@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Url;
 use Drupal\jsonapi\CacheableResourceResponse;
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\jsonapi\Normalizer\HttpExceptionNormalizer;
 use Psr\Http\Message\ResponseInterface;
 
@@ -79,10 +80,10 @@ trait ResourceResponseTestTrait {
     $merged_document['jsonapi'] = [
       'meta' => [
         'links' => [
-          'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+          'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
         ],
       ],
-      'version' => '1.0',
+      'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
     ];
     // Until we can reasonably know what caused an error, we shouldn't include
     // 'self' links in error documents. For example, a 404 shouldn't have a
@@ -123,7 +124,7 @@ trait ResourceResponseTestTrait {
    */
   protected function getExpectedIncludedResourceResponse(array $include_paths, array $request_options) {
     $resource_type = $this->resourceType;
-    $resource_data = array_reduce($include_paths, function ($data, $path) use ($request_options, $resource_type) {
+    $resource_data = array_reduce($include_paths, function (array $data, $path) use ($request_options, $resource_type): array {
       $field_names = explode('.', $path);
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       $entity = $this->entity;
@@ -218,7 +219,7 @@ trait ResourceResponseTestTrait {
    * @return \Drupal\jsonapi\ResourceResponse[]
    *   The ResourceResponses.
    */
-  protected static function toResourceResponses(array $responses) {
+  protected static function toResourceResponses(array $responses): array {
     return array_map([self::class, 'toResourceResponse'], $responses);
   }
 
@@ -244,7 +245,7 @@ trait ResourceResponseTestTrait {
       $cacheability->addCacheContexts(explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]));
     }
     if ($dynamic_cache = $response->getHeader('X-Drupal-Dynamic-Cache')) {
-      $cacheability->setCacheMaxAge(($dynamic_cache[0] === 'UNCACHEABLE' && $response->getStatusCode() < 400) ? 0 : Cache::PERMANENT);
+      $cacheability->setCacheMaxAge((str_contains($dynamic_cache[0], 'UNCACHEABLE') && $response->getStatusCode() < 400) ? 0 : Cache::PERMANENT);
     }
     $related_document = Json::decode($response->getBody());
     $resource_response = new CacheableResourceResponse($related_document, $response->getStatusCode());
@@ -260,7 +261,7 @@ trait ResourceResponseTestTrait {
    * @return array
    *   A resource identifier for the given entity.
    */
-  protected static function toResourceIdentifier(EntityInterface $entity) {
+  protected static function toResourceIdentifier(EntityInterface $entity): array {
     return [
       'type' => $entity->getEntityTypeId() . '--' . $entity->bundle(),
       'id' => $entity->uuid(),
@@ -276,7 +277,7 @@ trait ResourceResponseTestTrait {
    * @return bool
    *   TRUE if the array has a type and ID, FALSE otherwise.
    */
-  protected static function isResourceIdentifier(array $data) {
+  protected static function isResourceIdentifier(array $data): bool {
     return array_key_exists('type', $data) && array_key_exists('id', $data);
   }
 
@@ -290,7 +291,7 @@ trait ResourceResponseTestTrait {
    *   The resource or resource identifier.
    */
   protected static function sortResourceCollection(array &$resources) {
-    usort($resources, function ($a, $b) {
+    usort($resources, function (array $a, array $b): int {
       return strcmp("{$a['type']}:{$a['id']}", "{$b['type']}:{$b['id']}");
     });
   }
@@ -306,7 +307,7 @@ trait ResourceResponseTestTrait {
    * @return bool
    *   TRUE if the needle exists is present in the haystack, FALSE otherwise.
    */
-  protected static function collectionHasResourceIdentifier(array $needle, array $haystack) {
+  protected static function collectionHasResourceIdentifier(array $needle, array $haystack): bool {
     foreach ($haystack as $resource) {
       if ($resource['type'] == $needle['type'] && $resource['id'] == $needle['id']) {
         return TRUE;
@@ -326,9 +327,9 @@ trait ResourceResponseTestTrait {
    * @return array
    *   An array of link paths, keyed by relationship field name.
    */
-  protected static function getLinkPaths(array $relationship_field_names, $type) {
+  protected static function getLinkPaths(array $relationship_field_names, $type): mixed {
     assert($type === 'relationship' || $type === 'related');
-    return array_reduce($relationship_field_names, function ($link_paths, $relationship_field_name) use ($type) {
+    return array_reduce($relationship_field_names, function (array $link_paths, $relationship_field_name) use ($type): array {
       $tail = $type === 'relationship' ? 'self' : $type;
       $link_paths[$relationship_field_name] = "data.relationships.$relationship_field_name.links.$tail.href";
       return $link_paths;
@@ -346,7 +347,7 @@ trait ResourceResponseTestTrait {
    * @return array
    *   The extracted links, keyed by the original associated key name.
    */
-  protected static function extractLinks(array $link_paths, array $document) {
+  protected static function extractLinks(array $link_paths, array $document): array {
     return array_map(function ($link_path) use ($document) {
       $link = array_reduce(
         explode('.', $link_path),
@@ -366,7 +367,7 @@ trait ResourceResponseTestTrait {
    * @return string[]
    *   The resource links.
    */
-  protected static function getResourceLinks(array $resource_identifiers) {
+  protected static function getResourceLinks(array $resource_identifiers): array {
     return array_map([static::class, 'getResourceLink'], $resource_identifiers);
   }
 
@@ -398,7 +399,7 @@ trait ResourceResponseTestTrait {
    * @return string
    *   The relationship link.
    */
-  protected static function getRelationshipLink(array $resource_identifier, $relationship_field_name) {
+  protected static function getRelationshipLink(array $resource_identifier, $relationship_field_name): string {
     return static::getResourceLink($resource_identifier) . "/relationships/$relationship_field_name";
   }
 
@@ -413,7 +414,7 @@ trait ResourceResponseTestTrait {
    * @return string
    *   The related resource link.
    */
-  protected static function getRelatedLink(array $resource_identifier, $relationship_field_name) {
+  protected static function getRelatedLink(array $resource_identifier, $relationship_field_name): string {
     return static::getResourceLink($resource_identifier) . "/$relationship_field_name";
   }
 
@@ -432,9 +433,9 @@ trait ResourceResponseTestTrait {
    *
    * @see \GuzzleHttp\ClientInterface::request()
    */
-  protected function getRelatedResponses(array $relationship_field_names, array $request_options, EntityInterface $entity = NULL) {
+  protected function getRelatedResponses(array $relationship_field_names, array $request_options, ?EntityInterface $entity = NULL) {
     $entity = $entity ?: $this->entity;
-    $links = array_map(function ($relationship_field_name) use ($entity) {
+    $links = array_map(function ($relationship_field_name) use ($entity): string {
       return static::getRelatedLink(static::toResourceIdentifier($entity), $relationship_field_name);
     }, array_combine($relationship_field_names, $relationship_field_names));
     return $this->getResponses($links, $request_options);
@@ -454,7 +455,7 @@ trait ResourceResponseTestTrait {
    * @see \GuzzleHttp\ClientInterface::request()
    */
   protected function getRelationshipResponses(array $relationship_field_names, array $request_options) {
-    $links = array_map(function ($relationship_field_name) {
+    $links = array_map(function ($relationship_field_name): string {
       return static::getRelationshipLink(static::toResourceIdentifier($this->entity), $relationship_field_name);
     }, array_combine($relationship_field_names, $relationship_field_names));
     return $this->getResponses($links, $request_options);
@@ -473,8 +474,8 @@ trait ResourceResponseTestTrait {
    *
    * @see \GuzzleHttp\ClientInterface::request()
    */
-  protected function getResponses(array $links, array $request_options) {
-    return array_reduce(array_keys($links), function ($related_responses, $key) use ($links, $request_options) {
+  protected function getResponses(array $links, array $request_options): mixed {
+    return array_reduce(array_keys($links), function (array $related_responses, int|string $key) use ($links, $request_options): array {
       $related_responses[$key] = $this->request('GET', Url::fromUri($links[$key]), $request_options);
       return $related_responses;
     }, []);
@@ -494,7 +495,7 @@ trait ResourceResponseTestTrait {
    *   for testing related/relationship routes and includes.
    * @param string|null $detail
    *   (optional) Details for the JSON:API error object.
-   * @param string|bool|null $pointer
+   * @param string|false|null $pointer
    *   (optional) Document pointer for the JSON:API error object. FALSE to omit
    *   the pointer.
    *
@@ -525,7 +526,9 @@ trait ResourceResponseTestTrait {
       'jsonapi' => static::$jsonApiMember,
       'errors' => [$error],
     ], 403))
-      ->addCacheableDependency((new CacheableMetadata())->addCacheTags(['4xx-response', 'http_response'])->addCacheContexts(['url.site']))
+      ->addCacheableDependency((new CacheableMetadata())
+        ->addCacheTags(['4xx-response', 'http_response'])
+        ->addCacheContexts(['url.query_args', 'url.site']))
       ->addCacheableDependency($access);
   }
 
@@ -545,8 +548,7 @@ trait ResourceResponseTestTrait {
     // If the entity type is revisionable, add a resource version cache context.
     $cache_contexts = Cache::mergeContexts([
       // Cache contexts for JSON:API URL query parameters.
-      'url.query_args:fields',
-      'url.query_args:include',
+      'url.query_args',
       // Drupal defaults.
       'url.site',
     ], $this->entity->getEntityType()->isRevisionable() ? ['url.query_args:resourceVersion'] : []);
@@ -586,7 +588,7 @@ trait ResourceResponseTestTrait {
    * @return array
    *   A new omitted object.
    */
-  protected static function errorsToOmittedObject(array $errors) {
+  protected static function errorsToOmittedObject(array $errors): array {
     $omitted = [
       'detail' => 'Some resources have been omitted because of insufficient authorization.',
       'links' => [
@@ -639,7 +641,7 @@ trait ResourceResponseTestTrait {
   protected static function sortOmittedLinks(array &$omitted) {
     $help = $omitted['links']['help'];
     $links = array_diff_key($omitted['links'], array_flip(['help']));
-    uasort($links, function ($a, $b) {
+    uasort($links, function (array $a, array $b): int {
       return strcmp($a['href'], $b['href']);
     });
     $omitted['links'] = ['help' => $help] + $links;

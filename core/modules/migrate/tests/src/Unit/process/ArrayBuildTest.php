@@ -6,11 +6,14 @@ namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\process\ArrayBuild;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\process\ArrayBuild
- * @group migrate
+ * Tests Drupal\migrate\Plugin\migrate\process\ArrayBuild.
  */
+#[CoversClass(ArrayBuild::class)]
+#[Group('migrate')]
 class ArrayBuildTest extends MigrateProcessTestCase {
 
   /**
@@ -28,7 +31,7 @@ class ArrayBuildTest extends MigrateProcessTestCase {
   /**
    * Tests successful transformation.
    */
-  public function testTransform() {
+  public function testTransform(): void {
     $source = [
       ['foo' => 'Foo', 'bar' => 'Bar'],
       ['foo' => 'foo bar', 'bar' => 'bar foo'],
@@ -44,44 +47,44 @@ class ArrayBuildTest extends MigrateProcessTestCase {
   /**
    * Tests non-existent key for the key configuration.
    */
-  public function testNonExistentKey() {
+  public function testNonExistentKey(): void {
     $source = [
       ['bar' => 'foo'],
     ];
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage("The key 'foo' does not exist");
+    $this->expectExceptionMessageIs("The key 'foo' does not exist");
     $this->plugin->transform($source, $this->migrateExecutable, $this->row, 'destination_property');
   }
 
   /**
    * Tests non-existent key for the value configuration.
    */
-  public function testNonExistentValue() {
+  public function testNonExistentValue(): void {
     $source = [
       ['foo' => 'bar'],
     ];
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage("The key 'bar' does not exist");
+    $this->expectExceptionMessageIs("The key 'bar' does not exist");
     $this->plugin->transform($source, $this->migrateExecutable, $this->row, 'destination_property');
   }
 
   /**
    * Tests one-dimensional array input.
    */
-  public function testOneDimensionalArrayInput() {
+  public function testOneDimensionalArrayInput(): void {
     $source = ['foo' => 'bar'];
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('The input should be an array of arrays');
+    $this->expectExceptionMessageIs('The input should be an array of arrays');
     $this->plugin->transform($source, $this->migrateExecutable, $this->row, 'destination_property');
   }
 
   /**
    * Tests string input.
    */
-  public function testStringInput() {
+  public function testStringInput(): void {
     $source = 'foo';
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('The input should be an array of arrays');
+    $this->expectExceptionMessageIs('The input should be an array of arrays');
     $this->plugin->transform($source, $this->migrateExecutable, $this->row, 'destination_property');
   }
 

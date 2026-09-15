@@ -50,9 +50,9 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
   /**
    * Static cache for the language negotiation order check.
    *
-   * @see \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationContentEntity::hasLowerLanguageNegotiationWeight()
-   *
    * @var bool
+   *
+   * @see \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationContentEntity::hasLowerLanguageNegotiationWeight()
    */
   protected $hasLowerLanguageNegotiationWeightResult;
 
@@ -91,21 +91,24 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
   /**
    * {@inheritdoc}
    */
-  public function getLangcode(Request $request = NULL) {
+  public function getLangcode(?Request $request = NULL) {
     if ($request === NULL || $this->languageManager === NULL) {
       return NULL;
     }
 
     $langcode = $request->query->get(static::QUERY_PARAMETER);
 
-    $language_enabled = array_key_exists($langcode, $this->languageManager->getLanguages());
-    return $language_enabled ? $langcode : NULL;
+    if ($langcode === NULL || !array_key_exists($langcode, $this->languageManager->getLanguages())) {
+      return NULL;
+    }
+
+    return $langcode;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function processOutbound($path, &$options = [], Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
+  public function processOutbound($path, &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL) {
     // If appropriate, process outbound to add a query parameter to the URL and
     // remove the language option, so that URL negotiator does not rewrite the
     // URL.

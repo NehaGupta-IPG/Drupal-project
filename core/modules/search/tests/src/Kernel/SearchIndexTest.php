@@ -5,25 +5,27 @@ declare(strict_types=1);
 namespace Drupal\Tests\search\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the service "search.index".
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class SearchIndexTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['search'];
 
   /**
    * Test that the service "search.index" is backend overridable.
    */
-  public function testSearchIndexServiceIsBackendOverridable() {
+  public function testSearchIndexServiceIsBackendOverridable(): void {
     $definition = $this->container->getDefinition('search.index');
     $this->assertTrue($definition->hasTag('backend_overridable'));
   }

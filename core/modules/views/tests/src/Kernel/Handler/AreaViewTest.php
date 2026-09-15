@@ -6,19 +6,20 @@ namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the view area handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\area\View
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AreaViewTest extends ViewsKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user'];
 
@@ -32,7 +33,7 @@ class AreaViewTest extends ViewsKernelTestBase {
   /**
    * Tests the view area handler.
    */
-  public function testViewArea() {
+  public function testViewArea(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_area_view');

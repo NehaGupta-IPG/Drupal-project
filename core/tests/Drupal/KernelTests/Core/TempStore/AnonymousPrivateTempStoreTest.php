@@ -5,20 +5,15 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\TempStore;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the PrivateTempStore for anonymous users.
- *
- * @group TempStore
  */
+#[Group('TempStore')]
+#[RunTestsInSeparateProcesses]
 class AnonymousPrivateTempStoreTest extends KernelTestBase {
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  protected static $modules = ['system'];
 
   /**
    * The private temp store.
@@ -38,7 +33,7 @@ class AnonymousPrivateTempStoreTest extends KernelTestBase {
   /**
    * Tests anonymous can get without a previous set.
    */
-  public function testAnonymousCanUsePrivateTempStoreGet() {
+  public function testAnonymousCanUsePrivateTempStoreGet(): void {
     $actual = $this->tempStore->get('foo');
     $this->assertNull($actual);
   }
@@ -46,7 +41,7 @@ class AnonymousPrivateTempStoreTest extends KernelTestBase {
   /**
    * Tests anonymous can use the PrivateTempStore.
    */
-  public function testAnonymousCanUsePrivateTempStoreSet() {
+  public function testAnonymousCanUsePrivateTempStoreSet(): void {
     $this->tempStore->set('foo', 'bar');
     $metadata1 = $this->tempStore->getMetadata('foo');
 

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional\Views;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests comment operations.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentOperationsTest extends CommentTestBase {
 
   /**
@@ -26,7 +29,7 @@ class CommentOperationsTest extends CommentTestBase {
   /**
    * Tests the operations field plugin.
    */
-  public function testCommentOperations() {
+  public function testCommentOperations(): void {
     $admin_account = $this->drupalCreateUser(['administer comments']);
     $this->drupalLogin($admin_account);
     $this->drupalGet('test-comment-operations');

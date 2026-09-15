@@ -5,19 +5,23 @@ declare(strict_types=1);
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Drupal\block_content\Entity\BlockContent;
-use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Core\Url;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Layout Builder UI.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderTest extends WebDriverTestBase {
 
+  use BlockContentCreationTrait;
   use ContextualLinkClickTrait;
   use LayoutBuilderSortTrait;
   use OffCanvasTestTrait;
@@ -27,6 +31,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'block_content',
+    'body_field',
     'field_ui',
     'layout_builder',
     'layout_test',
@@ -49,11 +54,9 @@ class LayoutBuilderTest extends WebDriverTestBase {
   /**
    * A string used to mark the current page.
    *
-   * @var string
-   *
    * @todo Remove in https://www.drupal.org/project/drupal/issues/2909782.
    */
-  private $pageReloadMarker;
+  private ?string $pageReloadMarker = NULL;
 
   /**
    * {@inheritdoc}
@@ -63,19 +66,18 @@ class LayoutBuilderTest extends WebDriverTestBase {
 
     $this->drupalPlaceBlock('local_tasks_block');
 
-    $bundle = BlockContentType::create([
+    $this->createBlockContentType([
       'id' => 'basic',
       'label' => 'Basic',
-    ]);
-    $bundle->save();
-    block_content_add_body_field($bundle->id());
+    ], TRUE);
+
     BlockContent::create([
       'info' => 'My content block',
       'type' => 'basic',
       'body' => [
         [
           'value' => 'This is the block content',
-          'format' => filter_default_format(),
+          'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
         ],
       ],
     ])->save();
@@ -101,7 +103,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
   /**
    * Tests the Layout Builder UI.
    */
-  public function testLayoutBuilderUi() {
+  public function testLayoutBuilderUi(): void {
     $layout_url = 'node/1/layout';
     $node_url = 'node/1';
 
@@ -114,7 +116,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
     $assert_session->pageTextNotContains('Powered by Drupal');
     $assert_session->linkNotExists('Layout');
 
-    $this->enableLayoutsForBundle('admin/structure/types/manage/bundle_with_section_field/display', TRUE);
+    $this->enableLayoutsForBundle('admin/structure/types/manage/bundle_with_section_field/display/default', TRUE);
 
     // The existing content is still shown until overridden.
     $this->drupalGet($node_url);
@@ -152,6 +154,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
 
     // Save the layout, and the new block is visible.
     $page->pressButton('Save layout');
+    $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
     $assert_session->addressEquals($node_url);
     $assert_session->pageTextContains('Powered by Drupal');
     $assert_session->pageTextContains('This is the label');
@@ -189,6 +192,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
 
     // Ensure the dragged block is still in the correct position after save.
     $page->pressButton('Save layout');
+    $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
     $assert_session->elementExists('css', '.layout__region--second .block-system-powered-by-block');
     $assert_session->elementTextContains('css', '.layout__region--second', 'Powered by Drupal');
 
@@ -224,6 +228,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
     $this->assertPageNotReloaded();
 
     $page->pressButton('Save layout');
+    $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
     $assert_session->elementExists('css', '.layout');
 
     // Test deriver-based blocks.
@@ -255,6 +260,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
     $this->assertPageNotReloaded();
 
     $page->pressButton('Save layout');
+    $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
 
     // Removing all sections results in no layout being used.
     $assert_session->addressEquals($node_url);
@@ -265,7 +271,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
   /**
    * Tests configurable layouts.
    */
-  public function testConfigurableLayoutSections() {
+  public function testConfigurableLayoutSections(): void {
     $layout_url = 'node/1/layout';
 
     \Drupal::entityTypeManager()
@@ -344,7 +350,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
   /**
    * Tests bypassing the off-canvas dialog.
    */
-  public function testLayoutNoDialog() {
+  public function testLayoutNoDialog(): void {
     $layout_url = 'node/1/layout';
 
     \Drupal::entityTypeManager()
@@ -407,7 +413,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
    *
    * @todo Remove this in https://www.drupal.org/project/drupal/issues/2918718.
    */
-  protected function clickContextualLink($selector, $link_locator, $force_visible = TRUE) {
+  protected function clickContextualLink($selector, string $link_locator, $force_visible = TRUE): void {
     /** @var \Drupal\FunctionalJavascriptTests\JSWebAssert $assert_session */
     $assert_session = $this->assertSession();
     /** @var \Behat\Mink\Element\DocumentElement $page */
@@ -450,7 +456,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
    * @param bool $allow_custom
    *   Whether to allow custom layouts.
    */
-  private function enableLayoutsForBundle($path, $allow_custom = FALSE) {
+  private function enableLayoutsForBundle(string $path, bool $allow_custom = FALSE): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->drupalGet($path);
@@ -470,7 +476,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
    * @param string $block_title
    *   The block title which will be the link text.
    */
-  private function openAddBlockForm($block_title) {
+  private function openAddBlockForm(string $block_title): void {
     $assert_session = $this->assertSession();
     $assert_session->linkExists('Add block');
     $this->clickLink('Add block');
@@ -503,7 +509,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
    *
    * @todo Remove in https://www.drupal.org/project/drupal/issues/2909782.
    */
-  private function markCurrentPage() {
+  private function markCurrentPage(): void {
     $this->pageReloadMarker = $this->randomMachineName();
     $this->getSession()->executeScript('document.body.appendChild(document.createTextNode("' . $this->pageReloadMarker . '"));');
   }

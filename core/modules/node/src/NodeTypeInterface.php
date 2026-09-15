@@ -45,18 +45,25 @@ interface NodeTypeInterface extends ConfigEntityInterface, RevisionableEntityBun
   /**
    * Gets the preview mode.
    *
-   * @return int
-   *   DRUPAL_DISABLED, DRUPAL_OPTIONAL or DRUPAL_REQUIRED.
+   * @param bool $returnAsInt
+   *   (deprecated) Whether to return an integer or enum value. The $returnAsInt
+   *   parameter is deprecated in drupal:11.3.0 and is removed from
+   *   drupal:13.0.0.
+   *
+   * @return \Drupal\node\NodePreviewMode|int
+   *   Returns the enum case if $returnAsInt is FALSE, otherwise returns the
+   *   integer equivalent.
    */
-  public function getPreviewMode();
+  public function getPreviewMode(bool $returnAsInt = TRUE);
 
   /**
    * Sets the preview mode.
    *
-   * @param int $preview_mode
-   *   DRUPAL_DISABLED, DRUPAL_OPTIONAL or DRUPAL_REQUIRED.
+   * @param \Drupal\node\NodePreviewMode|int $preview_mode
+   *   A NodePreviewMode case, or the integer equivalent. Passing an integer
+   *   is deprecated.
    */
-  public function setPreviewMode($preview_mode);
+  public function setPreviewMode(NodePreviewMode|int $preview_mode);
 
   /**
    * Gets the help information.

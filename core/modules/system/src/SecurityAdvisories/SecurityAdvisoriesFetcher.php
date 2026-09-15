@@ -8,14 +8,13 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
-use Drupal\Core\Site\Settings;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\Utility\ProjectInfo;
 use Drupal\Core\Extension\ExtensionVersion;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
-use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Defines a service to get security advisories.
@@ -35,13 +34,6 @@ final class SecurityAdvisoriesFetcher {
   protected $config;
 
   /**
-   * The HTTP client.
-   *
-   * @var \GuzzleHttp\Client
-   */
-  protected $httpClient;
-
-  /**
    * The expirable key/value store for the advisories JSON response.
    *
    * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
@@ -55,49 +47,22 @@ final class SecurityAdvisoriesFetcher {
    */
   protected $extensionLists = [];
 
-  /**
-   * The logger.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * Whether to fall back to HTTP if the HTTPS request fails.
-   *
-   * @var bool
-   */
-  protected $withHttpFallback;
-
-  /**
-   * Constructs a new SecurityAdvisoriesFetcher object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $key_value_factory
-   *   The expirable key/value factory.
-   * @param \GuzzleHttp\ClientInterface $client
-   *   The HTTP client.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_list
-   *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_list
-   *   The theme extension list.
-   * @param \Drupal\Core\Extension\ProfileExtensionList $profile_list
-   *   The profile extension list.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The settings instance.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, KeyValueExpirableFactoryInterface $key_value_factory, ClientInterface $client, ModuleExtensionList $module_list, ThemeExtensionList $theme_list, ProfileExtensionList $profile_list, LoggerInterface $logger, Settings $settings) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    #[Autowire(service: 'keyvalue.expirable')]
+    KeyValueExpirableFactoryInterface $key_value_factory,
+    protected ClientInterface $httpClient,
+    ModuleExtensionList $module_list,
+    ThemeExtensionList $theme_list,
+    ProfileExtensionList $profile_list,
+    #[Autowire(service: 'logger.channel.system')]
+    protected LoggerInterface $logger,
+  ) {
     $this->config = $config_factory->get('system.advisories');
     $this->keyValueExpirable = $key_value_factory->get('system');
-    $this->httpClient = $client;
     $this->extensionLists['module'] = $module_list;
     $this->extensionLists['theme'] = $theme_list;
     $this->extensionLists['profile'] = $profile_list;
-    $this->logger = $logger;
-    $this->withHttpFallback = $settings->get('update_fetch_with_http_fallback', FALSE);
   }
 
   /**
@@ -198,7 +163,7 @@ final class SecurityAdvisoriesFetcher {
           try {
             $insecure_project_version = ExtensionVersion::createFromVersionString($insecure_version);
           }
-          catch (\UnexpectedValueException $exception) {
+          catch (\UnexpectedValueException) {
             // An invalid version string should not halt the evaluation of valid
             // versions in $insecure_versions. Version numbers that start with
             // core prefix besides '8.x-' are allowed in $insecure_versions,
@@ -299,10 +264,7 @@ final class SecurityAdvisoriesFetcher {
   }
 
   /**
-   * Makes an HTTPS GET request, with a possible HTTP fallback.
-   *
-   * This method will fall back to HTTP if the HTTPS request fails and the site
-   * setting 'update_fetch_with_http_fallback' is set to TRUE.
+   * Makes an HTTPS GET request.
    *
    * @param int $timeout
    *   The timeout in seconds for the request.
@@ -312,20 +274,7 @@ final class SecurityAdvisoriesFetcher {
    */
   protected function doRequest(int $timeout): string {
     $options = [RequestOptions::TIMEOUT => $timeout];
-    if (!$this->withHttpFallback) {
-      // If not using an HTTP fallback just use HTTPS and do not catch any
-      // exceptions.
-      $response = $this->httpClient->get('https://updates.drupal.org/psa.json', $options);
-    }
-    else {
-      try {
-        $response = $this->httpClient->get('https://updates.drupal.org/psa.json', $options);
-      }
-      catch (ClientExceptionInterface $exception) {
-        Error::logException($this->logger, $exception);
-        $response = $this->httpClient->get('http://updates.drupal.org/psa.json', $options);
-      }
-    }
+    $response = $this->httpClient->get('https://updates.drupal.org/psa.json', $options);
     return (string) $response->getBody();
   }
 

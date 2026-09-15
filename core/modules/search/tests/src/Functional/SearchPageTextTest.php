@@ -6,18 +6,28 @@ namespace Drupal\Tests\search\Functional;
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the search help text and search page text.
- *
- * @group search
  */
+#[Group('search')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class SearchPageTextTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node', 'search'];
+  protected static $modules = [
+    'block',
+    'node',
+    'search',
+    'search_node',
+    'search_user',
+  ];
 
   /**
    * {@inheritdoc}
@@ -54,7 +64,7 @@ class SearchPageTextTest extends BrowserTestBase {
    *
    * This is a regression test for https://www.drupal.org/node/2338081
    */
-  public function testSearchLabelXSS() {
+  public function testSearchLabelXSS(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer search']));
 
     $keys['label'] = '<script>alert("Don\'t Panic");</script>';
@@ -69,7 +79,7 @@ class SearchPageTextTest extends BrowserTestBase {
   /**
    * Tests the failed search text, and various other text on the search page.
    */
-  public function testSearchText() {
+  public function testSearchText(): void {
     $this->drupalLogin($this->searchingUser);
     $this->drupalGet('search/node');
     $this->assertSession()->pageTextContains('Enter your keywords');

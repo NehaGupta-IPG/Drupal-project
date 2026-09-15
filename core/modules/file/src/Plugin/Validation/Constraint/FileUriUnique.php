@@ -4,7 +4,8 @@ namespace Drupal\file\Plugin\Validation\Constraint;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Constraint as SymfonyConstraint;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldConstraint;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldValueValidator;
 
 /**
  * Supports validating file URIs.
@@ -13,15 +14,23 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
   id: 'FileUriUnique',
   label: new TranslatableMarkup('File URI', [], ['context' => 'Validation'])
 )]
-class FileUriUnique extends SymfonyConstraint {
+class FileUriUnique extends UniqueFieldConstraint {
 
-  public $message = 'The file %value already exists. Enter a unique file URI.';
+  public function __construct(
+    bool $caseSensitive = TRUE,
+    $message = 'The file %value already exists. Enter a unique file URI.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($caseSensitive, $message, $groups, $payload);
+
+  }
 
   /**
    * {@inheritdoc}
    */
   public function validatedBy(): string {
-    return '\Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldValueValidator';
+    return UniqueFieldValueValidator::class;
   }
 
 }

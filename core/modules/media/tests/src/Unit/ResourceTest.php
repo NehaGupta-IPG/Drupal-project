@@ -6,17 +6,21 @@ namespace Drupal\Tests\media\Unit;
 
 use Drupal\media\OEmbed\Resource;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\media\OEmbed\Resource
- * @group media
+ * Tests Drupal\media\OEmbed\Resource.
  */
+#[CoversClass(Resource::class)]
+#[Group('media')]
 class ResourceTest extends UnitTestCase {
 
   /**
    * Test cases for ::testSetDimensions.
    */
-  public static function setDimensionsTestCases() {
+  public static function setDimensionsTestCases(): array {
     return [
       'Standard rich dimensions' => [
         'rich',
@@ -74,13 +78,13 @@ class ResourceTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::setDimensions
-   * @dataProvider setDimensionsTestCases
+   * Tests set dimensions.
    */
-  public function testSetDimensions($factory, $width, $height, $exception = NULL, $expected_width = NULL, $expected_height = NULL) {
+  #[DataProvider('setDimensionsTestCases')]
+  public function testSetDimensions(string $factory, int|string|null $width, int|string|null $height, ?string $exception = NULL, ?int $expected_width = NULL, ?int $expected_height = NULL): void {
     if ($exception) {
       $this->expectException(\InvalidArgumentException::class);
-      $this->expectExceptionMessage($exception);
+      $this->expectExceptionMessageIs($exception);
     }
     $resource = Resource::$factory('foo', $width, $height);
     $this->assertSame($expected_width ?: $width, $resource->getWidth());

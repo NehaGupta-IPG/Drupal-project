@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Module;
 
+use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\TestTools\Extension\SchemaInspector;
@@ -17,12 +17,15 @@ use Drupal\TestTools\Extension\SchemaInspector;
 abstract class ModuleTestBase extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system_test'];
 
+  /**
+   * The test user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
   protected $adminUser;
 
   /**
@@ -41,11 +44,11 @@ abstract class ModuleTestBase extends BrowserTestBase {
   /**
    * Assert that all tables defined in a module's hook_schema() exist.
    *
-   * @param $module
+   * @param string $module
    *   The name of the module.
    */
-  public function assertModuleTablesExist($module) {
-    $tables = array_keys(SchemaInspector::getTablesSpecification(\Drupal::moduleHandler(), $module));
+  public function assertModuleTablesExist(string $module): void {
+    $tables = SchemaInspector::getTableNames(\Drupal::moduleHandler(), $module);
     $tables_exist = TRUE;
     $schema = Database::getConnection()->schema();
     foreach ($tables as $table) {
@@ -59,11 +62,11 @@ abstract class ModuleTestBase extends BrowserTestBase {
   /**
    * Assert that none of the tables defined in a module's hook_schema() exist.
    *
-   * @param $module
+   * @param string $module
    *   The name of the module.
    */
-  public function assertModuleTablesDoNotExist($module) {
-    $tables = array_keys(SchemaInspector::getTablesSpecification(\Drupal::moduleHandler(), $module));
+  public function assertModuleTablesDoNotExist(string $module): void {
+    $tables = SchemaInspector::getTableNames(\Drupal::moduleHandler(), $module);
     $tables_exist = FALSE;
     $schema = Database::getConnection()->schema();
     foreach ($tables as $table) {
@@ -80,7 +83,7 @@ abstract class ModuleTestBase extends BrowserTestBase {
    * @param string $module
    *   The name of the module.
    */
-  public function assertModuleConfig($module) {
+  public function assertModuleConfig(string $module): void {
     $module_config_dir = $this->getModulePath($module) . '/' . InstallStorage::CONFIG_INSTALL_DIRECTORY;
     if (!is_dir($module_config_dir)) {
       return;
@@ -121,7 +124,7 @@ abstract class ModuleTestBase extends BrowserTestBase {
    * @param string $module
    *   The name of the module.
    */
-  public function assertNoModuleConfig($module) {
+  public function assertNoModuleConfig(string $module): void {
     $names = \Drupal::configFactory()->listAll($module . '.');
     $this->assertEmpty($names, "No configuration found for $module module.");
   }
@@ -129,12 +132,12 @@ abstract class ModuleTestBase extends BrowserTestBase {
   /**
    * Assert the list of modules are enabled or disabled.
    *
-   * @param $modules
+   * @param array $modules
    *   Module list to check.
-   * @param $enabled
+   * @param bool $enabled
    *   Expected module state.
    */
-  public function assertModules(array $modules, $enabled) {
+  public function assertModules(array $modules, $enabled): void {
     $this->rebuildContainer();
     foreach ($modules as $module) {
       if ($enabled) {
@@ -150,24 +153,24 @@ abstract class ModuleTestBase extends BrowserTestBase {
   /**
    * Verify a log entry was entered for a module's status change.
    *
-   * @param $type
+   * @param string $type
    *   The category to which this message belongs.
-   * @param $message
+   * @param string $message
    *   The message to store in the log. Keep $message translatable
    *   by not concatenating dynamic values into it! Variables in the
    *   message should be added by using placeholder strings alongside
    *   the variables argument to declare the value of the placeholders.
    *   See t() for documentation on how $message and $variables interact.
-   * @param $variables
+   * @param array $variables
    *   Array of variables to replace in the message on display or
    *   NULL if message is already translated or not possible to
    *   translate.
-   * @param $severity
+   * @param int $severity
    *   The severity of the message, as per RFC 3164.
-   * @param $link
+   * @param string $link
    *   A link to associate with the message.
    */
-  public function assertLogMessage($type, $message, $variables = [], $severity = RfcLogLevel::NOTICE, $link = '') {
+  public function assertLogMessage($type, $message, $variables = [], $severity = RfcLogLevel::NOTICE, $link = ''): void {
     $this->assertNotEmpty(Database::getConnection()->select('watchdog', 'w')
       ->condition('type', $type)
       ->condition('message', $message)

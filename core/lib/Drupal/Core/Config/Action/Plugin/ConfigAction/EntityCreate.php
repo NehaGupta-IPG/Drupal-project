@@ -33,7 +33,7 @@ final class EntityCreate implements ConfigActionPluginInterface, ContainerFactor
    */
   public function __construct(
     protected readonly ConfigManagerInterface $configManager,
-    protected readonly Exists $exists
+    protected readonly Exists $exists,
   ) {
   }
 
@@ -70,7 +70,9 @@ final class EntityCreate implements ConfigActionPluginInterface, ContainerFactor
     $id = substr($configName, strlen($entity_type->getConfigPrefix()) + 1);
     $entity_type_manager
       ->getStorage($entity_type->id())
-      ->create($value + ['id' => $id])
+      ->create($value + [
+        $entity_type->getKey('id') => $id,
+      ])
       ->save();
   }
 

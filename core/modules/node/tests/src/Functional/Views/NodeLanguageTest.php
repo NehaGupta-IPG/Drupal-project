@@ -7,18 +7,22 @@ namespace Drupal\Tests\node\Functional\Views;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore nodo nœud tercera
-
 /**
  * Tests node language fields, filters, and sorting.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeLanguageTest extends NodeTestBase {
+
+  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -60,6 +64,8 @@ class NodeLanguageTest extends NodeTestBase {
     ConfigurableLanguage::createFromLangcode('fr')->save();
     ConfigurableLanguage::createFromLangcode('es')->save();
 
+    $this->enablePromotedContentView();
+
     // Make the body field translatable. The title is already translatable by
     // definition.
     $field_storage = FieldStorageConfig::loadByName('node', 'body');
@@ -92,15 +98,25 @@ class NodeLanguageTest extends NodeTestBase {
       $node = $this->drupalCreateNode(['title' => $title, 'langcode' => 'es', 'type' => 'page', 'promote' => 1]);
       foreach (['en', 'fr'] as $langcode) {
         if (isset($this->nodeTitles[$langcode][$index])) {
-          $translation = $node->addTranslation($langcode, ['title' => $this->nodeTitles[$langcode][$index]]);
+          $translation = $node->addTranslation(
+            $langcode,
+            [
+              'title' => $this->nodeTitles[$langcode][$index],
+              'promote' => TRUE,
+            ]);
           $translation->body->value = $this->randomMachineName(32);
         }
       }
       $node->save();
     }
     // Create non-translatable nodes.
-    foreach ($this->nodeTitles[LanguageInterface::LANGCODE_NOT_SPECIFIED] as $index => $title) {
-      $node = $this->drupalCreateNode(['title' => $title, 'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED, 'type' => 'page', 'promote' => 1]);
+    foreach ($this->nodeTitles[LanguageInterface::LANGCODE_NOT_SPECIFIED] as $title) {
+      $node = $this->drupalCreateNode([
+        'title' => $title,
+        'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+        'type' => 'page',
+        'promote' => 1,
+      ]);
       $node->body->value = $this->randomMachineName(32);
       $node->save();
     }
@@ -115,7 +131,7 @@ class NodeLanguageTest extends NodeTestBase {
   /**
    * Tests translation language filter, field, and sort.
    */
-  public function testLanguages() {
+  public function testLanguages(): void {
     // Test the page with no arguments. It is filtered to Spanish and French.
     // The page shows node titles and languages.
     $this->drupalGet('test-language');
@@ -153,8 +169,6 @@ class NodeLanguageTest extends NodeTestBase {
 
     // Test the argument -- filter to just Spanish.
     $this->drupalGet('test-language/es');
-    // This time, test just the language field.
-    $message = 'Spanish argument page';
     $this->assertSession()->pageTextNotContains('English');
     $this->assertSession()->pageTextNotContains('French');
     $this->assertSession()->pageTextContains('Spanish');
@@ -162,7 +176,7 @@ class NodeLanguageTest extends NodeTestBase {
     // Test the front page view filter. Only node titles in the current language
     // should be displayed on the front page by default.
     foreach ($this->nodeTitles as $langcode => $titles) {
-      // The frontpage view does not display content without a language.
+      // The promoted content view does not display content without a language.
       if ($langcode == LanguageInterface::LANGCODE_NOT_SPECIFIED) {
         continue;
       }
@@ -204,7 +218,7 @@ class NodeLanguageTest extends NodeTestBase {
     // Override the config for the front page view, so that the language
     // filter is set to the site default language instead. This should just
     // show the English nodes, no matter what the content language is.
-    $config = $this->config('views.view.frontpage');
+    $config = $this->config('views.view.promoted_content');
     $config->set('display.default.display_options.filters.langcode.value', [PluginBase::VIEWS_QUERY_LANGUAGE_SITE_DEFAULT => PluginBase::VIEWS_QUERY_LANGUAGE_SITE_DEFAULT]);
     $config->save();
     foreach ($this->nodeTitles as $langcode => $titles) {
@@ -255,7 +269,7 @@ class NodeLanguageTest extends NodeTestBase {
   /**
    * Tests native name display in language field.
    */
-  public function testNativeLanguageField() {
+  public function testNativeLanguageField(): void {
     $this->assertLanguageNames();
 
     // Modify test view to display native language names and set translations.

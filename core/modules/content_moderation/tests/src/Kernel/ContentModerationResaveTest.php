@@ -7,12 +7,14 @@ namespace Drupal\Tests\content_moderation\Kernel;
 use Drupal\content_moderation\Entity\ContentModerationState;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Content Moderation with entities that get re-saved automatically.
- *
- * @group content_moderation
  */
+#[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ContentModerationResaveTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -46,13 +48,6 @@ class ContentModerationResaveTest extends KernelTestBase {
   protected $entityStorage;
 
   /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -70,13 +65,12 @@ class ContentModerationResaveTest extends KernelTestBase {
     $entity_type_manager = $this->container->get('entity_type.manager');
     $this->contentModerationStateStorage = $entity_type_manager->getStorage('content_moderation_state');
     $this->entityStorage = $entity_type_manager->getStorage($entity_type_id);
-    $this->state = $this->container->get('state');
   }
 
   /**
    * Tests that Content Moderation works with entities being resaved.
    */
-  public function testContentModerationResave() {
+  public function testContentModerationResave(): void {
     $entity = $this->entityStorage->create();
     $this->assertSame('draft', $entity->get('moderation_state')->value);
     $this->assertNull(\Drupal::state()->get('content_moderation_test_resave'));

@@ -2,33 +2,13 @@
 
 /**
  * @file
- * Install, update and uninstall functions for the standard installation profile.
+ * Install, update and uninstall hooks for the Standard profile.
  */
-
-use Drupal\shortcut\Entity\Shortcut;
 
 /**
  * Implements hook_install().
- *
- * Perform actions to set up the site for this profile.
- *
- * @see system_install()
  */
-function standard_install() {
-  // Populate the default shortcut set.
-  $shortcut = Shortcut::create([
-    'shortcut_set' => 'default',
-    'title' => t('Add content'),
-    'weight' => -20,
-    'link' => ['uri' => 'internal:/node/add'],
-  ]);
-  $shortcut->save();
-
-  $shortcut = Shortcut::create([
-    'shortcut_set' => 'default',
-    'title' => t('All content'),
-    'weight' => -19,
-    'link' => ['uri' => 'internal:/admin/content'],
-  ]);
-  $shortcut->save();
+function standard_install(): void {
+  // Mark fresh Standard installs so updated sites don't get the welcome page.
+  \Drupal::state()->set('standard.show_welcome', TRUE);
 }

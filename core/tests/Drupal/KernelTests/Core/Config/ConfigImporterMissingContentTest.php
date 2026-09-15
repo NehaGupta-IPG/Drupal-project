@@ -7,23 +7,23 @@ namespace Drupal\KernelTests\Core\Config;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Block\Plugin\Block\Broken;
-use Drupal\Core\Config\ConfigImporter;
+use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Log\LoggerInterface;
 
 /**
  * Tests importing configuration which has missing content dependencies.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerInterface {
   use BlockCreationTrait;
   use RfcLoggerTrait;
@@ -36,16 +36,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
   protected $logMessages = [];
 
   /**
-   * Config Importer object used for testing.
-   *
-   * @var \Drupal\Core\Config\ConfigImporter
-   */
-  protected $configImporter;
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -58,7 +49,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     $container->register('logger.ConfigImporterMissingContentTest', __CLASS__)->addTag('logger');
     $container->set('logger.ConfigImporterMissingContentTest', $this);
@@ -84,19 +75,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
       $this->container->get('config.storage.sync'),
       $this->container->get('config.storage')
     );
-    $this->configImporter = new ConfigImporter(
-      $storage_comparer->createChangelist(),
-      $this->container->get('event_dispatcher'),
-      $this->container->get('config.manager'),
-      $this->container->get('lock'),
-      $this->container->get('config.typed'),
-      $this->container->get('module_handler'),
-      $this->container->get('module_installer'),
-      $this->container->get('theme_handler'),
-      $this->container->get('string_translation'),
-      $this->container->get('extension.list.module'),
-      $this->container->get('extension.list.theme')
-    );
+    $this->configImporter = $this->container->get(ConfigImporterFactory::class)->get($storage_comparer->createChangelist());
   }
 
   /**
@@ -105,7 +84,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
    * @see \Drupal\Core\Config\ConfigImporter::processMissingContent()
    * @see \Drupal\config_import_test\EventSubscriber
    */
-  public function testMissingContent() {
+  public function testMissingContent(): void {
     \Drupal::state()->set('config_import_test.config_import_missing_content', TRUE);
 
     // Update a configuration entity in the sync directory to have a dependency
@@ -134,7 +113,15 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
     $this->assertEquals($entity_one->uuid(), \Drupal::state()->get('config_import_test.config_import_missing_content_one'), 'The missing content event is fired during configuration import.');
     $this->assertEquals($entity_two->uuid(), \Drupal::state()->get('config_import_test.config_import_missing_content_two'), 'The missing content event is fired during configuration import.');
     $original_dynamic_data = $storage->read($dynamic_name);
-    $this->assertEquals([$entity_one->getConfigDependencyName(), $entity_two->getConfigDependencyName(), $entity_three->getConfigDependencyName()], $original_dynamic_data['dependencies']['content'], 'The imported configuration entity has the missing content entity dependency.');
+    $this->assertEquals(
+      [
+        $entity_one->getConfigDependencyName(),
+        $entity_two->getConfigDependencyName(),
+        $entity_three->getConfigDependencyName(),
+      ],
+      $original_dynamic_data['dependencies']['content'],
+      'The imported configuration entity has the missing content entity dependency.'
+    );
   }
 
   /**
@@ -143,13 +130,16 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
    * @see \Drupal\Core\Config\ConfigImporter::processMissingContent()
    * @see \Drupal\config_import_test\EventSubscriber
    */
-  public function testMissingBlockContent() {
+  public function testMissingBlockContent(): void {
     $this->enableModules([
       'block',
       'block_content',
+      'field',
+      'text',
     ]);
     $this->container->get('theme_installer')->install(['stark']);
     $this->installEntitySchema('block_content');
+    $this->installConfig(['block_content']);
     // Create a block content type.
     $block_content_type = BlockContentType::create([
       'id' => 'test',
@@ -181,12 +171,12 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
     $this->logMessages = [];
     $config_importer = $this->configImporter();
     $config_importer->import();
-    $this->assertNotContains('The "block_content:6376f337-fcbf-4b28-b30e-ed5b6932e692" was not found', $this->logMessages);
+    $this->assertNotContains('The "block_content:6376f337-fcbf-4b28-b30e-ed5b6932e692" block plugin was not found', $this->logMessages);
 
     // Ensure the expected message is generated when creating an instance of the
     // block.
     $instance = $this->container->get('plugin.manager.block')->createInstance($plugin_id);
-    $this->assertContains('The "block_content:6376f337-fcbf-4b28-b30e-ed5b6932e692" was not found', $this->logMessages);
+    $this->assertContains('The "block_content:6376f337-fcbf-4b28-b30e-ed5b6932e692" block plugin was not found', $this->logMessages);
     $this->assertInstanceOf(Broken::class, $instance);
   }
 
@@ -194,7 +184,8 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
    * {@inheritdoc}
    */
   public function log($level, $message, array $context = []): void {
-    $this->logMessages[] = PlainTextOutput::renderFromHtml(new FormattableMarkup($message, $context));
+    $message_placeholders = \Drupal::service('logger.log_message_parser')->parseMessagePlaceholders($message, $context);
+    $this->logMessages[] = empty($message_placeholders) ? $message : strtr($message, $message_placeholders);
   }
 
 }

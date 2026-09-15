@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Utility;
 
-use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Utility\Error;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Utility\Error
- * @group Utility
+ * Tests Drupal\Core\Utility\Error.
  */
+#[CoversClass(Error::class)]
+#[Group('Utility')]
 class ErrorTest extends UnitTestCase {
 
   /**
@@ -20,9 +24,8 @@ class ErrorTest extends UnitTestCase {
    *   The test backtrace array.
    * @param array $expected
    *   The expected return array.
-   *
-   * @dataProvider providerTestGetLastCaller
    */
+  #[DataProvider('providerTestGetLastCaller')]
   public function testGetLastCaller(array $backtrace, array $expected): void {
     $this->assertSame($expected, Error::getLastCaller($backtrace));
   }
@@ -69,9 +72,8 @@ class ErrorTest extends UnitTestCase {
    *   The test backtrace array.
    * @param string $expected
    *   The expected backtrace as a string.
-   *
-   * @dataProvider providerTestFormatBacktrace
    */
+  #[DataProvider('providerTestFormatBacktrace')]
   public function testFormatBacktrace(array $backtrace, string $expected): void {
     $this->assertSame($expected, Error::formatBacktrace($backtrace));
   }
@@ -80,12 +82,13 @@ class ErrorTest extends UnitTestCase {
    * Data provider for testFormatBacktrace.
    *
    * @return array
+   *   An array of test cases, each containing a backtrace array and its expected formatted string.
    */
   public static function providerTestFormatBacktrace(): array {
     $data = [];
 
     // Test with no function, main should be in the backtrace.
-    $data[] = [[self::createBacktraceItem(NULL, NULL)], "main() (Line: 10)\n"];
+    $data[] = [[self::createBacktraceItem(NULL)], "main() (Line: 10)\n"];
 
     $base = [self::createBacktraceItem()];
     $data[] = [$base, "test_function() (Line: 10)\n"];

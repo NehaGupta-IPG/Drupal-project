@@ -467,6 +467,9 @@
  *   - data: Contains data that can vary by path or similar context.
  *   - discovery: Contains cached discovery data for things such as plugins,
  *     views_data, or YAML discovered data such as library info.
+ *   - memory: An in-memory cache bin, also called static cache. Useful
+ *     alternative to properties when cache invalidation is needed, for example
+ *     through cache tags.
  *
  * A module can define a cache bin by defining a service in its
  * modulename.services.yml file as follows (substituting the desired name for
@@ -479,6 +482,15 @@
  *   factory: ['@cache_factory', 'get']
  *   arguments: [name_of_bin]
  * @endcode
+ *
+ * The tag can also include a default backend, which is useful for example
+ * when defining in-memory (which uses a separate tag) or fast chained bin.
+ *
+ * @code
+ * - { name: cache.bin, default_backend: cache.backend.chainedfast }
+ * - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
+ * @endcode
+ *
  * See the @link container Services topic @endlink for more on defining
  * services.
  *
@@ -487,7 +499,7 @@
  * There are two ways to remove an item from the cache:
  * - Deletion (using delete(), deleteMultiple() or deleteAll()) permanently
  *   removes the item from the cache.
- * - Invalidation (using invalidate(), invalidateMultiple() or invalidateAll())
+ * - Invalidation (using invalidate() or invalidateMultiple())
  *   is a "soft" delete that only marks items as "invalid", meaning "not fresh"
  *   or "not fresh enough". Invalid items are not usually returned from the
  *   cache, so in most ways they behave as if they have been deleted. However,
@@ -537,21 +549,21 @@
  * Example:
  * @code
  * // A cache item with nodes, users, and some custom module data.
- * $tags = array(
+ * $tags = [
  *   'my_custom_tag',
  *   'node:1',
  *   'node:3',
  *   'user:7',
- * );
+ * ];
  * \Drupal::cache()->set($cid, $data, CacheBackendInterface::CACHE_PERMANENT, $tags);
  *
  * // Invalidate all cache items with certain tags.
- * \Drupal\Core\Cache\Cache::invalidateTags(array('user:1'));
+ * \Drupal\Core\Cache\Cache::invalidateTags(['user:1']);
  * @endcode
  *
  * Drupal is a content management system, so naturally you want changes to your
  * content to be reflected everywhere, immediately. That's why we made sure that
- * every entity type in Drupal 8 automatically has support for cache tags: when
+ * every entity type in Drupal automatically has support for cache tags: when
  * you save an entity, you can be sure that the cache items that have the
  * corresponding cache tags will be invalidated.
  * This also is the case when you define your own entity types: you'll get the
@@ -559,8 +571,8 @@
  * the ability to override any of the default behavior if needed.
  * See \Drupal\Core\Cache\CacheableDependencyInterface::getCacheTags(),
  * \Drupal\Core\Entity\EntityTypeInterface::getListCacheTags(),
- * \Drupal\Core\Entity\Entity::invalidateTagsOnSave() and
- * \Drupal\Core\Entity\Entity::invalidateTagsOnDelete().
+ * \Drupal\Core\Entity\EntityBase::invalidateTagsOnSave() and
+ * \Drupal\Core\Entity\EntityBase::invalidateTagsOnDelete().
  *
  * @section context Cache contexts
  *
@@ -764,7 +776,7 @@
  * @code
  * path_alias.manager:
  *   class: Drupal\path_alias\AliasManager
- *   arguments: ['@path_alias.repository', '@path_alias.whitelist', '@language_manager']
+ *   arguments: ['@path_alias.repository', '@path_alias.prefix_list', '@language_manager']
  * @endcode
  * Some services use other services as factories; a typical service definition
  * is:
@@ -1138,15 +1150,13 @@
  *     subdirectory)
  *
  * Some notes about writing PHP test classes:
- * - The class needs a phpDoc comment block with a description and
- *   @group annotation, which gives information about the test.
- * - For unit tests, this comment block should also have @coversDefaultClass
- *   annotation.
+ * - The class needs a phpDoc comment block with a description of the test, and
+ *   a #[Group(...)] attribute, which gives information about the test.
+ * - For unit tests, this comment block should also have a #[CoversClass(...)]
+ *   attribute.
  * - When writing tests, put the test code into public methods, each covering a
  *   logical subset of the functionality that is being tested.
- * - The test methods must have names starting with 'test'. For unit tests, the
- *   test methods need to have a phpDoc block with @covers annotation telling
- *   which class method they are testing.
+ * - The test methods must have names starting with 'test'.
  * - In some cases, you may need to write a test module to support your test;
  *   put such modules under the your_module/tests/modules directory.
  *
@@ -1251,7 +1261,8 @@
  *   https://www.drupal.org/docs/theming-drupal
  * - Modules: Modules add to or alter the behavior and functionality of Drupal,
  *   by using one or more of the methods listed below. For more information
- *   about creating modules, see https://www.drupal.org/docs/creating-custom-modules
+ *   about creating modules, see
+ *   https://www.drupal.org/docs/creating-custom-modules
  * - Installation profiles: Installation profiles can be used to
  *   create distributions, which are complete specific-purpose packages of
  *   Drupal including additional modules, themes, and data. For more
@@ -1307,7 +1318,7 @@
  * system (block types are plugins), the entity/field system (entity types,
  * field types, field formatters, and field widgets are plugins), the image
  * manipulation system (image effects and image toolkits are plugins), and the
- * search system (search page types are plugins).
+ * filter system (text format filters are plugins).
  *
  * Plugins are grouped into plugin types, each generally defined by an
  * interface. Each plugin type is managed by a plugin manager service, which
@@ -1337,7 +1348,7 @@
  * - @link field Various types of field-related plugins @endlink
  * - @link views_plugins Views plugins @endlink (has links to topics covering
  *   various specific types of Views plugins).
- * - @link search Search page plugins @endlink
+ * - @link filter Filter plugins @endlink
  *
  * @section sec_define Defining a new plugin type
  * To define a new plugin type:
@@ -1392,8 +1403,8 @@
  *
  * @subsection sub_manager Defining a plugin manager class and service
  * To define an annotation-based plugin manager:
- * - Choose a namespace subdirectory for your plugin. For example, search page
- *   plugins go in directory Plugin/Search under the module namespace.
+ * - Choose a namespace subdirectory for your plugin. For example, filter
+ *   plugins go in directory Plugin/Filter under the module namespace.
  * - Define an annotation class for your plugin type. This class should extend
  *   \Drupal\Component\Annotation\Plugin, and for most plugin types, it should
  *   contain member variables corresponding to the annotations plugins will
@@ -1596,7 +1607,7 @@
  * Define functions that alter the behavior of Drupal core.
  *
  * One way for modules to alter the core behavior of Drupal (or another module)
- * is to use hooks. Hooks are specially-named functions that a module defines
+ * is to use hooks. Hooks are functions or methods that a module defines
  * (this is known as "implementing the hook"), which are discovered and called
  * at specific times to alter or add to the base behavior or data (this is
  * known as "invoking the hook"). Each hook has a name (example:
@@ -1605,15 +1616,78 @@
  * modules that they interact with. Your modules can also define their own
  * hooks, in order to let other modules interact with them.
  *
- * To implement a hook:
- * - Locate the documentation for the hook. Hooks are documented in *.api.php
- *   files, by defining functions whose name starts with "hook_" (these
- *   files and their functions are never loaded by Drupal -- they exist solely
- *   for documentation). The function should have a documentation header, as
- *   well as a sample function body. For example, in the core file form.api.php,
- *   you can find hooks such as hook_batch_alter(). Also, if you are viewing
- *   this documentation on an API reference site, the Core hooks will be listed
- *   in this topic.
+ * Hook implementations will execute in the following order.
+ * order.
+ * - Module weight.
+ * - Alphabetical by module name.
+ * - This order can be modified by using the order parameter on the #[Hook]
+ *   attribute, using the #[ReorderHook] attribute.
+ *
+ * @section implementing Implementing a hook
+ *
+ * There are two ways to implement a hook:
+ * - Class method, by adding an attribute to a class or a method. This is the
+ *   preferred method.
+ * - Procedural, by defining a specially-named function. Some hooks can only be
+ *   implemented as procedural.
+ *
+ * In both cases, first locate the documentation for the hook. Hooks are
+ * documented in *.api.php files, by defining functions whose name starts with
+ * "hook_" (these files and their functions are never loaded by Drupal -- they
+ * exist solely for documentation). The function should have a documentation
+ * header, as well as a sample function body. For example, in the core file
+ * form.api.php, you can find hooks such as hook_batch_alter(). Also, if you are
+ * viewing this documentation on an API reference site, the Core hooks will be
+ * listed in this topic.
+ *
+ * @subsection oo-hooks Class method hook implementation
+ *
+ * Class method hooks use the attribute \Drupal\Core\Hook\Attribute\Hook to
+ * declare a method as being the hook implementation. The first parameter to the
+ * attribute is the short hook name, that is, with the 'hook_' prefix removed.
+ *
+ * The Hook attribute can be used in any of the following ways:
+ * - On a method, use the attribute with the hook name:
+ *   @code
+ *   #[Hook('user_cancel')]
+ *   public function userCancel(...) {}
+ *   @endcode
+ * - On a class, specify the method name as well as the hook name:
+ *   @code
+ *   #[Hook('user_cancel', method: 'userCancel')]
+ *   class Hooks {
+ *     public function userCancel(...) {}
+ *   }
+ *   @endcode
+ * - On a class with an __invoke method, which is taken to be the hook
+ *   implementation:
+ *   @code
+ *   #[Hook('user_cancel')]
+ *   class Hooks {
+ *     public function __invoke(...) {}
+ *   }
+ *   @endcode
+ *
+ * The following hooks can not be implemented as a class method, and must be
+ * implemented as procedural:
+ *
+ * Install hooks:
+ * - hook_install()
+ * - hook_install_tasks()
+ * - hook_install_tasks_alter()
+ * - hook_post_update_NAME()
+ * - hook_removed_post_updates()
+ * - hook_schema()
+ * - hook_uninstall()
+ * - hook_update_dependencies()
+ * - hook_update_last_removed()
+ * - hook_update_N()
+ *
+ * Hooks implemented by themes must remain procedural.
+ *
+ * @subsection procedural-hooks Procedural hook implementation
+ *
+ * Procedural implementation should use the following technique:
  * - Copy the function to your module's .module file.
  * - Change the name of the function, substituting your module's short name
  *   (name of the module's directory, and .info.yml file without the extension)
@@ -1624,6 +1698,8 @@
  * - Edit the body of the function, substituting in what you need your module
  *   to do.
  *
+ * @section defining Defining a hook
+ *
  * To define a hook:
  * - Choose a unique name for your hook. It should start with "hook_", followed
  *   by your module's short name.
@@ -1631,6 +1707,8 @@
  *   directory. See the "implementing" section above for details of what this
  *   should contain (parameters, return value, and sample function body).
  * - Invoke the hook in your module's code.
+ *
+ * @section invoking Invoking a hook
  *
  * To invoke a hook, use methods on
  * \Drupal\Core\Extension\ModuleHandlerInterface such as alter(), invoke(),
@@ -1642,8 +1720,93 @@
  * @see themeable
  * @see callbacks
  * @see \Drupal\Core\Extension\ModuleHandlerInterface
+ * @see \Drupal\Core\Hook\Attribute\Hook
  * @see \Drupal::moduleHandler()
  *
+ * @section ordering_hooks Ordering hook implementations
+ *
+ * The order in which hook implementations are executed can be modified. A hook
+ * can be placed first or last in the order of execution. It can also be placed
+ * before or after the execution of another module's implementation of the same
+ * hook. When changing the order of execution in relation to a specific module
+ * either the module name or the class and method can be used.
+ *
+ * Use the order argument of the Hook attribute to order the execution of
+ * hooks.
+ *
+ * Example of executing 'entity_type_alter' of my_module first:
+ * @code
+ * #[Hook('entity_type_alter', order: Order::First)]
+ * @endcode
+ *
+ * Example of executing 'entity_type_alter' of my_module last:
+ * @code
+ * #[Hook('entity_type_alter', order: Order::Last)]
+ * @endcode
+ *
+ * Example of executing 'entity_type_alter' before the execution of the
+ * implementation in the foo module:
+ * @code
+ * #[Hook('entity_type_alter', order: new OrderBefore(['foo']))]
+ * @endcode
+ *
+ * Example of executing 'entity_type_alter' after the execution of the
+ * implementation in the foo module:
+ * @code
+ * #[Hook('entity_type_alter', order: new OrderAfter(['foo']))]
+ * @endcode
+ *
+ * Example of executing 'entity_type_alter' before two methods. One in the Foo
+ * class and one in the Bar class.
+ * @code
+ * #[Hook('entity_type_alter',
+ *   order: new OrderBefore(
+ *     classesAndMethods: [
+ *       [Foo::class, 'someMethod'],
+ *       [Bar::class, 'someOtherMethod'],
+ *     ]
+ *   )
+ * )]
+ * @endcode
+ *
+ * @see \Drupal\Core\Hook\Attribute\Hook
+ * @see \Drupal\Core\Hook\Order\Order
+ * @see \Drupal\Core\Hook\Order\OrderBefore
+ * @see \Drupal\Core\Hook\Order\OrderAfter
+ *
+ * @section ordering_other_module_hooks Ordering other module hook implementations
+ *
+ * The order in which hooks implemented in other modules are executed can be
+ * reordered. The reordering of the targeted hook is done relative to other
+ * implementations. The reordering process executes after the ordering defined
+ * in the Hook attribute.
+ *
+ * Example of reordering the execution of the 'entity_presave' hook so that
+ * Content Moderation module hook executes before the Workspaces module hook.
+ * @code
+ * #[ReorderHook('entity_presave',
+ *   class: ContentModerationHooks::class,
+ *   method: 'entityPresave',
+ *   order: new OrderBefore(['workspaces'])
+ * )]
+ * @endcode
+ *
+ * @see \Drupal\Core\Hook\Attribute\ReorderHook
+ *
+ * @section removing_hooks Removing hook implementations
+ *
+ * The execution of a hooks implemented by other modules can be skipped. This
+ * is done by removing the targeted hook, use the RemoveHook attribute.
+ *
+ * Example of removing the 'help' hook of the Layout Builder module.
+ * @code
+ * #[RemoveHook('help',
+ *   class: LayoutBuilderHooks::class,
+ *   method: 'help'
+ * )]
+ * @endcode
+ *
+ * @see \Drupal\Core\Hook\Attribute\RemoveHook
  * @}
  */
 
@@ -1712,14 +1875,14 @@
  *
  *   public function buildForm(array $form, FormStateInterface $form_state) {
  *     // Create a $form API array.
- *     $form['phone_number'] = array(
+ *     $form['phone_number'] = [
  *       '#type' => 'tel',
  *       '#title' => $this->t('Your phone number'),
- *     );
- *     $form['save'] = array(
+ *     ];
+ *     $form['save'] = [
  *       '#type' => 'submit',
  *       '#value' => $this->t('Save'),
- *     );
+ *     ];
  *     return $form;
  *   }
  *
@@ -1753,11 +1916,11 @@
  * $form = \Drupal::formBuilder()->getForm('Drupal\my_module\Form\ExampleForm', $extra);
  * ...
  * public function buildForm(array $form, FormStateInterface $form_state, $extra = NULL)
- *   $form['phone_number'] = array(
+ *   $form['phone_number'] = [
  *     '#type' => 'tel',
  *     '#title' => $this->t('Your phone number'),
  *     '#value' => $extra,
- *   );
+ *   ];
  *   return $form;
  * }
  * @endcode
@@ -1988,7 +2151,7 @@ function hook_queue_info_alter(&$queues) {
 }
 
 /**
- * Alter the information provided in \Drupal\Core\Condition\ConditionManager::getDefinitions().
+ * Alter the information provided in ConditionManager::getDefinitions().
  *
  * @param array $definitions
  *   The array of condition definitions.
@@ -2014,7 +2177,7 @@ function hook_condition_info_alter(array &$definitions) {
  * this hook. All core modules use MailManagerInterface->mail() for messaging,
  * it is best practice but not mandatory in contributed modules.
  *
- * @param $message
+ * @param array $message
  *   An array containing the message data. Keys in this array include:
  *   - 'id':
  *     The MailManagerInterface->mail() id of the message. Look at module source
@@ -2066,9 +2229,9 @@ function hook_mail_alter(&$message) {
  * unlike hook_mail_alter(), is only called on the $module argument to
  * MailManagerInterface->mail(), not all modules.
  *
- * @param $key
+ * @param string $key
  *   An identifier of the mail.
- * @param $message
+ * @param array $message
  *   An array to be filled in. Elements in this array include:
  *   - id: An ID to identify the mail sent. Look at module source code or
  *     MailManagerInterface->mail() for possible id values.
@@ -2089,13 +2252,13 @@ function hook_mail_alter(&$message) {
  *   - headers: Associative array containing mail headers, such as From,
  *     Sender, MIME-Version, Content-Type, etc.
  *     MailManagerInterface->mail() pre-fills several headers in this array.
- * @param $params
+ * @param array $params
  *   An array of parameters supplied by the caller of
  *   MailManagerInterface->mail().
  *
  * @see \Drupal\Core\Mail\MailManagerInterface::mail()
  */
-function hook_mail($key, &$message, $params) {
+function hook_mail($key, &$message, $params): void {
   $account = $params['account'];
   $context = $params['context'];
   $variables = [
@@ -2122,7 +2285,7 @@ function hook_mail($key, &$message, $params) {
     $variables += [
       '%uid' => $node->getOwnerId(),
       '%url' => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
-      '%node_type' => node_get_type_label($node),
+      '%node_type' => $node->getBundleEntity()->label(),
       '%title' => $node->getTitle(),
       '%teaser' => $node->teaser,
       '%body' => $node->body,
@@ -2150,7 +2313,7 @@ function hook_mail_backend_info_alter(&$info) {
 /**
  * Alter the default country list.
  *
- * @param $countries
+ * @param string[][] $countries
  *   The associative array of countries keyed by two-letter country code.
  *
  * @see \Drupal\Core\Locale\CountryManager::getList()
@@ -2204,7 +2367,7 @@ function hook_layout_alter(&$definitions) {
  * @see drupal_flush_all_caches()
  * @see hook_rebuild()
  */
-function hook_cache_flush() {
+function hook_cache_flush(): void {
   if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'update') {
     _update_cache_clear();
   }
@@ -2225,7 +2388,7 @@ function hook_cache_flush() {
  * @see hook_cache_flush()
  * @see drupal_flush_all_caches()
  */
-function hook_rebuild() {
+function hook_rebuild(): void {
   $themes = \Drupal::service('theme_handler')->listInfo();
   foreach ($themes as $theme) {
     _block_rehash($theme->getName());
@@ -2275,7 +2438,7 @@ function hook_config_import_steps_alter(&$sync_steps, \Drupal\Core\Config\Config
  *
  * For adding new data types use configuration schema YAML files instead.
  *
- * @param $definitions
+ * @param array $definitions
  *   Associative array of configuration type definitions keyed by schema type
  *   names. The elements are themselves array with information about the type.
  *
@@ -2340,14 +2503,14 @@ function hook_validation_constraint_alter(array &$definitions) {
  * Ajax response. This is done in the text field form array element
  * in \Drupal\config_translation\FormElement\DateFormat::getFormElement():
  * @code
- * '#ajax' => array(
+ * '#ajax' => [
  *   'callback' => 'Drupal\config_translation\FormElement\DateFormat::ajaxSample',
  *   'event' => 'keyup',
- *   'progress' => array(
+ *   'progress' => [
  *     'type' => 'throbber',
  *     'message' => NULL,
- *   ),
- * ),
+ *   ],
+ * ],
  * @endcode
  *
  * As you can see from this example, the #ajax property for a form element is
@@ -2435,7 +2598,7 @@ function hook_validation_constraint_alter(array &$definitions) {
  * 'wrapper' method and return HTML markup. This is not the case if you return
  * commands, but if you would like to show status messages, you can add
  * @code
- * array('#type' => 'status_messages')
+ * ['#type' => 'status_messages']
  * @endcode
  * to a render array, use \Drupal::service('renderer')->render() to render it,
  * and add a command to place the messages in an appropriate location.
@@ -2521,8 +2684,8 @@ function hook_validation_constraint_alter(array &$definitions) {
  * Creating a tag for a service does not do anything on its own, but tags
  * can be discovered or queried in a compiler pass when the container is built,
  * and a corresponding action can be taken. See
- * \Drupal\Core\Render\MainContent\MainContentRenderersPass for an example of
- * finding tagged services.
+ * \Drupal\Core\DependencyInjection\Compiler\TaggedHandlersPass for an example
+ * of finding tagged services.
  *
  * See @link container Services and Dependency Injection Container @endlink for
  * information on services and the dependency injection container.
@@ -2549,11 +2712,11 @@ function hook_validation_constraint_alter(array &$definitions) {
  * Making the expensive service lazy means that the class is only dependent on
  * the proxy service, and not on all the dependencies of the lazy service.
  *
- * To define a service as lazy, add @code lazy: true @endcode to the service
- * definition, and use the @code core/scripts/generate-proxy.sh @endcode script
- * to generate the proxy class.
+ * To define a service as lazy, add "lazy: true" to the service definition, and
+ * use the "core/scripts/generate-proxy-class.php" script to generate the proxy
+ * class.
  *
- * @see core/scripts/generate-proxy.sh
+ * @see core/scripts/generate-proxy-class.php
  */
 
 /**
@@ -2596,9 +2759,9 @@ function hook_validation_constraint_alter(array &$definitions) {
  *   @code
  *   public static function getSubscribedEvents(): array {
  *     // Subscribe to kernel terminate with priority 100.
- *     $events[KernelEvents::TERMINATE][] = array('onTerminate', 100);
+ *     $events[KernelEvents::TERMINATE][] = ['onTerminate', 100];
  *     // Subscribe to kernel request with default priority of 0.
- *     $events[KernelEvents::REQUEST][] = array('onRequest');
+ *     $events[KernelEvents::REQUEST][] = ['onRequest'];
  *     return $events;
  *   }
  *   @endcode
@@ -2700,5 +2863,125 @@ function hook_validation_constraint_alter(array &$definitions) {
  * @endcode
  * Session data must be deleted from custom session bags as soon as it is no
  * longer needed (see @ref sec_intro above).
+ * @}
+ */
+
+/**
+ * @defgroup console_commands CLI Commands
+ * @{
+ * Providing CLI commands for the Drupal CLI.
+ *
+ * Drupal includes a CLI tool (invoked as `vendor/bin/dr`) built on the Symfony
+ * Console component. Modules can provide their own commands that are
+ * automatically discovered.
+ *
+ * @section sec_creating Creating a command
+ * To provide a command, place a class in your module's `src/Command/` directory
+ * and apply the `#[AsCommand]` attribute to declare the command name and
+ * description. Command names follow the convention `module:action`
+ * (e.g. `my_module:hello`).
+ *
+ * There are two types of commands:
+ *
+ * @subsection sec_command_class Extending Symfony's Command class
+ * One style extends `\Symfony\Component\Console\Command\Command` and implements
+ * `execute()`:
+ * @code
+ * use Drupal\Component\Datetime\TimeInterface;
+ * use Symfony\Component\Console\Attribute\AsCommand;
+ * use Symfony\Component\Console\Command\Command;
+ * use Symfony\Component\Console\Input\InputInterface;
+ * use Symfony\Component\Console\Output\OutputInterface;
+ * use Symfony\Component\Console\Style\SymfonyStyle;
+ *
+ * #[AsCommand(
+ *   name: 'my_module:hello',
+ *   description: 'Say hello.',
+ * )]
+ * class HelloCommand extends Command {
+ *
+ *   public function __construct(
+ *     private readonly TimeInterface $time,
+ *   ) {
+ *     parent::__construct();
+ *   }
+ *
+ *   protected function execute(InputInterface $input, OutputInterface $output): int {
+ *     $io = new SymfonyStyle($input, $output);
+ *     $now = new \DateTimeImmutable('@' . $this->time->getRequestTime());
+ *     $io->success('Hello! The time is ' . $now->format('r'));
+ *     return Command::SUCCESS;
+ *   }
+ *
+ * }
+ * @endcode
+ *
+ * @subsection sec_invokable_command Invokable command classes
+ * As an alternative, a plain class can define a single `__invoke()` method
+ * instead of extending `\Symfony\Component\Console\Command\Command`. Symfony
+ * Console attributes such as `#[Argument]`, `#[Option]`, and `#[Ask]` can be
+ * applied to individual parameters to declare arguments, options, and
+ * interactive prompts, removing the need for a `configure()` method. Drupal
+ * services can be injected via the constructor as normal.
+ * @code
+ * use Drupal\Component\Datetime\TimeInterface;
+ * use Symfony\Component\Console\Attribute\Argument;
+ * use Symfony\Component\Console\Attribute\Ask;
+ * use Symfony\Component\Console\Attribute\AsCommand;
+ * use Symfony\Component\Console\Attribute\Option;
+ * use Symfony\Component\Console\Output\OutputInterface;
+ *
+ * #[AsCommand(
+ *   name: 'my_module:greet',
+ *   description: 'Greet someone.',
+ * )]
+ * class GreetCommand {
+ *
+ *   public function __construct(
+ *     protected readonly TimeInterface $time,
+ *   ) {}
+ *
+ *   public function __invoke(
+ *     OutputInterface $output,
+ *     #[Argument('The name to greet.')]
+ *     #[Ask('Who should be greeted?', 'World')]
+ *     string $name,
+ *     #[Option('Shout the greeting.')]
+ *     bool $shout = FALSE,
+ *   ): int {
+ *     $now = new \DateTimeImmutable('@' . $this->time->getRequestTime());
+ *     $greeting = "[$now] Hello, $name!";
+ *     $output->writeln($shout ? strtoupper($greeting) : $greeting);
+ *     return Command::SUCCESS;
+ *   }
+ *
+ * }
+ * @endcode
+ *
+ * @section sec_discovery Auto-discovery and dependency injection
+ * `\Drupal\Core\DependencyInjection\Compiler\ConsoleCompilerPass` scans each
+ * installed module's `src/Command/` directory at container compile time. Any
+ * class carrying the `#[AsCommand]` attribute is automatically registered as an
+ * autowired service tagged `console.command` — no service YAML entry is
+ * needed. Constructor dependencies are resolved from the service container
+ * automatically.
+ *
+ * After Drupal bootstraps, `\Drupal\Core\Command\DrupalApplication` registers
+ * all tagged commands.
+ *
+ * @section sec_service_tag Registering via service tag
+ * Commands that do not use `#[AsCommand]` — for example, those that declare
+ * their name only via `configure()` — are not auto-discovered and must be
+ * registered explicitly as a service tagged `console.command` in a module's
+ * `*.services.yml` file:
+ * @code
+ * my_module.hello_command:
+ *   class: Drupal\my_module\Command\HelloCommand
+ *   tags:
+ *     - { name: console.command }
+ * @endcode
+ *
+ * @see \Drupal\Core\Command\DrupalApplication
+ * @see \Drupal\Core\DependencyInjection\Compiler\ConsoleCompilerPass
  * @}
  */

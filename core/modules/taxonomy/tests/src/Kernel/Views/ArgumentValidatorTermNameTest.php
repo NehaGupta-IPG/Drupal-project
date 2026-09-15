@@ -6,12 +6,14 @@ namespace Drupal\Tests\taxonomy\Kernel\Views;
 
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the plugin of the taxonomy: taxonomy_term_name argument validator.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class ArgumentValidatorTermNameTest extends TaxonomyTestBase {
 
   /**
@@ -29,13 +31,6 @@ class ArgumentValidatorTermNameTest extends TaxonomyTestBase {
   protected $names = [];
 
   /**
-   * Stores the taxonomy IDs used by this test.
-   *
-   * @var array
-   */
-  protected $ids = [];
-
-  /**
    * {@inheritdoc}
    */
   public static $testViews = ['test_taxonomy_name_argument'];
@@ -50,7 +45,6 @@ class ArgumentValidatorTermNameTest extends TaxonomyTestBase {
     for ($i = 0; $i < 3; $i++) {
       $this->terms[] = $term = $this->createTerm();
       $this->names[] = $term->label();
-      $this->ids[] = $term->id();
     }
 
     // Create a second vocabulary.
@@ -66,7 +60,6 @@ class ArgumentValidatorTermNameTest extends TaxonomyTestBase {
     ]);
     $this->terms[] = $duplicate;
     $this->names[] = $duplicate->label();
-    $this->ids[] = $duplicate->id();
 
     // Add uniquely named term in second vocab as well.
     $unique = $this->createTerm([
@@ -74,13 +67,12 @@ class ArgumentValidatorTermNameTest extends TaxonomyTestBase {
     ]);
     $this->terms[] = $unique;
     $this->names[] = $unique->label();
-    $this->ids[] = $unique->id();
   }
 
   /**
    * Tests the term name argument validator plugin.
    */
-  public function testArgumentValidatorTermName() {
+  public function testArgumentValidatorTermName(): void {
     $view = Views::getView('test_taxonomy_name_argument');
     $view->initHandlers();
 
@@ -150,7 +142,7 @@ class ArgumentValidatorTermNameTest extends TaxonomyTestBase {
   /**
    * Tests the access checking in term name argument validator plugin.
    */
-  public function testArgumentValidatorTermNameAccess() {
+  public function testArgumentValidatorTermNameAccess(): void {
     $this->installConfig(['user']);
     $this->setCurrentUser($this->createUser(['access content']));
     $view = Views::getView('test_taxonomy_name_argument');

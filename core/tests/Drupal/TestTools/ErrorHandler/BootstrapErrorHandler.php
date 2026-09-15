@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\ErrorHandler;
 
+use Drupal\TestTools\Extension\DeprecationBridge\Configuration as DeprecationHandlerConfiguration;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\Event\Code\NoTestCaseObjectOnCallStackException;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
@@ -13,10 +14,8 @@ use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
  *
  * This code works in coordination with DeprecationHandler.
  *
- * This error handler is registered during PHPUnit's runner bootstrap, and is
- * essentially used to capture deprecations occurring before tests are run (for
- * example, deprecations triggered by the DebugClassloader). When test runs
- * are prepared, a test specific TestErrorHandler is activated instead.
+ * This error handler is registered during PHPUnit's runner bootstrap, and
+ * overrides PHPUnit's own error handler.
  *
  * @see \Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler
  *
@@ -26,8 +25,8 @@ final class BootstrapErrorHandler {
 
   /**
    * @param \PHPUnit\Runner\ErrorHandler $phpUnitErrorHandler
-   *   An instance of PHPUnit's runner own error handler. Any error not
-   *   managed here will fall back to it.
+   *   An instance of PHPUnit's runner own error handler, to which errors
+   *   will be relayed.
    */
   public function __construct(
     private readonly PhpUnitErrorHandler $phpUnitErrorHandler,
@@ -51,19 +50,11 @@ final class BootstrapErrorHandler {
    *   continue.
    */
   public function __invoke(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool {
-    if (!DeprecationHandler::isEnabled()) {
-      throw new \RuntimeException(__METHOD__ . '() must not be called if the deprecation handler is not enabled.');
-    }
+    assert(DeprecationHandlerConfiguration::instance()->projectIgnoresEnabled, __METHOD__ . '() must not be called if the deprecation handler is not enabled.');
 
-    // We collect a deprecation no matter what.
-    if (E_USER_DEPRECATED === $errorNumber || E_DEPRECATED === $errorNumber) {
-      $prefix = (error_reporting() & $errorNumber) ? 'Unsilenced deprecation: ' : '';
-      DeprecationHandler::collectActualDeprecation($prefix . $errorString);
-    }
-
-    // If the deprecation handled is one of those in the ignore list, we keep
-    // running.
-    if ((E_USER_DEPRECATED === $errorNumber || E_DEPRECATED === $errorNumber) && DeprecationHandler::isIgnoredDeprecation($errorString)) {
+    // Stop processing the deprecation if it is one of those in the ignore
+    // list.
+    if ((E_USER_DEPRECATED === $errorNumber || E_DEPRECATED === $errorNumber) && DeprecationHandler::handle($errorNumber, $errorString, $errorFile, $errorLine)) {
       return TRUE;
     }
 
@@ -73,7 +64,7 @@ final class BootstrapErrorHandler {
     try {
       call_user_func($this->phpUnitErrorHandler, $errorNumber, $errorString, $errorFile, $errorLine);
     }
-    catch (NoTestCaseObjectOnCallStackException $e) {
+    catch (NoTestCaseObjectOnCallStackException) {
       // If we end up here, it's likely because a test's processing has
       // finished already and we are processing an error that occurred while
       // dealing with STDOUT rewinding or truncating. Do nothing.

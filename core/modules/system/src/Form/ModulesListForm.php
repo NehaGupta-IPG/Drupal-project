@@ -17,10 +17,12 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Component\Utility\Xss;
 
 /**
  * Provides module installation interface.
@@ -144,9 +146,6 @@ class ModulesListForm extends FormBase {
     require_once DRUPAL_ROOT . '/core/includes/install.inc';
     $distribution = drupal_install_profile_distribution_name();
 
-    // Include system.admin.inc so we can use the sort callbacks.
-    $this->moduleHandler->loadInclude('system', 'inc', 'system.admin');
-
     $form['filters'] = [
       '#type' => 'container',
       '#attributes' => [
@@ -207,7 +206,8 @@ class ModulesListForm extends FormBase {
     foreach (Element::children($form['modules']) as $package) {
       $form['modules'][$package] += [
         '#type' => 'details',
-        '#title' => $this->t($package),
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
+        '#title' => Markup::create(Xss::filterAdmin($this->t($package))),
         '#open' => TRUE,
         '#theme' => 'system_modules_details',
         '#attributes' => ['class' => ['package-listing']],
@@ -244,7 +244,7 @@ class ModulesListForm extends FormBase {
    *   The list existing modules.
    * @param \Drupal\Core\Extension\Extension $module
    *   The module for which to build the form row.
-   * @param $distribution
+   * @param string $distribution
    *   The distribution.
    *
    * @return array
@@ -272,7 +272,8 @@ class ModulesListForm extends FormBase {
           ])
         )->toString();
     }
-    $row['description']['#markup'] = $this->t($module->info['description']);
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
+    $row['description']['#markup'] = (string) $this->t($module->info['description']);
     $row['version']['#markup'] = $module->info['version'];
 
     // Generate link for module's help page. Assume that if a hook_help()
@@ -324,7 +325,8 @@ class ModulesListForm extends FormBase {
 
     // Disable the checkbox for required modules.
     if (!empty($module->info['required'])) {
-      // Used when displaying modules that are required by the installation profile
+      // Used when displaying modules that are required by the installation
+      // profile.
       $row['enable']['#disabled'] = TRUE;
       $row['#required_by'][] = $distribution . (!empty($module->info['explanation']) ? ' (' . $module->info['explanation'] . ')' : '');
     }
@@ -348,7 +350,8 @@ class ModulesListForm extends FormBase {
       ]);
     }
 
-    // Ensure this module is compatible with the currently installed version of PHP.
+    // Ensure this module is compatible with the currently installed version of
+    // PHP.
     if (version_compare(phpversion(), $module->info['php']) < 0) {
       $compatible = FALSE;
       $required = $module->info['php'] . (substr_count($module->info['php'], '.') < 2 ? '.*' : '');
@@ -369,8 +372,6 @@ class ModulesListForm extends FormBase {
     // If this module requires other modules, add them to the array.
     /** @var \Drupal\Core\Extension\Dependency $dependency_object */
     foreach ($module->requires as $dependency => $dependency_object) {
-      // @todo Add logic for not displaying hidden modules in
-      //   https://drupal.org/node/3117829.
       if ($incompatible = $this->checkDependencyMessage($modules, $dependency, $dependency_object)) {
         $row['#requires'][$dependency] = $incompatible;
         $row['enable']['#disabled'] = TRUE;
@@ -416,6 +417,10 @@ class ModulesListForm extends FormBase {
     ];
 
     $data = $this->moduleExtensionList->getList();
+
+    // Determine the modules the user explicitly requested: required modules
+    // that are not yet installed, plus any that were selected on the form.
+    $selected = [];
     foreach ($data as $name => $module) {
       // If the module is installed there is nothing to do.
       if ($this->moduleHandler->moduleExists($name)) {
@@ -423,36 +428,29 @@ class ModulesListForm extends FormBase {
       }
       // Required modules have to be installed.
       if (!empty($module->required)) {
-        $modules['install'][$name] = $module->info['name'];
+        $selected[$name] = $module->info['name'];
       }
       // Selected modules should be installed.
       elseif (($checkbox = $form_state->getValue(['modules', $name], FALSE)) && $checkbox['enable']) {
-        $info = $data[$name]->info;
-        $modules['install'][$name] = $info['name'];
-        // Identify non-stable modules.
-        $lifecycle = $info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
-        if ($lifecycle !== ExtensionLifecycle::STABLE) {
-          $modules['non_stable'][$name] = $info['name'];
-        }
+        $selected[$name] = $data[$name]->info['name'];
       }
     }
 
-    // Add all dependencies to a list.
-    foreach ($modules['install'] as $module => $value) {
-      foreach (array_keys($data[$module]->requires) as $dependency) {
-        if (!isset($modules['install'][$dependency]) && !$this->moduleHandler->moduleExists($dependency)) {
-          $dependency_info = $data[$dependency]->info;
-          $modules['dependencies'][$module][$dependency] = $dependency_info['name'];
-          $modules['install'][$dependency] = $dependency_info['name'];
+    $selected = array_keys($selected);
 
-          // Identify non-stable modules.
-          $lifecycle = $dependency_info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
-          if ($lifecycle !== ExtensionLifecycle::STABLE) {
-            $modules['non_stable'][$dependency] = $dependency_info['name'];
-          }
-        }
-      }
-    }
+    // Resolve the full set of modules that will be installed, including any
+    // dependencies pulled in automatically. This uses the same resolution as
+    // the module installer, so the confirmation form reflects exactly what
+    // will be installed. The explicitly selected modules are listed first,
+    // followed by the dependencies pulled in automatically, which is the order
+    // users expect to see on the confirmation form.
+    $resolved = $this->moduleInstaller->getModulesToInstall($selected);
+    $ordered = array_merge(
+      array_intersect($selected, $resolved),
+      array_diff($resolved, $selected),
+    );
+    $modules = $this->classifyByStability($ordered, $modules, $data);
+    $modules = $this->groupDependenciesByParent($selected, $modules, $data);
 
     // Make sure the install API is available.
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
@@ -514,6 +512,56 @@ class ModulesListForm extends FormBase {
         return;
       }
     }
+  }
+
+  /**
+   * Classifies modules into stable and non-stable.
+   *
+   * @param array $ordered
+   *   The list of ordered module names.
+   * @param array $modules
+   *   The modules data structure.
+   * @param array $data
+   *   The module extension list data.
+   *
+   * @return array
+   *   The existing modules array containing 'install' and 'non_stable' keys.
+   */
+  protected function classifyByStability(array $ordered, array $modules, array $data): array {
+    foreach ($ordered as $name) {
+      $info = $data[$name]->info;
+      $modules['install'][$name] = $info['name'];
+      // Identify non-stable modules.
+      if ($info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::STABLE) {
+        $modules['non_stable'][$name] = $info['name'];
+      }
+    }
+    return $modules;
+  }
+
+  /**
+   * Group added dependencies under the modules that require them.
+   *
+   * @param array $selected
+   *   The selected modules.
+   * @param mixed $modules
+   *   The modules array.
+   * @param array $data
+   *   The module extension list data.
+   *
+   * @return array
+   *   The modules array.
+   */
+  protected function groupDependenciesByParent($selected, $modules, $data): array {
+    $added_dependencies = array_diff_key($modules['install'], array_flip($selected));
+    foreach (array_keys($modules['install']) as $module) {
+      foreach (array_keys($data[$module]->requires) as $dependency) {
+        if (isset($added_dependencies[$dependency])) {
+          $modules['dependencies'][$module][$dependency] = $modules['install'][$dependency];
+        }
+      }
+    }
+    return $modules;
   }
 
 }

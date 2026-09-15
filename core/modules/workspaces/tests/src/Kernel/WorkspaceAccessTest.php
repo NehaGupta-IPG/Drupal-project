@@ -5,16 +5,22 @@ declare(strict_types=1);
 namespace Drupal\Tests\workspaces\Kernel;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests access on workspaces.
- *
- * @group workspaces
- * @group #slow
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceAccessTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -26,7 +32,8 @@ class WorkspaceAccessTest extends KernelTestBase {
     'user',
     'system',
     'workspaces',
-    'workspace_access_test',
+    'workspaces_test',
+    'workspaces_ui',
   ];
 
   /**
@@ -35,7 +42,7 @@ class WorkspaceAccessTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     $this->installEntitySchema('workspace');
     $this->installEntitySchema('user');
@@ -50,7 +57,7 @@ class WorkspaceAccessTest extends KernelTestBase {
    * @return array
    *   An array of operations and permissions to test with.
    */
-  public static function operationCases() {
+  public static function operationCases(): array {
     return [
       ['create', 'administer workspaces'],
       ['create', 'create workspace'],
@@ -73,10 +80,9 @@ class WorkspaceAccessTest extends KernelTestBase {
    *   The operation to test with.
    * @param string $permission
    *   The permission to test with.
-   *
-   * @dataProvider operationCases
    */
-  public function testWorkspaceAccess($operation, $permission) {
+  #[DataProvider('operationCases')]
+  public function testWorkspaceAccess(string $operation, string $permission): void {
     $user = $this->createUser();
     $this->setCurrentUser($user);
     $workspace = Workspace::create(['id' => 'oak']);
@@ -91,9 +97,17 @@ class WorkspaceAccessTest extends KernelTestBase {
   }
 
   /**
+   * Implements hook_ENTITY_TYPE_access() for the 'workspace' entity type.
+   */
+  #[Hook('workspace_access')]
+  public function workspaceAccess(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
+    return \Drupal::keyValue('workspace_access_test')->get("result.{$operation}", AccessResult::neutral());
+  }
+
+  /**
    * Tests workspace publishing access.
    */
-  public function testPublishWorkspaceAccess() {
+  public function testPublishWorkspaceAccess(): void {
     $user = $this->createUser([
       'view own workspace',
       'edit own workspace',
@@ -108,15 +122,17 @@ class WorkspaceAccessTest extends KernelTestBase {
 
     // Simulate an external factor which decides that a workspace can not be
     // published.
-    \Drupal::state()->set('workspace_access_test.result.publish', AccessResult::forbidden());
+    \Drupal::keyValue('workspace_access_test')->set('result.publish', AccessResult::forbidden());
     \Drupal::entityTypeManager()->getAccessControlHandler('workspace')->resetCache();
     $this->assertFalse($workspace->access('publish'));
   }
 
   /**
-   * @covers \Drupal\workspaces\Plugin\EntityReferenceSelection\WorkspaceSelection::getReferenceableEntities
+   * Tests workspace selection.
+   *
+   * @legacy-covers \Drupal\workspaces\Plugin\EntityReferenceSelection\WorkspaceSelection::getReferenceableEntities
    */
-  public function testWorkspaceSelection() {
+  public function testWorkspaceSelection(): void {
     $own_permission_user = $this->createUser(['view own workspace']);
     $any_permission_user = $this->createUser(['view any workspace']);
     $admin_permission_user = $this->createUser(['administer workspaces']);
@@ -225,7 +241,9 @@ class WorkspaceAccessTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\workspaces\Plugin\Block\WorkspaceSwitcherBlock::blockAccess
+   * Tests workspace switcher block.
+   *
+   * @legacy-covers \Drupal\workspaces\Plugin\Block\WorkspaceSwitcherBlock::blockAccess
    */
   public function testWorkspaceSwitcherBlock(): void {
     $own_permission_user = $this->createUser(['view own workspace']);
@@ -244,6 +262,45 @@ class WorkspaceAccessTest extends KernelTestBase {
     $this->assertTrue($switcher_block->access($admin_permission_user));
     $this->assertFalse($switcher_block->access($access_content_user));
     $this->assertFalse($switcher_block->access($no_permission_user));
+  }
+
+  /**
+   * Tests that workspaces with non-default providers are not referenceable.
+   *
+   * @legacy-covers \Drupal\workspaces\Plugin\EntityReferenceSelection\WorkspaceSelection::getReferenceableEntities
+   */
+  public function testWorkspaceSelectionFiltersByProvider(): void {
+    $admin_permission_user = $this->createUser(['administer workspaces']);
+    $this->setCurrentUser($admin_permission_user);
+
+    // Create a couple of workspaces with the default provider, and one with the
+    // test provider.
+    Workspace::create([
+      'id' => 'default1',
+      'label' => 'Default Workspace 1',
+    ])->save();
+    Workspace::create([
+      'id' => 'default2',
+      'label' => 'Default Workspace 2',
+    ])->save();
+    Workspace::create([
+      'id' => 'test_provider_workspace',
+      'label' => 'Test Provider Workspace',
+      'provider' => 'test',
+    ])->save();
+
+    /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $selection_handler */
+    $selection_handler = \Drupal::service('plugin.manager.entity_reference_selection')->getInstance([
+      'target_type' => 'workspace',
+      'handler' => 'default',
+    ]);
+
+    $referenceable = $selection_handler->getReferenceableEntities();
+
+    // Verify that only relevant workspaces are referenceable.
+    $this->assertArrayHasKey('default1', $referenceable['workspace']);
+    $this->assertArrayHasKey('default2', $referenceable['workspace']);
+    $this->assertArrayNotHasKey('test_provider_workspace', $referenceable['workspace']);
   }
 
 }

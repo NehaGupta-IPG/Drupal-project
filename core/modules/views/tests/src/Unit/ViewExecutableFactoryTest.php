@@ -4,21 +4,29 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit;
 
+use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
+use Drupal\views\Plugin\ViewsPluginManager;
+use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewExecutableFactory;
+use Drupal\views\ViewsData;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\views\ViewExecutableFactory
- * @group views
+ * Tests Drupal\views\ViewExecutableFactory.
  */
+#[CoversClass(ViewExecutableFactory::class)]
+#[Group('views')]
 class ViewExecutableFactoryTest extends UnitTestCase {
 
   /**
    * The mock user object.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $user;
 
@@ -32,7 +40,7 @@ class ViewExecutableFactoryTest extends UnitTestCase {
   /**
    * The mock view entity.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\Entity\ConfigEntityInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $view;
 
@@ -46,21 +54,21 @@ class ViewExecutableFactoryTest extends UnitTestCase {
   /**
    * The mocked views data.
    *
-   * @var \Drupal\views\ViewsData|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\ViewsData|\PHPUnit\Framework\MockObject\Stub
    */
   protected $viewsData;
 
   /**
    * The mocked route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $routeProvider;
 
   /**
    * The display plugin manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var \Drupal\Component\Plugin\PluginManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $displayPluginManager;
 
@@ -70,25 +78,19 @@ class ViewExecutableFactoryTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->user = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $this->user = $this->createStub(AccountInterface::class);
     $this->requestStack = new RequestStack();
-    $this->view = $this->createMock('Drupal\views\ViewEntityInterface');
-    $this->viewsData = $this->getMockBuilder('Drupal\views\ViewsData')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
-    $this->displayPluginManager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->view = $this->createStub(ViewEntityInterface::class);
+    $this->viewsData = $this->createStub(ViewsData::class);
+    $this->routeProvider = $this->createStub(RouteProviderInterface::class);
+    $this->displayPluginManager = $this->createStub(ViewsPluginManager::class);
     $this->viewExecutableFactory = new ViewExecutableFactory($this->user, $this->requestStack, $this->viewsData, $this->routeProvider, $this->displayPluginManager);
   }
 
   /**
    * Tests the get method.
-   *
-   * @covers ::get
    */
-  public function testGet() {
+  public function testGet(): void {
     $request_1 = new Request();
     $request_2 = new Request();
 
@@ -108,6 +110,19 @@ class ViewExecutableFactoryTest extends UnitTestCase {
     $this->assertInstanceOf('Drupal\views\ViewExecutable', $executable);
     $this->assertSame($executable->getRequest(), $request_2);
     $this->assertSame($executable->getUser(), $this->user);
+  }
+
+  /**
+   * Tests the get method when current request is null.
+   *
+   * @legacy-covers ::get
+   */
+  public function testGetNoRequest(): void {
+    $executable = $this->viewExecutableFactory->get($this->view);
+
+    $this->assertInstanceOf('Drupal\views\ViewExecutable', $executable);
+    $this->assertSame($executable->getUser(), $this->user);
+    $this->assertSame($executable->getRequest(), NULL);
   }
 
 }

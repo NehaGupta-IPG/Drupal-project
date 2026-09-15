@@ -6,12 +6,14 @@ namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Views fields report page.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class ReportFieldsTest extends UITestBase {
 
   /**
@@ -32,7 +34,7 @@ class ReportFieldsTest extends UITestBase {
   /**
    * Tests the Views fields report page.
    */
-  public function testReportFields() {
+  public function testReportFields(): void {
     $this->drupalGet('admin/reports/fields/views-fields');
     $this->assertSession()->pageTextContains('Used in views');
     $this->assertSession()->pageTextContains('No fields have been used in views yet.');

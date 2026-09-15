@@ -7,10 +7,14 @@ namespace Drupal\Tests\serialization\Kernel;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group TypedData
+ * Tests Map Data Normalizer.
  */
+#[Group('TypedData')]
+#[RunTestsInSeparateProcesses]
 class MapDataNormalizerTest extends KernelTestBase {
 
   /**
@@ -44,7 +48,7 @@ class MapDataNormalizerTest extends KernelTestBase {
   /**
    * Tests whether map data can be normalized.
    */
-  public function testMapNormalize() {
+  public function testMapNormalize(): void {
     $typed_data = $this->buildExampleTypedData();
     $data = $this->serializer->normalize($typed_data, 'json');
     $expect_value = [
@@ -63,7 +67,7 @@ class MapDataNormalizerTest extends KernelTestBase {
   /**
    * Tests whether map data with properties can be normalized.
    */
-  public function testMapWithPropertiesNormalize() {
+  public function testMapWithPropertiesNormalize(): void {
     $typed_data = $this->buildExampleTypedDataWithProperties();
     $data = $this->serializer->normalize($typed_data, 'json');
     $expect_value = [
@@ -94,12 +98,11 @@ class MapDataNormalizerTest extends KernelTestBase {
       ],
     ];
     $map_data_definition = MapDataDefinition::create();
-    $typed_data = $this->typedDataManager->create(
+    return $this->typedDataManager->create(
       $map_data_definition,
       $tree,
       'test name'
     );
-    return $typed_data;
   }
 
   /**
@@ -126,13 +129,11 @@ class MapDataNormalizerTest extends KernelTestBase {
         ->setPropertyDefinition('key7', DataDefinition::create('string'))
     );
 
-    $typed_data = $this->typedDataManager->create(
+    return $this->typedDataManager->create(
       $map_data_definition,
       $tree,
       'test name'
     );
-
-    return $typed_data;
   }
 
 }

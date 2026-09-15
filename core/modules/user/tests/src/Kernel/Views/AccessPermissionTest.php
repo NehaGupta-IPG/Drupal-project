@@ -10,13 +10,16 @@ use Drupal\user\Plugin\views\access\Permission;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests views perm access plugin.
  *
- * @group user
  * @see \Drupal\user\Plugin\views\access\Permission
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class AccessPermissionTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -72,7 +75,7 @@ class AccessPermissionTest extends KernelTestBase {
   /**
    * Tests perm access plugin.
    */
-  public function testAccessPerm() {
+  public function testAccessPerm(): void {
     $view = Views::getView('test_access_perm');
     $view->setDisplay();
 
@@ -87,7 +90,7 @@ class AccessPermissionTest extends KernelTestBase {
   /**
    * Tests access on render caching.
    */
-  public function testRenderCaching() {
+  public function testRenderCaching(): void {
     $view = Views::getView('test_access_perm');
     $display = &$view->storage->getDisplay('default');
     $display['display_options']['cache'] = [

@@ -4,27 +4,31 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel;
 
+use Drupal\Core\Entity\EntityInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests field validation.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldValidationTest extends FieldKernelTestBase {
 
   /**
-   * @var string
+   * The entity type.
    */
-  private $entityType;
+  private string $entityType;
 
   /**
-   * @var string
+   * The bundle.
    */
-  private $bundle;
+  private string $bundle;
 
   /**
-   * @var \Drupal\Core\Entity\EntityInterface
+   * The test entity.
    */
-  private $entity;
+  private EntityInterface $entity;
 
   /**
    * {@inheritdoc}
@@ -47,7 +51,7 @@ class FieldValidationTest extends FieldKernelTestBase {
   /**
    * Tests that the number of values is validated against the field cardinality.
    */
-  public function testCardinalityConstraint() {
+  public function testCardinalityConstraint(): void {
     $cardinality = $this->fieldTestData->field_storage->getCardinality();
     $entity = $this->entity;
 
@@ -67,7 +71,7 @@ class FieldValidationTest extends FieldKernelTestBase {
   /**
    * Tests that constraints defined by the field type are validated.
    */
-  public function testFieldConstraints() {
+  public function testFieldConstraints(): void {
     $cardinality = $this->fieldTestData->field_storage->getCardinality();
     $entity = $this->entity;
 
@@ -83,7 +87,7 @@ class FieldValidationTest extends FieldKernelTestBase {
       }
       else {
         $value = -1;
-        $expected_violations[$delta . '.value'][] = t('%name does not accept the value -1.', ['%name' => $this->fieldTestData->field->getLabel()]);
+        $expected_violations[$delta . '.value'][] = $this->fieldTestData->field->getLabel() . ' does not accept the value -1.';
       }
       $entity->{$this->fieldTestData->field_name}[] = $value;
     }

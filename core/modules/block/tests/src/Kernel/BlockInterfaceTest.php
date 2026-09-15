@@ -7,16 +7,20 @@ namespace Drupal\Tests\block\Kernel;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore displaymessage
-
 /**
  * Tests that the block plugin can work properly without a supporting entity.
- *
- * @group block
  */
+#[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockInterfaceTest extends KernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['system', 'block', 'block_test', 'user'];
 
   /**
@@ -33,7 +37,7 @@ class BlockInterfaceTest extends KernelTestBase {
    * subsequent method calls are just attempting to cause a failure if a
    * dependency outside of the plugin configuration is required.
    */
-  public function testBlockInterface() {
+  public function testBlockInterface(): void {
     $manager = $this->container->get('plugin.manager.block');
     $configuration = [
       'label' => 'Custom Display Message',

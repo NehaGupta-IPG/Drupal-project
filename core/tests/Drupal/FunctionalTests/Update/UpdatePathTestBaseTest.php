@@ -6,13 +6,16 @@ namespace Drupal\FunctionalTests\Update;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Site\Settings;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the update path base class.
- *
- * @group Update
- * @group #slow
  */
+#[Group('Update')]
+#[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class UpdatePathTestBaseTest extends UpdatePathTestBase {
 
   /**
@@ -23,8 +26,8 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz';
+  protected function setDatabaseDumpFiles(): void {
+    $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-11.3.0.bare.standard.php.gz';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-8.update-test-schema-enabled.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-8.update-test-semver-update-n-enabled.php';
   }
@@ -32,14 +35,14 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
   /**
    * Tests that the database was properly loaded.
    */
-  public function testDatabaseProperlyLoaded() {
+  public function testDatabaseProperlyLoaded(): void {
     $this->testDatabaseLoaded();
   }
 
   /**
    * Tests that updates are properly run.
    */
-  public function testUpdateHookN() {
+  public function testUpdateHookN(): void {
     $connection = Database::getConnection();
 
     // Increment the schema version.
@@ -57,7 +60,7 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
     $select->range(0, 5);
     $select->fields('watchdog', ['message']);
 
-    $container_cannot_be_saved_messages = array_filter(iterator_to_array($select->execute()), function ($row) {
+    $container_cannot_be_saved_messages = array_filter(iterator_to_array($select->execute()), function ($row): bool {
       return str_contains($row->message, 'Container cannot be saved to cache.');
     });
     $this->assertEquals([], $container_cannot_be_saved_messages);
@@ -76,7 +79,7 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
   /**
    * Tests that path aliases are not processed during database updates.
    */
-  public function testPathAliasProcessing() {
+  public function testPathAliasProcessing(): void {
     // Add a path alias for the '/admin' system path.
     $values = [
       'path' => '/admin/structure',
@@ -122,7 +125,7 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
    *
    * @see update_test_schema_update_8003()
    */
-  public function testModuleListChange() {
+  public function testModuleListChange(): void {
     // Set a value in the cache to prove caches are cleared.
     \Drupal::service('cache.default')->set(__CLASS__, 'Test');
 
@@ -169,7 +172,7 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
    * @see \Drupal\FunctionalTests\Update\UpdatePathTestBase::runUpdates()
    * @see \Drupal\Core\Test\TestSetupTrait::$configSchemaCheckerExclusions
    */
-  public function testSchemaChecking() {
+  public function testSchemaChecking(): void {
     // Create some configuration that should be skipped.
     $this->config('config_schema_test.no_schema')->set('foo', 'bar')->save();
     $this->runUpdates();
@@ -180,7 +183,7 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
   /**
    * Tests that setup is done correctly.
    */
-  public function testSetup() {
+  public function testSetup(): void {
     $this->assertCount(3, $this->databaseDumpFiles);
     $this->assertSame(1, Settings::get('entity_update_batch_size'));
   }

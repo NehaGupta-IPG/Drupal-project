@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Kernel;
 
-use Drupal\Core\Session\AccountInterface;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
+use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests access to managed files.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileManagedAccessTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -32,7 +35,7 @@ class FileManagedAccessTest extends KernelTestBase {
   /**
    * Tests if public file is always accessible.
    */
-  public function testFileAccess() {
+  public function testFileAccess(): void {
     $this->installEntitySchema('user');
     $this->installEntitySchema('file');
     $this->installSchema('file', ['file_usage']);
@@ -40,7 +43,9 @@ class FileManagedAccessTest extends KernelTestBase {
 
     $anonymous = User::create(['uid' => 0, 'name' => '']);
     $anonymous->save();
-    user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['access content']);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
+      'access content',
+    ])->save();
 
     // Create an authenticated user to check file access.
     $account = $this->createUser(['access site reports', 'access content'], NULL, FALSE, ['uid' => 2]);

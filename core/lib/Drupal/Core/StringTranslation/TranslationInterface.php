@@ -76,7 +76,7 @@ interface TranslationInterface {
    *   $output = $string_translation->formatPlural($update_count,
    *     'Changed the content type of 1 post from %old-type to %new-type.',
    *     'Changed the content type of @count posts from %old-type to %new-type.',
-   *     array('%old-type' => $info->old_type, '%new-type' => $info->new_type));
+   *     ['%old-type' => $info->old_type, '%new-type' => $info->new_type)];
    * @endcode
    *
    * @param int $count
@@ -108,5 +108,23 @@ interface TranslationInterface {
    * @see \Drupal\Core\StringTranslation\PluralTranslatableMarkup::createFromTranslatedString()
    */
   public function formatPlural($count, $singular, $plural, array $args = [], array $options = []);
+
+  /**
+   * Selects the plural form for a given count.
+   *
+   * @param int|float $count
+   *   The item count to display.
+   * @param string $string
+   *   The translated string with plural forms delimited by PoItem::DELIMITER.
+   * @param string|null $langcode
+   *   The language code to translate to. If it is NULL then the current
+   *   language will be used.
+   *
+   * @return string
+   *   The plural form to use.
+   *
+   * @see \Drupal\Core\StringTranslation\TranslationManager::doTranslate()
+   */
+  public function selectPluralForm(int|float $count, string $string, ?string $langcode = NULL): string;
 
 }

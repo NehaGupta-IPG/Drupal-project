@@ -9,6 +9,7 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Site\Settings;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -52,7 +53,7 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
     protected readonly ConfigFactoryInterface $configFactory,
     protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
     protected readonly TimeInterface $time,
-    protected readonly LanguageManagerInterface $languageManager
+    protected readonly LanguageManagerInterface $languageManager,
   ) {}
 
   /**
@@ -89,6 +90,9 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
           // groups, whether or not files in a group are from a particular
           // library or not.
           $css_assets[$order]['preprocessed'] = TRUE;
+          if (!empty($css_group['libraries'])) {
+            $css_assets[$order]['libraries'] = $css_group['libraries'];
+          }
         }
       }
       if ($css_group['type'] === 'external') {
@@ -106,17 +110,25 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
       'theme' => $this->themeManager->getActiveTheme()->getName(),
       'include' => UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($libraries))),
     ];
-    $ajax_page_state = $this->requestStack->getCurrentRequest()->get('ajax_page_state');
-    $already_loaded = isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : [];
+    $ajax_page_state = $this->requestStack->getCurrentRequest()->attributes->get('ajax_page_state');
+    $already_loaded = isset($ajax_page_state['libraries']) ? explode(',', $ajax_page_state['libraries']) : [];
     if ($already_loaded) {
       $query_args['exclude'] = UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($already_loaded)));
     }
+    // When an asset corresponds 1-1 with a single library, we don't need
+    // either the include or exclude query arguments. Replace this with just
+    // the library needed to produce the aggregate.
 
     // Generate a URL for each group of assets, but do not process them inline,
     // this is done using optimizeGroup() when the asset path is requested.
     foreach ($css_assets as $order => $css_asset) {
       if (!empty($css_asset['preprocessed'])) {
         $query = ['delta' => "$order"] + $query_args;
+        if (isset($css_asset['libraries'])) {
+          unset($query['include'], $query['exclude'], $query['delta']);
+          $query['libraries'] = UrlHelper::compressQueryParameter(implode(',', $css_asset['libraries']));
+          $query['category'] = $css_asset['category'];
+        }
         $filename = 'css_' . $this->generateHash($css_asset) . '.css';
         $uri = 'assets://css/' . $filename;
         $css_assets[$order]['data'] = $this->fileUrlGenerator->generateString($uri) . '?' . UrlHelper::buildQuery($query);
@@ -131,7 +143,16 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
    * {@inheritdoc}
    */
   public function deleteAll() {
-    $this->fileSystem->deleteRecursive('assets://css');
+    if (!\is_dir('assets://css')) {
+      return;
+    }
+    $directory_iterator = new \DirectoryIterator('assets://css');
+    $threshold = Settings::get('aggregate_gc_threshold', 86400 * 45);
+    foreach ($directory_iterator as $file) {
+      if ($file->isFile() && $this->time->getRequestTime() - $file->getMtime() > $threshold) {
+        $this->fileSystem->delete($file->getPathName());
+      }
+    }
   }
 
   /**
@@ -148,10 +169,21 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
         $data .= "/* @license " . $css_asset['license']['name'] . " " . $css_asset['license']['url'] . " */\n";
       }
       $current_license = $css_asset['license'];
-      $data .= $this->optimizer->optimize($css_asset);
+
+      // Only external minified files can skip optimization.
+      // Local files (even if minified) must be processed to ensure resource
+      // paths are rewritten relative to the cached aggregated file location.
+      $is_minified = isset($css_asset['minified']) && $css_asset['minified'];
+      $is_external = isset($css_asset['type']) && $css_asset['type'] === 'external';
+      if ($is_minified && $is_external) {
+        $data .= file_get_contents($css_asset['data']);
+      }
+      else {
+        $data .= $this->optimizer->optimize($css_asset);
+      }
     }
     // Per the W3C specification at
-    // http://www.w3.org/TR/REC-CSS2/cascade.html#at-import, @import rules must
+    // https://www.w3.org/TR/REC-CSS2/cascade.html#at-import, @import rules must
     // precede any other style, so we move those to the top. The regular
     // expression is expressed in NOWDOC since it is detecting backslashes as
     // well as single and double quotes. It is difficult to read when

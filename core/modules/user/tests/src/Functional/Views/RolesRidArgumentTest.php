@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Functional\Views;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests the handler of the user: roles argument.
  *
- * @group user
  * @see \Drupal\user\Plugin\views\argument\RolesRid
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class RolesRidArgumentTest extends UserTestBase {
 
   /**
@@ -32,7 +36,7 @@ class RolesRidArgumentTest extends UserTestBase {
   /**
    * Tests the generated title of a user: roles argument.
    */
-  public function testArgumentTitle() {
+  public function testArgumentTitle(): void {
     $role_id = $this->createRole([], 'markup_role_name', '<em>Role name with markup</em>');
     $this->createRole([], 'second_role_name', 'Second role name');
     $user = $this->createUser([], 'User with role one');

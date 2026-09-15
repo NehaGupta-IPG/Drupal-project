@@ -8,14 +8,16 @@ use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\views\Entity\View;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the taxonomy term index filter.
  *
  * @see \Drupal\taxonomy\Plugin\views\filter\TaxonomyIndexTid
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TaxonomyIndexTidFilterTest extends TaxonomyTestBase {
 
   /**
@@ -61,7 +63,7 @@ class TaxonomyIndexTidFilterTest extends TaxonomyTestBase {
   /**
    * Tests dependencies are not added for terms that do not exist.
    */
-  public function testConfigDependency() {
+  public function testConfigDependency(): void {
     /** @var \Drupal\views\Entity\View $view */
     $view = View::load('test_filter_taxonomy_index_tid__non_existing_dependency');
 

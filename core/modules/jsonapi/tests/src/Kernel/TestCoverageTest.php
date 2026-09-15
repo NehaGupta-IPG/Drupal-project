@@ -9,13 +9,15 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\jsonapi\Functional\ConfigEntityResourceTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Checks that all core content/config entity types have JSON:API test coverage.
- *
- * @group jsonapi
- * @group #slow
  */
+#[Group('jsonapi')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class TestCoverageTest extends KernelTestBase {
 
   /**
@@ -36,8 +38,9 @@ class TestCoverageTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
     $all_modules = \Drupal::service('extension.list.module')->getList();
-    $stable_core_modules = array_filter($all_modules, function ($module) {
+    $stable_core_modules = array_filter($all_modules, function ($module): bool {
       // Filter out contrib, hidden, testing, experimental, and deprecated
       // modules. We also don't need to enable modules that are already enabled.
       return $module->origin === 'core'
@@ -45,7 +48,8 @@ class TestCoverageTest extends KernelTestBase {
         && $module->status == FALSE
         && $module->info['package'] !== 'Testing'
         && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::EXPERIMENTAL
-        && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::DEPRECATED;
+        && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::DEPRECATED
+        && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::OBSOLETE;
     });
 
     $this->container->get('module_installer')->install(array_keys($stable_core_modules));
@@ -54,7 +58,7 @@ class TestCoverageTest extends KernelTestBase {
 
     // Entity types marked as "internal" are not exposed by JSON:API and hence
     // also don't need test coverage.
-    $this->definitions = array_filter($this->definitions, function (EntityTypeInterface $entity_type) {
+    $this->definitions = array_filter($this->definitions, function (EntityTypeInterface $entity_type): bool {
       return !$entity_type->isInternal();
     });
   }
@@ -62,7 +66,7 @@ class TestCoverageTest extends KernelTestBase {
   /**
    * Tests that all core entity types have JSON:API test coverage.
    */
-  public function testEntityTypeRestTestCoverage() {
+  public function testEntityTypeRestTestCoverage(): void {
     $problems = [];
     foreach ($this->definitions as $entity_type_id => $info) {
       $class_name_full = $info->getClass();

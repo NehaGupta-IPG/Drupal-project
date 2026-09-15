@@ -118,7 +118,7 @@ class KeyValueEntityStorage extends EntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  public function doLoadMultiple(array $ids = NULL) {
+  public function doLoadMultiple(?array $ids = NULL) {
     if (empty($ids)) {
       $entities = $this->keyValueStore->getAll();
     }
@@ -126,6 +126,19 @@ class KeyValueEntityStorage extends EntityStorageBase {
       $entities = $this->keyValueStore->getMultiple($ids);
     }
     return $this->mapFromStorageRecords($entities);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function mapFromStorageRecords(array $records) {
+    $entities = [];
+    foreach ($records as $record) {
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      $entity = $this->doCreate($record);
+      $entities[$entity->id()] = $entity;
+    }
+    return $entities;
   }
 
   /**

@@ -11,20 +11,28 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the uninstallation of modules.
- *
- * @group Module
  */
+#[Group('Module')]
+#[RunTestsInSeparateProcesses]
 class UninstallTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  protected static $modules = ['module_test', 'user', 'views', 'node'];
+  protected static $modules = [
+    'ckeditor5',
+    'filter',
+    'module_test',
+    'node',
+    'user',
+    'views',
+    'views_ui',
+  ];
 
   /**
    * {@inheritdoc}
@@ -34,7 +42,7 @@ class UninstallTest extends BrowserTestBase {
   /**
    * Tests the hook_modules_uninstalled() of the user module.
    */
-  public function testUserPermsUninstalled() {
+  public function testUserPermsUninstalled(): void {
     // Uninstalls the module_test module, so hook_modules_uninstalled()
     // is executed.
     $this->container->get('module_installer')->uninstall(['module_test']);
@@ -47,7 +55,7 @@ class UninstallTest extends BrowserTestBase {
   /**
    * Tests the Uninstall page and Uninstall confirmation page.
    */
-  public function testUninstallPage() {
+  public function testUninstallPage(): void {
     $account = $this->drupalCreateUser(['administer modules']);
     $this->drupalLogin($account);
 
@@ -120,6 +128,13 @@ class UninstallTest extends BrowserTestBase {
     // Delete the node to allow node to be uninstalled.
     $node->delete();
 
+    // Ensure dependent module full names are shown.
+    $this->assertSession()->pageTextContains('Required by: Views UI');
+    // Ensure matching machine names do not display.
+    $this->assertSession()->pageTextNotContains('Required by: Views UI (views_ui)');
+    // Ensure machine names that do not match do display.
+    $this->assertSession()->pageTextContains('Text Editor (editor)');
+
     // Uninstall module_test.
     $edit = [];
     $edit['uninstall[module_test]'] = TRUE;
@@ -189,7 +204,7 @@ class UninstallTest extends BrowserTestBase {
   /**
    * Tests that a module which fails to install can still be uninstalled.
    */
-  public function testFailedInstallStatus() {
+  public function testFailedInstallStatus(): void {
     $account = $this->drupalCreateUser(['administer modules']);
     $this->drupalLogin($account);
 
@@ -198,7 +213,7 @@ class UninstallTest extends BrowserTestBase {
       $this->container->get('module_installer')->install(['module_installer_config_test']);
       $this->fail($message);
     }
-    catch (EntityMalformedException $e) {
+    catch (EntityMalformedException) {
       // Expected exception; just continue testing.
     }
 

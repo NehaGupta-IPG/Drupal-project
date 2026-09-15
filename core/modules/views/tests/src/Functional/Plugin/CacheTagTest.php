@@ -8,13 +8,16 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests tag cache plugin.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\cache\Tag
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class CacheTagTest extends ViewTestBase {
 
   /**
@@ -124,7 +127,7 @@ class CacheTagTest extends ViewTestBase {
   /**
    * Tests the tag cache plugin.
    */
-  public function testTagCaching() {
+  public function testTagCaching(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
     $view = Views::getView('test_tag_cache');

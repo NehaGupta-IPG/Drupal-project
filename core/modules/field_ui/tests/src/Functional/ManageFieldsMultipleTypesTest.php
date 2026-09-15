@@ -9,21 +9,23 @@ use Drupal\Core\Entity\Entity\EntityFormMode;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\field\Entity\FieldConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Field UI "Manage fields" screen.
- *
- * @group field_ui
- * @group #slow
  */
+#[Group('field_ui')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ManageFieldsMultipleTypesTest extends ManageFieldsFunctionalTestBase {
 
   /**
    * Tests that options are copied over when reusing a field.
-   *
-   * @dataProvider entityTypesProvider
    */
-  public function testReuseField($entity_type, $bundle1, $bundle2) {
+  #[DataProvider('entityTypesProvider')]
+  public function testReuseField(string $entity_type, array $bundle1, array $bundle2): void {
     $field_name = 'test_reuse';
     $label = $this->randomMachineName();
 
@@ -49,10 +51,9 @@ class ManageFieldsMultipleTypesTest extends ManageFieldsFunctionalTestBase {
 
   /**
    * Tests that options are copied over when reusing a field.
-   *
-   * @dataProvider entityTypesProvider
    */
-  public function testReuseFieldMultipleDisplay($entity_type, $bundle1, $bundle2) {
+  #[DataProvider('entityTypesProvider')]
+  public function testReuseFieldMultipleDisplay(string $entity_type, array $bundle1, array $bundle2): void {
     // Create additional form mode and enable it on both bundles.
     EntityFormMode::create([
       'id' => "{$entity_type}.little",
@@ -140,7 +141,7 @@ class ManageFieldsMultipleTypesTest extends ManageFieldsFunctionalTestBase {
    * @return array
    *   Test cases.
    */
-  public static function entityTypesProvider() {
+  public static function entityTypesProvider(): array {
     return [
       'node' => [
         'entity_type' => 'node',

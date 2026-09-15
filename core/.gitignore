@@ -26,3 +26,18 @@ nightwatch.settings.json
 
 # Ignore CSpell cache
 .cspellcache
+
+# Ignore phpstan cache
+phpstan-tmp
+
+# Ignore eslint cache
+.eslintcache
+
+# Ignore stylelint cache
+.stylelintcache
+
+# Ignore phpcs cache
+.phpcscache
+
+# Ignore twig-cs-fixer cache
+.twigcsfixercache

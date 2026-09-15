@@ -5,27 +5,30 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Entity\EntityFormBuilder;
+use Drupal\Core\Entity\EntityFormInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\EntityFormBuilder
- * @group Entity
+ * Tests Drupal\Core\Entity\EntityFormBuilder.
  */
+#[CoversClass(EntityFormBuilder::class)]
+#[Group('Entity')]
 class EntityFormBuilderTest extends UnitTestCase {
 
   /**
    * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&MockObject $entityTypeManager;
 
   /**
    * The form builder.
-   *
-   * @var \Drupal\Core\Form\FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $formBuilder;
+  protected FormBuilderInterface&MockObject $formBuilder;
 
   /**
    * The entity form builder.
@@ -47,15 +50,13 @@ class EntityFormBuilderTest extends UnitTestCase {
 
   /**
    * Tests the getForm() method.
-   *
-   * @covers ::getForm
    */
-  public function testGetForm() {
-    $form_controller = $this->createMock('Drupal\Core\Entity\EntityFormInterface');
-    $form_controller->expects($this->any())
+  public function testGetForm(): void {
+    $form_controller = $this->createStub(EntityFormInterface::class);
+    $form_controller
       ->method('getFormId')
       ->willReturn('the_form_id');
-    $this->entityTypeManager->expects($this->any())
+    $this->entityTypeManager
       ->method('getFormObject')
       ->with('the_entity_type', 'default')
       ->willReturn($form_controller);

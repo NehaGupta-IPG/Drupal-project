@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\link\Unit;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemList;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
@@ -15,12 +14,13 @@ use Drupal\Core\Url;
 use Drupal\link\LinkItemInterface;
 use Drupal\link\Plugin\Field\FieldFormatter\LinkFormatter;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Field Formatter for the link field type.
- *
- * @group link
  */
+#[Group('link')]
 class LinkFormatterTest extends UnitTestCase {
 
   /**
@@ -28,22 +28,12 @@ class LinkFormatterTest extends UnitTestCase {
    *
    * LinkItem::getUrl will throw \InvalidArgumentException.
    */
-  public function testFormatterLinkItemUrlMalformed() {
-    $entity = $this->createMock(EntityInterface::class);
-
+  public function testFormatterLinkItemUrlMalformed(): void {
     $linkItem = $this->createMock(LinkItemInterface::class);
-    $exception = new \InvalidArgumentException();
-    $linkItem->expects($this->any())
-      ->method('getParent')
-      ->willReturn($entity);
     $linkItem->expects($this->once())
       ->method('getUrl')
-      ->willThrowException($exception);
-    $linkItem->expects($this->any())
-      ->method('__get')
-      ->with('options')
-      ->willReturn([]);
-    $fieldDefinition = $this->createMock(FieldDefinitionInterface::class);
+      ->willThrowException(new \InvalidArgumentException());
+    $fieldDefinition = $this->createStub(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
     $fieldTypePluginManager = $this->createMock(FieldTypePluginManagerInterface::class);
@@ -61,7 +51,7 @@ class LinkFormatterTest extends UnitTestCase {
     \Drupal::setContainer($container);
     $fieldList->setValue([$linkItem]);
 
-    $pathValidator = $this->createMock(PathValidatorInterface::class);
+    $pathValidator = $this->createStub(PathValidatorInterface::class);
     $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator);
     $elements = $linkFormatter->viewElements($fieldList, 'es');
     $this->assertEquals('link', $elements[0]['#type']);
@@ -70,22 +60,12 @@ class LinkFormatterTest extends UnitTestCase {
   /**
    * Tests when LinkItem::getUrl throws an unexpected exception.
    */
-  public function testFormatterLinkItemUrlUnexpectedException() {
-    $exception = new \Exception('Unexpected!!!');
-
+  public function testFormatterLinkItemUrlUnexpectedException(): void {
     $linkItem = $this->createMock(LinkItemInterface::class);
-    $entity = $this->createMock(EntityInterface::class);
-    $linkItem->expects($this->any())
-      ->method('getParent')
-      ->willReturn($entity);
     $linkItem->expects($this->once())
       ->method('getUrl')
-      ->willThrowException($exception);
-    $linkItem->expects($this->any())
-      ->method('__get')
-      ->with('options')
-      ->willReturn([]);
-    $fieldDefinition = $this->createMock(FieldDefinitionInterface::class);
+      ->willThrowException(new \Exception('Unexpected!!!'));
+    $fieldDefinition = $this->createStub(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
     $fieldTypePluginManager = $this->createMock(FieldTypePluginManagerInterface::class);
@@ -97,32 +77,24 @@ class LinkFormatterTest extends UnitTestCase {
     \Drupal::setContainer($container);
     $fieldList->setValue([$linkItem]);
 
-    $pathValidator = $this->createMock(PathValidatorInterface::class);
+    $pathValidator = $this->createStub(PathValidatorInterface::class);
     $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator);
     $this->expectException(\Exception::class);
-    $this->expectExceptionMessage('Unexpected!!!');
+    $this->expectExceptionMessageIs('Unexpected!!!');
     $linkFormatter->viewElements($fieldList, 'fr');
   }
 
   /**
    * Tests when LinkItem::getUrl returns a functional URL.
    */
-  public function testFormatterLinkItem() {
+  public function testFormatterLinkItem(): void {
     $expectedUrl = Url::fromUri('route:<front>');
 
     $linkItem = $this->createMock(LinkItemInterface::class);
-    $entity = $this->createMock(EntityInterface::class);
-    $linkItem->expects($this->any())
-      ->method('getParent')
-      ->willReturn($entity);
     $linkItem->expects($this->once())
       ->method('getUrl')
       ->willReturn($expectedUrl);
-    $linkItem->expects($this->any())
-      ->method('__get')
-      ->with('options')
-      ->willReturn([]);
-    $fieldDefinition = $this->createMock(FieldDefinitionInterface::class);
+    $fieldDefinition = $this->createStub(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
     $fieldTypePluginManager = $this->createMock(FieldTypePluginManagerInterface::class);
@@ -140,7 +112,7 @@ class LinkFormatterTest extends UnitTestCase {
     \Drupal::setContainer($container);
     $fieldList->setValue([$linkItem]);
 
-    $pathValidator = $this->createMock(PathValidatorInterface::class);
+    $pathValidator = $this->createStub(PathValidatorInterface::class);
     $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator);
     $elements = $linkFormatter->viewElements($fieldList, 'zh');
     $this->assertEquals([
@@ -150,6 +122,104 @@ class LinkFormatterTest extends UnitTestCase {
         '#url' => $expectedUrl,
       ],
     ], $elements);
+  }
+
+  /**
+   * Tests settings summary messages.
+   */
+  #[DataProvider('providerSettingsSummary')]
+  public function testSettingsSummary(array $settings, array $expected_summaries): void {
+    $container = new ContainerBuilder();
+    $container->set('string_translation', $this->getStringTranslationStub());
+    \Drupal::setContainer($container);
+
+    $mock = $this->getMockBuilder(LinkFormatter::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods(['getPluginId', 'getSettings'])
+      ->getMock();
+    $mock->expects($this->once())
+      ->method('getPluginId')
+      ->willReturn('link');
+    $mock->expects($this->once())
+      ->method('getSettings')
+      ->willReturn($settings);
+
+    $summaries = $mock->settingsSummary();
+    // Summaries are translated so cast them to strings before comparison.
+    foreach ($summaries as $key => $summary) {
+      $summaries[$key] = (string) $summary;
+    }
+    $this->assertEqualsCanonicalizing($expected_summaries, $summaries);
+  }
+
+  /**
+   * Provides test cases for ::testSettingsSummary().
+   */
+  public static function providerSettingsSummary(): array {
+    return [
+      [
+        [],
+        [
+          'Link text not trimmed',
+        ],
+      ],
+      [
+        [
+          'trim_length' => 80,
+        ],
+        [
+          'Link text trimmed to 80 characters',
+        ],
+      ],
+      [
+        [
+          'trim_length' => 20,
+        ],
+        [
+          'Link text trimmed to 20 characters',
+        ],
+      ],
+      [
+        [
+          'trim_length' => 20,
+          'url_only' => TRUE,
+          'url_plain' => TRUE,
+        ],
+        [
+          'Link text not trimmed',
+          'Show URL only as plain-text',
+        ],
+      ],
+      [
+        [
+          'trim_length' => 20,
+          'url_only' => TRUE,
+          'url_plain' => FALSE,
+        ],
+        [
+          'Link text not trimmed',
+          'Show URL only',
+        ],
+      ],
+      [
+        [
+          'rel' => 'nofollow',
+        ],
+        [
+          'Link text not trimmed',
+          'Add rel="nofollow"',
+        ],
+      ],
+      [
+        [
+          'target' => '_blank',
+        ],
+        [
+          'Link text not trimmed',
+          'Open link in new window',
+        ],
+      ],
+    ];
   }
 
 }

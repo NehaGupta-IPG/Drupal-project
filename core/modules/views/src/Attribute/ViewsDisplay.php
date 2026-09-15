@@ -62,8 +62,8 @@ class ViewsDisplay extends Plugin {
    *   (optional) Whether to register a theme function automatically. Defaults
    *   to TRUE.
    * @param bool $entity_reference_display
-   *   (optional) Custom property, used with \Drupal\views\Views::getApplicableViews().
-   *   Defaults to FALSE.
+   *   (optional) Custom property, used with
+   *   \Drupal\views\Views::getApplicableViews(). Defaults to FALSE.
    * @param class-string|null $deriver
    *   (optional) The deriver class.
    */
@@ -83,7 +83,7 @@ class ViewsDisplay extends Plugin {
     public readonly bool $no_ui = FALSE,
     public readonly bool $register_theme = TRUE,
     public readonly bool $entity_reference_display = FALSE,
-    public readonly ?string $deriver = NULL
+    public readonly ?string $deriver = NULL,
   ) {}
 
 }

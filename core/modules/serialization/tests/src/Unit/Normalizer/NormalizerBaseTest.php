@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
-use Drupal\Tests\UnitTestCase;
 use Drupal\serialization\Normalizer\NormalizerBase;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\serialization\Normalizer\NormalizerBase
- * @group serialization
+ * Tests Drupal\serialization\Normalizer\NormalizerBase.
  */
+#[CoversClass(NormalizerBase::class)]
+#[Group('serialization')]
 class NormalizerBaseTest extends UnitTestCase {
 
   /**
    * Tests the supportsNormalization method.
-   *
-   * @dataProvider providerTestSupportsNormalization
    *
    * @param bool $expected_return
    *   The expected boolean return value from supportNormalization.
@@ -25,8 +27,9 @@ class NormalizerBaseTest extends UnitTestCase {
    * @param string $supported_types
    *   (optional) The supported interface or class to set on the normalizer.
    */
-  public function testSupportsNormalization($expected_return, $data, $supported_types = NULL) {
-    $normalizer_base = $this->getMockForAbstractClass('Drupal\Tests\serialization\Unit\Normalizer\TestNormalizerBase');
+  #[DataProvider('providerTestSupportsNormalization')]
+  public function testSupportsNormalization(bool $expected_return, \stdClass|\RecursiveArrayIterator|array $data, ?string $supported_types = NULL): void {
+    $normalizer_base = new TestNormalizerBase();
 
     if (isset($supported_types)) {
       $normalizer_base->setSupportedTypes($supported_types);
@@ -41,7 +44,7 @@ class NormalizerBaseTest extends UnitTestCase {
    * @return array
    *   An array of provider data for testSupportsNormalization.
    */
-  public static function providerTestSupportsNormalization() {
+  public static function providerTestSupportsNormalization(): array {
     return [
       // Something that is not an object should return FALSE immediately.
       [FALSE, []],
@@ -61,9 +64,9 @@ class NormalizerBaseTest extends UnitTestCase {
 }
 
 /**
- * Test class for NormalizerBase.
+ * Testable class for NormalizerBase.
  */
-abstract class TestNormalizerBase extends NormalizerBase {
+class TestNormalizerBase extends NormalizerBase {
 
   /**
    * The interface or class that this Normalizer supports.
@@ -87,6 +90,23 @@ abstract class TestNormalizerBase extends NormalizerBase {
    */
   public function getSupportedTypes(?string $format): array {
     return $this->supportedTypes;
+  }
+
+  /**
+   * Normalizes data into a set of arrays/scalars.
+   *
+   * @param object $object
+   *   Data to normalize.
+   * @param string|null $format
+   *   Format the normalization result will be encoded as.
+   * @param array<string, mixed> $context
+   *   Context options for the normalizer.
+   *
+   * @return null
+   *   The normalized data.
+   */
+  public function normalize($object, $format = NULL, array $context = []): NULL {
+    return NULL;
   }
 
 }

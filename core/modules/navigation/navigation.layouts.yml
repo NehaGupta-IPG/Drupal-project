@@ -1,10 +1,11 @@
 navigation_layout:
+  label: 'Navigation layout'
   path: layouts
   template: navigation
   library: navigation/navigation.layout
-  category: 'Navigation layout'
+  category: 'Navigation'
   class: \Drupal\navigation\NavigationLayout
-  default_region: first
+  default_region: content
   icon_map:
     - [ content ]
     - [ footer ]

@@ -6,12 +6,14 @@ namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the usage of form caching for AJAX forms.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
+#[RunTestsInSeparateProcesses]
 class AjaxFormCacheTest extends WebDriverTestBase {
 
   /**
@@ -27,7 +29,7 @@ class AjaxFormCacheTest extends WebDriverTestBase {
   /**
    * Tests the usage of form cache for AJAX forms.
    */
-  public function testFormCacheUsage() {
+  public function testFormCacheUsage(): void {
     /** @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $key_value_expirable */
     $key_value_expirable = \Drupal::service('keyvalue.expirable')->get('form');
     $this->drupalLogin($this->rootUser);
@@ -48,12 +50,12 @@ class AjaxFormCacheTest extends WebDriverTestBase {
   /**
    * Tests AJAX forms in blocks.
    */
-  public function testBlockForms() {
-    $this->container->get('module_installer')->install(['block', 'search']);
+  public function testBlockForms(): void {
+    $this->container->get('module_installer')->install(['block']);
     $this->rebuildContainer();
     $this->drupalLogin($this->rootUser);
 
-    $this->drupalPlaceBlock('search_form_block', ['weight' => -5]);
+    $this->drupalPlaceBlock('test_form_in_block', ['weight' => -5]);
     $this->drupalPlaceBlock('ajax_forms_test_block');
 
     $this->drupalGet('');
@@ -83,7 +85,7 @@ class AjaxFormCacheTest extends WebDriverTestBase {
   /**
    * Tests AJAX forms on pages with a query string.
    */
-  public function testQueryString() {
+  public function testQueryString(): void {
     $this->container->get('module_installer')->install(['block']);
     $this->drupalLogin($this->rootUser);
 

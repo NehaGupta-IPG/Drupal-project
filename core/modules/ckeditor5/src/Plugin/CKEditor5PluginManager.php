@@ -141,7 +141,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
    *   The CKEditor 5 plugin configuration, if any.
    *
    * @throws \InvalidArgumentException
-   *   Thrown when the method is called with any other text editor than CKEditor 5.
+   *   Thrown when the editor is not CKEditor 5.
    */
   protected static function getPluginConfiguration(EditorInterface $editor, string $plugin_id): array {
     if ($editor->getEditor() !== 'ckeditor5') {
@@ -351,7 +351,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
   /**
    * {@inheritdoc}
    */
-  public function getProvidedElements(array $plugin_ids = [], EditorInterface $editor = NULL, bool $resolve_wildcards = TRUE, bool $creatable_elements_only = FALSE): array {
+  public function getProvidedElements(array $plugin_ids = [], ?EditorInterface $editor = NULL, bool $resolve_wildcards = TRUE, bool $creatable_elements_only = FALSE): array {
     $plugins = $this->getDefinitions();
     if (!empty($plugin_ids)) {
       $plugins = array_intersect_key($plugins, array_flip($plugin_ids));
@@ -408,7 +408,10 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
           // ability to create tags that are still in the subset. This points to
           // a bug in the plugin's ::getElementsSubset() logic.
           $defined_creatable = HTMLRestrictions::fromString(implode($definition->getCreatableElements()));
-          $subset_creatable_actual = HTMLRestrictions::fromString(implode(array_filter($subset, [CKEditor5PluginDefinition::class, 'isCreatableElement'])));
+          $subset_creatable_actual = HTMLRestrictions::fromString(implode(array_filter($subset, [
+            CKEditor5PluginDefinition::class,
+            'isCreatableElement',
+          ])));
           $subset_creatable_needed = $subset_restrictions->extractPlainTagsSubset()
             ->intersect($defined_creatable);
           $missing_creatable_for_subset = $subset_creatable_needed->diff($subset_creatable_actual);

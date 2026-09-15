@@ -13,15 +13,20 @@ use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Prophecy\Prophet;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider
- * @group Entity
+ * Tests Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider.
  */
+#[CoversClass(DefaultHtmlRouteProvider::class)]
+#[Group('Entity')]
 class DefaultHtmlRouteProviderTest extends UnitTestCase {
 
   /**
@@ -58,15 +63,15 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getAddPageRoute
-   * @dataProvider providerTestGetAddPageRoute
+   * Tests get add page route.
    */
-  public function testGetAddPageRoute(Route $expected = NULL, EntityTypeInterface $entity_type) {
+  #[DataProvider('providerTestGetAddPageRoute')]
+  public function testGetAddPageRoute(?Route $expected, EntityTypeInterface $entity_type): void {
     $route = $this->routeProvider->getAddPageRoute($entity_type);
     $this->assertEquals($expected, $route);
   }
 
-  public static function providerTestGetAddPageRoute() {
+  public static function providerTestGetAddPageRoute(): array {
     $data = [];
 
     $entity_type1 = static::getEntityType();
@@ -96,10 +101,10 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getAddFormRoute
-   * @dataProvider providerTestGetAddFormRoute
+   * Tests get add form route.
    */
-  public function testGetAddFormRoute(Route $expected = NULL, EntityTypeInterface $entity_type, EntityTypeInterface $bundle_entity_type = NULL, FieldStorageDefinitionInterface $field_storage_definition = NULL) {
+  #[DataProvider('providerTestGetAddFormRoute')]
+  public function testGetAddFormRoute(?Route $expected, EntityTypeInterface $entity_type, ?EntityTypeInterface $bundle_entity_type = NULL, ?FieldStorageDefinitionInterface $field_storage_definition = NULL): void {
     if ($bundle_entity_type) {
       $this->entityTypeManager->getDefinition('the_bundle_entity_type_id')->willReturn($bundle_entity_type);
 
@@ -113,7 +118,7 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
     $this->assertEquals($expected, $route);
   }
 
-  public static function providerTestGetAddFormRoute() {
+  public static function providerTestGetAddFormRoute(): array {
     $prophet = new Prophet();
     $data = [];
 
@@ -168,7 +173,11 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
           'type' => 'entity:the_bundle_entity_type_id',
         ],
       ]);
-    $data['add_form_bundle_entity_id_key_type_null'] = [clone $route, $entity_type5->reveal(), $bundle_entity_type->reveal()];
+    $data['add_form_bundle_entity_id_key_type_null'] = [
+      clone $route,
+      $entity_type5->reveal(),
+      $bundle_entity_type->reveal(),
+    ];
 
     $entity_type6 = static::getEntityType($entity_type5);
     $bundle_entity_type = static::getEntityType();
@@ -176,7 +185,12 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
     $field_storage_definition = $prophet->prophesize(FieldStorageDefinitionInterface::class);
     $field_storage_definition->getType()->willReturn('integer');
     $route->setRequirement('the_entity_type_id', '\d+');
-    $data['add_form_bundle_entity_id_key_type_integer'] = [clone $route, $entity_type6->reveal(), $bundle_entity_type->reveal(), $field_storage_definition->reveal()];
+    $data['add_form_bundle_entity_id_key_type_integer'] = [
+      clone $route,
+      $entity_type6->reveal(),
+      $bundle_entity_type->reveal(),
+      $field_storage_definition->reveal(),
+    ];
 
     $entity_type7 = static::getEntityType($entity_type6);
     $bundle_entity_type = $prophet->prophesize(ConfigEntityTypeInterface::class);
@@ -191,16 +205,21 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
           'with_config_overrides' => TRUE,
         ],
       ]);
-    $data['add_form_bundle_entity_id_key_type_integer'] = [clone $route, $entity_type7->reveal(), $bundle_entity_type->reveal(), $field_storage_definition->reveal()];
+    $data['add_form_bundle_entity_id_key_type_integer'] = [
+      clone $route,
+      $entity_type7->reveal(),
+      $bundle_entity_type->reveal(),
+      $field_storage_definition->reveal(),
+    ];
 
     return $data;
   }
 
   /**
-   * @covers ::getCanonicalRoute
-   * @dataProvider providerTestGetCanonicalRoute
+   * Tests get canonical route.
    */
-  public function testGetCanonicalRoute(Route $expected = NULL, EntityTypeInterface $entity_type, FieldStorageDefinitionInterface $field_storage_definition = NULL) {
+  #[DataProvider('providerTestGetCanonicalRoute')]
+  public function testGetCanonicalRoute(?Route $expected, EntityTypeInterface $entity_type, ?FieldStorageDefinitionInterface $field_storage_definition = NULL): void {
     if ($field_storage_definition) {
       $this->entityFieldManager->getFieldStorageDefinitions($entity_type->id())
         ->willReturn([$entity_type->getKey('id') => $field_storage_definition]);
@@ -210,7 +229,7 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
     $this->assertEquals($expected, $route);
   }
 
-  public static function providerTestGetCanonicalRoute() {
+  public static function providerTestGetCanonicalRoute(): array {
     $prophet = new Prophet();
     $data = [];
 
@@ -248,6 +267,7 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
     $entity_type4 = static::getEntityType($entity_type3);
     $entity_type4->entityClassImplements(FieldableEntityInterface::class)->willReturn(TRUE);
     $entity_type4->getKey('id')->willReturn('id');
+    $entity_type4->hasIntegerId()->willReturn(TRUE);
     $route->setRequirement('the_entity_type_id', '\d+');
     $field_storage_definition = $prophet->prophesize(FieldStorageDefinitionInterface::class);
     $field_storage_definition->getType()->willReturn('integer');
@@ -257,15 +277,15 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getCollectionRoute
-   * @dataProvider providerTestGetCollectionRoute
+   * Tests get collection route.
    */
-  public function testGetCollectionRoute(Route $expected = NULL, EntityTypeInterface $entity_type) {
+  #[DataProvider('providerTestGetCollectionRoute')]
+  public function testGetCollectionRoute(?Route $expected, EntityTypeInterface $entity_type): void {
     $route = $this->routeProvider->getCollectionRoute($entity_type);
     $this->assertEquals($expected, $route);
   }
 
-  public static function providerTestGetCollectionRoute() {
+  public static function providerTestGetCollectionRoute(): array {
     $data = [];
 
     $entity_type1 = static::getEntityType();
@@ -350,9 +370,10 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getEntityTypeIdKeyType
+   * Tests get entity type id key type.
    */
-  public function testGetEntityTypeIdKeyType() {
+  #[IgnoreDeprecations]
+  public function testGetEntityTypeIdKeyType(): void {
     $entity_type = $this->prophesize(EntityTypeInterface::class);
     $entity_type->entityClassImplements(FieldableEntityInterface::class)->willReturn(TRUE);
     $entity_type->id()->willReturn('the_entity_type_id');
@@ -367,9 +388,10 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getEntityTypeIdKeyType
+   * Tests get entity type id key type not fieldable.
    */
-  public function testGetEntityTypeIdKeyTypeNotFieldable() {
+  #[IgnoreDeprecations]
+  public function testGetEntityTypeIdKeyTypeNotFieldable(): void {
     $entity_type = $this->prophesize(EntityTypeInterface::class);
     $entity_type->entityClassImplements(FieldableEntityInterface::class)->willReturn(FALSE);
     $this->entityFieldManager->getFieldStorageDefinitions(Argument::any())->shouldNotBeCalled();
@@ -379,15 +401,16 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
   }
 
   /**
-   * @param \Prophecy\Prophecy\ObjectProphecy $base_entity_type
+   * @param \Prophecy\Prophecy\ObjectProphecy|null $base_entity_type
    *   (optional) The prophesize base entity type.
    *
-   * @return \Prophecy\Prophecy\ObjectProphecy
+   * @return \Prophecy\Prophecy\ObjectProphecy<\Drupal\Core\Entity\EntityTypeInterface>
+   *   The entity type prophecy.
    */
-  protected static function getEntityType(ObjectProphecy $base_entity_type = NULL) {
+  protected static function getEntityType(?ObjectProphecy $base_entity_type = NULL): ObjectProphecy {
     $entity_type = (new Prophet())->prophesize(EntityTypeInterface::class);
     if ($base_entity_type) {
-      foreach ($base_entity_type->getMethodProphecies() as $method => $prophecies) {
+      foreach ($base_entity_type->getMethodProphecies() as $prophecies) {
         foreach ($prophecies as $prophecy) {
           $entity_type->addMethodProphecy(clone $prophecy);
         }
@@ -398,6 +421,9 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
 
 }
 
+/**
+ * Stub class for testing DefaultHtmlRouteProvider.
+ */
 class TestDefaultHtmlRouteProvider extends DefaultHtmlRouteProvider {
 
   public function getEntityTypeIdKeyType(EntityTypeInterface $entity_type) {

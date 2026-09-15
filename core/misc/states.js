@@ -93,15 +93,16 @@
    */
   Drupal.behaviors.states = {
     attach(context, settings) {
-      const $states = $(context).find('[data-drupal-states]');
-      const il = $states.length;
+      // Uses once to avoid duplicates if attach is called multiple times.
+      const elements = once('states', '[data-drupal-states]', context);
+      const il = elements.length;
       for (let i = 0; i < il; i++) {
         const config = JSON.parse(
-          $states[i].getAttribute('data-drupal-states'),
+          elements[i].getAttribute('data-drupal-states'),
         );
         Object.keys(config || {}).forEach((state) => {
           new states.Dependent({
-            element: $($states[i]),
+            element: $(elements[i]),
             state: states.State.sanitize(state),
             constraints: config[state],
           });
@@ -718,7 +719,7 @@
       if (e.value) {
         const label = `label${e.target.id ? `[for=${e.target.id}]` : ''}`;
         const $label = $(e.target)
-          .attr({ required: 'required', 'aria-required': 'true' })
+          .attr({ required: 'required' })
           .closest('.js-form-item, .js-form-wrapper')
           .find(label);
         // Avoids duplicate required markers on initialization.
@@ -727,7 +728,7 @@
         }
       } else {
         $(e.target)
-          .removeAttr('required aria-required')
+          .removeAttr('required')
           .closest('.js-form-item, .js-form-wrapper')
           .find('label.js-form-required')
           .removeClass('js-form-required form-required');

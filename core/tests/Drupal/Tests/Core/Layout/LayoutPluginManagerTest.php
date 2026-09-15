@@ -17,16 +17,22 @@ use Drupal\Core\Layout\LayoutDefinition;
 use Drupal\Core\Layout\LayoutInterface;
 use Drupal\Core\Layout\LayoutPluginManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\layout_discovery\Hook\LayoutDiscoveryThemeHooks;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 
 // cspell:ignore lorem, ipsum, consectetur, adipiscing
-
 /**
- * @coversDefaultClass \Drupal\Core\Layout\LayoutPluginManager
- * @group Layout
+ * Tests Drupal\Core\Layout\LayoutPluginManager.
  */
+#[CoversClass(LayoutPluginManager::class)]
+#[Group('Layout')]
+#[IgnoreDeprecations]
 class LayoutPluginManagerTest extends UnitTestCase {
 
   /**
@@ -42,6 +48,13 @@ class LayoutPluginManagerTest extends UnitTestCase {
    * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
   protected $themeHandler;
+
+  /**
+   * The theme manager.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected $themeManager;
 
   /**
    * Cache backend instance.
@@ -67,6 +80,8 @@ class LayoutPluginManagerTest extends UnitTestCase {
 
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->getStringTranslationStub());
+    $this->themeManager = $this->prophesize(ThemeManagerInterface::class);
+    $container->set('theme.manager', $this->themeManager->reveal());
     \Drupal::setContainer($container);
 
     $this->moduleHandler = $this->prophesize(ModuleHandlerInterface::class);
@@ -98,13 +113,17 @@ class LayoutPluginManagerTest extends UnitTestCase {
     $class_loader->addPsr4("Drupal\\Core\\", vfsStream::url("root/core/lib/Drupal/Core"));
     $class_loader->register(TRUE);
     $this->layoutPluginManager = new LayoutPluginManager($namespaces, $this->cacheBackend->reveal(), $this->moduleHandler->reveal(), $this->themeHandler->reveal());
+
+    $this->expectUserDeprecationMessage('Using @Layout annotation for plugin with ID plugin_provided_by_annotation_layout is deprecated and is removed from drupal:13.0.0. Use a Drupal\Core\Layout\Attribute\Layout attribute instead. See https://www.drupal.org/node/3395575');
   }
 
   /**
-   * @covers ::getDefinitions
-   * @covers ::providerExists
+   * Tests get definitions.
+   *
+   * @legacy-covers ::getDefinitions
+   * @legacy-covers ::providerExists
    */
-  public function testGetDefinitions() {
+  public function testGetDefinitions(): void {
     $expected = [
       'module_a_provided_layout',
       'theme_a_provided_layout',
@@ -118,10 +137,12 @@ class LayoutPluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getDefinition
-   * @covers ::processDefinition
+   * Tests get definition.
+   *
+   * @legacy-covers ::getDefinition
+   * @legacy-covers ::processDefinition
    */
-  public function testGetDefinition() {
+  public function testGetDefinition(): void {
     $layout_definition = $this->layoutPluginManager->getDefinition('theme_a_provided_layout');
     $this->assertSame('theme_a_provided_layout', $layout_definition->id());
     $this->assertSame('2 column layout', (string) $layout_definition->getLabel());
@@ -241,12 +262,12 @@ class LayoutPluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::processDefinition
+   * Tests process definition.
    */
-  public function testProcessDefinition() {
+  public function testProcessDefinition(): void {
     $this->moduleHandler->alter('layout', Argument::type('array'))->shouldNotBeCalled();
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The "module_a_derived_layout:array_based" layout definition must extend ' . LayoutDefinition::class);
+    $this->expectExceptionMessageIs('The "module_a_derived_layout:array_based" layout definition must extend ' . LayoutDefinition::class);
     $module_a_provided_layout = <<<'EOS'
 module_a_derived_layout:
   deriver: \Drupal\Tests\Core\Layout\LayoutDeriver
@@ -263,13 +284,37 @@ EOS;
   }
 
   /**
-   * @covers ::getThemeImplementations
+   * Tests ::processDefinition() with a layout that doesn't have a category.
+   *
+   * @legacy-covers ::processDefinition
    */
-  public function testGetThemeImplementations() {
+  public function testProcessDefinitionWithMissingLayoutCategory(): void {
+    $module_a_category_less_layout = <<<'EOS'
+module_a_category_less_layout:
+  label: Category-less Layout
+  description: A layout that doesn't have a category.
+EOS;
+    $file_name = 'module_a.layouts.yml';
+    vfsStream::create([
+      'modules' => [
+        'module_a' => [
+          $file_name => $module_a_category_less_layout,
+        ],
+      ],
+    ]);
+    $definitions = $this->layoutPluginManager->getDefinitions();
+    $this->assertEquals($file_name, $definitions['module_a_category_less_layout']->getCategory());
+  }
+
+  /**
+   * Tests get theme implementations.
+   */
+  public function testGetThemeImplementations(): void {
     $core_path = '/core/lib/Drupal/Core';
     $expected = [
       'layout' => [
         'render element' => 'content',
+        'initial preprocess' => LayoutDiscoveryThemeHooks::class . ':preprocessLayout',
       ],
       'twocol' => [
         'render element' => 'content',
@@ -295,9 +340,9 @@ EOS;
   }
 
   /**
-   * @covers ::getCategories
+   * Tests get categories.
    */
-  public function testGetCategories() {
+  public function testGetCategories(): void {
     $expected = [
       'Columns: 1',
       'Columns: 2',
@@ -307,9 +352,9 @@ EOS;
   }
 
   /**
-   * @covers ::getSortedDefinitions
+   * Tests get sorted definitions.
    */
-  public function testGetSortedDefinitions() {
+  public function testGetSortedDefinitions(): void {
     // Sorted by category first, then label.
     $expected = [
       'module_a_provided_layout',
@@ -324,9 +369,9 @@ EOS;
   }
 
   /**
-   * @covers ::getGroupedDefinitions
+   * Tests get grouped definitions.
    */
-  public function testGetGroupedDefinitions() {
+  public function testGetGroupedDefinitions(): void {
     $category_expected = [
       'Columns: 1' => [
         'module_a_provided_layout',
@@ -348,9 +393,29 @@ EOS;
   }
 
   /**
+   * Test that modules and themes can alter the list of layouts.
+   */
+  public function testGetLayoutOptions(): void {
+    $this->moduleHandler->alter(
+      ['plugin_filter_layout', 'plugin_filter_layout__layout'],
+      Argument::type('array'),
+      [],
+      'layout',
+    )->shouldBeCalled();
+    $this->themeManager->alter(
+      ['plugin_filter_layout', 'plugin_filter_layout__layout'],
+      Argument::type('array'),
+      [],
+      'layout',
+    )->shouldBeCalled();
+
+    $this->layoutPluginManager->getLayoutOptions();
+  }
+
+  /**
    * Sets up the filesystem with YAML files and annotated plugins.
    */
-  protected function setUpFilesystem() {
+  protected function setUpFilesystem(): void {
     $module_a_provided_layout = <<<'EOS'
 module_a_provided_layout:
   label: 1 column layout
@@ -487,6 +552,7 @@ class LayoutDeriver extends DeriverBase {
       $this->derivatives['invalid_provider'] = new LayoutDefinition([
         'id' => 'invalid_provider',
         'provider' => 'invalid_provider',
+        'label' => 'invalid_provider',
       ]);
       $this->derivatives['invalid_provider']->setClass(LayoutInterface::class);
     }

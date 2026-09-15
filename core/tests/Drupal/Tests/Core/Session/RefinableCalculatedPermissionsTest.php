@@ -6,24 +6,28 @@ namespace Drupal\Tests\Core\Session;
 
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Session\CalculatedPermissionsItem;
+use Drupal\Core\Session\CalculatedPermissionsTrait;
 use Drupal\Core\Session\RefinableCalculatedPermissions;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Tests the RefinableCalculatedPermissions class.
- *
- * @covers \Drupal\Core\Session\CalculatedPermissionsTrait
- * @covers \Drupal\Core\Session\RefinableCalculatedPermissions
- * @group Session
  */
+#[Group('Session')]
+#[CoversClass(RefinableCalculatedPermissions::class)]
+#[CoversTrait(CalculatedPermissionsTrait::class)]
 class RefinableCalculatedPermissionsTest extends UnitTestCase {
 
   /**
    * Tests the addition of a calculated permissions item.
    */
-  public function testAddItem() {
+  public function testAddItem(): void {
     $calculated_permissions = new RefinableCalculatedPermissions();
     $scope = 'some_scope';
 
@@ -43,10 +47,9 @@ class RefinableCalculatedPermissionsTest extends UnitTestCase {
 
   /**
    * Tests the overwriting of a calculated permissions item.
-   *
-   * @depends testAddItem
    */
-  public function testAddItemOverwrite() {
+  #[Depends('testAddItem')]
+  public function testAddItemOverwrite(): void {
     $calculated_permissions = new RefinableCalculatedPermissions();
     $scope = 'some_scope';
 
@@ -60,10 +63,9 @@ class RefinableCalculatedPermissionsTest extends UnitTestCase {
 
   /**
    * Tests the removal of a calculated permissions item.
-   *
-   * @depends testAddItem
    */
-  public function testRemoveItem() {
+  #[Depends('testAddItem')]
+  public function testRemoveItem(): void {
     $scope = 'some_scope';
     $item = new CalculatedPermissionsItem(['bar'], FALSE, $scope, 'foo');
 
@@ -75,10 +77,9 @@ class RefinableCalculatedPermissionsTest extends UnitTestCase {
 
   /**
    * Tests the removal of all calculated permissions items.
-   *
-   * @depends testAddItem
    */
-  public function testRemoveItems() {
+  #[Depends('testAddItem')]
+  public function testRemoveItems(): void {
     $scope = 'some_scope';
     $item = new CalculatedPermissionsItem(['bar'], FALSE, $scope, 'foo');
 
@@ -91,10 +92,9 @@ class RefinableCalculatedPermissionsTest extends UnitTestCase {
 
   /**
    * Tests the removal of calculated permissions items by scope.
-   *
-   * @depends testAddItem
    */
-  public function testRemoveItemsByScope() {
+  #[Depends('testAddItem')]
+  public function testRemoveItemsByScope(): void {
     $scope_a = 'cat';
     $scope_b = 'dog';
 
@@ -112,10 +112,9 @@ class RefinableCalculatedPermissionsTest extends UnitTestCase {
 
   /**
    * Tests merging in another CalculatedPermissions object.
-   *
-   * @depends testAddItem
    */
-  public function testMerge() {
+  #[Depends('testAddItem')]
+  public function testMerge(): void {
     $scope = 'some_scope';
 
     $cache_context_manager = $this->prophesize(CacheContextsManager::class);

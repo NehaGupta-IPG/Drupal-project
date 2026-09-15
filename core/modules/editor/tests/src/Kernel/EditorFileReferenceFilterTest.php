@@ -10,26 +10,25 @@ use Drupal\file\Entity\File;
 use Drupal\filter\FilterPluginCollection;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Editor module's file reference filter.
- *
- * @group editor
  */
+#[Group('editor')]
+#[RunTestsInSeparateProcesses]
 class EditorFileReferenceFilterTest extends KernelTestBase {
 
   use TestFileCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
     'filter',
     'editor',
-    'field',
     'file',
     'user',
   ];
@@ -56,7 +55,7 @@ class EditorFileReferenceFilterTest extends KernelTestBase {
   /**
    * Tests the editor file reference filter.
    */
-  public function testEditorFileReferenceFilter() {
+  public function testEditorFileReferenceFilter(): void {
     $filter = $this->filters['editor_file_reference'];
 
     $test = function ($input) use ($filter) {

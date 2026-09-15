@@ -9,17 +9,25 @@ use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\FileStorageFactory;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\Config\FileStorageFactory
- * @group config
+ * Tests Drupal\Core\Config\FileStorageFactory.
  */
+#[CoversClass(FileStorageFactory::class)]
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class FileStorageFactoryTest extends KernelTestBase {
 
   /**
-   * @covers ::getSync
+   * Tests get sync.
    */
-  public function testGetSync() {
+  public function testGetSync(): void {
+    $this->expectUserDeprecationMessage('Drupal\Core\Config\FileStorageFactory::getSync() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the "config.storage.sync" service instead. See https://www.drupal.org/node/3586484');
 
     // Write some random data to the sync storage.
     $name = $this->randomMachineName();
@@ -38,7 +46,7 @@ class FileStorageFactoryTest extends KernelTestBase {
 
     // On an empty settings there is an exception thrown.
     $this->expectException(ConfigDirectoryNotDefinedException::class);
-    $this->expectExceptionMessage('The config sync directory is not defined in $settings["config_sync_directory"]');
+    $this->expectExceptionMessageIs('The config sync directory is not defined in $settings["config_sync_directory"]');
     FileStorageFactory::getSync();
   }
 

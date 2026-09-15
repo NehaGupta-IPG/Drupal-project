@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\image_module_test\Plugin\ImageEffect;
 
 use Drupal\Core\Ajax\AjaxResponse;
@@ -69,7 +71,7 @@ class AjaxTestImageEffect extends ConfigurableImageEffectBase {
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     parent::submitConfigurationForm($form, $form_state);
 
     $this->configuration['test_parameter'] = $form_state->getValue('test_parameter');

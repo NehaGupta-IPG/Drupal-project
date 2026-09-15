@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\announcements_feed\Unit;
 
-use Drupal\Tests\UnitTestCase;
 use Drupal\announcements_feed\AnnounceFetcher;
+use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
+use Drupal\Tests\UnitTestCase;
+use GuzzleHttp\ClientInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Psr\Log\LoggerInterface;
 
 /**
  * Simple test to ensure that asserts pass.
- *
- * @group announcements_feed
  */
+#[Group('announcements_feed')]
 class AnnounceFetcherUnitTest extends UnitTestCase {
 
   /**
    * The Fetcher service object.
-   *
-   * @var \Drupal\announcements_feed\AnnounceFetcher
    */
   protected AnnounceFetcher $fetcher;
 
@@ -26,7 +28,7 @@ class AnnounceFetcherUnitTest extends UnitTestCase {
    */
   public function setUp():void {
     parent::setUp();
-    $httpClient = $this->createMock('GuzzleHttp\ClientInterface');
+    $httpClient = $this->createStub(ClientInterface::class);
     $config = $this->getConfigFactoryStub([
       'announcements_feed.settings' => [
         'max_age' => 86400,
@@ -37,20 +39,19 @@ class AnnounceFetcherUnitTest extends UnitTestCase {
     $tempStore = $this->createMock('Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface');
     $tempStore->expects($this->once())
       ->method('get')
-      ->willReturn($this->createMock('Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface'));
+      ->willReturn($this->createStub(KeyValueStoreExpirableInterface::class));
 
-    $logger = $this->createMock('Psr\Log\LoggerInterface');
+    $logger = $this->createStub(LoggerInterface::class);
     $this->fetcher = new AnnounceFetcher($httpClient, $config, $tempStore, $logger, 'https://www.drupal.org/announcements.json');
   }
 
   /**
    * Test the ValidateUrl() method.
    *
-   * @covers \Drupal\announcements_feed\AnnounceFetcher::validateUrl
-   *
-   * @dataProvider urlProvider
+   * @legacy-covers \Drupal\announcements_feed\AnnounceFetcher::validateUrl
    */
-  public function testValidateUrl($url, $isValid) {
+  #[DataProvider('urlProvider')]
+  public function testValidateUrl(string $url, bool $isValid): void {
     $this->assertEquals($isValid, $this->fetcher->validateUrl($url));
   }
 

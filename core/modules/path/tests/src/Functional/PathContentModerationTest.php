@@ -7,22 +7,22 @@ namespace Drupal\Tests\path\Functional;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests path aliases with Content Moderation.
- *
- * @group content_moderation
- * @group path
  */
+#[Group('content_moderation')]
+#[Group('path')]
+#[RunTestsInSeparateProcesses]
 class PathContentModerationTest extends BrowserTestBase {
 
   use ContentModerationTestTrait;
   use ContentTranslationTestTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -92,7 +92,7 @@ class PathContentModerationTest extends BrowserTestBase {
   /**
    * Tests node path aliases on a moderated content type.
    */
-  public function testNodePathAlias() {
+  public function testNodePathAlias(): void {
     // Create some moderated content with a path alias.
     $this->drupalGet('node/add/moderated');
     $this->assertSession()->fieldValueEquals('path[0][alias]', '');
@@ -157,7 +157,7 @@ class PathContentModerationTest extends BrowserTestBase {
   /**
    * Tests that translated and moderated node can get new draft revision.
    */
-  public function testTranslatedModeratedNodeAlias() {
+  public function testTranslatedModeratedNodeAlias(): void {
     // Create one node with a random alias.
     $default_node = $this->drupalCreateNode([
       'type' => 'moderated',

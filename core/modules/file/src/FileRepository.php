@@ -17,81 +17,20 @@ use Drupal\file\FileUsage\FileUsageInterface;
  */
 class FileRepository implements FileRepositoryInterface {
 
-  /**
-   * The file system service.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
-   * The stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
-   */
-  protected $streamWrapperManager;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The file usage service.
-   *
-   * @var \Drupal\file\FileUsage\FileUsageInterface
-   */
-  protected $fileUsage;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * FileRepository constructor.
-   *
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
-   *   The file system.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
-   *   The stream wrapper manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   * @param \Drupal\file\FileUsage\FileUsageInterface $fileUsage
-   *   The file usage service.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user.
-   */
-  public function __construct(FileSystemInterface $fileSystem, StreamWrapperManagerInterface $streamWrapperManager, EntityTypeManagerInterface $entityTypeManager, ModuleHandlerInterface $moduleHandler, FileUsageInterface $fileUsage, AccountInterface $currentUser) {
-    $this->fileSystem = $fileSystem;
-    $this->streamWrapperManager = $streamWrapperManager;
-    $this->entityTypeManager = $entityTypeManager;
-    $this->moduleHandler = $moduleHandler;
-    $this->fileUsage = $fileUsage;
-    $this->currentUser = $currentUser;
+  public function __construct(
+    protected FileSystemInterface $fileSystem,
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected FileUsageInterface $fileUsage,
+    protected AccountInterface $currentUser,
+  ) {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function writeData(string $data, string $destination, FileExists|int $fileExists = FileExists::Rename): FileInterface {
-    if (!$fileExists instanceof FileExists) {
-      // @phpstan-ignore-next-line
-      $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
-    }
+  public function writeData(string $data, string $destination, FileExists $fileExists = FileExists::Rename): FileInterface {
     if (!$this->streamWrapperManager->isValidUri($destination)) {
       throw new InvalidStreamWrapperException("Invalid stream wrapper: {$destination}");
     }
@@ -123,7 +62,7 @@ class FileRepository implements FileRepositoryInterface {
     }
 
     if ($rename && is_file($destination)) {
-      $file->setFilename($this->fileSystem->basename($destination));
+      $file->setFilename(basename($destination));
     }
 
     $file->setPermanent();
@@ -135,11 +74,7 @@ class FileRepository implements FileRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function copy(FileInterface $source, string $destination, FileExists|int $fileExists = FileExists::Rename): FileInterface {
-    if (!$fileExists instanceof FileExists) {
-      // @phpstan-ignore-next-line
-      $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
-    }
+  public function copy(FileInterface $source, string $destination, FileExists $fileExists = FileExists::Rename): FileInterface {
     if (!$this->streamWrapperManager->isValidUri($destination)) {
       throw new InvalidStreamWrapperException("Invalid stream wrapper: {$destination}");
     }
@@ -156,10 +91,10 @@ class FileRepository implements FileRepositoryInterface {
       // If we are renaming around an existing file (rather than a directory),
       // use its basename for the filename.
       if ($fileExists === FileExists::Rename && is_file($destination)) {
-        $file->setFilename($this->fileSystem->basename($destination));
+        $file->setFilename(basename($destination));
       }
       else {
-        $file->setFilename($this->fileSystem->basename($uri));
+        $file->setFilename(basename($uri));
       }
     }
     $file->save();
@@ -173,11 +108,7 @@ class FileRepository implements FileRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function move(FileInterface $source, string $destination, FileExists|int $fileExists = FileExists::Rename): FileInterface {
-    if (!$fileExists instanceof FileExists) {
-      // @phpstan-ignore-next-line
-      $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
-    }
+  public function move(FileInterface $source, string $destination, FileExists $fileExists = FileExists::Rename): FileInterface {
     if (!$this->streamWrapperManager->isValidUri($destination)) {
       throw new InvalidStreamWrapperException("Invalid stream wrapper: {$destination}");
     }
@@ -197,7 +128,7 @@ class FileRepository implements FileRepositoryInterface {
     // If we are renaming around an existing file (rather than a directory),
     // use its basename for the filename.
     elseif ($fileExists === FileExists::Rename && is_file($destination)) {
-      $file->setFilename($this->fileSystem->basename($destination));
+      $file->setFilename(basename($destination));
     }
 
     $file->save();

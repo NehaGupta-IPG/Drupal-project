@@ -8,38 +8,42 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Database\Database;
 use Drupal\node\Entity\NodeType;
-use Drupal\views\Entity\View;
-use Drupal\views\Views;
-use Drupal\views\ViewExecutable;
-use Drupal\views\ViewExecutableFactory;
+use Drupal\user\Entity\User;
 use Drupal\views\DisplayPluginCollection;
+use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\display\DefaultDisplay;
 use Drupal\views\Plugin\views\display\Page;
-use Drupal\views\Plugin\views\style\DefaultStyle;
-use Drupal\views\Plugin\views\style\Grid;
-use Drupal\views\Plugin\views\row\Fields;
-use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\Plugin\views\pager\PagerPluginBase;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\Plugin\views\query\Sql;
+use Drupal\views\Plugin\views\row\Fields;
+use Drupal\views\Plugin\views\style\DefaultStyle;
+use Drupal\views\Plugin\views\style\Grid;
+use Drupal\views\ViewExecutable;
+use Drupal\views\ViewExecutableFactory;
+use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\display\DisplayTest;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests the ViewExecutable class.
  *
- * @group views
- * @group #slow
  * @see \Drupal\views\ViewExecutable
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewExecutableTest extends ViewsKernelTestBase {
 
   use CommentTestTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
-    'system',
     'node',
     'comment',
-    'user',
     'filter',
     'field',
     'text',
@@ -51,22 +55,6 @@ class ViewExecutableTest extends ViewsKernelTestBase {
    * @var array
    */
   public static $testViews = ['test_destroy', 'test_executable_displays', 'test_argument_dependency'];
-
-  /**
-   * Properties that should be stored in the configuration.
-   *
-   * @var array
-   */
-  protected $configProperties = [
-    'disabled',
-    'name',
-    'description',
-    'tag',
-    'base_table',
-    'label',
-    'core',
-    'display',
-  ];
 
   /**
    * Properties that should be stored in the executable.
@@ -88,7 +76,10 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     'parent_views',
   ];
 
-  protected function setUpFixtures() {
+  /**
+   * Sets up the necessary fixtures for the test environment.
+   */
+  protected function setUpFixtures(): void {
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installEntitySchema('comment');
@@ -108,7 +99,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   /**
    * Tests the views.executable container service.
    */
-  public function testFactoryService() {
+  public function testFactoryService(): void {
     $factory = $this->container->get('views.executable');
     $this->assertInstanceOf(ViewExecutableFactory::class, $factory);
     $view = View::load('test_executable_displays');
@@ -118,7 +109,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   /**
    * Tests the initDisplay() and initHandlers() methods.
    */
-  public function testInitMethods() {
+  public function testInitMethods(): void {
     $view = Views::getView('test_destroy');
     $view->initDisplay();
 
@@ -142,22 +133,19 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $this->assertInstanceOf(DefaultDisplay::class, $view->display_handler);
     $this->assertInstanceOf(DefaultDisplay::class, $view->displayHandlers->get('default'));
 
-    $view_hash = spl_object_hash($view);
-    $display_hash = spl_object_hash($view->display_handler);
-
     // Test the initStyle() method.
     $view->initStyle();
     $this->assertInstanceOf(DefaultStyle::class, $view->style_plugin);
     // Test the plugin has been invited and view have references to the view and
     // display handler.
-    $this->assertEquals($view_hash, spl_object_hash($view->style_plugin->view));
-    $this->assertEquals($display_hash, spl_object_hash($view->style_plugin->displayHandler));
+    $this->assertSame($view, $view->style_plugin->view);
+    $this->assertSame($view->display_handler, $view->style_plugin->displayHandler);
 
     // Test the initQuery method().
     $view->initQuery();
     $this->assertInstanceOf(Sql::class, $view->query);
-    $this->assertEquals($view_hash, spl_object_hash($view->query->view));
-    $this->assertEquals($display_hash, spl_object_hash($view->query->displayHandler));
+    $this->assertSame($view, $view->query->view);
+    $this->assertSame($view->display_handler, $view->query->displayHandler);
 
     $view->destroy();
 
@@ -186,14 +174,14 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   /**
    * Tests the generation of the executable object.
    */
-  public function testConstructing() {
+  public function testConstructing(): void {
     Views::getView('test_destroy');
   }
 
   /**
    * Tests the accessing of values on the object.
    */
-  public function testProperties() {
+  public function testProperties(): void {
     $view = Views::getView('test_destroy');
     foreach ($this->executableProperties as $property) {
       $this->assertTrue(isset($view->{$property}));
@@ -203,7 +191,10 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $this->assertEquals([], $view->getExposedInput());
   }
 
-  public function testSetDisplayWithInvalidDisplay() {
+  /**
+   * Tests setting a display with an invalid display ID.
+   */
+  public function testSetDisplayWithInvalidDisplay(): void {
     \Drupal::service('module_installer')->install(['dblog']);
     $view = Views::getView('test_executable_displays');
     $view->initDisplay();
@@ -222,13 +213,13 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $this->assertEquals(serialize($arguments), $logged);
 
     $this->assertEquals('default', $view->current_display, 'If setDisplay is called with an invalid display id the default display should be used.');
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('default')), spl_object_hash($view->display_handler));
+    $this->assertSame($view->displayHandlers->get('default'), $view->display_handler);
   }
 
   /**
    * Tests the display related methods and properties.
    */
-  public function testDisplays() {
+  public function testDisplays(): void {
     $view = Views::getView('test_executable_displays');
 
     // Tests Drupal\views\ViewExecutable::initDisplay().
@@ -241,25 +232,25 @@ class ViewExecutableTest extends ViewsKernelTestBase {
 
     // After initializing the default display is the current used display.
     $this->assertEquals('default', $view->current_display);
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('default')), spl_object_hash($view->display_handler));
+    $this->assertSame($view->displayHandlers->get('default'), $view->display_handler);
 
     // All handlers should have a reference to the default display.
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('default')), spl_object_hash($view->displayHandlers->get('page_1')->default_display));
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('default')), spl_object_hash($view->displayHandlers->get('page_2')->default_display));
+    $this->assertSame($view->displayHandlers->get('default'), $view->displayHandlers->get('page_1')->default_display);
+    $this->assertSame($view->displayHandlers->get('default'), $view->displayHandlers->get('page_2')->default_display);
 
     // Tests Drupal\views\ViewExecutable::setDisplay().
     $view->setDisplay();
     $this->assertEquals('default', $view->current_display, 'If setDisplay is called with no parameter the default display should be used.');
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('default')), spl_object_hash($view->display_handler));
+    $this->assertSame($view->displayHandlers->get('default'), $view->display_handler);
 
     // Set two different valid displays.
     $view->setDisplay('page_1');
     $this->assertEquals('page_1', $view->current_display, 'If setDisplay is called with a valid display id the appropriate display should be used.');
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('page_1')), spl_object_hash($view->display_handler));
+    $this->assertSame($view->displayHandlers->get('page_1'), $view->display_handler);
 
     $view->setDisplay('page_2');
     $this->assertEquals('page_2', $view->current_display, 'If setDisplay is called with a valid display id the appropriate display should be used.');
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('page_2')), spl_object_hash($view->display_handler));
+    $this->assertSame($view->displayHandlers->get('page_2'), $view->display_handler);
 
     // Destroy the view, so we can start again and test an invalid display.
     $view->destroy();
@@ -298,7 +289,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   /**
    * Tests the setting/getting of properties.
    */
-  public function testPropertyMethods() {
+  public function testPropertyMethods(): void {
     $view = Views::getView('test_executable_displays');
 
     // Test the setAjaxEnabled() method.
@@ -334,7 +325,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $this->assertInstanceOf(Response::class, $view->getResponse());
     $new_response = new Response();
     $view->setResponse($new_response);
-    $this->assertSame(spl_object_hash($view->getResponse()), spl_object_hash($new_response), 'New response object correctly set.');
+    $this->assertSame($new_response, $view->getResponse(), 'New response object correctly set.');
 
     // Test the getPath() method.
     $path = $this->randomMachineName();
@@ -355,7 +346,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   /**
    * Tests the destructor to be sure that necessary objects are removed.
    */
-  public function testDestroy() {
+  public function testDestroy(): void {
     $view = Views::getView('test_destroy');
 
     $view->preview();
@@ -401,7 +392,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
    * @return mixed
    *   The instance property value.
    */
-  protected function getProtectedProperty($instance, $property) {
+  protected function getProtectedProperty($instance, $property): mixed {
     $reflection = new \ReflectionProperty($instance, $property);
     return $reflection->getValue($instance);
   }
@@ -409,7 +400,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   /**
    * Tests ViewExecutable::getHandlerTypes().
    */
-  public function testGetHandlerTypes() {
+  public function testGetHandlerTypes(): void {
     $types = ViewExecutable::getHandlerTypes();
     foreach (['field', 'filter', 'argument', 'sort', 'header', 'footer', 'empty'] as $type) {
       $this->assertTrue(isset($types[$type]));
@@ -428,7 +419,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   /**
    * Tests ViewExecutable::getHandlers().
    */
-  public function testGetHandlers() {
+  public function testGetHandlers(): void {
     $view = Views::getView('test_executable_displays');
     $view->setDisplay('page_1');
 
@@ -441,7 +432,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   /**
    * Tests the validation of display handlers.
    */
-  public function testValidate() {
+  public function testValidate(): void {
     $view = Views::getView('test_executable_displays');
     $view->setDisplay('page_1');
 
@@ -452,7 +443,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
 
     $count = 0;
     foreach ($view->displayHandlers as $id => $display) {
-      $match = function ($value) use ($display) {
+      $match = function ($value) use ($display): bool {
         return str_contains((string) $value, $display->display['display_title']);
       };
       $this->assertNotEmpty(array_filter($validate[$id], $match), "Error message found for $id display");
@@ -472,17 +463,15 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   /**
    * Tests that nested loops of the display handlers won't break validation.
    */
-  public function testValidateNestedLoops() {
+  public function testValidateNestedLoops(): void {
     $view = View::create(['id' => 'test_validate_nested_loops']);
     $executable = $view->getExecutable();
 
     $executable->newDisplay('display_test');
     $executable->newDisplay('display_test');
     $errors = $executable->validate();
-    $total_error_count = array_reduce($errors, function ($carry, $item) {
-      $carry += count($item);
-
-      return $carry;
+    $total_error_count = array_reduce($errors, function (float|int|null $carry, $item): float|int {
+      return $carry + count($item);
     });
     // Assert that there were 9 total errors across 3 displays.
     $this->assertSame(9, $total_error_count);
@@ -492,7 +481,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   /**
    * Tests serialization of the ViewExecutable object.
    */
-  public function testSerialization() {
+  public function testSerialization(): void {
     $view = Views::getView('test_executable_displays');
     $view->setDisplay('page_1');
     $view->setArguments(['test']);
@@ -548,14 +537,25 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   /**
    * Tests if argument overrides by validators are propagated to tokens.
    */
-  public function testArgumentValidatorValueOverride() {
+  public function testArgumentValidatorValueOverride(): void {
+    $account = User::create(['name' => $this->randomString()]);
+    $account->save();
+
     $view = Views::getView('test_argument_dependency');
     $view->setDisplay('page_1');
-    $view->setArguments(['1', 'this value should be replaced']);
+    // The view has two arguments: uid_touch (comment module) and uid (with
+    // argument_validator_test as its validator). Both are needed to verify
+    // that calculateDependencies() picks up dependencies from both default
+    // and validator plugins. uid receives the value the validator intercepts
+    // and overrides to '1'.
+    $view->setArguments([$account->id(), 'this value should be replaced']);
     $view->execute();
+    $account = User::load(1);
     $expected = [
-      '{{ arguments.uid }}' => '1',
-      '{{ raw_arguments.uid }}' => '1',
+      '{{ arguments.uid_touch }}' => $account->label(),
+      '{{ raw_arguments.uid_touch }}' => (string) $account->id(),
+      '{{ arguments.uid }}' => $account->label(),
+      '{{ raw_arguments.uid }}' => (string) $account->id(),
     ];
     $this->assertEquals($expected, $view->build_info['substitutions']);
   }

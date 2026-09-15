@@ -9,12 +9,14 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests widget form for a multiple value field.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class MultipleValueWidgetTest extends WebDriverTestBase {
 
   /**
@@ -66,7 +68,7 @@ class MultipleValueWidgetTest extends WebDriverTestBase {
   /**
    * Tests the 'Add more' functionality.
    */
-  public function testFieldMultipleValueWidget() {
+  public function testFieldMultipleValueWidget(): void {
     $this->drupalGet('entity_test/add');
 
     $assert_session = $this->assertSession();
@@ -172,7 +174,7 @@ class MultipleValueWidgetTest extends WebDriverTestBase {
   /**
    * Tests that no validation occurs on field on "Add more" click.
    */
-  public function testFieldMultipleValueWidgetAddMoreNoValidation() {
+  public function testFieldMultipleValueWidgetAddMoreNoValidation(): void {
     // Set unlimited field to be required.
     $field_name = 'field_unlimited';
     $field = FieldConfig::loadByName('entity_test', 'entity_test', $field_name);

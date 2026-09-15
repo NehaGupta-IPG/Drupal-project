@@ -6,8 +6,11 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\file\Entity\File;
+use Drupal\locale\LocaleDefaultOptions;
+use Drupal\locale\Model\TranslationUpdateMode;
 use Drupal\Tests\BrowserTestBase;
 
 // cspell:ignore februar januar juni marz
@@ -46,9 +49,7 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
   protected $timestampNow;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale', 'locale_test'];
 
@@ -68,7 +69,7 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->set('translation.use_source', TranslationUpdateMode::Local->value)
       ->save();
   }
 
@@ -81,7 +82,14 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
    */
   protected function setTranslationsDirectory($path) {
     \Drupal::service('file_system')->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY);
-    $this->config('locale.settings')->set('translation.path', $path)->save();
+    $settings['settings']['locale_translation_path'] = (object) [
+      'value' => $path,
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+    $settings = Settings::getAll();
+    $settings['locale_translation_path'] = $path;
+    new Settings($settings);
   }
 
   /**
@@ -112,8 +120,8 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
    *   singular strings are supported, no plurals. No double quotes are allowed
    *   in source and translations strings.
    */
-  protected function makePoFile($path, $filename, $timestamp = NULL, array $translations = []) {
-    $timestamp = $timestamp ? $timestamp : \Drupal::time()->getRequestTime();
+  protected function makePoFile($path, string $filename, $timestamp = NULL, array $translations = []) {
+    $timestamp = $timestamp ?: \Drupal::time()->getRequestTime();
     $path = 'public://' . $path;
     $text = '';
     $po_header = <<<EOF
@@ -121,18 +129,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 
 EOF;
 
     // Convert array of translations to Gettext source and translation strings.
-    if ($translations) {
-      foreach ($translations as $source => $target) {
-        $text .= 'msgid "' . $source . '"' . "\n";
-        $text .= 'msgstr "' . $target . '"' . "\n";
-      }
+    foreach ($translations as $source => $target) {
+      $text .= 'msgid "' . $source . '"' . "\n";
+      $text .= 'msgstr "' . $target . '"' . "\n";
     }
 
     \Drupal::service('file_system')->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY);
@@ -236,7 +242,7 @@ EOF;
         'lid' => $string->getId(),
         'language' => $langcode,
         'translation' => $translation,
-        'customized' => LOCALE_NOT_CUSTOMIZED,
+        'customized' => LocaleDefaultOptions::NOT_CUSTOMIZED,
       ])->save();
     }
 
@@ -256,7 +262,7 @@ EOF;
         'lid' => $string->getId(),
         'language' => $langcode,
         'translation' => $translation,
-        'customized' => LOCALE_CUSTOMIZED,
+        'customized' => LocaleDefaultOptions::CUSTOMIZED,
       ])->save();
     }
 

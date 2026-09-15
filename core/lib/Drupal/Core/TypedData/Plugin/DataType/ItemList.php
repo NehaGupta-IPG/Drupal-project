@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\TypedData\Plugin\DataType;
 
+use Drupal\Component\Utility\FilterArray;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
 use Drupal\Core\TypedData\ComplexDataInterface;
@@ -18,6 +19,10 @@ use Drupal\Core\TypedData\TypedDataInterface;
  * Drupal\Core\TypedData\Annotation\DataType.
  * Note: The class cannot be called "List" as list is a reserved PHP keyword.
  *
+ * @template T of \Drupal\Core\TypedData\TypedDataInterface
+ * @implements \IteratorAggregate<int, T>
+ * @implements \Drupal\Core\TypedData\ListInterface<T>
+ *
  * @ingroup typed_data
  */
 #[DataType(
@@ -30,7 +35,7 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
   /**
    * Numerically indexed array of items.
    *
-   * @var \Drupal\Core\TypedData\TypedDataInterface[]
+   * @var array<int,\Drupal\Core\TypedData\TypedDataInterface>
    */
   protected $list = [];
 
@@ -92,7 +97,7 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
       $strings[] = $item->getString();
     }
     // Remove any empty strings resulting from empty items.
-    return implode(', ', array_filter($strings, 'mb_strlen'));
+    return implode(', ', FilterArray::removeEmptyStrings($strings));
   }
 
   /**
@@ -216,6 +221,7 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    * Helper for creating a list item object.
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface
+   *   The new property instance.
    */
   protected function createItem($offset = 0, $value = NULL) {
     return $this->getTypedDataManager()->getPropertyInstance($this, $offset, $value);
@@ -229,7 +235,10 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Retrieves the iterator for the object.
+   *
+   * @return \ArrayIterator<int,\Drupal\Core\TypedData\TypedDataInterface>
+   *   The iterator.
    */
   public function getIterator(): \ArrayIterator {
     return new \ArrayIterator($this->list);
@@ -300,6 +309,13 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
       $this->list[$delta] = clone $item;
       $this->list[$delta]->setContext($delta, $this);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function last(): ?TypedDataInterface {
+    return $this->get($this->count() - 1);
   }
 
 }

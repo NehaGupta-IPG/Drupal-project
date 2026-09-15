@@ -49,7 +49,6 @@ class Config {
     'phpunit/php-code-coverage' => ['tests'],
     'phpunit/php-timer' => ['tests'],
     'phpunit/phpunit' => ['tests'],
-    'sebastian/code-unit-reverse-lookup' => ['tests'],
     'sebastian/comparator' => ['tests'],
     'sebastian/diff' => ['tests'],
     'sebastian/environment' => ['tests'],
@@ -77,6 +76,7 @@ class Config {
     'symfony/var-dumper' => ['Tests'],
     'symfony/validator' => ['Tests', 'Resources'],
     'symfony/yaml' => ['Tests'],
+    'tbachert/spi' => ['tests'],
     'theseer/tokenizer' => ['tests'],
     'twig/twig' => ['doc', 'ext', 'test', 'tests'],
   ];
@@ -125,6 +125,11 @@ class Config {
       $this->configData = array_change_key_case($package_config['drupal-core-vendor-hardening'], CASE_LOWER);
     }
 
+    // Find the packages which should not be cleaned up.
+    $do_not_clean = array_filter($this->configData, function ($paths) {
+      return $paths === FALSE;
+    });
+
     // Ensure the values are arrays.
     $this->configData = array_map(function ($paths) {
       return (array) $paths;
@@ -136,6 +141,10 @@ class Config {
         $this->configData[$package] ?? [],
         $paths);
     }
+
+    // Remove packages that should not be cleaned up.
+    $this->configData = array_diff_key($this->configData, $do_not_clean);
+
     return $this->configData;
   }
 

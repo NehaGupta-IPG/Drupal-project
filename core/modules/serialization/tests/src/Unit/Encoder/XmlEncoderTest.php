@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\serialization\Unit\Encoder;
 
 use Drupal\serialization\Encoder\XmlEncoder;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Serializer\Encoder\XmlEncoder as BaseXmlEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
-use Drupal\Tests\UnitTestCase;
 
 /**
- * @coversDefaultClass \Drupal\serialization\Encoder\XmlEncoder
- * @group serialization
+ * Tests Drupal\serialization\Encoder\XmlEncoder.
  */
+#[CoversClass(XmlEncoder::class)]
+#[Group('serialization')]
 class XmlEncoderTest extends UnitTestCase {
 
   /**
@@ -24,9 +28,9 @@ class XmlEncoderTest extends UnitTestCase {
   protected $encoder;
 
   /**
-   * @var \Symfony\Component\Serializer\Encoder\XmlEncoder|\PHPUnit\Framework\MockObject\MockObject
+   * The Symfony XML encoder.
    */
-  protected $baseEncoder;
+  protected BaseXmlEncoder&MockObject $baseEncoder;
 
   /**
    * An array of test data.
@@ -36,11 +40,9 @@ class XmlEncoderTest extends UnitTestCase {
   protected $testArray = ['test' => 'test'];
 
   /**
-   * {@inheritdoc}
+   * Initializes the encoder and baseEncoder properties.
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEncoder(): void {
     $this->baseEncoder = $this->createMock(BaseXmlEncoder::class);
     $this->encoder = new XmlEncoder();
     $this->encoder->setBaseEncoder($this->baseEncoder);
@@ -49,23 +51,26 @@ class XmlEncoderTest extends UnitTestCase {
   /**
    * Tests the supportsEncoding() method.
    */
-  public function testSupportsEncoding() {
-    $this->assertTrue($this->encoder->supportsEncoding('xml'));
-    $this->assertFalse($this->encoder->supportsEncoding('json'));
+  public function testSupportsEncoding(): void {
+    $encoder = new XmlEncoder();
+    $this->assertTrue($encoder->supportsEncoding('xml'));
+    $this->assertFalse($encoder->supportsEncoding('json'));
   }
 
   /**
    * Tests the supportsDecoding() method.
    */
-  public function testSupportsDecoding() {
-    $this->assertTrue($this->encoder->supportsDecoding('xml'));
-    $this->assertFalse($this->encoder->supportsDecoding('json'));
+  public function testSupportsDecoding(): void {
+    $encoder = new XmlEncoder();
+    $this->assertTrue($encoder->supportsDecoding('xml'));
+    $this->assertFalse($encoder->supportsDecoding('json'));
   }
 
   /**
    * Tests the encode() method.
    */
-  public function testEncode() {
+  public function testEncode(): void {
+    $this->setUpEncoder();
     $this->baseEncoder->expects($this->once())
       ->method('encode')
       ->with($this->testArray, 'test', [])
@@ -77,7 +82,8 @@ class XmlEncoderTest extends UnitTestCase {
   /**
    * Tests the decode() method.
    */
-  public function testDecode() {
+  public function testDecode(): void {
+    $this->setUpEncoder();
     $this->baseEncoder->expects($this->once())
       ->method('decode')
       ->with('test', 'test', [])
@@ -87,9 +93,11 @@ class XmlEncoderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getBaseEncoder
+   * Tests default encoder has serializer.
+   *
+   * @legacy-covers ::getBaseEncoder
    */
-  public function testDefaultEncoderHasSerializer() {
+  public function testDefaultEncoderHasSerializer(): void {
     // The serializer should be set on the Drupal encoder, which should then
     // set it on our default encoder.
     $encoder = new XmlEncoder();
@@ -103,9 +111,15 @@ class XmlEncoderTest extends UnitTestCase {
 
 }
 
+/**
+ * Test class used for the encoding test.
+ */
 class TestObject {
 
-  public function getA() {
+  /**
+   * Return the characters "A".
+   */
+  public function getA(): string {
     return 'A';
   }
 

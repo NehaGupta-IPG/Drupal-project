@@ -10,18 +10,20 @@ use Drupal\media\MediaInterface;
 use Drupal\media\MediaTypeInterface;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests creation of media types and media items.
- *
- * @group media
  */
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaCreationTest extends MediaKernelTestBase {
 
   /**
    * Tests creating a media type programmatically.
    */
-  public function testMediaTypeCreation() {
+  public function testMediaTypeCreation(): void {
     $media_type_storage = $this->container->get('entity_type.manager')->getStorage('media_type');
 
     $this->assertInstanceOf(MediaTypeInterface::class, MediaType::load($this->testMediaType->id()));
@@ -54,7 +56,7 @@ class MediaCreationTest extends MediaKernelTestBase {
       'id' => 'role1',
       'label' => 'role1',
     ]);
-    $role->grantPermission('view media')->trustData()->save();
+    $role->grantPermission('view media')->save();
     $user2->addRole($role->id());
     $this->assertFalse($test_media_type->access('view label', $user1));
     $this->assertTrue($test_media_type->access('view label', $user2));
@@ -63,7 +65,7 @@ class MediaCreationTest extends MediaKernelTestBase {
   /**
    * Tests creating a media item programmatically.
    */
-  public function testMediaEntityCreation() {
+  public function testMediaEntityCreation(): void {
     $media = Media::create([
       'bundle' => $this->testMediaType->id(),
       'name' => 'Unnamed',

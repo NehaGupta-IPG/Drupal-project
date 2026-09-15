@@ -6,21 +6,21 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\locale\LocaleJs;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore descripcion mostrar
-
 /**
  * Tests parsing js files for translatable strings.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleJavascriptTranslationTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale', 'locale_test'];
 
@@ -29,19 +29,22 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  public function testFileParsing() {
+  /**
+   * Tests file parsing.
+   */
+  public function testFileParsing(): void {
 
     // This test is for ensuring that the regular expression in
-    // _locale_parse_js_file() finds translatable source strings in all valid
+    // LocaleJs::parseJsFile() finds translatable source strings in all valid
     // JavaScript syntax regardless of the coding style used, especially with
     // respect to optional whitespace, line breaks, etc.
     // - We test locale_test.js, because that is the one that contains a
     //   variety of whitespace styles.
-    $files[] = __DIR__ . '/../../locale_test.js';
+    $files[] = __DIR__ . '/../../js/locale_test.js';
 
     foreach ($files as $filename) {
       // Parse the file to look for source strings.
-      _locale_parse_js_file($filename);
+      \Drupal::service(LocaleJs::class)->parseJsFile($filename);
 
       // Get all of the source strings that were found.
       $strings = $this->container
@@ -112,7 +115,7 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
   /**
    * Assert translations JS is added before drupal.js, because it depends on it.
    */
-  public function testLocaleTranslationJsDependencies() {
+  public function testLocaleTranslationJsDependencies(): void {
     // User to add and remove language.
     $admin_user = $this->drupalCreateUser([
       'administer languages',
@@ -151,7 +154,7 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
       ->getStrings([
         'source' => 'Show description',
         'type' => 'javascript',
-        'name' => 'core/modules/locale/locale.admin.js',
+        'name' => 'core/modules/locale/js/locale.admin.js',
       ]);
     $string = $strings[0];
 

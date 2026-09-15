@@ -6,12 +6,14 @@ namespace Drupal\Tests\config\Kernel;
 
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests default configuration provided by a module that does not own it.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigOtherModuleTest extends KernelTestBase {
 
   /**
@@ -112,11 +114,11 @@ class ConfigOtherModuleTest extends KernelTestBase {
    */
   public function testUninstall(): void {
     $this->installModule('views');
-    $this->assertNull($this->getStorage('view')->load('frontpage'), 'After installing Views, frontpage view which is dependant on the Node and Views modules does not exist.');
+    $this->assertNull($this->getStorage('view')->load('promoted_content'), 'After installing Views, promoted_content view which is dependant on the Node and Views modules does not exist.');
     $this->installModule('node');
-    $this->assertNotNull($this->getStorage('view')->load('frontpage'), 'After installing Node, frontpage view which is dependant on the Node and Views modules exists.');
+    $this->assertNotNull($this->getStorage('view')->load('promoted_content'), 'After installing Node, promoted_content view which is dependant on the Node and Views modules exists.');
     $this->uninstallModule('node');
-    $this->assertNull($this->getStorage('view')->load('frontpage'), 'After uninstalling Node, frontpage view which is dependant on the Node and Views modules does not exist.');
+    $this->assertNull($this->getStorage('view')->load('promoted_content'), 'After uninstalling Node, promoted_content view which is dependant on the Node and Views modules does not exist.');
   }
 
   /**

@@ -6,13 +6,18 @@ namespace Drupal\Tests\config_translation\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Translate settings and entities to various languages.
- *
- * @group config_translation
  */
+#[Group('config_translation')]
+#[RunTestsInSeparateProcesses]
 class ConfigTranslationUiTest extends WebDriverTestBase {
+
+  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -33,7 +38,10 @@ class ConfigTranslationUiTest extends WebDriverTestBase {
   /**
    * Tests that contextual link related to views.
    */
-  public function testViewContextualLink() {
+  public function testViewContextualLink(): void {
+    $this->enablePromotedContentView();
+    $this->config('system.site')->set('page.front', '/node')->save();
+
     $user = $this->drupalCreateUser([
       'translate configuration',
       'access contextual links',
@@ -49,7 +57,7 @@ class ConfigTranslationUiTest extends WebDriverTestBase {
   /**
    * Tests that the add, edit and delete operations open in a modal.
    */
-  public function testConfigTranslationDialog() {
+  public function testConfigTranslationDialog(): void {
     $page = $this->getSession()->getPage();
     ConfigurableLanguage::createFromLangcode('fi')->save();
 

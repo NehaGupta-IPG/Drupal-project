@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the UI of views when using the table style.
  *
- * @group views_ui
  * @see \Drupal\views\Plugin\views\style\Table.
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class StyleTableTest extends UITestBase {
 
   /**
@@ -22,7 +25,7 @@ class StyleTableTest extends UITestBase {
   /**
    * Tests created a table style view.
    */
-  public function testWizard() {
+  public function testWizard(): void {
     // Create a new view and check that the first field has a label.
     $view = [];
     $view['label'] = $this->randomMachineName(16);

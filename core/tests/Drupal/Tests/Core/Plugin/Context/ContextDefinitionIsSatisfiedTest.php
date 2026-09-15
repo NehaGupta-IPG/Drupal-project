@@ -16,12 +16,16 @@ use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\Core\Validation\ConstraintManager;
 use Drupal\Tests\Core\Plugin\Fixtures\InheritedContextDefinition;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\Core\Plugin\Context\ContextDefinition
- * @group Plugin
+ * Tests Drupal\Core\Plugin\Context\ContextDefinition.
  */
+#[CoversClass(ContextDefinition::class)]
+#[Group('Plugin')]
 class ContextDefinitionIsSatisfiedTest extends UnitTestCase {
 
   /**
@@ -39,7 +43,7 @@ class ContextDefinitionIsSatisfiedTest extends UnitTestCase {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
 
     $class_resolver = $this->prophesize(ClassResolverInterface::class);
-    $class_resolver->getInstanceFromDefinition(Argument::type('string'))->will(function ($arguments) {
+    $class_resolver->getInstanceFromDefinition(Argument::type('string'))->will(function ($arguments): object {
       $class_name = $arguments[0];
       return new $class_name();
     });
@@ -67,14 +71,13 @@ class ContextDefinitionIsSatisfiedTest extends UnitTestCase {
    * @param mixed $value
    *   (optional) The value to set on the context, defaults to NULL.
    *
-   * @covers ::isSatisfiedBy
-   * @covers ::dataTypeMatches
-   * @covers ::getSampleValues
-   * @covers ::getConstraintObjects
-   *
-   * @dataProvider providerTestIsSatisfiedBy
+   * @legacy-covers ::isSatisfiedBy
+   * @legacy-covers ::dataTypeMatches
+   * @legacy-covers ::getSampleValues
+   * @legacy-covers ::getConstraintObjects
    */
-  public function testIsSatisfiedBy($expected, ContextDefinition $requirement, ContextDefinition $definition, $value = NULL) {
+  #[DataProvider('providerTestIsSatisfiedBy')]
+  public function testIsSatisfiedBy($expected, ContextDefinition $requirement, ContextDefinition $definition, $value = NULL): void {
     $context = new Context($definition, $value);
     $this->assertSame($expected, $requirement->isSatisfiedBy($context));
   }
@@ -82,7 +85,7 @@ class ContextDefinitionIsSatisfiedTest extends UnitTestCase {
   /**
    * Provides test data for ::testIsSatisfiedBy().
    */
-  public static function providerTestIsSatisfiedBy() {
+  public static function providerTestIsSatisfiedBy(): array {
     $data = [];
 
     // Simple data types.

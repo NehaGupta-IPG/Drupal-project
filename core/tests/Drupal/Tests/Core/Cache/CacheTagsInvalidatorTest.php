@@ -8,28 +8,33 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidator;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Cache\CacheTagsInvalidator
- * @group Cache
+ * Tests Drupal\Core\Cache\CacheTagsInvalidator.
  */
+#[CoversClass(CacheTagsInvalidator::class)]
+#[Group('Cache')]
 class CacheTagsInvalidatorTest extends UnitTestCase {
 
   /**
-   * @covers ::invalidateTags
+   * Tests invalidate tags with invalid tags.
    */
-  public function testInvalidateTagsWithInvalidTags() {
+  public function testInvalidateTagsWithInvalidTags(): void {
     $cache_tags_invalidator = new CacheTagsInvalidator();
     $this->expectException(\AssertionError::class);
     $cache_tags_invalidator->invalidateTags(['node' => [2, 3, 5, 8, 13]]);
   }
 
   /**
-   * @covers ::invalidateTags
-   * @covers ::addInvalidator
-   * @covers ::addBin
+   * Tests invalidate tags.
+   *
+   * @legacy-covers ::invalidateTags
+   * @legacy-covers ::addInvalidator
+   * @legacy-covers ::addBin
    */
-  public function testInvalidateTags() {
+  public function testInvalidateTags(): void {
     $cache_tags_invalidator = new CacheTagsInvalidator();
 
     $invalidator_cache_bin = $this->createMock(InvalidatingCacheBackendInterface::class);
@@ -41,7 +46,7 @@ class CacheTagsInvalidatorTest extends UnitTestCase {
     // We do not have to define that invalidateTags() is never called as the
     // interface does not define that method, trying to call it would result in
     // a fatal error.
-    $non_invalidator_cache_bin = $this->createMock(CacheBackendInterface::class);
+    $non_invalidator_cache_bin = $this->createStub(CacheBackendInterface::class);
     $cache_tags_invalidator->addBin($non_invalidator_cache_bin);
 
     $invalidator = $this->createMock(CacheTagsInvalidatorInterface::class);
@@ -55,4 +60,7 @@ class CacheTagsInvalidatorTest extends UnitTestCase {
 
 }
 
+/**
+ * Test interface for testing the cache tags validator.
+ */
 interface InvalidatingCacheBackendInterface extends CacheTagsInvalidatorInterface, CacheBackendInterface {}

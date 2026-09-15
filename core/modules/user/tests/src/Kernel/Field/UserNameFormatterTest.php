@@ -8,18 +8,18 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the user_name formatter.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class UserNameFormatterTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field', 'user', 'system'];
 
@@ -63,16 +63,15 @@ class UserNameFormatterTest extends KernelTestBase {
    * @return string
    *   The rendered entity fields.
    */
-  protected function renderEntityFields(FieldableEntityInterface $entity, EntityViewDisplayInterface $display) {
+  protected function renderEntityFields(FieldableEntityInterface $entity, EntityViewDisplayInterface $display): string {
     $content = $display->build($entity);
-    $content = $this->render($content);
-    return $content;
+    return $this->render($content);
   }
 
   /**
    * Tests the formatter output.
    */
-  public function testFormatter() {
+  public function testFormatter(): void {
     $user = User::create([
       'name' => 'test name',
     ]);
@@ -80,7 +79,7 @@ class UserNameFormatterTest extends KernelTestBase {
 
     $result = $user->{$this->fieldName}->view(['type' => 'user_name']);
     $this->assertEquals('username', $result[0]['#theme']);
-    $this->assertEquals(spl_object_hash($user), spl_object_hash($result[0]['#account']));
+    $this->assertSame($user, $result[0]['#account']);
 
     $result = $user->{$this->fieldName}->view(['type' => 'user_name', 'settings' => ['link_to_entity' => FALSE]]);
     $this->assertEquals($user->getDisplayName(), $result[0]['#markup']);
@@ -89,7 +88,7 @@ class UserNameFormatterTest extends KernelTestBase {
 
     $result = $user->{$this->fieldName}->view(['type' => 'user_name']);
     $this->assertEquals('username', $result[0]['#theme']);
-    $this->assertEquals(spl_object_hash($user), spl_object_hash($result[0]['#account']));
+    $this->assertSame($user, $result[0]['#account']);
 
     $result = $user->{$this->fieldName}->view(['type' => 'user_name', 'settings' => ['link_to_entity' => FALSE]]);
     $this->assertEquals($user->getDisplayName(), $result[0]['#markup']);

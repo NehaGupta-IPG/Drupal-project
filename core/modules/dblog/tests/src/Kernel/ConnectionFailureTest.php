@@ -6,12 +6,14 @@ namespace Drupal\Tests\dblog\Kernel;
 
 use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests logging of connection failures.
- *
- * @group dblog
  */
+#[Group('dblog')]
+#[RunTestsInSeparateProcesses]
 class ConnectionFailureTest extends KernelTestBase {
 
   /**
@@ -22,7 +24,7 @@ class ConnectionFailureTest extends KernelTestBase {
   /**
    * Tests logging of connection failures.
    */
-  public function testConnectionFailureLogging() {
+  public function testConnectionFailureLogging(): void {
     $this->installSchema('dblog', ['watchdog']);
 
     // MySQL errors like "1153 - Got a packet bigger than 'max_allowed_packet'

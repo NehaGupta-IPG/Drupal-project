@@ -73,8 +73,8 @@ trait BrowserHtmlDebugTrait {
    * @return string
    *   The formatted HTML string.
    */
-  protected function formatHtmlOutputHeaders(array $headers) {
-    $flattened_headers = array_map(function ($header) {
+  protected function formatHtmlOutputHeaders(array $headers): string {
+    $flattened_headers = array_map(function (array $header) {
       if (is_array($header)) {
         return implode(';', array_map('trim', $header));
       }
@@ -91,7 +91,7 @@ trait BrowserHtmlDebugTrait {
    * @return string
    *   HTML output headers.
    */
-  protected function getHtmlOutputHeaders() {
+  protected function getHtmlOutputHeaders(): string {
     return $this->formatHtmlOutputHeaders($this->getSession()->getResponseHeaders());
   }
 
@@ -106,7 +106,7 @@ trait BrowserHtmlDebugTrait {
    *
    * @see \Drupal\Tests\Listeners\VerbosePrinter::printResult()
    */
-  protected function htmlOutput($message = NULL) {
+  protected function htmlOutput($message = NULL): void {
     if (!$this->htmlOutputEnabled) {
       return;
     }
@@ -118,14 +118,15 @@ trait BrowserHtmlDebugTrait {
     // Do not use the file_url_generator service as the module_handler service
     // might not be available.
     $uri = $this->htmlOutputBaseUrl . '/sites/simpletest/browser_output/' . $html_output_filename;
-    HtmlOutputLogger::log($uri . "\n");
+    HtmlOutputLogger::log($uri);
   }
 
   /**
    * Creates the directory to store browser output.
    */
-  protected function initBrowserOutputFile() {
-    $this->htmlOutputEnabled = HtmlOutputLogger::isEnabled();
+  protected function initBrowserOutputFile(): void {
+    $browserOutputFile = getenv('BROWSERTEST_OUTPUT_FILE');
+    $this->htmlOutputEnabled = $browserOutputFile !== FALSE;
     $this->htmlOutputBaseUrl = getenv('BROWSERTEST_OUTPUT_BASE_URL') ?: $GLOBALS['base_url'];
     if ($this->htmlOutputEnabled) {
       $this->htmlOutputClassName = str_replace("\\", "_", static::class);
@@ -142,7 +143,7 @@ trait BrowserHtmlDebugTrait {
         file_put_contents($this->htmlOutputDirectory . '/.htaccess', "<IfModule mod_expires.c>\nExpiresActive Off\n</IfModule>\n");
       }
       $this->htmlOutputCounterStorage = $this->htmlOutputDirectory . '/' . $this->htmlOutputClassName . '.counter';
-      $this->htmlOutputTestId = str_replace('sites/simpletest/', '', $this->siteDirectory);
+      $this->htmlOutputTestId = str_replace(['sites/simpletest/', 'vfs://root/'], '', $this->siteDirectory);
       if (is_file($this->htmlOutputCounterStorage)) {
         $this->htmlOutputCounter = max(1, (int) file_get_contents($this->htmlOutputCounterStorage)) + 1;
       }
@@ -156,10 +157,10 @@ trait BrowserHtmlDebugTrait {
    *   The callable handler that will do the logging.
    */
   protected function getResponseLogHandler() {
-    return function (callable $handler) {
+    return function (callable $handler): \Closure {
       return function (RequestInterface $request, array $options) use ($handler) {
         return $handler($request, $options)
-          ->then(function (ResponseInterface $response) use ($request) {
+          ->then(function (ResponseInterface $response) use ($request): ResponseInterface {
             if ($this->htmlOutputEnabled) {
 
               $caller = $this->getTestMethodCaller();

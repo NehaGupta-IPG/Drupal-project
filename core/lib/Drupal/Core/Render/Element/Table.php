@@ -23,8 +23,8 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  * - #empty: Text to display when no rows are present.
  * - #responsive: Indicates whether to add the drupal.tableresponsive library
  *   providing responsive tables.  Defaults to TRUE.
- * - #sticky: Indicates whether to add the drupal.tableheader library that makes
- *   table headers always visible at the top of the page. Defaults to FALSE.
+ * - #sticky: Indicates whether to make the table headers sticky at
+ *   the top of the page. Defaults to FALSE.
  * - #footer: Table footer rows, in the same format as the #rows property.
  * - #caption: A localized string for the <caption> tag.
  *
@@ -112,10 +112,14 @@ use Drupal\Component\Utility\Html as HtmlUtility;
 class Table extends FormElementBase {
 
   /**
+   * The cache ID used for the tableDrag instance counter.
+   */
+  protected const string TABLE_DRAG_CACHE_ID = 'tabledrag:instance_counter';
+
+  /**
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#header' => [],
       '#rows' => [],
@@ -129,20 +133,20 @@ class Table extends FormElementBase {
       '#multiple' => TRUE,
       '#js_select' => TRUE,
       '#process' => [
-        [$class, 'processTable'],
+        [static::class, 'processTable'],
       ],
       '#element_validate' => [
-        [$class, 'validateTable'],
+        [static::class, 'validateTable'],
       ],
       // Properties for tabledrag support.
       // The value is a list of arrays that are passed to
-      // drupal_attach_tabledrag(). Table::preRenderTable() prepends the HTML ID
+      // Table::attachTabledrag(). Table::preRenderTable() prepends the HTML ID
       // of the table to each set of options.
-      // @see drupal_attach_tabledrag()
+      // @see Table::attachTabledrag()
       '#tabledrag' => [],
       // Render properties.
       '#pre_render' => [
-        [$class, 'preRenderTable'],
+        [static::class, 'preRenderTable'],
       ],
       '#theme' => 'table',
     ];
@@ -152,7 +156,8 @@ class Table extends FormElementBase {
    * {@inheritdoc}
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
-    // If #multiple is FALSE, the regular default value of radio buttons is used.
+    // If #multiple is FALSE, the regular default value of radio buttons is
+    // used.
     if (!empty($element['#tableselect']) && !empty($element['#multiple'])) {
       // Contrary to #type 'checkboxes', the default value of checkboxes in a
       // table is built from the array keys (instead of array values) of the
@@ -170,7 +175,9 @@ class Table extends FormElementBase {
   }
 
   /**
-   * #process callback for #type 'table' to add tableselect support.
+   * Render API callback: Adds tableselect support to #type 'table'.
+   *
+   * This function is assigned as a #process callback.
    *
    * @param array $element
    *   An associative array containing the properties and children of the
@@ -262,8 +269,9 @@ class Table extends FormElementBase {
           $row['select'] += [
             '#type' => $element['#multiple'] ? 'checkbox' : 'radio',
             '#id' => HtmlUtility::getUniqueId('edit-' . implode('-', $element_parents)),
-            // @todo If rows happen to use numeric indexes instead of string keys,
-            //   this results in a first row with $key === 0, which is always FALSE.
+            // @todo If rows happen to use numeric indexes instead of string
+            //   keys, this results in a first row with $key === 0, which is
+            //   always FALSE.
             '#return_value' => $key,
             '#attributes' => $element['#attributes'],
             '#wrapper_attributes' => [
@@ -296,7 +304,9 @@ class Table extends FormElementBase {
   }
 
   /**
-   * #element_validate callback for #type 'table'.
+   * Render API callback: Validates the #type 'table'.
+   *
+   * This function is assigned as a #element_validate callback.
    *
    * @param array $element
    *   An associative array containing the properties and children of the
@@ -324,7 +334,9 @@ class Table extends FormElementBase {
   }
 
   /**
-   * #pre_render callback to transform children of an element of #type 'table'.
+   * Render API callback: Transform children of an element of #type 'table'.
+   *
+   * This function is assigned as a #pre_render callback.
    *
    * This function converts sub-elements of an element of #type 'table' to be
    * suitable for table.html.twig:
@@ -334,59 +346,62 @@ class Table extends FormElementBase {
    *   corresponding first-level table row.
    *
    * Simple example usage:
+   *
    * @code
-   * $form['table'] = array(
+   * $form['table'] = [
    *   '#type' => 'table',
-   *   '#header' => array($this->t('Title'), array('data' => $this->t('Operations'), 'colspan' => '1')),
+   *   '#header' => [$this->t('Title'), ['data' => $this->t('Operations'), 'colspan' => '1']],
    *   // Optionally, to add tableDrag support:
-   *   '#tabledrag' => array(
-   *     array(
+   *   '#tabledrag' => [
+   *     [
    *       'action' => 'order',
    *       'relationship' => 'sibling',
    *       'group' => 'thing-weight',
-   *     ),
-   *   ),
-   * );
+   *     ],
+   *   ],
+   * ];
    * foreach ($things as $row => $thing) {
    *   $form['table'][$row]['#weight'] = $thing['weight'];
    *
-   *   $form['table'][$row]['title'] = array(
+   *   $form['table'][$row]['title'] = [
    *     '#type' => 'textfield',
    *     '#default_value' => $thing['title'],
-   *   );
+   *   ];
    *
    *   // Optionally, to add tableDrag support:
    *   $form['table'][$row]['#attributes']['class'][] = 'draggable';
-   *   $form['table'][$row]['weight'] = array(
+   *   $form['table'][$row]['weight'] = [
    *     '#type' => 'textfield',
-   *     '#title' => $this->t('Weight for @title', array('@title' => $thing['title'])),
+   *     '#title' => $this->t('Weight for @title', ['@title' => $thing['title']]),
    *     '#title_display' => 'invisible',
    *     '#size' => 4,
    *     '#default_value' => $thing['weight'],
-   *     '#attributes' => array('class' => array('thing-weight')),
+   *     '#attributes' => ['class' => ['thing-weight']],
    *   );
    *
    *   // The amount of link columns should be identical to the 'colspan'
    *   // attribute in #header above.
-   *   $form['table'][$row]['edit'] = array(
+   *   $form['table'][$row]['edit'] = [
    *     '#type' => 'link',
    *     '#title' => $this->t('Edit'),
    *     '#url' => Url::fromRoute('entity.test_entity.edit_form', ['test_entity' => $row]),
-   *   );
+   *   ];
    * }
    * @endcode
    *
    * @param array $element
-   *   A structured array containing two sub-levels of elements. Properties used:
+   *   A structured array containing two sub-levels of elements. Properties
+   *   used:
    *   - #tabledrag: The value is a list of $options arrays that are passed to
-   *     drupal_attach_tabledrag(). The HTML ID of the table is added to each
+   *     Table::attachTabledrag(). The HTML ID of the table is added to each
    *     $options array.
    *
    * @return array
+   *   Associative array of rendered child elements for a table.
    *
-   * @see template_preprocess_table()
+   * @see \Drupal\Core\Theme\ThemePreprocess::preprocessTable()
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()
-   * @see drupal_attach_tabledrag()
+   * @see \Drupal\Core\Render\Element\Table::attachTabledrag()
    */
   public static function preRenderTable($element) {
     foreach (Element::children($element) as $first) {
@@ -420,13 +435,12 @@ class Table extends FormElementBase {
     // Add sticky headers, if applicable.
     if (count($element['#header']) && $element['#sticky']) {
       $element['#attached']['library'][] = 'core/drupal.tableheader';
-      // Add 'sticky-enabled' class to the table to identify it for JS.
-      // This is needed to target tables constructed by this function.
-      $element['#attributes']['class'][] = 'sticky-enabled';
+      $element['#attributes']['class'][] = 'sticky-header';
     }
-    // If the table has headers and it should react responsively to columns hidden
-    // with the classes represented by the constants RESPONSIVE_PRIORITY_MEDIUM
-    // and RESPONSIVE_PRIORITY_LOW, add the tableresponsive behaviors.
+    // If the table has headers and it should react responsively to columns
+    // hidden with the classes represented by the constants
+    // RESPONSIVE_PRIORITY_MEDIUM and RESPONSIVE_PRIORITY_LOW, add the
+    // tableresponsive behaviors.
     if (count($element['#header']) && $element['#responsive']) {
       $element['#attached']['library'][] = 'core/drupal.tableresponsive';
       // Add 'responsive-enabled' class to the table to identify it for JS.
@@ -437,13 +451,175 @@ class Table extends FormElementBase {
     // If the custom #tabledrag is set and there is an HTML ID, add the table's
     // HTML ID to the options and attach the behavior.
     if (!empty($element['#tabledrag']) && isset($element['#attributes']['id'])) {
+      $element['#attributes']['class'][] = 'tabledrag-enabled';
+      $element['#attributes']['data-drupal-tabledrag'] = $element['#attributes']['id'];
       foreach ($element['#tabledrag'] as $options) {
         $options['table_id'] = $element['#attributes']['id'];
-        drupal_attach_tabledrag($element, $options);
+        static::attachTabledrag($element, $options);
       }
     }
 
     return $element;
+  }
+
+  /**
+   * Assists in attaching the tableDrag JavaScript behavior to a themed table.
+   *
+   * Draggable tables should be used wherever an outline or list of sortable
+   * items needs to be arranged by an end-user. Draggable tables are very
+   * flexible and can manipulate the value of form elements placed within
+   * individual columns.
+   *
+   * To set up a table to use drag and drop in place of weight select-lists or
+   * in place of a form that contains parent relationships, the form must be
+   * themed into a table. The table must have an ID attribute set and it
+   * maybe set as follows:
+   * @code
+   * $table = [
+   *   '#type' => 'table',
+   *   '#header' => $header,
+   *   '#rows' => $rows,
+   *   '#attributes' => [
+   *     'id' => 'my-module-table',
+   *   ],
+   * ];
+   * return \Drupal::service('renderer')->render($table);
+   * @endcode
+   *
+   * In the theme function for the form, a special class must be added to each
+   * form element within the same column, "grouping" them together.
+   *
+   * In a situation where a single weight column is being sorted in the table,
+   * the classes could be added like this (in the theme function):
+   * @code
+   * $form['my_elements'][$delta]['weight']['#attributes']['class'] = ['my-elements-weight'];
+   * @endcode
+   *
+   * Each row of the table must also have a class of "draggable" in order to
+   * enable the drag handles:
+   * @code
+   * $row = [...];
+   * $rows[] = [
+   *   'data' => $row,
+   *   'class' => ['draggable'],
+   * ];
+   * @endcode
+   *
+   * When tree relationships are present, the two additional classes
+   * 'tabledrag-leaf' and 'tabledrag-root' can be used to refine the behavior:
+   * - Rows with the 'tabledrag-leaf' class cannot have child rows.
+   * - Rows with the 'tabledrag-root' class cannot be nested under a parent row.
+   *
+   * Calling Table::attachTabledrag() would then be written as such:
+   * @code
+   * Table::attachTabledrag('my-module-table', [
+   *   'action' => 'order',
+   *   'relationship' => 'sibling',
+   *   'group' => 'my-elements-weight',
+   * ];
+   * @endcode
+   *
+   * In a more complex case where there are several groups in one column (such
+   * as the block regions on the admin/structure/block page), a separate
+   * subgroup class must also be added to differentiate the groups.
+   * @code
+   * $form['my_elements'][$region][$delta]['weight']['#attributes']['class'] = ['my-elements-weight', 'my-elements-weight-' . $region];
+   * @endcode
+   *
+   * The 'group' option is still 'my-element-weight', and the additional
+   * 'subgroup' option will be passed in as 'my-elements-weight-' . $region.
+   * This also means that you'll need to call Table::attachTabledrag() once for
+   * every region added.
+   *
+   * @code
+   * foreach ($regions as $region) {
+   *   Table::attachTabledrag('my-module-table', [
+   *     'action' => 'order',
+   *     'relationship' => 'sibling',
+   *     'group' => 'my-elements-weight',
+   *     'subgroup' => 'my-elements-weight-' . $region,
+   *   ]);
+   * }
+   * @endcode
+   *
+   * In a situation where tree relationships are present, adding multiple
+   * subgroups is not necessary, because the table will contain indentations
+   * that provide enough information about the sibling and parent relationships.
+   * See MenuForm::BuildOverviewForm for an example creating a table containing
+   * parent relationships.
+   *
+   * @param array $element
+   *   A form element to attach the tableDrag behavior to.
+   * @param array $options
+   *   These options are used to generate JavaScript settings necessary to
+   *   configure the tableDrag behavior appropriately for this particular table.
+   *   An associative array containing the following keys:
+   *   - 'table_id': String containing the target table's id attribute. If the
+   *     table does not have an id, one will need to be set, such as
+   *     <table id="my-module-table">.
+   *   - 'action': String describing the action to be done on the form item.
+   *      Either 'match' 'depth', or 'order':
+   *     - 'match' is typically used for parent relationships.
+   *     - 'order' is typically used to set weights on other form elements with
+   *       the same group.
+   *     - 'depth' updates the target element with the current indentation.
+   *   - 'relationship': String describing where the "action" option should be
+   *     performed. Either 'parent', 'sibling', 'group', or 'self':
+   *     - 'parent' will only look for fields up the tree.
+   *     - 'sibling' will look for fields in the same group in rows above and
+   *       below it.
+   *     - 'self' affects the dragged row itself.
+   *     - 'group' affects the dragged row, plus any children below it (the
+   *       entire dragged group).
+   *   - 'group': A class name applied on all related form elements for this
+   *     action.
+   *   - 'subgroup': (optional) If the group has several subgroups within it,
+   *     this string should contain the class name identifying fields in the
+   *     same subgroup.
+   *   - 'source': (optional) If the $action is 'match', this string should
+   *     contain the classname identifying what field will be used as the source
+   *     value when matching the value in $subgroup.
+   *   - 'hidden': (optional) The column containing the field elements may be
+   *     entirely hidden from view dynamically when the JavaScript is loaded.
+   *     Set to FALSE if the column should not be hidden.
+   *   - 'limit': (optional) Limit the maximum amount of parenting in this
+   *     table.
+   *
+   * @see \Drupal\menu_ui\MenuForm::buildOverviewForm()
+   */
+  public static function attachTabledrag(array &$element, array $options): void {
+    // Add default values to elements.
+    $options += [
+      'subgroup' => NULL,
+      'source' => NULL,
+      'hidden' => TRUE,
+      'limit' => 0,
+    ];
+
+    $group = $options['group'];
+
+    // The counter for tableDrag instances is stored in the memory cache
+    // instead of a static property, so it does not bleed across requests in
+    // long-running PHP processes (e.g., FrankenPHP, RoadRunner), where memory
+    // cache bins are reset between requests.
+    $cache = \Drupal::cache('memory');
+    $cache_item = $cache->get(static::TABLE_DRAG_CACHE_ID);
+    $tabledrag_id = $cache_item ? $cache_item->data + 1 : 0;
+    $cache->set(static::TABLE_DRAG_CACHE_ID, $tabledrag_id);
+
+    // If a subgroup or source isn't set, assume it is the same as the group.
+    $target = $options['subgroup'] ?? $group;
+    $source = $options['source'] ?? $target;
+    $element['#attached']['drupalSettings']['tableDrag'][$options['table_id']][$group][$tabledrag_id] = [
+      'target' => $target,
+      'source' => $source,
+      'relationship' => $options['relationship'],
+      'action' => $options['action'],
+      'hidden' => $options['hidden'],
+      'limit' => $options['limit'],
+    ];
+
+    $element['#attached']['library'][] = 'core/drupal.tabledrag';
   }
 
 }

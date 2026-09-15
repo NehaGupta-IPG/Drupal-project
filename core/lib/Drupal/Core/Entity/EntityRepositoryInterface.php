@@ -8,14 +8,6 @@ namespace Drupal\Core\Entity;
 interface EntityRepositoryInterface {
 
   /**
-   * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3437685
-   */
-  const CONTEXT_ID_LEGACY_CONTEXT_OPERATION = '@entity.repository:legacy_context_operation';
-
-  /**
    * Loads an entity by UUID.
    *
    * Note that some entity types may not support UUIDs.
@@ -109,7 +101,7 @@ interface EntityRepositoryInterface {
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   An entity object variant or NULL if the entity does not exist.
    */
-  public function getActive($entity_type_id, $entity_id, array $contexts = NULL);
+  public function getActive($entity_type_id, $entity_id, ?array $contexts = NULL);
 
   /**
    * Retrieves the active entity variants matching the specified context.
@@ -129,7 +121,7 @@ interface EntityRepositoryInterface {
    *
    * @see getActive()
    */
-  public function getActiveMultiple($entity_type_id, array $entity_ids, array $contexts = NULL);
+  public function getActiveMultiple($entity_type_id, array $entity_ids, ?array $contexts = NULL);
 
   /**
    * Retrieves the canonical entity variant matching the specified context.
@@ -157,7 +149,7 @@ interface EntityRepositoryInterface {
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   An entity object variant or NULL if the entity does not exist.
    */
-  public function getCanonical($entity_type_id, $entity_id, array $contexts = NULL);
+  public function getCanonical($entity_type_id, $entity_id, ?array $contexts = NULL);
 
   /**
    * Retrieves the canonical entity variants matching the specified context.
@@ -177,6 +169,6 @@ interface EntityRepositoryInterface {
    *
    * @see getCanonical()
    */
-  public function getCanonicalMultiple($entity_type_id, array $entity_ids, array $contexts = NULL);
+  public function getCanonicalMultiple($entity_type_id, array $entity_ids, ?array $contexts = NULL);
 
 }

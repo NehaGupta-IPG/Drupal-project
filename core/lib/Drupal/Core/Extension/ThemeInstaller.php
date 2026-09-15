@@ -7,12 +7,14 @@ use Drupal\Core\Asset\AssetCollectionOptimizerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
+use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Theme\Registry;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Manages theme installation/uninstallation.
@@ -22,100 +24,104 @@ class ThemeInstaller implements ThemeInstallerInterface {
   use ModuleDependencyMessageTrait;
   use StringTranslationTrait;
 
-  /**
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
+  public function __construct(
+    protected ThemeHandlerInterface $themeHandler,
+    protected ConfigFactoryInterface $configFactory,
+    protected ConfigInstallerInterface $configInstaller,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ConfigManagerInterface $configManager,
+    #[Autowire(service: 'asset.css.collection_optimizer')]
+    protected AssetCollectionOptimizerInterface $cssCollectionOptimizer,
+    protected RouteBuilderInterface $routeBuilder,
+    #[Autowire(service: 'logger.channel.default')]
+    protected LoggerInterface $logger,
+    protected StateInterface $state,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected Registry $themeRegistry,
+    protected ThemeExtensionList $themeExtensionList,
+    #[Autowire(service: 'kernel')]
+    protected DrupalKernelInterface $kernel,
+  ) {
+  }
 
   /**
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * {@inheritdoc}
    */
-  protected $configFactory;
+  public function getThemesToInstall(array $theme_list, bool $install_dependencies = TRUE): array {
+    if (!$install_dependencies) {
+      // Without dependency resolution the caller is responsible for providing a
+      // complete list; the install loop still skips already-installed themes.
+      return array_values($theme_list);
+    }
 
-  /**
-   * @var \Drupal\Core\Config\ConfigInstallerInterface
-   */
-  protected $configInstaller;
+    $extension_config = $this->configFactory->get('core.extension');
+    $theme_data = $this->themeExtensionList->reset()->getList();
+    $installed_themes = $extension_config->get('theme') ?: [];
+    $installed_modules = $extension_config->get('module') ?: [];
 
-  /**
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
+    $theme_list = array_combine(array_values($theme_list), array_values($theme_list));
 
-  /**
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
+    if ($missing = array_diff_key($theme_list, $theme_data)) {
+      // One or more of the given themes doesn't exist.
+      throw new UnknownExtensionException('Unknown themes: ' . implode(', ', $missing) . '.');
+    }
 
-  /**
-   * @var \Drupal\Core\Config\ConfigManagerInterface
-   */
-  protected $configManager;
+    // Only process themes that are not installed currently.
+    if (!$theme_list = array_diff_key($theme_list, $installed_themes)) {
+      // Nothing to do. All themes already installed.
+      return [];
+    }
 
-  /**
-   * @var \Drupal\Core\Asset\AssetCollectionOptimizerInterface
-   */
-  protected $cssCollectionOptimizer;
+    $module_list = $this->moduleExtensionList->getList();
+    foreach ($theme_list as $theme => $value) {
+      $module_dependencies = $theme_data[$theme]->module_dependencies;
+      // $theme_data[$theme]->requires contains both theme and module
+      // dependencies keyed by the extension machine names.
+      // $theme_data[$theme]->module_dependencies contains only the module
+      // dependencies keyed by the module extension machine name. Therefore,
+      // we can find the theme dependencies by finding array keys for
+      // 'requires' that are not in $module_dependencies.
+      $theme_dependencies = array_diff_key($theme_data[$theme]->requires, $module_dependencies);
+      // We can find the unmet module dependencies by finding the module
+      // machine names keys that are not in $installed_modules keys.
+      $unmet_module_dependencies = array_diff_key($module_dependencies, $installed_modules);
 
-  /**
-   * @var \Drupal\Core\Routing\RouteBuilderInterface
-   */
-  protected $routeBuilder;
+      // Prevent themes with unmet module dependencies from being installed.
+      if (!empty($unmet_module_dependencies)) {
+        $unmet_module_dependencies_list = implode(', ', array_keys($unmet_module_dependencies));
+        throw new MissingDependencyException("Unable to install theme: '$theme' due to unmet module dependencies: '$unmet_module_dependencies_list'.");
+      }
 
-  /**
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
+      foreach ($module_dependencies as $dependency => $dependency_object) {
+        if ($incompatible = $this->checkDependencyMessage($module_list, $dependency, $dependency_object)) {
+          $sanitized_message = Html::decodeEntities(strip_tags($incompatible));
+          throw new MissingDependencyException("Unable to install theme: $sanitized_message");
+        }
+      }
 
-  /**
-   * The module extension list.
-   *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
-   */
-  protected $moduleExtensionList;
+      // Add dependencies to the list of themes to install. The new themes
+      // will be processed as the parent foreach loop continues.
+      foreach (array_keys($theme_dependencies) as $dependency) {
+        if (!isset($theme_data[$dependency])) {
+          // The dependency does not exist.
+          throw new UnknownExtensionException("Unable to install theme: '$theme' is missing its theme dependency '$dependency'.");
+        }
 
-  /**
-   * Constructs a new ThemeInstaller.
-   *
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory to get the installed themes.
-   * @param \Drupal\Core\Config\ConfigInstallerInterface $config_installer
-   *   (optional) The config installer to install configuration. This optional
-   *   to allow the theme handler to work before Drupal is installed and has a
-   *   database.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to fire themes_installed/themes_uninstalled hooks.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
-   *   The config manager used to uninstall a theme.
-   * @param \Drupal\Core\Asset\AssetCollectionOptimizerInterface $css_collection_optimizer
-   *   The CSS asset collection optimizer service.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $route_builder
-   *   (optional) The route builder service to rebuild the routes if a theme is
-   *   installed.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state store.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
-   *   The module extension list.
-   * @param \Drupal\Core\Theme\Registry|null $themeRegistry
-   *   The theme registry.
-   * @param \Drupal\Core\Extension\ThemeExtensionList|null $themeExtensionList
-   *   The theme extension list.
-   */
-  public function __construct(ThemeHandlerInterface $theme_handler, ConfigFactoryInterface $config_factory, ConfigInstallerInterface $config_installer, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, AssetCollectionOptimizerInterface $css_collection_optimizer, RouteBuilderInterface $route_builder, LoggerInterface $logger, StateInterface $state, ModuleExtensionList $module_extension_list, protected Registry $themeRegistry, protected ThemeExtensionList $themeExtensionList) {
-    $this->themeHandler = $theme_handler;
-    $this->configFactory = $config_factory;
-    $this->configInstaller = $config_installer;
-    $this->moduleHandler = $module_handler;
-    $this->configManager = $config_manager;
-    $this->cssCollectionOptimizer = $css_collection_optimizer;
-    $this->routeBuilder = $route_builder;
-    $this->logger = $logger;
-    $this->state = $state;
-    $this->moduleExtensionList = $module_extension_list;
+        // Skip already installed themes.
+        if (!isset($theme_list[$dependency]) && !isset($installed_themes[$dependency])) {
+          $theme_list[$dependency] = $dependency;
+        }
+      }
+    }
+
+    // Set the actual theme weights.
+    $theme_list = array_map(function ($theme) use ($theme_data) {
+      return $theme_data[$theme]->sort;
+    }, $theme_list);
+
+    // Sort the theme list by their weights (reverse).
+    arsort($theme_list);
+    return array_keys($theme_list);
   }
 
   /**
@@ -126,77 +132,26 @@ class ThemeInstaller implements ThemeInstallerInterface {
 
     $theme_data = $this->themeExtensionList->reset()->getList();
     $installed_themes = $extension_config->get('theme') ?: [];
-    $installed_modules = $extension_config->get('module') ?: [];
 
     if ($install_dependencies) {
-      $theme_list = array_combine($theme_list, $theme_list);
+      // Themes explicitly requested that are not yet installed. Deprecation
+      // notices are emitted only for these, not for resolved dependencies.
+      $requested_themes = array_diff(array_values($theme_list), array_keys($installed_themes));
 
-      if ($missing = array_diff_key($theme_list, $theme_data)) {
-        // One or more of the given themes doesn't exist.
-        throw new UnknownExtensionException('Unknown themes: ' . implode(', ', $missing) . '.');
-      }
-
-      // Only process themes that are not installed currently.
-      if (!$theme_list = array_diff_key($theme_list, $installed_themes)) {
+      // Resolve the full, dependency-sorted list of themes to install. This
+      // also validates that the themes and their dependencies are installable.
+      $theme_list = $this->getThemesToInstall($theme_list);
+      if (empty($theme_list)) {
         // Nothing to do. All themes already installed.
         return TRUE;
       }
 
-      $module_list = $this->moduleExtensionList->getList();
-      foreach ($theme_list as $theme => $value) {
-        $module_dependencies = $theme_data[$theme]->module_dependencies;
-        // $theme_data[$theme]->requires contains both theme and module
-        // dependencies keyed by the extension machine names.
-        // $theme_data[$theme]->module_dependencies contains only the module
-        // dependencies keyed by the module extension machine name. Therefore,
-        // we can find the theme dependencies by finding array keys for
-        // 'requires' that are not in $module_dependencies.
-        $theme_dependencies = array_diff_key($theme_data[$theme]->requires, $module_dependencies);
-        // We can find the unmet module dependencies by finding the module
-        // machine names keys that are not in $installed_modules keys.
-        $unmet_module_dependencies = array_diff_key($module_dependencies, $installed_modules);
-
-        if ($theme_data[$theme]->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
+      foreach ($requested_themes as $theme) {
+        if (isset($theme_data[$theme]) && $theme_data[$theme]->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
           // phpcs:ignore Drupal.Semantics.FunctionTriggerError
           @trigger_error("The theme '$theme' is deprecated. See " . $theme_data[$theme]->info['lifecycle_link'], E_USER_DEPRECATED);
         }
-
-        // Prevent themes with unmet module dependencies from being installed.
-        if (!empty($unmet_module_dependencies)) {
-          $unmet_module_dependencies_list = implode(', ', array_keys($unmet_module_dependencies));
-          throw new MissingDependencyException("Unable to install theme: '$theme' due to unmet module dependencies: '$unmet_module_dependencies_list'.");
-        }
-
-        foreach ($module_dependencies as $dependency => $dependency_object) {
-          if ($incompatible = $this->checkDependencyMessage($module_list, $dependency, $dependency_object)) {
-            $sanitized_message = Html::decodeEntities(strip_tags($incompatible));
-            throw new MissingDependencyException("Unable to install theme: $sanitized_message");
-          }
-        }
-
-        // Add dependencies to the list of themes to install. The new themes
-        // will be processed as the parent foreach loop continues.
-        foreach (array_keys($theme_dependencies) as $dependency) {
-          if (!isset($theme_data[$dependency])) {
-            // The dependency does not exist.
-            return FALSE;
-          }
-
-          // Skip already installed themes.
-          if (!isset($theme_list[$dependency]) && !isset($installed_themes[$dependency])) {
-            $theme_list[$dependency] = $dependency;
-          }
-        }
       }
-
-      // Set the actual theme weights.
-      $theme_list = array_map(function ($theme) use ($theme_data) {
-        return $theme_data[$theme]->sort;
-      }, $theme_list);
-
-      // Sort the theme list by their weights (reverse).
-      arsort($theme_list);
-      $theme_list = array_keys($theme_list);
     }
 
     $themes_installed = [];
@@ -222,15 +177,10 @@ class ThemeInstaller implements ThemeInstallerInterface {
       // configuration then stop installing.
       $this->configInstaller->checkConfigurationToInstall('theme', $key);
 
-      // The value is not used; the weight is ignored for themes currently. Do
-      // not check schema when saving the configuration.
+      // The value is not used; the weight is ignored for themes currently.
       $extension_config
         ->set("theme.$key", 0)
-        ->save(TRUE);
-
-      // Reset theme settings.
-      $theme_settings = &drupal_static('theme_get_setting');
-      unset($theme_settings[$key]);
+        ->save();
 
       // Reset theme listing.
       $this->themeHandler->reset();
@@ -247,8 +197,11 @@ class ThemeInstaller implements ThemeInstallerInterface {
       $this->logger->info('%theme theme installed.', ['%theme' => $key]);
     }
 
-    $this->cssCollectionOptimizer->deleteAll();
-    $this->resetSystem();
+    // Add new themes to the list of installed themes.
+    $register_themes = array_merge(array_keys($installed_themes), $themes_installed);
+    // Get list of extensions for the new list of themes.
+    $register_themes = array_intersect_key($theme_data, array_flip($register_themes));
+    $this->resetSystem($register_themes);
 
     // Invoke hook_themes_installed() after the themes have been installed.
     $this->moduleHandler->invokeAll('themes_installed', [$themes_installed]);
@@ -263,6 +216,8 @@ class ThemeInstaller implements ThemeInstallerInterface {
     $extension_config = $this->configFactory->getEditable('core.extension');
     $theme_config = $this->configFactory->getEditable('system.theme');
     $list = $this->themeHandler->listInfo();
+    $installed_themes = $extension_config->get('theme') ?: [];
+    $theme_data = $this->themeExtensionList->reset()->getList();
     foreach ($theme_list as $key) {
       if ($extension_config->get("theme.$key") === NULL) {
         throw new UnknownExtensionException("Unknown theme: $key.");
@@ -289,33 +244,49 @@ class ThemeInstaller implements ThemeInstallerInterface {
       // The value is not used; the weight is ignored for themes currently.
       $extension_config->clear("theme.$key");
 
-      // Reset theme settings.
-      $theme_settings = &drupal_static('theme_get_setting');
-      unset($theme_settings[$key]);
-
       // Remove all configuration belonging to the theme.
       $this->configManager->uninstall('theme', $key);
     }
-    // Don't check schema when uninstalling a theme since we are only clearing
-    // keys.
-    $extension_config->save(TRUE);
+    $extension_config->save();
 
     // Refresh theme info.
-    $this->resetSystem();
     $this->themeHandler->reset();
+    // Remove themes that were uninstalled from the list.
+    $register_themes = array_diff(array_keys($installed_themes), $theme_list);
+    // Get list of extensions for the new list of themes.
+    $register_themes = array_intersect_key($theme_data, array_flip($register_themes));
+    $this->resetSystem($register_themes);
 
     $this->moduleHandler->invokeAll('themes_uninstalled', [$theme_list]);
   }
 
   /**
    * Resets some other systems like rebuilding the route information or caches.
+   *
+   * @param array<string, \Drupal\Core\Extension\Extension> $register_themes
+   *   Extension data for themes that should be registered, keyed by name.
    */
-  protected function resetSystem() {
-    if ($this->routeBuilder) {
-      $this->routeBuilder->setRebuildNeeded();
-    }
-
+  protected function resetSystem(array $register_themes) {
     $this->themeRegistry->reset();
+    $this->kernel->updateThemes($register_themes);
+    $container = $this->kernel->getContainer();
+    $this->themeHandler = $container->get('theme_handler');
+    $this->configFactory = $container->get('config.factory');
+    $this->configInstaller = $container->get('config.installer');
+    $this->moduleHandler = $container->get('module_handler');
+    $this->configManager = $container->get('config.manager');
+    $this->cssCollectionOptimizer = $container->get('asset.css.collection_optimizer');
+    $this->routeBuilder = $container->get('router.builder');
+    $this->logger = $container->get('logger.channel.default');
+    $this->state = $container->get('state');
+    $this->moduleExtensionList = $container->get('extension.list.module');
+    $this->themeRegistry = $container->get('theme.registry');
+    $this->themeExtensionList = $container->get('extension.list.theme');
+
+    $container->get('stream_wrapper_manager')->register();
+    // Clear all plugin caches.
+    $container->get('plugin.cache_clearer')->clearCachedDefinitions();
+    $this->routeBuilder->setRebuildNeeded();
   }
 
 }

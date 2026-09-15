@@ -7,12 +7,14 @@ namespace Drupal\Tests\system\Functional\UpdateSystem;
 use Drupal\Core\Database\Database;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\UpdatePathTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests hook_post_update() when there is an exception in a post update.
- *
- * @group Update
  */
+#[Group('Update')]
+#[RunTestsInSeparateProcesses]
 class UpdatePostUpdateExceptionTest extends BrowserTestBase {
   use UpdatePathTestTrait;
 
@@ -52,7 +54,7 @@ class UpdatePostUpdateExceptionTest extends BrowserTestBase {
   /**
    * Tests hook_post_update_NAME().
    */
-  public function testPostUpdate() {
+  public function testPostUpdate(): void {
     // There are expected to be failed updates.
     $this->checkFailedUpdates = FALSE;
 
@@ -63,7 +65,7 @@ class UpdatePostUpdateExceptionTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function doSelectionTest() {
+  protected function doSelectionTest(): void {
     $this->assertSession()->assertEscaped("Post update that throws an exception.");
   }
 

@@ -6,12 +6,14 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests loading entities by UUID.
- *
- * @group entity
  */
+#[Group('entity')]
+#[RunTestsInSeparateProcesses]
 class EntityLoadByUuidTest extends KernelTestBase {
 
   /**
@@ -32,7 +34,7 @@ class EntityLoadByUuidTest extends KernelTestBase {
   /**
    * Ensures that ::loadEntityByUuid() doesn't apply access checking.
    */
-  public function testLoadEntityByUuidAccessChecking() {
+  public function testLoadEntityByUuidAccessChecking(): void {
     \Drupal::state()->set('entity_test_query_access', TRUE);
     // Create two test entities.
     $entity_0 = EntityTest::create([

@@ -8,12 +8,14 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the generic entity bundle filter.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FilterEntityBundleTest extends ViewsKernelTestBase {
 
   /**
@@ -29,7 +31,7 @@ class FilterEntityBundleTest extends ViewsKernelTestBase {
   /**
    * Tests the generic bundle filter.
    */
-  public function testFilterEntity() {
+  public function testFilterEntity(): void {
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     NodeType::create(['type' => 'test_bundle', 'name' => 'Test 1'])->save();

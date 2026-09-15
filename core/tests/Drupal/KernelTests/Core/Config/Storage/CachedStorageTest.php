@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config\Storage;
 
-use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\CachedStorage;
+use Drupal\Core\Config\FileStorage;
 use Drupal\Core\StreamWrapper\PublicStream;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests CachedStorage operations.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class CachedStorageTest extends ConfigStorageTestBase {
 
   /**
@@ -44,14 +46,14 @@ class CachedStorageTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testInvalidStorage() {
+  public function testInvalidStorage(): void {
     $this->markTestSkipped('No-op as this test does not make sense');
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function read($name) {
+  protected function read($name): array|object {
     $data = $this->cache->get($name);
     // Cache misses fall through to the underlying storage.
     return $data ? $data->data : $this->fileStorage->read($name);
@@ -60,7 +62,7 @@ class CachedStorageTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function insert($name, $data) {
+  protected function insert($name, $data): void {
     $this->fileStorage->write($name, $data);
     $this->cache->set($name, $data);
   }
@@ -68,7 +70,7 @@ class CachedStorageTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function update($name, $data) {
+  protected function update($name, $data): void {
     $this->fileStorage->write($name, $data);
     $this->cache->set($name, $data);
   }
@@ -76,7 +78,7 @@ class CachedStorageTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function delete($name) {
+  protected function delete($name): void {
     $this->cache->delete($name);
     unlink($this->fileStorage->getFilePath($name));
   }

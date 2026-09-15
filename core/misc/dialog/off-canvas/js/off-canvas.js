@@ -244,9 +244,13 @@
           : `${parseFloat(height)}px`,
       });
 
+      $element.dialog('option', adjustedOptions);
+
       $element
-        .dialog('option', adjustedOptions)
-        .trigger('dialogContentResize.off-canvas');
+        ?.get(0)
+        ?.dispatchEvent(
+          new CustomEvent('dialogContentResize', { bubbles: true }),
+        );
 
       Drupal.offCanvas.position = position;
     },
@@ -283,6 +287,7 @@
           `${width}px`;
 
         $container.attr(`data-offset-${Drupal.offCanvas.getEdge()}`, width);
+        $container.attr('data-offset-top', 0);
         displace();
       }
 
@@ -290,6 +295,7 @@
       if (position === 'top') {
         mainCanvasWrapper.style.paddingTop = `${height}px`;
         $container.attr('data-offset-top', height);
+        $container.attr(`data-offset-${Drupal.offCanvas.getEdge()}`, 0);
         displace();
       }
     },

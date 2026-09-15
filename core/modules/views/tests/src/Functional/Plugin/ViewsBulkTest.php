@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests views bulk operation selection.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewsBulkTest extends ViewTestBase {
 
   /**
@@ -21,9 +23,7 @@ class ViewsBulkTest extends ViewTestBase {
   protected $adminUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views'];
 
@@ -45,7 +45,7 @@ class ViewsBulkTest extends ViewTestBase {
   /**
    * Tests bulk selection.
    */
-  public function testBulkSelection() {
+  public function testBulkSelection(): void {
 
     // Create first node, set updated time to the past.
     $node_1 = $this->drupalCreateNode([

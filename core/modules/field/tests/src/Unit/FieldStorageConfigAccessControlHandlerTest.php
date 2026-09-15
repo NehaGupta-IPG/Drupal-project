@@ -15,14 +15,14 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldStorageConfigAccessControlHandler;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the field storage config access controller.
- *
- * @group field
- *
- * @coversDefaultClass \Drupal\field\FieldStorageConfigAccessControlHandler
  */
+#[CoversClass(FieldStorageConfigAccessControlHandler::class)]
+#[Group('field')]
 class FieldStorageConfigAccessControlHandlerTest extends UnitTestCase {
 
   /**
@@ -66,73 +66,61 @@ class FieldStorageConfigAccessControlHandlerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->anon = $this->createMock(AccountInterface::class);
+    $this->anon = $this->createStub(AccountInterface::class);
     $this->anon
-      ->expects($this->any())
       ->method('hasPermission')
       ->willReturn(FALSE);
     $this->anon
-      ->expects($this->any())
       ->method('id')
       ->willReturn(0);
 
-    $this->member = $this->createMock(AccountInterface::class);
+    $this->member = $this->createStub(AccountInterface::class);
     $this->member
-      ->expects($this->any())
       ->method('hasPermission')
       ->willReturnMap([
         ['administer node fields', TRUE],
       ]);
     $this->member
-      ->expects($this->any())
       ->method('id')
       ->willReturn(2);
 
-    $storageType = $this->createMock(ConfigEntityTypeInterface::class);
+    $storageType = $this->createStub(ConfigEntityTypeInterface::class);
     $storageType
-      ->expects($this->any())
       ->method('getProvider')
       ->willReturn('field');
     $storageType
-      ->expects($this->any())
       ->method('getConfigPrefix')
       ->willReturn('field.storage');
 
-    $entityType = $this->createMock(ConfigEntityTypeInterface::class);
+    $entityType = $this->createStub(ConfigEntityTypeInterface::class);
     $entityType
-      ->expects($this->any())
       ->method('getProvider')
       ->willReturn('node');
     $entityType
-      ->expects($this->any())
       ->method('getConfigPrefix')
       ->willReturn('node');
 
-    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
     $this->moduleHandler
-      ->expects($this->any())
       ->method('invokeAll')
       ->willReturn([]);
 
     $storage_access_control_handler = new FieldStorageConfigAccessControlHandler($storageType);
     $storage_access_control_handler->setModuleHandler($this->moduleHandler);
 
-    $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
+    $entity_type_manager = $this->createStub(EntityTypeManagerInterface::class);
     $entity_type_manager
-      ->expects($this->any())
       ->method('getDefinition')
       ->willReturnMap([
         ['field_storage_config', TRUE, $storageType],
         ['node', TRUE, $entityType],
       ]);
     $entity_type_manager
-      ->expects($this->any())
       ->method('getStorage')
       ->willReturnMap([
-        ['field_storage_config', $this->createMock(EntityStorageInterface::class)],
+        ['field_storage_config', $this->createStub(EntityStorageInterface::class)],
       ]);
     $entity_type_manager
-      ->expects($this->any())
       ->method('getAccessControlHandler')
       ->willReturnMap([
         ['field_storage_config', $storage_access_control_handler],
@@ -140,7 +128,7 @@ class FieldStorageConfigAccessControlHandlerTest extends UnitTestCase {
 
     $container = new Container();
     $container->set('entity_type.manager', $entity_type_manager);
-    $container->set('uuid', $this->createMock(UuidInterface::class));
+    $container->set('uuid', $this->createStub(UuidInterface::class));
     $container->set('cache_contexts_manager', $this->prophesize(CacheContextsManager::class));
     \Drupal::setContainer($container);
 
@@ -176,7 +164,7 @@ class FieldStorageConfigAccessControlHandlerTest extends UnitTestCase {
   /**
    * Ensures field storage config access is working properly.
    */
-  public function testAccess() {
+  public function testAccess(): void {
     $this->assertAllowOperations([], $this->anon);
     $this->assertAllowOperations(['view', 'update', 'delete'], $this->member);
 

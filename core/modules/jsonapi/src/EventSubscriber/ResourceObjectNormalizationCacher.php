@@ -5,6 +5,7 @@ namespace Drupal\jsonapi\EventSubscriber;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\VariationCacheInterface;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
+use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
@@ -101,8 +102,44 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
       return FALSE;
     }
 
+    if ($object->getCacheMaxAge() === 0) {
+      return FALSE;
+    }
+
     $cached = $this->variationCache->get($this->generateCacheKeys($object), new CacheableMetadata());
-    return $cached ? $cached->data : FALSE;
+    if (!$cached) {
+      return FALSE;
+    }
+
+    // When a cache hit occurs, we first calculate the remaining time before the
+    // cached record expires, ensuring that we do not reset the expiration with
+    // one that might have been generated on an earlier timestamp. This is done
+    // by subtracting the current timestamp from the cached record's expiration
+    // timestamp. If the max-age is set, we adjust it by merging the calculated
+    // remaining time with the original max-age of the cached item, ensuring
+    // that the expiration remains accurate based on the current cache state
+    // and timestamp.
+    $normalizer_values = $cached->data;
+    assert(is_array($normalizer_values));
+    if ($cached->expire >= 0) {
+      $max_age = max($cached->expire - $this->requestStack->getCurrentRequest()->server->get('REQUEST_TIME'), 0);
+      $cacheability = new CacheableMetadata();
+      $cacheability->setCacheMaxAge($max_age);
+
+      $subsets = [
+        ResourceObjectNormalizationCacher::RESOURCE_CACHE_SUBSET_BASE,
+        ResourceObjectNormalizationCacher::RESOURCE_CACHE_SUBSET_FIELDS,
+      ];
+      foreach ($subsets as $subset) {
+        foreach ($normalizer_values[$subset] as $name => $normalization) {
+          assert($normalization instanceof CacheableNormalization);
+          if ($normalization->getCacheMaxAge() > 0) {
+            $normalizer_values[$subset][$name] = $normalization->withCacheableDependency($cacheability);
+          }
+        }
+      }
+    }
+    return $normalizer_values;
   }
 
   /**
@@ -114,6 +151,9 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
    *   The normalization parts to cache.
    */
   public function saveOnTerminate(ResourceObject $object, array $normalization_parts) {
+    if ($object->getCacheMaxAge() === 0) {
+      return;
+    }
     assert(
       array_keys($normalization_parts) === [
         static::RESOURCE_CACHE_SUBSET_BASE,

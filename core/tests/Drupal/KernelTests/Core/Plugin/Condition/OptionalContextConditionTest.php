@@ -10,12 +10,14 @@ use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests a condition with optional context.
- *
- * @group condition_test
  */
+#[Group('condition_test')]
+#[RunTestsInSeparateProcesses]
 class OptionalContextConditionTest extends KernelTestBase {
 
   /**
@@ -26,7 +28,7 @@ class OptionalContextConditionTest extends KernelTestBase {
   /**
    * Tests with both contexts mapped to the same user.
    */
-  public function testContextMissing() {
+  public function testContextMissing(): void {
     /** @var \Drupal\Core\Condition\ConditionPluginBase $condition */
     $condition = \Drupal::service('plugin.manager.condition')
       ->createInstance('condition_test_optional_context')
@@ -40,7 +42,7 @@ class OptionalContextConditionTest extends KernelTestBase {
   /**
    * Tests with both contexts mapped to the same user.
    */
-  public function testContextNoValue() {
+  public function testContextNoValue(): void {
     /** @var \Drupal\Core\Condition\ConditionPluginBase $condition */
     $condition = \Drupal::service('plugin.manager.condition')
       ->createInstance('condition_test_optional_context')
@@ -56,7 +58,7 @@ class OptionalContextConditionTest extends KernelTestBase {
   /**
    * Tests with both contexts mapped to the same user.
    */
-  public function testContextAvailable() {
+  public function testContextAvailable(): void {
     NodeType::create(['type' => 'example', 'name' => 'Example'])->save();
     /** @var \Drupal\Core\Condition\ConditionPluginBase $condition */
     $condition = \Drupal::service('plugin.manager.condition')

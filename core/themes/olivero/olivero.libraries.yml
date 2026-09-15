@@ -1,5 +1,16 @@
 global-styling:
+  aggregate_target:
+    css: true
   version: VERSION
+  fonts:
+    fonts/metropolis/Metropolis-Regular.woff2:
+      preload: true
+    fonts/metropolis/Metropolis-SemiBold.woff2:
+      preload: true
+    fonts/metropolis/Metropolis-Bold.woff2:
+      preload: true
+    fonts/lora/lora-v14-latin-regular.woff2:
+      preload: true
   css:
     base:
       css/base/fonts.css: {}
@@ -37,15 +48,13 @@ global-styling:
       css/components/header-sticky-toggle.css: {}
       css/components/hero.css: {}
       css/components/links.css: {}
-      css/components/messages.css: {}
+      css/components/layout-field.css: {}
       css/components/navigation/nav-button-mobile.css: {}
       css/components/node.css: {}
       css/components/node-teaser.css: {}
-      css/components/page-title.css: {}
       css/components/site-header.css: {}
       css/components/skip-link.css: {}
       css/components/pager.css: {}
-      css/components/table.css: {}
       css/components/text-content.css: {}
       css/components/wide-content.css: {}
 
@@ -83,6 +92,9 @@ comments:
       css/components/comments.css: {}
   js:
     js/comments.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
 
 content-below:
   version: VERSION
@@ -197,6 +209,9 @@ messages:
   version: VERSION
   js:
     js/messages.js: {}
+  css:
+    component:
+      css/components/messages.css: {}
   dependencies:
     - olivero/global-styling
 
@@ -276,6 +291,9 @@ tabs:
       css/components/tabs.css: {}
   js:
     js/tabs.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
 
 tabledrag:
   version: VERSION
@@ -288,3 +306,9 @@ tags:
   css:
     theme:
       css/components/tags.css: {}
+
+olivero.table:
+  version: VERSION
+  css:
+    component:
+      css/components/table.css: {}

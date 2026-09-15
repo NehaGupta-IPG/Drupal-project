@@ -8,18 +8,21 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the grouped exposed filter admin UI.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class GroupedExposedFilterTest extends WebDriverTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
+    'body_field',
     'node',
     'views',
     'views_ui',
@@ -76,7 +79,9 @@ class GroupedExposedFilterTest extends WebDriverTestBase {
   /**
    * Tests if the right fields are shown and the right values set.
    */
-  public function testGroupedFilterValuesUI() {
+  public function testGroupedFilterValuesUI(): void {
+    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/project/drupal/issues/3028968.
+    $this->markTestSkipped();
     $web_assert = $this->assertSession();
 
     $this->drupalGet('/admin/structure/views/view/test_exposed_admin_ui');

@@ -6,20 +6,24 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\block_content\Entity\BlockContent;
-use Drupal\block_content\Entity\BlockContentType;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\FunctionalJavascriptTests\JSWebAssert;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore blocknodebundle fieldbody
 /**
  * Tests the Layout Builder disables interactions of rendered blocks.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
 
+  use BlockContentCreationTrait;
   use ContextualLinkClickTrait;
   use OffCanvasTestTrait;
 
@@ -29,12 +33,12 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
   protected static $modules = [
     'block',
     'block_content',
+    'block_test',
     'field_ui',
     'filter',
     'filter_test',
     'layout_builder',
     'node',
-    'search',
     'contextual',
     'off_canvas_test',
   ];
@@ -61,20 +65,18 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
       ],
     ]);
 
-    $bundle = BlockContentType::create([
+    $this->createBlockContentType([
       'id' => 'basic',
       'label' => 'Basic block',
       'revision' => 1,
-    ]);
-    $bundle->save();
-    block_content_add_body_field($bundle->id());
+    ], TRUE);
 
     BlockContent::create([
       'type' => 'basic',
       'info' => 'Block with link',
       'body' => [
         // Create a link that should be disabled in Layout Builder preview.
-        'value' => '<a id="link-that-should-be-disabled" href="/search/node">Take me away</a>',
+        'value' => '<a id="link-that-should-be-disabled" href="/user/login">Take me away</a>',
         'format' => 'full_html',
       ],
     ])->save();
@@ -93,11 +95,11 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
   /**
    * Tests that forms and links are disabled in the Layout Builder preview.
    */
-  public function testFormsLinksDisabled() {
+  public function testFormsLinksDisabled(): void {
     // Resize window due to bug in Chromedriver when clicking on overlays over
     // iFrames.
     // @see https://bugs.chromium.org/p/chromedriver/issues/detail?id=2758
-    $this->getSession()->resizeWindow(1200, 1200);
+    $this->getSession()->resizeWindow(1200, 1339);
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -105,19 +107,18 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
       'configure any layout',
       'administer node display',
       'administer node fields',
-      'search content',
       'access contextual links',
     ]));
 
     $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
 
-    $this->drupalGet("{$field_ui_prefix}/display");
+    $this->drupalGet("{$field_ui_prefix}/display/default");
     $this->submitForm(['layout[enabled]' => TRUE], 'Save');
     $assert_session->linkExists('Manage layout');
     $this->clickLink('Manage layout');
 
     // Add a block with a form, another with a link, and one with an iframe.
-    $this->addBlock('Search form', '#layout-builder .search-block-form');
+    $this->addBlock('Test form block', '[id^="block-test-form-test"]');
     $this->addBlock('Block with link', '#link-that-should-be-disabled');
     $this->addBlock('Block with iframe', '#iframe-that-should-be-disabled');
 
@@ -153,7 +154,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
    * @param string $rendered_locator
    *   The CSS locator to confirm the block was rendered.
    */
-  protected function addBlock($block_link_text, $rendered_locator) {
+  protected function addBlock($block_link_text, $rendered_locator): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -187,7 +188,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     try {
       $element->click();
       $tag_name = $element->getTagName();
-      $this->fail(new FormattableMarkup("@tag_name was clickable when it shouldn't have been", ['@tag_name' => $tag_name]));
+      $this->fail("$tag_name was clickable when it shouldn't have been");
     }
     catch (\Exception $e) {
       $this->assertTrue(JSWebAssert::isExceptionNotClickable($e));
@@ -203,9 +204,9 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
-    $this->assertNotEmpty($assert_session->waitForElement('css', '.block-search'));
-    $searchButton = $assert_session->buttonExists('Search');
-    $this->assertElementNotClickable($searchButton);
+    $this->assertNotEmpty($assert_session->waitForElement('css', '[id^="block-test-form-test"]'));
+    $submitButton = $assert_session->buttonExists('Submit');
+    $this->assertElementNotClickable($submitButton);
     $assert_session->linkExists('Take me away');
     $this->assertElementNotClickable($page->findLink('Take me away'));
     $iframe = $assert_session->elementExists('css', '#iframe-that-should-be-disabled');
@@ -282,7 +283,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     // After the contextual link opens the dialog, move the mouse pointer
     // elsewhere on the page. If mouse up were not working correctly this would
     // actually drag the body field too.
-    $this->movePointerTo('#iframe-that-should-be-disabled');
+    $this->getSession()->getDriver()->mouseOver('.//*[@id="iframe-that-should-be-disabled"]');
 
     $new_body_block_bottom_position = $this->getElementVerticalPosition($body_field_selector, 'bottom');
     $iframe_top_position = $this->getElementVerticalPosition('#iframe-that-should-be-disabled', 'top');
@@ -312,21 +313,9 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
    * @return int
    *   The element position.
    */
-  protected function getElementVerticalPosition($css_selector, $position_type) {
+  protected function getElementVerticalPosition($css_selector, $position_type): int {
     $this->assertContains($position_type, ['top', 'bottom'], 'Expected position type.');
     return (int) $this->getSession()->evaluateScript("document.querySelector('$css_selector').getBoundingClientRect().$position_type + window.pageYOffset");
-  }
-
-  /**
-   * Moves mouse pointer to location of $selector.
-   *
-   * @param string $selector
-   *   CSS selector.
-   */
-  protected function movePointerTo($selector) {
-    $driver_session = $this->getSession()->getDriver()->getWebDriverSession();
-    $element = $driver_session->element('css selector', $selector);
-    $driver_session->moveto(['element' => $element->getID()]);
   }
 
 }

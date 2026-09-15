@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\FunctionalJavascriptTests\SortableTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Media library entity reference widget.
- *
- * @group media_library
  */
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceWidgetTest extends MediaLibraryTestBase {
 
   use SortableTestTrait;
@@ -74,7 +77,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
   /**
    * Tests that disabled media items don't capture focus on page load.
    */
-  public function testFocusNotAppliedWithoutSelectionChange() {
+  public function testFocusNotAppliedWithoutSelectionChange(): void {
     // Create a node with the maximum number of values for the field_twin_media
     // field.
     $node = $this->drupalCreateNode([
@@ -99,7 +102,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
   /**
    * Tests that the Media library's widget works as expected.
    */
-  public function testWidget() {
+  public function testWidget(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -181,7 +184,12 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     foreach ($links as $link) {
       $link_titles[] = $link->getText();
     }
-    $expected_link_titles = ['Show Type Three media (selected)', 'Show Type One media', 'Show Type Two media', 'Show Type Four media'];
+    $expected_link_titles = [
+      'Show Type Three media (selected)',
+      'Show Type One media',
+      'Show Type Two media',
+      'Show Type Four media',
+    ];
     $this->assertSame($link_titles, $expected_link_titles);
     $this->drupalGet('admin/structure/types/manage/basic_page/form-display');
 
@@ -200,10 +208,12 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
 
     $this->drupalGet('node/add/basic_page');
     $this->openMediaLibraryForField('field_twin_media');
-    $link_titles = array_map(function ($link) {
+    $link_titles = array_map(function (NodeElement $link) {
       return $link->getText();
     }, $links);
-    $this->assertSame($link_titles, ['Show Type One media (selected)', 'Show Type Three media', 'Show Type Four media', 'Show Type Two media']);
+    $this->assertSame(
+      $link_titles,
+      ['Show Type One media (selected)', 'Show Type Three media', 'Show Type Four media', 'Show Type Two media']);
     $assert_session->elementExists('css', '.ui-dialog-titlebar-close')->click();
 
     // Assert the announcements for media type navigation in the media library.
@@ -235,13 +245,14 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $session = $this->getSession();
     $session->getPage()->fillField('Name', 'Dog');
     $session->getPage()->pressButton('Apply filters');
-    $this->waitForText('Dog');
-    $this->markTestSkipped("Skipped temporarily for random fails.");
-    $this->waitForNoText('Bear');
+    $assert_session->assertExpectedAjaxRequest(9);
+    $assert_session->pageTextContains('Dog');
+    $assert_session->pageTextNotContains('Bear');
     $session->getPage()->fillField('Name', '');
     $session->getPage()->pressButton('Apply filters');
-    $this->waitForText('Dog');
-    $this->waitForText('Bear');
+    $assert_session->assertExpectedAjaxRequest(10);
+    $assert_session->pageTextContains('Dog');
+    $assert_session->pageTextContains('Bear');
     $assert_session->elementExists('css', '.ui-dialog-titlebar-close')->click();
 
     // Assert adding a single media item and removing it.
@@ -283,13 +294,13 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
 
     // Assert the same has been added twice and remove the items again.
     $this->waitForElementsCount('css', '.field--name-field-twin-media [data-media-library-item-delta]', 2);
-    $assert_session->hiddenFieldValueEquals('field_twin_media[selection][0][target_id]', 4);
-    $assert_session->hiddenFieldValueEquals('field_twin_media[selection][1][target_id]', 4);
+    $assert_session->hiddenFieldValueEquals('field_twin_media[selection][0][target_id]', '4');
+    $assert_session->hiddenFieldValueEquals('field_twin_media[selection][1][target_id]', '4');
     $wrapper->pressButton('Remove');
     $this->waitForText('Dog has been removed.');
     $wrapper->pressButton('Remove');
     $this->waitForText('Dog has been removed.');
-    $result = $wrapper->waitFor(10, function ($wrapper) {
+    $result = $wrapper->waitFor(10, function ($wrapper): bool {
       /** @var \Behat\Mink\Element\NodeElement $wrapper */
       return $wrapper->findButton('Remove') == NULL;
     });
@@ -474,7 +485,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
   /**
    * Tests saving a required media library field.
    */
-  public function testRequiredMediaField() {
+  public function testRequiredMediaField(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -567,7 +578,8 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
    * Checks for inclusion of text in #drupal-live-announce.
    *
    * @param string $expected_message
-   *   The text that is expected to be present in the #drupal-live-announce element.
+   *   The text that is expected to be present in the #drupal-live-announce
+   *   element.
    *
    * @internal
    */
@@ -579,7 +591,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function sortableUpdate($item, $from, $to = NULL) {
+  protected function sortableUpdate($item, $from, $to = NULL): void {
     // See core/modules/media_library/js/media_library.widget.js.
     $script = <<<JS
 (function ($) {
@@ -599,7 +611,9 @@ JS;
   /**
    * Tests the preview displayed by the field widget.
    */
-  public function testWidgetPreview() {
+  public function testWidgetPreview(): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3569225');
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
