@@ -24,22 +24,10 @@ class AccessibilityTest extends AccessibilityTestBase {
     // @todo move these to default admin because it will be the default theme?
     yield 'Homepage' => [
       'path' => '<front>',
-      // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
-      'axe_options' => [
-        'rules' => [
-          'region' => ['enabled' => FALSE],
-        ],
-      ],
     ];
 
     yield 'Login' => [
       'path' => '/user/login',
-      // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
-      'axe_options' => [
-        'rules' => [
-          'region' => ['enabled' => FALSE],
-        ],
-      ],
     ];
   }
 
