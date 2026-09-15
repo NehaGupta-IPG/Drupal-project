@@ -13,6 +13,10 @@
   --messages--status-color: #42a877;
   --messages--warning-color: #e0ac00;
   --messages--error-color: #e34f4f;
+  --messages--notice-color: #1a59b7;
+  --messages--notice-color-bg: #edf8fd;
+  --messages--info-color: #5aba26;
+  --messages--info-color-bg: #ebfeee;
   --messages__link-color: var(--color-sunglow);
   --messages__link--hover-color: var(--color-white);
   --messages__icon-size: 1rem;
@@ -83,6 +87,22 @@
 
   & .messages__header {
     background: url(../../images/icons/e0ac00/exclamation.svg) no-repeat center left;
+  }
+}
+
+.messages--notice {
+  border-color: var(--messages--notice-color);
+
+  & .messages__header {
+    background: url(../../images/icons/notices/notice.svg) no-repeat center left;
+  }
+}
+
+.messages--info {
+  border-color: var(--messages--info-color);
+
+  & .messages__header {
+    background: url(../../images/icons/notices/info-circle.svg) no-repeat center left;
   }
 }
 

@@ -13,3 +13,11 @@
   color: #a51b00;
   background-color: #fcf4f2;
 }
+.color-notice {
+  color: var(--messages--notice-color);
+  background-color: var(--messages--notice-color-bg);
+}
+.color-info {
+  color: var(--messages--info-color);
+  background-color: var(--messages--info-color-bg);
+}

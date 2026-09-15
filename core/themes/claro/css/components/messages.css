@@ -20,6 +20,10 @@
   --messages--status-color: #42a877;
   --messages--warning-color: #e0ac00;
   --messages--error-color: #e34f4f;
+  --messages--notice-color: #1a59b7;
+  --messages--notice-color-bg: #edf8fd;
+  --messages--info-color: #5aba26;
+  --messages--info-color-bg: #ebfeee;
   --messages__link-color: var(--color-sunglow);
   --messages__link--hover-color: var(--color-white);
   --messages__icon-size: 1rem;
@@ -92,6 +96,22 @@
   & .messages__header {
     background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 4 14' fill='%23e0ac00'%3e%3cpath d='M.5 0h3v9h-3z'/%3e%3ccircle cx='2' cy='12.5' r='1.5'/%3e%3c/svg%3e") no-repeat center left;
   }
+}
+
+.messages--notice {
+  border-color: var(--messages--notice-color);
+}
+
+.messages--notice .messages__header {
+  background: url("data:image/svg+xml,%3c%3fxml version='1.0' encoding='UTF-8' standalone='no'%3f%3e%3csvg   width='16'   height='16'   fill='currentColor'   class='bi bi-bell'   viewBox='0 0 16 16'   version='1.1'   id='svg1'   sodipodi:docname='notice.svg'   inkscape:version='1.3 (0e150ed, 2023-07-21)'   xmlns:inkscape='http://www.inkscape.org/namespaces/inkscape'   xmlns:sodipodi='http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd'   xmlns='http://www.w3.org/2000/svg'   xmlns:svg='http://www.w3.org/2000/svg'%3e  %3cdefs     id='defs1' /%3e  %3csodipodi:namedview     id='namedview1'     pagecolor='%23ffffff'     bordercolor='%23666666'     borderopacity='1.0'     inkscape:showpageshadow='2'     inkscape:pageopacity='0.0'     inkscape:pagecheckerboard='0'     inkscape:deskcolor='%23d1d1d1'     inkscape:zoom='14.749193'     inkscape:cx='7.9665376'     inkscape:cy='8.0004377'     inkscape:window-width='1312'     inkscape:window-height='449'     inkscape:window-x='336'     inkscape:window-y='25'     inkscape:window-maximized='0'     inkscape:current-layer='svg1' /%3e  %3cpath     d='M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6'     id='path1'     style='fill:%231a59b7;fill-opacity:1' /%3e%3c/svg%3e") no-repeat center left;
+}
+
+.messages--info {
+  border-color: var(--messages--info-color);
+}
+
+.messages--info .messages__header {
+  background: url("data:image/svg+xml,%3c%3fxml version='1.0' encoding='UTF-8' standalone='no'%3f%3e%3csvg   width='16'   height='16'   fill='currentColor'   class='bi bi-info-circle'   viewBox='0 0 16 16'   version='1.1'   id='svg2'   sodipodi:docname='info-circle.svg'   inkscape:version='1.3 (0e150ed, 2023-07-21)'   xmlns:inkscape='http://www.inkscape.org/namespaces/inkscape'   xmlns:sodipodi='http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd'   xmlns='http://www.w3.org/2000/svg'   xmlns:svg='http://www.w3.org/2000/svg'%3e  %3cdefs     id='defs2' /%3e  %3csodipodi:namedview     id='namedview2'     pagecolor='%23ffffff'     bordercolor='%23666666'     borderopacity='1.0'     inkscape:showpageshadow='2'     inkscape:pageopacity='0.0'     inkscape:pagecheckerboard='0'     inkscape:deskcolor='%23d1d1d1'     inkscape:zoom='14.75'     inkscape:cx='6.7457627'     inkscape:cy='10.033898'     inkscape:window-width='1448'     inkscape:window-height='571'     inkscape:window-x='157'     inkscape:window-y='219'     inkscape:window-maximized='0'     inkscape:current-layer='g4' /%3e  %3cpath     d='m 108.93,6.588 -2.29,0.287 -0.082,0.38 0.45,0.083 c 0.294,0.07 0.352,0.176 0.288,0.469 l -0.738,3.468 c -0.194,0.897 0.105,1.319 0.808,1.319 0.545,0 1.178,-0.252 1.465,-0.598 l 0.088,-0.416 c -0.2,0.176 -0.492,0.246 -0.686,0.246 -0.275,0 -0.375,-0.193 -0.304,-0.533 z M 109,4.5 a 1,1 0 1 1 -2,0 1,1 0 0 1 2,0'     id='path2' /%3e  %3cg     id='g4'%3e    %3cpath       d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16'       id='path1'       style='fill:%235ab927;fill-opacity:1' /%3e    %3cg       id='g3'       transform='matrix(0.73607744,0,0,0.73607744,6.5278451,2.8474579)'%3e      %3cpath         d='m 3.5,14 h -3 V 5 h 3 z'         id='path1-5'         style='fill:%235ab927;fill-opacity:1' /%3e      %3ccircle         cx='-2'         cy='-1.5'         r='1.5'         id='circle1'         transform='scale(-1)'         style='fill:%235ab927;fill-opacity:1' /%3e    %3c/g%3e  %3c/g%3e%3c/svg%3e") no-repeat center left;
 }
 
 .messages__title {
