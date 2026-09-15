@@ -4,6 +4,7 @@ parameters:
 services:
   _defaults:
     autoconfigure: true
+    autowire: true
   cache.toolbar:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
@@ -16,4 +17,14 @@ services:
       - { name: page_cache_request_policy }
   toolbar.menu_tree:
     class: Drupal\toolbar\Menu\ToolbarMenuLinkTree
-    arguments: ['@menu.tree_storage', '@plugin.manager.menu.link', '@router.route_provider', '@menu.active_trail', '@callable_resolver']
+  toolbar.user_link_builder:
+    class: Drupal\toolbar\UserToolbarLinkBuilder
+  Drupal\toolbar\UserToolbarLinkBuilder: '@toolbar.user_link_builder'
+  toolbar.announcements_feed_link_builder:
+    class: \Drupal\toolbar\AnnouncementsFeedToolbarLinkBuilder
+  \Drupal\toolbar\AnnouncementsFeedToolbarLinkBuilder: '@toolbar.announcements_feed_link_builder'
+  toolbar.workspaces_ui_link_builder:
+    class: Drupal\toolbar\WorkspacesUiToolbarLinkBuilder
+    # Only used when Workspaces UI is installed, which provides the manager.
+    arguments: ['@?workspaces.manager', '@plugin.manager.element_info']
+  Drupal\toolbar\WorkspacesUiToolbarLinkBuilder: '@toolbar.workspaces_ui_link_builder'

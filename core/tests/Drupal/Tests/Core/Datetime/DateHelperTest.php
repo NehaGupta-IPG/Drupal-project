@@ -7,11 +7,13 @@ namespace Drupal\Tests\Core\Datetime;
 use Drupal\Core\Datetime\DateHelper;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\Datetime\DateHelper.
@@ -22,10 +24,8 @@ class DateHelperTest extends UnitTestCase {
 
   /**
    * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $languageManager;
+  protected LanguageManagerInterface&Stub $languageManager;
 
   /**
    * {@inheritdoc}
@@ -38,12 +38,12 @@ class DateHelperTest extends UnitTestCase {
     $container->set('config.factory', $this->getConfigFactoryStub($config));
     $container->set('string_translation', $this->getStringTranslationStub());
 
-    $this->languageManager = $this->createMock('\Drupal\Core\Language\LanguageManagerInterface');
+    $this->languageManager = $this->createStub(LanguageManagerInterface::class);
     $language = new Language(['langcode' => 'en']);
-    $this->languageManager->expects($this->any())
+    $this->languageManager
       ->method('getDefaultLanguage')
       ->willReturn($language);
-    $this->languageManager->expects($this->any())
+    $this->languageManager
       ->method('getCurrentLanguage')
       ->willReturn($language);
     $container->set('language_manager', $this->languageManager);
@@ -53,8 +53,6 @@ class DateHelperTest extends UnitTestCase {
 
   /**
    * Tests week days ordered.
-   *
-   * @legacy-covers ::weekDaysOrdered
    */
   #[DataProvider('providerTestWeekDaysOrdered')]
   public function testWeekDaysOrdered($first_day, $expected): void {
@@ -68,7 +66,7 @@ class DateHelperTest extends UnitTestCase {
     $this->assertSame($expected, DateHelper::weekDaysOrdered($weekdays));
   }
 
-  public static function providerTestWeekDaysOrdered() {
+  public static function providerTestWeekDaysOrdered(): array {
     $data = [];
     $data[] = [
       0,
@@ -171,8 +169,6 @@ class DateHelperTest extends UnitTestCase {
 
   /**
    * Tests days in month.
-   *
-   * @legacy-covers ::daysInMonth
    */
   public function testDaysInMonth(): void {
     // @todo Consider deprecating passing NULL in
@@ -198,8 +194,6 @@ class DateHelperTest extends UnitTestCase {
 
   /**
    * Tests days in year.
-   *
-   * @legacy-covers ::daysInYear
    */
   public function testDaysInYear(): void {
     // Passing NULL, FALSE, or an empty string should default to now. Just
@@ -224,8 +218,6 @@ class DateHelperTest extends UnitTestCase {
 
   /**
    * Tests day of week.
-   *
-   * @legacy-covers ::dayOfWeek
    */
   public function testDayOfWeek(): void {
     // Passing NULL, FALSE, or an empty string should default to now. Just
@@ -251,8 +243,6 @@ class DateHelperTest extends UnitTestCase {
 
   /**
    * Tests day of week name.
-   *
-   * @legacy-covers ::dayOfWeekName
    */
   public function testDayOfWeekName(): void {
     // Passing NULL, FALSE, or an empty string should default to now. Just

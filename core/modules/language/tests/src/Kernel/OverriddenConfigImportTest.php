@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Kernel;
 
-use Drupal\Core\Config\ConfigImporter;
+use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -16,13 +16,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('language')]
 #[RunTestsInSeparateProcesses]
 class OverriddenConfigImportTest extends KernelTestBase {
-
-  /**
-   * Config Importer object used for testing.
-   *
-   * @var \Drupal\Core\Config\ConfigImporter
-   */
-  protected $configImporter;
 
   /**
    * {@inheritdoc}
@@ -43,19 +36,7 @@ class OverriddenConfigImportTest extends KernelTestBase {
       $this->container->get('config.storage.sync'),
       $this->container->get('config.storage')
     );
-    $this->configImporter = new ConfigImporter(
-      $storage_comparer->createChangelist(),
-      $this->container->get('event_dispatcher'),
-      $this->container->get('config.manager'),
-      $this->container->get('lock'),
-      $this->container->get('config.typed'),
-      $this->container->get('module_handler'),
-      $this->container->get('module_installer'),
-      $this->container->get('theme_handler'),
-      $this->container->get('string_translation'),
-      $this->container->get('extension.list.module'),
-      $this->container->get('extension.list.theme')
-    );
+    $this->configImporter = $this->container->get(ConfigImporterFactory::class)->get($storage_comparer->createChangelist());
   }
 
   /**

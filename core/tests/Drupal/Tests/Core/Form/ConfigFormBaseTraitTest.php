@@ -18,8 +18,6 @@ class ConfigFormBaseTraitTest extends UnitTestCase {
 
   /**
    * Tests config.
-   *
-   * @legacy-covers ::config
    */
   public function testConfig(): void {
 
@@ -30,7 +28,7 @@ class ConfigFormBaseTraitTest extends UnitTestCase {
       'immutable.config' => [],
     ]);
 
-    $trait->expects($this->any())
+    $trait->expects($this->atLeastOnce())
       ->method('getEditableConfigNames')
       ->willReturn(['editable.config']);
 
@@ -48,30 +46,26 @@ class ConfigFormBaseTraitTest extends UnitTestCase {
 
   /**
    * Tests config factory exception.
-   *
-   * @legacy-covers ::config
    */
   public function testConfigFactoryException(): void {
     $testObject = new ConfiguredTrait();
 
     // There is no config factory available this should result in an exception.
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('No config factory available for ConfigFormBaseTrait');
+    $this->expectExceptionMessageIs('No config factory available for ConfigFormBaseTrait');
     $config_method = new \ReflectionMethod($testObject, 'config');
     $config_method->invoke($testObject, 'editable.config');
   }
 
   /**
    * Tests config factory exception invalid property.
-   *
-   * @legacy-covers ::config
    */
   public function testConfigFactoryExceptionInvalidProperty(): void {
     $testObject = new ConfiguredTrait();
 
     // There is no config factory available this should result in an exception.
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('No config factory available for ConfigFormBaseTrait');
+    $this->expectExceptionMessageIs('No config factory available for ConfigFormBaseTrait');
     $config_method = new \ReflectionMethod($testObject, 'config');
     $config_method->invoke($testObject, 'editable.config');
   }
@@ -91,6 +85,8 @@ class ConfiguredTrait {
    */
   public $configFactory;
 
-  protected function getEditableConfigNames() {}
+  protected function getEditableConfigNames(): array {
+    return [];
+  }
 
 }

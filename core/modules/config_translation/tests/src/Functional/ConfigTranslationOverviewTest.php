@@ -28,19 +28,24 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
     'config_test',
     'config_translation',
     'config_translation_test',
-    'contact',
     'contextual',
     'entity_test_operation',
     'field_ui',
     'node',
     'views',
     'views_ui',
+    'body_field',
   ];
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile = 'testing_locale';
 
   /**
    * Languages to enable.
@@ -65,8 +70,6 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
       'translate configuration',
       'administer languages',
       'administer site configuration',
-      'administer contact forms',
-      'access site-wide contact form',
       'access contextual links',
       'administer views',
     ];
@@ -198,7 +201,7 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
       'field_storage' => FieldStorageConfig::loadByName('node', 'body'),
       'bundle' => $node_type->id(),
       'label' => 'Body',
-      'settings' => ['display_summary' => FALSE],
+      'settings' => [],
     ]);
     $field->save();
 

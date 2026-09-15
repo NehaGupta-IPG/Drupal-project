@@ -23,19 +23,19 @@ class Rss extends RssPluginBase {
   /**
    * {@inheritdoc}
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $base_table = 'comment_field_data';
 
   /**
    * {@inheritdoc}
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $base_field = 'cid';
 
   /**
    * The field alias.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $field_alias;
 
   /**
@@ -124,7 +124,8 @@ class Rss extends RssPluginBase {
     $item->title = $comment->label();
     $item->link = $comment->toUrl('canonical', ['absolute' => TRUE])->toString();
     // Provide a reference so that the render call in
-    // template_preprocess_views_view_row_rss() can still access it.
+    // \Drupal\views\Hook\ViewsThemeHooks::preprocessViewsViewRowRss()
+    // can still access it.
     $item->elements = &$comment->rss_elements;
     $item->cid = $comment->id();
 

@@ -10,7 +10,6 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore downlander
@@ -89,9 +88,8 @@ class ManageFieldsTest extends BrowserTestBase {
     // Check that the summary element for the string field type exists and has
     // the correct text (which comes from the FieldItemBase class).
     $element = $assert_session->elementExists('css', '#highlander');
-    $summary = $assert_session->elementExists('css', '.field-settings-summary-cell > ul > li', $element);
-    $field_label = $this->container->get('plugin.manager.field.field_type')->getDefinitions()['string']['label'];
-    $this->assertEquals($field_label, $summary->getText());
+    $field_label = (string) $this->container->get('plugin.manager.field.field_type')->getDefinitions()['string']['label'];
+    $assert_session->elementExists('css', '.field-settings-summary-cell .field-type-label:contains("' . $field_label . '")', $element);
 
     // Add an entity reference field, and check that its summary is custom.
     /** @var \Drupal\field\FieldStorageConfigInterface $storage */
@@ -317,7 +315,6 @@ class ManageFieldsTest extends BrowserTestBase {
   /**
    * Tests hook_form_field_storage_config_form_edit_alter().
    */
-  #[IgnoreDeprecations]
   public function testFieldTypeCardinalityAlter(): void {
     $node_type = $this->drupalCreateContentType();
     $bundle = $node_type->id();

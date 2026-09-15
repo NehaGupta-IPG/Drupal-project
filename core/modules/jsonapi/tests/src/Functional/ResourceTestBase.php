@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Random;
@@ -24,6 +23,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\BooleanItem;
 use Drupal\Core\Session\AccountInterface;
@@ -39,6 +39,7 @@ use Drupal\jsonapi\JsonApiResource\LinkCollection;
 use Drupal\jsonapi\JsonApiResource\NullIncludedData;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
 use Drupal\jsonapi\JsonApiResource\ResourceObjectData;
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\jsonapi\Normalizer\HttpExceptionNormalizer;
 use Drupal\jsonapi\ResourceResponse;
 use Drupal\path\Plugin\Field\FieldType\PathItem;
@@ -71,7 +72,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
     'basic_auth',
     'rest_test',
     'jsonapi_test_field_access',
+    'jsonapi_response_validator',
     'text',
+    'dynamic_page_cache',
+    'page_cache',
   ];
 
   /**
@@ -79,14 +83,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @var string
    */
-  protected static $entityTypeId = NULL;
+  protected static $entityTypeId;
 
   /**
    * The name of the tested JSON:API resource type.
    *
    * @var string
    */
-  protected static $resourceTypeName = NULL;
+  protected static $resourceTypeName;
 
   /**
    * Whether the tested JSON:API resource is versionable.
@@ -150,7 +154,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @see ::testPostIndividual()
    */
-  protected static $labelFieldName = NULL;
+  protected static $labelFieldName;
 
   /**
    * Whether new revisions of updated entities should be created by default.
@@ -244,6 +248,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->uuidKey = $entity_type_manager->getDefinition(static::$entityTypeId)
       ->getKey('uuid');
     $this->entity = $this->setUpFields($this->createEntity(), $this->account);
+    // Refresh entity storage as new fields have been created.
+    $this->entityStorage = $entity_type_manager->getStorage(static::$entityTypeId);
 
     $this->resourceType = $this->container->get('jsonapi.resource_type.repository')->getByTypeName(static::$resourceTypeName);
   }
@@ -333,9 +339,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
    */
   protected function resaveEntity(EntityInterface $entity, AccountInterface $account): EntityInterface {
     // Reload entity so that it has the new field.
-    $reloaded_entity = $this->entityLoadUnchanged($entity->id());
+    $entity_id = $entity->id();
     // Some entity types are not stored, hence they cannot be reloaded.
-    if ($reloaded_entity !== NULL) {
+    if ($entity_id !== NULL) {
+      $reloaded_entity = $this->entityLoadUnchanged($entity_id);
       $entity = $reloaded_entity;
       // Set a default value on the fields.
       $entity->set('field_rest_test', ['value' => 'All the faith he had had had had no effect on the outcome of his life.']);
@@ -409,7 +416,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function createAnotherEntity($key) {
+  protected function createAnotherEntity(string $key) {
     $duplicate = $this->getEntityDuplicate($this->entity, $key);
     // Some entity types are not stored, hence they cannot be reloaded.
     if (get_class($this->entityStorage) !== ContentEntityNullStorage::class) {
@@ -422,7 +429,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getEntityDuplicate(EntityInterface $original, $key) {
+  protected function getEntityDuplicate(EntityInterface $original, string $key) {
     $duplicate = $original->createDuplicate();
     if ($label_key = $original->getEntityType()->getKey('label')) {
       $duplicate->set($label_key, $original->label() . '_' . $key);
@@ -431,11 +438,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $id_key = $duplicate->getEntityType()->getKey('id');
     $needs_manual_id = $duplicate instanceof ConfigEntityInterface && $id_key;
 
-    if ($duplicate instanceof FieldableEntityInterface && $id_key) {
-      $id_field = $duplicate->getFieldDefinition($id_key);
-      if ($id_field->getType() !== 'integer') {
-        $needs_manual_id = TRUE;
-      }
+    if (!$duplicate->getEntityType()->hasIntegerId()) {
+      $needs_manual_id = TRUE;
     }
 
     if ($needs_manual_id) {
@@ -567,7 +571,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The expected cacheability for the given entity collection.
    */
   protected static function getExpectedCollectionCacheability(AccountInterface $account, array $collection, ?array $sparse_fieldset = NULL, $filtered = FALSE) {
-    $cacheability = array_reduce($collection, function (CacheableMetadata $cacheability, EntityInterface $entity) use ($sparse_fieldset, $account) {
+    $cacheability = array_reduce($collection, function (CacheableMetadata $cacheability, EntityInterface $entity) use ($sparse_fieldset, $account): CacheableMetadata {
       $access_result = static::entityAccess($entity, 'view', $account);
       if (!$access_result->isAllowed()) {
         $access_result = static::entityAccess($entity, 'view label', $account)->addCacheableDependency($access_result);
@@ -588,6 +592,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
                     $cacheability->addCacheableDependency(CacheableMetadata::createFromObject($property));
                   }
                 }
+                $cacheability->addCacheableDependency(CacheableMetadata::createFromObject($field_item_list));
               }
             }
           }
@@ -603,6 +608,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'url.query_args',
       // Drupal defaults.
       'url.site',
+      'user.permissions',
     ];
     // If the entity type is revisionable, add a resource version cache context.
     $cache_contexts = Cache::mergeContexts($cache_contexts, $entity_type->isRevisionable() ? ['url.query_args:resourceVersion'] : []);
@@ -676,7 +682,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     foreach ($permissions as $permission) {
       $role->revokePermission($permission);
     }
-    $role->trustData()->save();
+    $role->save();
   }
 
   /**
@@ -824,7 +830,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The error response to assert.
    * @param string|false $pointer
    *   The expected JSON Pointer to the associated entity in the request
-   *   document. See http://jsonapi.org/format/#error-objects.
+   *   document. See https://jsonapi.org/format/#error-objects.
    * @param string[]|false $expected_cache_tags
    *   (optional) The expected cache tags in the X-Drupal-Cache-Tags response
    *   header, or FALSE if that header should be absent. Defaults to FALSE.
@@ -971,7 +977,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
           'status' => '400',
           'detail' => "The following query parameters violate the JSON:API spec: 'foo'.",
           'links' => [
-            'info' => ['href' => 'http://jsonapi.org/format/#query-parameters'],
+            'info' => ['href' => 'https://jsonapi.org/format/#query-parameters'],
             'via' => ['href' => $url_reserved_custom_query_parameter->toString()],
           ],
         ],
@@ -982,7 +988,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $expected_document,
       $response,
       ['4xx-response', 'http_response'],
-      ['url.query_args', 'url.site'],
+      ['url.query_args', 'url.site', 'user.permissions'],
       'UNCACHEABLE (request policy)',
       TRUE,
     );
@@ -996,7 +1002,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // Same for Dynamic Page Cache hit.
     $response = $this->request('GET', $url, $request_options);
 
-    $this->assertResourceResponse(200, $this->getExpectedDocument(), $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts(), 'UNCACHEABLE (request policy)', $this->generateDynamicPageCacheExpectedHeaderValue($this->getExpectedCacheContexts()) === 'MISS' ? 'HIT' : 'UNCACHEABLE (poor cacheability)');
+    $expected_document = $this->getExpectedDocument();
+
+    if ($this->entity->getEntityType()->isRevisionable()) {
+      $rel_working_copy_url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
+      $rel_working_copy_url->setOption('query', ['resourceVersion' => 'rel:working-copy']);
+      $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
+    }
+    $this->assertResourceResponse(200, $expected_document, $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts(), 'UNCACHEABLE (request policy)', $this->generateDynamicPageCacheExpectedHeaderValue($this->getExpectedCacheContexts()) === 'MISS' ? 'HIT' : 'UNCACHEABLE (poor cacheability)');
     // Assert that Dynamic Page Cache did not store a ResourceResponse object,
     // which needs serialization after every cache hit. Instead, it should
     // contain a flattened response. Otherwise performance suffers.
@@ -1048,7 +1061,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'Transfer-Encoding',
       'Vary',
     ];
-    $header_cleaner = function ($headers) use ($ignored_headers) {
+    $header_cleaner = function (array $headers) use ($ignored_headers): array {
       foreach ($headers as $header => $value) {
         if (str_starts_with($header, 'X-Drupal-Assertion-') || in_array($header, $ignored_headers)) {
           unset($headers[$header]);
@@ -1089,9 +1102,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
       [
         'url.query_args',
         'url.site',
+        'user.permissions',
       ],
       'UNCACHEABLE (request policy)',
-      'UNCACHEABLE (poor cacheability)',
+      'UNCACHEABLE (404)',
     );
 
     // DX: when Accept request header is missing, still 404, same response.
@@ -1110,9 +1124,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
       [
         'url.query_args',
         'url.site',
+        'user.permissions',
       ],
       'UNCACHEABLE (request policy)',
-      'UNCACHEABLE (poor cacheability)',
+      'UNCACHEABLE (404)',
     );
   }
 
@@ -1219,7 +1234,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', $this->generateDynamicPageCacheExpectedHeaderValue($expected_cacheability->getCacheContexts(), $expected_cacheability->getCacheMaxAge()));
 
     // Filtered collection with includes.
-    $relationship_field_names = array_reduce($filtered_entity_collection, function ($relationship_field_names, $entity) {
+    $relationship_field_names = array_reduce($filtered_entity_collection, function (array $relationship_field_names, EntityInterface $entity): array {
       return array_unique(array_merge($relationship_field_names, $this->getRelationshipFieldNames($entity)));
     }, []);
     $include = ['include' => implode(',', $relationship_field_names)];
@@ -1255,7 +1270,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // Sorted collection with includes.
     $sorted_entity_collection = $entity_collection;
-    uasort($sorted_entity_collection, function (EntityInterface $a, EntityInterface $b) {
+    uasort($sorted_entity_collection, function (EntityInterface $a, EntityInterface $b): int {
       // Sort by ID in reverse order.
       return strcmp($b->uuid(), $a->uuid());
     });
@@ -1370,7 +1385,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->doTestRelationshipGet($request_options);
 
     // Test POST.
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
     $this->doTestRelationshipMutation($request_options);
     // Grant entity-level edit access.
     $this->setUpAuthorization('PATCH');
@@ -1424,7 +1439,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         NULL,
         $actual_response->getStatusCode() === 200
           ? $expected_dynamic_page_cache_header_value
-          : ($expected_dynamic_page_cache_header_value === 'MISS' ? FALSE : $expected_dynamic_page_cache_header_value)
+          : "UNCACHEABLE ({$expected_resource_response->getStatusCode()})"
       );
     }
   }
@@ -1460,7 +1475,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $expected_cacheability->getCacheTags(),
         $expected_cacheability->getCacheContexts(),
         NULL,
-        $expected_dynamic_page_cache_header_value === 'MISS' && !$expected_resource_response->isSuccessful() ? FALSE : $expected_dynamic_page_cache_header_value
+        !$expected_resource_response->isSuccessful() ? "UNCACHEABLE ({$expected_resource_response->getStatusCode()})" : $expected_dynamic_page_cache_header_value
       );
     }
   }
@@ -1813,12 +1828,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
       }
 
       $resource_identifier = static::toResourceIdentifier($target_entity);
-      $resource_identifier = static::decorateResourceIdentifierWithDrupalInternalTargetId($field, $resource_identifier);
-      return $resource_identifier;
+      return static::decorateResourceIdentifierWithDrupalInternalTargetId($field, $resource_identifier);
     }
     else {
       $arity_counter = [];
-      $relation_list = array_filter(array_map(function ($item) use (&$arity_counter) {
+      $relation_list = array_filter(array_map(function (FieldItemInterface $item) use (&$arity_counter): ?array {
         $target_entity = $item->entity;
 
         if (is_null($target_entity)) {
@@ -1840,7 +1854,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
       }, iterator_to_array($field)));
 
       $arity_map = [];
-      $relation_list = array_map(function ($identifier) use ($arity_counter, &$arity_map) {
+
+      return array_map(function (array $identifier) use ($arity_counter, &$arity_map): array {
         $type = $identifier['type'];
         $id = $identifier['id'];
         // Only add an arity value if there are two or more resource identifiers
@@ -1857,8 +1872,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
         }
         return $identifier;
       }, $relation_list);
-
-      return $relation_list;
     }
   }
 
@@ -1980,7 +1993,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
           ? [$relationship_document['data']]
           : $relationship_document['data'];
         // Remove any relationships to 'virtual' resources.
-        $resource_identifiers = array_filter($resource_identifiers, function ($resource_identifier) {
+        $resource_identifiers = array_filter($resource_identifiers, function (array $resource_identifier): bool {
           return $resource_identifier['id'] !== 'virtual';
         });
         if (!empty($resource_identifiers)) {
@@ -2004,11 +2017,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->doTestPostIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
-    $this->config('jsonapi.settings')->set('read_only', TRUE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', TRUE)->save();
     $this->doTestPatchIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
-    $this->config('jsonapi.settings')->set('read_only', TRUE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', TRUE)->save();
     $this->doTestDeleteIndividual();
   }
 
@@ -2052,7 +2065,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertSame([''], $response->getHeader('Allow'));
     }
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // DX: 415 when no Content-Type request header.
     $response = $this->request('POST', $url, $request_options);
@@ -2280,7 +2293,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
     $this->assertSame(['GET'], $response->getHeader('Allow'));
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // DX: 415 when no Content-Type request header.
     $response = $this->request('PATCH', $url, $request_options);
@@ -2582,7 +2595,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
     $this->assertSame(['GET'], $response->getHeader('Allow'));
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // DX: 403 when unauthorized.
     $response = $this->request('DELETE', $url, $request_options);
@@ -2754,9 +2767,15 @@ abstract class ResourceTestBase extends BrowserTestBase {
           }
         }
       }
+      $rel_working_copy_url = clone $url;
+      $rel_working_copy_url->setOption('query', ['resourceVersion' => 'rel:working-copy']);
       $url->setOption('query', $query);
       // 'self' link should include the 'fields' query param.
       $expected_document['links']['self']['href'] = $url->setAbsolute()->toString();
+
+      if ($this->entity->getEntityType()->isRevisionable()) {
+        $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
+      }
 
       $response = $this->request('GET', $url, $request_options);
       $this->assertResourceResponse(
@@ -2813,6 +2832,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $actual_response = $this->request('GET', $url, $request_options);
       $expected_response = $this->getExpectedIncludedResourceResponse($included_paths, $request_options);
       $expected_document = $expected_response->getResponseData();
+
+      if ($this->entity->getEntityType()->isRevisionable()) {
+        $rel_working_copy_url = clone $url;
+        $rel_working_copy_url->setOption('query', ['resourceVersion' => 'rel:working-copy']);
+        $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
+      }
       // Dynamic Page Cache miss because cache should vary based on the
       // 'include' query param.
       $expected_cacheability = $expected_response->getCacheableMetadata();
@@ -2903,7 +2928,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $published_key = $this->entity->getEntityType()->getKey('published');
     $revision_translation_affected_key = $this->entity->getEntityType()->getKey('revision_translation_affected');
 
-    $amend_relationship_urls = function (array &$document, $revision_id) {
+    $amend_relationship_urls = function (array &$document, $revision_id): void {
       if (!empty($document['data']['relationships'])) {
         foreach ($document['data']['relationships'] as &$relationship) {
           $pattern = '/resourceVersion=id%3A\d/';
@@ -2948,6 +2973,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // The resource object should always links to the specific revision it
     // represents.
     $expected_document['data']['links']['self']['href'] = $latest_revision_id_url->setAbsolute()->toString();
+    $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
     $amend_relationship_urls($expected_document, $latest_revision_id);
     // Resource objects always link to their specific revision by revision ID.
     $expected_document['data']['attributes'][$revision_id_key] = $latest_revision_id;
@@ -3035,10 +3061,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $default_revision_id_url = $default_revision_id_url->setOption('query', ['resourceVersion' => "id:$default_revision_id"]);
     $expected_document['data']['links']['self']['href'] = $default_revision_id_url->setAbsolute()->toString();
     $amend_relationship_urls($expected_document, $default_revision_id);
-    // Since the requested version is the latest version and working copy, there
-    // should be no links.
+    // When viewing the latest version (current default revision), there should
+    // not be a link to the latest version.
     unset($expected_document['data']['links']['latest-version']);
-    unset($expected_document['data']['links']['working-copy']);
     $expected_document = $this->alterExpectedDocumentForRevision($expected_document);
     $expected_cache_tags = array_unique([...$expected_cache_tags, ...$workflow->getCacheTags()]);
     $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cache_contexts, NULL, TRUE);
@@ -3066,14 +3091,16 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'url.path',
       'url.query_args',
       'url.site',
+      'user.permissions',
     ];
-    $this->assertResourceErrorResponse(501, 'JSON:API does not support filtering on revisions other than the latest version because a secure Drupal core API does not yet exist to do so.', $rel_working_copy_collection_url_filtered, $actual_response, FALSE, ['http_response'], $filtered_collection_expected_cache_contexts);
+    $this->assertResourceErrorResponse(501, 'JSON:API does not support filtering on revisions other than the latest version because a secure Drupal core API does not yet exist to do so.', $rel_working_copy_collection_url_filtered, $actual_response, FALSE, ['http_response'], $filtered_collection_expected_cache_contexts, NULL, 'UNCACHEABLE (501)');
     // Fetch the collection URL using an invalid version identifier.
     $actual_response = $this->request('GET', $rel_invalid_collection_url, $request_options);
     $invalid_version_expected_cache_contexts = [
       'url.path',
       'url.query_args',
       'url.site',
+      'user.permissions',
     ];
     $this->assertResourceErrorResponse(
       400,
@@ -3083,6 +3110,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
       FALSE,
       ['4xx-response', 'http_response'],
       $invalid_version_expected_cache_contexts,
+      NULL,
+      'UNCACHEABLE (400)',
     );
 
     // Move the entity to its draft moderation state.
@@ -3168,7 +3197,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // Since the working copy is not the default revision. A `latest-version`
     // link is required to indicate that the requested version is not the
     // default revision.
-    unset($expected_document['data']['links']['working-copy']);
     $expected_document['data']['links']['latest-version']['href'] = $rel_latest_version_url->setAbsolute()->toString();
     $expected_cache_tags = $this->getExpectedCacheTags();
     $expected_cache_contexts = $this->getExpectedCacheContexts();
@@ -3280,7 +3308,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts(), NULL, TRUE);
     }
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // Ensures that PATCH and DELETE on individual resources with a
     // `resourceVersion` query parameter is not supported.
@@ -3506,7 +3534,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   An array of nested include paths.
    */
   protected function getNestedIncludePaths($depth = 3) {
-    $get_nested_relationship_field_names = function (EntityInterface $entity, $depth, $path = "") use (&$get_nested_relationship_field_names) {
+    $get_nested_relationship_field_names = function (EntityInterface $entity, $depth, $path = "") use (&$get_nested_relationship_field_names): array {
       $relationship_field_names = $this->getRelationshipFieldNames($entity);
       if ($depth > 0) {
         $paths = [];
@@ -3523,7 +3551,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         }
         return $paths;
       }
-      return array_map(function ($target_name) use ($path) {
+      return array_map(function ($target_name) use ($path): string {
         return "$path.$target_name";
       }, $relationship_field_names);
     };
@@ -3544,6 +3572,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     /** @var \Drupal\Core\Field\TypedData\FieldItemDataDefinition $item_definition */
     $item_definition = $field_definition->getItemDefinition();
     $main_property = $item_definition->getMainPropertyName();
+    if ($main_property === NULL) {
+      return FALSE;
+    }
     $property_definition = $item_definition->getPropertyDefinition($main_property);
     return $property_definition instanceof DataReferenceTargetDefinition;
   }
@@ -3574,8 +3605,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @todo Remove this after https://www.drupal.org/project/drupal/issues/3038706 lands.
    */
   protected function entityLoadUnchanged($id) {
-    $this->entityStorage->resetCache();
-    return $this->entityStorage->loadUnchanged($id);
+    $entity_storage = \Drupal::service('entity_type.manager')->getStorage(static::$entityTypeId);
+    $entity_storage->resetCache();
+    return $entity_storage->loadUnchanged($id);
   }
 
   /**

@@ -13,6 +13,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Render\Element;
 use Drupal\block\Entity\Block;
+use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Drupal\Core\Security\TrustedCallbackInterface;
 
 /**
@@ -48,7 +49,7 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
       $cache_tags = Cache::mergeTags($cache_tags, $plugin->getCacheTags());
 
       // Create the render array for the block as a whole.
-      // @see template_preprocess_block().
+      // @see \Drupal\block\Hook\BlockHooks::preprocessBlock().
       $build[$entity_id] = [
         '#cache' => [
           'contexts' => Cache::mergeContexts(
@@ -74,6 +75,16 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
       // dynamic page cache.
       if (!$plugin instanceof CacheOptionalInterface) {
         $build[$entity_id]['#cache']['keys'] = ['entity_view', 'block', $entity->id()];
+      }
+      else {
+        // When a block implements CacheOptionalInterface, it will be excluded
+        // from the dynamic render cache. Since it is also cheap to render,
+        // prevent it being placeholdered by BigPipe. This avoids loading
+        // BigPipe's JavaScript if this block is the only placeholder on the
+        // page, which is likely to be the case on dynamic page cache hits.
+        $build[$entity_id]['#placeholder_strategy_denylist'] = [
+          BigPipeStrategy::class => TRUE,
+        ];
       }
 
       // Allow altering of cacheability metadata or setting #create_placeholder.
@@ -132,7 +143,7 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
     }
 
     // Create the render array for the block as a whole.
-    // @see template_preprocess_block().
+    // @see \Drupal\block\Hook\BlockHooks::preprocessBlock().
     $build = [
       '#theme' => 'block',
       '#attributes' => [],
@@ -160,6 +171,15 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
     $module_handler->alter(['block_view', "block_view_$base_id"], $build, $plugin);
 
     return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    // Blocks do not use a view cache tag, they have no mechanisms that would
+    // require an invalidation of view related caches.
+    return [];
   }
 
   /**
@@ -214,11 +234,19 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
       // #contextual_links is information about the *entire* block. Therefore,
       // we must move these properties from $content and merge them into the
       // top-level element.
-      foreach (['#attributes', '#contextual_links'] as $property) {
-        if (isset($content[$property])) {
-          $build[$property] += $content[$property];
-          unset($content[$property]);
-        }
+      if (isset($content['#contextual_links'])) {
+        $build['#contextual_links'] += $content['#contextual_links'];
+        unset($content['#contextual_links']);
+      }
+      if (isset($content['#wrapper_attributes'])) {
+        $build['#attributes'] += $content['#wrapper_attributes'];
+        unset($content['#wrapper_attributes']);
+      }
+      // For BC, if wrapper attributes are not set, and the top-level render
+      // element has neither type nor theme, still pull up the attributes.
+      elseif (!isset($content['#type']) && !isset($content['#theme']) && isset($content['#attributes'])) {
+        $build['#attributes'] += $content['#attributes'];
+        unset($content['#attributes']);
       }
       $build['content'] = $content;
     }

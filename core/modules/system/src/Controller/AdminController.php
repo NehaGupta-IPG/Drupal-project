@@ -4,6 +4,8 @@ namespace Drupal\system\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Routing\Attribute\Route;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\ModuleAdminLinksHelper;
 use Drupal\user\ModulePermissionsLinkHelper;
 
@@ -28,6 +30,12 @@ class AdminController extends ControllerBase {
    * @return array
    *   A render array containing the listing.
    */
+  #[Route(
+    path: '/admin/index',
+    name: 'system.admin_index',
+    title: new TranslatableMarkup('Administration'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
   public function index() {
     $extensions = array_intersect_key($this->moduleExtensionList->getList(), $this->moduleHandler()->getModuleList());
 

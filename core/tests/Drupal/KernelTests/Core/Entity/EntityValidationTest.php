@@ -27,24 +27,25 @@ class EntityValidationTest extends EntityKernelTestBase {
   protected static $modules = ['filter', 'text', 'language'];
 
   /**
+   * The name of the entity.
+   *
    * @var string
    */
   protected $entityName;
 
   /**
+   * The user for the entity.
+   *
    * @var \Drupal\user\Entity\User
    */
   protected $entityUser;
 
   /**
+   * Text for the test field on the entity.
+   *
    * @var string
    */
   protected $entityFieldText;
-
-  /**
-   * @var array
-   */
-  protected array $cachedDiscoveries;
 
   /**
    * {@inheritdoc}
@@ -110,11 +111,8 @@ class EntityValidationTest extends EntityKernelTestBase {
     // Use the protected property on the cache_clearer first to check whether
     // the constraint manager is added there.
     $plugin_cache_clearer = \Drupal::service('plugin.cache_clearer');
-    $get_cached_discoveries = function () {
-      return $this->cachedDiscoveries;
-    };
-    $get_cached_discoveries = $get_cached_discoveries->bindTo($plugin_cache_clearer, $plugin_cache_clearer);
-    $cached_discoveries = $get_cached_discoveries();
+    $reflected_property = (new \ReflectionClass($plugin_cache_clearer))->getProperty('cachedDiscoveries');
+    $cached_discoveries = $reflected_property->getValue($plugin_cache_clearer);
     $cached_discovery_classes = [];
     foreach ($cached_discoveries as $cached_discovery) {
       $cached_discovery_classes[] = get_class($cached_discovery);
@@ -165,8 +163,9 @@ class EntityValidationTest extends EntityKernelTestBase {
     $test_entity = clone $entity;
     $test_entity->uuid->value = $this->randomString(129);
     $violations = $test_entity->validate();
-    $this->assertEquals(1, $violations->count(), 'Validation failed.');
-    $this->assertEquals('UUID: may not be longer than 128 characters.', $violations[0]->getMessage());
+    $this->assertEquals(2, $violations->count(), 'Validation failed.');
+    $this->assertEquals('This is not a valid UUID.', $violations[0]->getMessage());
+    $this->assertEquals('UUID: may not be longer than 128 characters.', $violations[1]->getMessage());
 
     $test_entity = clone $entity;
     $langcode_key = $this->entityTypeManager->getDefinition($entity_type)->getKey('langcode');

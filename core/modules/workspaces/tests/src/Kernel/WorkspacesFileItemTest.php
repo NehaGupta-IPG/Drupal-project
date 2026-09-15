@@ -30,7 +30,6 @@ class WorkspacesFileItemTest extends FileItemTest {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'file',
     'workspaces',
     'workspaces_test',
   ];
@@ -61,6 +60,13 @@ class WorkspacesFileItemTest extends FileItemTest {
     $this->ignoreEntityType('entity_view_display');
 
     parent::testFileItem();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testGenerateSampleValue(): void {
+    $this->markTestSkipped("This is already implemented and tested in base class. We don't require in child class.");
   }
 
 }

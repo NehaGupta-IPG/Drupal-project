@@ -47,8 +47,6 @@ class EntityDisplayBaseTest extends KernelTestBase {
 
   /**
    * Tests pre save.
-   *
-   * @legacy-covers ::preSave
    */
   public function testPreSave(): void {
     $entity_display = EntityViewDisplay::create([
@@ -86,8 +84,6 @@ class EntityDisplayBaseTest extends KernelTestBase {
 
   /**
    * Tests on dependency removal.
-   *
-   * @legacy-covers ::onDependencyRemoval
    */
   public function testOnDependencyRemoval(): void {
     // Create a comment field for entity_test.
@@ -133,7 +129,13 @@ class EntityDisplayBaseTest extends KernelTestBase {
       'mode' => 'default',
       'status' => TRUE,
       'content' => [
-        'test_field' => ['type' => 'comment_default', 'region' => 'content', 'settings' => ['view_mode' => 'default'], 'label' => 'hidden', 'third_party_settings' => []],
+        'test_field' => [
+          'type' => 'comment_default',
+          'region' => 'content',
+          'settings' => ['view_mode' => 'default'],
+          'label' => 'hidden',
+          'third_party_settings' => [],
+        ],
       ],
       'third_party_settings' => [
         'entity_test_third_party' => [
@@ -193,7 +195,7 @@ class EntityDisplayBaseTest extends KernelTestBase {
     $this->assertSame('rss', $display->getMode());
 
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage("'a.b' is not a valid entity display ID.");
+    $this->expectExceptionMessageIs("'a.b' is not a valid entity display ID.");
     $display->set('id', 'a.b');
   }
 

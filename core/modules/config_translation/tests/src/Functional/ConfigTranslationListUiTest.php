@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\config_translation\Functional;
 
 use Drupal\block_content\Entity\BlockContentType;
-use Drupal\contact\Entity\ContactForm;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\shortcut\Entity\ShortcutSet;
+use Drupal\locale\Model\TranslationUpdateMode;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\BrowserTestBase;
@@ -18,7 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Visit all lists.
  *
- * @see \Drupal\config_translation\Tests\ConfigTranslationViewListUiTest
+ * @see \Drupal\Tests\config_translation\Functional\ConfigTranslationViewListUiTest
  */
 #[Group('config_translation')]
 #[RunTestsInSeparateProcesses]
@@ -32,17 +31,14 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
   protected static $modules = [
     'block',
     'config_translation',
-    'contact',
     'block_content',
     'field',
     'field_ui',
     'menu_ui',
     'node',
-    'shortcut',
     'taxonomy',
     'image',
     'responsive_image',
-    'toolbar',
   ];
 
   /**
@@ -64,19 +60,16 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
     parent::setUp();
 
     $permissions = [
-      'access site-wide contact form',
       'administer blocks',
       'administer block content',
       'administer block types',
       'access block library',
-      'administer contact forms',
       'administer content types',
       'administer block_content fields',
       'administer filters',
       'administer menu',
       'administer node fields',
       'administer permissions',
-      'administer shortcuts',
       'administer site configuration',
       'administer taxonomy',
       'administer account settings',
@@ -94,7 +87,7 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->set('translation.use_source', TranslationUpdateMode::Local->value)
       ->save();
     $this->drupalPlaceBlock('local_tasks_block');
   }
@@ -227,30 +220,6 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
   }
 
   /**
-   * Tests the contact forms listing for the translate operation.
-   */
-  public function doContactFormsListTest(): void {
-    // Create a test contact form to decouple looking for translate operations
-    // link so this does not test more than necessary.
-    $contact_form = ContactForm::create([
-      'id' => $this->randomMachineName(16),
-      'label' => $this->randomMachineName(),
-    ]);
-    $contact_form->save();
-
-    // Get the contact form listing.
-    $this->drupalGet('admin/structure/contact');
-
-    $translate_link = 'admin/structure/contact/manage/' . $contact_form->id() . '/translate';
-    // Test if the link to translate the contact form is on the page.
-    $this->assertSession()->linkByHrefExists($translate_link);
-
-    // Test if the link to translate actually goes to the translate page.
-    $this->drupalGet($translate_link);
-    $this->assertSession()->responseContains('<th>Language</th>');
-  }
-
-  /**
    * Tests the content type listing for the translate operation.
    */
   public function doContentTypeListTest(): void {
@@ -290,30 +259,6 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
 
     $translate_link = 'admin/config/content/formats/manage/' . $filter_format->id() . '/translate';
     // Test if the link to translate the format is on the page.
-    $this->assertSession()->linkByHrefExists($translate_link);
-
-    // Test if the link to translate actually goes to the translate page.
-    $this->drupalGet($translate_link);
-    $this->assertSession()->responseContains('<th>Language</th>');
-  }
-
-  /**
-   * Tests the shortcut listing for the translate operation.
-   */
-  public function doShortcutListTest(): void {
-    // Create a test shortcut to decouple looking for translate operations
-    // link so this does not test more than necessary.
-    $shortcut = ShortcutSet::create([
-      'id' => $this->randomMachineName(16),
-      'label' => $this->randomString(),
-    ]);
-    $shortcut->save();
-
-    // Get the shortcut listing.
-    $this->drupalGet('admin/config/user-interface/shortcut');
-
-    $translate_link = 'admin/config/user-interface/shortcut/manage/' . $shortcut->id() . '/translate';
-    // Test if the link to translate the shortcut is on the page.
     $this->assertSession()->linkByHrefExists($translate_link);
 
     // Test if the link to translate actually goes to the translate page.
@@ -468,7 +413,7 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
    * @param string $link
    *   URL of the settings page to test.
    */
-  public function doSettingsPageTest($link): void {
+  public function doSettingsPageTest(string $link): void {
     // Get the settings page.
     $this->drupalGet($link);
 
@@ -490,10 +435,8 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
     $this->doMenuListTest();
     $this->doVocabularyListTest();
     $this->doCustomContentTypeListTest();
-    $this->doContactFormsListTest();
     $this->doContentTypeListTest();
     $this->doFormatsListTest();
-    $this->doShortcutListTest();
     $this->doUserRoleListTest();
     $this->doLanguageListTest();
     $this->doImageStyleListTest();

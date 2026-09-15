@@ -51,7 +51,7 @@ class ProxyBuilderTest extends UnitTestCase {
  * {@inheritdoc}
  */
 public function complexMethod($parameter, callable $function, ?\Drupal\Tests\Core\ProxyBuilder\TestServiceNoMethod $test_service = NULL, array &$elements = array (
-))
+)): true
 {
     return $this->lazyLoadItself()->complexMethod($parameter, $function, $test_service, $elements);
 }
@@ -74,7 +74,7 @@ EOS;
    * @return string
    *   The code of the entire proxy.
    */
-  protected function buildExpectedClass($class, $expected_methods_body, $interface_string = '') {
+  protected function buildExpectedClass($class, $expected_methods_body, $interface_string = ''): string {
     $reflection = new \ReflectionClass($class);
     $namespace = ProxyBuilder::buildProxyNamespace($class);
     $proxy_class = $reflection->getShortName();
@@ -148,7 +148,7 @@ namespace {{ namespace }} {
 
 EOS;
 
-    $expected_methods_body = implode("\n", array_map(function ($value) {
+    $expected_methods_body = implode("\n", array_map(function ($value): string {
       if ($value === '') {
         return $value;
       }
@@ -178,8 +178,8 @@ class TestServiceNoMethod {
  */
 class TestServiceComplexMethod {
 
-  public function complexMethod($parameter, callable $function, ?TestServiceNoMethod $test_service = NULL, array &$elements = []) {
-
+  public function complexMethod($parameter, callable $function, ?TestServiceNoMethod $test_service = NULL, array &$elements = []): true {
+    return TRUE;
   }
 
 }

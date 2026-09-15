@@ -24,8 +24,6 @@ class ExtensionVersionTest extends UnitTestCase {
    *   The version string to test.
    * @param array $expected_version_info
    *   The expected version information.
-   *
-   * @legacy-covers ::getMajorVersion
    */
   #[DataProvider('providerVersionInfos')]
   public function testGetMajorVersion(string $version, array $expected_version_info): void {
@@ -40,8 +38,6 @@ class ExtensionVersionTest extends UnitTestCase {
    *   The version string to test.
    * @param array $expected_version_info
    *   The expected version information.
-   *
-   * @legacy-covers ::getMinorVersion
    */
   #[DataProvider('providerVersionInfos')]
   public function testGetMinorVersion(string $version, array $expected_version_info): void {
@@ -56,8 +52,6 @@ class ExtensionVersionTest extends UnitTestCase {
    *   The version string to test.
    * @param array $expected_version_info
    *   The expected version information.
-   *
-   * @legacy-covers ::getVersionExtra
    */
   #[DataProvider('providerVersionInfos')]
   public function testGetVersionExtra(string $version, array $expected_version_info): void {
@@ -260,7 +254,7 @@ class ExtensionVersionTest extends UnitTestCase {
   #[DataProvider('providerInvalidVersionNumber')]
   public function testInvalidVersionNumber(string $version): void {
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage("Unexpected version number in: $version");
+    $this->expectExceptionMessageIs("Unexpected version number in: $version");
     ExtensionVersion::createFromVersionString($version);
   }
 
@@ -304,7 +298,7 @@ class ExtensionVersionTest extends UnitTestCase {
   #[DataProvider('providerInvalidVersionCorePrefix')]
   public function testInvalidVersionCorePrefix(string $version): void {
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage("Unexpected version core prefix in $version. The only core prefix expected in \Drupal\Core\Extension\ExtensionVersion is: 8.x-");
+    $this->expectExceptionMessageIs("Unexpected version core prefix in $version. The only core prefix expected in \Drupal\Core\Extension\ExtensionVersion is: 8.x-");
     ExtensionVersion::createFromVersionString($version);
   }
 
@@ -334,7 +328,7 @@ class ExtensionVersionTest extends UnitTestCase {
   #[DataProvider('providerInvalidBranchCorePrefix')]
   public function testInvalidBranchCorePrefix(string $branch): void {
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage("Unexpected version core prefix in {$branch}0. The only core prefix expected in \Drupal\Core\Extension\ExtensionVersion is: 8.x-");
+    $this->expectExceptionMessageIs("Unexpected version core prefix in {$branch}0. The only core prefix expected in \Drupal\Core\Extension\ExtensionVersion is: 8.x-");
     ExtensionVersion::createFromSupportBranch($branch);
   }
 
@@ -360,8 +354,6 @@ class ExtensionVersionTest extends UnitTestCase {
    *   The branch to test.
    * @param string $expected_major
    *   The expected major version.
-   *
-   * @legacy-covers ::createFromSupportBranch
    */
   #[DataProvider('providerCreateFromSupportBranch')]
   public function testCreateFromSupportBranch(string $branch, string $expected_major): void {
@@ -419,7 +411,7 @@ class ExtensionVersionTest extends UnitTestCase {
   #[DataProvider('provideInvalidBranch')]
   public function testInvalidBranch(string $branch): void {
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage("Invalid support branch: $branch");
+    $this->expectExceptionMessageIs("Invalid support branch: $branch");
     ExtensionVersion::createFromSupportBranch($branch);
   }
 
@@ -453,12 +445,17 @@ class ExtensionVersionTest extends UnitTestCase {
    *   as a single item array
    */
   protected static function createKeyedTestCases(array $test_arguments): array {
-    return array_combine(
+    $return = array_combine(
       $test_arguments,
-      array_map(function ($test_argument) {
+      array_map(function (string $test_argument): array {
         return [$test_argument];
       }, $test_arguments)
     );
+    if (isset($return[''])) {
+      $return['empty_string'] = $return[''];
+      unset($return['']);
+    }
+    return $return;
   }
 
 }

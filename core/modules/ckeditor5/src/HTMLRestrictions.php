@@ -288,7 +288,7 @@ final class HTMLRestrictions {
         if (array_key_exists('*', $html_tag_attribute_restrictions)) {
           throw new \InvalidArgumentException(sprintf('The "%s" HTML tag has an attribute restriction "%s" with a "*" allowed attribute value. This implies all attributes values are allowed. Remove the attribute value restriction instead, or use a prefix (`*-foo`), infix (`*-foo-*`) or suffix (`foo-*`) wildcard restriction instead.', $html_tag_name, $html_tag_attribute_name));
         }
-        // @codingStandardsIgnoreLine
+        // phpcs:ignore Drupal.Functions.MultiLineFunctionDeclaration.ContentAfterBrace, Drupal.WhiteSpace.CloseBracketSpacing.ClosingWhitespace, Drupal.WhiteSpace.OpenBracketSpacing.OpeningWhitespace, Drupal.WhiteSpace.ScopeClosingBrace.Line
         if (!Inspector::assertAll(function ($v) { return $v === TRUE; }, $html_tag_attribute_restrictions)) {
           throw new \InvalidArgumentException(sprintf('The "%s" HTML tag has attribute restriction "%s", but it is not an array of key-value pairs, with HTML tag attribute values as keys and TRUE as values.', $html_tag_name, $html_tag_attribute_name));
         }
@@ -843,8 +843,10 @@ final class HTMLRestrictions {
       if (!(is_array($this->elements[$tag]) && is_array($other->elements[$tag]))) {
         continue;
       }
-      $other_wildcard_attributes = array_filter(array_keys($other->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
-      $this_wildcard_attributes = array_filter(array_keys($this->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
+      $other_wildcard_attributes = array_filter(
+        array_keys($other->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
+      $this_wildcard_attributes = array_filter(
+        array_keys($this->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
 
       // If the same wildcard attribute restrictions are present in both or
       // neither, no adjustment necessary: the intersection is already correct.
@@ -1028,10 +1030,10 @@ final class HTMLRestrictions {
 
     // Using the PHP array union operator is safe because the two operation
     // result arrays ensure there is no overlap between the array keys.
-    // @codingStandardsIgnoreStart
+    // phpcs:disable Drupal.Functions.MultiLineFunctionDeclaration.ContentAfterBrace, Drupal.WhiteSpace.CloseBracketSpacing.ClosingWhitespace, Drupal.WhiteSpace.OpenBracketSpacing.OpeningWhitespace, Drupal.WhiteSpace.ScopeClosingBrace.Line, Generic.Formatting.DisallowMultipleStatements.SameLine
     assert(Inspector::assertAll(function ($t) { return self::isWildcardTag($t); }, array_keys($wildcard_op_result->elements)));
     assert(Inspector::assertAll(function ($t) { return !self::isWildcardTag($t); }, array_keys($concrete_op_result->elements)));
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 
     return new self($concrete_op_result->elements + $wildcard_op_result->elements);
   }
@@ -1245,6 +1247,8 @@ final class HTMLRestrictions {
       array_push($readable, $joined);
     }
     assert(Inspector::assertAllStrings($readable));
+
+    sort($readable);
     return $readable;
   }
 

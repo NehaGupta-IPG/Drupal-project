@@ -86,7 +86,7 @@ class NavigationLinkBlockTest extends PageCacheTagsTestBase {
     $this->verifyDynamicPageCache($test_page_url, 'MISS');
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
     // We should not see the admin page link in the page.
-    $link_selector = '.admin-toolbar__item .toolbar-button--icon--' . $link_icon;
+    $link_selector = '.toolbar-block .toolbar-button--icon--' . $link_icon;
     $this->assertSession()->elementNotExists('css', $link_selector);
     $this->assertSession()->pageTextNotContains($link_title);
     $this->assertSession()->pageTextNotContains($label);
@@ -219,7 +219,7 @@ class NavigationLinkBlockTest extends PageCacheTagsTestBase {
     $section->appendComponent(new SectionComponent(\Drupal::service('uuid')->generate(), 'content', [
       'id' => 'navigation_link',
       'label' => $label,
-      'label_display' => '1',
+      'label_display' => 'visible',
       'provider' => 'navigation',
       'context_mapping' => [],
       'title' => $link_title,

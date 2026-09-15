@@ -36,12 +36,12 @@
  * - no_striping: A boolean indicating that the row should receive no striping.
  * - header_columns: The number of columns in the header.
  *
- * @see template_preprocess_field_ui_table()
+ * @see \Drupal\Core\Theme\ThemePreprocess::preprocessTable()
  *
  * @ingroup themeable
  */
 #}
 {# Add Ajax wrapper. #}
 <div id="field-display-overview-wrapper">
-  {% include 'table.html.twig' %}
+  {{ include('table.html.twig') }}
 </div>

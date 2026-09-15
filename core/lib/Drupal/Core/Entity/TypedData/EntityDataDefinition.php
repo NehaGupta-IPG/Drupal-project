@@ -10,6 +10,11 @@ use Drupal\Core\TypedData\ComplexDataDefinitionBase;
 class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDataDefinitionInterface {
 
   /**
+   * The data type for this entity.
+   */
+  protected ?string $dataType;
+
+  /**
    * Creates a new entity definition.
    *
    * @param string $entity_type_id
@@ -98,6 +103,9 @@ class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDa
    * {@inheritdoc}
    */
   public function getDataType() {
+    if (isset($this->dataType)) {
+      return $this->dataType;
+    }
     $type = 'entity';
     if ($entity_type = $this->getEntityTypeId()) {
       $type .= ':' . $entity_type;
@@ -110,6 +118,7 @@ class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDa
         }
       }
     }
+    $this->dataType = $type;
     return $type;
   }
 
@@ -117,21 +126,21 @@ class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDa
    * {@inheritdoc}
    */
   public function getEntityTypeId() {
-    return $this->definition['constraints']['EntityType'] ?? NULL;
+    return $this->definition['constraints']['EntityType']['type'] ?? NULL;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setEntityTypeId($entity_type_id) {
-    return $this->addConstraint('EntityType', $entity_type_id);
+    return $this->addConstraint('EntityType', ['type' => $entity_type_id]);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getBundles() {
-    $bundle = $this->definition['constraints']['Bundle'] ?? NULL;
+    $bundle = $this->definition['constraints']['Bundle']['bundle'] ?? NULL;
     return is_string($bundle) ? [$bundle] : $bundle;
   }
 
@@ -140,13 +149,21 @@ class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDa
    */
   public function setBundles(?array $bundles = NULL) {
     if (isset($bundles)) {
-      $this->addConstraint('Bundle', $bundles);
+      $this->addConstraint('Bundle', ['bundle' => $bundles]);
     }
     else {
       // Remove the constraint.
       unset($this->definition['constraints']['Bundle']);
     }
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __sleep(): array {
+    $this->dataType = NULL;
+    return parent::__sleep();
   }
 
 }

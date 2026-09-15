@@ -40,11 +40,9 @@ class BaseFieldOverrideTest extends KernelTestBase {
 
   /**
    * Tests get class.
-   *
-   * @legacy-covers ::getClass
    */
   #[DataProvider('getClassTestCases')]
-  public function testGetClass($field_type, $base_field_class, $expected_override_class): void {
+  public function testGetClass(string $field_type, bool|string $base_field_class, string $expected_override_class): void {
     $base_field = BaseFieldDefinition::create($field_type)
       ->setName('Test Field')
       ->setTargetEntityTypeId('entity_test');
@@ -58,7 +56,7 @@ class BaseFieldOverrideTest extends KernelTestBase {
   /**
    * Test cases for ::testGetClass.
    */
-  public static function getClassTestCases() {
+  public static function getClassTestCases(): array {
     return [
       'String (default class)' => [
         'string',
@@ -128,7 +126,7 @@ class BaseFieldOverrideTest extends KernelTestBase {
    * @return int
    *   A primitive default value.
    */
-  public static function defaultValueCallbackPrimitive() {
+  public static function defaultValueCallbackPrimitive(): int {
     return 99;
   }
 

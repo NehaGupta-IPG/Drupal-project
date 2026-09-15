@@ -52,7 +52,7 @@ class EntityReference extends DisplayPluginBase {
   /**
    * The id field alias.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $id_field_alias;
 
   /**
@@ -215,7 +215,10 @@ class EntityReference extends DisplayPluginBase {
       $fields = array_keys($this->handlers['field']);
       foreach ($style['options']['search_fields'] as $field_alias => $enabled) {
         if ($enabled && !in_array($field_alias, $fields)) {
-          $errors[] = $this->t('Display "@display" uses field %field as search field, but the field is no longer present. See the settings for the Entity Reference list format.', ['@display' => $this->display['display_title'], '%field' => $field_alias]);
+          $errors[] = $this->t('Display "@display" uses field %field as search field, but the field is no longer present. See the settings for the Entity Reference list format.', [
+            '@display' => $this->display['display_title'],
+            '%field' => $field_alias,
+          ]);
         }
       }
     }

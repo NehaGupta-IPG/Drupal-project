@@ -25,7 +25,7 @@ class PercentagesTest extends UnitTestCase {
    * @legacy-covers ::format
    */
   #[DataProvider('providerTestPercentages')]
-  public function testPercentages($total, $current, $expected_result): void {
+  public function testPercentages(int $total, int|float $current, string $expected_result): void {
     $actual_result = Percentage::format($total, $current);
     $this->assertEquals($actual_result, $expected_result, sprintf('The expected the batch api percentage at the state %s/%s is %s%% and got %s%%.', $current, $total, $expected_result, $actual_result));
   }
@@ -37,7 +37,7 @@ class PercentagesTest extends UnitTestCase {
    *   An array of data used by the test. The array values, in order, are the
    *   total count, the current count, and the expected percentage.
    */
-  public static function providerTestPercentages() {
+  public static function providerTestPercentages(): array {
     // Set up an array of test cases.
     return [
       // 1/2 is 50%.

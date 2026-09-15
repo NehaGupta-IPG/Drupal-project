@@ -45,14 +45,15 @@ class ConfigActionsTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installConfig('system');
     $this->container->get(ThemeInstallerInterface::class)->install([
-      'olivero',
-      'claro',
-      'umami',
+      'stark',
+      'default_admin',
+      'block_test_theme',
     ]);
     $this->config('system.theme')
-      ->set('default', 'olivero')
-      ->set('admin', 'claro')
+      ->set('default', 'stark')
+      ->set('admin', 'default_admin')
       ->save();
     $this->configActionManager = $this->container->get('plugin.manager.config_action');
   }
@@ -61,7 +62,7 @@ class ConfigActionsTest extends KernelTestBase {
    * Tests the application of entity method actions on a block.
    */
   public function testEntityMethodActions(): void {
-    $block = $this->placeBlock('system_messages_block', ['theme' => 'olivero']);
+    $block = $this->placeBlock('system_messages_block', ['theme' => 'stark']);
     $this->assertSame('content', $block->getRegion());
     $this->assertSame(0, $block->getWeight());
 
@@ -88,7 +89,7 @@ class ConfigActionsTest extends KernelTestBase {
   #[TestWith(["placeBlockInAdminTheme"])]
   public function testPlaceBlockActionOnlyWorksOnBlocks(string $action): void {
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage("The \"user_role\" entity does not support the \"$action\" config action.");
+    $this->expectExceptionMessageIsOrContains("The \"user_role\" entity does not support the \"$action\" config action.");
     $this->configActionManager->applyAction($action, 'user.role.anonymous', []);
   }
 
@@ -96,30 +97,33 @@ class ConfigActionsTest extends KernelTestBase {
    * Verifies placeBlockInDefaultTheme action doesn't alter an existing block.
    */
   public function testPlaceBlockActionDoesNotChangeExistingBlock(): void {
-    $extant_region = Block::load('olivero_powered')->getRegion();
+    $this->config('system.theme')
+      ->set('default', 'default_admin')
+      ->save();
+    $extant_region = Block::load('default_admin_breadcrumbs')->getRegion();
     $this->assertNotSame('content', $extant_region);
 
-    $this->configActionManager->applyAction('placeBlockInDefaultTheme', 'block.block.olivero_powered', [
+    $this->configActionManager->applyAction('placeBlockInDefaultTheme', 'block.block.default_admin_powered', [
       'plugin' => 'system_powered_by_block',
       'region' => [
-        'olivero' => 'content',
+        'default_admin' => 'content',
       ],
     ]);
     // The extant block should be unchanged.
-    $this->assertSame($extant_region, Block::load('olivero_powered')->getRegion());
+    $this->assertSame($extant_region, Block::load('default_admin_breadcrumbs')->getRegion());
   }
 
   /**
  * Tests place block in dynamic region.
  */
-  #[TestWith(["placeBlockInDefaultTheme", "olivero", "header"])]
-  #[TestWith(["placeBlockInAdminTheme", "claro", "page_bottom"])]
+  #[TestWith(["placeBlockInDefaultTheme", "stark", "header"])]
+  #[TestWith(["placeBlockInAdminTheme", "default_admin", "page_bottom"])]
   public function testPlaceBlockInDynamicRegion(string $action, string $expected_theme, string $expected_region): void {
     $this->configActionManager->applyAction($action, 'block.block.test_block', [
       'plugin' => 'system_powered_by_block',
       'region' => [
-        'olivero' => 'header',
-        'claro' => 'page_bottom',
+        'stark' => 'header',
+        'default_admin' => 'page_bottom',
       ],
       'default_region' => 'content',
     ]);
@@ -131,7 +135,7 @@ class ConfigActionsTest extends KernelTestBase {
     $this->assertSame($expected_region, $block->getRegion());
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage('Cannot determine which region to place this block into, because no default region was provided.');
+    $this->expectExceptionMessageIs('Cannot determine which region to place this block into, because no default region was provided.');
     $this->configActionManager->applyAction($action, 'block.block.no_region', [
       'plugin' => 'system_powered_by_block',
       'region' => [],
@@ -141,8 +145,8 @@ class ConfigActionsTest extends KernelTestBase {
   /**
  * Tests place block in static region.
  */
-  #[TestWith(["placeBlockInDefaultTheme", "olivero"])]
-  #[TestWith(["placeBlockInAdminTheme", "claro"])]
+  #[TestWith(["placeBlockInDefaultTheme", "stark"])]
+  #[TestWith(["placeBlockInAdminTheme", "default_admin"])]
   public function testPlaceBlockInStaticRegion(string $action, string $expected_theme): void {
     $this->configActionManager->applyAction($action, 'block.block.test_block', [
       'plugin' => 'system_powered_by_block',
@@ -160,8 +164,8 @@ class ConfigActionsTest extends KernelTestBase {
    * Tests placing a block in the default theme's region.
    */
   public function testPlaceBlockInDefaultRegion(): void {
-    $this->config('system.theme')->set('default', 'umami')->save();
-    $this->testPlaceBlockInDynamicRegion('placeBlockInDefaultTheme', 'umami', 'content');
+    $this->config('system.theme')->set('default', 'block_test_theme')->save();
+    $this->testPlaceBlockInDynamicRegion('placeBlockInDefaultTheme', 'block_test_theme', 'content');
   }
 
   /**
@@ -171,7 +175,7 @@ class ConfigActionsTest extends KernelTestBase {
     // Ensure there's at least one block already in the region.
     $block = Block::create([
       'id' => 'block_1',
-      'theme' => 'olivero',
+      'theme' => 'stark',
       'region' => 'content_above',
       'weight' => 0,
       'plugin' => 'system_powered_by_block',
@@ -215,15 +219,15 @@ class ConfigActionsTest extends KernelTestBase {
       ->getStorage('block')
       ->getQuery()
       ->count()
-      ->condition('theme', 'olivero')
-      ->condition('region', 'footer_top');
+      ->condition('theme', 'stark')
+      ->condition('region', 'footer');
     $this->assertSame(0, $query->execute());
 
     // Place a block in that region.
     $this->configActionManager->applyAction('placeBlockInDefaultTheme', 'block.block.test', [
       'plugin' => 'system_powered_by_block',
       'region' => [
-        'olivero' => 'footer_top',
+        'stark' => 'footer',
       ],
       'position' => 'first',
     ]);

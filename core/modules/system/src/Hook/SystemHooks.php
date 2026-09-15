@@ -2,7 +2,6 @@
 
 namespace Drupal\system\Hook;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\LocalStream;
 use Drupal\Core\Site\Settings;
@@ -19,6 +18,7 @@ use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Field\FieldPurger;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -156,43 +156,6 @@ class SystemHooks {
         return '<p>' . $this->t("Here you can find a short overview of your site's parameters as well as any problems detected with your installation. It may be useful to copy and paste this information into support requests filed on Drupal.org's support forums and project issue queues. Before filing a support request, ensure that your web server meets the <a href=\":system-requirements\">system requirements.</a>", [':system-requirements' => 'https://www.drupal.org/docs/system-requirements']) . '</p>';
     }
     return NULL;
-  }
-
-  /**
-   * Implements hook_updater_info().
-   */
-  #[Hook('updater_info')]
-  public function updaterInfo(): array {
-    return [
-      'module' => [
-        'class' => 'Drupal\Core\Updater\Module',
-        'name' => $this->t('Update modules'),
-        'weight' => 0,
-      ],
-      'theme' => [
-        'class' => 'Drupal\Core\Updater\Theme',
-        'name' => $this->t('Update themes'),
-        'weight' => 0,
-      ],
-    ];
-  }
-
-  /**
-   * Implements hook_filetransfer_info().
-   */
-  #[Hook('filetransfer_info')]
-  public function filetransferInfo(): array {
-    $backends = [];
-    // This is the default, will be available on most systems.
-    if (function_exists('ftp_connect')) {
-      $backends['ftp'] = ['title' => $this->t('FTP'), 'class' => 'Drupal\Core\FileTransfer\FTP', 'weight' => 0];
-    }
-    // SSH2 lib connection is only available if the proper PHP extension is
-    // installed.
-    if (function_exists('ssh2_connect')) {
-      $backends['ssh'] = ['title' => $this->t('SSH'), 'class' => 'Drupal\Core\FileTransfer\SSH', 'weight' => 20];
-    }
-    return $backends;
   }
 
   /**
@@ -344,6 +307,12 @@ class SystemHooks {
       $fetcher = \Drupal::service('system.sa_fetcher');
       $fetcher->getSecurityAdvisories();
     }
+
+    // Do a pass of purging on deleted entity field data, if any exists.
+    if (!$config_purge_batch_size = \Drupal::config('field.field_settings')->get('purge_batch_size')) {
+      $config_purge_batch_size = Settings::get('field_purge_batch_size', 50);
+    }
+    \Drupal::service(FieldPurger::class)->purgeBatch($config_purge_batch_size);
   }
 
   /**
@@ -414,32 +383,6 @@ class SystemHooks {
         $entity_type->setRevisionMetadataKey('workspace', NULL);
         $entity_definition_update_manager->updateEntityType($entity_type);
       }
-    }
-  }
-
-  /**
-   * Implements hook_library_info_alter().
-   */
-  #[Hook('library_info_alter')]
-  public function libraryInfoAlter(&$libraries, $extension): void {
-    // If Claro is the admin theme but not the active theme, grant Claro the
-    // ability to override the toolbar library with its own assets.
-    if ($extension === 'toolbar' && _system_is_claro_admin_and_not_active()) {
-      require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
-      claro_system_module_invoked_library_info_alter($libraries, $extension);
-    }
-  }
-
-  /**
-   * Implements hook_theme_registry_alter().
-   */
-  #[Hook('theme_registry_alter')]
-  public function themeRegistryAlter(array &$theme_registry): void {
-    // If Claro is the admin theme but not the active theme, use Claro's toolbar
-    // templates.
-    if (_system_is_claro_admin_and_not_active()) {
-      require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
-      claro_system_module_invoked_theme_registry_alter($theme_registry);
     }
   }
 
@@ -522,30 +465,6 @@ class SystemHooks {
       }
     }
     return NULL;
-  }
-
-  /**
-   * Implements hook_archiver_info_alter().
-   */
-  #[Hook('archiver_info_alter')]
-  public function archiverInfoAlter(&$info): void {
-    if (!class_exists(\ZipArchive::class)) {
-      // PHP Zip extension is missing.
-      unset($info['Zip']);
-    }
-  }
-
-  /**
-   * Implements hook_entity_form_mode_presave().
-   *
-   * Transforms empty description into null.
-   */
-  #[Hook('hook_entity_form_mode_presave')]
-  public function systemEntityFormModePresave(EntityInterface $entity): void {
-    if ($entity->get('description') !== NULL && trim($entity->get('description')) === '') {
-      @trigger_error("Setting description to an empty string is deprecated in drupal:11.2.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3452144", E_USER_DEPRECATED);
-      $entity->set('description', NULL);
-    }
   }
 
 }

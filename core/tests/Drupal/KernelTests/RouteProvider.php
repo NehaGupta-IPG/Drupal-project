@@ -8,6 +8,8 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Routing\PreloadableRouteProviderInterface;
 use Drupal\Core\Routing\RouteProvider as RouteProviderBase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Rebuilds the router when the provider is instantiated.
@@ -27,7 +29,7 @@ class RouteProvider implements PreloadableRouteProviderInterface {
    * @return \Drupal\Core\Routing\PreloadableRouteProviderInterface|\Symfony\Component\EventDispatcher\EventSubscriberInterface
    *   The route provider.
    */
-  protected function lazyLoadItself() {
+  protected function lazyLoadItself(): RouteProviderBase {
     if (!isset($this->service)) {
       $container = \Drupal::getContainer();
       $this->service = $container->get('test.router.route_provider');
@@ -40,64 +42,64 @@ class RouteProvider implements PreloadableRouteProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRouteCollectionForRequest(Request $request) {
+  public function getRouteCollectionForRequest(Request $request): RouteCollection {
     return $this->lazyLoadItself()->getRouteCollectionForRequest($request);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getRouteByName($name) {
+  public function getRouteByName($name): Route {
     return $this->lazyLoadItself()->getRouteByName($name);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preLoadRoutes($names) {
-    return $this->lazyLoadItself()->preLoadRoutes($names);
+  public function preLoadRoutes($names): void {
+    $this->lazyLoadItself()->preLoadRoutes($names);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getRoutesByNames($names) {
+  public function getRoutesByNames($names): Route|array {
     return $this->lazyLoadItself()->getRoutesByNames($names);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCandidateOutlines(array $parts) {
+  public function getCandidateOutlines(array $parts): array {
     return $this->lazyLoadItself()->getCandidateOutlines($parts);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getRoutesByPattern($pattern) {
+  public function getRoutesByPattern($pattern): RouteCollection {
     return $this->lazyLoadItself()->getRoutesByPattern($pattern);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function routeProviderRouteCompare(array $a, array $b) {
+  public function routeProviderRouteCompare(array $a, array $b): int {
     return $this->lazyLoadItself()->routeProviderRouteCompare($a, $b);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getAllRoutes() {
+  public function getAllRoutes(): iterable {
     return $this->lazyLoadItself()->getAllRoutes();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function reset() {
-    return $this->lazyLoadItself()->reset();
+  public function reset(): void {
+    $this->lazyLoadItself()->reset();
   }
 
   /**

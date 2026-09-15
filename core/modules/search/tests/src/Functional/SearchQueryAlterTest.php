@@ -6,19 +6,21 @@ namespace Drupal\Tests\search\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the node search query can be altered via the query alter hook.
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SearchQueryAlterTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search', 'search_query_alter'];
+  protected static $modules = ['node', 'search', 'search_query_alter', 'search_node'];
 
   /**
    * {@inheritdoc}

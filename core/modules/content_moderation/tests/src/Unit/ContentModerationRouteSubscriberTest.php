@@ -37,7 +37,7 @@ class ContentModerationRouteSubscriberTest extends UnitTestCase {
     parent::setUp();
 
     /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
-    $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
+    $entity_type_manager = $this->createStub(EntityTypeManagerInterface::class);
     $this->routeSubscriber = new ContentModerationRouteSubscriber($entity_type_manager);
     $this->setupEntityTypes();
   }
@@ -46,18 +46,18 @@ class ContentModerationRouteSubscriberTest extends UnitTestCase {
    * Creates the entity type manager mock returning entity type objects.
    */
   protected function setupEntityTypes(): void {
-    $definition = $this->createMock(EntityTypeInterface::class);
-    $definition->expects($this->any())
+    $definition = $this->createStub(EntityTypeInterface::class);
+    $definition
       ->method('getClass')
       ->willReturn(TestEntity::class);
-    $definition->expects($this->any())
+    $definition
       ->method('isRevisionable')
       ->willReturn(FALSE);
-    $revisionable_definition = $this->createMock(EntityTypeInterface::class);
-    $revisionable_definition->expects($this->any())
+    $revisionable_definition = $this->createStub(EntityTypeInterface::class);
+    $revisionable_definition
       ->method('getClass')
       ->willReturn(TestEntity::class);
-    $revisionable_definition->expects($this->any())
+    $revisionable_definition
       ->method('isRevisionable')
       ->willReturn(TRUE);
     $entity_types = [
@@ -72,7 +72,7 @@ class ContentModerationRouteSubscriberTest extends UnitTestCase {
   /**
    * Data provider for ::testSetLatestRevisionFlag.
    */
-  public static function setLatestRevisionFlagTestCases() {
+  public static function setLatestRevisionFlagTestCases(): array {
     return [
       'Entity parameter not on an entity form' => [
         [],
@@ -167,7 +167,6 @@ class ContentModerationRouteSubscriberTest extends UnitTestCase {
           ],
         ],
         FALSE,
-        FALSE,
       ],
       'Overridden load_latest_revision flag does not change with multiple parameters' => [
         [
@@ -227,11 +226,9 @@ class ContentModerationRouteSubscriberTest extends UnitTestCase {
    *   The route parameters.
    * @param array|bool $expected_parameters
    *   (optional) The expected route parameters. Defaults to FALSE.
-   *
-   * @legacy-covers ::setLatestRevisionFlag
    */
   #[DataProvider('setLatestRevisionFlagTestCases')]
-  public function testSetLatestRevisionFlag($defaults, $parameters, $expected_parameters = FALSE): void {
+  public function testSetLatestRevisionFlag(array $defaults, array $parameters, bool|array $expected_parameters = FALSE): void {
     $route = new Route('/foo/{entity_test}', $defaults, [], [
       'parameters' => $parameters,
     ]);

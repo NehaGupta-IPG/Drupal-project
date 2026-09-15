@@ -26,15 +26,11 @@ class UnpackRecipeTest extends BuildTestBase {
 
   /**
    * The Symfony FileSystem component.
-   *
-   * @var \Composer\Util\Filesystem
    */
   protected Filesystem $fileSystem;
 
   /**
    * The Fixtures object.
-   *
-   * @var \Drupal\Tests\Composer\Plugin\Unpack\Fixtures
    */
   protected Fixtures $fixtures;
 
@@ -585,6 +581,55 @@ class UnpackRecipeTest extends BuildTestBase {
   }
 
   /**
+   * Tests unpacking with the wikimedia/composer-merge-plugin installed.
+   */
+  public function testUnpackWithComposerMergePlugin(): void {
+    $root_project_path = $this->fixturesDir . '/composer-root';
+    $this->runComposer('install');
+
+    // Copy the merge plugin composer file fixture into the root project so the
+    // merge plugin can include it.
+    $merge_fixture_source = $this->fixturesDir . '/merge/composer.merge.json';
+    $merge_fixture_dest = $root_project_path . '/composer.merge.json';
+    copy($merge_fixture_source, $merge_fixture_dest);
+
+    // Allow packagist since we need to require the merge plugin.
+    $this->runComposer('config --unset repositories.packagist.org');
+
+    // Configure and install the merge plugin.
+    $this->runComposer('config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true');
+    $this->runComposer('require wikimedia/composer-merge-plugin:*');
+    $this->runComposer("config --merge --json extra.merge-plugin.include '[\"composer.merge.json\"]'");
+
+    // Require recipe A, which should cause it to be unpacked automatically and
+    // also merge in any dependencies from composer.merge.json (module C).
+    $stdout = $this->runComposer('require fixtures/recipe-a');
+
+    // Confirm unpack occurred as expected.
+    $this->assertStringContainsString("fixtures/recipe-a unpacked.", $stdout);
+    $this->assertStringContainsString("fixtures/recipe-b unpacked.", $stdout);
+
+    // Validate composer files are still valid.
+    $this->runComposer('validate');
+
+    // Ensure recipe files exist.
+    $this->assertFileExists($root_project_path . '/recipes/recipe-a/recipe.yml');
+    $this->assertFileExists($root_project_path . '/recipes/recipe-b/recipe.yml');
+
+    // Check the lock for the merged dependencies.
+    $root_composer_lock = $this->getFileContents($root_project_path . '/composer.lock');
+    $this->assertSame([
+      'composer/installers',
+      'drupal/core-recipe-unpack',
+      'fixtures/module-a',
+      'fixtures/module-b',
+      'fixtures/module-c',
+      'fixtures/theme-a',
+      'wikimedia/composer-merge-plugin',
+    ], array_column($root_composer_lock['packages'], 'name'));
+  }
+
+  /**
    * Tests Recipe A is unpacked correctly.
    *
    * @param string $root_project_path
@@ -659,7 +704,7 @@ class UnpackRecipeTest extends BuildTestBase {
     $cwd ??= $this->fixturesDir . '/composer-root';
 
     // Always add --no-interaction and --no-ansi to Composer commands.
-    $output = $this->mustExec("composer $command --no-interaction --no-ansi", $cwd, [], $error_output);
+    $output = $this->mustExec("COMPOSER_NO_AUDIT=1 composer $command --no-interaction --no-ansi", $cwd, [], $error_output);
     if ($command === 'install') {
       $this->assertFileExists($cwd . '/composer.lock');
     }

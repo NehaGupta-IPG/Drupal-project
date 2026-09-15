@@ -44,7 +44,7 @@ class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
     $type = empty($type) ? $this->contentType : $type;
     $this->drupalGet('admin/structure/types/manage/' . $type . '/fields');
     // Check all table columns.
-    $table_headers = ['Label', 'Machine name', 'Field type', 'Operations'];
+    $table_headers = ['Field', 'Field type', 'Operations'];
     foreach ($table_headers as $table_header) {
       // We check that the label appear in the table headings.
       $this->assertSession()->responseContains($table_header . '</th>');
@@ -56,7 +56,7 @@ class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
     // Assert entity operations for all fields.
     $number_of_links = 2;
     $number_of_links_found = 0;
-    $operation_links = $this->xpath('//ul[@class = "dropbutton"]/li/a');
+    $operation_links = $this->getNodeElementsByXpath('//ul[@class = "dropbutton"]/li/a');
     $url = base_path() . "admin/structure/types/manage/$type/fields/node.$type.body";
 
     foreach ($operation_links as $link) {

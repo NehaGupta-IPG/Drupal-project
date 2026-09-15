@@ -34,7 +34,6 @@ class MediaLibraryWidgetTest extends KernelTestBase {
   protected static $modules = [
     'media',
     'media_library',
-    'field',
     'file',
     'filter',
     'image',
@@ -53,8 +52,6 @@ class MediaLibraryWidgetTest extends KernelTestBase {
 
   /**
    * The base field definition.
-   *
-   * @var \Drupal\Core\Field\BaseFieldDefinition
    */
   protected BaseFieldDefinition $baseField;
 

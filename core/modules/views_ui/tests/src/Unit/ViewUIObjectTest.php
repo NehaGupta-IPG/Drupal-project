@@ -8,6 +8,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\TempStore\Lock;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Entity\View;
+use Drupal\views\ViewExecutable;
 use Drupal\views_ui\ViewUI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -51,6 +52,8 @@ class ViewUIObjectTest extends UnitTestCase {
           'getConfigDependencyKey',
           'getConfigDependencyName',
           'calculateDependencies',
+          // Deprecated methods that are now no-ops.
+          'trustData',
         ])) {
         if (count($reflection_method->getParameters()) == 0) {
           $method_args[$reflection_method->getName()] = [];
@@ -62,10 +65,7 @@ class ViewUIObjectTest extends UnitTestCase {
       ->onlyMethods($interface_methods)
       ->setConstructorArgs([[], 'view'])
       ->getMock();
-    $executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
-      ->disableOriginalConstructor()
-      ->setConstructorArgs([$storage])
-      ->getMock();
+    $executable = $this->createStub(ViewExecutable::class);
     $storage->set('executable', $executable);
 
     $view_ui = new ViewUI($storage);
@@ -88,13 +88,8 @@ class ViewUIObjectTest extends UnitTestCase {
    * Tests the isLocked method.
    */
   public function testIsLocked(): void {
-    $storage = $this->getMockBuilder('Drupal\views\Entity\View')
-      ->setConstructorArgs([[], 'view'])
-      ->getMock();
-    $executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
-      ->disableOriginalConstructor()
-      ->setConstructorArgs([$storage])
-      ->getMock();
+    $storage = $this->createStub(View::class);
+    $executable = $this->createStub(ViewExecutable::class);
     $storage->set('executable', $executable);
     $account = $this->createMock('Drupal\Core\Session\AccountInterface');
     $account->expects($this->exactly(2))
@@ -129,10 +124,7 @@ class ViewUIObjectTest extends UnitTestCase {
    */
   public function testSerialization(): void {
     $storage = new View([], 'view');
-    $executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
-      ->disableOriginalConstructor()
-      ->setConstructorArgs([$storage])
-      ->getMock();
+    $executable = $this->createStub(ViewExecutable::class);
     $storage->set('executable', $executable);
 
     $view_ui = new ViewUI($storage);

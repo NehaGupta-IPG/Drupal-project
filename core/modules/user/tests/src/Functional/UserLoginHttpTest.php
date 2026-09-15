@@ -88,8 +88,7 @@ class UserLoginHttpTest extends BrowserTestBase {
     if (isset($pass)) {
       $request_body['pass'] = $pass;
     }
-
-    $result = \Drupal::httpClient()->post($user_login_url->toString(), [
+    return \Drupal::httpClient()->post($user_login_url->toString(), [
       'body' => $this->serializer->encode($request_body, $format),
       'headers' => [
         'Accept' => "application/$format",
@@ -97,7 +96,6 @@ class UserLoginHttpTest extends BrowserTestBase {
       'http_errors' => FALSE,
       'cookies' => $this->cookies,
     ]);
-    return $result;
   }
 
   /**
@@ -140,13 +138,13 @@ class UserLoginHttpTest extends BrowserTestBase {
       ->save();
 
     $response = $this->loginRequest($name, 'wrong-pass', $format);
-    $this->assertHttpResponseWithMessage($response, 400, 'Sorry, unrecognized username or password.', $format);
+    $this->assertHttpResponseWithMessage($response, 400, 'Unrecognized username or password.', $format);
 
     $response = $this->loginRequest($name, 'wrong-pass', $format);
-    $this->assertHttpResponseWithMessage($response, 400, 'Sorry, unrecognized username or password.', $format);
+    $this->assertHttpResponseWithMessage($response, 400, 'Unrecognized username or password.', $format);
 
     $response = $this->loginRequest($name, 'wrong-pass', $format);
-    $this->assertHttpResponseWithMessage($response, 400, 'Sorry, unrecognized username or password.', $format);
+    $this->assertHttpResponseWithMessage($response, 400, 'Unrecognized username or password.', $format);
 
     $response = $this->loginRequest($name, 'wrong-pass', $format);
     $this->assertHttpResponseWithMessage($response, 403, 'Too many failed login attempts from your IP address. This IP address is temporarily blocked.', $format);
@@ -178,10 +176,10 @@ class UserLoginHttpTest extends BrowserTestBase {
       ->save();
 
     $response = $this->loginRequest($name, 'garbage', $format);
-    $this->assertHttpResponseWithMessage($response, 400, 'Sorry, unrecognized username or password.', $format);
+    $this->assertHttpResponseWithMessage($response, 400, 'Unrecognized username or password.', $format);
 
     $response = $this->loginRequest('garbage', $pass, $format);
-    $this->assertHttpResponseWithMessage($response, 400, 'Sorry, unrecognized username or password.', $format);
+    $this->assertHttpResponseWithMessage($response, 400, 'Unrecognized username or password.', $format);
 
     $response = $this->loginRequest($name, $pass, $format);
     $this->assertEquals(200, $response->getStatusCode());
@@ -224,7 +222,7 @@ class UserLoginHttpTest extends BrowserTestBase {
       ->setRouteParameter('_format', $format)
       ->setAbsolute();
 
-    $result = \Drupal::httpClient()->post($password_reset_url->toString(), [
+    return \Drupal::httpClient()->post($password_reset_url->toString(), [
       'body' => $this->serializer->encode($request_body, $format),
       'headers' => [
         'Accept' => "application/$format",
@@ -232,8 +230,6 @@ class UserLoginHttpTest extends BrowserTestBase {
       'http_errors' => FALSE,
       'cookies' => $this->cookies,
     ]);
-
-    return $result;
   }
 
   /**
@@ -271,7 +267,7 @@ class UserLoginHttpTest extends BrowserTestBase {
    * @return mixed
    *   The value for the key.
    */
-  protected function getResultValue(ResponseInterface $response, $key, $format) {
+  protected function getResultValue(ResponseInterface $response, mixed $key, string $format) {
     $decoded = $this->serializer->decode((string) $response->getBody(), $format);
     if (is_array($decoded)) {
       return $decoded[$key];
@@ -389,7 +385,7 @@ class UserLoginHttpTest extends BrowserTestBase {
       // Try 2 failed logins.
       for ($i = 0; $i < 2; $i++) {
         $response = $this->loginRequest($incorrect_user1->getAccountName(), $incorrect_user1->passRaw, $format);
-        $this->assertHttpResponseWithMessage($response, 400, 'Sorry, unrecognized username or password.', $format);
+        $this->assertHttpResponseWithMessage($response, 400, 'Unrecognized username or password.', $format);
       }
 
       // A successful login will reset the per-user flood control count.
@@ -400,7 +396,7 @@ class UserLoginHttpTest extends BrowserTestBase {
       // Try 3 failed logins for user 1, they will not trigger flood control.
       for ($i = 0; $i < 3; $i++) {
         $response = $this->loginRequest($incorrect_user1->getAccountName(), $incorrect_user1->passRaw, $format);
-        $this->assertHttpResponseWithMessage($response, 400, 'Sorry, unrecognized username or password.', $format);
+        $this->assertHttpResponseWithMessage($response, 400, 'Unrecognized username or password.', $format);
       }
 
       // Try one successful attempt for user 2, it should not trigger any
@@ -460,9 +456,7 @@ class UserLoginHttpTest extends BrowserTestBase {
       'http_errors' => FALSE,
       'cookies' => $this->cookies,
     ];
-
-    $response = $client->post($user_logout_url->toString(), $post_options);
-    return $response;
+    return $client->post($user_logout_url->toString(), $post_options);
   }
 
   /**
@@ -607,7 +601,7 @@ class UserLoginHttpTest extends BrowserTestBase {
     $resetURL = $urls[0];
     $this->drupalGet($resetURL);
     $this->submitForm([], 'Log in');
-    $this->assertSession()->pageTextContains('You have used a one-time login link. You can set your new password now.');
+    $this->assertSession()->pageTextContains('You have used a one-time login link.');
   }
 
 }

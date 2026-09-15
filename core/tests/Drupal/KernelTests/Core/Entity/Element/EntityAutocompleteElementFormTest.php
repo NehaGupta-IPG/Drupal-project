@@ -107,14 +107,14 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'test_entity_autocomplete';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['single'] = [
       '#type' => 'entity_autocomplete',
       '#target_type' => 'entity_test',
@@ -205,12 +205,12 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
+  public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
+  public function validateForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * Tests valid entries in the EntityAutocomplete Form API element.

@@ -33,6 +33,7 @@ class ElementTest extends BrowserTestBase {
     $this->testOptions();
     $this->testRadiosChecked();
     $this->testWrapperIds();
+    $this->testChildAttributes();
     $this->testButtonClasses();
     $this->testSubmitButtonAttribute();
     $this->testGroupElements();
@@ -62,7 +63,7 @@ class ElementTest extends BrowserTestBase {
 
     // Verify that all options appear in their defined order.
     foreach (['checkbox', 'radio'] as $type) {
-      $elements = $this->xpath('//input[@type=:type]', [':type' => $type]);
+      $elements = $this->getNodeElementsByXpath('//input[@type=:type]', [':type' => $type]);
       $expected_values = ['0', 'foo', '1', 'bar', '>'];
       foreach ($elements as $element) {
         $expected = array_shift($expected_values);
@@ -82,7 +83,7 @@ class ElementTest extends BrowserTestBase {
     // Verify that all options appear in their defined order, taking a custom
     // #weight into account.
     foreach (['checkbox', 'radio'] as $type) {
-      $elements = $this->xpath('//input[@type=:type]', [':type' => $type]);
+      $elements = $this->getNodeElementsByXpath('//input[@type=:type]', [':type' => $type]);
       $expected_values = ['0', 'foo', 'bar', '>', '1'];
       foreach ($elements as $element) {
         $expected = array_shift($expected_values);
@@ -136,6 +137,17 @@ class ElementTest extends BrowserTestBase {
       $this->assertSession()->elementsCount('xpath', "//div[@id='edit-{$type}']", 1);
       $this->assertSession()->elementsCount('xpath', "//fieldset[@id='edit-{$type}--wrapper']", 1);
     }
+  }
+
+  /**
+   * Tests checkboxes and radios child element attributes.
+   */
+  protected function testChildAttributes(): void {
+    $this->drupalGet('form-test/checkboxes-radios');
+
+    // Verify that the child elements don't have aria-describedby attributes.
+    $this->assertSession()->elementsCount('xpath', "//input[@type='checkbox' and @aria-describedby]", 0);
+    $this->assertSession()->elementsCount('xpath', "//input[@type='radio' and @aria-describedby]", 0);
   }
 
   /**

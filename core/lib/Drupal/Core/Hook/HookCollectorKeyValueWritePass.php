@@ -25,10 +25,25 @@ class HookCollectorKeyValueWritePass implements CompilerPassInterface {
    */
   public function process(ContainerBuilder $container): void {
     $hookData = $container->getParameter('.hook_data');
+    if ($container->hasParameter('.theme_hook_data')) {
+      $themeHookData = $container->getParameter('.theme_hook_data');
+      $hookData = array_merge($hookData, $themeHookData);
+      $hookData['preprocess_for_suggestions'] = array_merge($hookData['preprocess_for_suggestions'], $hookData['theme_preprocess_for_suggestions']);
+      unset($hookData['theme_preprocess_for_suggestions']);
+    }
     $keyvalue = $container->get('keyvalue')->get('hook_data');
     assert($keyvalue instanceof KeyValueStoreInterface);
     $keyvalue->setMultiple($hookData);
-    $container->get('cache.bootstrap')->delete('hook_data');
+    $container->get('cache.bootstrap')->deleteMultiple(['hook_data', 'theme_hook_data']);
+
+    // Remove converted flags, they are only needed while building the
+    // container.
+    $parameters = $container->getParameterBag();
+    foreach ($parameters->all() as $name => $value) {
+      if (str_ends_with($name, '.skip_procedural_hook_scan')) {
+        $parameters->remove($name);
+      }
+    }
   }
 
 }

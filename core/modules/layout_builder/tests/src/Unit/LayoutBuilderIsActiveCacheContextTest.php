@@ -28,14 +28,12 @@ class LayoutBuilderIsActiveCacheContextTest extends UnitTestCase {
 
   /**
    * Tests get context missing entity type id.
-   *
-   * @legacy-covers ::getContext
    */
   public function testGetContextMissingEntityTypeId(): void {
     $route_match = $this->prophesize(RouteMatchInterface::class);
     $cache_context = new LayoutBuilderIsActiveCacheContext($route_match->reveal());
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Missing entity type ID');
+    $this->expectExceptionMessageIs('Missing entity type ID');
     $cache_context->getContext();
   }
 
@@ -104,7 +102,7 @@ class LayoutBuilderIsActiveCacheContextTest extends UnitTestCase {
   /**
    * Provides test data for ::testGetContext().
    */
-  public static function providerTestGetContext() {
+  public static function providerTestGetContext(): array {
     $data = [];
     $data['overridden'] = [
       TRUE,

@@ -10,6 +10,7 @@ use Drupal\toolbar\PageCache\AllowToolbarPath;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[CoversClass(AllowToolbarPath::class)]
 #[Group('toolbar')]
+#[IgnoreDeprecations]
 class AllowToolbarPathTest extends UnitTestCase {
 
   /**
@@ -41,7 +43,7 @@ class AllowToolbarPathTest extends UnitTestCase {
    * @legacy-covers ::check
    */
   #[DataProvider('providerTestAllowToolbarPath')]
-  public function testAllowToolbarPath($expected_result, $path): void {
+  public function testAllowToolbarPath(?string $expected_result, string $path): void {
     $request = Request::create($path);
     $result = $this->policy->check($request);
     $this->assertSame($expected_result, $result);
@@ -53,7 +55,7 @@ class AllowToolbarPathTest extends UnitTestCase {
    * @return array
    *   Data and expected results.
    */
-  public static function providerTestAllowToolbarPath() {
+  public static function providerTestAllowToolbarPath(): array {
     return [
       [NULL, '/'],
       [NULL, '/other-path?q=/toolbar/subtrees/'],

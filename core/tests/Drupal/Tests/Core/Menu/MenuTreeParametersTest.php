@@ -20,7 +20,7 @@ class MenuTreeParametersTest extends UnitTestCase {
   /**
    * Provides test data for testSetMinDepth().
    */
-  public static function providerTestSetMinDepth() {
+  public static function providerTestSetMinDepth(): array {
     $data = [];
 
     // Valid values at the extremes and in the middle.
@@ -43,8 +43,6 @@ class MenuTreeParametersTest extends UnitTestCase {
 
   /**
    * Tests setMinDepth().
-   *
-   * @legacy-covers ::setMinDepth
    */
   #[DataProvider('providerTestSetMinDepth')]
   public function testSetMinDepth($min_depth, $expected): void {
@@ -81,8 +79,6 @@ class MenuTreeParametersTest extends UnitTestCase {
 
   /**
    * Tests addCondition().
-   *
-   * @legacy-covers ::addCondition
    */
   public function testAddCondition(): void {
     $parameters = new MenuTreeParameters();
@@ -104,7 +100,12 @@ class MenuTreeParametersTest extends UnitTestCase {
 
     // Add another condition with an operator.
     $parameters->addCondition('id', 1337, '<');
-    $this->assertEquals(['expanded' => 1, 'has_children' => 0, 'provider' => [['module1', 'module2'], 'IN'], 'id' => [1337, '<']], $parameters->conditions);
+    $this->assertEquals([
+      'expanded' => 1,
+      'has_children' => 0,
+      'provider' => [['module1', 'module2'], 'IN'],
+      'id' => [1337, '<'],
+    ], $parameters->conditions);
 
     // It's impossible to add two conditions on the same field; in that case,
     // the old condition will be overwritten.
@@ -114,8 +115,6 @@ class MenuTreeParametersTest extends UnitTestCase {
 
   /**
    * Tests onlyEnabledLinks().
-   *
-   * @legacy-covers ::onlyEnabledLinks
    */
   public function testOnlyEnabledLinks(): void {
     $parameters = new MenuTreeParameters();
@@ -125,8 +124,6 @@ class MenuTreeParametersTest extends UnitTestCase {
 
   /**
    * Tests setTopLevelOnly().
-   *
-   * @legacy-covers ::setTopLevelOnly
    */
   public function testSetTopLevelOnly(): void {
     $parameters = new MenuTreeParameters();
@@ -136,8 +133,6 @@ class MenuTreeParametersTest extends UnitTestCase {
 
   /**
    * Tests excludeRoot().
-   *
-   * @legacy-covers ::excludeRoot
    */
   public function testExcludeRoot(): void {
     $parameters = new MenuTreeParameters();
