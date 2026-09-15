@@ -1982,14 +1982,14 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
     $entities = [];
     $items_by_entity = [];
-    foreach ($entity_query->execute() as $row) {
+    foreach ($entity_query->execute()?->fetchAll() ?: [] as $row) {
       $item_query = $this->database->select($table_name, 't', ['fetch' => FetchAs::Associative])
         ->fields('t')
         ->condition('entity_id', $row['entity_id'])
         ->condition('deleted', 1)
         ->orderBy('delta');
 
-      foreach ($item_query->execute() as $item_row) {
+      foreach ($item_query->execute()?->fetchAll() ?: [] as $item_row) {
         if (!isset($entities[$item_row['revision_id']])) {
           // Create entity with the right revision id and entity id combination.
           $item_row['entity_type'] = $this->entityTypeId;

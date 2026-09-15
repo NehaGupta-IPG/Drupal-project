@@ -9,7 +9,6 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\ExtendableInterface;
 use Drupal\Core\Database\Query\PagerSelectExtender;
-use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -177,9 +176,8 @@ class SearchNode extends ConfigurableSearchPluginBase implements AccessibleInter
    * This method can assume that $this->isSearchExecutable() has already been
    * checked and returned TRUE.
    *
-   * @return \Drupal\Core\Database\StatementInterface|null
-   *   Results from search query execute() method, or NULL if the search
-   *   failed.
+   * @return array
+   *   Results from search query execute() method.
    */
   protected function findResults() {
     $keys = $this->keywords;
@@ -235,7 +233,7 @@ class SearchNode extends ConfigurableSearchPluginBase implements AccessibleInter
     $this->addNodeRankings($query);
 
     // Run the query.
-    $find = $query
+    $result = $query
       // Add the language code of the indexed item to the result of the query,
       // since the node will be rendered using the respective language.
       ->fields('i', ['langcode'])
@@ -245,6 +243,7 @@ class SearchNode extends ConfigurableSearchPluginBase implements AccessibleInter
       ->groupBy('i.langcode')
       ->limit(10)
       ->execute();
+    $find = $result ? $result->fetchAll() : [];
 
     // Check query status and set messages if needed.
     $status = $query->getStatus();
@@ -267,13 +266,13 @@ class SearchNode extends ConfigurableSearchPluginBase implements AccessibleInter
   /**
    * Prepares search results for rendering.
    *
-   * @param \Drupal\Core\Database\StatementInterface $found
-   *   Results found from a successful search query execute() method.
+   * @param array $found
+   *   Results found from a successful search query.
    *
    * @return array
    *   Array of search result item render arrays (empty array if no results).
    */
-  protected function prepareResults(StatementInterface $found) {
+  protected function prepareResults(array $found) {
     $results = [];
 
     $node_storage = $this->entityTypeManager->getStorage('node');
