@@ -44,16 +44,8 @@ PO;
     // Create a misnamed translation file that
     // \Drupal\Core\StringTranslation\Translator\FileTranslation::findTranslationFiles()
     // will not find.
-    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-8.0.0-DEV.xx-lolspeak.po', $po_contents);
+    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-' . \Drupal::VERSION . '-DEV.xx-lolspeak.po', $po_contents);
     parent::setUpLanguage();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUpProfile(): void {
-    // Do nothing, because this test only tests the language installation
-    // step's results.
   }
 
   /**

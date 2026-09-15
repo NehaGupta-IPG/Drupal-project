@@ -77,7 +77,7 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
     // Make sure that there are resources being created.
     $all = $this->resourceTypeRepository->all();
     $this->assertNotEmpty($all);
-    array_walk($all, function (ResourceType $resource_type) {
+    array_walk($all, function (ResourceType $resource_type): void {
       $this->assertNotEmpty($resource_type->getDeserializationTargetClass());
       $this->assertNotEmpty($resource_type->getEntityTypeId());
       $this->assertNotEmpty($resource_type->getTypeName());
@@ -88,7 +88,7 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
    * Tests get.
    */
   #[DataProvider('getProvider')]
-  public function testGet($entity_type_id, $bundle, $entity_class): void {
+  public function testGet(string $entity_type_id, string $bundle, string $entity_class): void {
     // Make sure that there are resources being created.
     $resource_type = $this->resourceTypeRepository->get($entity_type_id, $bundle);
     $this->assertInstanceOf(ResourceType::class, $resource_type);
@@ -104,7 +104,7 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
    * @return array
    *   The data for the test method.
    */
-  public static function getProvider() {
+  public static function getProvider(): array {
     return [
       ['node', 'article', 'Drupal\node\Entity\Node'],
       ['node', '42', 'Drupal\node\Entity\Node'],
@@ -133,14 +133,14 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
    * @legacy-covers ::getFields
    */
   #[DataProvider('getFieldsProvider')]
-  public function testMappingNameConflictCheck($field_name_list): void {
+  public function testMappingNameConflictCheck(array $field_name_list): void {
     $entity_type = \Drupal::entityTypeManager()->getDefinition('node');
     $bundle = 'article';
     $reflection_class = new \ReflectionClass($this->resourceTypeRepository);
     $reflection_method = $reflection_class->getMethod('getFields');
 
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage("The generated alias '{$field_name_list[1]}' for field name '{$field_name_list[0]}' conflicts with an existing field. Report this in the JSON:API issue queue!");
+    $this->expectExceptionMessageIs("The generated alias '{$field_name_list[1]}' for field name '{$field_name_list[0]}' conflicts with an existing field. Report this in the JSON:API issue queue!");
     $reflection_method->invokeArgs($this->resourceTypeRepository, [$field_name_list, $entity_type, $bundle]);
   }
 
@@ -154,7 +154,7 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
    * @return array
    *   The data for the test method.
    */
-  public static function getFieldsProvider() {
+  public static function getFieldsProvider(): array {
     return [
       [['type', 'node_type']],
       [['id', 'node_id']],

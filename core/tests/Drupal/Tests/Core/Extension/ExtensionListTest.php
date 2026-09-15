@@ -18,6 +18,7 @@ use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 
 /**
@@ -170,11 +171,35 @@ class ExtensionListTest extends UnitTestCase {
    * @legacy-covers ::setPathname
    * @legacy-covers ::getPathname
    */
+  #[IgnoreDeprecations]
   public function testSetPathname(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
+    $this->expectUserDeprecationMessage('Drupal\Core\Extension\ExtensionList::setPathname() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/2934063');
     $test_extension_list->setPathname('test_name', 'vfs://drupal_root/example2/test_name/test_name.info.yml');
     $this->assertEquals('vfs://drupal_root/example2/test_name/test_name.info.yml', $test_extension_list->getPathname('test_name'));
+  }
+
+  /**
+   * Tests that set pathname survives reset.
+   *
+   * @legacy-covers ::setPathname
+   * @legacy-covers ::getPathname
+   * @legacy-covers ::reset
+   */
+  #[IgnoreDeprecations]
+  public function testSetPathnameSurvivesReset(): void {
+    $test_extension_list = $this->setupTestExtensionList();
+
+    $pathname = 'vfs://drupal_root/example2/test_name/test_name.info.yml';
+    $this->expectUserDeprecationMessage('Drupal\Core\Extension\ExtensionList::setPathname() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/2934063');
+    $test_extension_list->setPathname('test_name', $pathname);
+    $this->assertSame($pathname, $test_extension_list->getPathname('test_name'));
+
+    $test_extension_list->reset();
+
+    $this->assertSame($pathname, $test_extension_list->getPathname('test_name'));
+    $this->assertSame('vfs://drupal_root/example2/test_name', $test_extension_list->getPath('test_name'));
   }
 
   /**
@@ -219,7 +244,7 @@ class ExtensionListTest extends UnitTestCase {
    * Tests check incompatibility.
    */
   #[DataProvider('providerCheckIncompatibility')]
-  public function testCheckIncompatibility($additional_settings, $expected): void {
+  public function testCheckIncompatibility(array $additional_settings, bool $expected): void {
     $test_extension_list = $this->setupTestExtensionList(['test_name'], $additional_settings);
     $this->assertSame($expected, $test_extension_list->checkIncompatibility('test_name'));
   }

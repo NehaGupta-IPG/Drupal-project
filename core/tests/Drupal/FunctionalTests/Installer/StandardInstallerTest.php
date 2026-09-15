@@ -20,21 +20,22 @@ class StandardInstallerTest extends ConfigAfterInstallerTestBase {
   protected $profile = 'standard';
 
   /**
-   * Ensures that the user page is available after installation.
+   * Ensures that the welcome page is shown after installation.
    */
   public function testInstaller(): void {
-    // Verify that Olivero's default frontpage appears.
-    $this->assertSession()->pageTextContains('Congratulations and welcome to the Drupal community.');
-    $this->assertSession()->elementTextContains('css', '#block-olivero-powered', 'Powered by Drupal');
+    $this->assertSession()->addressEquals('admin/welcome');
+    $this->assertSession()->statusCodeEquals(200);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function setUpSite(): void {
-    // Test that the correct theme is being used.
-    $this->assertSession()->responseNotContains('olivero');
-    $this->assertSession()->responseContains('css/theme/install-page.css');
+    // Test that the correct theme is being used. This is the last installer
+    // step. The profile has installed claro by now, and a hook implementation
+    // of the install theme attaches the stylesheet, so this also covers that
+    // the install theme keeps its hook implementations.
+    $this->assertSession()->responseContains('default_admin/css/theme/install-page.css');
     parent::setUpSite();
   }
 

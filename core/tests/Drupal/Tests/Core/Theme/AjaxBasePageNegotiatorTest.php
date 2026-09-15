@@ -63,7 +63,7 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
   public function testApplies($request_data, $expected): void {
     $request = new Request();
     foreach ($request_data as $key => $data) {
-      $request->query->set($key, $data);
+      $request->attributes->set($key, $data);
     }
     $route_match = RouteMatch::createFromRequest($request);
     $this->requestStack->push($request);
@@ -76,11 +76,19 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
     $data = [];
     $data['empty'] = [[], FALSE];
     $data['no_theme'] = [['ajax_page_state' => ['theme' => '', 'theme_token' => '']], FALSE];
-    $data['valid_theme_empty_theme_token'] = [['ajax_page_state' => ['theme' => 'claro', 'theme_token' => '']], TRUE];
+    $data['valid_theme_empty_theme_token'] = [
+      [
+        'ajax_page_state' => [
+          'theme' => 'default_admin',
+          'theme_token' => '',
+        ],
+      ],
+      TRUE,
+    ];
     $data['valid_theme_valid_theme_token'] = [
       [
         'ajax_page_state' => [
-          'theme' => 'claro',
+          'theme' => 'default_admin',
           'theme_token' => 'valid_theme_token',
         ],
       ],
@@ -93,11 +101,11 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
    * Tests determine active theme valid token.
    */
   public function testDetermineActiveThemeValidToken(): void {
-    $theme = 'claro';
+    $theme = 'default_admin';
     $theme_token = 'valid_theme_token';
 
     $request = new Request();
-    $request->query->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);
+    $request->attributes->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);
     $this->requestStack->push($request);
     $route_match = RouteMatch::createFromRequest($request);
 
@@ -111,10 +119,10 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
    * Tests determine active theme invalid token.
    */
   public function testDetermineActiveThemeInvalidToken(): void {
-    $theme = 'claro';
+    $theme = 'default_admin';
     $theme_token = 'invalid_theme_token';
     $request = new Request();
-    $request->query->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);
+    $request->attributes->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);
     $request->request = new InputBag($request->request->all());
     $this->requestStack->push($request);
     $route_match = RouteMatch::createFromRequest($request);
@@ -135,7 +143,7 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
     $theme_token = '';
 
     $request = new Request([]);
-    $request->query->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);
+    $request->attributes->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);
     $request->request = new InputBag($request->request->all());
     $this->requestStack->push($request);
     $route_match = RouteMatch::createFromRequest($request);

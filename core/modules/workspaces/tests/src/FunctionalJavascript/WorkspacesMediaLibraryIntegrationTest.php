@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the Media library entity reference widget in a workspace.
  */
 #[Group('workspaces')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class WorkspacesMediaLibraryIntegrationTest extends EntityReferenceWidgetTest {
 
@@ -57,9 +58,9 @@ class WorkspacesMediaLibraryIntegrationTest extends EntityReferenceWidgetTest {
   /**
    * {@inheritdoc}
    */
-  protected function drupalCreateUser(array $permissions = [], $name = NULL, $admin = FALSE, array $values = []): UserInterface|false {
+  protected function drupalCreateUser(array $permissions = [], $name = NULL, $admin = FALSE, array $values = []): UserInterface {
     // Ensure that users and roles are managed outside a workspace context.
-    return \Drupal::service('workspaces.manager')->executeOutsideWorkspace(function () use ($permissions, $name, $admin, $values) {
+    return \Drupal::service('workspaces.manager')->executeOutsideWorkspace(function () use ($permissions, $name, $admin, $values): UserInterface {
       $permissions = array_merge($permissions, [
         'view any workspace',
       ]);

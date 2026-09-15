@@ -6,6 +6,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Query\UpsertUpdateExpression;
 use Drupal\search\Exception\SearchIndexException;
 
 /**
@@ -83,7 +84,7 @@ class SearchIndex implements SearchIndexInterface {
     foreach ($split as $value) {
       if ($tag) {
         // Increase or decrease score per word based on tag.
-        [$tagname] = explode(' ', $value, 2);
+        [$tagname] = preg_split('/\s+/', $value, 2);
         $tagname = mb_strtolower($tagname);
         // Closing or opening tag?
         if ($tagname[0] == '/') {
@@ -168,15 +169,22 @@ class SearchIndex implements SearchIndexInterface {
         // If a word already exists in the database, its score gets increased
         // appropriately. If not, we create a new record with the appropriate
         // starting score.
-        $this->connection->merge('search_index')
-          ->keys([
+        $this->connection->upsert('search_index')
+          ->key(['word', 'sid', 'langcode', 'type'])
+          ->fields([
+            'word',
+            'sid',
+            'langcode',
+            'type',
+            'score' => new UpsertUpdateExpression('{search_index}.[score] + :score', [':score' => $score]),
+          ])
+          ->values([
             'word' => $word,
             'sid' => $sid,
             'langcode' => $langcode,
             'type' => $type,
+            'score' => $score,
           ])
-          ->fields(['score' => $score])
-          ->expression('score', '[score] + :score', [':score' => $score])
           ->execute();
         $current_words[$word] = TRUE;
       }
@@ -269,9 +277,12 @@ class SearchIndex implements SearchIndexInterface {
           ->fetchField();
         // Apply Zipf's law to equalize the probability distribution.
         $total = log10(1 + 1 / (max(1, $total)));
-        $this->connection->merge('search_total')
-          ->key('word', $word)
-          ->fields(['count' => $total])
+        $this->connection->upsert('search_total')
+          ->key('word')
+          ->fields([
+            'word' => $word,
+            'count' => $total,
+          ])
           ->execute();
       }
       // Find words that were deleted from search_index, but are still in

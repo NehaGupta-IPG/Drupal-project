@@ -288,8 +288,11 @@ class MigrateExecutable implements MigrateExecutableInterface {
   public function rollback() {
     // Only begin the rollback operation if the migration is currently idle.
     if ($this->migration->getStatus() !== MigrationInterface::STATUS_IDLE) {
-      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-      $this->message->display($this->t('Migration @id is busy with another operation: @status', ['@id' => $this->migration->id(), '@status' => $this->t($this->migration->getStatusLabel())]), 'error');
+      $this->message->display($this->t('Migration @id is busy with another operation: @status', [
+        '@id' => $this->migration->id(),
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
+        '@status' => $this->t($this->migration->getStatusLabel()),
+      ]), 'error');
       return MigrationInterface::RESULT_FAILED;
     }
 
@@ -398,10 +401,6 @@ class MigrateExecutable implements MigrateExecutableInterface {
           try {
             $new_value[] = $plugin->transform($scalar_value, $this, $row, $destination);
           }
-          catch (MigrateSkipProcessException $e) {
-            $new_value[] = NULL;
-            $break = TRUE;
-          }
           catch (MigrateException $e) {
             // Prepend the process plugin id to the message.
             $message = sprintf("%s: %s", $plugin->getPluginId(), $e->getMessage());
@@ -420,10 +419,6 @@ class MigrateExecutable implements MigrateExecutableInterface {
         $plugin->reset();
         try {
           $value = $plugin->transform($value, $this, $row, $destination);
-        }
-        catch (MigrateSkipProcessException) {
-          $value = NULL;
-          break;
         }
         catch (MigrateException $e) {
           // Prepend the process plugin id to the message.

@@ -1,8 +1,7 @@
 drupal.contextual-links:
   version: VERSION
   js:
-    # Ensure to run before contextual/drupal.context-toolbar.
-    js/contextual.js: { weight: -2 }
+    js/contextual.js: { }
   css:
     component:
       css/contextual.module.css: {}
@@ -20,19 +19,3 @@ drupal.contextual-links:
     - core/drupalSettings
     - core/once
     - core/drupal.touchevents-test
-
-drupal.contextual-toolbar:
-  version: VERSION
-  js:
-    js/toolbar/contextualToolbarModelView.js: {}
-    js/contextual.toolbar.js: {}
-  css:
-    component:
-      css/contextual.toolbar.css: {}
-  dependencies:
-    - core/jquery
-    - contextual/drupal.contextual-links
-    - core/drupal
-    - core/once
-    - core/drupal.tabbingmanager
-    - core/drupal.announce

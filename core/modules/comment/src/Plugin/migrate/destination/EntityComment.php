@@ -55,12 +55,12 @@ class EntityComment extends EntityContentBase {
    *   The field type plugin manager service.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state storage object.
-   * @param \Drupal\Core\Session\AccountSwitcherInterface|null $account_switcher
+   * @param \Drupal\Core\Session\AccountSwitcherInterface $account_switcher
    *   The account switcher service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, EntityFieldManagerInterface $entity_field_manager, FieldTypePluginManagerInterface $field_type_manager, StateInterface $state, ?AccountSwitcherInterface $account_switcher = NULL, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, EntityFieldManagerInterface $entity_field_manager, FieldTypePluginManagerInterface $field_type_manager, StateInterface $state, AccountSwitcherInterface $account_switcher, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage, $bundles, $entity_field_manager, $field_type_manager, $account_switcher, $entity_type_bundle_info);
     $this->state = $state;
   }
@@ -83,26 +83,6 @@ class EntityComment extends EntityContentBase {
       $container->get('account_switcher'),
       $container->get('entity_type.bundle.info'),
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3533565
-   */
-  public function import(Row $row, array $old_destination_id_values = []) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533565', E_USER_DEPRECATED);
-    if ($row->isStub() && ($state = $this->state->get('comment.maintain_entity_statistics', 0))) {
-      $this->state->set('comment.maintain_entity_statistics', 0);
-    }
-    $return = parent::import($row, $old_destination_id_values);
-    if ($row->isStub() && $state) {
-      $this->state->set('comment.maintain_entity_statistics', $state);
-    }
-    return $return;
   }
 
   /**

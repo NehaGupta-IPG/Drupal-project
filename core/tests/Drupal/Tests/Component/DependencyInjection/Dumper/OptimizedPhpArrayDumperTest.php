@@ -6,7 +6,6 @@ namespace Drupal\Tests\Component\DependencyInjection\Dumper;
 
 use Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper;
 use Drupal\Component\Utility\Crypt;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -31,7 +30,6 @@ use Symfony\Component\ExpressionLanguage\Expression;
 #[Group('DependencyInjection')]
 class OptimizedPhpArrayDumperTest extends TestCase {
 
-  use ExpectDeprecationTrait;
   use ProphecyTrait;
 
   /**
@@ -109,7 +107,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    * Tests that alias processing works properly.
    */
   #[DataProvider('getAliasesDataProvider')]
-  public function testGetAliases($aliases, $definition_aliases): void {
+  public function testGetAliases(array $aliases, array $definition_aliases): void {
     $this->containerDefinition['aliases'] = $definition_aliases;
     $this->containerBuilder->getAliases()->willReturn($aliases);
     $this->assertEquals($this->containerDefinition, $this->dumper->getArray(), 'Expected definition matches dump.');
@@ -147,7 +145,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    * @legacy-covers ::getReferenceCall
    */
   #[DataProvider('getParametersDataProvider')]
-  public function testGetParameters($parameters, $definition_parameters, $is_frozen): void {
+  public function testGetParameters(array $parameters, array $definition_parameters, bool $is_frozen): void {
     $this->containerDefinition['parameters'] = $definition_parameters;
     $this->containerDefinition['frozen'] = $is_frozen;
 
@@ -235,7 +233,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    *     - parameters as expected in the container definition.
    *     - frozen value
    */
-  public static function getDefinitionsDataProvider() {
+  public static function getDefinitionsDataProvider(): array {
     $base_service_definition = [
       'class' => '\stdClass',
       'public' => TRUE,
@@ -476,7 +474,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a service definition.
    */
-  protected static function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+  protected static function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): \stdClass|string {
     return (object) [
       'type' => 'service',
       'id' => $id,
@@ -487,7 +485,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a service closure definition.
    */
-  protected static function getServiceClosureCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+  protected static function getServiceClosureCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): \stdClass {
     return (object) [
       'type' => 'service_closure',
       'id' => $id,
@@ -501,7 +499,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    * @legacy-covers ::getReferenceCall
    */
   #[DataProvider('publicPrivateDataProvider')]
-  public function testGetServiceDefinitionWithReferenceToAlias($public): void {
+  public function testGetServiceDefinitionWithReferenceToAlias(bool $public): void {
     $bar_definition = new Definition('\stdClass');
     $bar_definition_php_array = [
       'class' => '\stdClass',
@@ -627,7 +625,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    * Tests that service arguments with escaped percents are correctly dumped.
    */
   #[DataProvider('percentsEscapeProvider')]
-  public function testPercentsEscape($expected, $argument): void {
+  public function testPercentsEscape(string $expected, string $argument): void {
     $definition = new Definition('\stdClass', [$argument]);
     $definition->setPublic(TRUE);
     $this->containerBuilder->getDefinitions()->willReturn([
@@ -668,7 +666,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a private service definition.
    */
-  protected static function getPrivateServiceCall($id, $service_definition, $shared = FALSE) {
+  protected static function getPrivateServiceCall($id, $service_definition, $shared = FALSE): \stdClass {
     if (!$id) {
       $hash = Crypt::hashBase64(serialize($service_definition));
       $id = 'private__' . $hash;
@@ -684,7 +682,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a machine-optimized collection.
    */
-  protected static function getCollection($collection) {
+  protected static function getCollection($collection): \stdClass|array {
     return (object) [
       'type' => 'collection',
       'value' => $collection,
@@ -694,7 +692,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a machine-optimized iterator.
    */
-  protected static function getIterator($collection) {
+  protected static function getIterator($collection): \stdClass {
     return (object) [
       'type' => 'iterator',
       'value' => $collection,
@@ -704,7 +702,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a parameter definition.
    */
-  protected static function getParameterCall($name) {
+  protected static function getParameterCall($name): \stdClass|string {
     return (object) [
       'type' => 'parameter',
       'name' => $name,
@@ -714,7 +712,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a raw value definition.
    */
-  protected function getRaw($value) {
+  protected function getRaw($value): \stdClass {
     return (object) [
       'type' => 'raw',
       'value' => $value,
@@ -737,13 +735,15 @@ if (!class_exists('\Symfony\Component\ExpressionLanguage\Expression')) {
    */
   class Expression {
 
-    public function __construct($expression) {
+    public function __construct(
+      private readonly string $expression,
+    ) {
     }
 
     /**
      * Gets the string representation of the expression.
      */
-    public function __toString() {
+    public function __toString(): string {
       return 'dummy_expression';
     }
 
