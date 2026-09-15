@@ -29,7 +29,7 @@ module.exports = (packageFolder) => {
     // Add all the files in the build/ directory to the process array for
     // copying.
     const buildFiles = globSync(`${ckeditor5package}/build/**/*.js`, {
-      nodir: Boolean(process.env.CKEDITOR_PACKAGES_PATH),
+      nodir: true,
     });
     if (buildFiles.length) {
       // Clean up the path to get the original package name.
