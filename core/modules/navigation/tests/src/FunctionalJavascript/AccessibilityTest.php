@@ -26,7 +26,6 @@ class AccessibilityTest extends AccessibilityTestBase {
    */
   protected function setupAdminPageMobileSidebarOpen(): void {
     $session = $this->getSession();
-    $menu_button = $session->getPage()->find('css', '#admin-toolbar')->findButton('Create');
 
     $session->resizeWindow(
       500,
@@ -34,9 +33,10 @@ class AccessibilityTest extends AccessibilityTestBase {
     );
 
     // Wait and assert menu button is hidden.
-    $this->assertTrue($menu_button->waitFor(10, function ($menu_button): bool {
-      return !$menu_button->isVisible();
-    }));
+    sleep(2);
+
+    $menu_button = $session->getPage()->find('css', '#admin-toolbar')->findButton('Create');
+    $this->assertFalse($menu_button->isVisible());
 
     // Expand sidebar.
     $session->getPage()->pressButton('Expand sidebar');
