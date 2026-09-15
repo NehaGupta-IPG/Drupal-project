@@ -1501,6 +1501,12 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    */
   public function testCreateTableWithGeneratedColumn(): void {
     $tableName = 'test_generated_column';
+    // PostgreSQL supports virtual generated columns only from version 18.
+    // Fall back to stored columns on older versions so the rest of the
+    // scenario still runs there.
+    $virtualStorage = $this->connection->supportsVirtualGeneratedColumns()
+      ? GeneratedColumnStorage::Virtual
+      : GeneratedColumnStorage::Stored;
     $schemaDefinition = new SchemaDefinition(
       type: SchemaDefinitionType::Test,
       name: 'test_schema',
@@ -1539,7 +1545,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
               name: 'shout',
               type: ColumnType::Varchar,
               description: "The person's name in capitals",
-              storage: GeneratedColumnStorage::Virtual,
+              storage: $virtualStorage,
               length: 512,
               expression: new GeneratedColumnExpression('UPPER([name])'),
             ),
@@ -1556,7 +1562,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
               name: 'half_age',
               type: ColumnType::Numeric,
               description: "Half of the person's age",
-              storage: GeneratedColumnStorage::Virtual,
+              storage: $virtualStorage,
               precision: 10,
               scale: 2,
               expression: new GeneratedColumnExpression('[age] / 2'),
@@ -1569,7 +1575,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
               name: 'tricky',
               type: ColumnType::Int,
               description: 'A generated column whose expression is quoted',
-              storage: GeneratedColumnStorage::Virtual,
+              storage: $virtualStorage,
               expression: new GeneratedColumnExpression("CASE WHEN [name] = 'a, b (c''d)' /* , ) */ THEN 1 ELSE 0 END"),
             ),
           ],
@@ -1587,7 +1593,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->schema->createSchemaFromDefinition($schemaDefinition);
     $this->assertTrue($this->schema->tableExists($tableName));
     $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Stored, $tableName, 'double_age');
-    $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Virtual, $tableName, 'shout');
+    $this->checkGeneratedColumnStorage($virtualStorage, $tableName, 'shout');
     $this->connection->insert($tableName)->fields([
       'name' => 'John',
       'age' => 42,
@@ -1636,7 +1642,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertTrue($this->schema->fieldExists($tableName, 'tricky'));
     $this->assertTrue($this->schema->indexExists($tableName, 'double_age'));
     $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Stored, $tableName, 'double_age');
-    $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Virtual, $tableName, 'tricky');
+    $this->checkGeneratedColumnStorage($virtualStorage, $tableName, 'tricky');
     $doubleAge = $this->connection
       ->select($tableName)
       ->fields($tableName, ['double_age'])
@@ -1658,7 +1664,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->schema->addField($tableName, 'triple_age', Column::generated(
       name: 'triple_age',
       type: ColumnType::Int,
-      storage: GeneratedColumnStorage::Virtual,
+      storage: $virtualStorage,
       expression: new GeneratedColumnExpression('[age] * 3'),
     )->toArray());
     $this->schema->addField($tableName, 'quadruple_age', Column::generated(
@@ -1668,7 +1674,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       expression: new GeneratedColumnExpression('[age] * 4'),
     )->toArray());
     $this->assertTrue($this->schema->indexExists($tableName, 'double_age'));
-    $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Virtual, $tableName, 'triple_age');
+    $this->checkGeneratedColumnStorage($virtualStorage, $tableName, 'triple_age');
     $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Stored, $tableName, 'quadruple_age');
     $ages = $this->connection
       ->select($tableName)
@@ -1739,6 +1745,18 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertSame('60', $doubleAge);
     $this->assertTrue($this->schema->dropField($pkTableName, 'double_age'));
     $this->assertFalse($this->schema->fieldExists($pkTableName, 'double_age'));
+
+    // A server without virtual generated column support must reject one
+    // instead of creating a different column.
+    if (!$this->connection->supportsVirtualGeneratedColumns()) {
+      $this->expectException(SchemaException::class);
+      $this->schema->addField($tableName, 'volatile_age', Column::generated(
+        name: 'volatile_age',
+        type: ColumnType::Int,
+        storage: GeneratedColumnStorage::Virtual,
+        expression: new GeneratedColumnExpression('[age] * 5'),
+      )->toArray());
+    }
   }
 
 }

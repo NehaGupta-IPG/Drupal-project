@@ -4,6 +4,7 @@ namespace Drupal\pgsql\Driver\Database\pgsql;
 
 use Drupal\Core\Database\Schema as DatabaseSchema;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectExistsException;
 
@@ -374,6 +375,9 @@ EOD;
     }
 
     if (isset($spec['generated'])) {
+      if ($spec['generated']->generatedStorage === GeneratedColumnStorage::Virtual && !$this->connection->supportsVirtualGeneratedColumns()) {
+        throw new SchemaException("Virtual generated columns require PostgreSQL 18. Make '$name' a stored generated column instead.");
+      }
       $sql .= ' GENERATED ALWAYS AS (' . $spec['generated']->generatedExpression->expression . ') ';
       $sql .= match ($spec['generated']->generatedStorage) {
         GeneratedColumnStorage::Virtual => 'VIRTUAL',

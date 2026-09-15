@@ -18,8 +18,6 @@ global-styling:
       css/base/print.css: {}
     component:
       css/components/accordion.css: {}
-      # Ensure action-link.css is loaded after button.css.
-      css/components/action-link.css: { weight: 10 }
       css/components/batch.css: {}
       css/components/blocks.css: {}
       css/components/content-header.css: {}
@@ -28,6 +26,8 @@ global-styling:
       css/components/container-inline.module.css: {}
       css/components/breadcrumb.css: {}
       css/components/button.css: {}
+      # Ensure action-link.css is loaded after button.css.
+      css/components/action-link.css: {}
       css/components/dropbutton.css: {}
       css/components/details.css: {}
       css/components/divider.css: {}
@@ -404,13 +404,6 @@ escape_admin:
     migration/js/escape_admin.js: { minified: false }
   dependencies:
     - core/once
-
-# Custom CSS
-
-admin_custom_css:
-  css:
-    theme:
-      public://admin-custom.css: { preprocess: false, minified: false, weight: 50 }
 
 # Libs
 
