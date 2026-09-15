@@ -80,7 +80,7 @@ class UpdateScriptTest extends UpdateScriptTestBase {
     $this->clickLink('Continue');
     $this->assertSession()->pageTextContains('No pending updates.');
     // Confirm that all caches were cleared.
-    $this->assertSession()->pageTextContains('hook_cache_flush() invoked for the update_script_test module.');
+    $this->assertSession()->pageTextContains('hook_cache_flush() invoked for update_script_test.module.');
 
     // If there is a requirements warning, we expect it to be initially
     // displayed, but clicking the link to proceed should allow us to go
@@ -102,7 +102,7 @@ class UpdateScriptTest extends UpdateScriptTestBase {
     $this->checkForMetaRefresh();
     $this->assertSession()->pageTextContains('The update_script_test_update_8001() update was executed successfully.');
     // Confirm that all caches were cleared.
-    $this->assertSession()->pageTextContains('hook_cache_flush() invoked for the update_script_test module.');
+    $this->assertSession()->pageTextContains('hook_cache_flush() invoked for update_script_test.module.');
 
     // Now try again without pending updates to make sure that works too.
     $this->drupalGet($this->updateUrl, ['external' => TRUE]);
@@ -112,7 +112,7 @@ class UpdateScriptTest extends UpdateScriptTestBase {
     $this->clickLink('Continue');
     $this->assertSession()->pageTextContains('No pending updates.');
     // Confirm that all caches were cleared.
-    $this->assertSession()->pageTextContains('hook_cache_flush() invoked for the update_script_test module.');
+    $this->assertSession()->pageTextContains('hook_cache_flush() invoked for update_script_test.module.');
 
     // If there is a requirements error, it should be displayed even after
     // clicking the link to proceed (since the problem that triggered the error

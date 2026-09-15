@@ -29,8 +29,8 @@ class DependencyMissingTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    // Only install the update_test_2 module, even though its updates have a
-    // dependency on the update_test_3 module.
+    // Only install update_test_2.module, even though its updates have a
+    // dependency on update_test_3.module.
     parent::setUp();
     require_once $this->root . '/core/includes/update.inc';
   }

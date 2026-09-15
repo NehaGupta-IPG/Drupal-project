@@ -230,7 +230,7 @@ class ThemeSettingsForm extends ConfigFormBase {
       $form['theme_settings']['#access'] = FALSE;
     }
 
-    // Logo settings, only available when the file module is enabled.
+    // Logo settings, only available when file.module is enabled.
     if ((!$theme || in_array('logo', $features)) && $this->moduleHandler->moduleExists('file')) {
       $form['logo'] = [
         '#type' => 'details',

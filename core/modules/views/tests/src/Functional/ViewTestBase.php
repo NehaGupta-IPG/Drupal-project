@@ -47,9 +47,9 @@ abstract class ViewTestBase extends BrowserTestBase {
   }
 
   /**
-   * Sets up the views_test_data module.
+   * Sets up the views_test_data.module.
    *
-   * Because the schema of the views_test_data module is dependent on the test
+   * Because the schema of views_test_data.module is dependent on the test
    * using it, it cannot be enabled normally.
    */
   protected function enableViewsTestModule() {

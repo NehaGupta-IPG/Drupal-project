@@ -115,7 +115,7 @@ function hook_module_preinstall($module, bool $is_syncing): void {
  * \Drupal\Core\Extension\ModuleInstaller::install() for a detailed description
  * of the order in which install hooks are invoked.
  *
- * This hook should be implemented in src/Hook, not in an .install file.
+ * This hook should be implemented in a .module file, not in an .install file.
  *
  * @param string[] $modules
  *   An array of the modules that were installed.
@@ -154,12 +154,11 @@ function hook_modules_installed($modules, $is_syncing): void {
  * hook_install() implementation.
  *
  * Implementations of this hook are by convention declared in the module's
- * .install file. The implementation can rely on the deprecated .module file
- * being loaded. The hook will only be called when a module is installed. The
- * module's schema version will be set to the module's greatest numbered update
- * hook. Because of this, any time a hook_update_N() is added to the module,
- * this function needs to be updated to reflect the current version of the
- * database schema.
+ * .install file. The implementation can rely on the .module file being loaded.
+ * The hook will only be called when a module is installed. The module's schema
+ * version will be set to the module's greatest numbered update hook. Because of
+ * this, any time a hook_update_N() is added to the module, this function needs
+ * to be updated to reflect the current version of the database schema.
  *
  * See the @link https://www.drupal.org/node/146843 Schema API documentation
  * @endlink for details on hook_schema and how database tables are defined.
@@ -886,7 +885,7 @@ function hook_removed_post_updates(): array {
  * well as to search for missing dependencies.
  *
  * Implementations of this hook should be placed in a my_module.install file in
- * the same directory as my_module.
+ * the same directory as my_module.module.
  *
  * @return array
  *   A multidimensional array containing information about the module update
@@ -934,7 +933,7 @@ function hook_update_dependencies() {
  * ensure that no update is accidentally skipped.
  *
  * Implementations of this hook should be placed in a my_module.install file in
- * the same directory as my_module.
+ * the same directory as my_module.module.
  *
  * @return int
  *   An integer, corresponding to hook_update_N() which has been removed from

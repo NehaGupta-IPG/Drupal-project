@@ -313,10 +313,10 @@ function form_get_options($element, $key) {
  *     executed after the batch has completed. This should be used to perform
  *     any result massaging that may be needed, and possibly save data in
  *     the session for display after final page redirection.
- *   - file: Path to the file containing the definitions of the 'operations'
- *     and 'finished' functions, for instance if they don't reside in the
- *     deprecated .module file. The path should be relative to base_path(),
- *     and thus should be built using ModuleExtensionList::getPath().
+ *   - file: Path to the file containing the definitions of the 'operations' and
+ *     'finished' functions, for instance if they don't reside in the main
+ *     .module file. The path should be relative to base_path(), and thus should
+ *     be built using ModuleExtensionList::getPath().
  *   - library: An array of batch-specific CSS and JS libraries.
  *   - url_options: options passed to the \Drupal\Core\Url object when
  *     constructing redirect URLs for the batch.

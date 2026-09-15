@@ -67,7 +67,7 @@ class ViewValidationTest extends ConfigEntityValidationTestBase {
     // invalid handler plugin ID, we will get the expected validation error.
     // @todo Remove all this when fallback plugin IDs are not longer allowed by
     //   Views' config schema.
-    // @see the views_test_config module
+    // @see views_test_config.module
     $this->container->get('state')
       ->set('views_test_config_disable_broken_handler', [
         'area',

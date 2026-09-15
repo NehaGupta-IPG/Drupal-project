@@ -1687,8 +1687,16 @@
  *
  * @subsection procedural-hooks Procedural hook implementation
  *
- * Procedural implementation are no longer recommended and will not be
- * supported in Drupal 13.
+ * Procedural implementation should use the following technique:
+ * - Copy the function to your module's .module file.
+ * - Change the name of the function, substituting your module's short name
+ *   (name of the module's directory, and .info.yml file without the extension)
+ *   for the "hook" part of the sample function name. For instance, to implement
+ *   hook_batch_alter(), you would rename it to my_module_batch_alter().
+ * - Edit the documentation for the function (normally, your implementation
+ *   should just have one line saying "Implements hook_batch_alter().").
+ * - Edit the body of the function, substituting in what you need your module
+ *   to do.
  *
  * @section defining Defining a hook
  *

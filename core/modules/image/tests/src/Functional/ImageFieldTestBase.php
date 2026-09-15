@@ -10,7 +10,12 @@ use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 /**
  * @todo Test the following functions.
  *
+ * In file:
+ * - image.effects.inc:
+ *   image_style_generate()
  *   \Drupal\image\ImageStyleInterface::createDerivative()
+ *
+ * - image.module:
  *   \Drupal::service(ImageDerivativeUtilities::class)->styleOptions()
  *   \Drupal\image\ImageStyleInterface::flush()
  */

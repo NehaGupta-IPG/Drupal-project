@@ -59,7 +59,7 @@ abstract class ViewsKernelTestBase extends KernelTestBase {
   /**
    * Sets up the configuration and schema of views and views_test_data modules.
    *
-   * Because the schema of the views_test_data module is dependent on the test
+   * Because the schema of views_test_data.module is dependent on the test
    * using it, it cannot be enabled normally.
    */
   protected function setUpFixtures() {

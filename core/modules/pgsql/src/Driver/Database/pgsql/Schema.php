@@ -453,7 +453,8 @@ EOD;
    */
   public function getFieldTypeMap() {
     // Put :normal last so it gets preserved by array_flip. This makes
-    // it much easier for modules to map database types back into schema types.
+    // it much easier for modules (such as schema.module) to map
+    // database types back into schema types.
     // $map does not use drupal_static as its value never changes.
     static $map = [
       'varchar_ascii:normal' => 'varchar',

@@ -54,8 +54,8 @@ class InstallTest extends KernelTestBase {
    * Tests enabling User module once more.
    *
    * Regression: The installer might enable a module twice due to automatic
-   * dependency resolution. A bug caused the stored weight for the user module
-   * to be an array.
+   * dependency resolution. A bug caused the stored weight for user.module to
+   * be an array.
    */
   public function testEnableUserTwice(): void {
     $this->moduleInstaller->install(['user'], FALSE);

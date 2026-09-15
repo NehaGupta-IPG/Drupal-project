@@ -167,7 +167,7 @@ class BulkFormAccessTest extends NodeTestBase {
       'node test view',
     ]);
     // Create a node that may be deleted too, to ensure the delete confirmation
-    // page is shown later. In the node_access_test module, nodes may only be
+    // page is shown later. In node_access_test.module, nodes may only be
     // deleted by the author.
     $own_node = $this->drupalCreateNode([
       'type' => 'article',

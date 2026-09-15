@@ -8,7 +8,7 @@ use Drupal\taxonomy\TermInterface;
 use Drupal\taxonomy\VocabularyInterface;
 
 /**
- * Provides route responses for the taxonomy module.
+ * Provides route responses for taxonomy.module.
  */
 class TaxonomyController extends ControllerBase {
 

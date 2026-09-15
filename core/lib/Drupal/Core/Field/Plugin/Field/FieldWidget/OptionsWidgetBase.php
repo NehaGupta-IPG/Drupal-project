@@ -16,7 +16,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * Base class for the 'options_*' widgets.
  *
  * Field types willing to enable one or several of the widgets defined in
- * the options module (select, radios/checkboxes, on/off checkbox) need to
+ * options.module (select, radios/checkboxes, on/off checkbox) need to
  * implement the OptionsProviderInterface to specify the list of options to
  * display in the widgets.
  *
