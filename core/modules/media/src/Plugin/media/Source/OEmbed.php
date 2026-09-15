@@ -272,7 +272,8 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
         return $resource->getAuthorName();
 
       case 'author_url':
-        return $resource->getAuthorUrl();
+        $url = $resource->getAuthorUrl();
+        return $url ? $url->toString() : NULL;
 
       case 'provider_name':
         $provider = $resource->getProvider();
