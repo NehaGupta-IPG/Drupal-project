@@ -12,7 +12,9 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 
 /**
  * Defines a user navigation block.
@@ -90,12 +92,63 @@ final class NavigationUserBlock extends BlockBase {
     $tree = $menu_tree->transform([$tree], $manipulators);
     $build = $menu_tree->build($tree);
     $build['#title'] = $label;
+    static::replaceCurrentUserUrls($build, $account);
     $build['#cache']['contexts'][] = 'user';
     $cacheable_metadata = CacheableMetadata::createFromRenderArray($build);
     $cacheable_metadata->addCacheableDependency($account);
     $cacheable_metadata->applyTo($build);
 
     return $build;
+  }
+
+  /**
+   * Replaces redirecting current-user links with canonical destinations.
+   *
+   * The navigation user menu keeps parameterless routes so the links stay
+   * generic. The rendered URLs must match the pages the user lands on so
+   * toolbar JavaScript can mark the current item.
+   *
+   * @param array $build
+   *   The built menu render array.
+   * @param \Drupal\user\UserInterface $account
+   *   The current user account.
+   */
+  private static function replaceCurrentUserUrls(array &$build, UserInterface $account): void {
+    if (empty($build['#items'])) {
+      return;
+    }
+
+    $replacements = [
+      'navigation.user_links.user.wrapper' => 'entity.user.canonical',
+      'navigation.user_links.user.page'    => 'entity.user.canonical',
+      'navigation.user_links.user.edit'    => 'entity.user.edit_form',
+    ];
+    static::replaceItemUrls($build['#items'], $replacements, $account->id());
+  }
+
+  /**
+   * Replaces matching menu item URLs while preserving options.
+   *
+   * @param array $items
+   *   Menu items keyed by plugin ID.
+   * @param array $replacements
+   *   Map of plugin IDs to replacement route names.
+   * @param string $uid
+   *   The current user ID.
+   */
+  private static function replaceItemUrls(array &$items, array $replacements, string $uid): void {
+    foreach ($items as $plugin_id => &$item) {
+      if (isset($replacements[$plugin_id], $item['url']) && $item['url'] instanceof Url) {
+        $item['url'] = Url::fromRoute(
+          $replacements[$plugin_id],
+          ['user' => $uid],
+          $item['url']->getOptions(),
+        );
+      }
+      if (!empty($item['below'])) {
+        static::replaceItemUrls($item['below'], $replacements, $uid);
+      }
+    }
   }
 
 }
