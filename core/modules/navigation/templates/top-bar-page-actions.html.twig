@@ -19,7 +19,7 @@
     modifiers: ['primary'],
   } %}
   {% if featured_page_action.icon %}
-    {% set toolbar_button_props = toolbar_button_props|merge({ icon: featured_page_action.icon }) %}
+    {% set toolbar_button_props = toolbar_button_props|merge({icon: featured_page_action.icon}) %}
   {% endif %}
   {{ include('navigation:toolbar-button', toolbar_button_props, with_context: false) }}
 {% endfor %}
