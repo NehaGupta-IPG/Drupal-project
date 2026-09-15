@@ -306,6 +306,13 @@ system.linkset_settings:
   requirements:
     _permission: 'administer site configuration'
 
+system.reauthenticate:
+  path: '/admin/reauthenticate'
+  defaults:
+    _form: '\Drupal\system\Form\ReauthenticateForm'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
 route_callbacks:
   - '\Drupal\system\Routing\AssetRoutes::routes'
   - '\Drupal\system\Routing\MenuLinksetRoutes::routes'
