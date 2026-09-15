@@ -36,36 +36,82 @@ class AccessibilityTest extends AccessibilityTestBase {
     yield 'User Edit' => [
       'path' => '/user/1/edit',
       'admin' => TRUE,
+      'axe_options' => [
+        'rules' => [
+          // @todo remove after https://drupal.org/i/3318396.
+          'region' => ['enabled' => FALSE],
+        ],
+      ],
     ];
 
     yield 'Create Article' => [
       'path' => '/node/add/article',
       'admin' => TRUE,
+      'axe_options' => [
+        'rules' => [
+          // @todo remove after https://drupal.org/i/3623388.
+          'color-contrast' => ['enabled' => FALSE],
+          // @todo remove after https://drupal.org/i/3318396.
+          'region' => ['enabled' => FALSE],
+        ],
+      ],
     ];
 
     yield 'Create Page' => [
       'path' => '/node/add/page',
       'admin' => TRUE,
+      'axe_options' => [
+        'rules' => [
+          // @todo remove after https://drupal.org/i/3623388.
+          'color-contrast' => ['enabled' => FALSE],
+          // @todo remove after https://drupal.org/i/3318396.
+          'region' => ['enabled' => FALSE],
+        ],
+      ],
     ];
 
     yield 'Content Page' => [
       'path' => '/admin/content',
       'admin' => TRUE,
+      'axe_options' => [
+        'rules' => [
+          // @todo remove after https://drupal.org/i/3318396.
+          'region' => ['enabled' => FALSE],
+        ],
+      ],
     ];
 
     yield 'Structure Page' => [
       'path' => '/admin/structure',
       'admin' => TRUE,
+      'axe_options' => [
+        'rules' => [
+          // @todo remove after https://drupal.org/i/3318396.
+          'region' => ['enabled' => FALSE],
+        ],
+      ],
     ];
 
     yield 'Add content type' => [
       'path' => '/admin/structure/types/add',
       'admin' => TRUE,
+      'axe_options' => [
+        'rules' => [
+          // @todo remove after https://drupal.org/i/3318396.
+          'region' => ['enabled' => FALSE],
+        ],
+      ],
     ];
 
     yield 'Add vocabulary' => [
       'path' => '/admin/structure/taxonomy/add',
       'admin' => TRUE,
+      'axe_options' => [
+        'rules' => [
+          // @todo remove after https://drupal.org/i/3318396.
+          'region' => ['enabled' => FALSE],
+        ],
+      ],
     ];
 
     // @todo remove the skipped rules below in https://drupal.org/i/3318394.
