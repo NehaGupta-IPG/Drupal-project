@@ -122,8 +122,10 @@ class Number {
       // Compute the remainder of a division by $step.
       $remainder = (float) abs($double_value - $double_step * round($double_value / $double_step));
       // Remainders smaller than the acceptable error occur due to rounding
-      // when scaling $value and $step to floating point.
-      $acceptable_error = $double_step / pow(2.0, 24);
+      // when scaling $value and $step to floating point. The fractional
+      // part of a float has 24 bits. That means remainders smaller
+      // $double_step / 2^24 are acceptable.
+      $acceptable_error = $double_step / (2 ** 24);
       return $acceptable_error >= $remainder || $remainder >= ($double_step - $acceptable_error);
     }
 
