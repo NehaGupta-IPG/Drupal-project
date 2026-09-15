@@ -538,6 +538,7 @@
 
 .media-library-item--grid .field--name-thumbnail img {
   height: 180px;
+  vertical-align: bottom;
   object-fit: contain;
   object-position: center center;
 }
@@ -647,7 +648,8 @@
   overflow: hidden;
   max-width: calc(100% - 10px);
   max-height: calc(100% - 50px);
-  padding: 5px;
+  margin: 0.1rem;
+  padding: 0.1rem;
   background: white;
 }
 
