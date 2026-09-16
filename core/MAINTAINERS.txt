@@ -57,7 +57,7 @@ Core JavaScript packages
 
 Team facilitators
 - Pamela Barone 'pameeela' (pameeela) https://www.drupal.org/u/pameeela
-- (provisional) Griffyn Heels 'griffynh' (griffynh) https://www.drupal.org/u/griffynh
+- Griffyn Heels 'griffynh' (griffynh) https://www.drupal.org/u/griffynh
 
 Initiative facilitators
 - Gábor Hojtsy 'Gábor Hojtsy' (goba) https://www.drupal.org/u/gábor-hojtsy
@@ -375,9 +375,6 @@ Search
 Serialization
 - Brad Jones 'bradjones1' (bradjones1) https://www.drupal.org/u/bradjones1
 
-Shortcut
-- Jibran Ijaz 'jibran' (jibran) https://www.drupal.org/u/jibran
-
 Stark
 - John Albin Wilkins 'JohnAlbin' (johnalbin) https://www.drupal.org/u/johnalbin
 
@@ -405,9 +402,6 @@ Theme API
 
 Token
 - Max Pogonowski 'darvanen' (Darvanen) https://www.drupal.org/u/darvanen
-
-Toolbar
-- Théodore Biadala 'nod_' (nod_) https://www.drupal.org/u/nod_
 
 Transliteration
 - Andrei Mateescu 'amateescu' (amateescu) https://www.drupal.org/u/amateescu
