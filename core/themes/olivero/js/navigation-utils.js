@@ -166,7 +166,12 @@
       rootMarginTop -= 40;
     }
 
-    return `${rootMarginTop}px 0px 0px 0px`;
+    const topBar = document.querySelector('.top-bar');
+    if (topBar && window.getComputedStyle(topBar).position === 'fixed') {
+      rootMarginTop -= topBar.getBoundingClientRect().height;
+    }
+
+    return `${Math.max(rootMarginTop, 0)}px 0px 0px 0px`;
   }
 
   /**
