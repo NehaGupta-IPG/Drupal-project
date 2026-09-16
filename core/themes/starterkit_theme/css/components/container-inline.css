@@ -19,4 +19,5 @@
 .container-inline.form-actions {
   margin-top: 0;
   margin-bottom: 0;
+  padding-block-start: 0;
 }
