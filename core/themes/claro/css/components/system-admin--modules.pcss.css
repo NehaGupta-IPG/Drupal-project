@@ -186,3 +186,8 @@ td.module-list__description {
 .claro-details .admin-missing {
   color: var(--color-maximumred);
 }
+
+.module-link--non-stable {
+  padding-inline-start: 20px;
+  background: url(../../images/core/e29700/warning.svg) no-repeat center left transparent;
+}
