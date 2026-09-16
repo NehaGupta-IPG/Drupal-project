@@ -129,8 +129,7 @@ dialog.dialog--wide {
 }
 
 dialog.dialog--x-wide {
-  width: max(1800px, 95vw);
-  max-width: 1800px;
+  width: 95vw;
   min-height: min(75vh, 600px);
 }
 

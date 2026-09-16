@@ -24,7 +24,7 @@
   'dialog-position-' ~ position ?? 'side',
   'ui-dialog-off-canvas',
   'ui-dialog-position-' ~ position ?? 'side',
-  ]) }}>
+  ]).addClass(dialog_classes) }}>
   {% else %}
     {# Setup default and modal dialog attributes #}
     {% set close = 'closerequest' %}

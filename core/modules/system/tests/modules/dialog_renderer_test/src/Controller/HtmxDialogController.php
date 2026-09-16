@@ -83,6 +83,15 @@ class HtmxDialogController {
     (new Htmx())->get($modalUrl)
       ->applyTo($build['normal_modal']);
 
+    $modalUrl = Url::fromUri('base:/htmx/dialog/modal/htmx-dialog-content');
+    $build['styled_modal_single_class'] = [
+      '#title' => 'Modal with single additional class',
+      '#type' => 'checkbox',
+    ];
+    (new Htmx())->get($modalUrl)
+      ->vals(['class' => 'dialog--narrow'])
+      ->applyTo($build['styled_modal_single_class']);
+
     $defaultUrl = Url::fromUri('base:/htmx/dialog/default/htmx-dialog-content');
     $build['normal_dialog'] = [
       '#title' => 'Default dialog',
