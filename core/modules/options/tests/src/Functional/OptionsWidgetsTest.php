@@ -642,8 +642,9 @@ class OptionsWidgetsTest extends FieldTestBase {
     $term3->delete();
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertTrue($this->assertSession()->optionExists($field_name, $term2->id())->isSelected());
-    $this->assertSession()->optionNotExists($field_name, '_none');
+    $this->assertSession()->optionExists('Test term reference', $term2->id());
+    $this->assertSession()->optionExists('Test term reference', '_none');
+    $this->assertTrue($this->assertSession()->optionExists('Test term reference', '_none')->isSelected());
   }
 
   /**

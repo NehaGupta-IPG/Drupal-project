@@ -33,9 +33,9 @@ class OptionsSelectWidget extends OptionsWidgetBase {
     $options = $this->getOptions($items->getEntity());
     $selected = $this->getSelectedOptions($items);
 
-    // If the selected option is empty and the field is required and the user
-    // has more than one option, add an option to force the user to choose.
-    if (!isset($options['_none']) && empty($selected) && $this->required && (count($options) > 1 || !$this->multiple)) {
+    // If the selected option is empty and the field is required, add an option
+    // to force the user to choose.
+    if (!isset($options['_none']) && empty($selected) && $this->required) {
       // Ensure there is an empty option if the widget needs one.
       $empty_label = $this->t('- Select a value -');
       $this->sanitizeLabel($empty_label);
