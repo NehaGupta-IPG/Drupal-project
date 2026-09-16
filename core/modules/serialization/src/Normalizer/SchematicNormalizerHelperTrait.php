@@ -41,19 +41,29 @@ trait SchematicNormalizerHelperTrait {
   /**
    * Adds JSON Schema annotations derived from the data definition.
    *
-   * JSON Schema annotation keywords such as "default" are derived from the
-   * data definition of the object being normalized. The default value is
-   * descriptive metadata only: it documents the value an instance is expected
-   * to take when none is supplied, and never constrains which values validate
-   * against the schema. Defaults which cannot be represented in JSON, such as
-   * objects which are neither scalar, array nor \Stringable, are skipped, at
-   * any depth of an array default.
+   * The JSON Schema annotation keywords "default" and "examples" are derived
+   * from the data definition of the object being normalized. Both are
+   * descriptive metadata only: they document the value an instance is expected
+   * to take when none is supplied, and values an instance may take, and never
+   * constrain which values validate against the schema.
    *
-   * A data definition declares its default value in the format accepted by
+   * Values which cannot be represented in JSON, such as objects which are
+   * neither scalar, array nor \Stringable, are not annotated. A default which
+   * cannot be represented is omitted entirely. An example which cannot be
+   * represented is omitted entirely as well, including when the value which
+   * cannot be represented is nested at any depth within an array example; the
+   * other examples are still annotated.
+   *
+   * A declared NULL default value is indistinguishable from no declared default
+   * value, so it is not annotated. A declared NULL example is annotated,
+   * because it documents that the data may legitimately have no value.
+   *
+   * A data definition declares its default value and its example values in the
+   * format accepted by
    * \Drupal\Core\TypedData\TypedDataInterface::setValue(), while the schema
-   * describes the normalization of that value. Only normalizers which leave
-   * that format unchanged may annotate the default value, otherwise the
-   * annotation would contradict the type the schema declares.
+   * describes the normalization of those values. Only normalizers which leave
+   * that format unchanged may annotate them, otherwise the annotations would
+   * contradict the type the schema declares.
    *
    * @param mixed $object
    *   Supported object or class/interface name being normalized.
@@ -70,26 +80,40 @@ trait SchematicNormalizerHelperTrait {
     if (!$object instanceof TypedDataInterface) {
       return $schema;
     }
-    $default = $object->getDataDefinition()->getDefault();
+    $data_definition = $object->getDataDefinition();
+    $default = $data_definition->getDefault();
     // A declared NULL default value is indistinguishable from no declared
     // default value, so there is nothing to annotate.
-    if ($default === NULL) {
-      return $schema;
+    if ($default !== NULL) {
+      try {
+        $schema['default'] = $this->castToJsonValue($default);
+      }
+      catch (\UnexpectedValueException) {
+        // Skip defaults which cannot be represented in JSON.
+      }
     }
-    try {
-      $schema['default'] = $this->castDefaultToJsonValue($default);
+    $examples = [];
+    foreach ($data_definition->getExamples() as $example) {
+      try {
+        $examples[] = $this->castToJsonValue($example);
+      }
+      catch (\UnexpectedValueException) {
+        // Drop individual examples which cannot be represented in JSON, so
+        // that the remaining examples are still annotated. Appending keeps the
+        // keys sequential, so dropping one still encodes as a JSON array.
+      }
     }
-    catch (\UnexpectedValueException) {
-      // Skip defaults which cannot be represented in JSON.
+    if ($examples !== []) {
+      $schema['examples'] = $examples;
     }
     return $schema;
   }
 
   /**
-   * Casts a declared default value to a value which can be encoded as JSON.
+   * Casts a declared value to a value which can be encoded as JSON.
    *
    * @param mixed $value
-   *   A declared default value, or a value nested within one.
+   *   A declared default or example value, or a value nested within one.
    *
    * @return array|string|int|float|bool|null
    *   The value, with \Stringable objects cast to strings.
@@ -97,21 +121,21 @@ trait SchematicNormalizerHelperTrait {
    * @throws \UnexpectedValueException
    *   Thrown when the value cannot be encoded as JSON.
    */
-  protected function castDefaultToJsonValue(mixed $value): array|string|int|float|bool|NULL {
+  protected function castToJsonValue(mixed $value): array|string|int|float|bool|NULL {
     if (is_array($value)) {
-      return array_map($this->castDefaultToJsonValue(...), $value);
+      return array_map($this->castToJsonValue(...), $value);
     }
     if ($value instanceof \Stringable) {
       $value = (string) $value;
     }
     if ($value !== NULL && !is_scalar($value)) {
-      throw new \UnexpectedValueException(sprintf('Default values of type %s cannot be encoded as JSON.', get_debug_type($value)));
+      throw new \UnexpectedValueException(sprintf('Values of type %s cannot be encoded as JSON.', get_debug_type($value)));
     }
     if (is_float($value) && !is_finite($value)) {
-      throw new \UnexpectedValueException('Non-finite float default values cannot be encoded as JSON.');
+      throw new \UnexpectedValueException('Non-finite float values cannot be encoded as JSON.');
     }
     if (is_string($value) && !mb_check_encoding($value, 'UTF-8')) {
-      throw new \UnexpectedValueException('Default values which are not valid UTF-8 cannot be encoded as JSON.');
+      throw new \UnexpectedValueException('Values which are not valid UTF-8 cannot be encoded as JSON.');
     }
     return $value;
   }

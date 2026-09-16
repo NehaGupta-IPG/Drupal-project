@@ -128,6 +128,81 @@ class TypedDataNormalizerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that declared example values are annotated on the JSON schema.
+   */
+  public function testNormalizeJsonSchemaExamples(): void {
+    $definition = DataDefinition::createFromDataType('string');
+    $definition->setExamples(['foo', 'bar']);
+
+    $schema = $this->normalizeWithDefinition($definition);
+    $this->assertSame(['foo', 'bar'], $schema['examples']);
+  }
+
+  /**
+   * Tests that no examples are annotated when the definition declares none.
+   */
+  public function testNormalizeJsonSchemaWithoutExamples(): void {
+    $schema = $this->normalizeWithDefinition(DataDefinition::createFromDataType('string'));
+    $this->assertArrayNotHasKey('examples', $schema);
+  }
+
+  /**
+   * Tests that an array example value is annotated at any depth.
+   */
+  public function testNormalizeJsonSchemaArrayExample(): void {
+    $definition = DataDefinition::createFromDataType('any');
+    $definition->setExamples([
+      [
+        'count' => 1,
+        'nested' => ['label' => new FormattableMarkup('@greeting world', ['@greeting' => 'Hello'])],
+      ],
+    ]);
+
+    $schema = $this->normalizeWithDefinition($definition);
+    $this->assertSame([['count' => 1, 'nested' => ['label' => 'Hello world']]], $schema['examples']);
+  }
+
+  /**
+   * Tests that an array example is dropped in full when a nested value fails.
+   */
+  public function testNormalizeJsonSchemaUnsupportedNestedExample(): void {
+    $definition = DataDefinition::createFromDataType('any');
+    $definition->setExamples([
+      'foo',
+      ['one' => 'representable', 'two' => ['three' => new \stdClass()]],
+      'bar',
+    ]);
+
+    $schema = $this->normalizeWithDefinition($definition);
+    $this->assertSame(['foo', 'bar'], $schema['examples']);
+    $this->assertIsString(json_encode($schema, JSON_THROW_ON_ERROR));
+  }
+
+  /**
+   * Tests that a default value and examples are annotated together.
+   */
+  public function testNormalizeJsonSchemaDefaultAndExamples(): void {
+    $definition = DataDefinition::createFromDataType('string');
+    $definition->setDefault('test')->setExamples(['foo', 'bar']);
+
+    $schema = $this->normalizeWithDefinition($definition);
+    $this->assertSame('test', $schema['default']);
+    $this->assertSame(['foo', 'bar'], $schema['examples']);
+  }
+
+  /**
+   * Tests that examples are annotated when the default cannot be encoded.
+   */
+  public function testNormalizeJsonSchemaUnsupportedDefaultWithExamples(): void {
+    $definition = DataDefinition::createFromDataType('any');
+    $definition->setDefault(new \stdClass())->setExamples(['foo', 'bar']);
+
+    $schema = $this->normalizeWithDefinition($definition);
+    $this->assertArrayNotHasKey('default', $schema);
+    $this->assertSame(['foo', 'bar'], $schema['examples']);
+  }
+
+  /**
    * Normalizes typed data with the given definition to its JSON schema.
    *
    * @param \Drupal\Core\TypedData\DataDefinition $definition

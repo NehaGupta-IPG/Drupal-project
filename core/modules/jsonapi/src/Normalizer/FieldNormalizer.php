@@ -124,9 +124,9 @@ class FieldNormalizer extends NormalizerBase implements DenormalizerInterface {
     $schema = $item_schema;
     if ($cardinality !== 1) {
       $schema['type'] = 'array';
-      // A default value annotated on the item describes a single item, not
-      // the list of items.
-      unset($schema['default']);
+      // Annotations on the item describe a single item, not the list of items,
+      // so the list schema must not carry them.
+      unset($schema['default'], $schema['examples']);
       if ($object->getFieldDefinition()->isRequired()) {
         $schema['minItems'] = 1;
       }

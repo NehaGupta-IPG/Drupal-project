@@ -110,6 +110,89 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that declared example values are annotated on the JSON schema.
+   */
+  public function testNormalizeJsonSchemaExamples(): void {
+    $definition = DataDefinition::createFromDataType('string');
+    $definition->setExamples(['foo', 'bar']);
+    $string = new StringData($definition, 'string');
+    $schema = $this->normalizer->normalize($string, 'json_schema');
+    $this->assertIsArray($schema);
+    $this->assertArrayHasKey('examples', $schema);
+    $this->assertSame(['foo', 'bar'], $schema['examples']);
+  }
+
+  /**
+   * Tests that no examples are annotated when the definition declares none.
+   */
+  public function testNormalizeJsonSchemaWithoutExamples(): void {
+    $definition = DataDefinition::createFromDataType('string');
+    $string = new StringData($definition, 'string');
+    $schema = $this->normalizer->normalize($string, 'json_schema');
+    $this->assertIsArray($schema);
+    $this->assertArrayNotHasKey('examples', $schema);
+
+    // An explicitly empty list of examples is the same as declaring none.
+    $definition = DataDefinition::createFromDataType('string');
+    $definition->setExamples([]);
+    $string = new StringData($definition, 'string');
+    $schema = $this->normalizer->normalize($string, 'json_schema');
+    $this->assertIsArray($schema);
+    $this->assertArrayNotHasKey('examples', $schema);
+  }
+
+  /**
+   * Tests that a Stringable example is cast to its string representation.
+   */
+  public function testNormalizeJsonSchemaStringableExample(): void {
+    $definition = DataDefinition::createFromDataType('string');
+    $definition->setExamples([new FormattableMarkup('@greeting world', ['@greeting' => 'Hello'])]);
+    $string = new StringData($definition, 'string');
+    $schema = $this->normalizer->normalize($string, 'json_schema');
+    $this->assertIsArray($schema);
+    $this->assertSame(['Hello world'], $schema['examples']);
+  }
+
+  /**
+   * Tests that examples which cannot be encoded as JSON are dropped.
+   */
+  public function testNormalizeJsonSchemaUnsupportedExample(): void {
+    $definition = DataDefinition::createFromDataType('string');
+    $definition->setExamples(['foo', new \stdClass(), 'bar']);
+    $string = new StringData($definition, 'string');
+    $schema = $this->normalizer->normalize($string, 'json_schema');
+    $this->assertIsArray($schema);
+    // The surviving examples keep sequential keys, so they still encode as a
+    // JSON array rather than an object.
+    $this->assertSame(['foo', 'bar'], $schema['examples']);
+  }
+
+  /**
+   * Tests that no examples are annotated when none can be encoded as JSON.
+   */
+  public function testNormalizeJsonSchemaAllExamplesUnsupported(): void {
+    $definition = DataDefinition::createFromDataType('string');
+    $definition->setExamples([new \stdClass(), NAN, "\xB1\x31"]);
+    $string = new StringData($definition, 'string');
+    $schema = $this->normalizer->normalize($string, 'json_schema');
+    $this->assertIsArray($schema);
+    $this->assertArrayNotHasKey('examples', $schema);
+    $this->assertIsString(json_encode($schema, JSON_THROW_ON_ERROR));
+  }
+
+  /**
+   * Tests that a NULL example survives, unlike a NULL default value.
+   */
+  public function testNormalizeJsonSchemaNullExample(): void {
+    $definition = DataDefinition::createFromDataType('string');
+    $definition->setExamples([NULL, 'foo']);
+    $string = new StringData($definition, 'string');
+    $schema = $this->normalizer->normalize($string, 'json_schema');
+    $this->assertIsArray($schema);
+    $this->assertSame([NULL, 'foo'], $schema['examples']);
+  }
+
+  /**
    * Data provider for testNormalize().
    */
   public static function dataProviderPrimitiveData(): array {
@@ -173,6 +256,10 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
     $with_default_definition->setDefault('default value');
     $with_default = new StringData($with_default_definition, 'string');
     $with_default->setValue('test');
+    $with_examples_definition = DataDefinition::createFromDataType('string');
+    $with_examples_definition->setExamples(['foo', 'bar']);
+    $with_examples = new StringData($with_examples_definition, 'string');
+    $with_examples->setValue('test');
 
     return [
       'email' => [$email],
@@ -181,6 +268,7 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
       'decimal' => [$decimal],
       'duration' => [$duration],
       'string with default' => [$with_default],
+      'string with examples' => [$with_examples],
       ...array_map(fn (array $value): array => [$value[0]], static::dataProviderPrimitiveData()),
     ];
   }
