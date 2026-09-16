@@ -11,8 +11,8 @@ use Drupal\Core\Entity\EntityDisplayPluginCollection;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\EntityDisplayBase;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\Element;
-use Drupal\Core\TypedData\TranslatableInterface as TranslatableDataInterface;
 
 /**
  * Configuration entity.
@@ -232,7 +232,10 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
    * {@inheritdoc}
    */
   public function build(FieldableEntityInterface $entity) {
-    $build = $this->buildMultiple([$entity]);
+    // @todo Add the $langcode parameter in Drupal 13.0.0. Declaring it now
+    //   would break subclasses that still use the old signature.
+    $langcode = func_get_args()[1] ?? NULL;
+    $build = $this->buildMultiple([$entity], $langcode);
     return $build[0];
   }
 
@@ -240,6 +243,9 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
    * {@inheritdoc}
    */
   public function buildMultiple(array $entities) {
+    // @todo Add the $langcode parameter in Drupal 13.0.0. Declaring it now
+    //   would break subclasses that still use the old signature.
+    $langcode = func_get_args()[1] ?? NULL;
     $build_list = [];
     foreach ($entities as $key => $entity) {
       $build_list[$key] = [];
@@ -260,21 +266,25 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
 
         // Then let the formatter build the output for each entity.
         foreach ($entities as $id => $entity) {
+          // An untranslated entity is not displayed in a language of its own,
+          // so its components follow the content language. Formatters that do
+          // not pass the language down yet hand over the entity language here,
+          // which is indistinguishable from asking for it.
+          // @todo Remove the fallback in Drupal 13.0.0, once formatters pass
+          //   the language down.
+          $view_langcode = $langcode;
+          if ($langcode !== NULL && $langcode === $entity->language()->getId() && count($entity->getTranslationLanguages()) === 1) {
+            $view_langcode = NULL;
+          }
           $items = $grouped_items[$id];
           /** @var \Drupal\Core\Access\AccessResultInterface $field_access */
           $field_access = $items->access('view', NULL, TRUE);
-          // The language of the field values to display is already determined
-          // in the incoming $entity. The formatter should build its output of
-          // those values using:
-          // - the entity language if the entity is translatable,
-          // - the current "content language" otherwise.
-          if ($entity instanceof TranslatableDataInterface && $entity->isTranslatable()) {
-            $view_langcode = $entity->language()->getId();
-          }
-          else {
-            $view_langcode = NULL;
-          }
           $build_list[$id][$name] = $field_access->isAllowed() ? $formatter->view($items, $view_langcode) : [];
+          if ($view_langcode === NULL && $field_access->isAllowed() && \Drupal::languageManager()->isMultilingual()) {
+            // The formatter defaulted to the negotiated content language.
+            // @see \Drupal\Core\Field\FormatterBase::view()
+            $build_list[$id][$name]['#cache']['contexts'][] = 'languages:' . LanguageInterface::TYPE_CONTENT;
+          }
           // Apply the field access cacheability metadata to the render array.
           $this->renderer->addCacheableDependency($build_list[$id][$name], $field_access);
         }

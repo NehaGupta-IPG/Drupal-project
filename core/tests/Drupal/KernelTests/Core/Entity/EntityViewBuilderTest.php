@@ -335,6 +335,117 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
   }
 
   /**
+   * Tests that references of an untranslated entity use the content language.
+   *
+   * The entity in the middle of the chain is untranslated, so it is displayed
+   * in its own language, while the entities it references are displayed in the
+   * content language.
+   *
+   * @see \Drupal\Core\Entity\Entity\EntityViewDisplay::buildMultiple()
+   */
+  public function testUntranslatedEntityReferenceLangcode(): void {
+    $this->setUpReferenceTranslationTest();
+    $referenced = $this->createReferencedTestEntity();
+
+    $untranslated = $this->createTestEntity('entity_test_mul');
+    $untranslated->set('ref_field', $referenced);
+    $untranslated->save();
+
+    $host = $this->createTestEntity('entity_test_mul');
+    $host->set('ref_field', $untranslated);
+    $host->addTranslation('fr');
+    $host->save();
+
+    \Drupal::service('language.default')->set(ConfigurableLanguage::load('fr'));
+    \Drupal::languageManager()->reset();
+
+    $build = $this->container->get('entity_type.manager')
+      ->getViewBuilder('entity_test_mul')
+      ->view($host, 'default', 'fr');
+    $rendered = (string) $this->container->get('renderer')->renderRoot($build);
+
+    $this->assertStringContainsString('FR referenced', $rendered);
+    $this->assertStringNotContainsString('EN referenced', $rendered);
+  }
+
+  /**
+   * Tests that references of a translated entity use the entity language.
+   *
+   * @see \Drupal\Core\Entity\Entity\EntityViewDisplay::buildMultiple()
+   */
+  public function testTranslatedEntityReferenceLangcode(): void {
+    $this->setUpReferenceTranslationTest();
+    $referenced = $this->createReferencedTestEntity();
+
+    $host = $this->createTestEntity('entity_test_mul');
+    $host->set('ref_field', $referenced);
+    $host->addTranslation('de');
+    $host->save();
+
+    \Drupal::service('language.default')->set(ConfigurableLanguage::load('fr'));
+    \Drupal::languageManager()->reset();
+
+    $view_builder = $this->container->get('entity_type.manager')->getViewBuilder('entity_test_mul');
+    $renderer = $this->container->get('renderer');
+
+    // The default translation is displayed in its own language, so the
+    // content language does not apply to the entities it references.
+    $build = $view_builder->view($host, 'default', 'en');
+    $rendered = (string) $renderer->renderRoot($build);
+    $this->assertStringContainsString('EN referenced', $rendered);
+    $this->assertStringNotContainsString('FR referenced', $rendered);
+
+    // The same goes for any other translation.
+    $build = $view_builder->view($host, 'default', 'de');
+    $rendered = (string) $renderer->renderRoot($build);
+    $this->assertStringContainsString('DE referenced', $rendered);
+    $this->assertStringNotContainsString('FR referenced', $rendered);
+  }
+
+  /**
+   * Tests that references are render cached per negotiated content language.
+   *
+   * The content language can be negotiated separately from the interface
+   * language, so an untranslated entity may display its references in a
+   * different language on each request.
+   *
+   * @see \Drupal\Core\Field\FormatterBase::view()
+   */
+  public function testUntranslatedEntityReferenceRenderCache(): void {
+    $this->setUpReferenceTranslationTest();
+    $referenced = $this->createReferencedTestEntity();
+
+    $entity = $this->createTestEntity('entity_test_mul');
+    $entity->set('ref_field', $referenced);
+    $entity->save();
+
+    // Negotiate the content language on its own, so that the interface
+    // language stays the site default.
+    $this->config('language.types')
+      ->set('configurable', ['language_content'])
+      ->set('negotiation.language_content.enabled', ['language-selected' => 0])
+      ->save();
+    $negotiator = $this->container->get('language_negotiator');
+    $negotiator->setCurrentUser($this->container->get('current_user'));
+    $this->container->get('language_manager')->setNegotiator($negotiator);
+
+    $storage = $this->container->get('entity_type.manager')->getStorage('entity_test_mul');
+    $view_builder = $this->container->get('entity_type.manager')->getViewBuilder('entity_test_mul');
+    $renderer = $this->container->get('renderer');
+
+    // Render in French, then in German, then in French again to also cover
+    // reading the first render back from the cache.
+    foreach (['fr', 'de', 'fr'] as $langcode) {
+      $this->config('language.negotiation')->set('selected_langcode', $langcode)->save();
+      $this->container->get('language_manager')->reset();
+      $storage->resetCache([$entity->id()]);
+      $build = $view_builder->view($storage->load($entity->id()), 'default');
+      $rendered = (string) $renderer->renderRoot($build);
+      $this->assertStringContainsString(strtoupper($langcode) . ' referenced', $rendered);
+    }
+  }
+
+  /**
    * Tests a view mode alter on an entity.
    */
   public function testHookEntityTypeViewModeAlter(): void {
@@ -411,6 +522,53 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
     $view = $this->container->get('entity_type.manager')->getViewBuilder('entity_test_external')->view($entity_test);
     $renderer->renderRoot($view);
     $this->assertArrayNotHasKey('#contextual_links', $view);
+  }
+
+  /**
+   * Sets up an untranslatable entity reference field and its display.
+   */
+  private function setUpReferenceTranslationTest(): void {
+    // Allow access to view entity translations.
+    Role::load(RoleInterface::ANONYMOUS_ID)
+      ->grantPermission('view test entity translations')
+      ->save();
+    $this->enableModules(['language', 'content_translation']);
+    $this->installEntitySchema('entity_test_mul');
+    ConfigurableLanguage::createFromLangcode('en')->save();
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    ConfigurableLanguage::createFromLangcode('de')->save();
+    $this->container->get('content_translation.manager')->setEnabled('entity_test_mul', 'entity_test_mul', TRUE);
+
+    $this->createEntityReferenceField('entity_test_mul', 'entity_test_mul', 'ref_field', 'Reference', 'entity_test_mul');
+    FieldConfig::loadByName('entity_test_mul', 'entity_test_mul', 'ref_field')
+      ->set('translatable', FALSE)
+      ->save();
+
+    EntityViewDisplay::create([
+      'targetEntityType' => 'entity_test_mul',
+      'bundle' => 'entity_test_mul',
+      'mode' => 'default',
+      'status' => TRUE,
+    ])
+      ->setComponent('ref_field', [
+        'type' => 'entity_reference_entity_view',
+        'settings' => ['view_mode' => 'default'],
+      ])
+      ->setComponent('name', ['type' => 'string', 'region' => 'content'])
+      ->save();
+  }
+
+  /**
+   * Creates a test entity translated in French and German.
+   */
+  private function createReferencedTestEntity(): EntityInterface {
+    $entity = $this->createTestEntity('entity_test_mul');
+    $entity->set('name', 'EN referenced');
+    $entity->addTranslation('fr', ['name' => 'FR referenced']);
+    $entity->addTranslation('de', ['name' => 'DE referenced']);
+    $entity->save();
+
+    return $entity;
   }
 
 }
