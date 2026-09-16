@@ -253,14 +253,18 @@ class ConfigManager implements ConfigManagerInterface {
     // dependencies on the config entity classes. Assume data with UUID is a
     // config entity. Only configuration entities can be depended on so we can
     // ignore everything else.
-    $data = array_map(function ($config) {
-      $data = $config->get();
-      if (isset($data['uuid'])) {
-        return $data;
+    $data = [];
+    $configurations = $this->configFactory
+      ->loadMultiple($this->activeStorage->listAll());
+
+    foreach ($configurations as $config_name => $config) {
+      $config_data = $config->get();
+      if (isset($config_data['uuid'])) {
+        $data[$config_name] = $config_data;
       }
-      return FALSE;
-    }, $this->configFactory->loadMultiple($this->activeStorage->listAll()));
-    $dependency_manager->setData(array_filter($data));
+    }
+
+    $dependency_manager->setData($data);
     return $dependency_manager;
   }
 
