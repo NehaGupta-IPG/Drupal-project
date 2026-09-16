@@ -111,6 +111,17 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
       return;
     }
 
+    try {
+      // Allow method if it is defined in an interface and the interface has
+      // the TwigAllowed attribute.
+      $prototype = $reflectionMethod->getPrototype();
+      if ($prototype->getDeclaringClass()->isInterface() && $prototype->getAttributes(TwigAllowed::class)) {
+        return;
+      }
+    }
+    catch (\ReflectionException) {
+    }
+
     throw new SecurityError(sprintf('Calling "%s" method on a "%s" object is not allowed.', $method, get_class($obj)));
   }
 
@@ -123,9 +134,6 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
   public static function getMethodsAllowedOnAllObjects(): array {
     return Settings::get('twig_sandbox_allowed_methods', [
       // Only allow idempotent methods.
-      'id',
-      'label',
-      'bundle',
       'get',
       '__toString',
       'toString',
