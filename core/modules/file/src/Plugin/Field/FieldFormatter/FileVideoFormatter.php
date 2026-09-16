@@ -170,10 +170,6 @@ class FileVideoFormatter extends FileMediaFormatterBase {
     $summary[] = $this->t('Muted: %muted', ['%muted' => $this->getSetting('muted') ? $this->t('yes') : $this->t('no')]);
     $summary[] = $this->t('Plays Inline: %playsinline', ['%playsinline' => $this->getSetting('playsinline') ? $this->t('yes') : $this->t('no')]);
 
-    $summary[] = $this->t('Size: %width x %height pixels', [
-      '%width' => $this->getSetting('width'),
-      '%height' => $this->getSetting('height'),
-    ]);
     if (!empty($this->getSetting('poster'))) {
       $summary[] = $this->t('Poster field: %poster', ['%poster' => $this->getSetting('poster')]);
       $summary[] = $this->t('Poster image style: %poster_image_style', ['%poster_image_style' => $this->getSetting('poster_image_style') ?: $this->t('None (original image)')]);
