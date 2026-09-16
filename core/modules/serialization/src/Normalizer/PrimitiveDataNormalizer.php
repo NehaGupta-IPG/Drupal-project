@@ -55,12 +55,13 @@ class PrimitiveDataNormalizer extends NormalizerBase {
    */
   public function getNormalizationSchema(mixed $object, array $context = []): array {
     $nullable = !$object instanceof TypedDataInterface || !$object->getDataDefinition()->isRequired();
-    return $this->getJsonSchemaForMethod(
+    $schema = $this->getJsonSchemaForMethod(
       $object,
       'getCastedValue',
       ['$comment' => 'Unable to provide schema, no type specified.'],
       $nullable,
     );
+    return $this->addDataDefinitionAnnotations($object, $schema);
   }
 
   /**
