@@ -128,28 +128,12 @@ interface DataDefinitionInterface {
    * \Drupal\Core\TypedData\TypedDataInterface::setValue() for the described
    * data.
    *
-   * A NULL return value is ambiguous: it can mean that no default value was
-   * declared, or that the declared default value is NULL. Use ::hasDefault()
-   * to tell these apart.
-   *
    * @return mixed
    *   The default value, or NULL if no default value was declared.
    *
-   * @see \Drupal\Core\TypedData\DataDefinitionInterface::hasDefault()
    * @see \Drupal\Core\TypedData\DataDefinition::setDefault()
    */
   public function getDefault(): mixed;
-
-  /**
-   * Determines whether a default value was declared.
-   *
-   * @return bool
-   *   TRUE if a default value was declared, even if that value is NULL. FALSE
-   *   otherwise.
-   *
-   * @see \Drupal\Core\TypedData\DataDefinitionInterface::getDefault()
-   */
-  public function hasDefault(): bool;
 
   /**
    * Returns the class used for creating the typed data object.

@@ -24,7 +24,6 @@ class DataDefinitionTest extends UnitTestCase {
    */
   public function testNoDefault(): void {
     $definition = DataDefinition::create('string');
-    $this->assertFalse($definition->hasDefault());
     $this->assertNull($definition->getDefault());
     $this->assertArrayNotHasKey('default', $definition->toArray());
   }
@@ -54,27 +53,25 @@ class DataDefinitionTest extends UnitTestCase {
   public function testSetDefault(mixed $value): void {
     $definition = DataDefinition::create('any');
     $this->assertSame($definition, $definition->setDefault($value));
-    $this->assertTrue($definition->hasDefault());
     $this->assertSame($value, $definition->getDefault());
     $this->assertArrayHasKey('default', $definition->toArray());
     $this->assertSame($value, $definition->toArray()['default']);
   }
 
   /**
-   * Tests that a declared NULL default value differs from no default value.
+   * Tests that ::getDefault() reads a NULL default value as no default value.
    */
   public function testNullDefault(): void {
     $definition = DataDefinition::create('string');
-    $this->assertFalse($definition->hasDefault());
-
     $definition->setDefault(NULL);
-    $this->assertTrue($definition->hasDefault());
     $this->assertNull($definition->getDefault());
+    // The declaration is still recorded in the definition array.
+    $this->assertArrayHasKey('default', $definition->toArray());
 
     // Setting NULL after another value does not remove the declaration.
     $definition->setDefault('foo')->setDefault(NULL);
-    $this->assertTrue($definition->hasDefault());
     $this->assertNull($definition->getDefault());
+    $this->assertArrayHasKey('default', $definition->toArray());
   }
 
   /**
@@ -82,12 +79,11 @@ class DataDefinitionTest extends UnitTestCase {
    */
   public function testDefaultFromConstructor(): void {
     $definition = new DataDefinition(['type' => 'string', 'default' => 'foo']);
-    $this->assertTrue($definition->hasDefault());
     $this->assertSame('foo', $definition->getDefault());
 
     $definition = new DataDefinition(['type' => 'string', 'default' => NULL]);
-    $this->assertTrue($definition->hasDefault());
     $this->assertNull($definition->getDefault());
+    $this->assertArrayHasKey('default', $definition->toArray());
   }
 
   /**
@@ -95,10 +91,10 @@ class DataDefinitionTest extends UnitTestCase {
    */
   public function testRemoveDefaultViaArrayAccess(): void {
     $definition = DataDefinition::create('string')->setDefault('foo');
-    $this->assertTrue($definition->hasDefault());
+    $this->assertSame('foo', $definition->getDefault());
     unset($definition['default']);
-    $this->assertFalse($definition->hasDefault());
     $this->assertNull($definition->getDefault());
+    $this->assertArrayNotHasKey('default', $definition->toArray());
   }
 
   /**
@@ -108,18 +104,16 @@ class DataDefinitionTest extends UnitTestCase {
     // Use the constructor directly, as ::create() needs the typed data manager.
     $list_definition = new ListDataDefinition([], DataDefinition::create('string'));
     $list_definition->setDefault(['a', 'b']);
-    $this->assertTrue($list_definition->hasDefault());
     $this->assertSame(['a', 'b'], $list_definition->getDefault());
     // The default value of a list is not propagated to its item definition.
-    $this->assertFalse($list_definition->getItemDefinition()->hasDefault());
+    $this->assertNull($list_definition->getItemDefinition()->getDefault());
 
     $map_definition = MapDataDefinition::create()
       ->setPropertyDefinition('one', DataDefinition::create('string')->setDefault('foo'))
       ->setPropertyDefinition('two', DataDefinition::create('string'));
-    $this->assertFalse($map_definition->hasDefault());
-    $this->assertTrue($map_definition->getPropertyDefinition('one')->hasDefault());
+    $this->assertNull($map_definition->getDefault());
     $this->assertSame('foo', $map_definition->getPropertyDefinition('one')->getDefault());
-    $this->assertFalse($map_definition->getPropertyDefinition('two')->hasDefault());
+    $this->assertNull($map_definition->getPropertyDefinition('two')->getDefault());
   }
 
   /**
@@ -128,7 +122,6 @@ class DataDefinitionTest extends UnitTestCase {
   public function testDefaultIsSerialized(): void {
     $definition = DataDefinition::create('string')->setDefault('foo');
     $unserialized = unserialize(serialize($definition));
-    $this->assertTrue($unserialized->hasDefault());
     $this->assertSame('foo', $unserialized->getDefault());
   }
 

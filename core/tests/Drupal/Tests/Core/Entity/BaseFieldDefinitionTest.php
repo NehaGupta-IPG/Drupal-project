@@ -201,7 +201,6 @@ class BaseFieldDefinitionTest extends UnitTestCase {
    * @legacy-covers ::setDefaultValue
    * @legacy-covers ::getDefaultValueLiteral
    * @legacy-covers ::getDefault
-   * @legacy-covers ::hasDefault
    * @legacy-covers ::setDefault
    */
   public function testFieldDefaultValueAndDataDefault(): void {
@@ -211,12 +210,10 @@ class BaseFieldDefinitionTest extends UnitTestCase {
     // A field default value does not declare a data definition default.
     $definition->setDefaultValue('foo');
     $this->assertEquals([['value' => 'foo']], $definition->getDefaultValueLiteral());
-    $this->assertFalse($definition->hasDefault());
     $this->assertNull($definition->getDefault());
 
     // A data definition default does not change the field default value.
     $definition->setDefault('bar');
-    $this->assertTrue($definition->hasDefault());
     $this->assertSame('bar', $definition->getDefault());
     $this->assertEquals([['value' => 'foo']], $definition->getDefaultValueLiteral());
   }

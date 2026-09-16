@@ -113,7 +113,6 @@ class TypedDataDefinitionTest extends KernelTestBase {
     // Creating typed data does not apply the declared default value.
     $data = $this->typedDataManager->create($definition);
     $this->assertNull($data->getValue());
-    $this->assertTrue($data->getDataDefinition()->hasDefault());
     $this->assertSame('foo', $data->getDataDefinition()->getDefault());
 
     // Neither does applying the default value of the typed data object.

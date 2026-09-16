@@ -636,14 +636,6 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * {@inheritdoc}
    */
-  public function hasDefault(): bool {
-    // Field configuration does not declare a data definition default value.
-    return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function isInternal() {
     // Respect the definition, otherwise default to TRUE for computed fields.
     if (isset($this->definition['internal'])) {

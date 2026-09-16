@@ -171,13 +171,6 @@ class BaseFieldOverride extends FieldConfigBase {
   /**
    * {@inheritdoc}
    */
-  public function hasDefault(): bool {
-    return $this->getBaseFieldDefinition()->hasDefault();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getClass() {
     return $this->getBaseFieldDefinition()->getClass();
   }

@@ -192,22 +192,13 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
   }
 
   /**
-   * {@inheritdoc}
-   *
-   * Note that reading a missing key via the BC-only array access, e.g.
-   * $definition['default'], creates that key with a NULL value and thus
-   * declares NULL as the default value. Use ::getDefault() instead.
-   */
-  public function hasDefault(): bool {
-    return array_key_exists('default', $this->definition);
-  }
-
-  /**
    * Sets the default value.
    *
    * This only records metadata about the data; it does not change the value of
-   * any typed data object. Passing NULL declares NULL as the default value. It
-   * does not remove a previously declared default value.
+   * any typed data object. As ::getDefault() returns NULL when no default
+   * value is declared, a declared NULL default value cannot be told apart
+   * from no declared default value by reading ::getDefault(). The definition
+   * array still records the declaration.
    *
    * @param mixed $value
    *   The default value.
@@ -216,7 +207,6 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    *   The object itself for chaining.
    *
    * @see \Drupal\Core\TypedData\DataDefinitionInterface::getDefault()
-   * @see \Drupal\Core\TypedData\DataDefinitionInterface::hasDefault()
    */
   public function setDefault(mixed $value): static {
     $this->definition['default'] = $value;
