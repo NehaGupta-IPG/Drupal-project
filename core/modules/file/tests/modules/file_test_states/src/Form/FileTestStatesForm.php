@@ -48,6 +48,22 @@ class FileTestStatesForm extends FormBase {
         'required'  => [':input[name="toggle"]' => ['checked' => TRUE]],
       ],
     ];
+    $form['details'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Details'),
+      '#open' => TRUE,
+    ];
+    $form['details']['managed_file_in_details'] = [
+      '#type' => 'managed_file',
+      '#title' => $this->t('Managed File In Details'),
+      '#states' => [
+        'visible' => [':input[name="toggle"]' => ['checked' => TRUE]],
+      ],
+    ];
+    $form['details']['textfield_in_details'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Textfield In Details'),
+    ];
     return $form;
   }
 

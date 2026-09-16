@@ -31,15 +31,15 @@ class FileManagedStateTest extends WebDriverTestBase {
   public function testFileStateVisible(): void {
     $this->drupalLogin($this->drupalCreateUser());
     $this->drupalGet('file-test-states-form');
-
-    // Wait until the page has fully loaded including the ajax load of the
-    // managed files.
     $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
 
-    // Now get the fields from the page.
     $field_initially_visible = $page->findField('files[managed_file_initially_visible]');
     $field_initially_hidden = $page->findField('files[managed_file_initially_hidden]');
     $field_initially_optional = $page->findField('files[managed_file_initially_optional]');
+    $field_in_details = $page->findField('files[managed_file_in_details]');
+    $textfield_in_details = $page->findField('textfield_in_details');
+    $required_label = 'label.form-required[for="edit-managed-file-initially-optional-upload"]';
 
     // Check that the initially visible managed file is visible.
     $this->assertTrue($field_initially_visible->isVisible());
@@ -47,8 +47,15 @@ class FileManagedStateTest extends WebDriverTestBase {
     // Check that the initially hidden managed file is hidden.
     $this->assertFalse($field_initially_hidden->isVisible());
 
-    // Check that the initially optional managed file is optional.
+    // Check that the initially optional managed file is optional and that its
+    // label has no required marker.
     $this->assertFalse($field_initially_optional->hasAttribute('required'));
+    $assert_session->elementNotExists('css', $required_label);
+
+    // Check that a hidden managed file inside a details element does not hide
+    // the details element or its other children.
+    $this->assertFalse($field_in_details->isVisible());
+    $this->assertTrue($textfield_in_details->isVisible());
 
     // Toggle the fields.
     $page->findField('toggle')->click();
@@ -59,8 +66,20 @@ class FileManagedStateTest extends WebDriverTestBase {
     // Check that the initially hidden managed file is now visible.
     $this->assertTrue($field_initially_hidden->isVisible());
 
-    // Check that the initially optional managed file is now required.
+    // Check that the initially optional managed file is now required and that
+    // its label has the required marker.
     $this->assertTrue($field_initially_optional->hasAttribute('required'));
+    $assert_session->elementExists('css', $required_label);
+
+    // Check that the managed file inside the details element is now visible
+    // and that the details element is unchanged.
+    $this->assertTrue($field_in_details->isVisible());
+    $this->assertTrue($textfield_in_details->isVisible());
+
+    // Toggle back and check the details element is still visible.
+    $page->findField('toggle')->click();
+    $this->assertFalse($field_in_details->isVisible());
+    $this->assertTrue($textfield_in_details->isVisible());
   }
 
 }

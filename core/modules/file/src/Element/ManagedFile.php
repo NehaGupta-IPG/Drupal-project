@@ -12,7 +12,6 @@ use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\FormElementBase;
 use Drupal\Core\Site\Settings;
-use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Symfony\Component\HttpFoundation\Request;
@@ -378,27 +377,22 @@ class ManagedFile extends FormElementBase {
       $element['upload']['#attached']['drupalSettings']['file']['elements']['#' . $id] = $extension_list;
     }
 
-    // Add states to ajax wrapper so states.js can potentially attach this
-    // element as a Dependent.
-    $attributes = new Attribute(['id' => $ajax_wrapper_id]);
-    if (isset($element['#states']) && !empty($element['#states'])) {
-      $attributes->offsetSet('data-drupal-states', json_encode($element['#states']));
-
-      // If we already have a file, we don't show the upload controls.
+    // The wrapper rendered by file_managed_file keeps #attributes, including
+    // data-drupal-states, so visibility states already apply to the whole
+    // element. The required state marks the label of the element that carries
+    // #states, so copy #states to the upload control, or to the file IDs
+    // element when a file is present and the upload control is not rendered.
+    if (!empty($element['#states'])) {
       if ($fids) {
-        // So let field label's 'for' correspond to element with file IDs.
-        $element['#id'] = &$element['fids']['#id'];
-        // And add states to this element.
         $element['fids']['#states'] = $element['#states'];
       }
       else {
-        // Add states to the file form element itself.
         $element['upload']['#states'] = $element['#states'];
       }
     }
 
     // Prefix and suffix used for Ajax replacement.
-    $element['#prefix'] = '<div' . $attributes . '>';
+    $element['#prefix'] = '<div id="' . $ajax_wrapper_id . '">';
     $element['#suffix'] = '</div>';
 
     return $element;
