@@ -20,7 +20,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Manages data type plugins.
  */
 class TypedDataManager extends DefaultPluginManager implements TypedDataManagerInterface {
-  use DependencySerializationTrait;
+  use DependencySerializationTrait {
+    __sleep as private dependencySerializationSleep;
+  }
 
   /**
    * The validator used for validating typed data.
@@ -37,11 +39,15 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
   protected $constraintManager;
 
   /**
-   * An array of typed data property prototypes.
+   * Typed data property prototypes, keyed by their data definition object.
    *
-   * @var array
+   * The map is created lazily and is never serialized, so it is nullable and
+   * must not be initialized in the constructor: a typed property that is
+   * excluded from __sleep() would stay uninitialized after unserialization.
+   *
+   * @var \WeakMap<\Drupal\Core\TypedData\DataDefinitionInterface, \Drupal\Core\TypedData\TypedDataInterface>|null
    */
-  protected $prototypes = [];
+  protected ?\WeakMap $prototypes = NULL;
 
   /**
    * The class resolver.
@@ -157,64 +163,64 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
    * {@inheritdoc}
    */
   public function getPropertyInstance(TypedDataInterface $object, $property_name, $value = NULL) {
-    // For performance, try to reuse existing prototypes instead of
-    // constructing new objects when possible. A prototype is reused when
-    // creating a data object:
-    // - for a similar root object (same data type and settings),
-    // - at the same property path under that root object.
-    $root_definition = $object->getRoot()->getDataDefinition();
-    // If the root object is a list, we want to look at the data type and the
-    // settings of its item definition.
-    if ($root_definition instanceof ListDataDefinition) {
-      $root_definition = $root_definition->getItemDefinition();
+    // Fetch the data definition for the child object from the parent.
+    if ($object instanceof ComplexDataInterface) {
+      $definition = $object->getDataDefinition()->getPropertyDefinition($property_name);
+    }
+    elseif ($object instanceof ListInterface) {
+      $definition = $object->getItemDefinition();
+    }
+    else {
+      throw new \InvalidArgumentException("The passed object has to either implement the ComplexDataInterface or the ListInterface.");
+    }
+    if (!$definition) {
+      throw new \InvalidArgumentException("Property $property_name is unknown.");
     }
 
-    // Root data type and settings.
-    $parts[] = $root_definition->getDataType();
-    if ($settings = $root_definition->getSettings()) {
-      // Include the settings serialized as JSON as part of the key. The JSON is
-      // a shorter string than the serialized form, so array access is faster.
-      $parts[] = json_encode($settings);
-    }
-    // Property path for the requested data object.
-    $parts[] = $object->getPropertyPath();
-    // Only property instances of complex data types should be cached by the
-    // property name, as they represent different properties. Properties of list
-    // data types are the items of the list and the property name represents
-    // only the delta in that list and not an unique property, which is why all
-    // items should use the same prototype.
-    if ($object instanceof ComplexDataInterface) {
-      $parts[] = $property_name;
-    }
-    $key = implode(':', $parts);
+    // For performance, try to reuse existing prototypes instead of
+    // constructing new objects when possible. A prototype is derived from the
+    // definition it was built from: create() takes the class from
+    // $definition->getClass(), and the name and parent passed below are wiped
+    // again by setContext(NULL, NULL). Prototypes are therefore keyed by the
+    // definition object itself, so that two distinct definition objects never
+    // share one.
+    //
+    // Any coarser key, such as the root data type plus the property path that
+    // this cache used previously, collides whenever two separately built
+    // definitions declare a same-named property of a different data type,
+    // class, settings or constraint set. The colliding lookup then returns an
+    // object of the wrong class, or one carrying constraints that belong to
+    // the other definition. Keying on the definition object also keeps the
+    // cache honest when a definition is rebuilt on purpose, for example by
+    // \Drupal\field\Entity\FieldConfigBase::setPropertyConstraints() or by
+    // ListDataDefinition::__clone().
+    //
+    // The trade-off is that a caller building a fresh definition object per
+    // instantiation no longer hits the cache, while the previous key merged
+    // such definitions onto a single prototype. Core builds property and item
+    // definitions once and memoizes them, so entity field access is
+    // unaffected.
+    //
+    // The prototypes are held in a \WeakMap so that each one is released
+    // together with the data definition it was built from, instead of growing
+    // an array that is only ever emptied by clearCachedDefinitions().
+    $this->prototypes ??= new \WeakMap();
+    $prototype = $this->prototypes[$definition] ?? NULL;
 
     // Create the prototype if needed.
-    if (!isset($this->prototypes[$key])) {
-      // Fetch the data definition for the child object from the parent.
-      if ($object instanceof ComplexDataInterface) {
-        $definition = $object->getDataDefinition()->getPropertyDefinition($property_name);
-      }
-      elseif ($object instanceof ListInterface) {
-        $definition = $object->getItemDefinition();
-      }
-      else {
-        throw new \InvalidArgumentException("The passed object has to either implement the ComplexDataInterface or the ListInterface.");
-      }
-      if (!$definition) {
-        throw new \InvalidArgumentException("Property $property_name is unknown.");
-      }
+    if ($prototype === NULL) {
       // Create the prototype without any value, but with initial parenting
       // so that constructors can set up the objects correctly.
       $prototype = $this->create($definition, NULL, $property_name, $object);
       // Unset the parent so that it is not statically cached within the
       // prototype. It will be set again later anyway.
       $prototype->setContext(NULL, NULL);
-      $this->prototypes[$key] = $prototype;
+      $this->prototypes[$definition] = $prototype;
     }
 
     // Clone the prototype, update its parenting information, and assign the
     // value.
-    $property = clone $this->prototypes[$key];
+    $property = clone $prototype;
     $property->setContext($property_name, $object);
     if (isset($value)) {
       $property->setValue($value, FALSE);
@@ -291,7 +297,17 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
    */
   public function clearCachedDefinitions() {
     parent::clearCachedDefinitions();
-    $this->prototypes = [];
+    $this->prototypes = new \WeakMap();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __sleep(): array {
+    // \WeakMap objects cannot be serialized, not even when they are empty. The
+    // prototypes are a cache, so they are dropped here and lazily rebuilt
+    // after unserialization.
+    return array_diff($this->dependencySerializationSleep(), ['prototypes']);
   }
 
   /**
