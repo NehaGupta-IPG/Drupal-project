@@ -589,14 +589,16 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_2', []);
 
-    // Test required entity reference field when default value is deleted.
+    // Test required entity reference field when selected value is deleted.
 
     // Create vocabulary and terms.
     $vocab = $this->createVocabulary();
     // Create some test terms.
     $term_to_delete = $this->createTerm($vocab);
-    $another_test_term = $this->createTerm($vocab, ['weight' => 1000]);
-    // Create the field and set as required.
+    $term2 = $this->createTerm($vocab, ['weight' => 100]);
+    $term3 = $this->createTerm($vocab, ['weight' => 1000]);
+
+    // Create a required unlimited-cardinality entity reference field.
     $field_name = mb_strtolower($this->randomMachineName());
     $handler_settings = [
       'target_bundles' => [
@@ -624,12 +626,24 @@ class OptionsWidgetsTest extends FieldTestBase {
     ]);
     $entity->save();
 
-    // Delete the $term_to_delete.
+    // Delete the selected term. Two options remain so _none should appear
+    // pre-selected.
     $term_to_delete->delete();
-
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->optionExists($field_name, $another_test_term->id());
+    $this->assertSession()->optionExists('Test term reference', $term2->id());
+    $this->assertSession()->optionExists('Test term reference', $term3->id());
+    $empty_option = $this->assertSession()->optionExists('Test term reference', '_none');
+    $this->assertTrue($empty_option->isSelected());
+    $this->assertSame('- Select a value -', $empty_option->getText());
+
+    // Delete term3 as well. Since there's only one option left _none should
+    // not appear.
+    $term3->delete();
+    $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertTrue($this->assertSession()->optionExists($field_name, $term2->id())->isSelected());
+    $this->assertSession()->optionNotExists($field_name, '_none');
   }
 
   /**

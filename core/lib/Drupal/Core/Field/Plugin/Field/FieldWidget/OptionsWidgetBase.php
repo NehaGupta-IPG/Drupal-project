@@ -50,9 +50,9 @@ abstract class OptionsWidgetBase extends WidgetBase {
   protected bool $has_value;
 
   /**
-   * The array of options for the widget, or NULL if not yet built.
+   * The array of options for the widget.
    */
-  protected ?array $options = NULL;
+  protected array $options;
 
   /**
    * {@inheritdoc}
