@@ -1152,6 +1152,7 @@ class ViewEditForm extends ViewFormBase {
     // Filters can now be grouped so we do a little bit extra:
     $groups = [];
     $grouping = FALSE;
+    $group_info = [];
     if ($type == 'filter') {
       $group_info = $executable->display_handler->getOption('filter_groups');
       // If there is only one group but it is using the "OR" filter, we still
