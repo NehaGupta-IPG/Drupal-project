@@ -107,4 +107,11 @@ export default defineConfig(
       },
     },
   },
+  {
+    files: ['tests/Drupal/Playwright/**/*.mjs'],
+    rules: {
+      'no-restricted-syntax': 'off',
+      'no-await-in-loop': 'off',
+    },
+  },
 );

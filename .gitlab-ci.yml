@@ -88,7 +88,7 @@ variables:
   POSTGRES_USER: drupaltestbot
   POSTGRES_PASSWORD: drupaltestbotpw
   SIMPLETEST_BASE_URL: http://localhost/subdirectory
-  MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome", "goog:chromeOptions":{"w3c": true, "args":["--no-sandbox","--ignore-certificate-errors", "--allow-insecure-localhost", "--headless", "--dns-prefetch-disable", "--disable-dev-shm-usage"]}}, "http://selenium:4444"]'
+  MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome", "goog:chromeOptions":{"w3c": true, "args":["--no-sandbox","--ignore-certificate-errors", "--allow-insecure-localhost", "--headless", "--dns-prefetch-disable", "--disable-dev-shm-usage"]}}, "${SELENIUM_REMOTE_URL}"]'
   SELENIUM_JAVA_OPTS: "-Dwebdriver.chrome.logfile=/builds/chromedriver.log"
   # Use local cache for yarn, see .yarn-install-from-cache.
   YARN_ENABLE_GLOBAL_CACHE: false
@@ -147,6 +147,7 @@ default:
     SE_SESSION_REQUEST_TIMEOUT: "60"
     SE_START_XVFB: "true"
     SE_START_VNC: "false"
+    SELENIUM_REMOTE_URL: "http://selenium:4444/"
 
 .default-job-settings-lint: &default-job-settings-lint
   rules:
@@ -362,6 +363,45 @@ default:
       - ./core/.yarn/cache
     policy: pull
 
+'🎭️ Playwright':
+  stage: ⚡️ Tests
+  <<: [*with-composer, *test-setup, *default-job-settings-lint]
+  retry: 1
+  variables:
+    KUBERNETES_CPU_REQUEST: "16"
+    # Playwright resolves reporter paths relative to the config file
+    # (core/tests/Drupal/Playwright/), not cwd — use an absolute path so
+    # artifacts at ./playwright_output match where files are written.
+    DRUPAL_PLAYWRIGHT_OUTPUT: $CI_PROJECT_DIR/playwright_output
+    SELENIUM_REMOTE_URL: "http://selenium:4444/"
+
+  services:
+    - <<: *with-database
+    - <<: *with-selenium-chrome
+  script:
+    - export DRUPAL_TEST_DB_URL=$SIMPLETEST_DB
+    - export DRUPAL_TEST_BASE_URL=$SIMPLETEST_BASE_URL
+    - cd core
+    - corepack enable
+    - yarn install --frozen-lockfile
+    - yarn test:playwright
+  # Clean the after_script from the test-setup include.
+  after_script: []
+  artifacts:
+    when: always
+    expire_in: 6 mos
+    reports:
+      junit: ./playwright_output/results.xml
+    paths:
+      - ./playwright_output
+  cache:
+    key:
+      files:
+        - ./core/package.json
+        - ./core/yarn.lock
+    paths:
+      - ./core/.yarn/cache
+    policy: pull
 
 '👷️️️ PHPUnit Build':
   <<: [ *with-composer, *test-setup ]
@@ -1077,3 +1117,4 @@ default:
     - if [ ! -f core/.stylelintcache ]; then exit 1; fi
     - if [ ! -f core/.phpcscache ]; then exit 1; fi
     - if [ ! -f core/.twigcsfixercache ]; then exit 1; fi
+

@@ -150,6 +150,35 @@ project. For example, if core is located under `docroot/core`, then you could
 run `yarn add babel-preset-env` inside `docroot`, then copy the babel settings
 from `docroot/core/package.json` into `docroot/package.json`.
 
+## Running Playwright tests
+
+Playwright is a modern browser automation framework that can be used as an
+alternative to Nightwatch for end-to-end testing.
+
+### Setup
+
+* Ensure your vendor directory is populated (e.g. by running `composer install`)
+* Install [Node.js](https://nodejs.org/en/download/) and
+  [yarn](https://yarnpkg.com/en/docs/install). The versions required are
+  specified inside core/package.json in the `engines` field.
+* Inside the `core` folder, run `yarn install`
+* Install Playwright browsers: `yarn playwright install --with-deps chromium`
+* Configure settings by copying `.env.example` to `.env` and editing as
+  necessary.
+
+### Running tests
+
+* Inside the `core` folder, run `yarn test:playwright` to run all Playwright
+  tests. By default, this will output to `core/tests/Drupal/Playwright/reports`.
+* To run a specific test by name:
+  `yarn test:playwright --grep "Test login"`
+* To run a single test file:
+  `yarn test:playwright tests/Drupal/Playwright/Tests/loginTest.spec.js`
+* To run with trace recording for debugging:
+  `yarn test:playwright --trace on`
+* To view the HTML report after a test run:
+  `yarn playwright show-report tests/Drupal/Playwright/reports`
+
 ## Troubleshooting test running
 
 If you run into file permission problems while running tests, you may need to
