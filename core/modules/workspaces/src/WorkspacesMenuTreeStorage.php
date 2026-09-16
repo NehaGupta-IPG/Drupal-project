@@ -8,6 +8,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorage as CoreMenuTreeStorage;
+use Drupal\Core\Routing\RouteProviderInterface;
 
 /**
  * Overrides the default menu storage to provide workspace-specific menu links.
@@ -33,6 +34,8 @@ class WorkspacesMenuTreeStorage extends CoreMenuTreeStorage {
    *   The cache tags invalidator.
    * @param string $table
    *   A database table name to store configuration data in.
+   * @param \Drupal\Core\Routing\RouteProviderInterface|array|null $routeProvider
+   *   Route provider.
    * @param array $options
    *   (optional) Any additional database connection options to use in queries.
    */
@@ -44,9 +47,10 @@ class WorkspacesMenuTreeStorage extends CoreMenuTreeStorage {
     CacheBackendInterface $menu_cache_backend,
     CacheTagsInvalidatorInterface $cache_tags_invalidator,
     string $table,
+    protected RouteProviderInterface|array|null $routeProvider = NULL,
     array $options = [],
   ) {
-    parent::__construct($connection, $menu_cache_backend, $cache_tags_invalidator, $table, $options);
+    parent::__construct($connection, $menu_cache_backend, $cache_tags_invalidator, $table, $this->routeProvider, $options);
   }
 
   /**
