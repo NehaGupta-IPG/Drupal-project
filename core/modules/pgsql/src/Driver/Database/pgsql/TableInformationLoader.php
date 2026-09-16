@@ -46,7 +46,7 @@ LEFT JOIN pg_attrdef ON pg_attrdef.adrelid = pg_attribute.attrelid AND pg_attrde
 WHERE pg_attribute.attnum > 0
 AND NOT pg_attribute.attisdropped
 AND (format_type(pg_attribute.atttypid, pg_attribute.atttypmod) = 'bytea'
-OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid) LIKE 'nextval%')
+OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid)::text LIKE 'nextval%')
 EOD;
 
   /**

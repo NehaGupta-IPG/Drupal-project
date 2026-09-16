@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Database\Database;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\Url;
@@ -16,7 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore TÉXT Pácê
 /**
- * Tests the file_save_upload() function.
+ * Tests the FormFileUploader::saveFormUploadedFiles() function.
  */
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
@@ -111,7 +110,7 @@ class SaveUploadTest extends FileManagedTestBase {
   }
 
   /**
-   * Tests the file_save_upload() function.
+   * Tests the FormFileUploader::saveFormUploadedFiles() function.
    */
   public function testNormal(): void {
     $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
@@ -211,7 +210,7 @@ class SaveUploadTest extends FileManagedTestBase {
     // The file being tested is a .gif which is in the default safe list
     // of extensions to allow when the extension validator isn't used. This is
     // implicitly tested at the testNormal() test. Here we tell
-    // file_save_upload() to only allow ".foo".
+    // FormFileUploader::saveFormUploadedFiles() to only allow ".foo".
     $extensions = 'foo';
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
@@ -232,7 +231,7 @@ class SaveUploadTest extends FileManagedTestBase {
     FileTestHelper::reset();
 
     $extensions = 'foo ' . $this->imageExtension;
-    // Now tell file_save_upload() to allow the extension of our test image.
+    // Now tell FormFileUploader::saveFormUploadedFiles() to allow the extension of our test image.
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
       'files[file_test_upload]' => \Drupal::service('file_system')->realpath($this->image->getFileUri()),
@@ -251,7 +250,7 @@ class SaveUploadTest extends FileManagedTestBase {
     // Reset the hook counters.
     FileTestHelper::reset();
 
-    // Now tell file_save_upload() to allow any extension.
+    // Now tell FormFileUploader::saveFormUploadedFiles() to allow any extension.
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
       'files[file_test_upload]' => \Drupal::service('file_system')->realpath($this->image->getFileUri()),
@@ -269,7 +268,7 @@ class SaveUploadTest extends FileManagedTestBase {
     // Reset the hook counters.
     FileTestHelper::reset();
 
-    // Now tell file_save_upload() to allow any extension and try and upload a
+    // Now tell FormFileUploader::saveFormUploadedFiles() to allow any extension and try and upload a
     // malicious file.
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
@@ -709,7 +708,7 @@ class SaveUploadTest extends FileManagedTestBase {
   }
 
   /**
-   * Tests that filenames containing invalid UTF-8 are rejected.
+   * Tests that invalid UTF-8 in a filename is replaced rather than rejected.
    */
   public function testInvalidUtf8FilenameUpload(): void {
     $this->drupalGet('file-test/upload');
@@ -758,14 +757,17 @@ class SaveUploadTest extends FileManagedTestBase {
 
     $content = (string) $response->getBody();
     $this->htmlOutput($content);
-    $error_text = 'The file <em class="placeholder">' . Html::escape($filename) . '</em> could not be uploaded because the name is invalid.';
-    $this->assertStringContainsString($error_text, $content);
-    $this->assertStringContainsString('Epic upload FAIL!', $content);
+    // The invalid byte is replaced with the configured replacement character,
+    // so the upload succeeds rather than failing with a confusing message.
+    $this->assertStringContainsString('You WIN!', $content);
+    $this->assertStringContainsString('File name is x-xx.gif.', $content);
+    $this->assertStringNotContainsString('Epic upload FAIL!', $content);
+    $this->assertFileExists('temporary://x-xx.gif');
     $this->assertFileDoesNotExist('temporary://' . $filename);
   }
 
   /**
-   * Tests the file_save_upload() function when the field is required.
+   * Tests the FormFileUploader::saveFormUploadedFiles() function when the field is required.
    */
   public function testRequired(): void {
     // Reset the hook counters to get rid of the 'load' we just called.

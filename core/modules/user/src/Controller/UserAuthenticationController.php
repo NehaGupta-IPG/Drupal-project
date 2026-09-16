@@ -7,6 +7,8 @@ use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\user\LoginFinalizer;
+use Drupal\user\LogoutFinalizer;
 use Drupal\user\NotificationHandler;
 use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserFloodControlInterface;
@@ -97,11 +99,6 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    */
   protected $logger;
 
-  /**
-   * The user notification handler.
-   */
-  protected readonly NotificationHandler $notificationHandler;
-
   public function __construct(
     UserFloodControlInterface $user_flood_control,
     UserStorageInterface $user_storage,
@@ -111,7 +108,9 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
     Serializer $serializer,
     array $serializer_formats,
     LoggerInterface $logger,
-    ?NotificationHandler $notification_handler = NULL,
+    protected LoginFinalizer $loginFinalizer,
+    protected LogoutFinalizer $logoutFinalizer,
+    protected readonly NotificationHandler $notificationHandler,
   ) {
     $this->userFloodControl = $user_flood_control;
     $this->userStorage = $user_storage;
@@ -121,10 +120,6 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
     $this->serializerFormats = $serializer_formats;
     $this->routeProvider = $route_provider;
     $this->logger = $logger;
-    if ($notification_handler === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $notificationHandler argument is deprecated in drupal:11.5.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3539363', E_USER_DEPRECATED);
-    }
-    $this->notificationHandler = $notification_handler ?? \Drupal::service(NotificationHandler::class);
   }
 
   /**
@@ -150,6 +145,8 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       $serializer,
       $formats,
       $container->get('logger.factory')->get('user'),
+      $container->get(LoginFinalizer::class),
+      $container->get(LogoutFinalizer::class),
       $container->get(NotificationHandler::class),
     );
   }
@@ -309,7 +306,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    *   The user.
    */
   protected function userLoginFinalize(UserInterface $user) {
-    user_login_finalize($user);
+    $this->loginFinalizer->finalizeLogin($user);
   }
 
   /**
@@ -337,7 +334,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * Logs the user out.
    */
   protected function userLogout() {
-    user_logout();
+    $this->logoutFinalizer->finalizeLogout();
   }
 
   /**

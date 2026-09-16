@@ -16,23 +16,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class RegisterForm extends AccountForm {
 
-  /**
-   * The user notification handler.
-   */
-  protected NotificationHandler $notificationHandler;
-
   public function __construct(
     EntityRepositoryInterface $entity_repository,
     LanguageManagerInterface $language_manager,
     EntityTypeBundleInfoInterface $entity_type_bundle_info,
     TimeInterface $time,
-    ?NotificationHandler $notification_handler = NULL,
+    protected LoginFinalizer $loginFinalizer,
+    protected NotificationHandler $notificationHandler,
   ) {
     parent::__construct($entity_repository, $language_manager, $entity_type_bundle_info, $time);
-    if ($notification_handler === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $notificationHandler argument is deprecated in drupal:11.5.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3539363', E_USER_DEPRECATED);
-    }
-    $this->notificationHandler = $notification_handler ?? \Drupal::service(NotificationHandler::class);
   }
 
   /**
@@ -44,6 +36,7 @@ class RegisterForm extends AccountForm {
       $container->get(LanguageManagerInterface::class),
       $container->get(EntityTypeBundleInfoInterface::class),
       $container->get(TimeInterface::class),
+      $container->get(LoginFinalizer::class),
       $container->get(NotificationHandler::class),
     );
   }
@@ -156,7 +149,7 @@ class RegisterForm extends AccountForm {
     // No email verification required; log in user immediately.
     elseif (!$admin && !\Drupal::config('user.settings')->get('verify_mail') && $account->isActive()) {
       $this->notificationHandler->sendRegisterNoApprovalRequired($account);
-      user_login_finalize($account);
+      $this->loginFinalizer->finalizeLogin($account);
       $this->messenger()->addStatus($this->t('Registration successful. You are now logged in.'));
       $form_state->setRedirect('<front>');
     }

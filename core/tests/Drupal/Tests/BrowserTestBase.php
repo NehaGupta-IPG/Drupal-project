@@ -74,10 +74,8 @@ abstract class BrowserTestBase extends DrupalTestCase {
 
   /**
    * Time limit in seconds for the test.
-   *
-   * @var int
    */
-  protected $timeLimit = 500;
+  protected int $timeLimit = 500;
 
 
   /**
@@ -124,9 +122,9 @@ abstract class BrowserTestBase extends DrupalTestCase {
    *
    * Value can be overridden using the environment variable MINK_DRIVER_CLASS.
    *
-   * @var string
+   * @var class-string<\Behat\Mink\Driver\DriverInterface>
    */
-  protected $minkDefaultDriverClass = BrowserKitDriver::class;
+  protected string $minkDefaultDriverClass = BrowserKitDriver::class;
 
   /**
    * Mink default driver params.
@@ -146,10 +144,8 @@ abstract class BrowserTestBase extends DrupalTestCase {
    * Mink session manager.
    *
    * This will not be initialized if there was an error during the test setup.
-   *
-   * @var \Behat\Mink\Mink|null
    */
-  protected $mink;
+  protected ?Mink $mink;
 
   /**
    * The base URL.
@@ -183,6 +179,8 @@ abstract class BrowserTestBase extends DrupalTestCase {
 
       // Inject a Guzzle middleware to generate debug output for every request
       // performed in the test.
+      // Getting the handler via ::getConfig is discouraged, see
+      // https://github.com/guzzle/guzzle/issues/3114.
       $handler_stack = $client->getConfig('handler');
       $handler_stack->push($this->getResponseLogHandler());
 
@@ -390,7 +388,7 @@ abstract class BrowserTestBase extends DrupalTestCase {
   protected function tearDown(): void {
     // Close any mink sessions as early as possible to free a new browser
     // session up for the next test method or test.
-    if ($this->mink) {
+    if (isset($this->mink)) {
       $this->mink->stopSessions();
     }
     parent::tearDown();
@@ -541,8 +539,35 @@ abstract class BrowserTestBase extends DrupalTestCase {
    *
    * @return \Behat\Mink\Element\NodeElement[]
    *   The list of elements matching the xpath expression.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+   *   BrowserTestBase::getNodeElementsByXpath instead.
+   *
+   * @see https://www.drupal.org/node/3589621
    */
   protected function xpath($xpath, array $arguments = []) {
+    @trigger_error(__CLASS__ . "::" . __FUNCTION__ . " is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use BrowserTestBase::getNodeElementsByXpath instead. See https://www.drupal.org/node/3589621", E_USER_DEPRECATED);
+    return $this->getNodeElementsByXpath($xpath, $arguments);
+  }
+
+  /**
+   * Performs an xpath search on the contents of the internal browser.
+   *
+   * The search is relative to the root element (HTML tag normally) of the page.
+   *
+   * @param string $xpath
+   *   The xpath string to use in the search.
+   * @param array $arguments
+   *   An array of arguments with keys in the form ':name' matching the
+   *   placeholders in the query. The values may be either strings or numeric
+   *   values.
+   *
+   * @return \Behat\Mink\Element\NodeElement[]
+   *   The list of elements matching the xpath expression.
+   *
+   * @todo should we use DrupalTestCaseTrait to avoid duplication?
+   */
+  protected function getNodeElementsByXpath($xpath, array $arguments = []): array {
     $xpath = $this->assertSession()->buildXPathQuery($xpath, $arguments);
     return $this->getSession()->getPage()->findAll('xpath', $xpath);
   }
@@ -567,7 +592,7 @@ abstract class BrowserTestBase extends DrupalTestCase {
    *   The JSON decoded drupalSettings value from the current page.
    */
   protected function getDrupalSettings() {
-    if ($elements = $this->xpath('//script[@type="application/json" and @data-drupal-selector="drupal-settings-json"]')) {
+    if ($elements = $this->getNodeElementsByXpath('//script[@type="application/json" and @data-drupal-selector="drupal-settings-json"]')) {
       $settings = Json::decode($elements[0]->getText());
       if (isset($settings['ajaxPageState']['libraries'])) {
         $settings['ajaxPageState']['libraries'] = UrlHelper::uncompressQueryParameter($settings['ajaxPageState']['libraries']);
