@@ -112,7 +112,6 @@ createuser
 crossout
 crème
 csrftoken
-csslintrc
 csstools
 cweagans
 datelist
@@ -125,6 +124,7 @@ defgroup
 delayable
 deletedline
 delsp
+demi
 denormalizable
 denormalizer
 denormalizers
@@ -148,6 +148,7 @@ dragtable
 drillable
 dropbutton
 dropbuttons
+dtcg
 editables
 egulias
 elbonia
@@ -195,6 +196,7 @@ fodt
 fouc
 fourcol
 francais
+franken
 français
 fraîche
 frontpage
