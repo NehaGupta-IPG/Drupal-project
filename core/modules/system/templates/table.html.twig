@@ -17,6 +17,7 @@
  *   - content: A localized string for the title of the column.
  *   - field: Field name (required for column sorting).
  *   - sort: Default sort order for this column ("asc" or "desc").
+ * - header_row_attributes: HTML attributes to apply to the <tr> inside <thead>.
  * - sticky: A flag indicating whether to use a "sticky" table header.
  * - rows: Table rows. Each row contains the following properties:
  *   - attributes: HTML attributes to apply to the <tr> tag.
@@ -62,7 +63,7 @@
 
   {% if header %}
     <thead>
-      <tr>
+      <tr{{ header_row_attributes }}>
         {% for cell in header %}
           <{{ cell.tag }}{{ cell.attributes }}>
             {{- cell.content -}}
