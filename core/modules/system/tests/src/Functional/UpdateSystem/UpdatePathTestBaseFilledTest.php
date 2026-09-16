@@ -357,7 +357,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
 
     // Make sure our themes are still enabled.
     $expected_enabled_themes = [
-      'olivero',
       'claro',
       'stark',
     ];
