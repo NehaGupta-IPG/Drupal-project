@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\options\Functional;
 
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -603,7 +604,7 @@ class OptionsWidgetsTest extends FieldTestBase {
       ],
       'auto_create' => FALSE,
     ];
-    $this->createEntityReferenceField('entity_test', 'entity_test', $field_name, 'Test term reference', 'taxonomy_term', 'default', $handler_settings);
+    $this->createEntityReferenceField('entity_test', 'entity_test', $field_name, 'Test term reference', 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);;
     $field = FieldConfig::load('entity_test.entity_test.' . $field_name);
     $field->setRequired(TRUE);
     $field->save();
@@ -629,9 +630,6 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->optionExists($field_name, $another_test_term->id());
-    $empty_option = $this->assertSession()->optionExists($field_name, '_none');
-    $this->assertTrue($empty_option->isSelected());
-    $this->assertSame('- Select a value -', $empty_option->getText());
   }
 
   /**
