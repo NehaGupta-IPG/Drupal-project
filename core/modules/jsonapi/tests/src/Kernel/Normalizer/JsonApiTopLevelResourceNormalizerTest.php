@@ -63,6 +63,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     'filter',
     'user',
     'image',
+    'jsonapi_write',
     'jsonapi_test_normalizers_kernel',
     'jsonapi_test_resource_type_building',
   ];

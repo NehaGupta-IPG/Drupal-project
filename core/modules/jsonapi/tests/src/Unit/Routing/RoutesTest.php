@@ -10,6 +10,7 @@ use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeRelationship;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepository;
 use Drupal\jsonapi\Routing\Routes;
+use Drupal\jsonapi_write\Routing\WriteRoutes;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -22,6 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  */
 #[CoversClass(Routes::class)]
+#[CoversClass(WriteRoutes::class)]
 #[Group('jsonapi')]
 class RoutesTest extends UnitTestCase {
 
@@ -67,6 +69,7 @@ class RoutesTest extends UnitTestCase {
     ]);
 
     $this->routes['ok'] = Routes::create($container->reveal());
+    $this->routes['write'] = WriteRoutes::create($container->reveal());
   }
 
   /**
@@ -76,16 +79,28 @@ class RoutesTest extends UnitTestCase {
     // Get the route collection and start making assertions.
     $routes = $this->routes['ok']->routes();
 
-    // - 2 collection routes; GET & POST for the non-internal resource type.
-    // - 3 individual routes; GET, PATCH & DELETE for the non-internal resource
-    //   type.
+    // - 1 collection route; GET for the non-internal resource type.
+    // - 1 individual route; GET for the non-internal resource type.
     // - 2 related routes; GET for the non-internal resource type relationships
     //   fields: external & both.
-    // - 12 relationship routes; 3 fields * 4 HTTP methods.
+    // - 3 relationship routes; GET for each field.
     //   `relationship` routes are generated even for internal target resource
     //   types (`related` routes are not).
     // - 1 for the JSON:API entry point.
-    $this->assertEquals(20, $routes->count());
+    $this->assertCount(8, $routes);
+    foreach ($routes as $route) {
+      $this->assertSame(['GET'], $route->getMethods());
+    }
+
+    // Write routes belong exclusively to the JSON:API Write submodule.
+    $write_routes = $this->routes['write']->routes();
+    $this->assertCount(12, $write_routes);
+    foreach ($write_routes as $name => $route) {
+      $this->assertNull($routes->get($name));
+      $this->assertContains($route->getMethods(), [['POST'], ['PATCH'], ['DELETE']]);
+      $this->assertSame('TRUE', $route->getRequirement('_csrf_request_header_token'));
+      $this->assertSame('api_json', $route->getRequirement('_content_type_format'));
+    }
 
     $iterator = $routes->getIterator();
     // Check the collection route.
@@ -97,6 +112,7 @@ class RoutesTest extends UnitTestCase {
     $this->assertEquals(['GET'], $route->getMethods());
     $this->assertSame(Routes::CONTROLLER_SERVICE_NAME . ':getCollection', $route->getDefault(RouteObjectInterface::CONTROLLER_NAME));
     // Check the collection POST route.
+    $iterator = $write_routes->getIterator();
     $route = $iterator->offsetGet('jsonapi.entity_type_1--bundle_1_1.collection.post');
     $this->assertSame('/jsonapi/entity_type_1/bundle_1_1', $route->getPath());
     $this->assertSame(['lorem', 'ipsum'], $route->getOption('_auth'));
@@ -125,6 +141,7 @@ class RoutesTest extends UnitTestCase {
       'resource_type' => ['type' => 'jsonapi_resource_type'],
     ], $route->getOption('parameters'));
 
+    $iterator = $this->routes['write']->routes()->getIterator();
     $route = $iterator->offsetGet('jsonapi.entity_type_1--bundle_1_1.individual.patch');
     $this->assertSame('/jsonapi/entity_type_1/bundle_1_1/{entity}', $route->getPath());
     $this->assertSame('entity_type_1--bundle_1_1', $route->getDefault(Routes::RESOURCE_TYPE_KEY));
@@ -195,7 +212,9 @@ class RoutesTest extends UnitTestCase {
    */
   #[DataProvider('expectedRoutes')]
   public function testRoutes(string $route): void {
-    $this->assertArrayHasKey($route, $this->routes['ok']->routes()->all());
+    $routes = $this->routes['ok']->routes();
+    $routes->addCollection($this->routes['write']->routes());
+    $this->assertArrayHasKey($route, $routes->all());
   }
 
   /**
@@ -229,6 +248,7 @@ class RoutesTest extends UnitTestCase {
   #[DataProvider('notExpectedRoutes')]
   public function testInternalRoutes(string $route): void {
     $this->assertArrayNotHasKey($route, $this->routes['ok']->routes()->all());
+    $this->assertArrayNotHasKey($route, $this->routes['write']->routes()->all());
   }
 
   /**
