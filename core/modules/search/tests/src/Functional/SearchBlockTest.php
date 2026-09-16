@@ -142,6 +142,11 @@ class SearchBlockTest extends BrowserTestBase {
     $this->submitForm(['keys' => $this->randomMachineName()], 'Search', 'search-form');
     $this->assertSession()->statusMessageNotContains('You must include at least one keyword to match in the content');
 
+    // Make sure the search form on the search page and the search form in the
+    // search block don't generate duplicate HTML ID's.
+    $this->drupalGet('search');
+    $this->assertSession()->pageContainsNoDuplicateId();
+
     // Edit the block configuration so that it searches users instead of nodes,
     // and test.
     $this->drupalGet('admin/structure/block/manage/' . $block->id());
