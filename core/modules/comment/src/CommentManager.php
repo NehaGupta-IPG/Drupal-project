@@ -148,9 +148,9 @@ class CommentManager implements CommentManagerInterface {
     // We only output a link if we are certain that users will get the
     // permission to post comments by logging in, so check 'create' access for
     // authenticated user using CommentAccessControlHandler (proxying over
-    // field). Simulate authenticated user by creating a dummy user session
-    // with uid = '-1', which is actually not valid, but avoid real user
-    // access cache.
+    // field). Simulate an authenticated user by creating a dummy user session
+    // with uid = '-1', which is actually not valid but avoids real user access
+    // cache.
     $dummy_authenticated_user = new UserSession([
       'uid' => -1,
       'roles' => [

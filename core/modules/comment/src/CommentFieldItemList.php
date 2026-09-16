@@ -58,7 +58,7 @@ class CommentFieldItemList extends FieldItemList {
       // this field is considered a composition of listed comments and comment
       // form. The decision to show only comments, only comment form or both
       // will be made by CommentDefaultFormatter::viewElements() later. Uses
-      // recursive calls on same method invoking lower operations.
+      // recursive calls on the same method invoking lower operations.
       $result = $this->access('view comment list', $account, TRUE);
       if (!$result->isAllowed()) {
         $result = $result->orIf($this->access('create', $account, TRUE));

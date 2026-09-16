@@ -38,6 +38,7 @@ class CommentCreationAccessTest extends KernelTestBase {
     'comment_test',
     'entity_test',
     'field',
+    'filter',
     'system',
     'text',
     'user',
@@ -139,7 +140,7 @@ class CommentCreationAccessTest extends KernelTestBase {
    * Tests that createAccess() without context skips the static cache.
    *
    * When no commented_entity is in context, buildCreateAccessCid() must return
-   * NULL so createAccess() bypasses caching. Otherwise, the ambiguous CID
+   * NULL, so createAccess() bypasses caching. Otherwise, the ambiguous CID
    * "create:comment:0" would be shared across all context-less calls and could
    * serve stale results for the wrong entity.
    */
