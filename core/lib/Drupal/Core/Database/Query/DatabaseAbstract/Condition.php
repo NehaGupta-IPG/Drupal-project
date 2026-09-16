@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Core\Database\Query;
+namespace Drupal\Core\Database\Query\DatabaseAbstract;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Expression;
@@ -9,7 +9,7 @@ use Drupal\Core\Database\InvalidQueryException;
 /**
  * Generic class for a series of conditions in a query.
  */
-class DatabaseAbstractCondition implements ConditionInterface, \Countable {
+class Condition implements \Countable {
 
   /**
    * Provides a map of condition operators to condition operator options.

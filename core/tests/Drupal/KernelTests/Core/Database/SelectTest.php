@@ -7,7 +7,7 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\InvalidQueryException;
-use Drupal\Core\Database\Query\DatabaseAbstractSelect;
+use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\Core\Database\Query\SelectInterface;
 use PHPUnit\Framework\Attributes\DataProvider;

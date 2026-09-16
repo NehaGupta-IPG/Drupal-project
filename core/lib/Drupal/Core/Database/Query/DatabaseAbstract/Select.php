@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Core\Database\Query;
+namespace Drupal\Core\Database\Query\DatabaseAbstract;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Expression;
@@ -12,7 +12,7 @@ use Drupal\Core\Database\Expression;
  *
  * @ingroup database
  */
-final class DatabaseAbstractSelect {
+final class Select {
 
   /**
    * The placeholder counter.
@@ -31,7 +31,7 @@ final class DatabaseAbstractSelect {
    *
    * Condition handling is handled via composition.
    */
-  public protected(set) DatabaseAbstractCondition $condition;
+  public protected(set) Condition $condition;
 
   /**
    * The columns to SELECT.
@@ -94,7 +94,7 @@ final class DatabaseAbstractSelect {
   /**
    * The conditional object for the HAVING clause.
    */
-  public protected(set) DatabaseAbstractCondition $having;
+  public protected(set) Condition $having;
 
   /**
    * Whether or not this query should be DISTINCT.
@@ -164,15 +164,15 @@ final class DatabaseAbstractSelect {
   // ------------------------------------------------------
 
   /**
-   * Constructs a DatabaseAbstractSelect object.
+   * Constructs a Select object.
    *
-   * @param string|\Drupal\Core\Database\Query\DatabaseAbstractSelect $table
+   * @param string|\Drupal\Core\Database\Query\DatabaseAbstract\Select $table
    *   The table name or subquery that is being queried.
    * @param string $alias
    *   The alias for the table.
    */
   public function __construct(
-    string|DatabaseAbstractSelect $table,
+    string|Select $table,
     ?string $alias = NULL,
     public readonly string $conjunction = 'AND',
   ) {
@@ -194,11 +194,11 @@ final class DatabaseAbstractSelect {
         $args += $table['arguments'];
       }
       // If this table is a subquery, grab its arguments recursively.
-      if ($table['table'] instanceof DatabaseAbstractSelect) {
+      if ($table['table'] instanceof Select) {
         $args += $table['table']->arguments();
       }
       // If the join condition is an object, grab its arguments recursively.
-      if (!empty($table['condition']) && $table['condition'] instanceof DatabaseAbstractCondition) {
+      if (!empty($table['condition']) && $table['condition'] instanceof Condition) {
         $args += $table['condition']->arguments();
       }
     }
@@ -409,28 +409,28 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function join(string|DatabaseAbstractSelect $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
+  public function join(string|Select $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
     return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function innerJoin(string|DatabaseAbstractSelect $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
+  public function innerJoin(string|Select $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
     return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function leftJoin(string|DatabaseAbstractSelect $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
+  public function leftJoin(string|Select $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
     return $this->addJoin('LEFT OUTER', $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addJoin(?string $type, string|DatabaseAbstractSelect $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
+  public function addJoin(?string $type, string|Select $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
     if (empty($alias)) {
       if ($table instanceof self) {
         $alias = 'subquery';
@@ -492,7 +492,7 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function union(DatabaseAbstractSelect $query, string $type = ''): static {
+  public function union(Select $query, string $type = ''): static {
     // Handle UNION aliasing.
     switch ($type) {
       // Fold UNION DISTINCT to UNION for better cross database support.
@@ -537,10 +537,10 @@ final class DatabaseAbstractSelect {
   /**
    * Prepares a count query from the current query object.
    *
-   * @return DatabaseAbstractSelect
+   * @return Select
    *   A new query object ready to have COUNT(*) performed on it.
    */
-  protected function prepareCountQuery(): DatabaseAbstractSelect {
+  protected function prepareCountQuery(): Select {
     // Create our new query object that we will mutate into a count query.
     $count = clone($this);
 
@@ -601,7 +601,7 @@ final class DatabaseAbstractSelect {
    */
   public function condition($column, $value = NULL, $operator = '=') {
     if (!isset($this->condition)) {
-      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+      $this->condition = new Condition($this->conjunction);
     }
     $this->condition->condition($column, $value, $operator);
     return $this;
@@ -612,7 +612,7 @@ final class DatabaseAbstractSelect {
    */
   public function isNull($column) {
     if (!isset($this->condition)) {
-      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+      $this->condition = new Condition($this->conjunction);
     }
     $this->condition->isNull($column);
     return $this;
@@ -623,7 +623,7 @@ final class DatabaseAbstractSelect {
    */
   public function isNotNull($column) {
     if (!isset($this->condition)) {
-      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+      $this->condition = new Condition($this->conjunction);
     }
     $this->condition->isNotNull($column);
     return $this;
@@ -650,7 +650,7 @@ final class DatabaseAbstractSelect {
    */
   public function alwaysFalse() {
     if (!isset($this->condition)) {
-      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+      $this->condition = new Condition($this->conjunction);
     }
     $this->condition->alwaysFalse();
     return $this;
@@ -661,7 +661,7 @@ final class DatabaseAbstractSelect {
    */
   public function &conditions() {
     if (!isset($this->condition)) {
-      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+      $this->condition = new Condition($this->conjunction);
     }
     return $this->condition->conditions();
   }
@@ -671,7 +671,7 @@ final class DatabaseAbstractSelect {
    */
   public function conditionArguments() {
     if (!isset($this->condition)) {
-      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+      $this->condition = new Condition($this->conjunction);
     }
     return $this->condition->arguments();
   }
@@ -681,7 +681,7 @@ final class DatabaseAbstractSelect {
    */
   public function where($snippet, $args = []) {
     if (!isset($this->condition)) {
-      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+      $this->condition = new Condition($this->conjunction);
     }
     $this->condition->where($snippet, $args);
     return $this;

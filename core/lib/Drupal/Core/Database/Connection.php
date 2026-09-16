@@ -793,7 +793,7 @@ abstract class Connection {
   /**
    * Prepares and returns a SELECT query object.
    *
-   * @param string|\Drupal\Core\Database\Query\SelectInterface|\Drupal\Core\Database\Query\DatabaseAbstractSelect $table
+   * @param string|\Drupal\Core\Database\Query\SelectInterface|\Drupal\Core\Database\Query\DatabaseAbstract\Select $table
    *   The base table name or subquery for this query, used in the FROM clause.
    *   If a string, the table specified will also be used as the "base" table
    *   for query_alter hook implementations.

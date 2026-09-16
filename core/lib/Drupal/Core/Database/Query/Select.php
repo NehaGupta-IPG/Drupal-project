@@ -4,6 +4,7 @@ namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Expression;
+use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 
 /**
  * Query builder for SELECT statements.
@@ -135,7 +136,7 @@ class Select extends Query implements SelectInterface {
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   Database connection object.
-   * @param string|\Drupal\Core\Database\Query\SelectInterface|\Drupal\Core\Database\Query\DatabaseAbstractSelect $table
+   * @param string|\Drupal\Core\Database\Query\SelectInterface|\Drupal\Core\Database\Query\DatabaseAbstract\Select $table
    *   The table name or subquery that is being queried.
    * @param string $alias
    *   The alias for the table.

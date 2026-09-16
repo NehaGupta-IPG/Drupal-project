@@ -7,7 +7,7 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\RowCountException;
-use Drupal\Core\Database\Query\DatabaseAbstractSelect;
+use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;

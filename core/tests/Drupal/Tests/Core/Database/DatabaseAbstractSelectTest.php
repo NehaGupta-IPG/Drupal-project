@@ -6,8 +6,8 @@ namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\InvalidQueryException;
-use Drupal\Core\Database\Query\DatabaseAbstractCondition;
-use Drupal\Core\Database\Query\DatabaseAbstractSelect;
+use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
+use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
