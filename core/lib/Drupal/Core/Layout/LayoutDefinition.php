@@ -9,6 +9,7 @@ use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Component\Plugin\Definition\PluginDefinition;
 use Drupal\Core\Plugin\Definition\DependentPluginDefinitionInterface;
 use Drupal\Core\Plugin\Definition\DependentPluginDefinitionTrait;
+use Drupal\Core\Template\Attribute\TwigAllowed;
 
 /**
  * Provides an implementation of a layout definition and its metadata.
@@ -148,6 +149,15 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
     foreach ($definition as $property => $value) {
       $this->set($property, $value);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  #[TwigAllowed]
+  public function id(): string {
+    // Implementing here so that the attribute can be applied.
+    return parent::id();
   }
 
   /**
