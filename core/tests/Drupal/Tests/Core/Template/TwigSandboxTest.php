@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Template;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\Attribute\TwigAllowed;
@@ -69,7 +70,7 @@ class TwigSandboxTest extends UnitTestCase {
   }
 
   /**
-   * Tests that white listed classes can be extended.
+   * Tests that allowed classes can be extended.
    */
   public function testExtendedClass(): void {
     $this->assertEquals(' class=&quot;kitten&quot;', $this->twig->render('{{ attribute.addClass("kitten") }}', ['attribute' => new TestAttribute()]));
@@ -107,8 +108,10 @@ class TwigSandboxTest extends UnitTestCase {
   /**
    * Tests that valid methods can be called from within Twig templates.
    *
-   * Currently the following methods are in the allowed list: id, label, bundle,
-   * and get.
+   * Currently the following methods are in the allowed list: get.
+   *
+   * Other methods allowed by the TwigAllowed attribute: bundle, id, label,
+   * toLink, and toUrl.
    */
   public function testEntitySafeMethods(): void {
     $entity = $this->getMockBuilder(ContentEntityBaseMockableClass::class)
@@ -117,44 +120,63 @@ class TwigSandboxTest extends UnitTestCase {
     $entity->expects($this->atLeastOnce())
       ->method('get')
       ->with('title')
-      ->willReturn('test');
+      ->willReturn('test title get');
     $result = $this->twig->render('{{ entity.get("title") }}', ['entity' => $entity]);
-    $this->assertEquals('test', $result, 'Sandbox policy allows get() to be called.');
+    $this->assertEquals('test title get', $result, 'Sandbox policy allows get() to be called.');
 
-    $entity = $this->createMock('Drupal\Core\Entity\EntityInterface');
     $entity->expects($this->atLeastOnce())
       ->method('id')
       ->willReturn('1234');
     $result = $this->twig->render('{{ entity.id }}', ['entity' => $entity]);
-    $this->assertEquals('1234', $result, 'Sandbox policy allows get() to be called.');
+    $this->assertEquals('1234', $result, 'Sandbox policy allows id() to be called.');
 
-    $entity = $this->createMock('Drupal\Core\Entity\EntityInterface');
     $entity->expects($this->atLeastOnce())
       ->method('label')
-      ->willReturn('testing');
+      ->willReturn('test label');
     $result = $this->twig->render('{{ entity.label }}', ['entity' => $entity]);
-    $this->assertEquals('testing', $result, 'Sandbox policy allows get() to be called.');
+    $this->assertEquals('test label', $result, 'Sandbox policy allows label() to be called.');
 
-    $entity = $this->createMock('Drupal\Core\Entity\EntityInterface');
     $entity->expects($this->atLeastOnce())
       ->method('bundle')
-      ->willReturn('testing');
+      ->willReturn('test bundle');
     $result = $this->twig->render('{{ entity.bundle }}', ['entity' => $entity]);
-    $this->assertEquals('testing', $result, 'Sandbox policy allows get() to be called.');
+    $this->assertEquals('test bundle', $result, 'Sandbox policy allows bundle() to be called.');
+
+    $entity->expects($this->atLeastOnce())
+      ->method('toLink')
+      ->willReturn('<a href="/node/123">Entity Title</a>');
+    $result = $this->twig->render('{{ entity.toLink() }}', ['entity' => $entity]);
+    $this->assertEquals(Html::escape('<a href="/node/123">Entity Title</a>'), $result, 'Sandbox policy allows toLink() to be called.');
+
+    $entity->expects($this->atLeastOnce())
+      ->method('toUrl')
+      ->willReturn('/node/123/edit');
+    $result = $this->twig->render('{{ entity.toUrl("edit") }}', ['entity' => $entity]);
+    $this->assertEquals('/node/123/edit', $result, 'Sandbox policy allows toUrl() to be called.');
   }
 
   /**
    * Tests that safe methods inside Url objects can be called.
    */
   public function testUrlSafeMethods(): void {
+    // Only mock toString(), because the Url class's own setMethod() method
+    // needs to be reflected for the TwigAllowed attribute.
     $url = $this->getMockBuilder('Drupal\Core\Url')
       ->disableOriginalConstructor()
+      ->onlyMethods(['toString'])
       ->getMock();
-    $url->expects($this->once())
+    $setAbsolute = FALSE;
+    $url->expects($this->exactly(2))
       ->method('toString')
-      ->willReturn('http://kittens.cat/are/cute');
+      ->willReturnCallback(static function () use (&$setAbsolute): string {
+        return $setAbsolute ? 'http://kittens.cat/are/cute' : '/are/cute';
+      });
     $result = $this->twig->render('{{ url.toString }}', ['url' => $url]);
-    $this->assertEquals('http://kittens.cat/are/cute', $result, 'Sandbox policy allows toString() to be called.');
+    $this->assertEquals('/are/cute', $result, 'Sandbox policy allows toString() to be called.');
+
+    $setAbsolute = TRUE;
+    $result = $this->twig->render('{{ url.setAbsolute.toString }}', ['url' => $url]);
+    $this->assertEquals('http://kittens.cat/are/cute', $result, 'Sandbox policy allows setAbsolute() to be called.');
   }
 
   /**
@@ -164,6 +186,9 @@ class TwigSandboxTest extends UnitTestCase {
     $object = new AttributeAllowTestClass();
     $result = $this->twig->render('{{ object.allowed() }}', ['object' => $object]);
     $this->assertTrue((bool) $result, 'TwigAllowed attribute allows method to be called.');
+    // Attribute is on the interface method and should be allowed.
+    $result = $this->twig->render('{{ object.interfaceAllowed() }}', ['object' => $object]);
+    $this->assertTrue((bool) $result, 'TwigAllowed attribute allows interface method to be called.');
   }
 
   /**
@@ -171,8 +196,36 @@ class TwigSandboxTest extends UnitTestCase {
    */
   public function testTwigMethodAttributeNotAllowed(): void {
     $object = new AttributeAllowTestClass();
-    $this->expectException(SecurityError::class);
-    $this->twig->render('{{ object.notAllowed() }}', ['object' => $object]);
+    $throwable = NULL;
+    try {
+      // No attribute is on the method, and the method is not defined in an
+      // interface.
+      $this->twig->render('{{ object.notAllowed() }}', ['object' => $object]);
+    }
+    catch (\Throwable $throwable) {
+    }
+    $this->assertInstanceOf(SecurityError::class, $throwable);
+
+    $throwable = NULL;
+    try {
+      // No attribute is on the method. The method extends a method in a parent
+      // class, and the parent class has the attribute.
+      $this->twig->render('{{ object.baseAllowedChildNotAllowed() }}', ['object' => $object]);
+    }
+    catch (\Throwable $throwable) {
+    }
+    $this->assertInstanceOf(SecurityError::class, $throwable);
+
+    $throwable = NULL;
+    try {
+      // No attribute is on the method. The method is defined in an interface,
+      // but the interface method does not have the attribute.
+      $this->twig->render('{{ object.interfaceNotAllowed() }}', ['object' => $object]);
+    }
+    catch (\Throwable $throwable) {
+    }
+    $this->assertInstanceOf(SecurityError::class, $throwable);
+
   }
 
 }
@@ -183,9 +236,37 @@ class TwigSandboxTest extends UnitTestCase {
 class TestAttribute extends Attribute {}
 
 /**
+ * Test interface for TwigAllowed attribute.
+ */
+interface AttributeAllowTestInterface {
+
+  #[TwigAllowed]
+  public function interfaceAllowed(): string;
+
+  public function interfaceNotAllowed(): string;
+
+}
+
+/**
+ * Test base class for TwigAllowed attribute.
+ */
+abstract class AttributeAllowTestClassBase implements AttributeAllowTestInterface {
+
+  #[TwigAllowed]
+  public function baseAllowedChildNotAllowed(): string {
+    return __METHOD__;
+  }
+
+  public function interfaceNotAllowed(): string {
+    return __METHOD__;
+  }
+
+}
+
+/**
  * Test class for TwigAllowed attribute.
  */
-class AttributeAllowTestClass {
+class AttributeAllowTestClass extends AttributeAllowTestClassBase {
 
   #[TwigAllowed]
   public function allowed(): string {
@@ -193,6 +274,14 @@ class AttributeAllowTestClass {
   }
 
   public function notAllowed(): string {
+    return __METHOD__;
+  }
+
+  public function interfaceAllowed(): string {
+    return __METHOD__;
+  }
+
+  public function baseAllowedChildNotAllowed(): string {
     return __METHOD__;
   }
 
