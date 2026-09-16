@@ -587,6 +587,51 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_2', []);
+
+    // Test required entity reference field when default value is deleted.
+
+    // Create vocabulary and terms.
+    $vocab = $this->createVocabulary();
+    // Create some test terms.
+    $term_to_delete = $this->createTerm($vocab);
+    $another_test_term = $this->createTerm($vocab, ['weight' => 1000]);
+    // Create the field and set as required.
+    $field_name = mb_strtolower($this->randomMachineName());
+    $handler_settings = [
+      'target_bundles' => [
+        $vocab->id() => $vocab->id(),
+      ],
+      'auto_create' => FALSE,
+    ];
+    $this->createEntityReferenceField('entity_test', 'entity_test', $field_name, 'Test term reference', 'taxonomy_term', 'default', $handler_settings);
+    $field = FieldConfig::load('entity_test.entity_test.' . $field_name);
+    $field->setRequired(TRUE);
+    $field->save();
+    // Set field widget as select list.
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+    $display_repository->getFormDisplay('entity_test', 'entity_test')
+      ->setComponent($field_name, [
+        'type' => 'options_select',
+      ])->save();
+
+    // Create a page assigning it the $term_to_delete.
+    $entity = EntityTest::create([
+      'user_id' => 1,
+      'name' => $this->randomMachineName(),
+      $field_name => $term_to_delete->id(),
+    ]);
+    $entity->save();
+
+    // Delete the $term_to_delete.
+    $term_to_delete->delete();
+
+    $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->optionExists($field_name, $another_test_term->id());
+    $empty_option = $this->assertSession()->optionExists($field_name, '_none');
+    $this->assertTrue($empty_option->isSelected());
+    $this->assertSame('- Select a value -', $empty_option->getText());
   }
 
   /**

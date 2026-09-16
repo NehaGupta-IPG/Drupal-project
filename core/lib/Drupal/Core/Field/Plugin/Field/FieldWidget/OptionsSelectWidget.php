@@ -30,23 +30,24 @@ class OptionsSelectWidget extends OptionsWidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
-    // Checking for the scenario where the selected option is empty but there
-    // is a value in the field. This can happen when one of the options has
-    // been deleted.
+    $options = $this->getOptions($items->getEntity());
     $selected = $this->getSelectedOptions($items);
-    if (empty($selected) && $this->has_value) {
-      $this->has_value = FALSE;
-      // Reset cached options so getEmptyLabel() is re-evaluated with the
-      // updated has_value, preventing stale _none inclusion/exclusion.
-      $this->options = NULL;
+
+    // If the selected option is empty and the field is required and the user
+    // has more than one option, add an option to force the user to choose.
+    if (!isset($options['_none']) && empty($selected) && $this->required) {
+      // Ensure there is an empty option if the widget needs one.
+      $empty_label = $this->t('- Select a value -');
+      $this->sanitizeLabel($empty_label);
+      $options = ['_none' => $empty_label] + $options;
     }
 
     $element += [
       '#type' => 'select',
-      '#options' => $this->getOptions($items->getEntity()),
+      '#options' => $options,
       '#default_value' => $selected,
       // Do not display a 'multiple' select box if there is only one option.
-      '#multiple' => $this->multiple && (isset($this->options) && count($this->options) > 1),
+      '#multiple' => $this->multiple && count($options) > 1,
     ];
 
     return $element;
@@ -71,22 +72,9 @@ class OptionsSelectWidget extends OptionsWidgetBase {
    * {@inheritdoc}
    */
   protected function getEmptyLabel() {
-    if ($this->multiple) {
-      // Multiple select: add a 'none' option for non-required fields.
-      if (!$this->required) {
-        return $this->t('- None -');
-      }
-    }
-    else {
-      // Single select: add a 'none' option for non-required fields,
-      // and a 'select a value' option for required fields that do not come
-      // with a value selected.
-      if (!$this->required) {
-        return $this->t('- None -');
-      }
-      if (!$this->has_value) {
-        return $this->t('- Select a value -');
-      }
+    // Add a 'none' option for non-required fields.
+    if (!$this->required) {
+      return $this->t('- None -');
     }
   }
 
