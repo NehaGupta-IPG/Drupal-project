@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Session;
 
+use Drupal\Core\Template\Attribute\TwigAllowed;
+
 /**
  * Defines an account interface which represents the current user.
  *
@@ -28,6 +30,7 @@ interface AccountInterface {
    * @return int
    *   The user ID.
    */
+  #[TwigAllowed]
   public function id();
 
   /**

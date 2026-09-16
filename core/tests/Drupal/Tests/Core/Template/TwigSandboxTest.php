@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Template;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\Attribute\TwigAllowed;
 use Drupal\Core\Template\Loader\StringLoader;
@@ -122,37 +123,40 @@ class TwigSandboxTest extends UnitTestCase {
       ->with('title')
       ->willReturn('test title get');
     $result = $this->twig->render('{{ entity.get("title") }}', ['entity' => $entity]);
-    $this->assertEquals('test title get', $result, 'Sandbox policy allows get() to be called.');
+    $this->assertSame('test title get', $result, 'Sandbox policy allows get() to be called.');
 
     $entity->expects($this->atLeastOnce())
       ->method('id')
       ->willReturn('1234');
     $result = $this->twig->render('{{ entity.id }}', ['entity' => $entity]);
-    $this->assertEquals('1234', $result, 'Sandbox policy allows id() to be called.');
+    $this->assertSame('1234', $result, 'Sandbox policy allows id() to be called.');
+
+    $result = $this->twig->render('{{ entity.id }}', ['entity' => new AnonymousUserSession()]);
+    $this->assertSame('0', $result, 'Sandbox policy allows id() to be called.');
 
     $entity->expects($this->atLeastOnce())
       ->method('label')
       ->willReturn('test label');
     $result = $this->twig->render('{{ entity.label }}', ['entity' => $entity]);
-    $this->assertEquals('test label', $result, 'Sandbox policy allows label() to be called.');
+    $this->assertSame('test label', $result, 'Sandbox policy allows label() to be called.');
 
     $entity->expects($this->atLeastOnce())
       ->method('bundle')
       ->willReturn('test bundle');
     $result = $this->twig->render('{{ entity.bundle }}', ['entity' => $entity]);
-    $this->assertEquals('test bundle', $result, 'Sandbox policy allows bundle() to be called.');
+    $this->assertSame('test bundle', $result, 'Sandbox policy allows bundle() to be called.');
 
     $entity->expects($this->atLeastOnce())
       ->method('toLink')
       ->willReturn('<a href="/node/123">Entity Title</a>');
     $result = $this->twig->render('{{ entity.toLink() }}', ['entity' => $entity]);
-    $this->assertEquals(Html::escape('<a href="/node/123">Entity Title</a>'), $result, 'Sandbox policy allows toLink() to be called.');
+    $this->assertSame(Html::escape('<a href="/node/123">Entity Title</a>'), $result, 'Sandbox policy allows toLink() to be called.');
 
     $entity->expects($this->atLeastOnce())
       ->method('toUrl')
       ->willReturn('/node/123/edit');
     $result = $this->twig->render('{{ entity.toUrl("edit") }}', ['entity' => $entity]);
-    $this->assertEquals('/node/123/edit', $result, 'Sandbox policy allows toUrl() to be called.');
+    $this->assertSame('/node/123/edit', $result, 'Sandbox policy allows toUrl() to be called.');
   }
 
   /**
@@ -172,11 +176,11 @@ class TwigSandboxTest extends UnitTestCase {
         return $setAbsolute ? 'http://kittens.cat/are/cute' : '/are/cute';
       });
     $result = $this->twig->render('{{ url.toString }}', ['url' => $url]);
-    $this->assertEquals('/are/cute', $result, 'Sandbox policy allows toString() to be called.');
+    $this->assertSame('/are/cute', $result, 'Sandbox policy allows toString() to be called.');
 
     $setAbsolute = TRUE;
     $result = $this->twig->render('{{ url.setAbsolute.toString }}', ['url' => $url]);
-    $this->assertEquals('http://kittens.cat/are/cute', $result, 'Sandbox policy allows setAbsolute() to be called.');
+    $this->assertSame('http://kittens.cat/are/cute', $result, 'Sandbox policy allows setAbsolute() to be called.');
   }
 
   /**
