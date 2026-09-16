@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Database;
@@ -24,8 +26,6 @@ final class DatabaseAbstractSelect {
    */
   public protected(set) array $comments = [];
 
-  // ------------------------------------------------------
-
   /**
    * The condition object for this query.
    *
@@ -33,21 +33,19 @@ final class DatabaseAbstractSelect {
    */
   public protected(set) DatabaseAbstractCondition $condition;
 
-  // ------------------------------------------------------
-
   /**
-   * The fields to SELECT.
+   * The columns to SELECT.
    *
    * @var list<string>
    */
-  protected array $columns = [];
+  public protected(set) array $columns = [];
 
   /**
-   * The expressions to SELECT as virtual fields.
+   * The expressions to SELECT as virtual columns.
    *
    * @var list<Expression>
    */
-  protected array $expressions = [];
+  public protected(set) array $expressions = [];
 
   /**
    * The tables against which to JOIN.
@@ -76,9 +74,9 @@ final class DatabaseAbstractSelect {
   public protected(set) array $tables = [];
 
   /**
-   * The fields by which to order this query.
+   * The columns by which to order this query.
    *
-   * This is an associative array. The keys are the fields to order, and the
+   * This is an associative array. The keys are the columns to order, and the
    * value is the direction to order, either ASC or DESC.
    *
    * @var array<string,string>
@@ -86,11 +84,12 @@ final class DatabaseAbstractSelect {
   public protected(set) array $orderBy = [];
 
   /**
-   * The fields by which to group.
+   * The columns by which to group.
    *
    * @var list<string>
    */
-  protected array $group = [];
+// @todo rename to groupBy
+  public protected(set) array $group = [];
 
   /**
    * The conditional object for the HAVING clause.
@@ -177,8 +176,6 @@ final class DatabaseAbstractSelect {
     ?string $alias = NULL,
     public readonly string $conjunction = 'AND',
   ) {
-    // $this->condition = new DatabaseAbstractCondition($conjunction);
-    // $this->having = new DatabaseAbstractCondition($conjunction);
     $this->addJoin(NULL, $table, $alias);
   }
 
@@ -224,8 +221,8 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function havingCondition($field, $value = NULL, $operator = NULL) {
-    $this->having->condition($field, $value, $operator);
+  public function havingCondition($column, $value = NULL, $operator = NULL) {
+    $this->having->condition($column, $value, $operator);
     return $this;
   }
 
@@ -261,16 +258,16 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function havingIsNull($field) {
-    $this->having->isNull($field);
+  public function havingIsNull($column) {
+    $this->having->isNull($column);
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function havingIsNotNull($field) {
-    $this->having->isNotNull($field);
+  public function havingIsNotNull($column) {
+    $this->having->isNotNull($column);
     return $this;
   }
 
@@ -293,39 +290,17 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function forUpdate($set = TRUE) {
-    if (isset($set)) {
-      $this->forUpdate = $set;
-    }
+  public function forUpdate(bool $set = TRUE): static {
+    $this->forUpdate = $set;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function &getColumns() {
-    return $this->columns;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function &getExpressions() {
-    return $this->expressions;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function resetOrderBy(): void {
+  public function resetOrderBy(): static {
     $this->orderBy = [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function &getGroupBy() {
-    return $this->group;
+    return $this;
   }
 
   /**
@@ -356,7 +331,7 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function distinct($distinct = TRUE) {
+  public function distinct(bool $distinct = TRUE): static {
     $this->distinct = $distinct;
     return $this;
   }
@@ -364,15 +339,15 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function addColumn(string $table_alias, string $field, ?string $alias = NULL): string {
-    // If no alias is specified, first try the field name itself.
+  public function addColumn(string $table_alias, string $column, ?string $alias = NULL): string {
+    // If no alias is specified, first try the column name itself.
     if (empty($alias)) {
-      $alias = $field;
+      $alias = $column;
     }
 
-    // If that's already in use, try the table name and field name.
+    // If that's already in use, try the table name and column name.
     if (!empty($this->columns[$alias])) {
-      $alias = $table_alias . '_' . $field;
+      $alias = $table_alias . '_' . $column;
     }
 
     // If that is already used, just add a counter until we find an unused
@@ -385,7 +360,7 @@ final class DatabaseAbstractSelect {
     $alias = $alias_candidate;
 
     $this->columns[$alias] = [
-      'field' => $field,
+      'field' => $column,
       'table' => $table_alias,
       'alias' => $alias,
     ];
@@ -396,15 +371,15 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function columns(string $table_alias, array $fields = []): static {
-    if ($fields) {
-      foreach ($fields as $field) {
+  public function columns(string $table_alias, array $columns = []): static {
+    if ($columns) {
+      foreach ($columns as $column) {
         // We don't care what alias was assigned.
-        $this->addColumn($table_alias, $field);
+        $this->addColumn($table_alias, $column);
       }
     }
     else {
-      // We want all fields from this table.
+      // We want all columns from this table.
       $this->tables[$table_alias]['all_fields'] = TRUE;
     }
 
@@ -414,7 +389,7 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function addExpression(string $expression, ?string $alias = NULL, array $arguments = []) {
+  public function addExpression(string $expression, ?string $alias = NULL, array $arguments = []): string {
     if (empty($alias)) {
       $alias = 'expression';
     }
@@ -434,28 +409,28 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function join($table, $alias = NULL, $condition = NULL, $arguments = []) {
+  public function join(string|DatabaseAbstractSelect $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
     return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function innerJoin($table, $alias = NULL, $condition = NULL, $arguments = []) {
+  public function innerJoin(string|DatabaseAbstractSelect $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
     return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function leftJoin($table, $alias = NULL, $condition = NULL, $arguments = []) {
+  public function leftJoin(string|DatabaseAbstractSelect $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
     return $this->addJoin('LEFT OUTER', $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addJoin($type, $table, $alias = NULL, $condition = NULL, $arguments = []) {
+  public function addJoin(?string $type, string|DatabaseAbstractSelect $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
     if (empty($alias)) {
       if ($table instanceof self) {
         $alias = 'subquery';
@@ -490,17 +465,17 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function orderBy($field, $direction = 'ASC') {
+  public function orderBy(string $column, string $direction = 'ASC'): static {
     // Only allow ASC and DESC, default to ASC.
     $direction = strtoupper($direction) == 'DESC' ? 'DESC' : 'ASC';
-    $this->orderBy[$field] = $direction;
+    $this->orderBy[$column] = $direction;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function orderRandom() {
+  public function orderRandom(): static {
     $alias = $this->addExpression('RAND()', 'random_field');
     $this->orderBy($alias);
     return $this;
@@ -542,8 +517,8 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function groupBy($field) {
-    $this->group[$field] = $field;
+  public function groupBy(string $column): static {
+    $this->group[$column] = $column;
     return $this;
   }
 
@@ -562,32 +537,29 @@ final class DatabaseAbstractSelect {
   /**
    * Prepares a count query from the current query object.
    *
-   * @return \Drupal\Core\Database\Query\Select
+   * @return DatabaseAbstractSelect
    *   A new query object ready to have COUNT(*) performed on it.
    */
-  protected function prepareCountQuery() {
+  protected function prepareCountQuery(): DatabaseAbstractSelect {
     // Create our new query object that we will mutate into a count query.
     $count = clone($this);
 
-    $group_by = $count->getGroupBy();
+    $group_by = $count->group;
     $having = isset($this->having) ? $count->havingConditions() : NULL;
 
     if (!$count->distinct && !isset($having[0])) {
-      // When not executing a distinct query, we can zero-out existing fields
-      // and expressions that are not used by a GROUP BY or HAVING. Fields
+      // When not executing a distinct query, we can zero-out existing columns
+      // and expressions that are not used by a GROUP BY or HAVING. columns
       // listed in a GROUP BY or HAVING clause need to be present in the
       // query.
-      $fields =& $count->getColumns();
-      foreach (array_keys($fields) as $field) {
-        if (empty($group_by[$field])) {
-          unset($fields[$field]);
+      foreach (array_keys($count->columns) as $column) {
+        if (empty($count->group[$column])) {
+          unset($count->columns[$column]);
         }
       }
-
-      $expressions =& $count->getExpressions();
-      foreach (array_keys($expressions) as $field) {
-        if (empty($group_by[$field])) {
-          unset($expressions[$field]);
+      foreach (array_keys($count->expressions) as $column) {
+        if (empty($count->group[$column])) {
+          unset($count->expressions[$column]);
         }
       }
 
@@ -598,7 +570,7 @@ final class DatabaseAbstractSelect {
       }
     }
 
-    // If we've just removed all fields from the query, make sure there is at
+    // If we've just removed all columns from the query, make sure there is at
     // least one so that the query still runs.
     $count->addExpression('1');
 
@@ -609,7 +581,7 @@ final class DatabaseAbstractSelect {
     if ($count->distinct && !empty($group_by)) {
       // If the query is distinct and contains a GROUP BY, we need to remove the
       // distinct because SQL99 does not support counting on distinct multiple
-      // fields.
+      // columns.
       $count->distinct = FALSE;
     }
 
@@ -627,33 +599,33 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function condition($field, $value = NULL, $operator = '=') {
+  public function condition($column, $value = NULL, $operator = '=') {
     if (!isset($this->condition)) {
       $this->condition = new DatabaseAbstractCondition($this->conjunction);
     }
-    $this->condition->condition($field, $value, $operator);
+    $this->condition->condition($column, $value, $operator);
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isNull($field) {
+  public function isNull($column) {
     if (!isset($this->condition)) {
       $this->condition = new DatabaseAbstractCondition($this->conjunction);
     }
-    $this->condition->isNull($field);
+    $this->condition->isNull($column);
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isNotNull($field) {
+  public function isNotNull($column) {
     if (!isset($this->condition)) {
       $this->condition = new DatabaseAbstractCondition($this->conjunction);
     }
-    $this->condition->isNotNull($field);
+    $this->condition->isNotNull($column);
     return $this;
   }
 

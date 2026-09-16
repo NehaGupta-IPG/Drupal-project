@@ -18,49 +18,6 @@ class DatabaseAbstractSelectTest extends UnitTestCase {
   // ------------------------------------------------------ from SelectComplexTest
 
   /**
-   * Tests simple JOIN statements.
-   */
-  public function testDefaultJoin(): void {
-    $query = new DatabaseAbstractSelect('test_task', 't');
-    $people_alias = $query->join('test', 'p', '[t].[pid] = [p].[id]');
-    $name_field = $query->addColumn($people_alias, 'name', 'name');
-    $query->addColumn('t', 'task', 'task');
-    $priority_field = $query->addColumn('t', 'priority', 'priority');
-
-    $query->orderBy($priority_field);
-
-    dump($query);
-  }
-
-  /**
-   * Tests LEFT OUTER joins.
-   */
-  public function testLeftOuterJoin(): void {
-    $query = new DatabaseAbstractSelect('test', 'p');
-    $people_alias = $query->leftJoin('test_task', 't', '[t].[pid] = [p].[id]');
-    $name_field = $query->addColumn('p', 'name', 'name');
-    $query->addColumn($people_alias, 'task', 'task');
-    $query->addColumn($people_alias, 'priority', 'priority');
-
-    $query->orderBy($name_field);
-
-    dump($query);
-  }
-
-  /**
-   * Tests GROUP BY clauses.
-   */
-  public function testGroupBy(): void {
-    $query = new DatabaseAbstractSelect('test_task', 't');
-    $count_field = $query->addExpression('COUNT([task])', 'num');
-    $task_field = $query->addColumn('t', 'task');
-    $query->orderBy($count_field);
-    $query->groupBy($task_field);
-
-    dump($query);
-  }
-
-  /**
    * Tests GROUP BY and HAVING clauses together.
    */
   public function testGroupByAndHaving(): void {

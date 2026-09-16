@@ -162,8 +162,8 @@ class Select extends Query implements SelectInterface {
         $this->tables[$key]['table'] = $this->connection->select($table['table']);
       }
     }
-    $this->fields = $abstractSelect->getColumns();
-    foreach ($abstractSelect->getExpressions() as $key => $expression) {
+    $this->fields = $abstractSelect->columns;
+    foreach ($abstractSelect->expressions as $key => $expression) {
       $this->expressions[$key] = [
         'expression' => $expression->expression,
         'arguments' => $expression->arguments,
@@ -181,6 +181,7 @@ class Select extends Query implements SelectInterface {
       $this->condition($condition['field'], $condition['value'], $condition['operator']);
     }
     $this->order = $abstractSelect->orderBy ?? [];
+    $this->group = $abstractSelect->group ?? [];
     foreach ($abstractSelect->union as $union) {
       $this->union($this->connection->select($union['query']), $union['type']);
     }

@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\RowCountException;
+use Drupal\Core\Database\Query\DatabaseAbstractSelect;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,6 +20,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class SelectComplexTest extends DatabaseTestBase {
 
+  use SelectUniqueIdResetTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -28,14 +31,28 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests simple JOIN statements.
    */
   public function testDefaultJoin(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test_task', 't');
+    $abstractPeopleAlias = $abstractQuery->join('test', 'p', '[t].[pid] = [p].[id]');
+    $abstractNameField = $abstractQuery->addColumn($abstractPeopleAlias, 'name', 'name');
+    $abstractQuery->addColumn('t', 'task', 'task');
+    $abstractPriorityField = $abstractQuery->addColumn('t', 'priority', 'priority');
+    $abstractQuery->orderBy($abstractPriorityField);
+
     $query = $this->connection->select('test_task', 't');
     $people_alias = $query->join('test', 'p', '[t].[pid] = [p].[id]');
     $name_field = $query->addField($people_alias, 'name', 'name');
     $query->addField('t', 'task', 'task');
     $priority_field = $query->addField('t', 'priority', 'priority');
-
     $query->orderBy($priority_field);
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
     $result = $query->execute();
+    $hydratedResult = $hydratedQuery->execute();
 
     $num_records = 0;
     $last_priority = 0;
@@ -46,7 +63,17 @@ class SelectComplexTest extends DatabaseTestBase {
       $this->assertNotSame('Ringo', $record->$name_field, 'Person without a task not selected.');
       $last_priority = $record->$priority_field;
     }
+    $this->assertEquals(7, $num_records, 'Returned the correct number of rows.');
 
+    $num_records = 0;
+    $last_priority = 0;
+    // Verify that the results are returned in the correct order.
+    foreach ($hydratedResult as $record) {
+      $num_records++;
+      $this->assertGreaterThanOrEqual($last_priority, $record->$priority_field);
+      $this->assertNotSame('Ringo', $record->$name_field, 'Person without a task not selected.');
+      $last_priority = $record->$priority_field;
+    }
     $this->assertEquals(7, $num_records, 'Returned the correct number of rows.');
   }
 
@@ -54,24 +81,45 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests LEFT OUTER joins.
    */
   public function testLeftOuterJoin(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test', 'p');
+    $abstractPeopleAlias = $abstractQuery->leftJoin('test_task', 't', '[t].[pid] = [p].[id]');
+    $abstractNameField = $abstractQuery->addColumn('p', 'name', 'name');
+    $abstractQuery->addColumn($abstractPeopleAlias, 'task', 'task');
+    $abstractQuery->addColumn($abstractPeopleAlias, 'priority', 'priority');
+    $abstractQuery->orderBy($abstractNameField);
+
     $query = $this->connection->select('test', 'p');
     $people_alias = $query->leftJoin('test_task', 't', '[t].[pid] = [p].[id]');
     $name_field = $query->addField('p', 'name', 'name');
     $query->addField($people_alias, 'task', 'task');
     $query->addField($people_alias, 'priority', 'priority');
-
     $query->orderBy($name_field);
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
     $result = $query->execute();
+    $hydratedResult = $hydratedQuery->execute();
 
     $num_records = 0;
     $last_name = '0';
-
     // Verify that the results are returned in the correct order.
     foreach ($result as $record) {
       $num_records++;
       $this->assertGreaterThanOrEqual(0, strcmp($record->$name_field, $last_name));
     }
+    $this->assertEquals(8, $num_records, 'Returned the correct number of rows.');
 
+    $num_records = 0;
+    $last_name = '0';
+    // Verify that the results are returned in the correct order.
+    foreach ($hydratedResult as $record) {
+      $num_records++;
+      $this->assertGreaterThanOrEqual(0, strcmp($record->$name_field, $last_name));
+    }
     $this->assertEquals(8, $num_records, 'Returned the correct number of rows.');
   }
 
@@ -79,16 +127,31 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests GROUP BY clauses.
    */
   public function testGroupBy(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test_task', 't');
+    $abstractCountField = $abstractQuery->addExpression('COUNT([task])', 'num');
+    $abstractTaskField = $abstractQuery->addColumn('t', 'task');
+    $abstractQuery->orderBy($abstractCountField);
+    $abstractQuery->groupBy($abstractTaskField);
+
     $query = $this->connection->select('test_task', 't');
     $count_field = $query->addExpression('COUNT([task])', 'num');
     $task_field = $query->addField('t', 'task');
     $query->orderBy($count_field);
     $query->groupBy($task_field);
 
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
     $this->assertMatchesRegularExpression("/ORDER BY .*[^\w\s]num[^\w\s]/", (string) $query);
     $this->assertMatchesRegularExpression("/GROUP BY .*[^\w\s]task[^\w\s]/", (string) $query);
+    $this->assertMatchesRegularExpression("/ORDER BY .*[^\w\s]num[^\w\s]/", (string) $hydratedQuery);
+    $this->assertMatchesRegularExpression("/GROUP BY .*[^\w\s]task[^\w\s]/", (string) $hydratedQuery);
 
     $result = $query->execute();
+    $hydratedResult = $hydratedQuery->execute();
 
     $num_records = 0;
     $last_count = 0;
@@ -101,6 +164,17 @@ class SelectComplexTest extends DatabaseTestBase {
       $records[$record->$task_field] = $record->$count_field;
     }
 
+    $hydratedNumRecords = 0;
+    $last_count = 0;
+    $hydratedRecords = [];
+    // Verify that the results are returned in the correct order.
+    foreach ($hydratedResult as $record) {
+      $hydratedNumRecords++;
+      $this->assertGreaterThanOrEqual($last_count, $record->$count_field);
+      $last_count = $record->$count_field;
+      $hydratedRecords[$record->$task_field] = $record->$count_field;
+    }
+
     $correct_results = [
       'eat' => 1,
       'sleep' => 2,
@@ -111,9 +185,11 @@ class SelectComplexTest extends DatabaseTestBase {
 
     foreach ($correct_results as $task => $count) {
       $this->assertEquals($count, $records[$task], "Correct number of '$task' records found.");
+      $this->assertEquals($count, $hydratedRecords[$task], "Correct number of '$task' records found.");
     }
 
     $this->assertEquals(6, $num_records, 'Returned the correct number of total rows.');
+    $this->assertEquals(6, $hydratedNumRecords, 'Returned the correct number of total rows.');
   }
 
   /**
