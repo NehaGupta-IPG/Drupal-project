@@ -3,7 +3,6 @@
 namespace Drupal\Core\Locale;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Utility\NaturalSort;
 
 /**
  * Provides list of countries.
@@ -306,7 +305,7 @@ class CountryManager implements CountryManagerInterface {
     // cSpell:enable
 
     // Sort the list.
-    NaturalSort::natcasesort($countries);
+    natcasesort($countries);
 
     return $countries;
   }

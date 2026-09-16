@@ -6,7 +6,6 @@ namespace Drupal\Tests\language\Functional;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\Core\Url;
-use Drupal\Core\Utility\NaturalSort;
 use Drupal\locale\StringStorageInterface;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -86,7 +85,7 @@ class LanguageLocaleListTest extends BrowserTestBase {
     array_pop($options);
     // Order language list.
     $options_ordered = $options;
-    NaturalSort::natcasesort($options_ordered);
+    natcasesort($options_ordered);
 
     // Check the language list displayed is ordered.
     $this->assertSame($options, $options_ordered, 'Language list is ordered.');

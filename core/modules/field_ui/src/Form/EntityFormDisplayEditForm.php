@@ -6,7 +6,6 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\PluginSettingsInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Drupal\Core\Utility\NaturalSort;
 use Drupal\field_ui\FieldUI;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -174,7 +173,7 @@ class EntityFormDisplayEditForm extends EntityDisplayFormBase {
         if ($enabled_displays = array_filter($this->getDisplayStatuses())) {
           $default = array_keys(array_intersect_key($display_mode_options, $enabled_displays));
         }
-        NaturalSort::natcasesort($display_mode_options);
+        natcasesort($display_mode_options);
         $form['modes']['display_modes_custom'] = [
           '#type' => 'checkboxes',
           '#title' => $this->t('Use custom display settings for the following @display_context modes', ['@display_context' => $this->displayContext]),

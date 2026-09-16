@@ -11,7 +11,6 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformState;
-use Drupal\Core\Utility\NaturalSort;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\media\Entity\MediaType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -189,7 +188,7 @@ class MediaTypeForm extends EntityForm {
         }
       }
 
-      NaturalSort::natcasesort($options);
+      natcasesort($options);
 
       $field_map = $this->entity->getFieldMap();
       foreach ($source->getMetadataAttributes() as $metadata_attribute_name => $metadata_attribute_label) {

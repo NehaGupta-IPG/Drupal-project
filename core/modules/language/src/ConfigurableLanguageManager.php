@@ -12,7 +12,6 @@ use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\FiberResumeType;
-use Drupal\Core\Utility\NaturalSort;
 use Drupal\language\Config\LanguageConfigFactoryOverrideInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -529,7 +528,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
       // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $predefined[$key] = new TranslatableMarkup($value[0]);
     }
-    NaturalSort::natcasesort($predefined);
+    natcasesort($predefined);
     return $predefined;
   }
 
