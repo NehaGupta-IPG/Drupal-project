@@ -604,7 +604,7 @@ class OptionsWidgetsTest extends FieldTestBase {
       ],
       'auto_create' => FALSE,
     ];
-    $this->createEntityReferenceField('entity_test', 'entity_test', $field_name, 'Test term reference', 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);;
+    $this->createEntityReferenceField('entity_test', 'entity_test', $field_name, 'Test term reference', 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
     $field = FieldConfig::load('entity_test.entity_test.' . $field_name);
     $field->setRequired(TRUE);
     $field->save();
