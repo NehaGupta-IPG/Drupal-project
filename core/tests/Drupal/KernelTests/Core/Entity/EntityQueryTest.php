@@ -184,11 +184,25 @@ class EntityQueryTest extends EntityKernelTestBase {
   public function testEntityQuery(): void {
     $greetings = $this->greetings;
     $figures = $this->figures;
+
+    // String value value comparision.
     $this->queryResults = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->exists($greetings, 'tr')
       ->condition("$figures.color", 'red')
+      ->sort('id')
+      ->execute();
+    // As unit 0 was the red triangle and unit 2 was the turkish greeting,
+    // bit 0 and bit 2 needs to be set.
+    $this->assertResult(5, 7, 13, 15);
+
+    // Array value value comparision.
+    $this->queryResults = $this->storage
+      ->getQuery()
+      ->accessCheck(FALSE)
+      ->exists($greetings, 'tr')
+      ->condition("$figures.color", ['red'])
       ->sort('id')
       ->execute();
     // As unit 0 was the red triangle and unit 2 was the turkish greeting,

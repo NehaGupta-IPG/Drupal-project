@@ -154,7 +154,7 @@ class Condition extends ConditionBase {
    *
    * @param array $condition
    *   The condition array as created by the condition() method.
-   * @param string $value
+   * @param string|array $value
    *   The value to match against.
    *
    * @return bool
@@ -170,13 +170,26 @@ class Condition extends ConditionBase {
 
     if (isset($value)) {
       // We always want a case-insensitive match.
-      if (!is_bool($value)) {
+      if (is_array($value)) {
+        foreach ($value as $key => $string) {
+          $value[$key] = mb_strtolower($string);
+        }
+      }
+      elseif (!is_bool($value)) {
         $value = mb_strtolower($value);
       }
 
       switch ($condition['operator']) {
         case '=':
-          return $value == $condition['value'];
+          if (is_array($value)) {
+            foreach ($value as $string) {
+              if ($condition['value'] === $string) {
+                return TRUE;
+              }
+            }
+            return FALSE;
+          }
+          return $value === $condition['value'];
 
         case '>':
           return $value > $condition['value'];
