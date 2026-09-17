@@ -62,4 +62,5 @@
 .views-exposed-form__item.views-exposed-form__item.views-exposed-form__item--actions {
   /* Line height of a label + existing margin for the element + margin for label */
   margin-top: calc(var(--line-height-form-label) + var(--space-s) + var(--space-xs));
+  margin-inline-start: var(--space-xs);
 }

@@ -141,6 +141,10 @@ class ModeratedContentViewTest extends BrowserTestBase {
     $this->drupalGet('admin/content/moderated');
     $assert_session->statusCodeEquals(200);
 
+    $this->assertSession()->pageTextContains('Authored on');
+    $this->assertSession()->fieldExists('created[min]');
+    $this->assertSession()->fieldExists('created[max]');
+
     // Check that nodes with pending revisions appear in the view.
     $node_type_labels = $this->getNodeElementsByXpath('//td[contains(@class, "views-field-type")]');
     $delta = 0;
