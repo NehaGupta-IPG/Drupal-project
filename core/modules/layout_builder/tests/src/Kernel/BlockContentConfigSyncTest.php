@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\Core\Plugin\Context\ContextDefinition;
@@ -10,9 +12,9 @@ use Drupal\layout_builder\Section;
 
 /**
  * Tests config for inline_block components is correctly imported using UUIDs.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class BlockContentConfigSyncTest extends EntityKernelTestBase {
 
   /**
@@ -46,7 +48,7 @@ class BlockContentConfigSyncTest extends EntityKernelTestBase {
   /**
    * Tests inline_block components import when revision IDs don't match.
    */
-  public function testblockContentConfigSync() {
+  public function testBlockContentConfigSync(): void {
     // Create a block_content type.
     $block_content_type_storage = $this->entityTypeManager->getStorage('block_content_type');
     $basic_block_type = $block_content_type_storage->create([
