@@ -9,16 +9,6 @@ use Drupal\Component\Assertion\Inspector;
  */
 class CacheTagsInvalidator implements CacheTagsInvalidatorInterface, CacheTagsPurgeInterface {
 
-  /**
-   * Constructs a CacheTagsInvalidator object.
-   *
-   * @param iterable<\Drupal\Core\Cache\CacheTagsInvalidatorInterface> $invalidators
-   *   The cache tags invalidators.
-   * @param iterable<\Drupal\Core\Cache\CacheBackendInterface> $bins
-   *   The cache bins.
-   * @param iterable<\Drupal\Core\Cache\CacheBackendInterface> $memoryBins
-   *   The memory cache bins.
-   */
   public function __construct(
     protected iterable $invalidators = [],
     protected iterable $bins = [],
