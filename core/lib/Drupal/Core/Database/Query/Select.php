@@ -4,6 +4,7 @@ namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Expression;
+use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 
 /**
@@ -179,6 +180,10 @@ class Select extends Query implements SelectInterface {
         $this->where($condition->expression, $condition->arguments);
         continue;
       }
+      if ($condition['field'] instanceof DatabaseAbstractCondition) {
+        $this->condition($this->hydrateAbstractCondition($condition['field']), $condition['value'], $condition['operator']);
+        continue;
+      }
       $this->condition($condition['field'], $condition['value'], $condition['operator']);
     }
     foreach ($abstractSelect->having?->conditions ?? [] as $key => $condition) {
@@ -203,6 +208,22 @@ class Select extends Query implements SelectInterface {
       $this->range = $range;
     }
     $this->distinct = $abstractSelect->distinct;
+  }
+
+  final protected function hydrateAbstractCondition(DatabaseAbstractCondition $abstractCondition): ConditionInterface {
+    $conditions = $abstractCondition->conditions;
+    $hydratedCondition = $this->connection->condition($conditions['#conjunction']);
+    unset($conditions['#conjunction']);
+    foreach ($conditions as $tmp) {
+      if ($tmp['field'] instanceof DatabaseAbstractCondition) {
+        $field = $this->hydrateAbstractCondition($tmp['field']);
+      }
+      else {
+        $field = $tmp['field'];
+      }
+      $hydratedCondition->condition($field, $tmp['value'], $tmp['operator']);
+    }
+    return $hydratedCondition;
   }
 
   /**

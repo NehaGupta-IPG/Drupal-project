@@ -94,7 +94,7 @@ final class Condition implements \Countable {
   /**
    * {@inheritdoc}
    */
-  public function condition(string $column, string|int|bool|float|array|Select|null $value = NULL, ?string $operator = '='): static {
+  public function condition(string|Condition $column, string|int|bool|float|array|Select|null $value = NULL, ?string $operator = '='): static {
     if (empty($operator)) {
       $operator = '=';
     }

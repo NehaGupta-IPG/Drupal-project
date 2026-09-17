@@ -611,12 +611,29 @@ class SelectComplexTest extends DatabaseTestBase {
    * Confirms we can join on a single table twice with a dynamic alias.
    */
   public function testJoinTwice(): void {
+    $abstractQuery = (new DatabaseAbstractSelect('test'))->columns('test');
+    $abstractAlias = $abstractQuery->join('test', 'test', '[test].[job] = [%alias].[job]');
+    $abstractQuery->addColumn($abstractAlias, 'name', 'other_name');
+    $abstractQuery->addColumn($abstractAlias, 'job', 'other_job');
+    $abstractQuery->where("[$abstractAlias].[name] <> [test].[name]");
+
     $query = $this->connection->select('test')->fields('test');
     $alias = $query->join('test', 'test', '[test].[job] = [%alias].[job]');
     $query->addField($alias, 'name', 'other_name');
     $query->addField($alias, 'job', 'other_job');
     $query->where("[$alias].[name] <> [test].[name]");
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
     $crowded_job = $query->execute()->fetch();
+    $hydratedCrowdedJob = $hydratedQuery->execute()->fetch();
+
+    $this->assertEquals($crowded_job, $hydratedCrowdedJob);
+
     $this->assertEquals($crowded_job->other_job, $crowded_job->job, 'Correctly joined same table twice.');
     $this->assertNotEquals($crowded_job->other_name, $crowded_job->name, 'Correctly joined same table twice.');
   }
@@ -630,11 +647,23 @@ class SelectComplexTest extends DatabaseTestBase {
       'mail' => $this->randomMachineName() . '@example.com',
     ]);
 
+    $abstractQuery = new DatabaseAbstractSelect('test_task', 'tt');
+    $abstractQuery->addExpression('[tt].[pid] + 1', 'abc');
+    $abstractQuery->condition('priority', 1, '>');
+    $abstractQuery->condition('priority', 100, '<');
+    $abstractSubquery = new DatabaseAbstractSelect('test', 'tp');
+    $abstractSubquery->join('test_one_blob', 'tpb', '[tp].[id] = [tpb].[id]');
+    $abstractSubquery->join('node', 'n', '[tp].[id] = [n].[nid]');
+    $abstractSubquery->addColumn('tp', 'id');
+    $abstractSubquery->condition('age', 5, '>');
+    $abstractSubquery->condition('age', 500, '<');
+    $abstractQuery->leftJoin($abstractSubquery, 'sq', '[tt].[pid] = [sq].[id]');
+    $abstractQuery->join('test_one_blob', 'tb3', '[tt].[pid] = [tb3].[id]');
+
     $query = Database::getConnection('replica')->select('test_task', 'tt');
     $query->addExpression('[tt].[pid] + 1', 'abc');
     $query->condition('priority', 1, '>');
     $query->condition('priority', 100, '<');
-
     $subquery = $this->connection->select('test', 'tp');
     $subquery->join('test_one_blob', 'tpb', '[tp].[id] = [tpb].[id]');
     $subquery->join('node', 'n', '[tp].[id] = [n].[nid]');
@@ -643,9 +672,16 @@ class SelectComplexTest extends DatabaseTestBase {
     $subquery->addField('tp', 'id');
     $subquery->condition('age', 5, '>');
     $subquery->condition('age', 500, '<');
-
     $query->leftJoin($subquery, 'sq', '[tt].[pid] = [sq].[id]');
     $query->join('test_one_blob', 'tb3', '[tt].[pid] = [tb3].[id]');
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+    $hydratedQuery->addTag('node_access');
+    $hydratedQuery->addMetaData('account', $account);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
 
     // Construct the query string.
     // This is the same sequence that SelectQuery::execute() goes through.
