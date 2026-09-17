@@ -77,3 +77,12 @@
   /* There is no variable for the color - #fff4f4. */
   background-color: #fff4f4;
 }
+
+.node--view-mode-full {
+  & .field--name-field-tags {
+    margin-block: var(--sp4);
+    padding-block: var(--sp1-5);
+    padding-inline: var(--sp2);
+    background-color: var(--color--gray-100);
+  }
+}
