@@ -179,10 +179,14 @@ class PreprocessHooksTest extends KernelTestBase {
    * @see \Drupal\default_admin\Hook\PreprocessHooks::preprocessBlockContentAddList()
    */
   public function testBlockContentAddList(): void {
+    $request_stack = $this->container->get('request_stack');
     $request = Request::create('/admin/content/block/add', 'GET', [
       'destination' => '/admin/content/block',
     ]);
-    $this->container->get('request_stack')->push($request);
+    // The tear down of a kernel test cleans up the session of whatever request
+    // is current by then, so every pushed request has to carry one.
+    $request->setSession($request_stack->getSession());
+    $request_stack->push($request);
 
     $block_type = $this->createStub(BlockContentTypeInterface::class);
     $block_type->method('id')->willReturn('basic');

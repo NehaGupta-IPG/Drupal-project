@@ -35,11 +35,11 @@ class AdminPagesTest extends BrowserTestBase {
   protected static $modules = [
     'block',
     'block_content',
-    'dblog',
     'help',
     'menu_link_content',
     'menu_ui',
     'node',
+    'path',
     'views',
   ];
 
@@ -114,6 +114,7 @@ class AdminPagesTest extends BrowserTestBase {
       'administer permissions',
       'administer site configuration',
       'administer themes',
+      'administer url aliases',
       'create article content',
       'create page content',
     ]);
@@ -287,7 +288,7 @@ class AdminPagesTest extends BrowserTestBase {
     // icon, rendered by system-modules-details.html.twig.
     $assert_session->elementExists('css', '.module-details__links a.action-link.action-link--small.action-link--icon-questionmark[href$="/admin/help/node"]');
     $assert_session->elementExists('css', '.module-details__links a.action-link.action-link--small.action-link--icon-key[href$="/admin/people/permissions/module/node"]');
-    $assert_session->elementExists('css', '.module-details__links a.action-link.action-link--small.action-link--icon-cog[href$="/admin/config/development/logging"]');
+    $assert_session->elementExists('css', '.module-details__links a.action-link.action-link--small.action-link--icon-cog[href$="/admin/config/search/path"]');
 
     // The classes the form itself sets are kept.
     $assert_session->elementExists('css', '.module-details__links a.action-link.module-link.module-link-permissions');
@@ -350,13 +351,15 @@ class AdminPagesTest extends BrowserTestBase {
     $assert_session = $this->assertSession();
 
     // preprocessTable() marks the header cells of a plain table whose sort
-    // link carries both an order and a sort parameter. table.html.twig gives
-    // the linked headers th__item and the plain ones a label based class.
-    $this->drupalGet('admin/reports/dblog');
+    // link carries both an order and a sort parameter. On the path alias list
+    // the Alias and System path headers are sort links, while the Operations
+    // header is plain text. table.html.twig gives the linked headers th__item
+    // and the plain ones a label based class.
+    $this->drupalGet('admin/config/search/path');
     $assert_session->statusCodeEquals(200);
-    $assert_session->elementExists('css', 'table#admin-dblog th.th__item.sortable-heading a');
-    $assert_session->elementExists('css', 'table#admin-dblog th.th__message');
-    $assert_session->elementNotExists('css', 'table#admin-dblog th.th__message.sortable-heading');
+    $assert_session->elementExists('css', 'table th.th__item.sortable-heading a');
+    $assert_session->elementExists('css', 'table th.th__operations');
+    $assert_session->elementNotExists('css', 'table th.th__operations.sortable-heading');
 
     // preprocessViewsViewTable() marks the headers of the views table that
     // link to a sorted version of the same page.

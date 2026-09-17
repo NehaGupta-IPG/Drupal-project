@@ -487,10 +487,14 @@ class ThemeHooksTest extends KernelTestBase {
    *   The route name to report as current.
    */
   protected function setCurrentRoute(string $route_name): void {
+    $request_stack = $this->container->get('request_stack');
     $request = Request::create('/');
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, $route_name);
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('/'));
-    $this->container->get('request_stack')->push($request);
+    // The tear down of a kernel test cleans up the session of whatever request
+    // is current by then, so every pushed request has to carry one.
+    $request->setSession($request_stack->getSession());
+    $request_stack->push($request);
   }
 
   /**

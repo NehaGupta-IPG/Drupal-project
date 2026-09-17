@@ -207,7 +207,12 @@ class ThemeSettingsFormTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('This setting is overridden by the');
 
     // Another user still gets the settings configured for the theme.
-    $this->drupalLogin($this->rootUser);
+    $other_account = $this->drupalCreateUser([
+      'access administration pages',
+      'administer themes',
+      'access content overview',
+    ]);
+    $this->drupalLogin($other_account);
     $response = $this->drupalGet('/admin/content');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->elementNotExists('css', 'html.high-contrast-mode');
