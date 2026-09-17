@@ -224,6 +224,7 @@ dropbutton:
   dependencies:
     - core/drupal
     - core/once
+    - core/drupal.debounce
 
 autocomplete:
   version: VERSION
@@ -374,6 +375,8 @@ navigation:
   js:
     migration/js/navigation.js: { minified: false }
   dependencies:
+    - core/drupal
+    - core/drupal.displace
     - default_admin/escape_admin
     - default_admin/drupal.node.preview
     - default_admin/contextual_links
@@ -388,6 +391,7 @@ accent:
   js:
     migration/js/accent.js: { minified: false }
   dependencies:
+    - core/drupal
     - core/drupalSettings
     - core/once
 
@@ -399,11 +403,14 @@ description_toggle:
       css/components/description-toggle.css: { }
   js:
     migration/js/description_toggle.js: { minified: false }
+  dependencies:
+    - core/drupal
 
 escape_admin:
   js:
     migration/js/escape_admin.js: { minified: false }
   dependencies:
+    - core/drupal
     - core/once
 
 # Libs
@@ -435,7 +442,9 @@ sidebar:
   js:
     migration/js/sidebar.js: { minified: false }
   dependencies:
+    - core/drupal
     - core/once
+    - core/drupal.debounce
 
 settings:
   js:
@@ -444,13 +453,16 @@ settings:
     component:
       css/components/settings.css: { minified: false }
   dependencies:
+    - core/drupal
     - core/drupalSettings
 
 tableheader:
   js:
     migration/js/tableheader.js: { minified: false }
   dependencies:
+    - core/drupal
     - core/once
+    - core/drupal.debounce
     - default_admin/scroll_sync
 
 tooltip:
@@ -472,6 +484,7 @@ more_actions:
     component:
       css/components/more-actions.css: { minified: false }
   dependencies:
+    - core/drupal
     - core/once
 
 edit_form:
