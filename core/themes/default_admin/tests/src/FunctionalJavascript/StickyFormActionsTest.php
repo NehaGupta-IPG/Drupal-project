@@ -194,8 +194,8 @@ final class StickyFormActionsTest extends WebDriverTestBase {
 
     $this->getSession()->getPage()->fillField('label', 'Sticky bar label');
 
-    // Both events are dispatched synchronously while the copy is clicked, so
-    // the recorded order is complete as soon as the click returns.
+    // The relay runs synchronously inside the click on the copy, so whatever
+    // the original button receives is recorded by the time the script returns.
     $copy = self::STICKY_BAR . ' [data-drupal-selector="sticky-edit-submit"]';
     $recorded = $this->getSession()->evaluateScript(<<<JS
       (() => {
@@ -207,9 +207,14 @@ final class StickyFormActionsTest extends WebDriverTestBase {
         return events.join(',');
       })()
       JS);
-    $this->assertSame('mousedown,click', $recorded);
 
-    // The relayed click submits the form for real.
+    // The mouse down event has to come first, because nothing else starts the
+    // request. The forwarded click never arrives: Drupal.Ajax.beforeSend() has
+    // already disabled the button for the duration of the request, and
+    // HTMLElement.click() on a disabled form control dispatches no event.
+    $this->assertStringStartsWith('mousedown', $recorded);
+
+    // That one relayed event submits the field configuration for real.
     $this->assertTrue($assert_session->waitForText('Saved Sticky bar label configuration.'));
     $this->assertStringContainsString('/admin/structure/types/manage/page/fields', $this->getSession()->getCurrentUrl());
   }
