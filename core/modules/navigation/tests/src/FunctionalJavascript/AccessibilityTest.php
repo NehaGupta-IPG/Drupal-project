@@ -72,9 +72,9 @@ class AccessibilityTest extends AccessibilityTestBase {
     yield 'Admin page' => [
       'path' => '/user/1/edit',
       'admin' => TRUE,
-      // @todo remove the disabled 'region' rule after https://drupal.org/i/3583486.
       'axe_options' => [
         'rules' => [
+          // @todo remove after https://drupal.org/i/3583486.
           'region' => ['enabled' => FALSE],
         ],
       ],
