@@ -171,7 +171,7 @@ class Select extends Query implements SelectInterface {
         'alias' => $expression->alias,
       ];
     }
-    foreach ($abstractSelect->conditions() as $key => $condition) {
+    foreach ($abstractSelect->condition?->conditions ?? [] as $key => $condition) {
       if ($key === '#conjunction') {
         continue;
       }
@@ -181,7 +181,7 @@ class Select extends Query implements SelectInterface {
       }
       $this->condition($condition['field'], $condition['value'], $condition['operator']);
     }
-    foreach ($abstractSelect->having?->conditions() ?? [] as $key => $condition) {
+    foreach ($abstractSelect->having?->conditions ?? [] as $key => $condition) {
       if ($key === '#conjunction') {
         continue;
       }

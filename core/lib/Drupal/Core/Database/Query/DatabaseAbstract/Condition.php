@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Database\Query\DatabaseAbstract;
 
 use Drupal\Core\Database\Expression;
@@ -74,7 +76,7 @@ final class Condition implements \Countable {
    * @param string $conjunction
    *   The operator to use to combine conditions: 'AND' or 'OR'.
    */
-  public function __construct($conjunction) {
+  public function __construct(string $conjunction) {
     $this->conditions['#conjunction'] = $conjunction;
   }
 
@@ -92,7 +94,7 @@ final class Condition implements \Countable {
   /**
    * {@inheritdoc}
    */
-  public function condition($column, $value = NULL, $operator = '=') {
+  public function condition(string $column, string|int|bool|float|array|Select|null $value = NULL, ?string $operator = '='): static {
     if (empty($operator)) {
       $operator = '=';
     }
@@ -123,7 +125,7 @@ final class Condition implements \Countable {
   /**
    * {@inheritdoc}
    */
-  public function where($snippet, $args = []) {
+  public function where(string $snippet, array $args = []): static {
     $this->conditions[] = new Expression($snippet, $args);
     $this->changed = TRUE;
 
@@ -133,43 +135,36 @@ final class Condition implements \Countable {
   /**
    * {@inheritdoc}
    */
-  public function isNull($column) {
+  public function isNull(string $column): static {
     return $this->condition($column, NULL, 'IS NULL');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isNotNull($column) {
+  public function isNotNull(string $column): static {
     return $this->condition($column, NULL, 'IS NOT NULL');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function exists(Select $select) {
+  public function exists(Select $select): static {
     return $this->condition('', $select, 'EXISTS');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function notExists(Select $select) {
+  public function notExists(Select $select): static {
     return $this->condition('', $select, 'NOT EXISTS');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function alwaysFalse() {
+  public function alwaysFalse(): static {
     return $this->where('1 = 0');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function &conditions() {
-    return $this->conditions;
   }
 
   /**
@@ -359,21 +354,21 @@ final class Condition implements \Countable {
   /**
    * {@inheritdoc}
    */
-  public function conditionGroupFactory($conjunction = 'AND') {
+  public function conditionGroupFactory(string $conjunction = 'AND'): static {
     return new static($conjunction);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function andConditionGroup() {
+  public function andConditionGroup(): static {
     return $this->conditionGroupFactory('AND');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function orConditionGroup() {
+  public function orConditionGroup(): static {
     return $this->conditionGroupFactory('OR');
   }
 

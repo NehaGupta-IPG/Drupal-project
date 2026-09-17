@@ -654,16 +654,6 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function &conditions() {
-    if (!isset($this->condition)) {
-      $this->condition = new Condition($this->conjunction);
-    }
-    return $this->condition->conditions();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function conditionArguments() {
     if (!isset($this->condition)) {
       $this->condition = new Condition($this->conjunction);

@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\RowCountException;
+use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\user\Entity\User;
@@ -423,15 +424,27 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests that countQuery removes 'all_fields' statements and ordering clauses.
    */
   public function testCountQueryRemovals(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $abstractQuery->columns('test');
+    $abstractQuery->orderBy('name');
+    $abstractCountQuery = $abstractQuery->countQuery();
+
     $query = $this->connection->select('test');
     $query->fields('test');
     $query->orderBy('name');
     $count = $query->countQuery();
 
+    $hydratedQuery = $this->connection->select($abstractQuery);
+    $hydratedCountQuery = $this->connection->select($abstractCountQuery);
+
     // Check that the 'all_fields' statement is handled properly.
     $tables = $query->getTables();
     $this->assertEquals(1, $tables['test']['all_fields'], 'Query correctly sets \'all_fields\' statement.');
     $tables = $count->getTables();
+    $this->assertFalse(isset($tables['test']['all_fields']), 'Count query correctly unsets \'all_fields\' statement.');
+    $tables = $hydratedQuery->getTables();
+    $this->assertEquals(1, $tables['test']['all_fields'], 'Query correctly sets \'all_fields\' statement.');
+    $tables = $hydratedCountQuery->getTables();
     $this->assertFalse(isset($tables['test']['all_fields']), 'Count query correctly unsets \'all_fields\' statement.');
 
     // Check that the ordering clause is handled properly.
@@ -443,8 +456,20 @@ class SelectComplexTest extends DatabaseTestBase {
     $orderby = $count->getOrderBy();
     $this->assertFalse(isset($orderby['name']), 'Count query correctly unsets ordering clause.');
 
+    // Check that the ordering clause is handled properly.
+    $orderby = $hydratedQuery->getOrderBy();
+    // The orderby string is different for PostgreSQL.
+    // @see Drupal\pgsql\Driver\Database\pgsql\Select::orderBy()
+    $db_type = Database::getConnection()->databaseType();
+    $this->assertEquals($db_type == 'pgsql' ? 'ASC NULLS FIRST' : 'ASC', $orderby['name']);
+    $orderby = $hydratedCountQuery->getOrderBy();
+    $this->assertFalse(isset($orderby['name']));
+
     // Make sure that the count query works.
     $count = $count->execute()->fetchField();
+    $hydratedCount = $hydratedCountQuery->execute()->fetchField();
+
+    $this->assertEquals($count, $hydratedCount);
 
     $this->assertEquals(4, $count, 'Counted the correct number of records.');
   }
@@ -465,6 +490,16 @@ class SelectComplexTest extends DatabaseTestBase {
     $query = $this->connection->select('test');
     $query->addExpression('[fail]');
     $this->assertEquals(4, $query->countQuery()->execute()->fetchField(), 'Count Query removed expressions');
+
+    $query = new DatabaseAbstractSelect('test');
+    $query->columns('test', ['fail']);
+    $query = $query->countQuery();
+    $this->assertEquals(4, $this->connection->select($query)->execute()->fetchField());
+
+    $query = new DatabaseAbstractSelect('test');
+    $query->addExpression('[fail]');
+    $query = $query->countQuery();
+    $this->assertEquals(4, $this->connection->select($query)->execute()->fetchField());
   }
 
   /**
@@ -476,6 +511,15 @@ class SelectComplexTest extends DatabaseTestBase {
     $query->distinct();
 
     $count = $query->countQuery()->execute()->fetchField();
+
+    $this->assertEquals(6, $count, 'Counted the correct number of records.');
+
+    $query = new DatabaseAbstractSelect('test_task');
+    $query->addColumn('test_task', 'task');
+    $query->distinct();
+    $query = $query->countQuery();
+
+    $count = $this->connection->select($query)->execute()->fetchField();
 
     $this->assertEquals(6, $count, 'Counted the correct number of records.');
   }
@@ -492,15 +536,41 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $this->assertEquals(3, $count, 'Counted the correct number of records.');
 
+    $query = new DatabaseAbstractSelect('test_task');
+    $query->addColumn('test_task', 'pid');
+    $query->groupBy('pid');
+    $query = $query->countQuery();
+
+    $count = $this->connection->select($query)->execute()->fetchField();
+
+    $this->assertEquals(3, $count);
+
     // Use a column alias as, without one, the query can succeed for the wrong
     // reason.
+    $abstractQuery = new DatabaseAbstractSelect('test_task');
+    $abstractQuery->addColumn('test_task', 'pid', 'pid_alias');
+    $abstractQuery->addExpression('COUNT([test_task].[task])', 'count');
+    $abstractQuery->groupBy('pid_alias');
+    $abstractQuery->orderBy('pid_alias', 'asc');
+    $abstractCountQuery = $abstractQuery->countQuery();
+
     $query = $this->connection->select('test_task');
     $query->addField('test_task', 'pid', 'pid_alias');
     $query->addExpression('COUNT([test_task].[task])', 'count');
     $query->groupBy('pid_alias');
     $query->orderBy('pid_alias', 'asc');
+    $count_query = $query->countQuery();
 
-    $count = $query->countQuery()->execute()->fetchField();
+    $hydratedCountQuery = $this->connection->select($abstractCountQuery);
+
+    $this->resetUniqueIdentifiers($count_query);
+    $this->resetUniqueIdentifiers($hydratedCountQuery);
+    $this->assertEquals($count_query, $hydratedCountQuery);
+
+    $count = $count_query->execute()->fetchField();
+    $hydratedCount = $hydratedCountQuery->execute()->fetchField();
+
+    $this->assertEquals($count, $hydratedCount);
 
     $this->assertEquals(3, $count, 'Counted the correct number of records.');
   }
@@ -513,12 +583,27 @@ class SelectComplexTest extends DatabaseTestBase {
     // "SELECT job FROM {test} WHERE name = 'Paul' AND (age = 26 OR age = 27)"
     // That should find only one record. Yes it's a non-optimal way of writing
     // that query but that's not the point!
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $abstractQuery->addColumn('test', 'job');
+    $abstractQuery->condition('name', 'Paul');
+    $abstractQuery->condition((new DatabaseAbstractCondition('OR'))->condition('age', 26)->condition('age', 27));
+
     $query = $this->connection->select('test');
     $query->addField('test', 'job');
     $query->condition('name', 'Paul');
     $query->condition(($this->connection->condition('OR'))->condition('age', 26)->condition('age', 27));
 
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
     $job = $query->execute()->fetchField();
+    $hydratedJob = $hydratedQuery->execute()->fetchField();
+
+    $this->assertEquals($job, $hydratedJob);
+
     $this->assertEquals('Songwriter', $job, 'Correct data retrieved.');
   }
 
