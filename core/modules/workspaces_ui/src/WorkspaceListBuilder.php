@@ -334,31 +334,35 @@ class WorkspaceListBuilder extends EntityListBuilder {
         ],
       ];
       if (!$active_workspace->hasParent()) {
+        $url = Url::fromRoute('entity.workspace.publish_form',
+          ['workspace' => $active_workspace->id()],
+          ['query' => ['destination' => $active_workspace->toUrl('collection')->toString()]]
+        );
         $build['active_workspace']['actions']['publish'] = [
           '#type' => 'link',
           '#title' => $this->t('Publish content'),
-          '#url' => Url::fromRoute('entity.workspace.publish_form',
-            ['workspace' => $active_workspace->id()],
-            ['query' => ['destination' => $active_workspace->toUrl('collection')->toString()]]
-          ),
+          '#url' => $url,
+          '#access' => $url->access(return_as_object: TRUE),
           '#attributes' => [
             'class' => ['button', 'button--primary', 'active-workspace__button'],
           ],
         ];
       }
       else {
+        $url = Url::fromRoute('entity.workspace.merge_form',
+          [
+            'source_workspace' => $active_workspace->id(),
+            'target_workspace' => $active_workspace->parent->target_id,
+          ],
+          [
+            'query' => ['destination' => $active_workspace->toUrl('collection')->toString()],
+          ]
+        );
         $build['active_workspace']['actions']['merge'] = [
           '#type' => 'link',
           '#title' => $this->t('Merge content'),
-          '#url' => Url::fromRoute('entity.workspace.merge_form',
-            [
-              'source_workspace' => $active_workspace->id(),
-              'target_workspace' => $active_workspace->parent->target_id,
-            ],
-            [
-              'query' => ['destination' => $active_workspace->toUrl('collection')->toString()],
-            ]
-          ),
+          '#url' => $url,
+          '#access' => $url->access(return_as_object: TRUE),
           '#attributes' => [
             'class' => ['button', 'button--primary', 'active-workspace__button'],
           ],
