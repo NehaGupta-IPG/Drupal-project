@@ -62,15 +62,11 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
       $config = $event->getConfig();
       $original = $config->getOriginal();
 
-      // A brand-new configuration object's values are, by definition, the
-      // shipped defaults - never a manual edit - no matter what langcode it
-      // was installed with. This matters because ConfigInstaller may resolve
-      // such a langcode to something other than 'en' (see
-      // \Drupal\Core\Config\ConfigInstaller::createConfiguration()),
-      // including for a module installed long after the site itself was,
-      // which the InstallerKernel::installationAttempted() check above does
-      // not cover.
-      if (empty($original)) {
+      // Configuration created by the ConfigInstaller might have had the
+      // langcode updated to something other than 'en' (see
+      // \Drupal\Core\Config\ConfigInstaller::createConfiguration()). In this
+      // case, do not feed back any changes to locale.
+      if (empty($original) && $config->get('_core.default_config_hash') !== NULL) {
         return;
       }
 
