@@ -51,14 +51,14 @@
   box-shadow: var(--details-box-shadow);
 
   /*
-   * The following width and min-width values ensure that the <details> element
+   * The following inline-size and min-inline-size values ensure that the <details> element
    * does not shift widths when opening, in the event that a parent table
    * element constrains the width. This can happen when toggling the
    * "lazy-load" option within an image field.
    */
   td & {
-    width: min-content;
-    min-width: 100%;
+    inline-size: 0;
+    min-inline-size: 100%;
   }
 }
 
