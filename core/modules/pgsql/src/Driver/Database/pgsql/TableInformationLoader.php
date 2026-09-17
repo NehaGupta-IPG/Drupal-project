@@ -229,7 +229,7 @@ INNER JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
 LEFT JOIN (' . static::TABLE_ATTRIBUTES_SQL . ') ai ON ai.attrelid = pg_class.oid
 WHERE pg_namespace.nspname = :schema
 AND pg_class.relkind = \'r\'
-AND pg_class.relname LIKE :pattern
+AND pg_class.relname::text LIKE :pattern
 ORDER BY pg_class.relname, ai.attnum';
     $result = $this->connection->query($sql, [
       ':schema' => $schema,
