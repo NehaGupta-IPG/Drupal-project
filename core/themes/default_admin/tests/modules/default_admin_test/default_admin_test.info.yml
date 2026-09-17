@@ -1,0 +1,7 @@
+name: 'Default Admin tests'
+type: module
+description: 'Support module for testing the Default Admin theme.'
+package: Testing
+version: VERSION
+core_version_requirement: '*'
+hidden: true

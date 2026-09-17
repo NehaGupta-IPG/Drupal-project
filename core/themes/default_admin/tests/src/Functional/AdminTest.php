@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\default_admin\Functional;
 
+use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -126,33 +127,7 @@ class AdminTest extends BrowserTestBase {
 
     // Login as admin.
     $this->drupalLogin($this->rootUser);
-    $this->assertStringContainsString('"dark_mode":"auto"', $this->drupalGet('edit-form'));
-  }
-
-  /**
-   * Disabled: Test user settings.
-   */
-  public function disabledTestUserSettings(): void {
-    $user1 = $this->createUser();
-    $this->drupalLogin($user1);
-    // Change something on user1 edit form.
-    $this->drupalGet($user1->toUrl('edit-form'));
-    $this->submitForm([
-      'enable_user_settings' => TRUE,
-      'high_contrast_mode' => TRUE,
-      'enable_dark_mode' => '1',
-    ], 'Save');
-
-    // Check logged-in's user is not affected.
-    $loggedInUserResponse = $this->drupalGet('edit-form');
-    $this->assertStringContainsString('"high_contrast_mode":false', $loggedInUserResponse);
-    $this->assertStringContainsString('"dark_mode":"auto"', $loggedInUserResponse);
-
-    // Check settings of user1.
-    $this->drupalLogin($user1);
-    $rootUserResponse = $this->drupalGet($user1->toUrl('edit-form'));
-    $this->assertStringContainsString('"high_contrast_mode":true', $rootUserResponse);
-    $this->assertStringContainsString('"dark_mode":"1"', $rootUserResponse);
+    $this->assertStringContainsString('"dark_mode":"auto"', $this->drupalGet(Url::fromRoute('entity.user.edit_form', ['user' => $this->rootUser->id()])));
   }
 
 }

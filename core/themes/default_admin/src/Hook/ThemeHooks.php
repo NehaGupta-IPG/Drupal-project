@@ -91,13 +91,6 @@ class ThemeHooks implements TrustedCallbackInterface {
     if (isset($info['status_messages'])) {
       $info['status_messages']['#pre_render'][] = [__CLASS__, 'messagePlaceholder'];
     }
-
-    if (array_key_exists('text_format', $info)) {
-      $info['text_format']['#pre_render'][] = [
-        __CLASS__,
-        'textFormat',
-      ];
-    }
   }
 
   /**

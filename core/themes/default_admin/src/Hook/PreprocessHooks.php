@@ -780,7 +780,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    */
   #[Hook('preprocess_links')]
   public function preprocessLinks(array &$variables): void {
-    foreach ($variables['links'] as $links_item) {
+    foreach ($variables['links'] as &$links_item) {
       if (!empty($links_item['link']) && !empty($links_item['link']['#url']) && $links_item['link']['#url'] instanceof Url && $links_item['link']['#url']->isRouted()) {
         switch ($links_item['link']['#url']->getRouteName()) {
           case 'system.theme_settings_theme':
@@ -802,6 +802,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
         }
       }
     }
+    unset($links_item);
 
     // This makes it so array keys of #links items are added as a class. This
     // functionality was removed in Drupal 8.1, but still necessary in some
