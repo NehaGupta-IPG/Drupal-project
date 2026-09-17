@@ -58,7 +58,7 @@ class Radios extends FormElementBase {
    * Expands a radios element into individual radio elements.
    */
   public static function processRadios(&$element, FormStateInterface $form_state, &$complete_form) {
-    if (count($element['#options']) > 0) {
+    if (is_countable($element['#options']) && count($element['#options']) > 0) {
       $weight = 0;
       $child_attributes = $element['#attributes'];
       // Prevent child elements from inheriting an aria-describedby attribute.

@@ -60,7 +60,7 @@ class Checkboxes extends FormElementBase {
   public static function processCheckboxes(&$element, FormStateInterface $form_state, &$complete_form) {
     $value = is_array($element['#value']) ? $element['#value'] : [];
     $element['#tree'] = TRUE;
-    if (count($element['#options']) > 0) {
+    if (is_countable($element['#options']) && count($element['#options']) > 0) {
       if (!isset($element['#default_value']) || $element['#default_value'] == 0) {
         $element['#default_value'] = [];
       }
