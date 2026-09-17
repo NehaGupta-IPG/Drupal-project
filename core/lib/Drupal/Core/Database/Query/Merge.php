@@ -303,7 +303,8 @@ class Merge extends Query implements ConditionInterface {
    *
    * @return $this
    *
-   * @see \Drupal\Core\Cache\DatabaseCacheTagsChecksum::doInvalidateTags()
+   * @see \Drupal\KernelTests\Core\Database\MergeTest::testMergeFieldsAfterKeys()
+   * @see \Drupal\KernelTests\Core\Database\MergeTest::testMergeKeysAfterInsertFields()
    */
   public function keys(array $fields, array $values = []) {
     if ($values) {
@@ -333,7 +334,7 @@ class Merge extends Query implements ConditionInterface {
    * @return $this
    *
    * @see \Drupal\Core\Database\Query\Merge::keys()
-   * @see \Drupal\Core\Cache\DatabaseCacheTagsChecksum::doInvalidateTags()
+   * @see \Drupal\KernelTests\Core\Database\MergeTest::testMergeInsertFieldsAfterKey()
    */
   public function key($field, $value = NULL) {
     assert(is_string($field));
