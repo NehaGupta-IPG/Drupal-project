@@ -116,8 +116,46 @@ trait DeprecatedWakeupTrait {
       if (array_key_exists($property, $current) && $current[$property] === $value) {
         continue;
       }
+      if (is_string($property) && $property !== '' && $property[0] === "\0") {
+        $this->populatePrivateProperty($property, $value);
+        continue;
+      }
       $this->$property = $value;
     }
+  }
+
+  /**
+   * Populates a private property declared by another class in the hierarchy.
+   *
+   * A property that is private to a subclass cannot be assigned from the scope
+   * of this class: PHP either throws or, when the subclass implements __set(),
+   * silently reroutes the value there. Assign it in the scope of the declaring
+   * class instead, as a native unserialize() effectively does.
+   *
+   * @param string $key
+   *   The mangled property key, "\0Class\0property".
+   * @param mixed $value
+   *   The value to assign.
+   */
+  private function populatePrivateProperty(string $key, mixed $value): void {
+    $parts = explode("\0", $key, 3);
+    if (count($parts) !== 3 || !$this instanceof $parts[1]) {
+      // Not a private property of a class in the hierarchy, for example the
+      // declaring class was renamed. Assign it as a plain property, which is
+      // what happened with the plain property name before.
+      $this->{end($parts)} = $value;
+      return;
+    }
+    [, $class, $property] = $parts;
+    \Closure::bind(function (string $property, mixed $value): void {
+      // As in ::populateProperties(), leave a property that already holds the
+      // given value untouched, so that a readonly property is not assigned
+      // twice.
+      $current = get_object_vars($this);
+      if (!array_key_exists($property, $current) || $current[$property] !== $value) {
+        $this->$property = $value;
+      }
+    }, $this, $class)($property, $value);
   }
 
   /**
@@ -129,12 +167,18 @@ trait DeprecatedWakeupTrait {
    * property names. This method maps both forms to plain property names so
    * that doUnserialize() implementations can rely on a single key format.
    *
+   * The one exception is a private property of another class in the
+   * hierarchy, typically a subclass with its own legacy __sleep(). Such a
+   * property cannot be assigned from the scope of this class, so its key stays
+   * mangled and ::populateProperties() assigns it in the scope of the
+   * declaring class.
+   *
    * @param array<mixed, mixed> $data
    *   The payload as passed to __unserialize().
    *
    * @return array<string, mixed>
-   *   The payload keyed by plain property name. Keys that cannot map to a
-   *   property are dropped.
+   *   The payload keyed by property name. Keys that cannot map to a property
+   *   are dropped.
    */
   protected function normalizeSerializedData(array $data): array {
     $normalized = [];
@@ -155,7 +199,9 @@ trait DeprecatedWakeupTrait {
    *   Serialized key.
    *
    * @return string|null
-   *   Normalized property name, or NULL when key cannot map to a property.
+   *   Normalized property name, or NULL when key cannot map to a property. The
+   *   key of a private property of another class in the hierarchy is returned
+   *   unchanged.
    */
   protected function normalizeSerializedKey(mixed $key): ?string {
     if (!is_string($key)) {
@@ -164,10 +210,12 @@ trait DeprecatedWakeupTrait {
     // Legacy serialized payloads may contain mangled protected/private keys:
     // "\0*\0property" or "\0Class\0property".
     if ($key !== '' && $key[0] === "\0") {
-      $pos = strrpos($key, "\0");
-      if ($pos !== FALSE) {
-        return substr($key, $pos + 1);
+      $parts = explode("\0", $key, 3);
+      if (count($parts) === 3 && $parts[1] !== '*' && strcasecmp($parts[1], self::class) !== 0) {
+        // Private to another class: keep the declaring class in the key.
+        return $key;
       }
+      return end($parts);
     }
     return $key;
   }

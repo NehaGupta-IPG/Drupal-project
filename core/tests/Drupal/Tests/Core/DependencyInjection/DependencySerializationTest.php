@@ -179,6 +179,79 @@ class DependencySerializationTest extends UnitTestCase {
     $this->assertEmpty($unserialized->getServiceIds());
   }
 
+  /**
+   * Tests a subclass __sleep() that names a private property of the subclass.
+   *
+   * PHP resolves the names returned by a native __sleep() against the concrete
+   * class, so a private property of the subclass is serialized under its
+   * mangled key. The backwards compatibility layer must do the same and, on
+   * unserialization, assign the property in the scope of the subclass rather
+   * than in the scope of the class using the trait.
+   */
+  #[IgnoreDeprecations]
+  public function testSleepWithPrivateProperty(): void {
+    $service = new \stdClass();
+    $container = TestKernel::setContainerWithKernel();
+    $container->set('test_service', $service);
+
+    $object = new DependencySerializationTestDummyPrivateSubclass($service, 'private value');
+    $object->setContainer($container);
+
+    $this->expectUserDeprecationMessage('Implementing __sleep() in a subclass of Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy is deprecated in drupal:11.5.0 and is not supported in drupal:13.0.0. Implement __serialize() instead. See https://www.drupal.org/node/3578423');
+    $this->expectUserDeprecationMessage('Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy::__sleep() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use __serialize() instead. See https://www.drupal.org/node/3578423');
+    $serialized = serialize($object);
+    // The private property is serialized under its mangled key, as PHP does
+    // for a native __sleep().
+    $this->assertStringContainsString("\0" . DependencySerializationTestDummyPrivateSubclass::class . "\0secret", $serialized);
+
+    $unserialized = unserialize($serialized);
+    $this->assertInstanceOf(DependencySerializationTestDummyPrivateSubclass::class, $unserialized);
+    $this->assertSame('private value', $unserialized->getSecret());
+    // The property was assigned directly, not rerouted through __set().
+    $this->assertSame([], $unserialized->magicWrites);
+    $this->assertSame($service, $unserialized->service);
+    $this->assertSame($container, $unserialized->container);
+    $this->assertEmpty($unserialized->getServiceIds());
+  }
+
+  /**
+   * Tests a legacy payload carrying a private property of a subclass.
+   *
+   * Such payloads were written by PHP for a subclass whose __sleep() named one
+   * of its own private properties. The property must be assigned in the scope
+   * of the subclass: from the scope of the parent class PHP would either throw
+   * or, as the subclass implements __set(), silently reroute the value there.
+   */
+  public function testLegacySerializedDataWithPrivateProperty(): void {
+    $service = new \stdClass();
+    $container = TestKernel::setContainerWithKernel();
+    $container->set('test_service', $service);
+
+    $class = DependencySerializationTestDummyPrivateSubclass::class;
+    $legacy_service_ids = "\0*\0_serviceIds";
+    $legacy_entity_storages = "\0*\0_entityStorages";
+    $legacy_secret = "\0" . $class . "\0secret";
+    $payload = sprintf(
+      'O:%d:"%s":4:{s:9:"container";N;s:%d:"%s";a:1:{s:7:"service";s:12:"test_service";}s:%d:"%s";a:0:{}s:%d:"%s";s:12:"legacy value";}',
+      strlen($class),
+      $class,
+      strlen($legacy_service_ids),
+      $legacy_service_ids,
+      strlen($legacy_entity_storages),
+      $legacy_entity_storages,
+      strlen($legacy_secret),
+      $legacy_secret,
+    );
+
+    $unserialized = unserialize($payload);
+    $this->assertInstanceOf($class, $unserialized);
+    $this->assertSame('legacy value', $unserialized->getSecret());
+    $this->assertSame([], $unserialized->magicWrites);
+    $this->assertSame($service, $unserialized->service);
+    $this->assertNull($unserialized->container);
+    $this->assertEmpty($unserialized->getServiceIds());
+  }
+
 }
 
 /**
@@ -289,6 +362,51 @@ class DependencySerializationTestDummyReadonlySubclass extends DependencySeriali
 
   public function __wakeup(): void {
     parent::__wakeup();
+  }
+
+}
+
+/**
+ * Defines a test class with a private property named in its legacy __sleep().
+ *
+ * __set() records assignments to properties that are inaccessible from the
+ * calling scope. That is where the private property would end up if it were
+ * assigned from the scope of the parent class.
+ */
+class DependencySerializationTestDummyPrivateSubclass extends DependencySerializationTestDummy {
+
+  /**
+   * Values assigned through __set(), keyed by property name.
+   *
+   * @var array<string, mixed>
+   */
+  public array $magicWrites = [];
+
+  /**
+   * Constructs a new DependencySerializationTestDummyPrivateSubclass object.
+   *
+   * @param object $service
+   *   A test service.
+   * @param string $secret
+   *   A value for the private property.
+   */
+  public function __construct(\stdClass $service, private string $secret = 'default') {
+    parent::__construct($service);
+  }
+
+  public function __sleep(): array {
+    return [...parent::__sleep(), 'secret'];
+  }
+
+  public function __set(string $name, mixed $value): void {
+    $this->magicWrites[$name] = $value;
+  }
+
+  /**
+   * Gets the private property.
+   */
+  public function getSecret(): string {
+    return $this->secret;
   }
 
 }

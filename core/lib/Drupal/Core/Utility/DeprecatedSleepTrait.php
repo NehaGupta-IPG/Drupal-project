@@ -36,8 +36,26 @@ trait DeprecatedSleepTrait {
     @trigger_error('Implementing __sleep() in a subclass of ' . __CLASS__ . ' is deprecated in drupal:11.5.0 and is not supported in drupal:13.0.0. Implement __serialize() instead. See https://www.drupal.org/node/3578423', E_USER_DEPRECATED);
     // @phpstan-ignore method.deprecated
     $keys = $this->__sleep();
+    // Read the properties from the object's full property table, as PHP does
+    // for the names returned by a native __sleep(). Unlike a property read
+    // from the scope of this class, that also finds private properties of a
+    // subclass. Their keys stay mangled ("\0Class\0property"), exactly as PHP
+    // writes them, so that __unserialize() can assign them in the scope of the
+    // class that declares them.
+    $vars = (array) $this;
     $map = [];
     foreach ($keys as $key) {
+      // Mirror PHP's lookup order for a name returned by __sleep(): a public
+      // or dynamic property, then a private property of the concrete class,
+      // then a protected property.
+      foreach ([$key, "\0" . static::class . "\0" . $key, "\0*\0" . $key] as $candidate) {
+        if (array_key_exists($candidate, $vars)) {
+          $map[$candidate] = $vars[$candidate];
+          continue 2;
+        }
+      }
+      // Not found in the property table, for example an uninitialized typed
+      // property. Let a regular property read produce the usual error.
       $map[$key] = $this->$key;
     }
     return $map;
