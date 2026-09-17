@@ -14,6 +14,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Defines a storage for shortcut_set entities.
@@ -51,9 +52,11 @@ class ShortcutSetStorage extends ConfigEntityStorage implements ShortcutSetStora
    *   The memory cache.
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
+   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|null $event_dispatcher
+   *   (optional) The event dispatcher.
    */
-  public function __construct(EntityTypeInterface $entity_info, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache, Connection $connection) {
-    parent::__construct($entity_info, $config_factory, $uuid_service, $language_manager, $memory_cache);
+  public function __construct(EntityTypeInterface $entity_info, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache, Connection $connection, ?EventDispatcherInterface $event_dispatcher = NULL) {
+    parent::__construct($entity_info, $config_factory, $uuid_service, $language_manager, $memory_cache, $event_dispatcher);
 
     $this->moduleHandler = $module_handler;
     $this->connection = $connection;
@@ -70,7 +73,8 @@ class ShortcutSetStorage extends ConfigEntityStorage implements ShortcutSetStora
       $container->get('module_handler'),
       $container->get('language_manager'),
       $container->get('entity.memory_cache'),
-      $container->get('database')
+      $container->get('database'),
+      $container->get('event_dispatcher')
     );
   }
 
