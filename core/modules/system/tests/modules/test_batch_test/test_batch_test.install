@@ -7,14 +7,14 @@
 
 declare(strict_types=1);
 
-use Drupal\Core\Batch\BatchProcessor;
+use Drupal\Core\Batch\BatchManagerInterface;
 use Drupal\entity_test\Entity\EntityTest;
 
 /**
  * Implements hook_install().
  */
 function test_batch_test_install(): void {
-  $batch_processor = \Drupal::service(BatchProcessor::class);
+  $batch_manager = \Drupal::service(BatchManagerInterface::class);
   $total = 2;
   $operations = [];
   for ($i = 1; $i <= $total; $i++) {
@@ -23,10 +23,11 @@ function test_batch_test_install(): void {
   $batch = [
     'operations' => $operations,
   ];
-  $batch_processor->queue($batch);
-  $batch =& $batch_processor->getCurrentBatch();
-  $batch['progressive'] = FALSE;
-  $batch_processor->process();
+  $batch_manager->addBatch($batch);
+  // Bypass the progress bar and the redirect: the batch has to complete within
+  // this request.
+  $batch_manager->setProgressive(FALSE);
+  $batch_manager->process();
 }
 
 /**

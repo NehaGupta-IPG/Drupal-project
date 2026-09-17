@@ -5,6 +5,7 @@ namespace Drupal\jsonapi\Controller;
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Batch\BatchManagerInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -288,11 +289,11 @@ class EntityResource {
       $this->accountCancellation->cancel([], $entity->id(), $cancel_method);
       // Since AccountCancellation::cancel() is not invoked via Form API, batch
       // processing needs to be invoked manually.
-      $batch =& batch_get();
+      $batch_manager = \Drupal::service(BatchManagerInterface::class);
       // Mark this batch as non-progressive to bypass the progress bar and
       // redirect.
-      $batch['progressive'] = FALSE;
-      batch_process();
+      $batch_manager->setProgressive(FALSE);
+      $batch_manager->process();
     }
     else {
       $entity->delete();

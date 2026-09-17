@@ -2,6 +2,7 @@
 
 namespace Drupal\locale\Controller;
 
+use Drupal\Core\Batch\BatchManagerInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\locale\LocaleProjectChecker;
 use Drupal\locale\LocaleProjectRepository;
@@ -10,6 +11,10 @@ use Drupal\locale\LocaleProjectRepository;
  * Return response for manual check translations.
  */
 class LocaleController extends ControllerBase {
+
+  public function __construct(
+    protected readonly BatchManagerInterface $batchManager,
+  ) {}
 
   /**
    * Checks for translation updates and displays the translations status.
@@ -31,8 +36,8 @@ class LocaleController extends ControllerBase {
 
     // Execute a batch if required. A batch is only used when remote files
     // are checked.
-    if (batch_get()) {
-      return batch_process('admin/reports/translations');
+    if ($this->batchManager->needsProcessing()) {
+      return $this->batchManager->process('admin/reports/translations');
     }
 
     return $this->redirect('locale.translate_status');

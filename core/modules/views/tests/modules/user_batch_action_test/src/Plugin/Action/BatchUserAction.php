@@ -6,7 +6,7 @@ namespace Drupal\user_batch_action_test\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Action\Attribute\Action;
-use Drupal\Core\Batch\BatchProcessor;
+use Drupal\Core\Batch\BatchManagerInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -31,14 +31,14 @@ class BatchUserAction extends ActionBase implements ContainerFactoryPluginInterf
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Batch\BatchProcessor $batchProcessor
-   *   Batch processor.
+   * @param \Drupal\Core\Batch\BatchManagerInterface $batchManager
+   *   The batch manager.
    */
   public function __construct(
     array $configuration,
     $plugin_id,
     $plugin_definition,
-    protected readonly BatchProcessor $batchProcessor,
+    protected readonly BatchManagerInterface $batchManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -66,7 +66,7 @@ class BatchUserAction extends ActionBase implements ContainerFactoryPluginInterf
         'operations' => $operations,
         'finished' => [static::class, 'finishBatch'],
       ];
-      $this->batchProcessor->queue($batch);
+      $this->batchManager->addBatch($batch);
     }
   }
 

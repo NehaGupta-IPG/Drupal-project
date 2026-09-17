@@ -6,7 +6,7 @@ namespace Drupal\batch_test\Form;
 
 use Drupal\batch_test\BatchTestDefinitions;
 use Drupal\batch_test\BatchTestHelper;
-use Drupal\Core\Batch\BatchProcessor;
+use Drupal\Core\Batch\BatchManagerInterface;
 use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -23,11 +23,11 @@ class BatchTestSimpleForm extends FormBase {
   /**
    * Constructs a new BatchTestSimpleForm object.
    *
-   * @param \Drupal\Core\Batch\BatchProcessor $batchProcessor
-   *   The batch processor.
+   * @param \Drupal\Core\Batch\BatchManagerInterface $batchManager
+   *   The batch manager.
    */
   public function __construct(
-    protected readonly BatchProcessor $batchProcessor,
+    protected readonly BatchManagerInterface $batchManager,
   ) {}
 
   /**
@@ -73,7 +73,7 @@ class BatchTestSimpleForm extends FormBase {
     $batch_test_helper->stack(NULL, TRUE);
 
     foreach ($form_state->getValue('batch') as $batch) {
-      $this->batchProcessor->queue($batch_test_definitions->$batch());
+      $this->batchManager->addBatch($batch_test_definitions->$batch());
     }
 
     $form_state->setRedirect('batch_test.redirect');
