@@ -382,6 +382,10 @@ final class SettingsFormTest extends WebDriverTestBase {
     // preview working here: the listeners of the elements below are added
     // without checking that the element exists, so a route rendering only a
     // part of the settings would lose the preview altogether.
+    // All five sit inside the container that stays hidden until the
+    // overrides are enabled, and that is deliberate: existence is what the
+    // behavior needs, not visibility, so plain existence is all that is
+    // asserted for them.
     // @see \Drupal\default_admin\Settings::getSettingsForm()
     $assert_session->elementExists('css', '[data-drupal-selector="edit-preset-accent-color"] input');
     $assert_session->elementExists('css', 'select[name="preset_focus_color"]');
@@ -389,9 +393,18 @@ final class SettingsFormTest extends WebDriverTestBase {
     $assert_session->elementExists('css', 'input[name="focus_color"]');
     $assert_session->elementExists('css', 'input[name="high_contrast_mode"]');
 
-    // The settings are hidden until the user enables the overrides.
+    // The settings are hidden until the user enables the overrides. The
+    // state:visible handler of the states API toggles the inline display
+    // property of the closest form wrapper of the element carrying the
+    // condition, which is the container itself here, so the container is
+    // what becoming visible can be observed on. No class is toggled. The
+    // radios inside it are no signal either: the appearance setting styles
+    // its labels and renders its own inputs with an opacity of zero, so
+    // they stay invisible to the driver even once the container is shown.
+    // @see core/misc/states.js
+    // @see core/themes/default_admin/css/components/settings.css
     $page->checkField('enable_user_settings');
-    $this->assertNotNull($assert_session->waitForElementVisible('css', 'input[name="enable_dark_mode"][value="1"]'));
+    $this->assertNotNull($assert_session->waitForElementVisible('css', '[data-drupal-selector="edit-user-settings"]'));
 
     // The appearance setting is previewed here as well. Reading the accent
     // color preset and the focus color preset back from the form comes first

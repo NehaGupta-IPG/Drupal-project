@@ -259,6 +259,17 @@ final class ThemeOverridesTest extends WebDriverTestBase {
     $this->drupalGet('admin/people/create');
     $assert_session = $this->assertSession();
 
+    // On this route the account form checks "Email user with password setup
+    // instructions" by default and hides the whole password widget through the
+    // states API for as long as that checkbox is checked, so the widget has to
+    // be revealed before anything can be typed into it. The state is declared
+    // on the password element, which makes the states attribute land on the
+    // wrapper the classes below are read from.
+    // @see \Drupal\user\AccountForm::form()
+    // @see \Drupal\Core\Form\FormHelper::processStates()
+    $this->getSession()->getPage()->uncheckField('notify');
+    $this->assertNotNull($assert_session->waitForElementVisible('css', self::PASSWORD_WIDGET));
+
     // The password behavior adds this class to the parent of the main input,
     // so it marks the point from which the widget is live.
     // @see core/modules/user/js/user.js

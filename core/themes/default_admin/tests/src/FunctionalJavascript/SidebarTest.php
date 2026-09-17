@@ -312,6 +312,9 @@ final class SidebarTest extends WebDriverTestBase {
   private function loadContentForm(int $width, array $storage): int {
     $session = $this->getSession();
     $session->resizeWindow($width, self::WINDOW_HEIGHT);
+    // The seeding script below only needs a document of the right origin to
+    // write the browser storage, which drupalGet() has by the time it
+    // returns, so no wait for the behavior is needed here.
     $this->drupalGet('node/add/page');
 
     $script = 'localStorage.clear();';
@@ -324,7 +327,19 @@ final class SidebarTest extends WebDriverTestBase {
     }
     $session->executeScript($script);
     $session->reload();
-    $this->assertSession()->elementExists('css', self::TRIGGER);
+
+    // Session::reload() returns without waiting for the new document, so the
+    // helper waits for the marker the behavior writes on the trigger instead
+    // of asserting that the trigger is there. once() marks the elements it
+    // returns before the callback they are handed to is entered, so the
+    // marker of the initialization handler would be written too early to
+    // stand for the state the assertions read back; the marker of the toggle
+    // handler is only written once the initialization callback has returned.
+    // @see core/themes/default_admin/migration/js/sidebar.js
+    $this->assertNotNull(
+      $this->assertSession()->waitForElement('css', self::TRIGGER . '[data-once~="adminSidebarToggle"]'),
+      'The sidebar behavior attached to the trigger of the reloaded form.',
+    );
 
     // The window is not the viewport, and the requested size may have been
     // clamped, so the branch the assertions rely on is measured.
