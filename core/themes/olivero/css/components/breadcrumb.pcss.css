@@ -72,6 +72,10 @@
     padding-inline-start: 0;
     white-space: normal;
   }
+
+  @media (min-width: 16.5em) {
+    overflow-x: visible;
+  }
 }
 
 .breadcrumb__item {
