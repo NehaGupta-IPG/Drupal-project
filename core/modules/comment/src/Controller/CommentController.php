@@ -2,6 +2,7 @@
 
 namespace Drupal\comment\Controller;
 
+use Drupal\comment\CommentFieldItemList;
 use Drupal\comment\CommentInterface;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentingStatus;
@@ -289,13 +290,14 @@ class CommentController extends ControllerBase {
       throw new NotFoundHttpException();
     }
 
-    /** @var \Drupal\comment\CommentFieldItemList $field */
     $field = $entity->{$field_name};
+    assert($field instanceof CommentFieldItemList);
     $status = CommentingStatus::tryFrom((int) $field->status);
     // The user must have view access to the host entity.
     $access = $entity->access('view', NULL, TRUE)
       // And commenting must be open on this entity.
-      ->andIf(AccessResult::allowedIf($status === CommentingStatus::Open));
+      ->andIf(AccessResult::allowedIf($status === CommentingStatus::Open))
+      ->addCacheableDependency($entity);
 
     if ($pid) {
       // If replying, load the parent comment.
