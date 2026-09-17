@@ -100,13 +100,22 @@ trait DeprecatedWakeupTrait {
   /**
    * Populate class properties from values passed in during unserialization.
    *
+   * Properties that already hold the given value are left untouched. This
+   * happens when a legacy __wakeup() implementation chains to the trait's
+   * __wakeup() after __unserialize() has populated the object: assigning a
+   * readonly property a second time would throw, even with the same value.
+   *
    * @param array<string, mixed> $data
    *   Array of key/value pairs that represent the serialized form of the object
    *   as passed to __unserialize(), with keys already normalized by
    *   ::normalizeSerializedData().
    */
   protected function populateProperties(array $data): void {
+    $current = get_object_vars($this);
     foreach ($data as $property => $value) {
+      if (array_key_exists($property, $current) && $current[$property] === $value) {
+        continue;
+      }
       $this->$property = $value;
     }
   }

@@ -150,6 +150,35 @@ class DependencySerializationTest extends UnitTestCase {
     $this->assertSame(['service' => 'test_service', 'container' => 'service_container'], $unserialized->getServiceIds());
   }
 
+  /**
+   * Tests a chaining subclass __wakeup() on an object with a readonly property.
+   *
+   * __unserialize() populates every property, including readonly ones, before
+   * it invokes the subclass __wakeup(). When that method chains to the trait's
+   * __wakeup(), the properties must not be assigned a second time, as PHP
+   * rejects any further write to an initialized readonly property.
+   */
+  #[IgnoreDeprecations]
+  public function testWakeupWithReadonlyProperty(): void {
+    $service = new \stdClass();
+    $container = TestKernel::setContainerWithKernel();
+    $container->set('test_service', $service);
+
+    $object = new DependencySerializationTestDummyReadonlySubclass($service, 'readonly value');
+    $object->setContainer($container);
+    $serialized = serialize($object);
+
+    $this->expectUserDeprecationMessage('Implementing __wakeup() in a subclass of Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy is deprecated in drupal:11.5.0 and is not supported in drupal:13.0.0. Implement __unserialize() instead. See https://www.drupal.org/node/3578423');
+    $this->expectUserDeprecationMessage('Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy::__wakeup() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use __unserialize() instead. See https://www.drupal.org/node/3578423');
+    $unserialized = unserialize($serialized);
+    $this->assertInstanceOf(DependencySerializationTestDummyReadonlySubclass::class, $unserialized);
+
+    $this->assertSame('readonly value', $unserialized->id);
+    $this->assertSame($service, $unserialized->service);
+    $this->assertSame($container, $unserialized->container);
+    $this->assertEmpty($unserialized->getServiceIds());
+  }
+
 }
 
 /**
@@ -237,6 +266,29 @@ class DependencySerializationTestDummyWakeupOnlySubclass extends DependencySeria
 
   public function __wakeup(): void {
     $this->anotherProperty .= ' (woken up)';
+  }
+
+}
+
+/**
+ * Defines a test class with a readonly property and a chaining __wakeup().
+ */
+class DependencySerializationTestDummyReadonlySubclass extends DependencySerializationTestDummy {
+
+  /**
+   * Constructs a new DependencySerializationTestDummyReadonlySubclass object.
+   *
+   * @param object $service
+   *   A test service.
+   * @param string $id
+   *   A readonly identifier.
+   */
+  public function __construct(\stdClass $service, public readonly string $id) {
+    parent::__construct($service);
+  }
+
+  public function __wakeup(): void {
+    parent::__wakeup();
   }
 
 }
