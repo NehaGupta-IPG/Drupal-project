@@ -470,6 +470,10 @@ class ThemeHooksTest extends KernelTestBase {
    * Tests that per-user setting overrides make the page vary by user.
    */
   public function testPageAttachmentsAlterVariesByUserWhenOverridesAreAllowed(): void {
+    // Allowing the per-user overrides makes the settings service read the
+    // overrides of the current user from the user data storage.
+    $this->installSchema('user', ['users_data']);
+
     $this->config('default_admin.settings')->set('show_user_theme_settings', TRUE)->save();
 
     // The hook is handed pages that carry no cache metadata of their own yet.
