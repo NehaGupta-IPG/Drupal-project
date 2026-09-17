@@ -42,6 +42,49 @@ class MergeTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests that insertFields() replaces a previously set key field.
+   */
+  public function testMergeInsertFieldsAfterKey(): void {
+    $result = $this->connection->merge('test_people')
+      ->key('job', 'Presenter')
+      ->insertFields(['name' => 'Tiffany'])
+      ->execute();
+
+    $this->assertEquals(Merge::STATUS_INSERT, $result, 'Insert status returned.');
+    $person = $this->connection->query('SELECT * FROM {test_people} WHERE [name] = :name', [':name' => 'Tiffany'])->fetch();
+    $this->assertEquals('', $person->job, 'Key field was replaced by insertFields().');
+  }
+
+  /**
+   * Tests that keys() adds key fields after insertFields().
+   */
+  public function testMergeKeysAfterInsertFields(): void {
+    $result = $this->connection->merge('test_people')
+      ->insertFields(['name' => 'Tiffany'])
+      ->keys(['job' => 'Presenter'])
+      ->execute();
+
+    $this->assertEquals(Merge::STATUS_INSERT, $result, 'Insert status returned.');
+    $person = $this->connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Presenter'])->fetch();
+    $this->assertEquals('Tiffany', $person->name, 'Name set correctly.');
+    $this->assertEquals('Presenter', $person->job, 'Key field set correctly.');
+  }
+
+  /**
+   * Tests that fields() overrides a key field for insertion.
+   */
+  public function testMergeFieldsAfterKeys(): void {
+    $result = $this->connection->merge('test_people')
+      ->keys(['job' => 'Presenter'])
+      ->fields(['job' => 'Producer', 'name' => 'Tiffany'])
+      ->execute();
+
+    $this->assertEquals(Merge::STATUS_INSERT, $result, 'Insert status returned.');
+    $person = $this->connection->query('SELECT * FROM {test_people} WHERE [name] = :name', [':name' => 'Tiffany'])->fetch();
+    $this->assertEquals('Producer', $person->job, 'Key field was overridden by fields().');
+  }
+
+  /**
    * Confirms that we can merge-update a record successfully.
    */
   public function testMergeUpdate(): void {
