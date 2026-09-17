@@ -15,11 +15,6 @@ use Drupal\Core\Database\Expression;
 final class Select {
 
   /**
-   * The placeholder counter.
-   */
-  protected int $nextPlaceholder = 0;
-
-  /**
    * An array of comments that can be prepended to a query.
    *
    * @var list<string>
@@ -136,17 +131,20 @@ final class Select {
    */
   public private(set) array $alterTags = [];
 
-  // ------------------------------------------------------
-  // ------------------------------------------------------
-
   /**
-   * Gets the next placeholder value for this query object.
+   * Constructs a Select object.
    *
-   * @return int
-   *   The next placeholder value.
+   * @param string|\Drupal\Core\Database\Query\DatabaseAbstract\Select $table
+   *   The table name or subquery that is being queried.
+   * @param string $alias
+   *   The alias for the table.
    */
-  public function nextPlaceholder(): int {
-    return $this->nextPlaceholder++;
+  public function __construct(
+    string|Select $table,
+    ?string $alias = NULL,
+    public readonly string $conjunction = 'AND',
+  ) {
+    $this->addJoin(NULL, $table, $alias);
   }
 
   /**
@@ -170,24 +168,6 @@ final class Select {
     return $this;
   }
 
-  // ------------------------------------------------------
-
-  /**
-   * Constructs a Select object.
-   *
-   * @param string|\Drupal\Core\Database\Query\DatabaseAbstract\Select $table
-   *   The table name or subquery that is being queried.
-   * @param string $alias
-   *   The alias for the table.
-   */
-  public function __construct(
-    string|Select $table,
-    ?string $alias = NULL,
-    public readonly string $conjunction = 'AND',
-  ) {
-    $this->addJoin(NULL, $table, $alias);
-  }
-
   /**
    * {@inheritdoc}
    */
@@ -202,45 +182,6 @@ final class Select {
   public function addMetadata(string $key, mixed $object): static {
     $this->alterMetadata[$key] = $object;
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function arguments() {
-    if (!$this->compiled()) {
-      return NULL;
-    }
-
-    $args = $this->condition->arguments() + $this->having->arguments();
-
-    foreach ($this->tables as $table) {
-      if ($table['arguments']) {
-        $args += $table['arguments'];
-      }
-      // If this table is a subquery, grab its arguments recursively.
-      if ($table['table'] instanceof Select) {
-        $args += $table['table']->arguments();
-      }
-      // If the join condition is an object, grab its arguments recursively.
-      if (!empty($table['condition']) && $table['condition'] instanceof Condition) {
-        $args += $table['condition']->arguments();
-      }
-    }
-
-    foreach ($this->expressions as $expression) {
-      if ($expression['arguments']) {
-        $args += $expression['arguments'];
-      }
-    }
-
-    // If there are any dependent queries to UNION,
-    // incorporate their arguments recursively.
-    foreach ($this->union as $union) {
-      $args += $union['query']->arguments();
-    }
-
-    return $args;
   }
 
   /**
@@ -295,7 +236,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function havingExists(SelectInterface $select) {
+  public function havingExists(Select $select) {
     $this->having->exists($select);
     return $this;
   }
@@ -303,7 +244,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function havingNotExists(SelectInterface $select) {
+  public function havingNotExists(Select $select) {
     $this->having->notExists($select);
     return $this;
   }
@@ -322,31 +263,6 @@ final class Select {
   public function resetOrderBy(): static {
     $this->orderBy = [];
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function escapeLike($string) {
-    return $this->connection->escapeLike($string);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function escapeField($string) {
-    return $this->connection->escapeField($string);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getArguments(?PlaceholderInterface $queryPlaceholder = NULL) {
-    if (!isset($queryPlaceholder)) {
-      $queryPlaceholder = $this;
-    }
-    $this->compile($this->connection, $queryPlaceholder);
-    return $this->arguments();
   }
 
   /**
@@ -615,8 +531,6 @@ final class Select {
     return $count;
   }
 
-  // ------------------------------------------------------
-
   /**
    * {@inheritdoc}
    */
@@ -631,7 +545,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function isNull($column) {
+  public function isNull($column): static {
     if (!isset($this->condition)) {
       $this->condition = new Condition($this->conjunction);
     }
@@ -642,7 +556,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function isNotNull($column) {
+  public function isNotNull($column): static {
     if (!isset($this->condition)) {
       $this->condition = new Condition($this->conjunction);
     }
@@ -653,7 +567,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function exists(SelectInterface $select) {
+  public function exists(SelectInterface $select): static {
     $this->condition->exists($select);
     return $this;
   }
@@ -661,7 +575,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function notExists(SelectInterface $select) {
+  public function notExists(SelectInterface $select): static {
     $this->condition->notExists($select);
     return $this;
   }
@@ -669,7 +583,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function alwaysFalse() {
+  public function alwaysFalse(): static {
     if (!isset($this->condition)) {
       $this->condition = new Condition($this->conjunction);
     }
@@ -690,7 +604,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function where($snippet, $args = []) {
+  public function where($snippet, $args = []): static {
     if (!isset($this->condition)) {
       $this->condition = new Condition($this->conjunction);
     }
@@ -701,35 +615,21 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function compile(Connection $connection, PlaceholderInterface $queryPlaceholder) {
-    $this->condition->compile($connection, $queryPlaceholder);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function compiled() {
-    return $this->condition->compiled();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function conditionGroupFactory($conjunction = 'AND') {
+  public function conditionGroupFactory($conjunction = 'AND'): Condition {
     return $this->connection->condition($conjunction);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function andConditionGroup() {
+  public function andConditionGroup(): Condition {
     return $this->conditionGroupFactory('AND');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function orConditionGroup() {
+  public function orConditionGroup(): Condition {
     return $this->conditionGroupFactory('OR');
   }
 
