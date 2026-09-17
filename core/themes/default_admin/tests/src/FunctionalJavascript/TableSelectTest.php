@@ -114,6 +114,12 @@ final class TableSelectTest extends WebDriverTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
+    // The library syncs the checkbox of the cloned header by writing its
+    // checked property without the attribute of the same name. The CSS
+    // selectors of Mink are translated into xpath expressions testing that
+    // attribute, so the state of the clone is read in the browser instead.
+    $cloned_checked = sprintf("document.querySelectorAll('%s:checked').length", self::CLONED_SELECT_ALL);
+
     // The views table header ships without a checkbox, so exactly one is added
     // to it, while the cloned sticky header carries the one rendered by
     // views-view-table.html.twig.
@@ -133,17 +139,17 @@ final class TableSelectTest extends WebDriverTestBase {
     $this->assertJsCondition(sprintf('document.querySelectorAll(".views-table tbody tr.selected").length === %d', self::ROW_COUNT));
     $this->assertJsCondition(sprintf('document.querySelectorAll(".views-table tbody input:checked").length === %d', self::ROW_COUNT));
 
-    // With the range covering all rows, the select all checkbox of the rendered
-    // table flips its title, and the checkbox of the cloned sticky header is
-    // kept in sync through the table scroll wrapper.
+    // With the range covering all rows, the select all checkbox of the
+    // rendered table flips its title, and the checkbox of the cloned sticky
+    // header is kept in sync through the table scroll wrapper.
     $this->assertNotNull($assert_session->waitForElement('css', '.table-scroll-wrapper th.select-all input[title="Deselect all rows in this table"]'));
-    $this->assertNotNull($assert_session->waitForElement('css', self::CLONED_SELECT_ALL . ':checked'));
+    $this->assertJsCondition($cloned_checked . ' === 1');
 
     // Removing a single row from the selection reverts both.
     $this->clickBulkFormCheckbox(0);
     $this->assertJsCondition(sprintf('document.querySelectorAll(".views-table tbody tr.selected").length === %d', self::ROW_COUNT - 1));
     $this->assertNotNull($assert_session->waitForElement('css', '.table-scroll-wrapper th.select-all input[title="Select all rows in this table"]'));
-    $this->assertJsCondition('document.querySelectorAll("table.sticky-table-header th.select-all input:checked").length === 0');
+    $this->assertJsCondition($cloned_checked . ' === 0');
   }
 
   /**

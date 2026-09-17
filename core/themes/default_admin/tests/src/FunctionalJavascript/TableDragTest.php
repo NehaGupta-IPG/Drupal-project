@@ -190,8 +190,12 @@ final class TableDragTest extends WebDriverTestBase {
     $assert_session->elementNotExists('xpath', '//table[@id="tabledrag-test-table"]/tbody/tr/td[1]/div' . self::hasClass('js-indentation'));
 
     // The theme draws the hierarchy with an inline SVG tree instead of the
-    // non-breaking space that the core library emits.
-    $assert_session->elementsCount('xpath', "*[local-name()='svg']" . self::hasClass('tree'), 1, $indentation);
+    // non-breaking space that the core library emits. Both steps are matched
+    // by local name, because the elements of that tree are not in the
+    // namespace of the document, and the axis of the first one is spelled
+    // out, because the xpath manipulator of Mink strips a leading "*" while
+    // it prepends the expression of the container.
+    $assert_session->elementsCount('xpath', "child::*[local-name()='svg']" . self::hasClass('tree'), 1, $indentation);
     $assert_session->elementsCount('xpath', ".//*[local-name()='path']" . self::hasClass('tree__item'), 4, $indentation);
   }
 
