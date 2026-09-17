@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit;
 
 use Drupal\Core\Database\Connection;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\id_map\Sql;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -43,13 +45,6 @@ class TestSqlIdMap extends Sql implements \Iterator {
   public $message;
 
   /**
-   * {@inheritdoc}
-   */
-  public function getDatabase() {
-    return parent::getDatabase();
-  }
-
-  /**
    * Gets the field schema.
    *
    * @param array $id_definition
@@ -61,7 +56,7 @@ class TestSqlIdMap extends Sql implements \Iterator {
    *
    * @throws \Drupal\migrate\MigrateException
    */
-  protected function getFieldSchema(array $id_definition) {
+  protected function getFieldSchema(array $id_definition): array {
     if (!isset($id_definition['type'])) {
       return [];
     }
@@ -87,15 +82,9 @@ class TestSqlIdMap extends Sql implements \Iterator {
   /**
    * {@inheritdoc}
    */
-  public function ensureTables() {
+  // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod, Drupal.Commenting.FunctionComment.Missing
+  public function ensureTables(): void {
     parent::ensureTables();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getMigrationPluginManager() {
-    return parent::getMigrationPluginManager();
   }
 
 }

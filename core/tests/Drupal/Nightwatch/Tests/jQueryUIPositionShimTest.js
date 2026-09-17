@@ -758,17 +758,7 @@ testScenarios.element = testScenarios.selector;
 module.exports = {
   '@tags': ['core'],
   before(browser) {
-    browser.drupalInstall().drupalLoginAsAdmin(() => {
-      browser
-        .drupalRelativeURL('/admin/modules')
-        .setValue('input[type="search"]', 'position Shim Test')
-        .waitForElementVisible(
-          'input[name="modules[position_shim_test][enable]"]',
-          1000,
-        )
-        .click('input[name="modules[position_shim_test][enable]"]')
-        .click('input[type="submit"]');
-    });
+    browser.drupalInstall().drupalInstallModule('position_shim_test');
   },
   after(browser) {
     browser.drupalUninstall();
@@ -830,7 +820,6 @@ module.exports = {
             const regexVertical = /top|center|bottom/;
             const regexOffset = /[+-]\d+(\.[\d]+)?%?/;
             const regexPosition = /^\w+/;
-            const regexPercent = /%$/;
             let positions = offset.split(' ');
             if (positions.length === 1) {
               if (regexHorizontal.test(positions[0])) {
@@ -847,13 +836,13 @@ module.exports = {
             return {
               horizontalOffset: horizontalOffset
                 ? parseFloat(horizontalOffset[0]) *
-                  (regexPercent.test(horizontalOffset[0])
+                  (horizontalOffset[0].endsWith('%')
                     ? element.offsetWidth / 100
                     : 1)
                 : 0,
               verticalOffset: verticalOffset
                 ? parseFloat(verticalOffset[0]) *
-                  (regexPercent.test(verticalOffset[0])
+                  (verticalOffset[0].endsWith('%')
                     ? element.offsetWidth / 100
                     : 1)
                 : 0,
@@ -908,7 +897,7 @@ module.exports = {
                   } else if (atOffsets.vertical === 'bottom') {
                     y = document.documentElement.clientHeight - y;
                   } else {
-                    y += window.pageYOffset;
+                    y += window.scrollY;
                   }
                 } else {
                   // Measure the distance of the tip from the reference element.
@@ -919,9 +908,8 @@ module.exports = {
                   y -= refRect.y;
                 }
                 if (!withinRange(x, options.x) || !withinRange(y, options.y)) {
-                  toReturn[
-                    idKey
-                  ] = `${idKey} EXPECTED x:${options.x} y:${options.y} ACTUAL x:${x} y:${y}`;
+                  toReturn[idKey] =
+                    `${idKey} EXPECTED x:${options.x} y:${options.y} ACTUAL x:${x} y:${y}`;
                 } else {
                   toReturn[idKey] = true;
                 }
@@ -1063,8 +1051,12 @@ module.exports = {
           collision: 'none',
         });
         toReturn['elements return'] = {
-          actual: result,
-          expected: elements,
+          actual:
+            result.length === elements.length &&
+            result
+              .toArray()
+              .every((element, index) => element === elements[index]),
+          expected: true,
         };
         // eslint-disable-next-line func-names
         elements.each(function (index) {
@@ -1426,12 +1418,11 @@ module.exports = {
         const $ = jQuery;
         const toReturn = {};
         let count = 0;
-        const elems = $('#el1, #el2');
+        const elements = $('#el1, #el2');
         const of = $('#parentX');
         const expectedPosition = { top: 60, left: 60 };
         const expectedFeedback = {
           target: {
-            element: of,
             width: 20,
             height: 20,
             left: 40,
@@ -1447,7 +1438,7 @@ module.exports = {
           vertical: 'top',
           important: 'vertical',
         };
-        const originalPosition = elems
+        const originalPosition = elements
           .position({
             my: 'right bottom',
             at: 'right bottom',
@@ -1456,25 +1447,29 @@ module.exports = {
           })
           .offset();
 
-        elems.position({
+        elements.position({
           my: 'left top',
           at: 'center+10 bottom',
           of: '#parentX',
           using(position, feedback) {
             toReturn[`correct context for call #${count}`] = {
-              actual: this,
-              expected: elems[count],
+              actual: this === elements[count],
+              expected: true,
             };
             toReturn[`correct position for call #${count}`] = {
               actual: position,
               expected: expectedPosition,
             };
             toReturn[`feedback and element match for call #${count}`] = {
-              actual: feedback.element.element[0],
-              expected: elems[count],
+              actual: feedback.element.element[0] === elements[count],
+              expected: true,
             };
-            // assert.deepEqual(feedback.element.element[0], elems[count]);
+            toReturn[`feedback and target match for call #${count}`] = {
+              actual: feedback.target.element[0] === of[0],
+              expected: true,
+            };
             delete feedback.element.element;
+            delete feedback.target.element;
             toReturn[`expected feedback after delete for call #${count}`] = {
               actual: feedback,
               expected: expectedFeedback,
@@ -1484,7 +1479,7 @@ module.exports = {
         });
 
         // eslint-disable-next-line func-names
-        elems.each(function (index) {
+        elements.each(function (index) {
           toReturn[`elements not moved: ${index}`] = {
             actual: $(this).offset(),
             expected: originalPosition,
@@ -1494,7 +1489,7 @@ module.exports = {
       },
       [],
       (result) => {
-        browser.assert.equal(Object.keys(result.value).length, 10);
+        browser.assert.equal(Object.keys(result.value).length, 12);
         Object.entries(result.value).forEach(([key, value]) => {
           browser.assert.equal(typeof value, 'object');
           browser.assert.deepEqual(value.actual, value.expected, key);

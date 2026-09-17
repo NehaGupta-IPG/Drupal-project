@@ -3,7 +3,7 @@
  * CKEditor 5 implementation of {@link Drupal.editors} API.
  */
 
-((Drupal, debounce, CKEditor5, $, once) => {
+((Drupal, debounce, CKEDITOR, $, once) => {
   /**
    * The CKEditor 5 instances.
    *
@@ -116,6 +116,10 @@
       });
     }
 
+    if (config === null) {
+      return null;
+    }
+
     return Object.entries(config).reduce((processed, [key, value]) => {
       if (typeof value === 'object') {
         // Check for null values.
@@ -169,7 +173,9 @@
   /**
    * Select CKEditor 5 plugin classes to include.
    *
-   * Found in the CKEditor 5 global JavaScript object as {package.Class}.
+   * Plugins are specified as {package.Class} strings. Upstream plugins are
+   * found on the flat CKEDITOR UMD global, Drupal custom plugins on the
+   * nested CKEditor5.{package}.{Class} global.
    *
    * @param {Array} plugins
    *  List of package and Class name of plugins
@@ -180,8 +186,20 @@
   function selectPlugins(plugins) {
     return plugins.map((pluginDefinition) => {
       const [build, name] = pluginDefinition.split('.');
-      if (CKEditor5[build] && CKEditor5[build][name]) {
-        return CKEditor5[build][name];
+      // Upstream plugins: flat on the CKEDITOR UMD global.
+      if (CKEDITOR[name]) {
+        return CKEDITOR[name];
+      }
+      // Drupal custom plugins: nested on window.CKEditor5.{build}.{name}.
+      // CKEditor5 is referenced from window at runtime (not captured in the
+      // IIFE closure) because custom plugin scripts may load after this file
+      // and assign to window.CKEditor5.
+      if (
+        window.CKEditor5 &&
+        window.CKEditor5[build] &&
+        window.CKEditor5[build][name]
+      ) {
+        return window.CKEditor5[build][name];
       }
 
       // eslint-disable-next-line no-console
@@ -251,7 +269,7 @@
    * To ensure they have higher specificity and are not reset too aggressively.
    *
    * @param {CSSRule} rule
-   *  A single CSS rule to be analysed and changed if necessary.
+   *  A single CSS rule to be analyzed and changed if necessary.
    */
   function ckeditor5SelectorProcessing(rule) {
     // Handle nested rules in @media, @support, etc.
@@ -318,10 +336,8 @@
       // Additional styles that need to be explicity added in addition to the
       // prefixed versions of existing css in `existingCss`.
       const addedCss = [
-        `${prefix} .ck.ck-content {display:block;min-height:5rem;}`,
         `${prefix} .ck.ck-content * {display:revert;background:revert;color:initial;padding:revert;}`,
         `${prefix} .ck.ck-content li {display:list-item}`,
-        `${prefix} .ck.ck-content ol li {list-style-type: decimal}`,
       ];
 
       const prefixedCss = [...addedCss].join('\n');
@@ -351,7 +367,6 @@
      *   The text format for the editor.
      */
     attach(element, format) {
-      const { editorClassic } = CKEditor5;
       const { toolbar, plugins, config, language } = format.editorSettings;
       const extraPlugins = selectPlugins(plugins);
       const pluginConfig = processConfig(config);
@@ -365,7 +380,7 @@
       };
       // Set the id immediately so that it is available when onChange is called.
       const id = setElementId(element);
-      const { ClassicEditor } = editorClassic;
+      const { ClassicEditor } = CKEDITOR;
 
       ClassicEditor.create(element, editorConfig)
         .then((editor) => {
@@ -425,6 +440,20 @@
             element.removeAttribute('required');
           }
 
+          // If the textarea is disabled, enable CKEditor's read-only mode.
+          const readOnlyIfDisabled = () => {
+            if (element.disabled) {
+              editor.enableReadOnlyMode('ckeditor5_disabled');
+            } else {
+              editor.disableReadOnlyMode('ckeditor5_disabled');
+            }
+          };
+          const disabledMutationObserver = new MutationObserver(() => {
+            readOnlyIfDisabled();
+          });
+          disabledMutationObserver.observe(element, { attributes: true });
+          readOnlyIfDisabled();
+
           // Integrate CKEditor 5 viewport offset with Drupal displace.
           // @see \Drupal\Tests\ckeditor5\FunctionalJavascript\CKEditor5ToolbarTest
           // @see https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorui-EditorUI.html#member-viewportOffset
@@ -438,22 +467,9 @@
           editor.model.document.on('change:data', () => {
             const callback = callbacks.get(id);
             if (callback) {
-              if (editor.plugins.has('SourceEditing')) {
-                // If the change:data is being called while in source editing
-                // mode, it means that the form is being submitted. To avoid
-                // race conditions, in this case the callback gets called
-                // without decorating the callback with debounce.
-                // @see https://www.drupal.org/i/3229174
-                // @see Drupal.editorDetach
-                if (editor.plugins.get('SourceEditing').isSourceEditingMode) {
-                  callback();
-                  return;
-                }
-              }
-
               // Marks the field as changed.
               // @see Drupal.editorAttach
-              debounce(callback, 400)();
+              callback();
             }
           });
 
@@ -525,7 +541,7 @@
      *   Callback called with the value of the editor.
      */
     onChange(element, callback) {
-      callbacks.set(getElementId(element), callback);
+      callbacks.set(getElementId(element), debounce(callback, 400, true));
     },
 
     /**
@@ -539,7 +555,6 @@
      *   The id attribute for the main editor toolbar, if any.
      */
     attachInlineEditor(element, format, mainToolbarId) {
-      const { editorDecoupled } = CKEditor5;
       const {
         toolbar,
         plugins,
@@ -554,7 +569,7 @@
         ...processConfig(pluginConfig),
       };
       const id = setElementId(element);
-      const { DecoupledEditor } = editorDecoupled;
+      const { DecoupledEditor } = CKEDITOR;
 
       DecoupledEditor.create(element, config)
         .then((editor) => {
@@ -565,7 +580,7 @@
             const callback = callbacks.get(id);
             if (callback) {
               // Allow modules to update EditorModel by providing the current data.
-              debounce(callback, 400)(editor.getData());
+              callback(editor.getData());
             }
           });
         })
@@ -604,14 +619,19 @@
      */
     openDialog(url, saveCallback, dialogSettings) {
       // Add a consistent dialog class.
-      const classes = dialogSettings.dialogClass
-        ? dialogSettings.dialogClass.split(' ')
+      dialogSettings.classes = dialogSettings.classes || {};
+      const classes = dialogSettings.classes['ui-dialog']
+        ? dialogSettings.classes['ui-dialog'].split(' ')
         : [];
       classes.push('ui-dialog--narrow');
-      dialogSettings.dialogClass = classes.join(' ');
-      dialogSettings.autoResize =
-        window.matchMedia('(min-width: 600px)').matches;
-      dialogSettings.width = 'auto';
+      dialogSettings.classes['ui-dialog'] = classes.join(' ');
+      if (typeof dialogSettings.autoResize === 'undefined') {
+        dialogSettings.autoResize =
+          window.matchMedia('(min-width: 600px)').matches;
+      }
+      if (typeof dialogSettings.width === 'undefined') {
+        dialogSettings.width = 'auto';
+      }
 
       const ckeditorAjaxDialog = Drupal.ajax({
         dialog: dialogSettings,
@@ -630,9 +650,36 @@
     },
   };
 
+  Drupal.behaviors.editorStyleFix = {
+    attach(context) {
+      // CKEditor injects a style tag that overrides native list type styling.
+      // The following find the style(s) causing the problem and removes them.
+      // @todo remove this entire behavior when this issue is fixed
+      //  https://github.com/ckeditor/ckeditor5/issues/14613
+      [...document.styleSheets]
+        .filter(
+          (sheet) =>
+            sheet.ownerNode.hasAttribute('data-cke') ||
+            (sheet.href && sheet.href.includes('ckeditor5')),
+        )
+        .forEach((sheet) => {
+          [...sheet.cssRules].forEach((rule, ruleIndex) => {
+            if (
+              rule?.selectorText &&
+              (rule.selectorText.includes(' ol') ||
+                rule.selectorText.includes(' ul')) &&
+              !rule.selectorText.includes('type')
+            ) {
+              sheet.cssRules[ruleIndex].style['list-style-type'] = null;
+            }
+          });
+        });
+    },
+  };
+
   // Redirect on hash change when the original hash has an associated CKEditor 5.
   function redirectTextareaFragmentToCKEditor5Instance() {
-    const hash = window.location.hash.substr(1);
+    const hash = window.location.hash.substring(1);
     const element = document.getElementById(hash);
     if (element) {
       const editorID = getElementId(element);
@@ -654,13 +701,19 @@
   );
 
   // Respond to new dialogs that are opened by CKEditor, closing the AJAX loader.
-  $(window).on('dialog:beforecreate', () => {
-    $('.ckeditor5-dialog-loading').animate(
-      { top: '-40px' },
-      function removeDialogLoading() {
-        $(this).remove();
-      },
-    );
+  window.addEventListener('dialog:beforecreate', () => {
+    const dialogLoading = document.querySelector('.ckeditor5-dialog-loading');
+
+    if (dialogLoading) {
+      dialogLoading.addEventListener(
+        'transitionend',
+        function removeDialogLoading() {
+          dialogLoading.remove();
+        },
+      );
+      dialogLoading.style.transition = 'top 0.5s ease';
+      dialogLoading.style.top = '-40px';
+    }
   });
 
   // Respond to dialogs that are saved, sending data back to CKEditor.
@@ -671,9 +724,9 @@
   });
 
   // Respond to dialogs that are closed, removing the current save handler.
-  $(window).on('dialog:afterclose', () => {
+  window.addEventListener('dialog:afterclose', () => {
     if (Drupal.ckeditor5.saveCallback) {
       Drupal.ckeditor5.saveCallback = null;
     }
   });
-})(Drupal, Drupal.debounce, CKEditor5, jQuery, once);
+})(Drupal, Drupal.debounce, CKEDITOR, jQuery, once);

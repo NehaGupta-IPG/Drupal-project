@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\SecurityAdvisories;
 
 use Drupal\Core\Extension\Extension;
@@ -7,20 +9,26 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * @coversDefaultClass \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher
- *
- * @group system
+ * Tests Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher.
  */
+#[CoversClass(SecurityAdvisoriesFetcher::class)]
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInterface {
 
   use RfcLoggerTrait;
@@ -71,10 +79,9 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
    *   because they do not need to vary between test cases.
    * @param string|null $existing_version
    *   The existing version of the module.
-   *
-   * @dataProvider providerShowAdvisories
    */
-  public function testShowAdvisories(array $feed_item, string $existing_version = NULL): void {
+  #[DataProvider('providerShowAdvisories')]
+  public function testShowAdvisories(array $feed_item, ?string $existing_version = NULL): void {
     $this->setFeedItems([$feed_item]);
     if ($existing_version !== NULL) {
       $this->setExistingProjectVersion($existing_version);
@@ -89,7 +96,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
   /**
    * Data provider for testShowAdvisories().
    */
-  public function providerShowAdvisories(): array {
+  public static function providerShowAdvisories(): array {
     return [
       'contrib:exact:non-psa' => [
         'feed_item' => [
@@ -242,10 +249,9 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
    *   because they do not need to vary between test cases.
    * @param string|null $existing_version
    *   The existing version of the module.
-   *
-   * @dataProvider providerIgnoreAdvisories
    */
-  public function testIgnoreAdvisories(array $feed_item, string $existing_version = NULL): void {
+  #[DataProvider('providerIgnoreAdvisories')]
+  public function testIgnoreAdvisories(array $feed_item, ?string $existing_version = NULL): void {
     $this->setFeedItems([$feed_item]);
     if ($existing_version !== NULL) {
       $this->setExistingProjectVersion($existing_version);
@@ -257,7 +263,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
   /**
    * Data provider for testIgnoreAdvisories().
    */
-  public function providerIgnoreAdvisories(): array {
+  public static function providerIgnoreAdvisories(): array {
     return [
       'contrib:not-exact:non-psa' => [
         'feed_item' => [
@@ -507,7 +513,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
         'title' => 'SA title',
         'link' => 'http://example.com',
       ];
-      $responses[] = new Response('200', [], json_encode([$feed_item]));
+      $responses[] = new Response(200, [], json_encode([$feed_item]));
     }
     $this->setTestFeedResponses($responses);
   }
@@ -620,62 +626,22 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
   }
 
   /**
-   * @covers ::doRequest
-   * @covers ::getSecurityAdvisories
-   */
-  public function testHttpFallback(): void {
-    $this->setSetting('update_fetch_with_http_fallback', TRUE);
-    $feed_item = [
-      'is_psa' => 1,
-      'type' => 'core',
-      'project' => 'drupal',
-      'insecure' => [\Drupal::VERSION],
-      'title' => 'SA title',
-      'link' => 'http://example.com',
-    ];
-    $this->setTestFeedResponses([
-      new Response('500', [], 'HTTPS failed'),
-      new Response('200', [], json_encode([$feed_item])),
-    ]);
-    $advisories = $this->getAdvisories();
-
-    // There should be two request / response pairs.
-    $this->assertCount(2, $this->history);
-
-    // The first request should have been HTTPS and should have failed.
-    $first_try = $this->history[0];
-    $this->assertNotEmpty($first_try);
-    $this->assertEquals('https', $first_try['request']->getUri()->getScheme());
-    $this->assertEquals(500, $first_try['response']->getStatusCode());
-
-    // The second request should have been the HTTP fallback and should have
-    // worked.
-    $second_try = $this->history[1];
-    $this->assertNotEmpty($second_try);
-    $this->assertEquals('http', $second_try['request']->getUri()->getScheme());
-    $this->assertEquals(200, $second_try['response']->getStatusCode());
-
-    $this->assertCount(1, $advisories);
-    $this->assertSame('http://example.com', $advisories[0]->getUrl());
-    $this->assertSame('SA title', $advisories[0]->getTitle());
-    $this->assertSame(["Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n"], $this->errorMessages);
-  }
-
-  /**
-   * @covers ::doRequest
-   * @covers ::getSecurityAdvisories
+   * Tests no http fallback.
+   *
+   * @legacy-covers ::doRequest
+   * @legacy-covers ::getSecurityAdvisories
    */
   public function testNoHttpFallback(): void {
     $this->setTestFeedResponses([
-      new Response('500', [], 'HTTPS failed'),
+      new Response(500, [], 'HTTPS failed'),
     ]);
 
     $exception_thrown = FALSE;
     try {
       $this->getAdvisories();
     }
-    catch (TransferException $exception) {
-      $this->assertSame("Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n", $exception->getMessage());
+    catch (ClientExceptionInterface $exception) {
+      $this->assertSame("Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response: HTTPS failed", $exception->getMessage());
       $exception_thrown = TRUE;
     }
     $this->assertTrue($exception_thrown);

@@ -2,10 +2,12 @@
 
 namespace Drupal\Core\Field;
 
+use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Base class for configurable field definitions.
@@ -116,6 +118,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * Default field value.
    *
+   * @var array
    * The default value is used when an entity is created, either:
    * - through an entity creation form; the form elements for the field are
    *   prepopulated with the default value.
@@ -134,13 +137,11 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
    *
    * Example for an integer field:
    * @code
-   * array(
-   *   array('value' => 1),
-   *   array('value' => 2),
-   * )
+   * [
+   *   ['value' => 1],
+   *   ['value' => 2],
+   * ]
    * @endcode
-   *
-   * @var array
    */
   protected $default_value = [];
 
@@ -279,6 +280,13 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
     if (empty($this->field_type)) {
       $this->field_type = $this->getFieldStorageDefinition()->getType();
     }
+
+    // Make sure all expected runtime settings are present.
+    $default_settings = \Drupal::service('plugin.manager.field.field_type')
+      ->getDefaultFieldSettings($this->getType());
+    // Filter out any unknown (unsupported) settings.
+    $supported_settings = array_intersect_key($this->getSettings(), $default_settings);
+    $this->set('settings', $supported_settings + $default_settings);
   }
 
   /**
@@ -320,6 +328,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Set field label'), pluralize: FALSE)]
   public function setLabel($label) {
     $this->label = $label;
     return $this;
@@ -335,6 +344,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Set field description'), pluralize: FALSE)]
   public function setDescription($description) {
     $this->description = $description;
     return $this;
@@ -351,6 +361,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Set whether field is translatable'), pluralize: FALSE)]
   public function setTranslatable($translatable) {
     $this->translatable = $translatable;
     return $this;
@@ -366,6 +377,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Set field settings'), pluralize: FALSE)]
   public function setSettings(array $settings) {
     $this->settings = $settings + $this->settings;
     return $this;
@@ -401,6 +413,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Set whether field is required'), pluralize: FALSE)]
   public function setRequired($required) {
     $this->required = $required;
     return $this;
@@ -433,6 +446,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Set default value'), pluralize: FALSE)]
   public function setDefaultValue($value) {
     $this->default_value = $this->normalizeValue($value, $this->getFieldStorageDefinition()->getMainPropertyName());
     return $this;
@@ -458,13 +472,16 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
    *
    * Using the Serialize interface and serialize() / unserialize() methods
    * breaks entity forms in PHP 5.4.
+   *
    * @todo Investigate in https://www.drupal.org/node/1977206.
    */
-  public function __sleep() {
+  public function __sleep(): array {
+    $properties = get_object_vars($this);
+
     // Only serialize necessary properties, excluding those that can be
     // recalculated.
-    $properties = get_object_vars($this);
-    unset($properties['fieldStorage'], $properties['itemDefinition'], $properties['original']);
+    unset($properties['itemDefinition'], $properties['original']);
+
     return array_keys($properties);
   }
 
@@ -540,7 +557,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
         ->setSettings($this->getSettings());
 
       // Add any custom property constraints, overwriting as required.
-      $item_constraints = $this->itemDefinition->getConstraint('ComplexData') ?: [];
+      $item_constraints = $this->getItemDefinition()->getConstraint('ComplexData')['properties'] ?? [];
       foreach ($this->propertyConstraints as $name => $constraints) {
         if (isset($item_constraints[$name])) {
           $item_constraints[$name] = $constraints + $item_constraints[$name];
@@ -548,7 +565,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
         else {
           $item_constraints[$name] = $constraints;
         }
-        $this->itemDefinition->addConstraint('ComplexData', $item_constraints);
+        $this->itemDefinition->addConstraint('ComplexData', ['properties' => $item_constraints]);
       }
     }
 
@@ -573,7 +590,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * {@inheritdoc}
    */
-  public function addConstraint($constraint_name, $options = NULL) {
+  public function addConstraint(string $constraint_name, ?array $options = NULL): static {
     $this->constraints[$constraint_name] = $options;
     return $this;
   }

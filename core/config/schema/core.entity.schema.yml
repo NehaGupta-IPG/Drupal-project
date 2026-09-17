@@ -8,7 +8,7 @@ core.entity_view_mode.*.*:
       type: string
       label: 'ID'
     label:
-      type: label
+      type: required_label
       label: 'The human-readable name of the view mode'
     description:
       type: text
@@ -23,19 +23,36 @@ core.entity_view_mode.*.*:
 core.entity_form_mode.*.*:
   type: config_entity
   label: 'Entity form mode settings'
+  constraints:
+    FullyValidatable: ~
   mapping:
     id:
       type: string
       label: 'ID'
+      # Form mode IDs can only contain lowercase letters, numbers, and underscores
+      # prefixed by entity type name this form mode is used for and a dot.
+      # @see \Drupal\field_ui\Form\EntityDisplayModeFormBase::form()
+      constraints:
+        Regex:
+          pattern: '/^[a-z0-9_]+\.[a-z0-9_]+$/'
+          message: "The ID %value is not valid."
     label:
-      type: label
+      type: required_label
       label: 'Label'
     description:
       type: text
       label: 'Description'
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     targetEntityType:
       type: string
       label: 'Target entity type'
+      constraints:
+        PluginExists:
+          manager: entity_type.manager
+          interface: Drupal\Core\Entity\ContentEntityInterface
     cache:
       type: boolean
       label: 'Cache'
@@ -54,6 +71,9 @@ core.entity_view_display.*.*.*:
     bundle:
       type: string
       label: 'Bundle'
+      constraints:
+        EntityBundleExists:
+          entityTypeId: '%parent.targetEntityType'
     mode:
       type: string
       label: 'View or form mode machine name'
@@ -69,6 +89,39 @@ core.entity_view_display.*.*.*:
         type: boolean
         label: 'Value'
 
+core.design_token.*:
+  type: config_entity
+  label: 'Design token'
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    id:
+      type: machine_name
+      label: 'ID'
+    path:
+      type: string
+      label: 'The CSS variable path'
+      constraints:
+        Regex:
+          pattern: '/^[a-z0-9_\s\-\.]+$/'
+          message: "The %value path is not valid."
+    type:
+      type: string
+      label: 'The design token value type'
+      constraints:
+        PluginExists:
+          manager: plugin.manager.design_token_value
+          interface: 'Drupal\Core\Theme\DesignToken\DesignTokenValueInterface'
+    scopes:
+      type: sequence
+      label: 'The scopes of the value overrides.'
+      sequence:
+        type: design_token_value.[%parent.%parent.type]
+      constraints:
+        ValidSequenceKeys:
+          constraints:
+            CssSelector: []
+
 field_formatter:
   type: mapping
   label: 'Field formatter'
@@ -76,6 +129,10 @@ field_formatter:
     type:
       type: string
       label: 'Format type machine name'
+      constraints:
+        PluginExists:
+          manager: plugin.manager.field.formatter
+          interface: 'Drupal\Core\Field\FormatterInterface'
     label:
       type: string
       label: 'Label setting machine name'
@@ -83,6 +140,9 @@ field_formatter:
       type: field.formatter.settings.[%parent.type]
       label: 'Settings'
     third_party_settings:
+      # Third party settings are always optional: they're an optional extension
+      # point.
+      requiredKey: false
       type: sequence
       label: 'Third party settings'
       sequence:
@@ -92,7 +152,7 @@ field_formatter.entity_view_display:
   type: field_formatter
   mapping:
     weight:
-      type: integer
+      type: weight
       label: 'Weight'
     region:
       type: string
@@ -112,6 +172,9 @@ core.entity_form_display.*.*.*:
     bundle:
       type: string
       label: 'Bundle'
+      constraints:
+        EntityBundleExists:
+          entityTypeId: '%parent.targetEntityType'
     mode:
       type: string
       label: 'View or form mode machine name'
@@ -128,8 +191,12 @@ core.entity_form_display.*.*.*:
           type:
             type: string
             label: 'Widget type machine name'
+            constraints:
+              PluginExists:
+                manager: plugin.manager.field.widget
+                interface: '\Drupal\Core\Field\WidgetInterface'
           weight:
-            type: integer
+            type: weight
             label: 'Weight'
           region:
             type: string
@@ -138,6 +205,9 @@ core.entity_form_display.*.*.*:
             type: field.widget.settings.[%parent.type]
             label: 'Settings'
           third_party_settings:
+            # Third party settings are always optional: they're an optional extension
+            # point.
+            requiredKey: false
             type: sequence
             label: 'Third party settings'
             sequence:
@@ -233,6 +303,14 @@ field.widget.settings.checkbox:
       type: boolean
       label: 'Use field label instead of the "On value" as label'
 
+field.widget.settings.language_select:
+  type: mapping
+  label: 'Language format settings'
+  mapping:
+    include_locked:
+      type: boolean
+      label: 'Include locked languages'
+
 field.widget.settings.entity_reference_autocomplete_tags:
   type: mapping
   label: 'Entity reference autocomplete (Tags style) display format settings'
@@ -286,6 +364,15 @@ field.formatter.settings.string:
     link_to_entity:
       type: boolean
       label: 'Link to the entity'
+    link_rel:
+      type: string
+      label: 'Link destination'
+      constraints:
+        Choice:
+          choices:
+            - canonical
+            - edit-form
+      requiredKey: false
 
 field.formatter.settings.language:
   type: field.formatter.settings.string
@@ -378,10 +465,10 @@ field.formatter.settings.timestamp_ago:
   label: 'Timestamp ago display format settings'
   mapping:
     future_format:
-      type: label
+      type: required_label
       label: 'Future format'
     past_format:
-      type: label
+      type: required_label
       label: 'Past format'
     granularity:
       type: integer
@@ -415,6 +502,8 @@ block.settings.field_block:*:*:*:
   mapping:
     formatter:
       type: field_formatter
+  constraints:
+    FullyValidatable: ~
 
 block.settings.extra_field_block:*:*:*:
   type: block_settings

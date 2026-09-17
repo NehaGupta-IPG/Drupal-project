@@ -7,7 +7,10 @@
  * @see phpunit.xml.dist
  */
 
-use Drupal\TestTools\PhpUnitCompatibility\ClassWriter;
+declare(strict_types=1);
+
+use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
+use PHPUnit\TextUI\Configuration\Registry as PhpunitConfigurationRegistry;
 
 /**
  * Finds all valid extension directories recursively within a given directory.
@@ -19,7 +22,7 @@ use Drupal\TestTools\PhpUnitCompatibility\ClassWriter;
  *   An associative array of extension directories found within the scanned
  *   directory, keyed by extension name.
  */
-function drupal_phpunit_find_extension_directories($scan_directory) {
+function drupal_phpunit_find_extension_directories($scan_directory): array {
   $extensions = [];
   $dirs = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($scan_directory, \RecursiveDirectoryIterator::FOLLOW_SYMLINKS));
   foreach ($dirs as $dir) {
@@ -43,7 +46,7 @@ function drupal_phpunit_find_extension_directories($scan_directory) {
  * @return array
  *   An array of directories under which contributed extensions may exist.
  */
-function drupal_phpunit_contrib_extension_directory_roots($root = NULL) {
+function drupal_phpunit_contrib_extension_directory_roots($root = NULL): array {
   if ($root === NULL) {
     $root = dirname(__DIR__, 2);
   }
@@ -78,29 +81,16 @@ function drupal_phpunit_contrib_extension_directory_roots($root = NULL) {
  * @return array
  *   An associative array of extension directories, keyed by their namespace.
  */
-function drupal_phpunit_get_extension_namespaces($dirs) {
-  $suite_names = ['Unit', 'Kernel', 'Functional', 'Build', 'FunctionalJavascript'];
+function drupal_phpunit_get_extension_namespaces($dirs): array {
   $namespaces = [];
   foreach ($dirs as $extension => $dir) {
     if (is_dir($dir . '/src')) {
       // Register the PSR-4 directory for module-provided classes.
       $namespaces['Drupal\\' . $extension . '\\'][] = $dir . '/src';
     }
-    $test_dir = $dir . '/tests/src';
-    if (is_dir($test_dir)) {
-      foreach ($suite_names as $suite_name) {
-        $suite_dir = $test_dir . '/' . $suite_name;
-        if (is_dir($suite_dir)) {
-          // Register the PSR-4 directory for PHPUnit-based suites.
-          $namespaces['Drupal\\Tests\\' . $extension . '\\' . $suite_name . '\\'][] = $suite_dir;
-        }
-      }
-      // Extensions can have a \Drupal\Tests\extension\Traits namespace for
-      // cross-suite trait code.
-      $trait_dir = $test_dir . '/Traits';
-      if (is_dir($trait_dir)) {
-        $namespaces['Drupal\\Tests\\' . $extension . '\\Traits\\'][] = $trait_dir;
-      }
+    if (is_dir($dir . '/tests/src')) {
+      // Register the PSR-4 directory for PHPUnit-based suites.
+      $namespaces['Drupal\\Tests\\' . $extension . '\\'][] = $dir . '/tests/src';
     }
   }
   return $namespaces;
@@ -152,15 +142,13 @@ function drupal_phpunit_populate_class_loader() {
 }
 
 // Do class loader population.
-$loader = drupal_phpunit_populate_class_loader();
+drupal_phpunit_populate_class_loader();
 class_alias('\Drupal\Tests\DocumentElement', '\Behat\Mink\Element\DocumentElement', TRUE);
-
-ClassWriter::mutateTestBase($loader);
 
 // Set sane locale settings, to ensure consistent string, dates, times and
 // numbers handling.
 // @see \Drupal\Core\DrupalKernel::bootEnvironment()
-setlocale(LC_ALL, 'C');
+setlocale(LC_ALL, 'C.UTF-8', 'C');
 
 // Set appropriate configuration for multi-byte strings.
 mb_internal_encoding('utf-8');
@@ -173,14 +161,14 @@ mb_language('uni');
 // reduce the fragility of the testing system in general.
 date_default_timezone_set('Australia/Sydney');
 
-// Runtime assertions. PHPUnit follows the php.ini assert.active setting for
-// runtime assertions. By default this setting is on. Ensure exceptions are
-// thrown if an assert fails.
-assert_options(ASSERT_EXCEPTION, TRUE);
-
-// Ensure ignored deprecation patterns listed in .deprecation-ignore.txt are
-// considered in testing.
-if (getenv('SYMFONY_DEPRECATIONS_HELPER') === FALSE) {
-  $deprecation_ignore_filename = realpath(__DIR__ . "/../.deprecation-ignore.txt");
-  putenv("SYMFONY_DEPRECATIONS_HELPER=ignoreFile=$deprecation_ignore_filename");
+// Get deprecation override handling as early as possible, depending on the
+// extension configuration.
+try {
+  DeprecationHandler::preBootstrap(PhpunitConfigurationRegistry::get());
+}
+catch (\AssertionError) {
+  // In case this script is executed outside of a PHPUnit test run, the
+  // configuration is not defined, so we cannot bootstrap the deprecation
+  // handler extension. In such case, do nothing.
+  // @see core/scripts/test-site.php for an example.
 }

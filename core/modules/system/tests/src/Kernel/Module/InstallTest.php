@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Module;
 
 use Drupal\Core\Extension\ExtensionNameLengthException;
+use Drupal\Core\Extension\ExtensionNameReservedException;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the installation of modules.
- *
- * @group Module
  */
+#[Group('Module')]
+#[RunTestsInSeparateProcesses]
 class InstallTest extends KernelTestBase {
 
   /**
@@ -103,7 +108,7 @@ class InstallTest extends KernelTestBase {
   public function testModuleNameLength(): void {
     $module_name = 'invalid_module_name_over_the_maximum_allowed_character_length';
     $this->expectException(ExtensionNameLengthException::class);
-    $this->expectExceptionMessage("Module name 'invalid_module_name_over_the_maximum_allowed_character_length' is over the maximum allowed length of 50 characters");
+    $this->expectExceptionMessageIs("Module name 'invalid_module_name_over_the_maximum_allowed_character_length' is over the maximum allowed length of 50 characters");
     $this->moduleInstaller->install([$module_name]);
   }
 
@@ -115,8 +120,26 @@ class InstallTest extends KernelTestBase {
   public function testModuleNameLengthWithoutDependencyCheck(): void {
     $module_name = 'invalid_module_name_over_the_maximum_allowed_character_length';
     $this->expectException(ExtensionNameLengthException::class);
-    $this->expectExceptionMessage("Module name 'invalid_module_name_over_the_maximum_allowed_character_length' is over the maximum allowed length of 50 characters");
+    $this->expectExceptionMessageIs("Module name 'invalid_module_name_over_the_maximum_allowed_character_length' is over the maximum allowed length of 50 characters");
     $this->moduleInstaller->install([$module_name], FALSE);
+  }
+
+  /**
+   * Tests installing a module with the same name as an enabled theme.
+   */
+  public function testInstallModuleSameNameAsTheme(): void {
+    $name = 'name_collision_test';
+
+    // Install and uninstall the module.
+    $this->moduleInstaller->install([$name]);
+    $this->moduleInstaller->uninstall([$name]);
+
+    // Install the theme, then the module.
+    $this->container->get('theme_installer')->install([$name]);
+    $message = "Module name {$name} is already in use by an installed theme.";
+    $this->expectException(ExtensionNameReservedException::class);
+    $this->expectExceptionMessageIs($message);
+    $this->moduleInstaller->install([$name]);
   }
 
 }

@@ -3,4 +3,4 @@ test:
     component:
       views_cache.test.css: {}
   js:
-    views_cache.test.js: {}
+    js/views_cache.test.js: {}

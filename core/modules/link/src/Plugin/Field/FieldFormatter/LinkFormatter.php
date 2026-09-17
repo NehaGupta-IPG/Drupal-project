@@ -3,26 +3,27 @@
 namespace Drupal\link\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Path\PathValidatorInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\link\AttributeXss;
 use Drupal\link\LinkItemInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'link' formatter.
- *
- * @FieldFormatter(
- *   id = "link",
- *   label = @Translation("Link"),
- *   field_types = {
- *     "link"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'link',
+  label: new TranslatableMarkup('Link'),
+  field_types: [
+    'link',
+  ],
+)]
 class LinkFormatter extends FormatterBase {
 
   /**
@@ -33,26 +34,10 @@ class LinkFormatter extends FormatterBase {
   protected $pathValidator;
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $plugin_id,
-      $plugin_definition,
-      $configuration['field_definition'],
-      $configuration['settings'],
-      $configuration['label'],
-      $configuration['view_mode'],
-      $configuration['third_party_settings'],
-      $container->get('path.validator')
-    );
-  }
-
-  /**
    * Constructs a new LinkFormatter.
    *
    * @param string $plugin_id
-   *   The plugin_id for the formatter.
+   *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
@@ -99,6 +84,11 @@ class LinkFormatter extends FormatterBase {
       '#default_value' => $this->getSetting('trim_length'),
       '#min' => 1,
       '#description' => $this->t('Leave blank to allow unlimited link text lengths.'),
+      '#states' => [
+        'invisible' => [
+          ':input[name*="url_only"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
     $elements['url_only'] = [
       '#type' => 'checkbox',
@@ -140,8 +130,7 @@ class LinkFormatter extends FormatterBase {
     $summary = [];
 
     $settings = $this->getSettings();
-
-    if (!empty($settings['trim_length'])) {
+    if (!empty($settings['trim_length']) && empty($settings['url_only']) && empty($settings['url_plain'])) {
       $summary[] = $this->t('Link text trimmed to @limit characters', ['@limit' => $settings['trim_length']]);
     }
     else {
@@ -167,6 +156,8 @@ class LinkFormatter extends FormatterBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @phpstan-param \Drupal\Core\Field\FieldItemListInterface<\Drupal\link\LinkItemInterface> $items
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
@@ -187,7 +178,7 @@ class LinkFormatter extends FormatterBase {
       }
 
       // Trim the link text to the desired length.
-      if (!empty($settings['trim_length'])) {
+      if (!empty($settings['trim_length']) && empty($settings['url_plain']) && empty($settings['url_only'])) {
         $link_title = Unicode::truncate($link_title, $settings['trim_length'], FALSE, TRUE);
       }
 
@@ -205,16 +196,15 @@ class LinkFormatter extends FormatterBase {
         }
       }
       else {
+        // Skip the #options to prevent duplications of query parameters.
         $element[$delta] = [
           '#type' => 'link',
           '#title' => $link_title,
-          '#options' => $url->getOptions(),
+          '#url' => $url,
         ];
-        $element[$delta]['#url'] = $url;
 
         if (!empty($item->_attributes)) {
-          $element[$delta]['#options'] += ['attributes' => []];
-          $element[$delta]['#options']['attributes'] += $item->_attributes;
+          $element[$delta]['#attributes'] = $item->_attributes;
           // Unset field item attributes since they have been included in the
           // formatter output and should not be rendered in the field template.
           unset($item->_attributes);
@@ -238,13 +228,13 @@ class LinkFormatter extends FormatterBase {
     try {
       $url = $item->getUrl();
     }
-    catch (\InvalidArgumentException $e) {
+    catch (\InvalidArgumentException) {
       // @todo Add logging here in https://www.drupal.org/project/drupal/issues/3348020
       $url = Url::fromRoute('<none>');
     }
 
     $settings = $this->getSettings();
-    $options = $item->options;
+    $options = $item->options ?? [];
     $options += $url->getOptions();
 
     // Add optional 'rel' attribute to link options.
@@ -255,8 +245,12 @@ class LinkFormatter extends FormatterBase {
     if (!empty($settings['target'])) {
       $options['attributes']['target'] = $settings['target'];
     }
-    $url->setOptions($options);
 
+    if (!empty($options['attributes'])) {
+      $options['attributes'] = AttributeXss::sanitizeAttributes($options['attributes']);
+    }
+
+    $url->setOptions($options);
     return $url;
   }
 

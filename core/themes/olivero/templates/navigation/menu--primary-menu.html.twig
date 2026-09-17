@@ -76,20 +76,20 @@
           ]
         %}
 
-        <li{{ item.attributes.addClass(item_classes).setAttribute('data-drupal-selector', is_top_level_menu and item.below ? 'primary-nav-menu-item-has-children': false) }}>
+        <li{{ item.attributes.addClass(item_classes).setAttribute('data-drupal-selector', is_top_level_menu and item.below ? 'primary-nav-menu-item-has-children' : false) }}>
           {#
             A unique HTML ID should be used, but that isn't available through
             Twig yet, so the |clean_id filter is used for now.
             @see https://www.drupal.org/project/drupal/issues/3115445
           #}
-          {% set aria_id = (aria_id ~ loop.index )|clean_id %}
+          {% set aria_id = (aria_id ~ loop.index)|clean_id %}
           {% set link_title %}
             <span class="primary-nav__menu-link-inner primary-nav__menu-link-inner--level-{{ menu_level + 1 }}">{{ item.title }}</span>
           {% endset %}
 
           {% if menu_item_type == 'link' or menu_item_type == 'nolink' %}
             {{ link(menu_item_type == 'link' ? link_title : item.title, item.url, {
-              'class': link_classes,
+              class: link_classes,
               'data-drupal-selector': is_top_level_menu ? 'primary-nav-menu-link-has-children' : false,
               })
             }}
@@ -102,12 +102,12 @@
               #}
               {% if is_top_level_menu %}
                 {% set toggle_button_attributes = create_attribute({
-                  'class': 'primary-nav__button-toggle',
+                  class: 'primary-nav__button-toggle',
                   'data-drupal-selector': 'primary-nav-submenu-toggle-button',
                   'aria-controls': aria_id,
                   'aria-expanded': 'false',
                   'aria-hidden': 'true',
-                  'tabindex': '-1',
+                  tabindex: '-1',
                 }) %}
 
                 <button{{ toggle_button_attributes }}>
@@ -123,7 +123,7 @@
           {% elseif menu_item_type == 'button' %}
 
             {{ link(link_title, item.url, {
-              'class': link_classes,
+              class: link_classes,
               'aria-controls': is_top_level_menu and item.below ? aria_id : false,
               'aria-expanded': is_top_level_menu and item.below ? 'false' : false,
               'data-drupal-selector': is_top_level_menu and item.below ? 'primary-nav-submenu-toggle-button' : false,

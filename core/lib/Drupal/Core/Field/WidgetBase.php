@@ -5,6 +5,9 @@ namespace Drupal\Core\Field;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\SortArray;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\FocusFirstCommand;
+use Drupal\Core\Ajax\InsertCommand;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
@@ -37,7 +40,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    * Constructs a WidgetBase object.
    *
    * @param string $plugin_id
-   *   The plugin_id for the widget.
+   *   The plugin ID for the widget.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
@@ -58,7 +61,14 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($plugin_id, $plugin_definition, $configuration['field_definition'], $configuration['settings'], $configuration['third_party_settings']);
+    return static::createInstanceAutowired(
+      $container,
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings'],
+    );
   }
 
   /**
@@ -68,12 +78,18 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $field_name = $this->fieldDefinition->getName();
     $parents = $form['#parents'];
 
-    // Store field information in $form_state.
-    if (!static::getWidgetState($parents, $field_name, $form_state)) {
+    if (!$field_state = static::getWidgetState($parents, $field_name, $form_state)) {
       $field_state = [
         'items_count' => count($items),
         'array_parents' => [],
       ];
+      static::setWidgetState($parents, $field_name, $form_state, $field_state);
+    }
+
+    // Remove deleted items from the field item list.
+    if (isset($field_state['deleted_item']) && $items->get($field_state['deleted_item'])) {
+      $items->removeItem($field_state['deleted_item']);
+      unset($field_state['deleted_item']);
       static::setWidgetState($parents, $field_name, $form_state, $field_state);
     }
 
@@ -111,15 +127,6 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       $elements = $this->formMultipleElements($items, $form, $form_state);
     }
 
-    // Allow modules to alter the field multi-value widget form element.
-    // This hook can also be used for single-value fields.
-    $context = [
-      'form' => $form,
-      'widget' => $this,
-      'items' => $items,
-      'default' => $this->isDefaultValueWidget($form_state),
-    ];
-
     // Populate the 'array_parents' information in $form_state->get('field')
     // after the form is built, so that we catch changes in the form structure
     // performed in alter() hooks.
@@ -153,7 +160,10 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       'items' => $items,
       'default' => $this->isDefaultValueWidget($form_state),
     ];
-    \Drupal::moduleHandler()->alter(['field_widget_complete_form', 'field_widget_complete_' . $this->getPluginId() . '_form'], $field_widget_complete_form, $form_state, $context);
+    \Drupal::moduleHandler()->alter([
+      'field_widget_complete_form',
+      'field_widget_complete_' . $this->getPluginId() . '_form',
+    ], $field_widget_complete_form, $form_state, $context);
 
     return $field_widget_complete_form;
   }
@@ -281,9 +291,10 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
         $elements['add_more'] = [
           '#type' => 'submit',
           '#name' => strtr($id_prefix, '-', '_') . '_add_more',
-          '#value' => t('Add another item'),
+          '#value' => $this->t('Add another item'),
           '#attributes' => ['class' => ['field-add-more-submit']],
-          '#limit_validation_errors' => [array_merge($parents, [$field_name])],
+          '#button_type' => 'small',
+          '#limit_validation_errors' => [],
           '#submit' => [[static::class, 'addMoreSubmit']],
           '#ajax' => [
             'callback' => [static::class, 'addMoreAjax'],
@@ -352,10 +363,19 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
 
     // Add a DIV around the delta receiving the Ajax effect.
     $delta = $element['#max_delta'];
-    $element[$delta]['#prefix'] = '<div class="ajax-new-content">' . ($element[$delta]['#prefix'] ?? '');
+    // Construct an attribute to add to div for use as selector to set the focus
+    // on.
+    $button_parent = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
+    $focus_attribute = 'data-drupal-selector="field-' . $button_parent['#field_name'] . '-more-focus-target"';
+    $element[$delta]['#prefix'] = '<div class="ajax-new-content" ' . $focus_attribute . '>' . ($element[$delta]['#prefix'] ?? '');
     $element[$delta]['#suffix'] = ($element[$delta]['#suffix'] ?? '') . '</div>';
 
-    return $element;
+    // Turn render array into response with AJAX commands.
+    $response = new AjaxResponse();
+    $response->addCommand(new InsertCommand(NULL, $element));
+    // Add command to set the focus on first focusable element within the div.
+    $response->addCommand(new FocusFirstCommand("[$focus_attribute]"));
+    return $response;
   }
 
   /**
@@ -392,6 +412,8 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       NestedArray::setValue($user_input, $parent_element['#parents'], $field_values);
       $form_state->setUserInput($user_input);
     }
+
+    $field_state['deleted_item'] = $delta;
 
     unset($parent_element[$delta]);
     NestedArray::setValue($form, $array_parents, $parent_element);
@@ -457,7 +479,10 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
         'delta' => $delta,
         'default' => $this->isDefaultValueWidget($form_state),
       ];
-      \Drupal::moduleHandler()->alter(['field_widget_single_element_form', 'field_widget_single_element_' . $this->getPluginId() . '_form'], $element, $form_state, $context);
+      \Drupal::moduleHandler()->alter([
+        'field_widget_single_element_form',
+        'field_widget_single_element_' . $this->getPluginId() . '_form',
+      ], $element, $form_state, $context);
     }
 
     return $element;
@@ -539,7 +564,6 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
 
         $violations_by_delta = $item_list_violations = [];
         foreach ($violations as $violation) {
-          $violation = new InternalViolation($violation);
           // Separate violations by delta.
           $property_path = explode('.', $violation->getPropertyPath());
           $delta = array_shift($property_path);
@@ -550,8 +574,6 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
           else {
             $item_list_violations[] = $violation;
           }
-          // @todo Remove BC layer https://www.drupal.org/i/3307859 on PHP 8.2.
-          $violation->arrayPropertyPath = $property_path;
         }
 
         /** @var \Symfony\Component\Validator\ConstraintViolationInterface[] $delta_violations */
@@ -610,9 +632,11 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    *   The location of processing information within $form_state.
    */
   protected static function getWidgetStateParents(array $parents, $field_name) {
+    // phpcs:disable Drupal.Files.LineLength
     // Field processing data is placed at
-    // $form_state->get(['field_storage', '#parents', ...$parents..., '#fields', $field_name]),
+    // "$form_state->get(['field_storage', '#parents', ...$parents..., '#fields', $field_name])"
     // to avoid clashes between field names and $parents parts.
+    // phpcs:enable
     return array_merge(['field_storage', '#parents'], $parents, ['#fields', $field_name]);
   }
 

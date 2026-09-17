@@ -1,21 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\Core\Url;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentManagerInterface;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\comment\CommentPreviewMode;
 use Drupal\comment\Entity\Comment;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
-use Drupal\user\RoleInterface;
+use Drupal\Core\Url;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment user interfaces.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentInterfaceTest extends CommentTestBase {
 
   /**
@@ -34,7 +41,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->assertSession()->responseNotMatches('@<h2[^>]*>Comments</h2>@');
 
     // Set comments to have subject and preview disabled.
-    $this->setCommentPreview(DRUPAL_DISABLED);
+    $this->setCommentPreview(CommentPreviewMode::Disabled);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(FALSE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
@@ -43,7 +50,7 @@ class CommentInterfaceTest extends CommentTestBase {
   /**
    * Tests the comment interface.
    */
-  public function testCommentInterface() {
+  public function testCommentInterface(): void {
 
     // Post comment #1 without subject or preview.
     $this->drupalLogin($this->webUser);
@@ -62,7 +69,7 @@ class CommentInterfaceTest extends CommentTestBase {
     // Set comments to have subject and preview to required.
     $this->drupalLogout();
     $this->setCommentSubject(TRUE);
-    $this->setCommentPreview(DRUPAL_REQUIRED);
+    $this->setCommentPreview(CommentPreviewMode::Required);
 
     // Create comment #2 that allows subject and requires preview.
     $this->drupalLogin($this->webUser);
@@ -73,7 +80,12 @@ class CommentInterfaceTest extends CommentTestBase {
 
     // Comment as anonymous with preview required.
     $this->drupalLogout();
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access content', 'access comments', 'post comments', 'skip comment approval']);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
+      'access content',
+      'access comments',
+      'post comments',
+      'skip comment approval',
+    ])->save();
     $anonymous_comment = $this->postComment($this->node, $this->randomMachineName(), $this->randomMachineName(), TRUE);
     $this->assertTrue($this->commentExists($anonymous_comment), 'Comment found.');
     $anonymous_comment->delete();
@@ -89,7 +101,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->drupalLogout();
     $this->drupalLogin($this->adminUser);
     $this->setCommentSubject(TRUE);
-    $this->setCommentPreview(DRUPAL_OPTIONAL);
+    $this->setCommentPreview(CommentPreviewMode::Optional);
 
     $this->drupalGet('comment/' . $comment->id() . '/edit');
     $this->assertSession()->titleEquals('Edit comment ' . $comment->getSubject() . ' | Drupal');
@@ -121,7 +133,11 @@ class CommentInterfaceTest extends CommentTestBase {
     // \Drupal\comment\Controller\CommentController::redirectNode().
     $this->drupalGet('comment/' . $this->node->id() . '/reply');
     // Verify we were correctly redirected.
-    $this->assertSession()->addressEquals(Url::fromRoute('comment.reply', ['entity_type' => 'node', 'entity' => $this->node->id(), 'field_name' => 'comment']));
+    $this->assertSession()->addressEquals(Url::fromRoute('comment.reply', [
+      'entity_type' => 'node',
+      'entity' => $this->node->id(),
+      'field_name' => 'comment',
+    ]));
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment/' . $comment->id());
     $this->assertSession()->pageTextContains($subject_text);
     $this->assertSession()->pageTextContains($comment_text);
@@ -172,21 +188,33 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->assertSession()->statusCodeEquals(403);
 
     // Attempt to post to node with comments disabled.
-    $this->node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1, 'comment' => [['status' => CommentItemInterface::HIDDEN]]]);
+    $this->node = $this->drupalCreateNode([
+      'type' => 'article',
+      'promote' => 1,
+      'comment' => [['status' => CommentingStatus::Hidden->value]],
+    ]);
     $this->assertNotNull($this->node, 'Article node created.');
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');
     $this->assertSession()->statusCodeEquals(403);
     $this->assertSession()->fieldNotExists('edit-comment');
 
     // Attempt to post to node with read-only comments.
-    $this->node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1, 'comment' => [['status' => CommentItemInterface::CLOSED]]]);
+    $this->node = $this->drupalCreateNode([
+      'type' => 'article',
+      'promote' => 1,
+      'comment' => [['status' => CommentingStatus::Closed->value]],
+    ]);
     $this->assertNotNull($this->node, 'Article node created.');
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');
     $this->assertSession()->statusCodeEquals(403);
     $this->assertSession()->fieldNotExists('edit-comment');
 
     // Attempt to post to node with comments enabled (check field names etc).
-    $this->node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1, 'comment' => [['status' => CommentItemInterface::OPEN]]]);
+    $this->node = $this->drupalCreateNode([
+      'type' => 'article',
+      'promote' => 1,
+      'comment' => [['status' => CommentingStatus::Open->value]],
+    ]);
     $this->assertNotNull($this->node, 'Article node created.');
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');
     $this->assertSession()->pageTextNotContains('This discussion is closed');
@@ -224,7 +252,7 @@ class CommentInterfaceTest extends CommentTestBase {
    * comment body are used for the subject. If this would break within a word,
    * then the break is put at the previous word boundary instead.
    */
-  public function testAutoFilledSubject() {
+  public function testAutoFilledSubject(): void {
     $this->drupalLogin($this->webUser);
     $this->drupalGet('node/' . $this->node->id());
 
@@ -238,6 +266,16 @@ class CommentInterfaceTest extends CommentTestBase {
     $body_text2 = 'AQuickBrownFoxJumpedOverTheLazyDog';
     $comment2 = $this->postComment(NULL, $body_text2, '', TRUE);
     $this->assertEquals('AQuickBrownFoxJumpedOverTheL…', $comment2->getSubject());
+
+    // Make the body field non required.
+    $comment_body_field = FieldConfig::loadByName('comment', 'comment', 'comment_body');
+    $comment_body_field->setRequired(FALSE)->save();
+    // Try to post a comment without any value in body and subject fields.
+    $this->drupalGet('node/' . $this->node->id());
+    // Ensure that there are no PHP errors or warnings when automatically
+    // generating the subject. This occurs when the comment body is empty.
+    $comment2 = $this->postComment(NULL, '', '', TRUE);
+    $this->assertEquals('(No subject)', $comment2->getSubject());
   }
 
   /**
@@ -247,7 +285,7 @@ class CommentInterfaceTest extends CommentTestBase {
    * with the additional check that HTML is stripped appropriately prior to
    * character-counting.
    */
-  public function testAutoFilledHtmlSubject() {
+  public function testAutoFilledHtmlSubject(): void {
     // Set up two default (i.e. filtered HTML) input formats, because then we
     // can select one of them. Then create a user that can use these formats,
     // log the user in, and then GET the node page on which to test the
@@ -296,7 +334,7 @@ class CommentInterfaceTest extends CommentTestBase {
   /**
    * Tests the comment formatter configured with a custom comment view mode.
    */
-  public function testViewMode() {
+  public function testViewMode(): void {
     $this->drupalLogin($this->webUser);
     $this->drupalGet($this->node->toUrl());
     $comment_text = $this->randomMachineName();
@@ -313,6 +351,7 @@ class CommentInterfaceTest extends CommentTestBase {
     EntityViewMode::create([
       'targetEntityType' => 'comment',
       'id' => "comment.$mode",
+      'label' => 'Comment test',
     ])->save();
     // Create the corresponding entity view display for article node-type. Note
     // that this new view display mode doesn't contain the comment body.

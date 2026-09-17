@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Plugin\Discovery;
 
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
@@ -17,13 +19,13 @@ class TestContainerDerivativeDiscovery extends TestDerivativeDiscovery implement
    * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $example_service
    *   Some service.
    */
-  public function __construct(EventDispatcherInterface $example_service) {
+  public function __construct(protected readonly EventDispatcherInterface $example_service) {
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, $base_plugin_id) {
+  public static function create(ContainerInterface $container, $base_plugin_id): static {
     return new static($container->get('example_service'));
   }
 

@@ -3,7 +3,6 @@
 namespace Drupal\Core\StringTranslation;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Component\Utility\ToStringTrait;
 
 /**
  * Provides translatable markup class.
@@ -19,8 +18,6 @@ use Drupal\Component\Utility\ToStringTrait;
  * @see \Drupal\Core\Annotation\Translation
  */
 class TranslatableMarkup extends FormattableMarkup {
-
-  use ToStringTrait;
 
   /**
    * The translated markup without placeholder replacements.
@@ -90,7 +87,7 @@ class TranslatableMarkup extends FormattableMarkup {
    * as user names or link URLs into translated text. Variable substitution
    * looks like this:
    * @code
-   * new TranslatableMarkup("@name's blog", array('@name' => $account->getDisplayName()));
+   * new TranslatableMarkup("@name's blog", ['@name' => $account->getDisplayName()]);
    * @endcode
    * Basically, you can put placeholders like @name into your string, and the
    * method will substitute the sanitized values at translation time. (See the
@@ -126,7 +123,7 @@ class TranslatableMarkup extends FormattableMarkup {
    *
    * @ingroup sanitization
    */
-  public function __construct($string, array $arguments = [], array $options = [], TranslationInterface $string_translation = NULL) {
+  public function __construct($string, array $arguments = [], array $options = [], ?TranslationInterface $string_translation = NULL) {
     if (!is_string($string)) {
       $message = $string instanceof TranslatableMarkup ? '$string ("' . $string->getUntranslatedString() . '") must be a string.' : '$string ("' . (string) $string . '") must be a string.';
       throw new \InvalidArgumentException($message);
@@ -187,7 +184,7 @@ class TranslatableMarkup extends FormattableMarkup {
    */
   public function render() {
     if (!isset($this->translatedMarkup)) {
-      $this->translatedMarkup = $this->getStringTranslation()->translateString($this);
+      $this->translatedMarkup = $this->translateString();
     }
 
     // Handle any replacements.
@@ -198,9 +195,19 @@ class TranslatableMarkup extends FormattableMarkup {
   }
 
   /**
+   * Translates the string.
+   *
+   * @return string
+   *   The translated string.
+   */
+  protected function translateString(): string {
+    return $this->getStringTranslation()->translateString($this);
+  }
+
+  /**
    * Magic __sleep() method to avoid serializing the string translator.
    */
-  public function __sleep() {
+  public function __sleep(): array {
     return ['string', 'arguments', 'options'];
   }
 
@@ -224,9 +231,18 @@ class TranslatableMarkup extends FormattableMarkup {
    * @return int
    *   The length of the string.
    */
-  #[\ReturnTypeWillChange]
-  public function count() {
+  public function count(): int {
     return mb_strlen($this->render());
+  }
+
+  /**
+   * Returns the string representation of this object.
+   *
+   * @return string
+   *   The string representation.
+   */
+  public function __toString(): string {
+    return (string) $this->render();
   }
 
 }

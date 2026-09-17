@@ -9,7 +9,7 @@ related:
 {% set taxonomy_permissions_link_text %}
   {% trans %}Administer vocabularies and terms{% endtrans %}
 {% endset %}
-{% set taxonomy_permissions_link = render_var(help_route_link(taxonomy_permissions_link_text, 'user.admin_permissions.module', {'modules': 'taxonomy'})) %}
+{% set taxonomy_permissions_link = render_var(help_route_link(taxonomy_permissions_link_text, 'user.admin_permissions.module', {modules: 'taxonomy'})) %}
 {% set taxonomy_admin_link_text %}
   {% trans %}Taxonomy{% endtrans %}
 {% endset %}
@@ -32,5 +32,5 @@ related:
 </ol>
 <h2>{% trans %}Additional resources{% endtrans %}</h2>
 <ul>
-  <li><a href="https://www.drupal.org/docs/user_guide/en/structure-taxonomy-setup.html">{% trans %}User Guide: Setting up a taxonomy{% endtrans %}</a></li>
+  <li><a href="https://www.drupal.org/docs/user_guide/en/structure-taxonomy-setup.html">{% trans %}Setting Up a Taxonomy (Drupal User Guide){% endtrans %}</a></li>
 </ul>

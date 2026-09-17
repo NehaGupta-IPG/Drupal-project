@@ -112,7 +112,7 @@ abstract class ExtensionList {
   /**
    * The install profile used by the site.
    *
-   * @var string
+   * @var string|false|null
    */
   protected $installProfile;
 
@@ -148,6 +148,7 @@ abstract class ExtensionList {
    * Returns the extension discovery.
    *
    * @return \Drupal\Core\Extension\ExtensionDiscovery
+   *   The extension discovery.
    */
   protected function getExtensionDiscovery() {
     return new ExtensionDiscovery($this->root);
@@ -170,17 +171,13 @@ abstract class ExtensionList {
     $this->pathNames = NULL;
 
     try {
-      $this->state->delete($this->getPathnamesCacheId());
+      $this->state->delete($this->getPathNamesCacheId());
     }
-    catch (DatabaseExceptionWrapper $e) {
+    catch (DatabaseExceptionWrapper) {
       // Ignore exceptions caused by a non existing {key_value} table in the
       // early installer.
     }
 
-    $this->cache->delete($this->getPathnamesCacheId());
-    // @todo In the long run it would be great to add the reset, but the early
-    //   installer fails due to that. https://www.drupal.org/node/2719315 could
-    //   help to resolve with that.
     return $this;
   }
 
@@ -210,7 +207,7 @@ abstract class ExtensionList {
    * @return string
    *   The filename cache ID.
    */
-  protected function getPathnamesCacheId() {
+  protected function getPathNamesCacheId() {
     return "system.{$this->type}.files";
   }
 
@@ -270,10 +267,19 @@ abstract class ExtensionList {
   /**
    * Returns all available extensions.
    *
+   * @param bool $skip_cache
+   *   Whether to skip the extension list cache.
+   *
    * @return \Drupal\Core\Extension\Extension[]
    *   Processed extension objects, keyed by machine name.
    */
-  public function getList() {
+  public function getList(bool $skip_cache = FALSE) {
+    if ($skip_cache) {
+      // Although we're skipping the persistent cache, populate the extensions
+      // class property so that any subsequent calls use the latest information.
+      $this->extensions = $this->doList();
+      return $this->extensions;
+    }
     if ($this->extensions !== NULL) {
       return $this->extensions;
     }
@@ -314,15 +320,29 @@ abstract class ExtensionList {
     $extensions = $this->doScanExtensions();
 
     // Read info files for each extension.
-    foreach ($extensions as $extension) {
+    foreach ($extensions as $name => $extension) {
       $extension->info = $this->createExtensionInfo($extension);
-
+      $extension = $this->subClassExtension($extension);
+      $extensions[$name] = $extension;
       // Invoke hook_system_info_alter() to give installed modules a chance to
       // modify the data in the .info.yml files if necessary.
       $this->moduleHandler->alter('system_info', $extension->info, $extension, $this->type);
     }
 
     return $extensions;
+  }
+
+  /**
+   * Allows subclasses to convert the extension into a specific subclass.
+   *
+   * @param \Drupal\Core\Extension\Extension $extension
+   *   The extension.
+   *
+   * @return \Drupal\Core\Extension\Extension
+   *   Either the unchanged Extension object or a subclass of Extension.
+   */
+  protected function subClassExtension(Extension $extension): Extension {
+    return $extension;
   }
 
   /**
@@ -412,22 +432,20 @@ abstract class ExtensionList {
    * Returns a list of extension file paths keyed by machine name.
    *
    * @return string[]
+   *   An associative array of extension file paths, keyed by the extension
+   *   machine name.
    */
-  public function getPathnames() {
+  public function getPathNames() {
     if ($this->pathNames === NULL) {
-      $cache_id = $this->getPathnamesCacheId();
-      if ($cache = $this->cache->get($cache_id)) {
-        $path_names = $cache->data;
-      }
-      // We use $file_names below.
-      elseif (!$path_names = $this->state->get($cache_id)) {
-        $path_names = $this->recalculatePathnames();
+      $cache_id = $this->getPathNamesCacheId();
+      $this->pathNames = $this->state->get($cache_id);
+
+      if ($this->pathNames === NULL) {
+        $this->pathNames = $this->recalculatePathNames();
         // Store filenames to allow static::getPathname() to retrieve them
         // without having to rebuild or scan the filesystem.
-        $this->state->set($cache_id, $path_names);
-        $this->cache->set($cache_id, $path_names);
+        $this->state->set($cache_id, $this->pathNames);
       }
-      $this->pathNames = $path_names;
     }
     return $this->pathNames;
   }
@@ -438,7 +456,7 @@ abstract class ExtensionList {
    * @return string[]
    *   An array of .info.yml file locations keyed by the extension machine name.
    */
-  protected function recalculatePathnames() {
+  protected function recalculatePathNames() {
     $extensions = $this->getList();
     ksort($extensions);
 
@@ -462,11 +480,17 @@ abstract class ExtensionList {
    *   The pathname of the extension which is to be set explicitly rather
    *   than by consulting the dynamic extension listing.
    *
+   * @see ::getPathname
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is
+   *   no replacement.
+   *
    * @internal
    *
-   * @see ::getPathname
+   * @see https://www.drupal.org/node/2934063
    */
   public function setPathname($extension_name, $pathname) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/2934063', E_USER_DEPRECATED);
     $this->addedPathNames[$extension_name] = $pathname;
   }
 
@@ -477,7 +501,7 @@ abstract class ExtensionList {
    * only returned if the file exists.
    *
    * This function plays a key role in allowing Drupal's extensions (modules,
-   * themes, profiles, theme_engines, etc.) to be located in different places
+   * themes, profiles, etc.) to be located in different places
    * depending on a site's configuration. For example, a module 'foo' may
    * legally be located in any of these four places:
    *
@@ -518,7 +542,7 @@ abstract class ExtensionList {
     elseif (isset($this->pathNames[$extension_name])) {
       return $this->pathNames[$extension_name];
     }
-    elseif (($path_names = $this->getPathnames()) && isset($path_names[$extension_name])) {
+    elseif (($path_names = $this->getPathNames()) && isset($path_names[$extension_name])) {
       return $path_names[$extension_name];
     }
     throw new UnknownExtensionException("The {$this->type} $extension_name does not exist.");

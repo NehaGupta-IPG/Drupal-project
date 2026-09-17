@@ -4,6 +4,7 @@ namespace Drupal\comment;
 
 use Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface;
 use Drupal\Core\Breadcrumb\Breadcrumb;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -35,7 +36,8 @@ class CommentBreadcrumbBuilder implements BreadcrumbBuilderInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(RouteMatchInterface $route_match) {
+  public function applies(RouteMatchInterface $route_match, CacheableMetadata $cacheable_metadata) {
+    $cacheable_metadata->addCacheContexts(['route']);
     return $route_match->getRouteName() == 'comment.reply' && $route_match->getParameter('entity');
   }
 
@@ -44,7 +46,6 @@ class CommentBreadcrumbBuilder implements BreadcrumbBuilderInterface {
    */
   public function build(RouteMatchInterface $route_match) {
     $breadcrumb = new Breadcrumb();
-    $breadcrumb->addCacheContexts(['route']);
     $breadcrumb->addLink(Link::createFromRoute($this->t('Home'), '<front>'));
 
     $entity = $route_match->getParameter('entity');

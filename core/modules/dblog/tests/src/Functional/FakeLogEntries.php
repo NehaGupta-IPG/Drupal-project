@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\dblog\Functional;
 
 use Drupal\Core\Logger\RfcLogLevel;
@@ -34,7 +36,7 @@ trait FakeLogEntries {
    *     entry.
    *   - 'timestamp': Int unix timestamp.
    */
-  private function generateLogEntries($count, $options = []) {
+  private function generateLogEntries($count, $options = []): void {
     global $base_root;
 
     $user = !empty($this->adminUser) ? $this->adminUser : new AnonymousUserSession();
@@ -50,7 +52,7 @@ trait FakeLogEntries {
       'request_uri' => $base_root . \Drupal::request()->getRequestUri(),
       'referer'     => \Drupal::request()->server->get('HTTP_REFERER'),
       'ip'          => '127.0.0.1',
-      'timestamp'   => REQUEST_TIME,
+      'timestamp'   => \Drupal::time()->getRequestTime(),
     ];
 
     $logger = $this->container->get('logger.dblog');

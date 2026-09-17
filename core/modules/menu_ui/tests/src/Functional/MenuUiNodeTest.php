@@ -1,20 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_ui\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\menu_ui\MenuUiUtility;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\system\Entity\Menu;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
+use Drupal\node\NodeAccessRebuild;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Add, edit, and delete a node with menu link.
- *
- * @group menu_ui
  */
+#[Group('menu_ui')]
+#[RunTestsInSeparateProcesses]
 class MenuUiNodeTest extends BrowserTestBase {
+
+  use ContentTranslationTestTrait;
 
   /**
    * An editor user.
@@ -24,9 +33,7 @@ class MenuUiNodeTest extends BrowserTestBase {
   protected $editor;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'menu_ui',
@@ -72,7 +79,7 @@ class MenuUiNodeTest extends BrowserTestBase {
   /**
    * Tests creating, editing, deleting menu links via node form widget.
    */
-  public function testMenuNodeFormWidget() {
+  public function testMenuNodeFormWidget(): void {
     // Verify that cacheability metadata is bubbled from the menu link tree
     // access checking that is performed when determining the "default parent
     // item" options in menu_ui_form_node_type_form_alter(). The "log out" link
@@ -143,6 +150,10 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->drupalGet('node/add/page');
     $this->submitForm($edit, 'Preview');
 
+    // Get the current checksum (invalidation count) for the main menu.
+    $menu_cache_tag = 'config:system.menu.main';
+    $current_checksum = \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]);
+
     // Create a node.
     $node_title = $this->randomMachineName();
     $edit = [
@@ -156,15 +167,24 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->drupalGet('test-page');
     $this->assertSession()->linkNotExists($node_title);
 
+    // Saving a node without menu link must not invalidate the menu.
+    $this->assertEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
+
     // Edit the node, enable the menu link setting, but skip the link title.
     $edit = [
       'menu[enabled]' => 1,
     ];
     $this->drupalGet('node/' . $node->id() . '/edit');
+    // Assert that the details form is closed.
+    $this->assertSession()->elementAttributeNotExists('css', 'details.menu-link-form', 'open');
     $this->submitForm($edit, 'Save');
     // Assert that there is a link for the node.
     $this->drupalGet('test-page');
     $this->assertSession()->linkExists($node_title);
+
+    // Adding a menu link must update the checksum.
+    $this->assertNotEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
+    $current_checksum = \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]);
 
     // Make sure the menu links only appear when the node is published.
     // These buttons just appear for 'administer nodes' users.
@@ -184,15 +204,26 @@ class MenuUiNodeTest extends BrowserTestBase {
       'status[value]' => FALSE,
     ];
     $this->drupalGet('node/' . $node->id() . '/edit');
+    // Assert that the details form is still closed even though menu is enabled.
+    $this->assertSession()->elementAttributeNotExists('css', 'details.menu-link-form', 'open');
     $this->submitForm($edit, 'Save');
     $this->drupalGet('test-page');
     $this->assertSession()->linkNotExists($node_title, 'Found no menu link with the node unpublished');
+
+    // No change to the menu link, invalidation happened through the node.
+    $this->assertEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
+
     // Assert that the link exists if published.
-    $edit['status[value]'] = TRUE;
+    $edit = [
+      'status[value]' => TRUE,
+    ];
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->drupalGet('test-page');
     $this->assertSession()->linkExists($node_title, 0, 'Found a menu link with the node published');
+
+    // No change to the menu link, invalidation happened through the node.
+    $this->assertEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
 
     // Log back in as normal user.
     $this->drupalLogin($this->editor);
@@ -204,6 +235,10 @@ class MenuUiNodeTest extends BrowserTestBase {
     ];
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Save');
+
+    // Changing the weight must update the checksum.
+    $this->assertNotEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
+
     // Assert that the link exists.
     $this->drupalGet('test-page');
     $this->assertSession()->linkExists($node_title);
@@ -218,15 +253,21 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->assertSession()->responseMatches('/<input .* id="edit-menu-description" .* maxlength="' . $description_max_length . '" .* \/>/');
 
     // Disable the menu link, then edit the node--the link should stay disabled.
-    $link_id = menu_ui_get_menu_link_defaults($node)['entity_id'];
+    $link_id = \Drupal::service(MenuUiUtility::class)->getMenuLinkDefaults($node)['entity_id'];
     /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $link */
     $link = MenuLinkContent::load($link_id);
     $link->set('enabled', FALSE);
     $link->save();
+
+    $current_checksum = \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]);
+
     $this->drupalGet($node->toUrl('edit-form'));
     $this->submitForm($edit, 'Save');
     $link = MenuLinkContent::load($link_id);
     $this->assertFalse($link->isEnabled(), 'Saving a node with a disabled menu link keeps the menu link disabled.');
+
+    // No change to the menu link when saving the node.
+    $this->assertEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
 
     // Edit the node and remove the menu link.
     $edit = [
@@ -237,6 +278,9 @@ class MenuUiNodeTest extends BrowserTestBase {
     // Assert that there is no link for the node.
     $this->drupalGet('test-page');
     $this->assertSession()->linkNotExists($node_title);
+
+    // Deleting the link must update the checksum.
+    $this->assertNotEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
 
     // Add a menu link to the Administration menu.
     $item = MenuLinkContent::create([
@@ -271,21 +315,22 @@ class MenuUiNodeTest extends BrowserTestBase {
     $child_item->save();
     // Edit the first node.
     $this->drupalGet('node/' . $node->id() . '/edit');
-    // Assert that it is not possible to set the parent of the first node to itself or the second node.
+    // Assert that it is not possible to set the parent of the first node to
+    // itself or the second node.
     $this->assertSession()->optionNotExists('edit-menu-menu-parent', 'tools:' . $item->getPluginId());
     $this->assertSession()->optionNotExists('edit-menu-menu-parent', 'tools:' . $child_item->getPluginId());
-    // Assert that unallowed Administration menu is not available in options.
+    // Assert that disallowed Administration menu is not available in options.
     $this->assertSession()->optionNotExists('edit-menu-menu-parent', 'admin:');
   }
 
   /**
    * Testing correct loading and saving of menu links via node form widget in a multilingual environment.
    */
-  public function testMultilingualMenuNodeFormWidget() {
+  public function testMultilingualMenuNodeFormWidget(): void {
     // Setup languages.
     $langcodes = ['de'];
     foreach ($langcodes as $langcode) {
-      ConfigurableLanguage::createFromLangcode($langcode)->save();
+      static::createLanguageFromLangcode($langcode);
     }
     array_unshift($langcodes, \Drupal::languageManager()->getDefaultLanguage()->getId());
 
@@ -296,30 +341,16 @@ class MenuUiNodeTest extends BrowserTestBase {
     $config->set('url.prefixes.' . $langcodes[0], $langcodes[0]);
     $config->save();
 
-    $this->rebuildContainer();
-
     $languages = [];
     foreach ($langcodes as $langcode) {
       $languages[$langcode] = ConfigurableLanguage::load($langcode);
     }
 
-    // Use a UI form submission to make the node type and menu link content entity translatable.
-    $this->drupalLogout();
-    $this->drupalLogin($this->rootUser);
-    $edit = [
-      'entity_types[node]' => TRUE,
-      'entity_types[menu_link_content]' => TRUE,
-      'settings[node][page][settings][language][language_alterable]' => TRUE,
-      'settings[node][page][translatable]' => TRUE,
-      'settings[node][page][fields][title]' => TRUE,
-      'settings[menu_link_content][menu_link_content][translatable]' => TRUE,
-    ];
-    $this->drupalGet('admin/config/regional/content-language');
-    $this->submitForm($edit, 'Save configuration');
+    // Enable translation for pages and menu link content.
+    $this->enableContentTranslation('node', 'page');
+    $this->enableContentTranslation('menu_link_content', 'menu_link_content');
 
-    // Log out and back in as normal user.
-    $this->drupalLogout();
-    $this->drupalLogin($this->editor);
+    $this->rebuildContainer();
 
     // Create a node.
     $node_title = $this->randomMachineName(8);
@@ -335,7 +366,11 @@ class MenuUiNodeTest extends BrowserTestBase {
 
     // Create translation.
     $translated_node_title = $this->randomMachineName(8);
-    $node->addTranslation($langcodes[1], ['title' => $translated_node_title, 'body' => $this->randomMachineName(16), 'status' => 1]);
+    $node->addTranslation($langcodes[1], [
+      'title' => $translated_node_title,
+      'body' => $this->randomMachineName(16),
+      'status' => 1,
+    ]);
     $node->save();
 
     // Edit the node and create a menu link.
@@ -368,14 +403,16 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->drupalGet('node/' . $node->id(), ['language' => $languages[$langcodes[1]]]);
     $this->assertSession()->linkExists($translated_node_title);
 
-    // Revisit the edit page in original language, check the loaded menu item title and save.
+    // Revisit the edit page in original language, check the loaded menu item
+    // title and save.
     $options = ['language' => $languages[$langcodes[0]]];
     $url = $node->toUrl('edit-form', $options);
     $this->drupalGet($url);
     $this->assertSession()->fieldValueEquals('edit-menu-title', $node_title);
     $this->submitForm([], 'Save (this translation)');
 
-    // Revisit the edit page of the translation and check the loaded menu item title.
+    // Revisit the edit page of the translation and check the loaded menu item
+    // title.
     $options = ['language' => $languages[$langcodes[1]]];
     $url = $node->toUrl('edit-form', $options);
     $this->drupalGet($url);
@@ -385,9 +422,9 @@ class MenuUiNodeTest extends BrowserTestBase {
   /**
    * Tests creating menu links via node form widget for nodes with grants.
    */
-  public function testMenuNodeWithGrantsFormWidget() {
+  public function testMenuNodeWithGrantsFormWidget(): void {
     \Drupal::service('module_installer')->install(['node_access_test']);
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
     $this->assertTrue(\Drupal::moduleHandler()->hasImplementations('node_grants'));
 
     $admin_user = $this->drupalCreateUser([
@@ -413,7 +450,7 @@ class MenuUiNodeTest extends BrowserTestBase {
     $node = $this->drupalGetNodeByTitle($node_title);
     $this->assertTrue($node->access('view', $admin_user));
     $this->drupalGet('node/add/page');
-    $link_id = menu_ui_get_menu_link_defaults($node)['entity_id'];
+    $link_id = \Drupal::service(MenuUiUtility::class)->getMenuLinkDefaults($node)['entity_id'];
     /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $link */
     $link = MenuLinkContent::load($link_id);
     $this->assertSession()->optionExists('edit-menu-menu-parent', 'main:' . $link->getPluginId());
@@ -437,10 +474,13 @@ class MenuUiNodeTest extends BrowserTestBase {
   /**
    * Tests main menu links are prioritized when editing nodes.
    *
-   * @see menu_ui_get_menu_link_defaults()
+   * @see \Drupal\menu_ui\MenuUiUtility::getMenuLinkDefaults()
    */
   public function testMainMenuIsPrioritized(): void {
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer menu',
+      'edit any page content',
+    ]));
     $menu_name = $this->randomMachineName();
     $mainLinkTitle = $this->randomMachineName();
     $nonMainLinkTitle = $this->randomMachineName();

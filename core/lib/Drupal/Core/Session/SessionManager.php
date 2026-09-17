@@ -2,10 +2,11 @@
 
 namespace Drupal\Core\Session;
 
-use Drupal\Core\Database\Connection;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 
 /**
  * Manages user sessions.
@@ -16,8 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
  * storing and retrieving session data has been extracted from it in Symfony 2.1
  * but the class name was not changed.
  *
- * @todo
- *   In fact the NativeSessionStorage class already implements all of the
+ * @todo In fact the NativeSessionStorage class already implements all of the
  *   functionality required by a typical Symfony application. Normally it is not
  *   necessary to subclass it at all. In order to reach the point where Drupal
  *   can use the Symfony session management unmodified, the code implemented
@@ -29,27 +29,6 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   use DependencySerializationTrait;
 
   /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
-   * The database connection to use.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
-   * The session configuration.
-   *
-   * @var \Drupal\Core\Session\SessionConfigurationInterface
-   */
-  protected $sessionConfiguration;
-
-  /**
    * Whether a lazy session has been started.
    *
    * @var bool
@@ -57,37 +36,29 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   protected $startedLazy;
 
   /**
-   * The write safe session handler.
-   *
-   * @todo: This reference should be removed once all database queries
-   *   are removed from the session manager class.
-   *
-   * @var \Drupal\Core\Session\WriteSafeSessionHandlerInterface
-   */
-  protected $writeSafeHandler;
-
-  /**
    * Constructs a new session manager instance.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Session\MetadataBag $metadata_bag
-   *   The session metadata bag.
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
-   *   The session configuration interface.
    * @param \Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy|\SessionHandlerInterface|null $handler
    *   The object to register as a PHP session handler.
-   *   @see \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage::setSaveHandler()
+   * @param \Drupal\Core\Session\MetadataBag $metadata_bag
+   *   The session metadata bag.
+   * @param \Drupal\Core\Session\SessionConfigurationInterface $sessionConfiguration
+   *   The session configuration interface.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
+   *
+   * @see \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage::setSaveHandler()
    */
-  public function __construct(RequestStack $request_stack, Connection $connection, MetadataBag $metadata_bag, SessionConfigurationInterface $session_configuration, $handler = NULL) {
-    $options = [];
-    $this->sessionConfiguration = $session_configuration;
-    $this->requestStack = $request_stack;
-    $this->connection = $connection;
-
-    parent::__construct($options, $handler, $metadata_bag);
+  public function __construct(
+    protected RequestStack $requestStack,
+    AbstractProxy|\SessionHandlerInterface|null $handler,
+    MetadataBag $metadata_bag,
+    protected SessionConfigurationInterface $sessionConfiguration,
+    protected TimeInterface $time,
+  ) {
+    parent::__construct([], $handler, $metadata_bag);
   }
 
   /**
@@ -155,7 +126,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   /**
    * {@inheritdoc}
    */
-  public function save() {
+  public function save(): void {
     if ($this->isCli()) {
       // We don't have anything to do if we are not allowed to save the session.
       return;
@@ -210,19 +181,6 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   /**
    * {@inheritdoc}
    */
-  public function delete($uid) {
-    // Nothing to do if we are not allowed to change the session.
-    if (!$this->writeSafeHandler->isSessionWritable() || $this->isCli()) {
-      return;
-    }
-    $this->connection->delete('sessions')
-      ->condition('uid', $uid)
-      ->execute();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function destroy() {
     if ($this->isCli()) {
       return;
@@ -242,16 +200,9 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     // setcookie() can only be called when headers are not yet sent.
     if ($cookies->has($session_name) && !headers_sent()) {
       $params = session_get_cookie_params();
-      setcookie($session_name, '', REQUEST_TIME - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+      setcookie($session_name, '', $this->time->getRequestTime() - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
       $cookies->remove($session_name);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setWriteSafeHandler(WriteSafeSessionHandlerInterface $handler) {
-    $this->writeSafeHandler = $handler;
   }
 
   /**
@@ -260,6 +211,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    * Command line clients do not support cookies nor sessions.
    *
    * @return bool
+   *   TRUE if the current PHP process runs on CLI, otherwise FALSE>
    */
   protected function isCli() {
     return PHP_SAPI === 'cli';

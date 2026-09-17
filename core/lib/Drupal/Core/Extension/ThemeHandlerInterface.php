@@ -10,7 +10,7 @@ interface ThemeHandlerInterface {
   /**
    * Returns a list of currently installed themes.
    *
-   * @return \Drupal\Core\Extension\Extension[]
+   * @return \Drupal\Core\Extension\Theme[]
    *   An associative array of the currently installed themes. The keys are the
    *   themes' machine names and the values are Extension objects having the
    *   following properties:
@@ -21,8 +21,8 @@ interface ThemeHandlerInterface {
    *   - stylesheets: A two dimensional array, using the first key for the
    *     media attribute (e.g. 'all'), the second for the name of the file
    *     (e.g. style.css). The value is a complete filepath (e.g.
-   *     themes/olivero/style.css). Not set if no stylesheets are defined in the
-   *     .info.yml file.
+   *     themes/my_theme/style.css). Not set if no stylesheets are defined in
+   *     the .info.yml file.
    *   - scripts: An associative array of JavaScripts, using the filename as key
    *     and the complete filepath as value. Not set if no scripts are defined
    *     in the .info.yml file.
@@ -51,10 +51,10 @@ interface ThemeHandlerInterface {
   /**
    * Adds a theme extension to the internal listing.
    *
-   * @param \Drupal\Core\Extension\Extension $theme
+   * @param \Drupal\Core\Extension\Theme $theme
    *   The theme extension.
    */
-  public function addTheme(Extension $theme);
+  public function addTheme(Theme $theme);
 
   /**
    * Refreshes the theme info data of currently installed themes.
@@ -68,31 +68,6 @@ interface ThemeHandlerInterface {
    * Resets the internal state of the theme handler.
    */
   public function reset();
-
-  /**
-   * Scans and collects theme extension data and their engines.
-   *
-   * @return \Drupal\Core\Extension\Extension[]
-   *   An associative array of theme extensions.
-   */
-  public function rebuildThemeData();
-
-  /**
-   * Finds all the base themes for the specified theme.
-   *
-   * Themes can inherit templates and function implementations from earlier
-   * themes.
-   *
-   * @param \Drupal\Core\Extension\Extension[] $themes
-   *   An array of available themes.
-   * @param string $theme
-   *   The name of the theme whose base we are looking for.
-   *
-   * @return array
-   *   Returns an array of all of the theme's ancestors; the first element's
-   *   value will be NULL if an error occurred.
-   */
-  public function getBaseThemes(array $themes, $theme);
 
   /**
    * Gets the human readable name of a given theme.
@@ -123,6 +98,8 @@ interface ThemeHandlerInterface {
    * directories.
    *
    * @return array
+   *   An associative array containing the directory path for all installed
+   *   themes. The array is keyed by the theme name.
    */
   public function getThemeDirectories();
 
@@ -130,7 +107,7 @@ interface ThemeHandlerInterface {
    * Determines whether a given theme is installed.
    *
    * @param string $theme
-   *   The name of the theme (without the .theme extension).
+   *   The machine name of the theme.
    *
    * @return bool
    *   TRUE if the theme is installed.
@@ -143,8 +120,8 @@ interface ThemeHandlerInterface {
    * @param string $name
    *   The name of the theme to return.
    *
-   * @return \Drupal\Core\Extension\Extension
-   *   An extension object.
+   * @return \Drupal\Core\Extension\Theme
+   *   A theme extension object.
    *
    * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
    *   Thrown when the requested theme does not exist.

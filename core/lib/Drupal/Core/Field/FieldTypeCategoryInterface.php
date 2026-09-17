@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Field;
 
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-
 /**
  * Provides an object that returns the category info about the field type.
  */
@@ -12,18 +10,26 @@ interface FieldTypeCategoryInterface {
   /**
    * Returns the field group label.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return string|\Stringable
    *   The category label.
    */
-  public function getLabel(): TranslatableMarkup;
+  public function getLabel(): string|\Stringable;
 
   /**
    * Returns the field group description.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return string|\Stringable
    *   The category description.
    */
-  public function getDescription(): TranslatableMarkup;
+  public function getDescription(): string|\Stringable;
+
+  /**
+   * Returns the field group summary.
+   *
+   * @return string|\Stringable
+   *   The category summary.
+   */
+  public function getSummary(): string|\Stringable;
 
   /**
    * Returns the field group weight.
@@ -32,5 +38,13 @@ interface FieldTypeCategoryInterface {
    *   The weight.
    */
   public function getWeight(): int;
+
+  /**
+   * Returns asset libraries for the field group.
+   *
+   * @return array
+   *   The asset libraries to attach.
+   */
+  public function getLibraries(): array;
 
 }

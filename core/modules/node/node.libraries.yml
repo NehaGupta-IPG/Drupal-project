@@ -1,10 +1,7 @@
 drupal.node:
   version: VERSION
-  css:
-    layout:
-      css/node.module.css: {}
   js:
-    node.js: {}
+    js/node.js: {}
   dependencies:
     - core/drupal.entity-form
     - core/drupalSettings
@@ -15,7 +12,7 @@ drupal.node.preview:
     theme:
       css/node.preview.css: {}
   js:
-    node.preview.js: {}
+    js/node.preview.js: {}
   dependencies:
     - core/jquery
     - core/once
@@ -26,17 +23,11 @@ drupal.node.preview:
 drupal.content_types:
   version: VERSION
   js:
-    content_types.js: {}
+    js/content_types.js: {}
   dependencies:
     - core/jquery
     - core/drupal
     - core/drupal.form
-
-form:
-  version: VERSION
-  css:
-    layout:
-      css/node.module.css: {}
 
 drupal.node.admin:
   version: VERSION

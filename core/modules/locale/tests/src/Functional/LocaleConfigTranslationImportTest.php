@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Functional;
 
-use Drupal\locale\Locale;
-use Drupal\Tests\BrowserTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\locale\Model\TranslationUpdateMode;
+use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests translation update's effects on configuration translations.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleConfigTranslationImportTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'locale_test_translate'];
 
@@ -28,14 +30,12 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-  }
+  protected $profile = 'testing_locale';
 
   /**
    * Tests update changes configuration translations if enabled after language.
    */
-  public function testConfigTranslationImport() {
+  public function testConfigTranslationImport(): void {
     $admin_user = $this->drupalCreateUser([
       'administer modules',
       'administer site configuration',
@@ -57,7 +57,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->set('translation.use_source', TranslationUpdateMode::Local->value)
       ->save();
 
     // Add translation permissions now that the locale module has been enabled.
@@ -69,13 +69,8 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
 
     // Check and update the translation status. This will import the Afrikaans
     // translations of locale_test_translate module.
-    $this->drupalGet('admin/reports/translations/check');
-
-    // Override the Drupal core translation status to be up to date.
-    // Drupal core should not be a subject in this test.
-    $status = locale_translation_get_status();
-    $status['drupal']['af']->type = 'current';
-    \Drupal::state()->set('locale.translation_status', $status);
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
 
     $this->drupalGet('admin/reports/translations');
     $this->submitForm([], 'Update translations');
@@ -104,10 +99,9 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
 
     $this->configImporter()->import();
 
-    $this->drupalGet('admin/reports/translations/check');
-    $status = locale_translation_get_status();
-    $status['drupal']['af']->type = 'current';
-    \Drupal::state()->set('locale.translation_status', $status);
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
+    $this->checkForMetaRefresh();
     $this->drupalGet('admin/reports/translations');
     $this->submitForm([], 'Update translations');
 
@@ -119,7 +113,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
   /**
    * Tests update changes configuration translations if enabled after language.
    */
-  public function testConfigTranslationModuleInstall() {
+  public function testConfigTranslationModuleInstall(): void {
 
     // Enable locale, block and config_translation modules.
     $this->container->get('module_installer')->install(['block', 'config_translation']);
@@ -143,7 +137,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->set('translation.use_source', TranslationUpdateMode::Local->value)
       ->save();
 
     // Add predefined language.
@@ -176,7 +170,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     // Install any module.
     $this->drupalGet('admin/modules');
     $this->submitForm(['modules[dblog][enable]' => 'dblog'], 'Install');
-    $this->assertSession()->pageTextContains('Module Database Logging has been enabled.');
+    $this->assertSession()->pageTextContains('Module Database Logging has been installed.');
 
     // Get the front page and ensure that the translated configuration still
     // appears.
@@ -196,7 +190,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
   /**
    * Tests removing a string from Locale deletes configuration translations.
    */
-  public function testLocaleRemovalAndConfigOverrideDelete() {
+  public function testLocaleRemovalAndConfigOverrideDelete(): void {
     // Enable the locale module.
     $this->container->get('module_installer')->install(['locale']);
     $this->resetAll();
@@ -215,7 +209,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->set('translation.use_source', TranslationUpdateMode::Local->value)
       ->save();
 
     // Add predefined language.
@@ -231,7 +225,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     $string = $locale_storage->findString(['source' => 'Locale can translate']);
     \Drupal::service('locale.storage')->delete($string);
     // Force a rebuild of config translations.
-    $count = Locale::config()->updateConfigTranslations(['locale_test_translate.settings'], ['af']);
+    $count = \Drupal::service('locale.config_manager')->updateConfigTranslations(['locale_test_translate.settings'], ['af']);
     $this->assertEquals(1, $count, 'Correct count of updated translations');
 
     $override = \Drupal::languageManager()->getLanguageConfigOverride('af', 'locale_test_translate.settings');
@@ -242,7 +236,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
   /**
    * Tests removing a string from Locale changes configuration translations.
    */
-  public function testLocaleRemovalAndConfigOverridePreserve() {
+  public function testLocaleRemovalAndConfigOverridePreserve(): void {
     // Enable the locale module.
     $this->container->get('module_installer')->install(['locale']);
     $this->resetAll();
@@ -261,7 +255,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->set('translation.use_source', TranslationUpdateMode::Local->value)
       ->save();
 
     // Add predefined language.
@@ -308,7 +302,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
   /**
    * Tests setting a non-English language as default and importing configuration.
    */
-  public function testConfigTranslationWithNonEnglishLanguageDefault() {
+  public function testConfigTranslationWithNonEnglishLanguageDefault(): void {
     /** @var \Drupal\Core\Extension\ModuleInstallerInterface $module_installer */
     $module_installer = $this->container->get('module_installer');
     ConfigurableLanguage::createFromLangcode('af')->save();

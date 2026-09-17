@@ -97,7 +97,7 @@ class UserListBuilder extends EntityListBuilder {
         'data' => $this->t('Roles'),
         'class' => [RESPONSIVE_PRIORITY_LOW],
       ],
-      'member_for' => [
+      'created' => [
         'data' => $this->t('Member for'),
         'field' => 'created',
         'specifier' => 'created',
@@ -136,7 +136,7 @@ class UserListBuilder extends EntityListBuilder {
     $options = [
       'return_as_object' => TRUE,
     ];
-    $row['member_for']['data'] = $this->dateFormatter->formatTimeDiffSince($entity->getCreatedTime(), $options)->toRenderable();
+    $row['created']['data'] = $this->dateFormatter->formatTimeDiffSince($entity->getCreatedTime(), $options)->toRenderable();
     $last_access = $this->dateFormatter->formatTimeDiffSince($entity->getLastAccessedTime(), $options);
 
     if ($entity->getLastAccessedTime()) {
@@ -144,7 +144,7 @@ class UserListBuilder extends EntityListBuilder {
       CacheableMetadata::createFromObject($last_access)->applyTo($row['access']['data']);
     }
     else {
-      $row['access']['data']['#markup'] = t('never');
+      $row['access']['data']['#markup'] = $this->t('never');
     }
     return $row + parent::buildRow($entity);
   }
@@ -152,8 +152,8 @@ class UserListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getOperations(EntityInterface $entity) {
-    $operations = parent::getOperations($entity);
+  public function getOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL) {
+    $operations = parent::getOperations($entity, $cacheability);
     if (isset($operations['edit'])) {
       $destination = $this->redirectDestination->getAsArray();
       $operations['edit']['query'] = $destination;

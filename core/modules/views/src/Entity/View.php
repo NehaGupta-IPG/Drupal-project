@@ -2,48 +2,53 @@
 
 namespace Drupal\views\Entity;
 
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\views\Plugin\DependentWithRemovalPluginInterface;
+use Drupal\views\PostSaveProcess;
+use Drupal\views\PostSaveViewInterface;
 use Drupal\views\Views;
 use Drupal\views\ViewEntityInterface;
 
 /**
  * Defines a View configuration entity class.
- *
- * @ConfigEntityType(
- *   id = "view",
- *   label = @Translation("View", context = "View entity type"),
- *   label_collection = @Translation("Views", context = "View entity type"),
- *   label_singular = @Translation("view", context = "View entity type"),
- *   label_plural = @Translation("views", context = "View entity type"),
- *   label_count = @PluralTranslation(
- *     singular = "@count view",
- *     plural = "@count views",
- *     context = "View entity type",
- *   ),
- *   admin_permission = "administer views",
- *   entity_keys = {
- *     "id" = "id",
- *     "label" = "label",
- *     "status" = "status"
- *   },
- *   config_export = {
- *     "id",
- *     "label",
- *     "module",
- *     "description",
- *     "tag",
- *     "base_table",
- *     "base_field",
- *     "display",
- *   }
- * )
  */
+#[ConfigEntityType(
+  id: 'view',
+  label: new TranslatableMarkup('View', ['context' => 'View entity type']),
+  label_collection: new TranslatableMarkup('Views', ['context' => 'View entity type']),
+  label_singular: new TranslatableMarkup('view', ['context' => 'View entity type']),
+  label_plural: new TranslatableMarkup('views', ['context' => 'View entity type']),
+  entity_keys: [
+    'id' => 'id',
+    'label' => 'label',
+    'status' => 'status',
+  ],
+  admin_permission: 'administer views',
+  label_count: [
+    'singular' => '@count view',
+    'plural' => '@count views',
+  ],
+  config_export: [
+    'id',
+    'label',
+    'module',
+    'description',
+    'tag',
+    'base_table',
+    'base_field',
+    'display',
+  ],
+)]
 class View extends ConfigEntityBase implements ViewEntityInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The name of the base table this view will use.
@@ -139,10 +144,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
    * {@inheritdoc}
    */
   public function label() {
-    if (!$label = $this->get('label')) {
-      $label = $this->id();
-    }
-    return $label;
+    return $this->get('label');
   }
 
   /**
@@ -153,10 +155,10 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
       return FALSE;
     }
 
-    $plugin = Views::pluginManager('display')->getDefinition($plugin_id);
+    $plugin = \Drupal::service('plugin.manager.views.display')->getDefinition($plugin_id);
 
     if (empty($plugin)) {
-      $plugin['title'] = t('Broken');
+      $plugin['title'] = $this->t('Broken');
     }
 
     if (empty($id)) {
@@ -204,6 +206,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
    *   Which plugin should be used for the new display ID.
    *
    * @return string
+   *   The generated display ID.
    */
   protected function generateDisplayId($plugin_id) {
     // 'default' is singular and is unique, so just go with 'default'
@@ -300,7 +303,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
     // Calculating the cacheability metadata is only needed when the view is
     // saved through the UI or API. It should not be done when we are syncing
     // configuration or installing modules.
-    if (!$this->isSyncing() && !$this->hasTrustedData()) {
+    if (!$this->isSyncing()) {
       $this->addCacheMetadata();
     }
   }
@@ -347,13 +350,50 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
-    // @todo Remove if views implements a view_builder controller.
-    views_invalidate_cache();
-    $this->invalidateCaches();
+    Views::invalidateCache();
+    // Track for each display, handler and plugin whether action was taken in
+    // the postsave callback.
+    $postSaveProcess = new PostSaveProcess();
 
-    // Rebuild the router if this is a new view, or its status changed.
-    if (!isset($this->original) || ($this->status() != $this->original->status())) {
+    $executable = $this->getExecutable();
+    $original_executable = NULL;
+    if ($this->getOriginal()) {
+      $original_executable = $this->getOriginal()->getExecutable();
+      $original_executable->initDisplay();
+    }
+    $executable->initDisplay();
+    foreach ($executable->displayHandlers as $display_id => $display_handler) {
+      $original_display_handler = NULL;
+      if ($original_executable && $original_executable->displayHandlers->has($display_id)) {
+        $original_executable->setDisplay($display_id);
+        $original_display_handler = $original_executable->display_handler;
+      }
+      if ($display_handler instanceof PostSaveViewInterface) {
+        $display_handler->postSaveView($postSaveProcess, $original_display_handler);
+      }
+      foreach (\array_keys(Views::getHandlerTypes()) as $handler_type) {
+        foreach ($display_handler->getHandlers($handler_type) as $handler) {
+          if ($handler instanceof PostSaveViewInterface) {
+            $handler->postSaveView($postSaveProcess, $original_display_handler);
+          }
+        }
+      }
+      foreach (Views::getPluginTypes('plugin') as $plugin_type) {
+        $plugin = $display_handler->getPlugin($plugin_type);
+        if (!empty($plugin) && $plugin instanceof PostSaveViewInterface) {
+          $plugin->postSaveView($postSaveProcess, $original_display_handler);
+        }
+      }
+    }
+
+    if ($postSaveProcess->needsRouterRebuild()) {
+      // Set the router as needing to be rebuilt.
       \Drupal::service('router.builder')->setRebuildNeeded();
+      // Reset the RouteSubscriber from views.
+      \Drupal::service('views.route_subscriber')->reset();
+    }
+    foreach ($postSaveProcess->getDiscoveriesToClear() as $discovery) {
+      $discovery->clearCachedDefinitions();
     }
   }
 
@@ -425,7 +465,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
       $tempstore->delete($entity->id());
     }
 
-    views_invalidate_cache();
+    Views::invalidateCache();
   }
 
   /**
@@ -461,7 +501,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
   /**
    * {@inheritdoc}
    */
-  public function __sleep() {
+  public function __sleep(): array {
     $keys = parent::__sleep();
     unset($keys[array_search('executable', $keys)]);
     return $keys;
@@ -480,7 +520,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
    * {@inheritdoc}
    */
   public function onDependencyRemoval(array $dependencies) {
-    $changed = FALSE;
+    $changed = parent::onDependencyRemoval($dependencies);
 
     // Don't intervene if the views module is removed.
     if (isset($dependencies['module']) && in_array('views', $dependencies['module'])) {

@@ -16,6 +16,7 @@ use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\system\FileDownloadController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -57,7 +58,7 @@ abstract class AssetControllerBase extends FileDownloadController {
    * for the file will be served from disk and be cached. This is done to
    * avoid situations such as where one CDN endpoint is serving a version
    * cached from PHP, while another is serving a version cached from disk.
-   * Should there be any discrepancy in behaviour between those files, this
+   * Should there be any discrepancy in behavior between those files, this
    * can make debugging very difficult.
    */
   protected const CACHE_CONTROL = 'private, no-store';
@@ -119,9 +120,6 @@ abstract class AssetControllerBase extends FileDownloadController {
     if (file_exists($uri)) {
       return new BinaryFileResponse($uri, 200, [
         'Cache-control' => static::CACHE_CONTROL,
-        // @todo: remove the explicit setting of Content-Type once this is
-        // fixed in https://www.drupal.org/project/drupal/issues/3172550.
-        'Content-Type' => $this->contentType,
       ]);
     }
 
@@ -131,14 +129,16 @@ abstract class AssetControllerBase extends FileDownloadController {
     if (!$request->query->has('theme')) {
       throw new BadRequestHttpException('The theme must be passed as a query argument');
     }
-    if (!$request->query->has('delta') || !is_numeric($request->query->get('delta'))) {
-      throw new BadRequestHttpException('The numeric delta must be passed as a query argument');
+    if (!$request->query->has('libraries')) {
+      if (!$request->query->has('delta') || !is_numeric($request->query->get('delta'))) {
+        throw new BadRequestHttpException('The numeric delta must be passed as a query argument');
+      }
+      if (!$request->query->has('include')) {
+        throw new BadRequestHttpException('The libraries to include must be passed as a query argument');
+      }
     }
     if (!$request->query->has('language')) {
       throw new BadRequestHttpException('The language must be passed as a query argument');
-    }
-    if (!$request->query->has('include')) {
-      throw new BadRequestHttpException('The libraries to include must be passed as a query argument');
     }
     $file_parts = explode('_', basename($file_name, '.' . $this->fileExtension), 2);
     // Ensure the filename is correctly prefixed.
@@ -160,27 +160,47 @@ abstract class AssetControllerBase extends FileDownloadController {
     $this->themeManager->setActiveTheme($active_theme);
 
     $attached_assets = new AttachedAssets();
-    $include_string = UrlHelper::uncompressQueryParameter($request->query->get('include'));
 
-    if (!$include_string) {
-      throw new BadRequestHttpException('The libraries to include are encoded incorrectly.');
+    if ($request->query->has('include')) {
+      $include_libraries = explode(',', UrlHelper::uncompressQueryParameter($request->query->get('include')));
     }
-    $attached_assets->setLibraries(explode(',', $include_string));
+    else {
+      $include_libraries = explode(',', UrlHelper::uncompressQueryParameter($request->query->get('libraries')));
+    }
+
+    // Check that library names are in the correct format.
+    $validate = function ($libraries_to_check) {
+      foreach ($libraries_to_check as $library) {
+        if (substr_count($library, '/') === 0) {
+          throw new BadRequestHttpException(sprintf('The "%s" library name must include at least one slash.', $library));
+        }
+      }
+    };
+    $validate($include_libraries);
+    $attached_assets->setLibraries($include_libraries);
 
     if ($request->query->has('exclude')) {
-      $exclude_string = UrlHelper::uncompressQueryParameter($request->query->get('exclude'));
-      if (!$exclude_string) {
-        throw new BadRequestHttpException('The libraries to exclude are encoded incorrectly.');
-      }
-      $attached_assets->setAlreadyLoadedLibraries(explode(',', $exclude_string));
+      $exclude_libraries = explode(',', UrlHelper::uncompressQueryParameter($request->query->get('exclude')));
+      $validate($exclude_libraries);
+      $attached_assets->setAlreadyLoadedLibraries($exclude_libraries);
     }
+
     $groups = $this->getGroups($attached_assets, $request);
 
-    $group = $this->getGroup($groups, $request->query->get('delta'));
+    // If the request is for a single library, there is only ever one group.
+    $group = $this->getGroup($groups, $request->query->has('libraries') ? 0 : (int) $request->query->get('delta'));
+
+    // External assets, and local assets with preprocessing disabled, never
+    // have an aggregate. Reject them before the hash comparison below, which
+    // redirects a mismatch to the same group with a valid hash, so the retry
+    // would reach the optimizer and throw.
+    if ($group['type'] !== 'file' || $group['preprocess'] === FALSE) {
+      throw new BadRequestHttpException('The requested asset group is not aggregated.');
+    }
+
     // Generate a hash based on the asset group, this uses the same method as
     // the collection optimizer does to create the filename, so it should match.
     $generated_hash = $this->generateHash($group);
-    $data = $this->optimizer->optimizeGroup($group);
 
     // However, the hash from the library definitions in code may not match the
     // hash from the URL. This can be for three reasons:
@@ -195,16 +215,22 @@ abstract class AssetControllerBase extends FileDownloadController {
     // from filling the disk, while still serving aggregates that may be
     // referenced in cached HTML.
     if (hash_equals($generated_hash, $received_hash)) {
-      $uri = $this->dumper->dumpToUri($data, $this->assetType, $uri);
-      $state_key = 'drupal_' . $this->assetType . '_cache_files';
-      $files = $this->state()->get($state_key, []);
-      $files[] = $uri;
-      $this->state()->set($state_key, $files);
+      $data = $this->optimizer->optimizeGroup($group);
+      $this->dumper->dumpToUri($data, $this->assetType, $uri);
+      $response = new Response($data, 200, [
+        'Cache-control' => static::CACHE_CONTROL,
+        'Content-Type' => $this->contentType,
+      ]);
     }
-    return new Response($data, 200, [
-      'Cache-control' => static::CACHE_CONTROL,
-      'Content-Type' => $this->contentType,
-    ]);
+    else {
+      $expected_filename = $this->fileExtension . '_' . $generated_hash . '.' . $this->fileExtension;
+      $response = new RedirectResponse(
+        str_replace($file_name, $expected_filename, $request->getRequestUri()),
+        301,
+        ['Cache-Control' => 'public, max-age=3600, must-revalidate'],
+      );
+    }
+    return $response;
   }
 
   /**

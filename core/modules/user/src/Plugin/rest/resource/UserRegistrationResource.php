@@ -3,11 +3,16 @@
 namespace Drupal\user\Plugin\rest\resource;
 
 use Drupal\Core\Config\ImmutableConfig;
+use Drupal\Core\Password\PasswordGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\rest\Attribute\RestResource;
 use Drupal\rest\ModifiedResourceResponse;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\Plugin\rest\resource\EntityResourceAccessTrait;
 use Drupal\rest\Plugin\rest\resource\EntityResourceValidationTrait;
+use Drupal\user\Entity\User;
+use Drupal\user\NotificationHandler;
 use Drupal\user\UserInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -17,57 +22,32 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
  * Represents user registration as a resource.
- *
- * @RestResource(
- *   id = "user_registration",
- *   label = @Translation("User registration"),
- *   serialization_class = "Drupal\user\Entity\User",
- *   uri_paths = {
- *     "create" = "/user/register",
- *   },
- * )
  */
+#[RestResource(
+  id: "user_registration",
+  label: new TranslatableMarkup("User registration"),
+  serialization_class: User::class,
+  uri_paths: [
+    "create" => "/user/register",
+  ],
+)]
 class UserRegistrationResource extends ResourceBase {
 
   use EntityResourceValidationTrait;
   use EntityResourceAccessTrait;
 
-  /**
-   * User settings config instance.
-   *
-   * @var \Drupal\Core\Config\ImmutableConfig
-   */
-  protected $userSettings;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * Constructs a new UserRegistrationResource instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param array $serializer_formats
-   *   The available serialization formats.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\Core\Config\ImmutableConfig $user_settings
-   *   A user settings config instance.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, array $serializer_formats, LoggerInterface $logger, ImmutableConfig $user_settings, AccountInterface $current_user) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    array $serializer_formats,
+    LoggerInterface $logger,
+    protected ImmutableConfig $userSettings,
+    protected AccountInterface $currentUser,
+    protected PasswordGeneratorInterface $passwordGenerator,
+    protected NotificationHandler $notificationHandler,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
-    $this->userSettings = $user_settings;
-    $this->currentUser = $current_user;
   }
 
   /**
@@ -81,7 +61,9 @@ class UserRegistrationResource extends ResourceBase {
       $container->getParameter('serializer.formats'),
       $container->get('logger.factory')->get('rest'),
       $container->get('config.factory')->get('user.settings'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('password_generator'),
+      $container->get(NotificationHandler::class),
     );
   }
 
@@ -97,16 +79,20 @@ class UserRegistrationResource extends ResourceBase {
    * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    */
-  public function post(UserInterface $account = NULL) {
+  public function post(?UserInterface $account = NULL) {
     $this->ensureAccountCanRegister($account);
 
-    // Only activate new users if visitors are allowed to register and no email
-    // verification required.
-    if ($this->userSettings->get('register') == UserInterface::REGISTER_VISITORS && !$this->userSettings->get('verify_mail')) {
+    // Only activate new users if visitors are allowed to register.
+    if ($this->userSettings->get('register') == UserInterface::REGISTER_VISITORS) {
       $account->activate();
     }
     else {
       $account->block();
+    }
+
+    // Generate password if email verification required.
+    if ($this->userSettings->get('verify_mail')) {
+      $account->setPassword($this->passwordGenerator->generate());
     }
 
     $this->checkEditFieldAccess($account);
@@ -128,7 +114,7 @@ class UserRegistrationResource extends ResourceBase {
    * @param \Drupal\user\UserInterface $account
    *   The user account to register.
    */
-  protected function ensureAccountCanRegister(UserInterface $account = NULL) {
+  protected function ensureAccountCanRegister(?UserInterface $account = NULL) {
     if ($account === NULL) {
       throw new BadRequestHttpException('No user account data for registration received.');
     }
@@ -176,14 +162,12 @@ class UserRegistrationResource extends ResourceBase {
     $approval_settings = $this->userSettings->get('register');
     // No email verification is required. Activating the user.
     if ($approval_settings == UserInterface::REGISTER_VISITORS) {
-      if ($this->userSettings->get('verify_mail')) {
-        // No administrator approval required.
-        _user_mail_notify('register_no_approval_required', $account);
-      }
+      // No administrator approval required.
+      $this->notificationHandler->sendRegisterNoApprovalRequired($account);
     }
     // Administrator approval required.
     elseif ($approval_settings == UserInterface::REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL) {
-      _user_mail_notify('register_pending_approval', $account);
+      $this->notificationHandler->sendRegisterPendingApproval($account);
     }
   }
 

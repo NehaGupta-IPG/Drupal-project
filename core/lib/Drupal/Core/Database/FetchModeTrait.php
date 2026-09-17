@@ -2,64 +2,51 @@
 
 namespace Drupal\Core\Database;
 
+use Drupal\Core\Database\Statement\FetchAs;
+
 /**
  * Provide helper methods for statement fetching.
  */
 trait FetchModeTrait {
 
   /**
-   * Converts a row of data in FETCH_ASSOC format to FETCH_BOTH.
+   * Converts a row of data in associative format to list.
    *
    * @param array $rowAssoc
-   *   A row of data in FETCH_ASSOC format.
+   *   A row of data in associative format.
    *
    * @return array
-   *   The row in FETCH_BOTH format.
-   */
-  protected function assocToBoth(array $rowAssoc): array {
-    // \PDO::FETCH_BOTH returns an array indexed by both the column name
-    // and the column number.
-    return $rowAssoc + array_values($rowAssoc);
-  }
-
-  /**
-   * Converts a row of data in FETCH_ASSOC format to FETCH_NUM.
-   *
-   * @param array $rowAssoc
-   *   A row of data in FETCH_ASSOC format.
-   *
-   * @return array
-   *   The row in FETCH_NUM format.
+   *   The row in list format.
    */
   protected function assocToNum(array $rowAssoc): array {
     return array_values($rowAssoc);
   }
 
   /**
-   * Converts a row of data in FETCH_ASSOC format to FETCH_OBJ.
+   * Converts a row of data in associative format to object.
    *
    * @param array $rowAssoc
-   *   A row of data in FETCH_ASSOC format.
+   *   A row of data in associative format.
    *
    * @return object
-   *   The row in FETCH_OBJ format.
+   *   The row in object format.
    */
   protected function assocToObj(array $rowAssoc): \stdClass {
     return (object) $rowAssoc;
   }
 
   /**
-   * Converts a row of data in FETCH_ASSOC format to FETCH_CLASS.
+   * Converts a row of data in associative format to classed object.
    *
    * @param array $rowAssoc
-   *   A row of data in FETCH_ASSOC format.
+   *   A row of data in associative format.
    * @param string $className
    *   Name of the created class.
    * @param array $constructorArguments
    *   Elements of this array are passed to the constructor.
    *
    * @return object
-   *   The row in FETCH_CLASS format.
+   *   The row in classed object format.
    */
   protected function assocToClass(array $rowAssoc, string $className, array $constructorArguments): object {
     $classObj = new $className(...$constructorArguments);
@@ -70,54 +57,52 @@ trait FetchModeTrait {
   }
 
   /**
-   * Converts a row of data to FETCH_CLASS | FETCH_CLASSTYPE.
+   * Converts a row of data in associative format to column.
    *
    * @param array $rowAssoc
-   *   A row of data in FETCH_ASSOC format.
-   * @param array $constructorArguments
-   *   Elements of this array are passed to the constructor.
-   *
-   * @return object
-   *   The row in FETCH_CLASS format.
-   */
-  protected function assocToClassType(array $rowAssoc, array $constructorArguments): object {
-    $className = array_shift($rowAssoc);
-    return $this->assocToClass($rowAssoc, $className, $constructorArguments);
-  }
-
-  /**
-   * Fills an object with data from a FETCH_ASSOC row.
-   *
-   * @param array $rowAssoc
-   *   A row of data in FETCH_ASSOC format.
-   * @param object $object
-   *   The object receiving the data.
-   *
-   * @return object
-   *   The object receiving the data.
-   */
-  protected function assocIntoObject(array $rowAssoc, object $object): object {
-    foreach ($rowAssoc as $column => $value) {
-      $object->$column = $value;
-    }
-    return $object;
-  }
-
-  /**
-   * Converts a row of data in FETCH_ASSOC format to FETCH_COLUMN.
-   *
-   * @param array $rowAssoc
-   *   A row of data in FETCH_ASSOC format.
+   *   A row of data in associative format.
    * @param string[] $columnNames
    *   The list of the row columns.
    * @param int $columnIndex
    *   The index of the column to fetch the value of.
    *
-   * @return string|false
-   *   The value of the column, or FALSE if the column is not defined.
+   * @return string
+   *   The value of the column.
+   *
+   * @throws \ValueError
+   *   If the column index is not defined.
    */
   protected function assocToColumn(array $rowAssoc, array $columnNames, int $columnIndex): mixed {
-    return $rowAssoc[$columnNames[$columnIndex]] ?? FALSE;
+    if (!isset($columnNames[$columnIndex])) {
+      throw new \ValueError('Invalid column index');
+    }
+    return $rowAssoc[$columnNames[$columnIndex]];
+  }
+
+  /**
+   * Converts a row of data in associative format to a specified format.
+   *
+   * @param array $rowAssoc
+   *   A row of data in FetchAs::Associative format.
+   * @param \Drupal\Core\Database\Statement\FetchAs $mode
+   *   The target target mode.
+   * @param array $fetchOptions
+   *   The fetch mode options.
+   *
+   * @return array<scalar|null>|object|scalar|null|false
+   *   The data in the target mode.
+   *
+   * @throws \ValueError
+   *   If the column index is not defined.
+   */
+  protected function assocToFetchMode(array $rowAssoc, FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL {
+    return match ($mode) {
+      FetchAs::Associative => $rowAssoc,
+      FetchAs::ClassObject => $this->assocToClass($rowAssoc, $fetchOptions['class'], $fetchOptions['constructor_args']),
+      FetchAs::Column => $this->assocToColumn($rowAssoc, array_keys($rowAssoc), $fetchOptions['column']),
+      FetchAs::List => $this->assocToNum($rowAssoc),
+      FetchAs::Object => $this->assocToObj($rowAssoc),
+    };
   }
 
 }

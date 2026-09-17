@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\text\Functional;
 
 use Drupal\Component\Utility\Html;
@@ -7,15 +9,19 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\filter\Render\FilteredMarkup;
 use Drupal\Tests\field\Functional\FunctionalString\StringFieldTest;
 use Drupal\Tests\TestFileCreationTrait;
+use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation of text fields.
- *
- * @group text
  */
+#[Group('text')]
+#[RunTestsInSeparateProcesses]
 class TextFieldTest extends StringFieldTest {
 
   use TestFileCreationTrait {
@@ -56,7 +62,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Tests text field validation.
    */
-  public function testTextFieldValidation() {
+  public function testTextFieldValidation(): void {
     // Create a field with settings to validate.
     $max_length = 3;
     $field_name = $this->randomMachineName();
@@ -91,13 +97,13 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Tests required long text with file upload.
    */
-  public function testRequiredLongTextWithFileUpload() {
+  public function testRequiredLongTextWithFileUpload(): void {
     // Create a text field.
     $text_field_name = 'text_long';
     $field_storage = FieldStorageConfig::create([
       'field_name' => $text_field_name,
       'entity_type' => 'entity_test',
-      'type' => 'text_with_summary',
+      'type' => 'text_long',
     ]);
     $field_storage->save();
     FieldConfig::create([
@@ -125,7 +131,7 @@ class TextFieldTest extends StringFieldTest {
     $display_repository = \Drupal::service('entity_display.repository');
     $display_repository->getFormDisplay('entity_test', 'entity_test')
       ->setComponent($text_field_name, [
-        'type' => 'text_textarea_with_summary',
+        'type' => 'text_textarea',
       ])
       ->setComponent($file_field_name, [
         'type' => 'file_generic',
@@ -153,7 +159,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Tests widgets.
    */
-  public function testTextfieldWidgets() {
+  public function testTextfieldWidgets(): void {
     $this->_testTextfieldWidgets('text', 'text_textfield');
     $this->_testTextfieldWidgets('text_long', 'text_textarea');
   }
@@ -161,7 +167,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Tests widgets + 'formatted_text' setting.
    */
-  public function testTextfieldWidgetsFormatted() {
+  public function testTextfieldWidgetsFormatted(): void {
     $this->_testTextfieldWidgetsFormatted('text', 'text_textfield');
     $this->_testTextfieldWidgetsFormatted('text_long', 'text_textarea');
   }
@@ -169,7 +175,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Test widgets for fields with selected allowed formats.
    */
-  public function testTextfieldWidgetsAllowedFormats() {
+  public function testTextfieldWidgetsAllowedFormats(): void {
     // Create one text format.
     $this->drupalLogin($this->adminUser);
     $format1 = FilterFormat::create([
@@ -203,11 +209,11 @@ class TextFieldTest extends StringFieldTest {
     // Grant access to both formats to the user.
     $roles = $this->webUser->getRoles();
     $rid = $roles[0];
-    user_role_grant_permissions($rid, [
+    Role::loadOverrideFree($rid)->grantPermissions([
       $format1->getPermissionName(),
       $format2->getPermissionName(),
       $format3->getPermissionName(),
-    ]);
+    ])->save();
 
     // Create a field with multiple formats allowed.
     $field_name = $this->randomMachineName();
@@ -239,7 +245,7 @@ class TextFieldTest extends StringFieldTest {
     // Display the creation form.
     $this->drupalLogin($this->webUser);
     $this->drupalGet('entity_test/add');
-    $this->assertSession()->fieldExists("{$field_name}[0][value]", NULL);
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format1->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format2->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format3->id());
@@ -271,7 +277,7 @@ class TextFieldTest extends StringFieldTest {
     $this->drupalLogin($this->webUser);
     // We shouldn't have the 'format' selector since only one format is allowed.
     $this->drupalGet('entity_test/add');
-    $this->assertSession()->fieldExists("{$field_name}[0][value]", NULL);
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
     $this->assertSession()->fieldNotExists("{$field_name}[0][format]");
 
     // Retest the entity renders fine even though filter2 is disabled.
@@ -286,7 +292,7 @@ class TextFieldTest extends StringFieldTest {
     $field->save();
     $this->drupalGet('entity_test/add');
     // We should see the 'format' selector again.
-    $this->assertSession()->fieldExists("{$field_name}[0][value]", NULL);
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format1->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format2->id());
     $this->assertSession()->optionNotExists("{$field_name}[0][format]", $format3->id());
@@ -296,7 +302,7 @@ class TextFieldTest extends StringFieldTest {
     $field->save();
     $this->drupalGet('entity_test/add');
     // We should see the 'format' selector again.
-    $this->assertSession()->fieldExists("{$field_name}[0][value]", NULL);
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format1->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format2->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format3->id());
@@ -305,7 +311,7 @@ class TextFieldTest extends StringFieldTest {
   /**
    * Helper function for testTextfieldWidgetsFormatted().
    */
-  public function _testTextfieldWidgetsFormatted($field_type, $widget_type) {
+  public function _testTextfieldWidgetsFormatted($field_type, $widget_type): void {
     // Create a field.
     $field_name = $this->randomMachineName();
     $field_storage = FieldStorageConfig::create([
@@ -332,7 +338,7 @@ class TextFieldTest extends StringFieldTest {
 
     // Disable all text formats besides the plain text fallback format.
     $this->drupalLogin($this->adminUser);
-    foreach (filter_formats() as $format) {
+    foreach (\Drupal::service(FilterFormatRepositoryInterface::class)->getAllFormats() as $format) {
       if (!$format->isFallbackFormat()) {
         $this->drupalGet('admin/config/content/formats/manage/' . $format->id() . '/disable');
         $this->submitForm([], 'Disable');
@@ -373,13 +379,12 @@ class TextFieldTest extends StringFieldTest {
     ];
     $this->drupalGet('admin/config/content/formats/add');
     $this->submitForm($edit, 'Save configuration');
-    filter_formats_reset();
     $format = FilterFormat::load($edit['format']);
     $format_id = $format->id();
     $permission = $format->getPermissionName();
     $roles = $this->webUser->getRoles();
     $rid = $roles[0];
-    user_role_grant_permissions($rid, [$permission]);
+    Role::loadOverrideFree($rid)->grantPermissions([$permission])->save();
     $this->drupalLogin($this->webUser);
 
     // Display edition form.
@@ -396,7 +401,6 @@ class TextFieldTest extends StringFieldTest {
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been updated.');
 
     // Display the entity.
-    $this->container->get('entity_type.manager')->getStorage('entity_test')->resetCache([$id]);
     $entity = EntityTest::load($id);
     $display = $display_repository->getViewDisplay($entity->getEntityTypeId(), $entity->bundle(), 'full');
     $content = $display->build($entity);

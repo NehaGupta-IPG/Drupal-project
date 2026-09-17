@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\router_test;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\user\UserInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -28,13 +29,6 @@ class TestContent extends ControllerBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static($container->get('http_kernel'));
-  }
-
-  /**
    * Provides example content for testing route enhancers.
    */
   public function test1() {
@@ -44,7 +38,7 @@ class TestContent extends ControllerBase {
   /**
    * Provides example content for route specific authentication.
    *
-   * @returns string
+   * @return string
    *   The user name of the current logged in user.
    */
   public function test11() {

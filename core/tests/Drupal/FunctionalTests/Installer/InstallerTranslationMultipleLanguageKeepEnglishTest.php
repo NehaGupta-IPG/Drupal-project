@@ -1,12 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that keeping English in a foreign language install works.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class InstallerTranslationMultipleLanguageKeepEnglishTest extends InstallerTranslationMultipleLanguageForeignTest {
 
   /**

@@ -1,7 +1,7 @@
 drupal.comment:
   version: VERSION
   js:
-    comment-entity-form.js: {}
+    js/comment-entity-form.js: {}
   dependencies:
     - core/jquery
     - core/drupal
@@ -15,27 +15,6 @@ drupal.comment-by-viewer:
     - core/jquery
     - core/drupal
     - core/drupalSettings
-
-drupal.comment-new-indicator:
-  version: VERSION
-  js:
-    js/comment-new-indicator.js: {}
-  dependencies:
-    - core/jquery
-    - core/once
-    - core/drupal
-    - history/api
-    - core/drupal.displace
-
-drupal.node-new-comments-link:
-  version: VERSION
-  js:
-    js/node-new-comments-link.js: {}
-  dependencies:
-    - core/jquery
-    - core/once
-    - core/drupal
-    - history/api
 
 drupal.comment-icon:
   version: VERSION

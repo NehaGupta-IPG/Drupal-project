@@ -3,20 +3,14 @@
  * Utility classes to assist with JavaScript functionality.
  */
 
-/**
- * For anything you want to hide on page load when JS is enabled, so
- * that you can use the JS to control visibility and avoid flicker.
- */
-.js .js-hide {
-  display: none;
+@media (scripting: none) {
+  .js-show {
+    display: none !important;
+  }
 }
 
-/**
- * For anything you want to show on page load only when JS is enabled.
- */
-.js-show {
-  display: none;
-}
-.js .js-show {
-  display: block;
+@media (scripting: enabled) {
+  .js-hide {
+    display: none !important;
+  }
 }

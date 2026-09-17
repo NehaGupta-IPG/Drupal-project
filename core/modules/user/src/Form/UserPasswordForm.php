@@ -4,16 +4,19 @@ namespace Drupal\user\Form;
 
 use Drupal\Component\Utility\EmailValidatorInterface;
 use Drupal\Core\Config\ConfigFactory;
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\Element\Email;
-use Drupal\Core\TypedData\TypedDataManagerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\user\NotificationHandler;
 use Drupal\user\UserInterface;
 use Drupal\user\UserStorageInterface;
+use Drupal\user\UserNameValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides a user password reset form.
@@ -22,7 +25,20 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @internal
  */
-class UserPasswordForm extends FormBase {
+#[Route(
+  path: '/user/password',
+  name: 'user.pass',
+  requirements: [
+    '_access' => 'TRUE',
+  ],
+  options: [
+    '_maintenance_access' => TRUE,
+  ],
+  defaults: [
+    '_title' => new TranslatableMarkup('Reset your password'),
+  ],
+)]
+class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
 
   /**
    * The user storage.
@@ -46,41 +62,25 @@ class UserPasswordForm extends FormBase {
   protected $flood;
 
   /**
-   * The typed data manager.
-   *
-   * @var \Drupal\Core\TypedData\TypedDataManagerInterface
-   */
-  protected $typedDataManager;
-
-  /**
    * The email validator service.
    *
    * @var \Drupal\Component\Utility\EmailValidatorInterface
    */
   protected $emailValidator;
 
-  /**
-   * Constructs a UserPasswordForm object.
-   *
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Flood\FloodInterface $flood
-   *   The flood service.
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data_manager
-   *   The typed data manager.
-   * @param \Drupal\Component\Utility\EmailValidatorInterface $email_validator
-   *   The email validator service.
-   */
-  public function __construct(UserStorageInterface $user_storage, LanguageManagerInterface $language_manager, ConfigFactory $config_factory, FloodInterface $flood, TypedDataManagerInterface $typed_data_manager, EmailValidatorInterface $email_validator) {
+  public function __construct(
+    UserStorageInterface $user_storage,
+    LanguageManagerInterface $language_manager,
+    ConfigFactory $config_factory,
+    FloodInterface $flood,
+    protected UserNameValidator $userNameValidator,
+    EmailValidatorInterface $email_validator,
+    protected NotificationHandler $notificationHandler,
+  ) {
     $this->userStorage = $user_storage;
     $this->languageManager = $language_manager;
     $this->configFactory = $config_factory;
     $this->flood = $flood;
-    $this->typedDataManager = $typed_data_manager;
     $this->emailValidator = $email_validator;
   }
 
@@ -93,8 +93,9 @@ class UserPasswordForm extends FormBase {
       $container->get('language_manager'),
       $container->get('config.factory'),
       $container->get('flood'),
-      $container->get('typed_data_manager'),
-      $container->get('email.validator')
+      $container->get('user.name_validator'),
+      $container->get('email.validator'),
+      $container->get(NotificationHandler::class),
     );
   }
 
@@ -120,6 +121,7 @@ class UserPasswordForm extends FormBase {
         'autocapitalize' => 'off',
         'spellcheck' => 'false',
         'autofocus' => 'autofocus',
+        'autocomplete' => 'username',
       ],
     ];
     // Allow logged in users to request this also.
@@ -160,11 +162,7 @@ class UserPasswordForm extends FormBase {
     $this->flood->register('user.password_request_ip', $flood_config->get('ip_window'));
     // First, see if the input is possibly valid as a username.
     $name = trim($form_state->getValue('name'));
-    $definition = BaseFieldDefinition::create('string')
-      ->addConstraint('UserName', []);
-    $data = $this->typedDataManager->create($definition);
-    $data->setValue($name);
-    $violations = $data->validate();
+    $violations = $this->userNameValidator->validateName($name);
     // Usernames have a maximum length shorter than email addresses. Only print
     // this error if the input is not valid as a username or email address.
     if ($violations->count() > 0 && !$this->emailValidator->isValid($name)) {
@@ -200,8 +198,7 @@ class UserPasswordForm extends FormBase {
     $account = $form_state->getValue('account');
     if ($account) {
       // Mail one time login URL and instructions using current language.
-      $mail = _user_mail_notify('password_reset', $account);
-      if (!empty($mail)) {
+      if ($this->notificationHandler->sendPasswordReset($account)) {
         $this->logger('user')
           ->info('Password reset instructions mailed to %name at %email.', [
             '%name' => $account->getAccountName(),

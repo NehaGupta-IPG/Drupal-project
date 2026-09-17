@@ -2,8 +2,16 @@
 
 namespace Drupal\Core\Installer;
 
+@trigger_error('Drupal\Core\Installer\ExtensionListTrait is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement; the base extension list behavior now provides the same functionality. See https://www.drupal.org/node/3577846', E_USER_DEPRECATED);
+
 /**
  * Provides common functionality for the extension list classes.
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no
+ *   replacement; the base extension list behavior now provides the same
+ *   functionality.
+ *
+ * @see https://www.drupal.org/node/3577846
  */
 trait ExtensionListTrait {
 
@@ -43,7 +51,7 @@ trait ExtensionListTrait {
     elseif (isset(static::$staticAddedPathNames[$extension_name])) {
       return static::$staticAddedPathNames[$extension_name];
     }
-    elseif (($path_names = $this->getPathnames()) && isset($path_names[$extension_name])) {
+    elseif (($path_names = $this->getPathNames()) && isset($path_names[$extension_name])) {
       // Ensure we don't have to do path scanning more than really needed.
       foreach ($path_names as $extension => $path_name) {
         static::$staticAddedPathNames[$extension] = $path_name;

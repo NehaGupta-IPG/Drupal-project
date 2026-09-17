@@ -18,7 +18,10 @@ use Drupal\Core\Plugin\DefaultPluginManager;
  *   CATEGORY_NAME:
  *     label: STRING
  *     description: STRING
+ *     summary: STRING (optional)
  *     weight: INTEGER
+ *     libraries:
+ *       - STRING
  * @endcode
  * For example:
  * @code
@@ -26,6 +29,8 @@ use Drupal\Core\Plugin\DefaultPluginManager;
  *   label: Text
  *   description: Text fields.
  *   weight: 2
+ *   libraries:
+ *     - module_name/library_name
  * @endcode
  *
  * @see \Drupal\Core\Field\FieldTypeCategoryInterface
@@ -40,6 +45,7 @@ class FieldTypeCategoryManager extends DefaultPluginManager implements FieldType
   protected $defaults = [
     'label' => '',
     'description' => '',
+    'summary' => '',
     'weight' => 0,
     'class' => FieldTypeCategory::class,
   ];
@@ -70,7 +76,8 @@ class FieldTypeCategoryManager extends DefaultPluginManager implements FieldType
       $this->discovery = new YamlDiscovery('field_type_categories', $directories);
       $this->discovery
         ->addTranslatableProperty('label')
-        ->addTranslatableProperty('description');
+        ->addTranslatableProperty('description')
+        ->addTranslatableProperty('summary');
     }
     return $this->discovery;
   }
@@ -78,8 +85,19 @@ class FieldTypeCategoryManager extends DefaultPluginManager implements FieldType
   /**
    * {@inheritdoc}
    */
+  protected function alterDefinitions(&$definitions): void {
+    parent::alterDefinitions($definitions);
+
+    if (!isset($definitions[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY])) {
+      throw new \LogicException('Missing fallback category.');
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getFallbackPluginId($plugin_id, array $configuration = []): string {
-    return 'general';
+    return FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY;
   }
 
 }

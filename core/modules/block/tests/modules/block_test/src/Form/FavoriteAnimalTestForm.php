@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\block_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -39,7 +41,7 @@ class FavoriteAnimalTestForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t('Your favorite animal is: @favorite_animal', ['@favorite_animal' => $form['favorite_animal']['#value']]));
   }
 

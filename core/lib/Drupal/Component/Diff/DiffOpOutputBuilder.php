@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Drupal\Component\Diff;
 
@@ -44,6 +46,14 @@ final class DiffOpOutputBuilder implements DiffOutputBuilderInterface {
 
     for ($i = 0; $i < count($diff); $i++) {
 
+      // Differ prepends a warning pseudo-line when source and target use
+      // different end of line markings. Skip it: no DiffOp represents a
+      // warning, and keeping it would output a line absent from both inputs.
+      // The lines it warns about are still reported as changes below.
+      if ($diff[$i][1] === Differ::DIFF_LINE_END_WARNING) {
+        continue;
+      }
+
       // Handle a sequence of removals + additions as a sequence of changes, and
       // manages the tail if required.
       if ($diff[$i][1] === Differ::REMOVED) {
@@ -61,16 +71,8 @@ final class DiffOpOutputBuilder implements DiffOutputBuilderInterface {
         if (count($hunkTarget) === 0) {
           $ops[] = $this->hunkOp(Differ::REMOVED, $hunkSource, $hunkTarget);
         }
-        elseif (count($hunkSource) === count($hunkTarget)) {
-          $ops[] = $this->hunkOp(self::CHANGED, $hunkSource, $hunkTarget);
-        }
-        elseif (count($hunkSource) > count($hunkTarget)) {
-          $ops[] = $this->hunkOp(self::CHANGED, array_slice($hunkSource, 0, count($hunkTarget)), $hunkTarget);
-          $ops[] = $this->hunkOp(Differ::REMOVED, array_slice($hunkSource, count($hunkTarget)), []);
-        }
         else {
-          $ops[] = $this->hunkOp(self::CHANGED, $hunkSource, array_slice($hunkTarget, 0, count($hunkSource)));
-          $ops[] = $this->hunkOp(Differ::ADDED, array_slice($hunkTarget, count($hunkSource)), []);
+          $ops[] = $this->hunkOp(self::CHANGED, $hunkSource, $hunkTarget);
         }
         $hunkMode = NULL;
         $hunkSource = [];
@@ -108,7 +110,7 @@ final class DiffOpOutputBuilder implements DiffOutputBuilderInterface {
    *   A Differ constant or self::CHANGED.
    * @param string[] $source
    *   An array of strings to be changed/added/removed/copied.
-   * @param string[] $source
+   * @param string[] $target
    *   The array of strings to be changed to when self::CHANGED is specified.
    *
    * @return \Drupal\Component\Diff\Engine\DiffOp

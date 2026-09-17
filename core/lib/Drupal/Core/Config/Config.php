@@ -199,21 +199,24 @@ class Config extends StorableConfigBase {
    * {@inheritdoc}
    */
   public function save($has_trusted_data = FALSE) {
+    if (func_num_args() > 0) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $has_trusted_data argument is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3348180', E_USER_DEPRECATED);
+    }
     // Validate the configuration object name before saving.
     static::validateName($this->name);
 
     // If there is a schema for this configuration object, cast all values to
     // conform to the schema.
-    if (!$has_trusted_data) {
-      if ($this->typedConfigManager->hasConfigSchema($this->name)) {
-        // Ensure that the schema wrapper has the latest data.
-        $this->schemaWrapper = NULL;
-        $this->data = $this->castValue(NULL, $this->data);
-      }
-      else {
-        foreach ($this->data as $key => $value) {
-          $this->validateValue($key, $value);
-        }
+    if (!$has_trusted_data && $this->typedConfigManager->hasConfigSchema($this->name)) {
+      // Ensure that the schema wrapper has the latest data.
+      $this->schemaWrapper = NULL;
+      $this->data = $this->castValue(NULL, $this->data);
+      // Reclaim the memory used by the schema wrapper.
+      $this->schemaWrapper = NULL;
+    }
+    else {
+      foreach ($this->data as $key => $value) {
+        $this->validateValue($key, $value);
       }
     }
 
@@ -226,7 +229,8 @@ class Config extends StorableConfigBase {
       Cache::invalidateTags($this->getCacheTags());
     }
     $this->isNew = FALSE;
-    $this->eventDispatcher->dispatch(new ConfigCrudEvent($this), ConfigEvents::SAVE);
+    $event_name = $this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION ? ConfigEvents::SAVE : ConfigCollectionEvents::SAVE_IN_COLLECTION;
+    $this->eventDispatcher->dispatch(new ConfigCrudEvent($this), $event_name);
     $this->originalData = $this->data;
     return $this;
   }
@@ -243,19 +247,10 @@ class Config extends StorableConfigBase {
     Cache::invalidateTags($this->getCacheTags());
     $this->isNew = TRUE;
     $this->resetOverriddenData();
-    $this->eventDispatcher->dispatch(new ConfigCrudEvent($this), ConfigEvents::DELETE);
+    $event_name = $this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION ? ConfigEvents::DELETE : ConfigCollectionEvents::DELETE_IN_COLLECTION;
+    $this->eventDispatcher->dispatch(new ConfigCrudEvent($this), $event_name);
     $this->originalData = $this->data;
     return $this;
-  }
-
-  /**
-   * Gets the raw data without overrides.
-   *
-   * @return array
-   *   The raw data.
-   */
-  public function getRawData() {
-    return $this->data;
   }
 
   /**
@@ -265,8 +260,6 @@ class Config extends StorableConfigBase {
    * configuration storage before any changes. If this is a new configuration
    * object it will be an empty array.
    *
-   * @see \Drupal\Core\Config\Config::get()
-   *
    * @param string $key
    *   A string that maps to a key within the configuration data.
    * @param bool $apply_overrides
@@ -274,6 +267,8 @@ class Config extends StorableConfigBase {
    *
    * @return mixed
    *   The data that was requested.
+   *
+   * @see \Drupal\Core\Config\Config::get()
    */
   public function getOriginal($key = '', $apply_overrides = TRUE) {
     $original_data = $this->originalData;
@@ -309,14 +304,14 @@ class Config extends StorableConfigBase {
    *   (optional) A string that maps to a key within the configuration data.
    *   For instance in the following configuration array:
    *   @code
-   *   array(
-   *     'foo' => array(
+   *   [
+   *     'foo' => [
    *       'bar' => 'baz',
-   *     ),
-   *   );
+   *     ],
+   *   ];
    *   @endcode
    *   A key of 'foo.bar' would map to the string 'baz'. However, a key of 'foo'
-   *   would map to the array('bar' => 'baz').
+   *   would map to the ['bar' => 'baz'].
    *   If not supplied TRUE will be returned if there are any overrides at all
    *   for this configuration object.
    *

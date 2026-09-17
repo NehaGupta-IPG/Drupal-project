@@ -1,34 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Form;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the programmatic form submission behavior.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class ProgrammaticTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
   /**
    * Tests the programmatic form submission workflow.
    */
-  public function testSubmissionWorkflow() {
-    // Backup the current batch status and reset it to avoid conflicts while
-    // processing the dummy form submit handler.
-    $current_batch = $batch =& batch_get();
-    $batch = [];
-
+  public function testSubmissionWorkflow(): void {
     // Test that a programmatic form submission is rejected when a required
     // textfield is omitted and correctly processed when it is provided.
     $this->doSubmitForm([], FALSE);
@@ -51,21 +47,18 @@ class ProgrammaticTest extends KernelTestBase {
     $this->doSubmitForm(['op' => 'Submit with limited validation', 'field_to_validate' => 'all'], FALSE);
     $this->doSubmitForm(['op' => 'Submit with limited validation', 'field_to_validate' => 'textfield'], FALSE);
     $this->doSubmitForm(['op' => 'Submit with limited validation', 'field_to_validate' => 'field_to_validate'], TRUE);
-
-    // Restore the current batch status.
-    $batch = $current_batch;
   }
 
   /**
    * Programmatically submits the form_test.module form with the given values.
    *
-   * @param $values
+   * @param array $values
    *   An array of field values to be submitted.
-   * @param $valid_input
+   * @param bool $valid_input
    *   A boolean indicating whether or not the form submission is expected to
    *   be valid.
    */
-  protected function doSubmitForm($values, $valid_input) {
+  protected function doSubmitForm(array $values, $valid_input): void {
     // Programmatically submit the given values.
     $form_state = (new FormState())->setValues($values);
     \Drupal::formBuilder()->submitForm('\Drupal\form_test\Form\FormTestProgrammaticForm', $form_state);
@@ -73,18 +66,16 @@ class ProgrammaticTest extends KernelTestBase {
     // Check that the form returns an error when expected, and vice versa.
     $errors = $form_state->getErrors();
     $valid_form = empty($errors);
-    $args = [
-      '%values' => print_r($values, TRUE),
-      '%errors' => $valid_form ? 'None' : implode(' ', $errors),
-    ];
-    $this->assertSame($valid_form, $valid_input, new FormattableMarkup('Input values: %values<br />Validation handler errors: %errors', $args));
+    $input_values = print_r($values, TRUE);
+    $validation_errors = $valid_form ? 'None' : implode(' ', $errors);
+    $this->assertSame($valid_form, $valid_input, sprintf('Input values: %s<br />Validation handler errors: %s', $input_values, $validation_errors));
 
     // We check submitted values only if we have a valid input.
     if ($valid_input) {
       // Fetching the values that were set in the submission handler.
       $stored_values = $form_state->get('programmatic_form_submit');
       foreach ($values as $key => $value) {
-        $this->assertEquals($value, $stored_values[$key], new FormattableMarkup('Submission handler correctly executed: %stored_key is %stored_value', ['%stored_key' => $key, '%stored_value' => print_r($value, TRUE)]));
+        $this->assertEquals($value, $stored_values[$key], sprintf('Submission handler correctly executed: %s is %s', $key, print_r($value, TRUE)));
       }
     }
   }
@@ -92,7 +83,7 @@ class ProgrammaticTest extends KernelTestBase {
   /**
    * Tests the programmed_bypass_access_check flag.
    */
-  public function testProgrammaticAccessBypass() {
+  public function testProgrammaticAccessBypass(): void {
     $form_state = (new FormState())->setValues([
       'textfield' => 'dummy value',
       'field_restricted' => 'dummy value',

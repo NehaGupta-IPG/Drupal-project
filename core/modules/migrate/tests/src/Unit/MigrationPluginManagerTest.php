@@ -1,15 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit;
 
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\migrate\Plugin\Migration;
 use Drupal\migrate\Plugin\MigrationPluginManager;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\migrate\Plugin\MigrationPluginManager
- * @group migrate
+ * Tests Drupal\migrate\Plugin\MigrationPluginManager.
  */
+#[CoversClass(MigrationPluginManager::class)]
+#[Group('migrate')]
 class MigrationPluginManagerTest extends UnitTestCase {
 
   /**
@@ -26,18 +35,17 @@ class MigrationPluginManagerTest extends UnitTestCase {
     parent::setUp();
 
     // Get a plugin manager for testing.
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $cache_backend = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
-    $language_manager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
+    $cache_backend = $this->createStub(CacheBackendInterface::class);
+    $language_manager = $this->createStub(LanguageManagerInterface::class);
     $this->pluginManager = new MigrationPluginManager($module_handler, $cache_backend, $language_manager);
   }
 
   /**
    * Tests building dependencies for multiple migrations.
-   *
-   * @dataProvider dependencyProvider
    */
-  public function testDependencyBuilding($migrations_data, $result_ids) {
+  #[DataProvider('dependencyProvider')]
+  public function testDependencyBuilding(array $migrations_data, array $result_ids): void {
     $migrations = [];
     foreach ($migrations_data as $migration_id => $migration_data) {
       $migrations[$migration_id] = new TestMigrationMock($migration_id, $migration_data['migration_dependencies']);
@@ -66,9 +74,28 @@ class MigrationPluginManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that expandPluginIds returns all derivatives.
+   */
+  public function testExpandPluginIds(): void {
+    $backend = $this->prophesize(CacheBackendInterface::class);
+    $cache = new \stdClass();
+    $cache->data = [
+      'a:a' => ['provider' => 'core'],
+      'a:b' => ['provider' => 'core'],
+      'b' => ['provider' => 'core'],
+    ];
+    $backend->get('migration_plugins')->willReturn($cache);
+    $this->pluginManager->setCacheBackend($backend->reveal(), 'migration_plugins');
+    $plugin_ids = $this->pluginManager->expandPluginIds(['b', 'a']);
+    $this->assertContains('a:a', $plugin_ids);
+    $this->assertContains('a:b', $plugin_ids);
+    $this->assertContains('b', $plugin_ids);
+  }
+
+  /**
    * Provide dependency data for testing.
    */
-  public function dependencyProvider() {
+  public static function dependencyProvider(): array {
     return [
       // Just one migration, with no dependencies.
       [
@@ -206,7 +233,7 @@ class TestMigrationMock extends Migration {
   /**
    * {@inheritdoc}
    */
-  public function getMigrationDependencies(bool $expand = FALSE) {
+  public function getMigrationDependencies() {
     // For the purpose of testing, do not expand dependencies.
     return $this->migration_dependencies;
   }
@@ -214,7 +241,7 @@ class TestMigrationMock extends Migration {
   /**
    * {@inheritdoc}
    */
-  public function set($prop, $value) {
+  public function set($prop, $value): void {
     $this->set[] = func_get_args();
   }
 

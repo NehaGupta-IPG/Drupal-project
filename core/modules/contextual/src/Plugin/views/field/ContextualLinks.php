@@ -5,9 +5,11 @@ namespace Drupal\contextual\Plugin\views\field;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\contextual\ContextualLinksSerializer;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\Url;
+use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\ResultRow;
 
@@ -15,12 +17,26 @@ use Drupal\views\ResultRow;
  * Provides a handler that adds contextual links.
  *
  * @ingroup views_field_handlers
- *
- * @ViewsField("contextual_links")
  */
+#[ViewsField("contextual_links")]
 class ContextualLinks extends FieldPluginBase {
 
   use RedirectDestinationTrait;
+
+  /**
+   * The contextual links serializer service.
+   */
+  protected ContextualLinksSerializer $contextualLinksSerializer;
+
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    ContextualLinksSerializer $contextual_links_serializer ,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->contextualLinksSerializer = $contextual_links_serializer;
+  }
 
   /**
    * {@inheritdoc}
@@ -136,9 +152,9 @@ class ContextualLinks extends FieldPluginBase {
 
       $element = [
         '#type' => 'contextual_links_placeholder',
-        '#id' => _contextual_links_to_id($contextual_links),
+        '#id' => $this->contextualLinksSerializer->linksToId($contextual_links),
       ];
-      return \Drupal::service('renderer')->render($element);
+      return $this->getRenderer()->render($element);
     }
     else {
       return '';

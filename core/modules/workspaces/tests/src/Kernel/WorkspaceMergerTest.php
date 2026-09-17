@@ -1,19 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workspaces\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\workspaces\WorkspaceMerger;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore differring
 /**
  * Tests workspace merging.
- *
- * @coversDefaultClass \Drupal\workspaces\WorkspaceMerger
- *
- * @group workspaces
  */
+#[CoversClass(WorkspaceMerger::class)]
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceMergerTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -29,13 +35,6 @@ class WorkspaceMergerTest extends KernelTestBase {
   protected $entityTypeManager;
 
   /**
-   * An array of nodes created before installing the Workspaces module.
-   *
-   * @var \Drupal\node\NodeInterface[]
-   */
-  protected $nodes = [];
-
-  /**
    * {@inheritdoc}
    */
   protected static $modules = [
@@ -45,7 +44,6 @@ class WorkspaceMergerTest extends KernelTestBase {
     'text',
     'user',
     'system',
-    'path_alias',
   ];
 
   /**
@@ -71,13 +69,13 @@ class WorkspaceMergerTest extends KernelTestBase {
   /**
    * Tests workspace merging.
    *
-   * @covers ::merge
-   * @covers ::getNumberOfChangesOnSource
-   * @covers ::getNumberOfChangesOnTarget
-   * @covers ::getDifferringRevisionIdsOnSource
-   * @covers ::getDifferringRevisionIdsOnTarget
+   * @legacy-covers ::merge
+   * @legacy-covers ::getNumberOfChangesOnSource
+   * @legacy-covers ::getNumberOfChangesOnTarget
+   * @legacy-covers ::getDifferringRevisionIdsOnSource
+   * @legacy-covers ::getDifferringRevisionIdsOnTarget
    */
-  public function testWorkspaceMerger() {
+  public function testWorkspaceMerger(): void {
     $this->initializeWorkspacesModule();
     $this->createWorkspaceHierarchy();
 
@@ -204,7 +202,7 @@ class WorkspaceMergerTest extends KernelTestBase {
     // Check that Local 1 can not be merged directly into Stage, since it can
     // only be merged into its direct parent.
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('The contents of a workspace can only be merged into its parent workspace.');
+    $this->expectExceptionMessageIs('The contents of a workspace can only be merged into its parent workspace.');
     $workspace_merger->merge();
   }
 

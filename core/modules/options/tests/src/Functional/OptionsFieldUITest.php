@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\options\Functional;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\field\Functional\FieldTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Options field UI functionality.
- *
- * @group options
  */
+#[Group('options')]
+#[RunTestsInSeparateProcesses]
 class OptionsFieldUITest extends FieldTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -88,7 +90,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Options (integer) : test 'allowed values' input.
    */
-  public function testOptionsAllowedValuesInteger() {
+  public function testOptionsAllowedValuesInteger(): void {
     $this->fieldName = 'field_options_integer';
     $this->createOptionsField('list_integer');
     $page = $this->getSession()->getPage();
@@ -96,31 +98,31 @@ class OptionsFieldUITest extends FieldTestBase {
 
     // Explicit integer keys.
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 0,
-      'settings[allowed_values][table][0][item][label]' => 'Zero',
-      'settings[allowed_values][table][1][item][key]' => 2,
-      'settings[allowed_values][table][1][item][label]' => 'Two',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 0,
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Zero',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => 2,
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'Two',
     ];
     $array = [0 => 'Zero', 2 => 'Two'];
     $this->assertAllowedValuesInput($input, $array, 'Integer keys are accepted.');
 
     // Non-integer keys.
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 1.1,
-      'settings[allowed_values][table][0][item][label]' => 'One',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 1.1,
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'One',
     ];
     $this->assertAllowedValuesInput($input, 'keys must be integers', 'Non integer keys are rejected.');
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 'abc',
-      'settings[allowed_values][table][0][item][label]' => 'abc',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 'abc',
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'abc',
     ];
     $this->assertAllowedValuesInput($input, 'keys must be integers', 'Non integer keys are rejected.');
 
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 0,
-      'settings[allowed_values][table][0][item][label]' => 'Zero',
-      'settings[allowed_values][table][1][item][key]' => 1,
-      'settings[allowed_values][table][1][item][label]' => 'One',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 0,
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Zero',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => 1,
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'One',
     ];
     $array = [0 => 'Zero', 1 => 'One'];
     $this->assertAllowedValuesInput($input, $array, '');
@@ -148,10 +150,10 @@ class OptionsFieldUITest extends FieldTestBase {
 
     // Check that the same key can only be used once.
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 0,
-      'settings[allowed_values][table][0][item][label]' => 'Zero',
-      'settings[allowed_values][table][1][item][key]' => 0,
-      'settings[allowed_values][table][1][item][label]' => 'One',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 0,
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Zero',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => 0,
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'One',
     ];
     $array = ['0' => 'One'];
     $this->assertAllowedValuesInput($input, $array, 'Same value cannot be used multiple times.');
@@ -160,7 +162,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Options (float) : test 'allowed values' input.
    */
-  public function testOptionsAllowedValuesFloat() {
+  public function testOptionsAllowedValuesFloat(): void {
     $this->fieldName = 'field_options_float';
     $this->createOptionsField('list_float');
     $page = $this->getSession()->getPage();
@@ -168,39 +170,39 @@ class OptionsFieldUITest extends FieldTestBase {
 
     // Explicit numeric keys.
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 0,
-      'settings[allowed_values][table][0][item][label]' => 'Zero',
-      'settings[allowed_values][table][1][item][key]' => .5,
-      'settings[allowed_values][table][1][item][label]' => 'Point five',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 0,
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Zero',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => .5,
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'Point five',
     ];
     $array = ['0' => 'Zero', '0.5' => 'Point five'];
     $this->assertAllowedValuesInput($input, $array, 'Integer keys are accepted.');
 
     // Check that values can be added.
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 0,
-      'settings[allowed_values][table][0][item][label]' => 'Zero',
-      'settings[allowed_values][table][1][item][key]' => .5,
-      'settings[allowed_values][table][1][item][label]' => 'Point five',
-      'settings[allowed_values][table][2][item][key]' => 1,
-      'settings[allowed_values][table][2][item][label]' => 'One',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 0,
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Zero',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => .5,
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'Point five',
+      'field_storage[subform][settings][allowed_values][table][2][item][key]' => 1,
+      'field_storage[subform][settings][allowed_values][table][2][item][label]' => 'One',
     ];
     $array = ['0' => 'Zero', '0.5' => 'Point five', '1' => 'One'];
     $this->assertAllowedValuesInput($input, $array, 'Values can be added.');
     // Non-numeric keys.
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 'abc',
-      'settings[allowed_values][table][0][item][label]' => 'abc',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 'abc',
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'abc',
     ];
     $this->assertAllowedValuesInput($input, 'each key must be a valid integer or decimal', 'Non numeric keys are rejected.');
 
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 0,
-      'settings[allowed_values][table][0][item][label]' => 'Zero',
-      'settings[allowed_values][table][1][item][key]' => .5,
-      'settings[allowed_values][table][1][item][label]' => 'Point five',
-      'settings[allowed_values][table][2][item][key]' => 2,
-      'settings[allowed_values][table][2][item][label]' => 'Two',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 0,
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Zero',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => .5,
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'Point five',
+      'field_storage[subform][settings][allowed_values][table][2][item][key]' => 2,
+      'field_storage[subform][settings][allowed_values][table][2][item][label]' => 'Two',
     ];
     $array = ['0' => 'Zero', '0.5' => 'Point five', '2' => 'Two'];
     $this->assertAllowedValuesInput($input, $array, '');
@@ -227,20 +229,20 @@ class OptionsFieldUITest extends FieldTestBase {
     $this->assertSame($field_storage->getSetting('allowed_values'), [0 => 'Zero', 2 => 'Two']);
 
     $input = [
-      'settings[allowed_values][table][0][item][key]' => .5,
-      'settings[allowed_values][table][0][item][label]' => 'Point five',
-      'settings[allowed_values][table][1][item][key]' => .5,
-      'settings[allowed_values][table][1][item][label]' => 'Half',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => .5,
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Point five',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => .5,
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'Half',
     ];
     $array = ['0.5' => 'Half'];
     $this->assertAllowedValuesInput($input, $array, 'Same value cannot be used multiple times.');
 
     // Check that different forms of the same float value cannot be used.
     $input = [
-      'settings[allowed_values][table][0][item][key]' => .5,
-      'settings[allowed_values][table][0][item][label]' => 'Point five',
-      'settings[allowed_values][table][1][item][key]' => 0.5,
-      'settings[allowed_values][table][1][item][label]' => 'Half',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => .5,
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Point five',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => 0.5,
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'Half',
     ];
     $array = ['0.5' => 'Half'];
     $this->assertAllowedValuesInput($input, $array, 'Different forms of the same value cannot be used.');
@@ -249,7 +251,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Options (text) : test 'allowed values' input.
    */
-  public function testOptionsAllowedValuesText() {
+  public function testOptionsAllowedValuesText(): void {
     $this->fieldName = 'field_options_text';
     $this->createOptionsField('list_string');
     $page = $this->getSession()->getPage();
@@ -257,28 +259,28 @@ class OptionsFieldUITest extends FieldTestBase {
 
     // Explicit keys.
     $input = [
-      'settings[allowed_values][table][0][item][key]' => '_zero',
-      'settings[allowed_values][table][0][item][label]' => 'Zero',
-      'settings[allowed_values][table][1][item][key]' => '_one',
-      'settings[allowed_values][table][1][item][label]' => 'One',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => '_zero',
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Zero',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => '_one',
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'One',
     ];
     $array = ['_zero' => 'Zero', '_one' => 'One'];
     $this->assertAllowedValuesInput($input, $array, 'Explicit keys are accepted.');
 
     // Overly long keys.
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 'zero',
-      'settings[allowed_values][table][0][item][label]' => 'Zero',
-      'settings[allowed_values][table][1][item][key]' => $this->randomMachineName(256),
-      'settings[allowed_values][table][1][item][label]' => 'One',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 'zero',
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Zero',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => $this->randomMachineName(256),
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'One',
     ];
     $this->assertAllowedValuesInput($input, 'each key must be a string at most 255 characters long', 'Overly long keys are rejected.');
 
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 'zero',
-      'settings[allowed_values][table][0][item][label]' => 'Zero',
-      'settings[allowed_values][table][1][item][key]' => 'one',
-      'settings[allowed_values][table][1][item][label]' => 'One',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 'zero',
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Zero',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => 'one',
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'One',
     ];
     $array = ['zero' => 'Zero', 'one' => 'One'];
     $this->assertAllowedValuesInput($input, $array, '');
@@ -293,7 +295,7 @@ class OptionsFieldUITest extends FieldTestBase {
     $this->drupalGet($this->adminPath);
     $assert_session->elementExists('css', '#remove_row_button__1');
     $delete_button_1 = $page->findById('remove_row_button__1');
-    $value_field_1 = $page->findField('settings[allowed_values][table][1][item][key]');
+    $value_field_1 = $page->findField('field_storage[subform][settings][allowed_values][table][1][item][key]');
     $this->assertTrue($delete_button_1->hasAttribute('disabled'), 'Button is disabled');
     $this->assertTrue($value_field_1->hasAttribute('disabled'), 'Button is disabled');
 
@@ -306,21 +308,22 @@ class OptionsFieldUITest extends FieldTestBase {
     $field_storage = FieldStorageConfig::loadByName('node', $this->fieldName);
     $this->assertSame($field_storage->getSetting('allowed_values'), ['zero' => 'Zero']);
 
-    // Check that string values with dots can not be used.
+    // Check that string values with special characters can be used.
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 'zero',
-      'settings[allowed_values][table][0][item][label]' => 'Zero',
-      'settings[allowed_values][table][1][item][key]' => 'example.com',
-      'settings[allowed_values][table][1][item][label]' => 'Example',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 'zero',
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Zero',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => '.example #example',
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'Example',
     ];
-    $this->assertAllowedValuesInput($input, 'The machine-readable name must contain only lowercase letters, numbers, and underscores.', 'String value with dot is not supported.');
+    $array = ['zero' => 'Zero', '.example #example' => 'Example'];
+    $this->assertAllowedValuesInput($input, $array, '');
 
     // Check that the same key can only be used once.
     $input = [
-      'settings[allowed_values][table][0][item][key]' => 'zero',
-      'settings[allowed_values][table][0][item][label]' => 'Zero',
-      'settings[allowed_values][table][1][item][key]' => 'zero',
-      'settings[allowed_values][table][1][item][label]' => 'One',
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 'zero',
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => 'Zero',
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => 'zero',
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => 'One',
     ];
     $array = ['zero' => 'One'];
     $this->assertAllowedValuesInput($input, $array, 'Same value cannot be used multiple times.');
@@ -332,7 +335,7 @@ class OptionsFieldUITest extends FieldTestBase {
    * @param string $type
    *   One of 'list_integer', 'list_float' or 'list_string'.
    */
-  protected function createOptionsField($type) {
+  protected function createOptionsField($type): void {
     // Create a field.
     FieldStorageConfig::create([
       'field_name' => $this->fieldName,
@@ -350,7 +353,7 @@ class OptionsFieldUITest extends FieldTestBase {
       ->setComponent($this->fieldName)
       ->save();
 
-    $this->adminPath = 'admin/structure/types/manage/' . $this->type . '/fields/node.' . $this->type . '.' . $this->fieldName . '/storage';
+    $this->adminPath = 'admin/structure/types/manage/' . $this->type . '/fields/node.' . $this->type . '.' . $this->fieldName;
   }
 
   /**
@@ -373,7 +376,7 @@ class OptionsFieldUITest extends FieldTestBase {
     $add_button->click();
     $add_button->click();
 
-    $this->submitForm($input, 'Save field settings');
+    $this->submitForm($input, 'Save');
     // Verify that the page does not have double escaped HTML tags.
     $this->assertSession()->responseNotContains('&amp;lt;');
 
@@ -389,7 +392,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Tests normal and key formatter display on node display.
    */
-  public function testNodeDisplay() {
+  public function testNodeDisplay(): void {
     $this->fieldName = $this->randomMachineName();
     $this->createOptionsField('list_integer');
     $node = $this->drupalCreateNode(['type' => $this->type]);
@@ -397,17 +400,16 @@ class OptionsFieldUITest extends FieldTestBase {
     $on = $this->randomMachineName();
     $off = $this->randomMachineName();
     $edit = [
-      'settings[allowed_values][table][0][item][key]' => 1,
-      'settings[allowed_values][table][0][item][label]' => $on,
-      'settings[allowed_values][table][1][item][key]' => 0,
-      'settings[allowed_values][table][1][item][label]' => $off,
+      'field_storage[subform][settings][allowed_values][table][0][item][key]' => 1,
+      'field_storage[subform][settings][allowed_values][table][0][item][label]' => $on,
+      'field_storage[subform][settings][allowed_values][table][1][item][key]' => 0,
+      'field_storage[subform][settings][allowed_values][table][1][item][label]' => $off,
     ];
 
     $this->drupalGet($this->adminPath);
     $page = $this->getSession()->getPage();
     $page->findButton('Add another item')->click();
-    $this->submitForm($edit, 'Save field settings');
-    $this->assertSession()->pageTextContains('Updated field ' . $this->fieldName . ' field settings.');
+    $this->submitForm($edit, 'Save');
 
     // Select a default value.
     $edit = [
@@ -423,7 +425,7 @@ class OptionsFieldUITest extends FieldTestBase {
         "fields[$this->fieldName][type]" => $formatter,
         "fields[$this->fieldName][region]" => 'content',
       ];
-      $this->drupalGet('admin/structure/types/manage/' . $this->typeName . '/display');
+      $this->drupalGet('admin/structure/types/manage/' . $this->typeName . '/display/default');
       $this->submitForm($edit, 'Save');
       $this->drupalGet('node/' . $node->id());
 
@@ -442,7 +444,7 @@ class OptionsFieldUITest extends FieldTestBase {
   /**
    * Confirms the allowed value list is a required field.
    */
-  public function testRequiredPropertyForAllowedValuesList() {
+  public function testRequiredPropertyForAllowedValuesList(): void {
     $field_types = [
       'list_float',
       'list_string',
@@ -454,9 +456,22 @@ class OptionsFieldUITest extends FieldTestBase {
       $this->createOptionsField($field_type);
       $page = $this->getSession()->getPage();
 
-      // Try to proceed without entering any value.
       $this->drupalGet($this->adminPath);
-      $page->findButton('Save field settings')->click();
+      // Assert that the delete button for a single row is disabled.
+      $this->assertCount(1, $page->findAll('css', '#allowed-values-order tr.draggable'));
+      $delete_button_0 = $page->findById('remove_row_button__0');
+      $this->assertTrue($delete_button_0->hasAttribute('disabled'), 'Button is disabled');
+      $page->findButton('Add another item')->click();
+      // Assert that the delete button for the first row is enabled if there are
+      // more that one rows.
+      $this->assertCount(2, $page->findAll('css', '#allowed-values-order tr.draggable'));
+      $this->assertFalse($delete_button_0->hasAttribute('disabled'), 'Button is enabled');
+      // Delete a row.
+      $delete_button_0->click();
+      // Assert that the button is disabled again.
+      $this->assertTrue($delete_button_0->hasAttribute('disabled'), 'Button is disabled');
+      // Try to proceed without entering any value.
+      $page->findButton('Save')->click();
 
       if ($field_type == 'list_string') {
         // Asserting only name field as there is no value field for list_string.

@@ -12,7 +12,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
   /**
    * The item count to display.
    *
-   * @var int
+   * @var numeric
    */
   protected $count;
 
@@ -29,7 +29,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    * Parses values passed into this class through the format_plural() function
    * in Drupal and handles an optional context for the string.
    *
-   * @param int $count
+   * @param numeric $count
    *   The item count to display.
    * @param string $singular
    *   The string for the singular case. Make sure it is clear this is singular,
@@ -53,7 +53,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *
    * @see \Drupal\Component\Render\FormattableMarkup::placeholderFormat()
    */
-  public function __construct($count, $singular, $plural, array $args = [], array $options = [], TranslationInterface $string_translation = NULL) {
+  public function __construct($count, $singular, $plural, array $args = [], array $options = [], ?TranslationInterface $string_translation = NULL) {
     $this->count = $count;
     $translatable_string = implode(PoItem::DELIMITER, [$singular, $plural]);
     parent::__construct($translatable_string, $args, $options, $string_translation);
@@ -66,7 +66,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    * to the __construct() method, this method is designed to be invoked with
    * a string already translated (such as with configuration translation).
    *
-   * @param int $count
+   * @param numeric $count
    *   The item count to display.
    * @param string $translated_string
    *   The already translated string.
@@ -90,70 +90,24 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
   }
 
   /**
-   * Renders the object as a string.
-   *
-   * @return string
-   *   The translated string.
+   * {@inheritdoc}
    */
-  public function render() {
-    if (!$this->translatedString) {
-      $this->translatedString = $this->getStringTranslation()->translateString($this);
-    }
-    if ($this->translatedString === '') {
-      return '';
-    }
-
-    $arguments = $this->getArguments();
-    $arguments['@count'] = $this->count;
-    $translated_array = explode(PoItem::DELIMITER, $this->translatedString);
-
-    if ($this->count == 1) {
-      return $this->placeholderFormat($translated_array[0], $arguments);
-    }
-
-    $index = $this->getPluralIndex();
-    if ($index == 0) {
-      // Singular form.
-      $return = $translated_array[0];
-    }
-    else {
-      if (isset($translated_array[$index])) {
-        // N-th plural form.
-        $return = $translated_array[$index];
-      }
-      else {
-        // If the index cannot be computed or there's no translation, use the
-        // second plural form as a fallback (which allows for most flexibility
-        // with the replaceable @count value).
-        $return = $translated_array[1];
-      }
-    }
-
-    return $this->placeholderFormat($return, $arguments);
-  }
-
-  /**
-   * Gets the plural index through the gettext formula.
-   *
-   * @return int
-   */
-  protected function getPluralIndex() {
-    // We have to test both if the function and the service exist since in
-    // certain situations it is possible that locale code might be loaded but
-    // the service does not exist. For example, where the parent test site has
-    // locale installed but the child site does not.
-    // @todo Refactor in https://www.drupal.org/node/2660338 so this code does
-    // not depend on knowing that the Locale module exists.
-    if (function_exists('locale_get_plural') && \Drupal::hasService('locale.plural.formula')) {
-      return locale_get_plural($this->count, $this->getOption('langcode'));
-    }
-    return -1;
+  protected function translateString(): string {
+    $this->translatedString ??= parent::translateString();
+    return $this->getStringTranslation()->selectPluralForm($this->count, $this->translatedString, $this->getOptions()['langcode'] ?? NULL);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __sleep() {
+  public function getArguments(): array {
+    return parent::getArguments() + ['@count' => $this->count];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __sleep(): array {
     return array_merge(parent::__sleep(), ['count']);
   }
 
