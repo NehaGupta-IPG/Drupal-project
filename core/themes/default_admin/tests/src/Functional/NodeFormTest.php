@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\default_admin\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\default_admin\Traits\StickyActionButtonsTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -23,6 +24,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('default_admin')]
 #[RunTestsInSeparateProcesses]
 class NodeFormTest extends BrowserTestBase {
+
+  use StickyActionButtonsTrait;
 
   /**
    * {@inheritdoc}
@@ -223,23 +226,6 @@ class NodeFormTest extends BrowserTestBase {
     $assert_session->elementExists('css', 'header.admin--navigation-top-bar--offset.sticky-form-actions--preprocessed');
     $assert_session->elementNotExists('css', 'header.admin--navigation-top-bar--offset .sticky-form-actions');
     $assert_session->elementNotExists('css', 'header.region-sticky');
-  }
-
-  /**
-   * Sets the sticky action buttons feature flag in settings.php.
-   *
-   * @param string $value
-   *   The value for core_admin_theme_use_sticky_action_buttons.
-   */
-  protected function setStickyActionButtons(string $value): void {
-    $this->writeSettings([
-      'settings' => [
-        'core_admin_theme_use_sticky_action_buttons' => (object) [
-          'value' => $value,
-          'required' => TRUE,
-        ],
-      ],
-    ]);
   }
 
 }
