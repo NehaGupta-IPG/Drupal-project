@@ -94,9 +94,9 @@ final class AppearanceBootstrapTest extends WebDriverTestBase {
   /**
    * The dark mode variant the accent script mixes the focus color into.
    *
-   * mixColor() weights white at 65% per channel and truncates the result:
-   * 0x00 -> floor(0 + 255 * 0.65) = 0xa5, 0x88 -> floor(136 + 119 * 0.65) =
-   * 0xd5, 0xcc -> floor(204 + 51 * 0.65) = 0xed.
+   * Drupal.adminAccent.mixColor() weights white at 65% per channel and
+   * truncates the result: 0x00 -> floor(0 + 255 * 0.65) = 0xa5, 0x88 ->
+   * floor(136 + 119 * 0.65) = 0xd5, 0xcc -> floor(204 + 51 * 0.65) = 0xed.
    *
    * @see core/themes/default_admin/migration/js/accent.js
    */

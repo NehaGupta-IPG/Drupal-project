@@ -51,6 +51,33 @@ module.exports = {
     // autocomplete-message appears and then the autocomplete dropdown with a
     // result. At that point the autocomplete-message should be invisible again.
 
+    // The is-autocompleting class added by autocomplete.js:23 is removed again
+    // by autocomplete.js:13 as soon as the response arrives, so it only exists
+    // for the duration of one request - too short a window to sample by
+    // polling. Record every class change of the input instead, and inspect the
+    // recording once the results are in.
+    browser.waitForElementVisible('[name="autocomplete_3"]');
+    browser.execute(() => {
+      const input = document.querySelector('[name="autocomplete_3"]');
+      window.defaultAdminAutocompleteSeen = false;
+      const observer = new MutationObserver((mutations) => {
+        if (input.classList.contains('is-autocompleting')) {
+          window.defaultAdminAutocompleteSeen = true;
+        }
+        mutations.forEach((mutation) => {
+          const previous = mutation.oldValue || '';
+          if (previous.includes('is-autocompleting')) {
+            window.defaultAdminAutocompleteSeen = true;
+          }
+        });
+      });
+      observer.observe(input, {
+        attributeFilter: ['class'],
+        attributeOldValue: true,
+        attributes: true,
+      });
+    });
+
     // eslint-disable-next-line no-unused-expressions
     browser
       .setValue('[name="autocomplete_3"]', '123')
@@ -61,6 +88,23 @@ module.exports = {
       .expect.element(
         '.js-form-item-autocomplete-3 [data-drupal-selector="autocomplete-message"]',
       ).to.not.visible;
+
+    // autocomplete.js:23 marked the input while the search was in flight.
+    browser.execute(
+      () => window.defaultAdminAutocompleteSeen,
+      (result) => {
+        browser.assert.strictEqual(
+          result.value,
+          true,
+          'The input was marked as autocompleting during the search.',
+        );
+      },
+    );
+
+    // autocomplete.js:13 removed the mark again when the response arrived.
+    browser.waitForElementNotPresent(
+      '[name="autocomplete_3"].is-autocompleting',
+    );
 
     browser.drupalLogAndEnd({ onlyOnError: false });
   },
