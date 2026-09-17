@@ -75,11 +75,6 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
    */
   const ASSET_LIST = [
     {
-      pack: 'backbone',
-      library: 'internal.backbone',
-      files: ['backbone.js', 'backbone-min.js', 'backbone-min.js.map'],
-    },
-    {
       pack: 'htmx.org',
       folder: 'htmx',
       library: 'htmx',
