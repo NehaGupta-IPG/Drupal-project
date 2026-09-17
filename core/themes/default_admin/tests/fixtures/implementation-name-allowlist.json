@@ -60,11 +60,6 @@
     "reason": "The test covers migration and removal of legacy local-storage keys."
   },
   {
-    "path": "tests/src/Kernel/SettingsTest.php",
-    "pattern": "assertSame('gin',",
-    "reason": "The test covers the retained focus-color configuration value."
-  },
-  {
     "path": "tests/src/Kernel/ThemeHooksTest.php",
     "pattern": "['gin']",
     "reason": "The test covers the temporary drupalSettings compatibility alias."

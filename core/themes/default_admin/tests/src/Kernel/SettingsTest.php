@@ -80,7 +80,7 @@ class SettingsTest extends KernelTestBase {
   public function testGetDefaultReadsAdminThemeSettings(): void {
     $this->assertSame('blue', $this->settings->getDefault('preset_accent_color'));
     $this->assertSame('auto', $this->settings->getDefault('enable_dark_mode'));
-    $this->assertSame('gin', $this->settings->getDefault('preset_focus_color'));
+    $this->assertSame('default', $this->settings->getDefault('preset_focus_color'));
     $this->assertFalse($this->settings->getDefault('high_contrast_mode'));
 
     // Changed theme settings are picked up instead of being read only once.
@@ -285,7 +285,7 @@ class SettingsTest extends KernelTestBase {
     // value of that field.
     $this->assertSame('#012345', $form['accent_group']['accent_picker']['#default_value']);
     // Settings without an override keep the value of the theme.
-    $this->assertSame('gin', $form['preset_focus_color']['#default_value']);
+    $this->assertSame('default', $form['preset_focus_color']['#default_value']);
 
     // The form of an account is where the overrides are entered, so its
     // elements are not annotated with the override warning.
