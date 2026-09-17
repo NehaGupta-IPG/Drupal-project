@@ -247,7 +247,7 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
     $this->configFactory->getEditable($config_name)->delete();
     $this->configFactory->getEditable($config_name)
       ->setData([
-        '_core' => ['default_config_hash' => 'some-hash'],
+        '_core' => ['default_config_hash' => str_repeat('a', 43)],
         'langcode' => 'de',
         'test' => 'Test (German)',
       ])
