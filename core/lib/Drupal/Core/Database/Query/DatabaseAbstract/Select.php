@@ -24,28 +24,28 @@ final class Select {
    *
    * @var list<string>
    */
-  public protected(set) array $comments = [];
+  public private(set) array $comments = [];
 
   /**
    * The condition object for this query.
    *
    * Condition handling is handled via composition.
    */
-  public protected(set) Condition $condition;
+  public private(set) ?Condition $condition = NULL;
 
   /**
    * The columns to SELECT.
    *
    * @var list<string>
    */
-  public protected(set) array $columns = [];
+  public private(set) array $columns = [];
 
   /**
    * The expressions to SELECT as virtual columns.
    *
    * @var list<Expression>
    */
-  public protected(set) array $expressions = [];
+  public private(set) array $expressions = [];
 
   /**
    * The tables against which to JOIN.
@@ -71,7 +71,7 @@ final class Select {
    * incorporated into the object; a separate array of arguments does not
    * need to be provided.
    */
-  public protected(set) array $tables = [];
+  public private(set) array $tables = [];
 
   /**
    * The columns by which to order this query.
@@ -81,32 +81,31 @@ final class Select {
    *
    * @var array<string,string>
    */
-  public protected(set) array $orderBy = [];
+  public private(set) array $orderBy = [];
 
   /**
    * The columns by which to group.
    *
    * @var list<string>
    */
-// @todo rename to groupBy
-  public protected(set) array $group = [];
+  public private(set) array $groupBy = [];
 
   /**
    * The conditional object for the HAVING clause.
    */
-  public protected(set) Condition $having;
+  public private(set) ?Condition $having = NULL;
 
   /**
    * Whether or not this query should be DISTINCT.
    */
-  public protected(set) bool $distinct = FALSE;
+  public private(set) bool $distinct = FALSE;
 
   /**
    * The range limiters for this query.
    *
    * @var array|null
    */
-  public protected(set) ?array $range;
+  public private(set) array $range = [];
 
   /**
    * An array whose elements specify a query to UNION, and the UNION type.
@@ -120,12 +119,12 @@ final class Select {
    *
    * @var array
    */
-  public protected(set) array $union = [];
+  public private(set) array $union = [];
 
   /**
    * The FOR UPDATE status.
    */
-  public protected(set) bool $forUpdate = FALSE;
+  public private(set) bool $forUpdate = FALSE;
 
   // ------------------------------------------------------
   // ------------------------------------------------------
@@ -229,13 +228,6 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function &havingConditions() {
-    return $this->having?->conditions();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function havingArguments() {
     return $this->having->arguments();
   }
@@ -244,6 +236,9 @@ final class Select {
    * {@inheritdoc}
    */
   public function having($snippet, $args = []) {
+    if (!isset($this->having)) {
+      $this->having = new Condition($this->conjunction);
+    }
     $this->having->where($snippet, $args);
     return $this;
   }
@@ -518,7 +513,7 @@ final class Select {
    * {@inheritdoc}
    */
   public function groupBy(string $column): static {
-    $this->group[$column] = $column;
+    $this->groupBy[$column] = $column;
     return $this;
   }
 
@@ -544,7 +539,7 @@ final class Select {
     // Create our new query object that we will mutate into a count query.
     $count = clone($this);
 
-    $group_by = $count->group;
+    $group_by = $count->groupBy;
     $having = isset($this->having) ? $count->havingConditions() : NULL;
 
     if (!$count->distinct && !isset($having[0])) {
@@ -553,12 +548,12 @@ final class Select {
       // listed in a GROUP BY or HAVING clause need to be present in the
       // query.
       foreach (array_keys($count->columns) as $column) {
-        if (empty($count->group[$column])) {
+        if (empty($count->groupBy[$column])) {
           unset($count->columns[$column]);
         }
       }
       foreach (array_keys($count->expressions) as $column) {
-        if (empty($count->group[$column])) {
+        if (empty($count->groupBy[$column])) {
           unset($count->expressions[$column]);
         }
       }

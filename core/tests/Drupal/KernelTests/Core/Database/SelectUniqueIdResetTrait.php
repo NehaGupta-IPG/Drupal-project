@@ -16,6 +16,13 @@ trait SelectUniqueIdResetTrait {
     $main = new \ReflectionProperty($select, 'uniqueIdentifier');
     $main->setValue($select, NULL);
 
+    if (!$select instanceof SelectExtender) {
+      $range = new \ReflectionProperty($select, 'range');
+      if (is_null($range->getValue($select))) {
+        $range->setValue($select, []);
+      }
+    }
+
     if ($select instanceof SelectExtender) {
       $extender = $select;
       $query = new \ReflectionProperty($extender, 'query');

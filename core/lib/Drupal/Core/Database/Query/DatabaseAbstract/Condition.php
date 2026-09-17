@@ -2,14 +2,13 @@
 
 namespace Drupal\Core\Database\Query\DatabaseAbstract;
 
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Expression;
 use Drupal\Core\Database\InvalidQueryException;
 
 /**
  * Generic class for a series of conditions in a query.
  */
-class Condition implements \Countable {
+final class Condition implements \Countable {
 
   /**
    * Provides a map of condition operators to condition operator options.
@@ -43,14 +42,14 @@ class Condition implements \Countable {
    *
    * @var array
    */
-  protected $conditions = [];
+  public private(set) array $conditions = [];
 
   /**
    * Array of arguments.
    *
    * @var array
    */
-  protected $arguments = [];
+  public private(set) array $arguments = [];
 
   /**
    * Whether the conditions have been changed.
@@ -93,17 +92,17 @@ class Condition implements \Countable {
   /**
    * {@inheritdoc}
    */
-  public function condition($field, $value = NULL, $operator = '=') {
+  public function condition($column, $value = NULL, $operator = '=') {
     if (empty($operator)) {
       $operator = '=';
     }
     if (empty($value) && is_array($value)) {
-      throw new InvalidQueryException(sprintf("Query condition '%s %s ()' cannot be empty.", $field, $operator));
+      throw new InvalidQueryException(sprintf("Query condition '%s %s ()' cannot be empty.", $column, $operator));
     }
     if (is_array($value) && in_array($operator, ['=', '<', '>', '<=', '>=', 'IS NULL', 'IS NOT NULL'], TRUE)) {
       if (count($value) > 1) {
         $value = implode(', ', $value);
-        throw new InvalidQueryException(sprintf("Query condition '%s %s %s' must have an array compatible operator.", $field, $operator, $value));
+        throw new InvalidQueryException(sprintf("Query condition '%s %s %s' must have an array compatible operator.", $column, $operator, $value));
       }
       else {
         throw new InvalidQueryException('Calling ' . __METHOD__ . '() without an array compatible operator is not supported. See https://www.drupal.org/node/3350985');
@@ -111,7 +110,7 @@ class Condition implements \Countable {
     }
 
     $this->conditions[] = [
-      'field' => $field,
+      'field' => $column,
       'value' => $value,
       'operator' => $operator,
     ];
@@ -134,28 +133,28 @@ class Condition implements \Countable {
   /**
    * {@inheritdoc}
    */
-  public function isNull($field) {
-    return $this->condition($field, NULL, 'IS NULL');
+  public function isNull($column) {
+    return $this->condition($column, NULL, 'IS NULL');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isNotNull($field) {
-    return $this->condition($field, NULL, 'IS NOT NULL');
+  public function isNotNull($column) {
+    return $this->condition($column, NULL, 'IS NOT NULL');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function exists(SelectInterface $select) {
+  public function exists(Select $select) {
     return $this->condition('', $select, 'EXISTS');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function notExists(SelectInterface $select) {
+  public function notExists(Select $select) {
     return $this->condition('', $select, 'NOT EXISTS');
   }
 
@@ -206,9 +205,9 @@ class Condition implements \Countable {
           // put brackets around it (if it is a query), and collect any
           // arguments.
           $condition['field']->compile($connection, $queryPlaceholder);
-          $field_fragment = (string) $condition['field'];
+          $column_fragment = (string) $condition['field'];
           if ($condition['field'] instanceof SelectInterface) {
-            $field_fragment = '(' . $field_fragment . ')';
+            $column_fragment = '(' . $column_fragment . ')';
           }
           $arguments += $condition['field']->arguments();
           // If the operator and value were not passed in to the
@@ -222,13 +221,13 @@ class Condition implements \Countable {
           // ConditionInterface::where() method. Put brackets around the snippet
           // and collect the arguments from the value part. Also ignore the
           // operator and value parts.
-          $field_fragment = '(' . $condition['field'] . ')';
+          $column_fragment = '(' . $condition['field'] . ')';
           $arguments += $condition['value'];
           $ignore_operator = TRUE;
         }
         else {
           // Left hand part is a normal field. Add it as is.
-          $field_fragment = $connection->escapeField($condition['field']);
+          $column_fragment = $connection->escapeField($condition['field']);
           $ignore_operator = FALSE;
         }
 
@@ -306,7 +305,7 @@ class Condition implements \Countable {
 
         // Concatenate the left hand part, operator and right hand part.
         $condition_fragments[] = trim(implode(' ', [
-          $field_fragment . $operator['field_suffix'],
+          $column_fragment . $operator['field_suffix'],
           $operator_fragment,
           $value_fragment,
         ]));
@@ -324,41 +323,6 @@ class Condition implements \Countable {
    */
   public function compiled() {
     return !$this->changed;
-  }
-
-  /**
-   * Implements PHP magic __toString method to convert the conditions to string.
-   *
-   * @return string
-   *   A string version of the conditions.
-   */
-  public function __toString() {
-    // If the caller forgot to call compile() first, refuse to run.
-    if ($this->changed) {
-      return '';
-    }
-    return $this->stringVersion;
-  }
-
-  /**
-   * PHP magic __clone() method.
-   *
-   * Only copies fields that implement
-   * Drupal\Core\Database\Query\ConditionInterface. Also sets $this->changed to
-   * TRUE.
-   */
-  public function __clone() {
-    $this->changed = TRUE;
-    foreach ($this->conditions as $key => $condition) {
-      if ($key !== '#conjunction') {
-        if ($condition['field'] instanceof ConditionInterface) {
-          $this->conditions[$key]['field'] = clone($condition['field']);
-        }
-        if ($condition['value'] instanceof SelectInterface) {
-          $this->conditions[$key]['value'] = clone($condition['value']);
-        }
-      }
-    }
   }
 
   /**

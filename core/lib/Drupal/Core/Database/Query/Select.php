@@ -155,7 +155,7 @@ class Select extends Query implements SelectInterface {
     $this->addJoin(NULL, $table, $alias);
   }
 
-  protected function createFromAbstractSelect(DatabaseAbstractSelect $abstractSelect, ?string $alias): void {
+  final protected function createFromAbstractSelect(DatabaseAbstractSelect $abstractSelect, ?string $alias): void {
     $this->comments = $abstractSelect->comments;
     foreach ($abstractSelect->tables as $key => $table) {
       $this->tables[$key] = $table;
@@ -181,17 +181,28 @@ class Select extends Query implements SelectInterface {
       }
       $this->condition($condition['field'], $condition['value'], $condition['operator']);
     }
-    $this->order = $abstractSelect->orderBy ?? [];
-    $this->group = $abstractSelect->group ?? [];
+    foreach ($abstractSelect->having?->conditions() ?? [] as $key => $condition) {
+      if ($key === '#conjunction') {
+        continue;
+      }
+      if ($condition instanceof Expression) {
+        $this->having($condition->expression, $condition->arguments);
+        continue;
+      }
+    }
+    $this->order = $abstractSelect->orderBy;
+    $this->group = $abstractSelect->groupBy;
     foreach ($abstractSelect->union as $union) {
       $this->union($this->connection->select($union['query']), $union['type']);
     }
-    if (isset($abstractSelect->range)) {
-      $range = $abstractSelect->range;
-      if ($range !== []) {
-        $this->range($range['start'], $range['length']);
-      }
+    $range = $abstractSelect->range;
+    if ($range !== []) {
+      $this->range($range['start'] ?? NULL, $range['length'] ?? NULL);
     }
+    else {
+      $this->range = $range;
+    }
+    $this->distinct = $abstractSelect->distinct;
   }
 
   /**

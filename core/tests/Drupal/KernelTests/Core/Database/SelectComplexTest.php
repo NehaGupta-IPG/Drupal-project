@@ -196,13 +196,28 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests GROUP BY and HAVING clauses together.
    */
   public function testGroupByAndHaving(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test_task', 't');
+    $abstractCountField = $abstractQuery->addExpression('COUNT([task])', 'num');
+    $abstractTaskField = $abstractQuery->addColumn('t', 'task');
+    $abstractQuery->orderBy($abstractCountField);
+    $abstractQuery->groupBy($abstractTaskField);
+    $abstractQuery->having('COUNT([task]) >= 2');
+
     $query = $this->connection->select('test_task', 't');
     $count_field = $query->addExpression('COUNT([task])', 'num');
     $task_field = $query->addField('t', 'task');
     $query->orderBy($count_field);
     $query->groupBy($task_field);
     $query->having('COUNT([task]) >= 2');
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
     $result = $query->execute();
+    $hydratedResult = $hydratedQuery->execute();
 
     $num_records = 0;
     $last_count = 0;
@@ -216,15 +231,29 @@ class SelectComplexTest extends DatabaseTestBase {
       $records[$record->$task_field] = $record->$count_field;
     }
 
+    $hydratedNumRecords = 0;
+    $last_count = 0;
+    $hydratedRecords = [];
+    // Verify that the results are returned in the correct order.
+    foreach ($hydratedResult as $record) {
+      $hydratedNumRecords++;
+      $this->assertGreaterThanOrEqual(2, $record->$count_field);
+      $this->assertGreaterThanOrEqual($last_count, $record->$count_field);
+      $last_count = $record->$count_field;
+      $hydratedRecords[$record->$task_field] = $record->$count_field;
+    }
+
     $correct_results = [
       'sleep' => 2,
     ];
 
     foreach ($correct_results as $task => $count) {
       $this->assertEquals($count, $records[$task], "Correct number of '$task' records found.");
+      $this->assertEquals($count, $hydratedRecords[$task], "Correct number of '$task' records found.");
     }
 
     $this->assertEquals(1, $num_records, 'Returned the correct number of total rows.');
+    $this->assertEquals(1, $hydratedNumRecords, 'Returned the correct number of total rows.');
   }
 
   /**
@@ -233,74 +262,160 @@ class SelectComplexTest extends DatabaseTestBase {
    * The SQL clause varies with the database.
    */
   public function testRange(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $abstractQuery->addColumn('test', 'name');
+    $abstractQuery->addColumn('test', 'age', 'age');
+    $abstractQuery->range(0, 2);
+    $abstractQuery = $abstractQuery->countQuery();
+
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
     $query->addField('test', 'age', 'age');
     $query->range(0, 2);
-    $query_result = $query->countQuery()->execute()->fetchField();
+    $query = $query->countQuery();
 
-    $this->assertEquals(2, $query_result, 'Returned the correct number of rows.');
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $result = $query->execute()->fetchField();
+    $hydratedResult = $hydratedQuery->execute()->fetchField();
+
+    $this->assertEquals($result, $hydratedResult);
+
+    $this->assertEquals(2, $result, 'Returned the correct number of rows.');
   }
 
   /**
    * Tests whether the range property of a select clause can be undone.
    */
   public function testRangeUndo(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $abstractQuery->addColumn('test', 'name');
+    $abstractQuery->addColumn('test', 'age', 'age');
+    $abstractQuery->range(0, 2);
+    $abstractQuery->range();
+    $abstractQuery = $abstractQuery->countQuery();
+
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
     $query->addField('test', 'age', 'age');
     $query->range(0, 2);
     $query->range();
-    $query_result = $query->countQuery()->execute()->fetchField();
+    $query = $query->countQuery();
 
-    $this->assertEquals(4, $query_result, 'Returned the correct number of rows.');
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $result = $query->execute()->fetchField();
+    $hydratedResult = $hydratedQuery->execute()->fetchField();
+
+    $this->assertEquals($result, $hydratedResult);
+
+    $this->assertEquals(4, $result, 'Returned the correct number of rows.');
   }
 
   /**
    * Tests distinct queries.
    */
   public function testDistinct(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test_task');
+    $abstractQuery->addColumn('test_task', 'task');
+    $abstractQuery->orderBy('task');
+    $abstractQuery->distinct();
+
     $query = $this->connection->select('test_task');
     $query->addField('test_task', 'task');
     $query->orderBy('task');
     $query->distinct();
-    $query_result = $query->execute()->fetchAll(FetchAs::Column);
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $result = $query->execute()->fetchAll(FetchAs::Column);
+    $hydratedResult = $hydratedQuery->execute()->fetchAll(FetchAs::Column);
+
+    $this->assertEquals($result, $hydratedResult);
 
     $expected_result = ['code', 'eat', 'found new band', 'perform at superbowl', 'sing', 'sleep'];
-    $this->assertEquals($query_result, $expected_result, 'Returned the correct result.');
+    $this->assertEquals($expected_result, $result, 'Returned the correct result.');
   }
 
   /**
    * Tests that we can generate a count query from a built query.
    */
   public function testCountQuery(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $name_field = $abstractQuery->addColumn('test', 'name');
+    $age_field = $abstractQuery->addColumn('test', 'age', 'age');
+    $abstractQuery->orderBy('name');
+    $abstractCountQuery = $abstractQuery->countQuery();
+
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
     $age_field = $query->addField('test', 'age', 'age');
     $query->orderBy('name');
+    $query_count = $query->countQuery();
 
-    $count = $query->countQuery()->execute()->fetchField();
+    $hydratedCountQuery = $this->connection->select($abstractCountQuery);
+
+    $this->resetUniqueIdentifiers($query_count);
+    $this->resetUniqueIdentifiers($hydratedCountQuery);
+    $this->assertEquals($query_count, $hydratedCountQuery);
+
+    $count = $query_count->execute()->fetchField();
+    $hydratedCount = $hydratedCountQuery->execute()->fetchField();
+
+    $this->assertEquals($count, $hydratedCount);
 
     $this->assertEquals(4, $count, 'Counted the correct number of records.');
 
     // Now make sure we didn't break the original query!  We should still have
     // all of the fields we asked for.
     $record = $query->execute()->fetch();
+    $hydratedRecord = $this->connection->select($abstractQuery)->execute()->fetch();
     $this->assertEquals('George', $record->{$name_field}, 'Correct data retrieved.');
     $this->assertEquals(27, $record->{$age_field}, 'Correct data retrieved.');
+    $this->assertEquals($record, $hydratedRecord);
   }
 
   /**
    * Tests having queries.
    */
   public function testHavingCountQuery(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->groupBy('age')
+      ->having('[age] + 1 > 0');
+    $abstractQuery->addColumn('test', 'age');
+    $abstractQuery->addExpression('[age] + 1');
+
     $query = $this->connection->select('test')
       ->extend(PagerSelectExtender::class)
       ->groupBy('age')
       ->having('[age] + 1 > 0');
     $query->addField('test', 'age');
     $query->addExpression('[age] + 1');
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+    $hydratedQuery = $hydratedQuery->extend(PagerSelectExtender::class);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
     $count = count($query->execute()->fetchCol());
+    $hydratedCount = count($hydratedQuery->execute()->fetchCol());
+
+    $this->assertEquals($count, $hydratedCount);
+
     $this->assertEquals(4, $count, 'Counted the correct number of records.');
   }
 
