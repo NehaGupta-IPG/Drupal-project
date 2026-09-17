@@ -32,7 +32,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
     if ($operation === 'reply') {
       $context = ['commented_entity' => $entity->getCommentedEntity()];
       // The user must be able to view the comment.
-      return $this->checkAccess($entity, 'view', $account)
+      return $this->access($entity, 'view', $account, TRUE)
         // And must be able to create comments.
         ->andIf($this->createAccess($entity->bundle(), $account, $context, TRUE))
         // And comment must be published.
