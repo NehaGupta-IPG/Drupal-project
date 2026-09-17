@@ -102,13 +102,13 @@ class DependencySerializationTest extends UnitTestCase {
     $sleepWakeup = new DependencySerializationTestDummySubclass($service);
     $sleepWakeup->setContainer($container);
 
-    $this->expectUserDeprecationMessage('Implementing __sleep() in a subclass of Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy is deprecated in drupal:11.4.0 and is not supported in drupal:13.0.0. Implement __serialize() instead. See https://www.drupal.org/node/3578423');
-    $this->expectUserDeprecationMessage('Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy::__sleep() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use __serialize() instead. See https://www.drupal.org/node/3578423');
+    $this->expectUserDeprecationMessage('Implementing __sleep() in a subclass of Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy is deprecated in drupal:11.5.0 and is not supported in drupal:13.0.0. Implement __serialize() instead. See https://www.drupal.org/node/3578423');
+    $this->expectUserDeprecationMessage('Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy::__sleep() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use __serialize() instead. See https://www.drupal.org/node/3578423');
     $serialized = serialize($sleepWakeup);
     $this->assertStringContainsString('serialized value', $serialized);
 
-    $this->expectUserDeprecationMessage('Implementing __wakeup() in a subclass of Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy is deprecated in drupal:11.4.0 and is not supported in drupal:13.0.0. Implement __unserialize() instead. See https://www.drupal.org/node/3578423');
-    $this->expectUserDeprecationMessage('Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy::__wakeup() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use __unserialize() instead. See https://www.drupal.org/node/3578423');
+    $this->expectUserDeprecationMessage('Implementing __wakeup() in a subclass of Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy is deprecated in drupal:11.5.0 and is not supported in drupal:13.0.0. Implement __unserialize() instead. See https://www.drupal.org/node/3578423');
+    $this->expectUserDeprecationMessage('Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy::__wakeup() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use __unserialize() instead. See https://www.drupal.org/node/3578423');
     $unserialized = unserialize($serialized);
     $this->assertInstanceOf(DependencySerializationTestDummySubclass::class, $unserialized);
 
@@ -138,7 +138,7 @@ class DependencySerializationTest extends UnitTestCase {
     $object->anotherProperty = 'serialized value';
     $serialized = serialize($object);
 
-    $this->expectUserDeprecationMessage('Implementing __wakeup() in a subclass of Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy is deprecated in drupal:11.4.0 and is not supported in drupal:13.0.0. Implement __unserialize() instead. See https://www.drupal.org/node/3578423');
+    $this->expectUserDeprecationMessage('Implementing __wakeup() in a subclass of Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy is deprecated in drupal:11.5.0 and is not supported in drupal:13.0.0. Implement __unserialize() instead. See https://www.drupal.org/node/3578423');
     $unserialized = unserialize($serialized);
     $this->assertInstanceOf(DependencySerializationTestDummyWakeupOnlySubclass::class, $unserialized);
 
