@@ -95,6 +95,16 @@
     "reason": "The test covers migration and removal of legacy local-storage keys."
   },
   {
+    "path": "tests/src/Kernel/SettingsTest.php",
+    "pattern": "assertSame('gin',",
+    "reason": "The test covers the retained focus-color configuration value."
+  },
+  {
+    "path": "tests/src/Kernel/ThemeHooksTest.php",
+    "pattern": "['gin']",
+    "reason": "The test covers the temporary drupalSettings compatibility alias."
+  },
+  {
     "path": "tests/src/Unit/ImplementationNameTest.php",
     "pattern": "$name_pattern =",
     "reason": "The scanner must name inherited identifiers to detect them in source content."

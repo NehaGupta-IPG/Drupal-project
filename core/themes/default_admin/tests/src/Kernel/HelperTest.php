@@ -189,7 +189,7 @@ class HelperTest extends KernelTestBase {
   /**
    * Tests that modules can remove content form routes.
    *
-   * menu_ui.link_edit is one of the routes the theme ships with, and the test
+   * One of the routes the theme ships with is menu_ui.link_edit, and the test
    * module removes it in hook_default_admin_content_form_routes_alter(), so
    * unlike the route of ::testIsContentFormMatchesShippedRoute() it no longer
    * gets the content form layout.

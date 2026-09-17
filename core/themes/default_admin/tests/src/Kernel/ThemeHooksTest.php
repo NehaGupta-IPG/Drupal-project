@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\default_admin\Kernel;
 
+use Drupal\Core\Render\Element\Container;
+use Drupal\Core\Render\Element\Operations;
+use Drupal\Core\Render\Element\VerticalTabs;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\KernelTests\KernelTestBase;
@@ -69,10 +72,10 @@ class ThemeHooksTest extends KernelTestBase {
    */
   public function testElementInfoAlter(): void {
     $info = [
-      'container' => ['#pre_render' => ['existing_container_pre_render']],
+      'container' => ['#pre_render' => [[Container::class, 'preRenderGroup']]],
       'text_format' => [],
-      'operations' => ['#pre_render' => ['existing_operations_pre_render']],
-      'vertical_tabs' => ['#pre_render' => ['existing_vertical_tabs_pre_render']],
+      'operations' => ['#pre_render' => [[Operations::class, 'preRenderDropbutton']]],
+      'vertical_tabs' => ['#pre_render' => [[VerticalTabs::class, 'preRenderVerticalTabs']]],
       'managed_file' => [],
       'status_messages' => [],
     ];
@@ -82,19 +85,19 @@ class ThemeHooksTest extends KernelTestBase {
     // The sidebar handling has to happen before the container is rendered.
     $this->assertSame([
       [ThemeHooks::class, 'container'],
-      'existing_container_pre_render',
+      [Container::class, 'preRenderGroup'],
     ], $info['container']['#pre_render']);
 
     // The dropbutton type has to be set before
     // Dropbutton::preRenderDropbutton() turns it into CSS classes.
     $this->assertSame([
       [ThemeHooks::class, 'operations'],
-      'existing_operations_pre_render',
+      [Operations::class, 'preRenderDropbutton'],
     ], $info['operations']['#pre_render']);
     $this->assertContains('core/drupal.dialog.ajax', $info['operations']['#attached']['library']);
 
     $this->assertSame([
-      'existing_vertical_tabs_pre_render',
+      [VerticalTabs::class, 'preRenderVerticalTabs'],
       [ThemeHooks::class, 'verticalTabs'],
     ], $info['vertical_tabs']['#pre_render']);
     $this->assertSame([[ThemeHooks::class, 'managedFile']], $info['managed_file']['#pre_render']);

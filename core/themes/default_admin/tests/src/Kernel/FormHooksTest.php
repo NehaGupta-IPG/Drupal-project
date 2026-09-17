@@ -471,7 +471,7 @@ class FormHooksTest extends KernelTestBase {
    */
   public function testSystemThemeSettingsFormOfOtherTheme(): void {
     $other_theme = [
-      'config_key' => ['#type' => 'value', '#value' => 'claro.settings'],
+      'config_key' => ['#type' => 'value', '#value' => 'olivero.settings'],
       'logo' => ['#type' => 'details', '#open' => TRUE],
     ];
     $form = $other_theme;
