@@ -289,10 +289,11 @@ class Merge extends Query implements ConditionInterface {
    * If called with two arrays, the first array is taken as the fields
    * and the second array is taken as the corresponding values.
    *
-   * The fields are copied to the condition of the query and the INSERT part.
-   * If no other method is called, the UPDATE will become a no-op.
-   * Because of this, the keys() method should be called after fields() or
+   * The fields are copied to the condition of the query and the INSERT part;
+   * because of this, the keys() method should be called after fields() or
    * insertFields().
+   *
+   * If no other method is called, the UPDATE will become a no-op.
    *
    * @param array $fields
    *   An array of fields to set, or an associative array of fields and values.
