@@ -17,5 +17,6 @@ html {
 
   .dropbutton-wrapper:not(.open) .dropbutton__item:first-of-type ~ .dropbutton__item {
     visibility: visible;
+    height: auto;
   }
 }
