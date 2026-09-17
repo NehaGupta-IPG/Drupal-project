@@ -22,8 +22,6 @@ license, including:
 
 JavaScript
 
-  Backbone - Copyright (c) 2010 Jeremy Ashkenas and DocumentCloud
-
   CKEditor5 - Copyright (c) 2003 CKSource Holding sp. z o.o.
 
   Floating UI - Copyright (c) 2021 Floating UI contributors
