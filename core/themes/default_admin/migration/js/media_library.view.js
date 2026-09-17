@@ -41,7 +41,7 @@
 
             this.bulkOperations();
           });
-          header.prepend(selectAll);
+          header?.prepend(selectAll);
         }
 
         this.itemSelect();
@@ -76,8 +76,10 @@
               checkboxes.length ===
               Array.from(checkboxes).filter((el) => el.checked === true).length
             ) {
-              selectAll.checked = true;
-              selectAll.dispatchEvent(new Event('change'));
+              if (selectAll) {
+                selectAll.checked = true;
+                selectAll.dispatchEvent(new Event('change'));
+              }
             }
 
             Drupal.adminMediaLibrary.bulkOperations();
@@ -101,7 +103,7 @@
         bulkOperations.classList.add('is-sticky');
         bulkOperationsStickyBar?.setAttribute('data-drupal-sticky-vbo', true);
       } else {
-        bulkOperations.classList.remove('is-sticky');
+        bulkOperations?.classList.remove('is-sticky');
         bulkOperationsStickyBar?.setAttribute('data-drupal-sticky-vbo', false);
       }
     },
