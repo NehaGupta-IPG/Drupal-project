@@ -239,6 +239,14 @@ class AdminPagesTest extends BrowserTestBase {
     $this->assertNotEmpty($title_id);
     $assert_session->elementTextContains('css', 'h3#' . $title_id, 'Default Admin');
 
+    // The heading carries its identifier exactly once. A second, unquoted
+    // copy of the attribute is invalid markup and the parser is free to drop
+    // the association the card relies on.
+    $pattern = '#<h3[^>]*\sid="' . $title_id . '"([^>]*)>#';
+    $content = $this->getSession()->getPage()->getContent();
+    $this->assertSame(1, preg_match($pattern, $content, $heading));
+    $this->assertStringNotContainsString('id=', $heading[1]);
+
     $description_id = $card->getAttribute('aria-describedby');
     $this->assertIsString($description_id);
     $this->assertNotEmpty($description_id);

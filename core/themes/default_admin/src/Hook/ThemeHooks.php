@@ -8,6 +8,7 @@ use Drupal\default_admin\Helper;
 use Drupal\default_admin\Settings;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Asset\AssetQueryStringInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\Element;
@@ -140,6 +141,12 @@ class ThemeHooks implements TrustedCallbackInterface {
     $page['#attached']['library'][] = 'default_admin/sticky';
 
     $settings = Settings::getInstance();
+    // The settings below are read for the current account, so a page built
+    // with per-user overrides enabled must not be served to another user.
+    if ($settings->allowUserOverrides()) {
+      $page['#cache']['contexts'] = Cache::mergeContexts($page['#cache']['contexts'] ?? [], ['user']);
+    }
+
     // Expose theme settings to JS.
     $default_admin_settings = [
       'dark_mode' => $settings->get('enable_dark_mode'),

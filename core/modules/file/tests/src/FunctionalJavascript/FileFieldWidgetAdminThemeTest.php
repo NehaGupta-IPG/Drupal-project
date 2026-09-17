@@ -13,9 +13,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  *
  * The widget is intentionally tested with Admin as the default theme to test
  * the changes added in
- * \Drupal\default_admin\Hook\AdminHooks->fileAndImageWidgetHelper().
+ * \Drupal\default_admin\Hook\PreprocessHooks::fileAndImageWidget().
  *
- * @see \Drupal\default_admin\Hook\AdminHooks->fileAndImageWidgetHelper()
+ * @see \Drupal\default_admin\Hook\PreprocessHooks::fileAndImageWidget()
  */
 #[Group('file')]
 #[Group('#slow')]

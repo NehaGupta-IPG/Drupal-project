@@ -74,6 +74,14 @@ class HelperTest extends KernelTestBase {
       ->save();
 
     $this->assertTrue(Helper::isActive());
+
+    // The answer is computed once and then kept for the rest of the request,
+    // so that the theme does not look the theme configuration up again for
+    // every element it preprocesses.
+    $this->config('system.theme')
+      ->set('admin', 'stark')
+      ->save();
+    $this->assertTrue(Helper::isActive());
   }
 
   /**
@@ -163,6 +171,18 @@ class HelperTest extends KernelTestBase {
     $form_state->setFormObject($this->createStub(ContentEntityFormInterface::class));
 
     $this->assertTrue(Helper::isContentForm($form_state, 'block_content_basic_form'));
+  }
+
+  /**
+   * Tests a form state that is not built from a form object.
+   *
+   * Such a form state has no form object in its build information, and the
+   * decision is left to the route the form is built on.
+   */
+  public function testIsContentFormWithoutFormObject(): void {
+    $this->setCurrentRoute('entity.node.edit_form');
+
+    $this->assertTrue(Helper::isContentForm(new FormState(), 'default_admin_test_plain_form'));
   }
 
   /**

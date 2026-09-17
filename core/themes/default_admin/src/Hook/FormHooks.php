@@ -339,7 +339,6 @@ class FormHooks {
         'configure' => 'cog',
       ];
       if (isset($form['modules'][$key]['#type']) && $form['modules'][$key]['#type'] === 'details') {
-        $form['modules'][$key]['#module_package_listing'] = TRUE;
         foreach (Element::children($form['modules'][$key]) as $module_key) {
           if (isset($form['modules'][$key][$module_key]['links'])) {
             foreach ($form['modules'][$key][$module_key]['links'] as $link_key => &$link) {
@@ -812,11 +811,14 @@ class FormHooks {
         // @see https://www.drupal.org/project/gin/issues/3534385
         // @see \Drupal\media\MediaTypeForm::actions
         if ((isset($button['#type']) && $button['#type'] === 'submit') || $form['#form_id'] === 'media_type_add_form') {
-          // Update button.
+          // Update button. The copy gets its own identifiers, while
+          // data-sticky-form-selector keeps pointing at the original button
+          // inside the form, which is the button the click is forwarded to.
+          $original_selector = $button['#attributes']['data-drupal-selector'];
           $button['#attributes']['id'] = 'sticky-' . $button['#id'];
           $button['#attributes']['form'] = $form['#id'];
-          $button['#attributes']['data-drupal-selector'] = 'sticky-' . $button['#attributes']['data-drupal-selector'];
-          $button['#attributes']['data-sticky-form-selector'] = $button['#attributes']['data-drupal-selector'];
+          $button['#attributes']['data-drupal-selector'] = 'sticky-' . $original_selector;
+          $button['#attributes']['data-sticky-form-selector'] = $original_selector;
 
           // Add the button to the form actions array.
           if (!empty($button['#default_admin_action_item']) || $navigation_enabled || in_array($key, $includes, TRUE)) {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\default_admin\Kernel;
 
+use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Form\FormState;
 use Drupal\default_admin\Helper;
 use Drupal\default_admin\Settings;
@@ -218,6 +220,33 @@ class SettingsTest extends KernelTestBase {
   }
 
   /**
+   * Tests that the overrides are off without the user data service.
+   */
+  public function testOverridesAreOffWithoutUserDataService(): void {
+    $this->allowOverrides();
+    $account = $this->createUser();
+    // The user data service belongs to the user module, which a theme cannot
+    // depend on, so the service is optional.
+    // @see \Drupal\default_admin\Settings::create()
+    $settings = new Settings(
+      $this->container->get('current_user'),
+      $this->container->get('config.factory'),
+      NULL,
+      $this->container->get(ThemeSettingsProvider::class),
+    );
+
+    $this->assertFalse($settings->userOverrideEnabled($account));
+
+    // Storing and clearing overrides is a no-op rather than a failure.
+    $settings->setAll(['enable_dark_mode' => '1'], $account);
+    $settings->clear($account);
+
+    $this->assertSame([], $this->userData->get('default_admin', $account->id()));
+    // So everyone is served the settings of the theme.
+    $this->assertSame('auto', $settings->get('enable_dark_mode', $account));
+  }
+
+  /**
    * Tests that a setting counts as overridden only if its value differs.
    */
   public function testOverriddenComparesWithThemeDefault(): void {
@@ -305,13 +334,14 @@ class SettingsTest extends KernelTestBase {
     ], $account);
 
     $element = Settings::overriddenSettingByUser($this->appearanceElement());
+    $description = (string) $element['#description'];
 
     // The warning is appended to the description of the element.
-    $this->assertStringStartsWith('Enables dark mode for the administration interface.<span class="form-item__warning">', $element['#description']);
+    $this->assertStringStartsWith('Enables dark mode for the administration interface.<span class="form-item__warning">', $description);
     // It links to the account the value comes from and names the value the
     // way the form does, not the way it is stored.
-    $this->assertStringContainsString('<a href="/user/' . $account->id() . '/edit">current user</a>', $element['#description']);
-    $this->assertStringContainsString('Appearance: <em class="placeholder">Dark</em>', $element['#description']);
+    $this->assertStringContainsString('<a href="/user/' . $account->id() . '/edit">current user</a>', $description);
+    $this->assertStringContainsString('Appearance: <em class="placeholder">Dark</em>', $description);
 
     // A setting the user stored the value of the theme for is left alone.
     $density = [
@@ -326,6 +356,32 @@ class SettingsTest extends KernelTestBase {
     ];
 
     $this->assertSame($density, Settings::overriddenSettingByUser($density));
+  }
+
+  /**
+   * Tests that the warning about an overridden setting renders as markup.
+   */
+  public function testOverriddenSettingByUserWarningRendersAsMarkup(): void {
+    $this->allowOverrides();
+    $account = $this->setUpCurrentUser();
+    $this->settings->setAll(['enable_dark_mode' => '1'], $account);
+
+    $element = Settings::overriddenSettingByUser($this->appearanceElement());
+
+    $this->assertInstanceOf(MarkupInterface::class, $element['#description']);
+
+    // Rendering is what escapes a description that is a plain string, and is
+    // how the warning used to reach the screen as the tags it is made of.
+    $build = [
+      '#type' => 'inline_template',
+      '#template' => '{{ description }}',
+      '#context' => ['description' => $element['#description']],
+    ];
+    $rendered = (string) $this->container->get('renderer')->renderInIsolation($build);
+
+    $this->assertStringContainsString('<span class="form-item__warning">', $rendered);
+    $this->assertStringContainsString('<a href="/user/' . $account->id() . '/edit">current user</a>', $rendered);
+    $this->assertStringNotContainsString('&lt;', $rendered);
   }
 
   /**

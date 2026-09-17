@@ -1,7 +1,7 @@
 // cspell:ignore is-autocompleting
 
 module.exports = {
-  '@tags': ['core'],
+  '@tags': ['core', 'default_admin'],
 
   before(browser) {
     browser

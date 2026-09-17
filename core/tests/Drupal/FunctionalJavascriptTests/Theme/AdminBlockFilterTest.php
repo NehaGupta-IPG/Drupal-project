@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * @see \Drupal\Tests\block\FunctionalJavascript\BlockFilterTest.
  */
 #[Group('block')]
+#[Group('default_admin')]
 #[RunTestsInSeparateProcesses]
 class AdminBlockFilterTest extends BlockFilterTest {
 

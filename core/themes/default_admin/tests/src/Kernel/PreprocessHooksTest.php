@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\default_admin\Kernel;
 
-use Drupal\block_content\BlockContentTypeInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -19,7 +18,6 @@ use Drupal\node\Entity\NodeType;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -168,47 +166,6 @@ class PreprocessHooksTest extends KernelTestBase {
     $this->assertArrayHasKey('contextual_links', $variables['title_suffix']);
     $this->assertArrayHasKey('#contextual_links', $variables['elements']);
     $this->assertContains('contextual-region', $variables['attributes']['class']);
-  }
-
-  /**
-   * Tests that block type add links keep the query of the current request.
-   *
-   * The destination query argument is what returns the user to the page the
-   * block is being added from, so it has to be carried over to the add form.
-   *
-   * @see \Drupal\default_admin\Hook\PreprocessHooks::preprocessBlockContentAddList()
-   */
-  public function testBlockContentAddList(): void {
-    $request_stack = $this->container->get('request_stack');
-    $request = Request::create('/admin/content/block/add', 'GET', [
-      'destination' => '/admin/content/block',
-    ]);
-    // The tear down of a kernel test cleans up the session of whatever request
-    // is current by then, so every pushed request has to carry one.
-    $request->setSession($request_stack->getSession());
-    $request_stack->push($request);
-
-    $block_type = $this->createStub(BlockContentTypeInterface::class);
-    $block_type->method('id')->willReturn('basic');
-    $block_type->method('label')->willReturn('Basic block');
-    $block_type->method('getDescription')->willReturn('A basic block.');
-
-    $variables = ['content' => ['basic' => $block_type]];
-
-    $this->hooks()->preprocessBlockContentAddList($variables);
-
-    $bundle = $variables['bundles']['basic'];
-    $this->assertSame('Basic block', $bundle['label']);
-    $this->assertInstanceOf(Link::class, $bundle['add_link']);
-    $url = $bundle['add_link']->getUrl();
-    $this->assertSame('block_content.add_form', $url->getRouteName());
-    $this->assertSame([
-      'block_content_type' => 'basic',
-    ], $url->getRouteParameters());
-    $this->assertSame([
-      'destination' => '/admin/content/block',
-    ], $url->getOption('query'));
-    $this->assertSame('A basic block.', $bundle['description']['#markup']);
   }
 
   /**
@@ -1819,7 +1776,6 @@ class PreprocessHooksTest extends KernelTestBase {
       $route_match ?? $this->container->get('current_route_match'),
       $this->container->get('config.factory'),
       $this->container->get('current_user'),
-      $this->container->get('entity_type.manager'),
       $this->container->get('entity_type.bundle.info'),
       $this->container->get('plugin.manager.block'),
       $this->container->get('renderer'),

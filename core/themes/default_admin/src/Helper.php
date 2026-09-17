@@ -205,7 +205,8 @@ final class Helper {
       // Check if set as admin theme.
       $admin_theme_name = \Drupal::config('system.theme')->get('admin');
       if ($admin_theme_name === 'default_admin') {
-        return TRUE;
+        self::$active = TRUE;
+        return self::$active;
       }
 
       $theme_handler = \Drupal::service('theme_handler')->listInfo();
@@ -286,9 +287,16 @@ final class Helper {
         }
       }
     }
-    if ($form_state && (($form_state->getBuildInfo()['base_form_id'] ?? NULL) === 'node_form' || $form_state->getFormObject() instanceof ContentEntityFormInterface)) {
-      $is_content_form = TRUE;
-      return TRUE;
+    if ($form_state) {
+      // Forms that are not built from a form object have no 'callback_object'
+      // in their build information, so the form object has to be read from
+      // there instead of with ::getFormObject().
+      $build_info = $form_state->getBuildInfo();
+      if (($build_info['base_form_id'] ?? NULL) === 'node_form'
+        || ($build_info['callback_object'] ?? NULL) instanceof ContentEntityFormInterface) {
+        $is_content_form = TRUE;
+        return TRUE;
+      }
     }
 
     static $is_content_form_route;

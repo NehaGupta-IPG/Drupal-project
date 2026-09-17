@@ -467,6 +467,42 @@ class ThemeHooksTest extends KernelTestBase {
   }
 
   /**
+   * Tests that per-user setting overrides make the page vary by user.
+   */
+  public function testPageAttachmentsAlterVariesByUserWhenOverridesAreAllowed(): void {
+    $this->config('default_admin.settings')->set('show_user_theme_settings', TRUE)->save();
+
+    // The hook is handed pages that carry no cache metadata of their own yet.
+    $page = [];
+    $this->themeHooks()->pageAttachmentsAlter($page);
+
+    $this->assertSame(['user'], $page['#cache']['contexts']);
+
+    // Cache metadata the page already declared has to survive.
+    $page = [
+      '#cache' => [
+        'contexts' => ['route'],
+        'tags' => ['config:system.menu.admin'],
+      ],
+    ];
+    $this->themeHooks()->pageAttachmentsAlter($page);
+
+    $this->assertEqualsCanonicalizing(['route', 'user'], $page['#cache']['contexts']);
+    $this->assertSame(['config:system.menu.admin'], $page['#cache']['tags']);
+  }
+
+  /**
+   * Tests that pages stay shareable while per-user overrides are disabled.
+   */
+  public function testPageAttachmentsAlterDoesNotVaryByUserWithoutOverrides(): void {
+    $page = ['#cache' => ['contexts' => ['route']]];
+
+    $this->themeHooks()->pageAttachmentsAlter($page);
+
+    $this->assertSame(['route'], $page['#cache']['contexts']);
+  }
+
+  /**
    * Builds the hook implementations from the container.
    *
    * @return \Drupal\default_admin\Hook\ThemeHooks

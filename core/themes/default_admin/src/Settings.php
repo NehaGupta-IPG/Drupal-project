@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\default_admin;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Extension\ThemeSettingsProvider;
@@ -117,8 +118,12 @@ final class Settings implements ContainerInjectionInterface {
    *   The account object. Current user if NULL.
    */
   public function setAll(array $settings, ?AccountInterface $account = NULL): void {
-    if (!$account || !$this->userData) {
+    if (!$account) {
       $account = $this->currentUser;
+    }
+    if (!$this->userData) {
+      // Without the user data service there is nowhere to store overrides.
+      return;
     }
     // All settings are deleted to remove legacy settings.
     $this->userData->delete('default_admin', $account->id());
@@ -133,8 +138,12 @@ final class Settings implements ContainerInjectionInterface {
    *   The account object. Current user if NULL.
    */
   public function clear(?AccountInterface $account = NULL): void {
-    if (!$account || !$this->userData) {
+    if (!$account) {
       $account = $this->currentUser;
+    }
+    if (!$this->userData) {
+      // Without the user data service there are no overrides to remove.
+      return;
     }
     $this->userData->delete('default_admin', $account->id());
   }
@@ -158,12 +167,18 @@ final class Settings implements ContainerInjectionInterface {
    *   The account object. Current user if NULL.
    *
    * @return bool
-   *   TRUE, if the user has overridden theme settings, FALSE otherwise.
+   *   TRUE, if the user has overridden theme settings, FALSE otherwise. Also
+   *   FALSE if the user data service is not available, because overrides
+   *   cannot be stored without it.
    */
   public function userOverrideEnabled(?AccountInterface $account = NULL): bool {
+    if (!$this->userData) {
+      return FALSE;
+    }
+
     $overrides = &drupal_static(__CLASS__ . '_' . __METHOD__, []);
 
-    if (!$account || !$this->userData) {
+    if (!$account) {
       $account = $this->currentUser;
     }
 
@@ -403,13 +418,21 @@ final class Settings implements ContainerInjectionInterface {
       }
 
       $element += ['#description' => ''];
-      $element['#description'] .= '<span class="form-item__warning">' .
-        t('This setting is overridden by the <a href=":editUrl">current user</a>. @title: %value',
-          [
-            '@title' => $element['#title'],
-            '%value' => $value,
-            ':editUrl' => $userEditUrl,
-          ]) . '</span>';
+      $warning = t('This setting is overridden by the <a href=":editUrl">current user</a>. @title: %value',
+        [
+          '@title' => $element['#title'],
+          '%value' => $value,
+          ':editUrl' => $userEditUrl,
+        ]);
+      // The description has to be markup, because a plain string is escaped
+      // while the element is rendered and the warning then shows up as the
+      // tags it is made of. The description the element came with keeps being
+      // escaped, as it is passed in as a placeholder.
+      $format = '@description<span class="form-item__warning">@warning</span>';
+      $element['#description'] = new FormattableMarkup($format, [
+        '@description' => $element['#description'],
+        '@warning' => $warning,
+      ]);
     }
 
     return $element;

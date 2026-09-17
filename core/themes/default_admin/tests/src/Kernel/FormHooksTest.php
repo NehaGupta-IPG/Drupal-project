@@ -402,9 +402,6 @@ class FormHooksTest extends KernelTestBase {
     $this->assertSame('Filter', (string) $form['filters']['text']['#title']);
     $this->assertArrayNotHasKey('#title_display', $form['filters']['text']);
 
-    // Package details elements are rendered as the module package listing.
-    $this->assertTrue($form['modules']['Core']['#module_package_listing']);
-
     $links = $form['modules']['Core']['system']['links'];
     $this->assertSame([
       'action-link',
@@ -425,7 +422,6 @@ class FormHooksTest extends KernelTestBase {
     // Links without a known icon, and rows that are not a package, are left
     // alone.
     $this->assertArrayNotHasKey('#options', $links['uninstall']);
-    $this->assertArrayNotHasKey('#module_package_listing', $form['modules']['no_package']);
     $this->assertArrayNotHasKey('#options', $form['modules']['no_package']['system']['links']['help']);
   }
 
@@ -930,11 +926,12 @@ class FormHooksTest extends KernelTestBase {
     // in, are duplicated. Inaccessible buttons and links are not.
     $this->assertSame(['submit', 'preview', 'custom'], array_keys($sticky['actions']));
 
-    // The copies are distinct elements that still submit the original form.
+    // The copies are distinct elements that still submit the original form,
+    // and they point back at the in-form button they forward the click to.
     $this->assertSame('sticky-edit-submit', $sticky['actions']['submit']['#attributes']['id']);
     $this->assertSame('node-article-form', $sticky['actions']['submit']['#attributes']['form']);
     $this->assertSame('sticky-edit-submit', $sticky['actions']['submit']['#attributes']['data-drupal-selector']);
-    $this->assertSame('sticky-edit-submit', $sticky['actions']['submit']['#attributes']['data-sticky-form-selector']);
+    $this->assertSame('edit-submit', $sticky['actions']['submit']['#attributes']['data-sticky-form-selector']);
 
     // The original buttons are untouched.
     $this->assertSame('edit-submit', $result['actions']['submit']['#attributes']['data-drupal-selector']);
