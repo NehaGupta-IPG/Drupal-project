@@ -95,9 +95,9 @@ final class MediaLibraryTest extends MediaLibraryTestBase {
   /**
    * Tests that the selection counter leads the dialog button pane.
    *
-   * media_library/ui appends the counter to the end of the button pane, so the
-   * theme either moves an already present counter or waits for it with a
-   * mutation observer.
+   * The library of the media library module appends the counter to the end of
+   * the button pane, so the theme either moves an already present counter or
+   * waits for it with a mutation observer.
    *
    * @see core/themes/default_admin/js/media-library.ui.js
    * @see core/modules/media_library/js/media_library.ui.js

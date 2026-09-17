@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests the sticky table header of the theme.
  *
- * default_admin.info.yml unsets misc/tableheader.js from the
+ * The info file of the theme unsets misc/tableheader.js from the
  * core/drupal.tableheader library and extends that library with
  * default_admin/tableheader, so migration/js/tableheader.js is the only sticky
  * header implementation of the theme. Unlike the core script it does not build
