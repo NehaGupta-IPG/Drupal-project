@@ -25,7 +25,7 @@ class ReauthenticateRequestSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The event to process.
    */
-  public function onRequest(RequestEvent $event) {
+  public function onRequest(RequestEvent $event): void {
     $request = $event->getRequest();
     $routeMatch = RouteMatch::createFromRequest($request);
     $route = $routeMatch->getRouteObject();

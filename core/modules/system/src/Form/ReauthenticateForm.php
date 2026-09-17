@@ -72,7 +72,7 @@ class ReauthenticateForm extends FormBase implements WorkspaceSafeFormInterface 
   /**
    * Checks supplied password.
    */
-  public function validateAuthentication(array &$form, FormStateInterface $form_state) {
+  public function validateAuthentication(array &$form, FormStateInterface $form_state): void {
     $password = trim($form_state->getValue('pass'));
     $account = $this->userStorage->load($this->currentUser()->id());
     $isAuthenticated = $this->userAuth->authenticateAccount($account, $password);
@@ -86,7 +86,7 @@ class ReauthenticateForm extends FormBase implements WorkspaceSafeFormInterface 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $session = $this->getRequest()->getSession();
     $session->set('reauthenticate_timeout', time() + self::REAUTHENTICATE_TIMEOUT);
   }
