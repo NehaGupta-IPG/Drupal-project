@@ -150,18 +150,27 @@ class Select extends Query implements SelectInterface {
     $this->condition = $this->connection->condition($conjunction);
     $this->having = $this->connection->condition($conjunction);
     if ($table instanceof DatabaseAbstractSelect) {
-      $this->createFromAbstractSelect($table, $alias);
+      $this->hydrateAbstractSelect($table, $alias);
       return;
     }
     $this->addJoin(NULL, $table, $alias);
   }
 
-  final protected function createFromAbstractSelect(DatabaseAbstractSelect $abstractSelect, ?string $alias): void {
+  final protected function hydrateAbstractSelect(DatabaseAbstractSelect $abstractSelect, ?string $alias): void {
     $this->comments = $abstractSelect->comments;
+    if ($abstractSelect->alterTags !== []) {
+      $this->alterTags = $abstractSelect->alterTags;
+    }
+    if ($abstractSelect->alterMetadata !== []) {
+      $this->alterMetaData = $abstractSelect->alterMetadata;
+    }
     foreach ($abstractSelect->tables as $key => $table) {
       $this->tables[$key] = $table;
       if ($table['table'] instanceof DatabaseAbstractSelect) {
         $this->tables[$key]['table'] = $this->connection->select($table['table']);
+      }
+      if ($table['condition'] instanceof DatabaseAbstractCondition) {
+        $this->tables[$key]['condition'] = $this->hydrateAbstractCondition($table['condition']);
       }
     }
     $this->fields = $abstractSelect->columns;
@@ -215,6 +224,10 @@ class Select extends Query implements SelectInterface {
     $hydratedCondition = $this->connection->condition($conditions['#conjunction']);
     unset($conditions['#conjunction']);
     foreach ($conditions as $tmp) {
+      if ($tmp instanceof Expression) {
+        $hydratedCondition->where($tmp->expression, $tmp->arguments);
+        continue;
+      }
       if ($tmp['field'] instanceof DatabaseAbstractCondition) {
         $field = $this->hydrateAbstractCondition($tmp['field']);
       }

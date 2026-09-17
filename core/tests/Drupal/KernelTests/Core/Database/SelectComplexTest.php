@@ -654,6 +654,8 @@ class SelectComplexTest extends DatabaseTestBase {
     $abstractSubquery = new DatabaseAbstractSelect('test', 'tp');
     $abstractSubquery->join('test_one_blob', 'tpb', '[tp].[id] = [tpb].[id]');
     $abstractSubquery->join('node', 'n', '[tp].[id] = [n].[nid]');
+    $abstractSubquery->addTag('node_access');
+    $abstractSubquery->addMetaData('account', $account);
     $abstractSubquery->addColumn('tp', 'id');
     $abstractSubquery->condition('age', 5, '>');
     $abstractSubquery->condition('age', 500, '<');
@@ -676,8 +678,6 @@ class SelectComplexTest extends DatabaseTestBase {
     $query->join('test_one_blob', 'tb3', '[tt].[pid] = [tb3].[id]');
 
     $hydratedQuery = $this->connection->select($abstractQuery);
-    $hydratedQuery->addTag('node_access');
-    $hydratedQuery->addMetaData('account', $account);
 
     $this->resetUniqueIdentifiers($query);
     $this->resetUniqueIdentifiers($hydratedQuery);
@@ -693,6 +693,17 @@ class SelectComplexTest extends DatabaseTestBase {
     $pos = strpos($str, 'db_condition_placeholder_0', 0);
     $pos2 = strpos($str, 'db_condition_placeholder_0', $pos + 1);
     $this->assertFalse($pos2, 'Condition placeholder is not repeated.');
+
+    // Construct the query string.
+    // This is the same sequence that SelectQuery::execute() goes through.
+    $hydratedQuery->preExecute();
+    $hydratedQuery->getArguments();
+    $str = (string) $hydratedQuery;
+
+    // Verify that the string only has one copy of condition placeholder 0.
+    $pos = strpos($str, 'db_condition_placeholder_0', 0);
+    $pos2 = strpos($str, 'db_condition_placeholder_0', $pos + 1);
+    $this->assertFalse($pos2);
   }
 
   /**
@@ -717,15 +728,30 @@ class SelectComplexTest extends DatabaseTestBase {
    */
   public function testJoinConditionObject(): void {
     // Same test as testDefaultJoin, but with a Condition object.
+    $abstractQuery = new DatabaseAbstractSelect('test_task', 't');
+    $abstractJoinCond = (new DatabaseAbstractCondition('AND'))->where('[t].[pid] = [p].[id]');
+    $abstractPeopleAlias = $abstractQuery->join('test', 'p', $abstractJoinCond);
+    $abstractNameField = $abstractQuery->addColumn($abstractPeopleAlias, 'name', 'name');
+    $abstractQuery->addColumn('t', 'task', 'task');
+    $abstractPriorityField = $abstractQuery->addColumn('t', 'priority', 'priority');
+    $abstractQuery->orderBy($abstractPriorityField);
+
     $query = $this->connection->select('test_task', 't');
     $join_cond = ($this->connection->condition('AND'))->where('[t].[pid] = [p].[id]');
     $people_alias = $query->join('test', 'p', $join_cond);
     $name_field = $query->addField($people_alias, 'name', 'name');
     $query->addField('t', 'task', 'task');
     $priority_field = $query->addField('t', 'priority', 'priority');
-
     $query->orderBy($priority_field);
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
     $result = $query->execute();
+    $hydratedResult = $hydratedQuery->execute();
 
     $num_records = 0;
     $last_priority = 0;
@@ -736,12 +762,32 @@ class SelectComplexTest extends DatabaseTestBase {
       $this->assertNotSame('Ringo', $record->$name_field, 'Person without a task not selected.');
       $last_priority = $record->$priority_field;
     }
-
     $this->assertEquals(7, $num_records, 'Returned the correct number of rows.');
+
+    $num_records = 0;
+    $last_priority = 0;
+    foreach ($hydratedResult as $record) {
+      $num_records++;
+      // Verify that the results are returned in the correct order.
+      $this->assertGreaterThanOrEqual($last_priority, $record->$priority_field);
+      $this->assertNotSame('Ringo', $record->$name_field);
+      $last_priority = $record->$priority_field;
+    }
+    $this->assertEquals(7, $num_records);
 
     // Test a condition object that creates placeholders.
     $t1_name = 'John';
     $t2_name = 'George';
+
+    $abstractJoinCond = (new DatabaseAbstractCondition('AND'))
+      ->condition('t1.name', $t1_name)
+      ->condition('t2.name', $t2_name);
+    $abstractQuery = new DatabaseAbstractSelect('test', 't1');
+    $abstractQuery->innerJoin('test', 't2', $abstractJoinCond);
+    $abstractQuery->addColumn('t1', 'name', 't1_name');
+    $abstractQuery->addColumn('t2', 'name', 't2_name');
+    $abstractCountQuery = $abstractQuery->countQuery();
+
     $join_cond = ($this->connection->condition('AND'))
       ->condition('t1.name', $t1_name)
       ->condition('t2.name', $t2_name);
@@ -749,11 +795,24 @@ class SelectComplexTest extends DatabaseTestBase {
     $query->innerJoin('test', 't2', $join_cond);
     $query->addField('t1', 'name', 't1_name');
     $query->addField('t2', 'name', 't2_name');
+    $countQuery = $query->countQuery();
 
-    $num_records = $query->countQuery()->execute()->fetchField();
+    $hydratedCountQuery = $this->connection->select($abstractCountQuery);
+
+    $this->resetUniqueIdentifiers($countQuery);
+    $this->resetUniqueIdentifiers($hydratedCountQuery);
+    $this->assertEquals($countQuery, $hydratedCountQuery);
+
+    $num_records = $countQuery->execute()->fetchField();
+    $hydratedNumRecords = $hydratedCountQuery->execute()->fetchField();
+
+    $this->assertEquals($num_records, $hydratedNumRecords);
+
     $this->assertEquals(1, $num_records, 'Query expected to return 1 row. Actual: ' . $num_records);
     if ($num_records == 1) {
       $record = $query->execute()->fetchObject();
+      $hydratedRecord = $this->connection->select($abstractQuery)->execute()->fetchObject();
+      $this->assertEquals($record, $hydratedRecord);
       $this->assertEquals($t1_name, $record->t1_name, 'Query expected to retrieve name ' . $t1_name . ' from table t1. Actual: ' . $record->t1_name);
       $this->assertEquals($t2_name, $record->t2_name, 'Query expected to retrieve name ' . $t2_name . ' from table t2. Actual: ' . $record->t2_name);
     }

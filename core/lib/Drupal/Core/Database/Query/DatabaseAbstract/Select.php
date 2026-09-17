@@ -126,6 +126,16 @@ final class Select {
    */
   public private(set) bool $forUpdate = FALSE;
 
+  /**
+   * The query metadata for alter purposes.
+   */
+  public private(set) array $alterMetadata = [];
+
+  /**
+   * The query tags.
+   */
+  public private(set) array $alterTags = [];
+
   // ------------------------------------------------------
   // ------------------------------------------------------
 
@@ -176,6 +186,22 @@ final class Select {
     public readonly string $conjunction = 'AND',
   ) {
     $this->addJoin(NULL, $table, $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addTag(string $tag): static {
+    $this->alterTags[$tag] = 1;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addMetadata(string $key, mixed $object): static {
+    $this->alterMetadata[$key] = $object;
+    return $this;
   }
 
   /**
@@ -404,28 +430,28 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function join(string|Select $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
+  public function join(string|Select $table, ?string $alias = NULL, string|Condition|null $condition = NULL, array $arguments = []): string {
     return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function innerJoin(string|Select $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
+  public function innerJoin(string|Select $table, ?string $alias = NULL, string|Condition|null $condition = NULL, array $arguments = []): string {
     return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function leftJoin(string|Select $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
+  public function leftJoin(string|Select $table, ?string $alias = NULL, string|Condition|null $condition = NULL, array $arguments = []): string {
     return $this->addJoin('LEFT OUTER', $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addJoin(?string $type, string|Select $table, ?string $alias = NULL, ?string $condition = NULL, array $arguments = []): string {
+  public function addJoin(?string $type, string|Select $table, ?string $alias = NULL, string|Condition|null $condition = NULL, array $arguments = []): string {
     if (empty($alias)) {
       if ($table instanceof self) {
         $alias = 'subquery';
@@ -594,7 +620,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function condition($column, $value = NULL, $operator = '=') {
+  public function condition(string|Condition $column, string|int|bool|float|array|Select|null $value = NULL, ?string $operator = '='): static {
     if (!isset($this->condition)) {
       $this->condition = new Condition($this->conjunction);
     }
