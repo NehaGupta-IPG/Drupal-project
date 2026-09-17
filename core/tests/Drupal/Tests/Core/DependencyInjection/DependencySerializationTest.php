@@ -37,6 +37,9 @@ class DependencySerializationTest extends UnitTestCase {
     $dependencySerialization->setContainer($container);
 
     $string = serialize($dependencySerialization);
+    // Internal state of the backwards compatibility layer must never leak into
+    // the serialized payload.
+    $this->assertStringNotContainsString('unserializeData', $string);
     $dependencySerialization = unserialize($string);
     $this->assertInstanceOf(DependencySerializationTestDummy::class, $dependencySerialization);
 
@@ -116,6 +119,37 @@ class DependencySerializationTest extends UnitTestCase {
     $this->assertSame('unserialized value', $unserialized->anotherProperty);
   }
 
+  /**
+   * Tests a subclass __wakeup() implementation that does not call the parent.
+   *
+   * Before __unserialize() was introduced, PHP populated the object's
+   * properties from the payload and only then called __wakeup(). A subclass
+   * whose __wakeup() does not call parent::__wakeup() therefore still got a
+   * fully populated object. That behavior must be preserved.
+   */
+  #[IgnoreDeprecations]
+  public function testWakeupWithoutParentCall(): void {
+    $service = new \stdClass();
+    $container = TestKernel::setContainerWithKernel();
+    $container->set('test_service', $service);
+
+    $object = new DependencySerializationTestDummyWakeupOnlySubclass($service);
+    $object->setContainer($container);
+    $object->anotherProperty = 'serialized value';
+    $serialized = serialize($object);
+
+    $this->expectUserDeprecationMessage('Implementing __wakeup() in a subclass of Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy is deprecated in drupal:11.4.0 and is not supported in drupal:13.0.0. Implement __unserialize() instead. See https://www.drupal.org/node/3578423');
+    $unserialized = unserialize($serialized);
+    $this->assertInstanceOf(DependencySerializationTestDummyWakeupOnlySubclass::class, $unserialized);
+
+    // The properties were populated from the payload before __wakeup() ran.
+    $this->assertSame('serialized value (woken up)', $unserialized->anotherProperty);
+    // As with the legacy PHP behavior, services are only restored when the
+    // subclass calls parent::__wakeup(), which this one does not.
+    $this->assertNull($unserialized->service);
+    $this->assertSame(['service' => 'test_service', 'container' => 'service_container'], $unserialized->getServiceIds());
+  }
+
 }
 
 /**
@@ -185,6 +219,24 @@ class DependencySerializationTestDummySubclass extends DependencySerializationTe
   public function __wakeup(): void {
     parent::__wakeup();
     $this->anotherProperty = 'unserialized value';
+  }
+
+}
+
+/**
+ * Defines a test class whose __wakeup() does not call the parent method.
+ */
+class DependencySerializationTestDummyWakeupOnlySubclass extends DependencySerializationTestDummy {
+
+  /**
+   * Test property that is manipulated in the course of unserialization.
+   *
+   * @var string
+   */
+  public string $anotherProperty = 'initial value';
+
+  public function __wakeup(): void {
+    $this->anotherProperty .= ' (woken up)';
   }
 
 }

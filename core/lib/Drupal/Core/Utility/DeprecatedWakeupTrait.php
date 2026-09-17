@@ -24,13 +24,6 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 trait DeprecatedWakeupTrait {
 
   /**
-   * Temporary storage of data being passed to be unserialized.
-   *
-   * @var array<string, mixed>|null
-   */
-  private ?array $unserializeData = NULL;
-
-  /**
    * {@inheritdoc}
    */
   public function __unserialize(array $data): void {
@@ -41,13 +34,16 @@ trait DeprecatedWakeupTrait {
     // '_serviceIds' by name.
     $data = $this->normalizeSerializedData($data);
     if ($this->overridesWakeup()) {
-      // If an extending class implements its own __wakeup() method, make
-      // it gets called, otherwise PHP will ignore __wakeup() in any class
-      // that has __unserialize().
+      // If an extending class implements its own __wakeup() method, make sure
+      // it gets called, otherwise PHP will ignore __wakeup() in any class that
+      // has __unserialize().
       @trigger_error('Implementing __wakeup() in a subclass of ' . __CLASS__ . ' is deprecated in drupal:11.4.0 and is not supported in drupal:13.0.0. Implement __unserialize() instead. See https://www.drupal.org/node/3578423', E_USER_DEPRECATED);
-      // The __wakeup method calls doUnserialize, which needs the data array, so
-      // store it temporarily.
-      $this->unserializeData = $data;
+      // Emulate PHP's legacy behavior: the properties are populated from the
+      // payload first, and only then is __wakeup() invoked. This way a
+      // __wakeup() implementation that does not call parent::__wakeup() still
+      // ends up with a fully populated object, exactly as it did before
+      // __unserialize() was introduced.
+      $this->populateProperties($data);
       // @phpstan-ignore method.deprecated
       $this->__wakeup();
       return;
@@ -65,9 +61,12 @@ trait DeprecatedWakeupTrait {
    */
   public function __wakeup(): void {
     @trigger_error(__CLASS__ . '::__wakeup() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use __unserialize() instead. See https://www.drupal.org/node/3578423', E_USER_DEPRECATED);
-    $this->unserializeData ??= get_object_vars($this);
-    $this->doUnserialize($this->unserializeData);
-    $this->unserializeData = NULL;
+    // By the time __wakeup() runs, the object's properties hold the serialized
+    // values: either PHP populated them (legacy payload, no __unserialize()) or
+    // __unserialize() did before invoking this method. Feed them to
+    // doUnserialize() so that, for example, services are restored from the
+    // container.
+    $this->doUnserialize(get_object_vars($this));
   }
 
   /**
