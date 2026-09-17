@@ -47,6 +47,43 @@ class DependencySerializationTest extends UnitTestCase {
   }
 
   /**
+   * Tests unserializing a payload written by the legacy __sleep() method.
+   *
+   * Payloads serialized before __serialize() was introduced use PHP's mangled
+   * key format for non-public properties ("\0*\0property"). Such payloads may
+   * still exist in long-lived storage such as the form cache, tempstore, queue
+   * items and batches, and must still be unserialized correctly.
+   */
+  public function testLegacySerializedData(): void {
+    $service = new \stdClass();
+    $container = TestKernel::setContainerWithKernel();
+    $container->set('test_service', $service);
+
+    // Build the payload exactly as PHP wrote it for a legacy __sleep()
+    // implementation: the '_serviceIds' and '_entityStorages' properties are
+    // protected and therefore mangled, the 'service' property was replaced by
+    // its service ID and the public 'container' property was serialized as-is.
+    $class = DependencySerializationTestDummy::class;
+    $legacy_service_ids = "\0*\0_serviceIds";
+    $legacy_entity_storages = "\0*\0_entityStorages";
+    $payload = sprintf(
+      'O:%d:"%s":3:{s:9:"container";N;s:%d:"%s";a:1:{s:7:"service";s:12:"test_service";}s:%d:"%s";a:0:{}}',
+      strlen($class),
+      $class,
+      strlen($legacy_service_ids),
+      $legacy_service_ids,
+      strlen($legacy_entity_storages),
+      $legacy_entity_storages,
+    );
+
+    $unserialized = unserialize($payload);
+    $this->assertInstanceOf(DependencySerializationTestDummy::class, $unserialized);
+    $this->assertSame($service, $unserialized->service);
+    $this->assertNull($unserialized->container);
+    $this->assertEmpty($unserialized->getServiceIds());
+  }
+
+  /**
    * Test deprecation and backward compatibility of __sleep and __wakeup.
    */
   #[IgnoreDeprecations]

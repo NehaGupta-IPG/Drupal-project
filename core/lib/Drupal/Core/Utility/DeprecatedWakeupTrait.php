@@ -34,6 +34,12 @@ trait DeprecatedWakeupTrait {
    * {@inheritdoc}
    */
   public function __unserialize(array $data): void {
+    // PHP hands every payload to __unserialize() once the class declares it,
+    // including payloads written by a legacy __sleep() implementation. Those
+    // carry mangled keys for non-public properties, so normalize them here,
+    // before any doUnserialize() implementation looks up keys such as
+    // '_serviceIds' by name.
+    $data = $this->normalizeSerializedData($data);
     if ($this->overridesWakeup()) {
       // If an extending class implements its own __wakeup() method, make
       // it gets called, otherwise PHP will ignore __wakeup() in any class
@@ -97,16 +103,41 @@ trait DeprecatedWakeupTrait {
    *
    * @param array<string, mixed> $data
    *   Array of key/value pairs that represent the serialized form of the object
-   *   as passed to __unserialize().
+   *   as passed to __unserialize(), with keys already normalized by
+   *   ::normalizeSerializedData().
    */
   protected function populateProperties(array $data): void {
     foreach ($data as $property => $value) {
-      $normalized = $this->normalizeSerializedKey($property);
-      if ($normalized === NULL) {
+      $this->$property = $value;
+    }
+  }
+
+  /**
+   * Normalizes the keys of a serialized payload for backward compatibility.
+   *
+   * Payloads written by a legacy __sleep() implementation contain mangled keys
+   * for protected and private properties ("\0*\0property" or
+   * "\0Class\0property"). Payloads written by __serialize() contain plain
+   * property names. This method maps both forms to plain property names so
+   * that doUnserialize() implementations can rely on a single key format.
+   *
+   * @param array<mixed, mixed> $data
+   *   The payload as passed to __unserialize().
+   *
+   * @return array<string, mixed>
+   *   The payload keyed by plain property name. Keys that cannot map to a
+   *   property are dropped.
+   */
+  protected function normalizeSerializedData(array $data): array {
+    $normalized = [];
+    foreach ($data as $key => $value) {
+      $property = $this->normalizeSerializedKey($key);
+      if ($property === NULL) {
         continue;
       }
-      $this->$normalized = $value;
+      $normalized[$property] = $value;
     }
+    return $normalized;
   }
 
   /**
