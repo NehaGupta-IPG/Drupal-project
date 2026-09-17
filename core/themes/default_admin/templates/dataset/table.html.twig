@@ -45,7 +45,12 @@
   <thead>
     <tr>
       {% for cell in header %}
-        {% if '<a' in cell.content|render|render %}
+        {#
+          The render filter returns a Markup object, which the in operator does
+          not compare against a string, so the markup is trimmed into a plain
+          string first.
+        #}
+        {% if '<a' in cell.content|render|trim %}
           {%
             set cell_classes = [
               'th__item',
