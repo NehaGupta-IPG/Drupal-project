@@ -65,6 +65,7 @@ thead tr {
 }
 
 td {
+  position: relative;
   box-sizing: border-box;
   height: 4rem;
   padding: var(--space-xs) var(--space-m);
@@ -76,6 +77,13 @@ td {
 
   &.is-active {
     background: none;
+  }
+
+  .dropbutton-wrapper + .ajax-progress {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto 0 auto 0.5rem;
   }
 }
 
