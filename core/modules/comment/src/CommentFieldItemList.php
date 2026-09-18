@@ -96,7 +96,10 @@ class CommentFieldItemList extends FieldItemList {
       // the decision.
       $commented_entity = $this->getEntity();
       $cache_metadata = (new CacheableMetadata())->addCacheableDependency($commented_entity);
-      $context = ['commented_entity' => $commented_entity];
+      $context = [
+        'commented_entity' => $commented_entity,
+        'field' => $this->getName(),
+      ];
 
       /** @var \Drupal\Core\Access\AccessResult $result */
       $result = $access_control_handler->createAccess($bundle, $account, $context, TRUE);

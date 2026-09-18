@@ -536,7 +536,14 @@ class Comment extends ContentEntityBase implements CommentInterface {
    */
   public function access($operation, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     if ($operation === 'create') {
-      $context = ['commented_entity' => $this->getCommentedEntity()];
+      $context = array_filter(
+        [
+          'commented_entity' => $this->getCommentedEntity(),
+          'field' => $this->getFieldName(),
+          'parent' => $this->getParentComment(),
+        ],
+        static fn (mixed $val): bool => $val !== NULL,
+      );
       return $this->entityTypeManager()
         ->getAccessControlHandler($this->entityTypeId)
         ->createAccess($this->bundle(), $account, $context, $return_as_object);

@@ -30,7 +30,14 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
     }
 
     if ($operation === 'reply') {
-      $context = ['commented_entity' => $entity->getCommentedEntity()];
+      $context = array_filter(
+        [
+          'commented_entity' => $entity->getCommentedEntity(),
+          'field' => $entity->getFieldName(),
+          'parent' => $entity->getParentComment(),
+        ],
+        static fn (mixed $val): bool => $val !== NULL,
+      );
       // The user must be able to view the comment.
       return $this->access($entity, 'view', $account, TRUE)
         // And must be able to create comments.
