@@ -9,13 +9,22 @@
  * - attributes: HTML attributes for the containing element.
  * - aria_description: Flag for whether or not an ARIA description has been
  *   added to the description container.
+ * - title_display: Title display setting.
  *
  * @see \Drupal\filter\FilterThemeHooks::preprocessTextFormatWrapper()
  *
  * @ingroup themeable
  */
 #}
-<div class="js-text-format-wrapper js-form-item form-item">
+{%
+  set wrapper_classes = [
+    'js-text-format-wrapper',
+    'js-form-item',
+    'form-item',
+    title_display not in ['after', 'before'] ? 'form-no-label',
+  ]
+%}
+<div{{ attributes.addClass(wrapper_classes) }}>
   {{ children }}
   {% if description %}
     <div{{ attributes }}>{{ description }}</div>

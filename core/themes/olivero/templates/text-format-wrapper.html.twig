@@ -17,6 +17,7 @@
  * - disabled: An indicator for whether the associated form element is disabled,
  *   added by this theme.
  *   @see https://www.drupal.org/node/3016346
+ * - title_display: Title display setting.
  *
  * @see \Drupal\filter\FilterThemeHooks::preprocessTextFormatWrapper()
  */
@@ -25,6 +26,7 @@
   set classes = [
     'js-form-item',
     'form-item',
+    title_display not in ['after', 'before'] ? 'form-no-label',
   ]
 %}
 
