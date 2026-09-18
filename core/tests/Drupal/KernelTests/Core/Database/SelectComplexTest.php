@@ -9,6 +9,7 @@ use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\RowCountException;
 use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
@@ -407,6 +408,7 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
     $hydratedQuery = $hydratedQuery->extend(PagerSelectExtender::class);
+    $this->assertInstanceOf(SelectInterface::class, $hydratedQuery);
 
     $this->resetProperties($query);
     $this->resetProperties($hydratedQuery);

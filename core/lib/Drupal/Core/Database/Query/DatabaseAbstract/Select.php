@@ -189,22 +189,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function havingCondition($column, $value = NULL, $operator = NULL) {
-    $this->having->condition($column, $value, $operator);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function havingArguments() {
-    return $this->having->arguments();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function having($snippet, $args = []) {
+  public function having($snippet, $args = []): static {
     if (!isset($this->having)) {
       $this->having = new Condition($this->conjunction);
     }
@@ -215,14 +200,10 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function havingCompile(Connection $connection) {
-    $this->having->compile($connection, $this);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function havingIsNull($column) {
+  public function havingIsNull($column): static {
+    if (!isset($this->having)) {
+      $this->having = new Condition($this->conjunction);
+    }
     $this->having->isNull($column);
     return $this;
   }
@@ -230,7 +211,10 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function havingIsNotNull($column) {
+  public function havingIsNotNull($column): static {
+    if (!isset($this->having)) {
+      $this->having = new Condition($this->conjunction);
+    }
     $this->having->isNotNull($column);
     return $this;
   }
@@ -238,7 +222,10 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function havingExists(Select $select) {
+  public function havingExists(Select $select): static {
+    if (!isset($this->having)) {
+      $this->having = new Condition($this->conjunction);
+    }
     $this->having->exists($select);
     return $this;
   }
@@ -246,7 +233,10 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function havingNotExists(Select $select) {
+  public function havingNotExists(Select $select): static {
+    if (!isset($this->having)) {
+      $this->having = new Condition($this->conjunction);
+    }
     $this->having->notExists($select);
     return $this;
   }
@@ -569,7 +559,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function exists(SelectInterface $select): static {
+  public function exists(Select $select): static {
     $this->condition->exists($select);
     return $this;
   }
@@ -577,7 +567,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function notExists(SelectInterface $select): static {
+  public function notExists(Select $select): static {
     $this->condition->notExists($select);
     return $this;
   }
@@ -596,16 +586,6 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function conditionArguments() {
-    if (!isset($this->condition)) {
-      $this->condition = new Condition($this->conjunction);
-    }
-    return $this->condition->arguments();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function where($snippet, $args = []): static {
     if (!isset($this->condition)) {
       $this->condition = new Condition($this->conjunction);
@@ -618,7 +598,7 @@ final class Select {
    * {@inheritdoc}
    */
   public function conditionGroupFactory($conjunction = 'AND'): Condition {
-    return $this->connection->condition($conjunction);
+    return new Condition($conjunction);
   }
 
   /**

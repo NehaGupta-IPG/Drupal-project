@@ -9,6 +9,7 @@ use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 use Drupal\Core\Database\Query\SelectExtender;
+use Drupal\Core\Database\Query\SelectInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -486,6 +487,7 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
     $hydratedQuery = $hydratedQuery->extend(SelectExtender::class);
+    $this->assertInstanceOf(SelectInterface::class, $hydratedQuery);
 
     $this->resetProperties($query);
     $this->resetProperties($hydratedQuery);

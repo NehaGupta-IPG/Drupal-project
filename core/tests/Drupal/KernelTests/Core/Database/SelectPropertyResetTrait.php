@@ -38,7 +38,7 @@ trait SelectPropertyResetTrait {
 
     $tables = new \ReflectionProperty($select, 'tables');
     $tablesArray = $tables->getValue($select);
-    foreach ($tablesArray as $key => $value) {
+    foreach ($tablesArray as $value) {
       if ($value['table'] instanceof SelectInterface) {
         $this->resetProperties($value['table']);
       }
@@ -47,12 +47,12 @@ trait SelectPropertyResetTrait {
 
     $union = new \ReflectionProperty($select, 'union');
     $unionArray = $union->getValue($select);
-    foreach ($unionArray as $key => $value) {
+    foreach ($unionArray as $value) {
       $this->resetProperties($value['query']);
     }
     $union->setValue($select, $unionArray);
 
-    if (isset($extender)) {
+    if (isset($extender) && isset($query)) {
       $query->setValue($extender, $select);
     }
   }
