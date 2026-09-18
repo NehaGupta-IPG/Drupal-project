@@ -21,7 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class SelectComplexTest extends DatabaseTestBase {
 
-  use SelectUniqueIdResetTrait;
+  use SelectPropertyResetTrait;
 
   /**
    * {@inheritdoc}
@@ -48,8 +48,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $result = $query->execute();
@@ -71,9 +71,9 @@ class SelectComplexTest extends DatabaseTestBase {
     // Verify that the results are returned in the correct order.
     foreach ($hydratedResult as $record) {
       $num_records++;
-      $this->assertGreaterThanOrEqual($last_priority, $record->$priority_field);
-      $this->assertNotSame('Ringo', $record->$name_field, 'Person without a task not selected.');
-      $last_priority = $record->$priority_field;
+      $this->assertGreaterThanOrEqual($last_priority, $record->$abstractPriorityField);
+      $this->assertNotSame('Ringo', $record->$abstractNameField, 'Person without a task not selected.');
+      $last_priority = $record->$abstractPriorityField;
     }
     $this->assertEquals(7, $num_records, 'Returned the correct number of rows.');
   }
@@ -98,8 +98,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $result = $query->execute();
@@ -142,8 +142,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $this->assertMatchesRegularExpression("/ORDER BY .*[^\w\s]num[^\w\s]/", (string) $query);
@@ -213,8 +213,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $result = $query->execute();
@@ -277,8 +277,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $result = $query->execute()->fetchField();
@@ -309,8 +309,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $result = $query->execute()->fetchField();
@@ -337,8 +337,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $result = $query->execute()->fetchAll(FetchAs::Column);
@@ -368,8 +368,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedCountQuery = $this->connection->select($abstractCountQuery);
 
-    $this->resetUniqueIdentifiers($query_count);
-    $this->resetUniqueIdentifiers($hydratedCountQuery);
+    $this->resetProperties($query_count);
+    $this->resetProperties($hydratedCountQuery);
     $this->assertEquals($query_count, $hydratedCountQuery);
 
     $count = $query_count->execute()->fetchField();
@@ -408,8 +408,8 @@ class SelectComplexTest extends DatabaseTestBase {
     $hydratedQuery = $this->connection->select($abstractQuery);
     $hydratedQuery = $hydratedQuery->extend(PagerSelectExtender::class);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $count = count($query->execute()->fetchCol());
@@ -563,8 +563,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedCountQuery = $this->connection->select($abstractCountQuery);
 
-    $this->resetUniqueIdentifiers($count_query);
-    $this->resetUniqueIdentifiers($hydratedCountQuery);
+    $this->resetProperties($count_query);
+    $this->resetProperties($hydratedCountQuery);
     $this->assertEquals($count_query, $hydratedCountQuery);
 
     $count = $count_query->execute()->fetchField();
@@ -595,8 +595,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $job = $query->execute()->fetchField();
@@ -625,8 +625,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $crowded_job = $query->execute()->fetch();
@@ -679,8 +679,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     // Construct the query string.
@@ -746,8 +746,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $result = $query->execute();
@@ -769,9 +769,9 @@ class SelectComplexTest extends DatabaseTestBase {
     foreach ($hydratedResult as $record) {
       $num_records++;
       // Verify that the results are returned in the correct order.
-      $this->assertGreaterThanOrEqual($last_priority, $record->$priority_field);
-      $this->assertNotSame('Ringo', $record->$name_field);
-      $last_priority = $record->$priority_field;
+      $this->assertGreaterThanOrEqual($last_priority, $record->$abstractPriorityField);
+      $this->assertNotSame('Ringo', $record->$abstractNameField);
+      $last_priority = $record->$abstractPriorityField;
     }
     $this->assertEquals(7, $num_records);
 
@@ -799,8 +799,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $hydratedCountQuery = $this->connection->select($abstractCountQuery);
 
-    $this->resetUniqueIdentifiers($countQuery);
-    $this->resetUniqueIdentifiers($hydratedCountQuery);
+    $this->resetProperties($countQuery);
+    $this->resetProperties($hydratedCountQuery);
     $this->assertEquals($countQuery, $hydratedCountQuery);
 
     $num_records = $countQuery->execute()->fetchField();

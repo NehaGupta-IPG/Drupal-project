@@ -150,13 +150,22 @@ class Select extends Query implements SelectInterface {
     $this->condition = $this->connection->condition($conjunction);
     $this->having = $this->connection->condition($conjunction);
     if ($table instanceof DatabaseAbstractSelect) {
-      $this->hydrateAbstractSelect($table, $alias);
+      $this->hydrateAbstractSelect($table);
       return;
     }
     $this->addJoin(NULL, $table, $alias);
   }
 
-  final protected function hydrateAbstractSelect(DatabaseAbstractSelect $abstractSelect, ?string $alias): void {
+  /**
+   * Converts a DatabaseAbstractSelect object for the current connection.
+   *
+   * Loads the objects' properties from a database abstracts select object.
+   * Will recursively convert any nested DatabaseAbstractSelect too.
+   *
+   * @param \Drupal\Core\Database\Query\DatabaseAbstract\Select $abstractSelect
+   *   The database abstract select.
+   */
+  final protected function hydrateAbstractSelect(DatabaseAbstractSelect $abstractSelect): void {
     $this->comments = $abstractSelect->comments;
     if ($abstractSelect->alterTags !== []) {
       $this->alterTags = $abstractSelect->alterTags;
@@ -219,6 +228,15 @@ class Select extends Query implements SelectInterface {
     $this->distinct = $abstractSelect->distinct;
   }
 
+  /**
+   * Converts a DatabaseAbstractCondition object for the current connection.
+   *
+   * Loads the objects' properties from a database abstracts connection object.
+   * Will recursively convert any nested DatabaseAbstractCondition too.
+   *
+   * @param \Drupal\Core\Database\Query\DatabaseAbstract\Condition $abstractCondition
+   *   The database abstract select.
+   */
   final protected function hydrateAbstractCondition(DatabaseAbstractCondition $abstractCondition): ConditionInterface {
     $conditions = $abstractCondition->conditions;
     $hydratedCondition = $this->connection->condition($conditions['#conjunction']);

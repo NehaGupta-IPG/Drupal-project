@@ -9,7 +9,6 @@ use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 use Drupal\Core\Database\Query\SelectExtender;
-use Drupal\Core\Database\Query\SelectInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,7 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class SelectTest extends DatabaseTestBase {
 
-  use SelectUniqueIdResetTrait;
+  use SelectPropertyResetTrait;
 
   /**
    * Tests rudimentary SELECT statements.
@@ -39,8 +38,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $hydratedResult = $hydratedQuery->execute()->fetchField();
@@ -64,11 +63,9 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
-
-    $result = $hydratedQuery->execute();
 
     $hydratedResultRecords = $hydratedQuery->execute()->fetchAll();
     $resultRecords = $query->execute()->fetchAll();
@@ -95,8 +92,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $hydratedResultRecords = $hydratedQuery->execute()->fetchAll();
@@ -165,8 +162,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $hydratedResult = $hydratedQuery->execute();
@@ -204,8 +201,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $hydratedResult = $hydratedQuery->execute();
@@ -245,8 +242,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $hydratedResult = $hydratedQuery->execute();
@@ -265,6 +262,7 @@ class SelectTest extends DatabaseTestBase {
     $this->assertEquals('George', $record->{$name_field}, 'Fetched name is correct.');
     $this->assertEquals(27 * 2, $record->{$age_double_field}, 'Fetched double age expression is correct.');
     $this->assertEquals(27 * 3, $record->{$age_triple_field}, 'Fetched triple age expression is correct.');
+    $this->assertEquals($record->{$name_field}, $hydratedRecord->{$abstractQueryNameField});
     $this->assertEquals($record->{$age_double_field}, $hydratedRecord->{$abstractQueryAgeDoubleField});
     $this->assertEquals($record->{$age_triple_field}, $hydratedRecord->{$abstractQueryAgeTripleField});
   }
@@ -283,8 +281,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $hydratedRecord = $hydratedQuery->execute()->fetchObject();
@@ -319,8 +317,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $hydratedRecord = $hydratedQuery->execute()->fetchObject();
@@ -357,8 +355,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $hydratedNames = $hydratedQuery->execute()->fetchCol();
@@ -384,8 +382,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $hydratedNames = $hydratedQuery->execute()->fetchCol();
@@ -414,8 +412,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $hydratedNames = $hydratedQuery->execute()->fetchCol();
@@ -451,8 +449,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $hydratedNames = $hydratedQuery->execute()->fetchCol();
@@ -489,8 +487,8 @@ class SelectTest extends DatabaseTestBase {
     $hydratedQuery = $this->connection->select($abstractQuery);
     $hydratedQuery = $hydratedQuery->extend(SelectExtender::class);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $names = $this->connection->select('test', 'test')
@@ -528,8 +526,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery1 = $this->connection->select($abstractQuery1);
 
-    $this->resetUniqueIdentifiers($query_1);
-    $this->resetUniqueIdentifiers($hydratedQuery1);
+    $this->resetProperties($query_1);
+    $this->resetProperties($hydratedQuery1);
     $this->assertEquals($query_1, $hydratedQuery1);
 
     $hydratedNames = $hydratedQuery1->execute()->fetchCol();
@@ -564,8 +562,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery1 = $this->connection->select($abstractQuery1);
 
-    $this->resetUniqueIdentifiers($query_1);
-    $this->resetUniqueIdentifiers($hydratedQuery1);
+    $this->resetProperties($query_1);
+    $this->resetProperties($hydratedQuery1);
     $this->assertEquals($query_1, $hydratedQuery1);
 
     $hydratedNames = $hydratedQuery1->execute()->fetchCol();
@@ -605,8 +603,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery1 = $this->connection->select($abstractQuery1);
 
-    $this->resetUniqueIdentifiers($query_1);
-    $this->resetUniqueIdentifiers($hydratedQuery1);
+    $this->resetProperties($query_1);
+    $this->resetProperties($hydratedQuery1);
     $this->assertEquals($query_1, $hydratedQuery1);
 
     $hydratedCount = (int) $hydratedQuery1->execute()->fetchField();
@@ -647,8 +645,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery1 = $this->connection->select($abstractQuery1);
 
-    $this->resetUniqueIdentifiers($query_1);
-    $this->resetUniqueIdentifiers($hydratedQuery1);
+    $this->resetProperties($query_1);
+    $this->resetProperties($hydratedQuery1);
     $this->assertEquals($query_1, $hydratedQuery1);
 
     $hydratedNames = $hydratedQuery1->execute()->fetchCol();
@@ -698,8 +696,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery1 = $this->connection->select($abstractQuery1);
 
-    $this->resetUniqueIdentifiers($query_1);
-    $this->resetUniqueIdentifiers($hydratedQuery1);
+    $this->resetProperties($query_1);
+    $this->resetProperties($hydratedQuery1);
     $this->assertEquals($query_1, $hydratedQuery1);
 
     $hydratedNames = $hydratedQuery1->execute()->fetchCol();
@@ -754,8 +752,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedOrderedIdsQuery = $this->connection->select($abstractOrderedIdsQuery);
 
-    $this->resetUniqueIdentifiers($ordered_ids_query);
-    $this->resetUniqueIdentifiers($hydratedOrderedIdsQuery);
+    $this->resetProperties($ordered_ids_query);
+    $this->resetProperties($hydratedOrderedIdsQuery);
     $this->assertEquals($ordered_ids_query, $hydratedOrderedIdsQuery);
 
     $ordered_ids = $ordered_ids_query->execute()->fetchCol();
@@ -778,17 +776,22 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedRandomizedIdsQuery = $this->connection->select($abstractRandomizedIdsQuery);
 
-    $this->resetUniqueIdentifiers($randomized_ids_query);
-    $this->resetUniqueIdentifiers($hydratedRandomizedIdsQuery);
+    $this->resetProperties($randomized_ids_query);
+    $this->resetProperties($hydratedRandomizedIdsQuery);
     $this->assertEquals($randomized_ids_query, $hydratedRandomizedIdsQuery);
 
     $randomized_ids = $randomized_ids_query->execute()->fetchCol();
-    $hydratedORandomizedIds = $hydratedRandomizedIdsQuery->execute()->fetchCol();
+    $hydratedRandomizedIds = $hydratedRandomizedIdsQuery->execute()->fetchCol();
 
     $this->assertNotEquals($ordered_ids, $randomized_ids, 'A query with random ordering returns an unordered set of IDs.');
     $sorted_ids = $randomized_ids;
     sort($sorted_ids);
     $this->assertEquals($ordered_ids, $sorted_ids, 'After sorting the random list, the result matches the original query.');
+
+    $this->assertNotEquals($hydratedOrderedIds, $hydratedRandomizedIds);
+    $hydratedSortedIds = $hydratedRandomizedIds;
+    sort($hydratedSortedIds);
+    $this->assertEquals($hydratedOrderedIds, $hydratedSortedIds);
 
     // Now perform the exact same query again, and make sure the order is
     // different.
@@ -856,8 +859,8 @@ class SelectTest extends DatabaseTestBase {
 
     $hydratedQuery = $this->connection->select($abstractQuery);
 
-    $this->resetUniqueIdentifiers($query);
-    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
     $hydratedResult = $hydratedQuery->execute()->fetchCol();

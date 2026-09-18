@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\Query\DatabaseAbstract;
 
-use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Expression;
 
 /**
@@ -138,6 +137,9 @@ final class Select {
    *   The table name or subquery that is being queried.
    * @param string $alias
    *   The alias for the table.
+   * @param string $conjunction
+   *   The default conjunction that will be applied to arrays of conditions,
+   *   'AND' or 'OR'.
    */
   public function __construct(
     string|Select $table,
