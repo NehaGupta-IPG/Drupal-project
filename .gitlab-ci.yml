@@ -133,7 +133,7 @@ default:
       optional: true
 
 .with-database: &with-database
-  name: mariadb:13.0
+  name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:production
   alias: database
 
 .with-selenium-chrome: &with-selenium-chrome
@@ -476,6 +476,15 @@ default:
   variables:
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
+
+'MariaDB 13':
+  <<: [ *recursive-trigger, *run-on-mr ]
+  variables:
+    _TARGET_DB_DRIVER: "mysql"
+    _TARGET_DB_DRIVER_MODULE: "mysql"
+  services:
+    - name: mariadb:13
+      alias: database
 
 'MySQL (via PDO)':
   <<: [ *recursive-trigger, *run-on-mr ]
