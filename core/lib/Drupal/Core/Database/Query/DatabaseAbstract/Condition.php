@@ -10,7 +10,7 @@ use Drupal\Core\Database\InvalidQueryException;
 /**
  * Generic class for a series of conditions in a query.
  */
-final class Condition implements \Countable {
+final class Condition {
 
   /**
    * Array of conditions.
@@ -22,22 +22,12 @@ final class Condition implements \Countable {
   /**
    * Constructs a Condition object.
    *
-   * @param string $conjunction
-   *   The operator to use to combine conditions: 'AND' or 'OR'.
+   * @param ConjunctionType $conjunction
+   *   The operator to use to combine conditions.
    */
-  public function __construct(string $conjunction) {
-    $this->conditions['#conjunction'] = $conjunction;
-  }
-
-  /**
-   * Implements Countable::count().
-   *
-   * Returns the size of this conditional. The size of the conditional is the
-   * size of its conditional array minus one, because one element is the
-   * conjunction.
-   */
-  public function count(): int {
-    return count($this->conditions) - 1;
+  public function __construct(
+    public readonly ConjunctionType $conjunction,
+  ) {
   }
 
   /**
@@ -115,7 +105,7 @@ final class Condition implements \Countable {
   /**
    * {@inheritdoc}
    */
-  public function conditionGroupFactory(string $conjunction = 'AND'): static {
+  public function conditionGroupFactory(ConjunctionType $conjunction = ConjunctionType::And): static {
     return new static($conjunction);
   }
 

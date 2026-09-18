@@ -8,6 +8,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\RowCountException;
 use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
+use Drupal\Core\Database\Query\DatabaseAbstract\ConjunctionType;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
@@ -588,7 +589,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $abstractQuery = new DatabaseAbstractSelect('test');
     $abstractQuery->addColumn('test', 'job');
     $abstractQuery->condition('name', 'Paul');
-    $abstractQuery->condition((new DatabaseAbstractCondition('OR'))->condition('age', 26)->condition('age', 27));
+    $abstractQuery->condition((new DatabaseAbstractCondition(ConjunctionType::Or))->condition('age', 26)->condition('age', 27));
 
     $query = $this->connection->select('test');
     $query->addField('test', 'job');
@@ -731,7 +732,7 @@ class SelectComplexTest extends DatabaseTestBase {
   public function testJoinConditionObject(): void {
     // Same test as testDefaultJoin, but with a Condition object.
     $abstractQuery = new DatabaseAbstractSelect('test_task', 't');
-    $abstractJoinCond = (new DatabaseAbstractCondition('AND'))->where('[t].[pid] = [p].[id]');
+    $abstractJoinCond = (new DatabaseAbstractCondition(ConjunctionType::And))->where('[t].[pid] = [p].[id]');
     $abstractPeopleAlias = $abstractQuery->join('test', 'p', $abstractJoinCond);
     $abstractNameField = $abstractQuery->addColumn($abstractPeopleAlias, 'name', 'name');
     $abstractQuery->addColumn('t', 'task', 'task');
@@ -781,7 +782,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $t1_name = 'John';
     $t2_name = 'George';
 
-    $abstractJoinCond = (new DatabaseAbstractCondition('AND'))
+    $abstractJoinCond = (new DatabaseAbstractCondition(ConjunctionType::And))
       ->condition('t1.name', $t1_name)
       ->condition('t2.name', $t2_name);
     $abstractQuery = new DatabaseAbstractSelect('test', 't1');

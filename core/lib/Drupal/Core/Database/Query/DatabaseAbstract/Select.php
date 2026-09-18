@@ -137,14 +137,13 @@ final class Select {
    *   The table name or subquery that is being queried.
    * @param string $alias
    *   The alias for the table.
-   * @param string $conjunction
+   * @param ConjunctionType $conjunction
    *   The default conjunction that will be applied to arrays of conditions,
-   *   'AND' or 'OR'.
    */
   public function __construct(
     string|Select $table,
     ?string $alias = NULL,
-    public readonly string $conjunction = 'AND',
+    public readonly ConjunctionType $conjunction = ConjunctionType::And,
   ) {
     $this->addJoin(NULL, $table, $alias);
   }

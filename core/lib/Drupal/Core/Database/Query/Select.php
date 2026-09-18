@@ -5,6 +5,7 @@ namespace Drupal\Core\Database\Query;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Expression;
 use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
+use Drupal\Core\Database\Query\DatabaseAbstract\ConjunctionType;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 
 /**
@@ -239,8 +240,11 @@ class Select extends Query implements SelectInterface {
    */
   final protected function hydrateAbstractCondition(DatabaseAbstractCondition $abstractCondition): ConditionInterface {
     $conditions = $abstractCondition->conditions;
-    $hydratedCondition = $this->connection->condition($conditions['#conjunction']);
-    unset($conditions['#conjunction']);
+    $conjunction = match ($abstractCondition->conjunction) {
+      ConjunctionType::And => 'AND',
+      ConjunctionType::Or => 'OR',
+    };
+    $hydratedCondition = $this->connection->condition($conjunction);
     foreach ($conditions as $tmp) {
       if ($tmp instanceof Expression) {
         $hydratedCondition->where($tmp->expression, $tmp->arguments);

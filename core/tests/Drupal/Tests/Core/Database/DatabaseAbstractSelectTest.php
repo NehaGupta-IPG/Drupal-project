@@ -41,7 +41,7 @@ class DatabaseAbstractSelectTest extends UnitTestCase {
     $abstractQuery->addColumn('test', 'name');
     $abstractQuery->addColumn('test', 'age', 'age');
     $abstractQuery->addTag('foo');
-    $abstractQuery->addMetaData('bar', new \StdClass());
+    $abstractQuery->addMetaData('bar', new \stdClass());
     $abstractQuery = $abstractQuery->countQuery();
 
     serialize($abstractQuery);
