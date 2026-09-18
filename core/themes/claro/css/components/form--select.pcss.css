@@ -4,6 +4,7 @@
  */
 
 .form-element--type-select {
+  max-width: 60rem; /* Prevent long select values from breaking the node form layout. */
   padding-inline-end: calc(2rem - var(--input-border-size));
   background-image: url(../../images/icons/545560/chevron-down.svg);
   background-repeat: no-repeat;
@@ -31,6 +32,10 @@
       background-size: 1.75rem 0.4375rem; /* w: 14px + (2 * 7px), h: 7px */
     }
   }
+}
+
+.form-element--type-select-multiple {
+  max-width: 60rem; /* Prevent long select values from breaking the node form layout. */
 }
 
 @media (forced-colors: active) {
