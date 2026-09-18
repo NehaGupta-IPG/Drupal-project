@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * @file
+ * Install functions for the database_deprecation_test module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_schema().
+ */
+function database_deprecation_test_schema(): array {
+  $schema['deprecation_test'] = [
+    'description' => 'Basic test table for the database unit tests.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'name' => [
+        'description' => "A person's name",
+        'type' => 'varchar_ascii',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'binary' => TRUE,
+      ],
+      'age' => [
+        'description' => "The person's age",
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'job' => [
+        'description' => "The person's job",
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => 'Undefined',
+      ],
+    ],
+    'primary key' => ['id'],
+    'unique keys' => [
+      'name' => ['name'],
+    ],
+    'indexes' => [
+      'ages' => ['age'],
+    ],
+  ];
+
+  return $schema;
+}

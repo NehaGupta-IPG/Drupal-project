@@ -7,10 +7,12 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Database\SchemaDefinition\Schema;
+
 /**
  * Implements hook_schema().
  */
-function views_test_data_schema(): array {
+function views_test_data_schema(): Schema {
   return \Drupal::state()->get('views_test_data_schema');
 }
 

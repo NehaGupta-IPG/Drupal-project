@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
@@ -27,17 +32,33 @@ class FieldDateTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function schemaDefinition() {
-    $schema = parent::schemaDefinition();
-    $schema['views_test_data']['fields']['destroyed'] = [
-      'description' => "The destruction date of this record",
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => FALSE,
-      'default' => 0,
-      'size' => 'big',
-    ];
-    return $schema;
+  public function schemaDefinition(): Schema {
+    $parentSchema = parent::schemaDefinition();
+    $table = $parentSchema->getTableDefinition('views_test_data');
+    $columns = $table->columns;
+    $columns[] = Column::int(
+      name: 'destroyed',
+      description: "The destruction date of this record",
+      size: ColumnSize::Big,
+      unsigned: TRUE,
+      notNull: FALSE,
+      default: new IntValue(0),
+    );
+
+    return new Schema(
+      type: $parentSchema->type,
+      name: $parentSchema->name,
+      tables: [
+        new Table(
+          name: $table->name,
+          description: $table->description,
+          columns: $columns,
+          primaryKey: $table->primaryKey,
+          uniqueKeys: $table->uniqueKeys,
+          indexes: $table->indexes,
+        ),
+      ]
+    );
   }
 
   /**

@@ -6,6 +6,7 @@ namespace Drupal\Tests\views_ui\FunctionalJavascript;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\views\Tests\ViewTestData;
 use PHPUnit\Framework\Attributes\Group;
@@ -94,7 +95,7 @@ class PreviewTest extends WebDriverTestBase {
    *
    * @internal
    */
-  protected function schemaDefinition() {
+  protected function schemaDefinition(): Schema {
     return ViewTestData::schemaDefinition();
   }
 
