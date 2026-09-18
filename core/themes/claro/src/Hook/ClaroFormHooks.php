@@ -46,8 +46,12 @@ class ClaroFormHooks {
 
     if ($form_object instanceof ViewsForm && str_starts_with($form_object->getBaseFormId(), 'views_form_media_library')) {
       if (isset($form['header'])) {
+        foreach (Element::children($form['header']) as $key) {
+          if (str_contains($key, '_bulk_form')) {
+            $form['header'][$key]['#attributes']['class'][] = 'media-library-views-form__bulk_form';
+          }
+        }
         $form['header']['#attributes']['class'][] = 'media-library-views-form__header';
-        $form['header']['media_bulk_form']['#attributes']['class'][] = 'media-library-views-form__bulk_form';
       }
       $form['actions']['submit']['#attributes']['class'] = ['media-library-select'];
       $form['#attributes']['class'][] = 'media-library-views-form';
