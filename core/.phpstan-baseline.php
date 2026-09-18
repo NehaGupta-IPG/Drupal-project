@@ -16084,12 +16084,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/LayoutBuilderTranslationTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$expected_content of method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\LayoutSectionTest\\:\\:assertLayoutSection\\(\\) expects array\\|string, null given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/LayoutSectionTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\FunctionalJavascript\\\\BlockFormMessagesTest\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

@@ -2,6 +2,7 @@
 
 namespace Drupal\layout_builder;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
 use Drupal\Core\Plugin\PreviewAwarePluginInterface;
 use Drupal\Core\Render\Element;
@@ -84,10 +85,19 @@ class Section implements ThirdPartySettingsInterface {
    */
   public function toRenderArray(array $contexts = [], $in_preview = FALSE) {
     $regions = [];
+    // An empty build still carries the cacheability that
+    // SectionComponent::toRenderArray() stamps on it. Keep that cacheability,
+    // drop the component. Preview keeps every component: its regions reflect
+    // what is configured, not what renders.
+    $empty_cacheability = NULL;
     foreach ($this->getComponents() as $component) {
-      if ($output = $component->toRenderArray($contexts, $in_preview)) {
-        $regions[$component->getRegion()][$component->getUuid()] = $output;
+      $output = $component->toRenderArray($contexts, $in_preview);
+      if (!$in_preview && Element::isEmpty($output)) {
+        $empty_cacheability ??= new CacheableMetadata();
+        $empty_cacheability->addCacheableDependency(CacheableMetadata::createFromRenderArray($output));
+        continue;
       }
+      $regions[$component->getRegion()][$component->getUuid()] = $output;
     }
 
     $layout = $this->getLayout($contexts);
@@ -95,7 +105,18 @@ class Section implements ThirdPartySettingsInterface {
       $layout->setInPreview($in_preview);
     }
 
+    // A layout's build array always contains '#theme' and '#settings', so it
+    // can never be considered empty. Skip building it entirely.
+    if (!$regions && $empty_cacheability) {
+      $build = [];
+      $empty_cacheability->applyTo($build);
+      return $build;
+    }
+
     $build = $layout->build($regions);
+    if ($empty_cacheability) {
+      $empty_cacheability->merge(CacheableMetadata::createFromRenderArray($build))->applyTo($build);
+    }
     // If an entity was used to build the layout, store it on the build.
     if (!Element::isEmpty($build) && isset($contexts['layout_builder.entity'])) {
       $build['#entity'] = $contexts['layout_builder.entity']->getContextValue();
