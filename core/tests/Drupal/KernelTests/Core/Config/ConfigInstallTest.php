@@ -299,7 +299,7 @@ class ConfigInstallTest extends KernelTestBase {
    *
    * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
    */
-  public function testLanguageRelabelsToConfigurationDefault(): void {
+  public function testInstallingConfigWithNoLangcode(): void {
     $this->enableModules(['language']);
     $this->installConfig(['system', 'language']);
     ConfigurableLanguage::createFromLangcode('fr')->save();
@@ -349,7 +349,7 @@ class ConfigInstallTest extends KernelTestBase {
    *
    * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
    */
-  public function testLanguageRelabellingDoesNotAffectConfigHash(): void {
+  public function testUpdatingLangcodeDoesNotAffectConfigHash(): void {
     $this->enableModules(['language']);
     $this->installConfig(['system', 'language']);
     ConfigurableLanguage::createFromLangcode('fr')->save();

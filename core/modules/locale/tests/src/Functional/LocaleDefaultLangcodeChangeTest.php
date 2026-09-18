@@ -213,11 +213,11 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
   /**
    * Tests the previous default's content survives as a language override.
    *
-   * Relabelling only changes the langcode field - the object's values stay
-   * whatever they were in the previous default language until (and unless)
-   * a translation is applied. Without preserving them first, that previous
-   * content would simply be gone the moment a translation is applied, and
-   * even without one, would sit mislabelled as the new default forever.
+   * DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation() only
+   * changes the langcode field - the object's values stay whatever they were in
+   * the previous default language until (and unless) a translation is applied.
+   * Without preserving them first, that previous content would simply be gone
+   * the moment a translation is applied.
    */
   public function testDefaultLanguageChangePreservesEnglishAsOverride(): void {
     $this->assertSame('en', $this->config('locale_test.translation')->get('langcode'));

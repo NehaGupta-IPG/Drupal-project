@@ -36,7 +36,7 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
   /**
    * Tests configuration without an explicit langcode gets the new default.
    */
-  public function testConfigWithoutExplicitLangcodeIsRelabelled(): void {
+  public function testConfigWithoutExplicitLangcode(): void {
     $this->config('config_test.langcode_test')
       ->set('optional_translatable_value', 'Hello')
       ->save();
@@ -48,9 +48,9 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
   }
 
   /**
-   * Tests configuration explicitly labelled with the previous default.
+   * Tests configuration with the previous default is updated.
    */
-  public function testConfigExplicitlyLabelledWithOldDefaultIsRelabelled(): void {
+  public function testConfigEWithOldDefaultIsUpdated(): void {
     $this->config('config_test.langcode_test')
       ->set('optional_translatable_value', 'Hello')
       ->set('langcode', 'en')
@@ -62,9 +62,9 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
   }
 
   /**
-   * Tests configuration explicitly labelled with a third langcode is untouched.
+   * Tests configuration with a third langcode is untouched.
    */
-  public function testConfigWithExplicitThirdLangcodeIsUntouched(): void {
+  public function testConfigWithThirdLangcodeIsUntouched(): void {
     $this->config('config_test.langcode_test')
       ->set('optional_translatable_value', 'Hallo')
       ->set('langcode', 'de')

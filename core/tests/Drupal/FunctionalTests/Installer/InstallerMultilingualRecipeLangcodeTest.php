@@ -68,7 +68,7 @@ class InstallerMultilingualRecipeLangcodeTest extends InstallerTestBase {
     $this->assertSession()->addressEquals('user/1');
     $this->assertSession()->statusCodeEquals(200);
 
-    // Unlabelled recipe config must match the language chosen for this
+    // Recipe config without a langcode must match the language chosen for this
     // installation, not be hardcoded to English.
     $this->assertSame('fr', $this->config('config_test.dynamic.recipe_default')->get('langcode'));
 
