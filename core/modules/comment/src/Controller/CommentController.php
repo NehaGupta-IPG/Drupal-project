@@ -310,7 +310,7 @@ class CommentController extends ControllerBase {
         // The user must be able to reply.
         ->andIf($parent_comment->access('reply', NULL, TRUE))
         // And the parent comment host belongs to the entity.
-        ->andIf(AccessResult::allowedIf($parent_comment->getCommentedEntityId() === $entity->id()));
+        ->andIf(AccessResult::allowedIf($parent_comment->getCommentedEntityId() == $entity->id()));
     }
 
     // The user must be able to create comments.
