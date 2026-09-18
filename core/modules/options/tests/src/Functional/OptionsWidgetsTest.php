@@ -631,14 +631,19 @@ class OptionsWidgetsTest extends FieldTestBase {
     $term_to_delete->delete();
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->assertSession()->statusCodeEquals(200);
+    $this->assertTrue($this->assertSession()->fieldExists('Test term reference')->hasAttribute('multiple'));
+    $this->assertSession()->optionNotExists('Test term reference', '_none');
     $this->assertFalse($this->assertSession()->optionExists('Test term reference', $term2->id())->isSelected());
     $this->assertFalse($this->assertSession()->optionExists('Test term reference', $term3->id())->isSelected());
 
-    // Delete term3 as well. Since there's only one option left _none should
-    // not appear.
+    // Delete term3 as well. Since there's only one option left the select will
+    // not be a multiple select and _none should appear to force the user to
+    // choose.
     $term3->delete();
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->assertSession()->statusCodeEquals(200);
+    $this->assertFalse($this->assertSession()->fieldExists('Test term reference')->hasAttribute('multiple'));
+    $this->assertTrue($this->assertSession()->optionExists('Test term reference', '_none')->isSelected());
     $this->assertFalse($this->assertSession()->optionExists('Test term reference', $term2->id())->isSelected());
   }
 
