@@ -6,9 +6,11 @@ namespace Drupal\Tests\image\Functional;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\File\FileExists;
+use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
+use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\EntityViewTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -232,7 +234,7 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
     // Confirm the default image is shown on the node form.
     $file = File::load($default_images['field_new']->id());
     $this->drupalGet('node/add/article');
-    $this->assertSession()->responseContains($file->getFilename());
+    $this->assertSession()->responseContains(StreamWrapperManager::getTarget(ImageStyle::load('medium')->buildUri($file->getFileUri())));
 
     // Remove the field default from articles.
     $default_image_settings = $field->getSetting('default_image');
@@ -261,7 +263,7 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
     // Confirm the default image is shown on the node form.
     $file = File::load($default_images['field_storage_new']->id());
     $this->drupalGet('node/add/article');
-    $this->assertSession()->responseContains($file->getFilename());
+    $this->assertSession()->responseContains(StreamWrapperManager::getTarget(ImageStyle::load('medium')->buildUri($file->getFileUri())));
 
     // Change the default image for the field storage and also change the upload
     // destination to the private filesystem at the same time.

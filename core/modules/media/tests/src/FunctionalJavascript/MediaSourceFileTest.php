@@ -100,7 +100,9 @@ class MediaSourceFileTest extends MediaSourceTestBase {
     $this->assertNotEmpty($result);
     $page->pressButton('Save');
     $assert_session->waitForElement('css', '.messages--status');
-    $assert_session->elementAttributeContains('css', 'img', 'src', 'text--plain.png');
+    // The thumbnail image style may convert the icon to another format, so
+    // only assert on the file name without its extension.
+    $assert_session->elementAttributeContains('css', 'img', 'src', 'text--plain.');
 
     // Check if the mapped name is automatically updated.
     $new_filename = $this->randomMachineName() . '.txt';

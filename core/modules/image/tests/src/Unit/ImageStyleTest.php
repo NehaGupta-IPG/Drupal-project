@@ -135,7 +135,7 @@ class ImageStyleTest extends UnitTestCase {
     $image_style = $this->getImageStyleMock($image_effect_id, $image_effect);
     $image_style->expects($this->once())
       ->method('fileDefaultScheme');
-    $this->assertEquals($image_style->buildUri('public://test.jpeg'), 'public://styles/' . $image_style->id() . '/public/test.jpeg.png');
+    $this->assertEquals($image_style->buildUri('public://test.jpeg'), 'public://styles/' . $image_style->id() . '/public/test.png');
 
     // Image style that doesn't change the extension.
     $image_effect_id = $this->randomMachineName();

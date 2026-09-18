@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\image\Kernel;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
@@ -156,7 +157,8 @@ class ImageFormatterTest extends FieldKernelTestBase {
     $this->assertEquals('medium', $build[$this->fieldName][0]['#image_style']);
     // We check that the image URL contains the expected style directory
     // structure.
-    $this->assertStringContainsString('styles/medium/public/test-image.png', (string) $build[$this->fieldName][0]['#markup']);
+    $expected_derivative_uri = ImageStyle::load('medium')->buildUri($png->getFileUri());
+    $this->assertStringContainsString(StreamWrapperManager::getTarget($expected_derivative_uri), (string) $build[$this->fieldName][0]['#markup']);
     $this->assertStringContainsString('width="220"', (string) $build[$this->fieldName][0]['#markup']);
     $this->assertStringContainsString('height="220"', (string) $build[$this->fieldName][0]['#markup']);
 

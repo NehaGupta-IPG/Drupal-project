@@ -41,6 +41,7 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
   label_singular: new TranslatableMarkup('image style'),
   label_plural: new TranslatableMarkup('image styles'),
   config_prefix: 'style',
+  static_cache: TRUE,
   entity_keys: [
     'id' => 'name',
     'label' => 'label',
@@ -234,7 +235,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
         $path = \Drupal::config('system.file')->get('default_scheme') . '://' . $path;
       }
       $original_uri = $stream_wrapper_manager->normalizeUri($path);
-      $token_query = [IMAGE_DERIVATIVE_TOKEN => $this->getPathToken($original_uri)];
+      $token_query = [ImageStyleInterface::TOKEN => $this->getPathToken($original_uri)];
     }
 
     if ($clean_urls === NULL) {
@@ -433,25 +434,6 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
     $configuration['uuid'] = $this->uuidGenerator()->generate();
     $this->getEffects()->addInstanceId($configuration['uuid'], $configuration);
     return $configuration['uuid'];
-  }
-
-  /**
-   * Returns the replacement ID for the image style.
-   *
-   * @return string|null
-   *   The replacement image style ID, or NULL if no replacement exists.
-   *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There
-   *   is no replacement.
-   *
-   * @see https://www.drupal.org/node/3520914
-   * @see \Drupal\image\ImageStyleStorageInterface::getReplacementId
-   */
-  public function getReplacementID() {
-    @trigger_error("\Drupal\image\Entity\ImageStyle::getReplacementID() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3520914", E_USER_DEPRECATED);
-    /** @var \Drupal\image\ImageStyleStorageInterface $storage */
-    $storage = $this->entityTypeManager()->getStorage($this->getEntityTypeId());
-    return $storage->getReplacementId($this->id());
   }
 
   /**

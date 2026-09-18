@@ -46,7 +46,7 @@ class MediaPreviewTest extends MediaTestBase {
     $this->waitForEditor();
     $assert_session = $this->assertSession();
     $assert_session->waitForElementVisible('css', '.ck-widget.drupal-media');
-    $this->assertEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test.png"]', 1000));
+    $this->assertEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test."]', 1000));
     $assert_session->elementNotExists('css', '.ck-widget.drupal-media .media');
     $this->assertNotEmpty($assert_session->waitForText('An error occurred while trying to preview the media. Save your work and reload this page.'));
     // Now assert that the error doesn't appear when the override to force an
@@ -54,7 +54,7 @@ class MediaPreviewTest extends MediaTestBase {
     $this->container->get('state')->set('test_media_filter_controller_throw_error', FALSE);
     $this->getSession()->reload();
     $this->waitForEditor();
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test.png"]'));
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test."]'));
 
     // There's a second kind of error message that comes from the back end
     // that happens when the media uuid can't be converted to a media preview.
@@ -89,7 +89,7 @@ class MediaPreviewTest extends MediaTestBase {
     $this->host->save();
     $this->drupalGet($this->host->toUrl('edit-form'));
     $this->waitForEditor();
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test.png"]'));
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test."]'));
     $assert_session->elementNotExists('css', '.ck-widget.drupal-media .this-error-message-is-themeable');
   }
 
@@ -114,7 +114,7 @@ class MediaPreviewTest extends MediaTestBase {
     $this->drupalGet($this->host->toUrl('edit-form'));
     $this->waitForEditor();
     $assert_session = $this->assertSession();
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test.png"]'));
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test."]'));
     $element = $assert_session->elementExists('css', '[data-media-embed-test-active-theme]');
     $this->assertSame('stark', $element->getAttribute('data-media-embed-test-active-theme'));
     // Assert that the first preview request transferred >500 B over the wire.
@@ -134,7 +134,7 @@ class MediaPreviewTest extends MediaTestBase {
     $source_text_area = $this->getSession()->getPage()->find('css', '[name="body[0][value]"] + .ck-editor textarea');
     $source_text_area->setValue($source_text_area->getValue() . ' ');
     $this->pressEditorButton('Source');
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test.png"]'));
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test."]'));
     $this->assertSame(0, $this->getLastPreviewRequestTransferSize());
   }
 

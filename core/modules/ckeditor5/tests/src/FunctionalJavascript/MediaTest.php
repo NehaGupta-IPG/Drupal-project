@@ -55,7 +55,7 @@ class MediaTest extends MediaTestBase {
     $this->drupalGet($this->host->toUrl('edit-form'));
     $this->waitForEditor();
     $assert_session = $this->assertSession();
-    $assert_session->waitForElementVisible('css', 'img[src*="image-test.png"]', 1000);
+    $assert_session->waitForElementVisible('css', 'img[src*="image-test."]', 1000);
     $editor_html = $this->getEditorDataAsHtmlString();
     // Observe that `<drupal-media>` was moved into its own block element.
     $this->assertEquals('<p>foo</p>' . $original_value, str_replace('&nbsp;', '', $editor_html));
@@ -75,7 +75,7 @@ class MediaTest extends MediaTestBase {
     $this->drupalGet($this->host->toUrl('edit-form'));
     $this->waitForEditor();
     $assert_session = $this->assertSession();
-    $this->assertEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test.png"]', 1000));
+    $this->assertEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test."]', 1000));
     $assert_session->elementNotExists('css', '.ck-widget.drupal-media');
 
     $this->host->body->value = $original_value;
@@ -84,7 +84,7 @@ class MediaTest extends MediaTestBase {
     // Assert that `<drupal-media data-* …>` is upcast into a CKEditor Widget.
     $this->getSession()->reload();
     $this->waitForEditor();
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test.png"]'));
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'img[src*="image-test."]'));
     $assert_session->elementExists('css', '.ck-widget.drupal-media');
   }
 

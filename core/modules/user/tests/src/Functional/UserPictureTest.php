@@ -78,9 +78,10 @@ class UserPictureTest extends BrowserTestBase {
     $image = current($this->drupalGetTestFiles('image'));
     $file = $this->saveUserPicture($image);
 
-    // Verify that the image is displayed on the user account page.
+    // Verify that the image is displayed on the user account page, using the
+    // thumbnail image style configured for the user picture field.
     $this->drupalGet('user');
-    $this->assertSession()->responseContains(StreamWrapperManager::getTarget($file->getFileUri()));
+    $this->assertSession()->responseContains(StreamWrapperManager::getTarget(ImageStyle::load('thumbnail')->buildUri($file->getFileUri())));
 
     // Delete the picture.
     $edit = [];

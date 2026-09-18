@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional\Formatter;
 
+use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\file\Entity\File;
 use Drupal\file\Plugin\Field\FieldFormatter\FileVideoFormatter;
+use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\file\Functional\FileFieldTestBase;
 use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -162,7 +164,7 @@ class FileVideoPosterFormatterTest extends FileFieldTestBase {
     $assert_session = $this->assertSession();
     $assert_session->elementExists('css', "video > source[src='$file_url'][type='video/mp4']");
     // Ensure the image style is served:
-    $assert_session->elementAttributeContains('css', 'video', 'poster', 'styles/medium/public/file.jpg');
+    $assert_session->elementAttributeContains('css', 'video', 'poster', StreamWrapperManager::getTarget(ImageStyle::load('medium')->buildUri($poster1->getFileUri())));
   }
 
 }
