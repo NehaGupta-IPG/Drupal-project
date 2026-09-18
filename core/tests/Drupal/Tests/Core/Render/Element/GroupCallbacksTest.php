@@ -28,11 +28,12 @@ class GroupCallbacksTest extends UnitTestCase {
   public function testElementCallbacks(string $class, array $process, array $pre_render): void {
     $element = new $class([], 'test', []);
     $info = $element->getInfo();
-    foreach (['#process' => $process, '#pre_render' => $pre_render] as $property => $methods) {
+    // These are method-name expectations, not render arrays.
+    foreach (['process' => $process, 'pre_render' => $pre_render] as $property => $methods) {
       foreach ($methods as $method) {
-        $this->assertContains([$class, $method], $info[$property]);
+        $this->assertContains([$class, $method], $info['#' . $property]);
       }
-      foreach ($info[$property] ?? [] as $callback) {
+      foreach ($info['#' . $property] ?? [] as $callback) {
         $this->assertIsCallable($callback);
       }
     }

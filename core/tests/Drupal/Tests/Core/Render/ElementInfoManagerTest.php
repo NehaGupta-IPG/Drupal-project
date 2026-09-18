@@ -7,6 +7,8 @@ namespace Drupal\Tests\Core\Render;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Render\Element\Container;
+use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Render\ElementInfoManager;
 use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -69,7 +71,7 @@ class ElementInfoManagerTest extends UnitTestCase {
     $element_info->expects($this->once())
       ->method('getDefinitions')
       ->willReturn([
-        'page' => ['class' => 'TestElementPlugin'],
+        'page' => ['class' => $plugin_class],
       ]);
 
     $this->assertEquals($expected_info, $element_info->getInfo('page'));
@@ -84,36 +86,36 @@ class ElementInfoManagerTest extends UnitTestCase {
   public static function providerTestGetInfoElementPlugin(): array {
     $data = [];
     $data[] = [
-      'Drupal\Core\Render\Element\ElementInterface',
+      Container::class,
       [
         '#type' => 'page',
         '#theme' => 'page',
         '#defaults_loaded' => TRUE,
-        '#process' => [['TestElementPlugin', 'processGroup']],
-        '#pre_render' => [['TestElementPlugin', 'preRenderGroup']],
+        '#process' => [[Container::class, 'processGroup']],
+        '#pre_render' => [[Container::class, 'preRenderGroup']],
       ],
     ];
 
     $data[] = [
-      'Drupal\Core\Render\Element\FormElementInterface',
+      Textfield::class,
       [
         '#type' => 'page',
         '#theme' => 'page',
         '#input' => TRUE,
-        '#value_callback' => ['TestElementPlugin', 'valueCallback'],
+        '#value_callback' => [Textfield::class, 'valueCallback'],
         '#defaults_loaded' => TRUE,
-        '#process' => [['TestElementPlugin', 'processGroup']],
-        '#pre_render' => [['TestElementPlugin', 'preRenderGroup']],
+        '#process' => [[Textfield::class, 'processGroup']],
+        '#pre_render' => [[Textfield::class, 'preRenderGroup']],
       ],
     ];
     // Container puts grouping callbacks before its own callbacks. The manager
     // must preserve that order without adding duplicate grouping callbacks.
     $callbacks = [
-      '#process' => [['TestElementPlugin', 'processGroup'], ['TestElementPlugin', 'processContainer']],
-      '#pre_render' => [['TestElementPlugin', 'preRenderGroup'], ['TestElementPlugin', 'preRenderContainer']],
+      '#process' => [[Container::class, 'processGroup'], [Container::class, 'processContainer']],
+      '#pre_render' => [[Container::class, 'preRenderGroup'], [Container::class, 'preRenderContainer']],
     ];
     $data['existing group callbacks retain their order'] = [
-      'Drupal\Core\Render\Element\ElementInterface',
+      Container::class,
       $callbacks + ['#type' => 'page', '#defaults_loaded' => TRUE],
       $callbacks,
     ];
@@ -130,7 +132,7 @@ class ElementInfoManagerTest extends UnitTestCase {
       ->with('element_info', $this->anything())
       ->willReturnArgument(0);
 
-    $plugin = $this->createMock('Drupal\Core\Render\Element\FormElementInterface');
+    $plugin = $this->createMock(Textfield::class);
     $plugin->expects($this->once())
       ->method('getInfo')
       ->willReturn([
@@ -161,7 +163,7 @@ class ElementInfoManagerTest extends UnitTestCase {
     $element_info->expects($this->once())
       ->method('getDefinitions')
       ->willReturn([
-        'page' => ['class' => 'TestElementPlugin'],
+        'page' => ['class' => Textfield::class],
       ]);
 
     $this->assertEquals([
@@ -170,8 +172,8 @@ class ElementInfoManagerTest extends UnitTestCase {
       '#value_callback' => 'custom_value_callback',
       '#input' => TRUE,
       '#defaults_loaded' => TRUE,
-      '#process' => [['TestElementPlugin', 'processGroup']],
-      '#pre_render' => [['TestElementPlugin', 'preRenderGroup']],
+      '#process' => [[Textfield::class, 'processGroup']],
+      '#pre_render' => [[Textfield::class, 'preRenderGroup']],
     ], $element_info->getInfo('page'));
   }
 
