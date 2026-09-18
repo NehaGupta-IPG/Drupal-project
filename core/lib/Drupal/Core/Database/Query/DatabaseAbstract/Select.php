@@ -138,7 +138,7 @@ final class Select {
    * @param string $alias
    *   The alias for the table.
    * @param ConjunctionType $conjunction
-   *   The default conjunction that will be applied to arrays of conditions,
+   *   The default conjunction that will be applied to arrays of conditions.
    */
   public function __construct(
     string|Select $table,

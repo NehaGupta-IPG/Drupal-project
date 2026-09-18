@@ -113,14 +113,14 @@ final class Condition {
    * {@inheritdoc}
    */
   public function andConditionGroup(): static {
-    return $this->conditionGroupFactory('AND');
+    return $this->conditionGroupFactory(ConjunctionType::And);
   }
 
   /**
    * {@inheritdoc}
    */
   public function orConditionGroup(): static {
-    return $this->conditionGroupFactory('OR');
+    return $this->conditionGroupFactory(ConjunctionType::Or);
   }
 
 }
