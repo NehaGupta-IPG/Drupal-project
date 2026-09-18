@@ -48,8 +48,7 @@ class OptionsSelectWidget extends OptionsWidgetBase {
       '#type' => 'select',
       '#options' => $options,
       '#default_value' => $selected,
-      // Do not display a 'multiple' select box if there is only one option.
-      '#multiple' => $this->multiple && count($options) > 1,
+      '#multiple' => $multiple,
     ];
 
     return $element;
