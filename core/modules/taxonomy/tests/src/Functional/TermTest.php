@@ -41,7 +41,7 @@ class TermTest extends TaxonomyTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'taxonomy_test'];
+  protected static $modules = ['block', 'node', 'taxonomy_test'];
 
   /**
    * {@inheritdoc}

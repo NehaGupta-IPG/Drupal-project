@@ -32,7 +32,7 @@ class CacheWebTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['taxonomy'];
+  protected static $modules = ['taxonomy', 'node'];
 
   /**
    * {@inheritdoc}

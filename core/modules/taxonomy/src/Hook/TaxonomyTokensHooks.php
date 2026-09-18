@@ -42,10 +42,6 @@ class TaxonomyTokensHooks {
       'name' => $this->t("Description"),
       'description' => $this->t("The optional description of the taxonomy term."),
     ];
-    $term['node-count'] = [
-      'name' => $this->t("Node count"),
-      'description' => $this->t("The number of nodes tagged with the taxonomy term."),
-    ];
     $term['url'] = ['name' => $this->t("URL"), 'description' => $this->t("The URL of the taxonomy term.")];
     // Taxonomy vocabulary related variables.
     $vocabulary['vid'] = [
@@ -59,10 +55,6 @@ class TaxonomyTokensHooks {
     $vocabulary['description'] = [
       'name' => $this->t("Description"),
       'description' => $this->t("The optional description of the taxonomy vocabulary."),
-    ];
-    $vocabulary['node-count'] = [
-      'name' => $this->t("Node count"),
-      'description' => $this->t("The number of nodes tagged with terms belonging to the taxonomy vocabulary."),
     ];
     $vocabulary['term-count'] = [
       'name' => $this->t("Term count"),
@@ -84,6 +76,16 @@ class TaxonomyTokensHooks {
       'description' => $this->t("The date the taxonomy was most recently updated."),
       'type' => 'date',
     ];
+    if (\Drupal::moduleHandler()->moduleExists('node')) {
+      $term['node-count'] = [
+        'name' => $this->t("Node count"),
+        'description' => $this->t("The number of nodes tagged with the taxonomy term."),
+      ];
+      $vocabulary['node-count'] = [
+        'name' => $this->t("Node count"),
+        'description' => $this->t("The number of nodes tagged with terms belonging to the taxonomy vocabulary."),
+      ];
+    }
     return ['types' => $types, 'tokens' => ['term' => $term, 'vocabulary' => $vocabulary]];
   }
 
@@ -93,6 +95,7 @@ class TaxonomyTokensHooks {
   #[Hook('tokens')]
   public function tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
     $token_service = \Drupal::token();
+    $node_module_installed = \Drupal::moduleHandler()->moduleExists('node');
     if (isset($options['langcode'])) {
       $url_options['language'] = \Drupal::languageManager()->getLanguage($options['langcode']);
       $langcode = $options['langcode'];
@@ -128,11 +131,13 @@ class TaxonomyTokensHooks {
             break;
 
           case 'node-count':
-            $query = \Drupal::database()->select('taxonomy_index');
-            $query->condition('tid', $term->id());
-            $query->addTag('term_node_count');
-            $count = $query->countQuery()->execute()->fetchField();
-            $replacements[$original] = $count;
+            if ($node_module_installed) {
+              $query = \Drupal::database()->select('taxonomy_index');
+              $query->condition('tid', $term->id());
+              $query->addTag('term_node_count');
+              $count = $query->countQuery()->execute()->fetchField();
+              $replacements[$original] = $count;
+            }
             break;
 
           case 'vocabulary':
@@ -195,8 +200,10 @@ class TaxonomyTokensHooks {
             break;
 
           case 'node-count':
-            $taxonomy_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
-            $replacements[$original] = $taxonomy_storage->nodeCount($vocabulary->id());
+            if ($node_module_installed) {
+              $taxonomy_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+              $replacements[$original] = $taxonomy_storage->nodeCount($vocabulary->id());
+            }
             break;
         }
       }

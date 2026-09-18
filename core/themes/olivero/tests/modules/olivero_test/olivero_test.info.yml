@@ -7,6 +7,7 @@ dependencies:
   - drupal:comment
   - drupal:form_test
   - drupal:image
+  - drupal:node
   - drupal:path
   - drupal:taxonomy
   - drupal:views
