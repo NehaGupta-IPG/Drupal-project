@@ -199,11 +199,11 @@ class RecipeRunnerTest extends KernelTestBase {
   }
 
   /**
-   * Tests unlabelled recipe config resolves to the site's default langcode.
+   * Tests recipe config resolves to the site's default langcode.
    *
    * A recipe applied to a non-English-default site must not hardcode an
-   * assumption that unlabelled configuration means English - the same rule
-   * that applies to a module's own shipped config applies here too, since
+   * assumption that configuration without a langcode means English - the same
+   * rule that applies to a module's own shipped config applies here too, since
    * both go through \Drupal\Core\Config\ConfigInstaller::createConfiguration().
    */
   public function testConfigLangcodeResolvesToSiteDefault(): void {
@@ -219,7 +219,7 @@ class RecipeRunnerTest extends KernelTestBase {
   }
 
   /**
-   * Tests a recipe's own explicitly labelled language installs.
+   * Tests a recipe's configuration with an explicit langcode installs.
    *
    * The recipe ships language.entity.de and config_test.dynamic.recipe_german
    * together.
