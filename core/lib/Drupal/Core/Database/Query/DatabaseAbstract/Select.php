@@ -620,7 +620,7 @@ final class Select {
    */
   public function __serialize(): array {
     if ($this->alterMetadata !== []) {
-      throw new \LogicException(__CLASS__ . ' objects containing alter metadatada cannot be serialized');
+      throw new \LogicException(__CLASS__ . ' objects containing alter metadata cannot be serialized');
     }
     if ($this->alterTags !== []) {
       throw new \LogicException(__CLASS__ . ' objects containing alter tags cannot be serialized');

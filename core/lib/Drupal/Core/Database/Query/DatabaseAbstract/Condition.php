@@ -20,13 +20,6 @@ final class Condition implements \Countable {
   public private(set) array $conditions = [];
 
   /**
-   * Array of arguments.
-   *
-   * @var array
-   */
-  public private(set) array $arguments = [];
-
-  /**
    * Constructs a Condition object.
    *
    * @param string $conjunction
