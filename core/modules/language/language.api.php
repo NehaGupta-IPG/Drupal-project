@@ -115,15 +115,15 @@ function hook_language_fallback_candidates_OPERATION_alter(array &$candidates, a
  * Alter the configuration checked when the default language changes.
  *
  * When the site's default language changes,
- * \Drupal\language\DefaultLangcodeConfigUpdater relabels every configuration
+ * \Drupal\language\DefaultLangcodeConfigUpdater updates every configuration
  * object whose langcode currently matches the previous default to the new
  * one. Removing a name from $names stops that configuration object from
- * being relabelled - it keeps its current langcode, whatever the new
+ * being updated - it keeps its current langcode, whatever the new
  * default becomes.
  *
  * @param array $names
  *   The names of the configuration objects that will be checked for
- *   relabelling to the new default langcode.
+ *   updating to the new default langcode.
  * @param string $old_langcode
  *   The previous default langcode. Passed for context only.
  * @param string $new_langcode

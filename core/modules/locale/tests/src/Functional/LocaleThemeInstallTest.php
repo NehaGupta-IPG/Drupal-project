@@ -10,11 +10,11 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests that installing a theme relabels its shipped English config.
+ * Tests that installing a theme updates its shipped English config.
  *
  * When a theme ships config with langcode 'en' (or no langcode at all) and
  * the site's configuration default language is not English, ConfigInstaller
- * must relabel that configuration to the site default while installing it.
+ * must update that configuration to the site default while installing it.
  *
  * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
  */

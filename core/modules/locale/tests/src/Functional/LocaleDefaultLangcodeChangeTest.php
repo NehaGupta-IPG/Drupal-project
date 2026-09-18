@@ -70,9 +70,9 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/language');
     $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
 
-    // The default-langcode-change batch relabels the configuration to the
-    // new default, then locale module's hook into that same batch applies
-    // the real translated string - not just the langcode change.
+    // The default-langcode-change batch updates the configuration to the new
+    // default, then locale module's hook into that same batch applies the real
+    // translated string - not just the langcode change.
     $this->assertSame('fr', $this->config('locale_test.translation')->get('langcode'));
     $this->assertSame('French test', $this->config('locale_test.translation')->get('test'));
 
@@ -144,10 +144,10 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
    *
    * With locale.settings:translate_english on, English stops being the one
    * language none of this ever writes to - so this exercises the same
-   * relabel-then-save path testDefaultLanguageChangeToEnglishDoesNotCreate
-   * EnglishTranslations() found nothing to write for, this time with
-   * nothing stopping it from trying. Relabelling text back to English
-   * still must not be mistaken for a deliberate translation of it.
+   * update-then-save path testDefaultLanguageChangeToEnglishDoesNotCreate
+   * EnglishTranslations() found nothing to write for, this time with nothing
+   * stopping it from trying. Updating text back to English still must not be
+   * mistaken for a deliberate translation of it.
    */
   public function testDefaultLanguageChangeWithEnglishTranslatable(): void {
     $this->config('locale.settings')->set('translate_english', TRUE)->save();

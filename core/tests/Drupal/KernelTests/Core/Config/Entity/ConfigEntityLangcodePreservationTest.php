@@ -50,7 +50,7 @@ class ConfigEntityLangcodePreservationTest extends KernelTestBase {
     $this->assertSame('en', $entity->language()->getId());
 
     // Reload from storage and save again with no changes: an ordinary save
-    // must never relabel this to the site's configuration default.
+    // must never update this to the site's configuration default.
     $storage->resetCache();
     /** @var \Drupal\config_test\Entity\ConfigTest $reloaded */
     $reloaded = $storage->load('english_only');

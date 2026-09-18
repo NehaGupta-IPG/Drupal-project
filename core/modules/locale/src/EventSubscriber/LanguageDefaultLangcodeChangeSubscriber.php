@@ -21,7 +21,7 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
   }
 
   /**
-   * Adds a batch operation to translate whatever the sweep relabels.
+   * Adds a batch operation to translate updated configuration.
    */
   public function onDefaultLangcodeChange(LanguageDefaultLangcodeChangeEvent $event): void {
     $event->addOperation(

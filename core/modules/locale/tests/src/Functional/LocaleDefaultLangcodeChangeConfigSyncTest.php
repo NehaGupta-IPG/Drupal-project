@@ -14,14 +14,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests changing system.site:default_langcode back via a configuration sync.
  *
  * \Drupal\language\EventSubscriber\ConfigSubscriber::onConfigSave() skips
- * \Drupal\language\DefaultLangcodeConfigUpdater's retroactive relabelling
- * sweep while configuration is syncing, on the assumption that an import's
- * source storage is a complete, self-consistent snapshot already
- * responsible for providing correct langcodes for anything it changes
- * itself. This proves that assumption holds: a full site export, changed
- * away from English and changed back by re-importing that same export,
- * ends up exactly as it was exported - without ever needing the sweep a
- * UI-driven change relies on.
+ * \Drupal\language\DefaultLangcodeConfigUpdater's retroactive updates while
+ * configuration is syncing, on the assumption that an import's source storage
+ * is a complete, self-consistent snapshot already responsible for providing
+ * correct langcodes for anything it changes itself. This proves that assumption
+ * holds: a full site export, changed away from English and changed back by
+ * re-importing that same export, ends up exactly as it was exported.
  *
  * @see \Drupal\language\EventSubscriber\ConfigSubscriber::onConfigSave()
  * @see \Drupal\Tests\language\Functional\LanguageConfigOverrideImportTest
@@ -61,7 +59,7 @@ class LocaleDefaultLangcodeChangeConfigSyncTest extends BrowserTestBase {
     $sync = \Drupal::service('config.storage.sync');
     $this->copyConfig(\Drupal::service('config.storage'), $sync);
 
-    // Change the default language via the UI - relabelling and
+    // Change the default language via the UI - updating and
     // retranslating locale_test.translation to French, as proven separately
     // by LocaleDefaultLangcodeChangeTest.
     $admin_user = $this->drupalCreateUser(['administer languages']);
