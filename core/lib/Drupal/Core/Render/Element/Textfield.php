@@ -48,12 +48,12 @@ class Textfield extends FormElementBase {
       '#maxlength' => 128,
       '#autocomplete_route_name' => FALSE,
       '#process' => [
-        [$class, 'processAutocomplete'],
-        [$class, 'processAjaxForm'],
-        [$class, 'processPattern'],
+        [static::class, 'processAutocomplete'],
+        [static::class, 'processAjaxForm'],
+        [static::class, 'processPattern'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderTextfield'],
+        [static::class, 'preRenderTextfield'],
       ],
       '#theme' => 'input__textfield',
       '#theme_wrappers' => ['form_element'],

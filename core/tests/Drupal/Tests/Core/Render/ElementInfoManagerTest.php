@@ -158,6 +158,8 @@ class ElementInfoManagerTest extends UnitTestCase {
       '#value_callback' => 'custom_value_callback',
       '#input' => TRUE,
       '#defaults_loaded' => TRUE,
+      '#process' => [['TestElementPlugin', 'processGroup']],
+      '#pre_render' => [['TestElementPlugin', 'preRenderGroup']],
     ], $element_info->getInfo('page'));
   }
 

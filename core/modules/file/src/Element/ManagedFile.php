@@ -204,7 +204,7 @@ class ManagedFile extends FormElementBase {
       $form[$current_file_count]['#attributes']['class'][] = 'ajax-new-content';
     }
 
-    // Removing groups to make preRenderGroup to skip this call
+    // Removing groups to make preRenderGroup to skip this call.
     unset($form['#groups']);
 
     $status_messages = ['#type' => 'status_messages'];

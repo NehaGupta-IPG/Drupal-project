@@ -31,8 +31,8 @@ class Datetime extends DateElementBase {
         [static::class, 'validateDatetime'],
       ],
       '#process' => [
-        [$class, 'processDatetime'],
-        [$class, 'processAjaxForm'],
+        [static::class, 'processDatetime'],
+        [static::class, 'processAjaxForm'],
       ],
       '#theme' => 'datetime_form',
       '#theme_wrappers' => ['datetime_wrapper'],

@@ -52,12 +52,12 @@ class Container extends RenderElementBase {
     return [
       '#optional' => FALSE,
       '#process' => [
-        [$class, 'processContainer'],
+        [static::class, 'processContainer'],
       ],
       '#pre_render' => [
         // Prepend preRenderGroup, so it runs first.
-        [$class, 'preRenderGroup'],
-        [$class, 'preRenderContainer'],
+        [static::class, 'preRenderGroup'],
+        [static::class, 'preRenderContainer'],
       ],
       '#theme_wrappers' => ['container'],
     ];

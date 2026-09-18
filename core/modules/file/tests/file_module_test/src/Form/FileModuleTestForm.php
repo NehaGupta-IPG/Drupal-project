@@ -40,6 +40,15 @@ class FileModuleTestForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state, $tree = TRUE, $extended = TRUE, $multiple = FALSE, $default_fids = NULL) {
     $form['#tree'] = (bool) $tree;
 
+    // Keep the group before its members in the render order.
+    if ($this->getRequest()->query->get('grouped')) {
+      $form['group'] = [
+        '#type' => 'details',
+        '#title' => $this->t('File group'),
+        '#open' => TRUE,
+      ];
+    }
+
     $form['nested']['file'] = [
       '#type' => 'managed_file',
       '#title' => $this->t('Managed <em>@type</em>', ['@type' => 'file & butter']),
@@ -53,6 +62,10 @@ class FileModuleTestForm extends FormBase {
     if ($default_fids) {
       $default_fids = explode(',', $default_fids);
       $form['nested']['file']['#default_value'] = $extended ? ['fids' => $default_fids] : $default_fids;
+    }
+
+    if (isset($form['group'])) {
+      $form['nested']['file']['#group'] = 'group';
     }
 
     $form['textfield'] = [

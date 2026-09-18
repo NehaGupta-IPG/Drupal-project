@@ -33,11 +33,11 @@ class Checkbox extends FormElementBase {
       '#input' => TRUE,
       '#return_value' => 1,
       '#process' => [
-        [$class, 'processCheckbox'],
-        [$class, 'processAjaxForm'],
+        [static::class, 'processCheckbox'],
+        [static::class, 'processAjaxForm'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderCheckbox'],
+        [static::class, 'preRenderCheckbox'],
       ],
       '#theme' => 'input__checkbox',
       '#theme_wrappers' => ['form_element'],
