@@ -48,7 +48,7 @@ class GroupCallbacksTest extends UnitTestCase {
       'container' => [Container::class, ['processContainer'], ['preRenderContainer']],
       'details' => [Details::class, ['processAjaxForm'], ['preRenderDetails']],
       'fieldset' => [Fieldset::class, ['processAjaxForm'], []],
-      'textarea' => [Textarea::class, ['processAjaxForm'], []],
+      'textarea' => [Textarea::class, ['processAjaxForm'], ['preRenderAttachments']],
       'textfield' => [
         Textfield::class,
         ['processAutocomplete', 'processAjaxForm', 'processPattern'],

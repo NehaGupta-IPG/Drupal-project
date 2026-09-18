@@ -48,6 +48,17 @@ class FormTestGroupDetailsForm extends FormBase {
         'data-summary-attribute' => 'test',
       ],
     ];
+    $form['grouped_select'] = [
+      '#type' => 'select',
+      '#title' => 'Grouped select',
+      '#options' => ['one' => 'One', 'two' => 'Two'],
+      '#group' => 'details',
+    ];
+    $form['grouped_textarea'] = [
+      '#type' => 'textarea',
+      '#title' => 'Grouped textarea',
+      '#group' => 'details',
+    ];
     $form['description_attributes'] = [
       '#type' => 'details',
       '#title' => 'Details element with description',

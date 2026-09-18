@@ -25,11 +25,14 @@ class ElementInfoManagerTest extends UnitTestCase {
   /**
    * Tests the getInfo() method when render element plugins are used.
    *
+   * Data sets can supply plugin info with existing callbacks to check that the
+   * manager preserves them. By default, the plugin declares no callbacks.
+   *
    * @legacy-covers ::getInfo
    * @legacy-covers ::buildInfo
    */
   #[DataProvider('providerTestGetInfoElementPlugin')]
-  public function testGetInfoElementPlugin(string $plugin_class, $expected_info): void {
+  public function testGetInfoElementPlugin(string $plugin_class, $expected_info, array $plugin_info = ['#theme' => 'page']): void {
     // Override the module handler to set expectations.
     $moduleHandler = $this->createMock(ModuleHandlerInterface::class);
     $moduleHandler->expects($this->once())
@@ -40,9 +43,7 @@ class ElementInfoManagerTest extends UnitTestCase {
     $plugin = $this->createMock($plugin_class);
     $plugin->expects($this->once())
       ->method('getInfo')
-      ->willReturn([
-        '#theme' => 'page',
-      ]);
+      ->willReturn($plugin_info);
 
     $themeManager = $this->createStub(ThemeManagerInterface::class);
 
@@ -104,6 +105,17 @@ class ElementInfoManagerTest extends UnitTestCase {
         '#process' => [['TestElementPlugin', 'processGroup']],
         '#pre_render' => [['TestElementPlugin', 'preRenderGroup']],
       ],
+    ];
+    // Container puts grouping callbacks before its own callbacks. The manager
+    // must preserve that order without adding duplicate grouping callbacks.
+    $callbacks = [
+      '#process' => [['TestElementPlugin', 'processGroup'], ['TestElementPlugin', 'processContainer']],
+      '#pre_render' => [['TestElementPlugin', 'preRenderGroup'], ['TestElementPlugin', 'preRenderContainer']],
+    ];
+    $data['existing group callbacks retain their order'] = [
+      'Drupal\Core\Render\Element\ElementInterface',
+      $callbacks + ['#type' => 'page', '#defaults_loaded' => TRUE],
+      $callbacks,
     ];
     return $data;
   }

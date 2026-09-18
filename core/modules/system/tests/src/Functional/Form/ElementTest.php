@@ -182,6 +182,11 @@ class ElementTest extends BrowserTestBase {
   protected function testGroupElements(): void {
     $this->drupalGet('form-test/group-details');
     $this->assertSession()->elementsCount('xpath', '//div[@class="details-wrapper"]//div[@class="details-wrapper"]//label', 1);
+    $this->assertSession()->elementExists('css', '#edit-details select[name="grouped_select"]');
+    $this->assertSession()->elementExists('css', '#edit-details textarea[name="grouped_textarea"]');
+    $this->assertSession()->elementsCount('css', 'select[name="grouped_select"]', 1);
+    $this->assertSession()->elementsCount('css', 'textarea[name="grouped_textarea"]', 1);
+    $this->assertSession()->responseContains('core/misc/components/resize.module.css');
     $this->drupalGet('form-test/group-container');
     $this->assertSession()->elementsCount('xpath', '//div[@id="edit-container"]//div[@class="details-wrapper"]//label', 1);
     $this->drupalGet('form-test/group-fieldset');
