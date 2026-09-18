@@ -80,6 +80,7 @@ variables:
   _TARGET_DB: "mysql-8.4"
   _TARGET_DB_DRIVER: "mysql"
   _TARGET_DB_DRIVER_MODULE: "mysql"
+  _TARGET_DB_IMAGE: "$_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:production"
   MYSQL_ROOT_PASSWORD: root
   MYSQL_DATABASE: mysql
   MYSQL_USER: drupaltestbot
@@ -133,7 +134,7 @@ default:
       optional: true
 
 .with-database: &with-database
-  name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:production
+  name: $_TARGET_DB_IMAGE
   alias: database
 
 .with-selenium-chrome: &with-selenium-chrome
@@ -474,6 +475,16 @@ default:
       - _TARGET_PHP: !reference [.php_versions]
         _TARGET_DB: [mariadb-10.11, mariadb-12.3]
   variables:
+    _TARGET_DB_DRIVER: "mysql"
+    _TARGET_DB_DRIVER_MODULE: "mysql"
+
+'MariaDB 13 (via PDO)':
+  <<: [ *recursive-trigger, *run-on-mr ]
+  parallel:
+    matrix:
+      - _TARGET_PHP: !reference [.php_versions]
+  variables:
+    _TARGET_DB_IMAGE: "docker.io/library/mariadb:13"
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
 
