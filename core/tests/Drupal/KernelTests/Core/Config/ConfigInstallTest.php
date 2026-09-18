@@ -339,7 +339,7 @@ class ConfigInstallTest extends KernelTestBase {
   }
 
   /**
-   * Tests the config hash is unaffected by langcode relabelling on install.
+   * Tests the config hash is unaffected by langcode updating on install.
    *
    * _core.default_config_hash must be calculated from the configuration as
    * shipped by the extension, before ConfigInstaller resolves its langcode

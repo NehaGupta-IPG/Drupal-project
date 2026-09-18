@@ -75,10 +75,10 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
       // change in this save is never fed back as a customized translation.
       // Without this, an unrelated key changing in the same save - for
       // example a module's hook_install() setting a non-translatable key as
-      // a follow-up to ConfigInstaller relabelling the object's langcode -
-      // would cause the still-untranslated values to be re-saved as
-      // customized translations, clobbering any real translation before it
-      // gets a chance to apply.
+      // a follow-up to ConfigInstaller updating the object's langcode - would
+      // cause the still-untranslated values to be re-saved as customized
+      // translations, clobbering any real translation before it gets a chance
+      // to apply.
       $this->updateLocaleStorage($config, $langcode, [], $original);
     }
   }

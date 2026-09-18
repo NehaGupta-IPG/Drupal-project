@@ -57,13 +57,13 @@ class DefaultLangcodeConfigUpdater {
   }
 
   /**
-   * Batch operation: relabels configuration following the previous default.
+   * Batch operation: updates configuration following the previous default.
    *
    * Only configuration whose langcode currently matches the previous
    * default is touched - anything explicitly set to some other langcode is
    * left alone, the same way an ordinary save would leave it alone.
    *
-   * Before relabelling, whatever the configuration's current content
+   * Before updating, whatever the configuration's current content
    * actually is gets saved as an override for the langcode it is about to
    * stop being - otherwise it would simply be gone the moment locale module
    * applies the new default's own translation over the top. This is a plain
