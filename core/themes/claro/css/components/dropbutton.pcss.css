@@ -63,6 +63,14 @@
   list-style: none;
 }
 
+.dropbutton--primary .dropbutton__toggle {
+  background: var(--button-bg-color--primary);
+
+  &::before {
+    background: url(../../images/icons/000f33/chevron-down-white.svg) no-repeat center;
+  }
+}
+
 .dropbutton-widget {
   border-radius: var(--button-border-radius-size);
   background-color: var(--button-bg-color);
@@ -157,6 +165,14 @@
   }
 }
 
+.dropbutton--primary .dropbutton__toggle:hover {
+  background-color: var(--button--hover-bg-color--primary);
+}
+
+.dropbutton--primary .dropbutton__toggle:active {
+  background-color: var(--button--active-bg-color--primary);
+}
+
 .dropbutton-wrapper.open .dropbutton__toggle::before {
   transform: translate(50%, -50%) rotate(180deg);
   [dir="rtl"] & {
@@ -178,6 +194,12 @@
 .no-touchevents .dropbutton--small .dropbutton__toggle::before,
 .no-touchevents .dropbutton--extrasmall .dropbutton__toggle::before {
   width: 0.75rem; /* 12px */
+}
+
+.dropbutton--primary .dropbutton__item:first-of-type > *:hover,
+.dropbutton--primary .dropbutton__item:first-of-type > .button:hover {
+  color: var(--button-fg-color--primary);
+  background-color: var(--button--hover-bg-color--primary);
 }
 
 /* High contrast. */
@@ -212,6 +234,11 @@
   .dropbutton-wrapper.open .dropbutton__toggle::before {
     margin-top: calc(0.4375rem / (2 * 1.41429));
   }
+}
+
+.dropbutton--primary .dropbutton__item:first-of-type > * {
+  color: var(--button-fg-color--primary);
+  background-color: var(--button-bg-color--primary);
 }
 
 /**
@@ -295,6 +322,11 @@
   [dir="rtl"] .dropbutton--multiple & > * {
     border-radius: 0 var(--button-border-radius-size) var(--button-border-radius-size) 0;
   }
+}
+
+.dropbutton--primary .dropbutton__item:first-of-type > *:active {
+  color: var(--button-fg-color--primary);
+  background-color: var(--button--active-bg-color--primary);
 }
 
 .dropbutton > .dropbutton__item > a,

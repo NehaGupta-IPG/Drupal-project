@@ -119,6 +119,26 @@ class ClaroPreRender implements TrustedCallbackInterface {
     if (empty($element['#dropbutton_type'])) {
       $element['#dropbutton_type'] = 'extrasmall';
     }
+
+    // If any buttons within the dropbutton have variants, add that variant
+    // as a dropbutton--(variant) style to the dropbutton container.
+    foreach ($element['#links'] as $link) {
+      if (isset($link['url'])) {
+        $options = $link['url']->getOptions();
+        if (!empty($options['attributes']['class'])) {
+          foreach ($options['attributes']['class'] as $class) {
+            if (strpos($class, 'button--') === 0) {
+              $element['#attributes']['class'][] = 'dropbutton--' . str_replace('button--', '', $class);
+            }
+          }
+        }
+      }
+    }
+
+    if (!empty($element['#attributes']['class'])) {
+      $element['#attributes']['class'] = array_unique($element['#attributes']['class']);
+    }
+
     return $element;
   }
 
