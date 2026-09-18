@@ -602,7 +602,7 @@ class Sql extends QueryPluginBase {
       return $alias;
     }
     if (strlen($alias) > $maxlength) {
-      $checksum = 'c' . crc32($alias);
+      $checksum = 'c' . hash('crc32', $alias);
       $pos = strlen($checksum) + strlen($alias) - $maxlength;
       $alias = $checksum . substr($alias, $pos);
     }
