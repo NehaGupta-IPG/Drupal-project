@@ -6,4 +6,7 @@
  */
 .ck {
   --ck-color-base-border: var(--input-border-color);
+  --ck-focus-ring: 1px solid var(--color-focus);
+  --ck-focus-outer-shadow: 0 0 0 2px var(--color-white), 0 0 0 0.3125rem var(--color-focus);
+  --ck-inner-shadow: var(--ck-focus-outer-shadow);
 }
