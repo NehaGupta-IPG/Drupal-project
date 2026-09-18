@@ -1,0 +1,6 @@
+include:
+  - local: .gitlab-ci.yml
+
+.with-database: &with-database
+  name: mariadb:13
+  alias: database

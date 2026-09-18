@@ -477,14 +477,19 @@ default:
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
 
-'MariaDB 13':
-  <<: [ *recursive-trigger, *run-on-mr ]
+'MariaDB 13 (via PDO)':
+  <<: *run-on-mr
+  stage: 🗜️ Additional tests
+  trigger:
+    strategy: depend
+    include: .gitlab-ci/mariadb-13.yml
+  parallel:
+    matrix:
+      - _TARGET_PHP: !reference [ .php_versions ]
   variables:
+    _TARGET_DB: "mariadb"
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
-  services:
-    - name: mariadb:13
-      alias: database
 
 'MySQL (via PDO)':
   <<: [ *recursive-trigger, *run-on-mr ]
