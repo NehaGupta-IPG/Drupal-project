@@ -108,7 +108,7 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
     ]);
 
     foreach ($this->deprecatedThemeFiles as $deprecatedThemeFile => $v) {
-      @trigger_error('Code in ' . $deprecatedThemeFile . '.theme is deprecated in drupal:11.5.0 and must be converted before drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222', E_USER_DEPRECATED);
+      @trigger_error('Using ' . $deprecatedThemeFile . '.theme is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222', E_USER_DEPRECATED);
     }
   }
 
@@ -273,7 +273,7 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
           }
         }
       }
-      else {
+      elseif (!$shouldSkipProceduralScan) {
         $implementations = $proceduralHookFileCache->get($filename);
         if ($implementations === NULL) {
           $finder = MockFileFinder::create($filename);
@@ -285,7 +285,7 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
             if (StaticReflectionParser::hasAttribute($attributes, ExtensionFileIsConverted::class)) {
               $implementations['@skip_theme_file_deprecation'] = TRUE;
             }
-            if ($shouldSkipProceduralScan || StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
+            if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
               break;
             }
             if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && (preg_match($currentThemePreg, $function, $matches) || preg_match($allThemesPreg, $function, $matches))) {
