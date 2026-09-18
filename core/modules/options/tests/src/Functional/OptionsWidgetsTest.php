@@ -626,25 +626,20 @@ class OptionsWidgetsTest extends FieldTestBase {
     ]);
     $entity->save();
 
-    // Delete the selected term. Two options remain so _none should appear
-    // pre-selected.
+    // Delete the selected term. Two options remain but neither should be
+    // selected.
     $term_to_delete->delete();
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->optionExists('Test term reference', $term2->id());
-    $this->assertSession()->optionExists('Test term reference', $term3->id());
-    $empty_option = $this->assertSession()->optionExists('Test term reference', '_none');
-    $this->assertTrue($empty_option->isSelected());
-    $this->assertSame('- Select a value -', $empty_option->getText());
+    $this->assertFalse($this->assertSession()->optionExists('Test term reference', $term2->id())->isSelected());
+    $this->assertFalse($this->assertSession()->optionExists('Test term reference', $term3->id())->isSelected());
 
     // Delete term3 as well. Since there's only one option left _none should
     // not appear.
     $term3->delete();
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->optionExists('Test term reference', $term2->id());
-    $this->assertSession()->optionExists('Test term reference', '_none');
-    $this->assertTrue($this->assertSession()->optionExists('Test term reference', '_none')->isSelected());
+    $this->assertFalse($this->assertSession()->optionExists('Test term reference', $term2->id())->isSelected());
   }
 
   /**
