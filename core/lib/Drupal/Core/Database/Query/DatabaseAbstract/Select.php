@@ -615,4 +615,17 @@ final class Select {
     return $this->conditionGroupFactory('OR');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function __serialize(): array {
+    if ($this->alterMetadata !== []) {
+      throw new \LogicException(__CLASS__ . ' objects containing alter metadatada cannot be serialized');
+    }
+    if ($this->alterTags !== []) {
+      throw new \LogicException(__CLASS__ . ' objects containing alter tags cannot be serialized');
+    }
+    return get_object_vars($this);
+  }
+
 }
