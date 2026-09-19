@@ -741,10 +741,8 @@ class FormHooks {
       ],
       '#weight' => 1000,
       '#cache' => [
-        // Cache tag that can be invalidated.
-        'tags' => [
-          'default_admin_sidebar_toggle',
-        ],
+        // Don't cache so error indicator changes.
+        'max-age' => 0,
       ],
     ];
     $form['#attached']['library'][] = 'default_admin/sidebar';
@@ -854,10 +852,6 @@ class FormHooks {
       }
     }
 
-    if (isset($form['advanced'])) {
-      $form['#validate'][] = [static::class, 'validateAdminAdvancedSidebar'];
-    }
-
     Helper::formActions($form['default_admin_sticky_actions'] ?? NULL);
     unset($form['default_admin_sticky_actions']);
 
@@ -879,19 +873,6 @@ class FormHooks {
     $form['revision_information']['#type'] = 'container';
     $form['revision_information']['#group'] = 'meta';
     $form['revision_information']['#attributes']['class'][] = 'entity-meta__revision';
-  }
-
-  /**
-   * Form validate callback.
-   *
-   * Checks for form errors and invalidates the toggle button cache so
-   * that it can be rerendered with an error indicator.
-   */
-  public static function validateAdminAdvancedSidebar(array $form, FormStateInterface $form_state): void {
-    if (!empty($form['advanced']) && $form_state->hasAnyErrors() && ($form_actions = Helper::formActions()) && !empty($form_actions['default_admin_sidebar_toggle'])) {
-      \Drupal::service('cache_tags.invalidator')->invalidateTags(['default_admin_sidebar_toggle']);
-      Helper::formActions($form_actions);
-    }
   }
 
 }
