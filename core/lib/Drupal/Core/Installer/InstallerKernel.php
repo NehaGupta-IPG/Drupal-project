@@ -51,7 +51,14 @@ class InstallerKernel extends DrupalKernel {
       $this->containerNeedsRebuild = TRUE;
     }
     $this->compiledExtensions = $extensions;
-    return parent::initializeContainer();
+    $container = parent::initializeContainer();
+    // A container loaded from the dump skips service provider discovery, which
+    // is where the module and theme lists are normally populated. But the
+    // installer needs them later in the request, for example to look up the
+    // install theme in ::updateThemes().
+    $this->moduleList ??= $extensions['module'] ?? [];
+    $this->themeList ??= $extensions['theme'] ?? [];
+    return $container;
   }
 
   /**
