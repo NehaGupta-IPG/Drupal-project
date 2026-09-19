@@ -325,9 +325,7 @@
 .claro-details__wrapper--accordion::before,
 .claro-details__wrapper--accordion::after,
 .claro-details__wrapper--accordion-item::before,
-.claro-details__wrapper--accordion-item::after,
-.claro-details__wrapper--vertical-tabs-item::before,
-.claro-details__wrapper--vertical-tabs-item::after {
+.claro-details__wrapper--accordion-item::after {
   display: table;
   clear: both;
   content: "";
