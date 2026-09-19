@@ -106,7 +106,7 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     // Skipping these passes is only safe while the container is never dumped:
     // a dumped container needs aliases and private services fully resolved.
     // Once the base system is installed, the installer dumps its container so
-    // it can be reused across requests, so the passes must run then.
+    // it can be reused across requests.
     // @see install_begin_request()
     if (empty($install_state['base_system_verified'])) {
       $pass_config->setRemovingPasses(array_filter($pass_config->getRemovingPasses(), function ($pass) {
