@@ -30,14 +30,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * It is possible to use the following placeholders in the settings array:
  * - %bundle: the target bundle of entity display being modified.
  * - %entity_type: the target entity type of entity display being modified.
- * - %view_mode: the display mode of entity display being modified.
+ * - %display_mode: the display mode of entity display being modified.
  *
  * Example usages in a recipe:
  *
  * @code
  * config:
  *   actions:
- *     # Sets third-party setting of on the `user_picture` component, on
+ *     # Sets a third-party setting on the `user_picture` component, on
  *     # behalf of the System module.
  *     core.entity_view_display.user.user.default:
  *       setComponentThirdPartySetting:
@@ -122,7 +122,7 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
     // Ensure the component exists in the display.
     $component = $entity->getComponent($value['component']);
     if ($component === NULL) {
-      throw new ConfigActionException(sprintf("Component %s does not exist or hidden.", $value['component']));
+      throw new ConfigActionException(sprintf("Component %s does not exist or is hidden.", $value['component']));
     }
     $component['third_party_settings'][$provider] = ConfigActionManager::replacePlaceholders($value['settings'] ?? [], [
       '%bundle' => $entity->getTargetBundle(),

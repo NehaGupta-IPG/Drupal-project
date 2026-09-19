@@ -157,7 +157,7 @@ class SetComponentThirdPartySettingConfigActionTest extends KernelTestBase {
     $manager = $this->container->get('plugin.manager.config_action');
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("Component not_a_thing does not exist or hidden.");
+    $this->expectExceptionMessage("Component not_a_thing does not exist or is hidden.");
     $manager->applyAction(
       'setComponentThirdPartySetting',
       $config_name,
