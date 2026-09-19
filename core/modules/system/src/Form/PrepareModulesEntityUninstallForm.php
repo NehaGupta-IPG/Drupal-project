@@ -5,6 +5,7 @@ namespace Drupal\system\Form;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -135,7 +136,10 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
 
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
     $count = $storage->getQuery()->accessCheck(FALSE)->count()->execute();
-    $accessible_count = $storage->getQuery()->accessCheck(TRUE)->count()->execute();
+
+    $cacheability = new CacheableMetadata();
+    $accessible_count = $storage->getQuery()->accessCheck(TRUE)->count()->execute($cacheability);
+    $cacheability->applyTo($form);
 
     $form['entity_type_id'] = [
       '#type' => 'value',
@@ -153,11 +157,13 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
       ];
     }
     elseif ($accessible_count > 0 && $entity_type->hasKey('label')) {
+      $cacheability = new CacheableMetadata();
       $recent_entity_ids = $storage->getQuery()
         ->accessCheck(TRUE)
         ->sort($entity_type->getKey('id'), 'DESC')
         ->pager(10)
-        ->execute();
+        ->execute($cacheability);
+      $cacheability->applyTo($form);
       $recent_entities = $storage->loadMultiple($recent_entity_ids);
 
       $labels = [];

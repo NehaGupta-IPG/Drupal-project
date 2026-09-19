@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\node\Hook;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -81,11 +82,19 @@ class NodeDatabaseHooks {
     }
     // Update the query for the given storage method.
     \Drupal::service('node.grant_storage')->alterQuery($query, $tables, $op, $account, $base_table);
+
+    // Add the grants cache context to the query.
+    $contexts = ['user.node_grants:' . $op];
+    if ($query instanceof RefinableCacheableDependencyInterface) {
+      $query->addCacheContexts($contexts);
+    }
+
+    // @todo Remove in https://www.drupal.org/project/drupal/issues/3610599.
     // Bubble the 'user.node_grants:$op' cache context to the current render
     // context.
     $renderer = \Drupal::service('renderer');
     if ($renderer->hasRenderContext()) {
-      $build = ['#cache' => ['contexts' => ['user.node_grants:' . $op]]];
+      $build = ['#cache' => ['contexts' => $contexts]];
       $renderer->render($build);
     }
   }

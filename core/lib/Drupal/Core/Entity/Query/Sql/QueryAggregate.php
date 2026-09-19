@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Entity\Query\Sql;
 
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 
 /**
@@ -20,8 +22,8 @@ class QueryAggregate extends Query implements QueryAggregateInterface {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
-    return $this
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
+    $result = $this
       ->alter()
       ->prepare()
       ->addAggregate()
@@ -32,6 +34,15 @@ class QueryAggregate extends Query implements QueryAggregateInterface {
       ->addSortAggregate()
       ->finish()
       ->result();
+
+    if ($cacheableMetadata !== NULL) {
+      $cacheableMetadata->addCacheableDependency($this);
+    }
+    elseif (!empty($this->getCacheContexts()) || !empty($this->getCacheTags()) || $this->getCacheMaxAge() !== Cache::PERMANENT) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument when the query has cacheable metadata is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3610582', E_USER_DEPRECATED);
+    }
+
+    return $result;
   }
 
   /**
@@ -172,7 +183,7 @@ class QueryAggregate extends Query implements QueryAggregateInterface {
       return parent::result();
     }
     $return = [];
-    foreach ($this->sqlQuery->execute() as $row) {
+    foreach ($this->sqlQuery->execute($this) as $row) {
       $return[] = (array) $row;
     }
     return $return;

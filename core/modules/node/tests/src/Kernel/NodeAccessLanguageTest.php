@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -221,7 +222,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
       ->fields('n', ['nid'])
       ->addMetaData('account', $web_user)
       ->addTag('node_access');
-    $nids = $select->execute()->fetchAllAssoc('nid');
+    $nids = $select->execute(new CacheableMetadata())->fetchAllAssoc('nid');
 
     // The public node and no language node should be returned. Because no
     // langcode is given it will use the fallback node.
@@ -236,7 +237,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
       ->addMetaData('account', $web_user)
       ->addMetaData('langcode', 'de')
       ->addTag('node_access');
-    $nids = $select->execute()->fetchAllAssoc('nid');
+    $nids = $select->execute(new CacheableMetadata())->fetchAllAssoc('nid');
 
     // Because no nodes are created in German, no nodes are returned.
     $this->assertEmpty($nids, 'Query returns an empty result.');
@@ -247,7 +248,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
       ->fields('n', ['nid'])
       ->addMetaData('account', $admin_user)
       ->addTag('node_access');
-    $nids = $select->execute()->fetchAllAssoc('nid');
+    $nids = $select->execute(new CacheableMetadata())->fetchAllAssoc('nid');
 
     // All nodes are returned.
     $this->assertCount(3, $nids, 'Query returns all three nodes.');
@@ -259,7 +260,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
       ->addMetaData('account', $admin_user)
       ->addMetaData('langcode', 'de')
       ->addTag('node_access');
-    $nids = $select->execute()->fetchAllAssoc('nid');
+    $nids = $select->execute(new CacheableMetadata())->fetchAllAssoc('nid');
 
     // All nodes are returned because node access tag is not invoked when the
     // user is user 1.

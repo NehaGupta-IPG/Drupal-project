@@ -2,6 +2,9 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Database\Connection;
 
 /**
@@ -12,6 +15,7 @@ use Drupal\Core\Database\Connection;
 class Select extends Query implements SelectInterface {
 
   use QueryConditionTrait;
+  use RefinableCacheableDependencyTrait;
 
   /**
    * The fields to SELECT.
@@ -517,11 +521,18 @@ class Select extends Query implements SelectInterface {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
     // If validation fails, simply return NULL. Note that validation routines in
     // preExecute() may throw exceptions instead.
     if (!$this->preExecute()) {
       return NULL;
+    }
+
+    if ($cacheableMetadata !== NULL) {
+      $cacheableMetadata->addCacheableDependency($this);
+    }
+    elseif (!empty($this->getCacheContexts()) || !empty($this->getCacheTags()) || $this->getCacheMaxAge() !== Cache::PERMANENT) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument when the query has cacheable metadata is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3610582', E_USER_DEPRECATED);
     }
 
     $args = $this->getArguments();

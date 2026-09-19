@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Connection;
 
 /**
@@ -59,7 +60,7 @@ class PagerSelectExtender extends SelectExtender {
    * Before we run the query, we need to add pager-based range() instructions
    * to it.
    */
-  public function execute() {
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
     // By calling preExecute() here, we force it to preprocess the extender
     // object rather than just the base query object. That means
     // hook_query_alter() gets access to the extended object.
@@ -73,13 +74,13 @@ class PagerSelectExtender extends SelectExtender {
     }
     $this->ensureElement();
 
-    $total_items = $this->getCountQuery()->execute()->fetchField();
+    $total_items = $this->getCountQuery()->execute($cacheableMetadata)->fetchField();
     $pager = $this->connection->getPagerManager()->createPager($total_items, $this->limit, $this->element);
     $this->range($pager->getCurrentPage() * $this->limit, $this->limit);
 
     // Now that we've added our pager-based range instructions, run the query
     // normally.
-    return $this->query->execute();
+    return $this->query->execute($cacheableMetadata);
   }
 
   /**

@@ -10,7 +10,8 @@ use Drupal\Core\Url;
 /**
  * Provides test assertions for testing page-level cache contexts & tags.
  *
- * Can be used by test classes that extend \Drupal\Tests\BrowserTestBase.
+ * Can be used by test classes that extend \Drupal\Tests\BrowserTestBase and
+ * Drupal\KernelTests\KernelTestBase.
  */
 trait AssertPageCacheContextsAndTagsTrait {
 

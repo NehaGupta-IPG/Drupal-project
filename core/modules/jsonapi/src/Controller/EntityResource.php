@@ -22,7 +22,6 @@ use Drupal\Core\Entity\RevisionableStorageInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
@@ -405,17 +404,10 @@ class EntityResource {
    * @see node_query_node_access_alter()
    * @see https://www.drupal.org/project/drupal/issues/2557815
    * @see https://www.drupal.org/project/drupal/issues/2794385
-   * @todo Remove this after https://www.drupal.org/project/drupal/issues/3028976 is fixed.
+   * @todo Remove and inline in https://www.drupal.org/project/drupal/issues/3610597.
    */
   protected function executeQueryInRenderContext(QueryInterface $query, CacheableMetadata $query_cacheability) {
-    $context = new RenderContext();
-    $results = $this->renderer->executeInRenderContext($context, function () use ($query) {
-      return $query->execute();
-    });
-    if (!$context->isEmpty()) {
-      $query_cacheability->addCacheableDependency($context->pop());
-    }
-    return $results;
+    return $query->execute($query_cacheability);
   }
 
   /**

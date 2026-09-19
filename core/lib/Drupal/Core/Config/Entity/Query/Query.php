@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Config\Entity\Query;
 
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Query\QueryBase;
@@ -77,7 +79,7 @@ class Query extends QueryBase implements QueryInterface {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
     // Invoke entity query alter hooks.
     $this->alter();
 
@@ -109,6 +111,14 @@ class Query extends QueryBase implements QueryInterface {
     if ($this->range) {
       $result = array_slice($result, $this->range['start'], $this->range['length'], TRUE);
     }
+
+    if ($cacheableMetadata !== NULL) {
+      $cacheableMetadata->addCacheableDependency($this);
+    }
+    elseif (!empty($this->getCacheContexts()) || !empty($this->getCacheTags()) || $this->getCacheMaxAge() !== Cache::PERMANENT) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument when the query has cacheable metadata is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3610582', E_USER_DEPRECATED);
+    }
+
     if ($this->count) {
       return count($result);
     }

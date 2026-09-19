@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
@@ -207,7 +208,7 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
       ->fields('n', ['nid'])
       ->addMetaData('account', $this->webUser)
       ->addTag('node_access');
-    $nids = $select->execute()->fetchAllAssoc('nid');
+    $nids = $select->execute(new CacheableMetadata())->fetchAllAssoc('nid');
 
     // Three nodes should be returned:
     // - Node with both translations public.
@@ -224,7 +225,7 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
       ->addMetaData('account', $this->webUser)
       ->addMetaData('langcode', 'hu')
       ->addTag('node_access');
-    $nids = $select->execute()->fetchAllAssoc('nid');
+    $nids = $select->execute(new CacheableMetadata())->fetchAllAssoc('nid');
 
     // Two nodes should be returned: the node with both translations public, and
     // the node with only the Catalan translation marked as private.
@@ -238,7 +239,7 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
       ->addMetaData('account', $this->webUser)
       ->addMetaData('langcode', 'ca')
       ->addTag('node_access');
-    $nids = $select->execute()->fetchAllAssoc('nid');
+    $nids = $select->execute(new CacheableMetadata())->fetchAllAssoc('nid');
 
     // Two nodes should be returned: the node with both translations public, and
     // the node with only the Hungarian translation marked as private.
@@ -252,7 +253,7 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
       ->addMetaData('account', $this->webUser)
       ->addMetaData('langcode', 'de')
       ->addTag('node_access');
-    $nids = $select->execute()->fetchAllAssoc('nid');
+    $nids = $select->execute(new CacheableMetadata())->fetchAllAssoc('nid');
 
     // There are no nodes with German translations, so no results are returned.
     $this->assertEmpty($nids, 'Query returns an empty result when the de langcode is specified.');
@@ -263,7 +264,7 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
       ->fields('n', ['nid'])
       ->addMetaData('account', $this->adminUser)
       ->addTag('node_access');
-    $nids = $select->execute()->fetchAllAssoc('nid');
+    $nids = $select->execute(new CacheableMetadata())->fetchAllAssoc('nid');
 
     // All nodes are returned.
     $this->assertCount(6, $nids, 'Query returns all nodes.');
@@ -275,7 +276,7 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
       ->addMetaData('account', $this->adminUser)
       ->addMetaData('langcode', 'de')
       ->addTag('node_access');
-    $nids = $select->execute()->fetchAllAssoc('nid');
+    $nids = $select->execute(new CacheableMetadata())->fetchAllAssoc('nid');
 
     // Even though there is no German translation, all nodes are returned
     // because node access filtering does not occur when the user is user 1.

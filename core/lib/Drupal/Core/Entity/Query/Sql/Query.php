@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Entity\Query\Sql;
 
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -75,14 +77,23 @@ class Query extends QueryBase implements QueryInterface {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
-    return $this
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
+    $result = $this
       ->alter()
       ->prepare()
       ->compile()
       ->addSort()
       ->finish()
       ->result();
+
+    if ($cacheableMetadata !== NULL) {
+      $cacheableMetadata->addCacheableDependency($this);
+    }
+    elseif (!empty($this->getCacheContexts()) || !empty($this->getCacheTags()) || $this->getCacheMaxAge() !== Cache::PERMANENT) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $cacheableMetadata argument when the query has cacheable metadata is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3610582', E_USER_DEPRECATED);
+    }
+
+    return $result;
   }
 
   /**
@@ -281,12 +292,12 @@ class Query extends QueryBase implements QueryInterface {
    */
   protected function result() {
     if ($this->count) {
-      return (int) $this->sqlQuery->countQuery()->execute()->fetchField();
+      return (int) $this->sqlQuery->countQuery()->execute($this)->fetchField();
     }
     // Return a keyed array of results. The key is either the revision_id or
     // the entity_id depending on whether the entity type supports revisions.
     // The value is always the entity id.
-    return $this->sqlQuery->execute()->fetchAllKeyed();
+    return $this->sqlQuery->execute($this)->fetchAllKeyed();
   }
 
   /**
@@ -407,6 +418,27 @@ class Query extends QueryBase implements QueryInterface {
     $sql = $clone->connection->quoteIdentifiers($sql);
 
     return strtr($sql, $quoted);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts(): array {
+    return Cache::mergeContexts(parent::getCacheContexts(), $this->sqlQuery->getCacheContexts());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge(): int {
+    return Cache::mergeMaxAges(parent::getCacheMaxAge(), $this->sqlQuery->getCacheMaxAge());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags(): array {
+    return Cache::mergeTags(parent::getCacheTags(), $this->sqlQuery->getCacheTags());
   }
 
 }

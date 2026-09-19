@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Query\Null;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 use Drupal\Core\Entity\Query\QueryBase;
 use Drupal\Core\Entity\Query\QueryInterface;
@@ -15,7 +16,7 @@ class Query extends QueryBase implements QueryInterface, QueryAggregateInterface
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(?RefinableCacheableDependencyInterface $cacheableMetadata = NULL) {
     if ($this->count) {
       return 0;
     }
