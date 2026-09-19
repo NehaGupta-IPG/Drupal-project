@@ -106,7 +106,8 @@ class NumberFieldTest extends BrowserTestBase {
       preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
       $id = $match[1];
       $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
-      $this->assertSession()->responseContains($valid_entry);
+      // SQLite does not preserve trailing zeros in stored decimal values.
+      $this->assertEquals((float) $valid_entry, (float) $this->assertSession()->fieldExists("{$field_name}[0][value]")->getValue());
       $this->assertSession()->responseNotContains("{$field_name} is not a valid number.");
     }
 
@@ -163,11 +164,12 @@ class NumberFieldTest extends BrowserTestBase {
       'type' => 'decimal',
       'settings' => ['precision' => 10, 'scale' => 0],
     ])->save();
-    FieldConfig::create([
+    $field = FieldConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
-    ])->save();
+    ]);
+    $field->save();
 
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
@@ -175,12 +177,20 @@ class NumberFieldTest extends BrowserTestBase {
       ->setComponent($field_name, ['type' => 'number'])
       ->save();
 
+    $this->assertSetMinimumValue($field, 0);
+    $this->assertSame('1', $this->assertSession()->fieldExists('settings[min]')->getAttribute('step'));
+    $this->assertSame('1', $this->assertSession()->fieldExists('settings[max]')->getAttribute('step'));
+
     $this->drupalGet('entity_test/add');
-    $this->assertSession()->fieldExists("{$field_name}[0][value]");
+    $this->assertSame('1', $this->assertSession()->fieldExists("{$field_name}[0][value]")->getAttribute('step'));
 
     $edit = ["{$field_name}[0][value]" => '42'];
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->pageTextNotContains("{$field_name} must be a number.");
+    $this->assertSession()->pageTextContains('has been created.');
+
+    $this->drupalGet('entity_test/add');
+    $this->submitForm(["{$field_name}[0][value]" => '0.5'], 'Save');
+    $this->assertSession()->pageTextContains("{$field_name} is not a valid number.");
   }
 
   /**
