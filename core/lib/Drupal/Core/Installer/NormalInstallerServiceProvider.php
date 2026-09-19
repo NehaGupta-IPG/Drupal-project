@@ -110,9 +110,6 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     // @see install_begin_request()
     if (empty($install_state['base_system_verified'])) {
       $pass_config->setRemovingPasses(array_filter($pass_config->getRemovingPasses(), function ($pass) {
-        // Remove InlineServiceDefinitionsPass, RemoveUnusedDefinitionsPass,
-        // AnalyzeServiceReferencesPass and ReplaceAliasByActualDefinitionPass
-        // as these are not necessary during the early installer.
         // @see \Symfony\Component\DependencyInjection\Compiler\PassConfig
         return !($pass instanceof InlineServiceDefinitionsPass ||
                  $pass instanceof RemoveUnusedDefinitionsPass ||
