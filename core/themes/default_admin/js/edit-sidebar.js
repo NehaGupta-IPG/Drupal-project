@@ -5,9 +5,9 @@
 
 /* eslint-disable func-names, no-mutable-exports, comma-dangle, strict */
 ((Drupal, drupalSettings, once) => {
-  const reSizer = document.getElementById('gin-sidebar-draggable');
+  const reSizer = document.getElementById('sidebar-draggable');
   const resizable = document.getElementById('default_admin_sidebar');
-  const storageWidth = "Drupal.admin.sidebarWidth";
+  const storageWidth = 'Drupal.admin.sidebarWidth';
   let isResizing = false;
   let startX, startWidth;
 

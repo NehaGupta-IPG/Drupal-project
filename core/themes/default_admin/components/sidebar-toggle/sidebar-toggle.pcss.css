@@ -3,8 +3,6 @@
  * Sidebar panel and controls.
  */
 
-@import "../../css/base/media-queries.pcss.css";
-
 body[data-meta-sidebar="closed"] {
   --admin-theme-sidebar-offset: 0px;
 }

@@ -718,12 +718,11 @@ class FormHooks {
     $this->ensureAdvancedSettings($form);
 
     // Add sidebar toggle.
-    $hide_panel = $this->t('Show sidebar panel');
     $form['default_admin_sticky_actions']['default_admin_sidebar_toggle'] = [
       '#type' => 'component',
       '#component' => 'default_admin:sidebar-toggle',
       '#props' => [
-        'label' => $hide_panel,
+        'label' => $this->t('Sidebar panel'),
         'controls' => 'default_admin_sidebar',
         'expanded' => TRUE,
       ],
