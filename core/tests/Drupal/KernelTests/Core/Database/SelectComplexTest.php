@@ -8,8 +8,6 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Expression;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\RowCountException;
-use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
-use Drupal\Core\Database\Query\DatabaseAbstract\Conjunction;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
