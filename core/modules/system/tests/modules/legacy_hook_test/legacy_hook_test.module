@@ -6,9 +6,11 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
 use Drupal\Core\Hook\Attribute\LegacyHook;
 
 #[LegacyHook]
+#[ExtensionFileIsConverted]
 function legacy_hook_test_test1(): void {
   1 / 0;
 }
