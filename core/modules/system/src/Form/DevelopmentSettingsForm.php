@@ -6,7 +6,7 @@ use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 
 /**
  * Configure development settings for this site.
@@ -15,30 +15,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class DevelopmentSettingsForm extends FormBase {
 
-  /**
-   * Constructs a new development settings form.
-   *
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $keyValueFactory
-   *   The key value factory.
-   * @param \Drupal\Core\DrupalKernelInterface $kernel
-   *   The Drupal kernel.
-   */
   public function __construct(
     protected KeyValueFactoryInterface $keyValueFactory,
     protected DrupalKernelInterface $kernel,
+    MessengerInterface $messenger,
   ) {
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    $instance = new static(
-      $container->get('keyvalue'),
-      $container->get('kernel')
-    );
-    $instance->setMessenger($container->get('messenger'));
-    return $instance;
+    $this->setMessenger($messenger);
   }
 
   /**

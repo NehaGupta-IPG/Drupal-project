@@ -7,7 +7,6 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\ImageToolkit\ImageToolkitManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configures image toolkit settings for this site.
@@ -39,17 +38,6 @@ class ImageToolkitForm extends ConfigFormBase {
     foreach ($manager->getAvailableToolkits() as $id => $definition) {
       $this->availableToolkits[$id] = $manager->createInstance($id);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('config.typed'),
-      $container->get('image.toolkit.manager')
-    );
   }
 
   /**

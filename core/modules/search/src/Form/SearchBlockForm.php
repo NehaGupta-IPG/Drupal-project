@@ -2,14 +2,12 @@
 
 namespace Drupal\search\Form;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\search\SearchPageRepositoryInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builds the search form for the search block.
@@ -18,53 +16,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
 
-  /**
-   * The search page repository.
-   *
-   * @var \Drupal\search\SearchPageRepositoryInterface
-   */
-  protected $searchPageRepository;
-
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * Constructs a new SearchBlockForm.
-   *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
-   *   The search page repository.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   */
-  public function __construct(SearchPageRepositoryInterface $search_page_repository, ConfigFactoryInterface $config_factory, RendererInterface $renderer) {
-    $this->searchPageRepository = $search_page_repository;
-    $this->configFactory = $config_factory;
-    $this->renderer = $renderer;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('search.search_page_repository'),
-      $container->get('config.factory'),
-      $container->get('renderer')
-    );
-  }
+  public function __construct(
+    protected SearchPageRepositoryInterface $searchPageRepository,
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -85,7 +40,7 @@ class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
       // conditional return, otherwise the block would get cached without the
       // necessary cacheability metadata in case there is no default search page
       // and would not be invalidated if that changes.
-      $this->renderer->addCacheableDependency($form, $this->configFactory->get('search.settings'));
+      $this->renderer->addCacheableDependency($form, $this->config('search.settings'));
     }
 
     if (!$entity_id) {

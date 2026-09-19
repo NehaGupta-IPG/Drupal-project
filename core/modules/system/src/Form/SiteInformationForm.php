@@ -11,7 +11,6 @@ use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configure site information settings for this site.
@@ -29,48 +28,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SiteInformationForm extends ConfigFormBase {
   use RedundantEditableConfigNamesTrait;
 
-  /**
-   * The path validator.
-   *
-   * @var \Drupal\Core\Path\PathValidatorInterface
-   */
-  protected $pathValidator;
-
-  /**
-   * The request context.
-   *
-   * @var \Drupal\Core\Routing\RequestContext
-   */
-  protected $requestContext;
-
-  /**
-   * Constructs a SiteInformationForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
-   *   The path validator.
-   * @param \Drupal\Core\Routing\RequestContext $request_context
-   *   The request context.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, PathValidatorInterface $path_validator, RequestContext $request_context) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected PathValidatorInterface $pathValidator,
+    protected RequestContext $requestContext,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
-    $this->pathValidator = $path_validator;
-    $this->requestContext = $request_context;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('config.typed'),
-      $container->get('path.validator'),
-      $container->get('router.request_context')
-    );
   }
 
   /**

@@ -5,7 +5,6 @@ namespace Drupal\migrate\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Migrate messages form.
@@ -13,15 +12,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  */
 class MessageForm extends FormBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    $form = new static();
-    $form->setStringTranslation($container->get('string_translation'));
-    return $form;
-  }
 
   /**
    * {@inheritdoc}
