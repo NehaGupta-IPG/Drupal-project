@@ -3,7 +3,7 @@
  * Interactions for collapsible sidebar on edit pages.
  */
 
-/* eslint-disable func-names, no-mutable-exports, comma-dangle, strict */
+/* eslint-disable func-names, comma-dangle, strict */
 ((Drupal, drupalSettings, once) => {
   const breakpoint = 1024;
   const breakpointLarge = 1280;
@@ -18,56 +18,70 @@
 
   Drupal.adminSidebar = {
     init: function (context) {
-      once('adminSidebarInit', '#default_admin_sidebar', context).forEach(() => {
-        // If variable does not exist, create it, default being to show sidebar.
-        if (!localStorage.getItem(storageDesktop)) {
-          localStorage.setItem(storageDesktop, 'true');
-        }
+      once('adminSidebarInit', '#default_admin_sidebar', context).forEach(
+        () => {
+          // If variable does not exist, create it, default being to show sidebar.
+          if (!localStorage.getItem(storageDesktop)) {
+            localStorage.setItem(storageDesktop, 'true');
+          }
 
-        // Set mobile initial to false.
-        if (window.innerWidth >= breakpoint) {
-          if (localStorage.getItem(storageDesktop) === 'true') {
-            this.showSidebar();
+          // Set mobile initial to false.
+          if (window.innerWidth >= breakpoint) {
+            if (localStorage.getItem(storageDesktop) === 'true') {
+              this.showSidebar();
+            } else {
+              this.collapseSidebar();
+            }
           }
-          else {
-            this.collapseSidebar();
-          }
-        }
 
-        // Resize observer.
-        const resizeHandler = new ResizeObserver(entries => {
-          for (let entry of entries) {
-            Drupal.debounce(this.handleResize(entry.contentRect), 150);
-          }
-        });
-        resizeHandler.observe(document.querySelector('html'));
-      });
+          // Resize observer.
+          const resizeHandler = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+              Drupal.debounce(this.handleResize(entry.contentRect), 150);
+            }
+          });
+          resizeHandler.observe(document.querySelector('html'));
+        },
+      );
 
       // Toolbar toggle
-      once('adminSidebarToggle', '.meta-sidebar__trigger', context).forEach(el => el.addEventListener('click', e => {
-        this.toggleSidebar();
-      }));
+      once('adminSidebarToggle', '.meta-sidebar__trigger', context).forEach(
+        (el) =>
+          el.addEventListener('click', (e) => {
+            this.toggleSidebar();
+          }),
+      );
 
       // Toolbar close
-      once('adminSidebarClose', '.meta-sidebar__close, .meta-sidebar__overlay', context).forEach(el => el.addEventListener('click', e => {
-        this.collapseSidebar();
-      }));
+      once(
+        'adminSidebarClose',
+        '.meta-sidebar__close, .meta-sidebar__overlay',
+        context,
+      ).forEach((el) =>
+        el.addEventListener('click', (e) => {
+          this.collapseSidebar();
+        }),
+      );
     },
 
     toggleSidebar: () => {
       // Set active state.
-      if (document.querySelector('.meta-sidebar__trigger').classList.contains('is-active')) {
+      if (
+        document
+          .querySelector('.meta-sidebar__trigger')
+          .classList.contains('is-active')
+      ) {
         Drupal.adminSidebar.collapseSidebar();
         Drupal.adminStickyFormActions?.hideMoreActions();
-      }
-      else {
+      } else {
         Drupal.adminSidebar.showSidebar();
         Drupal.adminStickyFormActions?.hideMoreActions();
       }
     },
 
     showSidebar: () => {
-      const chooseStorage = window.innerWidth < breakpoint ? storageMobile : storageDesktop;
+      const chooseStorage =
+        window.innerWidth < breakpoint ? storageMobile : storageDesktop;
       const sidebarTrigger = document.querySelector('.meta-sidebar__trigger');
 
       sidebarTrigger?.setAttribute('aria-expanded', 'true');
@@ -84,7 +98,8 @@
     },
 
     collapseSidebar: () => {
-      const chooseStorage = window.innerWidth < breakpoint ? storageMobile : storageDesktop;
+      const chooseStorage =
+        window.innerWidth < breakpoint ? storageMobile : storageDesktop;
       const sidebarTrigger = document.querySelector('.meta-sidebar__trigger');
 
       sidebarTrigger?.setAttribute('aria-expanded', 'false');
@@ -107,6 +122,6 @@
           Drupal.adminSidebar.collapseSidebar();
         }
       }
-    }
+    },
   };
 })(Drupal, drupalSettings, once);

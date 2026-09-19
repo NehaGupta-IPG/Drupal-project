@@ -34,12 +34,17 @@
       e.preventDefault();
       isResizing = true;
       startX = e.clientX;
-      startWidth = parseInt(document.defaultView.getComputedStyle(resizable).width, 10);
+      startWidth = parseInt(
+        document.defaultView.getComputedStyle(resizable).width,
+        10,
+      );
     },
 
     resizeEnd: () => {
       isResizing = false;
-      const setWidth = document.documentElement.style.getPropertyValue('--admin-theme-sidebar-width');
+      const setWidth = document.documentElement.style.getPropertyValue(
+        '--admin-theme-sidebar-width',
+      );
       const currentWidth = setWidth ? setWidth : resizable.style.width;
       localStorage.setItem(storageWidth, currentWidth);
       document.removeEventListener('mousemove', this.resizeWidth);
@@ -58,9 +63,11 @@
 
         sidebarWidth = `${sidebarWidth}px`;
         // resizable.style.width = sidebarWidth;
-        document.documentElement.style.setProperty('--admin-theme-sidebar-width', sidebarWidth);
+        document.documentElement.style.setProperty(
+          '--admin-theme-sidebar-width',
+          sidebarWidth,
+        );
       }
-    }
-
+    },
   };
 })(Drupal, drupalSettings, once);
