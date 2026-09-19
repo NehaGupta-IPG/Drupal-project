@@ -120,7 +120,7 @@ class Search extends ArgumentPluginBase {
       // only concerned with relevance ranking so we do not need to normalize.
       $or = $this->view->query->getConnection()->condition('OR');
       foreach ($words as $word) {
-        $or->condition("$search_index.word", $word);
+        $or->condition("$search_index.word", '%' . $word . '%', 'LIKE');
       }
       $search_condition->condition($or);
 

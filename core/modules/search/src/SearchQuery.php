@@ -319,7 +319,7 @@ class SearchQuery extends SelectExtender {
         foreach ($key as $or) {
           [$num_new_scores] = $this->parseWord($or);
           $has_new_scores |= $num_new_scores;
-          $query_or->condition('d.data', "% $or %", 'LIKE');
+          $query_or->condition('d.data', "%$or%", 'LIKE');
         }
         if (count($query_or)) {
           $this->conditions->condition($query_or);
@@ -331,7 +331,7 @@ class SearchQuery extends SelectExtender {
       else {
         $has_and = TRUE;
         [$num_new_scores, $num_valid_words] = $this->parseWord($key);
-        $this->conditions->condition('d.data', "% $key %", 'LIKE');
+        $this->conditions->condition('d.data', "%$key%", 'LIKE');
         if (!$num_valid_words) {
           $this->simple = FALSE;
         }
@@ -345,7 +345,7 @@ class SearchQuery extends SelectExtender {
 
     // Negative matches.
     foreach ($this->keys['negative'] as $key) {
-      $this->conditions->condition('d.data', "% $key %", 'NOT LIKE');
+      $this->conditions->condition('d.data', "%$key%", 'NOT LIKE');
       $this->simple = FALSE;
     }
   }
@@ -405,7 +405,7 @@ class SearchQuery extends SelectExtender {
     // Build the basic search query: match the entered keywords.
     $or = $this->connection->condition('OR');
     foreach ($this->words as $word) {
-      $or->condition('i.word', $word);
+      $or->condition('i.word', '%' . $word . '%', 'LIKE');
     }
     $this->condition($or);
 

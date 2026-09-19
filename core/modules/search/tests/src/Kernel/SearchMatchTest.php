@@ -48,6 +48,7 @@ class SearchMatchTest extends KernelTestBase {
   public function testMatching(): void {
     $this->_setup();
     $this->_testQueries();
+    $this->_testPartialMatchQueries();
   }
 
   /**
@@ -272,6 +273,28 @@ class SearchMatchTest extends KernelTestBase {
       $this->_testQueryMatching($query, $set, $results);
       $this->_testQueryScores($query, $set, $results);
     }
+  }
+
+  /**
+   * Run predefined queries looking for a partial matching on indexed terms.
+   */
+  public function _testPartialMatchQueries(): void {
+    $queries = [
+      // Simple partial query (will match with "enim" and "minim").
+      'nim' => [4, 5, 6, 7],
+    ];
+    $connection = Database::getConnection();
+    foreach ($queries as $query => $results) {
+      $result = $connection->select('search_index', 'i')
+        ->extend(SearchQuery::class)
+        ->searchExpression($query, static::SEARCH_TYPE)
+        ->execute();
+
+      $set = $result ? $result->fetchAll() : [];
+      $this->_testQueryMatching($query, $set, $results);
+      $this->_testQueryScores($query, $set, $results);
+    }
+
   }
 
   /**
