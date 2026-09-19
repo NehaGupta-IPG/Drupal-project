@@ -52,6 +52,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     'shortcut' => 'Shortcut',
     'statistics' => 'Statistics',
     'telephone' => 'Telephone',
+    'toolbar' => 'Toolbar',
     'tour' => 'Tour',
     'tracker' => 'Tracker',
   ];
@@ -65,6 +66,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     'seven' => 'Seven',
     'stable' => 'Stable',
     'stable9' => 'Stable 9',
+    'olivero' => 'Olivero',
   ];
 
   /**

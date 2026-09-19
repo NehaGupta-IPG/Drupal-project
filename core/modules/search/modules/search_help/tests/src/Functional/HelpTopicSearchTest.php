@@ -8,6 +8,7 @@ use Drupal\search_help\Plugin\Search\SearchHelpSearch;
 use Drupal\Tests\help\Functional\HelpTopicTranslatedTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore asdrsad barmm foomm hilfetestmodul sdeeeee sqruct testen
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('help')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class HelpTopicSearchTest extends HelpTopicTranslatedTestBase {
 
   use CronRunTrait;
@@ -292,7 +294,7 @@ class HelpTopicSearchTest extends HelpTopicTranslatedTestBase {
    * @internal
    */
   protected function assertSearchResultsCount(int $count): void {
-    $this->assertSession()->elementsCount('css', '.help_search-results > li', $count);
+    $this->assertSession()->elementsCount('css', '#block-default-admin-content ol > li', $count);
   }
 
 }

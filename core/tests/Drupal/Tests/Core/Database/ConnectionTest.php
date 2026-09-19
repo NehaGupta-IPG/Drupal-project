@@ -546,23 +546,21 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests identifier quotes assert count.
-   *
-   * @legacy-covers ::__construct
    */
   public function testIdentifierQuotesAssertCount(): void {
     $this->expectException(\AssertionError::class);
     $this->expectExceptionMessageIs('\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
+    // @phpstan-ignore argument.type
     new StubConnection($this->createStub(\PDO::class), [], ['"']);
   }
 
   /**
    * Tests identifier quotes assert string.
-   *
-   * @legacy-covers ::__construct
    */
   public function testIdentifierQuotesAssertString(): void {
     $this->expectException(\AssertionError::class);
     $this->expectExceptionMessageIs('\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
+    // @phpstan-ignore argument.type
     new StubConnection($this->createStub(\PDO::class), [], [0, '1']);
   }
 
@@ -641,6 +639,8 @@ class ConnectionTest extends UnitTestCase {
     Database::addConnectionInfo('default', 'default', [
       'driver' => 'test',
       'namespace' => 'Drupal\Tests\Core\Database\Stub',
+      'autoload' => __DIR__ . '/Stub/',
+      'database' => 'test',
     ]);
     $connection = new StubConnection($this->createStub(\PDO::class), []);
     $result = $connection->findCallerFromDebugBacktrace();
