@@ -1,0 +1,70 @@
+test_theme:
+  label: 'Theme label'
+  description: 'Test theme.'
+  type: 'theme'
+  options:
+    any:
+      label: 'Any'
+      value: 'any-tag-class'
+    meta:
+      label: 'Meta'
+      value: 'meta-style-value'
+      attribute: 'meta-style-name'
+      target: 'meta'
+    html:
+      label: 'HTML'
+      value: 'html-style-value'
+      target: 'html'
+    body:
+      label: 'Body'
+      value: 'body-style-value'
+      target: 'body'
+
+test_utility:
+  label: 'Utility label'
+  description: 'Test utility.'
+  options:
+    small:
+      label: 'Small'
+      value: 'text-sm'
+    medium:
+      label: 'Medium'
+      value: 'font-size: 15px'
+      attribute: 'style'
+    large:
+      label: 'Large'
+      value: 'large'
+      attribute: 'cds-text'
+    experimental:
+      label: 'Experimental'
+      value: 'experimental'
+      status: 'experimental'
+    deprecated:
+      label: 'Deprecated'
+      value: 'deprecated'
+      status: 'deprecated'
+    obsolete:
+      label: 'Obsolete'
+      value: 'obsolete'
+      status: 'obsolete'
+    single_mode:
+      label: 'Single mode'
+      value: 'single-mode'
+      modes:
+        color_scheme: 'dark'
+    all_modes:
+      label: 'All modes'
+      value: 'all-modes'
+      modes:
+        color_scheme: 'light'
+        contrast: 'more'
+        reduced_motion: 'reduce'
+
+test_utility_library:
+  label: 'Utility with library'
+  description: 'Test utility.'
+  options:
+    with_library:
+      label: 'Library'
+      value: 'my-class'
+  library: 'style_test/style_test'

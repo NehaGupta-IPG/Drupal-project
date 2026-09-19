@@ -46,6 +46,9 @@ use Drupal\Core\Url;
  *   into consideration.
  * - #access_callback: A callable or function name to call to check access.
  *   Argument: element.
+ * - #accept_attributes: (bool) Whether styles can add HTML attributes to this
+ *   element. Element types that don't consume #attributes should set this to
+ *   FALSE in their element info.
  * - #allowed_tags: (array) Array of allowed HTML tags for XSS filtering of
  *   #markup, #prefix, #suffix, etc.
  * - #attached: (array) Array of attachments associated with the element.
@@ -55,11 +58,11 @@ use Drupal\Core\Url;
  *   for a list of what this can contain. Besides this list, it may also contain
  *   a 'placeholders' element; see the Placeholders section of the
  *   @link theme_render Render API topic @endlink for an overview.
- * - #attributes: (array) HTML attributes for the element. The first-level
- *   keys are the attribute names, such as 'class', and the attributes are
- *   usually given as an array of string values to apply to that attribute
- *   (the rendering system will concatenate them together into a string in
- *   the HTML output).
+ * - #attributes: (array) HTML attributes for an element type that supports
+ *   them. The first-level keys are the attribute names, such as 'class', and
+ *   the attributes are usually given as an array of string values to apply to
+ *   that attribute (the rendering system will concatenate them together into
+ *   a string in the HTML output).
  * - #cache: (array) Cache information. See the Caching section of the
  *   @link theme_render Render API topic @endlink for more information.
  * - #children: (array, internal) Array of child elements of this element.

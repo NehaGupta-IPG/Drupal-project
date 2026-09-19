@@ -1,0 +1,4 @@
+name: 'Style Test'
+type: module
+description: 'Provides test setup for style API.'
+package: 'Testing'
