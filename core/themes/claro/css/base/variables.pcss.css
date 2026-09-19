@@ -15,14 +15,14 @@
   --color-lightninggreen: #26a769;
   --color-focus: var(--color-lightninggreen);
   /* Variations. */
-  --color-absolutezero-hover: var(--color-blue-650); /* 5% darker than base. */
-  --color-absolutezero-active: var(--color-blue-700); /* 10% darker than base. */
-  --color-maximumred-hover: var(--color-red-550); /* 5% darker than base. */
-  --color-maximumred-active: var(--color-red-600); /* 10% darker than base. */
-  --color-bgblue-hover: var(--color-blue-020); /* 2% darker than base. */
-  --color-bgblue-active: var(--color-blue-050); /* 5% darker than base. */
-  --color-bgred-hover: var(--color-red-020); /* 5% darker than base. */
-  --color-bgred-active: var(--color-red-050); /* 10% darker than base. */
+  --color-absolutezero-hover: var(--color-blue-650); /* 15% darker than base (adjusted to avoid violet tone) */
+  --color-absolutezero-active: var(--color-blue-700); /* 30% darker than base (adjusted to avoid violet tone) */
+  --color-maximumred-hover: var(--color-red-550); /* 15% darker than base */
+  --color-maximumred-active: var(--color-red-600); /* 30% darker than base */
+  --color-bgblue-hover: var(--color-blue-020); /* 49% lighter than base */
+  --color-bgblue-active: var(--color-blue-050); /* 47% lighter than base */
+  --color-bgred-hover: var(--color-red-020); /* 49% lighter than base */
+  --color-bgred-active: var(--color-red-050); /* 47% lighter than base */
   /* Gray variations. */
   --color-gray: #232429;
   --color-gray-900: #393a3f;
@@ -41,7 +41,7 @@
   --color-blue-900: #000f33;
   --color-blue-800: #001f66;
   --color-blue-700: #002e9a;
-  --color-blue-650: #0036b1;
+  --color-blue-650: #0036bb;
   --color-blue-600: #003ecc;
   --color-blue-500: #004eff;
   --color-blue-400: #3371ff;
