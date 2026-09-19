@@ -57,7 +57,6 @@ class SelectSubqueryTest extends DatabaseTestBase {
 
       $hydratedSelect = $this->connection->select($abstractSelect);
 
-//dump([$i, $select, $hydratedSelect]);
       $this->resetProperties($select);
       $this->resetProperties($hydratedSelect);
       $this->assertEquals($select, $hydratedSelect);
@@ -70,7 +69,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
       // WHERE tt.task = 'code'
       // @endcode
       $people = $select->execute()->fetchCol();
-//dump([$i, $people, $hydratedSelect->execute()->fetchCol()]);
+
       $this->assertEquals($people, $hydratedSelect->execute()->fetchCol());
 
       $this->assertCount(1, $people, 'Returned the correct number of rows.');
