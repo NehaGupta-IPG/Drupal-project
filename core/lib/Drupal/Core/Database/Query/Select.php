@@ -244,7 +244,7 @@ class Select extends Query implements SelectInterface {
     $hydratedCondition = $this->connection->condition($conjunction);
     foreach ($conditions as $tmp) {
       if ($tmp instanceof Expression) {
-        $hydratedCondition->where($tmp);
+        $hydratedCondition->where($tmp->expression, $tmp->arguments);
         continue;
       }
       if ($tmp['variable'] instanceof DatabaseAbstractCondition) {

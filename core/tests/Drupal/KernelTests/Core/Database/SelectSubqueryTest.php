@@ -22,6 +22,11 @@ class SelectSubqueryTest extends DatabaseTestBase {
    */
   public function testFromSubquerySelect(): void {
     // Create a subquery, which is just a normal query object.
+    $abstractSubquery = new DatabaseAbstractSelect('test_task', 'tt');
+    $abstractSubquery->addColumn('tt', 'pid', 'pid');
+    $abstractSubquery->addColumn('tt', 'task', 'task');
+    $abstractSubquery->condition('priority', 1);
+
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
     $subquery->addField('tt', 'task', 'task');
@@ -30,6 +35,16 @@ class SelectSubqueryTest extends DatabaseTestBase {
     for ($i = 0; $i < 2; $i++) {
       // Create another query that joins against the virtual table resulting
       // from the subquery.
+      $abstractSelect = new DatabaseAbstractSelect($abstractSubquery, 'tt2');
+      $abstractSelect->join('test', 't', '[t].[id] = [tt2].[pid]');
+      $abstractSelect->addColumn('t', 'name');
+      if ($i) {
+        // Use a different number of conditions here to confuse the subquery
+        // placeholder counter, testing https://www.drupal.org/node/1112854.
+        $abstractSelect->condition('name', 'John');
+      }
+      $abstractSelect->condition('task', 'code');
+
       $select = $this->connection->select($subquery, 'tt2');
       $select->join('test', 't', '[t].[id] = [tt2].[pid]');
       $select->addField('t', 'name');
@@ -40,6 +55,13 @@ class SelectSubqueryTest extends DatabaseTestBase {
       }
       $select->condition('task', 'code');
 
+      $hydratedSelect = $this->connection->select($abstractSelect);
+
+//dump([$i, $select, $hydratedSelect]);
+      $this->resetProperties($select);
+      $this->resetProperties($hydratedSelect);
+      $this->assertEquals($select, $hydratedSelect);
+
       // The resulting query should be equivalent to:
       // @code
       // SELECT t.name
@@ -48,6 +70,8 @@ class SelectSubqueryTest extends DatabaseTestBase {
       // WHERE tt.task = 'code'
       // @endcode
       $people = $select->execute()->fetchCol();
+//dump([$i, $people, $hydratedSelect->execute()->fetchCol()]);
+      $this->assertEquals($people, $hydratedSelect->execute()->fetchCol());
 
       $this->assertCount(1, $people, 'Returned the correct number of rows.');
     }

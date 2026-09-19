@@ -45,6 +45,19 @@ trait SelectPropertyResetTrait {
     }
     $tables->setValue($select, $tablesArray);
 
+    $condition = new \ReflectionProperty($select, 'condition');
+    $selectCondition = $condition->getValue($select);
+    $innerConditions = new \ReflectionProperty($selectCondition, 'conditions');
+    $innerConditionsValue = $innerConditions->getValue($selectCondition);
+    $tmp = [];
+    foreach ($innerConditionsValue as $k => $c) {
+      if (is_array($c) && isset($c['value']) && $c['value'] instanceof SelectInterface) {
+        $this->resetProperties($c['value']);
+      }
+      $tmp[$k] = $c;
+    }
+    $innerConditions->setValue($selectCondition, $tmp);
+
     $union = new \ReflectionProperty($select, 'union');
     $unionArray = $union->getValue($select);
     foreach ($unionArray as $value) {
