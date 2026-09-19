@@ -9,7 +9,14 @@ use Drupal\Core\Database\Expression;
 /**
  * Database abstract query builder for SELECT statements.
  *
- * @ingroup database
+ * @phpstan-type TableEntry array{
+ *     'join type':?string,
+ *     'table':string|Select,
+ *     'alias':string,
+ *     'condition':string|Condition|null,
+ *     'arguments':array,
+ *     'all_fields'?:bool,
+ *   }
  */
 final class Select {
 
@@ -30,27 +37,27 @@ final class Select {
   /**
    * The columns to SELECT.
    *
-   * @var list<string>
+   * @var array<string,array{'field':string,'table':string,'alias':string}>
    */
   public private(set) array $columns = [];
 
   /**
    * The expressions to SELECT as virtual columns.
    *
-   * @var list<Expression>
+   * @var array<string,Expression>
    */
   public private(set) array $expressions = [];
 
   /**
    * The tables against which to JOIN.
    *
-   * @var array
+   * @var array<string,TableEntry>
    * This property is a nested array. Each entry is an array representing
    * a single table against which to join. The structure of each entry is:
    *
    * @code
    * [
-   *   'type' => $join_type (one of INNER, LEFT OUTER, RIGHT OUTER),
+   *   'join type' => $join_type (one of INNER, LEFT OUTER, RIGHT OUTER),
    *   'table' => $table,
    *   'alias' => $alias_of_the_table,
    *   'condition' => $join_condition (string or Condition object),
@@ -80,7 +87,7 @@ final class Select {
   /**
    * The columns by which to group.
    *
-   * @var list<string>
+   * @var array<string,string>
    */
   public private(set) array $groupBy = [];
 
@@ -97,7 +104,7 @@ final class Select {
   /**
    * The range limiters for this query.
    *
-   * @var array|null
+   * @var array
    */
   public private(set) array $range = [];
 
@@ -111,7 +118,7 @@ final class Select {
    * first query to union on the right of the original query, the second union
    * to the right of the first, etc.
    *
-   * @var array
+   * @var list<array{'type':string,'query':Select}>
    */
   public private(set) array $union = [];
 
@@ -137,13 +144,13 @@ final class Select {
    *   The table name or subquery that is being queried.
    * @param string $alias
    *   The alias for the table.
-   * @param ConjunctionType $conjunction
+   * @param Conjunction $conjunction
    *   The default conjunction that will be applied to arrays of conditions.
    */
   public function __construct(
     string|Select $table,
     ?string $alias = NULL,
-    public readonly ConjunctionType $conjunction = ConjunctionType::And,
+    public readonly Conjunction $conjunction = Conjunction::And,
   ) {
     $this->addJoin(NULL, $table, $alias);
   }
@@ -188,33 +195,33 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function having($snippet, $args = []): static {
+  public function having(Expression $expression): static {
     if (!isset($this->having)) {
       $this->having = new Condition($this->conjunction);
     }
-    $this->having->where($snippet, $args);
+    $this->having->where($expression);
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function havingIsNull($column): static {
+  public function havingIsNull(string|Condition $variable): static {
     if (!isset($this->having)) {
       $this->having = new Condition($this->conjunction);
     }
-    $this->having->isNull($column);
+    $this->having->isNull($variable);
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function havingIsNotNull($column): static {
+  public function havingIsNotNull(string|Condition $variable): static {
     if (!isset($this->having)) {
       $this->having = new Condition($this->conjunction);
     }
-    $this->having->isNotNull($column);
+    $this->having->isNotNull($variable);
     return $this;
   }
 
@@ -297,7 +304,16 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Add multiple columns from the same table to be SELECTed.
+   *
+   * @param string $table_alias
+   *   The name of the table from which the column comes, as an alias.
+   *   Generally you will want to use the return value of join() here to ensure
+   *   that it is valid.
+   * @param list<string> $columns
+   *   An indexed array of columns present in the specified table that should
+   *   be included in this query. If not specified, $table_alias.* will be
+   *   generated without any aliases.
    */
   public function columns(string $table_alias, array $columns = []): static {
     if ($columns) {
@@ -315,7 +331,20 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Adds an expression to the list of "columns" to be SELECTed.
+   *
+   * @param string $expression
+   *   The expression string. May contain placeholders.
+   * @param string $alias
+   *   The alias for this expression. If not specified, one will be generated
+   *   automatically in the form "expression_#". The alias will be checked for
+   *   uniqueness, so the requested alias may not be the alias that is assigned
+   *   in all cases.
+   * @param array<string,string|int|float|bool> $arguments
+   *   Any placeholder arguments needed for this expression.
+   *
+   * @return string
+   *   The unique alias that was assigned for this expression.
    */
   public function addExpression(string $expression, ?string $alias = NULL, array $arguments = []): string {
     if (empty($alias)) {
@@ -473,7 +502,7 @@ final class Select {
     $count = clone($this);
 
     $group_by = $count->groupBy;
-    $having = isset($this->having) ? $count->havingConditions() : NULL;
+    $having = isset($this->having) ? $count->having?->conditions : NULL;
 
     if (!$count->distinct && !isset($having[0])) {
       // When not executing a distinct query, we can zero-out existing columns
@@ -536,22 +565,22 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function isNull($column): static {
+  public function isNull(string|Condition $variable): static {
     if (!isset($this->condition)) {
       $this->condition = new Condition($this->conjunction);
     }
-    $this->condition->isNull($column);
+    $this->condition->isNull($variable);
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isNotNull($column): static {
+  public function isNotNull(string|Condition $variable): static {
     if (!isset($this->condition)) {
       $this->condition = new Condition($this->conjunction);
     }
-    $this->condition->isNotNull($column);
+    $this->condition->isNotNull($variable);
     return $this;
   }
 
@@ -559,6 +588,9 @@ final class Select {
    * {@inheritdoc}
    */
   public function exists(Select $select): static {
+    if (!isset($this->condition)) {
+      $this->condition = new Condition($this->conjunction);
+    }
     $this->condition->exists($select);
     return $this;
   }
@@ -567,6 +599,9 @@ final class Select {
    * {@inheritdoc}
    */
   public function notExists(Select $select): static {
+    if (!isset($this->condition)) {
+      $this->condition = new Condition($this->conjunction);
+    }
     $this->condition->notExists($select);
     return $this;
   }
@@ -585,18 +620,18 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function where($snippet, $args = []): static {
+  public function where(Expression $expression): static {
     if (!isset($this->condition)) {
       $this->condition = new Condition($this->conjunction);
     }
-    $this->condition->where($snippet, $args);
+    $this->condition->where($expression);
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function conditionGroupFactory($conjunction = 'AND'): Condition {
+  private function conditionGroupFactory(Conjunction $conjunction): Condition {
     return new Condition($conjunction);
   }
 
@@ -604,14 +639,14 @@ final class Select {
    * {@inheritdoc}
    */
   public function andConditionGroup(): Condition {
-    return $this->conditionGroupFactory('AND');
+    return $this->conditionGroupFactory(Conjunction::And);
   }
 
   /**
    * {@inheritdoc}
    */
   public function orConditionGroup(): Condition {
-    return $this->conditionGroupFactory('OR');
+    return $this->conditionGroupFactory(Conjunction::Or);
   }
 
   /**

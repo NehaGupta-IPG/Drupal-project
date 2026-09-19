@@ -15,35 +15,40 @@ final class Condition {
   /**
    * Array of conditions.
    *
-   * @var array
+   * @var list<array{'variable':string|Condition,'operator':string,'value':string|int|bool|float|array|Select|null}|Expression>
    */
   public private(set) array $conditions = [];
 
   /**
    * Constructs a Condition object.
    *
-   * @param ConjunctionType $conjunction
+   * @param Conjunction $conjunction
    *   The operator to use to combine conditions.
    */
   public function __construct(
-    public readonly ConjunctionType $conjunction,
+    public readonly Conjunction $conjunction,
   ) {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function condition(string|Condition $column, string|int|bool|float|array|Select|null $value = NULL, ?string $operator = '='): static {
+  public function condition(string|Condition $variable, string|int|bool|float|array|Select|null $value = NULL, ?string $operator = '='): static {
     if (empty($operator)) {
       $operator = '=';
     }
-    if (empty($value) && is_array($value)) {
-      throw new InvalidQueryException(sprintf("Query condition '%s %s ()' cannot be empty.", $column, $operator));
+    if (empty($value) && is_array($value) && is_string($variable)) {
+      throw new InvalidQueryException(sprintf("Query condition '%s %s ()' cannot be empty.", $variable, $operator));
     }
-    if (is_array($value) && in_array($operator, ['=', '<', '>', '<=', '>=', 'IS NULL', 'IS NOT NULL'], TRUE)) {
+    if (
+        is_array($value) &&
+        in_array($operator, ['=', '<', '>', '<=', '>=', 'IS NULL', 'IS NOT NULL'], TRUE) &&
+        is_string($variable)
+      ) {
       if (count($value) > 1) {
-        $value = implode(', ', $value);
-        throw new InvalidQueryException(sprintf("Query condition '%s %s %s' must have an array compatible operator.", $column, $operator, $value));
+        $onlyStrings = array_filter($value, 'is_string');
+        $value = $onlyStrings == $value ? implode(', ', $onlyStrings) : '[mixed value]';
+        throw new InvalidQueryException(sprintf("Query condition '%s %s %s' must have an array compatible operator.", $variable, $operator, $value));
       }
       else {
         throw new InvalidQueryException('Calling ' . __METHOD__ . '() without an array compatible operator is not supported. See https://www.drupal.org/node/3350985');
@@ -51,9 +56,9 @@ final class Condition {
     }
 
     $this->conditions[] = [
-      'field' => $column,
-      'value' => $value,
+      'variable' => $variable,
       'operator' => $operator,
+      'value' => $value,
     ];
 
     return $this;
@@ -62,23 +67,23 @@ final class Condition {
   /**
    * {@inheritdoc}
    */
-  public function where(string $snippet, array $args = []): static {
-    $this->conditions[] = new Expression($snippet, $args);
+  public function where(Expression $expression): static {
+    $this->conditions[] = $expression;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isNull(string $column): static {
-    return $this->condition($column, NULL, 'IS NULL');
+  public function isNull(string|Condition $variable): static {
+    return $this->condition($variable, NULL, 'IS NULL');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isNotNull(string $column): static {
-    return $this->condition($column, NULL, 'IS NOT NULL');
+  public function isNotNull(string|Condition $variable): static {
+    return $this->condition($variable, NULL, 'IS NOT NULL');
   }
 
   /**
@@ -99,13 +104,13 @@ final class Condition {
    * {@inheritdoc}
    */
   public function alwaysFalse(): static {
-    return $this->where('1 = 0');
+    return $this->where(new Expression('1 = 0'));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function conditionGroupFactory(ConjunctionType $conjunction = ConjunctionType::And): static {
+  private function conditionGroupFactory(Conjunction $conjunction): static {
     return new static($conjunction);
   }
 
@@ -113,14 +118,14 @@ final class Condition {
    * {@inheritdoc}
    */
   public function andConditionGroup(): static {
-    return $this->conditionGroupFactory(ConjunctionType::And);
+    return $this->conditionGroupFactory(Conjunction::And);
   }
 
   /**
    * {@inheritdoc}
    */
   public function orConditionGroup(): static {
-    return $this->conditionGroupFactory(ConjunctionType::Or);
+    return $this->conditionGroupFactory(Conjunction::Or);
   }
 
 }

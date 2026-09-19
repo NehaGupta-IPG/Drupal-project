@@ -7,7 +7,7 @@ namespace Drupal\Core\Database\Query\DatabaseAbstract;
 /**
  * Enumeration of the conjunction types for conditions.
  */
-enum ConjunctionType {
+enum Conjunction {
 
   case And;
   case Or;

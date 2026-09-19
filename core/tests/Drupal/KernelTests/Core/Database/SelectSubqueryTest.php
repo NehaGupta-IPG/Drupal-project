@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
+use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,6 +14,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
 class SelectSubqueryTest extends DatabaseTestBase {
+
+  use SelectPropertyResetTrait;
 
   /**
    * Tests that we can use a subquery in a FROM clause.
@@ -55,17 +58,34 @@ class SelectSubqueryTest extends DatabaseTestBase {
    */
   public function testFromSubquerySelectWithLimit(): void {
     // Create a subquery, which is just a normal query object.
+    $abstractSubquery = new DatabaseAbstractSelect('test_task', 'tt');
+    $abstractSubquery->addColumn('tt', 'pid', 'pid');
+    $abstractSubquery->addColumn('tt', 'task', 'task');
+    $abstractSubquery->orderBy('priority', 'DESC');
+    $abstractSubquery->range(0, 1);
+    // Create another query that joins against the virtual table resulting
+    // from the subquery.
+    $abstractSelect = new DatabaseAbstractSelect($abstractSubquery, 'tt2');
+    $abstractSelect->join('test', 't', '[t].[id] = [tt2].[pid]');
+    $abstractSelect->addColumn('t', 'name');
+
+    // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
     $subquery->addField('tt', 'task', 'task');
     $subquery->orderBy('priority', 'DESC');
     $subquery->range(0, 1);
-
     // Create another query that joins against the virtual table resulting
     // from the subquery.
     $select = $this->connection->select($subquery, 'tt2');
     $select->join('test', 't', '[t].[id] = [tt2].[pid]');
     $select->addField('t', 'name');
+
+    $hydratedSelect = $this->connection->select($abstractSelect);
+
+    $this->resetProperties($select);
+    $this->resetProperties($hydratedSelect);
+    $this->assertEquals($select, $hydratedSelect);
 
     // The resulting query should be equivalent to:
     // @code
@@ -75,6 +95,8 @@ class SelectSubqueryTest extends DatabaseTestBase {
     // @endcode
     $people = $select->execute()->fetchCol();
 
+    $this->assertEquals($people, $hydratedSelect->execute()->fetchCol());
+
     $this->assertCount(1, $people, 'Returned the correct number of rows.');
   }
 
@@ -83,21 +105,39 @@ class SelectSubqueryTest extends DatabaseTestBase {
    */
   public function testConditionSubquerySelect(): void {
     // Create a subquery, which is just a normal query object.
+    $abstractSubquery = new DatabaseAbstractSelect('test_task', 'tt');
+    $abstractSubquery->addColumn('tt', 'pid', 'pid');
+    $abstractSubquery->condition('tt.priority', 1);
+    // Create another query that joins against the virtual table resulting
+    // from the subquery.
+    $abstractSelect = new DatabaseAbstractSelect('test_task', 'tt2');
+    $abstractSelect->addColumn('tt2', 'task');
+    $abstractSelect->condition('tt2.pid', $abstractSubquery, 'IN');
+
+    // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
     $subquery->condition('tt.priority', 1);
-
     // Create another query that joins against the virtual table resulting
     // from the subquery.
     $select = $this->connection->select('test_task', 'tt2');
     $select->addField('tt2', 'task');
     $select->condition('tt2.pid', $subquery, 'IN');
 
+    $hydratedSelect = $this->connection->select($abstractSelect);
+
+    $this->resetProperties($select);
+    $this->resetProperties($hydratedSelect);
+    $this->assertEquals($select, $hydratedSelect);
+
     // The resulting query should be equivalent to:
     // SELECT tt2.name
     // FROM test tt2
     // WHERE tt2.pid IN (SELECT tt.pid AS pid FROM test_task tt WHERE tt.priority=1)
     $people = $select->execute()->fetchCol();
+
+    $this->assertEquals($people, $hydratedSelect->execute()->fetchCol());
+
     $this->assertCount(5, $people, 'Returned the correct number of rows.');
   }
 

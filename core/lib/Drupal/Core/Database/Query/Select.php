@@ -5,7 +5,7 @@ namespace Drupal\Core\Database\Query;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Expression;
 use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
-use Drupal\Core\Database\Query\DatabaseAbstract\ConjunctionType;
+use Drupal\Core\Database\Query\DatabaseAbstract\Conjunction;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 
 /**
@@ -192,18 +192,18 @@ class Select extends Query implements SelectInterface {
       ];
     }
     foreach ($abstractSelect->condition?->conditions ?? [] as $key => $condition) {
-      if ($key === '#conjunction') {
-        continue;
-      }
       if ($condition instanceof Expression) {
         $this->where($condition->expression, $condition->arguments);
         continue;
       }
+      $value = $condition['value'] instanceof DatabaseAbstractSelect ?
+        $this->connection->select($condition['value']) :
+        $condition['value'];
       if ($condition['field'] instanceof DatabaseAbstractCondition) {
-        $this->condition($this->hydrateAbstractCondition($condition['field']), $condition['value'], $condition['operator']);
+        $this->condition($this->hydrateAbstractCondition($condition['field']), $value, $condition['operator']);
         continue;
       }
-      $this->condition($condition['field'], $condition['value'], $condition['operator']);
+      $this->condition($condition['field'], $value, $condition['operator']);
     }
     foreach ($abstractSelect->having?->conditions ?? [] as $key => $condition) {
       if ($key === '#conjunction') {
@@ -241,8 +241,8 @@ class Select extends Query implements SelectInterface {
   final protected function hydrateAbstractCondition(DatabaseAbstractCondition $abstractCondition): ConditionInterface {
     $conditions = $abstractCondition->conditions;
     $conjunction = match ($abstractCondition->conjunction) {
-      ConjunctionType::And => 'AND',
-      ConjunctionType::Or => 'OR',
+      Conjunction::And => 'AND',
+      Conjunction::Or => 'OR',
     };
     $hydratedCondition = $this->connection->condition($conjunction);
     foreach ($conditions as $tmp) {
