@@ -46,9 +46,22 @@ final class Condition {
         is_string($variable)
       ) {
       if (count($value) > 1) {
-        $onlyStrings = array_filter($value, 'is_string');
-        $value = $onlyStrings == $value ? implode(', ', $onlyStrings) : '[mixed value]';
-        throw new InvalidQueryException(sprintf("Query condition '%s %s %s' must have an array compatible operator.", $variable, $operator, $value));
+        $onlyStrings = array_map(function (mixed $v): string {
+          if (is_string($v)) {
+            return $v;
+          }
+          if (is_numeric($v)) {
+            return (string) $v;
+          }
+          if (is_bool($v)) {
+            return $v ? 'TRUE' : 'FALSE';
+          }
+          if (is_null($v)) {
+            return 'NULL';
+          }
+          return '[non scalar]';
+        }, $value);
+        throw new InvalidQueryException(sprintf("Query condition '%s %s %s' must have an array compatible operator.", $variable, $operator, implode(', ', $onlyStrings)));
       }
       else {
         throw new InvalidQueryException('Calling ' . __METHOD__ . '() without an array compatible operator is not supported. See https://www.drupal.org/node/3350985');

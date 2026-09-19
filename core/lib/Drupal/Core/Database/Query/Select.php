@@ -199,16 +199,13 @@ class Select extends Query implements SelectInterface {
       $value = $condition['value'] instanceof DatabaseAbstractSelect ?
         $this->connection->select($condition['value']) :
         $condition['value'];
-      if ($condition['field'] instanceof DatabaseAbstractCondition) {
-        $this->condition($this->hydrateAbstractCondition($condition['field']), $value, $condition['operator']);
+      if ($condition['variable'] instanceof DatabaseAbstractCondition) {
+        $this->condition($this->hydrateAbstractCondition($condition['variable']), $value, $condition['operator']);
         continue;
       }
-      $this->condition($condition['field'], $value, $condition['operator']);
+      $this->condition($condition['variable'], $value, $condition['operator']);
     }
     foreach ($abstractSelect->having?->conditions ?? [] as $key => $condition) {
-      if ($key === '#conjunction') {
-        continue;
-      }
       if ($condition instanceof Expression) {
         $this->having($condition->expression, $condition->arguments);
         continue;
@@ -247,16 +244,16 @@ class Select extends Query implements SelectInterface {
     $hydratedCondition = $this->connection->condition($conjunction);
     foreach ($conditions as $tmp) {
       if ($tmp instanceof Expression) {
-        $hydratedCondition->where($tmp->expression, $tmp->arguments);
+        $hydratedCondition->where($tmp);
         continue;
       }
-      if ($tmp['field'] instanceof DatabaseAbstractCondition) {
-        $field = $this->hydrateAbstractCondition($tmp['field']);
+      if ($tmp['variable'] instanceof DatabaseAbstractCondition) {
+        $variable = $this->hydrateAbstractCondition($tmp['variable']);
       }
       else {
-        $field = $tmp['field'];
+        $variable = $tmp['variable'];
       }
-      $hydratedCondition->condition($field, $tmp['value'], $tmp['operator']);
+      $hydratedCondition->condition($variable, $tmp['value'], $tmp['operator']);
     }
     return $hydratedCondition;
   }

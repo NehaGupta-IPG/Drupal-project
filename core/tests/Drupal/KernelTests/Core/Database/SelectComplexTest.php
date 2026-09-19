@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Expression;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\RowCountException;
 use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
@@ -204,7 +205,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $abstractTaskField = $abstractQuery->addColumn('t', 'task');
     $abstractQuery->orderBy($abstractCountField);
     $abstractQuery->groupBy($abstractTaskField);
-    $abstractQuery->having('COUNT([task]) >= 2');
+    $abstractQuery->having(new Expression('COUNT([task]) >= 2'));
 
     $query = $this->connection->select('test_task', 't');
     $count_field = $query->addExpression('COUNT([task])', 'num');
@@ -396,7 +397,7 @@ class SelectComplexTest extends DatabaseTestBase {
   public function testHavingCountQuery(): void {
     $abstractQuery = new DatabaseAbstractSelect('test')
       ->groupBy('age')
-      ->having('[age] + 1 > 0');
+      ->having(new Expression('[age] + 1 > 0'));
     $abstractQuery->addColumn('test', 'age');
     $abstractQuery->addExpression('[age] + 1');
 
@@ -589,7 +590,10 @@ class SelectComplexTest extends DatabaseTestBase {
     $abstractQuery = new DatabaseAbstractSelect('test');
     $abstractQuery->addColumn('test', 'job');
     $abstractQuery->condition('name', 'Paul');
-    $abstractQuery->condition((new DatabaseAbstractCondition(Conjunction::Or))->condition('age', 26)->condition('age', 27));
+    $abstractQuery->condition($abstractQuery->orConditionGroup()
+      ->condition('age', 26)
+      ->condition('age', 27)
+    );
 
     $query = $this->connection->select('test');
     $query->addField('test', 'job');
@@ -618,7 +622,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $abstractAlias = $abstractQuery->join('test', 'test', '[test].[job] = [%alias].[job]');
     $abstractQuery->addColumn($abstractAlias, 'name', 'other_name');
     $abstractQuery->addColumn($abstractAlias, 'job', 'other_job');
-    $abstractQuery->where("[$abstractAlias].[name] <> [test].[name]");
+    $abstractQuery->where(new Expression("[$abstractAlias].[name] <> [test].[name]"));
 
     $query = $this->connection->select('test')->fields('test');
     $alias = $query->join('test', 'test', '[test].[job] = [%alias].[job]');
@@ -732,7 +736,7 @@ class SelectComplexTest extends DatabaseTestBase {
   public function testJoinConditionObject(): void {
     // Same test as testDefaultJoin, but with a Condition object.
     $abstractQuery = new DatabaseAbstractSelect('test_task', 't');
-    $abstractJoinCond = (new DatabaseAbstractCondition(Conjunction::And))->where('[t].[pid] = [p].[id]');
+    $abstractJoinCond = $abstractQuery->andConditionGroup()->where(new Expression('[t].[pid] = [p].[id]'));
     $abstractPeopleAlias = $abstractQuery->join('test', 'p', $abstractJoinCond);
     $abstractNameField = $abstractQuery->addColumn($abstractPeopleAlias, 'name', 'name');
     $abstractQuery->addColumn('t', 'task', 'task');
@@ -782,10 +786,10 @@ class SelectComplexTest extends DatabaseTestBase {
     $t1_name = 'John';
     $t2_name = 'George';
 
-    $abstractJoinCond = (new DatabaseAbstractCondition(Conjunction::And))
+    $abstractQuery = new DatabaseAbstractSelect('test', 't1');
+    $abstractJoinCond = $abstractQuery->andConditionGroup()
       ->condition('t1.name', $t1_name)
       ->condition('t2.name', $t2_name);
-    $abstractQuery = new DatabaseAbstractSelect('test', 't1');
     $abstractQuery->innerJoin('test', 't2', $abstractJoinCond);
     $abstractQuery->addColumn('t1', 'name', 't1_name');
     $abstractQuery->addColumn('t2', 'name', 't2_name');
