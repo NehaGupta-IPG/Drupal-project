@@ -165,6 +165,9 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
    * {@inheritdoc}
    */
   public function filterByFieldAccess(?AccountInterface $account = NULL) {
+    if ($this->entity instanceof ConfigEntityInterface) {
+      return $this;
+    }
     $filtered_fields = [];
     foreach ($this->getFieldNames() as $field_name) {
       if (!$this->entity->get($field_name)->access('edit', $account)) {

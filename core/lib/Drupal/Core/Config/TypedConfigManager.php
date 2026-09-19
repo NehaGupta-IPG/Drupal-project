@@ -208,9 +208,20 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     $static_type_root = NULL;
 
     while ($static_type_root === NULL && $object !== $root) {
+      // Use the parent data definition to determine the type of this mapping
+      // (including the dynamic placeholders). For example:
+      // - `editor.settings.[%parent.editor]`
+      // - `editor.image_upload_settings.[status]`.
+      $parent_data_def = $object->getParent()->getDataDefinition();
+      $original_mapping_type = match (TRUE) {
+        $parent_data_def instanceof MapDataDefinition => $parent_data_def->toArray()['mapping'][$object->getName()]['type'],
+        $parent_data_def instanceof SequenceDataDefinition => $parent_data_def->toArray()['sequence']['type'],
+        default => throw new \LogicException('Invalid config schema detected.'),
+      };
+
       // If this mapping's type was dynamically defined, then this is the static
       // type root inside which all types are statically defined.
-      if (str_contains(static::getOriginalMappingType($object), ']')) {
+      if (str_contains($original_mapping_type, ']')) {
         $static_type_root = $object;
         break;
       }
@@ -223,32 +234,6 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     assert(($static_type_root !== NULL && $static_type_root !== $root) || ($static_type_root === NULL && $object->getParent() === NULL));
 
     return $static_type_root ?? $root;
-  }
-
-  /**
-   * Gets the original mapping type for a config schema object.
-   *
-   * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $object
-   *   A config schema object to get the original type for.
-   *
-   * @return string
-   *   The original mapping type: if $object contains the mapping at
-   *   `editor.editor.basic_html:settings` for example, the current (resolved)
-   *   type could be `editor.settings.ckeditor5`, but the original type would be
-   *   `editor.settings.*`.
-   *   `block.block.*`).
-   */
-  public static function getOriginalMappingType(TraversableTypedDataInterface $object): string {
-    // Use the parent data definition to determine the type of this mapping
-    // (including the dynamic placeholders). For example:
-    // - `editor.settings.[%parent.editor]`
-    // - `editor.image_upload_settings.[status]`.
-    $parent_data_def = $object->getParent()->getDataDefinition();
-    return match (TRUE) {
-      $parent_data_def instanceof MapDataDefinition => $parent_data_def->toArray()['mapping'][$object->getName()]['type'],
-      $parent_data_def instanceof SequenceDataDefinition => $parent_data_def->toArray()['sequence']['type'],
-      default => throw new \LogicException('Invalid config schema detected.'),
-    };
   }
 
   /**

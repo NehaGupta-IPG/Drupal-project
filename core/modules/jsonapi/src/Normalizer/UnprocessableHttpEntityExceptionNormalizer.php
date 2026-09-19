@@ -50,7 +50,7 @@ class UnprocessableHttpEntityExceptionNormalizer extends HttpExceptionNormalizer
     $entity = $violations->getEntity();
     foreach ($violations->getFieldNames() as $field_name) {
       $field_violations = $violations->getByField($field_name);
-      $cardinality = match(TRUE) {
+      $cardinality = match (TRUE) {
         $entity instanceof FieldableEntityInterface => $entity->get($field_name)
           ->getFieldDefinition()
           ->getFieldStorageDefinition()

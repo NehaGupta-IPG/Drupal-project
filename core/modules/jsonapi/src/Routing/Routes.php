@@ -2,6 +2,7 @@
 
 namespace Drupal\jsonapi\Routing;
 
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\jsonapi\Access\RelationshipRouteAccessCheck;
 use Drupal\jsonapi\Controller\EntryPoint;
@@ -302,6 +303,8 @@ class Routes implements ContainerInjectionInterface {
       $individual_update_route->setRequirement('_entity_access', "entity.update");
       $individual_update_route->setRequirement('_csrf_request_header_token', 'TRUE');
       $routes->add(static::getRouteName($resource_type, 'individual.patch'), $individual_update_route);
+    }
+    if ($resource_type->isMutable() && !is_a($resource_type->getDeserializationTargetClass(), ConfigEntityInterface::class, TRUE)) {
       $individual_remove_route = new Route($individual_route->getPath());
       $individual_remove_route->addDefaults([RouteObjectInterface::CONTROLLER_NAME => static::CONTROLLER_SERVICE_NAME . ':deleteIndividual']);
       $individual_remove_route->setMethods(['DELETE']);

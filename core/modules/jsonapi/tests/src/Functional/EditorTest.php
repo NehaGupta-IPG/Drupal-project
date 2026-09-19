@@ -335,7 +335,7 @@ class EditorTest extends ConfigEntityResourceTestBase {
         0 => [
           'title' => 'Unprocessable Content',
           'status' => '422',
-          'detail' => "settings: The value at property path settings cannot be validated. Contact the developer of the \"unicorn\" editor plugin to make this validatable.",
+          'detail' => 'settings: The value at property path settings cannot be validated because the resolved schema type "editor.settings.unicorn" is not fully validatable.',
           'source' => [
             'pointer' => '/data/attributes/settings',
           ],

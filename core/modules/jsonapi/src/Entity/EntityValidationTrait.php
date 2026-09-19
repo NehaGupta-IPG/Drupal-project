@@ -2,13 +2,14 @@
 
 namespace Drupal\jsonapi\Entity;
 
+use Drupal\Core\TypedData\PrimitiveInterface;
+use Drupal\Core\Config\Schema\Undefined;
+use Drupal\Core\Entity\Plugin\Validation\Constraint\ImmutablePropertiesConstraint;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\Core\Config\Schema\TypeResolver;
 use Drupal\Core\Config\TypedConfigManager;
 use Drupal\Core\Entity\EntityConstraintViolationList;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Entity\Plugin\DataType\ConfigEntityAdapter;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstraint;
 use Drupal\jsonapi\Exception\UnprocessableHttpEntityException;
@@ -40,85 +41,28 @@ trait EntityValidationTrait {
    *
    * @see \Drupal\rest\Plugin\rest\resource\EntityResourceValidationTrait::validate()
    */
-  protected static function validate(EntityInterface $entity, ?array $field_names = NULL) {
+  protected static function validate(EntityInterface $entity, ?array $field_names = NULL): void {
     if (!$entity instanceof FieldableEntityInterface && !$entity instanceof ConfigEntityInterface) {
       return;
     }
 
-    // Any config entity received here is guaranteed to be fully validatable.
-    // @see \Drupal\jsonapi\ResourceType\ResourceTypeRepository::isMutableResourceType()
     if ($entity instanceof ConfigEntityInterface) {
-      $entity = $entity->getTypedData();
-    }
-
-    $violations = $entity->validate();
-
-    // Only fully validatable config entities are allowed to be modified. But …
-    // some property paths may be dynamically typed (for example for plugin
-    // specific settings) they may contain dynamic parts that are not yet fully
-    // validatable. Which makes it risky to accept these config changes
-    // @see \Drupal\Core\Config\TypedConfigManager::buildDataDefinition()
-    if ($entity instanceof ConfigEntityAdapter) {
-      $wrapped_entity = $entity->getEntity();
-      $config_name = $wrapped_entity->getConfigDependencyName();
-      $prefix = $wrapped_entity->getEntityType()->getConfigPrefix();
-      $suffix = str_replace($prefix, '', $config_name);
-      // Determine the ID parts (separated by periods) in the config dependency
-      // name.
-      $id_part_count = substr_count($suffix, '.');
-      // The config schema type is then: `<prefix>` followed by one `.*` for
-      // every ID part.
-      $entity_config_schema_type = $prefix . str_repeat('.*', $id_part_count);
-
-      foreach ($entity as $key => $v) {
-        // Only mappings or sequences can have dynamic type names.
-        // @see \Drupal\Core\Config\Schema\TypeResolver::resolveDynamicTypeName()
-        if (!$v instanceof TraversableTypedDataInterface) {
-          continue;
-        }
-
-        $static_type_root = TypedConfigManager::getStaticTypeRoot($v);
-        $static_type_root_type = $static_type_root->getDataDefinition()->getDataType();
-        if ($entity_config_schema_type !== $static_type_root_type) {
-          $root_type_has_opted_in = FALSE;
-          foreach ($static_type_root->getConstraints() as $c) {
-            if ($c instanceof FullyValidatableConstraint) {
-              $root_type_has_opted_in = TRUE;
-              break;
-            }
-          }
-
-          if ($root_type_has_opted_in) {
-            // This was a separate schema type, but it was fully validatable.
-            continue;
-          }
-
-          $exception = new UnprocessableHttpEntityException();
-          $original_type = TypedConfigManager::getOriginalMappingType($v);
-          preg_match('/\[(.*)\]/U', $original_type, $matches);
-          $expression = $matches[1];
-          $reason = TypeResolver::resolveExpression($expression, $v);
-          $exception->setViolations(new EntityConstraintViolationList(
-            $wrapped_entity,
-            [
-              // @todo the "editor plugin" part here should still be computed dynamically, by introspecting the schema. Or better yet: determine the provider of the `editor.settings.unicorn` schema type, which is the editor_test module, and provide that in the message.
-              new ConstraintViolation("The value at property path $key cannot be validated. Contact the developer of the \"$reason\" editor plugin to make this validatable.", NULL, [], '', $key, NULL),
-            ],
-          ));
-          throw $exception;
-        }
-
-        // @todo Add recursion … or add a helper to TypedConfigManager?
+      $typed_config = \Drupal::service('config.typed')->createFromNameAndData($entity->getConfigDependencyName(), $entity->toArray());
+      // Reject identity changes before plugin validators resolve dependencies.
+      $identity_constraints = array_filter($entity->getTypedData()->getConstraints(), static fn ($constraint) => $constraint instanceof ImmutablePropertiesConstraint);
+      $validator = \Drupal::service('validation.basic_recursive_validator_factory')->createValidator();
+      $violations = new EntityConstraintViolationList($entity, $validator->validate($entity, $identity_constraints));
+      if (count($violations) === 0) {
+        static::validateConfigSchema($typed_config, $violations);
+      }
+      if (count($violations) === 0) {
+        $violations = $entity->getTypedData()->validate();
       }
     }
-
-    // Remove violations of inaccessible fields as they cannot stem from our
-    // changes. Field-level access control only exists for fieldable entities,
-    // not for config entities.
-    if ($entity instanceof FieldableEntityInterface) {
+    else {
+      $violations = $entity->validate();
+      // Inaccessible fields cannot have been changed by this request.
       $violations->filterByFieldAccess();
-
-      // Filter violations based on the given fields.
       if ($field_names !== NULL) {
         $violations->filterByFields(
           array_diff(array_keys($entity->getFieldDefinitions()), $field_names)
@@ -127,14 +71,50 @@ trait EntityValidationTrait {
     }
 
     if (count($violations) > 0) {
-      // Instead of returning a generic 400 response we use the more specific
-      // 422 Unprocessable Entity code from RFC 4918. That way clients can
-      // distinguish between general syntax errors in bad serializations (code
-      // 400) and semantic errors in well-formed requests (code 422).
-      // @see \Drupal\jsonapi\Normalizer\UnprocessableHttpEntityExceptionNormalizer
+      // Semantic errors in a well-formed request use 422 rather than 400.
       $exception = new UnprocessableHttpEntityException();
       $exception->setViolations($violations);
       throw $exception;
+    }
+  }
+
+  /**
+   * Checks every resolved schema root, including nested plugin settings.
+   */
+  private static function validateConfigSchema(TraversableTypedDataInterface $data, EntityConstraintViolationList $violations): void {
+    if (TypedConfigManager::getStaticTypeRoot($data) === $data) {
+      $validatable = FALSE;
+      foreach ($data->getConstraints() as $constraint) {
+        if ($constraint instanceof FullyValidatableConstraint) {
+          $validatable = TRUE;
+          break;
+        }
+      }
+      if (!$validatable) {
+        $path = $data === $data->getRoot() ? '' : substr($data->getPropertyPath(), strlen($data->getRoot()->getPropertyPath()) + 1);
+        $type = $data->getDataDefinition()->getDataType();
+        $violations->add(new ConstraintViolation("The value at property path $path cannot be validated because the resolved schema type \"$type\" is not fully validatable.", NULL, [], $data->getRoot(), $path, $data->getValue()));
+        return;
+      }
+    }
+
+    if ($data->getValue() !== NULL && !is_array($data->getValue())) {
+      $path = substr($data->getPropertyPath(), strlen($data->getRoot()->getPropertyPath()) + 1);
+      $violations->add(new ConstraintViolation("The value at property path $path must be a mapping or sequence.", NULL, [], $data->getRoot(), $path, $data->getValue()));
+      return;
+    }
+    foreach ($data as $child) {
+      if ($child instanceof Undefined) {
+        $path = substr($child->getPropertyPath(), strlen($data->getRoot()->getPropertyPath()) + 1);
+        $violations->add(new ConstraintViolation("The value at property path $path has no defined schema.", NULL, [], $data->getRoot(), $path, $child->getValue()));
+      }
+      elseif ($child instanceof PrimitiveInterface && is_array($child->getValue())) {
+        $path = substr($child->getPropertyPath(), strlen($data->getRoot()->getPropertyPath()) + 1);
+        $violations->add(new ConstraintViolation("The value at property path $path must be a scalar.", NULL, [], $data->getRoot(), $path, $child->getValue()));
+      }
+      elseif ($child instanceof TraversableTypedDataInterface) {
+        static::validateConfigSchema($child, $violations);
+      }
     }
   }
 

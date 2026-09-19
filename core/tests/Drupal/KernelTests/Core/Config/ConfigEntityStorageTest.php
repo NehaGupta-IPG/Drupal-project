@@ -53,6 +53,21 @@ class ConfigEntityStorageTest extends KernelTestBase {
   }
 
   /**
+   * Tests negative UUID lookups are invalidated when config entities are saved.
+   */
+  public function testNegativeUuidLookup(): void {
+    $manager = $this->container->get('entity_type.manager');
+    $manager->getDefinition('config_test')->set('static_cache', TRUE);
+    $storage = $manager->getStorage('config_test');
+    $entity = $storage->create(['id' => 'new_config']);
+    $this->assertSame([], $storage->loadByProperties(['uuid' => $entity->uuid()]));
+    $entity->save();
+    $loaded = $storage->loadByProperties(['uuid' => $entity->uuid()]);
+    $this->assertArrayHasKey('new_config', $loaded);
+    $this->assertSame($entity->uuid(), $loaded['new_config']->uuid());
+  }
+
+  /**
    * Tests the hasData() method for config entity storage.
    *
    * @legacy-covers \Drupal\Core\Config\Entity\ConfigEntityStorage::hasData

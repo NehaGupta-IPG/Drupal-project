@@ -271,12 +271,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       if (static::$patchProtectedFieldNames !== NULL) {
         throw new \LogicException('$patchProtectedFieldNames must not be set for config entity JSON:API resource type tests: it is inferred automatically from its immutable properties.');
       }
-      static::$patchProtectedFieldNames = array_flip($this->entity->getEntityType()->getConstraints()['ImmutableProperties']);
-      // Abort ASAP to prevent unnecessary use of resources.
-      if ($this instanceof ConfigEntityResourceTestBase && !$this->isFullyValidatableConfigEntityType()) {
-        $this->markTestSkipped("Not yet supported for config entities.");
-        return;
-      }
+      static::$patchProtectedFieldNames = array_flip($this->entity->getEntityType()->getConstraints()['ImmutableProperties']['properties']);
     }
     // Refresh entity storage as new fields have been created.
     $this->entityStorage = $entity_type_manager->getStorage(static::$entityTypeId);
@@ -943,6 +938,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       case 'label':
         // Add a second label to this entity to make it invalid.
         $label_field = $entity_type->hasKey('label') ? $entity_type->getKey('label') : static::$labelFieldName;
+        $label_field = $this->resourceType->getPublicName($label_field);
         $document['data']['attributes'][$label_field] = [
           0 => $document['data']['attributes'][$label_field],
           1 => 'Second Title',
@@ -2052,6 +2048,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Tests POST/PATCH/DELETE for an individual resource.
    */
   public function testIndividual(): void {
+    if ($this->entity instanceof ConfigEntityInterface && !$this->resourceType->isMutable()) {
+      $routes = $this->container->get('router.route_provider');
+      foreach (['collection.post', 'individual.patch', 'individual.delete'] as $operation) {
+        $name = sprintf('jsonapi.%s.%s', static::$resourceTypeName, $operation);
+        $this->assertCount(0, $routes->getRoutesByNames([$name]));
+      }
+      return;
+    }
     $this->doTestPostIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
@@ -2140,25 +2144,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $this->assertResourceErrorResponse(422, "$label_field: $label_field_capitalized: this field cannot hold more than 1 values.", NULL, $response, '/data/attributes/' . $label_field);
       }
       else {
-        // @todo Config schema assumes at least high-level type compliance, which is violated here. Harden it to provide equivalently helpful error responses.
-        $this->assertResourceResponse(500, [
-          'jsonapi' => static::$jsonApiMember,
-          'errors' => [
-            0 => [
-              'title' => 'Internal Server Error',
-              'status' => '500',
-              'detail' => 'Expected argument of type "string", "array" given',
-              'links' => [
-                'via' => [
-                  'href' => Url::fromRoute(sprintf('jsonapi.%s.collection', static::$resourceTypeName))->setAbsolute()->toString(TRUE)->getGeneratedUrl(),
-                ],
-                'info' => [
-                  'href' => HttpExceptionNormalizer::getInfoUrl(500),
-                ],
-              ],
-            ],
-          ],
-        ], $response);
+        $this->assertResourceErrorResponse(422, 'The attribute ' . $this->resourceType->getPublicName($label_field) . ' must be a scalar.', $url, $response, FALSE);
       }
     }
 
@@ -2245,11 +2231,13 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertFalse($response->hasHeader('Location'));
     }
 
-    // Recreating the config entity using the same document will result in the
-    // same ID, because config entities do not have incrementing integer IDs. So
-    // there is no point in testing the same thing again.
-    // @todo This might actually need to be done, we get a 500 here right now.
     if ($this->entity instanceof ConfigEntityInterface) {
+      // Retrying a POST generates a new UUID but must not overwrite the entity
+      // with the same config ID, including entity types whose key is not "id".
+      $original_values = $this->entityLoadUnchanged(static::$firstCreatedEntityId)->toArray();
+      $response = $this->request('POST', $url, $request_options);
+      $this->assertResourceErrorResponse(409, 'Conflict: Entity already exists.', $url, $response, FALSE);
+      $this->assertSame($original_values, $this->entityLoadUnchanged(static::$firstCreatedEntityId)->toArray());
       return;
     }
 
@@ -2396,27 +2384,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $this->assertResourceErrorResponse(422, "$label_field: $label_field_capitalized: this field cannot hold more than 1 values.", NULL, $response, '/data/attributes/' . $label_field);
       }
       else {
-        // @todo Config schema assumes at least high-level type compliance, which is violated here. Harden it to provide equivalently helpful error responses.
-        $this->assertResourceResponse(500, [
-          'jsonapi' => static::$jsonApiMember,
-          'errors' => [
-            0 => [
-              'title' => 'Internal Server Error',
-              'status' => '500',
-              'detail' => 'Expected argument of type "string", "array" given',
-              'links' => [
-                'via' => [
-                  // @todo Remove line below in favor of commented line in https://www.drupal.org/project/drupal/issues/2878463.
-                  'href' => Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()])->setAbsolute()->toString(TRUE)->getGeneratedUrl(),
-                  // 'href' => $this->entity->toUrl('jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl(),
-                ],
-                'info' => [
-                  'href' => HttpExceptionNormalizer::getInfoUrl(500),
-                ],
-              ],
-            ],
-          ],
-        ], $response);
+        $this->assertResourceErrorResponse(422, 'The attribute ' . $this->resourceType->getPublicName($label_field) . ' must be a scalar.', $url, $response, FALSE);
       }
     }
 
@@ -2481,13 +2449,20 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // response, change the modified entity field that caused the error response
     // back to its original value, repeat.
     foreach (static::$patchProtectedFieldNames as $patch_protected_field_name => $reason) {
-      $request_options[RequestOptions::BODY] = Json::encode($this->normalize($modified_entity, $url));
+      $document = $this->normalize($modified_entity, $url);
+      if ($this->entity instanceof ConfigEntityInterface) {
+        // Test one property at a time, including IDs that are computed by id().
+        $document = $this->normalize($this->entity, $url);
+        $public_name = $this->resourceType->getPublicName($patch_protected_field_name);
+        $document['data']['attributes'][$public_name] = $modified_entity->get($patch_protected_field_name);
+      }
+      $request_options[RequestOptions::BODY] = Json::encode($document);
       $response = $this->request('PATCH', $url, $request_options);
       $this->assertResourceErrorResponse(
         $this->entity instanceof ContentEntityInterface ? 403 : 422,
         $this->entity instanceof ContentEntityInterface
           ? "The current user is not allowed to PATCH the selected field (" . $patch_protected_field_name . ")." . ($reason !== NULL ? ' ' . $reason : '')
-          : "Entity is not valid: The '$id_field_name' property cannot be changed.",
+          : "Entity is not valid: The '$patch_protected_field_name' property cannot be changed.",
         $this->entity instanceof ContentEntityInterface ? $url : NULL,
         $response,
         $this->entity instanceof ContentEntityInterface
@@ -2718,9 +2693,15 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Tests DELETEing an individual resource, plus edge cases to ensure good DX.
    */
   protected function doTestDeleteIndividual(): void {
-    // @todo Remove this in https://www.drupal.org/i/3423459.
     if ($this->entity instanceof ConfigEntityInterface) {
-      $this->markTestSkipped('DELETEing config entities is not yet supported.');
+      $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+      $this->setUpAuthorization('DELETE');
+      $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
+      $response = $this->request('DELETE', $url, $this->getAuthenticationRequestOptions());
+      $this->assertSame(405, $response->getStatusCode());
+      $this->entityStorage->resetCache();
+      $this->assertNotNull($this->entityStorage->load($this->entity->id()));
+      return;
     }
 
     // The URL and Guzzle request options that will be used in this test. The
@@ -3758,7 +3739,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Loads an entity in the test container, ignoring the static cache.
    *
-   * @param int $id
+   * @param int|string $id
    *   The entity ID.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null

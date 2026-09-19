@@ -152,8 +152,8 @@ class ConfigEntityAdapter extends EntityAdapter {
    */
   public function validate() {
     return new EntityConstraintViolationList(
-      $this->getEntity(),
-      iterator_to_array(parent::validate())
+      $this->entity,
+      parent::validate()
     );
   }
 

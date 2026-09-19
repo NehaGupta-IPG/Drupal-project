@@ -135,9 +135,10 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
   }
 
   /**
-   * @testWith [null, "This value should not be null."]
-   *           ["⌚", "This is not a valid date format."]
+   * Tests date pattern validation.
    */
+  #[\PHPUnit\Framework\Attributes\TestWith([NULL, "This value should not be null."])]
+  #[\PHPUnit\Framework\Attributes\TestWith(["⌚", "This is not a valid date format."])]
   public function testPostValidationErrors(?string $pattern, string $expected_validation_error): void {
     $this->setUpAuthorization('POST');
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
@@ -170,6 +171,9 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
     $this->assertResourceResponse(422, $expected_document, $response);
   }
 
+  /**
+   * Tests that duplicate config entity identifiers are rejected.
+   */
   public function testPostingExistingId(): void {
     $this->setUpAuthorization('POST');
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
@@ -183,14 +187,22 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
     $doc = $this->getPostDocument();
     $request_options[RequestOptions::BODY] = Json::encode($doc);
 
-    // POST request: 422 when adding relationships to non-existing resources.
+    // Create the original entity, then reject a duplicate config ID.
     $response = $this->request('POST', $url, $request_options);
-
     $this->assertResourceResponse(201, FALSE, $response);
-
+    $original = $this->entityLoadUnchanged('special')->toArray();
     $response = $this->request('POST', $url, $request_options);
-
     $this->assertResourceResponse(409, FALSE, $response);
+    $this->assertSame($original, $this->entityLoadUnchanged('special')->toArray());
+
+    // A different config ID cannot reuse an existing UUID either.
+    $doc['data']['id'] = $original['uuid'];
+    $doc['data']['attributes']['drupal_internal__id'] = 'another';
+    $request_options[RequestOptions::BODY] = Json::encode($doc);
+    $response = $this->request('POST', $url, $request_options);
+    $this->assertResourceResponse(409, FALSE, $response);
+    $this->assertNull($this->entityLoadUnchanged('another'));
+    $this->assertSame($original, $this->entityLoadUnchanged('special')->toArray());
   }
 
 }

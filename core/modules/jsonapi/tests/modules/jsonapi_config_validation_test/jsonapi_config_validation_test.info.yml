@@ -1,0 +1,4 @@
+name: JSON:API config validation test
+type: module
+description: 'Provides nested config schemas for JSON:API validation tests.'
+package: Testing

@@ -23,6 +23,11 @@ class ContentLanguageSettingsTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'node.special';
+
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['language', 'node'];
 
   /**
@@ -64,6 +69,7 @@ class ContentLanguageSettingsTest extends ConfigEntityResourceTestBase {
       'type' => 'camelids',
     ]);
     $camelids->save();
+    NodeType::create(['name' => 'Special', 'type' => 'special'])->save();
 
     $entity = ContentLanguageSettings::create([
       'target_entity_type_id' => 'node',
@@ -120,8 +126,28 @@ class ContentLanguageSettingsTest extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getPostDocument(): array {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => static::$resourceTypeName,
+        'attributes' => [
+          'drupal_internal__id' => 'node.special',
+          'target_entity_type_id' => 'node',
+          'target_bundle' => 'special',
+          'default_langcode' => 'site_default',
+          'language_alterable' => FALSE,
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getPatchDocument() {
+    $document = parent::getPatchDocument();
+    $document['data']['attributes']['target_bundle'] = $this->entity->getTargetBundle();
+    $document['data']['attributes']['language_alterable'] = TRUE;
+    return $document;
   }
 
   /**

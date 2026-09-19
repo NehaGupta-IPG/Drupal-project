@@ -325,7 +325,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     if ($this->entityType->isStaticallyCacheable()) {
       // Always invalidate through the cache tag, since config entities may
       // be cached under different cache keys depending on the override flag.
-      $this->memoryCache->invalidateTags([$this->memoryCacheTag]);
+      $this->memoryCache->invalidateTags([$this->memoryCacheTag, $this->uuidMemoryCacheTag]);
     }
   }
 

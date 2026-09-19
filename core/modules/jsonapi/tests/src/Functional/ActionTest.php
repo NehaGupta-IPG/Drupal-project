@@ -115,7 +115,7 @@ class ActionTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $firstCreatedEntityId = 'user_unblock_user_action.custom';
+  protected static $firstCreatedEntityId = 'user_add_role_action.custom';
 
   /**
    * {@inheritdoc}
@@ -125,9 +125,11 @@ class ActionTest extends ConfigEntityResourceTestBase {
       'data' => [
         'type' => 'action--action',
         'attributes' => [
-          'drupal_internal__id' => 'user_unblock_user_action.custom',
+          'drupal_internal__id' => 'user_add_role_action.custom',
           'label' => 'My special action',
-          'plugin' => 'user_unblock_user_action',
+          'plugin' => 'user_add_role_action',
+          'action_type' => 'user',
+          'configuration' => ['rid' => RoleInterface::ANONYMOUS_ID],
         ],
       ],
     ];

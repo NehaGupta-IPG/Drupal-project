@@ -319,7 +319,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     $definitions = \Drupal::service('config.typed')->getDefinitions();
     foreach ($definitions as $name => $definition) {
       if (str_starts_with($name, $config_prefix . '.*') && str_replace('.*', '', $name) === $config_prefix) {
-        $config_schema_type_definition = $definition;
+        $config_schema_type_definition = \Drupal::service('config.typed')->getDefinition($name);
         break;
       }
     }

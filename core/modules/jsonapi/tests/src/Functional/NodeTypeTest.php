@@ -117,10 +117,10 @@ class NodeTypeTest extends ConfigEntityResourceTestBase {
   protected function getPostDocument():array {
     return [
       'data' => [
-        'type' => 'date_format--date_format',
+        'type' => 'node_type--node_type',
         'attributes' => [
           'drupal_internal__type' => 'special',
-          'name' => 'My special date format',
+          'name' => 'My special content type',
         ],
       ],
     ];
@@ -130,7 +130,7 @@ class NodeTypeTest extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getExpectedUnauthorizedAccessMessage($method): string {
-    return match($method) {
+    return match ($method) {
       'GET' => "The 'access content' permission is required.",
       'POST', 'PATCH' => "The 'administer content types' permission is required.",
     };

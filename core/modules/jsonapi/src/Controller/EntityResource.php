@@ -800,6 +800,9 @@ class EntityResource {
 
     try {
       $context = ['resource_type' => $resource_type];
+      if ($request->isMethod('PATCH') && $request->attributes->get('entity') instanceof ConfigEntityInterface) {
+        $context['existing_config_entity'] = $request->attributes->get('entity');
+      }
       if ($relationship_field_name) {
         $context['related'] = $resource_type->getInternalName($relationship_field_name);
       }
@@ -1172,9 +1175,7 @@ class EntityResource {
 
     $return = FALSE;
     if ($entity instanceof ConfigEntityInterface) {
-      $return = !empty($entity_storage->loadByProperties([
-        'id' => $entity->id(),
-      ]));
+      $return = $entity->id() !== NULL && $entity_storage->load($entity->id()) !== NULL;
     }
 
     return $return || !empty($entity_storage->loadByProperties([

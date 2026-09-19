@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\Component\Serialization\Json;
+use Drupal\Core\Url;
+use GuzzleHttp\RequestOptions;
+
 /**
  * Resource test base class for config entities.
  *
@@ -35,6 +39,36 @@ abstract class ConfigEntityResourceTestBase extends ResourceTestBase {
       $this->markTestSkipped("Not yet supported for config entities.");
     }
     parent::setUp();
+  }
+
+  /**
+   * Tests field configuration that has no create access or validatable settings.
+   */
+  protected function assertFieldConfigWritesRejected(string $settings_schema): void {
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->setUpAuthorization('POST');
+    $original = $this->entityLoadUnchanged($this->entity->id())->toArray();
+    $options = $this->getAuthenticationRequestOptions();
+    $options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
+    $options[RequestOptions::BODY] = Json::encode($this->getPostDocument());
+    $url = Url::fromRoute(sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
+    // These entity access handlers do not grant create access, even to field
+    // administrators. JSON:API must not bypass the entity access decision.
+    $response = $this->request('POST', $url, $options);
+    $this->assertResourceResponse(403, FALSE, $response);
+
+    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
+    $options[RequestOptions::BODY] = Json::encode([
+      'data' => [
+        'type' => static::$resourceTypeName,
+        'id' => $this->entity->uuid(),
+        'attributes' => ['label' => 'Changed label'],
+      ],
+    ]);
+    $response = $this->request('PATCH', $url, $options);
+    $this->assertResourceErrorResponse(422, "settings: The value at property path settings cannot be validated because the resolved schema type \"$settings_schema\" is not fully validatable.", NULL, $response, '/data/attributes/settings');
+    $this->assertSame($original, $this->entityLoadUnchanged($this->entity->id())->toArray());
+    $this->doTestDeleteIndividual();
   }
 
 }
