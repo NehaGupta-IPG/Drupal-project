@@ -43,6 +43,10 @@
 }
 .form-element--type-date {
   min-width: 9.5rem; /* Prevent input width change while filling. */
+
+  &::-webkit-calendar-picker-indicator {
+    margin-inline-start: var(--space-s); /* Fixes unreasonable space between date and calendar icon. */
+  }
 }
 .form-element--type-time {
   min-width: 7.5rem; /* Prevent input width change while filling. */
