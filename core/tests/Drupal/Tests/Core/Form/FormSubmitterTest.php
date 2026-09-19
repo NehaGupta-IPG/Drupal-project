@@ -64,6 +64,93 @@ class FormSubmitterTest extends UnitTestCase {
   }
 
   /**
+   * Tests element callbacks, subtree limits, and form callbacks in order.
+   */
+  #[DataProvider('providerElementSubmit')]
+  public function testElementSubmit(array|bool|null $limit, array $expected): void {
+    $calls = [];
+    $callback = static function (array &$element, FormStateInterface $form_state, array &$complete_form) use (&$calls): void {
+      $calls[] = implode(':', $element['#array_parents']);
+      $element['#value'] = 'submitted';
+      $complete_form['#element_submitted'] = TRUE;
+    };
+    $form = [
+      'group_1' => [
+        '#array_parents' => ['group_1'],
+        '#element_submit' => [$callback],
+        'child' => [
+          '#array_parents' => ['group_1', 'child'],
+          '#element_submit' => [$callback],
+        ],
+      ],
+      'group_10' => [
+        '#array_parents' => ['group_10'],
+        '#element_submit' => [$callback],
+      ],
+      '#submit' => [
+        static function () use (&$calls): void {
+          $calls[] = 'form';
+        },
+      ],
+    ];
+    $form_state = (new FormState())
+      ->setCompleteForm($form)
+      ->setSubmitted()
+      ->disableRedirect();
+    if ($limit !== NULL) {
+      $form_state->setTriggeringElement(['#limit_element_submit' => $limit]);
+    }
+    $this->callableResolver->method('getCallableFromDefinition')
+      ->willReturnCallback(static fn($definition) => $definition);
+    $form_submitter = $this->getFormSubmitter();
+    $this->assertNull($form_submitter->doSubmitForm($form, $form_state));
+    $this->assertSame($expected, $calls);
+    if (count($expected) > 1) {
+      $this->assertTrue($form['#element_submitted']);
+      $this->assertSame('submitted', $form['group_1']['child']['#value']);
+    }
+  }
+
+  /**
+   * Provides element submission limits and expected callback order.
+   */
+  public static function providerElementSubmit(): array {
+    return [
+      'no triggering element' => [NULL, ['group_1:child', 'group_1', 'group_10', 'form']],
+      'unlimited' => [FALSE, ['group_1:child', 'group_1', 'group_10', 'form']],
+      'empty limit' => [[], ['group_1:child', 'group_1', 'group_10', 'form']],
+      'root subtree' => [[[]], ['group_1:child', 'group_1', 'group_10', 'form']],
+      'subtree' => [[['group_1']], ['group_1:child', 'group_1', 'form']],
+      'child only' => [[['group_1', 'child']], ['group_1:child', 'form']],
+      'multiple subtrees' => [[['group_1', 'child'], ['group_10']], ['group_1:child', 'group_10', 'form']],
+      'no matching subtree' => [[['missing']], ['form']],
+    ];
+  }
+
+  /**
+   * Tests that element callbacks use the form object and callable resolver.
+   */
+  public function testElementSubmitCallback(): void {
+    $form_object = $this->createMock(FormBase::class);
+    $form_object->expects($this->once())
+      ->method('submitForm')
+      ->with($this->isArray(), $this->isInstanceOf(FormStateInterface::class));
+    $this->callableResolver = $this->createMock(CallableResolver::class);
+    $this->callableResolver->expects($this->once())
+      ->method('getCallableFromDefinition')
+      ->with([$form_object, 'submitForm'])
+      ->willReturn([$form_object, 'submitForm']);
+    $form = ['#element_submit' => ['::submitForm']];
+    $form_state = (new FormState())
+      ->setCompleteForm($form)
+      ->setFormObject($form_object)
+      ->setSubmitted()
+      ->disableRedirect();
+
+    $this->getFormSubmitter()->doSubmitForm($form, $form_state);
+  }
+
+  /**
    * Tests handle form submission not submitted.
    *
    * @legacy-covers ::doSubmitForm
