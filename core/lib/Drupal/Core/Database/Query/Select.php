@@ -168,12 +168,15 @@ class Select extends Query implements SelectInterface {
    */
   final protected function hydrateAbstractSelect(DatabaseAbstractSelect $abstractSelect): void {
     $this->comments = $abstractSelect->comments;
+
     if ($abstractSelect->alterTags !== []) {
       $this->alterTags = $abstractSelect->alterTags;
     }
+
     if ($abstractSelect->alterMetadata !== []) {
       $this->alterMetaData = $abstractSelect->alterMetadata;
     }
+
     foreach ($abstractSelect->tables as $key => $table) {
       $this->tables[$key] = $table;
       if ($table['table'] instanceof DatabaseAbstractSelect) {
@@ -183,7 +186,9 @@ class Select extends Query implements SelectInterface {
         $this->tables[$key]['condition'] = $this->hydrateAbstractCondition($table['condition']);
       }
     }
+
     $this->fields = $abstractSelect->columns;
+
     foreach ($abstractSelect->expressions as $key => $expression) {
       $this->expressions[$key] = [
         'expression' => $expression->expression,
@@ -191,14 +196,12 @@ class Select extends Query implements SelectInterface {
         'alias' => $expression->alias,
       ];
     }
+
     foreach ($abstractSelect->condition?->conditions ?? [] as $key => $condition) {
       if ($condition instanceof Expression) {
         $this->where($condition->expression, $condition->arguments);
         continue;
       }
-      $value = $condition['value'] instanceof DatabaseAbstractSelect ?
-        $this->connection->select($condition['value']) :
-        $condition['value'];
       if ($condition['variable'] instanceof DatabaseAbstractCondition) {
         $variable = $this->hydrateAbstractCondition($condition['variable']);
       }
@@ -208,19 +211,41 @@ class Select extends Query implements SelectInterface {
       else {
         $variable = $condition['variable'];
       }
+      if ($condition['value'] instanceof DatabaseAbstractSelect) {
+        $value = $this->connection->select($condition['value']);
+      }
+      elseif (is_array($condition['value'])) {
+        $tmp = [];
+        foreach ($condition['value'] as $k => $v) {
+          if ($v instanceof DatabaseAbstractSelect) {
+            $tmp[$k] = $this->connection->select($v);
+            continue;
+          }
+          $tmp[$k] = $v;
+        }
+        $value = $tmp;
+      }
+      else {
+        $value = $condition['value'];
+      }
       $this->condition($variable, $value, $condition['operator']);
     }
+
     foreach ($abstractSelect->having?->conditions ?? [] as $key => $condition) {
       if ($condition instanceof Expression) {
         $this->having($condition->expression, $condition->arguments);
         continue;
       }
     }
+
     $this->order = $abstractSelect->orderBy;
+
     $this->group = $abstractSelect->groupBy;
+
     foreach ($abstractSelect->union as $union) {
       $this->union($this->connection->select($union['query']), $union['type']);
     }
+
     $range = $abstractSelect->range;
     if ($range !== []) {
       $this->range($range['start'] ?? NULL, $range['length'] ?? NULL);
@@ -228,6 +253,7 @@ class Select extends Query implements SelectInterface {
     else {
       $this->range = $range;
     }
+
     $this->distinct = $abstractSelect->distinct;
   }
 

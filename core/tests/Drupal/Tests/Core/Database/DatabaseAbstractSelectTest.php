@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\Group;
  * Tests Database Abstract Select objects.
  */
 #[Group('Database')]
+#[Group('DatabaseAbstractSelect')]
 class DatabaseAbstractSelectTest extends UnitTestCase {
 
   /**

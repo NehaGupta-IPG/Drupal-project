@@ -13,6 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the Select query builder.
  */
 #[Group('Database')]
+#[Group('DatabaseAbstractSelect')]
 #[RunTestsInSeparateProcesses]
 class SelectOrderedTest extends DatabaseTestBase {
 

@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the Select query builder with more complex queries.
  */
 #[Group('Database')]
+#[Group('DatabaseAbstractSelect')]
 #[RunTestsInSeparateProcesses]
 class SelectComplexTest extends DatabaseTestBase {
 

@@ -51,6 +51,9 @@ trait SelectPropertyResetTrait {
     $innerConditionsValue = $innerConditions->getValue($selectCondition);
     $tmp = [];
     foreach ($innerConditionsValue as $k => $c) {
+      if (is_array($c) && isset($c['field']) && $c['field'] instanceof SelectInterface) {
+        $this->resetProperties($c['field']);
+      }
       if (is_array($c) && isset($c['value']) && $c['value'] instanceof SelectInterface) {
         $this->resetProperties($c['value']);
       }

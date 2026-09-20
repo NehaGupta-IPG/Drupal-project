@@ -51,19 +51,16 @@ final class Condition {
       ) {
       if (count($value) > 1) {
         $onlyStrings = array_map(function (mixed $v): string {
-          if (is_string($v)) {
-            return $v;
-          }
-          if (is_numeric($v)) {
-            return (string) $v;
-          }
-          if (is_bool($v)) {
-            return $v ? 'TRUE' : 'FALSE';
-          }
-          if (is_null($v)) {
-            return 'NULL';
-          }
-          return '[non scalar]';
+          return match (gettype($v)) {
+            'string' => $v,
+            'integer', 'double' => (string) $v,
+            'boolean' => $v ? 'TRUE' : 'FALSE',
+            'NULL' => 'NULL',
+            'array' => '[array value]',
+            'object' => '[' . get_class($v) . ' value]',
+            'resource', 'resource (closed)' => '[resource value]',
+            default => '[unknown type value]',
+          };
         }, $value);
         throw new InvalidQueryException(sprintf("Query condition '%s %s %s' must have an array compatible operator.", $variable, $operator, implode(', ', $onlyStrings)));
       }
