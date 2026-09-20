@@ -141,6 +141,8 @@ libraries-extend:
     - claro/media_library.theme
   image/admin:
     - claro/image.admin
+  layout_builder/drupal.layout_builder:
+    - claro/layout_builder
 
 regions:
   header: Header

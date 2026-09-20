@@ -1,0 +1,9 @@
+/**
+ * @file
+ * Overriding styles from the Layout Builder module.
+ */
+
+.layout-builder__message--defaults .messages,
+.layout-builder__message--overrides .messages {
+  background-image: none;
+}

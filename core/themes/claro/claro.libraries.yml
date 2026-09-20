@@ -175,6 +175,12 @@ image.admin:
   dependencies:
     - claro/variables
 
+layout_builder:
+  version: VERSION
+  css:
+    theme:
+      css/theme/layout-builder.css: {}
+
 system.admin:
   version: VERSION
   css:
