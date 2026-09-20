@@ -15,7 +15,11 @@ final class Condition {
   /**
    * Array of conditions.
    *
-   * @var list<array{'variable':string|Condition,'operator':string,'value':string|int|bool|float|array|Select|null}|Expression>
+   * @var list<array{
+   *     'variable':string|Condition|Select,
+   *     'operator':string,
+   *     'value':string|int|bool|float|array|Select|null,
+   *   }|Expression>
    */
   public private(set) array $conditions = [];
 
@@ -33,7 +37,7 @@ final class Condition {
   /**
    * {@inheritdoc}
    */
-  public function condition(string|Condition $variable, string|int|bool|float|array|Select|null $value = NULL, ?string $operator = '='): static {
+  public function condition(string|Condition|Select $variable, string|int|bool|float|array|Select|null $value = NULL, ?string $operator = '='): static {
     if (empty($operator)) {
       $operator = '=';
     }

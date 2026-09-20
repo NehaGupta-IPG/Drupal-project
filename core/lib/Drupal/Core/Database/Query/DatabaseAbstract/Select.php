@@ -554,11 +554,11 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function condition(string|Condition $column, string|int|bool|float|array|Select|null $value = NULL, ?string $operator = '='): static {
+  public function condition(string|Condition|Select $variable, string|int|bool|float|array|Select|null $value = NULL, ?string $operator = '='): static {
     if (!isset($this->condition)) {
       $this->condition = new Condition($this->conjunction);
     }
-    $this->condition->condition($column, $value, $operator);
+    $this->condition->condition($variable, $value, $operator);
     return $this;
   }
 

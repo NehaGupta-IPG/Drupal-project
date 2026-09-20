@@ -200,10 +200,15 @@ class Select extends Query implements SelectInterface {
         $this->connection->select($condition['value']) :
         $condition['value'];
       if ($condition['variable'] instanceof DatabaseAbstractCondition) {
-        $this->condition($this->hydrateAbstractCondition($condition['variable']), $value, $condition['operator']);
-        continue;
+        $variable = $this->hydrateAbstractCondition($condition['variable']);
       }
-      $this->condition($condition['variable'], $value, $condition['operator']);
+      elseif ($condition['variable'] instanceof DatabaseAbstractSelect) {
+        $variable = $this->connection->select($condition['variable']);
+      }
+      else {
+        $variable = $condition['variable'];
+      }
+      $this->condition($variable, $value, $condition['operator']);
     }
     foreach ($abstractSelect->having?->conditions ?? [] as $key => $condition) {
       if ($condition instanceof Expression) {
