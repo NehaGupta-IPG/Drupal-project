@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Installer;
 
+use Drupal\Component\Datetime\Time;
+use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\NullBackendFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
@@ -69,6 +71,14 @@ class InstallerServiceProvider implements ServiceProviderInterface, ServiceModif
       $definition->clearTag('event_subscriber');
       $definition = $container->getDefinition('router.builder.yaml');
       $definition->clearTag('event_subscriber');
+
+      // The file_parsing bin has no cache.bin tag, so the memory default set
+      // below does not reach it and the cache factory would hand out the
+      // database backend. There is no database yet, so use a memory backend.
+      $definition = $container->getDefinition('cache.file_parsing');
+      $definition->setClass(MemoryBackend::class);
+      $definition->setArguments([new Time()]);
+      $definition->setFactory(NULL);
     }
     else {
       // Late installer phase: the database is available, so the real
