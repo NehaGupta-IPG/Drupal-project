@@ -24,6 +24,7 @@
 
 .field-plugin-summary {
   float: left; /* LTR */
+  word-break: break-word;
   font-size: var(--font-size-s);
 }
 
