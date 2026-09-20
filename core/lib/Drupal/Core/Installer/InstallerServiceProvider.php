@@ -71,14 +71,6 @@ class InstallerServiceProvider implements ServiceProviderInterface, ServiceModif
       $definition->clearTag('event_subscriber');
       $definition = $container->getDefinition('router.builder.yaml');
       $definition->clearTag('event_subscriber');
-
-      // The file_parsing bin has no cache.bin tag, so the memory default set
-      // below does not reach it and the cache factory would hand out the
-      // database backend. There is no database yet, so use a memory backend.
-      $definition = $container->getDefinition('cache.file_parsing');
-      $definition->setClass(MemoryBackend::class);
-      $definition->setArguments([new Time()]);
-      $definition->setFactory(NULL);
     }
     else {
       // Late installer phase: the database is available, so the real
@@ -107,6 +99,16 @@ class InstallerServiceProvider implements ServiceProviderInterface, ServiceModif
       $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
       $definition->setTags($tags);
     }
+
+    // The file_parsing bin has no cache.bin tag, so the memory default above
+    // does not reach it and the cache factory would hand out the database
+    // backend. That fails in the early phase, where there is no database yet,
+    // and in the late phase, where the config importer holding the sync file
+    // storage and its YAML cache is serialized into the installer batch.
+    $definition = $container->getDefinition('cache.file_parsing');
+    $definition->setClass(MemoryBackend::class);
+    $definition->setArguments([new Time()]);
+    $definition->setFactory(NULL);
 
     // When installing from existing config, disabling the config cache entirely
     // yields much faster install times.
