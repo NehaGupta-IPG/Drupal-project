@@ -50,8 +50,10 @@ class SystemRequirements implements InstallRequirementsInterface {
     'rdf' => 'RDF',
     'settings_tray' => 'Settings Tray',
     'shortcut' => 'Shortcut',
+    'search' => 'Search',
     'statistics' => 'Statistics',
     'telephone' => 'Telephone',
+    'toolbar' => 'Toolbar',
     'tour' => 'Tour',
     'tracker' => 'Tracker',
   ];
@@ -65,6 +67,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     'seven' => 'Seven',
     'stable' => 'Stable',
     'stable9' => 'Stable 9',
+    'olivero' => 'Olivero',
   ];
 
   /**
