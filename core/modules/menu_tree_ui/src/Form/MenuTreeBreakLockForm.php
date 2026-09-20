@@ -28,12 +28,12 @@ final class MenuTreeBreakLockForm extends ConfirmFormBase {
   /**
    * The menu whose working-copy lock is being broken.
    */
-  private ?MenuInterface $menu = NULL;
+  protected ?MenuInterface $menu = NULL;
 
   public function __construct(
-    private readonly TreegridWorkingCopy $workingCopy,
-    private readonly EntityTypeManagerInterface $entityTypeManager,
-    private readonly DateFormatterInterface $dateFormatter,
+    protected readonly TreegridWorkingCopy $workingCopy,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly DateFormatterInterface $dateFormatter,
   ) {}
 
   /**

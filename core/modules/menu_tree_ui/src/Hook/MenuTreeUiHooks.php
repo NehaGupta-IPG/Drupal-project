@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\menu_tree_ui\Hook;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -58,9 +59,11 @@ final class MenuTreeUiHooks {
    *   The merged operations array, keyed by operation ID.
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity the operations apply to.
+   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   *   The cacheable metadata the operations are collected into.
    */
   #[Hook('entity_operation_alter')]
-  public function entityOperationAlter(array &$operations, EntityInterface $entity): void {
+  public function entityOperationAlter(array &$operations, EntityInterface $entity, CacheableMetadata $cacheability): void {
     if (!$entity instanceof MenuInterface) {
       return;
     }
