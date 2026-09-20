@@ -63,37 +63,3 @@ if (localStorage.getItem('Drupal.defaultAdmin.sidebarWidth')) {
     sidebarWidth,
   );
 }
-
-if (localStorage.getItem('Drupal.defaultAdmin.sidebarExpanded.desktop')) {
-  const style = document.createElement('style');
-  const className = 'sidebar-inline-styles';
-  style.className = className;
-
-  if (
-    window.innerWidth < 1024 ||
-    localStorage.getItem('Drupal.defaultAdmin.sidebarExpanded.desktop') ===
-      'false'
-  ) {
-    style.innerHTML = `
-    body {
-      --admin-theme-sidebar-offset: 0px;
-      padding-inline-end: 0;
-      transition: none;
-    }
-
-    .layout-region--secondary {
-      transform: translateX(var(--admin-theme-sidebar-width, 360px));
-      transition: none;
-    }
-
-    .meta-sidebar__overlay {
-      display: none;
-    }
-    `;
-
-    const scriptTag = document.querySelector('script');
-    scriptTag.parentNode.insertBefore(style, scriptTag);
-  } else if (document.getElementsByClassName(className).length > 0) {
-    document.getElementsByClassName(className)[0].remove();
-  }
-}

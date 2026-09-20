@@ -59,10 +59,9 @@ body[data-meta-sidebar="closed"] {
 
 body[data-meta-sidebar="open"] {
   .layout-region--secondary {
-    @media (--admin-to-large) {
-      visibility: visible;
-      opacity: 1;
-    }
+    visibility: visible;
+    opacity: 1;
+    transform: none;
   }
 }
 
