@@ -139,11 +139,6 @@
   }
 }
 
-body:has(.admin--navigation-top-bar .sticky-form-actions) :where(#default_admin_sidebar) {
-  inset-block-start: 64px !important;
-  height: calc(100% - 64px) !important;
-}
-
 :where(.edit-form) .sticky-form-actions {
   gap: var(--admin-space-xs);
 

@@ -62,6 +62,16 @@
           this.collapseSidebar();
         }),
       );
+
+      // Add `--admin-theme-toolbar-y-offset` style inline on <html> element.
+      once('adminSidebarTop', '#default_admin_sidebar', context).forEach(() => {
+        const topBar = document.querySelector('.admin--navigation-top-bar');
+        const bottomEdge = topBar.getBoundingClientRect().bottom;
+        document.documentElement.style.setProperty(
+          '--admin-theme-toolbar-y-offset',
+          `${bottomEdge}px`,
+        );
+      });
     },
 
     toggleSidebar: () => {

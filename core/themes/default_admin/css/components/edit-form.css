@@ -90,24 +90,6 @@
     }
 
     .layout-region--secondary {
-      position: fixed;
-      z-index: 103;
-      overflow-x: hidden;
-      overflow-y: auto;
-      width: var(--admin-theme-sidebar-width);
-      min-width: var(--admin-theme-sidebar-min-width);
-      max-width: var(--admin-theme-sidebar-max-width);
-      height: calc(100% - var(--admin-theme-toolbar-y-offset));
-      margin: 0;
-      border-inline-start: 1px solid var(--admin-color-border-soft);
-      background: var(--admin-color-bg-surface);
-      inset-block-start: var(--admin-theme-toolbar-y-offset);
-      inset-inline-end: 0;
-
-      .dark-mode & {
-        box-shadow: 0 0 4px rgb(0, 0, 0, 0.1);
-      }
-
       .admin-sidebar .form-actions {
         margin: 0;
 
