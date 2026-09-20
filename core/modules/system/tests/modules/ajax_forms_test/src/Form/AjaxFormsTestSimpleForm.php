@@ -76,6 +76,32 @@ class AjaxFormsTestSimpleForm extends FormBase {
       '#open' => TRUE,
     ];
 
+    $form['select_category'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Category'),
+      '#group' => 'test_group',
+      '#options' => [
+        'a' => $this->t('Category A'),
+        'b' => $this->t('Category B'),
+      ],
+      '#ajax' => [
+        'callback' => [static::class, 'selectGroupCallback'],
+        'wrapper' => 'select-in-group-wrapper',
+      ],
+    ];
+    $category = $form_state->getValue('select_category', 'a');
+    $form['select_in_group'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Select in a group'),
+      '#group' => 'test_group',
+      '#options' => [
+        $category . '1' => $category . '1',
+        $category . '2' => $category . '2',
+      ],
+      '#prefix' => '<div id="select-in-group-wrapper">',
+      '#suffix' => '</div>',
+    ];
+
     // Test ajax element in a #group.
     $form['checkbox_in_group_wrapper'] = [
       '#type' => 'container',
@@ -159,6 +185,19 @@ class AjaxFormsTestSimpleForm extends FormBase {
   }
 
   /**
+   * AJAX callback for the grouped select.
+   *
+   * @param array $form
+   *   The form array.
+   *
+   * @return array
+   *   The form element to return via AJAX.
+   */
+  public static function selectGroupCallback(array $form): array {
+    return $form['select_in_group'];
+  }
+
+  /**
    * AJAX callback for textfield.
    *
    * @param array $form
@@ -188,6 +227,7 @@ class AjaxFormsTestSimpleForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $this->messenger()->addStatus($this->t('Selected @value.', ['@value' => $form_state->getValue('select_in_group')]));
   }
 
 }
