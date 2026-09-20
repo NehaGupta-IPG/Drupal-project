@@ -15,6 +15,7 @@ use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -82,16 +83,16 @@ class CommentCreationAccessTest extends KernelTestBase {
     // entity as context when called from the comment entity ::access() method.
     $comment->access('create');
     $create_access_context = $state->get('comment_test.create_access.context');
-    $this->assertSame($entity->id(), $create_access_context['commented_entity']->id());
+    $this->assertSame('entity_test:1', $create_access_context['commented_entity']);
 
     $comment->access('reply');
     $create_access_context = $state->get('comment_test.create_access.context');
-    $this->assertSame($entity->id(), $create_access_context['commented_entity']->id());
+    $this->assertSame('entity_test:1', $create_access_context['commented_entity']);
 
     // Check the same for comment field item list ::access() method.
     $field->access('create');
     $create_access_context = $state->get('comment_test.create_access.context');
-    $this->assertSame($entity->id(), $create_access_context['commented_entity']->id());
+    $this->assertSame('entity_test:1', $create_access_context['commented_entity']);
 
     // Reply to comment.
     $reply = $this->createComment(['pid' => $comment->id()]);
@@ -100,7 +101,7 @@ class CommentCreationAccessTest extends KernelTestBase {
     // entity and the parent comment entity as context.
     $reply->access('create');
     $create_access_context = $state->get('comment_test.create_access.context');
-    $this->assertSame($entity->id(), $create_access_context['commented_entity']->id());
+    $this->assertSame('entity_test:1', $create_access_context['commented_entity']);
 
   }
 
@@ -139,33 +140,72 @@ class CommentCreationAccessTest extends KernelTestBase {
   /**
    * Tests that createAccess() without context skips the static cache.
    *
-   * When no commented_entity is in context, buildCreateAccessCid() must return
-   * NULL, so createAccess() bypasses caching. Otherwise, the ambiguous CID
-   * "create:comment:0" would be shared across all context-less calls and could
-   * serve stale results for the wrong entity.
+   * When no commented_entity or field is in context, buildCreateAccessCid()
+   * must return NULL, so createAccess() bypasses caching. Otherwise, the
+   * ambiguous CID would be shared across all context-less calls and could serve
+   * stale results for the wrong entity.
    */
-  public function testCreateAccessWithoutContextSkipsCache(): void {
+  #[DataProvider('createAccessCaching')]
+  public function testCreateAccessCaching(array $context, bool $shouldBeCached): void {
+    $entityTypeManager = $this->container->get('entity_type.manager');
+    if (array_key_exists('commented_entity', $context)) {
+      $context['commented_entity'] = $entityTypeManager->getStorage('entity_test')->create();
+      $context['commented_entity']->save();
+    }
+
     $state = $this->container->get('state');
-
-    $access_handler = $this->container->get('entity_type.manager')
-      ->getAccessControlHandler('comment');
-
+    $access_handler = $entityTypeManager->getAccessControlHandler('comment');
     $account = User::getAnonymousUser();
 
-    $access_handler->createAccess('comment', $account, [], TRUE);
-    $this->assertSame($state->get('comment_test.create_access.account'), $account->id());
+    $access_handler->createAccess('comment', $account, $context, TRUE);
+    if ($shouldBeCached) {
+      $this->assertIsString($state->get('comment_test.create_access.cid'));
+    }
+    else {
+      $this->assertFalse($state->get('comment_test.create_access.cid'));
+      $this->assertNotNull($state->get('comment_test.create_access.account'));
+    }
 
-    $state->delete('comment_test.create_access.account');
+    $state->delete('comment_test.create_access.cid');
+    $state->delete('comment_test.create_access.context');
 
-    // Second call, same account, still no context. Without the fix this would
-    // be a cache hit on "create:comment:0" and checkCreateAccess() would NOT
-    // fire again. With the fix (NULL CID) caching is skipped entirely.
-    $access_handler->createAccess('comment', $account, [], TRUE);
-    $this->assertSame(
-      $state->get('comment_test.create_access.account'),
-      $account->id(),
-      'checkCreateAccess() must be called again when no commented entity context is provided.',
-    );
+    // Second call, same account. Without context, this shouldn't be a cache
+    // hit, so account or
+    $access_handler->createAccess('comment', $account, $context, TRUE);
+    $cid = $state->get('comment_test.create_access.cid');
+
+    if ($shouldBeCached) {
+      $this->assertIsString($cid);
+      // ::checkCreateAccess shouldn't be invoked, so context state value must
+      // be empty (unset).
+      $this->assertNull(
+        $state->get('comment_test.create_access.context'),
+        "checkCreateAccess() was invoked but it wasn't expected to be called again",
+      );
+    }
+    else {
+      $this->assertFalse(
+        $state->get('comment_test.create_access.cid'),
+        'checkCreateAccess() must be called again when no commented entity context is provided.',
+      );
+    }
+  }
+
+  /**
+   * Provides testing cases for ::testCreateAccessCaching()
+   *
+   * @return array[]
+   *   The test cases.
+   *
+   * @see self::testCreateAccessCaching()
+   */
+  public static function createAccessCaching(): array {
+    return [
+      'Empty context' => [[], FALSE],
+      'Only host entity' => [['commented_entity' => 1], FALSE],
+      'Only field' => [['field' => 'foo'], FALSE],
+      'Cached result' => [['commented_entity' => 1, 'field' => 'foo'], TRUE],
+    ];
   }
 
   /**
@@ -197,7 +237,7 @@ class CommentCreationAccessTest extends KernelTestBase {
 
     $access_handler->createAccess('comment', $account, ['commented_entity' => $entity_test], TRUE);
     $context = $state->get('comment_test.create_access.context');
-    $this->assertSame($entity_test->getEntityTypeId(), $context['commented_entity']->getEntityTypeId());
+    $this->assertSame('entity_test:1', $context['commented_entity']);
 
     $state->delete('comment_test.create_access.context');
 
@@ -210,7 +250,7 @@ class CommentCreationAccessTest extends KernelTestBase {
       $context,
       'checkCreateAccess() must be called for entity_test_rev:1, not cached from entity_test:1.',
     );
-    $this->assertSame($entity_test_rev->getEntityTypeId(), $context['commented_entity']->getEntityTypeId());
+    $this->assertSame('entity_test_rev:1', $context['commented_entity']);
   }
 
 }

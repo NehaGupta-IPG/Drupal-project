@@ -180,22 +180,34 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function buildCreateAccessCid(array $context, ?string $entity_bundle): ?string {
-    $commented_entity = $context['commented_entity'] ?? NULL;
-    unset($context['commented_entity']);
+    $defaults = ['commented_entity' => NULL, 'field' => NULL, 'parent' => NULL];
+    [
+      'commented_entity' => $commented_entity,
+      'field' => $field,
+      'parent' => $parent,
+    ] = $context += $defaults;
 
-    // Without a specific commented entity, the CID would be ambiguous across
-    // entities and could cause stale cache hits for the wrong entity context.
-    if ($commented_entity === NULL) {
+    // Without a specific commented entity, or comment field, the CID would be
+    // ambiguous across entities or fields and could cause stale cache hits for
+    // the wrong entity context.
+    if (!$commented_entity || !$field) {
       return NULL;
     }
 
-    $cid = parent::buildCreateAccessCid($context, $entity_bundle);
+    $parent_context = array_diff_key($context, $defaults);
+    $cid = parent::buildCreateAccessCid($parent_context, $entity_bundle);
     if ($cid === NULL) {
       return NULL;
     }
 
-    // Vary by entity type and ID, colon-separated to avoid CID ambiguity.
-    return $cid . ':' . $commented_entity->getEntityTypeId() . ':' . $commented_entity->id();
+    // Vary by commented entity type, ID, comment field, and parent comment ID.
+    return implode(':', [
+      $cid,
+      $commented_entity->getEntityTypeId(),
+      $commented_entity->id(),
+      $field,
+      $parent?->id(),
+    ]);
   }
 
 }
