@@ -297,4 +297,46 @@ EOF;
     ];
   }
 
+  /**
+   * Tests that PREG_CLASS_WORD_BOUNDARY classifies characters correctly.
+   *
+   * @param string $string
+   *   A string of characters that are either all word-boundary characters
+   *   or all non-boundary (word) characters.
+   * @param bool $isBoundary
+   *   TRUE if every character in $string is expected to be classified as a
+   *   word boundary by Unicode::PREG_CLASS_WORD_BOUNDARY, FALSE if none of
+   *   them are.
+   */
+  #[DataProvider('providerWordBoundaryClassification')]
+  public function testWordBoundaryClassification(string $string, bool $isBoundary): void {
+    $matched = preg_match_all('/[' . Unicode::PREG_CLASS_WORD_BOUNDARY . ']/u', $string);
+    $this->assertSame($isBoundary ? mb_strlen($string) : 0, $matched);
+  }
+
+  /**
+   * Data provider for testWordBoundaryClassification().
+   *
+   * @return array
+   *   An array of test cases, each containing a string and whether it is
+   *   expected to be classified as word-boundary characters.
+   */
+  public static function providerWordBoundaryClassification(): array {
+    $lines = explode("\n", file_get_contents(__DIR__ . '/fixtures/UnicodeTest.txt'));
+    $cases = [];
+    foreach ($lines as $key => $line) {
+      $cases['line ' . ($key + 1)] = [$line, (bool) ($key % 2)];
+    }
+
+    // ASCII control characters are excluded from the fixture file because
+    // they are problematic to store in a text file (e.g. null bytes).
+    $controlChars = '';
+    for ($i = 0; $i < 32; $i++) {
+      $controlChars .= chr($i);
+    }
+    $cases['ASCII control characters'] = [$controlChars, TRUE];
+
+    return $cases;
+  }
+
 }
