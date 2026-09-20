@@ -18,6 +18,7 @@ body {
 
 a,
 .link {
+  max-width: 62rem;
   color: var(--color-link);
 }
 a:hover,
@@ -44,6 +45,7 @@ hr {
 }
 
 summary {
+  max-width: 62rem;
   font-weight: bold;
 }
 
@@ -53,6 +55,7 @@ summary {
  */
 h1,
 .heading-a {
+  max-width: 62rem;
   margin: var(--space-m) 0 var(--space-s);
   font-size: var(--font-size-h1);
   font-weight: bold;
@@ -60,6 +63,7 @@ h1,
 }
 h2,
 .heading-b {
+  max-width: 62rem;
   margin: var(--space-m) 0 var(--space-s);
   font-size: var(--font-size-h2);
   font-weight: bold;
@@ -67,6 +71,7 @@ h2,
 }
 h3,
 .heading-c {
+  max-width: 62rem;
   margin: var(--space-m) 0 var(--space-s);
   font-size: var(--font-size-h3);
   font-weight: bold;
@@ -74,6 +79,7 @@ h3,
 }
 h4,
 .heading-d {
+  max-width: 62rem;
   margin: var(--space-m) 0 var(--space-s);
   font-size: var(--font-size-h4);
   font-weight: bold;
@@ -81,6 +87,7 @@ h4,
 }
 h5,
 .heading-e {
+  max-width: 62rem;
   margin: var(--space-m) 0 var(--space-s);
   font-size: var(--font-size-h5);
   font-weight: bold;
@@ -88,12 +95,14 @@ h5,
 }
 h6,
 .heading-f {
+  max-width: 62rem;
   margin: var(--space-m) 0 var(--space-s);
   font-size: var(--font-size-h6);
   font-weight: bold;
   line-height: var(--line-height-heading);
 }
 p {
+  max-width: 62rem;
   margin: 1em 0;
 }
 dl {
@@ -155,12 +164,14 @@ acronym {
   border-bottom: dotted 1px;
 }
 ul {
+  max-width: 62rem;
   margin-block: 0.25em;
   margin-inline: 1.5em 0;
   padding-inline-start: 0;
   list-style-image: none;
 }
 ol {
+  max-width: 62rem;
   margin-block: 0.25em;
   margin-inline: 2em 0;
   padding: 0;
