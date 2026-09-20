@@ -67,6 +67,13 @@
 
   & .messages__header {
     background: url(../../images/icons/e34f4f/crossout.svg) no-repeat center left;
+
+    @media (forced-colors: active) {
+      background: linktext !important;
+      mask-image: url(../../images/icons/e34f4f/crossout.svg);
+      mask-repeat: no-repeat;
+      mask-position: center left;
+    }
   }
 }
 

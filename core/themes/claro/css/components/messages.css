@@ -78,6 +78,18 @@
   }
 }
 
+@media (forced-colors: active) {
+  .messages--error .messages__header {
+    background: linktext !important;
+    -webkit-mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 14 14'%3e%3cpath d='M3 11.193L11.45 3' stroke='%23e34f4f' stroke-width='2'/%3e%3ccircle cx='7' cy='7' r='6' fill='none' stroke='%23e34f4f' stroke-width='2'/%3e%3c/svg%3e");
+    mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 14 14'%3e%3cpath d='M3 11.193L11.45 3' stroke='%23e34f4f' stroke-width='2'/%3e%3ccircle cx='7' cy='7' r='6' fill='none' stroke='%23e34f4f' stroke-width='2'/%3e%3c/svg%3e");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center left;
+    mask-position: center left;
+  }
+}
+
 .messages--status {
   border-color: var(--messages--status-color);
 
