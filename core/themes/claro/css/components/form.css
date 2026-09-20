@@ -85,7 +85,7 @@ tr .form-item,
   display: inline-block;
   margin-inline: 0.15em;
   content: "*";
-  color: var(--color-maximumred);
+  color: inherit;
   font-size: 0.875rem;
 }
 
