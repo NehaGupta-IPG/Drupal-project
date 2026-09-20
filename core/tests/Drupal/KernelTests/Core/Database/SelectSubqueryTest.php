@@ -28,6 +28,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
     $abstractSubquery->addColumn('tt', 'pid', 'pid');
     $abstractSubquery->addColumn('tt', 'task', 'task');
     $abstractSubquery->condition('priority', 1);
+    $hydratedSubquery = $this->connection->select($abstractSubquery);
 
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
@@ -37,15 +38,15 @@ class SelectSubqueryTest extends DatabaseTestBase {
     for ($i = 0; $i < 2; $i++) {
       // Create another query that joins against the virtual table resulting
       // from the subquery.
-      $abstractSelect = new DatabaseAbstractSelect($abstractSubquery, 'tt2');
-      $abstractSelect->join('test', 't', '[t].[id] = [tt2].[pid]');
-      $abstractSelect->addColumn('t', 'name');
+      $selectWithHydratedSubquery = $this->connection->select($hydratedSubquery, 'tt2');
+      $selectWithHydratedSubquery->join('test', 't', '[t].[id] = [tt2].[pid]');
+      $selectWithHydratedSubquery->addField('t', 'name');
       if ($i) {
         // Use a different number of conditions here to confuse the subquery
         // placeholder counter, testing https://www.drupal.org/node/1112854.
-        $abstractSelect->condition('name', 'John');
+        $selectWithHydratedSubquery->condition('name', 'John');
       }
-      $abstractSelect->condition('task', 'code');
+      $selectWithHydratedSubquery->condition('task', 'code');
 
       $select = $this->connection->select($subquery, 'tt2');
       $select->join('test', 't', '[t].[id] = [tt2].[pid]');
@@ -57,11 +58,9 @@ class SelectSubqueryTest extends DatabaseTestBase {
       }
       $select->condition('task', 'code');
 
-      $hydratedSelect = $this->connection->select($abstractSelect);
-
       $this->resetProperties($select);
-      $this->resetProperties($hydratedSelect);
-      $this->assertEquals($select, $hydratedSelect);
+      $this->resetProperties($selectWithHydratedSubquery);
+      $this->assertEquals($select, $selectWithHydratedSubquery);
 
       // The resulting query should be equivalent to:
       // @code
@@ -72,7 +71,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
       // @endcode
       $people = $select->execute()->fetchCol();
 
-      $this->assertEquals($people, $hydratedSelect->execute()->fetchCol());
+      $this->assertEquals($people, $selectWithHydratedSubquery->execute()->fetchCol());
 
       $this->assertCount(1, $people, 'Returned the correct number of rows.');
     }
@@ -429,13 +428,10 @@ class SelectSubqueryTest extends DatabaseTestBase {
     $this->resetProperties($hydratedQuery);
     $this->assertEquals($query, $hydratedQuery);
 
-    $result = $query->execute();
-    $hydratedResult = $hydratedQuery->execute();
-
     // Ensure that we got the right number of records.
     $people = $query->execute()->fetchCol();
 
-    $this->assertEquals($people, $hydratedResult->fetchCol());
+    $this->assertEquals($people, $hydratedQuery->execute()->fetchCol());
 
     $this->assertCount(3, $people, 'NOT EXISTS query returned the correct results.');
   }
