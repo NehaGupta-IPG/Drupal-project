@@ -46,8 +46,8 @@ class InstallerKernelRebuildTest extends UnitTestCase {
    */
   public function testSwappedExtensionsTriggerRecompile(): void {
     $kernel = $this->createKernel();
-    // Same number of modules, different key: only ::array_diff_key() catches
-    // this, the count comparison alone does not.
+    // Replace the module list with one of the same size but a different key,
+    // so that the change is only detectable by comparing the keys.
     $kernel->extensions['module'] = ['node' => 0];
 
     $this->expectException(RecompileSentinel::class);

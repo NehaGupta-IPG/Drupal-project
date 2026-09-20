@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Installer;
 
-use Drupal\Component\Datetime\Time;
-use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\NullBackendFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
@@ -22,11 +20,12 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * This class is manually added by install_begin_request() via
  * $conf['container_service_providers'] and handles both the early installer
- * phase (before the base system is installed) and the post-install phase.
+ * phase (before the base system is installed) and the late installer phase
+ * (once the database is available).
  *
  * The phase is determined by $install_state['base_system_verified']:
  * - FALSE/absent: Early phase with in-memory and fallback services.
- * - TRUE: Post-install phase with database-backed services.
+ * - TRUE: Late phase with database-backed services.
  *
  * This provider is also registered by DrupalKernel::discoverServiceProviders()
  * as a broken-site fallback and by TestRunnerKernel. In those cases,
@@ -72,9 +71,10 @@ class InstallerServiceProvider implements ServiceProviderInterface, ServiceModif
       $definition->clearTag('event_subscriber');
     }
     else {
-      // Post-install phase: real services from core.services.yml are used for
-      // config.storage and keyvalue. Register the lazy route provider decorator
-      // to avoid premature route building.
+      // Late installer phase: the database is available, so the real
+      // config.storage and keyvalue services from core.services.yml are used.
+      // Register the lazy route provider decorator to avoid premature route
+      // building.
       $container->register('router.route_provider.installer')
         ->setClass(InstallerRouteProviderLazyBuilder::class)
         ->setDecoratedService('router.route_provider')
@@ -97,13 +97,6 @@ class InstallerServiceProvider implements ServiceProviderInterface, ServiceModif
       $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
       $definition->setTags($tags);
     }
-
-    // Separately override the file_parsing bin as that doesn't use a
-    // tag/parameter.
-    $definition = $container->getDefinition('cache.file_parsing');
-    $definition->setClass(MemoryBackend::class);
-    $definition->setArguments([new Time()]);
-    $definition->setFactory(NULL);
 
     // When installing from existing config, disabling the config cache entirely
     // yields much faster install times.
@@ -133,9 +126,7 @@ class InstallerServiceProvider implements ServiceProviderInterface, ServiceModif
 
     $pass_config = $container->getCompilerPassConfig();
     $pass_config->setRemovingPasses(array_filter($pass_config->getRemovingPasses(), function ($pass) {
-      // Remove InlineServiceDefinitionsPass, RemoveUnusedDefinitionsPass,
-      // AnalyzeServiceReferencesPass and ReplaceAliasByActualDefinitionPass as
-      // these are not necessary during installation.
+      // These passes are not necessary during installation.
       // @see \Symfony\Component\DependencyInjection\Compiler\PassConfig
       return !($pass instanceof InlineServiceDefinitionsPass ||
                $pass instanceof RemoveUnusedDefinitionsPass ||

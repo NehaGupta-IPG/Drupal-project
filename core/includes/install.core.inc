@@ -421,8 +421,8 @@ function install_begin_request($class_loader, &$install_state): void {
     }
   }
 
-  // InstallerServiceProvider handles both early and post-install phases
-  // based on $install_state['base_system_verified'].
+  // InstallerServiceProvider handles both the early and the late installer
+  // phase based on $install_state['base_system_verified'].
   $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = 'Drupal\Core\Installer\InstallerServiceProvider';
   $GLOBALS['conf']['container_service_providers']['InstallerConfigOverride'] = 'Drupal\Core\Installer\ConfigOverride';
 
