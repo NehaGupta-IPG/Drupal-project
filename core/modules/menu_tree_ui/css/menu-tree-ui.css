@@ -6,8 +6,8 @@
  * variables — never hardcoded hex. Each bridge variable resolves to a
  * semantic token of the default admin theme (--admin-color-*, dark-mode
  * aware via light-dark()) with a static light-scheme fallback for themes
- * that do not define the token, such as Claro. Any theme can also override
- * the bridge variables on its own selectors.
+ * that do not define the token. Any theme can also override the bridge
+ * variables on its own selectors.
  *
  * Virtualization: [data-virtualized="true"] is set by RowWindow
  * (IntersectionObserver, see treegrid/js/windowing.js) for rows deep
@@ -43,8 +43,8 @@
 }
 
 /*
- * The search <input> carries the `form-element` class so Gin/Claro supply
- * its padding, border, border-radius, and font — no overrides needed here.
+ * The search <input> carries the `form-element` class so the admin theme
+ * supplies its padding, border, border-radius, and font — no overrides needed here.
  */
 .menu-tree-ui__search-input {
   width: 100%;

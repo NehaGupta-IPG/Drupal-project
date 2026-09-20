@@ -22,8 +22,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Column plugin for a menu link's row operations (Edit, Delete, Add child, …).
  *
  * Operations render as a 'markup' cell. The dropbutton's appearance is owned by
- * the active admin theme's CSS (Claro, Gin, …), each expecting different
- * markup, so the server renders the dropbutton — exactly as the classic menu
+ * the active admin theme's CSS, and themes expect different markup, so the
+ * server renders the dropbutton — exactly as the classic menu
  * admin does — and the client injects the finished HTML verbatim (see the
  * markup renderer in treegrid/js/cells.js). The column is read-only and last.
  *
