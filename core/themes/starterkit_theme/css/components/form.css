@@ -70,7 +70,8 @@ label.option {
 .marker {
   color: #e00;
 }
-.form-required::after {
+.form-required::after,
+.form-item:has(input[required]) > legend .fieldset-legend::after {
   display: inline-block;
   width: 6px;
   height: 6px;
