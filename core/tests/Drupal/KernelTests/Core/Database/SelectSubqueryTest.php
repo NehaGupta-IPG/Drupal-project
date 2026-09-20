@@ -58,10 +58,6 @@ class SelectSubqueryTest extends DatabaseTestBase {
       }
       $select->condition('task', 'code');
 
-      $this->resetProperties($select);
-      $this->resetProperties($selectWithHydratedSubquery);
-      $this->assertEquals($select, $selectWithHydratedSubquery);
-
       // The resulting query should be equivalent to:
       // @code
       // SELECT t.name

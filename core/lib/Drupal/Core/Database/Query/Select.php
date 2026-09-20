@@ -255,6 +255,8 @@ class Select extends Query implements SelectInterface {
     }
 
     $this->distinct = $abstractSelect->distinct;
+
+    $this->forUpdate = $abstractSelect->forUpdate;
   }
 
   /**
