@@ -295,9 +295,15 @@ default:
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
+  script:
+    # Run .yarn-install-from-cache:before_script here to
+    # preserve .test-setup:before_script.
+    - !reference [.yarn-install-from-cache, before_script]
+    - !reference [.test-setup, script]
   after_script:
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
     - cp /builds/chromedriver.log ./
+  cache: !reference [.yarn-install-from-cache, cache]
 
 '🌐️️ PHPUnit Functional':
   <<: [ *with-composer, *test-setup ]
