@@ -10,6 +10,7 @@ use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -39,7 +40,7 @@ class BreadcrumbTest extends BrowserTestBase {
     'field_ui',
     'filter_test',
     'menu_test',
-    'olivero_test',
+    'stark_test',
   ];
 
   /**
@@ -57,9 +58,14 @@ class BreadcrumbTest extends BrowserTestBase {
   protected $webUser;
 
   /**
+   * Breadcrumb block ID.
+   */
+  protected string $breadcrumbBlockId;
+
+  /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'olivero';
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
@@ -67,9 +73,9 @@ class BreadcrumbTest extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Install 'claro' and configure it as administrative theme.
-    $this->container->get('theme_installer')->install(['claro']);
-    $this->config('system.theme')->set('admin', 'claro')->save();
+    // Install 'default_admin' and configure it as administrative theme.
+    $this->container->get('theme_installer')->install(['default_admin']);
+    $this->config('system.theme')->set('admin', 'default_admin')->save();
 
     $this->enablePromotedContentView();
     $this->config('system.site')->set('page.front', '/node')->save();
@@ -78,16 +84,22 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->adminUser = $this->drupalCreateUser($perms);
     $this->drupalLogin($this->adminUser);
 
+    $block = $this->drupalPlaceBlock('system_breadcrumb_block', [
+      'region' => 'content',
+      'theme' => 'stark',
+    ]);
+    $this->breadcrumbBlockId = $block->id();
+
     // This test puts menu links in the Tools menu and then tests for their
     // presence on the page, so we need to ensure that the Tools block will be
-    // displayed in the admin theme and olivero.
+    // displayed in the Admin theme and Stark.
     $this->drupalPlaceBlock('system_menu_block:tools', [
       'region' => 'content',
       'theme' => $this->config('system.theme')->get('admin'),
     ]);
     $this->drupalPlaceBlock('system_menu_block:tools', [
       'region' => 'content',
-      'theme' => 'olivero',
+      'theme' => 'stark',
     ]);
   }
 
@@ -97,7 +109,9 @@ class BreadcrumbTest extends BrowserTestBase {
   public function testBreadCrumbs(): void {
     // Prepare common base breadcrumb elements.
     $home = ['' => 'Home'];
-    $admin = $home + ['admin' => 'Administration'];
+    // The default_admin theme renames the home breadcrumb on admin routes.
+    $admin_home = ['' => 'Back to site'];
+    $admin = $admin_home + ['admin' => 'Administration'];
     $config = $admin + ['admin/config' => 'Configuration'];
     $type = 'article';
 
@@ -185,10 +199,9 @@ class BreadcrumbTest extends BrowserTestBase {
     // Also verify that the node does not appear elsewhere (e.g., menu trees).
     $this->assertSession()->linkNotExists($node1->getTitle());
 
-    $trail += [
-      "node/$nid1" => $node1->getTitle(),
-    ];
-    $this->assertBreadcrumb("node/$nid1/edit", $trail);
+    // The default_admin theme replaces the home breadcrumb with a "Back to
+    // site" link pointing to the entity canonical URL.
+    $this->assertBreadcrumb("node/$nid1/edit", ["node/$nid1" => 'Back to site']);
 
     // Verify that breadcrumb on node listing page contains "Home" only.
     $trail = [];
@@ -317,7 +330,7 @@ class BreadcrumbTest extends BrowserTestBase {
       // untranslated menu links automatically generated from menu router items
       // ('taxonomy/term/%') should never be translated and appear in any menu
       // other than the breadcrumb trail.
-      $this->assertSession()->elementsCount('xpath', '//nav[contains(@class, "menu--tools")]/descendant::a[@href="' . Url::fromUri('base:' . $link_path)->toString() . '"]', 1);
+      $this->assertSession()->elementsCount('xpath', '//nav[contains(@id, "block-stark-tools")]/descendant::a[@href="' . Url::fromUri('base:' . $link_path)->toString() . '"]', 1);
 
       // Next iteration should expect this tag as parent link.
       // Note: Term name, not link name, due to taxonomy_term_page().
@@ -329,9 +342,9 @@ class BreadcrumbTest extends BrowserTestBase {
     // Verify breadcrumbs on user and user/%.
     // We need to log back in and out below, and cannot simply grant the
     // 'administer users' permission, since user_page() makes your head explode.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
       'access user profiles',
-    ]);
+    ])->save();
 
     // Verify breadcrumb on front page.
     $this->assertBreadcrumb('<front>', []);
@@ -346,10 +359,9 @@ class BreadcrumbTest extends BrowserTestBase {
     $trail = $home;
     $this->assertBreadcrumb('user', $trail, $this->adminUser->getAccountName());
     $this->assertBreadcrumb('user/' . $this->adminUser->id(), $trail, $this->adminUser->getAccountName());
-    $trail += [
-      'user/' . $this->adminUser->id() => $this->adminUser->getAccountName(),
-    ];
-    $this->assertBreadcrumb('user/' . $this->adminUser->id() . '/edit', $trail, $this->adminUser->getAccountName());
+    // User edit is an admin route: default_admin replaces home with "Back to
+    // site" linking to the user profile canonical URL.
+    $this->assertBreadcrumb('user/' . $this->adminUser->id() . '/edit', ['user/' . $this->adminUser->id() => 'Back to site'], $this->adminUser->getAccountName());
 
     // Create a second user to verify breadcrumb on user pages again.
     $this->webUser = $this->drupalCreateUser([
@@ -359,6 +371,7 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->drupalLogin($this->webUser);
 
     // Verify correct breadcrumb and page title on another user's account pages.
+    // webUser lacks 'view the administration theme', so Stark is used.
     $trail = $home;
     $this->assertBreadcrumb('user/' . $this->adminUser->id(), $trail, $this->adminUser->getAccountName());
     $trail += [
@@ -388,8 +401,10 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->assertBreadcrumb('admin', $trail, 'Access denied');
     $this->assertSession()->statusCodeEquals(403);
 
-    // Since the 'admin' path is not accessible, we still expect only the Home
-    // link.
+    // Since the 'admin' path is not accessible, the breadcrumb only has the
+    // home link. webUser lacks 'view the administration theme', so Stark is
+    // used and the home link reads "Home".
+    $trail = $home;
     $this->assertBreadcrumb('admin/reports', $trail, 'Reports');
     $this->assertSession()->statusCodeNotEquals(403);
 
@@ -446,7 +461,7 @@ class BreadcrumbTest extends BrowserTestBase {
 
     // Remove the breadcrumb block to test the trait when breadcrumbs are not
     // shown.
-    Block::load('olivero_breadcrumbs')->delete();
+    Block::load($this->breadcrumbBlockId)->delete();
 
     // If there is no trail, this should pass as there is no breadcrumb.
     $this->assertBreadcrumb('menu-test/breadcrumb1', []);
