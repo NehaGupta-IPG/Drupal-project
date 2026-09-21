@@ -120,9 +120,9 @@ chromedriver using port 4444, and keep it running:
 * To run a11y tests for the default theme only.
   `yarn test:nightwatch --tag a11y:default`
 * To run an a11y test for a custom theme used as the default theme.
-  `yarn test:nightwatch --tag a11y:default --defaultTheme olivero`
+  `yarn test:nightwatch --tag a11y:default --defaultTheme my_theme`
 * To run an a11y test for a custom admin theme.
-  `yarn test:nightwatch --tag a11y:admin --adminTheme claro`
+  `yarn test:nightwatch --tag a11y:admin --adminTheme my_admin_theme`
 
 Nightwatch tests, as well as custom commands, assertions and pages, can be
 placed in any folder with the pattern

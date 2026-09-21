@@ -5,13 +5,35 @@
 
 .fieldset {
   min-width: 0;
-  margin: var(--space-m) 0;
+  margin: var(--admin-space-m) 0;
   padding: 0;
-  color: var(--color-text);
+  color: var(--admin-color-text);
   border: var(--details-border-size) solid var(--details-border-color);
-  border-radius: var(--base-border-radius);
-  background-color: var(--color-white);
+  border-radius: var(--admin-radius-2xs);
+  background-color: var(--admin-color-bg-surface);
   box-shadow: var(--details-box-shadow);
+
+  &:not(.fieldgroup) {
+    padding-block-start: var(--admin-space-xs);
+    color: var(--admin-color-text-soft);
+    border-color: var(--admin-color-border);
+    border-radius: var(--admin-radius-m);
+    background: transparent;
+    box-shadow: none;
+    padding-inline: 0;
+
+    > legend {
+      inset-block-start: 20px;
+    }
+
+    > .fieldset-wrapper {
+      margin-block-start: 20px;
+    }
+
+    &.error {
+      border: 2px solid var(--admin-color-error);
+    }
+  }
 }
 
 .fieldset--group {
@@ -29,25 +51,22 @@
   display: contents; /* For Firefox. */
   float: left; /* iOS Safari, Android Chrome, Edge. */
   width: 100%; /* iOS Safari, Android Chrome, Edge. */
-  margin-block-end: var(--space-m);
-  color: var(--color-gray-800);
+  margin-block-end: var(--admin-space-m);
+  color: var(--admin-color-text-soft);
   font-weight: bold;
+
+  @media screen and (min-width: 48em) {
+    margin-bottom: var(--admin-space-l);
+  }
 }
 
 .fieldset__legend--composite {
   float: none;
   width: auto;
-  margin-block-start: calc(var(--space-xs) / 2); /* 4px */
-  margin-block-end: calc(var(--space-xs) / 2); /* 4px */
+  margin-block: calc(var(--admin-space-xs) / 2); /* 4px */
   color: inherit;
-  font-size: var(--font-size-s); /* 14px */
+  font-size: var(--admin-font-size-s); /* 14px */
   line-height: calc(18rem / 16); /* 18px */
-}
-
-@media screen and (min-width: 48em) {
-  .fieldset__legend {
-    margin-bottom: var(--space-l);
-  }
 }
 
 /* This is used only on install configure form. */
@@ -58,8 +77,14 @@
 
 .fieldset__label {
   display: block;
-  padding: var(--space-m);
-  line-height: var(--space-m);
+  margin-block-start: 0;
+  margin-block-end: var(--admin-space-xs);
+  padding: var(--admin-space-m);
+  color: var(--admin-color-text-loud);
+  font-size: var(--admin-font-size-s);
+  font-weight: var(--admin-font-weight-semibold);
+  line-height: var(--admin-space-m);
+
   &.is-disabled {
     color: var(--input--disabled-fg-color);
   }
@@ -67,30 +92,33 @@
   &.has-error {
     color: var(--input--error-color);
   }
+
+  @media screen and (min-width: 48em) {
+    padding-inline: var(--admin-space-l);
+  }
 }
 
 .fieldset__label--group {
+  margin-block-start: 0;
+  margin-block-end: var(--admin-space-xs);
   padding: 0;
+  color: var(--admin-color-text-loud);
+  font-size: var(--admin-font-size-s);
+  font-weight: var(--admin-font-weight-semibold);
   line-height: inherit;
-}
 
-@media screen and (min-width: 48em) {
-  .fieldset__label {
-    padding-right: var(--space-l);
-    padding-left: var(--space-l);
-  }
-
-  .fieldset__label--group {
+  @media screen and (min-width: 48em) {
     padding: 0;
   }
 }
 
 .fieldset__description {
-  margin-block-start: calc(6rem / 16); /* 6px */
-  margin-block-end: calc(6rem / 16); /* 6px */
-  color: var(--input-fg-color--description);
-  font-size: var(--font-size-xs); /* ~13px */
+  max-width: var(--admin-max-line-length);
+  color: var(--admin-color-text-soft);
+  font-size: var(--admin-font-size-xs); /* ~13px */
   line-height: calc(17rem / 16); /* 17px */
+  margin-block: calc(6rem / 16); /* 6px */
+
   &.is-disabled {
     color: var(--input--disabled-fg-color);
   }
@@ -98,27 +126,25 @@
 
 /* Error message (Inline form errors). */
 .fieldset__error-message {
-  margin-block-start: calc(6rem / 16); /* 6px */
-  margin-block-end: calc(6rem / 16); /* 6px */
+  margin-block: calc(6rem / 16); /* 6px */
   color: var(--input--error-color);
-  font-size: var(--font-size-xs); /* ~13px */
+  font-size: var(--admin-font-size-xs); /* ~13px */
   font-weight: normal;
   line-height: calc(17rem / 16); /* 17px */
 }
 
 .fieldset__wrapper {
-  margin: var(--space-m);
+  margin: var(--admin-space-m);
+
   /**
    * Remove the extra padding of container-inline wrapper if it's used inside a fieldset
    */
   & > .container-inline {
     padding: 0;
   }
-}
 
-@media screen and (min-width: 48em) {
-  .fieldset__wrapper {
-    margin: var(--space-l) var(--space-l) calc(var(--space-m) + var(--space-s));
+  @media screen and (min-width: 48em) {
+    margin: var(--admin-space-l) var(--admin-space-l) calc(var(--admin-space-m) + var(--admin-space-s));
   }
 }
 

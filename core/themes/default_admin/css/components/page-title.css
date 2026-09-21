@@ -11,17 +11,22 @@
  */
 
 .block-page-title-block {
-  margin-block-end: var(--space-s);
-
-  &:last-child {
-    margin-block-end: var(--space-l);
-  }
+  margin-block: var(--admin-space-s);
 }
 
 .page-title {
   display: inline-block;
+  overflow: hidden;
+  max-width: 90%;
   margin: 0;
-  font-size: var(--font-size-h1);
+  padding-inline-end: 0.25em;
+  white-space: nowrap;
+  letter-spacing: -0.05em;
+  text-overflow: ellipsis;
+  color: var(--admin-color-text-loud);
+  font-size: var(--admin-font-size-page-title);
+  font-weight: var(--admin-font-weight-bold);
+  line-height: normal;
   -webkit-font-smoothing: antialiased;
 
   .region-header > & {
@@ -30,6 +35,24 @@
      *
      * @see Drupal\system\Controller\BatchController::batchPage()
      */
-    margin-block: var(--breadcrumb-height) var(--space-l);
+    margin-block: var(--breadcrumb-height) var(--admin-space-l);
   }
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: font-size 0.25s ease;
+  }
+
+  @media (min-width: 64em) {
+    .region-sticky--is-sticky & {
+      font-size: var(--admin-font-size-h3);
+    }
+  }
+}
+
+.page-title__language {
+  display: block;
+  letter-spacing: normal;
+  color: var(--admin-color-text);
+  font-size: var(--admin-font-size-xs);
+  font-weight: var(--admin-font-weight-normal);
 }

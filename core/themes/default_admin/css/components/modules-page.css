@@ -56,3 +56,19 @@
 .locale-translation-status-form .sticky-header th {
   border: 0;
 }
+
+.system-modules,
+.system-modules-uninstall {
+  label {
+    color: var(--admin-color-text-loud);
+  }
+
+  details {
+    color: var(--admin-color-text);
+  }
+}
+
+.admin-requirements,
+.admin-required {
+  color: var(--admin-color-text-soft);
+}
