@@ -8,30 +8,6 @@ tests/Drupal/**/*Test.php   export-ignore
 tests/fixtures/       export-ignore
 modules/*/tests/*/ export-ignore
 
-# Functional test traits that contrib and custom code use.
-modules/*/tests/src/                   -export-ignore
-modules/*/tests/src/*                  export-ignore
-modules/block/tests/src/Traits/         -export-ignore
-modules/block/tests/src/Traits/*        export-ignore
-modules/block/tests/src/Traits/BlockCreationTrait.php       -export-ignore
-modules/field/tests/src/Traits/         -export-ignore
-modules/field/tests/src/Traits/*        export-ignore
-modules/field/tests/src/Traits/BodyFieldCreationTrait.php       -export-ignore
-modules/node/tests/src/Traits/          -export-ignore
-modules/node/tests/src/Traits/*         export-ignore
-modules/node/tests/src/Traits/ContentTypeCreationTrait.php  -export-ignore
-modules/node/tests/src/Traits/NodeCreationTrait.php         -export-ignore
-modules/user/tests/src/Traits/          -export-ignore
-modules/user/tests/src/Traits/*         export-ignore
-modules/user/tests/src/Traits/UserCreationTrait.php         -export-ignore
-
-# FunctionalJavascript test modules.
-modules/system/tests/modules/                                  -export-ignore
-modules/system/tests/modules/*/                                export-ignore
-modules/system/tests/modules/css_disable_transitions_test/     -export-ignore
-modules/system/tests/modules/js_testing_ajax_request_test/     -export-ignore
-modules/system/tests/modules/js_testing_log_test/              -export-ignore
-
 # Per-test fixture data under tests/Drupal/Tests/.
 tests/Drupal/Tests/**/fixtures/ export-ignore
 tests/Drupal/Tests/**/Fixtures/ export-ignore
@@ -43,7 +19,6 @@ modules/*/tests/src/Nightwatch/ export-ignore
 
 # Test fixture install profiles. The testing profile must remain.
 profiles/tests/*/        export-ignore
-profiles/tests/testing/ -export-ignore
 
 # PHPStan tests and baseline.
 tests/PHPStan/                export-ignore
