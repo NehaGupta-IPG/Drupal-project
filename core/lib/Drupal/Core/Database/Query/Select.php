@@ -257,6 +257,8 @@ class Select extends Query implements SelectInterface {
       $this->range($range['start'] ?? NULL, $range['length'] ?? NULL);
     }
     else {
+      // @todo the ignore below seems to surface a bug of mglaman/phpstan-drupal.
+      // @phpstan-ignore drupal.entityStoragePropertyAssignment
       $this->range = $range;
     }
 
