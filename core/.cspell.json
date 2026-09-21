@@ -37,7 +37,8 @@
       ".yarnrc.yml",
       ".yarn/*",
       "misc/cspell/dictionary.txt",
-      "phpstan*"
+      "phpstan*",
+      "modules/file/tests/fixtures/*.svg"
     ],
     "ignoreRegExpList": [
       "^msgstr .*",

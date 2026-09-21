@@ -54,7 +54,8 @@
         "sebastian/diff": "^7",
         "php-tuf/composer-stager": "^2.0",
         "justinrainbow/json-schema": "^6.5.2",
-        "twig/html-extra": "^3.23"
+        "twig/html-extra": "^3.23",
+        "enshrined/svg-sanitize": "^1.0"
     },
     "conflict": {
         "drupal/automatic_updates": "<4",
