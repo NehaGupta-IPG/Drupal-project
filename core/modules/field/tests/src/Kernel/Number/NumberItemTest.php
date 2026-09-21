@@ -193,6 +193,57 @@ class NumberItemTest extends FieldKernelTestBase {
   }
 
   /**
+   * Tests decimal precision and scale during entity validation.
+   *
+   * @param int $precision
+   *   The field storage precision.
+   * @param int $scale
+   *   The field storage scale.
+   * @param string $value
+   *   The decimal value to validate.
+   * @param bool $valid
+   *   Whether the value can be represented with the configured precision/scale.
+   */
+  #[DataProvider('dataDecimalPrecisionAndScaleProvider')]
+  public function testDecimalPrecisionAndScale(int $precision, int $scale, string $value, bool $valid): void {
+    $storage = FieldStorageConfig::loadByName('entity_test', 'field_decimal');
+    $storage->setSetting('precision', $precision);
+    $storage->setSetting('scale', $scale);
+    $storage->save();
+
+    $entity = EntityTest::create(['field_decimal' => $value]);
+    // Validate before saving so preSave() rounding and database-specific
+    // behavior cannot hide values outside the field's precision and scale.
+    $violations = $entity->validate();
+    $this->assertCount($valid ? 0 : 1, $violations);
+    if (!$valid) {
+      $this->assertSame('field_decimal.0.value', $violations->get(0)->getPropertyPath());
+    }
+  }
+
+  /**
+   * Data provider for testDecimalPrecisionAndScale().
+   *
+   * @return \Generator
+   *   The decimal validation cases.
+   */
+  public static function dataDecimalPrecisionAndScaleProvider(): \Iterator {
+    // Keep decimals as strings to avoid PHP rounding them before validation.
+    yield 'valid decimal' => [10, 2, '1.23', TRUE];
+    yield 'positive precision boundary' => [10, 2, '99999999.99', TRUE];
+    yield 'negative precision boundary' => [10, 2, '-99999999.99', TRUE];
+    yield 'positive precision overflow' => [10, 2, '100000000', FALSE];
+    yield 'negative precision overflow' => [10, 2, '-100000000', FALSE];
+    yield 'excess decimal places' => [10, 2, '1.234', FALSE];
+    yield 'negative excess decimal places' => [10, 2, '-1.234', FALSE];
+    yield 'insignificant trailing zeros' => [10, 2, '1.2300', TRUE];
+    yield 'whole number with zero scale' => [10, 0, '123', TRUE];
+    yield 'fraction with zero scale' => [10, 0, '1.2', FALSE];
+    yield 'large precision boundary' => [32, 2, str_repeat('9', 30) . '.99', TRUE];
+    yield 'large precision overflow' => [32, 2, '1' . str_repeat('0', 30), FALSE];
+  }
+
+  /**
    * Tests the validation of minimum and maximum values.
    *
    * @param int|float|string $min
