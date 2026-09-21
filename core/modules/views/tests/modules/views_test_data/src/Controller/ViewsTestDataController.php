@@ -33,8 +33,11 @@ class ViewsTestDataController implements TrustedCallbackInterface {
    *
    * Used to test Drupal.Views.parseQueryString() in the browser, without
    * requiring an actual AJAX view to be rendered.
+   *
+   * @return array<string, mixed>
+   *   A renderable array.
    */
-  public function parseQueryStringPage() {
+  public function parseQueryStringPage(): array {
     return [
       '#markup' => '',
       '#attached' => [
