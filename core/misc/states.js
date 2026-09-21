@@ -748,12 +748,12 @@
         }
 
         if ($emptyRadio.length && $firstOption.length) {
-          const message = Drupal.t('Please select an option.');
+          const message = Drupal.t('Select an option.');
           const updateValidity = () => {
             const option = $firstOption[0];
             // A hidden, checked _none still satisfies native radio validation.
             // Make a visible option invalid without changing the selection.
-            if (option.required && $emptyRadio.is(':checked')) {
+            if (option.required && $emptyRadio[0].checked) {
               option.setCustomValidity(message);
             } else if (option.validationMessage === message) {
               option.setCustomValidity('');
