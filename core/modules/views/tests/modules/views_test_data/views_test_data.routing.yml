@@ -27,3 +27,11 @@ views_test_data.error_form_page:
     _controller: '\Drupal\views_test_data\Controller\ViewsTestDataController::errorFormPage'
   requirements:
     _access: 'TRUE'
+
+views_test_data.parse_query_string_page:
+  path: '/views_test_data_parse_query_string_page'
+  defaults:
+    _title: 'Test Views.parseQueryString'
+    _controller: '\Drupal\views_test_data\Controller\ViewsTestDataController::parseQueryStringPage'
+  requirements:
+    _access: 'TRUE'
