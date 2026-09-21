@@ -25,7 +25,7 @@ final class Select {
    *
    * @var list<string>
    */
-  public private(set) array $comments = [];
+  private array $comments = [];
 
   /**
    * The condition object for this query.
@@ -39,14 +39,14 @@ final class Select {
    *
    * @var array<string,array{'field':string,'table':string,'alias':string}>
    */
-  public private(set) array $columns = [];
+  private array $columns = [];
 
   /**
    * The expressions to SELECT as virtual columns.
    *
    * @var array<string,Expression>
    */
-  public private(set) array $expressions = [];
+  private array $expressions = [];
 
   /**
    * The tables against which to JOIN.
@@ -72,7 +72,7 @@ final class Select {
    * incorporated into the object; a separate array of arguments does not
    * need to be provided.
    */
-  public private(set) array $tables = [];
+  private array $tables = [];
 
   /**
    * The columns by which to order this query.
@@ -82,14 +82,14 @@ final class Select {
    *
    * @var array<string,string>
    */
-  public private(set) array $orderBy = [];
+  private array $orderBy = [];
 
   /**
    * The columns by which to group.
    *
    * @var array<string,string>
    */
-  public private(set) array $groupBy = [];
+  private array $groupBy = [];
 
   /**
    * The conditional object for the HAVING clause.
@@ -106,7 +106,7 @@ final class Select {
    *
    * @var array
    */
-  public private(set) array $range = [];
+  private array $range = [];
 
   /**
    * An array whose elements specify a query to UNION, and the UNION type.
@@ -120,7 +120,7 @@ final class Select {
    *
    * @var list<array{'type':string,'query':Select}>
    */
-  public private(set) array $union = [];
+  private array $union = [];
 
   /**
    * The FOR UPDATE status.
@@ -130,12 +130,12 @@ final class Select {
   /**
    * The query metadata for alter purposes.
    */
-  public private(set) array $alterMetadata = [];
+  private array $alterMetadata = [];
 
   /**
    * The query tags.
    */
-  public private(set) array $alterTags = [];
+  private array $alterTags = [];
 
   /**
    * Constructs a Select object.
@@ -685,6 +685,16 @@ final class Select {
       throw new \LogicException(__CLASS__ . ' objects containing alter tags cannot be serialized');
     }
     return get_object_vars($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __get(string $name): mixed {
+    if (in_array($name, array_keys(get_object_vars($this), TRUE)) && is_array($this->{$name})) {
+      return $this->{$name};
+    }
+    throw new \LogicException('Unavailable property $' . $name . ' for ' . __CLASS__);
   }
 
 }

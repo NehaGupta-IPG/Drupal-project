@@ -9,19 +9,23 @@ use Drupal\Core\Database\InvalidQueryException;
 
 /**
  * Generic class for a series of conditions in a query.
+ *
+ * @phpstan-type ConditionEntry array{
+ *     'variable':string|Condition|Select,
+ *     'operator':string,
+ *     'value':string|int|bool|float|array|Select|null,
+ *   }|Expression
+ *
+ * @property-read list<ConditionEntry> $conditions
  */
 final class Condition {
 
   /**
    * Array of conditions.
    *
-   * @var list<array{
-   *     'variable':string|Condition|Select,
-   *     'operator':string,
-   *     'value':string|int|bool|float|array|Select|null,
-   *   }|Expression>
+   * @var list<ConditionEntry>
    */
-  public private(set) array $conditions = [];
+  private array $conditions = [];
 
   /**
    * Constructs a Condition object.
@@ -140,6 +144,16 @@ final class Condition {
    */
   public function orConditionGroup(): static {
     return $this->conditionGroupFactory(Conjunction::Or);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __get(string $name): mixed {
+    if (in_array($name, array_keys(get_object_vars($this), TRUE)) && is_array($this->{$name})) {
+      return $this->{$name};
+    }
+    throw new \LogicException('Unavailable property $' . $name . ' for ' . __CLASS__);
   }
 
 }
