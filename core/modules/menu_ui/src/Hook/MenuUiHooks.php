@@ -55,7 +55,7 @@ class MenuUiHooks {
         $output .= '<h2>' . $this->t('Uses') . '</h2>';
         $output .= '<dl>';
         $output .= '<dt>' . $this->t('Managing menus') . '</dt>';
-        $output .= '<dd>' . $this->t('Users with the <em>Administer menus and menu links</em> permission can add, edit, and delete custom menus on the <a href=":menu">Menus page</a>. Custom menus can be special site menus, menus of external links, or any combination of internal and external links. You may create an unlimited number of additional menus, each of which will automatically have an associated block (if you have the <a href=":block_help">Block module</a> installed). By selecting <em>Edit menu</em>, you can add, edit, or delete links for a given menu. The links listing page provides a drag-and-drop interface for controlling the order of links, and creating a hierarchy within the menu.', [
+        $output .= '<dd>' . $this->t('Users with the <em>Administer menus and menu links</em> permission can add, edit, and delete custom menus on the <a href=":menu">Menus page</a>. Custom menus can be special site menus, menus of external links, or any combination of internal and external links. You may create an unlimited number of additional menus, each of which will automatically have an associated block (if you have the <a href=":block_help">Block module</a> installed). By selecting <em>Edit links</em>, you can add, edit, or delete links for a given menu. The links listing page provides a drag-and-drop interface for controlling the order of links, and creating a hierarchy within the menu.', [
           ':block_help' => \Drupal::moduleHandler()->moduleExists('block') ? Url::fromRoute('help.page', [
             'name' => 'block',
           ])->toString() : '#',
