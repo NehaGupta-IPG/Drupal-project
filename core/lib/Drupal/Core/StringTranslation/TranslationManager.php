@@ -37,6 +37,18 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
   protected $sortedTranslators = NULL;
 
   /**
+   * Whether a translation was resolved.
+   *
+   * Tracks whether translated strings were resolved since the last call to
+   * resetTranslationTracking(). This is used to detect responses that output
+   * translated strings but lack the languages:language_interface cache
+   * context.
+   *
+   * @var bool
+   */
+  protected bool $translatedStrings = FALSE;
+
+  /**
    * The default langcode used in translations.
    *
    * @var string
@@ -105,6 +117,7 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    * {@inheritdoc}
    */
   public function translateString(TranslatableMarkup $translated_string) {
+    $this->translatedStrings = TRUE;
     return $this->doTranslate($translated_string->getUntranslatedString(), $translated_string->getOptions());
   }
 
@@ -112,6 +125,7 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    * {@inheritdoc}
    */
   public function selectPluralForm(int|float $count, string $string, ?string $langcode = NULL): string {
+    $this->translatedStrings = TRUE;
     $translated_array = explode(PoItem::DELIMITER, $string);
     if ($count == 1 || count($translated_array) == 1) {
       // Singular form.
@@ -192,6 +206,24 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    */
   public function setDefaultLangcode($langcode) {
     $this->defaultLangcode = $langcode;
+  }
+
+  /**
+   * Resets the translated strings tracking flag.
+   */
+  public function resetTranslationTracking(): void {
+    $this->translatedStrings = FALSE;
+  }
+
+  /**
+   * Returns whether a translation was resolved.
+   *
+   * @return bool
+   *   Whether a translation was resolved since the last call to
+   *   resetTranslationTracking().
+   */
+  public function translatedStringsWereResolved(): bool {
+    return $this->translatedStrings;
   }
 
   /**
