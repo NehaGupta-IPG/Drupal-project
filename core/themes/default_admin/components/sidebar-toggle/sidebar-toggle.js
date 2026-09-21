@@ -105,6 +105,21 @@
       if (window.innerWidth < breakpointLarge) {
         Drupal.adminCoreNavigation?.collapseToolbar();
       }
+      // document.querySelectorAll('.layout-node-form > *:not(#default_admin_sidebar)').forEach(el => {
+      //   el.inert = true;
+      // });
+
+      // document.querySelectorAll('.region-content > *:not(#block-default-admin-content)').forEach(el => {
+      //   el.inert = true;
+      // });
+
+      // document.querySelectorAll('.page-content > *:not(.region-content)').forEach(el => {
+      //   el.inert = true;
+      // });
+
+      // document.querySelectorAll('.page-wrapper__node-edit-form > *:not(.layout-container)').forEach(el => {
+      //   el.inert = true;
+      // });
     },
 
     collapseSidebar: () => {
