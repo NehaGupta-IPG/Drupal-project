@@ -46,13 +46,13 @@ const cases = [
 module.exports = {
   '@tags': ['core'],
   before(browser) {
-    browser.drupalInstall().drupalInstallModule('views_test_data', true);
+    browser.drupalInstall().drupalInstallModule('views_test_ajax_page', true);
   },
   after(browser) {
     browser.drupalUninstall();
   },
   'Drupal.Views.parseQueryString': (browser) => {
-    browser.drupalRelativeURL('/views_test_data_parse_query_string_page');
+    browser.drupalRelativeURL('/views_test_ajax_page/parse_query_string');
     cases.forEach(({ label, query, expected }) => {
       browser.execute(
         // eslint-disable-next-line func-names, prefer-arrow-callback
