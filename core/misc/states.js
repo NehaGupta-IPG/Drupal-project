@@ -726,6 +726,7 @@
         // @todo Find empty _none options by data attribute instead.
         const $emptyRadio = $radios.filter('[value="_none"]');
         const $emptyItem = $emptyRadio.closest('.js-form-item, .form-item');
+        const $firstOption = $radios.not($emptyRadio).first();
 
         if (e.value) {
           $radios.attr({ required: 'required' });
@@ -744,6 +745,25 @@
           if ($emptyRadio.length) {
             $emptyItem.show();
           }
+        }
+
+        if ($emptyRadio.length && $firstOption.length) {
+          const message = Drupal.t('Please select an option.');
+          const updateValidity = () => {
+            const option = $firstOption[0];
+            // A hidden, checked _none still satisfies native radio validation.
+            // Make a visible option invalid without changing the selection.
+            if (option.required && $emptyRadio.is(':checked')) {
+              option.setCustomValidity(message);
+            } else if (option.validationMessage === message) {
+              option.setCustomValidity('');
+            }
+          };
+          $(once('states-required-radios-validity', $radios)).on(
+            'change',
+            updateValidity,
+          );
+          updateValidity();
         }
         return;
       }
