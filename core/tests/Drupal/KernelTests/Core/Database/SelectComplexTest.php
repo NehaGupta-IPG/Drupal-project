@@ -8,6 +8,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Expression;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\RowCountException;
+use Drupal\Core\Database\Query\DatabaseAbstract\Order;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
@@ -554,7 +555,7 @@ class SelectComplexTest extends DatabaseTestBase {
       ->addColumn('test_task', 'pid', 'pid_alias')
       ->addExpression('COUNT([test_task].[task])', 'count')
       ->groupBy('pid_alias')
-      ->orderBy('pid_alias', 'asc')
+      ->orderBy('pid_alias', Order::Asc)
       ->countQuery();
 
     $query = $this->connection->select('test_task');

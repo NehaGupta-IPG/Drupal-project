@@ -15,13 +15,10 @@ class Expression {
    *   pass it through $arguments placeholders instead.
    * @param array<string,string|int|float|bool> $arguments
    *   (optional) The expression arguments, keyed by placeholder name.
-   * @param string $alias
-   *   (optional) An alias for this expression.
    */
   public function __construct(
     public readonly string $expression,
     public readonly array $arguments = [],
-    public readonly ?string $alias = NULL,
   ) {
   }
 

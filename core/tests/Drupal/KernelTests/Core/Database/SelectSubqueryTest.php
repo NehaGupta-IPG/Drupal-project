@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Expression;
+use Drupal\Core\Database\Query\DatabaseAbstract\Order;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
+use Drupal\Core\Database\Query\DatabaseAbstract\UnionType;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -81,7 +83,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
     $abstractSubquery = DatabaseAbstractSelect::build('test_task', 'tt')
       ->addColumn('tt', 'pid', 'pid')
       ->addColumn('tt', 'task', 'task')
-      ->orderBy('priority', 'DESC')
+      ->orderBy('priority', Order::Desc)
       ->range(0, 1);
     // Create another query that joins against the virtual table resulting
     // from the subquery.

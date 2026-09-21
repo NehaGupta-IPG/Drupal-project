@@ -7,7 +7,11 @@ use Drupal\Core\Database\Expression;
 use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
 use Drupal\Core\Database\Query\DatabaseAbstract\Conjunction;
 use Drupal\Core\Database\Query\DatabaseAbstract\JoinType;
+use Drupal\Core\Database\Query\DatabaseAbstract\Order;
+use Drupal\Core\Database\Query\DatabaseAbstract\UnionType;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
+
+// cspell:ignore mglaman
 
 /**
  * Query builder for SELECT statements.
@@ -244,12 +248,22 @@ class Select extends Query implements SelectInterface {
       }
     }
 
-    $this->order = $abstractSelect->orderBy;
+    foreach ($abstractSelect->orderBy as $key => $orderBy) {
+      $order = match ($orderBy) {
+        Order::Asc => 'ASC',
+        Order::Desc => 'DESC',
+      };
+      $this->order[$key] = $order;
+    }
 
     $this->group = $abstractSelect->groupBy;
 
     foreach ($abstractSelect->union as $union) {
-      $this->union($this->connection->select($union['query']), $union['type']);
+      $unionType = match ($union['type']) {
+        UnionType::Distinct => 'DISTINCT',
+        UnionType::All => 'ALL',
+      };
+      $this->union($this->connection->select($union['query']), $unionType);
     }
 
     $range = $abstractSelect->range;

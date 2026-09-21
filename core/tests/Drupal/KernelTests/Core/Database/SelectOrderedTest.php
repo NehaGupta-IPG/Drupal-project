@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Statement\FetchAs;
+use Drupal\Core\Database\Query\DatabaseAbstract\Order;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
+use Drupal\Core\Database\Query\DatabaseAbstract\UnionType;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -136,7 +138,7 @@ class SelectOrderedTest extends DatabaseTestBase {
     $abstractQuery = DatabaseAbstractSelect::build('test')
       ->addColumn('test', 'name')
       ->addColumn('test', 'age', 'age')
-      ->orderBy('age', 'DESC');
+      ->orderBy('age', Order::Desc);
 
     $query = $this->connection->select('test');
     $query->addField('test', 'name');

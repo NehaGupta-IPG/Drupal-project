@@ -20,12 +20,12 @@ use Drupal\Core\Database\Expression;
  *
  * @property-read list<string> $comments
  * @property-read array<string,array{'field':string,'table':string,'alias':string}> $columns
- * @property-read array<string,Expression> $expressions
+ * @property-read array<string,AliasedExpression> $expressions
  * @property-read array<string,TableEntry> $tables
- * @property-read array<string,string> $orderBy
+ * @property-read array<string,Order> $orderBy
  * @property-read array<string,string> $groupBy
  * @property-read ?array{'start':int,'length':?int} $range
- * @property-read list<array{'type':string,'query':Select}> $union
+ * @property-read list<array{'type':UnionType,'query':Select}> $union
  * @property-read array $alterMetadata
  * @property-read array $alterTags
  */
@@ -55,7 +55,7 @@ final class Select {
   /**
    * The expressions to SELECT as virtual columns.
    *
-   * @var array<string,Expression>
+   * @var array<string,AliasedExpression>
    */
   private array $expressions = [];
 
@@ -91,7 +91,7 @@ final class Select {
    * This is an associative array. The keys are the columns to order, and the
    * value is the direction to order, either ASC or DESC.
    *
-   * @var array<string,string>
+   * @var array<string,Order>
    */
   private array $orderBy = [];
 
@@ -129,7 +129,7 @@ final class Select {
    * first query to union on the right of the original query, the second union
    * to the right of the first, etc.
    *
-   * @var list<array{'type':string,'query':Select}>
+   * @var list<array{'type':UnionType,'query':Select}> $union
    */
   private array $union = [];
 
@@ -388,7 +388,7 @@ final class Select {
     }
     $alias = $alias_candidate;
 
-    $this->expressions[$alias] = new Expression($expression, $arguments, $alias);
+    $this->expressions[$alias] = new AliasedExpression($expression, $arguments, $alias);
 
     return $this;
   }
@@ -458,9 +458,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function orderBy(string $column, string $direction = 'ASC'): static {
-    // Only allow ASC and DESC, default to ASC.
-    $direction = strtoupper($direction) == 'DESC' ? 'DESC' : 'ASC';
+  public function orderBy(string $column, Order $direction = Order::Asc): static {
     $this->orderBy[$column] = $direction;
     return $this;
   }
@@ -485,25 +483,11 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function union(Select $query, string $type = ''): static {
-    // Handle UNION aliasing.
-    switch ($type) {
-      // Fold UNION DISTINCT to UNION for better cross database support.
-      case 'DISTINCT':
-      case '':
-        $type = 'UNION';
-        break;
-
-      case 'ALL':
-        $type = 'UNION ALL';
-      default:
-    }
-
+  public function union(Select $query, UnionType $type = UnionType::Distinct): static {
     $this->union[] = [
       'type' => $type,
       'query' => $query,
     ];
-
     return $this;
   }
 

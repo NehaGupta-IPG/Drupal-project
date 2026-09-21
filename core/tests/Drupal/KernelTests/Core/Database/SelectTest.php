@@ -7,7 +7,9 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\InvalidQueryException;
+use Drupal\Core\Database\Query\DatabaseAbstract\Order;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
+use Drupal\Core\Database\Query\DatabaseAbstract\UnionType;
 use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\Core\Database\Query\SelectInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -550,7 +552,7 @@ class SelectTest extends DatabaseTestBase {
     $abstractQuery2 = DatabaseAbstractSelect::build('test', 't')
       ->columns('t', ['name'])
       ->condition('age', 28);
-    $abstractQuery1->union($abstractQuery2, 'ALL');
+    $abstractQuery1->union($abstractQuery2, UnionType::All);
 
     $query_1 = $this->connection->select('test', 't')
       ->fields('t', ['name'])
@@ -589,7 +591,7 @@ class SelectTest extends DatabaseTestBase {
         DatabaseAbstractSelect::build('test', 't')
           ->columns('t', ['name'])
           ->condition('age', 28),
-        'ALL',
+        UnionType::All,
       )
       ->countQuery();
 
@@ -631,7 +633,7 @@ class SelectTest extends DatabaseTestBase {
           ->columns('t', ['name'])
           ->condition('age', 26)
       )
-      ->orderBy('name', 'DESC');
+      ->orderBy('name', Order::Desc);
 
     // This gives George and Ringo.
     $query_1 = $this->connection->select('test', 't')
@@ -679,7 +681,7 @@ class SelectTest extends DatabaseTestBase {
           ->columns('t', ['name'])
           ->condition('age', 26)
       )
-      ->orderBy('name', 'DESC')
+      ->orderBy('name', Order::Desc)
       ->range(0, 2);
 
     // This gives George and Ringo.
