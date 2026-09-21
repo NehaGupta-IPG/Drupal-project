@@ -15,8 +15,8 @@ use Drupal\sqlite\Driver\Database\sqlite\Install\Tasks;
 use Drupal\Tests\package_manager\Traits\AssertPreconditionsTrait;
 use Drupal\Tests\package_manager\Traits\FixtureUtilityTrait;
 use Drupal\Tests\RandomGeneratorTrait;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -335,8 +335,9 @@ END;
     $this->installQuickStart('minimal');
     $this->formLogin($this->adminUsername, $this->adminPassword);
 
-    // Test modules are excluded from distribution packages. Copy the Package
-    // Manager test modules from the test runner into the built test project.
+    // Core's .gitattributes excludes test code from the drupal/core package.
+    // The test project therefore has no Package Manager test modules, so copy
+    // them in from the code base running the test.
     (new Filesystem())->mirror(
       dirname(__DIR__, 2) . '/modules',
       $this->getWebRoot() . '/modules',
