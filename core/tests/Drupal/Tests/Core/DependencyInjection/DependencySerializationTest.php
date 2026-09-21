@@ -389,6 +389,8 @@ class DependencySerializationTestDummyPrivateSubclass extends DependencySerializ
    *   A test service.
    * @param string $secret
    *   A value for the private property.
+   *
+   * @phpstan-ignore dependencySerializationTraitProperty.unsupportedPrivateProperty
    */
   public function __construct(\stdClass $service, private string $secret = 'default') {
     parent::__construct($service);
