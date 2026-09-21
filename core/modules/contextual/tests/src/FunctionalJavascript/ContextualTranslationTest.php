@@ -98,7 +98,7 @@ class ContextualTranslationTest extends WebDriverTestBase {
     $edit_translation = $this->randomMachineName();
     $this->drupalGet('admin/config/regional/translate');
     $this->submitForm(['string' => 'Edit', 'langcode' => 'nl'], 'Filter');
-    $textarea = current($this->xpath('//textarea'));
+    $textarea = current($this->getNodeElementsByXpath('//textarea'));
     $lid = (string) $textarea->getAttribute('name');
     $this->submitForm([$lid => $edit_translation], 'Save translations');
 
