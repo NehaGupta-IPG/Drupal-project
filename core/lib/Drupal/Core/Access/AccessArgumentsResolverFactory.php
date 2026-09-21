@@ -7,7 +7,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\HttpFoundation\Request;
-use function Symfony\Component\String\u;
+use Symfony\Component\String\UnicodeString;
 
 /**
  * Resolves the arguments to pass to an access check callable.
@@ -39,7 +39,7 @@ readonly class AccessArgumentsResolverFactory implements AccessArgumentsResolver
       $language = isset($raw_route_arguments[$param_name]) ? $this->languageManager->getLanguage($raw_route_arguments[$param_name]) : $this->languageManager->getCurrentLanguage($type);
       // Match arguments for both snake- and camel-cased names.
       $upcasted_route_arguments[$type] = $language;
-      $upcasted_route_arguments[(string) u($type)->camel()] = $language;
+      $upcasted_route_arguments[(string) (new UnicodeString($type))->camel()] = $language;
     }
 
     // Parameters which are not defined on the route object, but still are

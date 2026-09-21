@@ -113,7 +113,7 @@ class AccessArgumentsResolverFactoryTest extends KernelTestBase {
   }
 
   /**
-   * Route custom access callback with camel-cased language arguments.
+   * Route custom access callback with language arguments.
    *
    * @param \Drupal\Core\Language\LanguageInterface|null $languageContent
    *   The content language with a camel-cased argument name.
