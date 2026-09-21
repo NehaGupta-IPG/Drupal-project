@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config\Command;
 
+use Drupal\Core\Command\Exception\UserAbortException;
 use Drupal\Core\Config\ConfigImporterException;
 use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\ImportStorageTransformer;
@@ -22,7 +23,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 #[AsCommand(
   name: 'config:import',
   description: 'Import configuration',
-  aliases: [],
+  aliases: ['cim'],
 )]
 final class ConfigImportCommand extends Command {
 
@@ -70,8 +71,7 @@ final class ConfigImportCommand extends Command {
     $this->renderTable($comparer, $io);
 
     if (!$yes && !$io->confirm((string) $this->t('Import the listed configuration changes?'))) {
-      $io->warning((string) $this->t('Cancelled'));
-      return Command::FAILURE;
+      throw new UserAbortException('Cancelled');
     }
 
     $importer = $this->importerFactory->get($comparer);

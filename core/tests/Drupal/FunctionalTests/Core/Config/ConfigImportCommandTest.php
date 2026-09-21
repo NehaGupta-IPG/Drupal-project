@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Core\Config;
 
+use Drupal\Core\Command\Exception\UserAbortException;
 use Drupal\Core\Config\Command\ConfigImportCommand;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\ConfigImporterFactory;
@@ -205,8 +206,13 @@ class ConfigImportCommandTest extends BrowserTestBase {
     // Run the import command but cancel it.
     $tester = $this->commandTester();
     $tester->setInputs(['no']);
-    $code = $tester->execute([], ['interactive' => TRUE]);
-    self::assertSame(Command::FAILURE, $code);
+    try {
+      $tester->execute([], ['interactive' => TRUE]);
+      $this->fail('Expected a UserAbortException to be thrown.');
+    }
+    catch (UserAbortException) {
+      // Expected.
+    }
     $display = preg_replace('/\s+/', ' ', $tester->getDisplay());
     self::assertStringContainsString('core.extension Update', $display);
     self::assertStringContainsString('system.theme Update', $display);
@@ -214,7 +220,6 @@ class ConfigImportCommandTest extends BrowserTestBase {
     self::assertStringContainsString('text.settings Delete', $display);
 
     self::assertStringContainsString('Import the listed configuration changes?', $display);
-    self::assertStringContainsString('[WARNING] Cancelled', $display);
     self::assertStringNotContainsString('The configuration was imported successfully.', $display);
 
     self::assertEmpty(\Drupal::state()->get('ConfigImportUITest.core.extension.modules_installed', []));
@@ -233,7 +238,6 @@ class ConfigImportCommandTest extends BrowserTestBase {
     self::assertStringContainsString('text.settings Delete', $display);
 
     self::assertStringContainsString('Import the listed configuration changes?', $display);
-    self::assertStringNotContainsString('[WARNING] Cancelled', $display);
     self::assertStringContainsString('The configuration was imported successfully.', $display);
 
     $this->rebuildContainer();
