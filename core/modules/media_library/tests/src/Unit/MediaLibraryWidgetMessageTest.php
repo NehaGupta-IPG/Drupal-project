@@ -41,7 +41,7 @@ final class MediaLibraryWidgetMessageTest extends UnitTestCase {
     $field_definition->expects($this->never())
       ->method('getTargetEntityTypeId');
 
-    $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
+    $entity_type_manager = $this->createStub(EntityTypeManagerInterface::class);
 
     $current_user = $this->createMock(AccountInterface::class);
     $current_user->expects($this->once())
@@ -53,7 +53,7 @@ final class MediaLibraryWidgetMessageTest extends UnitTestCase {
     $module_handler->expects($this->never())
       ->method('moduleExists');
 
-    $url_generator = $this->createMock(UrlGeneratorInterface::class);
+    $url_generator = $this->createStub(UrlGeneratorInterface::class);
     $url_generator->method('generateFromRoute')
       ->willReturn('/admin/structure/media/add');
     $container = new ContainerBuilder();
