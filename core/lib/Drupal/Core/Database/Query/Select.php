@@ -6,6 +6,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Expression;
 use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
 use Drupal\Core\Database\Query\DatabaseAbstract\Conjunction;
+use Drupal\Core\Database\Query\DatabaseAbstract\JoinType;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 
 /**
@@ -179,6 +180,11 @@ class Select extends Query implements SelectInterface {
 
     foreach ($abstractSelect->tables as $key => $table) {
       $this->tables[$key] = $table;
+      $this->tables[$key]['join type'] = match ($this->tables[$key]['join type']) {
+        JoinType::BaseTable => NULL,
+        JoinType::Inner => 'INNER',
+        JoinType::Left => 'LEFT OUTER',
+      };
       if ($table['table'] instanceof DatabaseAbstractSelect) {
         $this->tables[$key]['table'] = $this->connection->select($table['table']);
       }

@@ -10,7 +10,7 @@ use Drupal\Core\Database\Expression;
  * Database abstract query builder for SELECT statements.
  *
  * @phpstan-type TableEntry array{
- *     'join type':?string,
+ *     'join type':JoinType,
  *     'table':string|Select,
  *     'alias':string,
  *     'condition':string|Condition|null,
@@ -166,7 +166,7 @@ final class Select {
     ?string $alias,
     public readonly Conjunction $conjunction,
   ) {
-    $this->addJoin(NULL, $table, $alias);
+    $this->addJoin(JoinType::BaseTable, $table, $alias);
   }
 
   /**
@@ -397,27 +397,27 @@ final class Select {
    * {@inheritdoc}
    */
   public function join(string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
-    return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
+    return $this->addJoin(JoinType::Inner, $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
   public function innerJoin(string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
-    return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
+    return $this->addJoin(JoinType::Inner, $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
   public function leftJoin(string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
-    return $this->addJoin('LEFT OUTER', $table, $alias, $condition, $arguments);
+    return $this->addJoin(JoinType::Left, $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addJoin(?string $type, string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
+  public function addJoin(JoinType $type, string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
     if (empty($alias)) {
       if ($table instanceof self) {
         $alias = 'subquery';
