@@ -1144,6 +1144,9 @@ final class HTMLRestrictions {
    *
    * @param \Drupal\ckeditor5\HTMLRestrictions $r
    *   A set of HTML restrictions.
+   * @param array $supported_wildcard_tags
+   *   (optional) The concrete tags for which wildcard tags may be resolved,
+   *   in addition to the tags present in $r. Defaults to an empty array.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
    *   The concrete interpretation of the given set of HTML restrictions. All
@@ -1198,7 +1201,6 @@ final class HTMLRestrictions {
    *   (optional) Whether to resolve wildcards. Defaults to TRUE. When set to
    *   FALSE, the raw allowed elements will be returned (with no processing
    *   applied hence no resolved wildcards).
-   *
    * @param array $supported_wildcard_tags
    *   (optional) Supported wildcard tags. Defaults to an empty array.
    *
