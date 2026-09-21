@@ -12,7 +12,7 @@ use Drupal\Core\Database\InvalidQueryException;
  *
  * @phpstan-type ConditionEntry array{
  *     'variable':string|Condition|Select,
- *     'operator':string,
+ *     'operator':Operator,
  *     'value':string|int|bool|float|array|Select|null,
  *   }|Expression
  *
@@ -41,16 +41,16 @@ final class Condition {
   /**
    * {@inheritdoc}
    */
-  public function condition(string|Condition|Select $variable, string|int|bool|float|array|Select|null $value = NULL, ?string $operator = '='): static {
-    if (empty($operator)) {
-      $operator = '=';
+  public function condition(string|Condition|Select $variable, Operator|string $operator = Operator::Equal, string|int|bool|float|array|Select|null $value = NULL): static {
+    if (is_string($operator)) {
+      $operator = Operator::from($operator);
     }
     if (empty($value) && is_array($value) && is_string($variable)) {
-      throw new InvalidQueryException(sprintf("Query condition '%s %s ()' cannot be empty.", $variable, $operator));
+      throw new InvalidQueryException(sprintf("Query condition '%s %s ()' cannot be empty.", $variable, $operator->value));
     }
     if (
         is_array($value) &&
-        in_array($operator, ['=', '<', '>', '<=', '>=', 'IS NULL', 'IS NOT NULL'], TRUE) &&
+        in_array($operator->value, ['=', '<', '>', '<=', '>=', 'IS NULL', 'IS NOT NULL'], TRUE) &&
         is_string($variable)
       ) {
       if (count($value) > 1) {
@@ -66,7 +66,7 @@ final class Condition {
             default => '[unknown type value]',
           };
         }, $value);
-        throw new InvalidQueryException(sprintf("Query condition '%s %s %s' must have an array compatible operator.", $variable, $operator, implode(', ', $onlyStrings)));
+        throw new InvalidQueryException(sprintf("Query condition '%s %s %s' must have an array compatible operator.", $variable, $operator->value, implode(', ', $onlyStrings)));
       }
       else {
         throw new InvalidQueryException('Calling ' . __METHOD__ . '() without an array compatible operator is not supported. See https://www.drupal.org/node/3350985');
@@ -94,28 +94,28 @@ final class Condition {
    * {@inheritdoc}
    */
   public function isNull(string|Condition $variable): static {
-    return $this->condition($variable, NULL, 'IS NULL');
+    return $this->condition($variable, Operator::IsNull);
   }
 
   /**
    * {@inheritdoc}
    */
   public function isNotNull(string|Condition $variable): static {
-    return $this->condition($variable, NULL, 'IS NOT NULL');
+    return $this->condition($variable, Operator::IsNotNull);
   }
 
   /**
    * {@inheritdoc}
    */
   public function exists(Select $select): static {
-    return $this->condition('', $select, 'EXISTS');
+    return $this->condition('', Operator::Exists, $select);
   }
 
   /**
    * {@inheritdoc}
    */
   public function notExists(Select $select): static {
-    return $this->condition('', $select, 'NOT EXISTS');
+    return $this->condition('', Operator::NotExists, $select);
   }
 
   /**

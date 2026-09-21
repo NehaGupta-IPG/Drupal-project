@@ -238,7 +238,7 @@ class Select extends Query implements SelectInterface {
       else {
         $value = $condition['value'];
       }
-      $this->condition($variable, $value, $condition['operator']);
+      $this->condition($variable, $value, $condition['operator']->value);
     }
 
     foreach ($abstractSelect->having?->conditions ?? [] as $key => $condition) {

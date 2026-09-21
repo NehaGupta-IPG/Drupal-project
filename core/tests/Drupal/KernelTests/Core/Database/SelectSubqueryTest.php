@@ -28,7 +28,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
     $abstractSubquery = DatabaseAbstractSelect::build('test_task', 'tt')
       ->addColumn('tt', 'pid', 'pid')
       ->addColumn('tt', 'task', 'task')
-      ->condition('priority', 1);
+      ->condition('priority', '=', 1);
     $hydratedSubquery = $this->connection->select($abstractSubquery);
 
     $subquery = $this->connection->select('test_task', 'tt');
@@ -128,12 +128,12 @@ class SelectSubqueryTest extends DatabaseTestBase {
     // Create a subquery, which is just a normal query object.
     $abstractSubquery = DatabaseAbstractSelect::build('test_task', 'tt')
       ->addColumn('tt', 'pid', 'pid')
-      ->condition('tt.priority', 1);
+      ->condition('tt.priority', '=', 1);
     // Create another query that joins against the virtual table resulting
     // from the subquery.
     $abstractSelect = DatabaseAbstractSelect::build('test_task', 'tt2')
       ->addColumn('tt2', 'task')
-      ->condition('tt2.pid', $abstractSubquery, 'IN');
+      ->condition('tt2.pid', 'IN', $abstractSubquery);
 
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
@@ -197,7 +197,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
     // Create another query that adds a clause using the subqueries.
     $abstractSelect = DatabaseAbstractSelect::build('test', 't')
       ->addColumn('t', 'name')
-      ->condition($abstractSubquery1, $abstractSubquery2, '>');
+      ->condition($abstractSubquery1, '>', $abstractSubquery2);
 
     // Create subquery 1, which is just a normal query object.
     $subquery1 = $this->connection->select('test_task', 'tt');
@@ -251,7 +251,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
     // Create another query that adds a clause using the subqueries.
     $abstractSelect = DatabaseAbstractSelect::build('test', 't')
       ->addColumn('t', 'name')
-      ->condition($abstractSubquery1, [$abstractSubquery2, $abstractSubquery3], 'BETWEEN');
+      ->condition($abstractSubquery1, 'BETWEEN', [$abstractSubquery2, $abstractSubquery3]);
 
     // Create subquery 1, which is just a normal query object.
     $subquery1 = $this->connection->select('test_task', 'tt');
@@ -298,7 +298,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
     // Create a subquery, which is just a normal query object.
     $abstractSubquery = DatabaseAbstractSelect::build('test_task', 'tt')
       ->addColumn('tt', 'pid', 'pid')
-      ->condition('priority', 1);
+      ->condition('priority', '=', 1);
     // Create another query that joins against the virtual table resulting
     // from the subquery.
     $abstractSelect = DatabaseAbstractSelect::build('test', 't')
