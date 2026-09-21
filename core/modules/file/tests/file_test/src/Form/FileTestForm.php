@@ -6,28 +6,29 @@ namespace Drupal\file_test\Form;
 
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
-use Drupal\Core\Form\FormInterface;
+use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\file\Upload\FormFileUploader;
 
 /**
  * File test form class.
  */
-class FileTestForm implements FormInterface {
+class FileTestForm extends FormBase {
   use FileTestFormTrait;
   use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return '_file_test_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
 
     $form = $this->baseForm($form, $form_state);
 
@@ -42,12 +43,7 @@ class FileTestForm implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // Process the upload and perform validation. Note: we're using the
     // form value for the $replace parameter.
     if (!$form_state->isValueEmpty('file_subdir')) {
@@ -55,7 +51,7 @@ class FileTestForm implements FormInterface {
       \Drupal::service('file_system')->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY);
     }
     else {
-      $destination = FALSE;
+      $destination = 'temporary://';
     }
 
     // Setup validators.
@@ -77,12 +73,12 @@ class FileTestForm implements FormInterface {
 
     // The test for \Drupal::service('file_system')->moveUploadedFile()
     // triggering a warning is unavoidable. We're interested in what happens
-    // afterwards in file_save_upload().
+    // afterwards in FormFileUploader::saveFormUploadedFiles().
     if (\Drupal::state()->get('file_test.disable_error_collection')) {
       define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     }
 
-    $file = file_save_upload('file_test_upload', $validators, $destination, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
+    $file = \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles('file_test_upload', $validators, $destination, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
     if ($file) {
       $form_state->setValue('file_test_upload', $file);
       \Drupal::messenger()->addStatus($this->t('File @filepath was uploaded.', ['@filepath' => $file->getFileUri()]));

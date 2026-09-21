@@ -1,2 +1,7 @@
 parameters:
-  options.hooks_converted: true
+  options.skip_procedural_hook_scan: true
+
+services:
+  Drupal\options\OptionsAllowedValuesInterface:
+    class: Drupal\options\OptionsAllowedValues
+    autowire: true

@@ -128,13 +128,13 @@ class Html {
     // - 0-9 (U+0061 - U+007A)
     // - ISO 10646 characters U+00A1 and higher
     // We strip out any character not in the above list.
-    $identifier = preg_replace('/[^\x{002D}\x{0030}-\x{0039}\x{0041}-\x{005A}\x{005F}\x{0061}-\x{007A}\x{00A1}-\x{FFFF}]/u', '', $identifier);
+    $identifier = preg_replace('/[^\x{002D}\x{0030}-\x{0039}\x{0041}-\x{005A}\x{005F}\x{0061}-\x{007A}\x{00A1}-\x{FFFF}]/u', '', (string) $identifier);
     // Identifiers cannot start with a digit, two hyphens, or a hyphen followed
     // by a digit.
     $identifier = preg_replace([
       '/^[0-9]/',
       '/^(-[0-9])|^(--)/',
-    ], ['_', '__'], $identifier);
+    ], ['_', '__'], (string) $identifier);
     return $identifier;
   }
 
@@ -272,7 +272,7 @@ class Html {
    * Use \Drupal\Component\Utility\Html::serialize() to serialize this
    * \DOMDocument back to a string.
    *
-   * @param string $html
+   * @param string|\Stringable $html
    *   The partial HTML snippet to load. Invalid markup will be corrected on
    *   import.
    *
@@ -441,11 +441,11 @@ class Html {
    * change other relative URLs because they would result in different absolute
    * URLs depending on the current path. For example: when the same content
    * containing such a relative URL (for example 'image.png'), is served from
-   * its canonical URL (for example 'http://example.com/some-article') or from
-   * a listing or feed (for example 'http://example.com/all-articles') their
+   * its canonical URL (for example 'https://example.com/some-article') or from
+   * a listing or feed (for example 'https://example.com/all-articles') their
    * "current path" differs, resulting in different absolute URLs:
-   * 'http://example.com/some-article/image.png' versus
-   * 'http://example.com/all-articles/image.png'. Only one can be correct.
+   * 'https://example.com/some-article/image.png' versus
+   * 'https://example.com/all-articles/image.png'. Only one can be correct.
    * Therefore relative URLs that are not root-relative cannot be safely
    * transformed and should generally be avoided.
    *

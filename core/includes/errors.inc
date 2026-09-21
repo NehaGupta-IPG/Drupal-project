@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @ingroup logging_severity_levels
  */
-function drupal_error_levels() {
+function drupal_error_levels(): array {
   $types = [
     E_ERROR => ['Error', RfcLogLevel::ERROR],
     E_WARNING => ['Warning', RfcLogLevel::WARNING],
@@ -54,7 +54,7 @@ function drupal_error_levels() {
  * @param int $line
  *   The line number the error was raised at.
  */
-function _drupal_error_handler_real($error_level, $message, $filename, $line) {
+function _drupal_error_handler_real($error_level, $message, $filename, $line): void {
   if ($error_level & error_reporting()) {
     $types = drupal_error_levels();
     [$severity_msg, $severity_level] = $types[$error_level];
@@ -63,10 +63,6 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line) {
 
     // We treat recoverable errors as fatal.
     $recoverable = $error_level == E_RECOVERABLE_ERROR;
-    // As __toString() methods must not throw exceptions (recoverable errors)
-    // in PHP, we allow them to trigger a fatal error by emitting a user error
-    // using trigger_error().
-    $to_string = $error_level == E_USER_ERROR && str_ends_with($caller['function'], '__toString()');
     _drupal_log_error([
       '%type' => isset($types[$error_level]) ? $severity_msg : 'Unknown error',
       // The standard PHP error handler considers that the error messages
@@ -79,7 +75,7 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line) {
       'backtrace' => $backtrace,
       '@backtrace_string' => (new \Exception())->getTraceAsString(),
       'exception' => NULL,
-    ], $recoverable || $to_string);
+    ], $recoverable);
   }
   // If the site is a test site then fail for user deprecations so they can be
   // caught by the deprecation error handler.
@@ -145,7 +141,7 @@ function error_displayable($error = NULL) {
  *   - A recoverable fatal error, which is a fatal error.
  *   Non-recoverable fatal errors cannot be logged by Drupal.
  */
-function _drupal_log_error($error, $fatal = FALSE) {
+function _drupal_log_error($error, $fatal = FALSE): void {
   $is_installer = InstallerKernel::installationAttempted() && \Drupal::hasContainer();
 
   // Backtrace, exception and 'severity_level' are not valid replacement values
@@ -171,7 +167,12 @@ function _drupal_log_error($error, $fatal = FALSE) {
       // Provide the PHP backtrace and exception to logger implementations. Add
       // 'severity_level' to the context to maintain BC and allow logging
       // implementations to use it.
-      \Drupal::logger('php')->log($severity, '%type: @message in %function (line %line of %file) @backtrace_string.', $error + ['backtrace' => $backtrace, 'exception' => $exception, 'severity_level' => $severity]);
+      \Drupal::logger('php')
+        ->log($severity, '%type: @message in %function (line %line of %file) @backtrace_string.', $error + [
+          'backtrace' => $backtrace,
+          'exception' => $exception,
+          'severity_level' => $severity,
+        ]);
     }
     catch (\Throwable) {
       // We can't log, for example because the database connection is not
@@ -262,7 +263,7 @@ function _drupal_log_error($error, $fatal = FALSE) {
       // We fallback to a maintenance page at this point, because the page
       // generation itself can generate errors.
       // Should not translate the string to avoid errors producing more errors.
-      $message = 'The website encountered an unexpected error. Try again later.' . '<br />' . $message;
+      $message = 'The website encountered an unexpected error. Try again later.<br />' . $message;
 
       if ($is_installer) {
         // install_display_output() prints the output and ends script execution.
@@ -353,7 +354,7 @@ function _drupal_get_error_level() {
  * @param int $line
  *   The line number in file that emitted the error.
  */
-function _drupal_error_header($message, $type, $function, $file, $line) {
+function _drupal_error_header($message, $type, $function, $file, $line): void {
   // $number does not use drupal_static as it should not be reset
   // as it uniquely identifies each PHP error.
   static $number = 0;

@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the display of file fields in node and views.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileFieldDisplayTest extends FileFieldTestBase {
 
   use FieldUiTestTrait;
@@ -58,7 +61,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
           "fields[$field_name][region]" => 'content',
         ];
       }
-      $this->drupalGet("admin/structure/types/manage/{$type_name}/display");
+      $this->drupalGet("admin/structure/types/manage/{$type_name}/display/default");
       $this->submitForm($edit, 'Save');
       $this->drupalGet('node/' . $node->id());
       // Verify that the field label is hidden when no file is attached.
@@ -104,7 +107,12 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains($description);
 
-    // Ensure the filename in the link's title attribute is escaped.
+    // Ensure the filename in the link's title attribute is escaped. Uploaded
+    // filenames cannot contain characters that need escaping, so set one
+    // directly on the file entity.
+    $node_file->setFilename('escaped-&-text.txt');
+    $node_file->save();
+    $this->drupalGet('node/' . $nid);
     $this->assertSession()->responseContains('title="escaped-&amp;-text.txt"');
 
     // Test that fields appear as expected after during the preview.
@@ -234,6 +242,9 @@ class FileFieldDisplayTest extends FileFieldTestBase {
 
     $this->drupalGet('node/' . $nid);
     $this->assertSession()->elementTextContains('xpath', '//a[@href="' . $node->{$field_name}->entity->createFileUrl() . '"]', $description);
+    // Test that setting '#with_size' to FALSE prevents the size from being
+    // displayed as part of the file link.
+    $this->assertSession()->pageTextContainsOnce((string) ByteSizeMarkup::create($test_file->getSize()));
 
     // Test that null file size is rendered as "Unknown".
     $nonexistent_file = File::create([

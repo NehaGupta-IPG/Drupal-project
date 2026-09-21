@@ -8,21 +8,24 @@ use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Breadcrumb\Breadcrumb
- * @group Breadcrumb
+ * Tests Drupal\Core\Breadcrumb\Breadcrumb.
  */
+#[CoversClass(Breadcrumb::class)]
+#[Group('Breadcrumb')]
 class BreadcrumbTest extends UnitTestCase {
 
   /**
-   * @covers ::setLinks
+   * Tests set links.
    */
   public function testSetLinks(): void {
     $breadcrumb = new Breadcrumb();
     $breadcrumb->setLinks([new Link('Home', Url::fromRoute('<front>'))]);
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Once breadcrumb links are set, only additional breadcrumb links can be added.');
+    $this->expectExceptionMessageIs('Once breadcrumb links are set, only additional breadcrumb links can be added.');
     $breadcrumb->setLinks([new Link('None', Url::fromRoute('<none>'))]);
   }
 

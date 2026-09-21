@@ -7,13 +7,16 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\RowCountException;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Select query builder with more complex queries.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class SelectComplexTest extends DatabaseTestBase {
 
   /**
@@ -171,7 +174,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $query->addField('test', 'name');
     $query->addField('test', 'age', 'age');
     $query->range(0, 2);
-    $query->range(NULL, NULL);
+    $query->range();
     $query_result = $query->countQuery()->execute()->fetchField();
 
     $this->assertEquals(4, $query_result, 'Returned the correct number of rows.');
@@ -185,7 +188,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $query->addField('test_task', 'task');
     $query->orderBy('task');
     $query->distinct();
-    $query_result = $query->execute()->fetchAll(\PDO::FETCH_COLUMN);
+    $query_result = $query->execute()->fetchAll(FetchAs::Column);
 
     $expected_result = ['code', 'eat', 'found new band', 'perform at superbowl', 'sing', 'sleep'];
     $this->assertEquals($query_result, $expected_result, 'Returned the correct result.');

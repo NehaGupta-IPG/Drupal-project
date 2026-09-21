@@ -5,6 +5,7 @@ namespace Drupal\migrate\Plugin\migrate\source;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\migrate\Exception\RequirementsException;
@@ -49,10 +50,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Drupal Database API supports multiple database connections. The connection
  * parameters are defined in $databases array in settings.php or
  * settings.local.php. It is also possible to modify the $databases array in
- * runtime. For example, Migrate Drupal, which provides the migrations from
- * Drupal 6 / 7, asks for the source database connection parameters in the UI
- * and then adds the $databases['migrate'] connection in runtime before the
- * migrations are executed.
+ * runtime.
  *
  * As described above, the default source database is $databases['migrate']. If
  * the source plugin needs another source connection, the database connection
@@ -64,7 +62,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * https://www.drupal.org/docs/8/api/migrate-api/migrating-data-from-sql-source
  *
  * @see https://www.drupal.org/docs/drupal-apis/database-api
- * @see \Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase
  */
 abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPluginInterface, RequirementsInterface {
 
@@ -224,7 +221,7 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
    * Wrapper for database select.
    */
   protected function select($table, $alias = NULL, array $options = []) {
-    $options['fetch'] = \PDO::FETCH_ASSOC;
+    $options['fetch'] = FetchAs::Associative;
     return $this->getDatabase()->select($table, $alias, $options);
   }
 
@@ -347,7 +344,7 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
       $this->query->range($this->batch * $this->batchSize, $this->batchSize);
     }
     $statement = $this->query->execute();
-    $statement->setFetchMode(\PDO::FETCH_ASSOC);
+    $statement->setFetchMode(FetchAs::Associative);
     return new \IteratorIterator($statement);
   }
 
@@ -423,7 +420,7 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
     }
 
     // If we are tracking changes, we also need to retrieve all rows to compare
-    // hashes
+    // hashes.
     if ($this->trackChanges) {
       return FALSE;
     }

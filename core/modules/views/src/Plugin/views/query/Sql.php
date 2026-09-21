@@ -5,6 +5,7 @@ namespace Drupal\views\Plugin\views\query;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -17,7 +18,7 @@ use Drupal\views\Plugin\views\HandlerBase;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Views query plugin for an SQL query.
@@ -161,7 +162,7 @@ class Sql extends QueryPluginBase {
   /**
    * The count field definition.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public array $count_field;
 
   /**
@@ -180,7 +181,15 @@ class Sql extends QueryPluginBase {
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, DateSqlInterface $date_sql, MessengerInterface $messenger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    EntityTypeManagerInterface $entity_type_manager,
+    #[Autowire(service: 'views.date_sql')]
+    DateSqlInterface $date_sql,
+    MessengerInterface $messenger,
+  ) {
     // By default, use AND operator to connect WHERE groups.
     $this->groupOperator = 'AND';
 
@@ -189,20 +198,6 @@ class Sql extends QueryPluginBase {
     $this->entityTypeManager = $entity_type_manager;
     $this->dateSql = $date_sql;
     $this->messenger = $messenger;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager'),
-      $container->get('views.date_sql'),
-      $container->get('messenger')
-    );
   }
 
   /**
@@ -228,7 +223,7 @@ class Sql extends QueryPluginBase {
       'join' => NULL,
     ];
 
-    // Init the tables with our primary table
+    // Init the tables with our primary table.
     $this->tables[$base_table][$base_table] = [
       'count' => 1,
       'alias' => $base_table,
@@ -350,7 +345,7 @@ class Sql extends QueryPluginBase {
       '#title' => $this->t('Query Tags'),
       '#description' => $this->t('If set, these tags will be appended to the query and can be used to identify the query in a module. This can be helpful for altering queries.'),
       '#default_value' => implode(', ', $this->options['query_tags']),
-      '#element_validate' => ['views_element_validate_tags'],
+      '#element_validate' => [[static::class, 'elementValidateTags']],
     ];
   }
 
@@ -515,7 +510,7 @@ class Sql extends QueryPluginBase {
    */
   public function queueTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL, $alias = NULL) {
     // If the alias is set, make sure it doesn't already exist.
-    if (isset($this->tableQueue[$alias])) {
+    if (isset($alias, $this->tableQueue[$alias])) {
       return $alias;
     }
 
@@ -538,7 +533,7 @@ class Sql extends QueryPluginBase {
 
     // Check this again to make sure we don't blow up existing aliases for
     // already adjusted joins.
-    if (isset($this->tableQueue[$alias])) {
+    if (isset($alias, $this->tableQueue[$alias])) {
       return $alias;
     }
 
@@ -624,7 +619,7 @@ class Sql extends QueryPluginBase {
    *   cannot be ensured.
    */
   public function ensureTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL) {
-    // Ensure a relationship
+    // Ensure a relationship.
     if (empty($relationship)) {
       $relationship = $this->view->storage->get('base_table');
     }
@@ -781,7 +776,7 @@ class Sql extends QueryPluginBase {
       }
 
       // First, if this is our link point/anchor table, just use the
-      // relationship
+      // relationship.
       if ($join->leftTable == $this->relationships[$relationship]['table']) {
         $join->leftTable = $relationship;
       }
@@ -845,7 +840,7 @@ class Sql extends QueryPluginBase {
    * This will automatically call ensureTable to make sure the required table
    * exists, *unless* $table is unset.
    *
-   * @param string $table
+   * @param string|null $table
    *   The table this field is attached to. If NULL, it is assumed this will
    *   be a formula; otherwise, ensureTable is used to make sure the
    *   table exists.
@@ -881,14 +876,14 @@ class Sql extends QueryPluginBase {
       $alias = $table . '_' . $field;
     }
 
-    // Make sure an alias is assigned
+    // Make sure an alias is assigned.
     $alias = $alias ?: $field;
 
     // PostgreSQL truncates aliases to 63 characters:
     // https://www.drupal.org/node/571548.
 
     // We limit the length of the original alias up to 60 characters
-    // to get a unique alias later if its have duplicates
+    // to get a unique alias later if its have duplicates.
     $alias = strtolower(substr($alias, 0, 60));
 
     // Create a field info array.
@@ -911,8 +906,10 @@ class Sql extends QueryPluginBase {
       $this->fields[$alias] = $field_info;
     }
 
-    // Keep track of all aliases used.
-    $this->fieldAliases[$table][$field] = $alias;
+    if ($table) {
+      // Keep track of all aliases used.
+      $this->fieldAliases[$table][$field] = $alias;
+    }
 
     return $alias;
   }
@@ -994,11 +991,11 @@ class Sql extends QueryPluginBase {
    *   If the group does not yet exist it will be created as an AND group.
    * @param string $snippet
    *   The snippet to check. This can be either a column or
-   *   a complex expression like "UPPER(table.field) = 'value'"
+   *   a complex expression like "UPPER(table.field) = 'value'".
    * @param array $args
    *   An associative array of arguments.
    *
-   * @see QueryConditionInterface::where()
+   * @see ConditionInterface::where()
    */
   public function addWhereExpression($group, $snippet, $args = []) {
     // Ensure all variants of 0 are actually 0. Thus '', 0 and NULL are all
@@ -1032,11 +1029,11 @@ class Sql extends QueryPluginBase {
    *   If the group does not yet exist it will be created as an AND group.
    * @param string $snippet
    *   The snippet to check. This can be either a column or
-   *   a complex expression like "COUNT(table.field) > 3"
+   *   a complex expression like "COUNT(table.field) > 3".
    * @param array $args
    *   An associative array of arguments.
    *
-   * @see QueryConditionInterface::having()
+   * @see SelectInterface::having()
    */
   public function addHavingExpression($group, $snippet, $args = []) {
     // Ensure all variants of 0 are actually 0. Thus '', 0 and NULL are all
@@ -1061,7 +1058,7 @@ class Sql extends QueryPluginBase {
   /**
    * Add an ORDER BY clause to the query.
    *
-   * @param string $table
+   * @param string|null $table
    *   The table this field is part of. If a formula, enter NULL.
    *   If you want to orderby random use "rand" as table and nothing else.
    * @param string|null $field
@@ -1571,7 +1568,7 @@ class Sql extends QueryPluginBase {
         }
 
         $result = $query->execute();
-        $result->setFetchMode(\PDO::FETCH_CLASS, 'Drupal\views\ResultRow');
+        $result->setFetchMode(FetchAs::ClassObject, 'Drupal\views\ResultRow');
 
         // Setup the result row objects.
         $view->result = iterator_to_array($result);
@@ -1909,6 +1906,21 @@ class Sql extends QueryPluginBase {
    */
   public function getDateFormat($field, $format, $string_date = FALSE) {
     return $this->dateSql->getDateFormat($field, $format);
+  }
+
+  /**
+   * Validation callback for query tags.
+   *
+   * @internal
+   */
+  public static function elementValidateTags(array &$element, FormStateInterface $form_state): void {
+    $values = array_map('trim', explode(',', $element['#value']));
+    foreach ($values as $value) {
+      if (preg_match("/[^a-z_]/", $value)) {
+        $form_state->setError($element, t('The query tags may only contain lower-case alphabetical characters and underscores.'));
+        return;
+      }
+    }
   }
 
 }

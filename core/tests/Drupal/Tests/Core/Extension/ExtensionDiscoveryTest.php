@@ -8,20 +8,21 @@ use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Yaml\Yaml;
 
 /**
  * Tests discovery of extensions.
- *
- * @coversDefaultClass \Drupal\Core\Extension\ExtensionDiscovery
- * @group Extension
  */
+#[CoversClass(ExtensionDiscovery::class)]
+#[Group('Extension')]
 class ExtensionDiscoveryTest extends UnitTestCase {
 
   /**
    * Tests extension discovery in a virtual filesystem with vfsStream.
    *
-   * @covers ::scan
+   * @legacy-covers ::scan
    */
   public function testExtensionDiscoveryVfs(): void {
 
@@ -41,7 +42,7 @@ class ExtensionDiscoveryTest extends UnitTestCase {
     /** @var \Drupal\Core\Extension\Extension[][] $extensions_by_type */
     $extensions_by_type = [];
     $files_by_type_and_name = [];
-    foreach (['profile', 'module', 'theme', 'theme_engine'] as $type) {
+    foreach (['profile', 'module', 'theme'] as $type) {
       $extensions_by_type[$type] = $extension_discovery->scan($type, FALSE);
       foreach ($extensions_by_type[$type] as $name => $extension) {
         $files_by_type_and_name[$type][$name] = $extension->getPathname();
@@ -58,17 +59,12 @@ class ExtensionDiscoveryTest extends UnitTestCase {
     $extension_expected->subpath = 'modules/system';
     $extension_expected->origin = 'core';
     $this->assertEquals($extension_expected, $extensions_by_type['module']['system'], 'system');
-
-    $extension_expected = new Extension($root, 'theme_engine', 'core/themes/engines/twig/twig.info.yml', 'twig.engine');
-    $extension_expected->subpath = 'themes/engines/twig';
-    $extension_expected->origin = 'core';
-    $this->assertEquals($extension_expected, $extensions_by_type['theme_engine']['twig'], 'twig');
   }
 
   /**
    * Tests finding modules that have a trailing comment on the type property.
    *
-   * @covers ::scan
+   * @legacy-covers ::scan
    */
   public function testExtensionDiscoveryTypeComment(): void {
     $extension_discovery = new ExtensionDiscovery($this->root, TRUE, [], 'sites/default');
@@ -119,9 +115,6 @@ class ExtensionDiscoveryTest extends UnitTestCase {
       'modules/poorly_placed_theme/poorly_placed_theme.info.yml' => [
         'type' => 'theme',
       ],
-      'core/themes/engines/twig/twig.info.yml' => [
-        'type' => 'theme_engine',
-      ],
     ];
 
     $files_by_type_and_name_expected = [];
@@ -139,7 +132,6 @@ class ExtensionDiscoveryTest extends UnitTestCase {
     }
 
     $content_by_file['core/modules/system/system.module'] = '<?php';
-    $content_by_file['core/themes/engines/twig/twig.engine'] = '<?php';
 
     foreach ($content_by_file as $file => $content) {
       $pieces = explode('/', $file);

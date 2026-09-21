@@ -3,6 +3,9 @@
 namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Query\PlaceholderInterface;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
 
 /**
  * Provides a base implementation for Database Schema.
@@ -44,7 +47,7 @@ abstract class Schema implements PlaceholderInterface {
   protected $uniqueIdentifier;
 
   public function __construct($connection) {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = bin2hex(random_bytes(12));
     $this->connection = $connection;
   }
 
@@ -52,7 +55,7 @@ abstract class Schema implements PlaceholderInterface {
    * Implements the magic __clone function.
    */
   public function __clone() {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = bin2hex(random_bytes(12));
   }
 
   /**
@@ -143,7 +146,7 @@ abstract class Schema implements PlaceholderInterface {
   }
 
   /**
-   * Build a condition to match a table name against a standard information_schema.
+   * Builds a condition to match a table name against the information_schema.
    *
    * The information_schema is a SQL standard that provides information about
    * the database server and the databases, schemas, tables, columns and users
@@ -171,7 +174,7 @@ abstract class Schema implements PlaceholderInterface {
   protected function buildTableNameCondition($table_name, $operator = '=', $add_prefix = TRUE) {
     $info = $this->connection->getConnectionOptions();
 
-    // Retrieve the table name and schema
+    // Retrieve the table name and schema.
     $table_info = $this->getPrefixInfo($table_name, $add_prefix);
 
     $condition = $this->connection->condition('AND');
@@ -194,6 +197,7 @@ abstract class Schema implements PlaceholderInterface {
    */
   public function tableExists($table, bool $add_prefix = TRUE) {
     $condition = $this->buildTableNameCondition($table, '=', $add_prefix);
+    $condition->condition('table_type', 'BASE TABLE');
     $condition->compile($this->connection, $this);
     // Normally, we would heartily discourage the use of string
     // concatenation for conditionals like this however, we
@@ -221,6 +225,7 @@ abstract class Schema implements PlaceholderInterface {
     // Load all the tables up front in order to take into account per-table
     // prefixes. The actual matching is done at the bottom of the method.
     $condition = $this->buildTableNameCondition('%', 'LIKE');
+    $condition->condition('table_type', 'BASE TABLE');
     $condition->compile($this->connection, $this);
 
     $prefix = $this->connection->getPrefix();
@@ -539,6 +544,7 @@ abstract class Schema implements PlaceholderInterface {
    * @param string $table
    *   The name of the table.
    *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return array
    *   A schema array with the following keys: 'primary key', 'unique keys' and
    *   'indexes', and values as arrays of database columns.
@@ -548,7 +554,6 @@ abstract class Schema implements PlaceholderInterface {
    * @throws \RuntimeException
    *   If the driver does not implement this method.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn, Drupal.Commenting.FunctionComment.Missing
   protected function introspectIndexSchema($table) {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
@@ -626,7 +631,43 @@ abstract class Schema implements PlaceholderInterface {
   abstract public function changeField($table, $field, $field_new, $spec, $keys_new = []);
 
   /**
-   * Create a new table from a Drupal table definition.
+   * Creates the tables in a schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
+   *   A Schema definition.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If any of the specified tables already exists.
+   * @throws \BadMethodCallException
+   *   When concrete driver class is missing implementations.
+   */
+  final public function createSchemaFromDefinition(SchemaDefinition $schema): void {
+    foreach ($schema->tables as $table) {
+      $this->createTableFromDefinition($schema->type, $schema->name, $table);
+    }
+  }
+
+  /**
+   * Creates a new table from a table schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType $schemaDefinitionType
+   *   The type of Drupal feature providing the schema.
+   * @param string $schemaName
+   *   The schema name.
+   * @param \Drupal\Core\Database\SchemaDefinition\Table $table
+   *   The table definition.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified table already exists.
+   * @throws \BadMethodCallException
+   *   When concrete driver class is missing implementations.
+   */
+  final public function createTableFromDefinition(SchemaDefinitionType $schemaDefinitionType, string $schemaName, TableDefinition $table): void {
+    $this->createTable($table->name, $table->toArray());
+  }
+
+  /**
+   * Create a new table from a Drupal array table definition.
    *
    * @param string $name
    *   The name of the table to create.
@@ -658,6 +699,7 @@ abstract class Schema implements PlaceholderInterface {
    * @param array $table
    *   A Schema API table definition array.
    *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return array
    *   An array of SQL statements to create the table.
    *
@@ -670,13 +712,12 @@ abstract class Schema implements PlaceholderInterface {
    *   method, or to make it private for each driver, and ::createTable actually
    *   an abstract method here for implementation in each driver.
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn, Drupal.Commenting.FunctionComment.Missing
   protected function createTableSql($name, $table) {
     throw new \BadMethodCallException(get_class($this) . '::createTableSql() not implemented.');
   }
 
   /**
-   * Return an array of field names from an array of key/index column specifiers.
+   * Gets an array of field names from an array of key/index column specifiers.
    *
    * This is usually an identity function but if a key/index uses a column
    * prefix specification, this function extracts just the name.

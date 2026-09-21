@@ -54,14 +54,18 @@ class FormTestValidateForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     if ($form_state->getValue('name') == 'validate') {
       // Alter the form element.
       $form['name']['#value'] = '#value changed by #validate';
       // Alter the submitted value in $form_state.
       $form_state->setValueForElement($form['name'], 'value changed by setValueForElement() in #validate');
       // Output the element's value from $form_state.
-      $this->messenger()->addStatus($this->t('@label value: @value', ['@label' => $form['name']['#title'], '@value' => $form_state->getValue('name')]));
+      $this->messenger()
+        ->addStatus($this->t('@label value: @value', [
+          '@label' => $form['name']['#title'],
+          '@value' => $form_state->getValue('name'),
+        ]));
 
       // Trigger a form validation error to see our changes.
       $form_state->setErrorByName('');

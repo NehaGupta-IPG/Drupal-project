@@ -31,6 +31,7 @@ class FormTestCheckboxesRadiosForm extends FormBase {
     $form['checkboxes'] = [
       '#type' => 'checkboxes',
       '#title' => 'Checkboxes',
+      '#description' => 'Checkboxes description',
       '#options' => [
         0 => 'Zero',
         'foo' => 'Foo',
@@ -55,6 +56,7 @@ class FormTestCheckboxesRadiosForm extends FormBase {
     $form['radios'] = [
       '#type' => 'radios',
       '#title' => 'Radios',
+      '#description' => 'Radios description',
       '#options' => [
         0 => 'Zero',
         'foo' => 'Foo',
@@ -82,7 +84,7 @@ class FormTestCheckboxesRadiosForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->setResponse(new JsonResponse($form_state->getValues()));
   }
 

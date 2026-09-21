@@ -76,7 +76,7 @@ class Drupal {
   /**
    * The current system version.
    */
-  const VERSION = '11.2-dev';
+  const VERSION = '12.0-dev';
 
   /**
    * Core API compatibility.
@@ -114,7 +114,7 @@ class Drupal {
    * - Once in the error message printed to the user immediately after.
    * Remember to update both whenever this constant is updated.
    */
-  const MINIMUM_PHP = '8.3.0';
+  const MINIMUM_PHP = '8.5.0';
 
   /**
    * Minimum recommended value of PHP memory_limit.
@@ -132,12 +132,10 @@ class Drupal {
    * message, but Drupal can still be installed. Used for (e.g.) PHP versions
    * that have reached their EOL or will in the near future.
    */
-  const RECOMMENDED_PHP = '8.3.0';
+  const RECOMMENDED_PHP = '8.5';
 
   /**
    * Default location of gettext file on the translation server.
-   *
-   * @see locale_translation_default_translation_server()
    */
   const TRANSLATION_DEFAULT_SERVER_PATTERN = 'https://ftp.drupal.org/files/translations/%core/%project/%project-%version.%language.po';
 
@@ -193,17 +191,15 @@ class Drupal {
   /**
    * Retrieves a service from the container.
    *
-   * Use this method if the desired service is not one of those with a dedicated
-   * accessor method below. If it is listed below, those methods are preferred
-   * as they can return useful type hints.
-   *
-   * @param string $id
+   * @param class-string<T>|string $id
    *   The ID of the service to retrieve.
    *
-   * @return mixed
+   * @template T of object
+   *
+   * @return ($id is class-string<T> ? T : object)
    *   The specified service.
    */
-  public static function service($id) {
+  public static function service(string $id): object {
     return static::getContainer()->get($id);
   }
 
@@ -363,10 +359,12 @@ class Drupal {
    * One common use case is to provide a class which contains the actual code
    * of a hook implementation, without having to create a service.
    *
-   * @param string $class
+   * @param class-string<T>|null $class
    *   (optional) A class name to instantiate.
    *
-   * @return \Drupal\Core\DependencyInjection\ClassResolverInterface|object
+   * @template T of object
+   *
+   * @return ($class is class-string<T> ? T : \Drupal\Core\DependencyInjection\ClassResolverInterface)
    *   The class resolver or if $class is provided, a class instance with a
    *   given class definition.
    *

@@ -2,12 +2,13 @@
 
 namespace Drupal\mysql\Driver\Database\mysql;
 
-use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Database\SchemaException;
-use Drupal\Core\Database\SchemaObjectExistsException;
-use Drupal\Core\Database\SchemaObjectDoesNotExistException;
-use Drupal\Core\Database\Schema as DatabaseSchema;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
+use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaException;
+use Drupal\Core\Database\SchemaObjectDoesNotExistException;
+use Drupal\Core\Database\SchemaObjectExistsException;
 
 // cspell:ignore gipk
 
@@ -67,7 +68,7 @@ class Schema extends DatabaseSchema {
   }
 
   /**
-   * Build a condition to match a table name against a standard information_schema.
+   * Builds a condition to match a table name with the information schema.
    *
    * MySQL uses databases like schemas rather than catalogs so when we build a
    * condition to query the information_schema.tables, we set the default
@@ -133,7 +134,7 @@ class Schema extends DatabaseSchema {
   }
 
   /**
-   * Create an SQL string for a field to be used in table creation or alteration.
+   * Creates an SQL string for a field used in table creation or alteration.
    *
    * @param string $name
    *   Name of the field.
@@ -162,8 +163,18 @@ class Schema extends DatabaseSchema {
       $sql .= '(' . $spec['precision'] . ', ' . $spec['scale'] . ')';
     }
 
+    // MySQL treats 'unsigned' as part of the data type, so it has to come
+    // before the generated column clause.
     if (!empty($spec['unsigned'])) {
       $sql .= ' unsigned';
+    }
+
+    if (isset($spec['generated'])) {
+      $sql .= ' GENERATED ALWAYS AS (' . $spec['generated']->generatedExpression->expression . ') ';
+      $sql .= match ($spec['generated']->generatedStorage) {
+        GeneratedColumnStorage::Virtual => 'VIRTUAL',
+        GeneratedColumnStorage::Stored => 'STORED',
+      };
     }
 
     if (isset($spec['not null'])) {
@@ -184,7 +195,7 @@ class Schema extends DatabaseSchema {
       $sql .= ' DEFAULT ' . $this->escapeDefaultValue($spec['default']);
     }
 
-    if (empty($spec['not null']) && !isset($spec['default'])) {
+    if (empty($spec['not null']) && !isset($spec['default']) && !isset($spec['generated'])) {
       $sql .= ' DEFAULT NULL';
     }
 
@@ -438,11 +449,11 @@ class Schema extends DatabaseSchema {
     try {
       $this->executeDdlStatement($query);
     }
-    catch (DatabaseExceptionWrapper $e) {
+    catch (SchemaPrimaryKeyMustBeDroppedException $e) {
       // MySQL error number 4111 (ER_DROP_PK_COLUMN_TO_DROP_GIPK) indicates that
       // when dropping and adding a primary key, the generated invisible primary
       // key (GIPK) column must also be dropped.
-      if (isset($e->getPrevious()->errorInfo[1]) && $e->getPrevious()->errorInfo[1] === 4111 && isset($keys_new['primary key']) && $this->indexExists($table, 'PRIMARY') && $this->findPrimaryKeyColumns($table) === ['my_row_id']) {
+      if (isset($keys_new['primary key']) && $this->indexExists($table, 'PRIMARY') && $this->findPrimaryKeyColumns($table) === ['my_row_id']) {
         $this->executeDdlStatement($query . ', DROP COLUMN [my_row_id]');
       }
       else {
@@ -671,21 +682,33 @@ class Schema extends DatabaseSchema {
   }
 
   /**
-   * Retrieve a table or column comment.
+   * Retrieves a table or column comment.
+   *
+   * @param string $table
+   *   The table name.
+   * @param string|null $column
+   *   (optional) The column name.
+   *
+   * @return string|false
+   *   The table or column comment. FALSE if the table or column does not exist.
    */
   public function getComment($table, $column = NULL) {
     $condition = $this->buildTableNameCondition($table);
     if (isset($column)) {
+      if (!$this->tableExists($table)) {
+        // If the table is a view it will be present in
+        // information_schema.columns so we need to check if the table exists.
+        return FALSE;
+      }
       $condition->condition('column_name', $column);
       $condition->compile($this->connection, $this);
       // Don't use {} around information_schema.columns table.
       return $this->connection->query("SELECT column_comment AS column_comment FROM information_schema.columns WHERE " . (string) $condition, $condition->arguments())->fetchField();
     }
+    $condition->condition('table_type', 'BASE TABLE');
     $condition->compile($this->connection, $this);
     // Don't use {} around information_schema.tables table.
-    $comment = $this->connection->query("SELECT table_comment AS table_comment FROM information_schema.tables WHERE " . (string) $condition, $condition->arguments())->fetchField();
-    // Work-around for MySQL 5.0 bug http://bugs.mysql.com/bug.php?id=11379
-    return preg_replace('/; InnoDB free:.*$/', '', $comment);
+    return $this->connection->query("SELECT table_comment AS table_comment FROM information_schema.tables WHERE " . (string) $condition, $condition->arguments())->fetchField();
   }
 
 }

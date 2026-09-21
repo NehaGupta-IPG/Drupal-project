@@ -85,12 +85,12 @@ abstract class StylePluginBase extends PluginBase {
   /**
    * Stores the rendered field values, keyed by the row index and field name.
    *
+   * @var array|null
+   *
    * @see \Drupal\views\Plugin\views\style\StylePluginBase::renderFields()
    * @see \Drupal\views\Plugin\views\style\StylePluginBase::getField()
-   *
-   * @var array|null
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $rendered_fields;
 
   /**
@@ -117,7 +117,7 @@ abstract class StylePluginBase extends PluginBase {
    *
    * @var string[]
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public array $render_tokens = [];
 
   /**
@@ -371,7 +371,7 @@ abstract class StylePluginBase extends PluginBase {
       $form['uses_fields'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Force using fields'),
-        '#description' => $this->t('If neither the row nor the style plugin supports fields, this field allows to enable them, so you can for example use groupby.'),
+        '#description' => $this->t('If neither the row nor the style plugin supports fields, this field allows to enable them, so you can for example use group by.'),
         '#default_value' => $this->options['uses_fields'],
       ];
     }
@@ -484,7 +484,7 @@ abstract class StylePluginBase extends PluginBase {
    *   Each set contains the following associative array:
    *   - group: The group content.
    *   - level: The hierarchical level of the grouping.
-   *   - rows: The result rows to be rendered in this group..
+   *   - rows: The result rows to be rendered in this group.
    *
    * @return array
    *   Render array of grouping sets.
@@ -575,7 +575,7 @@ abstract class StylePluginBase extends PluginBase {
       $groupings = [['field' => $groupings, 'rendered' => $rendered]];
     }
 
-    // Make sure fields are rendered
+    // Make sure fields are rendered.
     $this->renderFields($this->view->result);
     $sets = [];
     if ($groupings) {
@@ -657,7 +657,7 @@ abstract class StylePluginBase extends PluginBase {
    * Renders all of the fields for a given style and store them on the object.
    *
    * @param array $result
-   *   The result array from $view->result
+   *   The result array from $view->result.
    */
   protected function renderFields(array $result) {
     if (!$this->usesFields()) {
@@ -686,31 +686,20 @@ abstract class StylePluginBase extends PluginBase {
         foreach ($result as $index => $row) {
           $this->view->row_index = $index;
 
-          // Here we implement render caching for result rows. Since we never
-          // build a render array for single rows, given that style templates
-          // need individual field markup to support proper theming, we build
-          // a raw render array containing all field render arrays and cache it.
-          // This allows us to cache the markup of the various children, that is
-          // individual fields, which is then available for style template
-          // preprocess functions, later in the rendering workflow.
-          // @todo Fetch all the available cached row items in one single cache
-          //   get operation, once https://www.drupal.org/node/2453945 is fixed.
           $data = [
             '#pre_render' => [[$this, 'elementPreRenderRow']],
             '#row' => $row,
             '#cache' => [
-              'keys' => $cache_plugin->getRowCacheKeys($row),
               'tags' => $cache_plugin->getRowCacheTags($row),
               'max-age' => $max_age,
             ],
-            '#cache_properties' => $field_ids,
           ];
           $renderer->addCacheableDependency($data, $this->view->storage);
           // Views may be rendered both inside and outside a render context:
           // - HTML views are rendered inside a render context: then we want to
           //   use ::render(), so that attachments and cacheability are bubbled.
           // - non-HTML views are rendered outside a render context: then we
-          //   want to use ::renderInIsolation(), so that no bubbling happens
+          //   want to use ::renderInIsolation(), so that no bubbling happens.
           if ($renderer->hasRenderContext()) {
             $renderer->render($data);
           }
@@ -760,10 +749,12 @@ abstract class StylePluginBase extends PluginBase {
   }
 
   /**
-   * #pre_render callback for view row field rendering.
+   * Render API callback: Performs view row field rendering.
+   *
+   * This function is assigned as a #pre_render callback.
    *
    * @param array $data
-   *   The element to #pre_render
+   *   The element to #pre_render.
    *
    * @return array
    *   The processed element.

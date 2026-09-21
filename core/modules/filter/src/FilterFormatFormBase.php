@@ -57,7 +57,7 @@ abstract class FilterFormatFormBase extends EntityForm {
     }
     if (!$format->isNew()) {
       // If editing an existing text format, pre-select its current permissions.
-      $form['roles']['#default_value'] = array_keys(filter_get_roles_by_format($format));
+      $form['roles']['#default_value'] = array_keys($format->getRoles());
     }
 
     // Create filter plugin instances for all available filters, including both
@@ -86,7 +86,7 @@ abstract class FilterFormatFormBase extends EntityForm {
     // Filter order (tabledrag).
     $form['filters']['order'] = [
       '#type' => 'table',
-      // For filter.admin.js
+      // For filter.admin.js.
       '#attributes' => ['id' => 'filter-order'],
       '#title' => $this->t('Filter processing order'),
       '#tabledrag' => [
@@ -172,7 +172,7 @@ abstract class FilterFormatFormBase extends EntityForm {
    * Determines if the format already exists.
    *
    * @param string $format_id
-   *   The format ID
+   *   The format ID.
    *
    * @return bool
    *   TRUE if the format exists, FALSE otherwise.
@@ -233,7 +233,7 @@ abstract class FilterFormatFormBase extends EntityForm {
     // Save user permissions.
     if ($permission = $format->getPermissionName()) {
       foreach ($form_state->getValue('roles') as $rid => $enabled) {
-        user_role_change_permissions($rid, [$permission => $enabled]);
+        Role::loadOverrideFree($rid)->changePermissions([$permission => $enabled])->save();
       }
     }
 

@@ -7,14 +7,15 @@ namespace Drupal\Tests\views\Unit\Plugin\views\query;
 use Drupal\Core\Database\Connection;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\query\PostgresqlDateSql;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the PostgreSQL-specific date query handler.
- *
- * @coversDefaultClass \Drupal\views\Plugin\views\query\PostgresqlDateSql
- *
- * @group views
  */
+#[CoversClass(PostgresqlDateSql::class)]
+#[Group('views')]
 class PostgresqlDateSqlTest extends UnitTestCase {
 
   /**
@@ -29,13 +30,11 @@ class PostgresqlDateSqlTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->database = $this->prophesize(Connection::class)->reveal();
+    $this->database = $this->createStub(Connection::class);
   }
 
   /**
    * Tests the getDateField method.
-   *
-   * @covers ::getDateField
    */
   public function testGetDateField(): void {
     $date_sql = new PostgresqlDateSql($this->database);
@@ -49,12 +48,9 @@ class PostgresqlDateSqlTest extends UnitTestCase {
 
   /**
    * Tests date formatting replacement.
-   *
-   * @covers ::getDateFormat
-   *
-   * @dataProvider providerTestGetDateFormat
    */
-  public function testGetDateFormat($field, $format, $expected_format): void {
+  #[DataProvider('providerTestGetDateFormat')]
+  public function testGetDateFormat(string $field, string $format, string $expected_format): void {
     $date_sql = new PostgresqlDateSql($this->database);
 
     $this->assertEquals("TO_CHAR($field, '$expected_format')", $date_sql->getDateFormat($field, $format));
@@ -63,7 +59,7 @@ class PostgresqlDateSqlTest extends UnitTestCase {
   /**
    * Provider for date formatting test.
    */
-  public static function providerTestGetDateFormat() {
+  public static function providerTestGetDateFormat(): array {
     return [
       ['foo.field', 'Y-y-M-m', 'YYYY-YY-Mon-MM'],
       ['bar.field', 'n-F D d l', 'MM-Month Dy DD Day'],
@@ -73,8 +69,6 @@ class PostgresqlDateSqlTest extends UnitTestCase {
 
   /**
    * Tests timezone offset formatting.
-   *
-   * @covers ::setFieldTimezoneOffset
    */
   public function testSetFieldTimezoneOffset(): void {
     $date_sql = new PostgresqlDateSql($this->database);
@@ -86,13 +80,11 @@ class PostgresqlDateSqlTest extends UnitTestCase {
 
   /**
    * Tests setting the database offset.
-   *
-   * @covers ::setTimezoneOffset
    */
   public function testSetTimezoneOffset(): void {
-    $database = $this->prophesize(Connection::class);
-    $database->query("SET TIME ZONE INTERVAL '42' HOUR TO MINUTE")->shouldBeCalledTimes(1);
-    $date_sql = new PostgresqlDateSql($database->reveal());
+    $database = $this->createMock(Connection::class);
+    $database->expects($this->once())->method('query')->with("SET TIME ZONE INTERVAL '42' HOUR TO MINUTE");
+    $date_sql = new PostgresqlDateSql($database);
     $date_sql->setTimezoneOffset(42);
   }
 

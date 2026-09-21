@@ -14,68 +14,58 @@ use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\entity_test\EntityTestAccessControlHandler;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests entity access control handler custom internal cache ID.
- *
- * @coversDefaultClass \Drupal\Core\Entity\EntityAccessControlHandler
- *
- * @group Entity
  */
+#[CoversClass(EntityAccessControlHandler::class)]
+#[Group('Entity')]
 class EntityCreateAccessCustomCidTest extends UnitTestCase {
 
   /**
    * A mock entity type.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
    */
-  protected EntityTypeInterface $entityType;
+  protected EntityTypeInterface&Stub $entityType;
 
   /**
    * A mock account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
    */
-  protected AccountInterface $account;
+  protected AccountInterface&Stub $account;
 
   /**
    * A language code.
-   *
-   * @var string
    */
   protected string $langcode;
 
   /**
    * A mock module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected ModuleHandlerInterface $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->entityType = $this->getMockBuilder(EntityTypeInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->entityType->expects($this->any())
+    $this->entityType = $this->createStub(EntityTypeInterface::class);
+    $this->entityType
       ->method('id')
       ->willReturn($this->randomMachineName());
 
-    $this->account = $this->getMockBuilder(AccountInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->account->expects($this->any())
+    $this->account = $this->createStub(AccountInterface::class);
+    $this->account
       ->method('id')
       ->willReturn(rand());
 
     $language_ids = array_keys(LanguageManager::getStandardLanguageList());
     $this->langcode = $language_ids[array_rand($language_ids)];
 
-    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
+    $this->moduleHandler
       ->method('invokeAll')
       ->willReturn([]);
   }
@@ -97,7 +87,6 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
    */
   protected function setUpAccessCache(EntityAccessControlHandler $handler, bool $in_cache, string $cid): \ReflectionProperty {
     $access_cache = new \ReflectionProperty($handler, 'accessCache');
-    $access_cache->setAccessible(TRUE);
 
     $cache = [];
     if ($in_cache) {
@@ -126,9 +115,9 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
    * @param bool $cacheable
    *   If the test createAccess() check should be cacheable.
    *
-   * @covers ::buildCreateAccessCid
-   * @dataProvider providerTestDefaultCid
+   * @legacy-covers ::buildCreateAccessCid
    */
+  #[DataProvider('providerTestDefaultCid')]
   public function testDefaultCid(array $context, bool $in_cache, bool $cacheable): void {
     $bundle = $this->randomMachineName();
     $cid = "create:{$bundle}";
@@ -214,16 +203,16 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
    * @param bool $in_cache
    *   Whether there is already a cached createAccess() check for the cache ID.
    *
-   * @covers ::buildCreateAccessCid
-   * @dataProvider providerTestCustomCid
+   * @legacy-covers ::buildCreateAccessCid
    */
+  #[DataProvider('providerTestCustomCid')]
   public function testCustomCid(string $bundle, array $context, string $cid, bool $in_cache): void {
     $context['langcode'] = $this->langcode;
 
     // Drupal\Core\Cache is used when merging access results in
     // checkCreateAccess(), and it calls the cache context manager service.
-    $cache_context_manager = $this->createMock(CacheContextsManager::class);
-    $cache_context_manager->expects($this->any())
+    $cache_context_manager = $this->createStub(CacheContextsManager::class);
+    $cache_context_manager
       ->method('assertValidTokens')
       ->willReturn(TRUE);
     $container = new ContainerBuilder();

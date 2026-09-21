@@ -5,17 +5,24 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Language;
 
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Language\Language
- * @group Language
+ * Tests Drupal\Core\Language\Language.
  */
+#[CoversClass(Language::class)]
+#[Group('Language')]
 class LanguageUnitTest extends UnitTestCase {
 
   /**
-   * @covers ::__construct
+   * Tests construct.
+   *
+   * @legacy-covers ::__construct
    */
   public function testConstruct(): void {
     $name = $this->randomMachineName();
@@ -29,7 +36,7 @@ class LanguageUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getName
+   * Tests get name.
    */
   public function testGetName(): void {
     $name = $this->randomMachineName();
@@ -39,7 +46,9 @@ class LanguageUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getId
+   * Tests get langcode.
+   *
+   * @legacy-covers ::getId
    */
   public function testGetLangcode(): void {
     $language_code = $this->randomMachineName(2);
@@ -48,7 +57,7 @@ class LanguageUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getDirection
+   * Tests get direction.
    */
   public function testGetDirection(): void {
     $language_code = $this->randomMachineName(2);
@@ -57,12 +66,12 @@ class LanguageUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::isDefault
+   * Tests is default.
    */
   public function testIsDefault(): void {
-    $language_default = $this->getMockBuilder('Drupal\Core\Language\LanguageDefault')->disableOriginalConstructor()->getMock();
+    $language_default = $this->createStub(LanguageDefault::class);
     $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-    $container->expects($this->any())
+    $container->expects($this->exactly(2))
       ->method('get')
       ->with('language.default')
       ->willReturn($language_default);
@@ -71,7 +80,7 @@ class LanguageUnitTest extends UnitTestCase {
     $language = new Language(['id' => $this->randomMachineName(2)]);
     // Set up the LanguageDefault to return different default languages on
     // consecutive calls.
-    $language_default->expects($this->any())
+    $language_default
       ->method('get')
       ->willReturnOnConsecutiveCalls(
         $language,
@@ -89,11 +98,8 @@ class LanguageUnitTest extends UnitTestCase {
    *   An array of language objects.
    * @param array $expected
    *   The expected array of keys.
-   *
-   * @covers ::sort
-   *
-   * @dataProvider providerTestSortArrayOfLanguages
    */
+  #[DataProvider('providerTestSortArrayOfLanguages')]
   public function testSortArrayOfLanguages(array $languages, array $expected): void {
     Language::sort($languages);
     $this->assertSame($expected, array_keys($languages));
@@ -105,7 +111,7 @@ class LanguageUnitTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestSortArrayOfLanguages() {
+  public static function providerTestSortArrayOfLanguages(): array {
     $language9A = new Language(['id' => 'dd', 'name' => 'A', 'weight' => 9]);
     $language10A = new Language(['id' => 'ee', 'name' => 'A', 'weight' => 10]);
     $language10B = new Language(['id' => 'ff', 'name' => 'B', 'weight' => 10]);

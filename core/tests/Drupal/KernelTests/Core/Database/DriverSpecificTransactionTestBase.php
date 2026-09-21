@@ -12,9 +12,18 @@ use Drupal\Core\Database\Transaction\StackItemType;
 use Drupal\Core\Database\Transaction\TransactionManagerBase;
 use Drupal\Core\Database\TransactionNameNonUniqueException;
 use Drupal\Core\Database\TransactionOutOfOrderException;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests the transaction abstraction system.
+ *
+ * NOTE: This base test class is mostly testing legacy Transaction processing
+ * occurring when transactions are committed as part of object destruction.
+ * That process is now deprecated, and the tests contained here were replicated
+ * in TransactionTest, that should receive any new test method. This class
+ * should be removed when commit-on-destruct is removed, and its child concrete
+ * test classes be adjusted not to rely on this. While removing, ensure that no
+ * test coverage gets lost and in case move test methods to TransactionTest.
  *
  * We test nesting by having two transaction layers, an outer and inner. The
  * outer layer encapsulates the inner layer. Our transaction nesting abstraction
@@ -38,7 +47,7 @@ use Drupal\Core\Database\TransactionOutOfOrderException;
  * is active, and mysqli does not fail when rolling back and no transaction
  * active.
  */
-class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
+abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
 
   /**
    * Keeps track of the post-transaction callback action executed.
@@ -111,7 +120,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @param bool $ddl_statement
    *   Whether to execute a DDL statement during the inner transaction.
    */
-  protected function transactionOuterLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
+  protected function transactionOuterLayer(string $suffix, $rollback = FALSE, $ddl_statement = FALSE): void {
     $depth = $this->connection->transactionManager()->stackDepth();
     $txn = $this->connection->startTransaction();
 
@@ -152,7 +161,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @param bool $ddl_statement
    *   Whether to execute a DDL statement during the transaction.
    */
-  protected function transactionInnerLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
+  protected function transactionInnerLayer(string $suffix, $rollback = FALSE, $ddl_statement = FALSE): void {
     $depth = $this->connection->transactionManager()->stackDepth();
     // Start a transaction. If we're being called from ->transactionOuterLayer,
     // then we're already in a transaction. Normally, that would make starting
@@ -239,7 +248,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    */
   public function testRollbackRootWithActiveSavepoint(): void {
     $transaction = $this->createRootTransaction();
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $savepoint = $this->createFirstSavepointTransaction();
 
     // Try to rollback root. Since a savepoint is active, this should fail.
@@ -251,6 +260,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests savepoint transaction rollback.
    */
+  #[IgnoreDeprecations]
   public function testRollbackSavepoint(): void {
     $transaction = $this->createRootTransaction();
     $savepoint = $this->createFirstSavepointTransaction();
@@ -279,7 +289,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * Tests savepoint transaction duplicated rollback.
    */
   public function testRollbackTwiceSameSavepoint(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $transaction = $this->createRootTransaction();
     $savepoint = $this->createFirstSavepointTransaction();
 
@@ -314,13 +324,13 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * Tests savepoint transaction rollback failure when later savepoints exist.
    */
   public function testRollbackSavepointWithLaterSavepoint(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $transaction = $this->createRootTransaction();
     $savepoint1 = $this->createFirstSavepointTransaction();
 
     // Starts another savepoint transaction. Corresponds to 'SAVEPOINT
     // savepoint_2' on the database.
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $savepoint2 = $this->connection->startTransaction();
     $this->assertTrue($this->connection->inTransaction());
     $this->assertSame(3, $this->connection->transactionManager()->stackDepth());
@@ -343,6 +353,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * The behavior of this test should be identical for connections that support
    * transactions and those that do not.
    */
+  #[IgnoreDeprecations]
   public function testCommittedTransaction(): void {
     try {
       // Create two nested transactions. The changes should be committed.
@@ -362,6 +373,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests the compatibility of transactions with DDL statements.
    */
+  #[IgnoreDeprecations]
   public function testTransactionWithDdlStatement(): void {
     // First, test that a commit works normally, even with DDL statements.
     $transaction = $this->createRootTransaction('', FALSE);
@@ -432,9 +444,6 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
 
   /**
    * Tests rollback after a DDL statement when no transactional DDL supported.
-   *
-   * @todo In drupal:12.0.0, rollBack will throw a
-   *   TransactionOutOfOrderException. Adjust the test accordingly.
    */
   public function testRollbackAfterDdlStatementForNonTransactionalDdlDatabase(): void {
     if ($this->connection->supportsTransactionalDDL()) {
@@ -477,7 +486,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Inserts a single row into the testing table.
    */
-  protected function insertRow($name) {
+  protected function insertRow($name): void {
     $this->connection->insert('test')
       ->fields([
         'name' => $name,
@@ -488,7 +497,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Executes a DDL statement.
    */
-  protected function executeDDLStatement() {
+  protected function executeDDLStatement(): void {
     static $count = 0;
     $table = [
       'fields' => [
@@ -506,7 +515,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Starts over for a new test.
    */
-  protected function cleanUp() {
+  protected function cleanUp(): void {
     $this->connection->truncate('test')
       ->execute();
     $this->postTransactionCallbackAction = NULL;
@@ -523,7 +532,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @internal
    */
   public function assertRowPresent(string $name, ?string $message = NULL): void {
-    $present = (boolean) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
+    $present = (bool) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
     $this->assertTrue($present, $message ?? "Row '{$name}' should be present, but it actually does not exist.");
   }
 
@@ -538,13 +547,14 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @internal
    */
   public function assertRowAbsent(string $name, ?string $message = NULL): void {
-    $present = (boolean) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
+    $present = (bool) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
     $this->assertFalse($present, $message ?? "Row '{$name}' should be absent, but it actually exists.");
   }
 
   /**
    * Tests transaction stacking, commit, and rollback.
    */
+  #[IgnoreDeprecations]
   public function testTransactionStacking(): void {
     // Standard case: pop the inner transaction before the outer transaction.
     $transaction = $this->createRootTransaction('', FALSE);
@@ -582,6 +592,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests that transactions can continue to be used if a query fails.
    */
+  #[IgnoreDeprecations]
   public function testQueryFailureInTransaction(): void {
     $transaction = $this->createRootTransaction('test_transaction', FALSE);
     $this->connection->schema()->dropTable('test');
@@ -700,6 +711,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests releasing a savepoint before last is safe.
    */
+  #[IgnoreDeprecations]
   public function testReleaseIntermediateSavepoint(): void {
     $transaction = $this->createRootTransaction();
     $savepoint1 = $this->createFirstSavepointTransaction('', FALSE);
@@ -710,12 +722,12 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $this->assertSame(3, $this->connection->transactionManager()->stackDepth());
     // Starts a savepoint transaction. Corresponds to 'SAVEPOINT savepoint_3'
     // on the database.
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $savepoint3 = $this->connection->startTransaction();
     $this->assertSame(4, $this->connection->transactionManager()->stackDepth());
     // Starts a savepoint transaction. Corresponds to 'SAVEPOINT savepoint_4'
     // on the database.
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $savepoint4 = $this->connection->startTransaction();
     $this->assertSame(5, $this->connection->transactionManager()->stackDepth());
 
@@ -740,9 +752,10 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests committing a transaction while savepoints are active.
    */
+  #[IgnoreDeprecations]
   public function testCommitWithActiveSavepoint(): void {
     $transaction = $this->createRootTransaction();
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $savepoint1 = $this->createFirstSavepointTransaction('', FALSE);
 
     // Starts a savepoint transaction. Corresponds to 'SAVEPOINT savepoint_2'
@@ -780,7 +793,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $this->assertSame('savepoint_1', $savepoint1->name());
 
     $this->expectException(TransactionNameNonUniqueException::class);
-    $this->expectExceptionMessage("savepoint_1 is already in use.");
+    $this->expectExceptionMessageIsOrContains("A transaction named savepoint_1 is already in use.");
     $this->connection->startTransaction('savepoint_1');
   }
 
@@ -795,6 +808,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests post-transaction callback executes after transaction commit.
    */
+  #[IgnoreDeprecations]
   public function testRootTransactionEndCallbackCalledOnCommit(): void {
     $transaction = $this->createRootTransaction('', FALSE);
     $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallback']);
@@ -838,6 +852,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests post-transaction callback executes after a DDL statement.
    */
+  #[IgnoreDeprecations]
   public function testRootTransactionEndCallbackCalledAfterDdlAndDestruction(): void {
     $transaction = $this->createRootTransaction('', FALSE);
     $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallback']);
@@ -919,9 +934,6 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * transaction including DDL statements is not possible, since a commit
    * happened already. We cannot decide what should be the status of the
    * callback, an exception is thrown.
-   *
-   * @todo In drupal:12.0.0, rollBack will throw a
-   *   TransactionOutOfOrderException. Adjust the test accordingly.
    */
   public function testRootTransactionEndCallbackFailureUponDdlAndRollbackForNonTransactionalDdlDatabase(): void {
     if ($this->connection->supportsTransactionalDDL()) {

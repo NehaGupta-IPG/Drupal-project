@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\TypedData\DataDefinition;
-use Drupal\Core\TypedData\TypedDataManagerInterface;
-use Drupal\Tests\UnitTestCase;
-use Drupal\serialization\Normalizer\ListNormalizer;
 use Drupal\Core\TypedData\Plugin\DataType\ItemList;
+use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\Core\TypedData\TypedDataManagerInterface;
+use Drupal\serialization\Normalizer\ListNormalizer;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Serializer\Serializer;
 
 /**
- * @coversDefaultClass \Drupal\serialization\Normalizer\ListNormalizer
- * @group serialization
+ * Tests Drupal\serialization\Normalizer\ListNormalizer.
  */
+#[CoversClass(ListNormalizer::class)]
+#[Group('serialization')]
 class ListNormalizerTest extends UnitTestCase {
 
   /**
@@ -41,7 +46,7 @@ class ListNormalizerTest extends UnitTestCase {
   /**
    * The mocked typed data.
    *
-   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\TypedData\TypedDataInterface
+   * @var \Drupal\Core\TypedData\TypedDataInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $typedData;
 
@@ -52,22 +57,16 @@ class ListNormalizerTest extends UnitTestCase {
     parent::setUp();
 
     // Mock the TypedDataManager to return a TypedDataInterface mock.
-    $this->typedData = $this->createMock('Drupal\Core\TypedData\TypedDataInterface');
-    $typed_data_manager = $this->createMock(TypedDataManagerInterface::class);
-    $typed_data_manager->expects($this->any())
+    $this->typedData = $this->createStub(TypedDataInterface::class);
+    $typed_data_manager = $this->createStub(TypedDataManagerInterface::class);
+    $typed_data_manager
       ->method('getPropertyInstance')
       ->willReturn($this->typedData);
 
-    // Set up a mock container as ItemList() will call for the
-    // 'typed_data_manager' service.
-    $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-      ->onlyMethods(['get'])
-      ->getMock();
-    $container->expects($this->any())
-      ->method('get')
-      ->with($this->equalTo('typed_data_manager'))
-      ->willReturn($typed_data_manager);
-
+    // Set up a container as ItemList() will call for the 'typed_data_manager'
+    // service.
+    $container = new ContainerBuilder();
+    $container->set('typed_data_manager', $typed_data_manager);
     \Drupal::setContainer($container);
 
     $this->normalizer = new ListNormalizer();

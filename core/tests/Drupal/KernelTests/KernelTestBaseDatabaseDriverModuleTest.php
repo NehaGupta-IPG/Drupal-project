@@ -5,27 +5,31 @@ declare(strict_types=1);
 namespace Drupal\KernelTests;
 
 use Drupal\Core\Database\Database;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\KernelTests\KernelTestBase
- *
- * @group PHPUnit
- * @group Test
- * @group KernelTests
+ * Tests Drupal\KernelTests\KernelTestBase.
  */
+#[CoversClass(KernelTestBase::class)]
+#[Group('PHPUnit')]
+#[Group('Test')]
+#[Group('KernelTests')]
+#[RunTestsInSeparateProcesses]
 class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function getDatabaseConnectionInfo() {
+  protected function getDatabaseConnectionInfo(): array {
     // If the test is run with argument SIMPLETEST_DB then use it.
     $db_url = getenv('SIMPLETEST_DB');
     if (empty($db_url)) {
       throw new \Exception('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.sh. See https://www.drupal.org/node/2116263#skipped-tests for more information.');
     }
     else {
-      $database = Database::convertDbUrlToConnectionInfo($db_url, $this->root);
+      $database = Database::convertDbUrlToConnectionInfo($db_url);
 
       if (in_array($database['driver'], ['mysql', 'pgsql'])) {
         // Change the used database driver to the one provided by the module
@@ -46,14 +50,16 @@ class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
       foreach ($connection_info as $target => $value) {
         // Replace the table prefix definition to ensure that no table of the
         // test runner leak into the test.
-        $connection_info[$target]['prefix'] = $this->databasePrefix;
+        $connection_info[$target]['prefix'] = $this->databasePrefix ?? '';
       }
     }
     return $connection_info;
   }
 
   /**
-   * @covers ::bootEnvironment
+   * Tests database driver module enabled.
+   *
+   * @legacy-covers ::bootEnvironment
    */
   public function testDatabaseDriverModuleEnabled(): void {
     $driver = Database::getConnection()->driver();

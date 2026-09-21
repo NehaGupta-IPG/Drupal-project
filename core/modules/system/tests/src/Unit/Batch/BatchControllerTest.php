@@ -7,24 +7,24 @@ namespace Drupal\Tests\system\Unit\Batch;
 use Drupal\Core\Batch\BatchStorageInterface;
 use Drupal\system\Controller\BatchController;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests for the batch controller class.
- *
- * @coversDefaultClass \Drupal\system\Controller\BatchController
- * @runTestsInSeparateProcesses
- * @group system
  */
+#[CoversClass(BatchController::class)]
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class BatchControllerTest extends UnitTestCase {
 
   /**
    * Tests title callback.
-   *
-   * @covers ::batchPageTitle
    */
   public function testBatchPageTitle(): void {
-    $batch_storage = $this->createMock(BatchStorageInterface::class);
+    $batch_storage = $this->createStub(BatchStorageInterface::class);
     $controller = new BatchController($this->root, $batch_storage);
     require_once $this->root . '/core/includes/form.inc';
     $this->assertSame('', $controller->batchPageTitle(new Request()));

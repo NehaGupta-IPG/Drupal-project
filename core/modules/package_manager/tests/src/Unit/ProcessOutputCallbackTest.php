@@ -8,11 +8,14 @@ use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\package_manager\ProcessOutputCallback;
 use Drupal\Tests\UnitTestCase;
 use PhpTuf\ComposerStager\API\Process\Value\OutputTypeEnum;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @covers \Drupal\package_manager\ProcessOutputCallback
- * @group package_manager
+ * Tests Process Output Callback.
  */
+#[Group('package_manager')]
+#[CoversClass(ProcessOutputCallback::class)]
 class ProcessOutputCallbackTest extends UnitTestCase {
 
   /**
@@ -23,7 +26,7 @@ class ProcessOutputCallbackTest extends UnitTestCase {
     $callback(OutputTypeEnum::OUT, '{A string of invalid JSON! 😈');
 
     $this->expectException(\JsonException::class);
-    $this->expectExceptionMessage('Syntax error');
+    $this->expectExceptionMessageIs('Syntax error');
     $callback->parseJsonOutput();
   }
 

@@ -16,11 +16,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class EntityChangedConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'The content has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.';
+  public function __construct(
+    public $message = 'The content has either been modified by another user, or you have already submitted modifications. As a result, your changes cannot be saved.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

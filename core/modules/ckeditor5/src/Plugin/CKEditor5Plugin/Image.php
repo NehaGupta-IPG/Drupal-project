@@ -8,8 +8,11 @@ use Drupal\ckeditor5\Plugin\CKEditor5PluginConfigurableTrait;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefault;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginConfigurableInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\editor\EditorInterface;
+use Drupal\editor\EditorImageUploadSettings;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * CKEditor 5 Image plugin.
@@ -17,10 +20,27 @@ use Drupal\editor\EditorInterface;
  * @internal
  *   Plugin classes are internal.
  */
-class Image extends CKEditor5PluginDefault implements CKEditor5PluginConfigurableInterface {
+class Image extends CKEditor5PluginDefault implements CKEditor5PluginConfigurableInterface, ContainerFactoryPluginInterface {
 
   use CKEditor5PluginConfigurableTrait;
   use DynamicPluginConfigWithCsrfTokenUrlTrait;
+
+  /**
+   * The image upload settings service.
+   */
+  protected EditorImageUploadSettings $editorImageUploadSettings;
+
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    #[Autowire(service: EditorImageUploadSettings::class)]
+    EditorImageUploadSettings $editor_image_upload_settings,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+    $this->editorImageUploadSettings = $editor_image_upload_settings;
+  }
 
   /**
    * {@inheritdoc}
@@ -49,12 +69,9 @@ class Image extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
 
   /**
    * {@inheritdoc}
-   *
-   * @see editor_image_upload_settings_form()
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form_state->loadInclude('editor', 'admin.inc');
-    return editor_image_upload_settings_form($form_state->get('editor'));
+    return $this->editorImageUploadSettings->getForm($form_state->get('editor'));
   }
 
   /**

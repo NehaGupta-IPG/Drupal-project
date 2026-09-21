@@ -3,7 +3,6 @@ status: true
 dependencies:
   config:
     - field.field.node.page.field_body
-    - field.field.node.page.layout_builder__layout
     - node.type.page
     - workflows.workflow.editorial
   module:
@@ -48,23 +47,9 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
-  promote:
-    type: boolean_checkbox
-    weight: 3
-    region: content
-    settings:
-      display_label: true
-    third_party_settings: {  }
   status:
     type: boolean_checkbox
     weight: 7
-    region: content
-    settings:
-      display_label: true
-    third_party_settings: {  }
-  sticky:
-    type: boolean_checkbox
-    weight: 4
     region: content
     settings:
       display_label: true
@@ -93,4 +78,5 @@ content:
       placeholder: ''
     third_party_settings: {  }
 hidden:
-  layout_builder__layout: true
+  promote: true
+  sticky: true

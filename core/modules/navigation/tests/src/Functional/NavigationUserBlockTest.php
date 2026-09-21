@@ -6,14 +6,15 @@ namespace Drupal\Tests\navigation\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore navigationuser linksuserwrapper
-
 /**
  * Tests for \Drupal\navigation\Plugin\NavigationBlock\NavigationUserBlock.
- *
- * @group navigation
  */
+#[Group('navigation')]
+#[RunTestsInSeparateProcesses]
 class NavigationUserBlockTest extends PageCacheTagsTestBase {
 
   /**
@@ -78,8 +79,8 @@ class NavigationUserBlockTest extends PageCacheTagsTestBase {
     $this->verifyDynamicPageCache($test_page_url, 'MISS');
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
     // We should see the users name in the navigation menu.
-    $rendered_user_name = $this->cssSelect('[aria-controls="navigation-link-navigationuser-linksuserwrapper"] > .toolbar-button__label')[0]->getText();
-    $this->assertEquals('My Account', $rendered_user_name);
+    $rendered_user_name = $this->cssSelect('[aria-controls*="navigation-link--navigationuser-linksuserwrapper"] > .toolbar-button__label')[0]->getText();
+    $this->assertEquals($this->normalUser->getDisplayName(), $rendered_user_name);
 
     // We should see all three user links in the page.
     $link_labels = ['View profile', 'Edit profile', 'Log out'];
@@ -96,8 +97,8 @@ class NavigationUserBlockTest extends PageCacheTagsTestBase {
     $this->drupalLogin($this->adminUser);
     $this->verifyDynamicPageCache($test_page_url, 'MISS');
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
-    $rendered_user_name = $this->cssSelect('[aria-controls="navigation-link-navigationuser-linksuserwrapper"] > .toolbar-button__label')[0]->getText();
-    $this->assertEquals('My Account', $rendered_user_name);
+    $rendered_user_name = $this->cssSelect('[aria-controls*="navigation-link--navigationuser-linksuserwrapper"] > .toolbar-button__label')[0]->getText();
+    $this->assertEquals($this->adminUser->getDisplayName(), $rendered_user_name);
     // The Edit profile link should link to the users edit profile page.
     $links = $this->getSession()->getPage()->findAll('named', ['link', 'Edit profile']);
     $this->assertStringContainsString('/user/edit', $links[0]->getAttribute('href'));
@@ -123,7 +124,7 @@ class NavigationUserBlockTest extends PageCacheTagsTestBase {
     $this->drupalLogin($this->normalUser);
     // We should see the users name in the navigation menu in a link.
     $rendered_user_name = $this->cssSelect('a.toolbar-button--icon--navigation-user-links-user-wrapper')[0]->getText();
-    $this->assertEquals('My Account', $rendered_user_name);
+    $this->assertEquals($this->normalUser->getDisplayName(), $rendered_user_name);
   }
 
 }

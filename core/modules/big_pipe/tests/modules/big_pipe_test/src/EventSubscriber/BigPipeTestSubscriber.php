@@ -10,6 +10,9 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Defines a test BigPipe subscriber that checks whether the session is empty.
+ */
 class BigPipeTestSubscriber implements EventSubscriberInterface {
 
   /**
@@ -29,7 +32,7 @@ class BigPipeTestSubscriber implements EventSubscriberInterface {
    *
    * @see \Drupal\big_pipe_test\BigPipeTestController::responseException()
    */
-  public function onRespondTriggerException(ResponseEvent $event) {
+  public function onRespondTriggerException(ResponseEvent $event): void {
     $response = $event->getResponse();
 
     if (!$response instanceof AttachmentsInterface) {
@@ -50,7 +53,7 @@ class BigPipeTestSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
    *   The event to process.
    */
-  public function onRespondSetBigPipeDebugPlaceholderHeaders(ResponseEvent $event) {
+  public function onRespondSetBigPipeDebugPlaceholderHeaders(ResponseEvent $event): void {
     $response = $event->getResponse();
     if (!$response instanceof HtmlResponse) {
       return;

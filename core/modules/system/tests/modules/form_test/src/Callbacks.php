@@ -17,7 +17,7 @@ class Callbacks {
   /**
    * Form element validation handler for 'name' in form_test_validate_form().
    */
-  public function validateName(&$element, FormStateInterface $form_state) {
+  public function validateName(&$element, FormStateInterface $form_state): void {
     $triggered = FALSE;
     if ($form_state->getValue('name') == 'element_validate') {
       // Alter the form element.
@@ -44,7 +44,11 @@ class Callbacks {
 
     if ($triggered) {
       // Output the element's value from $form_state.
-      \Drupal::messenger()->addStatus($this->t('@label value: @value', ['@label' => $element['#title'], '@value' => $form_state->getValue('name')]));
+      \Drupal::messenger()
+        ->addStatus($this->t('@label value: @value', [
+          '@label' => $element['#title'],
+          '@value' => $form_state->getValue('name'),
+        ]));
 
       // Trigger a form validation error to see our changes.
       $form_state->setErrorByName('');

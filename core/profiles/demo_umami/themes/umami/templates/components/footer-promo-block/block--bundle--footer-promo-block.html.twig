@@ -23,11 +23,11 @@
  * - title_suffix: Additional output populated by modules, intended to be
  *   displayed after the main title tag that appears in the template.
  *
- * @see template_preprocess_block()
+ * @see \Drupal\block\Hook\BlockHooks::preprocessBlock()
  */
 #}
 
-{% embed "umami:footer-block" with {
+{% embed 'umami:footer-block' with {
   attributes,
   content,
   label,
@@ -39,7 +39,7 @@
     {{ content.field_media_image }}
   {% endblock %}
   {% block content %}
-    {% embed "umami:title" with {
+    {% embed 'umami:title' with {
       attributes: title_attributes.addClass('footer-block__title'),
       label: label ? label : content.field_title,
       title_prefix,

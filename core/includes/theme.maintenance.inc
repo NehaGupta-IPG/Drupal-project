@@ -13,11 +13,13 @@ use Drupal\Core\Site\Settings;
  *
  * Used for site installs, updates and when the site is in maintenance mode.
  * It also applies when the database is unavailable or bootstrap was not
- * complete. Claro is always used for the initial install and update
+ * complete. The admin theme is always used for the initial install and update
  * operations, but this can be overridden by setting a "maintenance_theme" key
  * in the $settings variable in settings.php.
+ *
+ * @see \Drupal\Core\Installer\InstallerKernel::INSTALL_THEME
  */
-function _drupal_maintenance_theme() {
+function _drupal_maintenance_theme(): void {
   // If the theme is already set, assume the others are set too, and do nothing.
   if (\Drupal::theme()->hasActiveTheme()) {
     return;
@@ -34,7 +36,7 @@ function _drupal_maintenance_theme() {
       $custom_theme = $GLOBALS['install_state']['theme'];
     }
     else {
-      $custom_theme = Settings::get('maintenance_theme', 'claro');
+      $custom_theme = Settings::get('maintenance_theme', InstallerKernel::INSTALL_THEME);
     }
   }
   else {
@@ -54,8 +56,9 @@ function _drupal_maintenance_theme() {
     }
     if (!$custom_theme) {
       // We have been unable to identify the configured theme, so fall back to
-      // a safe default. Claro is reasonably user friendly and fairly generic.
-      $custom_theme = 'claro';
+      // a safe default. The admin theme is reasonably user friendly and fairly
+      // generic.
+      $custom_theme = InstallerKernel::INSTALL_THEME;
     }
   }
 
@@ -96,40 +99,4 @@ function _drupal_maintenance_theme() {
   \Drupal::theme()->setActiveTheme($theme_init->getActiveTheme($themes[$custom_theme], $base_themes));
   // Prime the theme registry.
   Drupal::service('theme.registry');
-}
-
-/**
- * Prepares variables for authorize.php operation report templates.
- *
- * This report displays the results of an operation run via authorize.php.
- *
- * Default template: authorize-report.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - messages: An array of result messages.
- */
-function template_preprocess_authorize_report(&$variables): void {
-  $messages = [];
-  if (!empty($variables['messages'])) {
-    foreach ($variables['messages'] as $heading => $logs) {
-      $items = [];
-      foreach ($logs as $number => $log_message) {
-        if ($number === '#abort') {
-          continue;
-        }
-        $class = 'authorize-results__' . ($log_message['success'] ? 'success' : 'failure');
-        $items[] = [
-          '#wrapper_attributes' => ['class' => [$class]],
-          '#markup' => $log_message['message'],
-        ];
-      }
-      $messages[] = [
-        '#theme' => 'item_list',
-        '#items' => $items,
-        '#title' => $heading,
-      ];
-    }
-  }
-  $variables['messages'] = $messages;
 }

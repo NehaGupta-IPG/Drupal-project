@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\Attribute\PluginID;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
@@ -208,7 +209,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * Retrieves the hash of the source identifier values.
    *
    * @param array $source_id_values
-   *   The source identifiers
+   *   The source identifiers.
    *
    * @return string
    *   A hash containing the hashed values of the source identifiers.
@@ -655,7 +656,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
     }
 
     try {
-      return $query->execute()->fetchAll(\PDO::FETCH_NUM);
+      return $query->execute()->fetchAll(FetchAs::List);
     }
     catch (DatabaseExceptionWrapper) {
       // It's possible that the query will cause an exception to be thrown. For
@@ -703,10 +704,11 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
       return;
     }
     $fields['last_imported'] = time();
+    $fields[$this::SOURCE_IDS_HASH] = $this->getSourceIdsHash($source_id_values);
     // Notify anyone listening of the map row we're about to save.
     $this->eventDispatcher->dispatch(new MigrateMapSaveEvent($this, $fields), MigrateEvents::MAP_SAVE);
-    $this->getDatabase()->merge($this->mapTableName())
-      ->key($this::SOURCE_IDS_HASH, $this->getSourceIdsHash($source_id_values))
+    $this->getDatabase()->upsert($this->mapTableName())
+      ->key($this::SOURCE_IDS_HASH)
       ->fields($fields)
       ->execute();
   }
