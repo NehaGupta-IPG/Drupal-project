@@ -20,14 +20,14 @@ class LocaleTestHooks {
   use StringTranslationTrait;
 
   /**
-   * Implements hook_system_info_alter().
+   * Implements hook_extension_info_alter().
    *
    * Make the test scripts to be believe this is not a hidden test module, but
    * a regular custom module.
    */
-  #[Hook('system_info_alter')]
-  public function systemInfoAlter(&$info, Extension $file, $type): void {
-    // Only modify the system info if required. By default the locale_test
+  #[Hook('extension_info_alter')]
+  public function extensionInfoAlter(&$info, Extension $file, $type): void {
+    // Only modify the extension info if required. By default the locale_test
     // modules are hidden and have a project specified. To test the module
     // detection process by
     // \Drupal\locale\LocaleProjectRepository::getProjectList() the test modules
