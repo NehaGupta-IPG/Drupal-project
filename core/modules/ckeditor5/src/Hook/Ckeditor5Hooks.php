@@ -590,13 +590,13 @@ class Ckeditor5Hooks {
      * @param \Drupal\Core\Ajax\AjaxResponse $response
      *   The AJAX response attachments will be added to.
      */
-    $attach = function (array $form, AjaxResponse &$response) use (&$attach): void {
+    $attach = function (array $form, AjaxResponse &$response): void {
       foreach ($form as $key => $value) {
         if ($key === "#attached") {
           $response->addAttachments(array_diff_key($value, ['placeholders' => '']));
         }
         elseif (is_array($value) && !str_contains((string) $key, '#')) {
-          $attach($value, $response);
+          \Closure::getCurrent()($value, $response);
         }
       }
     };
