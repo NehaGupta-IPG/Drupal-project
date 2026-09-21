@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\media_library\Functional;
+namespace Drupal\Tests\media_library\Unit;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
