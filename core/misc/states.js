@@ -726,7 +726,6 @@
         // @todo Find empty _none options by data attribute instead.
         const $emptyRadio = $radios.filter('[value="_none"]');
         const $emptyItem = $emptyRadio.closest('.js-form-item, .form-item');
-        const $selectedRealRadio = $radios.not($emptyRadio).filter(':checked');
 
         if (e.value) {
           $radios.attr({ required: 'required' });
@@ -735,9 +734,7 @@
           }
 
           if ($emptyRadio.length) {
-            if (!$selectedRealRadio.length) {
-              $emptyRadio.prop('checked', true).trigger('change');
-            }
+            // Changing required state must not change the selected value.
             $emptyItem.hide();
           }
         } else {

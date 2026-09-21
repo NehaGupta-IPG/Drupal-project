@@ -92,6 +92,14 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertNotEmpty($textfield_invisible_element);
     $textfield_required_element = $page->findField('textfield_required_when_checkbox_trigger_checked');
     $this->assertNotEmpty($textfield_required_element);
+    $radios_required_none_element = $this->assertSession()->elementExists(
+      'css',
+      'input[name="radios_required_when_checkbox_trigger_checked"][value="_none"]'
+    );
+    $radios_required_value1_element = $this->assertSession()->elementExists(
+      'css',
+      'input[name="radios_required_when_checkbox_trigger_checked"][value="value1"]'
+    );
     $textfield_readonly_element = $page->findField('textfield_readonly_when_checkbox_trigger_checked');
     $this->assertNotEmpty($textfield_readonly_element);
     $textarea_readonly_element = $page->findField('textarea_readonly_when_checkbox_trigger_checked');
@@ -173,6 +181,9 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($textfield_in_details->isVisible());
     $this->assertFalse($textfield_required_element->hasAttribute('required'));
     $this->assertFalse($textfield_required_element->hasAttribute('aria-required'));
+    $this->assertTrue($radios_required_none_element->isVisible());
+    $this->assertFalse($radios_required_none_element->isChecked());
+    $this->assertFalse($radios_required_value1_element->hasAttribute('required'));
     $this->assertFalse($textfield_readonly_element->hasAttribute('readonly'));
     $this->assertFalse($textarea_readonly_element->hasAttribute('readonly'));
     $this->assertFalse($checkbox_checked_element->isChecked());
@@ -209,6 +220,9 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($textfield_invisible_element->isVisible());
     $this->assertEquals('required', $textfield_required_element->getAttribute('required'));
     $this->assertFalse($textfield_required_element->hasAttribute('aria-required'));
+    $this->assertFalse($radios_required_none_element->isVisible());
+    $this->assertFalse($radios_required_none_element->isChecked());
+    $this->assertTrue($radios_required_value1_element->hasAttribute('required'));
     $this->assertTrue($textfield_readonly_element->hasAttribute('readonly'));
     $this->assertTrue($textarea_readonly_element->hasAttribute('readonly'));
     $this->assertTrue($details->hasAttribute('open'));
@@ -254,6 +268,9 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($details->hasAttribute('open'));
     $this->assertFalse($textfield_in_details->isVisible());
     $this->assertFalse($textfield_required_element->hasAttribute('required'));
+    $this->assertTrue($radios_required_none_element->isVisible());
+    $this->assertFalse($radios_required_none_element->isChecked());
+    $this->assertFalse($radios_required_value1_element->hasAttribute('required'));
     $this->assertFalse($textfield_readonly_element->hasAttribute('readonly'));
     $this->assertFalse($textarea_readonly_element->hasAttribute('readonly'));
     $this->assertFalse($checkbox_checked_element->isChecked());
@@ -283,6 +300,15 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($link->isVisible());
     // Check enter password is visible.
     $this->assertSession()->pageTextContains('Enter password');
+
+    // An existing empty selection is also preserved while it is hidden.
+    $radios_required_none_element->click();
+    $trigger->check();
+    $this->assertFalse($radios_required_none_element->isVisible());
+    $this->assertTrue($radios_required_none_element->isChecked());
+    $trigger->uncheck();
+    $this->assertTrue($radios_required_none_element->isVisible());
+    $this->assertTrue($radios_required_none_element->isChecked());
   }
 
   /**
