@@ -17,6 +17,17 @@ use Drupal\Core\Database\Expression;
  *     'arguments':array,
  *     'all_fields'?:bool,
  *   }
+ *
+ * @property-read list<string> $comments
+ * @property-read array<string,array{'field':string,'table':string,'alias':string}> $columns
+ * @property-read array<string,Expression> $expressions
+ * @property-read array<string,TableEntry> $tables
+ * @property-read array<string,string> $orderBy
+ * @property-read array<string,string> $groupBy
+ * @property-read ?array{'start':int,'length':?int} $range
+ * @property-read list<array{'type':string,'query':Select}> $union
+ * @property-read array $alterMetadata
+ * @property-read array $alterTags
  */
 final class Select {
 
@@ -104,9 +115,9 @@ final class Select {
   /**
    * The range limiters for this query.
    *
-   * @var array
+   * @var ?array{'start':int,'length':?int}
    */
-  private array $range = [];
+  private ?array $range = NULL;
 
   /**
    * An array whose elements specify a query to UNION, and the UNION type.
@@ -140,7 +151,7 @@ final class Select {
   /**
    * Constructs a Select object.
    *
-   * The object should be instantiated through the static ::biuld() method, not
+   * The object should be instantiated through the static ::build() method, not
    * directly.
    *
    * @param string|\Drupal\Core\Database\Query\DatabaseAbstract\Select $table
@@ -467,7 +478,7 @@ final class Select {
    * {@inheritdoc}
    */
   public function range(?int $start = NULL, ?int $length = NULL): static {
-    $this->range = $start !== NULL ? ['start' => $start, 'length' => $length] : [];
+    $this->range = $start !== NULL ? ['start' => $start, 'length' => $length] : NULL;
     return $this;
   }
 
@@ -691,7 +702,7 @@ final class Select {
    * {@inheritdoc}
    */
   public function __get(string $name): mixed {
-    if (in_array($name, array_keys(get_object_vars($this), TRUE)) && is_array($this->{$name})) {
+    if (in_array($name, array_keys(get_object_vars($this)), TRUE) && (is_array($this->{$name}) || is_null($this->{$name}))) {
       return $this->{$name};
     }
     throw new \LogicException('Unavailable property $' . $name . ' for ' . __CLASS__);
