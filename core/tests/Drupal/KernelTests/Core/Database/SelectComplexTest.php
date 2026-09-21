@@ -34,7 +34,7 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests simple JOIN statements.
    */
   public function testDefaultJoin(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test_task', 't')
+    $abstractQuery = DatabaseAbstractSelect::build('test_task', 't')
       ->join('test', 'p', '[t].[pid] = [p].[id]')
       ->addColumn('p', 'name', 'name')
       ->addColumn('t', 'task', 'task')
@@ -84,7 +84,7 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests LEFT OUTER joins.
    */
   public function testLeftOuterJoin(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test', 'p')
+    $abstractQuery = DatabaseAbstractSelect::build('test', 'p')
       ->leftJoin('test_task', 't', '[t].[pid] = [p].[id]')
       ->addColumn('p', 'name', 'name')
       ->addColumn('t', 'task', 'task')
@@ -130,7 +130,7 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests GROUP BY clauses.
    */
   public function testGroupBy(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test_task', 't')
+    $abstractQuery = DatabaseAbstractSelect::build('test_task', 't')
       ->addExpression('COUNT([task])', 'num')
       ->addColumn('t', 'task')
       ->orderBy('num')
@@ -199,7 +199,7 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests GROUP BY and HAVING clauses together.
    */
   public function testGroupByAndHaving(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test_task', 't')
+    $abstractQuery = DatabaseAbstractSelect::build('test_task', 't')
       ->addExpression('COUNT([task])', 'num')
       ->addColumn('t', 'task')
       ->orderBy('num')
@@ -265,7 +265,7 @@ class SelectComplexTest extends DatabaseTestBase {
    * The SQL clause varies with the database.
    */
   public function testRange(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test')
+    $abstractQuery = DatabaseAbstractSelect::build('test')
       ->addColumn('test', 'name')
       ->addColumn('test', 'age', 'age')
       ->range(0, 2)
@@ -295,7 +295,7 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests whether the range property of a select clause can be undone.
    */
   public function testRangeUndo(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test')
+    $abstractQuery = DatabaseAbstractSelect::build('test')
       ->addColumn('test', 'name')
       ->addColumn('test', 'age', 'age')
       ->range(0, 2)
@@ -327,7 +327,7 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests distinct queries.
    */
   public function testDistinct(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test_task')
+    $abstractQuery = DatabaseAbstractSelect::build('test_task')
       ->addColumn('test_task', 'task')
       ->orderBy('task')
       ->distinct();
@@ -356,7 +356,7 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests that we can generate a count query from a built query.
    */
   public function testCountQuery(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test')
+    $abstractQuery = DatabaseAbstractSelect::build('test')
       ->addColumn('test', 'name')
       ->addColumn('test', 'age', 'age')
       ->orderBy('name');
@@ -394,7 +394,7 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests having queries.
    */
   public function testHavingCountQuery(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test')
+    $abstractQuery = DatabaseAbstractSelect::build('test')
       ->groupBy('age')
       ->having(new Expression('[age] + 1 > 0'))
       ->addColumn('test', 'age')
@@ -427,7 +427,7 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests that countQuery removes 'all_fields' statements and ordering clauses.
    */
   public function testCountQueryRemovals(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test')
+    $abstractQuery = DatabaseAbstractSelect::build('test')
       ->columns('test')
       ->orderBy('name');
     $abstractCountQuery = $abstractQuery->countQuery();
@@ -494,12 +494,12 @@ class SelectComplexTest extends DatabaseTestBase {
     $query->addExpression('[fail]');
     $this->assertEquals(4, $query->countQuery()->execute()->fetchField(), 'Count Query removed expressions');
 
-    $query = new DatabaseAbstractSelect('test')
+    $query = DatabaseAbstractSelect::build('test')
       ->columns('test', ['fail'])
       ->countQuery();
     $this->assertEquals(4, $this->connection->select($query)->execute()->fetchField());
 
-    $query = new DatabaseAbstractSelect('test')
+    $query = DatabaseAbstractSelect::build('test')
       ->addExpression('[fail]')
       ->countQuery();
     $this->assertEquals(4, $this->connection->select($query)->execute()->fetchField());
@@ -517,7 +517,7 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $this->assertEquals(6, $count, 'Counted the correct number of records.');
 
-    $query = new DatabaseAbstractSelect('test_task')
+    $query = DatabaseAbstractSelect::build('test_task')
       ->addColumn('test_task', 'task')
       ->distinct()
       ->countQuery();
@@ -539,7 +539,7 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $this->assertEquals(3, $count, 'Counted the correct number of records.');
 
-    $query = new DatabaseAbstractSelect('test_task')
+    $query = DatabaseAbstractSelect::build('test_task')
       ->addColumn('test_task', 'pid')
       ->groupBy('pid')
       ->countQuery();
@@ -550,7 +550,7 @@ class SelectComplexTest extends DatabaseTestBase {
 
     // Use a column alias as, without one, the query can succeed for the wrong
     // reason.
-    $abstractQuery = new DatabaseAbstractSelect('test_task')
+    $abstractQuery = DatabaseAbstractSelect::build('test_task')
       ->addColumn('test_task', 'pid', 'pid_alias')
       ->addExpression('COUNT([test_task].[task])', 'count')
       ->groupBy('pid_alias')
@@ -586,7 +586,7 @@ class SelectComplexTest extends DatabaseTestBase {
     // "SELECT job FROM {test} WHERE name = 'Paul' AND (age = 26 OR age = 27)"
     // That should find only one record. Yes it's a non-optimal way of writing
     // that query but that's not the point!
-    $abstractQuery = new DatabaseAbstractSelect('test')
+    $abstractQuery = DatabaseAbstractSelect::build('test')
       ->addColumn('test', 'job')
       ->condition('name', 'Paul')
       ->condition(DatabaseAbstractSelect::orConditionGroup()
@@ -617,7 +617,7 @@ class SelectComplexTest extends DatabaseTestBase {
    * Confirms we can join on a single table twice with a dynamic alias.
    */
   public function testJoinTwice(): void {
-    $abstractQuery = (new DatabaseAbstractSelect('test'))
+    $abstractQuery = (DatabaseAbstractSelect::build('test'))
       ->columns('test')
       ->join('test', 'test_2', '[test].[job] = [%alias].[job]')
       ->addColumn('test_2', 'name', 'other_name')
@@ -654,11 +654,11 @@ class SelectComplexTest extends DatabaseTestBase {
       'mail' => $this->randomMachineName() . '@example.com',
     ]);
 
-    $abstractQuery = new DatabaseAbstractSelect('test_task', 'tt')
+    $abstractQuery = DatabaseAbstractSelect::build('test_task', 'tt')
       ->addExpression('[tt].[pid] + 1', 'abc')
       ->condition('priority', 1, '>')
       ->condition('priority', 100, '<');
-    $abstractSubquery = new DatabaseAbstractSelect('test', 'tp')
+    $abstractSubquery = DatabaseAbstractSelect::build('test', 'tp')
       ->join('test_one_blob', 'tpb', '[tp].[id] = [tpb].[id]')
       ->join('node', 'n', '[tp].[id] = [n].[nid]')
       ->addTag('node_access')
@@ -735,7 +735,7 @@ class SelectComplexTest extends DatabaseTestBase {
    */
   public function testJoinConditionObject(): void {
     // Same test as testDefaultJoin, but with a Condition object.
-    $abstractQuery = new DatabaseAbstractSelect('test_task', 't')
+    $abstractQuery = DatabaseAbstractSelect::build('test_task', 't')
       ->join('test', 'p', new Expression('[t].[pid] = [p].[id]'))
       ->addColumn('p', 'name', 'name')
       ->addColumn('t', 'task', 'task')
@@ -785,7 +785,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $t1_name = 'John';
     $t2_name = 'George';
 
-    $abstractQuery = new DatabaseAbstractSelect('test', 't1')
+    $abstractQuery = DatabaseAbstractSelect::build('test', 't1')
       ->innerJoin('test', 't2', (DatabaseAbstractSelect::andConditionGroup()
         ->condition('t1.name', $t1_name)
         ->condition('t2.name', $t2_name)

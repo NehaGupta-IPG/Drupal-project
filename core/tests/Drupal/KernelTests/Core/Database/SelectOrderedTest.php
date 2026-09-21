@@ -23,7 +23,7 @@ class SelectOrderedTest extends DatabaseTestBase {
    * Tests basic ORDER BY.
    */
   public function testSimpleSelectOrdered(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test')
+    $abstractQuery = DatabaseAbstractSelect::build('test')
       ->addColumn('test', 'name')
       ->addColumn('test', 'age', 'age')
       ->orderBy('age');
@@ -69,7 +69,7 @@ class SelectOrderedTest extends DatabaseTestBase {
    * Tests multiple ORDER BY.
    */
   public function testSimpleSelectMultiOrdered(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test')
+    $abstractQuery = DatabaseAbstractSelect::build('test')
       ->addColumn('test', 'name')
       ->addColumn('test', 'age', 'age')
       ->addColumn('test', 'job')
@@ -133,7 +133,7 @@ class SelectOrderedTest extends DatabaseTestBase {
    * Tests ORDER BY descending.
    */
   public function testSimpleSelectOrderedDesc(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test')
+    $abstractQuery = DatabaseAbstractSelect::build('test')
       ->addColumn('test', 'name')
       ->addColumn('test', 'age', 'age')
       ->orderBy('age', 'DESC');

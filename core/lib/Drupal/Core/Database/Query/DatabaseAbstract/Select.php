@@ -140,19 +140,41 @@ final class Select {
   /**
    * Constructs a Select object.
    *
+   * The object should be instantiated through the static ::biuld() method, not
+   * directly.
+   *
    * @param string|\Drupal\Core\Database\Query\DatabaseAbstract\Select $table
    *   The table name or subquery that is being queried.
    * @param string $alias
-   *   The alias for the table.
+   *   The alias for the table, or NULL to let an automatic alias.
    * @param Conjunction $conjunction
    *   The default conjunction that will be applied to arrays of conditions.
    */
-  public function __construct(
+  private function __construct(
     string|Select $table,
-    ?string $alias = NULL,
-    public readonly Conjunction $conjunction = Conjunction::And,
+    ?string $alias,
+    public readonly Conjunction $conjunction,
   ) {
     $this->addJoin(NULL, $table, $alias);
+  }
+
+  /**
+   * Builds a Select object.
+   *
+   * @param string|\Drupal\Core\Database\Query\DatabaseAbstract\Select $table
+   *   The table name or subquery that is being queried.
+   * @param string $alias
+   *   (optional) The alias for the table.
+   * @param Conjunction $conjunction
+   *   (optional) The default conjunction that will be applied to arrays of
+   *   conditions. By default, conditions are ANDed together.
+   */
+  public static function build(
+    string|Select $table,
+    ?string $alias = NULL,
+    Conjunction $conjunction = Conjunction::And,
+  ): static {
+    return new static($table, $alias, $conjunction);
   }
 
   /**
@@ -488,8 +510,8 @@ final class Select {
   public function countQuery(): static {
     $count = $this->prepareCountQuery();
 
-    $query = new self($count);
-    $query->addExpression('COUNT(*)');
+    $query = static::build($count)
+      ->addExpression('COUNT(*)');
 
     return $query;
   }

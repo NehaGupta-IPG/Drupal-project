@@ -19,10 +19,10 @@ class DatabaseAbstractSelectTest extends UnitTestCase {
    * Tests serialization.
    */
   public function testSerialization(): void {
-    $abstractQuery = new Select('test');
-    $abstractQuery->addColumn('test', 'name');
-    $abstractQuery->addColumn('test', 'age', 'age');
-    $abstractQuery = $abstractQuery->countQuery();
+    $abstractQuery = Select::build('test')
+      ->addColumn('test', 'name')
+      ->addColumn('test', 'age', 'age')
+      ->countQuery();
 
     $serialized = serialize($abstractQuery);
     $this->assertIsString($serialized);
@@ -38,12 +38,12 @@ class DatabaseAbstractSelectTest extends UnitTestCase {
     $this->expectException(\LogicException::class);
     $this->expectExceptionMessageIs('Drupal\Core\Database\Query\DatabaseAbstract\Select objects containing alter metadata cannot be serialized');
 
-    $abstractQuery = new Select('test');
-    $abstractQuery->addColumn('test', 'name');
-    $abstractQuery->addColumn('test', 'age', 'age');
-    $abstractQuery->addTag('foo');
-    $abstractQuery->addMetaData('bar', new \stdClass());
-    $abstractQuery = $abstractQuery->countQuery();
+    $abstractQuery = Select::build('test')
+      ->addColumn('test', 'name')
+      ->addColumn('test', 'age', 'age')
+      ->addTag('foo')
+      ->addMetaData('bar', new \stdClass())
+      ->countQuery();
 
     serialize($abstractQuery);
   }
