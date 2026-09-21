@@ -28,10 +28,10 @@ class SelectTest extends DatabaseTestBase {
    * Tests rudimentary SELECT statements.
    */
   public function testSimpleSelect(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test');
-    $abstractQuery->addColumn('test', 'name');
-    $abstractQuery->addColumn('test', 'age', 'age');
-    $abstractQuery = $abstractQuery->countQuery();
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->addColumn('test', 'name')
+      ->addColumn('test', 'age', 'age')
+      ->countQuery();
 
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
@@ -55,9 +55,10 @@ class SelectTest extends DatabaseTestBase {
    * Tests rudimentary SELECT statement with a COMMENT.
    */
   public function testSimpleComment(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test')->comment('Testing query comments');
-    $abstractQuery->addColumn('test', 'name');
-    $abstractQuery->addColumn('test', 'age', 'age');
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->comment('Testing query comments')
+      ->addColumn('test', 'name')
+      ->addColumn('test', 'age', 'age');
 
     $query = $this->connection->select('test')->comment('Testing query comments');
     $query->addField('test', 'name');
@@ -84,9 +85,10 @@ class SelectTest extends DatabaseTestBase {
    * Tests query COMMENT system against vulnerabilities.
    */
   public function testVulnerableComment(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test')->comment('Testing query comments */ SELECT nid FROM {node}; --');
-    $abstractQuery->addColumn('test', 'name');
-    $abstractQuery->addColumn('test', 'age', 'age');
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->comment('Testing query comments */ SELECT nid FROM {node}; --')
+      ->addColumn('test', 'name')
+      ->addColumn('test', 'age', 'age');
 
     $query = $this->connection->select('test')->comment('Testing query comments */ SELECT nid FROM {node}; --');
     $query->addField('test', 'name');
@@ -152,10 +154,10 @@ class SelectTest extends DatabaseTestBase {
    * Tests basic conditionals on SELECT statements.
    */
   public function testSimpleSelectConditional(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test');
-    $abstractQueryNameField = $abstractQuery->addColumn('test', 'name');
-    $abstractQueryAgeField = $abstractQuery->addColumn('test', 'age', 'age');
-    $abstractQuery->condition('age', 27);
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->addColumn('test', 'name')
+      ->addColumn('test', 'age', 'age')
+      ->condition('age', 27);
 
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
@@ -175,26 +177,24 @@ class SelectTest extends DatabaseTestBase {
     // Check that the aliases are being created the way we want.
     $this->assertEquals('name', $name_field, 'Name field alias is correct.');
     $this->assertEquals('age', $age_field, 'Age field alias is correct.');
-    $this->assertEquals($name_field, $abstractQueryNameField);
-    $this->assertEquals($age_field, $abstractQueryAgeField);
 
     // Ensure that we got the right record.
     $hydratedRecord = $hydratedResult->fetch();
     $record = $result->fetch();
     $this->assertEquals('George', $record->{$name_field}, 'Fetched name is correct.');
     $this->assertEquals(27, $record->{$age_field}, 'Fetched age is correct.');
-    $this->assertEquals($record->{$name_field}, $hydratedRecord->{$abstractQueryNameField});
-    $this->assertEquals($record->{$age_field}, $hydratedRecord->{$abstractQueryAgeField});
+    $this->assertEquals($record->{$name_field}, $hydratedRecord->name);
+    $this->assertEquals($record->{$age_field}, $hydratedRecord->age);
   }
 
   /**
    * Tests SELECT statements with expressions.
    */
   public function testSimpleSelectExpression(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test');
-    $abstractQueryNameField = $abstractQuery->addColumn('test', 'name');
-    $abstractQueryAgeField = $abstractQuery->addExpression("[age]*2", 'double_age');
-    $abstractQuery->condition('age', 27);
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->addColumn('test', 'name')
+      ->addExpression("[age]*2", 'double_age')
+      ->condition('age', 27);
 
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
@@ -214,27 +214,25 @@ class SelectTest extends DatabaseTestBase {
     // Check that the aliases are being created the way we want.
     $this->assertEquals('name', $name_field, 'Name field alias is correct.');
     $this->assertEquals('double_age', $age_field, 'Age field alias is correct.');
-    $this->assertEquals($name_field, $abstractQueryNameField);
-    $this->assertEquals($age_field, $abstractQueryAgeField);
 
     // Ensure that we got the right record.
     $hydratedRecord = $hydratedResult->fetch();
     $record = $result->fetch();
     $this->assertEquals('George', $record->{$name_field}, 'Fetched name is correct.');
     $this->assertEquals(27 * 2, $record->{$age_field}, 'Fetched age expression is correct.');
-    $this->assertEquals($record->{$name_field}, $hydratedRecord->{$abstractQueryNameField});
-    $this->assertEquals($record->{$age_field}, $hydratedRecord->{$abstractQueryAgeField});
+    $this->assertEquals($record->{$name_field}, $hydratedRecord->name);
+    $this->assertEquals($record->{$age_field}, $hydratedRecord->double_age);
   }
 
   /**
    * Tests SELECT statements with multiple expressions.
    */
   public function testSimpleSelectExpressionMultiple(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test');
-    $abstractQueryNameField = $abstractQuery->addColumn('test', 'name');
-    $abstractQueryAgeDoubleField = $abstractQuery->addExpression("[age]*2");
-    $abstractQueryAgeTripleField = $abstractQuery->addExpression("[age]*3");
-    $abstractQuery->condition('age', 27);
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->addColumn('test', 'name')
+      ->addExpression("[age]*2")
+      ->addExpression("[age]*3")
+      ->condition('age', 27);
 
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
@@ -255,18 +253,17 @@ class SelectTest extends DatabaseTestBase {
     // Check that the aliases are being created the way we want.
     $this->assertEquals('expression', $age_double_field, 'Double age field alias is correct.');
     $this->assertEquals('expression_2', $age_triple_field, 'Triple age field alias is correct.');
-    $this->assertEquals($age_double_field, $abstractQueryAgeDoubleField);
-    $this->assertEquals($age_triple_field, $abstractQueryAgeTripleField);
 
     // Ensure that we got the right record.
     $hydratedRecord = $hydratedResult->fetch();
+
     $record = $result->fetch();
     $this->assertEquals('George', $record->{$name_field}, 'Fetched name is correct.');
     $this->assertEquals(27 * 2, $record->{$age_double_field}, 'Fetched double age expression is correct.');
     $this->assertEquals(27 * 3, $record->{$age_triple_field}, 'Fetched triple age expression is correct.');
-    $this->assertEquals($record->{$name_field}, $hydratedRecord->{$abstractQueryNameField});
-    $this->assertEquals($record->{$age_double_field}, $hydratedRecord->{$abstractQueryAgeDoubleField});
-    $this->assertEquals($record->{$age_triple_field}, $hydratedRecord->{$abstractQueryAgeTripleField});
+    $this->assertEquals('George', $hydratedRecord->name);
+    $this->assertEquals(27 * 2, $hydratedRecord->expression);
+    $this->assertEquals(27 * 3, $hydratedRecord->expression_2);
   }
 
   /**
@@ -587,12 +584,14 @@ class SelectTest extends DatabaseTestBase {
   public function testUnionCount(): void {
     $abstractQuery1 = new DatabaseAbstractSelect('test', 't')
       ->columns('t', ['name'])
-      ->condition('age', [27, 28], 'IN');
-    $abstractQuery2 = new DatabaseAbstractSelect('test', 't')
-      ->columns('t', ['name'])
-      ->condition('age', 28);
-    $abstractQuery1->union($abstractQuery2, 'ALL');
-    $abstractQuery1 = $abstractQuery1->countQuery();
+      ->condition('age', [27, 28], 'IN')
+      ->union(
+        new DatabaseAbstractSelect('test', 't')
+          ->columns('t', ['name'])
+          ->condition('age', 28),
+        'ALL',
+      )
+      ->countQuery();
 
     $query_1 = $this->connection->select('test', 't')
       ->fields('t', ['name', 'age'])
@@ -624,16 +623,15 @@ class SelectTest extends DatabaseTestBase {
    * Tests that we can UNION multiple Select queries together and set the ORDER.
    */
   public function testUnionOrder(): void {
-    // This gives George and Ringo.
     $abstractQuery1 = new DatabaseAbstractSelect('test', 't')
       ->columns('t', ['name'])
-      ->condition('age', [27, 28], 'IN');
-    // This gives Paul.
-    $abstractQuery2 = new DatabaseAbstractSelect('test', 't')
-      ->columns('t', ['name'])
-      ->condition('age', 26);
-    $abstractQuery1->union($abstractQuery2);
-    $abstractQuery1->orderBy('name', 'DESC');
+      ->condition('age', [27, 28], 'IN')
+      ->union(
+        new DatabaseAbstractSelect('test', 't')
+          ->columns('t', ['name'])
+          ->condition('age', 26)
+      )
+      ->orderBy('name', 'DESC');
 
     // This gives George and Ringo.
     $query_1 = $this->connection->select('test', 't')
@@ -673,17 +671,16 @@ class SelectTest extends DatabaseTestBase {
    * Tests that we can UNION multiple Select queries together with and a LIMIT.
    */
   public function testUnionOrderLimit(): void {
-    // This gives George and Ringo.
     $abstractQuery1 = new DatabaseAbstractSelect('test', 't')
       ->columns('t', ['name'])
-      ->condition('age', [27, 28], 'IN');
-    // This gives Paul.
-    $abstractQuery2 = new DatabaseAbstractSelect('test', 't')
-      ->columns('t', ['name'])
-      ->condition('age', 26);
-    $abstractQuery1->union($abstractQuery2);
-    $abstractQuery1->orderBy('name', 'DESC');
-    $abstractQuery1->range(0, 2);
+      ->condition('age', [27, 28], 'IN')
+      ->union(
+        new DatabaseAbstractSelect('test', 't')
+          ->columns('t', ['name'])
+          ->condition('age', 26)
+      )
+      ->orderBy('name', 'DESC')
+      ->range(0, 2);
 
     // This gives George and Ringo.
     $query_1 = $this->connection->select('test', 't')
@@ -771,7 +768,7 @@ class SelectTest extends DatabaseTestBase {
     $abstractRandomizedIdsQuery = new DatabaseAbstractSelect('test', 't')
       ->columns('t', ['id'])
       ->range(0, $number_of_items)
-      ->orderRandom();
+      ->orderRandom('random_field');
     $randomized_ids_query = $this->connection->select('test', 't')
       ->fields('t', ['id'])
       ->range(0, $number_of_items)
@@ -852,9 +849,9 @@ class SelectTest extends DatabaseTestBase {
       ])
       ->execute();
 
-    $abstractQuery = new DatabaseAbstractSelect('test', 't');
-    $abstractQuery->addColumn('t', 'name');
-    $abstractQuery->condition("t.$column", $pattern, $operator);
+    $abstractQuery = new DatabaseAbstractSelect('test', 't')
+      ->addColumn('t', 'name')
+      ->condition("t.$column", $pattern, $operator);
 
     $query = $database->select('test', 't');
     $query->addField('t', 'name');
@@ -875,7 +872,7 @@ class SelectTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests that aliases are renamed when they are duplicates.
+   * Tests that aliases are renamed when they are duplicated.
    */
   public function testSelectDuplicateAlias(): void {
     $query = $this->connection->select('test', 't');
@@ -883,10 +880,12 @@ class SelectTest extends DatabaseTestBase {
     $alias2 = $query->addField('t', 'age', 'the_alias');
     $this->assertNotSame($alias1, $alias2, 'Duplicate aliases are renamed.');
 
-    $query = new DatabaseAbstractSelect('test', 't');
-    $alias1 = $query->addColumn('t', 'name', 'the_alias');
-    $alias2 = $query->addColumn('t', 'age', 'the_alias');
-    $this->assertNotSame($alias1, $alias2, 'Duplicate aliases are renamed.');
+    $query = new DatabaseAbstractSelect('test', 't')
+      ->addColumn('t', 'name', 'the_alias')
+      ->addColumn('t', 'age', 'the_alias');
+    $reflectionColumns = new \ReflectionProperty($query, 'columns');
+    $columns = $reflectionColumns->getValue($query);
+    $this->assertSame(['the_alias', 't_age'], array_keys($columns));
   }
 
   /**

@@ -23,10 +23,10 @@ class SelectOrderedTest extends DatabaseTestBase {
    * Tests basic ORDER BY.
    */
   public function testSimpleSelectOrdered(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test');
-    $abstractQuery->addColumn('test', 'name');
-    $abstractAgeField = $abstractQuery->addColumn('test', 'age', 'age');
-    $abstractQuery->orderBy($abstractAgeField);
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->addColumn('test', 'name')
+      ->addColumn('test', 'age', 'age')
+      ->orderBy('age');
 
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
@@ -69,12 +69,12 @@ class SelectOrderedTest extends DatabaseTestBase {
    * Tests multiple ORDER BY.
    */
   public function testSimpleSelectMultiOrdered(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test');
-    $abstractQuery->addColumn('test', 'name');
-    $abstractAgeField = $abstractQuery->addColumn('test', 'age', 'age');
-    $abstractJobField = $abstractQuery->addColumn('test', 'job');
-    $abstractQuery->orderBy($abstractJobField);
-    $abstractQuery->orderBy($abstractAgeField);
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->addColumn('test', 'name')
+      ->addColumn('test', 'age', 'age')
+      ->addColumn('test', 'job')
+      ->orderBy('job')
+      ->orderBy('age');
 
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
@@ -133,10 +133,10 @@ class SelectOrderedTest extends DatabaseTestBase {
    * Tests ORDER BY descending.
    */
   public function testSimpleSelectOrderedDesc(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test');
-    $abstractQuery->addColumn('test', 'name');
-    $abstractAgeField = $abstractQuery->addColumn('test', 'age', 'age');
-    $abstractQuery->orderBy($abstractAgeField, 'DESC');
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->addColumn('test', 'name')
+      ->addColumn('test', 'age', 'age')
+      ->orderBy('age', 'DESC');
 
     $query = $this->connection->select('test');
     $query->addField('test', 'name');

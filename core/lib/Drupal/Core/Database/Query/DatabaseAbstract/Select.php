@@ -274,7 +274,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function addColumn(string $table_alias, string $column, ?string $alias = NULL): string {
+  public function addColumn(string $table_alias, string $column, ?string $alias = NULL): static {
     // If no alias is specified, first try the column name itself.
     if (empty($alias)) {
       $alias = $column;
@@ -300,7 +300,7 @@ final class Select {
       'alias' => $alias,
     ];
 
-    return $alias;
+    return $this;
   }
 
   /**
@@ -342,11 +342,8 @@ final class Select {
    *   in all cases.
    * @param array<string,string|int|float|bool> $arguments
    *   Any placeholder arguments needed for this expression.
-   *
-   * @return string
-   *   The unique alias that was assigned for this expression.
    */
-  public function addExpression(string $expression, ?string $alias = NULL, array $arguments = []): string {
+  public function addExpression(string $expression, ?string $alias = NULL, array $arguments = []): static {
     if (empty($alias)) {
       $alias = 'expression';
     }
@@ -360,34 +357,34 @@ final class Select {
 
     $this->expressions[$alias] = new Expression($expression, $arguments, $alias);
 
-    return $alias;
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function join(string|Select $table, ?string $alias = NULL, string|Condition|null $condition = NULL, array $arguments = []): string {
+  public function join(string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
     return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function innerJoin(string|Select $table, ?string $alias = NULL, string|Condition|null $condition = NULL, array $arguments = []): string {
+  public function innerJoin(string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
     return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function leftJoin(string|Select $table, ?string $alias = NULL, string|Condition|null $condition = NULL, array $arguments = []): string {
+  public function leftJoin(string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
     return $this->addJoin('LEFT OUTER', $table, $alias, $condition, $arguments);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addJoin(?string $type, string|Select $table, ?string $alias = NULL, string|Condition|null $condition = NULL, array $arguments = []): string {
+  public function addJoin(?string $type, string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
     if (empty($alias)) {
       if ($table instanceof self) {
         $alias = 'subquery';
@@ -404,7 +401,13 @@ final class Select {
     }
     $alias = $alias_candidate;
 
-    if (is_string($condition)) {
+    if ($condition instanceof Expression) {
+      $tmp = new Condition(Conjunction::And);
+      $where = str_replace('%alias', $alias, $condition->expression);
+      $tmp->where(new Expression($where, $condition->arguments));
+      $condition = $tmp;
+    }
+    elseif (is_string($condition)) {
       $condition = str_replace('%alias', $alias, $condition);
     }
 
@@ -416,7 +419,7 @@ final class Select {
       'arguments' => $arguments,
     ];
 
-    return $alias;
+    return $this;
   }
 
   /**
@@ -432,8 +435,8 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function orderRandom(): static {
-    $alias = $this->addExpression('RAND()', 'random_field');
+  public function orderRandom(string $alias): static {
+    $this->addExpression('RAND()', $alias);
     $this->orderBy($alias);
     return $this;
   }
@@ -497,7 +500,7 @@ final class Select {
    * @return Select
    *   A new query object ready to have COUNT(*) performed on it.
    */
-  protected function prepareCountQuery(): Select {
+  private function prepareCountQuery(): Select {
     // Create our new query object that we will mutate into a count query.
     $count = clone($this);
 
@@ -631,22 +634,22 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  private function conditionGroupFactory(Conjunction $conjunction): Condition {
+  private static function conditionGroupFactory(Conjunction $conjunction): Condition {
     return new Condition($conjunction);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function andConditionGroup(): Condition {
-    return $this->conditionGroupFactory(Conjunction::And);
+  public static function andConditionGroup(): Condition {
+    return static::conditionGroupFactory(Conjunction::And);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function orConditionGroup(): Condition {
-    return $this->conditionGroupFactory(Conjunction::Or);
+  public static function orConditionGroup(): Condition {
+    return static::conditionGroupFactory(Conjunction::Or);
   }
 
   /**

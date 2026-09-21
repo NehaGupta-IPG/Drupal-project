@@ -34,12 +34,12 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests simple JOIN statements.
    */
   public function testDefaultJoin(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test_task', 't');
-    $abstractPeopleAlias = $abstractQuery->join('test', 'p', '[t].[pid] = [p].[id]');
-    $abstractNameField = $abstractQuery->addColumn($abstractPeopleAlias, 'name', 'name');
-    $abstractQuery->addColumn('t', 'task', 'task');
-    $abstractPriorityField = $abstractQuery->addColumn('t', 'priority', 'priority');
-    $abstractQuery->orderBy($abstractPriorityField);
+    $abstractQuery = new DatabaseAbstractSelect('test_task', 't')
+      ->join('test', 'p', '[t].[pid] = [p].[id]')
+      ->addColumn('p', 'name', 'name')
+      ->addColumn('t', 'task', 'task')
+      ->addColumn('t', 'priority', 'priority')
+      ->orderBy('priority');
 
     $query = $this->connection->select('test_task', 't');
     $people_alias = $query->join('test', 'p', '[t].[pid] = [p].[id]');
@@ -73,9 +73,9 @@ class SelectComplexTest extends DatabaseTestBase {
     // Verify that the results are returned in the correct order.
     foreach ($hydratedResult as $record) {
       $num_records++;
-      $this->assertGreaterThanOrEqual($last_priority, $record->$abstractPriorityField);
-      $this->assertNotSame('Ringo', $record->$abstractNameField, 'Person without a task not selected.');
-      $last_priority = $record->$abstractPriorityField;
+      $this->assertGreaterThanOrEqual($last_priority, $record->priority);
+      $this->assertNotSame('Ringo', $record->name, 'Person without a task not selected.');
+      $last_priority = $record->priority;
     }
     $this->assertEquals(7, $num_records, 'Returned the correct number of rows.');
   }
@@ -84,12 +84,12 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests LEFT OUTER joins.
    */
   public function testLeftOuterJoin(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test', 'p');
-    $abstractPeopleAlias = $abstractQuery->leftJoin('test_task', 't', '[t].[pid] = [p].[id]');
-    $abstractNameField = $abstractQuery->addColumn('p', 'name', 'name');
-    $abstractQuery->addColumn($abstractPeopleAlias, 'task', 'task');
-    $abstractQuery->addColumn($abstractPeopleAlias, 'priority', 'priority');
-    $abstractQuery->orderBy($abstractNameField);
+    $abstractQuery = new DatabaseAbstractSelect('test', 'p')
+      ->leftJoin('test_task', 't', '[t].[pid] = [p].[id]')
+      ->addColumn('p', 'name', 'name')
+      ->addColumn('t', 'task', 'task')
+      ->addColumn('t', 'priority', 'priority')
+      ->orderBy('name');
 
     $query = $this->connection->select('test', 'p');
     $people_alias = $query->leftJoin('test_task', 't', '[t].[pid] = [p].[id]');
@@ -130,11 +130,11 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests GROUP BY clauses.
    */
   public function testGroupBy(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test_task', 't');
-    $abstractCountField = $abstractQuery->addExpression('COUNT([task])', 'num');
-    $abstractTaskField = $abstractQuery->addColumn('t', 'task');
-    $abstractQuery->orderBy($abstractCountField);
-    $abstractQuery->groupBy($abstractTaskField);
+    $abstractQuery = new DatabaseAbstractSelect('test_task', 't')
+      ->addExpression('COUNT([task])', 'num')
+      ->addColumn('t', 'task')
+      ->orderBy('num')
+      ->groupBy('task');
 
     $query = $this->connection->select('test_task', 't');
     $count_field = $query->addExpression('COUNT([task])', 'num');
@@ -199,12 +199,12 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests GROUP BY and HAVING clauses together.
    */
   public function testGroupByAndHaving(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test_task', 't');
-    $abstractCountField = $abstractQuery->addExpression('COUNT([task])', 'num');
-    $abstractTaskField = $abstractQuery->addColumn('t', 'task');
-    $abstractQuery->orderBy($abstractCountField);
-    $abstractQuery->groupBy($abstractTaskField);
-    $abstractQuery->having(new Expression('COUNT([task]) >= 2'));
+    $abstractQuery = new DatabaseAbstractSelect('test_task', 't')
+      ->addExpression('COUNT([task])', 'num')
+      ->addColumn('t', 'task')
+      ->orderBy('num')
+      ->groupBy('task')
+      ->having(new Expression('COUNT([task]) >= 2'));
 
     $query = $this->connection->select('test_task', 't');
     $count_field = $query->addExpression('COUNT([task])', 'num');
@@ -265,11 +265,11 @@ class SelectComplexTest extends DatabaseTestBase {
    * The SQL clause varies with the database.
    */
   public function testRange(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test');
-    $abstractQuery->addColumn('test', 'name');
-    $abstractQuery->addColumn('test', 'age', 'age');
-    $abstractQuery->range(0, 2);
-    $abstractQuery = $abstractQuery->countQuery();
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->addColumn('test', 'name')
+      ->addColumn('test', 'age', 'age')
+      ->range(0, 2)
+      ->countQuery();
 
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
@@ -295,12 +295,12 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests whether the range property of a select clause can be undone.
    */
   public function testRangeUndo(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test');
-    $abstractQuery->addColumn('test', 'name');
-    $abstractQuery->addColumn('test', 'age', 'age');
-    $abstractQuery->range(0, 2);
-    $abstractQuery->range();
-    $abstractQuery = $abstractQuery->countQuery();
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->addColumn('test', 'name')
+      ->addColumn('test', 'age', 'age')
+      ->range(0, 2)
+      ->range()
+      ->countQuery();
 
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
@@ -327,10 +327,10 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests distinct queries.
    */
   public function testDistinct(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test_task');
-    $abstractQuery->addColumn('test_task', 'task');
-    $abstractQuery->orderBy('task');
-    $abstractQuery->distinct();
+    $abstractQuery = new DatabaseAbstractSelect('test_task')
+      ->addColumn('test_task', 'task')
+      ->orderBy('task')
+      ->distinct();
 
     $query = $this->connection->select('test_task');
     $query->addField('test_task', 'task');
@@ -356,10 +356,10 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests that we can generate a count query from a built query.
    */
   public function testCountQuery(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test');
-    $name_field = $abstractQuery->addColumn('test', 'name');
-    $age_field = $abstractQuery->addColumn('test', 'age', 'age');
-    $abstractQuery->orderBy('name');
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->addColumn('test', 'name')
+      ->addColumn('test', 'age', 'age')
+      ->orderBy('name');
     $abstractCountQuery = $abstractQuery->countQuery();
 
     $query = $this->connection->select('test');
@@ -396,9 +396,9 @@ class SelectComplexTest extends DatabaseTestBase {
   public function testHavingCountQuery(): void {
     $abstractQuery = new DatabaseAbstractSelect('test')
       ->groupBy('age')
-      ->having(new Expression('[age] + 1 > 0'));
-    $abstractQuery->addColumn('test', 'age');
-    $abstractQuery->addExpression('[age] + 1');
+      ->having(new Expression('[age] + 1 > 0'))
+      ->addColumn('test', 'age')
+      ->addExpression('[age] + 1');
 
     $query = $this->connection->select('test')
       ->extend(PagerSelectExtender::class)
@@ -427,9 +427,9 @@ class SelectComplexTest extends DatabaseTestBase {
    * Tests that countQuery removes 'all_fields' statements and ordering clauses.
    */
   public function testCountQueryRemovals(): void {
-    $abstractQuery = new DatabaseAbstractSelect('test');
-    $abstractQuery->columns('test');
-    $abstractQuery->orderBy('name');
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->columns('test')
+      ->orderBy('name');
     $abstractCountQuery = $abstractQuery->countQuery();
 
     $query = $this->connection->select('test');
@@ -494,14 +494,14 @@ class SelectComplexTest extends DatabaseTestBase {
     $query->addExpression('[fail]');
     $this->assertEquals(4, $query->countQuery()->execute()->fetchField(), 'Count Query removed expressions');
 
-    $query = new DatabaseAbstractSelect('test');
-    $query->columns('test', ['fail']);
-    $query = $query->countQuery();
+    $query = new DatabaseAbstractSelect('test')
+      ->columns('test', ['fail'])
+      ->countQuery();
     $this->assertEquals(4, $this->connection->select($query)->execute()->fetchField());
 
-    $query = new DatabaseAbstractSelect('test');
-    $query->addExpression('[fail]');
-    $query = $query->countQuery();
+    $query = new DatabaseAbstractSelect('test')
+      ->addExpression('[fail]')
+      ->countQuery();
     $this->assertEquals(4, $this->connection->select($query)->execute()->fetchField());
   }
 
@@ -517,10 +517,10 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $this->assertEquals(6, $count, 'Counted the correct number of records.');
 
-    $query = new DatabaseAbstractSelect('test_task');
-    $query->addColumn('test_task', 'task');
-    $query->distinct();
-    $query = $query->countQuery();
+    $query = new DatabaseAbstractSelect('test_task')
+      ->addColumn('test_task', 'task')
+      ->distinct()
+      ->countQuery();
 
     $count = $this->connection->select($query)->execute()->fetchField();
 
@@ -539,10 +539,10 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $this->assertEquals(3, $count, 'Counted the correct number of records.');
 
-    $query = new DatabaseAbstractSelect('test_task');
-    $query->addColumn('test_task', 'pid');
-    $query->groupBy('pid');
-    $query = $query->countQuery();
+    $query = new DatabaseAbstractSelect('test_task')
+      ->addColumn('test_task', 'pid')
+      ->groupBy('pid')
+      ->countQuery();
 
     $count = $this->connection->select($query)->execute()->fetchField();
 
@@ -550,12 +550,12 @@ class SelectComplexTest extends DatabaseTestBase {
 
     // Use a column alias as, without one, the query can succeed for the wrong
     // reason.
-    $abstractQuery = new DatabaseAbstractSelect('test_task');
-    $abstractQuery->addColumn('test_task', 'pid', 'pid_alias');
-    $abstractQuery->addExpression('COUNT([test_task].[task])', 'count');
-    $abstractQuery->groupBy('pid_alias');
-    $abstractQuery->orderBy('pid_alias', 'asc');
-    $abstractCountQuery = $abstractQuery->countQuery();
+    $abstractQuery = new DatabaseAbstractSelect('test_task')
+      ->addColumn('test_task', 'pid', 'pid_alias')
+      ->addExpression('COUNT([test_task].[task])', 'count')
+      ->groupBy('pid_alias')
+      ->orderBy('pid_alias', 'asc')
+      ->countQuery();
 
     $query = $this->connection->select('test_task');
     $query->addField('test_task', 'pid', 'pid_alias');
@@ -564,7 +564,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $query->orderBy('pid_alias', 'asc');
     $count_query = $query->countQuery();
 
-    $hydratedCountQuery = $this->connection->select($abstractCountQuery);
+    $hydratedCountQuery = $this->connection->select($abstractQuery);
 
     $this->resetProperties($count_query);
     $this->resetProperties($hydratedCountQuery);
@@ -586,13 +586,13 @@ class SelectComplexTest extends DatabaseTestBase {
     // "SELECT job FROM {test} WHERE name = 'Paul' AND (age = 26 OR age = 27)"
     // That should find only one record. Yes it's a non-optimal way of writing
     // that query but that's not the point!
-    $abstractQuery = new DatabaseAbstractSelect('test');
-    $abstractQuery->addColumn('test', 'job');
-    $abstractQuery->condition('name', 'Paul');
-    $abstractQuery->condition($abstractQuery->orConditionGroup()
-      ->condition('age', 26)
-      ->condition('age', 27)
-    );
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->addColumn('test', 'job')
+      ->condition('name', 'Paul')
+      ->condition(DatabaseAbstractSelect::orConditionGroup()
+        ->condition('age', 26)
+        ->condition('age', 27)
+      );
 
     $query = $this->connection->select('test');
     $query->addField('test', 'job');
@@ -617,11 +617,12 @@ class SelectComplexTest extends DatabaseTestBase {
    * Confirms we can join on a single table twice with a dynamic alias.
    */
   public function testJoinTwice(): void {
-    $abstractQuery = (new DatabaseAbstractSelect('test'))->columns('test');
-    $abstractAlias = $abstractQuery->join('test', 'test', '[test].[job] = [%alias].[job]');
-    $abstractQuery->addColumn($abstractAlias, 'name', 'other_name');
-    $abstractQuery->addColumn($abstractAlias, 'job', 'other_job');
-    $abstractQuery->where(new Expression("[$abstractAlias].[name] <> [test].[name]"));
+    $abstractQuery = (new DatabaseAbstractSelect('test'))
+      ->columns('test')
+      ->join('test', 'test_2', '[test].[job] = [%alias].[job]')
+      ->addColumn('test_2', 'name', 'other_name')
+      ->addColumn('test_2', 'job', 'other_job')
+      ->where(new Expression("[test_2].[name] <> [test].[name]"));
 
     $query = $this->connection->select('test')->fields('test');
     $alias = $query->join('test', 'test', '[test].[job] = [%alias].[job]');
@@ -653,20 +654,20 @@ class SelectComplexTest extends DatabaseTestBase {
       'mail' => $this->randomMachineName() . '@example.com',
     ]);
 
-    $abstractQuery = new DatabaseAbstractSelect('test_task', 'tt');
-    $abstractQuery->addExpression('[tt].[pid] + 1', 'abc');
-    $abstractQuery->condition('priority', 1, '>');
-    $abstractQuery->condition('priority', 100, '<');
-    $abstractSubquery = new DatabaseAbstractSelect('test', 'tp');
-    $abstractSubquery->join('test_one_blob', 'tpb', '[tp].[id] = [tpb].[id]');
-    $abstractSubquery->join('node', 'n', '[tp].[id] = [n].[nid]');
-    $abstractSubquery->addTag('node_access');
-    $abstractSubquery->addMetaData('account', $account);
-    $abstractSubquery->addColumn('tp', 'id');
-    $abstractSubquery->condition('age', 5, '>');
-    $abstractSubquery->condition('age', 500, '<');
-    $abstractQuery->leftJoin($abstractSubquery, 'sq', '[tt].[pid] = [sq].[id]');
-    $abstractQuery->join('test_one_blob', 'tb3', '[tt].[pid] = [tb3].[id]');
+    $abstractQuery = new DatabaseAbstractSelect('test_task', 'tt')
+      ->addExpression('[tt].[pid] + 1', 'abc')
+      ->condition('priority', 1, '>')
+      ->condition('priority', 100, '<');
+    $abstractSubquery = new DatabaseAbstractSelect('test', 'tp')
+      ->join('test_one_blob', 'tpb', '[tp].[id] = [tpb].[id]')
+      ->join('node', 'n', '[tp].[id] = [n].[nid]')
+      ->addTag('node_access')
+      ->addMetaData('account', $account)
+      ->addColumn('tp', 'id')
+      ->condition('age', 5, '>')
+      ->condition('age', 500, '<');
+    $abstractQuery->leftJoin($abstractSubquery, 'sq', '[tt].[pid] = [sq].[id]')
+      ->join('test_one_blob', 'tb3', '[tt].[pid] = [tb3].[id]');
 
     $query = Database::getConnection('replica')->select('test_task', 'tt');
     $query->addExpression('[tt].[pid] + 1', 'abc');
@@ -734,13 +735,12 @@ class SelectComplexTest extends DatabaseTestBase {
    */
   public function testJoinConditionObject(): void {
     // Same test as testDefaultJoin, but with a Condition object.
-    $abstractQuery = new DatabaseAbstractSelect('test_task', 't');
-    $abstractJoinCond = $abstractQuery->andConditionGroup()->where(new Expression('[t].[pid] = [p].[id]'));
-    $abstractPeopleAlias = $abstractQuery->join('test', 'p', $abstractJoinCond);
-    $abstractNameField = $abstractQuery->addColumn($abstractPeopleAlias, 'name', 'name');
-    $abstractQuery->addColumn('t', 'task', 'task');
-    $abstractPriorityField = $abstractQuery->addColumn('t', 'priority', 'priority');
-    $abstractQuery->orderBy($abstractPriorityField);
+    $abstractQuery = new DatabaseAbstractSelect('test_task', 't')
+      ->join('test', 'p', new Expression('[t].[pid] = [p].[id]'))
+      ->addColumn('p', 'name', 'name')
+      ->addColumn('t', 'task', 'task')
+      ->addColumn('t', 'priority', 'priority')
+      ->orderBy('priority');
 
     $query = $this->connection->select('test_task', 't');
     $join_cond = ($this->connection->condition('AND'))->where('[t].[pid] = [p].[id]');
@@ -775,9 +775,9 @@ class SelectComplexTest extends DatabaseTestBase {
     foreach ($hydratedResult as $record) {
       $num_records++;
       // Verify that the results are returned in the correct order.
-      $this->assertGreaterThanOrEqual($last_priority, $record->$abstractPriorityField);
-      $this->assertNotSame('Ringo', $record->$abstractNameField);
-      $last_priority = $record->$abstractPriorityField;
+      $this->assertGreaterThanOrEqual($last_priority, $record->priority);
+      $this->assertNotSame('Ringo', $record->name);
+      $last_priority = $record->priority;
     }
     $this->assertEquals(7, $num_records);
 
@@ -785,13 +785,13 @@ class SelectComplexTest extends DatabaseTestBase {
     $t1_name = 'John';
     $t2_name = 'George';
 
-    $abstractQuery = new DatabaseAbstractSelect('test', 't1');
-    $abstractJoinCond = $abstractQuery->andConditionGroup()
-      ->condition('t1.name', $t1_name)
-      ->condition('t2.name', $t2_name);
-    $abstractQuery->innerJoin('test', 't2', $abstractJoinCond);
-    $abstractQuery->addColumn('t1', 'name', 't1_name');
-    $abstractQuery->addColumn('t2', 'name', 't2_name');
+    $abstractQuery = new DatabaseAbstractSelect('test', 't1')
+      ->innerJoin('test', 't2', (DatabaseAbstractSelect::andConditionGroup()
+        ->condition('t1.name', $t1_name)
+        ->condition('t2.name', $t2_name)
+      ))
+      ->addColumn('t1', 'name', 't1_name')
+      ->addColumn('t2', 'name', 't2_name');
     $abstractCountQuery = $abstractQuery->countQuery();
 
     $join_cond = ($this->connection->condition('AND'))
