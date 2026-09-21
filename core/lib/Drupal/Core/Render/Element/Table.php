@@ -545,8 +545,8 @@ class Table extends FormElementBase {
    * In a situation where tree relationships are present, adding multiple
    * subgroups is not necessary, because the table will contain indentations
    * that provide enough information about the sibling and parent relationships.
-   * See MenuForm::BuildOverviewForm for an example creating a table containing
-   * parent relationships.
+   * See MenuOverviewBuilder::build() for an example creating a table
+   * containing parent relationships.
    *
    * @param array $element
    *   A form element to attach the tableDrag behavior to.
@@ -585,7 +585,7 @@ class Table extends FormElementBase {
    *   - 'limit': (optional) Limit the maximum amount of parenting in this
    *     table.
    *
-   * @see \Drupal\menu_ui\MenuForm::buildOverviewForm()
+   * @see \Drupal\menu_ui\MenuOverviewBuilder::build()
    */
   public static function attachTabledrag(array &$element, array $options): void {
     // Add default values to elements.

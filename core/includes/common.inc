@@ -132,7 +132,7 @@ function base_path() {
  *   \Drupal\Core\Render\Element\Table::attachTabledrag() instead.
  *
  * @see https://www.drupal.org/node/3035565
- * @see MenuForm::BuildOverviewForm()
+ * @see \Drupal\menu_ui\MenuOverviewBuilder::build()
  * @see \Drupal\Core\Render\Element\Table::attachTabledrag()
  */
 function drupal_attach_tabledrag(&$element, array $options): void {
