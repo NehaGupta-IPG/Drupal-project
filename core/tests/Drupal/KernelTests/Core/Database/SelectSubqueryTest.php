@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Expression;
 use Drupal\Core\Database\Query\DatabaseAbstract\Order;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
-use Drupal\Core\Database\Query\DatabaseAbstract\UnionType;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 

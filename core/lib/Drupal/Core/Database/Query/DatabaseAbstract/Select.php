@@ -129,7 +129,7 @@ final class Select {
    * first query to union on the right of the original query, the second union
    * to the right of the first, etc.
    *
-   * @var list<array{'type':UnionType,'query':Select}> $union
+   * @var list<array{'type':UnionType,'query':Select}>
    */
   private array $union = [];
 
