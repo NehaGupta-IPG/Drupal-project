@@ -21,7 +21,7 @@ class AdvisoryFeedTestHooks {
     // 'generic_module1_project' project name.  This ensures that for an
     // extension where the 'name' and the 'project' properties do not match,
     // 'project' is used for matching 'project' in the JSON feed.
-    $system_info = [
+    $extension_info = [
       'generic_module1_test' => [
         'project' => 'generic_module1_project',
         'version' => '8.x-1.1',
@@ -33,8 +33,8 @@ class AdvisoryFeedTestHooks {
         'hidden' => FALSE,
       ],
     ];
-    if (!empty($system_info[$file->getName()])) {
-      foreach ($system_info[$file->getName()] as $key => $value) {
+    if (!empty($extension_info[$file->getName()])) {
+      foreach ($extension_info[$file->getName()] as $key => $value) {
         $info[$key] = $value;
       }
     }
