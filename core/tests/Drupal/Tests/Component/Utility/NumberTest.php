@@ -137,9 +137,21 @@ class NumberTest extends TestCase {
       'Trailing zeros step' => ['1.0', '0.50', TRUE],
       'Integer high precision' => ['10', '0.0001', TRUE],
 
+      // Trailing zeros must not introduce rounding errors when scaling a valid
+      // value, even when the scaled result is below PHP_INT_MAX.
+      'Fine step without trailing zeros' => ['1.1', '0.0000000001', TRUE],
+      'Fine step with trailing zeros' => ['1.10000000000000000', '0.0000000001', TRUE],
+
       // Large numbers.
       'Large within limits' => ['99999999.9999999', '0.0000001', TRUE],
       'PHP_INT_MAX overflow' => ['9000000000000000000.99', '0.01', TRUE],
+
+      // Converting to float or rounding must not change the divisibility of
+      // integers that fit within PHP_INT_MAX on 64-bit systems.
+      'Large integer multiple of three' => ['9007199254740993', '3', TRUE],
+      'Large integer multiple of ten' => ['9007199254740900', '10', TRUE],
+      'Large integer below a valid step' => ['9007199254740998', '500', FALSE],
+      'Large integer on a valid step' => ['9007199254741000', '500', TRUE],
 
       // Large precision within MySQL DECIMAL(65,30) and PostgreSQL NUMERIC limits.
       'Precision 32 scale 10' => ['1234567890123456789012.1234567890', '0.0000000001', TRUE],
@@ -210,6 +222,14 @@ class NumberTest extends TestCase {
       'Offset valid' => ['3.1', '2.0', 1.1, TRUE],
       'Offset invalid' => ['3.2', '2.0', 1.1, FALSE],
 
+      // Subtracting the offset can introduce floating-point noise. It must not
+      // be mistaken for additional decimal places in the submitted value.
+      'Small difference with positive offset' => ['10.01', '0.01', 10.0, TRUE],
+      'Small difference with float inputs' => [10.01, 0.01, 10, TRUE],
+      'Small difference with negative offset' => ['-499.99', '0.01', -500.0, TRUE],
+      'Small difference with fractional offset' => ['0.3001', '0.0001', 0.3, TRUE],
+      'Small difference with invalid step' => ['10.015', '0.01', 10.0, FALSE],
+
       // Zero offset.
       'Zero value zero offset' => ['0', '0.1', 0.0, TRUE],
       'Value equals offset' => ['5.5', '0.5', 5.5, TRUE],
@@ -222,6 +242,13 @@ class NumberTest extends TestCase {
 
       // Mixed signs.
       'Pos value neg offset' => ['10', '5', -5.0, TRUE],
+
+      // The padded inputs each fit in a 64-bit integer after scaling, but their
+      // difference does not. Trailing zeros must not change step validity.
+      'Negative offset invalid without trailing zeros' => ['500.005', '0.01', -500.0, FALSE],
+      'Negative offset invalid with trailing zeros' => ['500.0050000000000000', '0.01', -500.0, FALSE],
+      'Negative offset valid without trailing zeros' => ['500.01', '0.01', -500.0, TRUE],
+      'Negative offset valid with trailing zeros' => ['500.0100000000000000', '0.01', -500.0, TRUE],
     ];
   }
 
