@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\treegrid_reorder\Functional;
+namespace Drupal\Tests\menu_tree_ui\Kernel;
 
-use Drupal\Tests\system\Functional\Module\GenericModuleTestBase;
+use Drupal\Tests\system\Kernel\Module\GenericModuleTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Generic module test for treegrid_reorder.
+ * Generic module test for menu_tree_ui.
  */
-#[Group('treegrid_reorder')]
+#[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 class GenericTest extends GenericModuleTestBase {}
