@@ -1,28 +1,3 @@
-# Define export ignores for files that are only needed by core developers.
-
-# Individual test classes.
-tests/Drupal/**/*Test.php   export-ignore
-**/tests/src/**/*Test.php   export-ignore
-
-# Test fixtures, modules, themes, engines. Exclude test subdirectories.
-tests/fixtures/       export-ignore
-modules/*/tests/*/ export-ignore
-
-# Per-test fixture data under tests/Drupal/Tests/.
-tests/Drupal/Tests/**/fixtures/ export-ignore
-tests/Drupal/Tests/**/Fixtures/ export-ignore
-
-# Build and Nightwatch tests.
-tests/Drupal/BuildTests/        export-ignore
-tests/Drupal/Nightwatch/        export-ignore
-modules/*/tests/src/Nightwatch/ export-ignore
-
-# Test fixture install profiles. The testing profile must remain.
-profiles/tests/*/        export-ignore
-
-# PHPStan tests and baseline.
-tests/PHPStan/                export-ignore
-.phpstan-baseline.php         export-ignore
-
-# Don't ship this file itself.
-.gitattributes                export-ignore
+# Exclude test code from packaged releases.
+tests           export-ignore
+.gitattributes  export-ignore
