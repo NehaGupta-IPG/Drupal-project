@@ -27,8 +27,14 @@ final class MediaLibraryWidgetMessageTest extends UnitTestCase {
   /**
    * Tests the no-media-types messages for base fields.
    */
-  #[TestWith([TRUE, 'There are no allowed media types configured for this field. You might want to <a href="/admin/structure/media/add">create one</a>.'])]
-  #[TestWith([FALSE, 'There are no allowed media types configured for this field. Contact the site administrator.'])]
+  #[TestWith([
+    TRUE,
+    'There are no allowed media types configured for this field. You might want to <a href="/admin/structure/media/add">create one</a>.',
+  ])]
+  #[TestWith([
+    FALSE,
+    'There are no allowed media types configured for this field. Contact the site administrator.',
+  ])]
   public function testNoMediaTypesMessageForBaseField($can_create_media_types, $expected_message): void {
     $field_definition = $this->createMock(FieldDefinitionInterface::class);
 
