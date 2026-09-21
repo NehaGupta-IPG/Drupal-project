@@ -54,7 +54,6 @@ class LanguageAdministrationPagesLanguageTest extends BrowserTestBase {
     'block',
     'node',
     'contextual',
-    'toolbar',
     'system_test',
   ];
 
