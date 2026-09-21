@@ -62,7 +62,6 @@ global-styling:
       css/components/tabs.css: {}
     theme:
       css/theme/colors.css: {}
-      css/components/button.css: {}
     layout:
       css/layout/breadcrumb.css: {}
       css/layout/local-actions.css: {}
