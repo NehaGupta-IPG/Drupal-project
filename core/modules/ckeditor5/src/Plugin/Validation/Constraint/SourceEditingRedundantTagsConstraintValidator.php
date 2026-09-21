@@ -81,7 +81,6 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
       if (!$overlap->allowsNothing()) {
         $plugins_to_check_against = $checking_enabled ? $other_enabled_plugins : $enableable_disabled_plugins;
         $plain_tags_to_check_against = $checking_enabled ? $enabled_plugin_plain_tags : $disabled_plugin_plain_tags;
-        $tags_plugin_report = $this->pluginsSupplyingTagsMessage($overlap, $plugins_to_check_against, $enabled_plugin_elements);
         $message = match ($overlap) {
           $enabled_plugin_overlap => $constraint->enabledPluginsMessage,
           $enabled_plugin_optional_overlap => $constraint->enabledPluginsOptionalMessage,
@@ -136,6 +135,8 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
           }
         }
 
+        $tags_plugin_report = $this->pluginsSupplyingTagsMessage($overlap, $plugins_to_check_against, $is_attr_overlap);
+
         // If we reach this, it means the entirety (so not just the tag but also
         // the attributes, and not just some of the attribute values, but all of
         // them) of the HTML elements being configured to be edited via the
@@ -176,39 +177,70 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
    *   An array of overlapping tags.
    * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition[] $plugin_definitions
    *   An array of plugin definitions where overlap was found.
-   * @param \Drupal\ckeditor5\HTMLRestrictions $enabled_plugin_restrictions
-   *   The set of HTML restrictions for all already enabled CKEditor 5 plugins.
+   * @param bool $is_attr_overlap
+   *   Whether attribute is overlapping.
    *
    * @return string
    *   A list of plugins that provide the overlapping tags.
    */
-  private function pluginsSupplyingTagsMessage(HTMLRestrictions $overlap, array $plugin_definitions, HTMLRestrictions $enabled_plugin_restrictions): string {
+  private function pluginsSupplyingTagsMessage(HTMLRestrictions $overlap, array $plugin_definitions, bool $is_attr_overlap): string {
     $message_array = [];
     $message_string = '';
+
     foreach ($plugin_definitions as $definition) {
       if ($definition->hasElements()) {
         $plugin_capabilities = HTMLRestrictions::fromString(implode(' ', $definition->getElements()));
 
-        // If this plugin supports wildcards, resolve them.
-        if (!$plugin_capabilities->getWildcardSubset()->allowsNothing()) {
-          $plugin_capabilities = $plugin_capabilities
-            // Resolve wildcards.
-            ->merge($enabled_plugin_restrictions)
-            ->diff($enabled_plugin_restrictions);
-        }
-
-        // Skip plugins that provide a subset, only mention the plugin that
-        // actually provides the overlap.
-        // For example: avoid listing the image alignment/captioning plugins
-        // when matching `<img src>`; only lists the main image plugin.
-        if (!$overlap->diff($plugin_capabilities)->allowsNothing()) {
-          continue;
-        }
-        foreach ($plugin_capabilities->intersect($overlap)->toCKEditor5ElementsArray() as $element) {
-          $message_array[(string) $definition->label()][] = $element;
+        // Intersection in the overlap and the plugin definition,
+        // which tells us whether the overlap comes from this plugin.
+        $intersect = $plugin_capabilities->intersect($overlap);
+        // Tag and attribute's name of the intersection restrictions.
+        // which will be used in the message.
+        $intersect_tag_attributes = implode(', ', $intersect->toCKEditor5ElementsArray());
+        // Go through all allowed elements in the intersection restriction to
+        // check if this plugin should be used.
+        foreach ($intersect->getAllowedElements() as $tag_name => $attributes) {
+          $plugin_allowed_elements = $plugin_capabilities->getAllowedElements(TRUE, [$tag_name => $attributes]);
+          $plugin_allowed_attributes = $plugin_allowed_elements[$tag_name] ?? NULL;
+          // The flag variable if this plugin should be used.
+          $plugin_should_be_used = FALSE;
+          if (is_array($attributes)) {
+            // Go through all intersect attributes.
+            // to check if there is overlap one.
+            // If so, then this plugin should be used.
+            foreach ($attributes as $attribute_name => $value) {
+              if (isset($plugin_allowed_attributes[$attribute_name])) {
+                // In order to compare two nested array,
+                // convert the plugin allowed elements array into a json string.
+                $str_plugin_allowed = json_encode($plugin_allowed_attributes[$attribute_name]);
+                // Convert the intersect attribute value array
+                // into a json string.
+                $str_value = json_encode($value);
+                // Remove the first '{' and last '}' from the string.
+                $str_value = substr($str_value, 1, strlen($str_value) - 2);
+                // Compare those two strings to figure out if overlapped.
+                if (strpos($str_plugin_allowed, $str_value) !== FALSE) {
+                  // As long as there is one overlap tag and attribute.
+                  // This plugin should be used.
+                  $plugin_should_be_used = TRUE;
+                  break;
+                }
+              }
+            }
+          }
+          else {
+            // If plugin's element is same as the intersected element,
+            // then this plugin should be used.
+            $plugin_should_be_used = $plugin_allowed_attributes === $attributes;
+          }
+          if ($plugin_should_be_used) {
+            // Add the plugin name, tag and attribute into the message.
+            $message_array[(string) $definition->label()][] = $intersect_tag_attributes;
+          }
         }
       }
     }
+    // Format the message.
     foreach ($message_array as $plugin_label => $tag_list) {
       $tags_string = implode(', ', $tag_list);
       $message_string .= "$plugin_label ($tags_string), ";

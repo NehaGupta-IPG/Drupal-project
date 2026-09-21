@@ -1024,8 +1024,18 @@ final class HTMLRestrictions {
     // For example: <p class="text-align-center"> in the first operand and
     // <$text-container class="text-align-center"> in the second
     // operand.
-    $a_concrete = self::resolveWildcards($a);
-    $b_concrete = self::resolveWildcards($b);
+    if ($a_wildcard->elements == $a->elements) {
+      $a_concrete = self::resolveWildcards($a, $b->elements);
+    }
+    else {
+      $a_concrete = self::resolveWildcards($a);
+    }
+    if ($b_wildcard->elements === $b->elements) {
+      $b_concrete = self::resolveWildcards($b, $a->elements);
+    }
+    else {
+      $b_concrete = self::resolveWildcards($b);
+    }
     $concrete_op_result = $a_concrete->$operation_method_name($b_concrete);
 
     // Using the PHP array union operator is safe because the two operation
@@ -1143,7 +1153,7 @@ final class HTMLRestrictions {
    *
    * @see ::getWildcardTags()
    */
-  private static function resolveWildcards(HTMLRestrictions $r): HTMLRestrictions {
+  private static function resolveWildcards(HTMLRestrictions $r, array $supported_wildcard_tags = []): HTMLRestrictions {
     // Start by resolving the wildcards in a naive, simple way: generate
     // tags, attributes and attribute values they support.
     $naively_resolved_wildcard_elements = [];
@@ -1155,7 +1165,7 @@ final class HTMLRestrictions {
         // allow declaring support for additional attributes and attribute
         // values on already supported tags.
         foreach ($wildcard_tags as $wildcard_tag) {
-          if (isset($r->elements[$wildcard_tag])) {
+          if (isset($r->elements[$wildcard_tag]) || isset($supported_wildcard_tags[$wildcard_tag])) {
             $naively_resolved_wildcard_elements[$wildcard_tag] = $tag_config;
           }
         }
@@ -1189,14 +1199,17 @@ final class HTMLRestrictions {
    *   FALSE, the raw allowed elements will be returned (with no processing
    *   applied hence no resolved wildcards).
    *
+   * @param array $supported_wildcard_tags
+   *   (optional) Supported wildcard tags. Defaults to an empty array.
+   *
    * @return array
-   *   The allowed elements.
+   *   Return all allowed elements in an array.
    *
    * @see \Drupal\filter\Plugin\FilterInterface::getHTMLRestrictions()
    */
-  public function getAllowedElements(bool $resolve_wildcards = TRUE): array {
+  public function getAllowedElements(bool $resolve_wildcards = TRUE, array $supported_wildcard_tags = []): array {
     if ($resolve_wildcards) {
-      return self::resolveWildcards($this)->elements;
+      return self::resolveWildcards($this, $supported_wildcard_tags)->elements;
     }
 
     return $this->elements;
@@ -1320,7 +1333,11 @@ final class HTMLRestrictions {
           $allowed_attribute_value = is_array($value)
             ? ['regexp' => ['pattern' => '/^(' . implode('|', str_replace('*', '.*', $value)) . ')$/']]
             : $value;
-          if ($name === 'class') {
+          // If the attribute name is 'class'
+          // or contains a wildcard as 'class*',
+          // then allow all classes.
+          // @see https://www.drupal.org/project/drupal/issues/3410100
+          if ($name === 'class' || $name === 'class*') {
             $to_allow['classes'] = $allowed_attribute_value;
             continue;
           }
