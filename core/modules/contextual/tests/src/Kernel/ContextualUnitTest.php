@@ -57,7 +57,7 @@ class ContextualUnitTest extends KernelTestBase {
         ],
       ],
       'foo:0=bar&key=baz&1=qux:langcode=en&admin_langcode=en',
-      'claro',
+      'default_admin',
     ];
 
     $tests['one group, one dynamic path argument, metadata'] = [
