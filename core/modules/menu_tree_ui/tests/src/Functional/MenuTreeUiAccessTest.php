@@ -157,15 +157,17 @@ final class MenuTreeUiAccessTest extends BrowserTestBase {
     // user with the same permission and break it.
     $this->drupalLogin($admin);
     $this->drupalGet('/admin/structure/menu/manage/access-test-a/tree');
-    $this->assertSession()->pageTextContains('is currently editing this menu');
-    $this->assertSession()->linkExists('Break lock');
+    $this->assertSession()->elementExists('css', '.menu-tree-ui__lock');
+    $this->assertSession()->linkByHrefExists('/admin/structure/menu/manage/access-test-a/tree/break-lock');
 
+    // Breaking the lock returns to the tree, which no longer shows the notice.
     $this->drupalGet('/admin/structure/menu/manage/access-test-a/tree/break-lock');
     $this->submitForm([], 'Break lock');
-    $this->assertSession()->pageTextContains('The lock has been broken.');
+    $this->assertSession()->addressEquals('/admin/structure/menu/manage/access-test-a/tree');
+    $this->assertSession()->elementNotExists('css', '.menu-tree-ui__lock');
 
     $this->drupalGet('/admin/structure/menu/manage/access-test-a/tree');
-    $this->assertSession()->pageTextNotContains('is currently editing this menu');
+    $this->assertSession()->elementNotExists('css', '.menu-tree-ui__lock');
   }
 
 }

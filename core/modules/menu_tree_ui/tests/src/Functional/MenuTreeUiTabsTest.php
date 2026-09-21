@@ -51,18 +51,15 @@ final class MenuTreeUiTabsTest extends BrowserTestBase {
    */
   public function testThreeTabs(): void {
     $this->drupalGet('/admin/structure/menu/manage/tabs-test');
-    $assert = $this->assertSession();
 
-    $assert->linkExists('Edit');
-    $assert->linkExists('Links');
-    $assert->linkExists('Links (no js)');
+    // Edit is the settings page, Links is the tree and Links (no js) is the
+    // classic overview.
+    $this->assertLinkToPath('/admin/structure/menu/manage/tabs-test');
+    $this->assertLinkToPath('/admin/structure/menu/manage/tabs-test/tree');
+    $this->assertLinkToPath('/admin/structure/menu/manage/tabs-test/links');
 
-    // The "Links" tab is the tree; "Links (no js)" is the classic overview.
-    $assert->linkByHrefExists('/admin/structure/menu/manage/tabs-test/tree');
-    $assert->linkByHrefExists('/admin/structure/menu/manage/tabs-test/links');
-
-    // The settings page itself does not list links.
-    $assert->pageTextNotContains('There are no menu links yet');
+    // The settings page itself does not carry the link overview.
+    $this->assertSession()->elementNotExists('css', '#menu-overview');
   }
 
   /**
@@ -82,13 +79,35 @@ final class MenuTreeUiTabsTest extends BrowserTestBase {
    */
   public function testListDropbutton(): void {
     $this->drupalGet('/admin/structure/menu');
-    $assert = $this->assertSession();
-    $assert->linkExists('Edit links');
-    $assert->linkExists('Edit links (no js)');
-    $assert->linkExists('Edit');
-    // The primary action is the tree; the no-JS action is the classic page.
-    $assert->linkByHrefExists('/admin/structure/menu/manage/tabs-test/tree');
-    $assert->linkByHrefExists('/admin/structure/menu/manage/tabs-test/links');
+    // The primary action is the tree, the no-JS action is the classic page
+    // and Edit is the settings page.
+    $this->assertLinkToPath('/admin/structure/menu/manage/tabs-test/tree');
+    $this->assertLinkToPath('/admin/structure/menu/manage/tabs-test/links');
+    $this->assertLinkToPath('/admin/structure/menu/manage/tabs-test');
+  }
+
+  /**
+   * Asserts a link to a path, with or without a destination query.
+   */
+  protected function assertLinkToPath(string $path): void {
+    $this->assertSession()->elementExists('xpath', $this->linkToPathXpath($path));
+  }
+
+  /**
+   * Asserts there is no link to a path, with or without a destination query.
+   */
+  protected function assertNoLinkToPath(string $path): void {
+    $this->assertSession()->elementNotExists('xpath', $this->linkToPathXpath($path));
+  }
+
+  /**
+   * Builds the XPath matching an anchor whose href is $path or "$path?...".
+   */
+  private function linkToPathXpath(string $path): string {
+    return $this->assertSession()->buildXPathQuery(
+      '//a[@href = :path or starts-with(@href, concat(:path, "?"))]',
+      [':path' => $path],
+    );
   }
 
 }
