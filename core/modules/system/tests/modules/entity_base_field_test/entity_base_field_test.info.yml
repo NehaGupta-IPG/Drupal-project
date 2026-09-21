@@ -1,0 +1,5 @@
+name: 'Entity base field test'
+type: module
+description: 'Adds a base field to an entity type provided by another module.'
+package: Testing
+version: VERSION
