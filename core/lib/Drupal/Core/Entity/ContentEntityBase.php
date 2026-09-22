@@ -484,7 +484,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         $this->setRevisionUserId($currentUser->id());
       }
 
-      if ($this->isNewRevision() && $this->getRevisionCreationTime() === $this->getOriginal()->getRevisionCreationTime()) {
+      if ($this->isNewRevision() && $this->getRevisionCreationTime() === $this->getOriginal()?->getRevisionCreationTime()) {
         $currentTime = \Drupal::time()->getRequestTime();
         $this->setRevisionCreationTime($currentTime);
       }
