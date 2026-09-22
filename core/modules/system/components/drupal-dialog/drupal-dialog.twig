@@ -4,7 +4,6 @@
 {# Setup base attributes #}
 {# Additional classes will be set by variant. #}
 {% set attributes = create_attribute({
-  class: ['ui-dialog', 'ui-widget', 'ui-front'],
   'aria-labelledby': (id ~ '-title'),
  })
 %}
@@ -12,7 +11,7 @@
 {# Setup content wrapper attributes #}
 {# Additional classes will be set by variant. #}
 {% set content_wrapper_attributes = create_attribute({
-    class: ['dialog-content', 'ui-dialog-content'],
+    class: ['dialog__content'],
   })
 %}
 
@@ -20,10 +19,8 @@
   {% if variant === 'off-canvas' %}
   {# Off canvas dialogs are in the layout and use a wrapper <div> #}
   <div id="drupal-off-canvas-wrapper" role="dialog" aria-describedby="drupal-off-canvas" {{ attributes.addClass([
-  'dialog-off-canvas',
-  'dialog-position-' ~ position ?? 'side',
-  'ui-dialog-off-canvas',
-  'ui-dialog-position-' ~ position ?? 'side',
+  'dialog--off-canvas',
+  'dialog--position-' ~ position ?? 'side',
   ]).addClass(dialog_classes) }}>
   {% else %}
     {# Setup default and modal dialog attributes #}
@@ -36,23 +33,17 @@
       {% set content_id = 'drupal-modal' %}
     {% endif %}
     {# Dialogs are in the top layer so use a native <dialog> #}
-    <dialog open aria-labelledby="{{ id -}}-title" closedby="{{ close }}" {% if variant === 'modal' %} data-modal{% endif %} {{ attributes.addClass('ui-widget-content').addClass(dialog_classes) }}>
+    <dialog open aria-labelledby="{{ id -}}-title" closedby="{{ close }}" {% if variant === 'modal' %} data-modal{% endif %} {{ attributes.addClass(dialog_classes) }}>
   {% endif %}
-    <div class="titlebar ui-dialog-titlebar">
-      <h2 id="{{ id -}}-title" class="dialog-title ui-dialog-title">{{ title }}</h2>
+    <div class="dialog__titlebar">
+      <h2 id="{{ id -}}-title" class="dialog__title">{{ title }}</h2>
       <form method="dialog">
-        <button class="titlebar-close ui-dialog-titlebar-close" aria-label="Close">
-          <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
-          <span class="ui-button-icon-space"> </span>
+        <button class="dialog__titlebar--close" aria-label="Close">
           Close
         </button>
       </form>
     </div>
-    {% if variant === 'off-canvas' %}
-    <div id="drupal-off-canvas" {{ content_wrapper_attributes.addClass('drupal-off-canvas-reset') }}>
-    {% else %}
     <div {{ content_wrapper_attributes }}>
-    {% endif %}
     {% block content %}
       {{ content }}
     {% endblock %}

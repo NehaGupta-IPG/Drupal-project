@@ -2,6 +2,13 @@
 
 drupal-dialog {
   display: contents;
+  --dialog-width-narrow: 500px;
+  --dialog-max-width-narrow: 500px;
+  --dialog-width-default: 880px;
+  --dialog-max-width-default: 880px;
+  --dialog-width-wide: 1100px;
+  --dialog-max-width-wide: 1100px;
+  --dialog-height-x-wide: 600px;
 }
 
 dialog {
@@ -51,7 +58,7 @@ dialog::backdrop {
 }
 
 /* Titlebar */
-.titlebar {
+.dialog__titlebar {
   position: relative;
   flex-shrink: 0;
   padding: 0.75rem 3.5rem 0.75rem 1.25rem;
@@ -62,12 +69,12 @@ dialog::backdrop {
   font-weight: bold;
   line-height: 1.5;
 }
-dialog.titlebar:empty {
+.dialog__titlebar:empty {
   display: none;
 }
 
 /* Close button */
-.titlebar .titlebar-close {
+.dialog__titlebar .dialog__titlebar--close {
   position: absolute;
   top: 50%;
   inset-inline: auto 0.625rem;
@@ -106,31 +113,27 @@ dialog.titlebar:empty {
   &::after {
     transform: translate(-50%, 50%) rotate(45deg);
   }
-
-  /* Hide the default jQuery UI dialog close button. */
-  & .ui-icon {
-    display: none;
-  }
 }
 
-dialog.dialog--narrow {
-  width: min(500px, 95vw);
-  max-width: 500px;
+/* Sizing classes */
+.dialog--narrow {
+  width: min(var(--dialog-width-narrow), 95vw);
+  max-width: var(--dialog-max-width-narrow);
 }
 
-dialog.dialog--default {
-  width: min(880px, 95vw);
-  max-width: 880px;
+.dialog--default {
+  width: min(var(--dialog-width-default), 95vw);
+  max-width: var(--dialog-max-width-default);
 }
 
-dialog.dialog--wide {
-  width: min(1100px, 95vw);
-  max-width: 1100px;
+.dialog--wide {
+  width: min(var(--dialog-width-wide), 95vw);
+  max-width: var(--dialog-max-width-wide);
 }
 
-dialog.dialog--x-wide {
+.dialog--x-wide {
   width: 95vw;
-  min-height: min(75vh, 600px);
+  min-height: min(75vh, var(--dialog-height-x-wide));
 }
 
 /* Content */
