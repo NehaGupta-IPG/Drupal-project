@@ -20,7 +20,10 @@ class DrupalEmphasisEditing extends Plugin {
   init() {
     this.editor.conversion.for('downcast').attributeToElement({
       model: 'italic',
-      view: 'em',
+      view: (modelAttributeValue, { writer }, data) =>
+        data.item.hasAttribute('htmlI')
+          ? writer.createAttributeElement('i')
+          : writer.createAttributeElement('em'),
       converterPriority: 'high',
     });
   }
