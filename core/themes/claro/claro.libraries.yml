@@ -80,6 +80,10 @@ global-styling:
     # rendering links, it is hard to recognize when this detection should be
     # attached, therefore it is always attached.
     - core/drupal.touchevents-test
+  after:
+    # jquery.ui/theme.css resets background for .ui-widget so buttons look wrong.
+    # Lets make sure that buttons styles are applied after.
+    - claro/claro.jquery.ui
 
 form-two-columns:
   version: VERSION
