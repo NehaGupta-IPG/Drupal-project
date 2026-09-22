@@ -5,6 +5,7 @@ namespace Drupal\views\Ajax;
 use Drupal\Core\Cache\CacheableAjaxResponse;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Custom JSON response object for an ajax view response.
@@ -68,6 +69,12 @@ class ViewAjaxResponse extends CacheableAjaxResponse {
 
     // Restore other properties.
     unset($data['request'], $data['view_id'], $data['display_id']);
+
+    // Symfony 8.1 deprecated assigning the headers property directly.
+    // Restore it through the constructor, which is the recommended approach.
+    Response::__construct($data['content'], $data['statusCode'], $data['headers']);
+    unset($data['headers']);
+
     foreach ($data as $key => $value) {
       $this->{$key} = $value;
     }
