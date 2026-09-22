@@ -6,7 +6,6 @@ use Drupal\comment\CommentInterface;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
@@ -41,13 +40,6 @@ class CommentAdminOverview extends FormBase {
   protected $dateFormatter;
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * The tempstore factory.
    *
    * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
@@ -61,16 +53,13 @@ class CommentAdminOverview extends FormBase {
    *   The entity type manager service.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
    * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
    *   The tempstore factory.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, DateFormatterInterface $date_formatter, ModuleHandlerInterface $module_handler, PrivateTempStoreFactory $temp_store_factory) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, DateFormatterInterface $date_formatter, PrivateTempStoreFactory $temp_store_factory) {
     $this->entityTypeManager = $entity_type_manager;
     $this->commentStorage = $entity_type_manager->getStorage('comment');
     $this->dateFormatter = $date_formatter;
-    $this->moduleHandler = $module_handler;
     $this->tempStoreFactory = $temp_store_factory;
   }
 
@@ -81,7 +70,6 @@ class CommentAdminOverview extends FormBase {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('date.formatter'),
-      $container->get('module_handler'),
       $container->get('tempstore.private')
     );
   }
@@ -227,12 +215,7 @@ class CommentAdminOverview extends FormBase {
         'title' => $this->t('Edit'),
         'url' => $comment->toUrl('edit-form', $comment_uri_options),
       ];
-      if ($this->moduleHandler->moduleExists('content_translation') && content_translation_translate_access($comment)->isAllowed()) {
-        $links['translate'] = [
-          'title' => $this->t('Translate'),
-          'url' => $comment->toUrl('drupal:content-translation-overview', $comment_uri_options),
-        ];
-      }
+
       $options[$comment->id()]['operations']['data'] = [
         '#type' => 'operations',
         '#links' => $links,

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\AnonymousContact;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentInterface;
 use Drupal\comment\CommentPreviewMode;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\entity_test\Entity\EntityTest;
@@ -18,6 +18,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -96,16 +97,16 @@ class CommentNonNodeTest extends BrowserTestBase {
     ]);
 
     // Enable anonymous and authenticated user comments.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
       'access comments',
       'post comments',
       'skip comment approval',
-    ]);
-    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, [
+    ])->save();
+    Role::loadOverrideFree(RoleInterface::AUTHENTICATED_ID)->grantPermissions([
       'access comments',
       'post comments',
       'skip comment approval',
-    ]);
+    ])->save();
 
     // Create a test entity.
     $random_label = $this->randomMachineName();
@@ -130,7 +131,7 @@ class CommentNonNodeTest extends BrowserTestBase {
    * @return \Drupal\comment\CommentInterface
    *   The new comment entity.
    */
-  public function postComment(?EntityInterface $entity, $comment, $subject = '', $contact = NULL) {
+  public function postComment(?EntityInterface $entity, string|int|float|bool $comment, $subject = '', $contact = NULL) {
     $edit = [];
     $edit['comment_body[0][value]'] = $comment;
 
@@ -224,7 +225,7 @@ class CommentNonNodeTest extends BrowserTestBase {
    * @return bool
    *   Contact info is available.
    */
-  public function commentContactInfoAvailable() {
+  public function commentContactInfoAvailable(): bool {
     return (bool) preg_match('/(input).*?(name="name").*?(input).*?(name="mail").*?(input).*?(name="homepage")/s', $this->getSession()->getPage()->getContent());
   }
 
@@ -263,7 +264,7 @@ class CommentNonNodeTest extends BrowserTestBase {
    * @return int
    *   Comment ID.
    */
-  public function getUnapprovedComment($subject) {
+  public function getUnapprovedComment(string $subject): string {
     $this->drupalGet('admin/content/comment/approval');
     preg_match('/href="(.*?)#comment-([^"]+)"(.*?)>(' . $subject . ')/', $this->getSession()->getPage()->getContent(), $match);
 
@@ -360,12 +361,12 @@ class CommentNonNodeTest extends BrowserTestBase {
     $this->drupalLogout();
 
     // Deny anonymous users access to comments.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions([
       'access comments' => FALSE,
       'post comments' => FALSE,
       'skip comment approval' => FALSE,
       'view test entity' => TRUE,
-    ]);
+    ])->save();
 
     // Attempt to view comments while disallowed.
     $this->drupalGet('entity-test/' . $this->entity->id());
@@ -379,12 +380,12 @@ class CommentNonNodeTest extends BrowserTestBase {
     $this->assertSession()->fieldNotExists('subject[0][value]');
     $this->assertSession()->fieldNotExists('comment_body[0][value]');
 
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions([
       'access comments' => TRUE,
       'post comments' => FALSE,
       'view test entity' => TRUE,
       'skip comment approval' => FALSE,
-    ]);
+    ])->save();
     $this->drupalGet('entity_test/' . $this->entity->id());
     // Verify that the comment field title is displayed.
     $this->assertSession()->responseMatches('@<h2[^>]*>Comments</h2>@');
@@ -396,12 +397,12 @@ class CommentNonNodeTest extends BrowserTestBase {
     // Test the combination of anonymous users being able to post, but not view
     // comments, to ensure that access to post comments doesn't grant access to
     // view them.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions([
       'access comments' => FALSE,
       'post comments' => TRUE,
       'skip comment approval' => TRUE,
       'view test entity' => TRUE,
-    ]);
+    ])->save();
     $this->drupalGet('entity_test/' . $this->entity->id());
     // Verify that comments were not displayed.
     $this->assertSession()->responseNotMatches('@<h2[^>]*>Comments</h2>@');
@@ -426,7 +427,7 @@ class CommentNonNodeTest extends BrowserTestBase {
     $this->assertSession()->checkboxChecked('edit-default-value-input-comment-0-status-2');
     // Test comment option change in field settings.
     $edit = [
-      'default_value_input[comment][0][status]' => CommentItemInterface::CLOSED,
+      'default_value_input[comment][0][status]' => CommentingStatus::Closed->value,
       'settings[anonymous]' => AnonymousContact::Allowed->value,
     ];
     $this->submitForm($edit, 'Save settings');
@@ -543,7 +544,7 @@ class CommentNonNodeTest extends BrowserTestBase {
 
     // Change the comments to be displayed as hidden by default.
     $edit = [
-      'default_value_input[comment][0][status]' => CommentItemInterface::HIDDEN,
+      'default_value_input[comment][0][status]' => CommentingStatus::Hidden->value,
       'settings[anonymous]' => AnonymousContact::Allowed->value,
     ];
     $this->submitForm($edit, 'Save settings');

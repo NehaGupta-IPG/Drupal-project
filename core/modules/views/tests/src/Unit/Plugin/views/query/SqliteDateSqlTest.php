@@ -31,7 +31,7 @@ class SqliteDateSqlTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->database = $this->prophesize(Connection::class)->reveal();
+    $this->database = $this->createStub(Connection::class);
   }
 
   /**
@@ -51,7 +51,7 @@ class SqliteDateSqlTest extends UnitTestCase {
    * Tests date formatting replacement.
    */
   #[DataProvider('providerTestGetDateFormat')]
-  public function testGetDateFormat($field, $format, $expected): void {
+  public function testGetDateFormat(string $field, string $format, string $expected): void {
     $date_sql = new SqliteDateSql($this->database);
 
     $this->assertEquals($expected, $date_sql->getDateFormat($field, $format));
@@ -60,7 +60,7 @@ class SqliteDateSqlTest extends UnitTestCase {
   /**
    * Provider for date formatting test.
    */
-  public static function providerTestGetDateFormat() {
+  public static function providerTestGetDateFormat(): array {
     return [
       [
         'foo.field',
@@ -100,9 +100,9 @@ class SqliteDateSqlTest extends UnitTestCase {
    * Tests setting the database offset.
    */
   public function testSetTimezoneOffset(): void {
-    $database = $this->prophesize(Connection::class);
-    $database->query()->shouldNotBeCalled();
-    $date_sql = new SqliteDateSql($database->reveal());
+    $database = $this->createMock(Connection::class);
+    $database->expects($this->never())->method('query');
+    $date_sql = new SqliteDateSql($database);
     $date_sql->setTimezoneOffset(42);
   }
 

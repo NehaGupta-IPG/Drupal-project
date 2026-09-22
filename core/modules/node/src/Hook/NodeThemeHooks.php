@@ -6,7 +6,6 @@ namespace Drupal\node\Hook;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ThemeSettingsProvider;
-use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
@@ -14,9 +13,7 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
-use Drupal\node\Form\NodePreviewForm;
 use Drupal\node\NodeInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
  * Theme hook implementations for the node module.
@@ -27,8 +24,6 @@ class NodeThemeHooks {
     protected readonly RouteMatchInterface $routeMatch,
     protected readonly RendererInterface $renderer,
     protected readonly EntityTypeManagerInterface $entityTypeManager,
-    #[AutowireServiceClosure('form_builder')]
-    protected readonly \Closure $formBuilderClosure,
     protected readonly ThemeSettingsProvider $themeSettingsProvider,
   ) {
 
@@ -139,15 +134,6 @@ class NodeThemeHooks {
   public function preprocessNode(&$variables): void {
     $variables['view_mode'] = $variables['elements']['#view_mode'];
 
-    // The teaser variable is deprecated.
-    $variables['deprecations']['teaser'] = "'teaser' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. Use 'view_mode' instead. See https://www.drupal.org/node/3458185";
-    $variables['teaser'] = $variables['view_mode'] == 'teaser';
-
-    // The 'metadata' variable was originally added to support RDF, which has
-    // now been moved to contrib. It was needed because it is not possible to
-    // extend the markup of the 'submitted' variable generically.
-    $variables['deprecations']['metadata'] = "'metadata' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3458638";
-
     $variables['node'] = $variables['elements']['#node'];
     /** @var \Drupal\node\NodeInterface $node */
     $node = $variables['node'];
@@ -253,42 +239,6 @@ class NodeThemeHooks {
       if ($node instanceof NodeInterface) {
         $variables['node_type'] = $node->getType();
       }
-    }
-  }
-
-  /**
-   * Implements hook_preprocess_HOOK() for block templates.
-   */
-  #[Hook('preprocess_block')]
-  public function preprocessBlock(&$variables): void {
-    if ($variables['configuration']['provider'] == 'node') {
-      switch ($variables['elements']['#plugin_id']) {
-        case 'node_syndicate_block':
-          $variables['attributes']['role'] = 'complementary';
-          break;
-      }
-    }
-  }
-
-  /**
-   * Implements hook_page_top().
-   */
-  #[Hook('page_top')]
-  public function pageTop(array &$page_top): void {
-    // Add 'Back to content editing' link on preview page.
-    if ($this->routeMatch->getRouteName() == 'entity.node.preview') {
-      $form_builder = ($this->formBuilderClosure)();
-      assert($form_builder instanceof FormBuilderInterface);
-      $page_top['node_preview'] = [
-        '#type' => 'container',
-        '#attributes' => [
-          'class' => [
-            'node-preview-container',
-            'container-inline',
-          ],
-        ],
-        'view_mode' => $form_builder->getForm(NodePreviewForm::class, $this->routeMatch->getParameter('node_preview')),
-      ];
     }
   }
 

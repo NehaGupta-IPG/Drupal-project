@@ -27,7 +27,7 @@ class SpecialAttributesRouteSubscriberTest extends UnitTestCase {
    * @return array
    *   An array of invalid routes.
    */
-  public static function providerTestOnRouteBuildingInvalidVariables() {
+  public static function providerTestOnRouteBuildingInvalidVariables(): array {
     // Build an array of mock route objects based on paths.
     $routes = [];
     $paths = [
@@ -53,7 +53,7 @@ class SpecialAttributesRouteSubscriberTest extends UnitTestCase {
    * @return array
    *   An array of valid routes.
    */
-  public static function providerTestOnRouteBuildingValidVariables() {
+  public static function providerTestOnRouteBuildingValidVariables(): array {
     // Build an array of mock route objects based on paths.
     $routes = [];
     $paths = [
@@ -104,7 +104,7 @@ class SpecialAttributesRouteSubscriberTest extends UnitTestCase {
     $event = new RouteBuildEvent($route_collection);
     $subscriber = new SpecialAttributesRouteSubscriber();
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Route test uses reserved variable names:');
+    $this->expectExceptionMessageIsOrContains('Route test uses reserved variable names:');
     $subscriber->onAlterRoutes($event);
   }
 

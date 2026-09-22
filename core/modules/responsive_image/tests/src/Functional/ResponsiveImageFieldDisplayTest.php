@@ -13,9 +13,9 @@ use Drupal\responsive_image\Plugin\Field\FieldFormatter\ResponsiveImageFormatter
 use Drupal\responsive_image\ResponsiveImageStyleInterface;
 use Drupal\Tests\image\Functional\ImageFieldTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -101,7 +101,9 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   public function testResponsiveImageFieldFormattersPrivate(): void {
     $this->addTestImageStyleMappings();
     // Remove access content permission from anonymous users.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, ['access content' => FALSE]);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions([
+      'access content' => FALSE,
+    ])->save();
     $this->doTestResponsiveImageFieldFormatters('private');
   }
 
@@ -449,38 +451,6 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
     $this->assertStringContainsString('alt="test alt"', $html_output);
     $this->assertStringContainsString('data-test1="test1"', $html_output);
     $this->assertStringContainsString('data-test2="test2"', $html_output);
-  }
-
-  /**
-   * Test the deprecated item_attributes property.
-   */
-  #[IgnoreDeprecations]
-  public function testResponsiveImageFieldFormatterDeprecatedProperty(): void {
-    /** @var \Drupal\Core\Render\RendererInterface $renderer */
-    $renderer = $this->container->get('renderer');
-    $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
-    $field_name = $this->randomMachineName();
-    $this->createImageField($field_name, 'node', 'article', ['uri_scheme' => 'public']);
-
-    // Create a new node with an image attached.
-    $test_image = current($this->getTestFiles('image'));
-    $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $this->randomMachineName());
-    $node_storage->resetCache([$nid]);
-    $node = $node_storage->load($nid);
-
-    $image = [
-      '#theme' => 'responsive_image_formatter',
-      '#item' => $node->{$field_name}[0],
-      '#responsive_image_style_id' => 'style_one',
-      '#item_attributes' => [
-        'data-test1' => 'test1',
-        'data-test2' => 'test2',
-      ],
-    ];
-    $html_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
-    $this->assertStringContainsString('data-test1="test1"', $html_output);
-    $this->assertStringContainsString('data-test2="test2"', $html_output);
-    $this->expectDeprecation('Usage of #item_attributes is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use #attributes instead. See https://www.drupal.org/node/3554585');
   }
 
   /**

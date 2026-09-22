@@ -54,7 +54,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
 
@@ -89,7 +89,9 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     /** @var \Drupal\user\RoleInterface $role */
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
 
-    user_role_revoke_permissions($role->id(), ['view media']);
+    Role::loadOverrideFree($role->id())->revokePermissions([
+      'view media',
+    ])->save();
 
     // Test 'create BUNDLE media' permission.
     $this->drupalGet('media/add/' . $media_type->id());
@@ -100,7 +102,8 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $this->drupalGet('media/add/' . $media_type->id());
     $this->assertCacheContext('user.permissions');
     $assert_session->statusCodeEquals(200);
-    user_role_revoke_permissions($role->id(), $permissions);
+    Role::loadOverrideFree($role->id())->revokePermissions($permissions)->save();
+    /** @var \Drupal\user\RoleInterface $role */
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
 
     // Verify the author can not view the unpublished media item without
@@ -132,7 +135,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $this->assertCacheContext('user');
     $assert_session->statusCodeEquals(200);
     $this->drupalGet('media/' . $user_media->id() . '/revisions/' . $previous_revision . '/view');
-    $this->assertCacheContext('user.permissions');
+    $this->assertCacheContext('user');
     $assert_session->statusCodeEquals(200);
     $role->revokePermission('view own unpublished media')->save();
     $this->drupalGet('media/' . $user_media->id() . '/revisions/' . $user_media->getRevisionId() . '/view');
@@ -169,7 +172,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $this->drupalGet('media/add/' . $media_type->id());
     $this->assertCacheContext('user.permissions');
     $assert_session->statusCodeEquals(200);
-    user_role_revoke_permissions($role->id(), $permissions);
+    Role::loadOverrideFree($role->id())->revokePermissions($permissions)->save();
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
 
     // Test 'edit own BUNDLE media' and 'delete own BUNDLE media' permissions.
@@ -190,7 +193,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $this->drupalGet('media/' . $user_media->id() . '/delete');
     $this->assertCacheContext('user');
     $assert_session->statusCodeEquals(200);
-    user_role_revoke_permissions($role->id(), $permissions);
+    Role::loadOverrideFree($role->id())->revokePermissions($permissions)->save();
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
 
     // Test 'edit any BUNDLE media' and 'delete any BUNDLE media' permissions.
@@ -247,7 +250,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
 
@@ -268,7 +271,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     /** @var \Drupal\user\RoleInterface $role */
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
 
-    user_role_revoke_permissions($role->id(), ['view media']);
+    Role::loadOverrideFree($role->id())->revokePermissions(['view media'])->save();
 
     $this->drupalGet('media/' . $media->id());
     $this->assertCacheContext('user.permissions');
@@ -288,7 +291,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
 
@@ -330,7 +333,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
 
@@ -369,7 +372,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
 

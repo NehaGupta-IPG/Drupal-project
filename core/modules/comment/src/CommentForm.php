@@ -2,7 +2,6 @@
 
 namespace Drupal\comment;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
@@ -115,7 +114,10 @@ class CommentForm extends ContentEntityForm {
 
     // Use #comment-form as unique jump target, regardless of entity type.
     $form['#id'] = Html::getUniqueId('comment_form');
-    $form['#theme'] = ['comment_form__' . $entity->getEntityTypeId() . '__' . $entity->bundle() . '__' . $field_name, 'comment_form'];
+    $form['#theme'] = [
+      'comment_form__' . $entity->getEntityTypeId() . '__' . $entity->bundle() . '__' . $field_name,
+      'comment_form',
+    ];
 
     $anonymous_contact = AnonymousContact::tryFrom($field_definition->getSetting('anonymous'));
     $is_admin = $comment->id() && $this->currentUser->hasPermission('administer comments');
@@ -123,7 +125,11 @@ class CommentForm extends ContentEntityForm {
     // If not replying to a comment, use our dedicated page callback for new
     // Comments on entities.
     if (!$comment->id() && !$comment->hasParentComment()) {
-      $form['#action'] = Url::fromRoute('comment.reply', ['entity_type' => $entity->getEntityTypeId(), 'entity' => $entity->id(), 'field_name' => $field_name])->toString();
+      $form['#action'] = Url::fromRoute('comment.reply', [
+        'entity_type' => $entity->getEntityTypeId(),
+        'entity' => $entity->id(),
+        'field_name' => $field_name,
+      ])->toString();
     }
 
     $comment_preview = $form_state->get('comment_preview');
@@ -393,7 +399,7 @@ class CommentForm extends ContentEntityForm {
       // field output.
       $field_name = $comment->getFieldName();
       $entity = clone $entity;
-      $entity->$field_name->status = CommentItemInterface::HIDDEN;
+      $entity->$field_name->status = CommentingStatus::Hidden->value;
       $build = $this->entityTypeManager
         ->getViewBuilder($entity->getEntityTypeId())
         ->view($entity);
@@ -418,7 +424,7 @@ class CommentForm extends ContentEntityForm {
     $uri = $entity->toUrl();
     $logger = $this->logger('comment');
 
-    if ($this->currentUser->hasPermission('post comments') && ($this->currentUser->hasPermission('administer comments') || $entity->{$field_name}->status == CommentItemInterface::OPEN)) {
+    if ($this->currentUser->hasPermission('post comments') && ($this->currentUser->hasPermission('administer comments') || $entity->{$field_name}->status == CommentingStatus::Open->value)) {
       $comment->save();
       $form_state->setValue('cid', $comment->id());
 

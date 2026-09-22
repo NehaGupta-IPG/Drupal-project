@@ -5,7 +5,6 @@ namespace Drupal\menu_link_content\Plugin\migrate\process;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
-use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
@@ -13,6 +12,11 @@ use Drupal\migrate\Row;
 
 /**
  * Generates an internal URI from the source value.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ * \Drupal\migrate\Plugin\migrate\process\LinkUri instead.
+ *
+ * @see https://www.drupal.org/node/3572239
  *
  * Converts the source path value to an 'entity:', 'internal:' or 'base:' URI.
  *
@@ -39,7 +43,6 @@ use Drupal\migrate\Row;
  * 'link_path' property is 'node/12', the uri property value of link will be
  * 'entity:node/12'.
  */
-#[MigrateProcess('link_uri')]
 class LinkUri extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
@@ -62,6 +65,7 @@ class LinkUri extends ProcessPluginBase implements ContainerFactoryPluginInterfa
    *   The entity type manager, used to fetch entity link templates.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager) {
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\migrate\Plugin\migrate\process\LinkUri instead. See https://www.drupal.org/node/3533560', E_USER_DEPRECATED);
     $configuration += [
       'validate_route' => TRUE,
     ];

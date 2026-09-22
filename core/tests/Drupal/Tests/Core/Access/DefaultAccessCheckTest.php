@@ -6,9 +6,11 @@ namespace Drupal\Tests\Core\Access;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\DefaultAccessCheck;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
@@ -27,11 +29,9 @@ class DefaultAccessCheckTest extends UnitTestCase {
   protected $accessChecker;
 
   /**
-   * The mocked account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The account.
    */
-  protected $account;
+  protected AccountInterface&Stub $account;
 
   /**
    * {@inheritdoc}
@@ -39,7 +39,7 @@ class DefaultAccessCheckTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->account = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $this->account = $this->createStub(AccountInterface::class);
     $this->accessChecker = new DefaultAccessCheck();
   }
 

@@ -15,7 +15,6 @@ use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -122,7 +121,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
     // Test using theme_image_formatter() with a NULL value for the alt option.
     $element = $base_element;
     $this->setRawContent($renderer->renderRoot($element));
-    $elements = $this->xpath(
+    $elements = $this->getSimpleXmlElementsByXpath(
       '//a[@href=:path]/img[@src=:url and @width=:width and @height=:height]',
       [
         ':path' => base_path() . $path,
@@ -138,7 +137,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
     $element = $base_element;
     $element['#item']->alt = '';
     $this->setRawContent($renderer->renderRoot($element));
-    $elements = $this->xpath(
+    $elements = $this->getSimpleXmlElementsByXpath(
       '//a[@href=:path]/img[@src=:url and @width=:width and @height=:height and @alt=""]',
       [
         ':path' => base_path() . $path,
@@ -154,49 +153,13 @@ class ImageThemeFunctionTest extends KernelTestBase {
     $element = $base_element;
     $element['#url'] = Url::fromRoute('<none>', [], ['fragment' => $fragment]);
     $this->setRawContent($renderer->renderRoot($element));
-    $elements = $this->xpath('//a[@href=:fragment]/img[@src=:url and @width=:width and @height=:height and @alt=""]', [
+    $elements = $this->getSimpleXmlElementsByXpath('//a[@href=:fragment]/img[@src=:url and @width=:width and @height=:height and @alt=""]', [
       ':fragment' => '#' . $fragment,
       ':url' => $url,
       ':width' => $image->getWidth(),
       ':height' => $image->getHeight(),
     ]);
     $this->assertCount(1, $elements, 'theme_image_formatter() correctly renders a link fragment.');
-  }
-
-  /**
-   * Test the deprecated item_attributes property.
-   */
-  #[IgnoreDeprecations]
-  public function testImageFormatterDeprecatedProperty(): void {
-    /** @var \Drupal\Core\Render\RendererInterface $renderer */
-    $renderer = $this->container->get('renderer');
-
-    // Create an image.
-    $files = $this->drupalGetTestFiles('image');
-    $file = reset($files);
-    $original_uri = \Drupal::service('file_system')->copy($file->uri, 'public://', FileExists::Rename);
-
-    // Create a test entity with the image field set.
-    $entity = EntityTest::create();
-    $entity->image_test->target_id = $this->image->id();
-    $entity->image_test->alt = NULL;
-    $entity->image_test->uri = $original_uri;
-    $entity->save();
-
-    // Create the base element that we'll use in the tests below.
-    $path = $this->randomMachineName();
-    $element = [
-      '#theme' => 'image_formatter',
-      '#item' => $entity->image_test,
-      '#url' => Url::fromUri('base:' . $path),
-      '#item_attributes' => [
-        'class' => [
-          'foo',
-        ],
-      ],
-    ];
-    $renderer->renderRoot($element);
-    $this->expectDeprecation('Usage of #item_attributes is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use #attributes instead. See https://www.drupal.org/node/3554585');
   }
 
   /**
@@ -225,14 +188,14 @@ class ImageThemeFunctionTest extends KernelTestBase {
 
     $element = $base_element;
     $this->setRawContent($renderer->renderRoot($element));
-    $elements = $this->xpath('//img[@src=:url and @alt=""]', [':url' => $url]);
+    $elements = $this->getSimpleXmlElementsByXpath('//img[@src=:url and @alt=""]', [':url' => $url]);
     $this->assertCount(1, $elements, 'theme_image_style() renders an image correctly.');
 
     // Test using theme_image_style() with a NULL value for the alt option.
     $element = $base_element;
     $element['#alt'] = NULL;
     $this->setRawContent($renderer->renderRoot($element));
-    $elements = $this->xpath('//img[@src=:url]', [':url' => $url]);
+    $elements = $this->getSimpleXmlElementsByXpath('//img[@src=:url]', [':url' => $url]);
     $this->assertCount(1, $elements, 'theme_image_style() renders an image correctly with a NULL value for the alt option.');
   }
 
@@ -246,7 +209,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
     // Test using alt directly with alt attribute.
     $image_with_alt_property = [
       '#theme' => 'image',
-      '#uri' => '/core/themes/olivero/logo.svg',
+      '#uri' => '/core/themes/stark/logo.svg',
       '#alt' => 'Regular alt',
       '#title' => 'Test title',
       '#width' => '50%',
@@ -255,7 +218,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
     ];
 
     $this->setRawContent($renderer->renderRoot($image_with_alt_property));
-    $elements = $this->xpath(
+    $elements = $this->getSimpleXmlElementsByXpath(
       '//img[contains(@class, class) and contains(@alt, :alt)]',
       [
         ":class" => "image-with-regular-alt",
@@ -266,7 +229,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
     // Test using alt attribute inside attributes.
     $image_with_alt_attribute_alt_attribute = [
       '#theme' => 'image',
-      '#uri' => '/core/themes/olivero/logo.svg',
+      '#uri' => '/core/themes/stark/logo.svg',
       '#width' => '50%',
       '#height' => '50%',
       '#attributes' => [
@@ -278,7 +241,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
     ];
 
     $this->setRawContent($renderer->renderRoot($image_with_alt_attribute_alt_attribute));
-    $elements = $this->xpath(
+    $elements = $this->getSimpleXmlElementsByXpath(
       '//img[contains(@class, class) and contains(@alt, :alt)]',
       [
         ":class" => "image-with-attribute-alt",
@@ -289,7 +252,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
     // Test using alt attribute as property and inside attributes.
     $image_with_alt_attribute_both = [
       '#theme' => 'image',
-      '#uri' => '/core/themes/olivero/logo.svg',
+      '#uri' => '/core/themes/stark/logo.svg',
       '#width' => '50%',
       '#height' => '50%',
       '#alt' => 'Kitten sustainable',
@@ -302,7 +265,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
     ];
 
     $this->setRawContent($renderer->renderRoot($image_with_alt_attribute_both));
-    $elements = $this->xpath(
+    $elements = $this->getSimpleXmlElementsByXpath(
       '//img[contains(@class, class) and contains(@alt, :alt)]',
       [
         ":class" => "image-with-attribute-alt",

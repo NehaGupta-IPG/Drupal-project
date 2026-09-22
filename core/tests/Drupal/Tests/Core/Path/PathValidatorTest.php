@@ -6,14 +6,19 @@ namespace Drupal\Tests\Core\Path;
 
 use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\Core\Path\PathValidator;
+use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
+use Drupal\Core\Routing\AccessAwareRouterInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
 /**
  * Tests Drupal\Core\Path\PathValidator.
@@ -23,32 +28,24 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 class PathValidatorTest extends UnitTestCase {
 
   /**
-   * The mocked access aware router.
-   *
-   * @var \Drupal\Core\Routing\AccessAwareRouterInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The access aware router stub.
    */
-  protected $accessAwareRouter;
+  protected AccessAwareRouterInterface&Stub $accessAwareRouter;
 
   /**
-   * The mocked access unaware router.
-   *
-   * @var \Symfony\Component\Routing\Matcher\UrlMatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The access unaware router stub.
    */
-  protected $accessUnawareRouter;
+  protected UrlMatcherInterface&Stub $accessUnawareRouter;
 
   /**
-   * The mocked account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The account stub.
    */
-  protected $account;
+  protected AccountInterface&Stub $account;
 
   /**
-   * The path processor.
-   *
-   * @var \Drupal\Core\PathProcessor\InboundPathProcessorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The path processor stub.
    */
-  protected $pathProcessor;
+  protected InboundPathProcessorInterface&Stub $pathProcessor;
 
   /**
    * The tested path validator.
@@ -63,17 +60,55 @@ class PathValidatorTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->accessAwareRouter = $this->createMock('Drupal\Core\Routing\AccessAwareRouterInterface');
-    $this->accessUnawareRouter = $this->createMock('Symfony\Component\Routing\Matcher\UrlMatcherInterface');
-    $this->account = $this->createMock('Drupal\Core\Session\AccountInterface');
-    $this->pathProcessor = $this->createMock('Drupal\Core\PathProcessor\InboundPathProcessorInterface');
+    $this->accessAwareRouter = $this->createStub(AccessAwareRouterInterface::class);
+    $this->accessUnawareRouter = $this->createStub(UrlMatcherInterface::class);
+    $this->account = $this->createStub(AccountInterface::class);
+    $this->pathProcessor = $this->createStub(InboundPathProcessorInterface::class);
     $this->pathValidator = new PathValidator($this->accessAwareRouter, $this->accessUnawareRouter, $this->account, $this->pathProcessor);
+  }
+
+  /**
+   * Reinitializes the access aware router as a mock object.
+   */
+  protected function setUpMockAccessAwareRouter(): void {
+    $this->accessAwareRouter = $this->createMock(AccessAwareRouterInterface::class);
+    $reflection = new \ReflectionProperty($this->pathValidator, 'accessAwareRouter');
+    $reflection->setValue($this->pathValidator, $this->accessAwareRouter);
+  }
+
+  /**
+   * Reinitializes the access unaware router as a mock object.
+   */
+  protected function setUpMockAccessUnawareRouter(): void {
+    $this->accessUnawareRouter = $this->createMock(UrlMatcherInterface::class);
+    $reflection = new \ReflectionProperty($this->pathValidator, 'accessUnawareRouter');
+    $reflection->setValue($this->pathValidator, $this->accessUnawareRouter);
+  }
+
+  /**
+   * Reinitializes the account as a mock object.
+   */
+  protected function setUpMockAccount(): void {
+    $this->account = $this->createMock(AccountInterface::class);
+    $reflection = new \ReflectionProperty($this->pathValidator, 'account');
+    $reflection->setValue($this->pathValidator, $this->account);
+  }
+
+  /**
+   * Reinitializes the inbound path processor as a mock object.
+   */
+  protected function setUpMockInboundPathProcessor(): void {
+    $this->pathProcessor = $this->createMock(InboundPathProcessorInterface::class);
+    $reflection = new \ReflectionProperty($this->pathValidator, 'pathProcessor');
+    $reflection->setValue($this->pathValidator, $this->pathProcessor);
   }
 
   /**
    * Tests the isValid() method for the frontpage.
    */
   public function testIsValidWithFrontpage(): void {
+    $this->setUpMockAccessAwareRouter();
+
     $this->accessAwareRouter->expects($this->never())
       ->method('match');
 
@@ -84,6 +119,8 @@ class PathValidatorTest extends UnitTestCase {
    * Tests the isValid() method for <none> (used for jump links).
    */
   public function testIsValidWithNone(): void {
+    $this->setUpMockAccessAwareRouter();
+
     $this->accessAwareRouter->expects($this->never())
       ->method('match');
 
@@ -94,6 +131,8 @@ class PathValidatorTest extends UnitTestCase {
    * Tests the isValid() method for an external URL.
    */
   public function testIsValidWithExternalUrl(): void {
+    $this->setUpMockAccessAwareRouter();
+
     $this->accessAwareRouter->expects($this->never())
       ->method('match');
 
@@ -104,6 +143,8 @@ class PathValidatorTest extends UnitTestCase {
    * Tests the isValid() method with an invalid external URL.
    */
   public function testIsValidWithInvalidExternalUrl(): void {
+    $this->setUpMockAccessAwareRouter();
+
     $this->accessAwareRouter->expects($this->never())
       ->method('match');
 
@@ -117,6 +158,11 @@ class PathValidatorTest extends UnitTestCase {
    * @legacy-covers ::getPathAttributes
    */
   public function testIsValidWithLinkToAnyPageAccount(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccessUnawareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->once())
       ->method('hasPermission')
       ->with('link to any page')
@@ -141,6 +187,11 @@ class PathValidatorTest extends UnitTestCase {
    * Tests the isValid() method without the 'link to any page' permission.
    */
   public function testIsValidWithoutLinkToAnyPageAccount(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccessUnawareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->once())
       ->method('hasPermission')
       ->with('link to any page')
@@ -165,6 +216,11 @@ class PathValidatorTest extends UnitTestCase {
    * Tests the isValid() method with a path alias.
    */
   public function testIsValidWithPathAlias(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccessUnawareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->once())
       ->method('hasPermission')
       ->with('link to any page')
@@ -193,6 +249,11 @@ class PathValidatorTest extends UnitTestCase {
    * @legacy-covers ::getPathAttributes
    */
   public function testIsValidWithAccessDenied(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccessUnawareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->once())
       ->method('hasPermission')
       ->with('link to any page')
@@ -217,6 +278,11 @@ class PathValidatorTest extends UnitTestCase {
    * @legacy-covers ::getPathAttributes
    */
   public function testIsValidWithResourceNotFound(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccessUnawareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->once())
       ->method('hasPermission')
       ->with('link to any page')
@@ -241,6 +307,11 @@ class PathValidatorTest extends UnitTestCase {
    * @legacy-covers ::getPathAttributes
    */
   public function testIsValidWithParamNotConverted(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccessUnawareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->once())
       ->method('hasPermission')
       ->with('link to any page')
@@ -265,6 +336,11 @@ class PathValidatorTest extends UnitTestCase {
    * @legacy-covers ::getPathAttributes
    */
   public function testIsValidWithMethodNotAllowed(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccessUnawareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->once())
       ->method('hasPermission')
       ->with('link to any page')
@@ -286,6 +362,11 @@ class PathValidatorTest extends UnitTestCase {
    * Tests the isValid() method with a not working param converting.
    */
   public function testIsValidWithFailingParameterConverting(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccessUnawareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->once())
       ->method('hasPermission')
       ->with('link to any page')
@@ -307,6 +388,11 @@ class PathValidatorTest extends UnitTestCase {
    * Tests the isValid() method with a non-existent path.
    */
   public function testIsValidWithNotExistingPath(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccessUnawareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->once())
       ->method('hasPermission')
       ->with('link to any page')
@@ -331,6 +417,10 @@ class PathValidatorTest extends UnitTestCase {
    * @legacy-covers ::getPathAttributes
    */
   public function testGetUrlIfValidWithAccess(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->exactly(2))
       ->method('hasPermission')
       ->with('link to any page')
@@ -365,6 +455,10 @@ class PathValidatorTest extends UnitTestCase {
    * Tests the getUrlIfValid() method with a query in the path.
    */
   public function testGetUrlIfValidWithQuery(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->once())
       ->method('hasPermission')
       ->with('link to any page')
@@ -389,6 +483,10 @@ class PathValidatorTest extends UnitTestCase {
    * Tests the getUrlIfValid() method where there is no access.
    */
   public function testGetUrlIfValidWithoutAccess(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->once())
       ->method('hasPermission')
       ->with('link to any page')
@@ -424,6 +522,11 @@ class PathValidatorTest extends UnitTestCase {
    * @legacy-covers ::getPathAttributes
    */
   public function testGetUrlIfValidWithoutAccessCheck(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccessUnawareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
     $this->account->expects($this->never())
       ->method('hasPermission')
       ->with('link to any page');
@@ -454,6 +557,8 @@ class PathValidatorTest extends UnitTestCase {
    * @legacy-covers ::getUrl
    */
   public function testGetUrlIfValidWithoutAccessCheckWithInvalidPath(): void {
+    $this->setUpMockInboundPathProcessor();
+
     // URLs must not start nor end with ASCII control characters or spaces.
     $this->assertFalse($this->pathValidator->getUrlIfValidWithoutAccessCheck('foo '));
     // Also check URL-encoded variant.
