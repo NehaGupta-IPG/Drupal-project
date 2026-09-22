@@ -30,6 +30,11 @@ class ViewAjaxTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $modules = ['views', 'views_test_config', 'page_cache'];
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
     parent::setUp($import_test_views, $modules);
 
