@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_tree_ui\Functional;
 
+use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\system\Entity\Menu;
 use PHPUnit\Framework\Attributes\Group;
@@ -102,11 +103,14 @@ final class MenuTreeUiTabsTest extends BrowserTestBase {
 
   /**
    * Builds the XPath matching an anchor whose href is $path or "$path?...".
+   *
+   * The path is a site-relative user path; the base path is prepended so the
+   * match holds when the test site runs in a subdirectory.
    */
   private function linkToPathXpath(string $path): string {
     return $this->assertSession()->buildXPathQuery(
-      '//a[@href = :path or starts-with(@href, concat(:path, "?"))]',
-      [':path' => $path],
+      '//a[@href = :href or starts-with(@href, concat(:href, "?"))]',
+      [':href' => Url::fromUserInput($path)->toString()],
     );
   }
 
