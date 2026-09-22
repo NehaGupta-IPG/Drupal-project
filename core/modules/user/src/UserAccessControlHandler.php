@@ -30,8 +30,12 @@ class UserAccessControlHandler extends EntityAccessControlHandler {
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\user\UserInterface $entity*/
 
-    // The anonymous user's profile can neither be viewed, updated nor deleted.
     if ($entity->isAnonymous()) {
+      if ($operation === 'view label') {
+        // This allows to see "Anonymous" (configuration, not personal data).
+        return AccessResult::allowed();
+      }
+      // The anonymous user's profile can neither be viewed, updated nor deleted.
       return AccessResult::forbidden();
     }
 
