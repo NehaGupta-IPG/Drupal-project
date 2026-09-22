@@ -150,7 +150,7 @@ class NodeEditFormTest extends NodeTestBase {
     $open_details_elements = count($this->cssSelect('details[open="open"]'));
     $this->submitForm($edit, 'Save');
     // The node author details must be open.
-    $this->assertSession()->responseContains('details class="node-form-author js-form-wrapper form-wrapper error" data-drupal-selector="edit-author" id="edit-author" open="open" data-child-error-count="3"');
+    $this->assertSession()->responseContains('<details class="node-form-author js-form-wrapper form-wrapper error" data-drupal-selector="edit-author" id="edit-author" open="open" data-child-error-count="3">');
     // Only one extra details element should now be open.
     $open_details_elements++;
     $this->assertCount($open_details_elements, $this->cssSelect('details[open="open"]'), 'Exactly one extra open &lt;details&gt; element found.');
