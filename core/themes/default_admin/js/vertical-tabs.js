@@ -11,6 +11,10 @@
    *   An object with the following keys:
    * @param {string} settings.title
    *   The name of the tab.
+   * @param {jQuery} settings.details
+   *   The jQuery object of the details element that is the tab pane.
+   * @param {jQuery} settings.childErrorIndicator
+   *   The indicator for form errors contained inside the tab pane.
    *
    * @return {object}
    *   This function has to return an object with at least these keys:
