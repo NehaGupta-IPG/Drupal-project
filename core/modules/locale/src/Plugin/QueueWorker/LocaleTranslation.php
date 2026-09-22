@@ -2,7 +2,6 @@
 
 namespace Drupal\locale\Plugin\QueueWorker;
 
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Queue\Attribute\QueueWorker;
 use Drupal\Core\Queue\QueueInterface;
@@ -32,7 +31,6 @@ class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPlugi
     array $configuration,
     string $plugin_id,
     array $plugin_definition,
-    protected ModuleHandlerInterface $moduleHandler,
     QueueInterface $queue,
     protected readonly CallableResolver $callableResolver,
   ) {
@@ -48,7 +46,6 @@ class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPlugi
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('module_handler'),
       $container->get('queue')->get('locale_translation', TRUE),
       $container->get(CallableResolver::class),
     );
@@ -66,7 +63,6 @@ class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPlugi
    * queue data.
    */
   public function processItem($data) {
-    $this->moduleHandler->loadInclude('locale', 'batch.inc');
     [$callable, $args] = $data;
 
     // We execute batch operation functions here to check, download and import

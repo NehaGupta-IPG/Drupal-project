@@ -51,7 +51,6 @@ class UpdateController extends ControllerBase {
       '#theme' => 'update_report',
     ];
     if ($available = $this->updateManager->getAvailable(TRUE)) {
-      $this->moduleHandler()->loadInclude('update', 'compare.inc');
       $build['#data'] = $this->updateManager->calculateProjectData($available);
 
       // @todo Consider using 'fetch_failures' from the 'update' collection

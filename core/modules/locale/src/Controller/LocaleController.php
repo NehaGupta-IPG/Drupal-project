@@ -20,8 +20,6 @@ class LocaleController extends ControllerBase {
    *   A redirection to translations reports page.
    */
   public function checkTranslation() {
-    $this->moduleHandler()->loadInclude('locale', 'inc', 'locale.compare');
-
     // Check translation status of all translatable project in all languages.
     // First we clear the cached list of projects. Although not strictly
     // necessary, this is helpful in case the project list is out of sync.
