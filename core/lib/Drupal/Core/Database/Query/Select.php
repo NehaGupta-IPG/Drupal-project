@@ -207,45 +207,12 @@ class Select extends Query implements SelectInterface {
       ];
     }
 
-    foreach ($abstractSelect->condition?->conditions ?? [] as $key => $condition) {
-      if ($condition instanceof Expression) {
-        $this->where($condition->expression, $condition->arguments);
-        continue;
-      }
-      if ($condition['variable'] instanceof DatabaseAbstractCondition) {
-        $variable = $this->hydrateAbstractCondition($condition['variable']);
-      }
-      elseif ($condition['variable'] instanceof DatabaseAbstractSelect) {
-        $variable = $this->connection->select($condition['variable']);
-      }
-      else {
-        $variable = $condition['variable'];
-      }
-      if ($condition['value'] instanceof DatabaseAbstractSelect) {
-        $value = $this->connection->select($condition['value']);
-      }
-      elseif (is_array($condition['value'])) {
-        $tmp = [];
-        foreach ($condition['value'] as $k => $v) {
-          if ($v instanceof DatabaseAbstractSelect) {
-            $tmp[$k] = $this->connection->select($v);
-            continue;
-          }
-          $tmp[$k] = $v;
-        }
-        $value = $tmp;
-      }
-      else {
-        $value = $condition['value'];
-      }
-      $this->condition($variable, $value, $condition['operator']->value);
+    if ($abstractSelect->condition) {
+      $this->condition = $this->hydrateAbstractCondition($abstractSelect->condition);
     }
 
-    foreach ($abstractSelect->having?->conditions ?? [] as $key => $condition) {
-      if ($condition instanceof Expression) {
-        $this->having($condition->expression, $condition->arguments);
-        continue;
-      }
+    if ($abstractSelect->having) {
+      $this->having = $this->hydrateAbstractCondition($abstractSelect->having);
     }
 
     foreach ($abstractSelect->orderBy as $key => $orderBy) {
@@ -305,10 +272,30 @@ class Select extends Query implements SelectInterface {
       if ($tmp['variable'] instanceof DatabaseAbstractCondition) {
         $variable = $this->hydrateAbstractCondition($tmp['variable']);
       }
+      elseif ($tmp['variable'] instanceof DatabaseAbstractSelect) {
+        $variable = $this->connection->select($tmp['variable']);
+      }
       else {
         $variable = $tmp['variable'];
       }
-      $hydratedCondition->condition($variable, $tmp['value'], $tmp['operator']->value);
+      if ($tmp['value'] instanceof DatabaseAbstractSelect) {
+        $value = $this->connection->select($tmp['value']);
+      }
+      elseif (is_array($tmp['value'])) {
+        $t = [];
+        foreach ($tmp['value'] as $k => $v) {
+          if ($v instanceof DatabaseAbstractSelect) {
+            $t[$k] = $this->connection->select($v);
+            continue;
+          }
+          $t[$k] = $v;
+        }
+        $value = $t;
+      }
+      else {
+        $value = $tmp['value'];
+      }
+      $hydratedCondition->condition($variable, $value, $tmp['operator']->value);
     }
     return $hydratedCondition;
   }
