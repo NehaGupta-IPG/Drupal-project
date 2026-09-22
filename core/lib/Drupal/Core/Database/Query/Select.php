@@ -308,7 +308,7 @@ class Select extends Query implements SelectInterface {
       else {
         $variable = $tmp['variable'];
       }
-      $hydratedCondition->condition($variable, $tmp['value'], $tmp['operator']);
+      $hydratedCondition->condition($variable, $tmp['value'], $tmp['operator']->value);
     }
     return $hydratedCondition;
   }
