@@ -589,10 +589,10 @@ class SelectComplexTest extends DatabaseTestBase {
     // that query but that's not the point!
     $abstractQuery = DatabaseAbstractSelect::build('test')
       ->addColumn('test', 'job')
-      ->condition('name', 'Paul')
+      ->condition('name', '=', 'Paul')
       ->condition(DatabaseAbstractSelect::orConditionGroup()
-        ->condition('age', 26)
-        ->condition('age', 27)
+        ->condition('age', '=', 26)
+        ->condition('age', '=', 27)
       );
 
     $query = $this->connection->select('test');
@@ -657,16 +657,16 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $abstractQuery = DatabaseAbstractSelect::build('test_task', 'tt')
       ->addExpression('[tt].[pid] + 1', 'abc')
-      ->condition('priority', 1, '>')
-      ->condition('priority', 100, '<');
+      ->condition('priority', '>', 1)
+      ->condition('priority', '<', 100);
     $abstractSubquery = DatabaseAbstractSelect::build('test', 'tp')
       ->join('test_one_blob', 'tpb', '[tp].[id] = [tpb].[id]')
       ->join('node', 'n', '[tp].[id] = [n].[nid]')
       ->addTag('node_access')
       ->addMetaData('account', $account)
       ->addColumn('tp', 'id')
-      ->condition('age', 5, '>')
-      ->condition('age', 500, '<');
+      ->condition('age', '>', 5)
+      ->condition('age', '<', 500);
     $abstractQuery->leftJoin($abstractSubquery, 'sq', '[tt].[pid] = [sq].[id]')
       ->join('test_one_blob', 'tb3', '[tt].[pid] = [tb3].[id]');
 
@@ -788,8 +788,8 @@ class SelectComplexTest extends DatabaseTestBase {
 
     $abstractQuery = DatabaseAbstractSelect::build('test', 't1')
       ->innerJoin('test', 't2', (DatabaseAbstractSelect::andConditionGroup()
-        ->condition('t1.name', $t1_name)
-        ->condition('t2.name', $t2_name)
+        ->condition('t1.name', '=', $t1_name)
+        ->condition('t2.name', '=', $t2_name)
       ))
       ->addColumn('t1', 'name', 't1_name')
       ->addColumn('t2', 'name', 't2_name');

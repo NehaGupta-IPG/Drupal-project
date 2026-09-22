@@ -159,7 +159,7 @@ class SelectTest extends DatabaseTestBase {
     $abstractQuery = DatabaseAbstractSelect::build('test')
       ->addColumn('test', 'name')
       ->addColumn('test', 'age', 'age')
-      ->condition('age', 27);
+      ->condition('age', '=', 27);
 
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
@@ -196,7 +196,7 @@ class SelectTest extends DatabaseTestBase {
     $abstractQuery = DatabaseAbstractSelect::build('test')
       ->addColumn('test', 'name')
       ->addExpression("[age]*2", 'double_age')
-      ->condition('age', 27);
+      ->condition('age', '=', 27);
 
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
@@ -234,7 +234,7 @@ class SelectTest extends DatabaseTestBase {
       ->addColumn('test', 'name')
       ->addExpression("[age]*2")
       ->addExpression("[age]*3")
-      ->condition('age', 27);
+      ->condition('age', '=', 27);
 
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
@@ -274,7 +274,7 @@ class SelectTest extends DatabaseTestBase {
   public function testSimpleSelectMultipleFields(): void {
     $abstractQuery = DatabaseAbstractSelect::build('test')
       ->columns('test', ['id', 'name', 'age', 'job'])
-      ->condition('age', 27);
+      ->condition('age', '=', 27);
 
     $query = $this->connection->select('test')
       ->fields('test', ['id', 'name', 'age', 'job'])
@@ -310,7 +310,7 @@ class SelectTest extends DatabaseTestBase {
   public function testSimpleSelectAllFields(): void {
     $abstractQuery = DatabaseAbstractSelect::build('test')
       ->columns('test')
-      ->condition('age', 27);
+      ->condition('age', '=', 27);
 
     $query = $this->connection->select('test')
       ->fields('test')
@@ -348,7 +348,7 @@ class SelectTest extends DatabaseTestBase {
 
     $abstractQuery = DatabaseAbstractSelect::build('test_null', 'tn')
       ->columns('tn', ['name'])
-      ->condition('age');
+      ->condition('age', '=', NULL);
 
     $query = $this->connection->select('test_null', 'tn')
       ->fields('tn', ['name'])
@@ -440,7 +440,7 @@ class SelectTest extends DatabaseTestBase {
 
     $abstractQuery = DatabaseAbstractSelect::build('test', 'test')
       ->columns('test', ['name'])
-      ->condition('age', 27)
+      ->condition('age', '=', 27)
       ->alwaysFalse();
 
     $query = $this->connection->select('test', 'test')
@@ -476,7 +476,7 @@ class SelectTest extends DatabaseTestBase {
 
     $abstractQuery = DatabaseAbstractSelect::build('test', 'test')
       ->columns('test', ['name'])
-      ->condition('age', 27)
+      ->condition('age', '=', 27)
       ->alwaysFalse();
 
     $query = $this->connection->select('test', 'test')
@@ -512,10 +512,10 @@ class SelectTest extends DatabaseTestBase {
   public function testUnion(): void {
     $abstractQuery1 = DatabaseAbstractSelect::build('test', 't')
       ->columns('t', ['name'])
-      ->condition('age', [27, 28], 'IN');
+      ->condition('age', 'IN', [27, 28]);
     $abstractQuery2 = DatabaseAbstractSelect::build('test', 't')
       ->columns('t', ['name'])
-      ->condition('age', 28);
+      ->condition('age', '=', 28);
     $abstractQuery1->union($abstractQuery2);
 
     $query_1 = $this->connection->select('test', 't')
@@ -548,10 +548,10 @@ class SelectTest extends DatabaseTestBase {
   public function testUnionAll(): void {
     $abstractQuery1 = DatabaseAbstractSelect::build('test', 't')
       ->columns('t', ['name'])
-      ->condition('age', [27, 28], 'IN');
+      ->condition('age', 'IN', [27, 28]);
     $abstractQuery2 = DatabaseAbstractSelect::build('test', 't')
       ->columns('t', ['name'])
-      ->condition('age', 28);
+      ->condition('age', '=', 28);
     $abstractQuery1->union($abstractQuery2, UnionType::All);
 
     $query_1 = $this->connection->select('test', 't')
@@ -586,11 +586,11 @@ class SelectTest extends DatabaseTestBase {
   public function testUnionCount(): void {
     $abstractQuery1 = DatabaseAbstractSelect::build('test', 't')
       ->columns('t', ['name'])
-      ->condition('age', [27, 28], 'IN')
+      ->condition('age', 'IN', [27, 28])
       ->union(
         DatabaseAbstractSelect::build('test', 't')
           ->columns('t', ['name'])
-          ->condition('age', 28),
+          ->condition('age', '=', 28),
         UnionType::All,
       )
       ->countQuery();
@@ -627,11 +627,11 @@ class SelectTest extends DatabaseTestBase {
   public function testUnionOrder(): void {
     $abstractQuery1 = DatabaseAbstractSelect::build('test', 't')
       ->columns('t', ['name'])
-      ->condition('age', [27, 28], 'IN')
+      ->condition('age', 'IN', [27, 28])
       ->union(
         DatabaseAbstractSelect::build('test', 't')
           ->columns('t', ['name'])
-          ->condition('age', 26)
+          ->condition('age', '=', 26)
       )
       ->orderBy('name', Order::Desc);
 
@@ -675,11 +675,11 @@ class SelectTest extends DatabaseTestBase {
   public function testUnionOrderLimit(): void {
     $abstractQuery1 = DatabaseAbstractSelect::build('test', 't')
       ->columns('t', ['name'])
-      ->condition('age', [27, 28], 'IN')
+      ->condition('age', 'IN', [27, 28])
       ->union(
         DatabaseAbstractSelect::build('test', 't')
           ->columns('t', ['name'])
-          ->condition('age', 26)
+          ->condition('age', '=', 26)
       )
       ->orderBy('name', Order::Desc)
       ->range(0, 2);
@@ -853,7 +853,7 @@ class SelectTest extends DatabaseTestBase {
 
     $abstractQuery = DatabaseAbstractSelect::build('test', 't')
       ->addColumn('t', 'name')
-      ->condition("t.$column", $pattern, $operator);
+      ->condition("t.$column", $operator, $pattern);
 
     $query = $database->select('test', 't');
     $query->addField('t', 'name');
@@ -909,7 +909,7 @@ class SelectTest extends DatabaseTestBase {
     try {
       DatabaseAbstractSelect::build('test', 't')
         ->columns('t')
-        ->condition('age', [], 'IN');
+        ->condition('age', 'IN', []);
 
       $this->fail('Expected exception not thrown');
     }
@@ -920,7 +920,7 @@ class SelectTest extends DatabaseTestBase {
     try {
       DatabaseAbstractSelect::build('test', 't')
         ->columns('t')
-        ->condition('age', [], 'NOT IN');
+        ->condition('age', 'NOT IN', []);
 
       $this->fail('Expected exception not thrown');
     }
@@ -989,16 +989,35 @@ class SelectTest extends DatabaseTestBase {
   }
 
   /**
+   * Data provider for testNonArrayOperatorWithArrayValueCondition().
+   *
+   * @return array[]
+   *   Array of non array compatible operators and its value in the expected
+   *   exception message.
+   */
+  public static function providerAbstractNonArrayOperatorWithArrayValueCondition(): array {
+    return [
+      '=' => ['=', '='],
+      '>' => ['>', '>'],
+      '<' => ['<', '<'],
+      '>=' => ['>=', '>='],
+      '<=' => ['<=', '<='],
+      'IS NULL' => ['IS NULL', 'IS NULL'],
+      'IS NOT NULL' => ['IS NOT NULL', 'IS NOT NULL'],
+    ];
+  }
+
+  /**
    * Tests non array operator conditions with array value in abstract select.
    */
-  #[DataProvider('providerNonArrayOperatorWithArrayValueCondition')]
+  #[DataProvider('providerAbstractNonArrayOperatorWithArrayValueCondition')]
   public function testAbstractNonArrayOperatorWithArrayValueCondition(?string $operator, string $operator_in_exception_message): void {
     $this->expectException(InvalidQueryException::class);
     $this->expectExceptionMessageIs("Query condition 'age " . $operator_in_exception_message . " 26, 27' must have an array compatible operator.");
 
     DatabaseAbstractSelect::build('test', 't')
       ->columns('t')
-      ->condition('age', [26, 27], $operator);
+      ->condition('age', $operator, [26, 27]);
   }
 
 }

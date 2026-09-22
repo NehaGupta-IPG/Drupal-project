@@ -27,7 +27,13 @@ enum Operator: string {
   case Between = 'BETWEEN';
   case NotBetween = 'NOT BETWEEN';
 
+  case Like = 'LIKE';
+  case NotLike = 'NOT LIKE';
+
   case Exists = 'EXISTS';
   case NotExists = 'NOT EXISTS';
+
+  case RegExp = 'REGEXP';
+  case NotRegExp = 'NOT REGEXP';
 
 }
