@@ -105,7 +105,6 @@ export default class DrupalEntityLinkSuggestionsEditing extends Plugin {
           this.attrs.forEach((attribute) => {
             extraAttributeValues[attribute] = evt.source[attribute];
           });
-          args[1].entityLinkAttributes = extraAttributeValues;
         } else {
           extraAttributeValues = args[1].entityLinkAttributes;
         }
@@ -133,6 +132,11 @@ export default class DrupalEntityLinkSuggestionsEditing extends Plugin {
             return newRange;
           };
 
+          // The entityLinkAttributes is internal and not a real decorator,
+          // but LinkCommand writes every decorator key to the model. Remove it.
+          if (args[1]) {
+            delete args[1].entityLinkAttributes;
+          }
           editor.execute('link', ...args);
 
           this.attrs.forEach((attribute) => {
