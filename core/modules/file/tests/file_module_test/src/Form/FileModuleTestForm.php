@@ -64,14 +64,15 @@ class FileModuleTestForm extends FormBase {
       $form['nested']['file']['#default_value'] = $extended ? ['fids' => $default_fids] : $default_fids;
     }
 
-    if (isset($form['group'])) {
-      $form['nested']['file']['#group'] = 'group';
-    }
-
     $form['textfield'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Type a value and ensure it stays'),
     ];
+
+    if (isset($form['group'])) {
+      $form['nested']['file']['#group'] = 'group';
+      $form['textfield']['#group'] = $tree ? 'nested][file' : 'file';
+    }
 
     $form['submit'] = [
       '#type' => 'submit',
