@@ -131,7 +131,7 @@ function drupal_phpunit_populate_class_loader() {
     $extension_roots = drupal_phpunit_contrib_extension_directory_roots();
 
     $dirs = array_map('drupal_phpunit_find_extension_directories', $extension_roots);
-    $dirs = array_reduce($dirs, 'array_merge', []);
+    $dirs = array_reduce($dirs, array_merge(...), []);
     $GLOBALS['namespaces'] = drupal_phpunit_get_extension_namespaces($dirs);
   }
   foreach ($GLOBALS['namespaces'] as $prefix => $paths) {

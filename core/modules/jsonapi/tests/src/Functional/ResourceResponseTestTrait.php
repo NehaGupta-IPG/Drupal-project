@@ -220,7 +220,7 @@ trait ResourceResponseTestTrait {
    *   The ResourceResponses.
    */
   protected static function toResourceResponses(array $responses): array {
-    return array_map([self::class, 'toResourceResponse'], $responses);
+    return array_map(self::toResourceResponse(...), $responses);
   }
 
   /**
@@ -368,7 +368,7 @@ trait ResourceResponseTestTrait {
    *   The resource links.
    */
   protected static function getResourceLinks(array $resource_identifiers): array {
-    return array_map([static::class, 'getResourceLink'], $resource_identifiers);
+    return array_map(static::getResourceLink(...), $resource_identifiers);
   }
 
   /**

@@ -111,7 +111,7 @@ class FieldUiTable extends Table {
     foreach ($regions as $region_name => $region) {
       $elements['#regions'][$region_name]['rows_order'] = array_reduce(
         $trees[$region_name],
-        [static::class, 'reduceOrder'],
+        static::reduceOrder(...),
       );
     }
 
@@ -237,7 +237,7 @@ class FieldUiTable extends Table {
     }
     if (!empty($a['children'])) {
       uasort($a['children'], ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
-      $array = array_merge($array, array_reduce($a['children'], [static::class, 'reduceOrder']));
+      $array = array_merge($array, array_reduce($a['children'], static::reduceOrder(...)));
     }
 
     return $array;

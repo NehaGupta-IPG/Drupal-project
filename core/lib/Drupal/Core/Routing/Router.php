@@ -304,7 +304,7 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
     }
     krsort($buckets);
 
-    $flattened = array_reduce($buckets, 'array_merge', []);
+    $flattened = array_reduce($buckets, array_merge(...), []);
 
     // Add them back onto a new route collection.
     $collection = new RouteCollection();

@@ -1256,7 +1256,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     ];
     if (!empty($relationship_field_names) && !empty(array_intersect($expected_cacheability->getCacheContexts(), $permission_related_cache_contexts))) {
       $applicable_permissions = array_intersect_key(static::getIncludePermissions(), array_flip($relationship_field_names));
-      $flattened_permissions = array_unique(array_reduce($applicable_permissions, 'array_merge', []));
+      $flattened_permissions = array_unique(array_reduce($applicable_permissions, array_merge(...), []));
       $this->grantPermissionsToTestedRole($flattened_permissions);
       $expected_response = $this->getExpectedCollectionResponse($filtered_entity_collection, $filtered_collection_include_url->toString(), $request_options, $relationship_field_names, TRUE);
       $expected_cacheability = $expected_response->getCacheableMetadata();
@@ -1305,7 +1305,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @see \GuzzleHttp\ClientInterface::request()
    */
   protected function getExpectedCollectionResponse(array $collection, $self_link, array $request_options, ?array $included_paths = NULL, $filtered = FALSE) {
-    $resource_identifiers = array_map([static::class, 'toResourceIdentifier'], $collection);
+    $resource_identifiers = array_map(static::toResourceIdentifier(...), $collection);
     $individual_responses = static::toResourceResponses($this->getResponses(static::getResourceLinks($resource_identifiers), $request_options));
     $merged_response = static::toCollectionResourceResponse($individual_responses, $self_link, TRUE);
 
@@ -3587,7 +3587,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    */
   protected function grantIncludedPermissions(array $include_paths = []) {
     $applicable_permissions = array_intersect_key(static::getIncludePermissions(), array_flip($include_paths));
-    $flattened_permissions = array_unique(array_reduce($applicable_permissions, 'array_merge', []));
+    $flattened_permissions = array_unique(array_reduce($applicable_permissions, array_merge(...), []));
     // Always grant access to 'view' the test entity reference field.
     $flattened_permissions[] = 'field_jsonapi_test_entity_ref view access';
     $this->grantPermissionsToTestedRole($flattened_permissions);
