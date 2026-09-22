@@ -128,22 +128,15 @@ final class Condition {
   /**
    * {@inheritdoc}
    */
-  private function conditionGroupFactory(Conjunction $conjunction): static {
-    return new static($conjunction);
+  public static function and(): static {
+    return new static(Conjunction::And);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function andConditionGroup(): static {
-    return $this->conditionGroupFactory(Conjunction::And);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function orConditionGroup(): static {
-    return $this->conditionGroupFactory(Conjunction::Or);
+  public static function or(): static {
+    return new static(Conjunction::Or);
   }
 
   /**

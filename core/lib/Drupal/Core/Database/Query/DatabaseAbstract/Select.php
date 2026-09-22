@@ -307,7 +307,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function addColumn(string $table_alias, string $column, ?string $alias = NULL): static {
+  public function addColumn(string $tableAlias, string $column, ?string $alias = NULL): static {
     // If no alias is specified, first try the column name itself.
     if (empty($alias)) {
       $alias = $column;
@@ -315,7 +315,7 @@ final class Select {
 
     // If that's already in use, try the table name and column name.
     if (!empty($this->columns[$alias])) {
-      $alias = $table_alias . '_' . $column;
+      $alias = $tableAlias . '_' . $column;
     }
 
     // If that is already used, just add a counter until we find an unused
@@ -329,7 +329,7 @@ final class Select {
 
     $this->columns[$alias] = [
       'field' => $column,
-      'table' => $table_alias,
+      'table' => $tableAlias,
       'alias' => $alias,
     ];
 
@@ -339,25 +339,25 @@ final class Select {
   /**
    * Add multiple columns from the same table to be SELECTed.
    *
-   * @param string $table_alias
+   * @param string $tableAlias
    *   The name of the table from which the column comes, as an alias.
    *   Generally you will want to use the return value of join() here to ensure
    *   that it is valid.
    * @param list<string> $columns
    *   An indexed array of columns present in the specified table that should
-   *   be included in this query. If not specified, $table_alias.* will be
+   *   be included in this query. If not specified, $tableAlias.* will be
    *   generated without any aliases.
    */
-  public function columns(string $table_alias, array $columns = []): static {
+  public function columns(string $tableAlias, array $columns = []): static {
     if ($columns) {
       foreach ($columns as $column) {
         // We don't care what alias was assigned.
-        $this->addColumn($table_alias, $column);
+        $this->addColumn($tableAlias, $column);
       }
     }
     else {
       // We want all columns from this table.
-      $this->tables[$table_alias]['all_fields'] = TRUE;
+      $this->tables[$tableAlias]['all_fields'] = TRUE;
     }
 
     return $this;
@@ -417,7 +417,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function addJoin(JoinType $type, string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
+  private function addJoin(JoinType $type, string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
     if (empty($alias)) {
       if ($table instanceof self) {
         $alias = 'subquery';
@@ -646,27 +646,6 @@ final class Select {
     }
     $this->condition->where($expression);
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  private static function conditionGroupFactory(Conjunction $conjunction): Condition {
-    return new Condition($conjunction);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function andConditionGroup(): Condition {
-    return static::conditionGroupFactory(Conjunction::And);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function orConditionGroup(): Condition {
-    return static::conditionGroupFactory(Conjunction::Or);
   }
 
   /**

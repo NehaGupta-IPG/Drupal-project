@@ -8,6 +8,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Expression;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\RowCountException;
+use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
 use Drupal\Core\Database\Query\DatabaseAbstract\Order;
 use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 use Drupal\Core\Database\Query\SelectInterface;
@@ -590,7 +591,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $abstractQuery = DatabaseAbstractSelect::build('test')
       ->addColumn('test', 'job')
       ->condition('name', '=', 'Paul')
-      ->condition(DatabaseAbstractSelect::orConditionGroup()
+      ->condition(DatabaseAbstractCondition::or()
         ->condition('age', '=', 26)
         ->condition('age', '=', 27)
       );
@@ -787,7 +788,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $t2_name = 'George';
 
     $abstractQuery = DatabaseAbstractSelect::build('test', 't1')
-      ->innerJoin('test', 't2', (DatabaseAbstractSelect::andConditionGroup()
+      ->innerJoin('test', 't2', (DatabaseAbstractCondition::and()
         ->condition('t1.name', '=', $t1_name)
         ->condition('t2.name', '=', $t2_name)
       ))
