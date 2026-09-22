@@ -12,7 +12,6 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Controller\UserAuthenticationController;
 use GuzzleHttp\Cookie\CookieJar;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -23,7 +22,6 @@ use Symfony\Component\Serializer\Serializer;
  * Tests login and password reset via direct HTTP.
  */
 #[Group('user')]
-#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class UserLoginHttpTest extends BrowserTestBase {
 
@@ -90,8 +88,7 @@ class UserLoginHttpTest extends BrowserTestBase {
     if (isset($pass)) {
       $request_body['pass'] = $pass;
     }
-
-    $result = \Drupal::httpClient()->post($user_login_url->toString(), [
+    return \Drupal::httpClient()->post($user_login_url->toString(), [
       'body' => $this->serializer->encode($request_body, $format),
       'headers' => [
         'Accept' => "application/$format",
@@ -99,16 +96,12 @@ class UserLoginHttpTest extends BrowserTestBase {
       'http_errors' => FALSE,
       'cookies' => $this->cookies,
     ]);
-    return $result;
   }
 
   /**
    * Tests user session life cycle.
    */
-  #[IgnoreDeprecations]
   public function testLogin(): void {
-    $this->expectUserDeprecationMessage('Drupal\user\Controller\UserAuthenticationController is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\rest\Controller\RestAuthenticationController instead. See https://www.drupal.org/node/3552724');
-
     // Without the serialization module only JSON is supported.
     $this->doTestLogin('json');
 
@@ -229,7 +222,7 @@ class UserLoginHttpTest extends BrowserTestBase {
       ->setRouteParameter('_format', $format)
       ->setAbsolute();
 
-    $result = \Drupal::httpClient()->post($password_reset_url->toString(), [
+    return \Drupal::httpClient()->post($password_reset_url->toString(), [
       'body' => $this->serializer->encode($request_body, $format),
       'headers' => [
         'Accept' => "application/$format",
@@ -237,17 +230,12 @@ class UserLoginHttpTest extends BrowserTestBase {
       'http_errors' => FALSE,
       'cookies' => $this->cookies,
     ]);
-
-    return $result;
   }
 
   /**
    * Tests user password reset.
    */
-  #[IgnoreDeprecations]
   public function testPasswordReset(): void {
-    $this->expectUserDeprecationMessage('Drupal\user\Controller\UserAuthenticationController is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\rest\Controller\RestAuthenticationController instead. See https://www.drupal.org/node/3552724');
-
     // Create a user account.
     $account = $this->drupalCreateUser();
 
@@ -468,9 +456,7 @@ class UserLoginHttpTest extends BrowserTestBase {
       'http_errors' => FALSE,
       'cookies' => $this->cookies,
     ];
-
-    $response = $client->post($user_logout_url->toString(), $post_options);
-    return $response;
+    return $client->post($user_logout_url->toString(), $post_options);
   }
 
   /**
@@ -615,7 +601,7 @@ class UserLoginHttpTest extends BrowserTestBase {
     $resetURL = $urls[0];
     $this->drupalGet($resetURL);
     $this->submitForm([], 'Log in');
-    $this->assertSession()->pageTextContains('You have used a one-time login link. You can set your new password now.');
+    $this->assertSession()->pageTextContains('You have used a one-time login link.');
   }
 
 }

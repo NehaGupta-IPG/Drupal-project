@@ -17,6 +17,7 @@ use Drupal\Tests\RequirementsPageTrait;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
@@ -37,11 +38,34 @@ trait StandardTestTrait {
    * Tests Standard installation profile or recipe.
    */
   public function testStandard(): void {
-    $this->drupalGet('');
-    $this->assertSession()->pageTextContains('Powered by Drupal');
-    $this->assertSession()->pageTextContains('Congratulations and welcome to the Drupal community.');
+    // Assert the configured front page and derive expected anonymous status.
+    // - /admin/welcome: Standard profile front page. 403 while the route
+    //   exists; 404 after the profile was uninstalled.
+    // - /user/login: Standard recipe front page for anonymous users.
+    $front_page_path = (string) $this->config('system.site')->get('page.front');
+    $this->assertContains($front_page_path, ['/admin/welcome', '/user/login']);
+    try {
+      \Drupal::service('router.route_provider')->getRouteByName('standard.welcome');
+      $has_standard_welcome_route = TRUE;
+    }
+    catch (RouteNotFoundException) {
+      $has_standard_welcome_route = FALSE;
+    }
+    switch ($front_page_path) {
+      case '/admin/welcome':
+        $expected_anonymous_front_status = $has_standard_welcome_route ? 403 : 404;
+        break;
 
-    // Test anonymous user can access 'Main navigation' block.
+      case '/user/login':
+        $expected_anonymous_front_status = 200;
+        break;
+    }
+
+    $this->drupalGet('');
+    $anonymous_front_status = $this->getSession()->getStatusCode();
+    $this->assertSame($expected_anonymous_front_status, $anonymous_front_status);
+
+    // Test admin users configure and access the main navigation block.
     $this->adminUser = $this->drupalCreateUser([
       'administer nodes',
       'administer blocks',
@@ -49,9 +73,9 @@ trait StandardTestTrait {
     ]);
     $this->drupalLogin($this->adminUser);
     // Configure the block.
-    $this->drupalGet('admin/structure/block/add/system_menu_block:main/olivero');
+    $this->drupalGet('admin/structure/block/add/system_menu_block:main/default_admin');
     $this->submitForm([
-      'region' => 'sidebar',
+      'region' => 'header',
       'id' => 'main_navigation',
     ], 'Save block');
     // Verify admin user can see the block.
@@ -60,10 +84,12 @@ trait StandardTestTrait {
 
     // Verify we have role = complementary on help_block blocks.
     $this->drupalGet('admin/structure/block');
-    $this->assertSession()->elementAttributeContains('xpath', "//div[@id='block-olivero-help']", 'role', 'complementary');
+    $this->assertSession()->elementAttributeContains('xpath', "//div[@id='block-default-admin-help']", 'role', 'complementary');
 
-    // Verify anonymous user can see the block.
+    // Verify anonymous visibility on front page in each install mode.
     $this->drupalLogout();
+    $this->drupalGet('');
+    $this->assertSession()->statusCodeEquals($anonymous_front_status);
     $this->assertSession()->pageTextContains('Main navigation');
 
     $this->drupalLogin($this->adminUser);
@@ -181,12 +207,6 @@ trait StandardTestTrait {
       'status' => 1,
     ]);
 
-    $url = Url::fromRoute('<front>');
-    $this->drupalGet($url);
-    $this->drupalGet($url);
-    // Verify that frontpage is cached by Dynamic Page Cache.
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
-
     $url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()]);
     $this->drupalGet($url);
     $this->drupalGet($url);
@@ -235,15 +255,12 @@ trait StandardTestTrait {
 
       // The name field should be hidden.
       $assert_session->fieldNotExists('Name', $form);
-      // The source field should be shown before the vertical tabs.
+      // The source field should be shown at the bottom with verticals tabs
+      // on the side.
       $source_field_label = $media_type->getSource()->getSourceFieldDefinition($media_type)->getLabel();
       $test_source_field = $assert_session->elementExists('xpath', "//*[contains(text(), '$source_field_label')]", $form)->getOuterHtml();
-      $vertical_tabs = $assert_session->elementExists('css', '.js-form-type-vertical-tabs', $form)->getOuterHtml();
-      $this->assertGreaterThan(strpos($form_html, $test_source_field), strpos($form_html, $vertical_tabs));
-      // The "Published" checkbox should be the last element.
-      $date_field = $assert_session->fieldExists('Date', $form)->getOuterHtml();
-      $published_checkbox = $assert_session->fieldExists('Published', $form)->getOuterHtml();
-      $this->assertGreaterThan(strpos($form_html, $date_field), strpos($form_html, $published_checkbox));
+      $side_tabs = $assert_session->elementExists('css', '.entity-meta', $form)->getOuterHtml();
+      $this->assertGreaterThan(strpos($form_html, $test_source_field), strpos($form_html, $side_tabs));
       if (is_a($media_type->getSource(), Image::class, TRUE)) {
         // Assert the default entity view display is configured with an image
         // style.

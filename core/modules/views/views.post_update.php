@@ -67,6 +67,18 @@ function views_post_update_counter_field_not_sortable(): void {
 }
 
 /**
+ * Add default min_label and max_label to exposed numeric-type filters.
+ */
+function views_post_update_filter_min_max_labels(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsMinMaxLabelUpdate($view);
+  });
+}
+
+/**
  * Add custom row and column classes to the responsive grid style plugin.
  */
 function views_post_update_responsive_grid_custom_classes(?array &$sandbox = NULL): void {
