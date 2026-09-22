@@ -170,7 +170,9 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
 
     // Inject group member elements belonging to this group.
     $parents = implode('][', $element['#parents']);
-    $children = Element::children($element['#groups'][$parents]);
+    // When a theme renders this element's children, its group members have
+    // already been added by the initial render pass.
+    $children = isset($element['#render_children']) ? [] : Element::children($element['#groups'][$parents]);
     if (!empty($children)) {
       foreach ($children as $key) {
         // Break references and indicate that the element should be rendered as
