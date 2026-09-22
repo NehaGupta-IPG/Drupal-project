@@ -6,6 +6,7 @@ namespace Drupal\Tests\package_manager\Kernel;
 
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\package_manager\ProjectInfo;
+use Drupal\update\UpdateManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -140,7 +141,7 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
     $metadata_fixtures['drupal'] = $fixtures_directory . 'drupal.9.8.2.xml';
     $metadata_fixtures['package_manager_test_update'] = $fixtures_directory . 'package_manager_test_update.7.0.1.xml';
     $this->setReleaseMetadata($metadata_fixtures);
-    $available = update_get_available(TRUE);
+    $available = \Drupal::service(UpdateManagerInterface::class)->getAvailable(TRUE);
     $this->assertSame(['drupal'], array_keys($available));
     $this->setReleaseMetadata($metadata_fixtures);
     $state = $this->container->get('state');

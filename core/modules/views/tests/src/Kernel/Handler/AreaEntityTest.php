@@ -48,8 +48,8 @@ class AreaEntityTest extends ViewsKernelTestBase {
    */
   protected function setUpFixtures(): void {
     // Install the themes used for this test.
-    $this->container->get('theme_installer')->install(['olivero']);
-    $this->container->get('config.factory')->getEditable('system.theme')->set('default', 'olivero')->save();
+    $this->container->get('theme_installer')->install(['stark']);
+    $this->container->get('config.factory')->getEditable('system.theme')->set('default', 'stark')->save();
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
@@ -132,22 +132,22 @@ class AreaEntityTest extends ViewsKernelTestBase {
     $header_xpath = '//div[@class = "' . $view_class . '"]/header[1]';
     $footer_xpath = '//div[@class = "' . $view_class . '"]/footer[1]';
 
-    $result = $this->xpath($header_xpath);
+    $result = $this->getSimpleXmlElementsByXpath($header_xpath);
     $this->assertStringContainsString($entities[0]->label(), (string) $result[0], 'The rendered entity appears in the header of the view.');
     $this->assertStringContainsString('full', (string) $result[0], 'The rendered entity appeared in the right view mode.');
 
-    $result = $this->xpath($footer_xpath);
+    $result = $this->getSimpleXmlElementsByXpath($footer_xpath);
     $this->assertStringContainsString($entities[1]->label(), (string) $result[0], 'The rendered entity appears in the footer of the view.');
     $this->assertStringContainsString('full', (string) $result[0], 'The rendered entity appeared in the right view mode.');
 
     $preview = $view->preview('default', [$entities[1]->id()]);
     $this->setRawContent($renderer->renderRoot($preview));
 
-    $result = $this->xpath($header_xpath);
+    $result = $this->getSimpleXmlElementsByXpath($header_xpath);
     $this->assertStringContainsString($entities[0]->label(), (string) $result[0], 'The rendered entity appears in the header of the view.');
     $this->assertStringContainsString('full', (string) $result[0], 'The rendered entity appeared in the right view mode.');
 
-    $result = $this->xpath($footer_xpath);
+    $result = $this->getSimpleXmlElementsByXpath($footer_xpath);
     $this->assertStringContainsString($entities[1]->label(), (string) $result[0], 'The rendered entity appears in the footer of the view.');
     $this->assertStringContainsString('full', (string) $result[0], 'The rendered entity appeared in the right view mode.');
 
@@ -165,7 +165,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
     $preview = $view->preview('default', [$entities[1]->id()]);
     $this->setRawContent($renderer->renderRoot($preview));
     $view_class = 'js-view-dom-id-' . $view->dom_id;
-    $result = $this->xpath('//div[@class = "' . $view_class . '"]/header[1]');
+    $result = $this->getSimpleXmlElementsByXpath('//div[@class = "' . $view_class . '"]/header[1]');
     $this->assertStringContainsString($entities[0]->label(), (string) $result[0], 'The rendered entity appears in the header of the view.');
     $this->assertStringContainsString('test', (string) $result[0], 'The rendered entity appeared in the right view mode.');
 
@@ -174,7 +174,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
     $preview = $view->preview('default', [$entities[2]->id()]);
     $this->setRawContent($renderer->renderRoot($preview));
     $view_class = 'js-view-dom-id-' . $view->dom_id;
-    $result = $this->xpath('//div[@class = "' . $view_class . '"]/footer[1]');
+    $result = $this->getSimpleXmlElementsByXpath('//div[@class = "' . $view_class . '"]/footer[1]');
     $this->assertStringNotContainsString($entities[2]->label(), (string) $result[0], 'The rendered entity does not appear in the footer of the view.');
 
     // Test the available view mode options.
