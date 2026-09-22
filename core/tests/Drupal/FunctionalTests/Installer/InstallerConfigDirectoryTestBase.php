@@ -6,6 +6,7 @@ namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Extension\ModuleWeight;
 
 /**
  * Provides a base class for testing installing from existing configuration.
@@ -112,12 +113,7 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
         // If the module depends on another driver module, add that too.
         $info = Database::getConnection()->getConnectionOptions();
         $core_extension['module'] += array_fill_keys(array_keys($info['dependencies'] ?? []), 0);
-        // @see \Drupal\Core\Extension\ModuleWeight::sort()
-        $sort = [];
-        foreach ($core_extension['module'] as $name => $weight) {
-          $sort[] = ((int) ($weight >= 0)) . sprintf('%019d', abs($weight)) . $name;
-        }
-        array_multisort($sort, SORT_STRING, $core_extension['module']);
+        $core_extension['module'] = ModuleWeight::sort($core_extension['module']);
       }
       if ($this->profile === FALSE && array_key_exists('profile', $core_extension)) {
         // Remove the profile.
