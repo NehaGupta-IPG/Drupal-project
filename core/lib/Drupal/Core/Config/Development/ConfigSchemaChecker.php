@@ -17,10 +17,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * If tests have the $strictConfigSchema property set to TRUE this event
  * listener will be added to the container and throw exceptions if configuration
- * is invalid.
+ * is invalid. To exclude specific config object names from schema checking, use
+ * the $configSchemaCheckerExclusions property.
  *
  * @see \Drupal\KernelTests\KernelTestBase::register()
  * @see \Drupal\Core\Test\FunctionalTestSetupTrait::prepareSettings()
+ * @see \Drupal\Core\Test\TestSetupTrait::$configSchemaCheckerExclusions
  */
 class ConfigSchemaChecker implements EventSubscriberInterface {
   use SchemaCheckTrait;
