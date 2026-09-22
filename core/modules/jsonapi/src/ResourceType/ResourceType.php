@@ -409,7 +409,7 @@ class ResourceType {
         return [$field->getPublicName() => $field->getRelatableResourceTypes()];
       }, array_filter($this->fields, function (ResourceTypeField $field) {
         return $field instanceof ResourceTypeRelationship && $field->isFieldEnabled();
-      })), 'array_merge', []);
+      })), array_merge(...), []);
     }
     return $this->relatableResourceTypesByField;
   }

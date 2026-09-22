@@ -141,7 +141,7 @@ class ViewsDataTest extends UnitTestCase {
       ->method('invokeAllWith')
       ->with('views_data')
       ->willReturnCallback(function (string $hook, callable $callback) {
-        $callback(\Closure::fromCallable([$this, 'viewsData']), 'views_test_data');
+        $callback($this->viewsData(...), 'views_test_data');
       });
   }
 
@@ -218,7 +218,7 @@ class ViewsDataTest extends UnitTestCase {
       ->method('invokeAllWith')
       ->with('views_data')
       ->willReturnCallback(function ($hook, $callback) {
-        $callback(\Closure::fromCallable([$this, 'viewsData']), 'views_test_data');
+        $callback($this->viewsData(...), 'views_test_data');
       });
     $this->moduleHandler->expects($this->exactly(2))
       ->method('alter')
@@ -895,7 +895,7 @@ class ViewsDataTest extends UnitTestCase {
         if (\Fiber::getCurrent() !== NULL) {
           \Fiber::suspend();
         }
-        $callback(\Closure::fromCallable([$this, 'viewsData']), 'views_test_data');
+        $callback($this->viewsData(...), 'views_test_data');
       });
 
     $this->moduleHandler->expects($this->once())

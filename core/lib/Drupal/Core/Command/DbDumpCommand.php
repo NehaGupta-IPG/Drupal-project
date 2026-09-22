@@ -326,7 +326,7 @@ class DbDumpCommand extends DbCommandBase {
    */
   protected function fieldTypeMap(Connection $connection, $type) {
     // Convert everything to lowercase.
-    $map = array_map('strtolower', $connection->schema()->getFieldTypeMap());
+    $map = array_map(strtolower(...), $connection->schema()->getFieldTypeMap());
     $map = array_flip($map);
 
     // The MySql map contains type:size. Remove the size part.
@@ -346,7 +346,7 @@ class DbDumpCommand extends DbCommandBase {
    */
   protected function fieldSizeMap(Connection $connection, $type) {
     // Convert everything to lowercase.
-    $map = array_map('strtolower', $connection->schema()->getFieldTypeMap());
+    $map = array_map(strtolower(...), $connection->schema()->getFieldTypeMap());
     $map = array_flip($map);
 
     // Do nothing if the field type is not defined.

@@ -332,8 +332,9 @@ class Views {
       case 'all':
       case 'disabled':
       case 'enabled':
-        $filter = ucfirst($filter);
-        $views = call_user_func(static::class . "::get{$filter}Views");
+        $method = 'get' . ucfirst($filter) . 'Views';
+        $callable = static::$method(...);
+        $views = $callable();
         break;
 
       default:
