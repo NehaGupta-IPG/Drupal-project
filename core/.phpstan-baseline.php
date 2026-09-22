@@ -24576,7 +24576,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/Entity/Role.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$callback of function uasort expects callable\\(Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\)\\: int, array\\{class\\-string\\<static\\(Drupal\\\\user\\\\Entity\\\\Role\\)\\>, \'sort\'\\} given\\.$#',
+	'message' => '#^Parameter \\#2 \\$callback of function uasort expects callable\\(Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\)\\: int, Closure\\(Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityInterface, Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityInterface\\)\\: mixed given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/src/Entity/Role.php',
