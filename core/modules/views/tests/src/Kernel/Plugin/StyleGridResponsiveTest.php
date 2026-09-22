@@ -54,14 +54,14 @@ class StyleGridResponsiveTest extends PluginKernelTestBase {
     // Confirm that custom classes have been added.
     if (!empty($expected['grid_wrapper_class_custom'])) {
       foreach (explode(' ', $expected['grid_wrapper_class_custom']) as $class) {
-        $result = $this->xpath('//div[contains(@class, "views-view-responsive-grid") and contains(@class, :class)]', [':class' => $class]);
+        $result = $this->getSimpleXmlElementsByXpath('//div[contains(@class, "views-view-responsive-grid") and contains(@class, :class)]', [':class' => $class]);
         $this->assertGreaterThan(0, count($result), "Custom row class '$class' is present on the grid container.");
       }
     }
 
     if (!empty($expected['grid_cell_class_custom'])) {
       foreach (explode(' ', $expected['grid_cell_class_custom']) as $class) {
-        $result = $this->xpath('//div[contains(@class, "views-view-responsive-grid__item") and contains(@class, :class)]', [':class' => $class]);
+        $result = $this->getSimpleXmlElementsByXpath('//div[contains(@class, "views-view-responsive-grid__item") and contains(@class, :class)]', [':class' => $class]);
         $this->assertGreaterThan(0, count($result), "Custom column class '$class' is present on the grid items.");
       }
     }
