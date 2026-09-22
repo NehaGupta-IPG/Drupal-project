@@ -17,17 +17,22 @@ use Drupal\Core\Database\Expression;
  *     'arguments':array,
  *     'all_fields'?:bool,
  *   }
+ * @phpstan-type ColumnEntry array{
+ *     'name':string,
+ *     'table':string,
+ *     'alias':string,
+ *   }
  *
  * @property-read list<string> $comments
- * @property-read array<string,array{'field':string,'table':string,'alias':string}> $columns
- * @property-read array<string,AliasedExpression> $expressions
  * @property-read array<string,TableEntry> $tables
+ * @property-read array<string,ColumnEntry> $columns
+ * @property-read array<string,AliasedExpression> $expressions
  * @property-read array<string,Order> $orderBy
  * @property-read array<string,string> $groupBy
  * @property-read ?array{'start':int,'length':?int} $range
  * @property-read list<array{'type':UnionType,'query':Select}> $union
- * @property-read array $alterMetadata
- * @property-read array $alterTags
+ * @property-read array<string,mixed> $alterMetadata
+ * @property-read array<string,1> $alterTags
  */
 final class Select {
 
@@ -48,7 +53,7 @@ final class Select {
   /**
    * The columns to SELECT.
    *
-   * @var array<string,array{'field':string,'table':string,'alias':string}>
+   * @var array<string,ColumnEntry>
    */
   private array $columns = [];
 
@@ -145,6 +150,8 @@ final class Select {
 
   /**
    * The query tags.
+   *
+   * @var array<string,1>
    */
   private array $alterTags = [];
 
@@ -307,7 +314,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function addColumn(string $tableAlias, string $column, ?string $alias = NULL): static {
+  public function column(string $tableAlias, string $column, ?string $alias = NULL): static {
     // If no alias is specified, first try the column name itself.
     if (empty($alias)) {
       $alias = $column;
@@ -328,7 +335,7 @@ final class Select {
     $alias = $alias_candidate;
 
     $this->columns[$alias] = [
-      'field' => $column,
+      'name' => $column,
       'table' => $tableAlias,
       'alias' => $alias,
     ];
@@ -352,7 +359,7 @@ final class Select {
     if ($columns) {
       foreach ($columns as $column) {
         // We don't care what alias was assigned.
-        $this->addColumn($tableAlias, $column);
+        $this->column($tableAlias, $column);
       }
     }
     else {
@@ -376,7 +383,7 @@ final class Select {
    * @param array<string,string|int|float|bool> $arguments
    *   Any placeholder arguments needed for this expression.
    */
-  public function addExpression(string $expression, ?string $alias = NULL, array $arguments = []): static {
+  public function expression(string $expression, ?string $alias = NULL, array $arguments = []): static {
     if (empty($alias)) {
       $alias = 'expression';
     }
@@ -467,7 +474,7 @@ final class Select {
    * {@inheritdoc}
    */
   public function orderRandom(string $alias): static {
-    $this->addExpression('RAND()', $alias);
+    $this->expression('RAND()', $alias);
     $this->orderBy($alias);
     return $this;
   }
@@ -506,7 +513,7 @@ final class Select {
     $count = $this->prepareCountQuery();
 
     $query = static::build($count)
-      ->addExpression('COUNT(*)');
+      ->expression('COUNT(*)');
 
     return $query;
   }
@@ -549,7 +556,7 @@ final class Select {
 
     // If we've just removed all columns from the query, make sure there is at
     // least one so that the query still runs.
-    $count->addExpression('1');
+    $count->expression('1');
 
     // Ordering a count query is a waste of cycles, and breaks on some
     // databases anyway.

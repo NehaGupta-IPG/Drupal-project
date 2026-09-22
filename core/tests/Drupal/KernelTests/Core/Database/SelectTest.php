@@ -31,8 +31,8 @@ class SelectTest extends DatabaseTestBase {
    */
   public function testSimpleSelect(): void {
     $abstractQuery = DatabaseAbstractSelect::build('test')
-      ->addColumn('test', 'name')
-      ->addColumn('test', 'age', 'age')
+      ->column('test', 'name')
+      ->column('test', 'age', 'age')
       ->countQuery();
 
     $query = $this->connection->select('test');
@@ -59,8 +59,8 @@ class SelectTest extends DatabaseTestBase {
   public function testSimpleComment(): void {
     $abstractQuery = DatabaseAbstractSelect::build('test')
       ->comment('Testing query comments')
-      ->addColumn('test', 'name')
-      ->addColumn('test', 'age', 'age');
+      ->column('test', 'name')
+      ->column('test', 'age', 'age');
 
     $query = $this->connection->select('test')->comment('Testing query comments');
     $query->addField('test', 'name');
@@ -89,8 +89,8 @@ class SelectTest extends DatabaseTestBase {
   public function testVulnerableComment(): void {
     $abstractQuery = DatabaseAbstractSelect::build('test')
       ->comment('Testing query comments */ SELECT nid FROM {node}; --')
-      ->addColumn('test', 'name')
-      ->addColumn('test', 'age', 'age');
+      ->column('test', 'name')
+      ->column('test', 'age', 'age');
 
     $query = $this->connection->select('test')->comment('Testing query comments */ SELECT nid FROM {node}; --');
     $query->addField('test', 'name');
@@ -157,8 +157,8 @@ class SelectTest extends DatabaseTestBase {
    */
   public function testSimpleSelectConditional(): void {
     $abstractQuery = DatabaseAbstractSelect::build('test')
-      ->addColumn('test', 'name')
-      ->addColumn('test', 'age', 'age')
+      ->column('test', 'name')
+      ->column('test', 'age', 'age')
       ->condition('age', '=', 27);
 
     $query = $this->connection->select('test');
@@ -194,8 +194,8 @@ class SelectTest extends DatabaseTestBase {
    */
   public function testSimpleSelectExpression(): void {
     $abstractQuery = DatabaseAbstractSelect::build('test')
-      ->addColumn('test', 'name')
-      ->addExpression("[age]*2", 'double_age')
+      ->column('test', 'name')
+      ->expression("[age]*2", 'double_age')
       ->condition('age', '=', 27);
 
     $query = $this->connection->select('test');
@@ -231,9 +231,9 @@ class SelectTest extends DatabaseTestBase {
    */
   public function testSimpleSelectExpressionMultiple(): void {
     $abstractQuery = DatabaseAbstractSelect::build('test')
-      ->addColumn('test', 'name')
-      ->addExpression("[age]*2")
-      ->addExpression("[age]*3")
+      ->column('test', 'name')
+      ->expression("[age]*2")
+      ->expression("[age]*3")
       ->condition('age', '=', 27);
 
     $query = $this->connection->select('test');
@@ -852,7 +852,7 @@ class SelectTest extends DatabaseTestBase {
       ->execute();
 
     $abstractQuery = DatabaseAbstractSelect::build('test', 't')
-      ->addColumn('t', 'name')
+      ->column('t', 'name')
       ->condition("t.$column", $operator, $pattern);
 
     $query = $database->select('test', 't');
@@ -883,8 +883,8 @@ class SelectTest extends DatabaseTestBase {
     $this->assertNotSame($alias1, $alias2, 'Duplicate aliases are renamed.');
 
     $query = DatabaseAbstractSelect::build('test', 't')
-      ->addColumn('t', 'name', 'the_alias')
-      ->addColumn('t', 'age', 'the_alias');
+      ->column('t', 'name', 'the_alias')
+      ->column('t', 'age', 'the_alias');
     $reflectionColumns = new \ReflectionProperty($query, 'columns');
     $columns = $reflectionColumns->getValue($query);
     $this->assertSame(['the_alias', 't_age'], array_keys($columns));

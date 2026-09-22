@@ -25,8 +25,8 @@ class SelectOrderedTest extends DatabaseTestBase {
    */
   public function testSimpleSelectOrdered(): void {
     $abstractQuery = DatabaseAbstractSelect::build('test')
-      ->addColumn('test', 'name')
-      ->addColumn('test', 'age', 'age')
+      ->column('test', 'name')
+      ->column('test', 'age', 'age')
       ->orderBy('age');
 
     $query = $this->connection->select('test');
@@ -71,9 +71,9 @@ class SelectOrderedTest extends DatabaseTestBase {
    */
   public function testSimpleSelectMultiOrdered(): void {
     $abstractQuery = DatabaseAbstractSelect::build('test')
-      ->addColumn('test', 'name')
-      ->addColumn('test', 'age', 'age')
-      ->addColumn('test', 'job')
+      ->column('test', 'name')
+      ->column('test', 'age', 'age')
+      ->column('test', 'job')
       ->orderBy('job')
       ->orderBy('age');
 
@@ -135,8 +135,8 @@ class SelectOrderedTest extends DatabaseTestBase {
    */
   public function testSimpleSelectOrderedDesc(): void {
     $abstractQuery = DatabaseAbstractSelect::build('test')
-      ->addColumn('test', 'name')
-      ->addColumn('test', 'age', 'age')
+      ->column('test', 'name')
+      ->column('test', 'age', 'age')
       ->orderBy('age', Order::Desc);
 
     $query = $this->connection->select('test');

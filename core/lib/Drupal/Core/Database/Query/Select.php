@@ -197,7 +197,13 @@ class Select extends Query implements SelectInterface {
       }
     }
 
-    $this->fields = $abstractSelect->columns;
+    foreach ($abstractSelect->columns as $key => $column) {
+      $this->fields[$key] = [
+        'field' => $column['name'],
+        'table' => $column['table'],
+        'alias' => $column['alias'],
+      ];
+    }
 
     foreach ($abstractSelect->expressions as $key => $expression) {
       $this->expressions[$key] = [

@@ -20,8 +20,8 @@ class DatabaseAbstractSelectTest extends UnitTestCase {
    */
   public function testSerialization(): void {
     $abstractQuery = Select::build('test')
-      ->addColumn('test', 'name')
-      ->addColumn('test', 'age', 'age')
+      ->column('test', 'name')
+      ->column('test', 'age', 'age')
       ->countQuery();
 
     $serialized = serialize($abstractQuery);
@@ -39,8 +39,8 @@ class DatabaseAbstractSelectTest extends UnitTestCase {
     $this->expectExceptionMessageIs('Drupal\Core\Database\Query\DatabaseAbstract\Select objects containing alter metadata cannot be serialized');
 
     $abstractQuery = Select::build('test')
-      ->addColumn('test', 'name')
-      ->addColumn('test', 'age', 'age')
+      ->column('test', 'name')
+      ->column('test', 'age', 'age')
       ->addTag('foo')
       ->addMetaData('bar', new \stdClass())
       ->countQuery();
