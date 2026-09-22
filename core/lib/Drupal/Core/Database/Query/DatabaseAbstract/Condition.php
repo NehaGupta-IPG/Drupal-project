@@ -11,7 +11,7 @@ use Drupal\Core\Database\InvalidQueryException;
  * Generic class for a series of conditions in a query.
  *
  * @phpstan-type ConditionEntry array{
- *     'variable':string|Condition|Select,
+ *     'variable':string|Condition|Select|null,
  *     'operator':Operator,
  *     'value':string|int|bool|float|array|Select|null,
  *   }|Expression
@@ -41,7 +41,7 @@ final class Condition {
   /**
    * {@inheritdoc}
    */
-  public function condition(string|Condition|Select $variable, Operator|string $operator = Operator::Equal, string|int|bool|float|array|Select|null $value = NULL): static {
+  public function condition(string|Condition|Select|null $variable, Operator|string $operator = Operator::Equal, string|int|bool|float|array|Select|null $value = NULL): static {
     if (is_string($operator)) {
       $operator = Operator::from($operator);
     }
@@ -108,14 +108,14 @@ final class Condition {
    * {@inheritdoc}
    */
   public function exists(Select $select): static {
-    return $this->condition('', Operator::Exists, $select);
+    return $this->condition(NULL, Operator::Exists, $select);
   }
 
   /**
    * {@inheritdoc}
    */
   public function notExists(Select $select): static {
-    return $this->condition('', Operator::NotExists, $select);
+    return $this->condition(NULL, Operator::NotExists, $select);
   }
 
   /**

@@ -281,6 +281,9 @@ class Select extends Query implements SelectInterface {
       elseif ($tmp['variable'] instanceof DatabaseAbstractSelect) {
         $variable = $this->connection->select($tmp['variable']);
       }
+      elseif ($tmp['variable'] === NULL) {
+        $variable = '';
+      }
       else {
         $variable = $tmp['variable'];
       }

@@ -581,7 +581,7 @@ final class Select {
   /**
    * {@inheritdoc}
    */
-  public function condition(string|Condition|Select $variable, Operator|string $operator = Operator::Equal, string|int|bool|float|array|Select|null $value = NULL): static {
+  public function condition(string|Condition|Select|null $variable, Operator|string $operator = Operator::Equal, string|int|bool|float|array|Select|null $value = NULL): static {
     if (!isset($this->condition)) {
       $this->condition = new Condition($this->conjunction);
     }
