@@ -660,16 +660,19 @@ class SelectComplexTest extends DatabaseTestBase {
       ->expression('[tt].[pid] + 1', 'abc')
       ->condition('priority', '>', 1)
       ->condition('priority', '<', 100);
-    $abstractSubquery = DatabaseAbstractSelect::build('test', 'tp')
-      ->join('test_one_blob', 'tpb', '[tp].[id] = [tpb].[id]')
-      ->join('node', 'n', '[tp].[id] = [n].[nid]')
-      ->addTag('node_access')
-      ->addMetaData('account', $account)
-      ->column('tp', 'id')
-      ->condition('age', '>', 5)
-      ->condition('age', '<', 500);
-    $abstractQuery->leftJoin($abstractSubquery, 'sq', '[tt].[pid] = [sq].[id]')
-      ->join('test_one_blob', 'tb3', '[tt].[pid] = [tb3].[id]');
+      ->join('test_one_blob', 'tb3', '[tt].[pid] = [tb3].[id]')
+      ->leftJoin(
+        DatabaseAbstractSelect::build('test', 'tp')
+          ->join('test_one_blob', 'tpb', '[tp].[id] = [tpb].[id]')
+          ->join('node', 'n', '[tp].[id] = [n].[nid]')
+          ->addTag('node_access')
+          ->addMetaData('account', $account)
+          ->column('tp', 'id')
+          ->condition('age', '>', 5)
+          ->condition('age', '<', 500),
+        'sq',
+        '[tt].[pid] = [sq].[id]',
+      );
 
     $query = Database::getConnection('replica')->select('test_task', 'tt');
     $query->addExpression('[tt].[pid] + 1', 'abc');
