@@ -31,17 +31,43 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\AllowedValuesConstraint;
  *
  * Supported settings (below the definition's 'settings' key) are:
  * - target_type: The entity type to reference. Required.
+ *
+ * phpcs:ignoreFile
  */
 #[FieldType(
   id: "entity_reference",
   label: new TranslatableMarkup("Entity reference"),
-  description: new TranslatableMarkup("An entity field containing an entity reference."),
+  description: [
+    new TranslatableMarkup("Choose any content or configuration type to reference on the next screen"),
+  ],
   category: "reference",
   default_widget: "entity_reference_autocomplete",
   default_formatter: "entity_reference_label",
   list_class: EntityReferenceFieldItemList::class,
 )]
 class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProviderInterface, PreconfiguredFieldUiOptionsInterface {
+
+  /**
+   * The referenced entity, if it exists.
+   */
+  public ?EntityInterface $entity {
+    get => $this->__get('entity');
+
+    set(?EntityInterface $entity) {
+      $this->set('entity', $entity);
+    }
+  }
+
+  /**
+   * The ID of the referenced entity, if it exists.
+   */
+  public string|int|null $target_id {
+    get => $this->__get('target_id');
+
+    set(string|int|null $target_id) {
+      $this->set('target_id', $target_id);
+    }
+  }
 
   /**
    * {@inheritdoc}
@@ -75,13 +101,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       throw new FieldException('Entity type "' . $target_type_info->id() . '" has no ID key and cannot be targeted by entity reference field "' . $field_definition->getName() . '"');
     }
 
-    $target_id_data_type = 'string';
-    if ($target_type_info->entityClassImplements(FieldableEntityInterface::class)) {
-      $id_definition = \Drupal::service('entity_field.manager')->getBaseFieldDefinitions($settings['target_type'])[$target_type_info->getKey('id')];
-      if ($id_definition->getType() === 'integer') {
-        $target_id_data_type = 'integer';
-      }
-    }
+    $target_id_data_type = $target_type_info->hasIntegerId() ? 'integer' : 'string';
 
     if ($target_id_data_type === 'integer') {
       $target_id_definition = DataReferenceTargetDefinition::create('integer')
@@ -105,7 +125,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       // We can add a constraint for the target entity type. The list of
       // referenceable bundles is a field setting, so the corresponding
       // constraint is added dynamically in ::getConstraints().
-      ->addConstraint('EntityType', $settings['target_type']);
+      ->addConstraint('EntityType', ['type' => $settings['target_type']]);
 
     return $properties;
   }
@@ -763,6 +783,9 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     foreach ($common_references as $entity_type) {
       $options[$entity_type->id()] = [
         'label' => $entity_type->getLabel(),
+        'description' => new TranslatableMarkup('A reference to a(n) @item', [
+          '@item' => $entity_type->getSingularLabel(),
+        ]),
         'field_storage_config' => [
           'settings' => [
             'target_type' => $entity_type->id(),

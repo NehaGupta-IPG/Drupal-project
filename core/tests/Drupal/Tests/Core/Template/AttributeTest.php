@@ -26,6 +26,22 @@ use Twig\Markup as TwigMarkup;
 class AttributeTest extends UnitTestCase {
 
   /**
+   * Tests AttributeValueBase copy.
+   */
+  public function testAttributeValueBaseCopy(): void {
+    $original_attributes = new Attribute([
+      'checked' => TRUE,
+      'class' => ['who', 'is', 'on'],
+      'id' => 'first',
+    ]);
+    $attributes['selected'] = $original_attributes['checked'];
+    $attributes['id'] = $original_attributes['id'];
+    $attributes = new Attribute($attributes);
+    $this->assertSame(' checked class="who is on" id="first"', (string) $original_attributes, 'Original boolean value used with original name.');
+    $this->assertSame(' selected id="first"', (string) $attributes, 'Original boolean value used with new name.');
+  }
+
+  /**
    * Tests the constructor of the attribute class.
    */
   public function testConstructor(): void {
@@ -83,8 +99,6 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests setting attributes.
-   *
-   * @legacy-covers ::setAttribute
    */
   public function testSetAttribute(): void {
     $attribute = new Attribute();
@@ -112,8 +126,6 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests removing attributes.
-   *
-   * @legacy-covers ::removeAttribute
    */
   public function testRemoveAttribute(): void {
     $attributes = [
@@ -152,8 +164,6 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests adding class attributes with the AttributeArray helper method.
-   *
-   * @legacy-covers ::addClass
    */
   public function testAddClasses(): void {
     // Add a class with the array syntax without first initializing the 'class'
@@ -209,8 +219,6 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests removing class attributes with the AttributeArray helper method.
-   *
-   * @legacy-covers ::removeClass
    */
   public function testRemoveClasses(): void {
     // Add duplicate class to ensure that both duplicates are removed.
@@ -241,8 +249,6 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests checking for class names with the Attribute method.
-   *
-   * @legacy-covers ::hasClass
    */
   public function testHasClass(): void {
     // Test an attribute without any classes.
@@ -281,7 +287,7 @@ class AttributeTest extends UnitTestCase {
    * @legacy-covers ::addClass
    */
   #[DataProvider('providerTestAttributeClassHelpers')]
-  public function testTwigAddRemoveClasses($template, $expected, $seed_attributes = []): void {
+  public function testTwigAddRemoveClasses(string $template, string $expected, array $seed_attributes = []): void {
     $loader = new StringLoader();
     $twig = new Environment($loader);
     $data = ['attributes' => new Attribute($seed_attributes)];
@@ -361,7 +367,7 @@ class AttributeTest extends UnitTestCase {
     $attribute = new Attribute(['class' => ['example-class'], 'id' => 'example-id', 'enabled' => TRUE]);
 
     $content = $this->randomMachineName();
-    $html = '<div' . (string) $attribute . '>' . $content . '</div>';
+    $html = '<div' . $attribute . '>' . $content . '</div>';
     $this->assertClass('example-class', $html);
     $this->assertNoClass('example-class2', $html);
 
@@ -382,7 +388,24 @@ class AttributeTest extends UnitTestCase {
   }
 
   public static function providerTestAttributeValues(): array {
-    $data = [];
+    $data = [
+      'HTML-encoded attribute name' => [['&"\'<>' => 'value'], ' &amp;&quot;&#039;&lt;&gt;="value"'],
+      'HTML-encoded attribute value' => [['title' => '&"\'<>'], ' title="&amp;&quot;&#039;&lt;&gt;"'],
+      'multi-value attribute' => [['class' => ['first', 'last']], ' class="first last"'],
+      'true boolean attribute' => [['disabled' => TRUE], ' disabled'],
+      'false boolean attribute' => [['disabled' => FALSE], ''],
+      'empty attribute value' => [['alt' => ''], ' alt=""'],
+      'null attribute value' => [['alt' => NULL], ''],
+      'multiple attributes' => [
+        [
+          'id' => 'id-test',
+          'class' => ['first', 'last'],
+          'alt' => 'Alternate',
+        ],
+        ' id="id-test" class="first last" alt="Alternate"',
+      ],
+      'empty attributes array' => [[], ''],
+    ];
 
     $string = '"> <script>alert(123)</script>"';
     $data['safe-object-xss1'] = [['title' => Markup::create($string)], ' title="&quot;&gt; alert(123)&quot;"'];
@@ -504,11 +527,9 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests has attribute.
-   *
-   * @legacy-covers ::hasAttribute
    */
   #[DataProvider('providerTestHasAttribute')]
-  public function testHasAttribute(array $test_data, $test_attribute, $expected): void {
+  public function testHasAttribute(array $test_data, string $test_attribute, bool $expected): void {
     $attributes = new Attribute($test_data);
     $this->assertSame($expected, $attributes->hasAttribute($test_attribute));
   }
@@ -546,18 +567,14 @@ class AttributeTest extends UnitTestCase {
 
   /**
    * Tests merge.
-   *
-   * @legacy-covers ::merge
    */
   #[DataProvider('providerTestMerge')]
-  public function testMerge($original, $merge, $expected): void {
+  public function testMerge(Attribute $original, Attribute $merge, Attribute $expected): void {
     $this->assertEquals($expected, $original->merge($merge));
   }
 
   /**
    * Tests merge argument exception.
-   *
-   * @legacy-covers ::merge
    */
   public function testMergeArgumentException(): void {
     $attributes = new Attribute(['class' => ['example-class']]);

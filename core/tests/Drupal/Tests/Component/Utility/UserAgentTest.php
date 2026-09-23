@@ -70,11 +70,9 @@ class UserAgentTest extends TestCase {
 
   /**
    * Tests matching language from user agent.
-   *
-   * @legacy-covers ::getBestMatchingLangcode
    */
   #[DataProvider('providerTestGetBestMatchingLangcode')]
-  public function testGetBestMatchingLangcode($accept_language, $expected): void {
+  public function testGetBestMatchingLangcode(string $accept_language, string|bool $expected): void {
     $result = UserAgent::getBestMatchingLangcode($accept_language, $this->getLanguages(), $this->getMappings());
     $this->assertSame($expected, $result);
   }

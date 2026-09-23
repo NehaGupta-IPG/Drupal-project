@@ -26,8 +26,9 @@ use Drupal\file\Validation\FileValidatorSettingsTrait;
   id: "file",
   label: new TranslatableMarkup("File"),
   description: [
-    new TranslatableMarkup("For uploading files"),
-    new TranslatableMarkup("Can be configured with options such as allowed file extensions and maximum upload size"),
+    new TranslatableMarkup("Downloadable files"),
+    new TranslatableMarkup("Configure allowed file extensions, maximum upload size, and storage location"),
+    new TranslatableMarkup("Examples: document (pdf, txt), audio (mp3), video (avi, mov), downloadable image (jpeg, png, webp, gif), etc."),
   ],
   category: "file_upload",
   default_widget: "file_generic",
@@ -345,8 +346,9 @@ class FileItem extends EntityReferenceItem {
    * Retrieves the upload validators for a file field.
    *
    * @return array
-   *   An array suitable for passing to file_save_upload() or the file field
-   *   element's '#upload_validators' property.
+   *   An array suitable for passing to
+   *   FormFileUploader::saveFormUploadedFiles() or the file field element's
+   *   '#upload_validators' property.
    */
   public function getUploadValidators() {
     return $this->getFileUploadValidators($this->getSettings());

@@ -54,8 +54,6 @@ class TimestampNormalizerTest extends UnitTestCase {
 
   /**
    * Tests supports normalization.
-   *
-   * @legacy-covers ::supportsNormalization
    */
   public function testSupportsNormalization(): void {
     $this->assertTrue($this->normalizer->supportsNormalization($this->data->reveal()));
@@ -69,8 +67,6 @@ class TimestampNormalizerTest extends UnitTestCase {
 
   /**
    * Tests supports denormalization.
-   *
-   * @legacy-covers ::supportsDenormalization
    */
   public function testSupportsDenormalization(): void {
     $this->assertTrue($this->normalizer->supportsDenormalization($this->data->reveal(), Timestamp::class));
@@ -78,8 +74,6 @@ class TimestampNormalizerTest extends UnitTestCase {
 
   /**
    * Tests normalize.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalize(): void {
     $random_rfc_3339_string = $this->randomMachineName();
@@ -99,8 +93,6 @@ class TimestampNormalizerTest extends UnitTestCase {
 
   /**
    * Tests the denormalize function with good data.
-   *
-   * @legacy-covers ::denormalize
    */
   #[DataProvider('providerTestDenormalizeValidFormats')]
   public function testDenormalizeValidFormats($normalized, $expected): void {
@@ -114,18 +106,18 @@ class TimestampNormalizerTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestDenormalizeValidFormats() {
+  public static function providerTestDenormalizeValidFormats(): array {
     $expected_stamp = 1478422920;
 
     $data = [];
 
     $data['U'] = [$expected_stamp, $expected_stamp];
     $data['RFC3339'] = ['2016-11-06T09:02:00+00:00', $expected_stamp];
-    $data['RFC3339 +0100'] = ['2016-11-06T09:02:00+01:00', $expected_stamp - 1 * 3600];
+    $data['RFC3339 +0100'] = ['2016-11-06T09:02:00+01:00', $expected_stamp - 3600];
     $data['RFC3339 -0600'] = ['2016-11-06T09:02:00-06:00', $expected_stamp + 6 * 3600];
 
     $data['ISO8601'] = ['2016-11-06T09:02:00+0000', $expected_stamp];
-    $data['ISO8601 +0100'] = ['2016-11-06T09:02:00+0100', $expected_stamp - 1 * 3600];
+    $data['ISO8601 +0100'] = ['2016-11-06T09:02:00+0100', $expected_stamp - 3600];
     $data['ISO8601 -0600'] = ['2016-11-06T09:02:00-0600', $expected_stamp + 6 * 3600];
 
     return $data;
@@ -133,12 +125,10 @@ class TimestampNormalizerTest extends UnitTestCase {
 
   /**
    * Tests the denormalize function with bad data.
-   *
-   * @legacy-covers ::denormalize
    */
   public function testDenormalizeException(): void {
     $this->expectException(UnexpectedValueException::class);
-    $this->expectExceptionMessage('The specified date "2016/11/06 09:02am GMT" is not in an accepted format: "U" (UNIX timestamp), "Y-m-d\TH:i:sO" (ISO 8601), "Y-m-d\TH:i:sP" (RFC 3339).');
+    $this->expectExceptionMessageIs('The specified date "2016/11/06 09:02am GMT" is not in an accepted format: "U" (UNIX timestamp), "Y-m-d\TH:i:sO" (ISO 8601), "Y-m-d\TH:i:sP" (RFC 3339).');
 
     $normalized = '2016/11/06 09:02am GMT';
 
@@ -184,8 +174,8 @@ class TimestampNormalizerTestDrupalDateTime extends DrupalDateTime {
   /**
    * Sets the timezone.
    */
-  public function setTimezone(\DateTimeZone $timezone) {
-    parent::setTimezone($timezone);
+  public function setTimezone(\DateTimeZone $timezone): static {
+    return parent::setTimezone($timezone);
   }
 
 }

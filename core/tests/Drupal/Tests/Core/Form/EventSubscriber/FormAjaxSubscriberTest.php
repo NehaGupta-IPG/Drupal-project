@@ -8,12 +8,15 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Form\EventSubscriber\FormAjaxSubscriber;
 use Drupal\Core\Form\Exception\BrokenPostRequestException;
 use Drupal\Core\Form\FormAjaxException;
+use Drupal\Core\Form\FormAjaxResponseBuilderInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -33,14 +36,14 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   protected $subscriber;
 
   /**
-   * @var \Drupal\Core\Form\FormAjaxResponseBuilderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The form AJAX response builder mock.
    */
-  protected $formAjaxResponseBuilder;
+  protected FormAjaxResponseBuilderInterface&MockObject $formAjaxResponseBuilder;
 
   /**
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The HTTP kernel mock.
    */
-  protected $httpKernel;
+  protected HttpKernelInterface&Stub $httpKernel;
 
   /**
    * The mocked string translation.
@@ -50,18 +53,16 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   protected $stringTranslation;
 
   /**
-   * The mocked messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The messenger.
    */
-  protected $messenger;
+  protected MessengerInterface&Stub $messenger;
 
   /**
    * The event used to derive the response.
    *
    * @var \Symfony\Component\HttpKernel\Event\ExceptionEvent
    */
-  protected $event = NULL;
+  protected $event;
 
   /**
    * {@inheritdoc}
@@ -69,17 +70,15 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->httpKernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+    $this->httpKernel = $this->createStub(HttpKernelInterface::class);
     $this->formAjaxResponseBuilder = $this->createMock('Drupal\Core\Form\FormAjaxResponseBuilderInterface');
     $this->stringTranslation = $this->getStringTranslationStub();
-    $this->messenger = $this->createMock(MessengerInterface::class);
+    $this->messenger = $this->createStub(MessengerInterface::class);
     $this->subscriber = new FormAjaxSubscriber($this->formAjaxResponseBuilder, $this->stringTranslation, $this->messenger);
   }
 
   /**
    * Tests on exception.
-   *
-   * @legacy-covers ::onException
    */
   public function testOnException(): void {
     $form = ['#type' => 'form', '#build_id' => 'the_build_id'];
@@ -105,8 +104,6 @@ class FormAjaxSubscriberTest extends UnitTestCase {
 
   /**
    * Tests on exception new build id.
-   *
-   * @legacy-covers ::onException
    */
   public function testOnExceptionNewBuildId(): void {
     $form = ['#type' => 'form', '#build_id' => 'the_build_id'];
@@ -132,8 +129,6 @@ class FormAjaxSubscriberTest extends UnitTestCase {
 
   /**
    * Tests on exception other class.
-   *
-   * @legacy-covers ::onException
    */
   public function testOnExceptionOtherClass(): void {
     $request = new Request();
@@ -147,8 +142,6 @@ class FormAjaxSubscriberTest extends UnitTestCase {
 
   /**
    * Tests on exception response builder exception.
-   *
-   * @legacy-covers ::onException
    */
   public function testOnExceptionResponseBuilderException(): void {
     $form = ['#type' => 'form', '#build_id' => 'the_build_id'];
@@ -172,13 +165,12 @@ class FormAjaxSubscriberTest extends UnitTestCase {
 
   /**
    * Tests on exception broken post request.
-   *
-   * @legacy-covers ::onException
    */
   public function testOnExceptionBrokenPostRequest(): void {
     $this->formAjaxResponseBuilder->expects($this->never())
       ->method('buildResponse');
 
+    $this->messenger = $this->createMock(MessengerInterface::class);
     $this->messenger->expects($this->once())
       ->method('addError');
 
@@ -191,7 +183,7 @@ class FormAjaxSubscriberTest extends UnitTestCase {
     $renderer->expects($this->once())
       ->method('renderRoot')
       ->with()
-      ->willReturnCallback(function (&$elements) use ($rendered_output) {
+      ->willReturnCallback(function (array &$elements) use ($rendered_output): string {
         $elements['#attached'] = [];
         return $rendered_output;
       });

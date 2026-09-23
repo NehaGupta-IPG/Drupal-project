@@ -24,7 +24,7 @@ class Tasks extends InstallTasks {
   /**
    * Minimum required MariaDB version.
    */
-  const MARIADB_MINIMUM_VERSION = '10.6';
+  const MARIADB_MINIMUM_VERSION = '10.11';
 
   /**
    * The PDO driver name for MySQL and equivalent databases.
@@ -54,10 +54,10 @@ class Tasks extends InstallTasks {
       if ($this->getConnection()->isMariaDb()) {
         return $this->t('MariaDB');
       }
-      return $this->t('MySQL, Percona Server, or equivalent');
+      return $this->t('MySQL or equivalent');
     }
     catch (ConnectionNotDefinedException) {
-      return $this->t('MySQL, MariaDB, Percona Server, or equivalent');
+      return $this->t('MySQL, MariaDB, or equivalent');
     }
   }
 

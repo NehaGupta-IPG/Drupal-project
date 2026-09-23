@@ -5,7 +5,6 @@ namespace Drupal\user;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
@@ -18,36 +17,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class AccountSettingsForm extends ConfigFormBase {
 
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The role storage used when changing the admin role.
-   *
-   * @var \Drupal\user\RoleStorageInterface
-   */
-  protected $roleStorage;
-
-  /**
-   * Constructs a \Drupal\user\AccountSettingsForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\user\RoleStorageInterface $role_storage
-   *   The role storage.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ModuleHandlerInterface $module_handler, RoleStorageInterface $role_storage) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected RoleStorageInterface $roleStorage,
+    protected AccountCancellation $accountCancellation,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
-    $this->moduleHandler = $module_handler;
-    $this->roleStorage = $role_storage;
   }
 
   /**
@@ -57,8 +33,8 @@ class AccountSettingsForm extends ConfigFormBase {
     return new static(
       $container->get('config.factory'),
       $container->get('config.typed'),
-      $container->get('module_handler'),
-      $container->get('entity_type.manager')->getStorage('user_role')
+      $container->get('entity_type.manager')->getStorage('user_role'),
+      $container->get(AccountCancellation::class),
     );
   }
 
@@ -104,18 +80,6 @@ class AccountSettingsForm extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
-    // @todo Remove this check once language settings are generalized.
-    if ($this->moduleHandler->moduleExists('content_translation')) {
-      $form['language'] = [
-        '#type' => 'details',
-        '#title' => $this->t('Language settings'),
-        '#open' => TRUE,
-        '#tree' => TRUE,
-      ];
-      $form_state->set(['content_translation', 'key'], 'language');
-      $form['language'] += content_translation_enable_widget('user', 'user', $form, $form_state);
-    }
-
     // User registration settings.
     $form['registration_cancellation'] = [
       '#type' => 'details',
@@ -147,9 +111,14 @@ class AccountSettingsForm extends ConfigFormBase {
       '#type' => 'radios',
       '#title' => $this->t('When cancelling a user account'),
       '#config_target' => 'user.settings:cancel_method',
-      '#description' => $this->t('Users with the %select-cancel-method or %administer-users <a href=":permissions-url">permissions</a> can override this default method.', ['%select-cancel-method' => $this->t('Select method for cancelling account'), '%administer-users' => $this->t('Administer users'), ':permissions-url' => Url::fromRoute('user.admin_permissions')->toString()]),
+      '#description' => $this->t('Users with the %select-cancel-method or %administer-users <a href=":permissions-url">permissions</a> can override this default method.', [
+        '%select-cancel-method' => $this->t('Select method for cancelling account'),
+        '%administer-users' => $this->t('Administer users'),
+        ':permissions-url' => Url::fromRoute('user.admin_permissions')
+          ->toString(),
+      ]),
     ];
-    $form['registration_cancellation']['user_cancel_method'] += user_cancel_methods();
+    $form['registration_cancellation']['user_cancel_method'] += $this->accountCancellation->cancelMethods();
     foreach (Element::children($form['registration_cancellation']['user_cancel_method']) as $key) {
       // All account cancellation methods that specify #access cannot be
       // configured as default method.

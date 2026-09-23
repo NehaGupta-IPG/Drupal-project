@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Controller;
 
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\MainContent\AjaxRenderer;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -38,19 +40,10 @@ class AjaxRendererTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $element_info_manager = $this->createMock('Drupal\Core\Render\ElementInfoManagerInterface');
-    $element_info_manager->expects($this->any())
-      ->method('getInfo')
-      ->with('ajax')
-      ->willReturn([
-        '#header' => TRUE,
-        '#commands' => [],
-        '#error' => NULL,
-      ]);
-    $renderer = $this->createMock(RendererInterface::class);
-    $renderer->expects($this->any())
-      ->method('renderRoot')
-      ->willReturnCallback(function (&$elements, $is_root_call = FALSE) {
+    $element_info_manager = $this->createStub(ElementInfoManagerInterface::class);
+    $renderer = $this->createStub(RendererInterface::class);
+    $renderer->method('renderRoot')
+      ->willReturnCallback(function (array &$elements, $is_root_call = FALSE) {
         $elements += ['#attached' => []];
         if (isset($elements['#markup'])) {
           return $elements['#markup'];
@@ -67,6 +60,38 @@ class AjaxRendererTest extends UnitTestCase {
   }
 
   /**
+   * Tests renderResponse() when the render array has no #attached key.
+   */
+  public function testRenderWithoutAttached(): void {
+    $element_info_manager = $this->createStub(ElementInfoManagerInterface::class);
+    $renderer = $this->createStub(RendererInterface::class);
+    $renderer->method('renderRoot')
+      ->willReturnCallback(function (array &$elements, $is_root_call = FALSE) {
+        if (isset($elements['#markup'])) {
+          return $elements['#markup'];
+        }
+        elseif (isset($elements['#type'])) {
+          return $elements['#type'];
+        }
+        else {
+          return 'Markup';
+        }
+      });
+
+    $ajax_renderer = new AjaxRenderer($element_info_manager, $renderer);
+    $main_content = ['#markup' => 'example content'];
+    $request = new Request();
+    $route_match = $this->createStub(RouteMatchInterface::class);
+
+    $result = $ajax_renderer->renderResponse($main_content, $request, $route_match);
+
+    $this->assertInstanceOf('Drupal\Core\Ajax\AjaxResponse', $result);
+    $commands = $result->getCommands();
+    $this->assertEquals('insert', $commands[0]['command']);
+    $this->assertEquals('example content', $commands[0]['data']);
+  }
+
+  /**
    * Tests the content method.
    *
    * @legacy-covers ::renderResponse
@@ -74,7 +99,7 @@ class AjaxRendererTest extends UnitTestCase {
   public function testRenderWithFragmentObject(): void {
     $main_content = ['#markup' => 'example content'];
     $request = new Request();
-    $route_match = $this->createMock('Drupal\Core\Routing\RouteMatchInterface');
+    $route_match = $this->createStub(RouteMatchInterface::class);
     /** @var \Drupal\Core\Ajax\AjaxResponse $result */
     $result = $this->ajaxRenderer->renderResponse($main_content, $request, $route_match);
 

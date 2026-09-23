@@ -103,7 +103,7 @@ class DefaultsSectionStorageTest extends UnitTestCase {
     $this->assertSame('value 1', $this->plugin->getThirdPartySetting('the_module', 'the_key'));
 
     // When the section list is updated, also update the result returned.
-    $section_list->setThirdPartySetting('the_module', 'the_key', 'value 2')->shouldBeCalled()->will(function (array $args) use ($section_list) {
+    $section_list->setThirdPartySetting('the_module', 'the_key', 'value 2')->shouldBeCalled()->will(function (array $args) use ($section_list): void {
       $section_list->getThirdPartySetting('the_module', 'the_key', NULL)->willReturn($args[2]);
     });
 
@@ -124,8 +124,6 @@ class DefaultsSectionStorageTest extends UnitTestCase {
    *   The value to pass to ::extractEntityFromRoute().
    * @param array $defaults
    *   The defaults to pass to ::extractEntityFromRoute().
-   *
-   * @legacy-covers ::extractEntityFromRoute
    */
   #[DataProvider('providerTestExtractEntityFromRoute')]
   public function testExtractEntityFromRoute($success, $expected_entity_id, $value, array $defaults): void {
@@ -154,7 +152,7 @@ class DefaultsSectionStorageTest extends UnitTestCase {
   /**
    * Provides data for ::testExtractEntityFromRoute().
    */
-  public static function providerTestExtractEntityFromRoute() {
+  public static function providerTestExtractEntityFromRoute(): array {
     // Data provider values are:
     // - whether a successful result is expected
     // - the expected entity ID
@@ -199,8 +197,6 @@ class DefaultsSectionStorageTest extends UnitTestCase {
 
   /**
    * Tests extract entity from route create.
-   *
-   * @legacy-covers ::extractEntityFromRoute
    */
   public function testExtractEntityFromRouteCreate(): void {
     $expected = 'the_return_value';
@@ -424,8 +420,6 @@ class DefaultsSectionStorageTest extends UnitTestCase {
 
   /**
    * Tests build routes no field ui.
-   *
-   * @legacy-covers ::buildRoutes
    */
   public function testBuildRoutesNoFieldUi(): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);

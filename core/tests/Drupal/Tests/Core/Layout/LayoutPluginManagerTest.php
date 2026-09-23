@@ -114,7 +114,7 @@ class LayoutPluginManagerTest extends UnitTestCase {
     $class_loader->register(TRUE);
     $this->layoutPluginManager = new LayoutPluginManager($namespaces, $this->cacheBackend->reveal(), $this->moduleHandler->reveal(), $this->themeHandler->reveal());
 
-    $this->expectDeprecation('Using @Layout annotation for plugin with ID plugin_provided_by_annotation_layout is deprecated and is removed from drupal:13.0.0. Use a Drupal\Core\Layout\Attribute\Layout attribute instead. See https://www.drupal.org/node/3395575');
+    $this->expectUserDeprecationMessage('Using @Layout annotation for plugin with ID plugin_provided_by_annotation_layout is deprecated and is removed from drupal:13.0.0. Use a Drupal\Core\Layout\Attribute\Layout attribute instead. See https://www.drupal.org/node/3395575');
   }
 
   /**
@@ -263,13 +263,11 @@ class LayoutPluginManagerTest extends UnitTestCase {
 
   /**
    * Tests process definition.
-   *
-   * @legacy-covers ::processDefinition
    */
   public function testProcessDefinition(): void {
     $this->moduleHandler->alter('layout', Argument::type('array'))->shouldNotBeCalled();
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The "module_a_derived_layout:array_based" layout definition must extend ' . LayoutDefinition::class);
+    $this->expectExceptionMessageIs('The "module_a_derived_layout:array_based" layout definition must extend ' . LayoutDefinition::class);
     $module_a_provided_layout = <<<'EOS'
 module_a_derived_layout:
   deriver: \Drupal\Tests\Core\Layout\LayoutDeriver
@@ -279,27 +277,6 @@ EOS;
       'modules' => [
         'module_a' => [
           'module_a.layouts.yml' => $module_a_provided_layout,
-        ],
-      ],
-    ]);
-    $this->layoutPluginManager->getDefinitions();
-  }
-
-  /**
-   * Tests ::processDefinition() with a layout that doesn't have a label.
-   *
-   * @legacy-covers ::processDefinition
-   */
-  public function testProcessDefinitionWithMissingLayoutLabel(): void {
-    $this->expectDeprecation('A layout plugin not having a label is deprecated in drupal:11.4.0 and having a label will be enforced in drupal:12.0.0. See https://www.drupal.org/node/3464076');
-    $module_a_label_less_layout = <<<'EOS'
-module_a_label_less_layout:
-  description: A layout that doesn't have a label.
-EOS;
-    vfsStream::create([
-      'modules' => [
-        'module_a' => [
-          'module_a.layouts.yml' => $module_a_label_less_layout,
         ],
       ],
     ]);
@@ -331,8 +308,6 @@ EOS;
 
   /**
    * Tests get theme implementations.
-   *
-   * @legacy-covers ::getThemeImplementations
    */
   public function testGetThemeImplementations(): void {
     $core_path = '/core/lib/Drupal/Core';
@@ -366,8 +341,6 @@ EOS;
 
   /**
    * Tests get categories.
-   *
-   * @legacy-covers ::getCategories
    */
   public function testGetCategories(): void {
     $expected = [
@@ -380,8 +353,6 @@ EOS;
 
   /**
    * Tests get sorted definitions.
-   *
-   * @legacy-covers ::getSortedDefinitions
    */
   public function testGetSortedDefinitions(): void {
     // Sorted by category first, then label.
@@ -399,8 +370,6 @@ EOS;
 
   /**
    * Tests get grouped definitions.
-   *
-   * @legacy-covers ::getGroupedDefinitions
    */
   public function testGetGroupedDefinitions(): void {
     $category_expected = [
@@ -425,8 +394,6 @@ EOS;
 
   /**
    * Test that modules and themes can alter the list of layouts.
-   *
-   * @legacy-covers ::getLayoutOptions
    */
   public function testGetLayoutOptions(): void {
     $this->moduleHandler->alter(

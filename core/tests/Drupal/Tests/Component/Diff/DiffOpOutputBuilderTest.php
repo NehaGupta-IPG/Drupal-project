@@ -88,13 +88,30 @@ class DiffOpOutputBuilderTest extends TestCase {
         ['a', 'bb', 'd', 'ee'],
         ['a', 'b', 'c', 'd', 'e'],
       ],
+      // Differ prepends a line end warning when source and target use
+      // different end of line markings. It is skipped, the lines are a change.
+      'line end warning' => [
+        [new DiffOpChange(["foo\r\n"], ["foo\n"])],
+        ["foo\r\n"],
+        ["foo\n"],
+      ],
+      'line end warning, multiple lines' => [
+        [new DiffOpChange(["line1\r\n", "line2\r\n"], ["line1\n", "line2\n"])],
+        ["line1\r\n", "line2\r\n"],
+        ["line1\n", "line2\n"],
+      ],
+      // No warning is raised when both sides use the same end of line
+      // markings.
+      'consistent line ends' => [
+        [new DiffOpCopy(["foo\r\n"])],
+        ["foo\r\n"],
+        ["foo\r\n"],
+      ],
     ];
   }
 
   /**
    * Tests whether op classes returned match expectations.
-   *
-   * @legacy-covers ::toOpsArray
    */
   #[DataProvider('provideTestDiff')]
   public function testToOpsArray(array $expected, array $from, array $to): void {
@@ -105,7 +122,7 @@ class DiffOpOutputBuilderTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getDiff
+   * Tests get diff.
    */
   #[DataProvider('provideTestDiff')]
   public function testGetDiff(array $expected, array $from, array $to): void {

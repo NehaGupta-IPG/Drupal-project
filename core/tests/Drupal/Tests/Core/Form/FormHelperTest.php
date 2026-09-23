@@ -20,8 +20,6 @@ class FormHelperTest extends UnitTestCase {
 
   /**
    * Tests rewriting the #states selectors.
-   *
-   * @legacy-covers ::rewriteStatesSelector
    */
   public function testRewriteStatesSelector(): void {
 
@@ -91,11 +89,9 @@ class FormHelperTest extends UnitTestCase {
 
   /**
    * Tests process states.
-   *
-   * @legacy-covers ::processStates
    */
   #[DataProvider('providerElements')]
-  public function testProcessStates($elements, $key): void {
+  public function testProcessStates(array $elements, string $key): void {
     $json = Json::encode($elements['#states']);
     FormHelper::processStates($elements);
     $this->assertEquals(['core/drupal.states'], $elements['#attached']['library']);

@@ -15,11 +15,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class ValidPathConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = "Either the path '%link_path' is invalid or you do not have access to it.";
+  public function __construct(
+    public $message = "Either the path '%link_path' is invalid or you do not have access to it.",
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

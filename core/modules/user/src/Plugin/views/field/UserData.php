@@ -9,7 +9,6 @@ use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\ResultRow;
 use Drupal\user\UserDataInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides access to the user data service.
@@ -36,31 +35,12 @@ class UserData extends FieldPluginBase {
   protected $moduleHandler;
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('user.data'),
-      $container->get('module_handler'),
-      $container->get('extension.list.module')
-    );
-  }
-
-  /**
    * Constructs a UserData object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, UserDataInterface $user_data, ModuleHandlerInterface $module_handler, protected ?ModuleExtensionList $moduleExtensionList = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, UserDataInterface $user_data, ModuleHandlerInterface $module_handler, protected ModuleExtensionList $moduleExtensionList) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
     $this->userData = $user_data;
     $this->moduleHandler = $module_handler;
-    if ($this->moduleExtensionList === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleExtensionList argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
-      $this->moduleExtensionList = \Drupal::service('extension.list.module');
-    }
   }
 
   /**

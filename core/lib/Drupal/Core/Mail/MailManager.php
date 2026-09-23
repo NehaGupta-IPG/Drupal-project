@@ -229,9 +229,6 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
   public function doMail($module, $key, $to, $langcode, $params = [], $reply = NULL, $send = TRUE) {
     $site_config = $this->configFactory->get('system.site');
     $site_mail = $site_config->get('mail');
-    if (empty($site_mail)) {
-      $site_mail = ini_get('sendmail_from');
-    }
 
     // Bundle up the variables into a structured array for altering.
     $message = [
@@ -251,7 +248,7 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
     // Build the default headers.
     $headers = [
       'MIME-Version' => '1.0',
-      'Content-Type' => 'text/plain; charset=UTF-8; format=flowed; delsp=yes',
+      'Content-Type' => 'text/plain; charset=utf-8; format=flowed; delsp=yes',
       'Content-Transfer-Encoding' => '8Bit',
       'X-Mailer' => 'Drupal',
     ];

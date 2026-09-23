@@ -41,11 +41,9 @@ class HtmlTest extends TestCase {
    * @param array|null $filter
    *   (optional) An array of string replacements to use on the identifier. If
    *   NULL, no filter will be passed and a default will be used.
-   *
-   * @legacy-covers ::cleanCssIdentifier
    */
   #[DataProvider('providerTestCleanCssIdentifier')]
-  public function testCleanCssIdentifier($expected, $source, $filter = NULL): void {
+  public function testCleanCssIdentifier(string $expected, string $source, ?array $filter = NULL): void {
     if ($filter !== NULL) {
       $this->assertSame($expected, Html::cleanCssIdentifier($source, $filter));
     }
@@ -118,7 +116,7 @@ class HtmlTest extends TestCase {
    * @legacy-covers ::getUniqueId
    */
   #[DataProvider('providerTestHtmlGetUniqueId')]
-  public function testHtmlGetUniqueId($expected, $source, $reset = FALSE): void {
+  public function testHtmlGetUniqueId(string $expected, string $source, bool $reset = FALSE): void {
     if ($reset) {
       Html::resetSeenIds();
     }
@@ -160,7 +158,7 @@ class HtmlTest extends TestCase {
    * @legacy-covers ::getUniqueId
    */
   #[DataProvider('providerTestHtmlGetUniqueIdWithAjaxIds')]
-  public function testHtmlGetUniqueIdWithAjaxIds($expected, $source): void {
+  public function testHtmlGetUniqueIdWithAjaxIds(string $expected, string $source): void {
     Html::setIsAjax(TRUE);
     $id = Html::getUniqueId($source);
 
@@ -203,7 +201,7 @@ class HtmlTest extends TestCase {
    * @legacy-covers ::getId
    */
   #[DataProvider('providerTestHtmlGetId')]
-  public function testHtmlGetId($expected, $source): void {
+  public function testHtmlGetId(string $expected, string $source): void {
     Html::setIsAjax(FALSE);
     $this->assertSame($expected, Html::getId($source));
   }
@@ -233,11 +231,9 @@ class HtmlTest extends TestCase {
 
   /**
    * Tests Html::decodeEntities().
-   *
-   * @legacy-covers ::decodeEntities
    */
   #[DataProvider('providerDecodeEntities')]
-  public function testDecodeEntities($text, $expected): void {
+  public function testDecodeEntities(string $text, string $expected): void {
     $this->assertEquals($expected, Html::decodeEntities($text));
   }
 
@@ -274,11 +270,9 @@ class HtmlTest extends TestCase {
 
   /**
    * Tests Html::escape().
-   *
-   * @legacy-covers ::escape
    */
   #[DataProvider('providerEscape')]
-  public function testEscape($expected, $text): void {
+  public function testEscape(string $expected, string $text): void {
     $this->assertEquals($expected, Html::escape($text));
   }
 
@@ -330,8 +324,6 @@ class HtmlTest extends TestCase {
    * Resolves an issue by where an empty DOMDocument object sent to
    * serialization would cause errors in getElementsByTagName() in the
    * serialization function.
-   *
-   * @legacy-covers ::serialize
    */
   public function testSerialize(): void {
     $document = new \DOMDocument();
@@ -340,7 +332,7 @@ class HtmlTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::transformRootRelativeUrlsToAbsolute
+   * Tests transform root relative urls to absolute.
    */
   #[DataProvider('providerTestTransformRootRelativeUrlsToAbsolute')]
   public function testTransformRootRelativeUrlsToAbsolute($html, $scheme_and_host, $expected_html): void {
@@ -348,10 +340,10 @@ class HtmlTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::transformRootRelativeUrlsToAbsolute
+   * Tests transform root relative urls to absolute assertion.
    */
   #[DataProvider('providerTestTransformRootRelativeUrlsToAbsoluteAssertion')]
-  public function testTransformRootRelativeUrlsToAbsoluteAssertion($scheme_and_host): void {
+  public function testTransformRootRelativeUrlsToAbsoluteAssertion(string $scheme_and_host): void {
     $this->expectException(\AssertionError::class);
     Html::transformRootRelativeUrlsToAbsolute('', $scheme_and_host);
   }
@@ -362,7 +354,7 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public static function providerTestTransformRootRelativeUrlsToAbsolute() {
+  public static function providerTestTransformRootRelativeUrlsToAbsolute(): array {
     $data = [];
 
     // Random generator.

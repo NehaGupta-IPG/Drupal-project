@@ -33,7 +33,7 @@ class TypedConfigTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $configSchemaCheckerExclusions = ['config_test.validation'];
+  protected static array $configSchemaCheckerExclusions = ['config_test.validation'];
 
   /**
    * {@inheritdoc}
@@ -108,10 +108,13 @@ class TypedConfigTest extends KernelTestBase {
       'uuid',
       'string__not_blank',
       'host',
-      'composite',
       'block_id',
       'block_revision_id',
       'block_serialized',
+      'composite',
+      'string_concat_value_1',
+      'string_concat_value_2',
+      'string_concat_values',
     ], array_keys($typed_config->getElements()));
     $this->assertSame('config_test.validation', $typed_config->getName());
     $this->assertSame('config_test.validation', $typed_config->getPropertyPath());

@@ -17,11 +17,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class UriHostConstraint extends SymfonyConstraint {
 
-  /**
-   * The error message if validation fails.
-   *
-   * @var string
-   */
-  public string $message = 'This value should conform to RFC 3986 URI host component.';
+  public function __construct(
+    public string $message = 'This value should conform to RFC 3986 URI host component.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

@@ -20,8 +20,6 @@ class CacheTagsInvalidatorTest extends UnitTestCase {
 
   /**
    * Tests invalidate tags with invalid tags.
-   *
-   * @legacy-covers ::invalidateTags
    */
   public function testInvalidateTagsWithInvalidTags(): void {
     $cache_tags_invalidator = new CacheTagsInvalidator();
@@ -48,7 +46,7 @@ class CacheTagsInvalidatorTest extends UnitTestCase {
     // We do not have to define that invalidateTags() is never called as the
     // interface does not define that method, trying to call it would result in
     // a fatal error.
-    $non_invalidator_cache_bin = $this->createMock(CacheBackendInterface::class);
+    $non_invalidator_cache_bin = $this->createStub(CacheBackendInterface::class);
     $cache_tags_invalidator->addBin($non_invalidator_cache_bin);
 
     $invalidator = $this->createMock(CacheTagsInvalidatorInterface::class);

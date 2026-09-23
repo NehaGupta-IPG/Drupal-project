@@ -28,8 +28,6 @@ class ConfigDependenciesTest extends KernelTestBase {
 
   /**
    * Tests calculate dependencies.
-   *
-   * @legacy-covers ::calculateDependencies
    */
   #[DataProvider('providerBasicDependencies')]
   public function testCalculateDependencies(array $configuration): void {
@@ -65,7 +63,7 @@ class ConfigDependenciesTest extends KernelTestBase {
    *   An array with numerical keys:
    *   0. The original REST resource configuration.
    */
-  public static function providerBasicDependencies() {
+  public static function providerBasicDependencies(): array {
     return [
       'method' => [
         [
@@ -142,7 +140,7 @@ class ConfigDependenciesTest extends KernelTestBase {
    * @legacy-covers ::onDependencyRemovalForResourceGranularity
    */
   #[DataProvider('providerOnDependencyRemovalForResourceGranularity')]
-  public function testOnDependencyRemovalForResourceGranularity(array $configuration, $module, $expected_configuration): void {
+  public function testOnDependencyRemovalForResourceGranularity(array $configuration, string $module, bool|array $expected_configuration): void {
     assert(is_string($module));
     assert($expected_configuration === FALSE || is_array($expected_configuration));
 
@@ -163,7 +161,7 @@ class ConfigDependenciesTest extends KernelTestBase {
    *   1. The module to uninstall (the dependency that is about to be removed).
    *   2. The expected configuration after uninstalling this module.
    */
-  public static function providerOnDependencyRemovalForResourceGranularity() {
+  public static function providerOnDependencyRemovalForResourceGranularity(): array {
     return [
       'resource with multiple formats' => [
         [

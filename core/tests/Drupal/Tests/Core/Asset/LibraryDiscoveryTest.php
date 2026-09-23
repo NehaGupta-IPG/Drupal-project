@@ -4,31 +4,23 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Asset;
 
-use Drupal\Core\Asset\LibraryDiscovery;
+use Drupal\Core\Asset\LibraryDiscoveryCollector;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * Tests Drupal\Core\Asset\LibraryDiscovery.
+ * Tests Drupal\Core\Asset\LibraryDiscoveryCollector.
  */
-#[CoversClass(LibraryDiscovery::class)]
+#[CoversClass(LibraryDiscoveryCollector::class)]
 #[Group('Asset')]
 class LibraryDiscoveryTest extends UnitTestCase {
 
   /**
    * The tested library discovery service.
-   *
-   * @var \Drupal\Core\Asset\LibraryDiscoveryCollector
    */
-  protected $libraryDiscovery;
-
-  /**
-   * The cache tags invalidator.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $cacheTagsInvalidator;
+  protected LibraryDiscoveryCollector&MockObject $libraryDiscovery;
 
   /**
    * Test library data.
@@ -63,16 +55,15 @@ class LibraryDiscoveryTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->cacheTagsInvalidator = $this->createMock('Drupal\Core\Cache\CacheTagsInvalidatorInterface');
     $this->libraryDiscovery = $this->getMockBuilder('Drupal\Core\Asset\LibraryDiscoveryCollector')
       ->onlyMethods(['resolveCacheMiss', 'getLibrariesByExtension'])
       ->disableOriginalConstructor()
       ->getMock();
-    $this->libraryDiscovery->expects($this->any())
+    $this->libraryDiscovery
       ->method('resolveCacheMiss')
       ->with('test')
       ->willReturn($this->libraryData);
-    $this->libraryDiscovery->expects($this->any())
+    $this->libraryDiscovery
       ->method('getLibrariesByExtension')
       ->with('test')
       ->willReturn($this->libraryData);
@@ -80,8 +71,6 @@ class LibraryDiscoveryTest extends UnitTestCase {
 
   /**
    * Tests getting a library by name.
-   *
-   * @legacy-covers ::getLibraryByName
    */
   public function testGetLibraryByName(): void {
     $this->assertSame($this->libraryData['test_1'], $this->libraryDiscovery->getLibraryByName('test', 'test_1'));
