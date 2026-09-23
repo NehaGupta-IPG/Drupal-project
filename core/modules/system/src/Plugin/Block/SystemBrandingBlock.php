@@ -139,7 +139,7 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
         '#access' => $this->configuration['use_site_logo'],
       ];
       // SVG uses an inline template. Otherwise, use the image factory.
-      if ($extension === 'svg') {
+      if ($extension === 'svg' && file_exists($logo_uri)) {
         $build['site_logo']['#type'] = 'inline_template';
         $build['site_logo']['#template'] = file_get_contents($logo_uri);
       }
