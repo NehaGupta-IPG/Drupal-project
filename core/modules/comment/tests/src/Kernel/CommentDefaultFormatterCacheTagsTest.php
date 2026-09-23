@@ -35,11 +35,6 @@ class CommentDefaultFormatterCacheTagsTest extends EntityKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Create user 1 so that the user created later in the test has a different
-    // user ID.
-    // @todo Remove in https://www.drupal.org/node/540008.
-    $this->createUser([], NULL, FALSE, ['uid' => 1, 'name' => 'user1'])->save();
-
     $this->container->get('module_handler')->loadInclude('comment', 'install');
     comment_install();
 
