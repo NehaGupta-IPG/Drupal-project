@@ -791,7 +791,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $t2_name = 'George';
 
     $abstractQuery = DatabaseAbstractSelect::build('test', 't1')
-      ->innerJoin('test', 't2', (DatabaseAbstractCondition::and()
+      ->join('test', 't2', (DatabaseAbstractCondition::and()
         ->condition('t1.name', '=', $t1_name)
         ->condition('t2.name', '=', $t2_name)
       ))
