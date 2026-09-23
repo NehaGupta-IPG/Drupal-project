@@ -512,11 +512,11 @@ class SelectTest extends DatabaseTestBase {
   public function testUnion(): void {
     $abstractQuery1 = DatabaseAbstractSelect::build('test', 't')
       ->columns('t', ['name'])
-      ->condition('age', 'IN', [27, 28]);
-    $abstractQuery2 = DatabaseAbstractSelect::build('test', 't')
-      ->columns('t', ['name'])
-      ->condition('age', '=', 28);
-    $abstractQuery1->union($abstractQuery2);
+      ->condition('age', 'IN', [27, 28])
+      ->union(DatabaseAbstractSelect::build('test', 't')
+        ->columns('t', ['name'])
+        ->condition('age', '=', 28)
+      );
 
     $query_1 = $this->connection->select('test', 't')
       ->fields('t', ['name'])
@@ -548,11 +548,13 @@ class SelectTest extends DatabaseTestBase {
   public function testUnionAll(): void {
     $abstractQuery1 = DatabaseAbstractSelect::build('test', 't')
       ->columns('t', ['name'])
-      ->condition('age', 'IN', [27, 28]);
-    $abstractQuery2 = DatabaseAbstractSelect::build('test', 't')
-      ->columns('t', ['name'])
-      ->condition('age', '=', 28);
-    $abstractQuery1->union($abstractQuery2, UnionType::All);
+      ->condition('age', 'IN', [27, 28])
+      ->union(
+        DatabaseAbstractSelect::build('test', 't')
+          ->columns('t', ['name'])
+          ->condition('age', '=', 28),
+        UnionType::All,
+      );
 
     $query_1 = $this->connection->select('test', 't')
       ->fields('t', ['name'])
@@ -631,7 +633,7 @@ class SelectTest extends DatabaseTestBase {
       ->union(
         DatabaseAbstractSelect::build('test', 't')
           ->columns('t', ['name'])
-          ->condition('age', '=', 26)
+          ->condition('age', '=', 26),
       )
       ->orderBy('name', Order::Desc);
 

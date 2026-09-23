@@ -659,7 +659,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $abstractQuery = DatabaseAbstractSelect::build('test_task', 'tt')
       ->expression('[tt].[pid] + 1', 'abc')
       ->condition('priority', '>', 1)
-      ->condition('priority', '<', 100);
+      ->condition('priority', '<', 100)
       ->join('test_one_blob', 'tb3', '[tt].[pid] = [tb3].[id]')
       ->leftJoin(
         DatabaseAbstractSelect::build('test', 'tp')
