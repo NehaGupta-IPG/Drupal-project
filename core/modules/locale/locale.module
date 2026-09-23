@@ -356,7 +356,6 @@ function locale_system_update(array $components): void {
   // because it would break out of the installer flow. We have
   // built-in support for translation imports in the installer.
   if (!InstallerKernel::installationAttempted() && \Drupal::service(LocaleLanguages::class)->getTranslatableLanguages()) {
-    $module_handler = \Drupal::moduleHandler();
     if (\Drupal::config('locale.settings')->get('translation.import_enabled')) {
 
       // Update the list of translatable projects and start the import batch.
