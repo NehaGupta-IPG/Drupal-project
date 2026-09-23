@@ -418,7 +418,7 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
   /**
    * Tests the comment field item list 'view comment list' access.
    */
-  public function testFieldViewOnlyOperationAccess(): void {
+  public function testFieldViewCommentListOperationAccess(): void {
     // Enable comment statistics creation.
     $this->container->get('state')->set('comment.maintain_entity_statistics', TRUE);
 
