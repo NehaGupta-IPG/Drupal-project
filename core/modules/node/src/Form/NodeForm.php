@@ -235,7 +235,9 @@ class NodeForm extends ContentEntityForm {
       '#weight' => 20,
       '#submit' => ['::submitForm', '::preview'],
     ];
-
+    if (array_key_exists('cancel', $element)) {
+      $element['cancel']['#weight'] = 50;
+    }
     if (array_key_exists('delete', $element)) {
       $element['delete']['#weight'] = 100;
     }

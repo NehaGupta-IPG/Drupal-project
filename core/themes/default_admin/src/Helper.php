@@ -156,7 +156,7 @@ final class Helper {
     $link['#options']['attributes'] += ['class' => []];
 
     // Determine the needed (type) variant.
-    $variants_supported = ['default', 'danger'];
+    $variants_supported = ['default', 'cancel', 'danger'];
     $variant = in_array($variant, $variants_supported) ? $variant : reset($variants_supported);
 
     // Remove button, button modifier CSS classes and other unwanted ones.
@@ -164,6 +164,7 @@ final class Helper {
       'button',
       'button--action',
       'button--primary',
+      'button--cancel',
       'button--danger',
       'button--small',
       'button--extrasmall',

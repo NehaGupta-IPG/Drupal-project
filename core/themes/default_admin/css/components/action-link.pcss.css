@@ -133,6 +133,18 @@
 /**
  * Action link variants.
  */
+
+/* Cancel. */
+
+.action-link--cancel {
+  color: var(--admin-color-primary);
+
+  &:hover {
+    color: var(--admin-color-bg-surface);
+    background-color: var(--admin-color-primary);
+  }
+}
+
 /* Danger. */
 .action-link--danger {
   color: var(--admin-color-text-error);
@@ -155,6 +167,19 @@
   &::before {
     content: "";
     mask-image: url(../../images/icons/545560/trash.svg);
+  }
+
+  /* Trash action link rendered as a button. */
+  &.action-link--cancel {
+    border: 2px solid var(--admin-color-primary);
+    border-radius: var(--admin-radius-m);
+    font-size: var(--admin-font-size-s);
+    line-height: 1;
+    padding-block: calc(var(--admin-space-s) - 2px);
+    padding-inline: var(--admin-space-m);
+    &::before {
+      content: none;
+    }
   }
 
   /* Trash action link rendered as a button. */
