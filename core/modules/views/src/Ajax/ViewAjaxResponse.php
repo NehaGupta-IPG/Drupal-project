@@ -68,14 +68,19 @@ class ViewAjaxResponse extends CacheableAjaxResponse {
     $this->view->setDisplay($data['display_id']);
     \Drupal::requestStack()->pop();
 
-    // Restore other properties.
-    unset($data['request'], $data['view_id'], $data['display_id']);
-
     // Symfony 8.1 deprecated assigning the headers property directly.
     // Restore it through the constructor, which is the recommended approach.
     Response::__construct($data['content'], $data['statusCode'], $data['headers']);
-    unset($data['headers']);
 
+    // Restore other properties.
+    unset(
+      $data['request'],
+      $data['view_id'],
+      $data['display_id'],
+      $data['content'],
+      $data['statusCode'],
+      $data['headers'],
+    );
     foreach ($data as $key => $value) {
       $this->{$key} = $value;
     }
