@@ -230,27 +230,39 @@ class FileUpload {
    *   The account for which file upload access should be checked.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
    *   The field definition for which to get validators.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface|null $entity
    *   (optional) The entity to which the file is to be uploaded, if it exists.
    *   If the entity does not exist and it is not given, create access to the
    *   entity the file is attached to will be checked.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The file upload access result.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown when the given field definition does not match the given entity.
    */
   public static function checkFileUploadAccess(AccountInterface $account, FieldDefinitionInterface $field_definition, ?EntityInterface $entity = NULL) {
-    assert(is_null($entity) ||
-      $field_definition->getTargetEntityTypeId() === $entity->getEntityTypeId() &&
+    if (!is_null($entity) && (
+      $field_definition->getTargetEntityTypeId() !== $entity->getEntityTypeId() ||
       // Base fields do not have target bundles.
-      (is_null($field_definition->getTargetBundle()) || $field_definition->getTargetBundle() === $entity->bundle())
-    );
+      (!is_null($field_definition->getTargetBundle()) && $field_definition->getTargetBundle() !== $entity->bundle())
+    )) {
+      throw new \InvalidArgumentException(sprintf(
+        'The field definition "%s:%s" does not match the given entity "%s:%s".',
+        $field_definition->getTargetEntityTypeId(),
+        $field_definition->getTargetBundle() ?? 'any',
+        $entity->getEntityTypeId(),
+        $entity->bundle(),
+      ));
+    }
     $entity_type_manager = \Drupal::entityTypeManager();
     $entity_access_control_handler = $entity_type_manager->getAccessControlHandler($field_definition->getTargetEntityTypeId());
     $bundle = $entity_type_manager->getDefinition($field_definition->getTargetEntityTypeId())->hasKey('bundle') ? $field_definition->getTargetBundle() : NULL;
     $entity_access_result = $entity
       ? $entity_access_control_handler->access($entity, 'update', $account, TRUE)
       : $entity_access_control_handler->createAccess($bundle, $account, [], TRUE);
-    $field_access_result = $entity_access_control_handler->fieldAccess('edit', $field_definition, NULL, NULL, TRUE);
+    $field_items = $entity?->get($field_definition->getName());
+    $field_access_result = $entity_access_control_handler->fieldAccess('edit', $field_definition, $account, $field_items, TRUE);
     return $entity_access_result->andIf($field_access_result);
   }
 
@@ -265,9 +277,7 @@ class FileUpload {
    *   The entity, if one exists, for which the file is to be uploaded.
    */
   protected static function ensureFileUploadAccess(AccountInterface $account, FieldDefinitionInterface $field_definition, ?FieldableEntityInterface $entity = NULL) {
-    $access_result = $entity
-      ? static::checkFileUploadAccess($account, $field_definition, $entity)
-      : static::checkFileUploadAccess($account, $field_definition);
+    $access_result = static::checkFileUploadAccess($account, $field_definition, $entity);
     if (!$access_result->isAllowed()) {
       $reason = 'The current user is not permitted to upload a file for this field.';
       if ($access_result instanceof AccessResultReasonInterface) {
