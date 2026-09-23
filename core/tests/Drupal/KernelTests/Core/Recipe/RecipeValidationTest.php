@@ -227,7 +227,7 @@ YAML,
 name: 'Only installs extensions'
 install:
   - filter
-  - drupal:default_admin
+  - drupal:claro
 YAML,
       NULL,
     ];
@@ -237,8 +237,8 @@ name: 'Correct config import list'
 config:
   import:
     config_test: '*'
-    default_admin:
-      - default_admin.settings
+    claro:
+      - claro.settings
 YAML,
       NULL,
     ];

@@ -7,7 +7,7 @@ use Drupal\Core\Database\Connection;
 /**
  * General class for an abstracted TRUNCATE operation.
  */
-class Truncate extends Query implements QueryExecutionVoidInterface {
+class Truncate extends Query {
 
   /**
    * The table to truncate.
@@ -40,16 +40,26 @@ class Truncate extends Query implements QueryExecutionVoidInterface {
    * PostgreSQL also locks the entire table for a TRUNCATE strongly reducing
    * the concurrency with other transactions.
    *
+   * @return int|null
+   *   Return value is dependent on whether the executed SQL statement is a
+   *   TRUNCATE or a DELETE. TRUNCATE is DDL and no information on affected
+   *   rows is available. DELETE is DML and will return the number of affected
+   *   rows. In general, do not rely on the value returned by this method in
+   *   calling code.
+   *
    * @see https://learnsql.com/blog/difference-between-truncate-delete-and-drop-table-in-sql
    */
-  public function execute(): void {
-    $statement = $this->connection->prepareStatement((string) $this, $this->queryOptions, TRUE);
+  public function execute() {
+    $stmt = $this->connection->prepareStatement((string) $this, $this->queryOptions, TRUE);
     try {
-      $statement->execute([], $this->queryOptions);
+      $stmt->execute([], $this->queryOptions);
+      return $stmt->rowCount();
     }
     catch (\Exception $e) {
-      $this->connection->exceptionHandler()->handleExecutionException($e, $statement, [], $this->queryOptions);
+      $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, [], $this->queryOptions);
     }
+
+    return NULL;
   }
 
   /**

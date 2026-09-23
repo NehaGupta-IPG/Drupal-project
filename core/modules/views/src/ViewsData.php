@@ -20,14 +20,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class ViewsData {
 
   /**
-   * The cache tags to apply to all cache entries.
-   */
-  const array CACHE_TAGS = [
-    'views_data',
-    'config:core.extension',
-  ];
-
-  /**
    * The base cache ID to use.
    *
    * @var string
@@ -77,8 +69,6 @@ class ViewsData {
     protected CacheBackendInterface $cacheBackend,
     protected ModuleHandlerInterface $moduleHandler,
     protected LanguageManagerInterface $languageManager,
-    #[Autowire(service: 'cache.discovery')]
-    protected CacheBackendInterface $chainedFastBackend,
   ) {
     $this->langcode = $this->languageManager->getCurrentLanguage()->getId();
   }
@@ -133,10 +123,10 @@ class ViewsData {
 
     if (!isset($this->storage[$key])) {
       // Prepare a cache ID for get and set.
-      $cid = $this->prepareCid($this->baseCid . ':' . $key);
+      $cid = $this->baseCid . ':' . $key;
       $from_cache = FALSE;
 
-      if ($data = $this->chainedFastBackend->get($cid)) {
+      if ($data = $this->cacheGet($cid)) {
         $this->storage[$key] = $data->data;
         $from_cache = TRUE;
       }
@@ -159,10 +149,38 @@ class ViewsData {
         }
 
         // Create a cache entry for the requested table.
-        $this->chainedFastBackend->set($cid, $this->allStorage[$key], Cache::PERMANENT, static::CACHE_TAGS);
+        $this->cacheSet($cid, $this->allStorage[$key]);
       }
     }
     return $this->storage[$key];
+  }
+
+  /**
+   * Gets data from the cache backend.
+   *
+   * @param string $cid
+   *   The cache ID to return.
+   *
+   * @return mixed
+   *   The cached data.
+   */
+  protected function cacheGet($cid) {
+    return $this->cacheBackend->get($this->prepareCid($cid));
+  }
+
+  /**
+   * Sets data to the cache backend.
+   *
+   * @param string $cid
+   *   The cache ID to set.
+   * @param mixed $data
+   *   The data that will be cached.
+   */
+  protected function cacheSet($cid, $data) {
+    return $this->cacheBackend->set($this->prepareCid($cid), $data, Cache::PERMANENT, [
+      'views_data',
+      'config:core.extension',
+    ]);
   }
 
   /**
@@ -187,8 +205,7 @@ class ViewsData {
    *   An array of all data.
    */
   protected function getData() {
-    $cid = $this->prepareCid($this->baseCid);
-    if ($cache = $this->cacheBackend->get($cid)) {
+    if ($cache = $this->cacheGet($this->baseCid)) {
       $data = $cache->data;
     }
     else {
@@ -214,7 +231,7 @@ class ViewsData {
       $this->processEntityTypes($data);
 
       // Keep a record with all data.
-      $this->cacheBackend->set($cid, $data, Cache::PERMANENT, static::CACHE_TAGS);
+      $this->cacheSet($this->baseCid, $data);
     }
 
     $this->fullyLoaded = TRUE;

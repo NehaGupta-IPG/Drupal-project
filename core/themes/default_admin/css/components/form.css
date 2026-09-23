@@ -18,6 +18,7 @@
 /**
  * General form item.
  */
+
 .form-item {
   margin-block: var(--admin-space-l);
 
@@ -27,7 +28,7 @@
   }
 
   /* Special case, form starts with a form item, remove margin-block-start. */
-  #block-default-admin-content > form > &:first-of-type {
+  #block-gin-content > form > &:first-of-type {
     margin-block-start: 0;
   }
 
@@ -65,6 +66,7 @@
 /**
  * Form element label.
  */
+
 .form-item__label {
   display: block;
   margin-block: 0 var(--admin-space-xs);
@@ -101,6 +103,7 @@
 }
 
 /* Multiple selectors used to ensure styling even if modules override markup. */
+
 .form-item__label--multiple-value-form,
 .field-multiple-table .field-label h4.label {
   display: inline-block;
@@ -129,6 +132,7 @@
 /**
  * Form item description.
  */
+
 .form-item__description {
   max-width: var(--admin-max-line-length);
   color: var(--admin-color-text-soft);
@@ -144,6 +148,7 @@
 /**
  * Error message (Inline form errors).
  */
+
 .form-item__error-message {
   margin-block: calc(6rem / 16); /* 6px */
   color: var(--admin-color-error);
@@ -158,6 +163,7 @@
 }
 
 /* Add some spacing so that the focus ring and suffix don't overlap. */
+
 @media screen and (min-width: 37.5625rem) {
   .form-item__suffix {
     margin-inline-start: var(--admin-space-xs);
@@ -168,6 +174,7 @@
 /**
  * Form actions.
  */
+
 .form-actions,
 .field-actions {
   display: flex;
@@ -209,6 +216,7 @@
  * @legacy
  * @todo These should be in a standalone component file.
  */
+
 .confirm-parent,
 .password-parent {
   overflow: visible;
@@ -223,6 +231,7 @@
 /**
  * Custom label placement for editor filter format select.
  */
+
 .form-item--editor-format {
   display: flex;
   flex-wrap: wrap;
@@ -271,6 +280,7 @@
  *
  * @legacy
  */
+
 @media screen and (max-width: 37.5rem) {
   .password-strength {
     width: 100%;
@@ -284,9 +294,11 @@
  * Prevent regression due to explicit line-heights applied to these elements in
  * normalize.css 7.0.0.
  */
+
 button {
   line-height: 1.125rem;
 }
+
 input,
 optgroup {
   line-height: 1.5rem;
@@ -296,6 +308,7 @@ optgroup {
  * Prevent regression due to -webkit-appearance being set to button in
  * normalize.css 4.1.0.
  */
+
 ::-webkit-file-upload-button {
   -webkit-appearance: push-button;
 }

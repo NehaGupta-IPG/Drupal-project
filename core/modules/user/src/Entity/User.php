@@ -14,7 +14,6 @@ use Drupal\Core\Flood\PrefixFloodInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\UserSessionRepositoryInterface;
 use Drupal\user\Form\UserCancelForm;
-use Drupal\user\NotificationHandler;
 use Drupal\user\ProfileForm;
 use Drupal\user\ProfileTranslationHandler;
 use Drupal\user\RegisterForm;
@@ -169,13 +168,8 @@ class User extends ContentEntityBase implements UserInterface {
       // Send emails after we have the new user object.
       if ($this->status->value != $this->getOriginal()->status->value) {
         // The user's status is changing; conditionally send notification email.
-        $notificationHandler = \Drupal::service(NotificationHandler::class);
-        if ($this->isActive()) {
-          $notificationHandler->sendStatusActivated($this);
-        }
-        else {
-          $notificationHandler->sendStatusBlocked($this);
-        }
+        $op = $this->status->value == 1 ? 'status_activated' : 'status_blocked';
+        _user_mail_notify($op, $this);
       }
     }
   }
@@ -561,11 +555,7 @@ class User extends ContentEntityBase implements UserInterface {
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time that the user was created.'))
-      ->setDisplayOptions('view', [
-        'region' => 'hidden',
-      ])
-      ->setDisplayConfigurable('view', TRUE);
+      ->setDescription(t('The time that the user was created.'));
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))

@@ -6,8 +6,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\locale\StringStorageInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\locale\LocaleDefaultOptions;
-use Drupal\locale\LocaleLanguages;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines the locale user interface translation form base.
@@ -17,18 +16,59 @@ use Drupal\locale\LocaleLanguages;
 abstract class TranslateFormBase extends FormBase {
 
   /**
+   * The locale storage.
+   *
+   * @var \Drupal\locale\StringStorageInterface
+   */
+  protected $localeStorage;
+
+  /**
+   * The state store.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  protected $state;
+
+  /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Filter values. Shared between objects that inherit this class.
    *
    * @var array|null
    */
   protected static $filterValues;
 
-  public function __construct(
-    protected StringStorageInterface $localeStorage,
-    protected StateInterface $state,
-    protected LanguageManagerInterface $languageManager,
-    protected LocaleLanguages $localeLanguages,
-  ) {}
+  /**
+   * Constructs a new TranslationFormBase object.
+   *
+   * @param \Drupal\locale\StringStorageInterface $locale_storage
+   *   The locale storage.
+   * @param \Drupal\Core\State\StateInterface $state
+   *   The state service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
+   */
+  public function __construct(StringStorageInterface $locale_storage, StateInterface $state, LanguageManagerInterface $language_manager) {
+    $this->localeStorage = $locale_storage;
+    $this->state = $state;
+    $this->languageManager = $language_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('locale.storage'),
+      $container->get('state'),
+      $container->get('language_manager')
+    );
+  }
 
   /**
    * Builds a string search query and returns an array of string objects.
@@ -121,7 +161,7 @@ abstract class TranslateFormBase extends FormBase {
     $languages = $this->languageManager->getLanguages();
     $language_options = [];
     foreach ($languages as $langcode => $language) {
-      if ($this->localeLanguages->isTranslatable($langcode)) {
+      if (locale_is_translatable($langcode)) {
         $language_options[$langcode] = $language->getName();
       }
     }
@@ -159,8 +199,8 @@ abstract class TranslateFormBase extends FormBase {
       'title' => $this->t('Translation type'),
       'options' => [
         'all' => $this->t('All'),
-        LocaleDefaultOptions::NOT_CUSTOMIZED => $this->t('Non-customized translation'),
-        LocaleDefaultOptions::CUSTOMIZED => $this->t('Customized translation'),
+        LOCALE_NOT_CUSTOMIZED => $this->t('Non-customized translation'),
+        LOCALE_CUSTOMIZED => $this->t('Customized translation'),
       ],
       'states' => [
         'visible' => [

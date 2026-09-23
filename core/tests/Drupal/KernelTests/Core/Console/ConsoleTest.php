@@ -9,13 +9,13 @@ use Drupal\console_test\Command\ConsoleExampleCommand;
 use Drupal\console_test\Command\ConsoleExampleConfigureCommand;
 use Drupal\console_test\Command\ConsoleExamplePrivateCommand;
 use Drupal\Core\DependencyInjection\Compiler\ConsoleCompilerPass;
-use Drupal\KernelTests\DrupalApplicationTesterTrait;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LazyCommand;
+use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
  * Tests integration with Symfony Console.
@@ -25,7 +25,6 @@ use Symfony\Component\Console\Command\LazyCommand;
 #[CoversClass(ConsoleCompilerPass::class)]
 #[CoversClass(ConsoleExampleCommand::class)]
 class ConsoleTest extends KernelTestBase {
-  use DrupalApplicationTesterTrait;
 
   /**
    * {@inheritdoc}
@@ -115,6 +114,16 @@ class ConsoleTest extends KernelTestBase {
     $code = $tester->run(['command' => 'example:sub:command'], ['capture_stderr_separately' => TRUE]);
     $this->assertEquals(Command::SUCCESS, $code, $tester->getErrorOutput());
     $this->assertStringContainsString('[OK] Done', $tester->getDisplay());
+  }
+
+  /**
+   * Builds an ApplicationTester to invoke `vendor/bin/dr`.
+   */
+  private function applicationTester(array $context = []): ApplicationTester {
+    $application = include __DIR__ . '/../../../../../../vendor/bin/dr';
+    $application = $application($context);
+    $application->setAutoExit(FALSE);
+    return new ApplicationTester($application);
   }
 
 }

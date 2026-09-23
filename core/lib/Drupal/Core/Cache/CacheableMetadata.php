@@ -89,7 +89,6 @@ class CacheableMetadata implements RefinableCacheableDependencyInterface {
    * @return static
    *   A new CacheableMetadata object, with the merged data.
    */
-  #[\NoDiscard]
   public function merge(CacheableMetadata $other) {
     $result = clone $this;
 

@@ -13,7 +13,6 @@ use Drupal\editor\Plugin\EditorManager;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\editor\Entity\Editor.
@@ -31,8 +30,10 @@ class EditorConfigEntityUnitTest extends UnitTestCase {
 
   /**
    * The entity type manager used for testing.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected EntityTypeManagerInterface&MockObject $entityTypeManager;
+  protected $entityTypeManager;
 
   /**
    * The ID of the type of the entity under test.
@@ -50,8 +51,10 @@ class EditorConfigEntityUnitTest extends UnitTestCase {
 
   /**
    * The editor plugin manager used for testing.
+   *
+   * @var \Drupal\editor\Plugin\EditorManager|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected EditorManager&MockObject $editorPluginManager;
+  protected $editorPluginManager;
 
   /**
    * Editor plugin ID.

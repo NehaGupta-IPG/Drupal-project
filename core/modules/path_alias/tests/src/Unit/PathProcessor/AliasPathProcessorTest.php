@@ -6,13 +6,11 @@ namespace Drupal\Tests\path_alias\Unit\PathProcessor;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\path_alias\AliasManagerInterface;
 use Drupal\path_alias\PathProcessor\AliasPathProcessor;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -25,8 +23,10 @@ class AliasPathProcessorTest extends UnitTestCase {
 
   /**
    * The mocked alias manager.
+   *
+   * @var \Drupal\path_alias\AliasManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected AliasManagerInterface&MockObject $aliasManager;
+  protected $aliasManager;
 
   /**
    * The tested path processor.

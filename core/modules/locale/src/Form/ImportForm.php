@@ -6,14 +6,12 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\file\Upload\ManagedFileElementHelper;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\File\LocaleFile;
 use Drupal\locale\LocaleConfigBatch;
 use Drupal\locale\LocaleImportBatch;
-use Drupal\locale\LocaleLanguages;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -34,9 +32,8 @@ class ImportForm extends FormBase {
     protected ModuleHandlerInterface $moduleHandler,
     #[Autowire('language_manager')]
     protected ConfigurableLanguageManagerInterface $languageManager,
-    protected LocaleImportBatch $localeImportBatch,
-    protected LocaleConfigBatch $localeConfigBatch,
-    protected LocaleLanguages $localeLanguages,
+    protected readonly LocaleImportBatch $localeImportBatch,
+    protected readonly LocaleConfigBatch $localeConfigBatch,
   ) {}
 
   /**
@@ -56,7 +53,7 @@ class ImportForm extends FormBase {
     // are to translate Drupal to English as well.
     $existing_languages = [];
     foreach ($languages as $langcode => $language) {
-      if ($this->localeLanguages->isTranslatable($langcode)) {
+      if (locale_is_translatable($langcode)) {
         $existing_languages[$langcode] = $language->getName();
       }
     }
@@ -138,7 +135,7 @@ class ImportForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $this->file = \Drupal::service(ManagedFileElementHelper::class)->saveFileUploads($form['file'], $form_state, 0);
+    $this->file = _file_save_upload_from_form($form['file'], $form_state, 0);
 
     // Ensure we have the file uploaded.
     if (!$this->file) {
@@ -161,7 +158,7 @@ class ImportForm extends FormBase {
     $options = array_merge(LocaleDefaultOptions::updateOptions(), [
       'langcode' => $form_state->getValue('langcode'),
       'overwrite_options' => $form_state->getValue('overwrite_options'),
-      'customized' => $form_state->getValue('customized') ? LocaleDefaultOptions::CUSTOMIZED : LocaleDefaultOptions::NOT_CUSTOMIZED,
+      'customized' => $form_state->getValue('customized') ? LOCALE_CUSTOMIZED : LOCALE_NOT_CUSTOMIZED,
     ]);
     $this->moduleHandler->loadInclude('locale', 'bulk.inc');
     $file = LocaleFile::createFromPath($this->file->getFilename(), $this->file->getFileUri(), $options['langcode']);

@@ -528,7 +528,7 @@ class WebAssert extends MinkWebAssert {
       $replacement = function ($matches) use ($value) {
         return $value;
       };
-      $xpath = preg_replace_callback('/' . preg_quote($placeholder) . '\b/', $replacement, $xpath);
+      $xpath = preg_replace_callback('/' . preg_quote($placeholder, NULL) . '\b/', $replacement, $xpath);
     }
     return $xpath;
   }
@@ -594,7 +594,7 @@ class WebAssert extends MinkWebAssert {
    * @throws \Behat\Mink\Exception\ExpectationException
    *   When the condition is not fulfilled.
    */
-  public function assert($condition, $message): void {
+  public function assert($condition, $message) {
     if ($condition) {
       return;
     }
@@ -939,7 +939,7 @@ class WebAssert extends MinkWebAssert {
       $selector = $this->buildXPathQuery($selector . '//div[(contains(@aria-label, :aria_label) or contains(@aria-labelledby, :type)) and contains(., :message)]', [
         // Value of the 'aria-label' attribute, used in Stark.
         ':aria_label' => $aria_label,
-        // Value of the 'aria-labelledby' attribute, used in core themes.
+        // Value of the 'aria-labelledby' attribute, used in Claro and Olivero.
         ':type' => $type,
         ':message' => $message,
       ]);

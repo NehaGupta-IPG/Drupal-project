@@ -7,7 +7,6 @@ namespace Drupal\Tests\locale\Functional;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,7 +20,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class LocalePathTest extends BrowserTestBase {
 
   use PathAliasTestTrait;
-  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -38,8 +36,6 @@ class LocalePathTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->enablePromotedContentView();
 
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
     $this->config('system.site')->set('page.front', '/node')->save();
@@ -84,7 +80,7 @@ class LocalePathTest extends BrowserTestBase {
     // Check that the "xx" front page is readily available because path prefix
     // negotiation is pre-configured.
     $this->drupalGet($prefix);
-    $this->assertSession()->pageTextContains('No promoted content has been created yet.');
+    $this->assertSession()->pageTextContains('Welcome!');
 
     // Create a node.
     $node = $this->drupalCreateNode(['type' => 'page']);

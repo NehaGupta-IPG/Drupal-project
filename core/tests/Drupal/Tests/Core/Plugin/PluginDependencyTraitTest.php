@@ -184,13 +184,17 @@ class TestPluginDependency {
 
   /**
    * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected ModuleHandlerInterface $moduleHandler;
+  protected $moduleHandler;
 
   /**
    * The theme handler.
+   *
+   * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
-  protected ThemeHandlerInterface $themeHandler;
+  protected $themeHandler;
 
   public function setModuleHandler(ModuleHandlerInterface $module_handler): void {
     $this->moduleHandler = $module_handler;
@@ -200,11 +204,11 @@ class TestPluginDependency {
     $this->themeHandler = $theme_handler;
   }
 
-  protected function moduleHandler(): ModuleHandlerInterface {
+  protected function moduleHandler() {
     return $this->moduleHandler;
   }
 
-  protected function themeHandler(): ThemeHandlerInterface {
+  protected function themeHandler() {
     return $this->themeHandler;
   }
 
@@ -212,7 +216,7 @@ class TestPluginDependency {
    * @return array[]
    *   The dependencies.
    */
-  public function getDependencies(): array {
+  public function getDependencies() {
     return $this->dependencies;
   }
 

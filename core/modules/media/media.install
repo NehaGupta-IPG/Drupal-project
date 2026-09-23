@@ -8,7 +8,6 @@
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
-use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 
 /**
@@ -42,13 +41,8 @@ function media_install(): void {
 
   // Grant the "view media" permission to all users by default.
   if (\Drupal::moduleHandler()->moduleExists('user')) {
-    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)?->grantPermissions([
-      'view media',
-    ])?->save();
-
-    Role::loadOverrideFree(RoleInterface::AUTHENTICATED_ID)?->grantPermissions([
-      'view media',
-    ])?->save();
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['view media']);
+    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['view media']);
   }
 }
 

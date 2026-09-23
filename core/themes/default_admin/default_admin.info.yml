@@ -5,6 +5,7 @@ description: A clean, accessible and powerful Drupal administration theme with a
 alt text: Screenshot of Default Admin, the Drupal administration theme.
 package: Core
 version: VERSION
+lifecycle: experimental
 
 libraries:
   - core/drupal.message
@@ -65,6 +66,29 @@ libraries-override:
     css:
       theme:
         css/field_ui.admin.css: css/theme/field-ui.admin.css
+
+  node/drupal.node:
+    css:
+      layout:
+        css/node.module.css: false
+
+  node/form:
+    css:
+      layout:
+        css/node.module.css: false
+
+  toolbar/toolbar:
+    css:
+      component:
+        css/toolbar.module.css: css/components/toolbar.module.css
+      theme:
+        css/toolbar.theme.css: css/theme/toolbar.theme.css
+        css/toolbar.icons.theme.css: css/theme/toolbar.icons.theme.css
+
+  toolbar/toolbar.menu:
+    css:
+      state:
+        css/toolbar.menu.css: css/state/toolbar.menu.css
 
   views_ui/admin.styling:
     css:

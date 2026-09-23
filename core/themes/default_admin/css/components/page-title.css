@@ -4,10 +4,12 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
+
 /**
  * @file
  * Page title.
  */
+
 .block-page-title-block {
   margin-block: var(--admin-space-s);
 }

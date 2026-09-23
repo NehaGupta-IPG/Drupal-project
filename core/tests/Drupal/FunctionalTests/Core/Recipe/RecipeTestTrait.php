@@ -8,7 +8,6 @@ use Composer\InstalledVersions;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\Composer\ComposerIntegrationTrait;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -16,8 +15,6 @@ use Symfony\Component\Process\Process;
  * Contains helper methods for interacting with recipes in functional tests.
  */
 trait RecipeTestTrait {
-
-  use ComposerIntegrationTrait;
 
   /**
    * Creates a recipe in a temporary directory.
@@ -103,7 +100,7 @@ trait RecipeTestTrait {
 
     // `dr` must be run from the project root.
     ['install_path' => $project_root] = InstalledVersions::getRootPackage();
-    array_unshift($arguments, (new PhpExecutableFinder())->find(), static::binDir() . '/dr');
+    array_unshift($arguments, (new PhpExecutableFinder())->find(), 'vendor/bin/dr');
 
     $process = (new Process($arguments))
       ->setWorkingDirectory($project_root)

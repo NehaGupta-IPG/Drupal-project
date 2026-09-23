@@ -11,7 +11,6 @@
 #views-display-menu-tabs {
   display: flex;
 }
-
 div.views-display-top {
   input.button {
     display: inline-block;

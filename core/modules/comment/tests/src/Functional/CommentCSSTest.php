@@ -8,7 +8,6 @@ use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\Traits\Core\GeneratePermutationsTrait;
-use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -36,10 +35,10 @@ class CommentCSSTest extends CommentTestBase {
     parent::setUp();
 
     // Allow anonymous users to see comments.
-    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments',
       'access content',
-    ])->save();
+    ]);
   }
 
   /**

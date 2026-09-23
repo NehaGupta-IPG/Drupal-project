@@ -31,7 +31,6 @@ class ContextualLinksTest extends WebDriverTestBase {
     'layout_test',
     'block',
     'node',
-    'node_block_test',
     'contextual',
   ];
 

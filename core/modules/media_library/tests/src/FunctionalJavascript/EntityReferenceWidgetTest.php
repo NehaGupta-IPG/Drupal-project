@@ -245,14 +245,12 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $session = $this->getSession();
     $session->getPage()->fillField('Name', 'Dog');
     $session->getPage()->pressButton('Apply filters');
-    $assert_session->assertExpectedAjaxRequest(9);
-    $assert_session->pageTextContains('Dog');
-    $assert_session->pageTextNotContains('Bear');
+    $this->waitForText('Dog');
+    $this->waitForNoText('Bear');
     $session->getPage()->fillField('Name', '');
     $session->getPage()->pressButton('Apply filters');
-    $assert_session->assertExpectedAjaxRequest(10);
-    $assert_session->pageTextContains('Dog');
-    $assert_session->pageTextContains('Bear');
+    $this->waitForText('Dog');
+    $this->waitForText('Bear');
     $assert_session->elementExists('css', '.ui-dialog-titlebar-close')->click();
 
     // Assert adding a single media item and removing it.
@@ -612,8 +610,6 @@ JS;
    * Tests the preview displayed by the field widget.
    */
   public function testWidgetPreview(): void {
-    // @todo Fix random test failure.
-    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3569225');
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

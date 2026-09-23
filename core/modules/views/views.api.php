@@ -967,7 +967,7 @@ function hook_views_preview_info_alter(array &$rows, ViewExecutable $view) {
  * This hook will fire whenever a view is enabled, disabled, created,
  * updated, or deleted.
  *
- * @see \Drupal\views\Views::invalidateCache()
+ * @see views_invalidate_cache()
  */
 function hook_views_invalidate_cache(): void {
   Cache::invalidateTags(['views']);

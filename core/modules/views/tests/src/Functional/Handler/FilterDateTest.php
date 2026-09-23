@@ -46,12 +46,12 @@ class FilterDateTest extends ViewTestBase {
   public $dateFormatter;
 
   /**
-   * The nodes.
+   * @var array
    */
   protected array $nodes;
 
   /**
-   * The map.
+   * @var array
    */
   protected array $map;
 
@@ -221,9 +221,6 @@ class FilterDateTest extends ViewTestBase {
     $this->drupalLogin($this->drupalCreateUser(['administer views']));
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_date_between/default/filter/created');
     $this->submitForm([], 'Expose filter');
-    // Check that date filter defaults use date-appropriate labels.
-    $this->assertSession()->fieldValueEquals('options[expose][min_label]', 'Start date');
-    $this->assertSession()->fieldValueEquals('options[expose][max_label]', 'End date');
     $this->submitForm([], 'Grouped filters');
 
     $edit = [];

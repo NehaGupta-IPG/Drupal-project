@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_link_content\Kernel;
 
-use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
@@ -45,7 +44,7 @@ class PathAliasMenuLinkContentTest extends KernelTestBase {
 
     // Ensure that the weight of module_link_content is higher than system.
     // @see menu_link_content_install()
-    \Drupal::service(ModuleWeight::class)->set('menu_link_content', 1);
+    module_set_weight('menu_link_content', 1);
   }
 
   /**

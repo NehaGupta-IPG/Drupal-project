@@ -232,10 +232,12 @@ class MockContainerInjection implements ContainerInjectionInterface {
 
   /**
    * The test value saved during construction.
+   *
+   * @var string
    */
-  protected string $result;
+  protected $result;
 
-  public function __construct(string $result) {
+  public function __construct($result) {
     $this->result = $result;
   }
 
@@ -243,7 +245,7 @@ class MockContainerInjection implements ContainerInjectionInterface {
     return new static('This used injection.');
   }
 
-  public function getResult(): string {
+  public function getResult() {
     return $this->result;
   }
 

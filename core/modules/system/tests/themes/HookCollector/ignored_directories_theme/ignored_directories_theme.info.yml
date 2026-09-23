@@ -1,5 +1,0 @@
-name: 'Test theme with hooks in ignored directories'
-type: theme
-description: 'Test theme with hooks in ignored directories.'
-version: VERSION
-base theme: false

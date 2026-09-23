@@ -41,7 +41,7 @@ class UserAnonymousActivateTest extends KernelTestBase {
 
     // Test that the anonymous user cannot be activated.
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessageIs('The anonymous user account should remain blocked at all times.');
+    $this->expectExceptionMessage('The anonymous user account should remain blocked at all times.');
     $accountAnon->activate();
   }
 

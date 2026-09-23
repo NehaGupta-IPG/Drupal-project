@@ -101,7 +101,7 @@ class FormBuilderTest extends FormTestBase {
     $form_arg = 'foo';
     $form_state = new FormState();
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs('The form class foo could not be found or loaded.');
+    $this->expectExceptionMessage('The form class foo could not be found or loaded.');
     $this->formBuilder->getFormId($form_arg, $form_state);
   }
 
@@ -112,7 +112,7 @@ class FormBuilderTest extends FormTestBase {
     $form_arg = \stdClass::class;
     $form_state = new FormState();
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs("The form argument $form_arg must be an instance of \Drupal\Core\Form\FormInterface.");
+    $this->expectExceptionMessage("The form argument $form_arg must be an instance of \Drupal\Core\Form\FormInterface.");
     $this->formBuilder->getFormId($form_arg, $form_state);
   }
 
@@ -200,7 +200,7 @@ class FormBuilderTest extends FormTestBase {
       });
 
     $this->callableResolver->method('getCallableFromDefinition')
-      ->willReturnCallback(fn ($definition) => is_callable($definition) ? $definition : [$form_arg, 'submitForm']);
+      ->willReturn([$form_arg, 'submitForm']);
 
     $form_state = new FormState();
     try {
@@ -248,7 +248,7 @@ class FormBuilderTest extends FormTestBase {
       });
 
     $this->callableResolver->method('getCallableFromDefinition')
-      ->willReturnCallback(fn ($definition) => is_callable($definition) ? $definition : [$form_arg, 'submitForm']);
+      ->willReturn([$form_arg, 'submitForm']);
 
     $form_state = new FormState();
     try {
@@ -269,7 +269,7 @@ class FormBuilderTest extends FormTestBase {
   public function testGetFormWithString(): void {
     $form_id = 'test_form_id';
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs('The form class test_form_id could not be found or loaded.');
+    $this->expectExceptionMessage('The form class test_form_id could not be found or loaded.');
     $this->formBuilder->getForm($form_id);
   }
 
@@ -308,7 +308,7 @@ class FormBuilderTest extends FormTestBase {
   public function testBuildFormWithString(): void {
     $form_id = 'test_form_id';
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs('The form class test_form_id could not be found or loaded.');
+    $this->expectExceptionMessage('The form class test_form_id could not be found or loaded.');
     $this->formBuilder->getForm($form_id);
   }
 
@@ -578,7 +578,7 @@ class FormBuilderTest extends FormTestBase {
     $expected_form = self::buildTestFormStructure();
     $expected_form['#build_id'] = $form_build_id;
     $form_arg = $this->getMockForm($form_id, $expected_form);
-    $form_arg->expects($this->once())
+    $form_arg->expects($this->exactly(2))
       ->method('submitForm')
       ->willReturnCallback(function (array &$form, FormStateInterface $form_state): void {
         // Mimic EntityForm by cleaning the $form_state upon submit.
@@ -586,7 +586,7 @@ class FormBuilderTest extends FormTestBase {
       });
 
     $this->callableResolver->method('getCallableFromDefinition')
-      ->willReturnCallback(fn ($definition) => is_callable($definition) ? $definition : [$form_arg, 'submitForm']);
+      ->willReturn([$form_arg, 'submitForm']);
 
     $this->formCache->expects($this->once())
       ->method('deleteCache')
@@ -1135,9 +1135,9 @@ class TestForm implements FormInterface {
     return FormBuilderTest::buildTestFormStructure();
   }
 
-  public function validateForm(array &$form, FormStateInterface $form_state): void {}
+  public function validateForm(array &$form, FormStateInterface $form_state) {}
 
-  public function submitForm(array &$form, FormStateInterface $form_state): void {}
+  public function submitForm(array &$form, FormStateInterface $form_state) {}
 
 }
 
@@ -1158,7 +1158,7 @@ class TestFormInjected extends TestForm implements ContainerInjectionInterface {
 class TestFormWithPredefinedForm extends TestForm {
 
   /**
-   * The form data.
+   * @var array
    */
   protected array $form;
 

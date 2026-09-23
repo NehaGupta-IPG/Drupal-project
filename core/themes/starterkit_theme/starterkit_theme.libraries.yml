@@ -102,6 +102,11 @@ item-list:
     component:
       css/components/item-list.css:
         weight: -10
+search-results:
+  version: VERSION
+  css:
+    component:
+      css/components/search-results.css: {  }
 user:
   version: VERSION
   css:

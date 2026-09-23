@@ -59,11 +59,11 @@ final class ProjectSecurityData {
   protected $existingVersion;
 
   /**
-   * Releases from \Drupal\update\UpdateManagerInterface::getAvailable().
+   * Releases as returned by update_get_available().
    *
    * @var array
    *
-   * @see \Drupal\update\UpdateManagerInterface::getAvailable()
+   * @see update_get_available()
    */
   protected $releases;
 
@@ -73,8 +73,7 @@ final class ProjectSecurityData {
    * @param string $existing_version
    *   The existing (currently installed) version of the project.
    * @param array $releases
-   *   Project releases as returned by
-   *   \Drupal\update\UpdateManagerInterface::getAvailable().
+   *   Project releases as returned by update_get_available().
    */
   private function __construct($existing_version = NULL, array $releases = []) {
     $this->existingVersion = $existing_version;
@@ -86,10 +85,9 @@ final class ProjectSecurityData {
    *
    * @param array $project_data
    *   Project data from Drupal\update\UpdateManagerInterface::getProjects() and
-   *   processed by \Drupal\update\UpdateCalculator::processProjectInfo().
+   *   processed by update_process_project_info().
    * @param array $releases
-   *   Project releases as returned by
-   *   \Drupal\update\UpdateManagerInterface::getAvailable().
+   *   Project releases as returned by update_get_available().
    *
    * @return static
    */

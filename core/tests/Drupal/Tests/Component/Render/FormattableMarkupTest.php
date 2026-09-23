@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Render;
 
-// cspell:ignore errfile errline
-
 use Drupal\Component\Render\FormattableMarkup;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -56,20 +54,30 @@ class FormattableMarkupTest extends TestCase {
   }
 
   /**
+   * Custom error handler that saves the last error.
+   *
+   * We need this custom error handler because we cannot rely on the error to
+   * exception conversion as __toString is never allowed to leak any kind of
+   * exception.
+   *
+   * @param int $error_number
+   *   The error number.
+   * @param string $error_message
+   *   The error message.
+   */
+  public function errorHandler($error_number, $error_message): void {
+    $this->lastErrorNumber = $error_number;
+    $this->lastErrorMessage = $error_message;
+  }
+
+  /**
    * @legacy-covers ::__toString
    */
   #[DataProvider('providerTestUnexpectedPlaceholder')]
   public function testUnexpectedPlaceholder(string $string, array $arguments, ?int $error_number, string $error_message): void {
-    // We set a custom error handler that saves the last error.
-    // We need this custom error handler because we cannot rely on the error to
-    // exception conversion as __toString is never allowed to leak any kind of
-    // exception.
+    // We set a custom error handler because of
     // https://github.com/sebastianbergmann/phpunit/issues/487
-    set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline): bool {
-      $this->lastErrorNumber = $errno;
-      $this->lastErrorMessage = $errstr;
-      return TRUE;
-    });
+    set_error_handler([$this, 'errorHandler']);
     // We want this to trigger an error.
     $markup = new FormattableMarkup($string, $arguments);
     // Cast it to a string which will generate the errors.

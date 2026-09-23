@@ -88,7 +88,8 @@ class UserLoginHttpTest extends BrowserTestBase {
     if (isset($pass)) {
       $request_body['pass'] = $pass;
     }
-    return \Drupal::httpClient()->post($user_login_url->toString(), [
+
+    $result = \Drupal::httpClient()->post($user_login_url->toString(), [
       'body' => $this->serializer->encode($request_body, $format),
       'headers' => [
         'Accept' => "application/$format",
@@ -96,6 +97,7 @@ class UserLoginHttpTest extends BrowserTestBase {
       'http_errors' => FALSE,
       'cookies' => $this->cookies,
     ]);
+    return $result;
   }
 
   /**
@@ -222,7 +224,7 @@ class UserLoginHttpTest extends BrowserTestBase {
       ->setRouteParameter('_format', $format)
       ->setAbsolute();
 
-    return \Drupal::httpClient()->post($password_reset_url->toString(), [
+    $result = \Drupal::httpClient()->post($password_reset_url->toString(), [
       'body' => $this->serializer->encode($request_body, $format),
       'headers' => [
         'Accept' => "application/$format",
@@ -230,6 +232,8 @@ class UserLoginHttpTest extends BrowserTestBase {
       'http_errors' => FALSE,
       'cookies' => $this->cookies,
     ]);
+
+    return $result;
   }
 
   /**
@@ -456,7 +460,9 @@ class UserLoginHttpTest extends BrowserTestBase {
       'http_errors' => FALSE,
       'cookies' => $this->cookies,
     ];
-    return $client->post($user_logout_url->toString(), $post_options);
+
+    $response = $client->post($user_logout_url->toString(), $post_options);
+    return $response;
   }
 
   /**
@@ -601,7 +607,7 @@ class UserLoginHttpTest extends BrowserTestBase {
     $resetURL = $urls[0];
     $this->drupalGet($resetURL);
     $this->submitForm([], 'Log in');
-    $this->assertSession()->pageTextContains('You have used a one-time login link.');
+    $this->assertSession()->pageTextContains('You have used a one-time login link. You can set your new password now.');
   }
 
 }

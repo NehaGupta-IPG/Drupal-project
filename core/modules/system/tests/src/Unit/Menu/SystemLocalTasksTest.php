@@ -7,11 +7,9 @@ namespace Drupal\Tests\system\Unit\Menu;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\Extension;
-use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests existence of system local tasks.
@@ -21,8 +19,10 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
    * The mocked theme handler.
+   *
+   * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
-  protected ThemeHandlerInterface&MockObject $themeHandler;
+  protected $themeHandler;
 
   /**
    * {@inheritdoc}
@@ -36,17 +36,17 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
 
     $this->themeHandler = $this->createMock('Drupal\Core\Extension\ThemeHandlerInterface');
 
-    $theme = new Extension($this->root, 'theme', 'core/themes/stark', 'stark.info.yml');
+    $theme = new Extension($this->root, 'theme', 'core/themes/olivero', 'olivero.info.yml');
     $theme->status = 1;
-    $theme->info = ['name' => 'stark'];
+    $theme->info = ['name' => 'olivero'];
     $this->themeHandler->expects($this->once())
       ->method('listInfo')
       ->willReturn([
-        'stark' => $theme,
+        'olivero' => $theme,
       ]);
     $this->themeHandler->expects($this->once())
       ->method('hasUi')
-      ->with('stark')
+      ->with('olivero')
       ->willReturn(TRUE);
     $this->container->set('theme_handler', $this->themeHandler);
 
@@ -83,7 +83,7 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
         'system.theme_settings_theme',
         [
           ['system.themes_page', 'system.theme_settings'],
-          ['system.theme_settings_global', 'system.theme_settings_theme:stark'],
+          ['system.theme_settings_global', 'system.theme_settings_theme:olivero'],
         ],
       ],
       [

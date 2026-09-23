@@ -34,7 +34,7 @@ class ContentEntityConstructorTest extends KernelTestBase {
   public function testConstructor(array $configuration, array $plugin_definition, string $exception_class, string $expected): void {
     $migration = $this->prophesize(MigrationInterface::class)->reveal();
     $this->expectException($exception_class);
-    $this->expectExceptionMessageIs($expected);
+    $this->expectExceptionMessage($expected);
     ContentEntity::create($this->container, $configuration, 'content_entity', $plugin_definition, $migration);
   }
 

@@ -7,7 +7,6 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\FocusFirstCommand;
 use Drupal\Core\Ajax\InsertCommand;
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -16,8 +15,6 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\OptionsProviderInterface;
-use Drupal\options\OptionsAllowedValues;
-use Drupal\options\OptionsAllowedValuesInterface;
 
 /**
  * Plugin base class inherited by the options field types.
@@ -65,19 +62,15 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * {@inheritdoc}
    */
   public function getSettableOptions(?AccountInterface $account = NULL) {
-    return \Drupal::service(OptionsAllowedValuesInterface::class)->getAllowedValues(
-      $this->getFieldDefinition()->getFieldStorageDefinition(),
-      $this->getEntity()
-    );
+    $allowed_options = options_allowed_values($this->getFieldDefinition()->getFieldStorageDefinition(), $this->getEntity());
+    return $allowed_options;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
-    $allowed_options = \Drupal::service(OptionsAllowedValuesInterface::class)
-      ->getAllowedValues($field_definition->getFieldStorageDefinition());
-
+    $allowed_options = options_allowed_values($field_definition->getFieldStorageDefinition());
     if (empty($allowed_options)) {
       $values['value'] = NULL;
       return $values;
@@ -114,12 +107,12 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
 
     $wrapper_id = Html::getUniqueId('allowed-values-wrapper');
     $element['allowed_values'] = [
-      '#type' => 'container',
       '#element_validate' => [[static::class, 'validateAllowedValues']],
       '#field_has_data' => $has_data,
       '#allowed_values' => $allowed_values,
       '#required' => TRUE,
-      '#id' => $wrapper_id,
+      '#prefix' => '<div id="' . $wrapper_id . '">',
+      '#suffix' => '</div>',
       '#access' => empty($allowed_values_function),
       'help_text' => ['#markup' => $this->allowedValuesDescription()],
     ];
@@ -574,14 +567,10 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   }
 
   /**
-   * Resets the cached allowed values on field storage update.
-   *
-   * @todo Deprecate this method in #3583435.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/3583435
+   * Resets the static variable on field storage update.
    */
   public static function submitFieldStorageUpdate() {
-    Cache::invalidateTags([OptionsAllowedValues::CACHE_TAG]);
+    drupal_static_reset('options_allowed_values');
   }
 
 }

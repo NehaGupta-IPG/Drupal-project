@@ -902,7 +902,9 @@ class AccessResultTest extends UnitTestCase {
     }
     if ($implements_cacheable_dependency_interface) {
       $this->assertInstanceOf(CacheableDependencyInterface::class, $result);
-      $this->assertSame($is_cacheable, $result->getCacheMaxAge() !== 0, 'getCacheMaxAge() matches expectations.');
+      if ($result instanceof CacheableDependencyInterface) {
+        $this->assertSame($is_cacheable, $result->getCacheMaxAge() !== 0, 'getCacheMaxAge() matches expectations.');
+      }
     }
     else {
       $this->assertNotInstanceOf(CacheableDependencyInterface::class, $result);

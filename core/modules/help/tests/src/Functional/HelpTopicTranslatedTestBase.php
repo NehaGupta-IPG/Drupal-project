@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\help\Functional;
 
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\Traits\Core\Locale\InstallerLanguageTrait;
 
 // cspell:ignore hilfetestmodul übersetzung
 
@@ -16,7 +15,6 @@ use Drupal\Tests\Traits\Core\Locale\InstallerLanguageTrait;
  * page title blocks.
  */
 abstract class HelpTopicTranslatedTestBase extends BrowserTestBase {
-  use InstallerLanguageTrait;
 
   /**
    * {@inheritdoc}
@@ -33,16 +31,16 @@ abstract class HelpTopicTranslatedTestBase extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // These tests rely on some markup from the Default Admin theme, as well as
-    // an optional block added when Default Admin is enabled.
-    \Drupal::service('theme_installer')->install(['default_admin']);
+    // These tests rely on some markup from the 'Claro' theme, as well as an
+    // optional block added when Claro is enabled.
+    \Drupal::service('theme_installer')->install(['claro']);
     \Drupal::configFactory()->getEditable('system.theme')
-      ->set('admin', 'default_admin')
+      ->set('admin', 'claro')
       ->save();
 
     // Place various blocks.
     $settings = [
-      'theme' => 'default_admin',
+      'theme' => 'claro',
       'region' => 'help',
     ];
     $this->placeBlock('help_block', $settings);
@@ -61,15 +59,15 @@ abstract class HelpTopicTranslatedTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getInstallLangcode(): string {
-    return 'de';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getTranslationFileContents(): string {
-    return <<<PO
+  protected function installParameters(): array {
+    $parameters = parent::installParameters();
+    // Install in German. This will ensure the language and locale modules are
+    // installed.
+    $parameters['parameters']['langcode'] = 'de';
+    // Create a po file so we don't attempt to download one from
+    // localize.drupal.org and to have a test translation that will not change.
+    \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/translations', NULL, TRUE);
+    $contents = <<<PO
 msgid ""
 msgstr ""
 
@@ -83,6 +81,8 @@ msgid "Non-word-item to translate."
 msgstr "Non-word-german sdfwedrsdf."
 
 PO;
+    file_put_contents($this->publicFilesDirectory . '/translations/drupal-' . \Drupal::VERSION . '.de.po', $contents);
+    return $parameters;
   }
 
 }

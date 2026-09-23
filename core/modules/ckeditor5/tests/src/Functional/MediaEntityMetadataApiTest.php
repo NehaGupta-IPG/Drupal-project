@@ -76,6 +76,8 @@ class MediaEntityMetadataApiTest extends BrowserTestBase {
 
   /**
    * The admin user.
+   *
+   * @var \Drupal\user\Entity\User
    */
   protected User $adminUser;
 

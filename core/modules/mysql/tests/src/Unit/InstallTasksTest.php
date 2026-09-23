@@ -10,6 +10,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * Tests the MySQL install tasks.
@@ -19,15 +20,29 @@ use PHPUnit\Framework\Attributes\Group;
 class InstallTasksTest extends UnitTestCase {
 
   /**
+   * A connection object prophecy.
+   */
+  private ObjectProphecy|Connection $connection;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    $this->connection = $this->prophesize(Connection::class);
+  }
+
+  /**
    * Creates a Tasks object for testing.
-   *
-   * @param \Drupal\mysql\Driver\Database\mysql\Connection $connection
-   *   The database connection.
    *
    * @return \Drupal\mysql\Driver\Database\mysql\Install\Tasks
    *   A Tasks object.
    */
-  private function createTasks(Connection $connection): Tasks {
+  private function createTasks(): Tasks {
+    /** @var \Drupal\mysql\Driver\Database\mysql\Connection $connection */
+    $connection = $this->connection->reveal();
+
     return new class($connection) extends Tasks {
 
       /**
@@ -49,7 +64,7 @@ class InstallTasksTest extends UnitTestCase {
       /**
        * {@inheritdoc}
        */
-      protected function getConnection(): Connection {
+      protected function getConnection() {
         return $this->connection;
       }
 
@@ -104,12 +119,11 @@ class InstallTasksTest extends UnitTestCase {
    */
   #[DataProvider('providerNameAndMinimumVersion')]
   public function testNameAndMinimumVersion(bool $is_mariadb, string $expected_name, string $expected_minimum_version): void {
-    $connection = $this->createMock(Connection::class);
-    $connection
-      ->expects($this->exactly(2))
-      ->method('isMariaDb')
+    $this->connection
+      ->isMariaDb()
+      ->shouldBeCalledTimes(2)
       ->willReturn($is_mariadb);
-    $tasks = $this->createTasks($connection);
+    $tasks = $this->createTasks();
 
     $minimum_version = $tasks->minimumVersion();
     $name = $tasks->name();

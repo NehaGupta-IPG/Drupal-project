@@ -5,8 +5,6 @@ namespace Drupal\user\EventSubscriber;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Site\MaintenanceModeEvents;
 use Drupal\Core\Site\MaintenanceModeInterface;
-use Drupal\user\LogoutFinalizer;
-use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
@@ -30,19 +28,16 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   protected $account;
 
   /**
-   * The logout finalizer closure.
+   * Constructs a new MaintenanceModeSubscriber.
+   *
+   * @param \Drupal\Core\Site\MaintenanceModeInterface $maintenance_mode
+   *   The maintenance mode.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The current user.
    */
-  protected \Closure $logoutFinalizer;
-
-  public function __construct(
-    MaintenanceModeInterface $maintenance_mode,
-    AccountInterface $account,
-    #[AutowireServiceClosure(LogoutFinalizer::class)]
-    \Closure $logoutFinalizer,
-  ) {
+  public function __construct(MaintenanceModeInterface $maintenance_mode, AccountInterface $account) {
     $this->maintenanceMode = $maintenance_mode;
     $this->account = $account;
-    $this->logoutFinalizer = $logoutFinalizer;
   }
 
   /**
@@ -54,7 +49,7 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   public function onMaintenanceModeRequest(RequestEvent $event) {
     // If the site is offline, log out unprivileged users.
     if ($this->account->isAuthenticated()) {
-      ($this->logoutFinalizer)()->finalizeLogout();
+      user_logout();
     }
   }
 

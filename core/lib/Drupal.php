@@ -359,12 +359,10 @@ class Drupal {
    * One common use case is to provide a class which contains the actual code
    * of a hook implementation, without having to create a service.
    *
-   * @param class-string<T>|null $class
+   * @param string $class
    *   (optional) A class name to instantiate.
    *
-   * @template T of object
-   *
-   * @return ($class is class-string<T> ? T : \Drupal\Core\DependencyInjection\ClassResolverInterface)
+   * @return \Drupal\Core\DependencyInjection\ClassResolverInterface|object
    *   The class resolver or if $class is provided, a class instance with a
    *   given class definition.
    *

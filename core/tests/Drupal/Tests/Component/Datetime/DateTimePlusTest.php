@@ -107,7 +107,10 @@ class DateTimePlusTest extends TestCase {
   #[DataProvider('providerTestInvalidDateArrays')]
   public function testInvalidDateArrays(array $input, string $timezone, string $class): void {
     $this->expectException($class);
-    DateTimePlus::createFromArray($input, $timezone);
+    $this->assertInstanceOf(
+      '\Drupal\Component\DateTimePlus',
+      DateTimePlus::createFromArray($input, $timezone)
+    );
   }
 
   /**
@@ -290,7 +293,7 @@ class DateTimePlusTest extends TestCase {
   public function testDateTimezoneWithDateTimeObject(): void {
     // Create a date object with another date object.
     $input = new \DateTime('now', new \DateTimeZone('Pacific/Midway'));
-    $timezone = [];
+    $timezone = NULL;
     $expected_timezone = 'Pacific/Midway';
     $message = 'DateTimePlus uses the specified timezone if provided.';
 
@@ -1023,7 +1026,7 @@ class DateTimePlusTest extends TestCase {
     // Parse the same date with ['validate_format' => TRUE] and make sure we
     // get the expected exception.
     $this->expectException(\UnexpectedValueException::class);
-    DateTimePlus::createFromFormat('Y-m-d H:i:s', '11-03-31 17:44:00', 'UTC', ['validate_format' => TRUE]);
+    $date = DateTimePlus::createFromFormat('Y-m-d H:i:s', '11-03-31 17:44:00', 'UTC', ['validate_format' => TRUE]);
   }
 
   /**

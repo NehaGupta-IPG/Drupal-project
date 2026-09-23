@@ -6,6 +6,7 @@ namespace Drupal\FunctionalJavascriptTests;
 
 use Drupal\Core\Database\Database;
 use Drupal\Tests\PerformanceTestTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Collects performance metrics.
@@ -45,8 +46,8 @@ abstract class PerformanceTestBase extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getModulesFromClassProperty(): array {
-    return $this->doGetModulesFromClassProperty();
+  protected function installModulesFromClassProperty(ContainerInterface $container): void {
+    $this->doInstallModulesFromClassProperty($container);
   }
 
   /**

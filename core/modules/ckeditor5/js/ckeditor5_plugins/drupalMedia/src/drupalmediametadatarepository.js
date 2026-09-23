@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* cspell:ignore drupalmediametadatarepository */
 
-import { Plugin } from 'ckeditor5';
+import { Plugin } from 'ckeditor5/src/core';
 
 /**
  * @module drupalMedia/drupalmediametadatarepository

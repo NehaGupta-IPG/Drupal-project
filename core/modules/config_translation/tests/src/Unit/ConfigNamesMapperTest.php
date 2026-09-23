@@ -19,7 +19,6 @@ use Drupal\locale\LocaleConfigManager;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Route;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -82,8 +81,10 @@ class ConfigNamesMapperTest extends UnitTestCase {
 
   /**
    * The mocked URL generator.
+   *
+   * @var \Drupal\Core\Routing\UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected UrlGeneratorInterface&MockObject $urlGenerator;
+  protected $urlGenerator;
 
   /**
    * {@inheritdoc}

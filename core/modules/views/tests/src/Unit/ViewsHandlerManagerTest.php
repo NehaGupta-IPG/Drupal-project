@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit;
 
-use Drupal\Component\Plugin\Factory\FactoryInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Tests\UnitTestCase;
@@ -13,7 +12,6 @@ use Drupal\views\Plugin\ViewsHandlerManager;
 use Drupal\views\ViewsData;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests the ViewsHandlerManager class.
@@ -45,8 +43,10 @@ class ViewsHandlerManagerTest extends UnitTestCase {
 
   /**
    * The mocked factory.
+   *
+   * @var \Drupal\Component\Plugin\Factory\FactoryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected FactoryInterface&MockObject $factory;
+  protected $factory;
 
   /**
    * {@inheritdoc}

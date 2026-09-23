@@ -50,7 +50,7 @@ class PhpRequirementsTest extends UnitTestCase {
       }
       return $a_date <=> $b_date;
     });
-    $this->assertEquals($php_eol_dates, $reflected->getStaticPropertyValue('phpEolDates'));
+    $this->assertSame($php_eol_dates, $reflected->getStaticPropertyValue('phpEolDates'));
   }
 
   /**

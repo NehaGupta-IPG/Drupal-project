@@ -31,11 +31,15 @@ class LanguageMapper {
     #[Autowire('@cache.memory')]
     CacheBackendInterface $memory_cache,
     protected ModuleHandlerInterface $moduleHandler,
-    ConfigFactoryInterface $config_factory,
+    ?ConfigFactoryInterface $config_factory = NULL,
   ) {
     $this->cache = new BackendChain();
     $this->cache->appendBackend($memory_cache);
     $this->cache->appendBackend($persistent_cache);
+    if (!$config_factory) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $config_factory argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+      $config_factory = \Drupal::configFactory();
+    }
     $this->configFactory = $config_factory;
   }
 

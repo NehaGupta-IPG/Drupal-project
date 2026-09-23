@@ -16,12 +16,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class FieldValidationTest extends FieldKernelTestBase {
 
   /**
-   * The entity type.
+   * @var string
    */
   private string $entityType;
 
   /**
-   * The bundle.
+   * @var string
    */
   private string $bundle;
 

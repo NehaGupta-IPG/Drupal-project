@@ -12,7 +12,6 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
-use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 use Drupal\user\UserInterface;
@@ -170,7 +169,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
       foreach ([1, 1, 0] as $delta) {
         // Ensure we have the expected number of Remove buttons, and that they
         // are numbered sequentially.
-        $buttons = $this->getNodeElementsByXpath('//input[@type="submit" and @value="Remove"]');
+        $buttons = $this->xpath('//input[@type="submit" and @value="Remove"]');
         $this->assertCount($num_expected_remove_buttons, $buttons, "There are $num_expected_remove_buttons \"Remove\" buttons displayed.");
         foreach ($buttons as $i => $button) {
           $key = $i >= $remaining ? $i - $remaining : $i;
@@ -251,9 +250,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
   public function testPrivateFileSetting(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     // Grant the admin user required permissions.
-    Role::loadOverrideFree($this->adminUser->roles[0]->target_id)->grantPermissions([
-      'administer node fields',
-    ])->save();
+    user_role_grant_permissions($this->adminUser->roles[0]->target_id, ['administer node fields']);
 
     $type_name = 'article';
     $field_name = $this->randomMachineName();
@@ -295,20 +292,12 @@ class FileFieldWidgetTest extends FileFieldTestBase {
 
     // Grant the admin user required comment permissions.
     $roles = $this->adminUser->getRoles();
-    Role::loadOverrideFree($roles[1])->grantPermissions([
-      'administer comment fields',
-      'administer comments',
-    ])->save();
+    user_role_grant_permissions($roles[1], ['administer comment fields', 'administer comments']);
 
     // Revoke access comments permission from anon user, grant post to
     // authenticated.
-    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->revokePermissions([
-      'access comments',
-    ])->save();
-    Role::loadOverrideFree(RoleInterface::AUTHENTICATED_ID)->grantPermissions([
-      'post comments',
-      'skip comment approval',
-    ])->save();
+    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['access comments']);
+    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['post comments', 'skip comment approval']);
 
     // Create a new field.
     $this->addDefaultCommentField('node', 'article');
@@ -469,11 +458,11 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $attacker_user = User::getAnonymousUser();
 
     // Set up permissions for anonymous attacker user.
-    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions([
+    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access content' => TRUE,
       'create article content' => TRUE,
       'edit any article content' => TRUE,
-    ])->save();
+    ]);
 
     // Log out so as to be the anonymous attacker user.
     $this->drupalLogout();
@@ -487,9 +476,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    */
   public function testMaximumUploadFileSizeValidation(): void {
     // Grant the admin user required permissions.
-    Role::loadOverrideFree($this->adminUser->roles[0]->target_id)->grantPermissions([
-      'administer node fields',
-    ])->save();
+    user_role_grant_permissions($this->adminUser->roles[0]->target_id, ['administer node fields']);
 
     $type_name = 'article';
     $field_name = $this->randomMachineName();
@@ -516,9 +503,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    */
   public function testFileExtensionsSetting(): void {
     // Grant the admin user required permissions.
-    Role::loadOverrideFree($this->adminUser->roles[0]->target_id)->grantPermissions([
-      'administer node fields',
-    ])->save();
+    user_role_grant_permissions($this->adminUser->roles[0]->target_id, ['administer node fields']);
 
     $type_name = 'article';
     $field_name = $this->randomMachineName();

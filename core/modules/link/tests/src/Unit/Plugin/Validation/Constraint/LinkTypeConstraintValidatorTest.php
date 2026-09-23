@@ -127,6 +127,9 @@ class LinkTypeConstraintValidatorTest extends UnitTestCase {
   public function testBadUrl(): void {
     $link = $this->createMock(LinkItemInterface::class);
     $link->expects($this->once())
+      ->method('getFieldDefinition')
+      ->willReturn($this->getMockFieldDefinition(LinkItemInterface::LINK_INTERNAL));
+    $link->expects($this->once())
       ->method('getUrl')
       ->willThrowException(new \InvalidArgumentException());
 

@@ -2,14 +2,8 @@
 
 namespace Drupal\user\Form;
 
-use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;
-use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\user\AccountCancellation;
-use Drupal\user\NotificationHandler;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a confirmation form for cancelling user account.
@@ -39,29 +33,6 @@ class UserCancelForm extends ContentEntityConfirmFormBase {
    */
   protected $entity;
 
-  public function __construct(
-    EntityRepositoryInterface $entity_repository,
-    EntityTypeBundleInfoInterface $entity_type_bundle_info,
-    TimeInterface $time,
-    protected NotificationHandler $notificationHandler,
-    protected AccountCancellation $accountCancellation,
-  ) {
-    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container): static {
-    return new static(
-      $container->get(EntityRepositoryInterface::class),
-      $container->get(EntityTypeBundleInfoInterface::class),
-      $container->get(TimeInterface::class),
-      $container->get(NotificationHandler::class),
-      $container->get(AccountCancellation::class),
-    );
-  }
-
   /**
    * {@inheritdoc}
    */
@@ -88,10 +59,9 @@ class UserCancelForm extends ContentEntityConfirmFormBase {
     }
     $default_method = $this->config('user.settings')->get('cancel_method');
     $own_account = $this->entity->id() == $this->currentUser()->id();
-    // Options supplied via AccountCancellation::cancelMethods() can have a
-    // custom #confirm_description property for the confirmation form
-    // description. This text refers to "Your account" so only user it if
-    // cancelling own account.
+    // Options supplied via user_cancel_methods() can have a custom
+    // #confirm_description property for the confirmation form description. This
+    // text refers to "Your account" so only user it if cancelling own account.
     if ($own_account && isset($this->cancelMethods[$default_method]['#confirm_description'])) {
       return $this->cancelMethods[$default_method]['#confirm_description'];
     }
@@ -111,7 +81,7 @@ class UserCancelForm extends ContentEntityConfirmFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $user = $this->currentUser();
-    $this->cancelMethods = $this->accountCancellation->cancelMethods();
+    $this->cancelMethods = user_cancel_methods();
 
     // Display account cancellation method selection, if allowed.
     $own_account = $this->entity->id() == $user->id();
@@ -167,7 +137,7 @@ class UserCancelForm extends ContentEntityConfirmFormBase {
     // privileges, no confirmation mail shall be sent, and the user does not
     // attempt to cancel the own account.
     if (!$form_state->isValueEmpty('access') && $form_state->isValueEmpty('user_cancel_confirm') && $this->entity->id() != $this->currentUser()->id()) {
-      $this->accountCancellation->cancel($form_state->getValues(), $this->entity->id(), $form_state->getValue('user_cancel_method'));
+      user_cancel($form_state->getValues(), $this->entity->id(), $form_state->getValue('user_cancel_method'));
 
       $form_state->setRedirectUrl($this->entity->toUrl('collection'));
     }
@@ -178,7 +148,7 @@ class UserCancelForm extends ContentEntityConfirmFormBase {
       $this->entity->user_cancel_method = $form_state->getValue('user_cancel_method');
       $this->entity->user_cancel_notify = $form_state->getValue('user_cancel_notify');
       $this->entity->save();
-      $this->notificationHandler->sendCancelConfirm($this->entity);
+      _user_mail_notify('cancel_confirm', $this->entity);
       $this->logger('user')
         ->info('Sent account cancellation request to %name %email.', [
           '%name' => $this->entity->label(),

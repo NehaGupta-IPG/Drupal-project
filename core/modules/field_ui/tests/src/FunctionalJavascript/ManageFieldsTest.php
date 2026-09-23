@@ -16,7 +16,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the Field UI "Manage Fields" screens.
  */
 #[Group('field_ui')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class ManageFieldsTest extends WebDriverTestBase {
 

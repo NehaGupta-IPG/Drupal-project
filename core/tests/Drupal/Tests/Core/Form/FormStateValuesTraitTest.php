@@ -253,12 +253,12 @@ class FormStateValuesTraitStub {
    *
    * @var mixed[]
    */
-  protected array $values = [];
+  protected $values = [];
 
   /**
    * {@inheritdoc}
    */
-  public function &getValues(): array {
+  public function &getValues() {
     return $this->values;
   }
 

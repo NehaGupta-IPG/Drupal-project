@@ -27,9 +27,8 @@ class Gettext {
    *     Drupal\locale\PoDatabaseWriter. Optional, defaults to an empty array.
    *   - 'customized': Flag indicating whether the strings imported from $file
    *     are customized translations or come from a community source. Use
-   *     LocaleDefaultOptions::CUSTOMIZED or
-   *     LocaleDefaultOptions::NOT_CUSTOMIZED. Optional, defaults to
-   *     LocaleDefaultOptions::NOT_CUSTOMIZED.
+   *     LOCALE_CUSTOMIZED or LOCALE_NOT_CUSTOMIZED. Optional, defaults to
+   *     LOCALE_NOT_CUSTOMIZED.
    *   - 'seek': Specifies from which position in the file should the reader
    *     start reading the next items. Optional, defaults to 0.
    *   - 'items': Specifies the number of items to read. Optional, defaults to
@@ -44,7 +43,7 @@ class Gettext {
     // Add the default values to the options array.
     $options += [
       'overwrite_options' => [],
-      'customized' => LocaleDefaultOptions::NOT_CUSTOMIZED,
+      'customized' => LOCALE_NOT_CUSTOMIZED,
       'items' => -1,
       'seek' => 0,
     ];

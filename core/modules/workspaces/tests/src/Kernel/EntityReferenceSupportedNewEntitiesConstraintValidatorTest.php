@@ -37,6 +37,8 @@ class EntityReferenceSupportedNewEntitiesConstraintValidatorTest extends KernelT
 
   /**
    * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManager
    */
   protected EntityTypeManager $entityTypeManager;
 

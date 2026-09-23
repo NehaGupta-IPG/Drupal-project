@@ -14,7 +14,6 @@ use Drupal\update\ProjectSecurityData;
 use Drupal\update\ProjectSecurityRequirement;
 use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
-use Drupal\update\UpdateMessageTrait;
 
 /**
  * Requirements for the update module.
@@ -22,11 +21,9 @@ use Drupal\update\UpdateMessageTrait;
 class UpdateRequirements {
 
   use StringTranslationTrait;
-  use UpdateMessageTrait;
 
   public function __construct(
     protected readonly ModuleHandlerInterface $moduleHandler,
-    protected readonly UpdateManagerInterface $updateManager,
   ) {}
 
   /**
@@ -45,16 +42,16 @@ class UpdateRequirements {
    * notification messages during cron runs, and might be useful for other
    * modules to find out if the site is up to date or not.
    *
-   * @see \Drupal\update\UpdateMessageTrait::getText()
+   * @see _update_message_text()
    * @see \Drupal\update\Hook\UpdateCronHooks::notify()
    * @see \Drupal\update\UpdateManagerInterface
    */
   #[Hook('runtime_requirements')]
   public function runtime(): array {
     $requirements = [];
-    if ($available = $this->updateManager->getAvailable(FALSE)) {
+    if ($available = update_get_available(FALSE)) {
       $this->moduleHandler->loadInclude('update', 'inc', 'update.compare');
-      $data = $this->updateManager->calculateProjectData($available);
+      $data = update_calculate_project_data($available);
       // First, populate the requirements for core:
       $requirements['update_core'] = $this->requirementCheck($data['drupal'], 'core');
       if (!empty($available['drupal']['releases'])) {
@@ -71,15 +68,7 @@ class UpdateRequirements {
         // status constants are numbered in the right order of precedence, so
         // we just need to make sure the projects are sorted in ascending
         // order of status, and we can look at the first project we find.
-        uasort($data, function ($a, $b) {
-          // The status constants are numerically in the right order, so we can
-          // usually subtract the two to compare in the order we want. However,
-          // negative status values should be treated as if they are huge,
-          // since we always want them at the bottom of the list.
-          $a_status = $a['status'] > 0 ? $a['status'] : (-10 * $a['status']);
-          $b_status = $b['status'] > 0 ? $b['status'] : (-10 * $b['status']);
-          return $a_status - $b_status;
-        });
+        uasort($data, '_update_project_status_sort');
         $first_project = reset($data);
         $requirements['update_contrib'] = $this->requirementCheck($first_project, 'contrib');
       }
@@ -89,7 +78,7 @@ class UpdateRequirements {
       $requirements['update_core']['value'] = $this->t('No update data available');
       $requirements['update_core']['severity'] = RequirementSeverity::Warning;
       $requirements['update_core']['reason'] = UpdateFetcherInterface::UNKNOWN;
-      $requirements['update_core']['description'] = $this->noData();
+      $requirements['update_core']['description'] = _update_no_data();
     }
     return $requirements;
   }
@@ -102,7 +91,7 @@ class UpdateRequirements {
    *
    * @param array $project
    *   Array of information about the project we're testing as returned by
-   *   \Drupal\update\UpdateManagerInterface::calculateProjectData().
+   *   update_calculate_project_data().
    * @param string $type
    *   What kind of project this is ('core' or 'contrib').
    *
@@ -111,7 +100,7 @@ class UpdateRequirements {
    *
    * @see hook_requirements()
    * @see Drupal\update\Hook\UpdateRequirements::runtime()
-   * @see \Drupal\update\UpdateManagerInterface::calculateProjectData()
+   * @see update_calculate_project_data()
    */
   protected function requirementCheck($project, $type): array {
     $requirement = [];
@@ -125,7 +114,7 @@ class UpdateRequirements {
     if ($status != UpdateManagerInterface::CURRENT) {
       $requirement['reason'] = $status;
       $requirement['severity'] = RequirementSeverity::Error;
-      $requirement['description'][] = ['#markup' => $this->getText($type, $status)];
+      $requirement['description'][] = ['#markup' => _update_message_text($type, $status)];
       if (!in_array($status, [
         UpdateFetcherInterface::UNKNOWN,
         UpdateFetcherInterface::NOT_CHECKED,
@@ -135,8 +124,8 @@ class UpdateRequirements {
         $url = Url::fromRoute('update.status');
         // When updates are available, if the current user has access to the
         // available updates report, append the available updates link to the
-        // message from \Drupal\update\UpdateMessageTrait::getText(), and
-        // format the two translated strings together in a single paragraph.
+        // message from _update_message_text(), and format the two translated
+        // strings together in a single paragraph.
         if ($url->access()) {
           $requirement['description'][] = [
             '#prefix' => ' ',

@@ -4,10 +4,12 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
+
 /**
  * @file
  * Visual styles for views exposed form.
  */
+
 .views-exposed-form {
   display: flex;
   flex-wrap: wrap;
@@ -25,11 +27,11 @@
     margin-block-start: 0;
   }
 
-  .dark-mode & {
+  .gin--dark-mode & {
     box-shadow: 0 6px 16px var(--admin-color-border-soft);
   }
 
-  .high-contrast-mode & {
+  .gin--high-contrast-mode & {
     box-shadow: none;
   }
 

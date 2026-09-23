@@ -51,5 +51,3 @@ services:
     parent: logger.channel_base
     arguments: ['locale']
   Drupal\locale\CurrentImportStorage: ~
-  Drupal\locale\LocaleLanguages: ~
-  Drupal\locale\LocaleJs: ~

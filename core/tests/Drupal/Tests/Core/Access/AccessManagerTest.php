@@ -10,7 +10,6 @@ use Drupal\Core\Access\AccessCheckInterface;
 use Drupal\Core\Access\AccessException;
 use Drupal\Core\Access\AccessManager;
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Access\CheckProvider;
 use Drupal\Core\Access\DefaultAccessCheck;
 use Drupal\Core\Cache\Context\CacheContextsManager;
@@ -622,6 +621,6 @@ class AccessManagerTest extends UnitTestCase {
  */
 interface TestAccessCheckInterface extends AccessCheckInterface {
 
-  public function access(): int|string|array|AccessResultForbidden;
+  public function access();
 
 }

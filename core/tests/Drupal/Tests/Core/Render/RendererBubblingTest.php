@@ -547,7 +547,7 @@ class RendererBubblingTest extends RendererTestBase {
       '#pre_render' => [__NAMESPACE__ . '\\BubblingTest::bubblingCacheOverwritePrerender'],
     ];
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessageIs('Cache keys may not be changed after initial setup. Use the contexts property instead to bubble additional metadata.');
+    $this->expectExceptionMessage('Cache keys may not be changed after initial setup. Use the contexts property instead to bubble additional metadata.');
     $this->renderer->renderRoot($data);
   }
 
@@ -563,8 +563,8 @@ class BubblingTest implements TrustedCallbackInterface {
    *
    * This function is assigned as an #pre_render callback.
    */
-  public static function bubblingPreRender(array $elements): array {
-    return $elements + [
+  public static function bubblingPreRender($elements) {
+    $elements += [
       'child_cache_context' => [
         '#cache' => [
           'contexts' => ['child.cache_context'],
@@ -596,6 +596,7 @@ class BubblingTest implements TrustedCallbackInterface {
         '#pre_render' => [__CLASS__ . '::bubblingNestedPreRenderCached'],
       ],
     ];
+    return $elements;
   }
 
   /**
@@ -614,7 +615,7 @@ class BubblingTest implements TrustedCallbackInterface {
    *
    * This function is assigned as an #pre_render callback in.
    */
-  public static function bubblingNestedPreRenderCached(array $elements): array {
+  public static function bubblingNestedPreRenderCached($elements) {
     \Drupal::state()->set('bubbling_nested_pre_render_cached', TRUE);
     return $elements;
   }

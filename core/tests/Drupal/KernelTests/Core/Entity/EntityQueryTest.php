@@ -6,7 +6,6 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\Query\QueryException;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestMulRev;
@@ -68,13 +67,6 @@ class EntityQueryTest extends EntityKernelTestBase {
   public $figures;
 
   /**
-   * Field name for the unlimited cardinality figures field.
-   *
-   * @var string
-   */
-  public $figuresUnlimited;
-
-  /**
    * The entity_test_mulrev entity storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
@@ -92,18 +84,13 @@ class EntityQueryTest extends EntityKernelTestBase {
     $this->installConfig(['language']);
 
     $figures = $this->randomMachineName();
-    $figures_unlimited = $this->randomMachineName();
     $greetings = $this->randomMachineName();
-    foreach ([
-      $figures => ['shape', 2],
-      $figures_unlimited => ['shape', FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED],
-      $greetings => ['text', 2],
-    ] as $field_name => [$field_type, $cardinality]) {
+    foreach ([$figures => 'shape', $greetings => 'text'] as $field_name => $field_type) {
       $field_storage = FieldStorageConfig::create([
         'field_name' => $field_name,
         'entity_type' => 'entity_test_mulrev',
         'type' => $field_type,
-        'cardinality' => $cardinality,
+        'cardinality' => 2,
       ]);
       $field_storage->save();
       $field_storages[] = $field_storage;
@@ -183,12 +170,10 @@ class EntityQueryTest extends EntityKernelTestBase {
           $entity->getTranslation($units[$key][1])->{$units[$key][0]}[] = $units[$key][2];
         }
       }
-      $entity->{$figures_unlimited} = $entity->{$figures}->getValue();
       $entity->save();
     }
     $this->bundles = $bundles;
     $this->figures = $figures;
-    $this->figuresUnlimited = $figures_unlimited;
     $this->greetings = $greetings;
     $this->storage = $this->container->get('entity_type.manager')->getStorage('entity_test_mulrev');
   }
@@ -199,7 +184,6 @@ class EntityQueryTest extends EntityKernelTestBase {
   public function testEntityQuery(): void {
     $greetings = $this->greetings;
     $figures = $this->figures;
-    $figures_unlimited = $this->figuresUnlimited;
     $this->queryResults = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
@@ -266,18 +250,6 @@ class EntityQueryTest extends EntityKernelTestBase {
     $query = $this->storage->getQuery()->accessCheck(FALSE);
     $group_blue = $query->andConditionGroup()->condition("$figures.color", 'blue');
     $group_red = $query->andConditionGroup()->condition("$figures.color", 'red');
-    $this->queryResults = $query
-      ->condition($group_blue)
-      ->condition($group_red)
-      ->sort('revision_id')
-      ->execute();
-    // Unit 0 and unit 1, so bits 0 1.
-    $this->assertResult(3, 7, 11, 15);
-
-    // Do the same test with an unlimited cardinality field.
-    $query = $this->storage->getQuery()->accessCheck(FALSE);
-    $group_blue = $query->andConditionGroup()->condition("$figures_unlimited.color", 'blue');
-    $group_red = $query->andConditionGroup()->condition("$figures_unlimited.color", 'red');
     $this->queryResults = $query
       ->condition($group_blue)
       ->condition($group_red)
@@ -1432,9 +1404,7 @@ class EntityQueryTest extends EntityKernelTestBase {
    * Test the entity query alter hooks are invoked.
    *
    * Hook functions in field_test.module add additional conditions to the query
-   * removing entities with specific ids. The alterations are also applied when
-   * the query is cast to a string, so its string representation matches the
-   * query that is executed.
+   * removing entities with specific ids.
    */
   public function testAlterHook(): void {
     $basicQuery = $this->storage
@@ -1446,18 +1416,15 @@ class EntityQueryTest extends EntityKernelTestBase {
 
     // Verify assumptions about the unaltered result.
     $query = clone $basicQuery;
-    // The unaltered query does not contain the condition added by the hook.
-    $this->assertDoesNotMatchRegularExpression("/<>\s*'5'/", (string) $query);
     $this->queryResults = $query->execute();
     $this->assertResult(5, 7, 13, 15);
 
     // field_test_entity_query_alter() removes the entity with id '5'.
     $query = clone $basicQuery;
-    $query->addTag('entity_query_alter_hook_test');
-    // Casting the query to a string applies the alter hooks, so the added
-    // condition is reflected even before the query is executed.
-    $this->assertMatchesRegularExpression("/<>\s*'5'/", (string) $query);
-    $this->queryResults = $query->execute();
+    $this->queryResults = $query
+      // Add a tag that no hook function matches.
+      ->addTag('entity_query_alter_hook_test')
+      ->execute();
     $this->assertResult(7, 13, 15);
 
     // field_test_entity_query_entity_test_mulrev_alter() removes the
@@ -1601,7 +1568,7 @@ class EntityQueryTest extends EntityKernelTestBase {
    */
   public function testAccessCheckSpecified(): void {
     $this->expectException(QueryException::class);
-    $this->expectExceptionMessageIs('Entity queries must explicitly set whether the query should be access checked or not. See Drupal\Core\Entity\Query\QueryInterface::accessCheck().');
+    $this->expectExceptionMessage('Entity queries must explicitly set whether the query should be access checked or not. See Drupal\Core\Entity\Query\QueryInterface::accessCheck().');
     // We are purposely testing an entity query without access check, so we need
     // to tell PHPStan to ignore this.
     // @phpstan-ignore-next-line

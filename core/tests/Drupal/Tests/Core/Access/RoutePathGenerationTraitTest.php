@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
@@ -89,7 +90,12 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
     });
     $parameterBag->method('all')->willReturn($requestParams);
 
-    $request = new Request($requestParams);
+    // Get a real InputBag because it is a final class.
+    $inputBag = new InputBag($requestParams);
+
+    // Mock Request.
+    $request = $this->createStub(Request::class);
+    $request->query = $inputBag;
 
     // Mock RouteMatch.
     $routeMatch = $this->createStub(RouteMatchInterface::class);

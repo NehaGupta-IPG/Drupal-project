@@ -295,10 +295,8 @@ class Xss {
           if (preg_match('/^([-a-zA-Z][-a-zA-Z0-9]*)/', $attributes, $match)) {
             $attribute_name = strtolower($match[1]);
             $skip = (
-              in_array($attribute_name, ['style', 'srcdoc'], TRUE) ||
+              in_array($attribute_name, ['style', 'srcdoc']) ||
               str_starts_with($attribute_name, 'on') ||
-              str_starts_with($attribute_name, 'data-hx') ||
-              str_starts_with($attribute_name, 'hx') ||
               str_starts_with($attribute_name, '-') ||
               // Ignore long attributes to avoid unnecessary processing
               // overhead.
@@ -320,7 +318,7 @@ class Xss {
               'property',
               'class',
               'datetime',
-            ], TRUE);
+            ]);
 
             $working = $mode = 1;
             $attributes = preg_replace('/^[-a-zA-Z][-a-zA-Z0-9]*/', '', $attributes);

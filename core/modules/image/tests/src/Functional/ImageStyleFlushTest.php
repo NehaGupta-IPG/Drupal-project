@@ -91,7 +91,9 @@ class ImageStyleFlushTest extends ImageFieldTestBase {
       // Add the effect.
       $this->drupalGet($style_path);
       $this->submitForm(['new' => $effect], 'Add');
-      $this->submitForm($edit, 'Add effect');
+      if (!empty($edit)) {
+        $this->submitForm($edit, 'Add effect');
+      }
     }
 
     // Load the saved image style.

@@ -44,9 +44,9 @@ class ViewsListingTest extends WebDriverTestBase {
    * Tests the filtering on the Views listing page.
    */
   public function testFilterViewsListing(): void {
-    $enabled_views_count = 2;
-    $disabled_views_count = 1;
-    $content_views_count = 1;
+    $enabled_views_count = 6;
+    $disabled_views_count = 2;
+    $content_views_count = 3;
 
     $this->drupalGet('admin/structure/views');
 
@@ -156,9 +156,10 @@ class ViewsListingTest extends WebDriverTestBase {
    *   The filtered array.
    */
   protected function filterVisibleElements($elements): array {
-    return array_filter($elements, function ($element) {
+    $elements = array_filter($elements, function ($element) {
       return $element->isVisible();
     });
+    return $elements;
   }
 
 }

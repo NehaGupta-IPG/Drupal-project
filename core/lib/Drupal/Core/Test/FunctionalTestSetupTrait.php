@@ -490,27 +490,6 @@ trait FunctionalTestSetupTrait {
   }
 
   /**
-   * Gets a list of modules recursively from inherited class properties.
-   *
-   * @return array
-   *   The modules to install, or an empty array if none are specified.
-   */
-  protected function getModulesFromClassProperty(): array {
-    $class = static::class;
-    $modules = [];
-    while ($class) {
-      if (property_exists($class, 'modules')) {
-        $modules = array_merge($modules, $class::$modules);
-      }
-      $class = get_parent_class($class);
-    }
-    if ($modules) {
-      $modules = array_unique($modules);
-    }
-    return $modules;
-  }
-
-  /**
    * Install modules defined by `static::$modules`.
    *
    * To install test modules outside of the testing environment, add
@@ -521,15 +500,18 @@ trait FunctionalTestSetupTrait {
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The container.
-   *
-   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no
-   * replacement.
-   * @see https://www.drupal.org/node/3616201
    */
   protected function installModulesFromClassProperty(ContainerInterface $container) {
-    trigger_error(__METHOD__ . 'is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3616201', E_USER_DEPRECATED);
-    $modules = $this->getModulesFromClassProperty();
+    $class = static::class;
+    $modules = [];
+    while ($class) {
+      if (property_exists($class, 'modules')) {
+        $modules = array_merge($modules, $class::$modules);
+      }
+      $class = get_parent_class($class);
+    }
     if ($modules) {
+      $modules = array_unique($modules);
       try {
         $success = $container->get('module_installer')->install($modules, TRUE);
         $this->assertTrue($success, 'Enabled modules: ' . implode(', ', $modules));
@@ -568,7 +550,7 @@ trait FunctionalTestSetupTrait {
     $formInput = Database::getConnectionInfo()['default'];
     $driverName = $formInput['driver'];
     $driverNamespace = $formInput['namespace'];
-    $modules = $this->getModulesFromClassProperty();
+
     unset($formInput['driver']);
     unset($formInput['namespace']);
     unset($formInput['autoload']);
@@ -589,7 +571,6 @@ trait FunctionalTestSetupTrait {
         'profile' => $this->profile,
         'langcode' => 'en',
       ],
-      'extra_modules' => $modules,
       'forms' => [
         'install_settings_form' => [
           'driver' => $driverNamespace,
@@ -614,9 +595,6 @@ trait FunctionalTestSetupTrait {
         ],
       ],
     ];
-    if (isset($this->defaultTheme)) {
-      $parameters['default_theme'] = $this->defaultTheme;
-    }
 
     // If we only have one db driver available, we cannot set the driver.
     if (count(Database::getDriverList()->getInstallableList()) == 1) {

@@ -81,6 +81,18 @@ class HtmxRequestInfoTest extends UnitTestCase {
   }
 
   /**
+   * Tests the getHtmxPrompt method.
+   */
+  public function testGetHtmxPrompt(): void {
+    // Test with the header not present.
+    $this->assertEquals('', $this->getHtmxPrompt());
+
+    // Test with the header present.
+    $this->request->headers->set('HX-Prompt', 'Enter a value');
+    $this->assertEquals('Enter a value', $this->getHtmxPrompt());
+  }
+
+  /**
    * Tests the getHtmxTarget method.
    */
   public function testGetHtmxTarget(): void {
@@ -88,20 +100,20 @@ class HtmxRequestInfoTest extends UnitTestCase {
     $this->assertEquals('', $this->getHtmxTarget());
 
     // Test with the header present.
-    $this->request->headers->set('HX-Target', 'input#submit-button');
-    $this->assertEquals('input#submit-button', $this->getHtmxTarget());
+    $this->request->headers->set('HX-Target', 'submit-button');
+    $this->assertEquals('submit-button', $this->getHtmxTarget());
   }
 
   /**
    * Tests the getHtmxTrigger method.
    */
-  public function testGetHtmxSource(): void {
+  public function testGetHtmxTrigger(): void {
     // Test with the header not present.
-    $this->assertEquals('', $this->getHtmxSource());
+    $this->assertEquals('', $this->getHtmxTrigger());
 
     // Test with the header present.
-    $this->request->headers->set('HX-Source', 'input#submit-button');
-    $this->assertEquals('input#submit-button', $this->getHtmxSource());
+    $this->request->headers->set('HX-Trigger', 'submit-button');
+    $this->assertEquals('submit-button', $this->getHtmxTrigger());
   }
 
   /**
@@ -112,20 +124,8 @@ class HtmxRequestInfoTest extends UnitTestCase {
     $this->assertEquals('', $this->getHtmxTriggerName());
 
     // Test with the header present.
-    $this->request->headers->set('HX-Source', 'input[name="submit-button"]');
+    $this->request->headers->set('HX-Trigger-Name', 'submit-button');
     $this->assertEquals('submit-button', $this->getHtmxTriggerName());
-  }
-
-  /**
-   * Tests the getHtmxRequestType method.
-   */
-  public function testGetHtmxRequestType(): void {
-    // Test with the header not present.
-    $this->assertEquals('', $this->getHtmxRequestType());
-
-    // Test with the header present.
-    $this->request->headers->set('HX-Request-Type', 'request-type');
-    $this->assertEquals('request-type', $this->getHtmxRequestType());
   }
 
   /**

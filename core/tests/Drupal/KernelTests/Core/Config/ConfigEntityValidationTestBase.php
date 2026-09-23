@@ -33,6 +33,8 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
 
   /**
    * The config entity being tested.
+   *
+   * @var \Drupal\Core\Config\Entity\ConfigEntityInterface
    */
   protected ConfigEntityInterface $entity;
 
@@ -43,6 +45,8 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
    * not, typically highly abstract/very low level config entities without a
    * strong UI presence. For example: REST resource configuration entities and
    * entity view displays.
+   *
+   * @var bool
    *
    * @see \Drupal\Core\Entity\EntityInterface::label()
    */

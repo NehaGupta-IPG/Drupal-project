@@ -1,1 +1,0 @@
-foo: !php/const Drupal\config_constant_test\Test::FOO

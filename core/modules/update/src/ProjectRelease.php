@@ -105,8 +105,7 @@ final class ProjectRelease {
    * Creates a ProjectRelease instance from an array.
    *
    * @param array $release_data
-   *   The project release data as returned by
-   *   \Drupal\update\UpdateManagerInterface::getAvailable().
+   *   The project release data as returned by update_get_available().
    *
    * @return \Drupal\update\ProjectRelease
    *   The ProjectRelease instance.
@@ -114,7 +113,7 @@ final class ProjectRelease {
    * @throws \UnexpectedValueException
    *   Thrown if project release data is not valid.
    *
-   * @see \Drupal\update\UpdateManagerInterface::getAvailable()
+   * @see \update_get_available()
    */
   public static function createFromArray(array $release_data): ProjectRelease {
     static::validateReleaseData($release_data);

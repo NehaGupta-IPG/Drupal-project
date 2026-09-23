@@ -390,8 +390,7 @@ class Query extends QueryBase implements QueryInterface {
     // Clone the query so the prepare and compile doesn't get repeated.
     $clone = clone($this);
 
-    $clone->alter()
-      ->prepare()
+    $clone->prepare()
       ->compile()
       ->addSort()
       ->finish();

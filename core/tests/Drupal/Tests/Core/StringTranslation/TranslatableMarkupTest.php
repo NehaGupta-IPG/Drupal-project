@@ -19,6 +19,8 @@ class TranslatableMarkupTest extends UnitTestCase {
 
   /**
    * Tests that errors are correctly handled when a __toString() fails.
+   *
+   * @legacy-covers ::__toString
    */
   public function testToString(): void {
     $string = 'May I have an exception?';
@@ -33,36 +35,34 @@ class TranslatableMarkupTest extends UnitTestCase {
       ->willThrowException($exception);
 
     $this->expectException(\Exception::class);
-    $this->expectExceptionMessageIs($exception->getMessage());
+    $this->expectExceptionMessage($exception->getMessage());
     (string) $text;
   }
 
-  // phpcs:disable Drupal.Semantics.FunctionT.NotLiteralString
-
   /**
-   * Tests exception when a string is passed.
+   * Tests is string assertion.
+   *
+   * @legacy-covers ::__construct
    */
   public function testIsStringAssertion(): void {
     $translation = $this->getStringTranslationStub();
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs('$string ("foo") must be a string.');
+    $this->expectExceptionMessage('$string ("foo") must be a string.');
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-    // @phpstan-ignore argument.type
     new TranslatableMarkup(new TranslatableMarkup('foo', [], [], $translation));
   }
 
   /**
-   * Tests exception when a FormattableMarkup is passed.
+   * Tests is string assertion with formattable markup.
+   *
+   * @legacy-covers ::__construct
    */
   public function testIsStringAssertionWithFormattableMarkup(): void {
     $formattable_string = new FormattableMarkup('@bar', ['@bar' => 'foo']);
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs('$string ("foo") must be a string.');
+    $this->expectExceptionMessage('$string ("foo") must be a string.');
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-    // @phpstan-ignore argument.type
     new TranslatableMarkup($formattable_string);
   }
-
-  // phpcs:enable
 
 }

@@ -420,7 +420,7 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
     $time
       ->method('getCurrentTime')
       ->willReturnCallback(function () use (&$currentTime): int {
-        return $currentTime;
+        return (int) $currentTime;
       });
     $time
       ->method('getCurrentMicroTime')

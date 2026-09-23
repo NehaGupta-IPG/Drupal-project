@@ -23,9 +23,11 @@ trait FileSystemModuleDiscoveryDataProviderTrait {
     }, $module_dirs);
     $modules_keyed = array_combine($module_names, $module_names);
 
-    return array_map(function (string $module): array {
+    $data = array_map(function (string $module): array {
       return [$module];
     }, $modules_keyed);
+
+    return $data;
   }
 
 }

@@ -63,7 +63,7 @@ class UpdateCronHooks {
     else {
       // Otherwise, see if any individual projects are now stale or still
       // missing data, and if so, try to fetch the data.
-      ($this->updateManager)()->getAvailable(TRUE);
+      update_get_available(TRUE);
     }
     $last_email_notice = $this->state->get('update.last_email_notification', 0);
     if ($request_time - $last_email_notice > $interval) {

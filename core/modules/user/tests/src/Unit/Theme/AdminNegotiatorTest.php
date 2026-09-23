@@ -38,7 +38,7 @@ class AdminNegotiatorTest extends UnitTestCase {
    */
   public static function getThemes(): array {
     return [
-      ['default_admin', 'default_admin'],
+      ['claro', 'claro'],
       [NULL, NULL],
       ['', NULL],
     ];

@@ -31,8 +31,6 @@ class BasicAuthTest extends BrowserTestBase {
     'router_test',
     'locale',
     'basic_auth_test',
-    'page_cache',
-    'dynamic_page_cache',
   ];
 
   /**

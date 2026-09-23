@@ -31,7 +31,7 @@ class SqliteDateSqlTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->database = $this->createStub(Connection::class);
+    $this->database = $this->prophesize(Connection::class)->reveal();
   }
 
   /**
@@ -100,9 +100,9 @@ class SqliteDateSqlTest extends UnitTestCase {
    * Tests setting the database offset.
    */
   public function testSetTimezoneOffset(): void {
-    $database = $this->createMock(Connection::class);
-    $database->expects($this->never())->method('query');
-    $date_sql = new SqliteDateSql($database);
+    $database = $this->prophesize(Connection::class);
+    $database->query()->shouldNotBeCalled();
+    $date_sql = new SqliteDateSql($database->reveal());
     $date_sql->setTimezoneOffset(42);
   }
 

@@ -34,7 +34,7 @@ class FieldUiTable extends Table {
    *   - #region_callback: A callback that provides the region of the table to
    *     place the row in.
    *   - #tabledrag: The value is a list of $options arrays that are passed to
-   *     Table::attachTabledrag(). The HTML ID of the table is added to each
+   *     drupal_attach_tabledrag(). The HTML ID of the table is added to each
    *     $options array.
    *
    * @return array
@@ -42,7 +42,6 @@ class FieldUiTable extends Table {
    *
    * @see \Drupal\Core\Render\RendererInterface::render()
    * @see \Drupal\Core\Render\Element\Table::preRenderTable()
-   * @see \Drupal\Core\Render\Element\Table::attachTabledrag()
    */
   public static function tablePreRender($elements) {
     $js_settings = [];
@@ -73,7 +72,7 @@ class FieldUiTable extends Table {
           $region_name = call_user_func_array($row['#region_callback'], [&$row]);
 
           // Add the element in the tree.
-          // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+          // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
           $target = &$trees[$region_name][''];
           foreach ($parents[$name] as $key) {
             $target = &$target['children'][$key];
@@ -123,7 +122,7 @@ class FieldUiTable extends Table {
     if (!empty($elements['#tabledrag']) && isset($elements['#attributes']['id'])) {
       foreach ($elements['#tabledrag'] as $options) {
         $options['table_id'] = $elements['#attributes']['id'];
-        static::attachTabledrag($elements, $options);
+        drupal_attach_tabledrag($elements, $options);
       }
     }
 
@@ -137,7 +136,7 @@ class FieldUiTable extends Table {
    *   A structured array containing two sub-levels of elements. Properties
    *   used:
    *   - #tabledrag: The value is a list of $options arrays that are passed to
-   *     Table::attachTabledrag(). The HTML ID of the table is added to each
+   *     drupal_attach_tabledrag(). The HTML ID of the table is added to each
    *     $options array.
    *
    * @return array

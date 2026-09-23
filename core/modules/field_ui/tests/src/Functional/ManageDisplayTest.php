@@ -44,12 +44,12 @@ class ManageDisplayTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * The type.
+   * @var string
    */
   private string $type;
 
   /**
-   * The vocabulary.
+   * @var string
    */
   private string $vocabulary;
 
@@ -364,10 +364,10 @@ class ManageDisplayTest extends BrowserTestBase {
     $output = (string) \Drupal::service('renderer')->renderRoot($element);
 
     if ($not_exists) {
-      $this->assertStringNotContainsString($text, $output, $message);
+      $this->assertStringNotContainsString((string) $text, $output, $message);
     }
     else {
-      $this->assertStringContainsString($text, $output, $message);
+      $this->assertStringContainsString((string) $text, $output, $message);
     }
   }
 
@@ -383,7 +383,7 @@ class ManageDisplayTest extends BrowserTestBase {
    */
   protected function assertFieldSelectOptions(string $name, array $expected_options): void {
     $xpath = $this->assertSession()->buildXPathQuery('//select[@name=:name]', [':name' => $name]);
-    $fields = $this->getNodeElementsByXpath($xpath);
+    $fields = $this->xpath($xpath);
     if ($fields) {
       $field = $fields[0];
       $options = $this->getAllOptionsList($field);

@@ -3,5 +3,3 @@ type: module
 description: 'Support module for testing layouts.'
 package: Testing
 version: VERSION
-dependencies:
-  - drupal:layout_discovery

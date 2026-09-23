@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\editor\Kernel;
 
-use Drupal\Core\Extension\ModuleWeight;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -39,7 +38,7 @@ class EntityUpdateTest extends EntityKernelTestBase {
     // that editor_test_entity_update() is called before editor_entity_update().
     $extension_config = \Drupal::configFactory()->get('core.extension');
     $editor_module_weight = $extension_config->get('module.editor');
-    \Drupal::service(ModuleWeight::class)->set('editor_test', $editor_module_weight - 1);
+    module_set_weight('editor_test', $editor_module_weight - 1);
   }
 
   /**

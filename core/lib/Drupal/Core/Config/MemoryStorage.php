@@ -56,14 +56,7 @@ class MemoryStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function readMultiple(array $names) {
-    $items = [];
-    foreach ($names as $name) {
-      $value = $this->read($name);
-      if (!empty($value)) {
-        $items[$name] = $value;
-      }
-    }
-    return $items;
+    return array_intersect_key($this->config[$this->collection], array_flip($names));
   }
 
   /**

@@ -15,7 +15,6 @@ use Drupal\Tests\Core\Entity\ContentEntityBaseMockableClass;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -27,13 +26,17 @@ class EntityNormalizerTest extends UnitTestCase {
 
   /**
    * The mock entity field manager.
+   *
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected EntityFieldManagerInterface&MockObject $entityFieldManager;
+  protected $entityFieldManager;
 
   /**
    * The mock entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected EntityTypeManagerInterface&MockObject $entityTypeManager;
+  protected $entityTypeManager;
 
   /**
    * The mock entity type repository.

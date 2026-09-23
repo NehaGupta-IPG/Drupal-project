@@ -41,6 +41,8 @@ abstract class ComponentKernelTestBase extends KernelTestBase {
 
   /**
    * The component plugin manager.
+   *
+   * @var \Drupal\Core\Theme\ComponentPluginManager
    */
   protected ComponentPluginManager $manager;
 

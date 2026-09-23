@@ -1,7 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 // cspell:ignore linksuggestioncommand
 
-import { Plugin, findAttributeRange } from 'ckeditor5';
+import { Plugin } from 'ckeditor5/src/core';
+import { findAttributeRange } from 'ckeditor5/src/typing';
 import DrupalEntityLinkSuggestionMetadataCommand from './linksuggestioncommand';
 import { getCurrentLinkRange, extractTextFromLinkRange } from './utils';
 

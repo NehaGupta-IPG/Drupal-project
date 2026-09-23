@@ -28,6 +28,8 @@ class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
 
   /**
    * The database connection for testing.
+   *
+   * @var \Drupal\Core\Database\Connection
    */
   protected Connection $testingFakeConnection;
 

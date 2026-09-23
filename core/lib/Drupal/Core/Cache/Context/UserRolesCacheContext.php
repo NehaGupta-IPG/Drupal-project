@@ -38,11 +38,7 @@ class UserRolesCacheContext extends UserCacheContextBase implements CalculatedCa
    * {@inheritdoc}
    */
   public function getCacheableMetadata($role = NULL) {
-    // The list of roles for the anonymous user can never change.
-    if ($this->user->isAuthenticated()) {
-      return (new CacheableMetadata())->setCacheTags(['user:' . $this->user->id()]);
-    }
-    return new CacheableMetadata();
+    return (new CacheableMetadata())->setCacheTags(['user:' . $this->user->id()]);
   }
 
 }

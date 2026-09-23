@@ -26,7 +26,7 @@ class ProcessOutputCallbackTest extends UnitTestCase {
     $callback(OutputTypeEnum::OUT, '{A string of invalid JSON! 😈');
 
     $this->expectException(\JsonException::class);
-    $this->expectExceptionMessageIs('Syntax error');
+    $this->expectExceptionMessage('Syntax error');
     $callback->parseJsonOutput();
   }
 

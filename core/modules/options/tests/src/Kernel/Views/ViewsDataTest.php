@@ -32,7 +32,7 @@ class ViewsDataTest extends OptionsTestBase {
   protected $fieldStorage;
 
   /**
-   * The field data.
+   * @var int
    */
   protected int $field;
 

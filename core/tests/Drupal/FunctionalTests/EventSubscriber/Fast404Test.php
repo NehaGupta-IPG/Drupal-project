@@ -26,10 +26,7 @@ class Fast404Test extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'file',
-    'page_cache',
-  ];
+  protected static $modules = ['file'];
 
   /**
    * Tests the fast 404 functionality.

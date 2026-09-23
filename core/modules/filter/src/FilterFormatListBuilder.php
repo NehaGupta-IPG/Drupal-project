@@ -38,11 +38,21 @@ class FilterFormatListBuilder extends DraggableListBuilder {
    */
   protected $messenger;
 
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ConfigFactoryInterface $config_factory, MessengerInterface $messenger, protected FilterFormatRepositoryInterface $formatRepository) {
+  /**
+   * The filter format repository service.
+   */
+  protected FilterFormatRepositoryInterface $formatRepository;
+
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ConfigFactoryInterface $config_factory, MessengerInterface $messenger, ?FilterFormatRepositoryInterface $format_repository = NULL) {
     parent::__construct($entity_type, $storage);
 
     $this->configFactory = $config_factory;
     $this->messenger = $messenger;
+    if (!$format_repository) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $format_repository argument is deprecated in drupal:11.4.0 and the $format_repository argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3035368', E_USER_DEPRECATED);
+      $format_repository = \Drupal::service(FilterFormatRepositoryInterface::class);
+    }
+    $this->formatRepository = $format_repository;
   }
 
   /**

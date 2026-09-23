@@ -194,6 +194,14 @@ class ComponentMetadata {
 
           $schema['properties'][$name] = $prop_schema;
         }
+
+        // All props should also support "object" this allows deferring
+        // rendering in Twig to the render pipeline.
+        $type = $prop_schema['type'] ?? '';
+        $schema['properties'][$name]['type'] = array_unique([
+          ...(array) $type,
+          'object',
+        ]);
       }
     }
     return $schema;

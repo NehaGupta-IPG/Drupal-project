@@ -13,7 +13,6 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\comment\Functional\CommentTestBase as CommentBrowserTestBase;
-use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -60,11 +59,11 @@ class CommentAdminTest extends CommentBrowserTestBase {
    */
   public function testApprovalAdminInterface(): void {
     // Set anonymous comments to require approval.
-    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions([
+    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => TRUE,
       'post comments' => TRUE,
       'skip comment approval' => FALSE,
-    ])->save();
+    ]);
     $this->drupalPlaceBlock('page_title_block');
     $this->drupalLogin($this->adminUser);
     // Ensure that doesn't require contact info.

@@ -68,7 +68,7 @@ class EditorTest extends ConfigEntityResourceTestBase {
         'filter_html' => [
           'status' => TRUE,
           'settings' => [
-            'allowed_html' => '<a> <b> <lo> <p>',
+            'allowed_html' => '<p> <a> <b> <lo>',
           ],
         ],
       ],
@@ -186,7 +186,7 @@ class EditorTest extends ConfigEntityResourceTestBase {
         'filter_html' => [
           'status' => TRUE,
           'settings' => [
-            'allowed_html' => '<a> <b> <lo> <p>',
+            'allowed_html' => '<p> <a> <b> <lo>',
           ],
         ],
       ],

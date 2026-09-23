@@ -23,7 +23,6 @@ class BubbleableMetadata extends CacheableMetadata implements AttachmentsInterfa
    * @return static
    *   A new bubbleable metadata object, with the merged data.
    */
-  #[\NoDiscard]
   public function merge(CacheableMetadata $other) {
     $result = parent::merge($other);
 
@@ -162,19 +161,6 @@ class BubbleableMetadata extends CacheableMetadata implements AttachmentsInterfa
       unset($a['placeholders']);
       unset($b['placeholders']);
     }
-    // page_top and page_bottom may contain complete render arrays. Merge only
-    // their top-level elements to avoid recursively traversing cyclic
-    // references within those render arrays.
-    $page_regions = [];
-    foreach (['page_top', 'page_bottom'] as $page_region) {
-      if (isset($a[$page_region]) || isset($b[$page_region])) {
-        $page_regions[$page_region] = array_merge(
-          $a[$page_region] ?? [],
-          $b[$page_region] ?? [],
-        );
-        unset($a[$page_region], $b[$page_region]);
-      }
-    }
     // Apply the normal merge.
     $a = array_merge_recursive($a, $b);
     if (isset($drupalSettings)) {
@@ -185,8 +171,7 @@ class BubbleableMetadata extends CacheableMetadata implements AttachmentsInterfa
       // Save the custom merge for the placeholders.
       $a['placeholders'] = $placeholders;
     }
-    // Save the custom merges for the page regions.
-    return $a + $page_regions;
+    return $a;
   }
 
 }

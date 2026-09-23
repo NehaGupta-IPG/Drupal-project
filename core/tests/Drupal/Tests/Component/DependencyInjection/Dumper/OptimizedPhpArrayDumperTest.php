@@ -474,7 +474,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a service definition.
    */
-  protected static function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): \stdClass|string {
+  protected static function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
     return (object) [
       'type' => 'service',
       'id' => $id,
@@ -485,7 +485,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a service closure definition.
    */
-  protected static function getServiceClosureCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): \stdClass {
+  protected static function getServiceClosureCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
     return (object) [
       'type' => 'service_closure',
       'id' => $id,
@@ -666,7 +666,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a private service definition.
    */
-  protected static function getPrivateServiceCall($id, $service_definition, $shared = FALSE): \stdClass {
+  protected static function getPrivateServiceCall($id, $service_definition, $shared = FALSE) {
     if (!$id) {
       $hash = Crypt::hashBase64(serialize($service_definition));
       $id = 'private__' . $hash;
@@ -682,7 +682,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a machine-optimized collection.
    */
-  protected static function getCollection($collection): \stdClass|array {
+  protected static function getCollection($collection) {
     return (object) [
       'type' => 'collection',
       'value' => $collection,
@@ -692,7 +692,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a machine-optimized iterator.
    */
-  protected static function getIterator($collection): \stdClass {
+  protected static function getIterator($collection) {
     return (object) [
       'type' => 'iterator',
       'value' => $collection,
@@ -702,7 +702,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a parameter definition.
    */
-  protected static function getParameterCall($name): \stdClass|string {
+  protected static function getParameterCall($name) {
     return (object) [
       'type' => 'parameter',
       'name' => $name,
@@ -712,7 +712,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Helper function to return a raw value definition.
    */
-  protected function getRaw($value): \stdClass {
+  protected function getRaw($value) {
     return (object) [
       'type' => 'raw',
       'value' => $value,
@@ -735,9 +735,7 @@ if (!class_exists('\Symfony\Component\ExpressionLanguage\Expression')) {
    */
   class Expression {
 
-    public function __construct(
-      private readonly string $expression,
-    ) {
+    public function __construct($expression) {
     }
 
     /**

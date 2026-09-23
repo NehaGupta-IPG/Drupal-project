@@ -30,7 +30,7 @@ class DistributionProfileTranslationTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $profile;
+  protected $profile = NULL;
 
   /**
    * The distribution profile info.
@@ -54,7 +54,7 @@ class DistributionProfileTranslationTest extends InstallerTestBase {
         'name' => 'My Distribution',
         'langcode' => $this->langcode,
         'install' => [
-          'theme' => 'default_admin',
+          'theme' => 'claro',
         ],
       ],
     ];

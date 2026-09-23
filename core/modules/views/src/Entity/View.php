@@ -11,8 +11,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\views\Plugin\DependentWithRemovalPluginInterface;
-use Drupal\views\PostSaveProcess;
-use Drupal\views\PostSaveViewInterface;
 use Drupal\views\Views;
 use Drupal\views\ViewEntityInterface;
 
@@ -350,50 +348,13 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
-    Views::invalidateCache();
-    // Track for each display, handler and plugin whether action was taken in
-    // the postsave callback.
-    $postSaveProcess = new PostSaveProcess();
+    // @todo Remove if views implements a view_builder controller.
+    views_invalidate_cache();
+    $this->invalidateCaches();
 
-    $executable = $this->getExecutable();
-    $original_executable = NULL;
-    if ($this->getOriginal()) {
-      $original_executable = $this->getOriginal()->getExecutable();
-      $original_executable->initDisplay();
-    }
-    $executable->initDisplay();
-    foreach ($executable->displayHandlers as $display_id => $display_handler) {
-      $original_display_handler = NULL;
-      if ($original_executable && $original_executable->displayHandlers->has($display_id)) {
-        $original_executable->setDisplay($display_id);
-        $original_display_handler = $original_executable->display_handler;
-      }
-      if ($display_handler instanceof PostSaveViewInterface) {
-        $display_handler->postSaveView($postSaveProcess, $original_display_handler);
-      }
-      foreach (\array_keys(Views::getHandlerTypes()) as $handler_type) {
-        foreach ($display_handler->getHandlers($handler_type) as $handler) {
-          if ($handler instanceof PostSaveViewInterface) {
-            $handler->postSaveView($postSaveProcess, $original_display_handler);
-          }
-        }
-      }
-      foreach (Views::getPluginTypes('plugin') as $plugin_type) {
-        $plugin = $display_handler->getPlugin($plugin_type);
-        if (!empty($plugin) && $plugin instanceof PostSaveViewInterface) {
-          $plugin->postSaveView($postSaveProcess, $original_display_handler);
-        }
-      }
-    }
-
-    if ($postSaveProcess->needsRouterRebuild()) {
-      // Set the router as needing to be rebuilt.
+    // Rebuild the router if this is a new view, or its status changed.
+    if (!$this->getOriginal() || ($this->status() != $this->getOriginal()->status())) {
       \Drupal::service('router.builder')->setRebuildNeeded();
-      // Reset the RouteSubscriber from views.
-      \Drupal::service('views.route_subscriber')->reset();
-    }
-    foreach ($postSaveProcess->getDiscoveriesToClear() as $discovery) {
-      $discovery->clearCachedDefinitions();
     }
   }
 
@@ -465,7 +426,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
       $tempstore->delete($entity->id());
     }
 
-    Views::invalidateCache();
+    views_invalidate_cache();
   }
 
   /**

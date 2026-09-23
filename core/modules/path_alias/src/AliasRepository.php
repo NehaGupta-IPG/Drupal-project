@@ -3,7 +3,6 @@
 namespace Drupal\path_alias;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Language\LanguageInterface;
@@ -117,18 +116,11 @@ class AliasRepository implements AliasRepositoryInterface {
     $query = $this->getBaseQuery();
     $query->addExpression(1);
 
-    // This query may run in the early installer when the table has not yet been
-    // created yet, in that case ignore any errors.
-    try {
-      return (bool) $query
-        ->condition('base_table.path', $this->connection->escapeLike($initial_substring) . '%', 'LIKE')
-        ->range(0, 1)
-        ->execute()
-        ->fetchField();
-    }
-    catch (DatabaseException) {
-      return FALSE;
-    }
+    return (bool) $query
+      ->condition('base_table.path', $this->connection->escapeLike($initial_substring) . '%', 'LIKE')
+      ->range(0, 1)
+      ->execute()
+      ->fetchField();
   }
 
   /**

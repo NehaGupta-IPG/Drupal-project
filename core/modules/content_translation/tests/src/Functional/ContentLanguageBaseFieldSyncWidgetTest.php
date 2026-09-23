@@ -58,10 +58,6 @@ final class ContentLanguageBaseFieldSyncWidgetTest extends BrowserTestBase {
     $assert_session->elementExists('css', 'input[name="settings[media][' . $media_type->id() . '][columns][thumbnail][file]"]');
     $assert_session->elementExists('css', 'input[name="settings[media][' . $media_type->id() . '][columns][thumbnail][alt]"]');
     $assert_session->elementExists('css', 'input[name="settings[media][' . $media_type->id() . '][columns][thumbnail][title]"]');
-
-    // Ensure the form can be saved without config schema errors.
-    $this->getSession()->getPage()->pressButton('Save configuration');
-    $this->assertSession()->pageTextContains('Settings successfully updated.');
   }
 
 }

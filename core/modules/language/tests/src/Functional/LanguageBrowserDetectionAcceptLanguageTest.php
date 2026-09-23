@@ -24,7 +24,6 @@ class LanguageBrowserDetectionAcceptLanguageTest extends BrowserTestBase {
     'locale',
     'content_translation',
     'system_test',
-    'page_cache',
   ];
 
   /**

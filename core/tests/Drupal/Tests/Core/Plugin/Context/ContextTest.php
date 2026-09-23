@@ -79,7 +79,7 @@ class ContextTest extends UnitTestCase {
    * @legacy-covers ::getContextData
    */
   public function testNullDataValue(): void {
-    $this->setUpDefaultValue();
+    $this->setUpDefaultValue(NULL);
 
     $context = new Context($this->contextDefinition);
     $context->setTypedDataManager($this->typedDataManager);

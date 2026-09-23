@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Database\Database;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\Url;
@@ -15,7 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore TÉXT Pácê
 /**
- * Tests the FormFileUploader::saveFormUploadedFiles() function.
+ * Tests the file_save_upload() function.
  */
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
@@ -110,7 +111,7 @@ class SaveUploadTest extends FileManagedTestBase {
   }
 
   /**
-   * Tests the FormFileUploader::saveFormUploadedFiles() function.
+   * Tests the file_save_upload() function.
    */
   public function testNormal(): void {
     $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
@@ -210,7 +211,7 @@ class SaveUploadTest extends FileManagedTestBase {
     // The file being tested is a .gif which is in the default safe list
     // of extensions to allow when the extension validator isn't used. This is
     // implicitly tested at the testNormal() test. Here we tell
-    // FormFileUploader::saveFormUploadedFiles() to only allow ".foo".
+    // file_save_upload() to only allow ".foo".
     $extensions = 'foo';
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
@@ -231,7 +232,7 @@ class SaveUploadTest extends FileManagedTestBase {
     FileTestHelper::reset();
 
     $extensions = 'foo ' . $this->imageExtension;
-    // Now tell FormFileUploader::saveFormUploadedFiles() to allow the extension of our test image.
+    // Now tell file_save_upload() to allow the extension of our test image.
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
       'files[file_test_upload]' => \Drupal::service('file_system')->realpath($this->image->getFileUri()),
@@ -250,7 +251,7 @@ class SaveUploadTest extends FileManagedTestBase {
     // Reset the hook counters.
     FileTestHelper::reset();
 
-    // Now tell FormFileUploader::saveFormUploadedFiles() to allow any extension.
+    // Now tell file_save_upload() to allow any extension.
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
       'files[file_test_upload]' => \Drupal::service('file_system')->realpath($this->image->getFileUri()),
@@ -268,7 +269,7 @@ class SaveUploadTest extends FileManagedTestBase {
     // Reset the hook counters.
     FileTestHelper::reset();
 
-    // Now tell FormFileUploader::saveFormUploadedFiles() to allow any extension and try and upload a
+    // Now tell file_save_upload() to allow any extension and try and upload a
     // malicious file.
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
@@ -708,7 +709,7 @@ class SaveUploadTest extends FileManagedTestBase {
   }
 
   /**
-   * Tests that invalid UTF-8 in a filename is replaced rather than rejected.
+   * Tests that filenames containing invalid UTF-8 are rejected.
    */
   public function testInvalidUtf8FilenameUpload(): void {
     $this->drupalGet('file-test/upload');
@@ -757,17 +758,14 @@ class SaveUploadTest extends FileManagedTestBase {
 
     $content = (string) $response->getBody();
     $this->htmlOutput($content);
-    // The invalid byte is replaced with the configured replacement character,
-    // so the upload succeeds rather than failing with a confusing message.
-    $this->assertStringContainsString('You WIN!', $content);
-    $this->assertStringContainsString('File name is x-xx.gif.', $content);
-    $this->assertStringNotContainsString('Epic upload FAIL!', $content);
-    $this->assertFileExists('temporary://x-xx.gif');
+    $error_text = 'The file <em class="placeholder">' . Html::escape($filename) . '</em> could not be uploaded because the name is invalid.';
+    $this->assertStringContainsString($error_text, $content);
+    $this->assertStringContainsString('Epic upload FAIL!', $content);
     $this->assertFileDoesNotExist('temporary://' . $filename);
   }
 
   /**
-   * Tests the FormFileUploader::saveFormUploadedFiles() function when the field is required.
+   * Tests the file_save_upload() function when the field is required.
    */
   public function testRequired(): void {
     // Reset the hook counters to get rid of the 'load' we just called.
@@ -841,7 +839,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
     // Test that the file name has only been transliterated.
-    $this->assertSession()->responseContains('File name is S  Pace--tab___---.txt.');
+    $this->assertSession()->responseContains('File name is S  Pace--tab#	#---.txt.');
 
     // Leave transliteration on and enable whitespace replacement.
     $this->drupalLogin($admin);
@@ -855,7 +853,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
     // Test that the file name has been transliterated and whitespace replaced.
-    $this->assertSession()->responseContains('File name is S--Pace--tab_-_---.txt.');
+    $this->assertSession()->responseContains('File name is S--Pace--tab#-#---.txt.');
 
     // Leave transliteration and whitespace replacement on, replace non-alpha.
     $this->drupalLogin($admin);

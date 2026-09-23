@@ -31,7 +31,7 @@ class SectionListTraitTest extends SectionListTestBase {
    */
   public function testAddBlankSection(): void {
     $this->expectException(\Exception::class);
-    $this->expectExceptionMessageIs('A blank section must only be added to an empty list');
+    $this->expectExceptionMessage('A blank section must only be added to an empty list');
     $this->sectionList->addBlankSection();
   }
 

@@ -58,7 +58,7 @@
     }
   }
 
-  .dark-mode & {
+  .gin--dark-mode & {
     color-scheme: dark;
   }
 
@@ -110,6 +110,7 @@
 /**
  * Override normalize.css's search appearance.
  */
+
 .form-element--type-search[type="search"] {
   appearance: none;
   box-sizing: border-box;
@@ -118,6 +119,7 @@
 /**
  * Fix minor things for specific types.
  */
+
 .form-element--type-date,
 .form-element--type-time {
   /* stylelint-disable-next-line declaration-property-value-no-unknown */
@@ -135,6 +137,7 @@
 /**
  * Better upload button alignment for Chrome.
  */
+
 .form-element--type-file::-webkit-file-upload-button {
   vertical-align: top;
 }

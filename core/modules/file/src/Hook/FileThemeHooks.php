@@ -95,7 +95,7 @@ class FileThemeHooks {
 
     $url = $this->fileUrlGenerator->generate($file->getFileUri());
 
-    $mime_type = $file->getMimeType() ?? 'application/octet-stream';
+    $mime_type = $file->getMimeType();
     $options['attributes']['type'] = $mime_type;
 
     // Use the description as the link text if available.

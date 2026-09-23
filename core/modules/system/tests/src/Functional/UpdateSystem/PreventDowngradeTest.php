@@ -6,7 +6,6 @@ namespace Drupal\Tests\system\Functional\UpdateSystem;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -17,7 +16,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Update')]
 #[RunTestsInSeparateProcesses]
-#[IgnoreDeprecations]
 class PreventDowngradeTest extends UpdatePathTestBase {
 
   /**

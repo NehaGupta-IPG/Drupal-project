@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Functional;
 
-use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -46,11 +45,7 @@ class WorkspaceConcurrentEditingTest extends BrowserTestBase {
     $mayer = $this->drupalCreateUser($permissions);
     $this->drupalLogin($mayer);
 
-    $test_node = $this->drupalCreateNode([
-      'title' => 'Test node',
-      'type' => 'test',
-      'status' => NodeInterface::PUBLISHED,
-    ]);
+    $test_node = $this->createNodeThroughUi('Test node', 'test');
 
     // Check that the user can edit the node.
     $page = $this->getSession()->getPage();

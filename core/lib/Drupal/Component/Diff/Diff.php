@@ -22,6 +22,7 @@ class Diff {
   protected $edits;
 
   /**
+   * Constructor.
    * Computes diff between sequences of strings.
    *
    * @param array $from_lines

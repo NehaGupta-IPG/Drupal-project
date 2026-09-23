@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\UpdateSystem;
 
-use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -84,7 +83,7 @@ class RebuildScriptTest extends BrowserTestBase {
     // Enable a module by writing to the core.extension list.
     $modules = $this->config('core.extension')->get('module');
     $modules['module_test'] = 0;
-    $this->config('core.extension')->set('module', \Drupal::service(ModuleWeight::class)->sort($modules))->save();
+    $this->config('core.extension')->set('module', module_config_sort($modules))->save();
     \Drupal::state()->set('container_rebuild_test.count', 0);
     $this->drupalGet(Url::fromUri('base:core/rebuild.php'));
     $this->assertSession()->addressEquals(new Url('<front>'));

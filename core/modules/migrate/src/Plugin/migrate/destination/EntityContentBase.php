@@ -228,8 +228,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     // for the current row.
     try {
       $violations = $entity->validate();
-    }
-    finally {
+    } finally {
       if ($account) {
         $this->accountSwitcher->switchBack();
       }

@@ -61,7 +61,8 @@ class FilterAutoP extends FilterBase {
       elseif (!$ignore) {
         // Skip if the next chunk starts with Twig theme debug.
         // @see twig_render_template()
-        if (isset($chunks[$i + 1]) && $chunks[$i + 1] === "<!--\n\nTHEME DEBUG -->") {
+        if (isset($chunks[$i + 1]) && $chunks[$i + 1] === '<!-- THEME DEBUG -->') {
+          $chunk = rtrim($chunk, "\n");
           $output .= $chunk;
           continue;
         }
@@ -70,9 +71,10 @@ class FilterAutoP extends FilterBase {
         // @see \Drupal\Core\Template\TwigThemeEngine::renderTemplate()
         if (isset($chunks[$i - 1])) {
           if (
-            str_starts_with($chunks[$i - 1], "<!--\nBEGIN OUTPUT from ")
-            || str_starts_with($chunks[$i - 1], "<!--\n💡 BEGIN CUSTOM TEMPLATE OUTPUT from ")
+            str_starts_with($chunks[$i - 1], '<!-- BEGIN OUTPUT from ')
+            || str_starts_with($chunks[$i - 1], '<!-- 💡 BEGIN CUSTOM TEMPLATE OUTPUT from ')
           ) {
+            $chunk = ltrim($chunk, "\n");
             $output .= $chunk;
             continue;
           }

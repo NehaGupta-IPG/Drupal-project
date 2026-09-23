@@ -23,13 +23,7 @@ class UserBlocksTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'block',
-    'node',
-    'views',
-    'dynamic_page_cache',
-    'page_cache',
-  ];
+  protected static $modules = ['block', 'node', 'views'];
 
   /**
    * {@inheritdoc}

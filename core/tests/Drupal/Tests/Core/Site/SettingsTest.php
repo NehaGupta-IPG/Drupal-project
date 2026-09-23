@@ -8,7 +8,6 @@ use Composer\Autoload\ClassLoader;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
-use Drupal\TestTools\Attribute\Skip;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -326,9 +325,9 @@ class SettingsTest extends UnitTestCase {
    *   The expected deprecation message.
    */
   #[DataProvider('providerTestRealDeprecatedSettings')]
-  #[IgnoreDeprecations]
-  #[Skip('No settings to test real deprecated settings with.')]
   public function testRealDeprecatedSettings(string $legacy_setting, string $expected_deprecation): void {
+    $this->markTestSkipped('No settings to test real deprecated settings with.');
+
     $settings_file_content = "<?php\n\$settings['$legacy_setting'] = 'foo';\n";
     $class_loader = NULL;
     $vfs_root = vfsStream::setup('root');
@@ -439,6 +438,13 @@ class SettingsTest extends UnitTestCase {
       ],
       [
         'mysql',
+        'Drupal\\Driver\\Database\\mysql',
+        NULL,
+        'Drupal\\Driver\\Database\\mysql',
+        NULL,
+      ],
+      [
+        'mysql',
         'Drupal\\mysql\\Driver\\Database\\mysql',
         'modules/custom/mysql/src/Driver/Database/mysql/',
         'Drupal\\mysql\\Driver\\Database\\mysql',
@@ -475,6 +481,13 @@ class SettingsTest extends UnitTestCase {
       ],
       [
         'pgsql',
+        'Drupal\\Driver\\Database\\pgsql',
+        NULL,
+        'Drupal\\Driver\\Database\\pgsql',
+        NULL,
+      ],
+      [
+        'pgsql',
         'Drupal\\pgsql\\Driver\\Database\\pgsql',
         'modules/custom/pgsql/src/Driver/Database/pgsql/',
         'Drupal\\pgsql\\Driver\\Database\\pgsql',
@@ -508,6 +521,13 @@ class SettingsTest extends UnitTestCase {
         NULL,
         'Drupal\\sqlite\\Driver\\Database\\sqlite',
         'core/modules/sqlite/src/Driver/Database/sqlite/',
+      ],
+      [
+        'sqlite',
+        'Drupal\\Driver\\Database\\sqlite',
+        NULL,
+        'Drupal\\Driver\\Database\\sqlite',
+        NULL,
       ],
       [
         'sqlite',

@@ -42,6 +42,7 @@
 }
 
 /* Tab links within the vertical tabs. */
+
 .media-library-menu__link {
   position: relative;
   display: block;
@@ -129,7 +130,7 @@
     }
   }
 
-  /* Default Admin state overrides — must come after base states so source-order cascade wins. */
+  /* Gin state overrides — must come after base states so source-order cascade wins. */
   &:active,
   &:hover,
   &:focus,

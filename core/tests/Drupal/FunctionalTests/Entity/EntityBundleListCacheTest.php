@@ -24,11 +24,7 @@ class EntityBundleListCacheTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'cache_test',
-    'entity_test',
-    'page_cache',
-  ];
+  protected static $modules = ['cache_test', 'entity_test'];
 
   /**
    * {@inheritdoc}

@@ -49,7 +49,6 @@ class NumericFormatPluralTest extends ViewTestBase {
     $this->drupalLogin($web_user);
     $config = $this->config('locale.settings');
     $config->set('translate_english', TRUE)->save();
-    $this->rebuildContainer();
   }
 
   /**
@@ -90,7 +89,7 @@ class NumericFormatPluralTest extends ViewTestBase {
       \Drupal::service('file.usage')->add($file, 'views_ui', 'dummy', $i, $number);
     }
     $this->drupalGet('numeric-test');
-    foreach ($numbers as $number) {
+    foreach ($numbers as $i => $number) {
       $this->assertSession()->responseContains('<span class="field-content">' . $number . ($number == 1 ? ' time' : ' times') . '</span>');
     }
 

@@ -28,11 +28,15 @@ class ProviderRepositoryTest extends UnitTestCase {
 
   /**
    * The provider repository under test.
+   *
+   * @var \Drupal\media\OEmbed\ProviderRepository
    */
   private ProviderRepository $repository;
 
   /**
    * The HTTP client handler which will serve responses.
+   *
+   * @var \GuzzleHttp\Handler\MockHandler
    */
   private MockHandler $responses;
 
@@ -43,6 +47,8 @@ class ProviderRepositoryTest extends UnitTestCase {
 
   /**
    * The time that the current test began.
+   *
+   * @var int
    */
   private int $currentTime;
 

@@ -16,7 +16,6 @@ use Drupal\Core\Theme\Registry;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\theme_test\Hook\ThemeTestHooks;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -28,9 +27,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class RegistryTest extends UnitTestCase {
 
   /**
-   * The theme registry.
+   * The mocked theme registry.
+   *
+   * @var \Drupal\Core\Theme\Registry|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected Registry $registry;
+  protected $registry;
 
   /**
    * The cache backend.
@@ -74,15 +75,17 @@ class RegistryTest extends UnitTestCase {
 
   /**
    * They key value factory.
+   *
+   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
    */
   protected KeyValueFactoryInterface $keyValueFactory;
 
   /**
    * The list of functions that get_defined_functions() should provide.
    *
-   * @var array{'internal'?: list<string>|'user'?: list<string>}
+   * @var array
    */
-  public static array $functions = [];
+  public static $functions = [];
 
   /**
    * {@inheritdoc}
@@ -245,7 +248,7 @@ class RegistryTest extends UnitTestCase {
    * @legacy-covers ::completeSuggestion
    * @legacy-covers ::mergePreprocessFunctions
    */
-  #[DataProvider('providerTestPostProcessExtension')]
+  #[\PHPUnit\Framework\Attributes\DataProvider('providerTestPostProcessExtension')]
   public function testPostProcessExtension($defined_functions, $hooks, $expected): void {
     $this->setUpMockModuleHandler();
 
@@ -553,6 +556,6 @@ use Drupal\Tests\Core\Theme\RegistryTest;
 /**
  * Overrides get_defined_functions() with a configurable mock.
  */
-function get_defined_functions(): array {
+function get_defined_functions() {
   return RegistryTest::$functions ?: \get_defined_functions();
 }

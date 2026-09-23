@@ -76,7 +76,6 @@ class RouteSubscriber extends RouteSubscriberBase {
   public static function getSubscribedEvents(): array {
     $events = parent::getSubscribedEvents();
     $events[RoutingEvents::FINISHED] = ['routeRebuildFinished'];
-    $events[RoutingEvents::STATIC] = ['onBuildRoutes'];
     // Ensure to run after the entity resolver subscriber.
     // @see \Drupal\Core\EventSubscriber\EntityRouteAlterSubscriber
     $events[RoutingEvents::ALTER] = ['onAlterRoutes', -175];
@@ -103,9 +102,12 @@ class RouteSubscriber extends RouteSubscriberBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Returns a set of route objects.
+   *
+   * @return \Symfony\Component\Routing\RouteCollection
+   *   A route collection.
    */
-  protected function buildRoutes(): RouteCollection {
+  public function routes() {
     $collection = new RouteCollection();
     foreach ($this->getViewsDisplayIDsWithRoute() as $pair) {
       [$view_id, $display_id] = explode('.', $pair);
@@ -123,16 +125,6 @@ class RouteSubscriber extends RouteSubscriberBase {
 
     $this->state->set('views.view_route_names', $this->viewRouteNames);
     return $collection;
-  }
-
-  /**
-   * Returns a set of route objects.
-   *
-   * @return \Symfony\Component\Routing\RouteCollection
-   *   A route collection.
-   */
-  public function routes() {
-    return $this->buildRoutes();
   }
 
   /**

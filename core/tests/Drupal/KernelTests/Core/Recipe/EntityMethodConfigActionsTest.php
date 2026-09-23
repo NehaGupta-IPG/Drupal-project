@@ -205,8 +205,8 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
    */
   public function testSetNestedProperty(): void {
     $this->container->get(ThemeInstallerInterface::class)
-      ->install(['default_admin']);
-    $block = $this->placeBlock('local_tasks_block', ['theme' => 'default_admin']);
+      ->install(['claro']);
+    $block = $this->placeBlock('local_tasks_block', ['theme' => 'claro']);
 
     $this->configActionManager->applyAction(
       'setProperties',
@@ -237,7 +237,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
     // We should get an exception if we try to set a nested value on a property
     // that isn't an array.
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessageIs('The setProperties config action can only set nested values on arrays.');
+    $this->expectExceptionMessage('The setProperties config action can only set nested values on arrays.');
     $this->configActionManager->applyAction(
       'setProperties',
       $block->getConfigDependencyName(),
@@ -259,7 +259,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
     $this->assertNotEmpty($property_name);
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessageIs("Entity key '$property_name' cannot be changed by the setProperties config action.");
+    $this->expectExceptionMessage("Entity key '$property_name' cannot be changed by the setProperties config action.");
     $this->configActionManager->applyAction(
       'setProperties',
       $view_display->getConfigDependencyName(),
@@ -276,7 +276,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
     $view_display->save();
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessageIs('Using the simpleConfigUpdate config action on config entities is not supported. Use the setProperties action instead. See https://www.drupal.org/node/3515543');
+    $this->expectExceptionMessage('Using the simpleConfigUpdate config action on config entities is not supported. Use the setProperties action instead. See https://www.drupal.org/node/3515543');
     $this->configActionManager->applyAction(
       'simpleConfigUpdate',
       $view_display->getConfigDependencyName(),

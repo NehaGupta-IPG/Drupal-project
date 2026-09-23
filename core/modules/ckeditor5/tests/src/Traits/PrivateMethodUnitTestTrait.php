@@ -24,7 +24,8 @@ trait PrivateMethodUnitTestTrait {
    */
   protected static function getMethod(string $fqcn, string $name): \ReflectionMethod {
     $class = new \ReflectionClass($fqcn);
-    return $class->getMethod($name);
+    $method = $class->getMethod($name);
+    return $method;
   }
 
 }

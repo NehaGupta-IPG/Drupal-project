@@ -44,25 +44,25 @@ class ThemeUninstallConfirmTest extends BrowserTestBase {
    * Tests the theme uninstall confirmation form basic workflow.
    */
   public function testThemeUninstallConfirmForm(): void {
-    \Drupal::service('theme_installer')->install(['default_admin']);
+    \Drupal::service('theme_installer')->install(['claro']);
 
     $this->drupalGet('admin/appearance');
-    $this->clickLink('Uninstall Default Admin theme');
-    $this->drupalGet('admin/appearance/uninstall', ['query' => ['theme' => 'default_admin']]);
+    $this->clickLink('Uninstall Claro theme');
+    $this->drupalGet('admin/appearance/uninstall', ['query' => ['theme' => 'claro']]);
 
-    $this->assertSession()->pageTextContains('Uninstall Default Admin theme');
-    $this->assertSession()->pageTextContains('The Default Admin theme will be completely uninstalled from your site, and all data from this theme will be lost!');
+    $this->assertSession()->pageTextContains('Uninstall Claro theme');
+    $this->assertSession()->pageTextContains('The Claro theme will be completely uninstalled from your site, and all data from this theme will be lost!');
     $this->assertSession()->buttonExists('Uninstall');
     $this->assertSession()->linkExists('Cancel');
     $this->submitForm([], 'Uninstall');
 
-    $this->assertSession()->pageTextContains('The Default Admin theme has been uninstalled');
+    $this->assertSession()->pageTextContains('The Claro theme has been uninstalled');
     $this->assertSession()->addressEquals('admin/appearance');
-    $this->assertSession()->linkExists('Install Default Admin theme');
+    $this->assertSession()->linkExists('Install Claro theme');
 
     \Drupal::service('theme_handler')->refreshInfo();
     $themes = \Drupal::service('theme_handler')->listInfo();
-    $this->assertArrayNotHasKey('default_admin', $themes);
+    $this->assertArrayNotHasKey('claro', $themes);
   }
 
   /**
@@ -83,16 +83,16 @@ class ThemeUninstallConfirmTest extends BrowserTestBase {
    * Tests that the admin theme cannot be uninstalled.
    */
   public function testCannotUninstallAdminTheme(): void {
-    \Drupal::service('theme_installer')->install(['default_admin']);
-    $this->config('system.theme')->set('admin', 'default_admin')->save();
-    $this->drupalGet('admin/appearance/uninstall', ['query' => ['theme' => 'default_admin']]);
+    \Drupal::service('theme_installer')->install(['claro']);
+    $this->config('system.theme')->set('admin', 'claro')->save();
+    $this->drupalGet('admin/appearance/uninstall', ['query' => ['theme' => 'claro']]);
 
     $this->assertSession()->addressEquals('admin/appearance');
-    $this->assertSession()->pageTextContains('Default Admin is the admin theme and cannot be uninstalled');
+    $this->assertSession()->pageTextContains('Claro is the admin theme and cannot be uninstalled');
 
     \Drupal::service('theme_handler')->refreshInfo();
     $themes = \Drupal::service('theme_handler')->listInfo();
-    $this->assertNotEmpty($themes['default_admin']->status);
+    $this->assertNotEmpty($themes['claro']->status);
   }
 
   /**
@@ -118,22 +118,22 @@ class ThemeUninstallConfirmTest extends BrowserTestBase {
    * Tests that configuration dependencies are displayed.
    */
   public function testConfigDependenciesDisplayed(): void {
-    \Drupal::service('theme_installer')->install(['default_admin']);
+    \Drupal::service('theme_installer')->install(['claro']);
     $this->drupalPlaceBlock('system_powered_by_block', [
       'region' => 'content',
-      'theme' => 'default_admin',
-      'id' => 'default_admin_powered_by',
-      'label' => 'Powered by Default Admin',
+      'theme' => 'claro',
+      'id' => 'claro_powered_by',
+      'label' => 'Powered by Claro',
     ]);
 
-    $this->drupalGet('admin/appearance/uninstall', ['query' => ['theme' => 'default_admin']]);
+    $this->drupalGet('admin/appearance/uninstall', ['query' => ['theme' => 'claro']]);
     $this->assertSession()->pageTextContains('Configuration deletions');
-    $this->assertSession()->pageTextContains('Powered by Default Admin');
+    $this->assertSession()->pageTextContains('Powered by Claro');
     $this->submitForm([], 'Uninstall');
 
-    $this->assertSession()->pageTextContains('The Default Admin theme has been uninstalled');
+    $this->assertSession()->pageTextContains('The Claro theme has been uninstalled');
 
-    $block = \Drupal::entityTypeManager()->getStorage('block')->load('default_admin_powered_by');
+    $block = \Drupal::entityTypeManager()->getStorage('block')->load('claro_powered_by');
     $this->assertNull($block, 'Block config was deleted');
   }
 

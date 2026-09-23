@@ -34,7 +34,6 @@ class MenuUiUtility {
     /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
     if (!empty($values['entity_id'])) {
       $entity = $this->entityRepository->getActive('menu_link_content', $values['entity_id']);
-      $entity->setOriginal(clone $entity);
       if ($entity->isTranslatable() && $node->isTranslatable()) {
         if (!$entity->hasTranslation($node->language()->getId())) {
           $entity = $entity->addTranslation($node->language()->getId(), $entity->toArray());
@@ -73,26 +72,17 @@ class MenuUiUtility {
         // version.
         $entity->get('link')->uri = 'internal:/node/' . $node->id() . '/latest';
       }
-      $entity->save();
     }
     else {
-      $default_revision_change = FALSE;
-      if ($entity->isDefaultRevision() != $node->isDefaultRevision()) {
-        $entity->isDefaultRevision($node->isDefaultRevision());
-        $default_revision_change = TRUE;
-      }
+      $entity->isDefaultRevision($node->isDefaultRevision());
       if (!$entity->isDefaultRevision()) {
         $entity->setNewRevision();
       }
       elseif ($entity->get('link')->uri !== 'entity:node/' . $node->id()) {
         $entity->get('link')->uri = 'entity:node/' . $node->id();
       }
-      // Save the menu link only if there is a default revision state change or
-      // a field change is detected.
-      if ($default_revision_change || $entity->hasTranslationChanges()) {
-        $entity->save();
-      }
     }
+    $entity->save();
   }
 
   /**

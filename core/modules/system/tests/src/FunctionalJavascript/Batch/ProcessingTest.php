@@ -22,8 +22,10 @@ class ProcessingTest extends WebDriverTestBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @todo Use the stark theme in https://drupal.org/i/3407067.
    */
-  protected $defaultTheme = 'stark';
+  protected $defaultTheme = 'olivero';
 
   /**
    * Tests that a link to the error page is shown.

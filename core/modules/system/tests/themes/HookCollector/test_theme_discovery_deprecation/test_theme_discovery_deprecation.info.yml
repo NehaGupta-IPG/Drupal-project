@@ -1,5 +1,0 @@
-name: 'Test .theme deprecation'
-type: theme
-description: 'Test .theme deprecation messages.'
-version: VERSION
-base theme: false

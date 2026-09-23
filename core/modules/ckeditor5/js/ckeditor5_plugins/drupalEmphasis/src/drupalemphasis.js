@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 // cspell:ignore drupalemphasisediting
 
-import { Plugin } from 'ckeditor5';
+import { Plugin } from 'ckeditor5/src/core';
 import DrupalEmphasisEditing from './drupalemphasisediting';
 
 /**

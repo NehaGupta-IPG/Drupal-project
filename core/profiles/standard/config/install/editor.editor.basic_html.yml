@@ -43,12 +43,12 @@ settings:
       multiBlock: true
     ckeditor5_sourceEditing:
       allowed_tags:
-        - '<a hreflang>'
-        - '<blockquote cite>'
         - '<cite>'
-        - '<dd>'
         - '<dl>'
         - '<dt>'
+        - '<dd>'
+        - '<a hreflang>'
+        - '<blockquote cite>'
         - '<h2 id>'
         - '<h3 id>'
         - '<h4 id>'

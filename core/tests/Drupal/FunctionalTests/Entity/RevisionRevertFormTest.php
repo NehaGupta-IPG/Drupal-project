@@ -20,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[CoversClass(RevisionRevertForm::class)]
 #[Group('Entity')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class RevisionRevertFormTest extends BrowserTestBase {
 

@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Tests\views\Traits\ViewsLoggerTestTrait;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
@@ -36,7 +37,7 @@ class LinkBaseTest extends UnitTestCase {
     parent::setUp();
     $this->setUpMockLoggerWithMissingEntity();
     $container = \Drupal::getContainer();
-    $container->set('string_translation', $this->getStringTranslationStub());
+    $container->set('string_translation', $this->createStub(TranslationInterface::class));
     $container->set('renderer', $this->createStub(RendererInterface::class));
     \Drupal::setContainer($container);
   }

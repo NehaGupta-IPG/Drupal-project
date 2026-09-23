@@ -625,13 +625,9 @@
         : [];
       classes.push('ui-dialog--narrow');
       dialogSettings.classes['ui-dialog'] = classes.join(' ');
-      if (typeof dialogSettings.autoResize === 'undefined') {
-        dialogSettings.autoResize =
-          window.matchMedia('(min-width: 600px)').matches;
-      }
-      if (typeof dialogSettings.width === 'undefined') {
-        dialogSettings.width = 'auto';
-      }
+      dialogSettings.autoResize =
+        window.matchMedia('(min-width: 600px)').matches;
+      dialogSettings.width = 'auto';
 
       const ckeditorAjaxDialog = Drupal.ajax({
         dialog: dialogSettings,

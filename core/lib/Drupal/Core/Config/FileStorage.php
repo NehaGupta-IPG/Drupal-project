@@ -2,17 +2,37 @@
 
 namespace Drupal\Core\Config;
 
+use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\FileSecurity\FileSecurity;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
-use Drupal\Core\Cache\CacheCollectorInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Serialization\Yaml;
-use Drupal\Core\Utility\YamlCacheCollector;
 
 /**
  * Defines the file storage.
  */
 class FileStorage implements StorageInterface {
+
+  /**
+   * The storage collection.
+   *
+   * @var string
+   */
+  protected $collection;
+
+  /**
+   * The filesystem path for configuration objects.
+   *
+   * @var string
+   */
+  protected $directory = '';
+
+  /**
+   * The file cache object.
+   *
+   * @var \Drupal\Component\FileCache\FileCacheInterface
+   */
+  protected $fileCache;
 
   /**
    * Constructs a new FileStorage.
@@ -22,18 +42,14 @@ class FileStorage implements StorageInterface {
    * @param string $collection
    *   (optional) The collection to store configuration in. Defaults to the
    *   default collection.
-   * @param ?Drupal\Core\Cache\CacheCollectorInterface $yamlCacheCollector
-   *   The YAML cache collector. If not passed, a YAMl cache collector with
-   *   a memory backend will be used.
    */
-  public function __construct(
-    protected string $directory,
-    protected string $collection = StorageInterface::DEFAULT_COLLECTION,
-    protected ?CacheCollectorInterface $yamlCacheCollector = NULL,
-  ) {
-    if (!isset($yamlCacheCollector)) {
-      $this->yamlCacheCollector = YamlCacheCollector::createWithMemoryCache();
-    }
+  public function __construct($directory, $collection = StorageInterface::DEFAULT_COLLECTION) {
+    $this->directory = $directory;
+    $this->collection = $collection;
+    // Use a NULL File Cache backend by default. This will ensure only the
+    // internal static caching of FileCache is used and thus avoids blowing up
+    // the APCu cache.
+    $this->fileCache = FileCacheFactory::get('config', ['cache_backend_class' => NULL]);
   }
 
   /**
@@ -90,27 +106,18 @@ class FileStorage implements StorageInterface {
     }
 
     $filepath = $this->getFilePath($name);
+    if ($data = $this->fileCache->get($filepath)) {
+      return $data;
+    }
 
-    // To support enums in YAML files, the config system implements a special
-    // autoloader to load classes from extensions that may not be installed such
-    // as before config sync. This autoloader has to be primed with the names of
-    // extensions which are about to be installed. However, before doing that,
-    // it has to read the extensions from core.extension. To avoid trying to
-    // unserialize() enums which may not exist, avoid the YamlCacheCollector
-    // when reading core.extension, this allows the autoloader to be set up
-    // prior to the cache being unserialized.
+    $data = file_get_contents($filepath);
     try {
-      if ($name === 'core.extension') {
-        $data = file_get_contents($filepath);
-        return Yaml::decode($data);
-      }
-      elseif ($data = $this->yamlCacheCollector->get($filepath)) {
-        return is_array($data) ? $data : FALSE;
-      }
+      $data = $this->decode($data);
     }
     catch (InvalidDataTypeException $e) {
       throw new UnsupportedDataTypeConfigException('Invalid data type in config ' . $name . ', found in file ' . $filepath . ': ' . $e->getMessage());
     }
+    $this->fileCache->set($filepath, $data);
 
     return $data;
   }
@@ -149,7 +156,8 @@ class FileStorage implements StorageInterface {
     if ($status === FALSE) {
       throw new StorageException('Failed to write configuration file: ' . $target);
     }
-    $this->yamlCacheCollector->delete($target);
+
+    $this->fileCache->set($target, $data);
 
     return TRUE;
   }
@@ -161,7 +169,7 @@ class FileStorage implements StorageInterface {
     if (!$this->exists($name)) {
       return FALSE;
     }
-    $this->yamlCacheCollector->delete($this->getFilePath($name));
+    $this->fileCache->delete($this->getFilePath($name));
     return $this->getFileSystem()->unlink($this->getFilePath($name));
   }
 
@@ -173,8 +181,8 @@ class FileStorage implements StorageInterface {
     if ($status === FALSE) {
       return FALSE;
     }
-    $this->yamlCacheCollector->delete($this->getFilePath($name));
-    $this->yamlCacheCollector->delete($this->getFilePath($new_name));
+    $this->fileCache->delete($this->getFilePath($name));
+    $this->fileCache->delete($this->getFilePath($new_name));
     return TRUE;
   }
 
@@ -250,8 +258,7 @@ class FileStorage implements StorageInterface {
   public function createCollection($collection) {
     return new static(
       $this->directory,
-      $collection,
-      $this->yamlCacheCollector
+      $collection
     );
   }
 

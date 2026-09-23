@@ -8,7 +8,6 @@ use Drupal\update\UpdateManagerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\update\UpdateMessageTrait;
 
 /**
  * Hook implementations for update.
@@ -16,7 +15,6 @@ use Drupal\update\UpdateMessageTrait;
 class UpdateHooks {
 
   use StringTranslationTrait;
-  use UpdateMessageTrait;
 
   /**
    * Implements hook_help().
@@ -111,13 +109,61 @@ class UpdateHooks {
   }
 
   /**
+   * Implements hook_themes_installed().
+   *
+   * If themes are installed, we invalidate the information of available
+   * updates.
+   */
+  #[Hook('themes_installed')]
+  public function themesInstalled($themes): void {
+    // Clear all Update Status module data.
+    update_storage_clear();
+  }
+
+  /**
+   * Implements hook_themes_uninstalled().
+   *
+   * If themes are uninstalled, we invalidate the information of available
+   * updates.
+   */
+  #[Hook('themes_uninstalled')]
+  public function themesUninstalled($themes): void {
+    // Clear all Update Status module data.
+    update_storage_clear();
+  }
+
+  /**
+   * Implements hook_modules_installed().
+   *
+   * If modules are installed, we invalidate the information of available
+   * updates.
+   */
+  #[Hook('modules_installed')]
+  public function modulesInstalled($modules): void {
+    // Clear all Update Status module data.
+    update_storage_clear();
+  }
+
+  /**
+   * Implements hook_modules_uninstalled().
+   *
+   * If modules are uninstalled, we invalidate the information of available
+   * updates.
+   */
+  #[Hook('modules_uninstalled')]
+  public function modulesUninstalled($modules): void {
+    // Clear all Update Status module data.
+    update_storage_clear();
+  }
+
+  /**
    * Implements hook_mail().
    *
    * Constructs the email notification message when the site is out of date.
    *
    * @see \Drupal\Core\Mail\MailManagerInterface::mail()
    * @see \Drupal\update\Hook\UpdateCronHooks::notify()
-   * @see \Drupal\update\UpdateMessageTrait::getText()
+   * @see _update_message_text()
    * @see \Drupal\update\UpdateManagerInterface
    */
   #[Hook('mail')]
@@ -126,7 +172,7 @@ class UpdateHooks {
     $language = \Drupal::languageManager()->getLanguage($langcode);
     $message['subject'] .= $this->t('New release(s) available for @site_name', ['@site_name' => \Drupal::config('system.site')->get('name')], ['langcode' => $langcode]);
     foreach ($params as $msg_type => $msg_reason) {
-      $message['body'][] = $this->getText($msg_type, $msg_reason, $langcode, TRUE) ?? '';
+      $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode, TRUE);
     }
     $message['body'][] = $this->t('See the available updates page for more information:',
       [],

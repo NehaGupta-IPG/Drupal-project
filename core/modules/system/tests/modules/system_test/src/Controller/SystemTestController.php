@@ -15,10 +15,8 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\LocalRedirectResponse;
 use Drupal\Core\Routing\TrustedRedirectResponse;
-use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -107,29 +105,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return string
    *   The text to display.
    */
-  #[Route(
-    path: '/system-test/main-content-handling',
-    name: 'system_test.main_content_handling',
-    title: new TranslatableMarkup('Test main content handling'),
-    requirements: ['_access' => 'TRUE'],
-  )]
-  #[Route(
-    path: '/system-test/main-content-fallback',
-    name: 'system_test.main_content_fallback',
-    title: new TranslatableMarkup('Test main content fallback'),
-    requirements: ['_access' => 'TRUE'],
-  )]
-  #[Route(
-    path: '/system-test/permission-dependent-route-access',
-    name: 'system_test.permission_dependent_route_access',
-    requirements: ['_permission' => 'pet llamas'],
-  )]
-  #[Route(
-    path: '/system-test/custom-4xx',
-    name: 'system_test.custom_4xx_with_limited_access',
-    title: new TranslatableMarkup('Admin-only 4xx response'),
-    requirements: ['_role' => 'administrator'],
-  )]
   public function mainContentFallback() {
     return ['#markup' => $this->t('Content to test main content fallback')];
   }
@@ -140,12 +115,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return string
    *   Empty string, we just test the setting of messages.
    */
-  #[Route(
-    path: '/system-test/messenger-service',
-    name: 'system_test.messenger_service',
-    title: new TranslatableMarkup('Set messages with Messenger service'),
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function messengerServiceTest() {
     // Set two messages.
     $this->messenger->addStatus('First message (removed).');
@@ -190,12 +159,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return array
    *   Empty array, we just need the messages.
    */
-  #[Route(
-    path: '/system-test/status-messages-for-assertions',
-    name: 'system_test.status_messages_for_assertions',
-    title: new TranslatableMarkup('Set various message to test status message assertion methods'),
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function statusMessagesForAssertions(): array {
     // Add a simple message of each type.
     $this->messenger->addMessage('My Status Message', 'status');
@@ -220,11 +183,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
-  #[Route(
-    path: '/system-test/method',
-    name: 'system_test.method',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function getMethod(Request $request): Response {
     return new Response($request->getMethod());
   }
@@ -238,11 +196,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
-  #[Route(
-    path: '/system-test/get-destination',
-    name: 'system_test.get_destination',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function getDestination(Request $request) {
     $response = new Response($request->query->get('destination'));
     return $response;
@@ -257,11 +210,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
-  #[Route(
-    path: '/system-test/request-destination',
-    name: 'system_test.request_destination',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function requestDestination(Request $request) {
     $response = new Response($request->request->get('destination'));
     return $response;
@@ -270,13 +218,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Try to acquire a named lock and report the outcome.
    */
-  #[Route(
-    path: '/system-test/lock-acquire',
-    name: 'system_test.lock_acquire',
-    title: new TranslatableMarkup('Lock acquire'),
-    requirements: ['_access' => 'TRUE'],
-    options: ['no_cache' => TRUE],
-  )]
   public function lockAcquire() {
     if ($this->lock->acquire('system_test_lock_acquire')) {
       $this->lock->release('system_test_lock_acquire');
@@ -290,13 +231,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Try to acquire a specific lock, and then exit.
    */
-  #[Route(
-    path: '/system-test/lock-exit',
-    name: 'system_test.lock_exit',
-    title: new TranslatableMarkup('Lock acquire then exit'),
-    requirements: ['_access' => 'TRUE'],
-    options: ['no_cache' => TRUE],
-  )]
   public function lockExit() {
     if ($this->lock->acquire('system_test_lock_exit', 900)) {
       echo 'TRUE: Lock successfully acquired in \Drupal\system_test\Controller\SystemTestController::lockExit()';
@@ -317,13 +251,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return string
    *   The text to display.
    */
-  #[Route(
-    path: '/system-test/lock-persist/{lock_name}',
-    name: 'system_test.lock_persist',
-    title: new TranslatableMarkup('Persistent lock acquire'),
-    requirements: ['_access' => 'TRUE'],
-    options: ['no_cache' => TRUE],
-  )]
   public function lockPersist($lock_name) {
     if ($this->persistentLock->acquire($lock_name)) {
       return ['#markup' => 'TRUE: Lock successfully acquired in SystemTestController::lockPersist()'];
@@ -336,11 +263,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Set cache tag on the returned render array.
    */
-  #[Route(
-    path: '/system-test/cache_tags_page',
-    name: 'system_test.cache_tags_page',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function system_test_cache_tags_page() {
     $build['main'] = [
       '#cache' => ['tags' => ['system_test_cache_tags_page']],
@@ -357,11 +279,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Set cache max-age on the returned render array.
    */
-  #[Route(
-    path: '/system-test/cache_max_age_page',
-    name: 'system_test.cache_max_age_page',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function system_test_cache_max_age_page() {
     $build['main'] = [
       '#cache' => ['max-age' => 90],
@@ -383,11 +300,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Sets a header.
    */
-  #[Route(
-    path: '/system-test/set-header',
-    name: 'system_test.set_header',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function setHeader(Request $request) {
     $query = $request->query->all();
     $response = new CacheableResponse();
@@ -404,11 +316,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * A simple page callback that uses a plain Symfony response object.
    */
-  #[Route(
-    path: '/system-test/respond-response',
-    name: 'system_test.respond_response',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function respondWithResponse(Request $request) {
     return new Response('test');
   }
@@ -416,11 +323,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * A plain Symfony response with Cache-Control: public, max-age=60.
    */
-  #[Route(
-    path: '/system-test/respond-public-response',
-    name: 'system_test.respond_public_response',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function respondWithPublicResponse() {
     return (new Response('test'))->setPublic()->setMaxAge(60);
   }
@@ -428,11 +330,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * A simple page callback that uses a CacheableResponse object.
    */
-  #[Route(
-    path: '/system-test/respond-cacheable-response',
-    name: 'system_test.respond_cacheable_response',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function respondWithCacheableResponse(Request $request) {
     return new CacheableResponse('test');
   }
@@ -440,11 +337,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * A simple page callback which adds a register shutdown function.
    */
-  #[Route(
-    path: '/system-test/shutdown-functions/{arg1}/{arg2}',
-    name: 'system_test.shutdown_functions',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function shutdownFunctions($arg1, $arg2) {
     drupal_register_shutdown_function('_system_test_first_shutdown_function', $arg1, $arg2);
     // If using PHP-FPM then fastcgi_finish_request() will have been fired
@@ -480,17 +372,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return array
    *   A render array.
    */
-  #[Route(
-    path: '/system-test/echo/{text}',
-    name: 'system_test.echo',
-    requirements: ['_access' => 'TRUE'],
-  )]
-  #[Route(
-    // cspell:disable-next-line
-    path: '/system-test/Ȅchȏ/meφΩ/{text}',
-    name: 'system_test.echo_utf8',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function simpleEcho($text) {
     return [
       '#plain_text' => $text,
@@ -503,11 +384,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return array
    *   A render array.
    */
-  #[Route(
-    path: '/system-test/permission-dependent-content',
-    name: 'system_test.permission_dependent_content',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function permissionDependentContent() {
     $build = [];
 
@@ -532,12 +408,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   A Response object containing the current date.
    */
-  #[Route(
-    path: '/system-test/date',
-    name: 'system_test.date',
-    requirements: ['_access' => 'TRUE'],
-    options: ['no_cache' => 'TRUE'],
-  )]
   public function getCurrentDate() {
     // Uses specific time to test that the right timezone is used.
     $response = new Response(\Drupal::service('date.formatter')->format(1452702549));
@@ -550,11 +420,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * @return \Symfony\Component\HttpFoundation\Response
    *   A Response object containing the test header.
    */
-  #[Route(
-    path: '/system-test/header',
-    name: 'system_test.header',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function getTestHeader(Request $request) {
     $response = new Response();
     $response->headers->set('Test-Header', $request->headers->get('Test-Header'));
@@ -564,12 +429,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Returns a cacheable response with a custom cache control.
    */
-  #[Route(
-    path: '/system-test/custom-cache-control',
-    name: 'system_test.custom_cache_control',
-    title: new TranslatableMarkup('Cacheable response with custom cache control'),
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function getCacheableResponseWithCustomCacheControl() {
     return new CacheableResponse('Foo', 200, ['Cache-Control' => 'bar']);
   }
@@ -577,11 +436,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Returns a CacheableRedirectResponse with the given status code.
    */
-  #[Route(
-    path: '/system-test/redirect/cacheable/{status_code}',
-    name: 'router_test.cacheable_redirect',
-    requirements: ['_access' => 'TRUE', 'status_code' => '201|301|302|303|307|308'],
-  )]
   public function respondWithCacheableRedirectResponse(int $status_code): CacheableRedirectResponse {
     return new CacheableRedirectResponse('/llamas', $status_code);
   }
@@ -589,11 +443,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Returns a LocalRedirectResponse with the given status code.
    */
-  #[Route(
-    path: '/system-test/redirect/local/{status_code}',
-    name: 'router_test.local_redirect',
-    requirements: ['_access' => 'TRUE', 'status_code' => '201|301|302|303|307|308'],
-  )]
   public function respondWithLocalRedirectResponse(int $status_code): LocalRedirectResponse {
     return new LocalRedirectResponse('/llamas', $status_code);
   }
@@ -601,11 +450,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Returns a TrustedRedirectResponse with the given status code.
    */
-  #[Route(
-    path: '/system-test/redirect/trusted/{status_code}',
-    name: 'router_test.trusted_redirect',
-    requirements: ['_access' => 'TRUE', 'status_code' => '201|301|302|303|307|308'],
-  )]
   public function respondWithTrustedRedirectResponse(int $status_code): TrustedRedirectResponse {
     return new TrustedRedirectResponse('/llamas', $status_code);
   }
@@ -620,11 +464,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Use a plain Symfony response object to output the current install_profile.
    */
-  #[Route(
-    path: '/system-test/get-install-profile',
-    name: 'system_test.install_profile',
-    requirements: ['_access' => 'TRUE'],
-  )]
   public function getInstallProfile() {
     $install_profile = \Drupal::installProfile() ?: 'NONE';
     return new Response('install_profile: ' . $install_profile);

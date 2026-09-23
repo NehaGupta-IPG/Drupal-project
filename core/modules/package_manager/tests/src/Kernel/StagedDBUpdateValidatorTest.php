@@ -31,7 +31,7 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
 
     $this->container->get('theme_installer')->install(['stark']);
     $this->assertFalse($this->container->get('module_handler')->moduleExists('views'));
-    $this->assertFalse($this->container->get('theme_handler')->themeExists('test_theme'));
+    $this->assertFalse($this->container->get('theme_handler')->themeExists('olivero'));
 
     // Ensure that all the extensions we're testing with have database update
     // files in the active directory.
@@ -39,13 +39,13 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
 
     // System and Stark are installed, so they are used to test what happens
     // when database updates are detected in installed extensions. Views and
-    // test_theme are not installed, so they are used to test what happens when
+    // Olivero are not installed, so they are used to test what happens when
     // non-installed extensions have database updates.
     $extensions = [
       'core/modules/system',
       'core/themes/stark',
       'core/modules/views',
-      'core/modules/system/tests/themes/test_theme',
+      'core/themes/olivero',
     ];
     foreach ($extensions as $extension_path) {
       $extension_path = $active_dir . '/' . $extension_path;
@@ -123,12 +123,12 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
         [],
       ],
       'schema update in non-installed theme' => [
-        'core/modules/system/tests/themes/test_theme',
+        'core/themes/olivero',
         'install',
         [],
       ],
       'post-update in non-installed theme' => [
-        'core/modules/system/tests/themes/test_theme',
+        'core/themes/olivero',
         'post_update.php',
         [],
       ],

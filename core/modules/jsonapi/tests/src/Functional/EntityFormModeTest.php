@@ -97,7 +97,7 @@ class EntityFormModeTest extends ConfigEntityResourceTestBase {
               'user',
             ],
           ],
-          'description' => NULL,
+          'description' => '',
           'label' => 'Test',
           'langcode' => 'en',
           'status' => TRUE,

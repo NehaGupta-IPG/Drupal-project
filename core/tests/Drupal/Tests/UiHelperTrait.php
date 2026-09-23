@@ -39,7 +39,7 @@ trait UiHelperTrait {
    *
    * @var null|int
    */
-  protected $maximumMetaRefreshCount;
+  protected $maximumMetaRefreshCount = NULL;
 
   /**
    * The number of meta refresh redirects followed during ::drupalGet().
@@ -71,7 +71,7 @@ trait UiHelperTrait {
    *   form, which is typically the same thing but with hyphens replacing the
    *   underscores.
    */
-  protected function submitForm(array $edit, $submit, $form_html_id = NULL): void {
+  protected function submitForm(array $edit, $submit, $form_html_id = NULL) {
     $assert_session = $this->assertSession();
     $submit_button = $assert_session->buttonExists($submit);
     // Check if button has a form attribute set.
@@ -161,7 +161,7 @@ trait UiHelperTrait {
    *
    * @see drupalCreateUser()
    */
-  protected function drupalLogin(AccountInterface $account): void {
+  protected function drupalLogin(AccountInterface $account) {
     if ($this->loggedInUser) {
       $this->drupalLogout();
     }
@@ -198,7 +198,7 @@ trait UiHelperTrait {
    *
    * Confirms logout by checking the login page.
    */
-  protected function drupalLogout(): void {
+  protected function drupalLogout() {
     // Make a request to the logout page, and redirect to the user page, the
     // idea being if you were properly logged out you should be seeing a login
     // screen.
@@ -387,7 +387,7 @@ trait UiHelperTrait {
    *
    * @see drupal_valid_test_ua()
    */
-  protected function prepareRequest(): void {
+  protected function prepareRequest() {
     $session = $this->getSession();
     $session->setCookie('SIMPLETEST_USER_AGENT', drupal_generate_test_ua($this->databasePrefix));
   }
@@ -418,7 +418,7 @@ trait UiHelperTrait {
    * @param string $css_selector
    *   The CSS selector identifying the element to click.
    */
-  protected function click(string $css_selector): void {
+  protected function click(string $css_selector) {
     $starting_url = $this->getSession()->getCurrentUrl();
     $this->getSession()->getDriver()->click($this->cssSelectToXpath($css_selector));
     // Log only for WebDriverTestBase tests because for BrowserKitDriver we log
@@ -448,7 +448,7 @@ trait UiHelperTrait {
    *   (optional) The index number for cases where multiple links have the same
    *   text. Defaults to 0.
    */
-  protected function clickLink($label, $index = 0): void {
+  protected function clickLink($label, $index = 0) {
     $label = (string) $label;
     $links = $this->getSession()->getPage()->findAll('named', ['link', $label]);
     $this->assertArrayHasKey($index, $links, 'The link ' . $label . ' was not found on the page.');
@@ -458,7 +458,7 @@ trait UiHelperTrait {
   /**
    * Retrieves the plain-text content from the current page.
    */
-  protected function getTextContent(): string {
+  protected function getTextContent() {
     return $this->getSession()->getPage()->getText();
   }
 

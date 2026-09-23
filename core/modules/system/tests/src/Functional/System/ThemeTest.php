@@ -42,6 +42,8 @@ class ThemeTest extends BrowserTestBase {
 
   /**
    * A test node.
+   *
+   * @var \Drupal\node\Entity\Node
    */
   protected Node $node;
 
@@ -91,7 +93,7 @@ INFO;
    */
   public function testThemeSettings(): void {
     // Ensure a disabled theme settings form URL returns 404.
-    $this->drupalGet('admin/appearance/settings/default_admin');
+    $this->drupalGet('admin/appearance/settings/olivero');
     $this->assertSession()->statusCodeEquals(404);
     // Ensure a non existent theme settings form URL returns 404.
     $this->drupalGet('admin/appearance/settings/' . $this->randomMachineName());
@@ -212,7 +214,7 @@ INFO;
 
     // Upload a file to use for the logo. Try both the test image we've been
     // using so far and an SVG file.
-    $upload_uris = [$file->uri, 'core/misc/logo/drupal-logo.svg'];
+    $upload_uris = [$file->uri, 'core/themes/olivero/logo.svg'];
     $this->drupalPlaceBlock('system_branding_block', ['region' => 'header']);
     foreach ($upload_uris as $upload_uri) {
       $edit = [
@@ -238,14 +240,14 @@ INFO;
       $this->submitForm($edit, 'Save configuration');
     }
 
-    $this->container->get('theme_installer')->install(['default_admin']);
+    $this->container->get('theme_installer')->install(['olivero']);
 
     // Ensure only valid themes are listed in the local tasks.
     $this->drupalPlaceBlock('local_tasks_block', ['region' => 'header']);
     $this->drupalGet('admin/appearance/settings');
     $theme_handler = \Drupal::service('theme_handler');
     $this->assertSession()->linkExists($theme_handler->getName('starterkit_theme'));
-    $this->assertSession()->linkExists($theme_handler->getName('default_admin'));
+    $this->assertSession()->linkExists($theme_handler->getName('olivero'));
     $this->assertSession()->linkNotExists($theme_handler->getName('test_base_theme'));
 
     // If a hidden theme is an admin theme it should be viewable.
@@ -275,14 +277,14 @@ INFO;
    * Tests the theme settings logo form.
    */
   public function testThemeSettingsLogo(): void {
-    // Visit default_admin's theme settings page to replace the logo.
-    $this->container->get('theme_installer')->install(['default_admin']);
-    $this->drupalGet('admin/appearance/settings/default_admin');
+    // Visit Olivero's theme settings page to replace the logo.
+    $this->container->get('theme_installer')->install(['olivero']);
+    $this->drupalGet('admin/appearance/settings/olivero');
     $edit = [
       'default_logo' => FALSE,
       'logo_path' => 'core/misc/druplicon.png',
     ];
-    $this->drupalGet('admin/appearance/settings/default_admin');
+    $this->drupalGet('admin/appearance/settings/olivero');
     $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->fieldValueEquals('default_logo', FALSE);
     $this->assertSession()->fieldValueEquals('logo_path', 'core/misc/druplicon.png');
@@ -296,11 +298,52 @@ INFO;
   }
 
   /**
+   * Tests the theme settings color input.
+   */
+  public function testThemeSettingsColorHexCode() : void {
+    // Install the Olivero theme.
+    $this->container->get('theme_installer')->install(['olivero']);
+
+    // Define invalid and valid hex color codes.
+    $invalid_hex_codes = [
+      'xyz',
+      '#xyz',
+      '#ffff',
+      '#00000',
+      '#FFFFF ',
+      '00#000',
+    ];
+    $valid_hex_codes = [
+      '0F0',
+      '#F0F',
+      '#2ecc71',
+      '0074cc',
+    ];
+
+    // Visit Olivero's theme settings page.
+    $this->drupalGet('admin/appearance/settings/olivero');
+
+    // Test invalid hex color codes.
+    foreach ($invalid_hex_codes as $invalid_hex) {
+      $this->submitForm(['base_primary_color' => $invalid_hex], 'Save configuration');
+      // Invalid hex codes should throw error.
+      $this->assertSession()->statusMessageContains('"' . $invalid_hex . '" is not a valid hexadecimal color.', 'error');
+      $this->assertTrue($this->getSession()->getPage()->findField('base_primary_color')->hasClass('error'));
+    }
+
+    // Test valid hex color codes.
+    foreach ($valid_hex_codes as $valid_hex) {
+      $this->submitForm(['base_primary_color' => $valid_hex], 'Save configuration');
+      $this->assertSession()->statusMessageContains('The configuration options have been saved.', 'status');
+      $this->assertSame($valid_hex, \Drupal::service('config.factory')->getEditable('olivero.settings')->get('base_primary_color'));
+    }
+  }
+
+  /**
    * Tests the 'rendered' cache tag is cleared when saving theme settings.
    */
   public function testThemeSettingsRenderCacheClear(): void {
-    \Drupal::service('module_installer')->install(['page_cache']);
-    $this->container->get('theme_installer')->install(['default_admin']);
+    $this->container->get('theme_installer')->install(['olivero']);
     // Ensure the frontpage is cached for anonymous users. The render cache will
     // cleared by installing a theme.
     $this->drupalLogout();
@@ -310,9 +353,9 @@ INFO;
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
 
     $this->drupalLogin($this->adminUser);
-    // Save default_admin's theme settings which should invalidate the 'rendered'
+    // Save Olivero's theme settings which should invalidate the 'rendered'
     // cache tag in \Drupal\system\EventSubscriber\ConfigCacheTag.
-    $this->drupalGet('admin/appearance/settings/default_admin');
+    $this->drupalGet('admin/appearance/settings/olivero');
     $this->submitForm([], 'Save configuration');
     $this->drupalLogout();
     $this->drupalGet('');
@@ -323,11 +366,11 @@ INFO;
    * Tests the administration theme functionality.
    */
   public function testAdministrationTheme(): void {
-    $this->container->get('theme_installer')->install(['default_admin']);
+    $this->container->get('theme_installer')->install(['claro']);
 
     // Install an administration theme and show it on the node admin pages.
     $edit = [
-      'admin_theme' => 'default_admin',
+      'admin_theme' => 'claro',
       'use_admin_theme' => TRUE,
     ];
     $this->drupalGet('admin/appearance');
@@ -344,7 +387,7 @@ INFO;
 
     // Check that the administration theme is used on an administration page.
     $this->drupalGet('admin/config');
-    $this->assertSession()->responseContains('core/themes/default_admin');
+    $this->assertSession()->responseContains('core/themes/claro');
 
     // Check that the site default theme used on node page.
     $this->drupalGet('node/' . $this->node->id());
@@ -352,11 +395,11 @@ INFO;
 
     // Check that the administration theme is used on the add content page.
     $this->drupalGet('node/add');
-    $this->assertSession()->responseContains('core/themes/default_admin');
+    $this->assertSession()->responseContains('core/themes/claro');
 
     // Check that the administration theme is used on the edit content page.
     $this->drupalGet('node/' . $this->node->id() . '/edit');
-    $this->assertSession()->responseContains('core/themes/default_admin');
+    $this->assertSession()->responseContains('core/themes/claro');
 
     // Disable the admin theme on the node admin pages.
     $edit = [
@@ -371,7 +414,7 @@ INFO;
 
     // Check that the administration theme is used on an administration page.
     $this->drupalGet('admin/config');
-    $this->assertSession()->responseContains('core/themes/default_admin');
+    $this->assertSession()->responseContains('core/themes/claro');
 
     // Ensure that the admin theme is also visible on the 403 page.
     $normal_user = $this->drupalCreateUser(['view the administration theme']);
@@ -379,7 +422,7 @@ INFO;
     // Check that the administration theme is used on an administration page.
     $this->drupalGet('admin/config');
     $this->assertSession()->statusCodeEquals(403);
-    $this->assertSession()->responseContains('core/themes/default_admin');
+    $this->assertSession()->responseContains('core/themes/claro');
     $this->drupalLogin($this->adminUser);
 
     // Check that the site default theme used on the add content page.
@@ -414,22 +457,22 @@ INFO;
     $this->config('system.theme')->set('default', 'stark')->save();
     $this->drupalPlaceBlock('local_tasks_block');
 
-    // Install default_admin and set it as the default theme.
-    $theme_installer->install(['default_admin']);
+    // Install Olivero and set it as the default theme.
+    $theme_installer->install(['olivero']);
     $this->drupalGet('admin/appearance');
     $this->clickLink('Set as default');
-    $this->assertEquals('default_admin', $this->config('system.theme')->get('default'));
+    $this->assertEquals('olivero', $this->config('system.theme')->get('default'));
 
     // Test the default theme on the secondary links (blocks admin page).
     $this->drupalGet('admin/structure/block');
-    $this->assertSession()->pageTextContains('Default Admin');
-    // Switch back to default_admin and test again to test that the menu cache is
+    $this->assertSession()->pageTextContains('Olivero');
+    // Switch back to Stark and test again to test that the menu cache is
     // cleared.
     $this->drupalGet('admin/appearance');
-    // default_admin is the first 'Set as default' link.
+    // Stark is the first 'Set as default' link.
     $this->clickLink('Set as default');
     $this->drupalGet('admin/structure/block');
-    $this->assertSession()->pageTextContains('Default Admin');
+    $this->assertSession()->pageTextContains('Stark');
   }
 
   /**
@@ -459,23 +502,23 @@ INFO;
    * Tests uninstalling of themes works.
    */
   public function testUninstallingThemes(): void {
-    // Install 'Test theme'.
-    \Drupal::service('theme_installer')->install(['test_theme']);
-    // Set up Admin as the admin theme.
-    \Drupal::service('theme_installer')->install(['default_admin']);
+    // Install olivero.
+    \Drupal::service('theme_installer')->install(['olivero']);
+    // Set up Claro as the admin theme.
+    \Drupal::service('theme_installer')->install(['claro']);
     $edit = [
-      'admin_theme' => 'default_admin',
+      'admin_theme' => 'claro',
       'use_admin_theme' => TRUE,
     ];
     $this->drupalGet('admin/appearance');
     $this->submitForm($edit, 'Save configuration');
 
-    // Set 'Test theme' as the default theme.
-    $this->cssSelect('a[title="Set <strong>Test theme</strong> as default theme"]')[0]->click();
-    // Check that Admin cannot be uninstalled as it is the admin theme.
-    $this->assertSession()->responseNotContains('Uninstall Default Admin theme');
-    // Check that 'Test theme' cannot be uninstalled as it is the default theme.
-    $this->assertSession()->responseNotContains('Uninstall <strong>Test theme</strong> theme');
+    // Set olivero as the default theme.
+    $this->cssSelect('a[title="Set Olivero as default theme"]')[0]->click();
+    // Check that claro cannot be uninstalled as it is the admin theme.
+    $this->assertSession()->responseNotContains('Uninstall claro theme');
+    // Check that olivero cannot be uninstalled as it is the default theme.
+    $this->assertSession()->responseNotContains('Uninstall Olivero theme');
 
     // Install Stark and set it as the default theme.
     \Drupal::service('theme_installer')->install(['stark']);
@@ -487,22 +530,22 @@ INFO;
     $this->drupalGet('admin/appearance');
     $this->submitForm($edit, 'Save configuration');
 
-    // Check that default_admin can be uninstalled now.
-    $this->assertSession()->responseContains('Uninstall Default Admin theme');
+    // Check that claro can be uninstalled now.
+    $this->assertSession()->responseContains('Uninstall claro theme');
 
     // Change the default theme to stark, stark is second in the list.
     $this->clickLink('Set as default', 1);
 
-    // Check that 'Test theme' can be uninstalled now.
-    $this->assertSession()->responseContains('Uninstall &lt;strong&gt;Test theme&lt;/strong&gt; theme');
+    // Check that olivero can be uninstalled now.
+    $this->assertSession()->responseContains('Uninstall Olivero theme');
 
-    // Uninstall each of the two themes starting with 'Test theme'.
-    $this->cssSelect('a[title="Uninstall <strong>Test theme</strong> theme"]')[0]->click();
+    // Uninstall each of the two themes starting with Olivero.
+    $this->cssSelect('a[title="Uninstall Olivero theme"]')[0]->click();
     $this->submitForm([], 'Uninstall');
-    $this->assertSession()->responseContains('The <em class="placeholder">&lt;strong&gt;Test theme&lt;/strong&gt;</em> theme has been uninstalled.');
-    $this->cssSelect('a[title="Uninstall Default Admin theme"]')[0]->click();
+    $this->assertSession()->responseContains('The <em class="placeholder">Olivero</em> theme has been uninstalled');
+    $this->cssSelect('a[title="Uninstall Claro theme"]')[0]->click();
     $this->submitForm([], 'Uninstall');
-    $this->assertSession()->responseContains('The <em class="placeholder">Default Admin</em> theme has been uninstalled');
+    $this->assertSession()->responseContains('The <em class="placeholder">Claro</em> theme has been uninstalled');
   }
 
   /**
@@ -510,7 +553,7 @@ INFO;
    */
   public function testInstallAndSetAsDefault(): void {
     $themes = [
-      'test_theme' => '<strong>Test theme</strong>',
+      'olivero' => 'Olivero',
       'test_core_semver' => 'Theme test with semver core version',
     ];
     foreach ($themes as $theme_machine_name => $theme_name) {
@@ -530,7 +573,7 @@ INFO;
       // Confirm the theme is indicated as the default theme and administration
       // theme because the admin theme is the default theme.
       $out = $this->getSession()->getPage()->getContent();
-      $this->assertTrue((bool) preg_match("#" . htmlspecialchars($theme_name) . " " . preg_quote($version) . '\s{2,}\(default theme, administration theme\)#', $out));
+      $this->assertTrue((bool) preg_match("/$theme_name " . preg_quote($version) . '\s{2,}\(default theme, administration theme\)/', $out));
     }
   }
 

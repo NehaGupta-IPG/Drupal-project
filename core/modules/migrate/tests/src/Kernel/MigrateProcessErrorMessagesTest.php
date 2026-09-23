@@ -54,6 +54,8 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
 
   /**
    * The default stub migration definition.
+   *
+   * @var array
    */
   protected array $definition = [
     'id' => 'process_errors_migration',

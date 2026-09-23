@@ -66,6 +66,7 @@
 /**
  * Dropbutton list.
  */
+
 .dropbutton {
   display: block;
   overflow: visible;
@@ -78,8 +79,8 @@
   border-radius: var(--admin-radius-m);
   box-shadow: 0 1px 2px var(--admin-color-primary-soft);
 
-  .dark-mode & {
-    box-shadow: 0 4px 18px var(--admin-shadow-color-button);
+  .gin--dark-mode & {
+    box-shadow: 0 4px 18px var(--admin-color-shadow-button);
   }
 
   &:hover {
@@ -120,12 +121,12 @@
   }
 
   /* Drupal 10.2.x fix */
-  &.dropbutton--admin .dropbutton-action > .button {
+  &.dropbutton--gin .dropbutton-action > .button {
     border: var(--dropbutton-border-size) solid transparent !important;
   }
 
   /* The ugly part: make it work for all different dropbutton versions out there */
-  &:not(.dropbutton--admin) > .dropbutton__item ~ .dropbutton__item,
+  &:not(.dropbutton--gin) > .dropbutton__item ~ .dropbutton__item,
   .dropbutton__items > .dropbutton__item,
   .dropbutton__items > .dropbutton__item ~ .dropbutton__item {
     border: 0 none;
@@ -192,11 +193,11 @@
   }
 
   /* Shadow for pseudo dropdown on views page */
-  &:not(.dropbutton--admin) > .dropbutton__item.secondary-action {
+  &:not(.dropbutton--gin) > .dropbutton__item.secondary-action {
     box-shadow: var(--admin-shadow-2);
   }
 
-  &:not(.dropbutton--admin) > .dropbutton__item:not(:first-of-type),
+  &:not(.dropbutton--gin) > .dropbutton__item:not(:first-of-type),
   .dropbutton__items > .dropbutton__item,
   > .dropbutton__items > .dropbutton__item ~ .dropbutton__item {
     > a,
@@ -209,6 +210,7 @@
 }
 
 /* Variants. */
+
 .dropbutton--small {
   height: var(--dropbutton-small-toggle-size);
 }
@@ -220,6 +222,7 @@
 /**
  * First dropbutton list item.
  */
+
 .dropbutton--multiple .dropbutton__item:first-of-type {
   height: 100%;
   margin-right: calc(var(--dropbutton-toggle-size) + var(--dropbutton-toggle-size-spacing));
@@ -242,6 +245,7 @@
 }
 
 /* First dropbutton list item variants */
+
 .no-touchevents .dropbutton--multiple.dropbutton--small .dropbutton__item:first-of-type {
   margin-right: calc(var(--dropbutton-small-toggle-size) + var(--dropbutton-toggle-size-spacing));
   /* LTR */
@@ -267,6 +271,7 @@
 /**
  * Dropbutton toggler.
  */
+
 .dropbutton__toggle {
   position: absolute;
   z-index: 3;
@@ -361,6 +366,7 @@
 }
 
 /* Toggler variants */
+
 .no-touchevents .dropbutton--small .dropbutton__toggle {
   width: var(--dropbutton-small-toggle-size);
   height: var(--dropbutton-small-toggle-size);
@@ -378,6 +384,7 @@
 }
 
 /* High contrast. */
+
 @media (forced-colors: active) {
   /* Default. */
   .dropbutton__toggle::before {
@@ -418,6 +425,7 @@
  *
  * Duplicates base button styles.
  */
+
 .dropbutton__item:first-of-type {
   & > * {
     display: inline-flex;
@@ -556,6 +564,7 @@
 /**
  * Non-first dropbutton list elements.
  */
+
 .dropbutton__item:first-of-type ~ .dropbutton__item {
   max-width: unset;
   border: var(--dropbutton-border-size) solid var(--admin-color-primary);
@@ -579,6 +588,7 @@
 /**
  * Dropbutton items of non-first dropbutton list elements.
  */
+
 .dropbutton__item:first-of-type ~ .dropbutton__item {
   max-width: var(--dropbutton-item-max-width);
 }
@@ -608,6 +618,7 @@
 }
 
 /* Variants. */
+
 .no-touchevents .dropbutton--small .dropbutton__item:first-of-type ~ .dropbutton__item > a,
 .no-touchevents .dropbutton--small .dropbutton__item:first-of-type ~ .dropbutton__item > .button {
   padding-top: var(--dropbutton-small-spacing-size);
@@ -625,6 +636,7 @@
 }
 
 /* States. */
+
 .dropbutton__item {
   & > *:focus {
     position: relative;
@@ -642,10 +654,15 @@
 
   &:first-of-type ~ & > *:focus {
     border-color: var(--admin-color-focus) !important;
+    /* 1 */
+    box-shadow:
+      inset 0 0 0 1px var(--admin-color-focus),
+      0 0 0 1px var(--admin-color-focus);
   }
 }
 
 /* Overlay the dropdown button on top of the sticky header and main toolbar */
+
 html.js {
   .dropbutton-wrapper.open {
     .dropbutton-widget {

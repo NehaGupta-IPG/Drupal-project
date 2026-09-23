@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\Core\Database\Database;
-use Drupal\node\NodeAccessRebuild;
 use Drupal\user\Entity\User;
+use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -44,6 +44,8 @@ class NodeAccessGrantsCacheContextTest extends NodeTestBase {
 
   /**
    * User without permission to view content.
+   *
+   * @var \Drupal\user\Entity\User
    */
   protected User $noAccessUser2;
 
@@ -57,7 +59,7 @@ class NodeAccessGrantsCacheContextTest extends NodeTestBase {
   protected $adminUser;
 
   /**
-   * The user map.
+   * @var array
    */
   protected array $userMapping;
 

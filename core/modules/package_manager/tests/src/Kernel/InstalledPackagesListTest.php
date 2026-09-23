@@ -170,7 +170,7 @@ class InstalledPackagesListTest extends PackageManagerKernelTestBase {
       ]),
     ]);
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessageIs("Project 'duplicate_project' was found in packages 'drupal/test_project1' and 'drupal/test_project2'.");
+    $this->expectExceptionMessage("Project 'duplicate_project' was found in packages 'drupal/test_project1' and 'drupal/test_project2'.");
     $list->getPackageByDrupalProjectName('duplicate_project');
   }
 

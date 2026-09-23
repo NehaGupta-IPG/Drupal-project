@@ -30,6 +30,8 @@ class QueueSerializationTest extends KernelTestBase implements FormInterface {
 
   /**
    * The queue object.
+   *
+   * @var \Drupal\Core\Queue\DatabaseQueue
    */
   protected DatabaseQueue $queue;
 

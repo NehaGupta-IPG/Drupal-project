@@ -20,7 +20,6 @@ use Drupal\views\ViewExecutableFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 
 /**
@@ -39,8 +38,10 @@ class ViewsBlockTest extends UnitTestCase {
 
   /**
    * The view executable factory.
+   *
+   * @var \Drupal\views\ViewExecutableFactory|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected ViewExecutableFactory&MockObject $executableFactory;
+  protected $executableFactory;
 
   /**
    * The view entity.

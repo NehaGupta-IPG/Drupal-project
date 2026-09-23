@@ -10,7 +10,6 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\file\Upload\ManagedFileElementHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -49,7 +48,7 @@ class FileTestSaveUploadFromForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container): static {
+  public static function create(ContainerInterface $container) {
     return new static(
       $container->get('state'),
       $container->get('messenger')
@@ -59,14 +58,14 @@ class FileTestSaveUploadFromForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId(): string {
+  public function getFormId() {
     return '_file_test_save_upload_from_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state): array {
+  public function buildForm(array $form, FormStateInterface $form_state) {
 
     $form = $this->baseForm($form, $form_state);
 
@@ -123,7 +122,7 @@ class FileTestSaveUploadFromForm extends FormBase {
 
     // The test for \Drupal::service('file_system')->moveUploadedFile()
     // triggering a warning is unavoidable. We're interested in what happens
-    // afterwards in ManagedFileElementHelper::saveFileUploads().
+    // afterwards in _file_save_upload_from_form().
     if ($this->state->get('file_test.disable_error_collection')) {
       define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     }
@@ -131,9 +130,9 @@ class FileTestSaveUploadFromForm extends FormBase {
     $form['file_test_upload']['#upload_validators'] = $validators;
     $form['file_test_upload']['#upload_location'] = $destination;
 
-    $this->messenger->addStatus($this->t('Number of error messages before ManagedFileElementHelper::saveFileUploads(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
-    $file = \Drupal::service(ManagedFileElementHelper::class)->saveFileUploads($form['file_test_upload'], $form_state, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
-    $this->messenger->addStatus($this->t('Number of error messages after ManagedFileElementHelper::saveFileUploads(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
+    $this->messenger->addStatus($this->t('Number of error messages before _file_save_upload_from_form(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
+    $file = _file_save_upload_from_form($form['file_test_upload'], $form_state, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
+    $this->messenger->addStatus($this->t('Number of error messages after _file_save_upload_from_form(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
 
     if ($file) {
       $form_state->setValue('file_test_upload', $file);
@@ -150,7 +149,7 @@ class FileTestSaveUploadFromForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state): void {}
+  public function submitForm(array &$form, FormStateInterface $form_state) {}
 
   /**
    * Get a FileExists enum from its name.

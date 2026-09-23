@@ -9,8 +9,6 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\file\Entity\File;
-use Drupal\locale\LocaleDefaultOptions;
-use Drupal\locale\Model\TranslationUpdateMode;
 use Drupal\Tests\BrowserTestBase;
 
 // cspell:ignore februar januar juni marz
@@ -69,7 +67,7 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', TranslationUpdateMode::Local->value)
+      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
       ->save();
   }
 
@@ -136,9 +134,11 @@ msgstr ""
 EOF;
 
     // Convert array of translations to Gettext source and translation strings.
-    foreach ($translations as $source => $target) {
-      $text .= 'msgid "' . $source . '"' . "\n";
-      $text .= 'msgstr "' . $target . '"' . "\n";
+    if ($translations) {
+      foreach ($translations as $source => $target) {
+        $text .= 'msgid "' . $source . '"' . "\n";
+        $text .= 'msgstr "' . $target . '"' . "\n";
+      }
     }
 
     \Drupal::service('file_system')->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY);
@@ -242,7 +242,7 @@ EOF;
         'lid' => $string->getId(),
         'language' => $langcode,
         'translation' => $translation,
-        'customized' => LocaleDefaultOptions::NOT_CUSTOMIZED,
+        'customized' => LOCALE_NOT_CUSTOMIZED,
       ])->save();
     }
 
@@ -262,7 +262,7 @@ EOF;
         'lid' => $string->getId(),
         'language' => $langcode,
         'translation' => $translation,
-        'customized' => LocaleDefaultOptions::CUSTOMIZED,
+        'customized' => LOCALE_CUSTOMIZED,
       ])->save();
     }
 

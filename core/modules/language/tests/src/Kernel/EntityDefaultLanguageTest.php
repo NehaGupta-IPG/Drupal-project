@@ -141,7 +141,8 @@ class EntityDefaultLanguageTest extends KernelTestBase {
     if (!empty($langcode)) {
       $values['langcode'] = $langcode;
     }
-    return $this->container->get('entity_type.manager')->getStorage('node')->create($values);
+    $node = $this->container->get('entity_type.manager')->getStorage('node')->create($values);
+    return $node;
   }
 
 }

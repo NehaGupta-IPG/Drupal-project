@@ -25,10 +25,7 @@ class BlockContentCacheTagsTest extends EntityCacheTagsTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'block_content',
-    'page_cache',
-  ];
+  protected static $modules = ['block_content'];
 
   /**
    * {@inheritdoc}

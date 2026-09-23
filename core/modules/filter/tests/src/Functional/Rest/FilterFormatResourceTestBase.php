@@ -46,7 +46,7 @@ abstract class FilterFormatResourceTestBase extends ConfigEntityResourceTestBase
         'filter_html' => [
           'status' => TRUE,
           'settings' => [
-            'allowed_html' => '<a> <b> <lo> <p>',
+            'allowed_html' => '<p> <a> <b> <lo>',
           ],
         ],
       ],
@@ -68,7 +68,7 @@ abstract class FilterFormatResourceTestBase extends ConfigEntityResourceTestBase
           'status' => TRUE,
           'weight' => -10,
           'settings' => [
-            'allowed_html' => '<a> <b> <lo> <p>',
+            'allowed_html' => '<p> <a> <b> <lo>',
             'filter_html_help' => TRUE,
             'filter_html_nofollow' => FALSE,
           ],

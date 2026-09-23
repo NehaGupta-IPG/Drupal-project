@@ -23,6 +23,13 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
   use EntityDefinitionTestTrait;
 
   /**
+   * The entity definition update manager.
+   *
+   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
+   */
+  protected $entityDefinitionUpdateManager;
+
+  /**
    * {@inheritdoc}
    */
   protected static $modules = [
@@ -56,6 +63,13 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
+
+  /**
+   * The state service.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  protected $state;
 
   /**
    * {@inheritdoc}

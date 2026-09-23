@@ -22,6 +22,13 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
   use UserCreationTrait;
 
   /**
+   * {@inheritdoc}
+   */
+  protected static $modules = [
+    'toolbar',
+  ];
+
+  /**
    * Version constraint.
    */
   protected string $constraint;
@@ -35,6 +42,7 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
 
     // Setting current user.
     $permissions = [
+      'access toolbar',
       'access announcements',
     ];
     $this->setUpCurrentUser(['uid' => 1], $permissions);
@@ -66,6 +74,7 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
 
     // Create another user and test again.
     $permissions = [
+      'access toolbar',
       'access announcements',
     ];
     $this->setUpCurrentUser(['uid' => 2], $permissions);

@@ -3,16 +3,11 @@
 namespace Drupal\Component\Diff\Engine;
 
 /**
- * A diff operation to add lines.
- *
+ * @todo document
  * @private
  * @subpackage DifferenceEngine
  */
 class DiffOpAdd extends DiffOp {
-
-  /**
-   * {@inheritdoc}
-   */
   public $type = 'add';
 
   public function __construct($lines) {

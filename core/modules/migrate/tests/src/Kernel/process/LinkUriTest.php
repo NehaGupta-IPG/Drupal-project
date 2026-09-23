@@ -105,7 +105,7 @@ class LinkUriTest extends KernelTestBase {
   #[DataProvider('providerTestNotRouted')]
   public function testNotRouted($value, string $exception_message): void {
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessageIs($exception_message);
+    $this->expectExceptionMessage($exception_message);
     $this->doTransform($value);
   }
 
@@ -198,8 +198,9 @@ class LinkUriTest extends KernelTestBase {
     $executable = $this->prophesize(MigrateExecutableInterface::class)->reveal();
 
     $plugin = new LinkUri($configuration, 'link_uri', [], $entityTypeManager);
+    $actual = $plugin->transform($value, $executable, $row, 'destination_property');
 
-    return $plugin->transform($value, $executable, $row, 'destination_property');
+    return $actual;
   }
 
 }

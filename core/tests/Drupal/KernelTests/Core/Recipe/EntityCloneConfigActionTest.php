@@ -47,7 +47,7 @@ class EntityCloneConfigActionTest extends KernelTestBase {
    */
   public function testErrorIfOriginalDoesNotExist(): void {
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessageIs("Cannot clone 'user.role.nope' because it does not exist.");
+    $this->expectExceptionMessage("Cannot clone 'user.role.nope' because it does not exist.");
     $this->container->get('plugin.manager.config_action')
       ->applyAction('cloneAs', 'user.role.nope', 'user.role.yep');
   }
@@ -90,7 +90,7 @@ class EntityCloneConfigActionTest extends KernelTestBase {
       ]);
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessageIs('Entity user.role.cloned exists');
+    $this->expectExceptionMessage('Entity user.role.cloned exists');
     $this->container->get('plugin.manager.config_action')
       ->applyAction('cloneAs', 'user.role.test', [
         'id' => 'cloned',

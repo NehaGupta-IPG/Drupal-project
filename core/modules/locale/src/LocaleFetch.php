@@ -4,14 +4,11 @@ namespace Drupal\locale;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\locale\File\LocaleFileManager;
 use Drupal\locale\File\RemoteFileStatus;
-use Drupal\locale\Model\SourceType;
-use Drupal\locale\Model\TranslationUpdateMode;
 
 /**
  * Provides the locale fetch services.
@@ -28,8 +25,6 @@ class LocaleFetch {
     protected readonly StateInterface $state,
     protected readonly TimeInterface $time,
     protected readonly LocaleImportBatch $localeImportBatch,
-    protected readonly ConfigFactoryInterface $configFactory,
-    protected readonly LocaleLanguages $localeLanguages,
   ) {}
 
   /**
@@ -49,7 +44,7 @@ class LocaleFetch {
    */
   public function buildUpdateBatch(array $projects = [], array $langcodes = [], array $options = []): array {
     $projects = $projects ?: array_keys($this->localeProjectRepository->getAll());
-    $langcodes = $langcodes ?: array_keys($this->localeLanguages->getTranslatableLanguages());
+    $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
     $status_options = $options;
     $status_options['finish_feedback'] = FALSE;
 
@@ -85,7 +80,7 @@ class LocaleFetch {
    */
   public function buildFetchBatch(array $projects = [], array $langcodes = [], array $options = []): array {
     $projects = $projects ?: array_keys($this->localeProjectRepository->getAll());
-    $langcodes = $langcodes ?: array_keys($this->localeLanguages->getTranslatableLanguages());
+    $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
     $batch_builder = (new BatchBuilder())
       ->setTitle($this->t('Updating translations.'))
@@ -115,11 +110,10 @@ class LocaleFetch {
    */
   protected function getFetchOperations(array $projects, array $langcodes, array $options): array {
     $operations = [];
-    $useRemote = $this->configFactory->get('locale.settings')->get('translation.use_source') == TranslationUpdateMode::RemoteAndLocal->value;
 
     foreach ($projects as $project) {
       foreach ($langcodes as $langcode) {
-        if ($useRemote) {
+        if (locale_translation_use_remote_source()) {
           $operations[] = [self::class . ':batchDownload', [$project, $langcode]];
         }
         $operations[] = [self::class . ':batchImport', [$project, $langcode, $options]];
@@ -173,16 +167,16 @@ class LocaleFetch {
    */
   public function batchDownload(string $project, string $langcode, array|\ArrayAccess &$context): void {
     $source = $this->localeSource->loadSource($project, $langcode);
-    if ($source->getType() == SourceType::Remote) {
-      if ($file = $this->localeFileManager->downloadTranslationSource($source->getFile(SourceType::Remote), 'translations://')) {
+    if (isset($source->type) && $source->type == LOCALE_TRANSLATION_REMOTE) {
+      if ($file = $this->localeFileManager->downloadTranslationSource($source->files[LOCALE_TRANSLATION_REMOTE], 'translations://')) {
         $context['message'] = $this->t('Downloaded %langcode translation for %project.', [
           '%langcode' => $langcode,
           '%project' => $source->project,
         ]);
-        $this->localeSource->saveSource($source->name, $source->langcode, SourceType::Local->value, $file);
+        $this->localeSource->saveSource($source->name, $source->langcode, LOCALE_TRANSLATION_LOCAL, $file);
       }
       else {
-        $context['results']['failed_files'][] = $source->getFile(SourceType::Remote);
+        $context['results']['failed_files'][] = $source->files[LOCALE_TRANSLATION_REMOTE];
       }
     }
   }
@@ -207,8 +201,8 @@ class LocaleFetch {
    */
   public function batchImport(string $project, string $langcode, array $options, array|\ArrayAccess &$context): void {
     $source = $this->localeSource->loadSource($project, $langcode);
-    if ($source->getType() == SourceType::Local) {
-      $file = $source->getFile(SourceType::Local);
+    if ($source->type == LOCALE_TRANSLATION_REMOTE || $source->type == LOCALE_TRANSLATION_LOCAL) {
+      $file = $source->files[LOCALE_TRANSLATION_LOCAL];
       $options += [
         'message' => $this->t('Importing %langcode translation for %project.', [
           '%langcode' => $langcode,
@@ -230,11 +224,11 @@ class LocaleFetch {
 
           // Save the data of imported source into the {locale_file} table
           // and update the current translation status.
-          $this->localeSource->saveSource($project, $langcode, SourceType::Current->value, $source->getFile(SourceType::Local));
+          $this->localeSource->saveSource($project, $langcode, LOCALE_TRANSLATION_CURRENT, $source->files[LOCALE_TRANSLATION_LOCAL]);
         }
       }
     }
-    elseif ($source->getType() == SourceType::Current) {
+    elseif ($source->type == LOCALE_TRANSLATION_CURRENT) {
       /*
        * This can happen if the \Drupal\locale\LocaleFetch::batchImport()
        * batch was interrupted
@@ -317,21 +311,21 @@ class LocaleFetch {
     $failure = $checked = FALSE;
     $options += [
       'finish_feedback' => TRUE,
-      'use_remote' => $this->configFactory->get('locale.settings')->get('translation.use_source') == TranslationUpdateMode::RemoteAndLocal->value,
+      'use_remote' => locale_translation_use_remote_source(),
     ];
     $source = $this->localeSource->loadSource($project, $langcode);
 
     // Check the status of local translation files.
-    if ($source->getFile(SourceType::Local)) {
+    if (isset($source->files[LOCALE_TRANSLATION_LOCAL])) {
       if ($file = $this->localeSource->sourceCheckFile($source)) {
-        $this->localeSource->saveSource($source->name, $source->langcode, SourceType::Local->value, $file);
+        $this->localeSource->saveSource($source->name, $source->langcode, LOCALE_TRANSLATION_LOCAL, $file);
       }
       $checked = TRUE;
     }
 
     // Check the status of remote translation files.
-    if ($options['use_remote'] && $source->getFile(SourceType::Remote)) {
-      $remote_file = $source->getFile(SourceType::Remote);
+    if ($options['use_remote'] && isset($source->files[LOCALE_TRANSLATION_REMOTE])) {
+      $remote_file = $source->files[LOCALE_TRANSLATION_REMOTE];
       if ($langcode === 'en') {
         // drupal.org does not support english as translation.
         $uri = $this->localeSource->buildServerPattern($source, strtr(\Drupal::TRANSLATION_DEFAULT_SERVER_PATTERN, ['%language' => $langcode]));
@@ -347,7 +341,7 @@ class LocaleFetch {
         if ($remoteFileInfo->lastModified) {
           $remote_file->uri = $remoteFileInfo->location ?? $remote_file->uri;
           $remote_file->timestamp = $remoteFileInfo->lastModified;
-          $this->localeSource->saveSource($source->name, $source->langcode, SourceType::Remote->value, $remote_file);
+          $this->localeSource->saveSource($source->name, $source->langcode, LOCALE_TRANSLATION_REMOTE, $remote_file);
         }
         // @todo What to do with when the file is not found (404)? To prevent
         //   re-checking within the TTL (1day, 1week) we can set a last_checked

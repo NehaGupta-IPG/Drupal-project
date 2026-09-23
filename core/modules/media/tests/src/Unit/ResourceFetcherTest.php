@@ -105,7 +105,7 @@ class ResourceFetcherTest extends UnitTestCase {
 
     // Valid JSON that does not produce an array should also throw an exception.
     $this->expectException(ResourceException::class);
-    $this->expectExceptionMessageIs('The oEmbed resource could not be decoded.');
+    $this->expectExceptionMessage('The oEmbed resource could not be decoded.');
     $fetcher->fetchResource('non_array');
   }
 

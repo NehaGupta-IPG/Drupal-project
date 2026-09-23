@@ -23,7 +23,6 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\BooleanItem;
 use Drupal\Core\Session\AccountInterface;
@@ -74,8 +73,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
     'jsonapi_test_field_access',
     'jsonapi_response_validator',
     'text',
-    'dynamic_page_cache',
-    'page_cache',
   ];
 
   /**
@@ -83,14 +80,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @var string
    */
-  protected static $entityTypeId;
+  protected static $entityTypeId = NULL;
 
   /**
    * The name of the tested JSON:API resource type.
    *
    * @var string
    */
-  protected static $resourceTypeName;
+  protected static $resourceTypeName = NULL;
 
   /**
    * Whether the tested JSON:API resource is versionable.
@@ -154,7 +151,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @see ::testPostIndividual()
    */
-  protected static $labelFieldName;
+  protected static $labelFieldName = NULL;
 
   /**
    * Whether new revisions of updated entities should be created by default.
@@ -416,7 +413,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function createAnotherEntity(string $key) {
+  protected function createAnotherEntity($key) {
     $duplicate = $this->getEntityDuplicate($this->entity, $key);
     // Some entity types are not stored, hence they cannot be reloaded.
     if (get_class($this->entityStorage) !== ContentEntityNullStorage::class) {
@@ -571,7 +568,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The expected cacheability for the given entity collection.
    */
   protected static function getExpectedCollectionCacheability(AccountInterface $account, array $collection, ?array $sparse_fieldset = NULL, $filtered = FALSE) {
-    $cacheability = array_reduce($collection, function (CacheableMetadata $cacheability, EntityInterface $entity) use ($sparse_fieldset, $account): CacheableMetadata {
+    $cacheability = array_reduce($collection, function (CacheableMetadata $cacheability, EntityInterface $entity) use ($sparse_fieldset, $account) {
       $access_result = static::entityAccess($entity, 'view', $account);
       if (!$access_result->isAllowed()) {
         $access_result = static::entityAccess($entity, 'view label', $account)->addCacheableDependency($access_result);
@@ -1828,11 +1825,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
       }
 
       $resource_identifier = static::toResourceIdentifier($target_entity);
-      return static::decorateResourceIdentifierWithDrupalInternalTargetId($field, $resource_identifier);
+      $resource_identifier = static::decorateResourceIdentifierWithDrupalInternalTargetId($field, $resource_identifier);
+      return $resource_identifier;
     }
     else {
       $arity_counter = [];
-      $relation_list = array_filter(array_map(function (FieldItemInterface $item) use (&$arity_counter): ?array {
+      $relation_list = array_filter(array_map(function ($item) use (&$arity_counter): ?array {
         $target_entity = $item->entity;
 
         if (is_null($target_entity)) {
@@ -1854,8 +1852,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       }, iterator_to_array($field)));
 
       $arity_map = [];
-
-      return array_map(function (array $identifier) use ($arity_counter, &$arity_map): array {
+      $relation_list = array_map(function (array $identifier) use ($arity_counter, &$arity_map): array {
         $type = $identifier['type'];
         $id = $identifier['id'];
         // Only add an arity value if there are two or more resource identifiers
@@ -1872,6 +1869,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
         }
         return $identifier;
       }, $relation_list);
+
+      return $relation_list;
     }
   }
 

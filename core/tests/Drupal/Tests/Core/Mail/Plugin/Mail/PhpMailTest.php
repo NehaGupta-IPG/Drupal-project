@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\ServerBag;
 
 /**
  * Tests Drupal\Core\Mail\Plugin\Mail\PhpMail.
@@ -89,9 +90,24 @@ class PhpMailTest extends UnitTestCase {
       ->onlyMethods(['doMail'])
       ->getMock();
 
+    $request = $this->createStub(Request::class);
+
+    $request->server = $this->getMockBuilder(ServerBag::class)
+      ->onlyMethods(['has', 'get'])
+      ->getMock();
+
+    $request->server
+      ->expects($this->atLeastOnce())
+      ->method('has')
+      ->willReturn(FALSE);
+    $request->server
+      ->expects($this->atLeastOnce())
+      ->method('get')
+      ->willReturn(FALSE);
+
     $reflection = new \ReflectionClass($mailer);
     $reflection_property = $reflection->getProperty('request');
-    $reflection_property->setValue($mailer, new Request());
+    $reflection_property->setValue($mailer, $request);
     return $mailer;
   }
 

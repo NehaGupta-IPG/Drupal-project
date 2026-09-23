@@ -6,8 +6,6 @@ namespace Drupal\Tests\Core\Access;
 
 use Drupal\Core\Access\AccessArgumentsResolverFactoryInterface;
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Access\AccessResultAllowed;
-use Drupal\Core\Access\AccessResultNeutral;
 use Drupal\Core\Access\CustomAccessCheck;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -106,7 +104,7 @@ class CustomAccessCheckTest extends UnitTestCase {
     $request = Request::create('/foo?example=muh');
 
     $this->expectException(\BadMethodCallException::class);
-    $this->expectExceptionMessageIs('The "\Drupal\Tests\Core\Access\NonExistentController::nonExistentMethod" method is not callable as a _custom_access callback in route "/test-route"');
+    $this->expectExceptionMessage('The "\Drupal\Tests\Core\Access\NonExistentController::nonExistentMethod" method is not callable as a _custom_access callback in route "/test-route"');
 
     // Run the access check.
     $accessChecker->access($route, $route_match, $account, $request);
@@ -119,19 +117,19 @@ class CustomAccessCheckTest extends UnitTestCase {
  */
 class TestController {
 
-  public function accessAllow(): AccessResultAllowed {
+  public function accessAllow() {
     return AccessResult::allowed();
   }
 
-  public function accessDeny(): AccessResultNeutral {
+  public function accessDeny() {
     return AccessResult::neutral();
   }
 
-  public function accessParameter($parameter): AccessResult {
+  public function accessParameter($parameter) {
     return AccessResult::allowedIf($parameter == 'TRUE');
   }
 
-  public function accessRequest(Request $request): AccessResult {
+  public function accessRequest(Request $request) {
     return AccessResult::allowedIf($request->query->get('example') === 'muh');
   }
 

@@ -10,7 +10,6 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\rest\ResourceResponseInterface;
 use Drupal\serialization\Normalizer\CacheableNormalizerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -24,8 +23,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ResourceResponseSubscriber implements EventSubscriberInterface {
 
   public function __construct(
-    #[AutowireServiceClosure('serializer')]
-    protected \Closure $serializer,
+    #[Autowire(service: 'serializer')]
+    protected SerializerInterface $serializer,
     protected RendererInterface $renderer,
     #[Autowire(service: 'current_route_match')]
     protected RouteMatchInterface $routeMatch,
@@ -45,7 +44,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
 
     $request = $event->getRequest();
     $format = $this->getResponseFormat($this->routeMatch, $request);
-    $this->renderResponseBody($request, $response, ($this->serializer)(), $format);
+    $this->renderResponseBody($request, $response, $this->serializer, $format);
     $event->setResponse($this->flattenResponse($response));
   }
 

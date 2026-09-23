@@ -15,7 +15,6 @@ use Drupal\sqlite\Driver\Database\sqlite\Install\Tasks;
 use Drupal\Tests\package_manager\Traits\AssertPreconditionsTrait;
 use Drupal\Tests\package_manager\Traits\FixtureUtilityTrait;
 use Drupal\Tests\RandomGeneratorTrait;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -38,21 +37,29 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
 
   /**
    * The web root of the test site, relative to the workspace directory.
+   *
+   * @var string
    */
   private string $webRoot;
 
   /**
    * The project root of the test site, relative to the workspace directory.
+   *
+   * @var string
    */
   const string PROJECT_ROOT_RELATIVE = 'project/';
 
   /**
    * A secondary server instance, to serve XML metadata about available updates.
+   *
+   * @var \Symfony\Component\Process\Process
    */
   private Process $metadataServer;
 
   /**
    * All output that the PHP web server logs to the error buffer.
+   *
+   * @var string
    */
   private string $serverErrorLog = '';
 
@@ -166,7 +173,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
     $ps = new Process($server, $working_path);
     $ps->setIdleTimeout(30)
       ->setTimeout(30)
-      ->start(function ($output_type, string $output): void {
+      ->start(function ($output_type, $output): void {
         if ($output_type === Process::ERR) {
           $this->serverErrorLog .= $output;
         }
@@ -262,9 +269,7 @@ END;
   protected function createTestProject(string $template): void {
     // Create a copy of core (including its Composer plugins, templates, and
     // metapackages) which we can modify.
-    $finder = $this->getCodebaseFinder();
-    $finder->exclude('core/tests');
-    $this->copyCodebase($finder->getIterator());
+    $this->copyCodebase();
 
     $workspace_dir = $this->getWorkspaceDirectory();
     $project_dir = $workspace_dir . '/project';
@@ -334,14 +339,6 @@ END;
     // Install Drupal.
     $this->installQuickStart('minimal');
     $this->formLogin($this->adminUsername, $this->adminPassword);
-
-    // Core's .gitattributes excludes test code from the drupal/core package.
-    // The test project therefore has no Package Manager test modules, so copy
-    // them in from the code base running the test.
-    (new Filesystem())->mirror(
-      dirname(__DIR__, 2) . '/modules',
-      $this->getWebRoot() . '/modules',
-    );
 
     // When checking for updates, we need to be able to make sub-requests, but
     // the built-in PHP server is single-threaded. Therefore, open a second

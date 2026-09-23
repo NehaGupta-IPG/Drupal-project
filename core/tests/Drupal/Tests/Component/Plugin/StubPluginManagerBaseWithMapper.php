@@ -18,7 +18,6 @@ final class StubPluginManagerBaseWithMapper extends PluginManagerBase {
    * @param \Drupal\Component\Plugin\Mapper\MapperInterface $mapper
    *   The plugin mapper interface.
    */
-  // @phpstan-ignore pluginManagerSetsCacheBackend.missingCacheBackend
   public function __construct(MapperInterface $mapper) {
     $this->mapper = $mapper;
   }

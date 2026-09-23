@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -51,6 +52,7 @@ class LoggerChannelTest extends UnitTestCase {
       $request_mock
         ->method('getClientIp')
         ->willReturn('127.0.0.1');
+      $request_mock->headers = $this->createStub(HeaderBag::class);
 
       $requestStack = new RequestStack();
       $requestStack->push($request_mock);
@@ -126,6 +128,7 @@ class LoggerChannelTest extends UnitTestCase {
     $request_mock
       ->method('getClientIp')
       ->willReturn(NULL);
+    $request_mock->headers = $this->createStub(HeaderBag::class);
     $requestStack->push($request_mock);
 
     // Set up the logger channel for testing.

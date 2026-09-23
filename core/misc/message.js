@@ -58,7 +58,7 @@
       }
       wrapper.setAttribute('data-drupal-messages', '');
 
-      return wrapper.childElementCount === 0
+      return wrapper.innerHTML === ''
         ? Drupal.Message.messageInternalWrapper(wrapper)
         : wrapper.firstElementChild;
     }

@@ -53,7 +53,7 @@ class PhpArrayDumperTest extends OptimizedPhpArrayDumperTest {
   /**
    * {@inheritdoc}
    */
-  protected static function getCollection($collection, $resolve = TRUE): array {
+  protected static function getCollection($collection, $resolve = TRUE) {
     return $collection;
   }
 

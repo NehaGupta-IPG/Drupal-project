@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Drupal\Component\Diff;
 
@@ -45,14 +43,6 @@ final class DiffOpOutputBuilder implements DiffOutputBuilderInterface {
     $hunkTarget = [];
 
     for ($i = 0; $i < count($diff); $i++) {
-
-      // Differ prepends a warning pseudo-line when source and target use
-      // different end of line markings. Skip it: no DiffOp represents a
-      // warning, and keeping it would output a line absent from both inputs.
-      // The lines it warns about are still reported as changes below.
-      if ($diff[$i][1] === Differ::DIFF_LINE_END_WARNING) {
-        continue;
-      }
 
       // Handle a sequence of removals + additions as a sequence of changes, and
       // manages the tail if required.
@@ -110,7 +100,7 @@ final class DiffOpOutputBuilder implements DiffOutputBuilderInterface {
    *   A Differ constant or self::CHANGED.
    * @param string[] $source
    *   An array of strings to be changed/added/removed/copied.
-   * @param string[] $target
+   * @param string[] $source
    *   The array of strings to be changed to when self::CHANGED is specified.
    *
    * @return \Drupal\Component\Diff\Engine\DiffOp

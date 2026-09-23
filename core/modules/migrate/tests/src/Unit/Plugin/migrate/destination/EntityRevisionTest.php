@@ -63,7 +63,7 @@ class EntityRevisionTest extends EntityTestBase {
       $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal(),
     );
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessageIs('The "foo" entity type does not support revisions.');
+    $this->expectExceptionMessage('The "foo" entity type does not support revisions.');
     $destination->getIds();
   }
 
@@ -93,7 +93,7 @@ class EntityRevisionTest extends EntityTestBase {
       $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal(),
     );
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessageIs('The "foo" entity type does not support translations.');
+    $this->expectExceptionMessage('The "foo" entity type does not support translations.');
     $destination->getIds();
   }
 
@@ -109,7 +109,7 @@ class EntityRevisionTestDestination extends EntityRevision {
    *
    * @var \Drupal\migrate\Plugin\migrate\destination\EntityRevision|null
    */
-  private $entity;
+  private $entity = NULL;
 
   /**
    * Sets the test entity.

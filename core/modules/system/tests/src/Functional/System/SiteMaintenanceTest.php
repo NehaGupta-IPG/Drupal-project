@@ -41,6 +41,8 @@ class SiteMaintenanceTest extends BrowserTestBase {
 
   /**
    * User allowed to access site in maintenance mode.
+   *
+   * @var \Drupal\user\Entity\User
    */
   protected User $user;
 
@@ -174,7 +176,11 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->submitForm([], 'Log in');
     $this->assertSession()->pageTextContains($user_message);
 
-    // Logout and verify that offline message is displayed.
+    // Check if title displays in Olivero on maintenance page.
+    \Drupal::service('theme_installer')->install(['olivero']);
+    $this->config('system.theme')->set('default', 'olivero')->save();
+
+    // Logout and verify that offline message is displayed in Olivero.
     $this->drupalLogout();
     $this->drupalGet('');
     $this->assertEquals('Site under maintenance', $this->cssSelect('main h1')[0]->getText());

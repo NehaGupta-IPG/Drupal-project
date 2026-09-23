@@ -38,7 +38,7 @@ class RendererCallbackTest extends RendererTestBase {
   #[DataProvider('providerTestCallback')]
   public function testCallback(array $render_array, string $expected_deprecation): void {
     $this->expectException(UntrustedCallbackException::class);
-    $this->expectExceptionMessageIs($expected_deprecation);
+    $this->expectExceptionMessage($expected_deprecation);
     $this->renderer->renderRoot($render_array);
   }
 
@@ -85,14 +85,14 @@ class RendererCallbackTest extends RendererTestBase {
   /**
    * A test render callback.
    */
-  public static function renderCallback($element = []): array {
+  public static function renderCallback($element = []) {
     return $element;
   }
 
   /**
    * Implements magic method as a render callback.
    */
-  public function __invoke($element = []): array {
+  public function __invoke($element = []) {
     return $element;
   }
 
@@ -101,6 +101,6 @@ class RendererCallbackTest extends RendererTestBase {
 /**
  * A test render callback.
  */
-function callback($element = []): array {
+function callback($element = []) {
   return $element;
 }

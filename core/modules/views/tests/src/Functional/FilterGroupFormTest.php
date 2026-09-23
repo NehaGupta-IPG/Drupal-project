@@ -16,6 +16,8 @@ class FilterGroupFormTest extends ViewTestBase {
 
   /**
    * Views used by this test.
+   *
+   * @var array
    */
   public static array $testViews = ['test_empty_group_form'];
 

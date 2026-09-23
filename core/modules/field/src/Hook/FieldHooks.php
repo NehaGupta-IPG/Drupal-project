@@ -2,7 +2,6 @@
 
 namespace Drupal\field\Hook;
 
-use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field\EntityDisplayRebuilder;
@@ -12,6 +11,7 @@ use Drupal\field\ConfigImporterFieldPurger;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\DynamicallyFieldableEntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -30,7 +30,7 @@ class FieldHooks {
 
   public function __construct(
     #[Autowire(service: 'cache.memory')]
-    protected readonly MemoryCacheInterface $memoryCache,
+    protected readonly CacheBackendInterface $memoryCache,
   ) {
 
   }

@@ -16,9 +16,7 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 class LinkNotExistingInternalConstraint extends SymfonyConstraint {
 
   public function __construct(
-    public string $notFoundMessage = "The URL '@uri' doesn't exist.",
-    public string $invalidParameterMessage = "The URL '@uri' has an invalid parameter.",
-    public string $missingParameterMessage = "The URL '@uri' is missing a required parameter.",
+    public string $message = "The path '@uri' is invalid.",
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {

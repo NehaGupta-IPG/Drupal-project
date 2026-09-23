@@ -37,9 +37,7 @@ class LocaleImportBatch {
      */
     #[AutowireServiceClosure('logger.channel.locale')]
     protected readonly \Closure $logger,
-    protected LocaleJs $localeJs,
-  ) {
-  }
+  ) {}
 
   /**
    * Build a locale batch from an array of files.
@@ -54,9 +52,8 @@ class LocaleImportBatch {
    *     Drupal\locale\PoDatabaseWriter. Optional, defaults to an empty array.
    *   - 'customized': Flag indicating whether the strings imported from $file
    *     are customized translations or come from a community source. Use
-   *     LocaleDefaultOptions::CUSTOMIZED or
-   *     LocaleDefaultOptions::NOT_CUSTOMIZED. Optional, defaults to
-   *     LocaleDefaultOptions::NOT_CUSTOMIZED.
+   *     LOCALE_CUSTOMIZED or LOCALE_NOT_CUSTOMIZED. Optional, defaults to
+   *     LOCALE_NOT_CUSTOMIZED.
    *   - 'finish_feedback': Whether or not to give feedback to the user when the
    *     batch is finished. Optional, defaults to TRUE.
    *
@@ -66,7 +63,7 @@ class LocaleImportBatch {
   public function buildBatch(array $files, array $options): array|bool {
     $options += [
       'overwrite_options' => [],
-      'customized' => LocaleDefaultOptions::NOT_CUSTOMIZED,
+      'customized' => LOCALE_NOT_CUSTOMIZED,
       'finish_feedback' => TRUE,
     ];
     if (count($files)) {
@@ -108,9 +105,8 @@ class LocaleImportBatch {
    *     Drupal\locale\PoDatabaseWriter. Optional, defaults to an empty array.
    *   - 'customized': Flag indicating whether the strings imported from $file
    *     are customized translations or come from a community source. Use
-   *     LocaleDefaultOptions::CUSTOMIZED or
-   *     LocaleDefaultOptions::NOT_CUSTOMIZED. Optional, defaults to
-   *     LocaleDefaultOptions::NOT_CUSTOMIZED.
+   *     LOCALE_CUSTOMIZED or LOCALE_NOT_CUSTOMIZED. Optional, defaults to
+   *     LOCALE_NOT_CUSTOMIZED.
    *   - 'message': Alternative message to display during import. Note, this
    *     must be sanitized text.
    * @param array|\ArrayAccess $context
@@ -120,7 +116,7 @@ class LocaleImportBatch {
     // Merge the default values in the $options array.
     $options += [
       'overwrite_options' => [],
-      'customized' => LocaleDefaultOptions::NOT_CUSTOMIZED,
+      'customized' => LOCALE_NOT_CUSTOMIZED,
     ];
 
     if (isset($file->langcode) && $file->langcode != LanguageInterface::LANGCODE_NOT_SPECIFIED) {
@@ -276,7 +272,7 @@ class LocaleImportBatch {
       $next = array_slice($context['sandbox']['refresh']['strings'], 0, 100);
       array_splice($context['sandbox']['refresh']['strings'], 0, count($next));
       // Clear cache and force refresh of JavaScript translations.
-      $this->localeJs->refreshTranslations($context['sandbox']['refresh']['languages'], $next);
+      _locale_refresh_translations($context['sandbox']['refresh']['languages'], $next);
       // Check whether we need to refresh configuration objects.
       if ($names = $this->localeConfigManager->getStringNames($next)) {
         $context['sandbox']['refresh']['names_finished'] = $context['finished'];

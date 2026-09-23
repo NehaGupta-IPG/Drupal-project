@@ -51,7 +51,7 @@ class HtmxRequestTest extends KernelTestBase {
   }
 
   /**
-   * Test all 7 request methods.
+   * Test all 5 request verb methods.
    */
   #[DataProvider('htmxRequestProvider')]
   public function testHxRequest(string $method): void {
@@ -100,8 +100,6 @@ class HtmxRequestTest extends KernelTestBase {
       ['put'],
       ['patch'],
       ['delete'],
-      ['query'],
-      ['action'],
     ];
   }
 

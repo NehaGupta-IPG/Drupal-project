@@ -61,7 +61,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
   /**
    * Sets up the entity type manager to be tested.
    *
-   * @param array<\Prophecy\Prophecy\ProphecyInterface<\Drupal\Core\Entity\EntityTypeInterface>> $definitions
+   * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
   protected function setUpEntityTypeDefinitions(array $definitions = []): void {
@@ -78,7 +78,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
     }
 
     $this->entityTypeManager->getDefinition(Argument::cetera())
-      ->will(function (array $args) use ($definitions): EntityTypeInterface {
+      ->will(function ($args) use ($definitions) {
         $entity_type_id = $args[0];
         $exception_on_invalid = $args[1];
         if (isset($definitions[$entity_type_id])) {
@@ -161,7 +161,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
     $banana->getDecoratedClasses()->willReturn(['\Drupal\banana\Entity\Banana']);
 
     $this->expectException(NoCorrespondingEntityClassException::class);
-    $this->expectExceptionMessageIs('The \Drupal\pear\Entity\Pear class does not correspond to an entity type.');
+    $this->expectExceptionMessage('The \Drupal\pear\Entity\Pear class does not correspond to an entity type.');
     $this->entityTypeRepository->getEntityTypeFromClass('\Drupal\pear\Entity\Pear');
   }
 
@@ -183,7 +183,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
     ]);
 
     $this->expectException(AmbiguousEntityClassException::class);
-    $this->expectExceptionMessageIs('Multiple entity types found for \Drupal\apple\Entity\Apple.');
+    $this->expectExceptionMessage('Multiple entity types found for \Drupal\apple\Entity\Apple.');
     $this->entityTypeRepository->getEntityTypeFromClass('\Drupal\apple\Entity\Apple');
   }
 

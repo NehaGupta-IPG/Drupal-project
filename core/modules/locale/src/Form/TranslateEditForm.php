@@ -5,8 +5,6 @@ namespace Drupal\locale\Form;
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
-use Drupal\locale\LocaleJs;
-use Drupal\locale\LocaleXss;
 use Drupal\locale\SourceString;
 
 /**
@@ -160,7 +158,7 @@ class TranslateEditForm extends TranslateFormBase {
     $langcode = $form_state->getValue('langcode');
     foreach ($form_state->getValue('strings') as $lid => $translations) {
       foreach ($translations['translations'] as $key => $value) {
-        if (!LocaleXss::stringIsSafe($value)) {
+        if (!locale_string_is_safe($value)) {
           $form_state->setErrorByName("strings][$lid][translations][$key", $this->t('The submitted string contains disallowed HTML: %string', ['%string' => $value]));
           $form_state->setErrorByName("translations][$langcode][$key", $this->t('The submitted string contains disallowed HTML: %string', ['%string' => $value]));
           $this->logger('locale')->warning('Attempted submission of a translation string with disallowed HTML: %string', ['%string' => $value]);
@@ -237,11 +235,8 @@ class TranslateEditForm extends TranslateFormBase {
 
     if ($updated) {
       // Clear cache and force refresh of JavaScript translations.
-      \Drupal::service(LocaleJs::class)->refreshTranslations([$langcode], $updated);
-      $locale_config_manager = \Drupal::service('locale.config_manager');
-      if ($langcode && $names = $locale_config_manager->getStringNames($updated)) {
-        $locale_config_manager->updateConfigTranslations($names, [$langcode]);
-      }
+      _locale_refresh_translations([$langcode], $updated);
+      _locale_refresh_configuration([$langcode], $updated);
     }
   }
 

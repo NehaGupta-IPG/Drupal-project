@@ -28,7 +28,7 @@ class StyleMappingTest extends StyleTestBase {
    */
   public function testMappedOutput(): void {
     $view = Views::getView('test_style_mapping');
-    $output = $this->mappedOutputHelper($view);
+    $output = (string) $this->mappedOutputHelper($view);
     $this->assertStringNotContainsString('job', $output, 'The job field is added to the view but not in the mapping.');
     $view->destroy();
 

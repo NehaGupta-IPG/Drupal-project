@@ -19,7 +19,7 @@ class ModuleUninstallFilterTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['user', 'system', 'page_cache', 'dynamic_page_cache'];
+  protected static $modules = ['user', 'system'];
 
   /**
    * {@inheritdoc}
@@ -95,9 +95,10 @@ class ModuleUninstallFilterTest extends WebDriverTestBase {
    *   An array of node elements that are visible.
    */
   protected function filterVisibleElements($elements): array {
-    return array_filter($elements, function (NodeElement $element) {
+    $elements = array_filter($elements, function (NodeElement $element) {
       return $element->isVisible();
     });
+    return $elements;
   }
 
 }

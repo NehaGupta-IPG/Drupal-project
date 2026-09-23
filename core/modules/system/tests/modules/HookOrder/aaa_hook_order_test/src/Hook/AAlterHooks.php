@@ -39,14 +39,4 @@ class AAlterHooks {
     $calls[] = __METHOD__;
   }
 
-  /**
-   * Implements hook_test_no_base_subtype_alter().
-   *
-   * This implementation has no ordering modifications.
-   */
-  #[Hook('test_no_base_subtype_alter')]
-  public function testNoBaseSubtypeAlter(array &$calls): void {
-    $calls[] = __METHOD__;
-  }
-
 }

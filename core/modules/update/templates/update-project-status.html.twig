@@ -88,13 +88,13 @@
     <ul>
       <li>
         {% trans %}
-          Installed: {{ includes|placeholder }}
+          Enabled: {{ includes|placeholder }}
         {% endtrans %}
       </li>
       <li>
         {% set disabled = disabled|join(', ') %}
         {% trans %}
-          Uninstalled: {{ disabled|placeholder }}
+          Disabled: {{ disabled|placeholder }}
         {% endtrans %}
       </li>
     </ul>

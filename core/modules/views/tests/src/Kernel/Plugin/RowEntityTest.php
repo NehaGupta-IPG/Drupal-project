@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
-use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Form\FormState;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
@@ -55,11 +54,6 @@ class RowEntityTest extends ViewsKernelTestBase {
     ]);
     $user->save();
 
-    // Make the Created field visible on user entity display.
-    EntityViewDisplay::collectRenderDisplay($user, 'default')
-      ->setComponent('created', ['type' => 'timestamp'])
-      ->save();
-
     $entity_test = EntityTest::create([
       'user_id' => $user->id(),
       'name' => 'test entity test',
@@ -81,7 +75,7 @@ class RowEntityTest extends ViewsKernelTestBase {
     $this->render($build);
 
     $this->assertText('test entity test');
-    $this->assertNoText('Created');
+    $this->assertNoText('Member for');
 
     // Change the view to use a relationship to render the row.
     $view = Views::getView('test_entity_row');
@@ -93,7 +87,7 @@ class RowEntityTest extends ViewsKernelTestBase {
     $this->render($build);
 
     $this->assertNoText('test entity test');
-    $this->assertText('Created');
+    $this->assertText('Member for');
 
     // Tests the available view mode options.
     $form = [];

@@ -11,7 +11,6 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Stub;
 
 /**
@@ -58,56 +57,27 @@ class HtmxAttributesTest extends UnitTestCase {
    * Test on method.
    */
   #[DataProvider('hxOnDataProvider')]
-  public function testHxOn(string|array $event, string $action, string $name, string $expected): void {
-    $this->htmx->on($event, $action);
+  public function testHxOn(string $event, string $expected): void {
+    $this->htmx->on($event, 'someAction');
     $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes'][$name]));
-    $this->assertEquals($expected, $render['#attributes'][$name]);
+    $this->assertTrue(isset($render['#attributes'][$expected]));
+    $this->assertEquals('someAction', $render['#attributes'][$expected]);
   }
 
   /**
-   * Provides data to self::testHxOn.
+   * Provides data to ::testHxOn.
    *
    * @return array<int, string[]>
    *   Array of event, expected.
    */
   public static function hxOnDataProvider(): array {
     return [
-      [
-        'simple',
-        'someAction(this)',
-        'data-hx-on:simple',
-        'someAction(this)',
-      ],
-      [
-        '::before:request',
-        'someAction(event)',
-        'data-hx-on::before:request',
-        'someAction(event)',
-      ],
-      [
-        ['singleEvent' => 'someAction()'],
-        '',
-        'data-hx-on',
-        'singleEvent -> someAction()',
-      ],
-      [
-        [
-          'load' => 'this.showModal()',
-          'click from:self, closeDialog from:body' => 'this.close()',
-        ],
-        '',
-        'data-hx-on',
-        'load -> this.showModal(); click from:self, closeDialog from:body -> this.close()',
-      ],
-      [
-        [
-          'close' => "this.remove(); log('dialog removed')",
-        ],
-        '',
-        'data-hx-on',
-        "close -> this.remove(); log('dialog removed')",
-      ],
+      ['lowercase', 'data-hx-on-lowercase'],
+      ['already-kebab-case', 'data-hx-on-already-kebab-case'],
+      ['snake_case', 'data-hx-on-snake-case'],
+      ['camelCaseEvent', 'data-hx-on-camel-case-event'],
+      ['htmx:beforeRequest', 'data-hx-on-htmx-before-request'],
+      ['::beforeRequest', 'data-hx-on--before-request'],
     ];
   }
 
@@ -134,7 +104,7 @@ class HtmxAttributesTest extends UnitTestCase {
   }
 
   /**
-   * Provides data to self::testHxPushUrl and self::testHxReplaceUrl.
+   * Provides data to ::testHxPushUrl and :testHxReplaceUrl.
    *
    * @return array{bool, string}[]
    *   Array of <bool, string> expected.
@@ -176,7 +146,7 @@ class HtmxAttributesTest extends UnitTestCase {
   }
 
   /**
-   * Provides data to self::testHxSwapOob.
+   * Provides data to ::testHxSwapOob.
    *
    * @return array{true|string, string}[]
    *   Array of true|string, expected.
@@ -222,14 +192,14 @@ class HtmxAttributesTest extends UnitTestCase {
   }
 
   /**
-   * Test config method.
+   * Test request method.
    */
-  public function testHxConfig(): void {
-    $values = ['timeout' => 100, 'credentials' => 'include'];
-    $this->htmx->config($values);
+  public function testHxRequest(): void {
+    $values = ['timeout' => 100, 'credentials' => FALSE];
+    $this->htmx->request($values);
     $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-config']));
-    $this->assertEquals('{"timeout":100,"credentials":"include"}', $render['#attributes']['data-hx-config']);
+    $this->assertTrue(isset($render['#attributes']['data-hx-request']));
+    $this->assertEquals('{"timeout":100,"credentials":false}', $render['#attributes']['data-hx-request']);
   }
 
   /**
@@ -249,7 +219,7 @@ class HtmxAttributesTest extends UnitTestCase {
   }
 
   /**
-   * Provides data to self::testHxValidate.
+   * Provides data to ::testHxValidate.
    *
    * @return array{?bool, string}[]
    *   Array of null|bool, string, expected.
@@ -260,20 +230,6 @@ class HtmxAttributesTest extends UnitTestCase {
       [FALSE, 'false'],
       [NULL, 'true'],
     ];
-  }
-
-  /**
-   * Test disable method.
-   */
-  #[TestWith([FALSE])]
-  #[TestWith([TRUE])]
-  public function testHxDisable(bool $useMerge): void {
-    $selector = 'div.some-class';
-    $expectedName = $useMerge ? 'data-hx-disable:merge' : 'data-hx-disable';
-    $this->htmx->disable($selector, $useMerge);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes'][$expectedName]));
-    $this->assertEquals($selector, $render['#attributes'][$expectedName]);
   }
 
   /**
@@ -298,23 +254,6 @@ class HtmxAttributesTest extends UnitTestCase {
   }
 
   /**
-   * Test status method.
-   */
-  public function testStatus(): void {
-    // Test with a placeholder status code.
-    $this->htmx->status('status-code', 'swap:innerHTML target:#errors');
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-status:status-code']));
-    $this->assertEquals('swap:innerHTML target:#errors', $render['#attributes']['data-hx-status:status-code']);
-  }
-
-  public function testInvalidMethod(): void {
-    // Test an invalid string.
-    $this->expectException(\ValueError::class);
-    $this->htmx->method('invalid');
-  }
-
-  /**
    * Test remaining methods.
    */
   #[DataProvider('hxSimpleStringAttributesDataProvider')]
@@ -331,7 +270,7 @@ class HtmxAttributesTest extends UnitTestCase {
   }
 
   /**
-   * Provides data to self::testHxSimpleStringAttributes.
+   * Provides data to ::testHxSimpleStringAttributes.
    *
    * @return array{string, ?string, string, string|bool}[]
    *   Array of method, value, attribute, expected.
@@ -347,47 +286,24 @@ class HtmxAttributesTest extends UnitTestCase {
       ['trigger', 'event', 'data-hx-trigger', 'event'],
       ['trigger', ['load', 'click delay:1s'], 'data-hx-trigger', 'load,click delay:1s'],
       ['confirm', 'A confirmation message', 'data-hx-confirm', 'A confirmation message'],
-      ['ignore', NULL, 'data-hx-ignore', TRUE],
-      ['historyElt', NULL, 'data-hx-history-elt', TRUE],
+      ['disable', NULL, 'data-hx-disable', TRUE],
+      ['disabledElt', 'descriptor', 'data-hx-disabled-elt', 'descriptor'],
+      ['disinherit', 'descriptor', 'data-hx-disinherit', 'descriptor'],
       ['encoding', NULL, 'data-hx-encoding', 'multipart/form-data'],
       ['encoding', 'application/x-www-form-urlencoded', 'data-hx-encoding', 'application/x-www-form-urlencoded'],
+      ['ext', 'name, name', 'data-hx-ext', 'name, name'],
+      ['historyElt', NULL, 'data-hx-history-elt', TRUE],
       ['include', 'descriptor', 'data-hx-include', 'descriptor'],
       ['indicator', 'descriptor', 'data-hx-indicator', 'descriptor'],
+      ['inherit', 'descriptor', 'data-hx-inherit', 'descriptor'],
+      ['params', '*', 'data-hx-params', '*'],
+      ['params', ['not param1', 'param2', 'param3'], 'data-hx-params', 'not param1,param2,param3'],
+      ['params', ['param1', 'param2', 'param3'], 'data-hx-params', 'param1,param2,param3'],
+      ['preserve', NULL, 'data-hx-preserve', TRUE],
+      ['history', NULL, 'data-hx-history', 'false'],
+      ['prompt', 'A prompt message', 'data-hx-prompt', 'A prompt message'],
       ['sync', 'closest form:abort', 'data-hx-sync', 'closest form:abort'],
-      ['method', 'get', 'data-hx-method', 'get'],
-      ['method', 'post', 'data-hx-method', 'post'],
-      ['method', 'PUT', 'data-hx-method', 'PUT'],
-      ['method', 'patch', 'data-hx-method', 'patch'],
-      ['method', 'delete', 'data-hx-method', 'delete'],
-      ['morphSkip', NULL, 'data-hx-morph-skip', TRUE],
-      ['morphSkipChildren', NULL, 'data-hx-morph-skip-children', TRUE],
     ];
-  }
-
-  /**
-   * Tests modifiers.
-   */
-  public function testModifiers(): void {
-    // No modifier is the default.  Including for completeness.
-    $this->htmx->select('selector', Htmx::NO_MODIFIER);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-select']));
-    $this->assertEquals('selector', $render['#attributes']['data-hx-select']);
-    // Inherited.
-    $this->htmx->select('selector', Htmx::INHERITED);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-select']));
-    $this->assertEquals('selector', $render['#attributes']['data-hx-select:inherited']);
-    // Append.
-    $this->htmx->select('selector', Htmx::APPEND);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-select']));
-    $this->assertEquals('selector', $render['#attributes']['data-hx-select:append']);
-    // Combined.
-    $this->htmx->select('selector', Htmx::INHERITED | Htmx::APPEND);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attributes']['data-hx-select']));
-    $this->assertEquals('selector', $render['#attributes']['data-hx-select:inherited:append']);
   }
 
 }

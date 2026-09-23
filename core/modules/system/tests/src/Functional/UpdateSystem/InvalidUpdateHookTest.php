@@ -41,6 +41,8 @@ class InvalidUpdateHookTest extends BrowserTestBase {
 
   /**
    * A user account with upgrade permission.
+   *
+   * @var \Drupal\user\UserInterface
    */
   private UserInterface $updateUser;
 

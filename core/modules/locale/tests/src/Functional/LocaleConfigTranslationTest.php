@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\locale\Model\TranslationUpdateMode;
 use Drupal\locale\StringStorageInterface;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -37,7 +36,7 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * The string storage.
+   * @var \Drupal\locale\StringStorageInterface
    */
   protected StringStorageInterface $storage;
 
@@ -53,7 +52,7 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', TranslationUpdateMode::Local->value)
+      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
       ->save();
 
     // Add custom language.
@@ -290,16 +289,16 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
 
     // Check the optional default configuration in node module.
     $string = $this->storage->findString([
-      'source' => 'No promoted content has been created yet.',
+      'source' => 'No promoted content has been created yet.<br/>Follow the <a target="_blank" href="https://www.drupal.org/docs/user_guide/en/index.html">User Guide</a> to start building your site.',
       'context' => '',
       'type' => 'configuration',
     ]);
     if ($optional) {
-      $this->assertFalse($this->config('views.view.promoted_content')->isNew());
+      $this->assertFalse($this->config('views.view.frontpage')->isNew());
       $this->assertNotEmpty($string, 'Node view text can be found with node and views modules.');
     }
     else {
-      $this->assertTrue($this->config('views.view.promoted_content')->isNew());
+      $this->assertTrue($this->config('views.view.frontpage')->isNew());
       $this->assertNull($string, 'Node view text can not be found without node and/or views modules.');
     }
   }

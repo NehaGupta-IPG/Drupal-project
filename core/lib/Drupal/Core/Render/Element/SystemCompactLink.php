@@ -2,8 +2,10 @@
 
 namespace Drupal\Core\Render\Element;
 
+use Drupal\Core\Link as BaseLink;
 use Drupal\Core\Render\Attribute\RenderElement;
-use Drupal\Core\Url;
+use Drupal\Core\Url as BaseUrl;
+use Drupal\Component\Utility\NestedArray;
 
 /**
  * Provides a link to show or hide help text on administration pages.
@@ -55,15 +57,29 @@ class SystemCompactLink extends Link {
    *   The passed-in element containing the system compact link default values.
    */
   public static function preRenderCompactLink($element) {
-    $element['#title'] = t('Hide descriptions');
-    $element['#url'] = Url::fromUri('internal:#?');
-    $element['#options'] = [
-      'attributes' => [
-        'title' => t('Compress layout by hiding descriptions.'),
-        'data-admin-compact-toggle' => TRUE,
-      ],
-    ];
-    $element['#attached']['library'][] = 'system/drupal.system.admin_compact';
+    // By default, link options to pass to l() are normally set in #options.
+    $element += ['#options' => []];
+
+    if (system_admin_compact_mode()) {
+      $element['#title'] = t('Show descriptions');
+      $element['#url'] = BaseUrl::fromRoute('system.admin_compact_page', ['mode' => 'off']);
+      $element['#options'] = [
+        'attributes' => ['title' => t('Expand layout to include descriptions.')],
+        'query' => \Drupal::destination()->getAsArray(),
+      ];
+    }
+    else {
+      $element['#title'] = t('Hide descriptions');
+      $element['#url'] = BaseUrl::fromRoute('system.admin_compact_page', ['mode' => 'on']);
+      $element['#options'] = [
+        'attributes' => ['title' => t('Compress layout by hiding descriptions.')],
+        'query' => \Drupal::destination()->getAsArray(),
+      ];
+    }
+
+    $options = NestedArray::mergeDeep($element['#url']->getOptions(), $element['#options']);
+    $element['#markup'] = BaseLink::fromTextAndUrl($element['#title'], $element['#url']->setOptions($options))->toString();
+
     return $element;
   }
 

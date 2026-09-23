@@ -30,10 +30,7 @@ abstract class FileParsingCacheCollectorBase extends CacheCollector {
   public function get($key): array {
     $this->lazyLoadCache();
     if (isset($this->storage[$key]) && file_exists($key)) {
-      // Ensure that items written within the same second as the current request
-      // are not returned from cache since they may have been written twice with
-      // different values.
-      if ($this->storage[$key]['mtime'] === filemtime($key) && $this->storage[$key]['mtime'] < $this->time->getRequestTime()) {
+      if ($this->storage[$key]['mtime'] === filemtime($key)) {
         return $this->storage[$key]['parsed'];
       }
     }

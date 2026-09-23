@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\filter\Entity\FilterFormat;
-use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -19,8 +18,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('node')]
 #[RunTestsInSeparateProcesses]
 class NodeRSSContentTest extends NodeTestBase {
-
-  use PromotedContentViewTestTrait;
 
   /**
    * Enable a module that implements hook_node_view().
@@ -39,8 +36,6 @@ class NodeRSSContentTest extends NodeTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->enablePromotedContentView();
 
     // Use bypass node access permission here, because the test class uses
     // hook_grants_alter() to deny access to everyone on node_access

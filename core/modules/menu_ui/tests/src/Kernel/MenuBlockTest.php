@@ -34,6 +34,8 @@ class MenuBlockTest extends KernelTestBase {
 
   /**
    * The menu for testing.
+   *
+   * @var \Drupal\system\MenuInterface
    */
   protected MenuInterface $menu;
 

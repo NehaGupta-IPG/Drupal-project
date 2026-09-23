@@ -502,7 +502,7 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
     $query = $this->mulRevChangedStorage->getQuery()->accessCheck(FALSE);
     $ids = $query->condition('revision_translation_affected', 1, '=', $entity->language()->getId())->execute();
     $id = reset($ids);
-    return $id == $entity->id();
+    return (bool) ($id == $entity->id());
   }
 
 }

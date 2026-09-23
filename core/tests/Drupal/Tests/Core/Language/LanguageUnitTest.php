@@ -71,7 +71,7 @@ class LanguageUnitTest extends UnitTestCase {
   public function testIsDefault(): void {
     $language_default = $this->createStub(LanguageDefault::class);
     $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-    $container->expects($this->exactly(2))
+    $container
       ->method('get')
       ->with('language.default')
       ->willReturn($language_default);

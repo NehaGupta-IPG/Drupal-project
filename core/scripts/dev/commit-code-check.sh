@@ -108,8 +108,9 @@ PHPSTAN_DIST_FILE_CHANGED=0
 
 # This variable will be set to one when one of the eslint config file is
 # changed:
-#  - core/eslint.passing.config.mjs
-#  - core/eslint.config.mjs
+#  - core/.eslintrc.passing.json
+#  - core/.eslintrc.json
+#  - core/.eslintrc.jquery.json
 ESLINT_CONFIG_PASSING_FILE_CHANGED=0
 
 # This variable will be set to one when the stylelint config file is changed.
@@ -117,11 +118,6 @@ ESLINT_CONFIG_PASSING_FILE_CHANGED=0
 #  - core/.stylelintignore
 #  - core/.stylelintrc.json
 STYLELINT_CONFIG_FILE_CHANGED=0
-
-# This variable will be set to one when the twig-cs-fixer config file is
-# changed:
-#  - core/.twig-cs-fixer.php
-TWIGCSFIXER_CONFIG_FILE_CHANGED=0
 
 # This variable will be set to one when JavaScript packages files are changed.
 # changed:
@@ -148,15 +144,11 @@ for FILE in $FILES; do
     PHPCS_XML_DIST_FILE_CHANGED=1;
   fi;
 
-  if [[ $FILE == "core/.twig-cs-fixer.php" ]]; then
-    TWIGCSFIXER_CONFIG_FILE_CHANGED=1;
-  fi;
-
   if [[ $FILE == "core/.phpstan-baseline.php" || $FILE == "core/phpstan.neon.dist" ]]; then
     PHPSTAN_DIST_FILE_CHANGED=1;
   fi;
 
-  if [[ $FILE == "core/eslint.config.mjs" || $FILE == "core/eslint.passing.config.mjs" ]]; then
+  if [[ $FILE == "core/.eslintrc.json" || $FILE == "core/.eslintrc.passing.json" || $FILE == "core/.eslintrc.jquery.json" ]]; then
     ESLINT_CONFIG_PASSING_FILE_CHANGED=1;
   fi;
 
@@ -279,24 +271,6 @@ if [[ $PHPCS_XML_DIST_FILE_CHANGED == "1" ]]; then
   printf "\n"
 fi
 
-# Run Twig CS Fixer on all files when twig cs fixer files are changed.
-if [[ $TWIGCSFIXER_CONFIG_FILE_CHANGED == "1" ]]; then
-  # Test all files with twig-cs-fixer rules.
-  vendor/bin/twig-cs-fixer lint -c "$TOP_LEVEL/core/.twig-cs-fixer.php"
-  TWIGCS=$?
-  if [ "$TWIGCS" -ne "0" ]; then
-    # If there are failures set the status to a number other than 0.
-    FINAL_STATUS=1
-    printf "\TWIGCS: ${red}failed${reset}\n"
-  else
-    printf "\TWIGCS: ${green}passed${reset}\n"
-  fi
-  # Add a separator line to make the output easier to read.
-  printf "\n"
-  printf -- '-%.0s' {1..100}
-  printf "\n"
-fi
-
 # When the eslint config has been changed, then eslint must check all files.
 if [[ $ESLINT_CONFIG_PASSING_FILE_CHANGED == "1" ]]; then
   cd "$TOP_LEVEL/core"
@@ -357,7 +331,6 @@ fi
 PHP_FILES=""
 JS_FILES=""
 CSS_FILES=""
-TWIG_FILES=""
 for FILE in $FILES; do
   if [[ -f "$TOP_LEVEL/$FILE" ]]; then
     if [[ $FILE =~ \.(inc|install|module|php|profile|test|theme|yml)$ ]]; then
@@ -371,9 +344,6 @@ for FILE in $FILES; do
       if [[ $FILE =~ \.pcss\.css$ ]] || [[ ! -f "$TOP_LEVEL/$BASENAME.pcss.css" ]]; then
         CSS_FILES="$CSS_FILES $TOP_LEVEL/$FILE"
       fi
-    fi
-    if [[ $FILE =~ \.twig$ ]]; then
-      TWIG_FILES="$TWIG_FILES $TOP_LEVEL/$FILE"
     fi
   fi
 done
@@ -393,25 +363,10 @@ if [[ "$PHP_FILES" != "" ]] && [[ $PHPCS_XML_DIST_FILE_CHANGED == "0" ]]; then
   printf "\n"
 fi
 
-# Run Twig CS Fixer on changed Twig files.
-if [[ "$TWIG_FILES" != "" ]] && [[ $TWIGCSFIXER_CONFIG_FILE_CHANGED == "0" ]]; then
-  vendor/bin/twig-cs-fixer lint $TWIG_FILES -c "$TOP_LEVEL/core/.twig-cs-fixer.php"
-  if [ "$?" -ne "0" ]; then
-    FINAL_STATUS=1
-    printf "\TWIGCS: ${red}failed${reset}\n"
-  else
-    printf "\TWIGCS: ${green}passed${reset}\n"
-  fi
-  # Add a separator line to make the output easier to read.
-  printf "\n"
-  printf -- '-%.0s' {1..100}
-  printf "\n"
-fi
-
 # Run ESLint on changed YAML and JavaScript files.
 if [[ "$JS_FILES" != "" ]] && [[ $ESLINT_CONFIG_PASSING_FILE_CHANGED == "0" ]]; then
   cd "$TOP_LEVEL/core"
-  node ./node_modules/eslint/bin/eslint.js --quiet --config=eslint.passing.config.mjs $JS_FILES
+  node ./node_modules/eslint/bin/eslint.js --quiet --resolve-plugins-relative-to . --config=.eslintrc.passing.json $JS_FILES
   if [ "$?" -ne "0" ]; then
     FINAL_STATUS=1
     printf "\nESLint: ${red}failed${reset}\n"

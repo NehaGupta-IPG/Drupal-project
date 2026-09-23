@@ -32,6 +32,7 @@ h3 {
   color: var(--admin-color-text);
   font-size: var(--admin-font-size-2xl);
 }
+
 .site-name--subtle {
   margin-top: var(--admin-space-s);
   color: var(--admin-color-text-soft);
@@ -42,6 +43,7 @@ h3 {
   margin-top: 0;
   font-size: 1.602rem;
 }
+
 .title--broad {
   font-size: var(--admin-font-size-h1);
 }
@@ -55,6 +57,7 @@ h3 {
   margin-bottom: var(--admin-space-m);
   color: var(--admin-color-text);
 }
+
 .content--subtle {
   color: var(--admin-color-text-soft);
 }
@@ -69,6 +72,7 @@ h3 {
  * Task list & step indicator.
  * Shows on both the install screen and the database update page.
  */
+
 @media all and (max-width: 48em) {
   /* 768px */
   header[role="banner"] {
@@ -127,7 +131,7 @@ h3 {
     color: var(--admin-color-link);
     border: 1px solid transparent; /* Required for forced-colors mode. */
     /* Fixed blue tint, not the accent-derived --admin-color-bg-item: the
-       maintenance/install page has no [data-accent] context, so accent
+       maintenance/install page has no [data-gin-accent] context, so accent
        tokens are undefined here. */
     background: var(--admin-color-blue-050);
     font-weight: 500;
@@ -140,6 +144,7 @@ h3 {
 /**
  * Layout
  */
+
 .layout-container {
   width: auto;
   margin-right: 1.25em;
@@ -150,6 +155,7 @@ h3 {
   background: #fff;
   box-shadow: var(--shadow-z3);
 }
+
 .layout-container::after {
   /* No reason for a clearfix in the markup. */
   display: table;
@@ -232,18 +238,21 @@ h3 {
 /**
  * Status report customization for install and update page.
  */
+
 .system-status-report__status-title {
   float: none;
   width: 100%;
   color: var(--admin-color-text-loud);
   font-weight: var(--admin-font-weight-semibold);
 }
+
 .system-status-report__entry__value {
   float: none;
   width: 100%;
   padding-top: 0;
   padding-left: 3em; /* LTR */
 }
+
 [dir="rtl"] .system-status-report__entry__value {
   padding-right: 3em;
   padding-left: 1em;
@@ -252,6 +261,7 @@ h3 {
 /**
  * Updates list customization for update page.
  */
+
 .update-results {
   overflow: auto; /* Required to prevent text clipping. */
   margin-top: 0;
@@ -260,9 +270,11 @@ h3 {
   border-radius: var(--admin-radius-2xs);
   background: var(--admin-color-bg-surface-nested);
 }
+
 .update-results > h3:first-child {
   margin-top: 0;
 }
+
 .update-results .failure strong {
   color: var(--admin-color-text-error);
 }
@@ -270,6 +282,7 @@ h3 {
 .item-list > h3 {
   font-size: var(--admin-font-size-h5);
 }
+
 .item-list > ul {
   margin-left: 0;
 }

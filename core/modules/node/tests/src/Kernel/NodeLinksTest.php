@@ -74,15 +74,10 @@ class NodeLinksTest extends KernelTestBase {
       'promote' => NodeInterface::PROMOTED,
     ]);
 
-    // Full view doesn't have read more link.
-    $this->drupalGet('node/' . $node->id());
-    $this->assertSession()->linkNotExists('Read more');
-
-    // Teaser has read more link.
-    $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
-    $teaser_build = $view_builder->view($node, 'teaser');
-    $teaser_output = \Drupal::service('renderer')->renderInIsolation($teaser_build);
-    $this->assertStringContainsString('Read more', (string) $teaser_output);
+    // Links are displayed by default.
+    $this->drupalGet('node');
+    $this->assertSession()->pageTextContains($node->getTitle());
+    $this->assertSession()->linkExists('Read more');
 
     // Hide links.
     \Drupal::service('entity_display.repository')
@@ -90,10 +85,9 @@ class NodeLinksTest extends KernelTestBase {
       ->removeComponent('links')
       ->save();
 
-    // Test teaser view after hiding links.
-    $teaser_build = $view_builder->view($node, 'teaser');
-    $teaser_output = \Drupal::service('renderer')->renderInIsolation($teaser_build);
-    $this->assertStringNotContainsString('Read more', (string) $teaser_output);
+    $this->drupalGet('node');
+    $this->assertSession()->pageTextContains($node->getTitle());
+    $this->assertSession()->linkNotExists('Read more');
   }
 
 }

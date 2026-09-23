@@ -27,6 +27,8 @@ class TopBarItemManagerTest extends UnitTestCase {
 
   /**
    * The top bar item manager under test.
+   *
+   * @var \Drupal\navigation\TopBarItemManagerInterface
    */
   protected TopBarItemManagerInterface $manager;
 

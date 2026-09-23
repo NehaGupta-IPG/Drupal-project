@@ -29,7 +29,6 @@ body {
     }
   }
 }
-
 /* We apply transitions after page load to avoid shifts. */
 [data-admin-toolbar-transitions] {
   :is(#extra-specificity-hack, [data-drupal-admin-styles]) {
@@ -52,7 +51,6 @@ body {
     }
   }
 }
-
 /**
  * This zero height div has the [data-offset-left] attribute for
  * Drupal.displace() to measure. It purposefully does not have any transitions
@@ -69,7 +67,6 @@ body {
     }
   }
 }
-
 /**
  * The Admin toolbar component.
  */
@@ -349,7 +346,6 @@ body {
     }
   }
 }
-
 /**
  * Element is used to overlay the content when Toolbar is expanded in smaller devices.
  * It is created in the template templates/navigation.html.twig.

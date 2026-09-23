@@ -197,18 +197,15 @@ final class Settings implements ContainerInjectionInterface {
   /**
    * Return the active administration theme.
    *
-   * @return string|null
-   *   The active administration theme name, or NULL if it cannot be
-   *   determined. This is the case while Drupal is being installed, because
-   *   the system theme configuration does not exist yet. The theme settings
-   *   provider then falls back to the active theme.
+   * @return string
+   *   The active administration theme name.
    */
-  private function getAdminTheme(): ?string {
+  private function getAdminTheme(): string {
     $admin_theme = $this->configFactory->get('system.theme')->get('admin');
     if (empty($admin_theme)) {
       $admin_theme = $this->configFactory->get('system.theme')->get('default');
     }
-    return $admin_theme ?: NULL;
+    return $admin_theme;
   }
 
   /**
@@ -221,8 +218,8 @@ final class Settings implements ContainerInjectionInterface {
    *   The theme setting form elements.
    */
   public function getSettingsForm(?AccountInterface $account = NULL): array {
-    $experimental_label = ' <span class="admin-experimental-flag">Experimental</span>';
-    $beta_label = ' <span class="admin-beta-flag">Beta</span>';
+    $experimental_label = ' <span class="gin-experimental-flag">Experimental</span>';
+    $beta_label = ' <span class="gin-beta-flag">Beta</span>';
 
     $form['enable_dark_mode'] = [
       '#type' => 'radios',
@@ -230,9 +227,9 @@ final class Settings implements ContainerInjectionInterface {
       '#description' => $this->t('Enables dark mode for the administration interface.'),
       '#default_value' => (string) ($account ? $this->get('enable_dark_mode', $account) : $this->getDefault('enable_dark_mode')),
       '#options' => [
-        'auto' => $this->t('Auto'),
         0 => $this->t('Light'),
         1 => $this->t('Dark'),
+        'auto' => $this->t('Auto'),
       ],
     ];
 
@@ -280,8 +277,6 @@ final class Settings implements ContainerInjectionInterface {
     // Accent color picker (helper field).
     $form['accent_group']['accent_picker'] = [
       '#type' => 'color',
-      '#title' => $this->t('Accent color picker'),
-      '#title_display' => 'invisible',
       '#placeholder' => '#777777',
       '#default_value' => $account ? $this->get('accent_color', $account) : $this->getDefault('accent_color'),
       '#process' => [[__CLASS__, 'processColorPicker']],
@@ -293,9 +288,9 @@ final class Settings implements ContainerInjectionInterface {
       '#title' => $this->t('Focus color'),
       '#default_value' => $account ? $this->get('preset_focus_color', $account) : $this->getDefault('preset_focus_color'),
       '#options' => [
-        'default' => $this->t('Default Admin Focus color (Default)'),
+        'gin' => $this->t('Default Admin Focus color (Default)'),
         'green' => $this->t('Green'),
-        'legacy_green' => $this->t('Legacy green'),
+        'claro' => $this->t('Claro Green'),
         'orange' => $this->t('Orange'),
         'dark' => $this->t('Neutral'),
         'accent' => $this->t('Same as Accent color'),
@@ -319,8 +314,6 @@ final class Settings implements ContainerInjectionInterface {
     // Focus color picker (helper).
     $form['focus_group']['focus_picker'] = [
       '#type' => 'color',
-      '#title' => $this->t('Focus color picker'),
-      '#title_display' => 'invisible',
       '#placeholder' => '#777777',
       '#default_value' => $account ? $this->get('focus_color', $account) : $this->getDefault('focus_color'),
       '#process' => [[__CLASS__, 'processColorPicker']],

@@ -28,7 +28,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
   public function testConstructor(array $elements, ?string $expected_exception_message): void {
     if ($expected_exception_message !== NULL) {
       $this->expectException(\InvalidArgumentException::class);
-      $this->expectExceptionMessageIs($expected_exception_message);
+      $this->expectExceptionMessage($expected_exception_message);
     }
     $restrictions = new HTMLRestrictions($elements);
     $this->assertIsArray($restrictions->getAllowedElements(FALSE));
@@ -147,19 +147,19 @@ class HTMLRestrictionsTest extends UnitTestCase {
     // Invalid overrides of globally disallowed attributes.
     yield 'INVALID: <foo bar> when "bar" is globally disallowed' => [
       ['foo' => ['bar' => TRUE], '*' => ['bar' => FALSE, 'baz' => TRUE]],
-      'The attribute restrictions in "<foo bar>" are allowing attributes "bar" that are disallowed by the special "*" global attribute restrictions.',
+      'The attribute restrictions in "<foo bar>" are allowing attributes "bar" that are disallowed by the special "*" global attribute restrictions',
     ];
     yield 'INVALID: <foo style> when "style" is globally disallowed' => [
       ['foo' => ['style' => TRUE], '*' => ['bar' => FALSE, 'baz' => TRUE, 'style' => FALSE]],
-      'The attribute restrictions in "<foo style>" are allowing attributes "bar", "style" that are disallowed by the special "*" global attribute restrictions.',
+      'The attribute restrictions in "<foo style>" are allowing attributes "bar", "style" that are disallowed by the special "*" global attribute restrictions',
     ];
     yield 'INVALID: <foo on*> when "on*" is globally disallowed' => [
       ['foo' => ['on*' => TRUE], '*' => ['bar' => FALSE, 'baz' => TRUE, 'style' => FALSE, 'on*' => FALSE]],
-      'The attribute restrictions in "<foo on*>" are allowing attributes "bar", "style", "on*" that are disallowed by the special "*" global attribute restrictions.',
+      'The attribute restrictions in "<foo on*>" are allowing attributes "bar", "style", "on*" that are disallowed by the special "*" global attribute restrictions',
     ];
     yield 'INVALID: <foo ontouch> when "on" is globally disallowed' => [
       ['foo' => ['ontouch' => TRUE], '*' => ['bar' => FALSE, 'baz' => TRUE, 'style' => FALSE, 'on*' => FALSE]],
-      'The attribute restrictions in "<foo ontouch>" are allowing attributes "bar", "style", "on*" that are disallowed by the special "*" global attribute restrictions.',
+      'The attribute restrictions in "<foo ontouch>" are allowing attributes "bar", "style", "on*" that are disallowed by the special "*" global attribute restrictions',
     ];
   }
 
@@ -348,7 +348,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
     ];
     yield 'tag with two attributes, spread across declarations' => [
       '<a target> <a class>',
-      ['a' => ['class' => TRUE, 'target' => TRUE]],
+      ['a' => ['target' => TRUE, 'class' => TRUE]],
     ];
     yield 'tag with conflicting attribute config, allow one attribute and forbid all attributes' => [
       '<a target> <a>',
@@ -360,7 +360,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
     ];
     yield 'tag attribute configuration spread across declarations' => [
       '<a target="_blank"> <a target="_self"> <a target="_*">',
-      ['a' => ['target' => ['_*' => TRUE, '_blank' => TRUE, '_self' => TRUE]]],
+      ['a' => ['target' => ['_blank' => TRUE, '_self' => TRUE, '_*' => TRUE]]],
     ];
     yield 'tag attribute configuration spread across declarations, allow all attributes values' => [
       '<a target> <a target="_blank"> <a target="_self"> <a target="_*">',
@@ -374,7 +374,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
     ];
     yield 'two tags (reverse order)' => [
       '<p> <a>',
-      ['a' => FALSE, 'p' => FALSE],
+      ['p' => FALSE, 'a' => FALSE],
     ];
 
     // Wildcard tag, attribute and attribute value.
@@ -398,10 +398,10 @@ class HTMLRestrictionsTest extends UnitTestCase {
       [
         '$text-container' => [
           'class' => [
-            'text-align-center' => TRUE,
-            'text-align-justify' => TRUE,
             'text-align-left' => TRUE,
+            'text-align-center' => TRUE,
             'text-align-right' => TRUE,
+            'text-align-justify' => TRUE,
           ],
         ],
       ],
@@ -433,7 +433,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
     yield '$text-container + two concrete tag to resolve into' => [
       '<p> <$text-container class="text-align-left text-align-center text-align-right text-align-justify"> <div>',
       [
-        'div' => [
+        'p' => [
           'class' => [
             'text-align-left' => TRUE,
             'text-align-center' => TRUE,
@@ -441,7 +441,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
             'text-align-justify' => TRUE,
           ],
         ],
-        'p' => [
+        'div' => [
           'class' => [
             'text-align-left' => TRUE,
             'text-align-center' => TRUE,
@@ -451,8 +451,8 @@ class HTMLRestrictionsTest extends UnitTestCase {
         ],
       ],
       [
-        'div' => FALSE,
         'p' => FALSE,
+        'div' => FALSE,
         '$text-container' => [
           'class' => [
             'text-align-left' => TRUE,
@@ -673,12 +673,8 @@ class HTMLRestrictionsTest extends UnitTestCase {
 
     yield 'only tags' => [
       new HTMLRestrictions(['a' => FALSE, 'p' => FALSE, 'br' => FALSE]),
-      [
-        '<a>',
-        '<br>',
-        '<p>',
-      ],
-      '<a> <br> <p>',
+      ['<a>', '<p>', '<br>'],
+      '<a> <p> <br>',
       [
         ['name' => 'a'],
         ['name' => 'p'],
@@ -711,13 +707,8 @@ class HTMLRestrictionsTest extends UnitTestCase {
         'span' => FALSE,
         'p' => ['id' => TRUE],
       ]),
-      [
-        '<$text-container class data-llama>',
-        '<div>',
-        '<p id>',
-        '<span>',
-      ],
-      '<div class data-llama> <p id class data-llama> <span>',
+      ['<$text-container class data-llama>', '<div>', '<span>', '<p id>'],
+      '<div class data-llama> <span> <p id class data-llama>',
       [
         [
           'name' => 'div',
@@ -756,12 +747,8 @@ class HTMLRestrictionsTest extends UnitTestCase {
         'p' => ['data-*' => TRUE, 'class' => ['block' => TRUE]],
         'br' => FALSE,
       ]),
-      [
-        '<a href hreflang="en fr">',
-        '<br>',
-        '<p data-* class="block">',
-      ],
-      '<a href hreflang="en fr"> <br> <p data-* class="block">',
+      ['<a href hreflang="en fr">', '<p data-* class="block">', '<br>'],
+      '<a href hreflang="en fr"> <p data-* class="block"> <br>',
       [
         [
           'name' => 'a',
@@ -802,10 +789,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
     // Wildcard tag, attribute and attribute value.
     yield '$text-container' => [
       new HTMLRestrictions(['p' => FALSE, '$text-container' => ['data-*' => TRUE]]),
-      [
-        '<$text-container data-*>',
-        '<p>',
-      ],
+      ['<p>', '<$text-container data-*>'],
       '<p data-*>',
       [
         [

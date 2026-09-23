@@ -269,7 +269,8 @@ class RouteTest extends KernelTestBase {
     $executable = $this->prophesize(MigrateExecutableInterface::class)->reveal();
 
     $plugin = new Route([], 'route', [], $migration, $pathValidator);
-    return $plugin->transform($value, $executable, $row, 'destination_property');
+    $actual = $plugin->transform($value, $executable, $row, 'destination_property');
+    return $actual;
   }
 
 }

@@ -46,6 +46,8 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
    *
    * Some caches explicitly allow this, for example,
    * \Drupal\Core\Cache\MemoryCache\MemoryCache.
+   *
+   * @var bool
    */
   protected bool $testObjectProperties = TRUE;
 

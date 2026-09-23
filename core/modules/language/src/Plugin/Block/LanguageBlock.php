@@ -98,7 +98,7 @@ class LanguageBlock extends BlockBase implements ContainerFactoryPluginInterface
       $build = [
         '#theme' => 'links__language_block',
         '#links' => $links->links,
-        '#wrapper_attributes' => [
+        '#attributes' => [
           'class' => [
             "language-switcher-{$links->method_id}",
           ],

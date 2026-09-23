@@ -1,4 +1,0 @@
-name: 'Configuration test for constants'
-type: module
-package: Testing
-version: VERSION

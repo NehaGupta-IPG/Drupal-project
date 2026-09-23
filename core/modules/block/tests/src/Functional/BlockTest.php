@@ -298,7 +298,8 @@ class BlockTest extends BlockTestBase {
   public function testBlockThemeSelector(): void {
     // Install all themes.
     $themes = [
-      'default_admin',
+      'olivero',
+      'claro',
       'stark',
     ];
     \Drupal::service('theme_installer')->install($themes);
@@ -428,7 +429,6 @@ class BlockTest extends BlockTestBase {
    * - "block_plugin:<block plugin ID>"
    */
   public function testBlockCacheTags(): void {
-    \Drupal::service('module_installer')->install(['page_cache']);
     // The page cache only works for anonymous users.
     $this->drupalLogout();
 
@@ -555,14 +555,14 @@ class BlockTest extends BlockTestBase {
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = \Drupal::service('theme_installer');
 
-    $theme_installer->install(['default_admin']);
-    $this->config('system.theme')->set('default', 'default_admin')->save();
-    $block = $this->drupalPlaceBlock('system_powered_by_block', ['theme' => 'default_admin', 'region' => 'help']);
+    $theme_installer->install(['claro']);
+    $this->config('system.theme')->set('default', 'claro')->save();
+    $block = $this->drupalPlaceBlock('system_powered_by_block', ['theme' => 'claro', 'region' => 'help']);
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextContains('Powered by Drupal');
 
     $this->config('system.theme')->set('default', 'stark')->save();
-    $theme_installer->uninstall(['default_admin']);
+    $theme_installer->uninstall(['claro']);
 
     // Ensure that the block configuration does not exist anymore.
     $this->assertNull(Block::load($block->id()));
@@ -635,11 +635,11 @@ class BlockTest extends BlockTestBase {
     $this->submitForm($edit, 'Save block');
 
     // Ensure that the title is displayed as plain text.
-    $elements = $this->getNodeElementsByXpath('//table/tbody/tr//td[contains(@class, "block")]');
+    $elements = $this->xpath('//table/tbody/tr//td[contains(@class, "block")]');
     $this->assertEquals($title, $elements[0]->getText());
 
     $this->clickLink('Disable');
-    $elements = $this->getNodeElementsByXpath('//table/tbody/tr//td[contains(@class, "block")]');
+    $elements = $this->xpath('//table/tbody/tr//td[contains(@class, "block")]');
     $this->assertEquals("$title (disabled)", $elements[0]->getText());
   }
 

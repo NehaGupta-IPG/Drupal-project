@@ -35,6 +35,8 @@ class AnnounceBlockTest extends WebDriverTestBase {
 
   /**
    * The announce block instance.
+   *
+   * @var \Drupal\block\BlockInterface
    */
   protected BlockInterface $announceBlock;
 

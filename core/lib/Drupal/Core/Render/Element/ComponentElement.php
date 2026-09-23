@@ -29,7 +29,7 @@ use Drupal\Core\Template\Attribute;
  * @code
  * $build['component'] = [
  *   '#type' => 'component',
- *   '#component' => 'my_theme:button',
+ *   '#component' => 'olivero:button',
  * ];
  * @endcode
  *

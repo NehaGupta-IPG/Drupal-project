@@ -6,7 +6,6 @@ namespace Drupal\locale;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Session\AccountProxyInterface;
@@ -14,8 +13,6 @@ use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
-use Drupal\locale\Model\SourceType;
-use Drupal\locale\Model\TranslationUpdateMode;
 
 /**
  * Provide Locale Project Checker helper methods.
@@ -34,8 +31,6 @@ class LocaleProjectChecker {
     protected readonly ModuleHandlerInterface $moduleHandler,
     protected readonly TranslationInterface $translationManager,
     protected readonly AccountProxyInterface $currentUser,
-    protected readonly ConfigFactoryInterface $configFactory,
-    protected readonly LocaleLanguages $localeLanguages,
   ) {}
 
   /**
@@ -47,7 +42,7 @@ class LocaleProjectChecker {
    *   Array of language codes. Defaults to all translatable languages.
    */
   public function checkProjects(array $projects, array $langcodes = []): void {
-    if ($this->configFactory->get('locale.settings')->get('translation.use_source') == TranslationUpdateMode::RemoteAndLocal->value) {
+    if (locale_translation_use_remote_source()) {
       // Retrieve the status of both remote and local translation sources by
       // using a batch process.
       $this->triggerBatch($projects, $langcodes);
@@ -79,7 +74,7 @@ class LocaleProjectChecker {
    *   Array of language codes. Defaults to all translatable languages.
    */
   public function checkLocalProjects(array $projects, array $langcodes = []): void {
-    $langcodes = $langcodes ?: array_keys($this->localeLanguages->getTranslatableLanguages());
+    $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
     // For each project and each language we check if a local po file is
     // available. When found the source object is updated with the appropriate
@@ -89,7 +84,7 @@ class LocaleProjectChecker {
         $source = $this->localeSource->loadSource($project, $langcode);
         $file = $this->localeSource->sourceCheckFile($source);
         if ($file) {
-          $this->localeSource->saveSource($project, $langcode, SourceType::Local->value, $file);
+          $this->localeSource->saveSource($project, $langcode, LOCALE_TRANSLATION_LOCAL, $file);
         }
       }
     }
@@ -110,7 +105,7 @@ class LocaleProjectChecker {
    *   Array of language codes. Defaults to all translatable languages.
    */
   public function triggerBatch(array $projects, array $langcodes = []): void {
-    $langcodes = $langcodes ?: array_keys($this->localeLanguages->getTranslatableLanguages());
+    $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
     $options = LocaleDefaultOptions::updateOptions();
 
     $operations = $this->localeFetch->getStatusOperations($projects, $langcodes, $options);

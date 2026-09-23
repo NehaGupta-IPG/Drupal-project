@@ -17,7 +17,6 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\field\Entity\FieldStorageConfig.
@@ -42,8 +41,10 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
 
   /**
    * The field type manager.
+   *
+   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected FieldTypePluginManagerInterface&MockObject $fieldTypeManager;
+  protected $fieldTypeManager;
 
   /**
    * {@inheritdoc}
@@ -190,7 +191,7 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
     ]);
 
     $this->expectException(FieldException::class);
-    $this->expectExceptionMessageIs("Invalid enforced cardinality '$enforced_cardinality'. Allowed values: a positive integer or -1.");
+    $this->expectExceptionMessage("Invalid enforced cardinality '$enforced_cardinality'. Allowed values: a positive integer or -1.");
     $field_storage->getCardinality();
   }
 

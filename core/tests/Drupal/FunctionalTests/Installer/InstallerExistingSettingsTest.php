@@ -24,11 +24,6 @@ class InstallerExistingSettingsTest extends InstallerTestBase {
 
   /**
    * {@inheritdoc}
-   */
-  protected $profile = 'testing_locale';
-
-  /**
-   * {@inheritdoc}
    *
    * Fully configures a preexisting settings.php file before invoking the
    * interactive installer.
@@ -88,7 +83,7 @@ class InstallerExistingSettingsTest extends InstallerTestBase {
   public function testInstaller(): void {
     $this->assertSession()->addressEquals('user/1');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertEquals('testing_locale', \Drupal::installProfile());
+    $this->assertEquals('testing', \Drupal::installProfile());
   }
 
 }

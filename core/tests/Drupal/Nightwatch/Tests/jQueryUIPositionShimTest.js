@@ -1051,12 +1051,8 @@ module.exports = {
           collision: 'none',
         });
         toReturn['elements return'] = {
-          actual:
-            result.length === elements.length &&
-            result
-              .toArray()
-              .every((element, index) => element === elements[index]),
-          expected: true,
+          actual: result,
+          expected: elements,
         };
         // eslint-disable-next-line func-names
         elements.each(function (index) {
@@ -1423,6 +1419,7 @@ module.exports = {
         const expectedPosition = { top: 60, left: 60 };
         const expectedFeedback = {
           target: {
+            element: of,
             width: 20,
             height: 20,
             left: 40,
@@ -1453,23 +1450,19 @@ module.exports = {
           of: '#parentX',
           using(position, feedback) {
             toReturn[`correct context for call #${count}`] = {
-              actual: this === elements[count],
-              expected: true,
+              actual: this,
+              expected: elements[count],
             };
             toReturn[`correct position for call #${count}`] = {
               actual: position,
               expected: expectedPosition,
             };
             toReturn[`feedback and element match for call #${count}`] = {
-              actual: feedback.element.element[0] === elements[count],
-              expected: true,
+              actual: feedback.element.element[0],
+              expected: elements[count],
             };
-            toReturn[`feedback and target match for call #${count}`] = {
-              actual: feedback.target.element[0] === of[0],
-              expected: true,
-            };
+            // assert.deepEqual(feedback.element.element[0], elements[count]);
             delete feedback.element.element;
-            delete feedback.target.element;
             toReturn[`expected feedback after delete for call #${count}`] = {
               actual: feedback,
               expected: expectedFeedback,
@@ -1489,7 +1482,7 @@ module.exports = {
       },
       [],
       (result) => {
-        browser.assert.equal(Object.keys(result.value).length, 12);
+        browser.assert.equal(Object.keys(result.value).length, 10);
         Object.entries(result.value).forEach(([key, value]) => {
           browser.assert.equal(typeof value, 'object');
           browser.assert.deepEqual(value.actual, value.expected, key);

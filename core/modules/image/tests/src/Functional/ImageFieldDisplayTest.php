@@ -11,7 +11,6 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\TestFileCreationTrait;
-use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -51,9 +50,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
    */
   public function testImageFieldFormattersPrivate(): void {
     // Remove access content permission from anonymous users.
-    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions([
-      'access content' => FALSE,
-    ])->save();
+    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, ['access content' => FALSE]);
     $this->_testImageFieldFormatters('private');
   }
 
@@ -77,9 +74,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Remove 'administer image styles' permission from testing admin user.
     $admin_user_roles = $this->adminUser->getRoles(TRUE);
-    Role::loadOverrideFree(reset($admin_user_roles))->changePermissions([
-      'administer image styles' => FALSE,
-    ])->save();
+    user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => FALSE]);
 
     // Go to manage display page again.
     $this->drupalGet("admin/structure/types/manage/article/display/default");
@@ -89,9 +84,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->assertSession()->linkByHrefNotExists(Url::fromRoute('entity.image_style.collection')->toString(), 'Link to image styles configuration is absent when permissions are insufficient');
 
     // Restore 'administer image styles' permission to testing admin user.
-    Role::loadOverrideFree(reset($admin_user_roles))->changePermissions([
-      'administer image styles' => TRUE,
-    ])->save();
+    user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => TRUE]);
 
     // Create a new node with an image attached.
     $test_image = current($this->drupalGetTestFiles('image'));
@@ -144,7 +137,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#alt' => $alt,
       '#attributes' => ['loading' => 'lazy'],
     ];
-    $default_output = '<a href="' . $file->createFileUrl() . '">' . $renderer->renderRoot($image) . '</a>';
+    $default_output = '<a href="' . $file->createFileUrl() . '">' . (string) $renderer->renderRoot($image) . '</a>';
     $this->drupalGet('node/' . $nid);
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', $file->getCacheTags()[0]);
     // @todo Remove in https://www.drupal.org/node/2646744.
@@ -384,9 +377,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Remove 'administer image styles' permission from testing admin user.
     $admin_user_roles = $this->adminUser->getRoles(TRUE);
-    Role::loadOverrideFree(reset($admin_user_roles))->changePermissions([
-      'administer image styles' => FALSE,
-    ])->save();
+    user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => FALSE]);
 
     // Go to manage display page again.
     $this->drupalGet("admin/structure/types/manage/article/display/default");
@@ -396,9 +387,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->assertSession()->linkByHrefNotExists(Url::fromRoute('entity.image_style.collection')->toString(), 'Link to image styles configuration is absent when permissions are insufficient');
 
     // Restore 'administer image styles' permission to testing admin user.
-    Role::loadOverrideFree(reset($admin_user_roles))->changePermissions([
-      'administer image styles' => TRUE,
-    ])->save();
+    user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => TRUE]);
 
     // Create a new node with an image attached.
     $test_image = current($this->drupalGetTestFiles('image'));

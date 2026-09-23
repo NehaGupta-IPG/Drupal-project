@@ -32,7 +32,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * @internal
  */
 #[Group('jsonapi')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class JsonApiRegressionTest extends JsonApiFunctionalTestBase {
 

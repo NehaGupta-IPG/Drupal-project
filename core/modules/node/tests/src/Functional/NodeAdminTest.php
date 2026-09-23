@@ -11,7 +11,6 @@ use Drupal\node\NodeInterface;
 use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\user\RoleInterface;
 use Drupal\node\NodeAccessRebuild;
-use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -71,9 +70,7 @@ class NodeAdminTest extends NodeTestBase {
     // Remove the "view own unpublished content" permission which is set
     // by default for authenticated users so we can test this permission
     // correctly.
-    Role::loadOverrideFree(RoleInterface::AUTHENTICATED_ID)->revokePermissions([
-      'view own unpublished content',
-    ])->save();
+    user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['view own unpublished content']);
 
     $this->adminUser = $this->drupalCreateUser([
       'access administration pages',
@@ -177,7 +174,7 @@ class NodeAdminTest extends NodeTestBase {
     $this->drupalGet('admin/content');
     $this->assertSession()->statusCodeEquals(200);
 
-    $node_type_labels = $this->getNodeElementsByXpath('//td[contains(@class, "views-field-type")]');
+    $node_type_labels = $this->xpath('//td[contains(@class, "views-field-type")]');
     $delta = 0;
     foreach ($nodes as $node) {
       $this->assertSession()->linkByHrefExists('node/' . $node->id());

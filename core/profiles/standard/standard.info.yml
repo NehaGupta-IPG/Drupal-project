@@ -31,4 +31,5 @@ install:
   - automated_cron
   - announcements_feed
 themes:
-  - default_admin
+  - olivero
+  - claro

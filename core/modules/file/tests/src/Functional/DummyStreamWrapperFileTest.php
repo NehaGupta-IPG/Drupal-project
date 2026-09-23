@@ -31,7 +31,7 @@ class DummyStreamWrapperFileTest extends FileManagedTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * The user account.
+   * @var \Drupal\user\UserInterface
    */
   protected UserInterface $account;
 

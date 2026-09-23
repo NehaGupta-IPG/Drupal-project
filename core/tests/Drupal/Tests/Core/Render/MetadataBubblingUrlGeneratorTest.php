@@ -29,6 +29,8 @@ class MetadataBubblingUrlGeneratorTest extends UrlGeneratorTest {
 
   /**
    * The URL generator.
+   *
+   * @var \Drupal\Core\Routing\UrlGeneratorInterface|\Drupal\Core\Render\MetadataBubblingUrlGenerator
    */
   protected UrlGeneratorInterface $urlGenerator;
 

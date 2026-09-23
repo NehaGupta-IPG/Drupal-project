@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Asset;
 
-use Drupal\Component\Graph\Graph;
-
 /**
  * Resolves the dependencies of asset (CSS/JavaScript) libraries.
  */
@@ -15,6 +13,13 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
    * @var \Drupal\Core\Asset\LibraryDiscoveryInterface
    */
   protected $libraryDiscovery;
+
+  /**
+   * The libraries dependencies.
+   *
+   * @var array
+   */
+  protected $librariesDependencies = [];
 
   /**
    * Constructs a new LibraryDependencyResolver instance.
@@ -30,20 +35,14 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
    * {@inheritdoc}
    */
   public function getLibrariesWithDependencies(array $libraries) {
-    $libraries_graph = $this->doGetDependencies($libraries);
-    $libraries_graph = $this->doProcessBeforeAfter($libraries_graph);
-
-    $graph_object = new Graph($libraries_graph);
-    $graph = $graph_object->searchAndSort();
-
-    uasort($graph, function ($a, $b) {
-      if ($a['weight'] == $b['weight']) {
-        return 0;
+    $return = [];
+    foreach ($libraries as $library) {
+      if (!isset($this->librariesDependencies[$library])) {
+        $this->librariesDependencies[$library] = $this->doGetDependencies([$library]);
       }
-      return ($a['weight'] < $b['weight']) ? 1 : -1;
-    });
-
-    return array_keys($graph);
+      $return += $this->librariesDependencies[$library];
+    }
+    return array_values($return);
   }
 
   /**
@@ -51,67 +50,29 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
    *
    * Helper method for ::getLibrariesWithDependencies().
    *
-   * @param string[] $libraries
-   *   A list of libraries in the order they should be loaded.
-   * @param array $graph
-   *   The graph of libraries that is being built recursively.
+   * @param string[] $libraries_with_unresolved_dependencies
+   *   A list of libraries, with unresolved dependencies, in the order they
+   *   should be loaded.
+   * @param string[] $final_libraries
+   *   The final list of libraries (the return value) that is being built
+   *   recursively.
    *
    * @return string[]
    *   A list of libraries, in the order they should be loaded, including their
    *   dependencies.
    */
-  protected function doGetDependencies(array $libraries, array $graph = []) {
-    foreach ($libraries as $library) {
-      if (!isset($graph[$library])) {
+  protected function doGetDependencies(array $libraries_with_unresolved_dependencies, array $final_libraries = []) {
+    foreach ($libraries_with_unresolved_dependencies as $library) {
+      if (!isset($final_libraries[$library])) {
         [$extension, $name] = explode('/', $library, 2);
         $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
-        if ($definition) {
-          $graph[$library]['edges'] = [];
-        }
-
         if (!empty($definition['dependencies'])) {
-          foreach ($definition['dependencies'] as $dependency) {
-            $graph[$library]['edges'][$dependency] = $dependency;
-          }
-
-          $graph = $this->doGetDependencies($definition['dependencies'], $graph);
+          $final_libraries = $this->doGetDependencies($definition['dependencies'], $final_libraries);
         }
+        $final_libraries[$library] = $library;
       }
     }
-    return $graph;
-  }
-
-  /**
-   * Processes before and after settings for the libraries graph.
-   *
-   * @param array $graph
-   *   The libraries graph array.
-   *
-   * @return array
-   *   The libraries graph with before and after processed.
-   */
-  protected function doProcessBeforeAfter($graph): array {
-    foreach ($graph as $library => $data) {
-      [$extension, $name] = explode('/', $library, 2);
-      $definition = $this->libraryDiscovery->getLibraryByName($extension, $name) + [
-        'after' => [],
-        'before' => [],
-      ];
-
-      foreach ($definition['after'] as $after) {
-        if (isset($graph[$after])) {
-          $graph[$library]['edges'][$after] = $after;
-        }
-      }
-
-      foreach ($definition['before'] as $before) {
-        if (isset($graph[$before])) {
-          $graph[$before]['edges'][$library] = $library;
-        }
-      }
-    }
-
-    return $graph;
+    return $final_libraries;
   }
 
   /**
@@ -120,14 +81,15 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
   public function getMinimalRepresentativeSubset(array $libraries) {
     assert(count($libraries) === count(array_unique($libraries)), '$libraries can\'t contain duplicate items.');
 
-    $graph = $this->doGetDependencies($libraries);
-
-    $libraries_to_exclude = [];
-    foreach ($graph as $vertex) {
-      $libraries_to_exclude += $vertex['edges'];
+    // Determine each library's dependencies.
+    $all_dependencies = [];
+    foreach ($libraries as $library) {
+      $with_deps = $this->getLibrariesWithDependencies([$library]);
+      // We don't need library itself listed in the dependencies.
+      $all_dependencies = array_unique(array_merge($all_dependencies, array_diff($with_deps, [$library])));
     }
 
-    return array_values(array_diff($libraries, $libraries_to_exclude));
+    return array_values(array_diff($libraries, array_intersect($all_dependencies, $libraries)));
   }
 
 }

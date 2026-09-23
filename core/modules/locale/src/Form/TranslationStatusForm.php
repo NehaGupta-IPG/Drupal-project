@@ -13,9 +13,6 @@ use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleFetch;
 use Drupal\locale\LocaleProjectRepository;
 use Drupal\locale\LocaleSource;
-use Drupal\locale\LocaleLanguages;
-use Drupal\locale\Model\SourceType;
-use Drupal\locale\Model\TranslationUpdateMode;
 
 /**
  * Provides a translation status form.
@@ -29,10 +26,10 @@ class TranslationStatusForm extends FormBase {
     protected StateInterface $state,
     protected TimeInterface $time,
     protected LocaleFetch $localeFetch,
-    protected LocaleConfigBatch $localeConfigBatch,
+    protected readonly LocaleConfigBatch $localeConfigBatch,
     protected LocaleSource $localeSource,
-    protected LocaleLanguages $localeLanguages,
-  ) {}
+  ) {
+  }
 
   /**
    * {@inheritdoc}
@@ -47,7 +44,7 @@ class TranslationStatusForm extends FormBase {
    * @ingroup forms
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $languages = $this->localeLanguages->getTranslatableLanguages();
+    $languages = locale_translatable_language_list();
     $sources = $this->localeSource->loadSources();
     $options = [];
     $languages_update = [];
@@ -140,7 +137,7 @@ class TranslationStatusForm extends FormBase {
       '#multiple' => TRUE,
       '#required' => TRUE,
       '#not_found' => $languages_not_found,
-      '#after_build' => ['::translationLanguageTable'],
+      '#after_build' => ['locale_translation_language_table'],
     ];
 
     $form['#attached']['library'][] = 'locale/drupal.locale.admin';
@@ -187,8 +184,12 @@ class TranslationStatusForm extends FormBase {
           ];
         }
         // Translation update found for this project-language combination.
-        elseif ($project_info->isUpdateAvailable()) {
-          $recent = $project_info->getFile($project_info->getType());
+        elseif ($project_info->type == LOCALE_TRANSLATION_LOCAL || $project_info->type == LOCALE_TRANSLATION_REMOTE) {
+          $local = $project_info->files[LOCALE_TRANSLATION_LOCAL] ?? NULL;
+          $remote = $project_info->files[LOCALE_TRANSLATION_REMOTE] ?? NULL;
+          $local_timestamp = $local->timestamp ?? 0;
+          $remote_timestamp = $remote->timestamp ?? 0;
+          $recent = $local_timestamp < $remote_timestamp ? $remote : $local;
           $updates[$langcode]['updates'][] = [
             'name' => $project_info->name == 'drupal' ? $this->t('Drupal core') : $project_data[$project_info->name]->info['name'],
             'version' => $project_info->version,
@@ -209,17 +210,17 @@ class TranslationStatusForm extends FormBase {
    * This method will produce debug information including the respective path(s)
    * based on this setting.
    *
-   * @param \Drupal\locale\LocaleTranslationSource $project_info
+   * @param array $project_info
    *   An array which is the project information of the source.
    *
    * @return string
    *   The string which contains debug information.
    */
   protected function createInfoString($project_info) {
-    $remote_path = $project_info->getFile(SourceType::Remote)->uri ?? FALSE;
-    $local_path = $project_info->getFile(SourceType::Local)->uri ?? FALSE;
+    $remote_path = $project_info->files['remote']->uri ?? FALSE;
+    $local_path = $project_info->files['local']->uri ?? FALSE;
 
-    if ($this->configFactory()->get('locale.settings')->get('translation.use_source') == TranslationUpdateMode::RemoteAndLocal->value && $remote_path && $local_path) {
+    if (locale_translation_use_remote_source() && $remote_path && $local_path) {
       return $this->t('File not found at %remote_path nor at %local_path', [
         '%remote_path' => $remote_path,
         '%local_path' => $local_path,
@@ -259,8 +260,7 @@ class TranslationStatusForm extends FormBase {
     // translation updates. If the status is expired we clear it and run a batch
     // to update the status and then fetch the translation updates.
     $last_checked = $this->localeSource->getLastChecked();
-    // @todo Review ttl https://www.drupal.org/project/drupal/issues/3619926
-    if ($last_checked < $this->time->getRequestTime() - 600) {
+    if ($last_checked < $this->time->getRequestTime() - LOCALE_TRANSLATION_STATUS_TTL) {
       $this->localeSource->clearSources();
       $batch = $this->localeFetch->buildUpdateBatch([], $langcodes, $options);
       batch_set($batch);
@@ -274,28 +274,6 @@ class TranslationStatusForm extends FormBase {
         batch_set($batch);
       }
     }
-  }
-
-  /**
-   * Form element callback: After build changes to the language update table.
-   *
-   * Adds labels to the languages and removes checkboxes from languages from
-   * which translation files could not be found.
-   *
-   * @param array $form_element
-   *   Form element for the translation table.
-   *
-   * @return array
-   *   Populated table.
-   */
-  public function translationLanguageTable(array $form_element): array {
-    // Remove checkboxes of languages without updates.
-    if ($form_element['#not_found']) {
-      foreach ($form_element['#not_found'] as $langcode) {
-        $form_element[$langcode] = [];
-      }
-    }
-    return $form_element;
   }
 
 }

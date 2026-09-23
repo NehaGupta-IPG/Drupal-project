@@ -30,6 +30,8 @@ class PathExtractorTest extends UnitTestCase {
 
   /**
    * The PathExtractor instance.
+   *
+   * @var \Drupal\Core\Theme\Plugin\IconExtractor\PathExtractor
    */
   private PathExtractor $pathExtractorPlugin;
 

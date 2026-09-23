@@ -430,6 +430,7 @@ class GDToolkit extends ImageToolkitBase {
       );
     }
     if ($unsupported_formats) {
+      $requirements['version']['severity'] = RequirementSeverity::Warning;
       $unsupported = $this->formatPlural(
         count($unsupported_formats),
         'Unsupported image file format: %formats.',

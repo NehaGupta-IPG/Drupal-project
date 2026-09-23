@@ -13,7 +13,6 @@ use Drupal\responsive_image\Plugin\Field\FieldFormatter\ResponsiveImageFormatter
 use Drupal\responsive_image\ResponsiveImageStyleInterface;
 use Drupal\Tests\image\Functional\ImageFieldTestBase;
 use Drupal\Tests\TestFileCreationTrait;
-use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -101,9 +100,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   public function testResponsiveImageFieldFormattersPrivate(): void {
     $this->addTestImageStyleMappings();
     // Remove access content permission from anonymous users.
-    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions([
-      'access content' => FALSE,
-    ])->save();
+    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, ['access content' => FALSE]);
     $this->doTestResponsiveImageFieldFormatters('private');
   }
 

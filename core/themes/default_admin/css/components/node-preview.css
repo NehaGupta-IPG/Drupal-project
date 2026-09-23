@@ -4,7 +4,6 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
-
 .node-preview-container {
   position: sticky;
   z-index: 501;
@@ -20,7 +19,7 @@
   font-size: var(--admin-font-size-xs);
   inset-block-start: 0;
 
-  .dark-mode & {
+  .gin--dark-mode & {
     background: rgb(27, 27, 29, 0.98);
 
     @supports (backdrop-filter: blur()) {
@@ -28,14 +27,18 @@
     }
   }
 
-  .high-contrast-mode & {
+  .gin--high-contrast-mode & {
     background: var(--admin-color-bg);
     backdrop-filter: none;
   }
 
-  .admin--navigation & {
+  .gin--navigation & {
     width: calc(100% - var(--admin-theme-toolbar-x-offset));
     margin-inline-start: var(--admin-theme-toolbar-x-offset);
+  }
+
+  .gin-layout-container {
+    box-sizing: border-box;
   }
 
   .node-preview-backlink,
@@ -113,8 +116,10 @@
   }
 
   *:focus {
-    outline: var(--focus-outline);
-    outline-offset: var(--outline-offset);
+    outline: none;
+    box-shadow:
+      0 0 0 1px var(--admin-color-focus-border),
+      0 0 0 4px var(--admin-color-focus);
   }
 
   @supports (backdrop-filter: blur()) {
@@ -124,7 +129,6 @@
     backdrop-filter: blur(0.75rem);
   }
 }
-
 .node-preview-form-select {
   display: flex;
   flex-wrap: wrap;

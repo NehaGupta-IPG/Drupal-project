@@ -161,7 +161,6 @@ class StubReflectionFactory extends ReflectionFactory {
  */
 class ArgumentsPluginId {
 
-  // @phpstan-ignore constructor.unusedParameter
   public function __construct($plugin_id) {
     // No-op.
   }
@@ -175,7 +174,6 @@ class ArgumentsPluginId {
  */
 class ArgumentsMany {
 
-  // @phpstan-ignore constructor.unusedParameter,constructor.unusedParameter,constructor.unusedParameter,constructor.unusedParameter,constructor.unusedParameter
   public function __construct($configuration, $plugin_definition, $plugin_id, $foo = 'default_value', $what_am_i_doing_here = 'what_default') {
     // No-op.
   }
@@ -189,7 +187,6 @@ class ArgumentsMany {
  */
 class ArgumentsConfigArrayKey {
 
-  // @phpstan-ignore constructor.unusedParameter
   public function __construct($config_name) {
     // No-op.
   }
@@ -203,7 +200,6 @@ class ArgumentsConfigArrayKey {
  */
 class ArgumentsAllNull {
 
-  // @phpstan-ignore constructor.unusedParameter,constructor.unusedParameter,constructor.unusedParameter,constructor.unusedParameter
   public function __construct($charismatic, $demure, $delightful, $electrostatic) {
     // No-op.
   }

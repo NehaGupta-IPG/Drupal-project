@@ -28,6 +28,7 @@ final class AnnouncementsCacheTest extends BrowserTestBase {
     'announcements_feed',
     'dynamic_page_cache',
     'node',
+    'toolbar',
   ];
 
   /**
@@ -37,12 +38,14 @@ final class AnnouncementsCacheTest extends BrowserTestBase {
     $node_type = $this->drupalCreateContentType();
     $node = $this->drupalCreateNode(['type' => $node_type->id()]);
     $this->drupalLogin($this->drupalCreateUser([
+      'access toolbar',
       'access announcements',
     ]));
     $this->drupalGet($node->toUrl());
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'MISS');
     // Reload the page, it should be cached now.
     $this->drupalGet($node->toUrl());
+    $this->assertSession()->elementExists('css', '[data-drupal-announce-trigger]');
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
   }
 

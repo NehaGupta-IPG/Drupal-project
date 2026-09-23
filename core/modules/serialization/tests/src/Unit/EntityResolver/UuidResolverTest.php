@@ -9,7 +9,6 @@ use Drupal\serialization\EntityResolver\UuidResolver;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -28,8 +27,10 @@ class UuidResolverTest extends UnitTestCase {
 
   /**
    * The mock entity repository service.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected EntityRepositoryInterface&MockObject $entityRepository;
+  protected $entityRepository;
 
   /**
    * {@inheritdoc}

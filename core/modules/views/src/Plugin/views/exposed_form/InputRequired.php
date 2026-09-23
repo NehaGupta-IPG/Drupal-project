@@ -19,9 +19,19 @@ use Drupal\views\Attribute\ViewsExposedForm;
 )]
 class InputRequired extends ExposedFormPluginBase {
 
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected FilterFormatRepositoryInterface $formatRepository) {
+  /**
+   * The filter format repository service.
+   */
+  protected FilterFormatRepositoryInterface $formatRepository;
+
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ?FilterFormatRepositoryInterface $format_repository = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
+    if (!$format_repository) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $format_repository argument is deprecated in drupal:11.4.0 and the $format_repository argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3035368', E_USER_DEPRECATED);
+      $format_repository = \Drupal::service(FilterFormatRepositoryInterface::class);
+    }
+    $this->formatRepository = $format_repository;
   }
 
   /**

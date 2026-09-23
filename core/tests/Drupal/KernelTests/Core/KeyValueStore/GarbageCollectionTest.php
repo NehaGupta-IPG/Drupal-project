@@ -36,12 +36,12 @@ class GarbageCollectionTest extends KernelTestBase {
 
     // Manually expire the data.
     for ($i = 0; $i <= 3; $i++) {
-      $connection->upsert('key_value_expire')
-        ->key(['name', 'collection'])
-        ->fields([
+      $connection->merge('key_value_expire')
+        ->keys([
           'name' => 'key_' . $i,
           'collection' => $collection,
-          'value' => '',
+        ])
+        ->fields([
           'expire' => \Drupal::time()->getRequestTime() - 1,
         ])
         ->execute();

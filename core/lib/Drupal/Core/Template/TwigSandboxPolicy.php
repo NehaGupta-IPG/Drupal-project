@@ -75,7 +75,7 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
   /**
    * {@inheritdoc}
    */
-  public function checkSecurity($tags, $filters, $functions, array $tests = []): void {}
+  public function checkSecurity($tags, $filters, $functions): void {}
 
   /**
    * {@inheritdoc}

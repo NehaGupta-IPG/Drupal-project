@@ -26,7 +26,17 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPluginInterface {
 
   /**
-   * Drupal root.
+   * The file URL generator service.
+   */
+  protected FileUrlGeneratorInterface $fileUrlGenerator;
+
+  /**
+   * The module handler service.
+   */
+  protected ModuleHandlerInterface $moduleHandler;
+
+  /**
+   * The app root directory path.
    */
   protected string $root;
 
@@ -34,13 +44,27 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
     array $configuration,
     $plugin_id,
     $plugin_definition,
-    protected FileUrlGeneratorInterface $fileUrlGenerator,
-    protected ModuleHandlerInterface $moduleHandler,
+    ?FileUrlGeneratorInterface $file_url_generator = NULL,
+    ?ModuleHandlerInterface $module_handler = NULL,
     #[Autowire(param: 'app.root')]
-    string $root,
+    ?string $root = NULL,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
+    if (!$file_url_generator) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $file_url_generator argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+      $file_url_generator = \Drupal::service('file_url_generator');
+    }
+    $this->fileUrlGenerator = $file_url_generator;
+    if (!$module_handler) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $module_handler argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+      $module_handler = \Drupal::moduleHandler();
+    }
+    $this->moduleHandler = $module_handler;
+    if (!$root) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $root argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+      $root = \Drupal::root();
+    }
     $this->root = $root;
   }
 

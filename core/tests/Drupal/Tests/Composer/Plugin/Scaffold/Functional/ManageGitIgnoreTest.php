@@ -115,7 +115,10 @@ class ManageGitIgnoreTest extends TestCase {
     $this->assertFileExists($sut . '/docroot/index.php');
     $expected = <<<EOT
 /build
+/.csslintrc
 /.editorconfig
+/.eslintignore
+/.eslintrc.json
 /.gitattributes
 /.ht.router.php
 /autoload.php
@@ -223,7 +226,10 @@ SH;
 
     $expected = <<<EOT
 Scaffolding files for fixtures/drupal-assets-fixture:
+  - Copy [web-root]/.csslintrc from assets/.csslintrc
   - Copy [web-root]/.editorconfig from assets/.editorconfig
+  - Copy [web-root]/.eslintignore from assets/.eslintignore
+  - Copy [web-root]/.eslintrc.json from assets/.eslintrc.json
   - Copy [web-root]/.gitattributes from assets/.gitattributes
   - Copy [web-root]/.ht.router.php from assets/.ht.router.php
   - Skip [web-root]/.htaccess: overridden in fixtures/drupal-composer-drupal-project

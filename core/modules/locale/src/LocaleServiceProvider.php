@@ -22,9 +22,6 @@ class LocaleServiceProvider extends ServiceProviderBase {
         $container->setParameter('language.translate_english', $config['translate_english'] ?? TRUE);
       }
     }
-
-    $container->getDefinition('string_translation')
-      ->setClass(TranslationManager::class);
   }
 
 }

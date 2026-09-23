@@ -60,7 +60,7 @@ class BlockViewBuilderTest extends KernelTestBase {
 
     // Create a block with only required values.
     $this->block = $this->controller->create([
-      'id' => 'test_block_0',
+      'id' => 'test_block',
       'theme' => 'stark',
       'plugin' => 'test_cache',
     ]);
@@ -146,37 +146,6 @@ class BlockViewBuilderTest extends KernelTestBase {
   }
 
   /**
-   * Tests that #attributes are pulled up when no #type or #theme is set.
-   *
-   * This covers the BC case where a block plugin returns a plain render array
-   * (no #type, no #theme) with #attributes at the top level. Those attributes
-   * must be hoisted to the block wrapper element.
-   *
-   * @see \Drupal\block\BlockViewBuilder::preRender()
-   */
-  public function testAttributesPulledUpWithoutTypeOrTheme(): void {
-    \Drupal::keyValue('block_test')->set('content', 'Block content');
-    \Drupal::keyValue('block_test')->set('attributes', ['class' => ['my-wrapper-class'], 'data-foo' => 'bar']);
-
-    $entity = $this->controller->create([
-      'id' => 'test_block_attrs',
-      'theme' => 'stark',
-      'plugin' => 'test_html',
-    ]);
-    $entity->save();
-
-    $builder = \Drupal::entityTypeManager()->getViewBuilder('block');
-    $output = $builder->view($entity, 'block');
-    $rendered = (string) $this->renderer->renderRoot($output);
-
-    // The wrapper <div> must carry the plugin's #attributes.
-    $this->assertStringContainsString('my-wrapper-class', $rendered);
-    $this->assertStringContainsString('data-foo="bar"', $rendered);
-    // The inner content must still be present.
-    $this->assertStringContainsString('Block content', $rendered);
-  }
-
-  /**
    * Tests block render cache handling.
    */
   public function testBlockViewBuilderCache(): void {
@@ -185,7 +154,7 @@ class BlockViewBuilderTest extends KernelTestBase {
 
     // Create an empty block.
     $this->block = $this->controller->create([
-      'id' => 'test_block_0',
+      'id' => 'test_block',
       'theme' => 'stark',
       'plugin' => 'test_cache',
     ]);
@@ -237,7 +206,7 @@ class BlockViewBuilderTest extends KernelTestBase {
 
     // Test that a cache entry is created.
     $build = $this->getBlockRenderArray();
-    $cache_keys = ['entity_view', 'block', 'test_block_0'];
+    $cache_keys = ['entity_view', 'block', 'test_block'];
     $this->renderer->renderRoot($build);
     $this->assertNotEmpty($cache_bin->get($cache_keys, CacheableMetadata::createFromRenderArray($build)), 'The block render element has been cached.');
 
@@ -270,7 +239,7 @@ class BlockViewBuilderTest extends KernelTestBase {
 
     // Create a block with a plugin implementing CacheOptionalInterface.
     $this->block = $this->controller->create([
-      'id' => 'test_block_0',
+      'id' => 'test_block',
       'theme' => 'stark',
       'plugin' => 'test_cache_optional',
     ]);
@@ -288,7 +257,7 @@ class BlockViewBuilderTest extends KernelTestBase {
 
     // Test that an entry for the block is not created in the render cache.
     $build = $this->getBlockRenderArray();
-    $cache_keys = ['entity_view', 'block', 'test_block_0'];
+    $cache_keys = ['entity_view', 'block', 'test_block'];
     $markup = $this->renderer->renderRoot($build);
     $this->assertTrue(str_contains((string) $markup, 'This is content for a block that is not render cached.'));
     $this->assertFalse($cache_bin->get($cache_keys, CacheableMetadata::createFromRenderArray($build)));
@@ -344,7 +313,7 @@ class BlockViewBuilderTest extends KernelTestBase {
     $request_method = $request->server->get('REQUEST_METHOD');
     $request->setMethod('GET');
 
-    $default_keys = ['entity_view', 'block', 'test_block_0'];
+    $default_keys = ['entity_view', 'block', 'test_block'];
     $default_contexts = [];
     $default_tags = ['config:block_list'];
     $default_max_age = Cache::PERMANENT;

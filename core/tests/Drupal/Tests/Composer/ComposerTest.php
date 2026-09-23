@@ -7,7 +7,6 @@ namespace Drupal\Tests\Composer;
 use Drupal\Composer\Composer;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -20,10 +19,9 @@ class ComposerTest extends UnitTestCase {
   /**
    * Verify that Composer::ensureComposerVersion() doesn't break.
    */
-  #[DoesNotPerformAssertions]
   public function testEnsureComposerVersion(): void {
     try {
-      Composer::ensureComposerVersion();
+      $this->assertNull(Composer::ensureComposerVersion());
     }
     catch (\RuntimeException $e) {
       $this->assertMatchesRegularExpression('/Drupal core development requires Composer 2.3.5, but Composer /', $e->getMessage());

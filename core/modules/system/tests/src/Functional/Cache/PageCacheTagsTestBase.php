@@ -15,14 +15,6 @@ abstract class PageCacheTagsTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'page_cache',
-    'dynamic_page_cache',
-  ];
-
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
 

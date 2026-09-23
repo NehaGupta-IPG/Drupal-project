@@ -23,6 +23,8 @@ class CallableResolverTest extends UnitTestCase {
 
   /**
    * The callable resolver.
+   *
+   * @var \Drupal\Core\Utility\CallableResolver
    */
   protected CallableResolver $resolver;
 
@@ -35,11 +37,15 @@ class CallableResolverTest extends UnitTestCase {
     $container = new ContainerBuilder();
     $container->set('test_service', $this);
 
-    $this->resolver = new CallableResolver(new ClassResolver($container));
+    $class_resolver = new ClassResolver($container);
+
+    $this->resolver = new CallableResolver($class_resolver);
   }
 
   /**
    * Tests callback resolver.
+   *
+   * @legacy-covers ::getCallableFromDefinition
    */
   public function testCallbackResolver(): void {
     $cases = [
@@ -47,7 +53,7 @@ class CallableResolverTest extends UnitTestCase {
         function (string $suffix): string {
           return __METHOD__ . '+' . $suffix;
         },
-        '{closure:Drupal\Tests\Core\Utility\CallableResolverTest::testCallbackResolver():' . (__LINE__ - 3) . '}',
+        '{closure:Drupal\Tests\Core\Utility\CallableResolverTest::testCallbackResolver():53}',
       ],
       'First-class callable function' => [
         $this->method(...),
@@ -59,7 +65,7 @@ class CallableResolverTest extends UnitTestCase {
       ],
       'Arrow function' => [
         fn($suffix): string => __METHOD__ . '+' . $suffix,
-        '{closure:Drupal\Tests\Core\Utility\CallableResolverTest::testCallbackResolver():' . (__LINE__ - 1) . '}',
+        '{closure:Drupal\Tests\Core\Utility\CallableResolverTest::testCallbackResolver():67}',
       ],
       'Static function' => [
         '\Drupal\Tests\Core\Utility\NoInstantiationMockStaticCallable::staticMethod',
@@ -113,7 +119,7 @@ class CallableResolverTest extends UnitTestCase {
   #[DataProvider('callableResolverExceptionHandlingTestCases')]
   public function testCallbackResolverExceptionHandling(string|array $definition, string $exception_class, string $exception_message): void {
     $this->expectException($exception_class);
-    $this->expectExceptionMessageIs($exception_message);
+    $this->expectExceptionMessage($exception_message);
     $this->resolver->getCallableFromDefinition($definition);
   }
 

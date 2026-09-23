@@ -22,7 +22,7 @@ class SingleVisibleProfileTest extends InstallerTestBase {
    *
    * @var string
    */
-  protected $profile;
+  protected $profile = NULL;
 
   /**
    * {@inheritdoc}

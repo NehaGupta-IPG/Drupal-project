@@ -11,7 +11,6 @@ use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleFetch;
 use Drupal\locale\LocaleProjectRepository;
 use Drupal\locale\LocaleSource;
-use Drupal\locale\LocaleLanguages;
 
 /**
  * Extension hook implementations for locale.
@@ -25,7 +24,6 @@ class LocaleExtensionHooks {
     protected readonly LocaleFileManager $localeFileManager,
     protected readonly LocaleSource $localeSource,
     protected readonly ConfigFactoryInterface $configFactory,
-    protected readonly LocaleLanguages $localeLanguages,
   ) {}
 
   /**
@@ -39,7 +37,7 @@ class LocaleExtensionHooks {
     // Skip running the translation imports if in the installer,
     // because it would break out of the installer flow. We have
     // built-in support for translation imports in the installer.
-    if (!InstallerKernel::installationAttempted() && $this->localeLanguages->getTranslatableLanguages()) {
+    if (!InstallerKernel::installationAttempted() && locale_translatable_language_list()) {
       if ($this->configFactory->get('locale.settings')->get('translation.import_enabled')) {
 
         // Update the list of translatable projects and start the import batch.
@@ -95,7 +93,7 @@ class LocaleExtensionHooks {
    */
   protected function deleteTranslationHistory(array $extensions): void {
 
-    if ($this->localeLanguages->getTranslatableLanguages()) {
+    if (locale_translatable_language_list()) {
       // Only when projects are removed, the translation files and records will
       // be deleted. Not every uninstalled module will remove a project, e.g.,
       // sub modules.

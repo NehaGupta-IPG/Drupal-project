@@ -6,6 +6,7 @@ namespace Drupal\Tests\Composer\Generator;
 
 use Drupal\Composer\Generator\Builder\DrupalCoreRecommendedBuilder;
 use Drupal\Composer\Generator\Builder\DrupalDevDependenciesBuilder;
+use Drupal\Composer\Generator\Builder\DrupalPinnedDevDependenciesBuilder;
 use Drupal\Composer\Generator\PackageGenerator;
 use Drupal\Composer\Generator\Util\DrupalCoreComposer;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -30,6 +31,11 @@ class MetapackageUpdateTest extends TestCase {
       [
         DrupalDevDependenciesBuilder::class,
         'composer/Metapackage/DevDependencies',
+      ],
+      [
+        // @phpstan-ignore classConstant.deprecatedClass
+        DrupalPinnedDevDependenciesBuilder::class,
+        'composer/Metapackage/PinnedDevDependencies',
       ],
     ];
   }

@@ -52,7 +52,7 @@ class HelpTopicTest extends KernelTestBase {
   protected $noTestUser;
 
   /**
-   * A regular authenticated user without additional permissions.
+   * The anonymous user that will be created.
    *
    * @var \Drupal\user\UserInterface
    */

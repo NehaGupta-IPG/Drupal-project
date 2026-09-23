@@ -107,7 +107,7 @@ YAML;
     $yaml_file_loader = new YamlFileLoader($builder);
 
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs($message);
+    $this->expectExceptionMessage($message);
     $yaml_file_loader->load('vfs://drupal/modules/example/example.yml');
   }
 
@@ -206,7 +206,7 @@ YAML,
    do not:
       do: this: for the love of Foo Bar!
 YAML,
-        'The file "vfs://drupal/modules/example/example.yml" does not contain valid YAML: Unable to parse at line 1 (near "   do not:").',
+        'The file "vfs://drupal/modules/example/example.yml" does not contain valid YAML',
       ],
       'YAML must have expected keys' => [<<<YAML
       "do not":

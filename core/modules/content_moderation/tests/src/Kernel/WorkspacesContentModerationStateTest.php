@@ -317,18 +317,22 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
    * {@inheritdoc}
    */
   protected function createEntity($entity_type_id, $moderation_state = 'published', $create_workflow = TRUE) {
-    return $this->workspaceManager->executeOutsideWorkspace(function () use ($entity_type_id, $moderation_state, $create_workflow) {
+    $entity = $this->workspaceManager->executeOutsideWorkspace(function () use ($entity_type_id, $moderation_state, $create_workflow) {
       return parent::createEntity($entity_type_id, $moderation_state, $create_workflow);
     });
+
+    return $entity;
   }
 
   /**
    * {@inheritdoc}
    */
   protected function createEditorialWorkflow() {
-    return $this->workspaceManager->executeOutsideWorkspace(function () {
+    $workflow = $this->workspaceManager->executeOutsideWorkspace(function () {
       return $this->traitCreateEditorialWorkflow();
     });
+
+    return $workflow;
   }
 
   /**
@@ -344,9 +348,11 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
    * {@inheritdoc}
    */
   protected function createContentType(array $values = [], bool $create_body = TRUE) {
-    return $this->workspaceManager->executeOutsideWorkspace(function () use ($values, $create_body) {
+    $note_type = $this->workspaceManager->executeOutsideWorkspace(function () use ($values, $create_body) {
       return $this->traitCreateContentType($values, $create_body);
     });
+
+    return $note_type;
   }
 
   /**

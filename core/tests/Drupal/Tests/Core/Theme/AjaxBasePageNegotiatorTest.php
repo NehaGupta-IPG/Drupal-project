@@ -76,19 +76,11 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
     $data = [];
     $data['empty'] = [[], FALSE];
     $data['no_theme'] = [['ajax_page_state' => ['theme' => '', 'theme_token' => '']], FALSE];
-    $data['valid_theme_empty_theme_token'] = [
-      [
-        'ajax_page_state' => [
-          'theme' => 'default_admin',
-          'theme_token' => '',
-        ],
-      ],
-      TRUE,
-    ];
+    $data['valid_theme_empty_theme_token'] = [['ajax_page_state' => ['theme' => 'claro', 'theme_token' => '']], TRUE];
     $data['valid_theme_valid_theme_token'] = [
       [
         'ajax_page_state' => [
-          'theme' => 'default_admin',
+          'theme' => 'claro',
           'theme_token' => 'valid_theme_token',
         ],
       ],
@@ -101,7 +93,7 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
    * Tests determine active theme valid token.
    */
   public function testDetermineActiveThemeValidToken(): void {
-    $theme = 'default_admin';
+    $theme = 'claro';
     $theme_token = 'valid_theme_token';
 
     $request = new Request();
@@ -119,7 +111,7 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
    * Tests determine active theme invalid token.
    */
   public function testDetermineActiveThemeInvalidToken(): void {
-    $theme = 'default_admin';
+    $theme = 'claro';
     $theme_token = 'invalid_theme_token';
     $request = new Request();
     $request->attributes->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);

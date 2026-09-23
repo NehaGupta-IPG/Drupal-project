@@ -38,6 +38,9 @@ abstract class BlockResourceTestBase extends ConfigEntityResourceTestBase {
         break;
 
       case 'POST':
+        $this->grantPermissionsToTestedRole(['administer blocks']);
+        break;
+
       case 'PATCH':
         $this->grantPermissionsToTestedRole(['administer blocks']);
         break;
@@ -79,7 +82,7 @@ abstract class BlockResourceTestBase extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getExpectedNormalizedEntity() {
-    return [
+    $normalization = [
       'uuid' => $this->entity->uuid(),
       'id' => 'llama',
       'weight' => 0,
@@ -102,6 +105,8 @@ abstract class BlockResourceTestBase extends ConfigEntityResourceTestBase {
       ],
       'visibility' => [],
     ];
+
+    return $normalization;
   }
 
   /**

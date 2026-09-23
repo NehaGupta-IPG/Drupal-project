@@ -50,8 +50,10 @@ class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
     // Create a definition that specifies some AllowedValues.
     $definition = DataDefinition::create($type);
 
-    foreach ($extra_constraints as $name => $settings) {
-      $definition->addConstraint($name, $settings);
+    if (count($extra_constraints) > 0) {
+      foreach ($extra_constraints as $name => $settings) {
+        $definition->addConstraint($name, $settings);
+      }
     }
 
     $definition->addConstraint('AtLeastOneOf', [

@@ -513,7 +513,7 @@ class BlockComponentRenderArrayTest extends UnitTestCase {
 
     $block->build()->willReturn(NULL);
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessageIs(sprintf('The block "%s" did not return an array', get_class($block->reveal())));
+    $this->expectExceptionMessage(sprintf('The block "%s" did not return an array', get_class($block->reveal())));
     $this->blockManager->createInstance('some_block_id', ['id' => 'some_block_id'])->willReturn($block->reveal());
 
     $component = new SectionComponent('some-uuid', 'some-region', ['id' => 'some_block_id']);

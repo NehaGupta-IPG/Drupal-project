@@ -7,7 +7,6 @@ namespace Drupal\Core\Command;
 use Drupal\Core\Logger\LogMessageParserInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Psr\Log\AbstractLogger;
-use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LogLevel;
@@ -55,7 +54,7 @@ class DrupalConsoleLogger extends AbstractLogger implements LoggerAwareInterface
       RfcLogLevel::NOTICE => LogLevel::NOTICE,
       RfcLogLevel::INFO => LogLevel::INFO,
       RfcLogLevel::DEBUG => LogLevel::DEBUG,
-      default => throw new InvalidArgumentException("Invalid log level: $level"),
+      default => throw new \InvalidArgumentException("Invalid log level: $level"),
     };
   }
 

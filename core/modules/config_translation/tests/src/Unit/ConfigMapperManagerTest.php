@@ -7,7 +7,6 @@ namespace Drupal\Tests\config_translation\Unit;
 use Drupal\config_translation\ConfigMapperManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\Schema\Mapping;
-use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\Language;
@@ -17,7 +16,6 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use Prophecy\Prophet;
 
 /**
@@ -35,8 +33,10 @@ class ConfigMapperManagerTest extends UnitTestCase {
 
   /**
    * The typed configuration manager used for testing.
+   *
+   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected TypedConfigManagerInterface&MockObject $typedConfigManager;
+  protected $typedConfigManager;
 
   /**
    * {@inheritdoc}

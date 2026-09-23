@@ -7,6 +7,8 @@ global:
       css/components/blocks/help/help.css: {}
       css/components/blocks/page-title/page-title.css: {}
       css/components/blocks/language-switcher/language-switcher.css: {}
+      css/components/blocks/search/search.css: {}
+      css/components/blocks/search/search-results.css: {}
       css/components/blocks/articles-aside/articles-aside.css: {}
       css/components/forms/content-moderation.css: {}
       css/components/content/node.css: {}
@@ -35,6 +37,7 @@ global:
       css/components/regions/pre-header/pre-header.css: {}
       css/components/regions/tabs/tabs.css: {}
       css/components/toolbar/toolbar.css: {}
+      css/components/layout_builder/layout-builder.css: {}
   fonts:
     fonts/source-sans-pro-v21-latin-regular.woff2:
       preload: true
@@ -84,6 +87,11 @@ user:
   css:
     component:
       css/components/user/user.css: { weight: -10 }
+
+oneplusfourgrid_section:
+  css:
+    layout:
+      layouts/oneplusfourgrid_section/oneplusfourgrid_section.css: {}
 
 filter:
   version: VERSION
@@ -170,6 +178,12 @@ classy.progress:
   css:
     component:
       css/classy/components/progress.css: { weight: -10 }
+
+classy.search-results:
+  version: VERSION
+  css:
+    component:
+      css/classy/components/search-results.css: {}
 
 drupal.node.preview:
   version: VERSION

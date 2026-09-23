@@ -91,7 +91,7 @@ final class ProjectSecurityRequirement {
    *
    * @see \Drupal\update\UpdateManagerInterface::getProjects()
    * @see \Drupal\update\ProjectSecurityData::getCoverageInfo()
-   * @see \Drupal\update\UpdateCalculator::processProjectInfo()
+   * @see update_process_project_info()
    */
   public static function createFromProjectDataAndSecurityCoverageInfo(array $project_data, array $security_coverage_info) {
     if ($project_data['project_type'] !== 'core' || $project_data['name'] !== 'drupal' || empty($security_coverage_info)) {

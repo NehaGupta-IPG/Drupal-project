@@ -96,12 +96,8 @@ class ModuleRequiredByThemesUninstallValidator implements ConfigImportModuleUnin
   protected function getThemesDependingOnModule($module) {
     $installed_themes = $this->themeExtensionList->getAllInstalledInfo();
     $themes_depending_on_module = array_map(function ($theme) use ($module) {
-      foreach ($theme['dependencies'] as $dependency) {
-        // A dependency may be prefixed with its project, for example
-        // 'drupal:node'. Compare only the dependency name.
-        if (Dependency::createFromString($dependency)->getName() === $module) {
-          return $theme['name'];
-        }
+      if (in_array($module, $theme['dependencies'])) {
+        return $theme['name'];
       }
     }, $installed_themes);
 

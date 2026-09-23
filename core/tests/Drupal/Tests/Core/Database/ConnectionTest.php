@@ -10,6 +10,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\StatementPrefetchIterator;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
+use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -53,7 +54,8 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerPrefixRoundTrip')]
   public function testPrefixRoundTrip(array $expected, string $prefix_info): void {
-    $connection = new StubConnection($this->createStub(\PDO::class), []);
+    $mock_pdo = $this->createStub(StubPDO::class);
+    $connection = new StubConnection($mock_pdo, []);
 
     // setPrefix() is protected, so we make it accessible with reflection.
     $reflection = new \ReflectionClass('Drupal\Tests\Core\Database\Stub\StubConnection');
@@ -116,7 +118,8 @@ class ConnectionTest extends UnitTestCase {
     string $query,
     array $quote_identifier = ['"', '"'],
   ): void {
-    $connection = new StubConnection($this->createStub(\PDO::class), ['prefix' => $prefix_info], $quote_identifier);
+    $mock_pdo = $this->createStub(StubPDO::class);
+    $connection = new StubConnection($mock_pdo, ['prefix' => $prefix_info], $quote_identifier);
     $this->assertEquals($expected, $connection->prefixTables($query));
   }
 
@@ -177,6 +180,11 @@ class ConnectionTest extends UnitTestCase {
         'Drupal\Core\Database\Schema',
         'Drupal\CoreFake\Driver\Database\CoreFake',
         'Schema',
+      ],
+      [
+        'SearchQuery',
+        'Drupal\CoreFake\Driver\Database\CoreFake',
+        'SearchQuery',
       ],
       [
         'Drupal\Core\Database\Query\Select',
@@ -246,6 +254,11 @@ class ConnectionTest extends UnitTestCase {
         'Schema',
       ],
       [
+        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\SearchQuery',
+        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
+        'SearchQuery',
+      ],
+      [
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\Select',
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
         'Select',
@@ -295,6 +308,16 @@ class ConnectionTest extends UnitTestCase {
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
         '\Drupal\Core\Database\Query\TableSortExtender',
       ],
+      [
+        'Drupal\search\SearchQuery',
+        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
+        'Drupal\search\SearchQuery',
+      ],
+      [
+        '\Drupal\search\SearchQuery',
+        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
+        '\Drupal\search\SearchQuery',
+      ],
     ];
   }
 
@@ -308,8 +331,9 @@ class ConnectionTest extends UnitTestCase {
     $additional_class_loader->addPsr4("Drupal\\core_fake\\Driver\\Database\\CoreFakeWithAllCustomClasses\\", __DIR__ . "/../../../../../tests/fixtures/database_drivers/module/core_fake/src/Driver/Database/CoreFakeWithAllCustomClasses");
     $additional_class_loader->register(TRUE);
 
-    $connection = new StubConnection($this->createStub(\PDO::class), ['namespace' => $namespace]);
-    match ($class) {
+    $mock_pdo = $this->createStub(StubPDO::class);
+    $connection = new StubConnection($mock_pdo, ['namespace' => $namespace]);
+    match($class) {
       'Install\\Tasks',
       'ExceptionHandler',
       'Select',
@@ -321,7 +345,7 @@ class ConnectionTest extends UnitTestCase {
       'Truncate',
       'Schema',
       'Condition',
-      'Transaction' => $this->expectExceptionMessageIs('Calling Drupal\\Core\\Database\\Connection::getDriverClass() for \'' . $class . '\' is not supported. Use standard autoloading in the methods that return database operations. See https://www.drupal.org/node/3217534'),
+      'Transaction' => $this->expectExceptionMessage('Calling Drupal\\Core\\Database\\Connection::getDriverClass() for \'' . $class . '\' is not supported. Use standard autoloading in the methods that return database operations. See https://www.drupal.org/node/3217534'),
       default => NULL,
     };
     $this->assertEquals($expected, $connection->getDriverClass($class));
@@ -351,7 +375,8 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerSchema')]
   public function testSchema(string $expected, string $driver, string $namespace): void {
-    $connection = new StubConnection($this->createStub(\PDO::class), ['namespace' => $namespace]);
+    $mock_pdo = $this->createStub(StubPDO::class);
+    $connection = new StubConnection($mock_pdo, ['namespace' => $namespace]);
     $connection->driver = $driver;
     $this->assertInstanceOf($expected, $connection->schema());
   }
@@ -386,7 +411,8 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerMakeComments')]
   public function testMakeComments(string $expected, array $comment_array): void {
-    $connection = new StubConnection($this->createStub(\PDO::class), []);
+    $mock_pdo = $this->createStub(StubPDO::class);
+    $connection = new StubConnection($mock_pdo, []);
     $this->assertEquals($expected, $connection->makeComment($comment_array));
   }
 
@@ -411,7 +437,8 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerFilterComments')]
   public function testFilterComments(string $expected, string $comment): void {
-    $connection = new StubConnection($this->createStub(\PDO::class), []);
+    $mock_pdo = $this->createStub(StubPDO::class);
+    $connection = new StubConnection($mock_pdo, []);
 
     // filterComment() is protected, so we make it accessible with reflection.
     $reflection = new \ReflectionClass('Drupal\Tests\Core\Database\Stub\StubConnection');
@@ -452,7 +479,9 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerEscapeTables')]
   public function testEscapeTable(string $expected, string $name, array $identifier_quote = ['"', '"']): void {
-    $connection = new StubConnection($this->createStub(\PDO::class), [], $identifier_quote);
+    $mock_pdo = $this->createStub(StubPDO::class);
+    $connection = new StubConnection($mock_pdo, [], $identifier_quote);
+
     $this->assertEquals($expected, $connection->escapeTable($name));
   }
 
@@ -481,7 +510,9 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerEscapeAlias')]
   public function testEscapeAlias(string $expected, string $name, array $identifier_quote = ['"', '"']): void {
-    $connection = new StubConnection($this->createStub(\PDO::class), [], $identifier_quote);
+    $mock_pdo = $this->createStub(StubPDO::class);
+    $connection = new StubConnection($mock_pdo, [], $identifier_quote);
+
     $this->assertEquals($expected, $connection->escapeAlias($name));
   }
 
@@ -513,7 +544,9 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerEscapeFields')]
   public function testEscapeField(string $expected, string $name, array $identifier_quote = ['"', '"']): void {
-    $connection = new StubConnection($this->createStub(\PDO::class), [], $identifier_quote);
+    $mock_pdo = $this->createStub(StubPDO::class);
+    $connection = new StubConnection($mock_pdo, [], $identifier_quote);
+
     $this->assertEquals($expected, $connection->escapeField($name));
   }
 
@@ -540,28 +573,34 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerEscapeDatabase')]
   public function testEscapeDatabase(string $expected, string $name, array $identifier_quote = ['"', '"']): void {
-    $connection = new StubConnection($this->createStub(\PDO::class), [], $identifier_quote);
+    $mock_pdo = $this->createStub(StubPDO::class);
+    $connection = new StubConnection($mock_pdo, [], $identifier_quote);
+
     $this->assertEquals($expected, $connection->escapeDatabase($name));
   }
 
   /**
    * Tests identifier quotes assert count.
+   *
+   * @legacy-covers ::__construct
    */
   public function testIdentifierQuotesAssertCount(): void {
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessageIs('\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
-    // @phpstan-ignore argument.type
-    new StubConnection($this->createStub(\PDO::class), [], ['"']);
+    $this->expectExceptionMessage('\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
+    $mock_pdo = $this->createStub(StubPDO::class);
+    new StubConnection($mock_pdo, [], ['"']);
   }
 
   /**
    * Tests identifier quotes assert string.
+   *
+   * @legacy-covers ::__construct
    */
   public function testIdentifierQuotesAssertString(): void {
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessageIs('\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
-    // @phpstan-ignore argument.type
-    new StubConnection($this->createStub(\PDO::class), [], [0, '1']);
+    $this->expectExceptionMessage('\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
+    $mock_pdo = $this->createStub(StubPDO::class);
+    new StubConnection($mock_pdo, [], [0, '1']);
   }
 
   /**
@@ -570,7 +609,8 @@ class ConnectionTest extends UnitTestCase {
    * @legacy-covers ::__construct
    */
   public function testNamespaceDefault(): void {
-    $connection = new StubConnection($this->createStub(\PDO::class), []);
+    $mock_pdo = $this->createStub(StubPDO::class);
+    $connection = new StubConnection($mock_pdo, []);
     $this->assertSame('Drupal\Tests\Core\Database\Stub', $connection->getConnectionOptions()['namespace']);
   }
 
@@ -579,7 +619,9 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('provideQueriesToTrim')]
   public function testQueryTrim(string $expected, string $query, array $options): void {
-    $connection = new StubConnection($this->createStub(\PDO::class), []);
+    $mock_pdo = $this->createStub(StubPdo::class);
+    $connection = new StubConnection($mock_pdo, []);
+
     $preprocess_method = new \ReflectionMethod($connection, 'preprocessStatement');
     $this->assertSame($expected, $preprocess_method->invoke($connection, $query, $options));
   }
@@ -639,10 +681,8 @@ class ConnectionTest extends UnitTestCase {
     Database::addConnectionInfo('default', 'default', [
       'driver' => 'test',
       'namespace' => 'Drupal\Tests\Core\Database\Stub',
-      'autoload' => __DIR__ . '/Stub/',
-      'database' => 'test',
     ]);
-    $connection = new StubConnection($this->createStub(\PDO::class), []);
+    $connection = new StubConnection($this->createStub(StubPDO::class), []);
     $result = $connection->findCallerFromDebugBacktrace();
     $this->assertSame([
       'file' => __FILE__,
@@ -672,7 +712,7 @@ class ConnectionTest extends UnitTestCase {
     $mock_builder = $this->getMockBuilder(StubConnection::class);
     $connection = $mock_builder
       ->onlyMethods(['getDebugBacktrace', 'getConnectionOptions'])
-      ->setConstructorArgs([$this->createStub(\PDO::class), []])
+      ->setConstructorArgs([$this->createStub(StubPDO::class), []])
       ->getMock();
     $connection->expects($this->once())
       ->method('getConnectionOptions')
@@ -868,7 +908,7 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerSupportedFetchModes')]
   public function testSupportedFetchModes(FetchAs $mode): void {
-    $mockPdo = $this->createStub(\PDO::class);
+    $mockPdo = $this->createStub(StubPDO::class);
     $mockConnection = new StubConnection($mockPdo, []);
     $statement = new StatementPrefetchIterator($mockPdo, $mockConnection, '');
     $this->assertInstanceOf(StatementPrefetchIterator::class, $statement);

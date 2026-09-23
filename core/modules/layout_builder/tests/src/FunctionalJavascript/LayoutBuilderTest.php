@@ -31,7 +31,6 @@ class LayoutBuilderTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'block_content',
-    'body_field',
     'field_ui',
     'layout_builder',
     'layout_test',
@@ -154,7 +153,6 @@ class LayoutBuilderTest extends WebDriverTestBase {
 
     // Save the layout, and the new block is visible.
     $page->pressButton('Save layout');
-    $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
     $assert_session->addressEquals($node_url);
     $assert_session->pageTextContains('Powered by Drupal');
     $assert_session->pageTextContains('This is the label');
@@ -192,7 +190,6 @@ class LayoutBuilderTest extends WebDriverTestBase {
 
     // Ensure the dragged block is still in the correct position after save.
     $page->pressButton('Save layout');
-    $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
     $assert_session->elementExists('css', '.layout__region--second .block-system-powered-by-block');
     $assert_session->elementTextContains('css', '.layout__region--second', 'Powered by Drupal');
 
@@ -228,7 +225,6 @@ class LayoutBuilderTest extends WebDriverTestBase {
     $this->assertPageNotReloaded();
 
     $page->pressButton('Save layout');
-    $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
     $assert_session->elementExists('css', '.layout');
 
     // Test deriver-based blocks.
@@ -260,7 +256,6 @@ class LayoutBuilderTest extends WebDriverTestBase {
     $this->assertPageNotReloaded();
 
     $page->pressButton('Save layout');
-    $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
 
     // Removing all sections results in no layout being used.
     $assert_session->addressEquals($node_url);

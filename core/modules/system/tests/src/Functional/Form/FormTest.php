@@ -13,7 +13,6 @@ use Drupal\Core\Url;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\form_test\Form\FormTestDisabledElementsForm;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -48,7 +47,7 @@ class FormTest extends BrowserTestBase {
     $filtered_html_format->save();
 
     $filtered_html_permission = $filtered_html_format->getPermissionName();
-    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([$filtered_html_permission])->save();
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [$filtered_html_permission]);
   }
 
   /**
@@ -233,7 +232,7 @@ class FormTest extends BrowserTestBase {
     }
 
     // Check the page for error messages.
-    $errors = $this->getNodeElementsByXpath('//div[contains(@class, "error")]//li');
+    $errors = $this->xpath('//div[contains(@class, "error")]//li');
     foreach ($errors as $error) {
       $expected_key = array_search($error->getText(), $expected);
       // If the error message is not one of the expected messages, fail.
@@ -800,7 +799,7 @@ class FormTest extends BrowserTestBase {
     // disabled elements, so we need to un-disable those elements first.
     $this->drupalGet('form-test/disabled-elements');
     $disabled_elements = [];
-    foreach ($this->getNodeElementsByXpath('//*[@disabled]') as $element) {
+    foreach ($this->xpath('//*[@disabled]') as $element) {
       $disabled_elements[] = (string) $element->getAttribute('name');
     }
 

@@ -15,7 +15,6 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
-use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -30,7 +29,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
 
   use LanguageTestTrait;
   use CommentTestTrait;
-  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -263,12 +261,12 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     $article = $this->drupalCreateNode(['type' => 'article', 'langcode' => $this->langcodes[0]]);
 
     // Set up the default admin theme and use it for node editing.
-    $this->container->get('theme_installer')->install(['default_admin']);
-    $this->config('system.theme')->set('admin', 'default_admin')->save();
+    $this->container->get('theme_installer')->install(['claro']);
+    $this->config('system.theme')->set('admin', 'claro')->save();
 
     // Verify that translation uses the admin theme if edit is admin.
     $this->drupalGet('node/' . $article->id() . '/translations');
-    $this->assertSession()->responseContains('core/themes/default_admin/css/base/elements.css');
+    $this->assertSession()->responseContains('core/themes/claro/css/base/elements.css');
 
     // Turn off admin theme for editing, assert inheritance to translations.
     $this->config('node.settings')->set('use_admin_theme', FALSE)->save();
@@ -277,7 +275,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
 
     // Verify that translation uses the frontend theme if edit is frontend.
     $this->drupalGet('node/' . $article->id() . '/translations');
-    $this->assertSession()->responseNotContains('core/themes/default_admin/css/base/elements.css');
+    $this->assertSession()->responseNotContains('core/themes/claro/css/base/elements.css');
 
     // Assert presence of translation page itself (vs. DisabledBundle below).
     $this->assertSession()->statusCodeEquals(200);
@@ -340,16 +338,13 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     }
     $node->save();
 
-    // Test that the promoted content view displays the correct translations.
+    // Test that the frontpage view displays the correct translations.
     \Drupal::service('module_installer')->install(['views'], TRUE);
     $this->rebuildContainer();
-
-    $this->enablePromotedContentView();
-
     $this->doTestTranslations('node', $values);
 
     // Enable the translation language renderer.
-    $view = \Drupal::entityTypeManager()->getStorage('view')->load('promoted_content');
+    $view = \Drupal::entityTypeManager()->getStorage('view')->load('frontpage');
     $display = &$view->getDisplay('default');
     $display['display_options']['rendering_language'] = '***LANGUAGE_entity_translation***';
     $view->save();
@@ -373,7 +368,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
         $expected_href = $base_path . $langcode . '/' . $node_href;
       }
       $pattern = '|^' . $expected_href . '$|';
-      foreach ($this->getNodeElementsByXpath("//a[text()='Read more']") as $link) {
+      foreach ($this->xpath("//a[text()='Read more']") as $link) {
         if (preg_match($pattern, $link->getAttribute('href'), $matches) == TRUE) {
           $num_match_found++;
         }
@@ -395,7 +390,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
         $expected_href = $base_path . $langcode . '/' . $comment_form_href;
       }
       $pattern = '|^' . $expected_href . '$|';
-      foreach ($this->getNodeElementsByXpath("//a[text()='Add new comment']") as $link) {
+      foreach ($this->xpath("//a[text()='Add new comment']") as $link) {
         if (preg_match($pattern, $link->getAttribute('href'), $matches) == TRUE) {
           $num_match_found++;
         }

@@ -133,7 +133,8 @@ class CKEditor5HeightTest extends CKEditor5TestBase {
         return false;
       })();
     JS;
-    return $this->getSession()->evaluateScript($javascript);
+    $evaluateScript = $this->getSession()->evaluateScript($javascript);
+    return $evaluateScript;
   }
 
 }

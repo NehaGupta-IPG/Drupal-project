@@ -51,6 +51,15 @@ class SortDateTest extends ViewsKernelTestBase {
           break;
 
         case 'hour':
+          $expected = [
+            ['name' => 'John'],
+            ['name' => 'Ringo'],
+            ['name' => 'Paul'],
+            ['name' => 'Meredith'],
+            ['name' => 'George'],
+          ];
+          break;
+
         case 'day':
           $expected = [
             ['name' => 'John'],
@@ -62,7 +71,25 @@ class SortDateTest extends ViewsKernelTestBase {
           break;
 
         case 'week':
+          $expected = [
+            ['name' => 'John'],
+            ['name' => 'George'],
+            ['name' => 'Ringo'],
+            ['name' => 'Paul'],
+            ['name' => 'Meredith'],
+          ];
+          break;
+
         case 'month':
+          $expected = [
+            ['name' => 'John'],
+            ['name' => 'George'],
+            ['name' => 'Ringo'],
+            ['name' => 'Paul'],
+            ['name' => 'Meredith'],
+          ];
+          break;
+
         case 'year':
           $expected = [
             ['name' => 'John'],
@@ -77,6 +104,15 @@ class SortDateTest extends ViewsKernelTestBase {
     else {
       switch ($granularity) {
         case 'second':
+          $expected = [
+            ['name' => 'George'],
+            ['name' => 'Ringo'],
+            ['name' => 'Meredith'],
+            ['name' => 'Paul'],
+            ['name' => 'John'],
+          ];
+          break;
+
         case 'minute':
           $expected = [
             ['name' => 'George'],
@@ -108,7 +144,25 @@ class SortDateTest extends ViewsKernelTestBase {
           break;
 
         case 'week':
+          $expected = [
+            ['name' => 'John'],
+            ['name' => 'George'],
+            ['name' => 'Ringo'],
+            ['name' => 'Paul'],
+            ['name' => 'Meredith'],
+          ];
+          break;
+
         case 'month':
+          $expected = [
+            ['name' => 'John'],
+            ['name' => 'George'],
+            ['name' => 'Ringo'],
+            ['name' => 'Paul'],
+            ['name' => 'Meredith'],
+          ];
+          break;
+
         case 'year':
           $expected = [
             ['name' => 'John'],

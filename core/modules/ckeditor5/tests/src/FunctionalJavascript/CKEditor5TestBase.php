@@ -60,7 +60,7 @@ abstract class CKEditor5TestBase extends WebDriverTestBase {
         'filter_html' => [
           'status' => TRUE,
           'settings' => [
-            'allowed_html' => '<br> <em> <h2> <h3> <h4> <h5> <h6> <p> <strong>',
+            'allowed_html' => '<br> <p> <h2> <h3> <h4> <h5> <h6> <strong> <em>',
           ],
         ],
         'filter_align' => ['status' => TRUE],

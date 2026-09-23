@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional\Rest;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
 use Drupal\user\Entity\User;
@@ -60,7 +59,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method): void {
+  protected function setUpAuthorization($method) {
     switch ($method) {
       case 'GET':
         $this->grantPermissionsToTestedRole(['access content']);
@@ -83,7 +82,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * Makes the current user the file owner.
    */
-  protected function makeCurrentUserFileOwner(): void {
+  protected function makeCurrentUserFileOwner() {
     $account = static::$auth ? User::load(2) : User::load(0);
     $this->entity->setOwnerId($account->id());
     $this->entity->setOwner($account);
@@ -93,7 +92,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function createEntity(): EntityInterface {
+  protected function createEntity() {
     $this->author = User::load(1);
 
     $file = File::create();
@@ -112,7 +111,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedNormalizedEntity(): array {
+  protected function getExpectedNormalizedEntity() {
     return [
       'changed' => [
         [
@@ -181,7 +180,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getNormalizedPostEntity(): array {
+  protected function getNormalizedPostEntity() {
     return [
       'uid' => [
         [
@@ -199,14 +198,14 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getNormalizedPatchEntity(): array {
+  protected function getNormalizedPatchEntity() {
     return array_diff_key($this->getNormalizedPostEntity(), ['uid' => TRUE]);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedCacheContexts(): array {
+  protected function getExpectedCacheContexts() {
     return [
       'url.site',
       'user.permissions',
@@ -216,8 +215,8 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessMessage($method): string {
-    return match ($method) {
+  protected function getExpectedUnauthorizedAccessMessage($method) {
+    return match($method) {
       'GET' => "The 'access content' permission is required.",
       'PATCH' => "Only the file owner can update the file entity.",
       'DELETE' => "The 'delete any file' permission is required.",

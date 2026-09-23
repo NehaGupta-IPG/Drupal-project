@@ -38,6 +38,3 @@ phpstan-tmp
 
 # Ignore phpcs cache
 .phpcscache
-
-# Ignore twig-cs-fixer cache
-.twigcsfixercache

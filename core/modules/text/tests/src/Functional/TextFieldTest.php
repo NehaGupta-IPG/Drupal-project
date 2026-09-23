@@ -13,7 +13,6 @@ use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\filter\Render\FilteredMarkup;
 use Drupal\Tests\field\Functional\FunctionalString\StringFieldTest;
 use Drupal\Tests\TestFileCreationTrait;
-use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -103,7 +102,7 @@ class TextFieldTest extends StringFieldTest {
     $field_storage = FieldStorageConfig::create([
       'field_name' => $text_field_name,
       'entity_type' => 'entity_test',
-      'type' => 'text_long',
+      'type' => 'text_with_summary',
     ]);
     $field_storage->save();
     FieldConfig::create([
@@ -131,7 +130,7 @@ class TextFieldTest extends StringFieldTest {
     $display_repository = \Drupal::service('entity_display.repository');
     $display_repository->getFormDisplay('entity_test', 'entity_test')
       ->setComponent($text_field_name, [
-        'type' => 'text_textarea',
+        'type' => 'text_textarea_with_summary',
       ])
       ->setComponent($file_field_name, [
         'type' => 'file_generic',
@@ -209,11 +208,11 @@ class TextFieldTest extends StringFieldTest {
     // Grant access to both formats to the user.
     $roles = $this->webUser->getRoles();
     $rid = $roles[0];
-    Role::loadOverrideFree($rid)->grantPermissions([
+    user_role_grant_permissions($rid, [
       $format1->getPermissionName(),
       $format2->getPermissionName(),
       $format3->getPermissionName(),
-    ])->save();
+    ]);
 
     // Create a field with multiple formats allowed.
     $field_name = $this->randomMachineName();
@@ -245,7 +244,7 @@ class TextFieldTest extends StringFieldTest {
     // Display the creation form.
     $this->drupalLogin($this->webUser);
     $this->drupalGet('entity_test/add');
-    $this->assertSession()->fieldExists("{$field_name}[0][value]");
+    $this->assertSession()->fieldExists("{$field_name}[0][value]", NULL);
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format1->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format2->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format3->id());
@@ -277,7 +276,7 @@ class TextFieldTest extends StringFieldTest {
     $this->drupalLogin($this->webUser);
     // We shouldn't have the 'format' selector since only one format is allowed.
     $this->drupalGet('entity_test/add');
-    $this->assertSession()->fieldExists("{$field_name}[0][value]");
+    $this->assertSession()->fieldExists("{$field_name}[0][value]", NULL);
     $this->assertSession()->fieldNotExists("{$field_name}[0][format]");
 
     // Retest the entity renders fine even though filter2 is disabled.
@@ -292,7 +291,7 @@ class TextFieldTest extends StringFieldTest {
     $field->save();
     $this->drupalGet('entity_test/add');
     // We should see the 'format' selector again.
-    $this->assertSession()->fieldExists("{$field_name}[0][value]");
+    $this->assertSession()->fieldExists("{$field_name}[0][value]", NULL);
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format1->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format2->id());
     $this->assertSession()->optionNotExists("{$field_name}[0][format]", $format3->id());
@@ -302,7 +301,7 @@ class TextFieldTest extends StringFieldTest {
     $field->save();
     $this->drupalGet('entity_test/add');
     // We should see the 'format' selector again.
-    $this->assertSession()->fieldExists("{$field_name}[0][value]");
+    $this->assertSession()->fieldExists("{$field_name}[0][value]", NULL);
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format1->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format2->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format3->id());
@@ -384,7 +383,7 @@ class TextFieldTest extends StringFieldTest {
     $permission = $format->getPermissionName();
     $roles = $this->webUser->getRoles();
     $rid = $roles[0];
-    Role::loadOverrideFree($rid)->grantPermissions([$permission])->save();
+    user_role_grant_permissions($rid, [$permission]);
     $this->drupalLogin($this->webUser);
 
     // Display edition form.

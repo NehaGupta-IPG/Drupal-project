@@ -8,7 +8,6 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\locale\File\LocaleFile;
-use Drupal\locale\Model\SourceType;
 
 /**
  * Provides the locale source services.
@@ -32,7 +31,6 @@ class LocaleSource {
     protected readonly CurrentImportStorage $currentImportStorage,
     protected readonly KeyValueFactoryInterface $keyValueFactory,
     protected readonly TimeInterface $time,
-    protected readonly LocaleLanguages $localeLanguages,
   ) {}
 
   /**
@@ -50,7 +48,7 @@ class LocaleSource {
    */
   public function loadSources(?array $projects = NULL, ?array $langcodes = NULL): array {
     $projects = $projects ?: array_keys($this->localeProjectRepository->getAll());
-    $langcodes = $langcodes ?: array_keys($this->localeLanguages->getTranslatableLanguages());
+    $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
     // If there are no translatable languages, return early.
     if (!$langcodes) {
@@ -106,7 +104,7 @@ class LocaleSource {
     // Merge the new status data with the existing status.
     $request_time = $this->time->getRequestTime();
     switch ($type) {
-      case SourceType::Remote->value:
+      case LOCALE_TRANSLATION_REMOTE:
         // Add the source data to the status array.
         $project_sources[$langcode]->files[$type] = $data;
 
@@ -121,7 +119,7 @@ class LocaleSource {
         }
         break;
 
-      case SourceType::Local->value:
+      case LOCALE_TRANSLATION_LOCAL:
         // Add the source data to the status array.
         $project_sources[$langcode]->files[$type] = $data;
 
@@ -149,7 +147,7 @@ class LocaleSource {
         }
         break;
 
-      case SourceType::Current->value:
+      case LOCALE_TRANSLATION_CURRENT:
         $data->last_checked = $request_time;
         $project_sources[$langcode]->timestamp = $data->timestamp;
         $project_sources[$langcode]->hash = $data->hash;
@@ -232,7 +230,7 @@ class LocaleSource {
   public function buildSources(array $projects, array $langcodes = []): array {
     $sources = [];
     $projects = $this->localeProjectRepository->getMultiple($projects);
-    $langcodes = $langcodes ?: array_keys($this->localeLanguages->getTranslatableLanguages());
+    $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
     foreach ($projects as $project) {
       foreach ($langcodes as $langcode) {
@@ -268,8 +266,8 @@ class LocaleSource {
    * @see sourceBuild()
    */
   public function sourceCheckFile($source) {
-    $source_file = $source->getFile(SourceType::Local);
-    if ($source_file) {
+    if (isset($source->files[LOCALE_TRANSLATION_LOCAL])) {
+      $source_file = $source->files[LOCALE_TRANSLATION_LOCAL];
       if (isset($source_file->uri) && file_exists($source_file->uri)) {
         $source_file->timestamp = filemtime($source_file->uri);
         $source_file->hash = hash_file(self::LOCAL_FILE_HASH_ALGO, $source_file->uri);
@@ -308,24 +306,24 @@ class LocaleSource {
       $remote_filename = $this->buildServerPattern($source, basename($source->server_pattern));
       $remote_uri = $this->buildServerPattern($source, $source->server_pattern);
       $remote_file = new LocaleFile($remote_filename, $remote_uri, '', NULL, $langcode, $project->name, $project->version);
-      $remote_file->type = SourceType::Remote->value;
-      $files[SourceType::Remote->value] = $remote_file;
+      $remote_file->type = LOCALE_TRANSLATION_REMOTE;
+      $files[LOCALE_TRANSLATION_REMOTE] = $remote_file;
 
       $local_filename = $this->buildServerPattern($source, $filename);
       $local_uri = 'translations://' . $local_filename;
       $local_file = new LocaleFile($local_filename, $local_uri, '', NULL, $langcode, $project->name, $project->version);
-      $local_file->type = SourceType::Local->value;
+      $local_file->type = LOCALE_TRANSLATION_LOCAL;
       $local_file->directory = 'translations://';
-      $files[SourceType::Local->value] = $local_file;
+      $files[LOCALE_TRANSLATION_LOCAL] = $local_file;
     }
     else {
       $local_directory = $this->buildServerPattern($source, $this->fileSystem->dirname($source->server_pattern));
       $local_filename = $this->buildServerPattern($source, basename($source->server_pattern));
       $local_uri = $local_directory . '/' . $local_filename;
       $local_file = new LocaleFile($local_filename, $local_uri, '', NULL, $langcode, $project->name, $project->version);
-      $local_file->type = SourceType::Local->value;
+      $local_file->type = LOCALE_TRANSLATION_LOCAL;
       $local_file->directory = $local_directory;
-      $files[SourceType::Local->value] = $local_file;
+      $files[LOCALE_TRANSLATION_LOCAL] = $local_file;
     }
     $source->files = $files;
 
@@ -334,7 +332,7 @@ class LocaleSource {
     // project+language is not translated before, create a new record.
     $current_import_state = $this->currentImportStorage->get($project->name, $langcode);
     if ($current_import_state instanceof CurrentImport && $current_import_state->timestamp) {
-      $source->type = SourceType::Current->value;
+      $source->type = LOCALE_TRANSLATION_CURRENT;
       $source->timestamp = $current_import_state->timestamp;
       $source->hash = $current_import_state->hash;
       $source->last_checked = $current_import_state->last_checked ?? NULL;

@@ -22,7 +22,6 @@ abstract class FieldKernelTestBase extends KernelTestBase {
     'user',
     'system',
     'field',
-    'filter',
     'text',
     'entity_test',
     'field_test',
@@ -45,7 +44,7 @@ abstract class FieldKernelTestBase extends KernelTestBase {
   protected $fieldTestData;
 
   /**
-   * The entity ID.
+   * @var string
    */
   protected string $entityId;
 

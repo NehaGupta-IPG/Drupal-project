@@ -19,6 +19,8 @@ final class FilterImageLazyLoadTest extends UnitTestCase {
 
   /**
    * The lazy load image filter.
+   *
+   * @var \Drupal\filter\Plugin\Filter\FilterImageLazyLoad
    */
   protected FilterImageLazyLoad $filter;
 

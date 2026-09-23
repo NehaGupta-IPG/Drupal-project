@@ -33,18 +33,24 @@ class MenuActiveTrailTest extends UnitTestCase {
 
   /**
    * The tested active menu trail service.
+   *
+   * @var \Drupal\Core\Menu\MenuActiveTrail
    */
-  protected MenuActiveTrail $menuActiveTrail;
+  protected $menuActiveTrail;
 
   /**
    * The test request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected RequestStack $requestStack;
+  protected $requestStack;
 
   /**
    * The current route match service.
+   *
+   * @var \Drupal\Core\Routing\CurrentRouteMatch
    */
-  protected CurrentRouteMatch $currentRouteMatch;
+  protected $currentRouteMatch;
 
   /**
    * The mocked menu link manager.
@@ -295,7 +301,7 @@ class MenuActiveTrailTest extends UnitTestCase {
     $cacheTagsInvalidator->expects($this->exactly(2))
       ->method('invalidateTags')
       ->willReturnCallback(fn($tags): NULL =>
-        match ($tags) {
+        match($tags) {
           ['config:system.menu.' . $menu_name] => NULL,
           [
             'config:system.menu.' . $menu_name,
@@ -329,7 +335,7 @@ class MenuActiveTrailTest extends UnitTestCase {
     $request->attributes->get('_raw_variables')->add(['b' => 1, 'a' => 0]);
     $this->requestStack->push($request);
 
-    $this->menuLinkManager->expects($this->once())
+    $this->menuLinkManager
       ->method('loadLinksByRoute')
       ->with('baby_llama')
       ->willReturn($data[1]);

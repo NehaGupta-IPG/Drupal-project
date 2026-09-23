@@ -24,14 +24,12 @@
  *   Whether we wait at the beginning or end to execute the function.
  *
  * @return {function}
- *   The debounced function. Call its cancel() method to drop an invocation
- *   that is scheduled but has not run yet.
+ *   The debounced function.
  */
 Drupal.debounce = function (func, wait, immediate) {
   let timeout;
   let result;
-
-  const debounced = function (...args) {
+  return function (...args) {
     const context = this;
     const later = function () {
       timeout = null;
@@ -47,18 +45,4 @@ Drupal.debounce = function (func, wait, immediate) {
     }
     return result;
   };
-
-  /**
-   * Cancels a scheduled invocation that has not run yet.
-   *
-   * Unbinding the event handler that triggered the debounced function does
-   * not stop an invocation that is already scheduled. Use this when the
-   * callback would act on state that no longer exists.
-   */
-  debounced.cancel = () => {
-    clearTimeout(timeout);
-    timeout = null;
-  };
-
-  return debounced;
 };

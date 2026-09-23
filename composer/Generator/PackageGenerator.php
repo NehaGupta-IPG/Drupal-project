@@ -4,6 +4,7 @@ namespace Drupal\Composer\Generator;
 
 use Drupal\Composer\Generator\Builder\DrupalCoreRecommendedBuilder;
 use Drupal\Composer\Generator\Builder\DrupalDevDependenciesBuilder;
+use Drupal\Composer\Generator\Builder\DrupalPinnedDevDependenciesBuilder;
 use Drupal\Composer\Generator\Util\DrupalCoreComposer;
 use Composer\Util\Filesystem;
 use Composer\IO\IOInterface;
@@ -69,6 +70,8 @@ class PackageGenerator {
     return [
       DrupalCoreRecommendedBuilder::class,
       DrupalDevDependenciesBuilder::class,
+      // @phpstan-ignore classConstant.deprecatedClass
+      DrupalPinnedDevDependenciesBuilder::class,
     ];
   }
 

@@ -77,7 +77,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     // If composer.json is removed, we should get an exception because
     // getConfig() should validate that $dir is Composer-ready.
     unlink($dir . '/composer.json');
-    $this->expectExceptionMessageIsOrContains("composer.json not found.");
+    $this->expectExceptionMessage("composer.json not found.");
     $inspector->getConfig('extra', $dir);
   }
 
@@ -158,7 +158,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     // getInstalledPackagesList() should validate that $project_root is
     // Composer-ready.
     unlink($lock_file->getPath());
-    $this->expectExceptionMessageIs("composer.lock not found in $project_root.");
+    $this->expectExceptionMessage("composer.lock not found in $project_root.");
     $inspector->getInstalledPackagesList($project_root);
   }
 
@@ -193,7 +193,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
     // Call validate() again to ensure the precondition is called once.
     $this->expectException(ComposerNotReadyException::class);
-    $this->expectExceptionMessageIs("Well, that didn't work.");
+    $this->expectExceptionMessage("Well, that didn't work.");
     $inspector->validate($project_root);
   }
 
@@ -300,7 +300,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
     if (isset($expected_message)) {
       $this->expectException(ComposerNotReadyException::class);
-      $this->expectExceptionMessageIs($expected_message);
+      $this->expectExceptionMessage($expected_message);
     }
     $inspector->validate($project_root);
   }
@@ -315,7 +315,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
     if (empty($reported_version)) {
       $this->expectException(\UnexpectedValueException::class);
-      $this->expectExceptionMessageIs('Unable to determine Composer version');
+      $this->expectExceptionMessage('Unable to determine Composer version');
     }
     $this->assertSame($reported_version, $this->container->get(ComposerInspector::class)->getVersion());
   }
@@ -440,7 +440,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     if ($exception_message) {
       $this->expectException(\UnexpectedValueException::class);
       $exception_message = str_replace('<PROJECT_ROOT>', $project_root, $exception_message);
-      $this->expectExceptionMessageIs($exception_message);
+      $this->expectExceptionMessage($exception_message);
     }
     $list = $inspector->getInstalledPackagesList($project_root);
     $this->assertArrayHasKey('test/package', $list);

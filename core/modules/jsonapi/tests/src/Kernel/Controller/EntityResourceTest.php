@@ -85,6 +85,8 @@ class EntityResourceTest extends JsonapiKernelTestBase {
 
   /**
    * A node with related nodes.
+   *
+   * @var \Drupal\node\Entity\Node
    */
   protected Node $node4;
 

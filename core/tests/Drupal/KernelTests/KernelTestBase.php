@@ -12,8 +12,6 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\Development\ConfigSchemaChecker;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\Exception\SchemaDefinitionException;
-use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DrupalKernel;
@@ -27,7 +25,7 @@ use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Tests\BrowserHtmlDebugTrait;
 use Drupal\Tests\ConfigTestTrait;
-use Drupal\Tests\DrupalTestCase;
+use Drupal\Tests\DrupalTestCaseTrait;
 use Drupal\Tests\ExtensionListTestTrait;
 use Drupal\Tests\HttpKernelUiHelperTrait;
 use Drupal\Tests\RandomGeneratorTrait;
@@ -38,6 +36,7 @@ use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\visitor\vfsStreamPrintVisitor;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -96,8 +95,9 @@ use Symfony\Component\Routing\Route;
  *
  * @ingroup testing
  */
-abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderInterface {
+abstract class KernelTestBase extends TestCase implements ServiceProviderInterface {
 
+  use DrupalTestCaseTrait;
   use AssertContentTrait;
   use RandomGeneratorTrait;
   use ConfigTestTrait;
@@ -577,12 +577,6 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $definition = $container->register(static::class, static::class)->setSynthetic(TRUE);
     $container->set(static::class, $this);
     $container->addCompilerPass(new KernelTestCompilerPass($definition), priority: -100);
-
-    // Allow kernel tests to register routes.
-    $container
-      ->register(KernelTestAttributeRouteDiscovery::class, KernelTestAttributeRouteDiscovery::class)
-      ->addArgument(static::class)
-      ->addTag('event_subscriber');
   }
 
   /**
@@ -748,16 +742,6 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $schema = $this->container->get('database')->schema();
     $tables = (array) $tables;
     foreach ($tables as $table) {
-      if ($specification instanceof Schema) {
-        try {
-          $table_definition = $specification->getTableDefinition($table);
-          $schema->createTableFromDefinition($specification->type, $specification->name, $table_definition);
-          continue;
-        }
-        catch (SchemaDefinitionException) {
-          throw new \LogicException("$module module does not define a schema for table '$table'.");
-        }
-      }
       if (empty($specification[$table])) {
         throw new \LogicException("$module module does not define a schema for table '$table'.");
       }

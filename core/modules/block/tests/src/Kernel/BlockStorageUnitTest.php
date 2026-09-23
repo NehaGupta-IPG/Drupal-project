@@ -39,6 +39,8 @@ class BlockStorageUnitTest extends KernelTestBase {
     parent::setUp();
 
     $this->controller = $this->container->get('entity_type.manager')->getStorage('block');
+
+    $this->container->get('theme_installer')->install(['stark']);
   }
 
   /**
@@ -48,7 +50,6 @@ class BlockStorageUnitTest extends KernelTestBase {
     $this->assertInstanceOf(ConfigEntityStorage::class, $this->controller);
 
     // Run each test method in the same installation.
-    \Drupal::service('theme_installer')->install(['stark']);
     $this->createTests();
     $this->loadTests();
     $this->deleteTests();
@@ -70,7 +71,7 @@ class BlockStorageUnitTest extends KernelTestBase {
 
     // Create a block with only required values.
     $entity = $this->controller->create([
-      'id' => 'test_block_0',
+      'id' => 'test_block',
       'theme' => 'stark',
       'region' => 'content',
       'plugin' => 'test_html',
@@ -80,7 +81,7 @@ class BlockStorageUnitTest extends KernelTestBase {
     $this->assertInstanceOf(Block::class, $entity);
 
     // Verify all of the block properties.
-    $actual_properties = $this->config('block.block.test_block_0')->get();
+    $actual_properties = $this->config('block.block.test_block')->get();
     $this->assertNotEmpty($actual_properties['uuid'], 'The block UUID is set.');
     unset($actual_properties['uuid']);
 
@@ -89,7 +90,7 @@ class BlockStorageUnitTest extends KernelTestBase {
       'langcode' => \Drupal::languageManager()->getDefaultLanguage()->getId(),
       'status' => TRUE,
       'dependencies' => ['module' => ['block_test'], 'theme' => ['stark']],
-      'id' => 'test_block_0',
+      'id' => 'test_block',
       'theme' => 'stark',
       'region' => 'content',
       'weight' => 0,
@@ -113,7 +114,7 @@ class BlockStorageUnitTest extends KernelTestBase {
    * Tests the loading of blocks.
    */
   protected function loadTests(): void {
-    $entity = $this->controller->load('test_block_0');
+    $entity = $this->controller->load('test_block');
 
     $this->assertInstanceOf(Block::class, $entity);
 
@@ -128,7 +129,7 @@ class BlockStorageUnitTest extends KernelTestBase {
    * Tests the deleting of blocks.
    */
   protected function deleteTests(): void {
-    $entity = $this->controller->load('test_block_0');
+    $entity = $this->controller->load('test_block');
 
     // Ensure that the storage isn't currently empty.
     $config_storage = $this->container->get('config.storage');
@@ -136,8 +137,6 @@ class BlockStorageUnitTest extends KernelTestBase {
     $this->assertNotEmpty($config, 'There are blocks in config storage.');
 
     // Delete the block.
-    $entity->delete();
-    $entity = $this->controller->load('test_block');
     $entity->delete();
 
     // Ensure that the storage is now empty.
@@ -149,9 +148,9 @@ class BlockStorageUnitTest extends KernelTestBase {
    * Tests the installation of default blocks.
    */
   public function testDefaultBlocks(): void {
+    \Drupal::service('theme_installer')->install(['stark']);
     $entities = $this->controller->loadMultiple();
     $this->assertEmpty($entities, 'There are no blocks initially.');
-    \Drupal::service('theme_installer')->install(['stark']);
 
     // Install the block_test.module, so that its default config is installed.
     $this->installConfig(['block_test']);

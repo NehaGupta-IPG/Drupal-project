@@ -1,5 +1,0 @@
-name: Body field
-type: module
-description: 'Includes optional body field storage'
-version: VERSION
-package: Testing

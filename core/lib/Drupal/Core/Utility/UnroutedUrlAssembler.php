@@ -59,10 +59,7 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
     // Note that UrlHelper::isExternal will return FALSE if the $uri has a
     // disallowed protocol.  This is later made safe since we always add at
     // least a leading slash.
-    // parse_url can return inconsistent results for some urls, so perform a
-    // simple string comparison for the 'base:' scheme, but further validate
-    // that parse_url can parse the URI at all.
-    if (strncasecmp($uri, 'base:', 5) === 0 && parse_url($uri, PHP_URL_SCHEME) !== FALSE) {
+    if (parse_url($uri, PHP_URL_SCHEME) === 'base') {
       return $this->buildLocalUrl($uri, $options, $collect_bubbleable_metadata);
     }
     elseif (UrlHelper::isExternal($uri)) {

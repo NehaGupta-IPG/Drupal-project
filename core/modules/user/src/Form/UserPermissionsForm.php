@@ -6,11 +6,9 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\user\RoleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides the user permissions administration form.
@@ -20,16 +18,6 @@ use Symfony\Component\Routing\Attribute\Route;
  *
  * @internal
  */
-#[Route(
-  path: '/admin/people/permissions',
-  name: 'user.admin_permissions',
-  requirements: [
-    '_permission' => 'administer permissions',
-  ],
-  defaults: [
-    '_title' => new TranslatableMarkup('Permissions'),
-  ],
-)]
 class UserPermissionsForm extends FormBase {
 
   /**
@@ -133,6 +121,8 @@ class UserPermissionsForm extends FormBase {
       '#value' => $role_names,
     ];
     // Render role/permission overview:
+    $hide_descriptions = system_admin_compact_mode();
+
     $form['system_compact_link'] = [
       '#id' => FALSE,
       '#type' => 'system_compact_link',
@@ -203,13 +193,16 @@ class UserPermissionsForm extends FormBase {
         $form['permissions'][$perm]['#attributes']['data-filter-parent-group'] = 'module-' . $provider;
         $form['permissions'][$perm]['description'] = [
           '#type' => 'inline_template',
-          '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span>{% if description or warning %}<div class="description" data-admin-compact-collapsible>{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
+          '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span>{% if description or warning %}<div class="description">{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
           '#context' => [
             'title' => $perm_item['title'],
           ],
         ];
-        $form['permissions'][$perm]['description']['#context']['description'] = $perm_item['description'];
-        $form['permissions'][$perm]['description']['#context']['warning'] = $perm_item['warning'];
+        // Show the permission description.
+        if (!$hide_descriptions) {
+          $form['permissions'][$perm]['description']['#context']['description'] = $perm_item['description'];
+          $form['permissions'][$perm]['description']['#context']['warning'] = $perm_item['warning'];
+        }
         foreach ($role_names as $rid => $name) {
           $form['permissions'][$perm][$rid] = [
             '#title' => $name . ': ' . $perm_item['title'],
@@ -247,9 +240,8 @@ class UserPermissionsForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-
-    foreach ($this->getRoles() as $role_name => $role) {
-      $role->changePermissions((array) $form_state->getValue($role_name))->save();
+    foreach ($form_state->getValue('role_names') as $role_name => $name) {
+      user_role_change_permissions($role_name, (array) $form_state->getValue($role_name));
     }
 
     $this->messenger()->addStatus($this->t('The changes have been saved.'));

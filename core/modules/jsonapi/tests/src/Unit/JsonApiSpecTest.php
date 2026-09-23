@@ -11,7 +11,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore kitt
-
 /**
  * Tests Drupal\jsonapi\JsonApiSpec.
  *
@@ -116,7 +115,7 @@ class JsonApiSpecTest extends UnitTestCase {
   /**
    * Data provider for testIsValidCustomQueryParameter.
    */
-  public static function providerTestIsValidCustomQueryParameter(): array {
+  public static function providerTestIsValidCustomQueryParameter() {
     $data = static::providerTestIsValidMemberName();
 
     // All valid member names are also valid custom query parameters, except for

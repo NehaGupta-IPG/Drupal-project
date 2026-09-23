@@ -6,8 +6,8 @@ namespace Drupal\Tests\announcements_feed\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 
@@ -27,6 +27,8 @@ abstract class AnnounceTestBase extends KernelTestBase {
 
   /**
    * History of requests/responses.
+   *
+   * @var array
    */
   protected array $history = [];
 

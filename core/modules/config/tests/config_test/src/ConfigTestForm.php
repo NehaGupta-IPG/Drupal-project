@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\config_test;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
@@ -139,12 +140,12 @@ class ConfigTestForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $entity = $this->entity;
     $status = $entity->save();
-    $label = $entity->label();
+
     if ($status === SAVED_UPDATED) {
-      $this->messenger()->addStatus("$label configuration has been updated.");
+      $this->messenger()->addStatus(new FormattableMarkup('%label configuration has been updated.', ['%label' => $entity->label()]));
     }
     else {
-      $this->messenger()->addStatus("$label configuration has been created.");
+      $this->messenger()->addStatus(new FormattableMarkup('%label configuration has been created.', ['%label' => $entity->label()]));
     }
 
     $form_state->setRedirectUrl($this->entity->toUrl('collection'));

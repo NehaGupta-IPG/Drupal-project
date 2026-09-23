@@ -13,7 +13,6 @@ use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\filter\Entity\FilterFormat;
-use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -80,12 +79,12 @@ class CommentInterfaceTest extends CommentTestBase {
 
     // Comment as anonymous with preview required.
     $this->drupalLogout();
-    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
       'access content',
       'access comments',
       'post comments',
       'skip comment approval',
-    ])->save();
+    ]);
     $anonymous_comment = $this->postComment($this->node, $this->randomMachineName(), $this->randomMachineName(), TRUE);
     $this->assertTrue($this->commentExists($anonymous_comment), 'Comment found.');
     $anonymous_comment->delete();

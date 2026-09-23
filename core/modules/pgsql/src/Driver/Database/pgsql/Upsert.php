@@ -66,14 +66,6 @@ class Upsert extends QueryUpsert {
         }
       }
     }
-    foreach ($this->updateExpressions as $update_expression) {
-      foreach ($update_expression->arguments as $argument => $value) {
-        // Bind the arguments by value. With a by-reference binding, such as
-        // bindParam(), all placeholders would share the loop variable and
-        // read its final value when the statement executes.
-        $stmt->getClientStatement()->bindValue($argument, $value);
-      }
-    }
 
     $options = $this->queryOptions;
     if (!empty($table_information->sequences)) {
@@ -123,12 +115,6 @@ class Upsert extends QueryUpsert {
       return $this->connection->escapeField($field);
     }, $insert_fields);
 
-    // Escape column names of update values.
-    $update_expressions = [];
-    foreach ($this->updateExpressions as $column => $expression) {
-      $update_expressions[$this->connection->escapeField($column)] = $expression->expression;
-    }
-
     $query = $comments . 'INSERT INTO {' . $this->table . '} (' . implode(', ', $insert_fields) . ') VALUES ';
 
     $values = $this->getInsertPlaceholderFragment($this->insertValues, $this->defaultFields);
@@ -143,17 +129,10 @@ class Upsert extends QueryUpsert {
     foreach ($insert_fields as $field) {
       // The "excluded." prefix causes the field to refer to the value for field
       // that would have been inserted had there been no conflict.
-      $update[] = isset($update_expressions[$field]) ? "$field = {$update_expressions[$field]}" : "$field = EXCLUDED.$field";
+      $update[] = "$field = EXCLUDED.$field";
     }
 
-    $query .= ' ON CONFLICT (' . implode(', ', $keys) . ') DO ';
-
-    if (!empty($update)) {
-      $query .= 'UPDATE SET ' . implode(', ', $update);
-    }
-    else {
-      $query .= 'NOTHING';
-    }
+    $query .= ' ON CONFLICT (' . implode(', ', $keys) . ') DO UPDATE SET ' . implode(', ', $update);
 
     return $query;
   }

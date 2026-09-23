@@ -1,6 +1,0 @@
-header:
-  header: true
-  js:
-    js/header.js: {}
-  dependencies:
-    - core/drupal

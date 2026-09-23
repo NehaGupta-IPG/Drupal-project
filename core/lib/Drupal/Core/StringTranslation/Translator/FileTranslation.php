@@ -18,21 +18,31 @@ use Drupal\Core\Language\LanguageInterface;
 class FileTranslation extends StaticTranslation {
 
   /**
+   * Directory to find translation files in the file system.
+   *
+   * @var string
+   */
+  protected $directory;
+
+  /**
+   * The file system.
+   *
+   * @var \Drupal\Core\File\FileSystemInterface
+   */
+  protected $fileSystem;
+
+  /**
    * Constructs a StaticTranslation object.
    *
    * @param string $directory
    *   The directory to retrieve file translations from.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   * @param \Drupal\Core\File\FileSystemInterface $file_system
    *   The file system service.
-   * @param string|null $profile
-   *   The machine name of the install profile, or NULL if not known.
    */
-  public function __construct(
-    protected string $directory,
-    protected FileSystemInterface $fileSystem,
-    protected ?string $profile = NULL,
-  ) {
+  public function __construct($directory, FileSystemInterface $file_system) {
     parent::__construct();
+    $this->directory = $directory;
+    $this->fileSystem = $file_system;
   }
 
   /**
@@ -90,11 +100,10 @@ class FileTranslation extends StaticTranslation {
    *   String file pattern.
    */
   protected function getTranslationFilesPattern($langcode = NULL) {
-    $project = $this->profile ? "(drupal|$this->profile)" : 'drupal';
-    // Matches (drupal|[profile])-[any-version].[language code].po
+    // The file name matches: drupal-[release version].[language code].po
     // When provided the $langcode is use as language code. If not provided all
     // language codes will match.
-    return '!' . $project . '-.+\.' . (!empty($langcode) ? preg_quote($langcode, '!') : LanguageInterface::VALID_LANGCODE_REGEX) . '\.po$!';
+    return '!drupal-[0-9]+\.[0-9]+(\.([0-9]+|x))?(-[a-z]+[0-9]*)?\.' . (!empty($langcode) ? preg_quote($langcode, '!') : LanguageInterface::VALID_LANGCODE_REGEX) . '\.po$!';
   }
 
   /**

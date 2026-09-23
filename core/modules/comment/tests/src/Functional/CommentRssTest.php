@@ -7,7 +7,6 @@ namespace Drupal\Tests\comment\Functional;
 use Drupal\comment\CommentingStatus;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
-use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,7 +19,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class CommentRssTest extends CommentTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
-  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -46,8 +44,6 @@ class CommentRssTest extends CommentTestBase {
       'mode' => 'rss',
       'content' => ['links' => ['weight' => 100]],
     ])->save();
-
-    $this->enablePromotedContentView();
   }
 
   /**
@@ -71,7 +67,7 @@ class CommentRssTest extends CommentTestBase {
 
     $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($cache_contexts)->getCacheTags();
     $this->assertCacheTags(Cache::mergeTags($cache_context_tags, [
-      'config:views.view.promoted_content',
+      'config:views.view.frontpage',
       'node:1', 'node_list',
       'node_view',
       'user:3',

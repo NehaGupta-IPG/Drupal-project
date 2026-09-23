@@ -6,7 +6,6 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\locale\LocaleJs;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -31,11 +30,13 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
 
   /**
    * Tests file parsing.
+   *
+   * @legacy-covers ::\_locale_parse_js_file
    */
   public function testFileParsing(): void {
 
     // This test is for ensuring that the regular expression in
-    // LocaleJs::parseJsFile() finds translatable source strings in all valid
+    // _locale_parse_js_file() finds translatable source strings in all valid
     // JavaScript syntax regardless of the coding style used, especially with
     // respect to optional whitespace, line breaks, etc.
     // - We test locale_test.js, because that is the one that contains a
@@ -44,7 +45,7 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
 
     foreach ($files as $filename) {
       // Parse the file to look for source strings.
-      \Drupal::service(LocaleJs::class)->parseJsFile($filename);
+      _locale_parse_js_file($filename);
 
       // Get all of the source strings that were found.
       $strings = $this->container

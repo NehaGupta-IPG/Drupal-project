@@ -11,6 +11,8 @@ install:
   - ckeditor5
   - config
   - contextual
+  - layout_builder
+  - layout_discovery
   - menu_link_content
   - datetime
   - block_content
@@ -41,6 +43,6 @@ install:
   - content_translation
   - announcements_feed
 themes:
-  - default_admin
+  - claro
   - umami
 keep_english: true

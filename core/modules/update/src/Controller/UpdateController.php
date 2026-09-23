@@ -50,9 +50,9 @@ class UpdateController extends ControllerBase {
     $build = [
       '#theme' => 'update_report',
     ];
-    if ($available = $this->updateManager->getAvailable(TRUE)) {
+    if ($available = update_get_available(TRUE)) {
       $this->moduleHandler()->loadInclude('update', 'compare.inc');
-      $build['#data'] = $this->updateManager->calculateProjectData($available);
+      $build['#data'] = update_calculate_project_data($available);
 
       // @todo Consider using 'fetch_failures' from the 'update' collection
       // in the key_value_expire service for this?
@@ -78,36 +78,12 @@ class UpdateController extends ControllerBase {
     $this->updateManager->refreshUpdateData();
     $batch_builder = (new BatchBuilder())
       ->setTitle($this->t('Checking available update data'))
-      ->addOperation(UpdateManagerInterface::class . ':fetchDataBatch', [])
+      ->addOperation([$this->updateManager, 'fetchDataBatch'], [])
       ->setProgressMessage($this->t('Trying to check available update data ...'))
       ->setErrorMessage($this->t('Error checking available update data.'))
-      ->setFinishCallback(self::class . ':updateFetchDataFinished');
+      ->setFinishCallback('update_fetch_data_finished');
     batch_set($batch_builder->toArray());
     return batch_process('admin/reports/updates');
-  }
-
-  /**
-   * Finished batch callback.
-   *
-   * @param bool $success
-   *   TRUE if batch successfully completed.
-   * @param array $results
-   *   Batch results.
-   */
-  public function updateFetchDataFinished(bool $success, array $results): void {
-    if ($success) {
-      if (!empty($results)) {
-        if (!empty($results['updated'])) {
-          $this->messenger()->addStatus($this->formatPlural($results['updated'], 'Checked available update data for one project.', 'Checked available update data for @count projects.'));
-        }
-        if (!empty($results['failures'])) {
-          $this->messenger()->addError($this->formatPlural($results['failures'], 'Failed to get available update data for one project.', 'Failed to get available update data for @count projects.'));
-        }
-      }
-    }
-    else {
-      $this->messenger()->addError($this->t('An error occurred trying to get available update data.'), 'error');
-    }
   }
 
 }

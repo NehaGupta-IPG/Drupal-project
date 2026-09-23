@@ -17,7 +17,7 @@ class ArgumentsResolver implements ArgumentsResolverInterface {
   /**
    * An associative array of parameter names to object candidate values.
    *
-   * @var array<string,object>
+   * @var array
    */
   protected $objects;
 
@@ -33,7 +33,7 @@ class ArgumentsResolver implements ArgumentsResolverInterface {
    *
    * @param array $scalars
    *   An associative array of parameter names to scalar candidate values.
-   * @param array<string,object> $objects
+   * @param object[] $objects
    *   An associative array of parameter names to object candidate values.
    * @param object[] $wildcards
    *   An array object candidates tried on every parameter regardless of its

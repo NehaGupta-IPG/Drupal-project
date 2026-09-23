@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\options\Functional;
 
-use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\Tests\field\Functional\FieldTestBase;
 
 /**
@@ -34,12 +34,14 @@ abstract class OptionsDynamicValuesTestBase extends FieldTestBase {
   protected $fieldStorage;
 
   /**
-   * The field data.
+   * @var int
    */
   protected int $field;
 
   /**
    * Test data.
+   *
+   * @var array
    */
   protected array $test;
 

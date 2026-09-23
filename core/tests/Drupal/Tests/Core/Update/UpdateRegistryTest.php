@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Update;
 
-use Drupal\Component\Datetime\Time;
-use Drupal\Core\Cache\MemoryCache\MemoryCache;
-use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\Site\Settings;
@@ -32,17 +29,10 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class UpdateRegistryTest extends UnitTestCase {
 
   /**
-   * The memory cache.
-   */
-  protected MemoryCacheInterface $memoryCache;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->memoryCache = new MemoryCache(new Time());
 
     $settings = [];
     $settings['extension_discovery_scan_tests'] = TRUE;
@@ -227,7 +217,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
+    ], $key_value, $theme_handler, 'post_update');
 
     // Confirm the updates are sorted alphabetically.
     $this->assertEquals([
@@ -255,9 +245,7 @@ EOS;
 
     // Preload modules to ensure that ::getAvailableUpdateFunctions filters out
     // not enabled modules.
-    // @phpstan-ignore includeOnce.fileNotFound
     include_once 'vfs://drupal/sites/default/modules/module_a/module_a.post_update.php';
-    // @phpstan-ignore includeOnce.fileNotFound
     include_once 'vfs://drupal/sites/default/modules/module_b/module_b.post_update.php';
 
     $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
@@ -267,7 +255,7 @@ EOS;
           'pathname' => 'core/modules/module_a/module_a.info.yml',
           'filename' => 'module_a.module',
         ],
-    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
+    ], $key_value, $theme_handler, 'post_update');
 
     // Confirm the updates are sorted alphabetically.
     $this->assertEquals([
@@ -312,7 +300,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
+    ], $key_value, $theme_handler, 'post_update');
 
     // Confirm the updates are sorted alphabetically.
     $this->assertEquals(array_values([
@@ -355,7 +343,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
+    ], $key_value, $theme_handler, 'post_update');
 
     // Confirm the updates are sorted alphabetically.
     $expected = [];
@@ -407,7 +395,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
+    ], $key_value, $theme_handler, 'post_update');
 
     // Confirm the updates are sorted alphabetically.
     $expected = [];
@@ -442,7 +430,7 @@ EOS;
           'pathname' => 'core/modules/module_c/module_c.info.yml',
           'filename' => 'module_c.module',
         ],
-    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
+    ], $key_value, $theme_handler, 'post_update');
 
     $this->expectException(RemovedPostUpdateNameException::class);
     $update_registry->getPendingUpdateInformation();
@@ -477,7 +465,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
+    ], $key_value, $theme_handler, 'post_update');
 
     $this->assertEquals(['module_a_post_update_a', 'module_a_post_update_b'], array_values($update_registry->getUpdateFunctions('module_a')));
     $this->assertEquals(['module_b_post_update_a'], array_values($update_registry->getUpdateFunctions('module_b')));
@@ -520,7 +508,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
+    ], $key_value, $theme_handler, 'post_update');
     $update_registry->registerInvokedUpdates(['module_a_post_update_a']);
   }
 
@@ -560,7 +548,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
+    ], $key_value, $theme_handler, 'post_update');
     $update_registry->registerInvokedUpdates([
       'module_a_post_update_a',
       'module_a_post_update_b',
@@ -599,7 +587,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
+    ], $key_value, $theme_handler, 'post_update');
     $update_registry->registerInvokedUpdates(['module_a_post_update_a']);
   }
 
@@ -644,7 +632,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
+    ], $key_value, $theme_handler, 'post_update');
     $update_registry->filterOutInvokedUpdatesByExtension('module_a');
   }
 
@@ -728,7 +716,7 @@ EOS;
           'pathname' => 'core/modules/module_a/module_a.info.yml',
           'filename' => 'module_a.module',
         ],
-    ], $key_value, $theme_handler, $this->memoryCache, 'custom_update');
+    ], $key_value, $theme_handler, 'custom_update');
 
     // Themes are not supported.
     $this->assertEquals([

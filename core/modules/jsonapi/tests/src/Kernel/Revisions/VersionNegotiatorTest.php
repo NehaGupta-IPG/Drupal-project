@@ -142,7 +142,7 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
    */
   public function testInvalidRevisionId(): void {
     $this->expectException(CacheableNotFoundHttpException::class);
-    $this->expectExceptionMessageIs(sprintf('The requested version, identified by `id:%s`, could not be found.', $this->node2->getRevisionId()));
+    $this->expectExceptionMessage(sprintf('The requested version, identified by `id:%s`, could not be found.', $this->node2->getRevisionId()));
     $this->versionNegotiator->getRevision($this->node, 'id:' . $this->node2->getRevisionId());
   }
 
@@ -176,7 +176,7 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
    */
   public function testInvalidRevisionRel(): void {
     $this->expectException(CacheableBadRequestHttpException::class);
-    $this->expectExceptionMessageIs('An invalid resource version identifier, `rel:erroneous-revision-name`, was provided.');
+    $this->expectExceptionMessage('An invalid resource version identifier, `rel:erroneous-revision-name`, was provided.');
     $this->versionNegotiator->getRevision($this->node, 'rel:erroneous-revision-name');
   }
 

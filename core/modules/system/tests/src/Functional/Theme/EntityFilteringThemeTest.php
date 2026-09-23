@@ -12,7 +12,6 @@ use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -25,7 +24,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class EntityFilteringThemeTest extends BrowserTestBase {
 
   use CommentTestTrait;
-  use PromotedContentViewTestTrait;
   use TaxonomyTestTrait;
 
   /**
@@ -137,8 +135,6 @@ class EntityFilteringThemeTest extends BrowserTestBase {
       'comment_body' => [$this->randomMachineName()],
     ]);
     $this->comment->save();
-
-    $this->enablePromotedContentView();
   }
 
   /**

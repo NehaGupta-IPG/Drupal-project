@@ -27,12 +27,19 @@ class AjaxTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Tests that AJAX works on admin routes.
+   * {@inheritdoc}
    */
+  protected function setUp(): void {
+    if ($this->name() === 'testAjaxFocus') {
+      $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3396536");
+    }
+    parent::setUp();
+  }
+
   public function testAjaxWithAdminRoute(): void {
-    \Drupal::service('theme_installer')->install(['stark', 'default_admin']);
+    \Drupal::service('theme_installer')->install(['stark', 'claro']);
     $theme_config = \Drupal::configFactory()->getEditable('system.theme');
-    $theme_config->set('admin', 'default_admin');
+    $theme_config->set('admin', 'claro');
     $theme_config->set('default', 'stark');
     $theme_config->save();
 
@@ -43,7 +50,7 @@ class AjaxTest extends WebDriverTestBase {
     // admin theme.
     $this->drupalGet('admin/ajax-test/theme');
     $assert = $this->assertSession();
-    $assert->pageTextContains('Current theme: default_admin');
+    $assert->pageTextContains('Current theme: claro');
 
     // Now click the modal, which should use the front-end theme.
     $this->drupalGet('ajax-test/dialog');
@@ -52,7 +59,7 @@ class AjaxTest extends WebDriverTestBase {
     $assert->assertWaitOnAjaxRequest();
 
     $assert->pageTextContains('Current theme: stark');
-    $assert->pageTextNotContains('Current theme: default_admin');
+    $assert->pageTextNotContains('Current theme: claro');
   }
 
   /**
@@ -273,7 +280,8 @@ JS;
    */
   public function testUiAjaxException(): void {
     $themes = [
-      'default_admin',
+      'olivero',
+      'claro',
       'stark',
     ];
     \Drupal::service('theme_installer')->install($themes);
@@ -294,11 +302,11 @@ JS;
       $this->assertSession()
         ->statusMessageContainsAfterWait("Oops, something went wrong. Check your browser's developer console for more details.", 'error');
 
-      if ($theme === 'default_admin') {
+      if ($theme === 'olivero') {
         // Check that the message can be closed.
-        $this->click('.button--dismiss');
+        $this->click('.messages__close');
         $this->assertTrue($page->find('css', '.messages--error')
-          ->hasClass('visually-hidden'));
+          ->hasClass('hidden'));
       }
     }
 
@@ -338,15 +346,11 @@ JS;
 
     // Test textfield with 'change' event listener with refocus-blur set to
     // FALSE.
+    $textfield2->setValue('Llamas say hi');
     $textfield3->focus();
-    // Trigger the change event via JavaScript so it fires while focus is on
-    // textfield-3, which is where the refocus must not return to.
-    $this->getSession()->executeScript(<<<JS
-const textfield2 = document.querySelector('#edit-textfield-2');
-textfield2.value = 'Llamas say hi';
-textfield2.dispatchEvent(new Event('change', { bubbles: true }));
-JS);
-    $this->assertTrue($this->getSession()->wait(10000, "document.activeElement.id === 'edit-textfield-2'"));
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $has_focus_id = $this->getSession()->evaluateScript('document.activeElement.id');
+    $this->assertEquals('edit-textfield-2', $has_focus_id);
 
     // Test textfield with 'change' event.
     $textfield3->focus();
@@ -360,27 +364,9 @@ JS);
     // Test email field with 'blur' event listener.
     $email_field1->setValue('user@example.com');
     $email_field1->focus();
-    $email_field1->blur();
     $this->assertSession()->assertWaitOnAjaxRequest();
     $has_focus_id = $this->getSession()->evaluateScript('document.activeElement.id');
     $this->assertEquals('edit-email-field-1', $has_focus_id);
-  }
-
-  /**
-   * Tests URLs that are also a JS object property are not mistakenly trusted.
-   */
-  public function testPropertyUrl(): void {
-    $this->drupalGet('ajax-test/property-link');
-    $this->clickLink('Ajax constructor');
-
-    // The AJAX request should fail because the URL is not trusted.
-    $this->failOnJavascriptConsoleErrors = FALSE;
-    $this->assertSession()
-      ->statusMessageContainsAfterWait("Oops, something went wrong. Check your browser's developer console for more details.", 'error');
-
-    // This is needed to avoid an unfinished AJAX request error from tearDown()
-    // because this test intentionally does not complete all AJAX requests.
-    $this->getSession()->executeScript("delete window.drupalActiveXhrCount");
   }
 
 }

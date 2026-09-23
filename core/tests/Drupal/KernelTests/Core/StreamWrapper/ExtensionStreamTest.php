@@ -50,7 +50,7 @@ class ExtensionStreamTest extends KernelTestBase {
       $this->streamWrappers[$scheme] = $this->container->get("stream_wrapper.$scheme");
     }
 
-    $this->container->get('theme_installer')->install(['default_admin']);
+    $this->container->get('theme_installer')->install(['olivero', 'claro']);
   }
 
   /**
@@ -86,7 +86,7 @@ class ExtensionStreamTest extends KernelTestBase {
   #[TestWith([''])]
   public function testInvalidStreamUri(string $uri): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs("Malformed extension URI: {$uri}");
+    $this->expectExceptionMessage("Malformed extension URI: {$uri}");
     $this->streamWrappers['module']->dirname($uri);
   }
 
@@ -119,9 +119,14 @@ class ExtensionStreamTest extends KernelTestBase {
     'core/modules/image/sample.png',
   ])]
   #[TestWith([
-    'theme://default_admin/style.css',
-    'theme://default_admin',
-    'core/themes/default_admin/style.css',
+    'theme://claro/style.css',
+    'theme://claro',
+    'core/themes/claro/style.css',
+  ])]
+  #[TestWith([
+    'theme://olivero/js/checkbox.js',
+    'theme://olivero/js',
+    'core/themes/olivero/js/checkbox.js',
   ])]
   public function testStreamWrapperMethods(string $uri, string $expected_dirname, string $expected_path): void {
     $base_url = $this->container->get('router.request_context')->getCompleteBaseUrl();
@@ -149,7 +154,7 @@ class ExtensionStreamTest extends KernelTestBase {
     $this->streamWrappers[$scheme]->setUri($uri);
 
     $this->expectException(UnknownExtensionException::class);
-    $this->expectExceptionMessageIs($expected_message);
+    $this->expectExceptionMessage($expected_message);
     $this->streamWrappers[$scheme]->dirname();
   }
 
@@ -167,7 +172,7 @@ class ExtensionStreamTest extends KernelTestBase {
     $this->streamWrappers[$scheme]->setUri($uri);
 
     $this->expectException(UnknownExtensionException::class);
-    $this->expectExceptionMessageIs($expected_message);
+    $this->expectExceptionMessage($expected_message);
     $this->streamWrappers[$scheme]->realpath();
   }
 
@@ -185,7 +190,7 @@ class ExtensionStreamTest extends KernelTestBase {
     $this->streamWrappers[$scheme]->setUri($uri);
 
     $this->expectException(UnknownExtensionException::class);
-    $this->expectExceptionMessageIs($expected_message);
+    $this->expectExceptionMessage($expected_message);
     $this->streamWrappers[$scheme]->getExternalUrl();
   }
 
@@ -221,8 +226,8 @@ class ExtensionStreamTest extends KernelTestBase {
         'The theme system does not exist.',
       ],
       'Module stream wrapper cannot access installed theme' => [
-        'module://default_admin/default_admin.info.yml',
-        'The module default_admin does not exist.',
+        'module://claro/claro.info.yml',
+        'The module claro does not exist.',
       ],
     ];
   }
@@ -234,7 +239,7 @@ class ExtensionStreamTest extends KernelTestBase {
     $this->assertSame('module://file_module_test', $this->streamWrappers['module']->dirname('module://file_module_test/file_module_test.info.yml'));
     $this->container->get('module_installer')->uninstall(['file_module_test']);
     $this->expectException(UnknownExtensionException::class);
-    $this->expectExceptionMessageIs('The module file_module_test does not exist.');
+    $this->expectExceptionMessage('The module file_module_test does not exist.');
     $this->streamWrappers['module']->dirname('module://file_module_test/file_module_test.info.yml');
   }
 
@@ -242,11 +247,11 @@ class ExtensionStreamTest extends KernelTestBase {
    * Tests stream wrappers after theme uninstall.
    */
   public function testWrappersAfterThemeUninstall(): void {
-    $this->assertSame('theme://default_admin', $this->streamWrappers['theme']->dirname('theme://default_admin/default_admin.info.yml'));
-    $this->container->get('theme_installer')->uninstall(['default_admin']);
+    $this->assertSame('theme://claro', $this->streamWrappers['theme']->dirname('theme://claro/claro.info.yml'));
+    $this->container->get('theme_installer')->uninstall(['claro']);
     $this->expectException(UnknownExtensionException::class);
-    $this->expectExceptionMessage('The theme default_admin does not exist.');
-    $this->streamWrappers['theme']->dirname('theme://default_admin/default_admin.info.yml');
+    $this->expectExceptionMessage('The theme claro does not exist.');
+    $this->streamWrappers['theme']->dirname('theme://claro/claro.info.yml');
   }
 
   /**
@@ -271,14 +276,14 @@ class ExtensionStreamTest extends KernelTestBase {
    */
   #[TestWith(['module://system'])]
   #[TestWith(['module://system/system.module'])]
-  #[TestWith(['theme://default_admin'])]
-  #[TestWith(['theme://default_admin/default_admin.theme'])]
+  #[TestWith(['theme://claro'])]
+  #[TestWith(['theme://claro/claro.theme'])]
   public function testDisallowedFileExtensions(string $uri): void {
     [$scheme] = explode('://', $uri);
     $extension = pathinfo($uri, PATHINFO_EXTENSION);
 
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs("The $scheme stream wrapper does not support the '$extension' file type.");
+    $this->expectExceptionMessage("The $scheme stream wrapper does not support the '$extension' file type.");
     $this->streamWrappers[$scheme]->setUri($uri);
     $this->streamWrappers[$scheme]->realpath();
   }
@@ -290,7 +295,7 @@ class ExtensionStreamTest extends KernelTestBase {
   #[TestWith(['theme'])]
   public function testNoExtensionError(string $scheme): void {
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessageIs('Unable to determine the extension name.');
+    $this->expectExceptionMessage('Unable to determine the extension name.');
     file_exists($scheme . '://');
   }
 

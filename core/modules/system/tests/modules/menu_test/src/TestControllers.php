@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\menu_test;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -44,7 +45,7 @@ class TestControllers {
   public function testSession(Request $request) {
     $counter = $request->getSession()->get('menu_test', 0);
     $request->getSession()->set('menu_test', ++$counter);
-    return ['#markup' => "Session menu_test is $counter"];
+    return ['#markup' => new FormattableMarkup('Session menu_test is @count', ['@count' => $counter])];
   }
 
   /**
@@ -65,7 +66,7 @@ class TestControllers {
    */
   public function testDefaults($placeholder = NULL) {
     if ($placeholder) {
-      return ['#markup' => "Sometimes there is a placeholder: '$placeholder'."];
+      return ['#markup' => new FormattableMarkup("Sometimes there is a placeholder: '@placeholder'.", ['@placeholder' => $placeholder])];
     }
     else {
       return ['#markup' => 'Sometimes there is no placeholder.'];

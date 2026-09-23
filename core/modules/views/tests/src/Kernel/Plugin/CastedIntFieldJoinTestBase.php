@@ -200,7 +200,8 @@ abstract class CastedIntFieldJoinTestBase extends DriverSpecificKernelTestBase {
     $join->buildJoin($query, $table, $view->query);
 
     $tables = $query->getTables();
-    return $tables[$table['alias']];
+    $join_info = $tables[$table['alias']];
+    return $join_info;
   }
 
 }

@@ -29,3 +29,9 @@ drupal.user.permissions:
     - user/drupal.user.admin
     - core/drupal.checkbox
     - core/drupal.announce
+
+drupal.user.icons:
+  version: VERSION
+  css:
+    theme:
+      css/user.icons.admin.css: {}

@@ -687,7 +687,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $file = File::load($fid);
     $this->assertInstanceOf(FileInterface::class, $file);
 
-    return [
+    $expected_normalization = [
       'fid' => [
         [
           'value' => (int) $file->id(),
@@ -750,6 +750,8 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
         ],
       ],
     ];
+
+    return $expected_normalization;
   }
 
   /**

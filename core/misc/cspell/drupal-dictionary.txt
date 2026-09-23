@@ -19,7 +19,6 @@ drupalmedia
 drupalorg
 druplicon
 drush
-exin
 fapi
 fieldable
 fulldate
@@ -30,9 +29,12 @@ jswebassert
 keyvalue
 langcode
 langcodes
+lullabot
+mabe
 mulrev
 mulrevpub
 olivero
+olivero's
 prerender
 renderable
 revlog

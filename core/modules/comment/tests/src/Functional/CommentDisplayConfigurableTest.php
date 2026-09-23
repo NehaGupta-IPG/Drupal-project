@@ -8,7 +8,6 @@ use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -23,7 +22,7 @@ class CommentDisplayConfigurableTest extends CommentTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'starterkit_theme';
+  protected $defaultTheme = 'olivero';
 
   /**
    * {@inheritdoc}
@@ -32,10 +31,10 @@ class CommentDisplayConfigurableTest extends CommentTestBase {
     parent::setUp();
 
     // Allow anonymous users to see comments.
-    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments',
       'access content',
-    ])->save();
+    ]);
   }
 
   /**
@@ -60,8 +59,7 @@ class CommentDisplayConfigurableTest extends CommentTestBase {
 
     // Check the comment author with Drupal default non-configurable display.
     $this->drupalGet('node/' . $nid);
-    $display_name = $this->webUser->getDisplayName();
-    $assert->responseContains("Submitted by <span>$display_name</span>");
+    $assert->elementExists('css', 'p.comment__author span');
 
     // Enable module to make base fields' displays configurable.
     \Drupal::service('module_installer')->install(['comment_display_configurable_test']);

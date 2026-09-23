@@ -505,7 +505,7 @@ class UserCancelTest extends BrowserTestBase {
 
     // Confirm there's only one session in the database. The user will be logged
     // out and their session migrated.
-    // @see AccountCancellation::regenerateSession()
+    // @see _user_cancel_session_regenerate()
     $this->assertSame(1, (int) \Drupal::database()->select('sessions', 's')->countQuery()->execute()->fetchField());
 
     // Confirm that user's content has been deleted.

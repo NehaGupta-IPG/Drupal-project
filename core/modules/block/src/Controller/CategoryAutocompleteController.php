@@ -8,7 +8,6 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Returns autocomplete responses for block categories.
@@ -50,11 +49,6 @@ class CategoryAutocompleteController implements ContainerInjectionInterface {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing autocomplete suggestions.
    */
-  #[Route(
-    path: '/block-category/autocomplete',
-    name: 'block.category_autocomplete',
-    requirements: ['_permission' => 'administer blocks'],
-  )]
   public function autocomplete(Request $request) {
     $typed_category = $request->query->get('q');
     $matches = [];

@@ -145,9 +145,10 @@ class ContentTranslationEntityBundleInfoTest extends KernelTestBase {
       'name' => 'Bundle Test',
     ]);
     $bundle->save();
-    return Node::create([
+    $node = Node::create([
       'type' => 'bundle_test',
     ]);
+    return $node;
   }
 
 }

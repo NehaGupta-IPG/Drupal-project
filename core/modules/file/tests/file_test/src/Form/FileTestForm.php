@@ -9,7 +9,6 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\file\Upload\FormFileUploader;
 
 /**
  * File test form class.
@@ -51,7 +50,7 @@ class FileTestForm extends FormBase {
       \Drupal::service('file_system')->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY);
     }
     else {
-      $destination = 'temporary://';
+      $destination = FALSE;
     }
 
     // Setup validators.
@@ -73,12 +72,12 @@ class FileTestForm extends FormBase {
 
     // The test for \Drupal::service('file_system')->moveUploadedFile()
     // triggering a warning is unavoidable. We're interested in what happens
-    // afterwards in FormFileUploader::saveFormUploadedFiles().
+    // afterwards in file_save_upload().
     if (\Drupal::state()->get('file_test.disable_error_collection')) {
       define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     }
 
-    $file = \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles('file_test_upload', $validators, $destination, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
+    $file = file_save_upload('file_test_upload', $validators, $destination, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
     if ($file) {
       $form_state->setValue('file_test_upload', $file);
       \Drupal::messenger()->addStatus($this->t('File @filepath was uploaded.', ['@filepath' => $file->getFileUri()]));

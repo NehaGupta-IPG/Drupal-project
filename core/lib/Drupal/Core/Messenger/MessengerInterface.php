@@ -92,8 +92,10 @@ interface MessengerInterface {
   /**
    * Gets all messages.
    *
-   * @return array<self::TYPE_STATUS|self::TYPE_WARNING|self::TYPE_ERROR, array<string|\Drupal\Component\Render\MarkupInterface>>
-   *   The messages grouped by message type.
+   * @return string[][]|\Drupal\Component\Render\MarkupInterface[][]
+   *   Keys are message types and values are indexed arrays of messages. Message
+   *   types are either self::TYPE_STATUS, self::TYPE_WARNING, or
+   *   self::TYPE_ERROR.
    */
   public function all();
 
@@ -112,8 +114,8 @@ interface MessengerInterface {
   /**
    * Deletes all messages.
    *
-   * @return array<self::TYPE_STATUS|self::TYPE_WARNING|self::TYPE_ERROR, array<string|\Drupal\Component\Render\MarkupInterface>>
-   *   The deleted messages grouped by message type.
+   * @return string[]|\Drupal\Component\Render\MarkupInterface[]
+   *   The deleted messages.
    */
   public function deleteAll();
 

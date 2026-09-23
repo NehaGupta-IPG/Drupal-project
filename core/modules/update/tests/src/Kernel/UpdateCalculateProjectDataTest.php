@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Test the values set in \Drupal\update\UpdateManagerInterface::calculateProjectData().
+ * Test the values set in update_calculate_project_data().
  */
 #[Group('update')]
 #[RunTestsInSeparateProcesses]
@@ -115,12 +115,15 @@ class UpdateCalculateProjectDataTest extends KernelTestBase {
 
   /**
    * Tests the project_status of the project.
+   *
+   * @legacy-covers update_calculate_project_update_status
    */
   #[DataProvider('providerProjectStatus')]
   public function testProjectStatus(string $fixture, int $status, string $label, string $expected_error_message): void {
+    update_storage_clear();
     $this->setReleaseMetadata(__DIR__ . $fixture);
-    $available = \Drupal::service(UpdateManagerInterface::class)->getAvailable(TRUE);
-    $project_data = \Drupal::service(UpdateManagerInterface::class)->calculateProjectData($available);
+    $available = update_get_available(TRUE);
+    $project_data = update_calculate_project_data($available);
     $this->assertArrayHasKey('status', $project_data['drupal']);
     $this->assertEquals($status, $project_data['drupal']['status']);
     $this->assertArrayHasKey('extra', $project_data['drupal']);

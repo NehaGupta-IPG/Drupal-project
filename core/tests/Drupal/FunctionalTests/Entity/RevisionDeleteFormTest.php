@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[CoversClass(RevisionDeleteForm::class)]
 #[Group('Entity')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class RevisionDeleteFormTest extends BrowserTestBase {
 

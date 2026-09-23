@@ -9,8 +9,6 @@ use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\locale\LocaleSource;
-use Drupal\locale\Model\Overwrite;
-use Drupal\locale\Model\TranslationUpdateMode;
 use Drupal\locale\StreamWrapper\TranslationsStream;
 
 /**
@@ -67,14 +65,21 @@ class LocaleSettingsForm extends ConfigFormBase {
       '#type' => 'radios',
       '#title' => $this->t('Translation source'),
       '#config_target' => 'locale.settings:translation.use_source',
-      '#options' => TranslationUpdateMode::asOptions(),
+      '#options' => [
+        LOCALE_TRANSLATION_USE_SOURCE_REMOTE_AND_LOCAL => $this->t('Drupal translation server and local files'),
+        LOCALE_TRANSLATION_USE_SOURCE_LOCAL => $this->t('Local files only'),
+      ],
       '#description' => $this->t('The source of translation files for automatic interface translation.') . ' ' . $description,
     ];
 
     $form['overwrite'] = [
       '#type' => 'radios',
       '#title' => $this->t('Import behavior'),
-      '#options' => Overwrite::asOptions(),
+      '#options' => [
+        LOCALE_TRANSLATION_OVERWRITE_NONE => $this->t("Don't overwrite existing translations."),
+        LOCALE_TRANSLATION_OVERWRITE_NON_CUSTOMIZED => $this->t('Only overwrite imported translations, customized translations are kept.'),
+        LOCALE_TRANSLATION_OVERWRITE_ALL => $this->t('Overwrite existing translations.'),
+      ],
       '#description' => $this->t('How to treat existing translations when automatically updating the interface translations.'),
       '#config_target' => new ConfigTarget(
         'locale.settings',
@@ -82,21 +87,21 @@ class LocaleSettingsForm extends ConfigFormBase {
           'translation.overwrite_customized',
           'translation.overwrite_not_customized',
         ],
-        fromConfig: fn (bool $overwrite_customized, bool $overwrite_not_customized): string => match (TRUE) {
-          $overwrite_not_customized == FALSE => Overwrite::None->value,
-          $overwrite_customized == TRUE => Overwrite::All->value,
-          default => Overwrite::NonCustomized->value,
+        fromConfig: fn (bool $overwrite_customized, bool $overwrite_not_customized): string => match(TRUE) {
+          $overwrite_not_customized == FALSE => LOCALE_TRANSLATION_OVERWRITE_NONE,
+          $overwrite_customized == TRUE => LOCALE_TRANSLATION_OVERWRITE_ALL,
+          default => LOCALE_TRANSLATION_OVERWRITE_NON_CUSTOMIZED,
         },
-        toConfig: fn (string $radio_option): array => match ($radio_option) {
-          Overwrite::All->value => [
+        toConfig: fn (string $radio_option): array => match($radio_option) {
+          LOCALE_TRANSLATION_OVERWRITE_ALL => [
             'translation.overwrite_customized' => TRUE,
             'translation.overwrite_not_customized' => TRUE,
           ],
-          Overwrite::NonCustomized->value => [
+          LOCALE_TRANSLATION_OVERWRITE_NON_CUSTOMIZED => [
             'translation.overwrite_customized' => FALSE,
             'translation.overwrite_not_customized' => TRUE,
           ],
-          Overwrite::None->value => [
+          LOCALE_TRANSLATION_OVERWRITE_NONE => [
             'translation.overwrite_customized' => FALSE,
             'translation.overwrite_not_customized' => FALSE,
           ],
@@ -113,7 +118,7 @@ class LocaleSettingsForm extends ConfigFormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
 
-    if (empty($form['#translation_directory']) && $form_state->getValue('use_source') == TranslationUpdateMode::Local->value) {
+    if (empty($form['#translation_directory']) && $form_state->getValue('use_source') == LOCALE_TRANSLATION_USE_SOURCE_LOCAL) {
       $form_state->setErrorByName('use_source', $this->t('You have selected local translation source, but no <a href=":url">Interface translation directory</a> was configured.', [':url' => Url::fromRoute('system.file_system_settings')->toString()]));
     }
   }

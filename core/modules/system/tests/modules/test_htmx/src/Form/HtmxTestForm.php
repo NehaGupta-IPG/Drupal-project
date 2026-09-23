@@ -7,14 +7,12 @@ namespace Drupal\test_htmx\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Htmx\Htmx;
-use Drupal\Core\Htmx\HtmxRequestInfoTrait;
 use Drupal\Core\Url;
 
 /**
  * A small form used to test HTMX dynamic forms.
  */
 class HtmxTestForm extends FormBase {
-  use HtmxRequestInfoTrait;
 
   /**
    * {@inheritdoc}
@@ -68,11 +66,11 @@ class HtmxTestForm extends FormBase {
       ->applyTo($form['data'], '#wrapper_attributes');
 
     $push = FALSE;
-    if ($this->getHtmxTriggerName() === 'type') {
+    if ($this->getTriggerElement($form_state) === 'type') {
       $form['data']['#markup'] = '';
       $push = Url::fromRoute('test_htmx.form_builder_test');
     }
-    elseif ($this->getHtmxTriggerName() === 'selected') {
+    elseif ($this->getTriggerElement($form_state) === 'selected') {
       // A value is selected.
       $defaultSelection = $form_state->getValue('selected', $selected);
       // Also update the browser URL.
@@ -113,6 +111,11 @@ class HtmxTestForm extends FormBase {
       ],
     ];
     return $options[$selected] ?? [];
+  }
+
+  protected function getTriggerElement($form_state): string|bool {
+    $input = $form_state->getUserInput();
+    return !empty($input['_triggering_element_name']) ? $input['_triggering_element_name'] : FALSE;
   }
 
 }

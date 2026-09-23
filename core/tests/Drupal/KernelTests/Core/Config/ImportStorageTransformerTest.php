@@ -88,7 +88,7 @@ class ImportStorageTransformerTest extends KernelTestBase {
     );
 
     $this->expectException(StorageTransformerException::class);
-    $this->expectExceptionMessageIs("Cannot acquire config import transformer lock.");
+    $this->expectExceptionMessage("Cannot acquire config import transformer lock.");
     $transformer->transform(new MemoryStorage());
   }
 

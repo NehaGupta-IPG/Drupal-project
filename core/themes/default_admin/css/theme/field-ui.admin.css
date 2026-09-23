@@ -11,6 +11,7 @@
  */
 
 /* 'Manage fields' and 'Manage display' overviews */
+
 .field-ui-overview {
   /* Extra specificity to override tabledrag CSS. */
   &[class] td {
@@ -54,7 +55,7 @@
   .field-option__icon {
     filter: brightness(0);
 
-    .dark-mode & {
+    .gin--dark-mode & {
       filter: brightness(0) invert(1);
     }
   }
@@ -101,7 +102,7 @@
     .field-option__icon {
       filter: brightness(0) invert(1);
 
-      .dark-mode & {
+      .gin--dark-mode & {
         filter: brightness(0);
       }
     }
@@ -116,6 +117,7 @@
 }
 
 /* 'Manage form display' and 'Manage display' overview */
+
 .field-plugin-summary {
   float: inline-start;
   color: var(--admin-color-text-soft);
@@ -129,6 +131,7 @@
 }
 
 /* Settings edit. */
+
 .field-plugin-settings-edit-wrapper {
   position: relative;
   display: flex;

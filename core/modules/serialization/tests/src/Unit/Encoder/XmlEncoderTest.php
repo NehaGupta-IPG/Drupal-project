@@ -8,7 +8,6 @@ use Drupal\serialization\Encoder\XmlEncoder;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Serializer\Encoder\XmlEncoder as BaseXmlEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -29,8 +28,10 @@ class XmlEncoderTest extends UnitTestCase {
 
   /**
    * The Symfony XML encoder.
+   *
+   * @var \Symfony\Component\Serializer\Encoder\XmlEncoder|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected BaseXmlEncoder&MockObject $baseEncoder;
+  protected $baseEncoder;
 
   /**
    * An array of test data.

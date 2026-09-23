@@ -21,8 +21,12 @@ class Element implements TrustedCallbackInterface {
   public function __construct(
     #[Autowire(service: 'plugin.manager.editor')]
     protected PluginManagerInterface $pluginManager,
-    protected ModuleHandlerInterface $moduleHandler,
+    protected ?ModuleHandlerInterface $moduleHandler = NULL,
   ) {
+    if (!$moduleHandler) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleHandler argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3568146', E_USER_DEPRECATED);
+      $this->moduleHandler = \Drupal::moduleHandler();
+    }
   }
 
   /**

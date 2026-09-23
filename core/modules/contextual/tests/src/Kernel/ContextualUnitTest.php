@@ -42,7 +42,7 @@ class ContextualUnitTest extends KernelTestBase {
         ],
       ],
       'node:node=14031991:langcode=en',
-      'stark',
+      'olivero',
     ];
 
     $tests['one group, multiple dynamic path arguments, no metadata'] = [
@@ -57,14 +57,14 @@ class ContextualUnitTest extends KernelTestBase {
         ],
       ],
       'foo:0=bar&key=baz&1=qux:langcode=en',
-      'default_admin',
+      'claro',
     ];
 
     $tests['one group, one dynamic path argument, metadata'] = [
       [
         'views_ui_edit' => [
           'route_parameters' => [
-            'view' => 'promoted_content',
+            'view' => 'frontpage',
           ],
           'metadata' => [
             'location' => 'page',
@@ -73,8 +73,8 @@ class ContextualUnitTest extends KernelTestBase {
           ],
         ],
       ],
-      'views_ui_edit:view=promoted_content:location=page&display=page_1&langcode=en',
-      'stark',
+      'views_ui_edit:view=frontpage:location=page&display=page_1&langcode=en',
+      'olivero',
     ];
 
     $tests['multiple groups, multiple dynamic path arguments'] = [
@@ -99,7 +99,7 @@ class ContextualUnitTest extends KernelTestBase {
         ],
       ],
       'node:node=14031991:langcode=en|foo:0=bar&key=baz&1=qux:langcode=en|edge:0=20011988:langcode=en',
-      'default_admin',
+      'claro',
     ];
 
     return $tests;

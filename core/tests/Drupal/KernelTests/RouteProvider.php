@@ -91,7 +91,7 @@ class RouteProvider implements PreloadableRouteProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAllRoutes(): iterable {
+  public function getAllRoutes(): array {
     return $this->lazyLoadItself()->getAllRoutes();
   }
 
