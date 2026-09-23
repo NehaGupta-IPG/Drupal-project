@@ -77,6 +77,7 @@ class OptionsSelectWidget extends OptionsWidgetBase {
     if (!$this->required) {
       return $this->t('- None -');
     }
+    return NULL;
   }
 
 }
