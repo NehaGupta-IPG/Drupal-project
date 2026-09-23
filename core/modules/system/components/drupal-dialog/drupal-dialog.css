@@ -113,12 +113,6 @@ dialog::backdrop {
 .dialog--narrow {
   --dialog-width: 500px;
   --dialog-max-width: 500px;
-
-  --dialog-width-narrow: 500px;
-  --dialog-max-width-narrow: 500px;
-  --dialog-width-wide: 1100px;
-  --dialog-max-width-wide: 1100px;
-  --dialog-height-x-wide: 600px;
 }
 
 .dialog--wide {
