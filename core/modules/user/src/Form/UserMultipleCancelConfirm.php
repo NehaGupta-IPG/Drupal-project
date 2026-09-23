@@ -9,6 +9,7 @@ use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
+use Drupal\user\AccountCancellation;
 use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -51,17 +52,12 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a new UserMultipleCancelConfirm.
-   *
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
-   *   The temp store factory.
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
-  public function __construct(PrivateTempStoreFactory $temp_store_factory, UserStorageInterface $user_storage, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(
+    PrivateTempStoreFactory $temp_store_factory,
+    UserStorageInterface $user_storage,
+    EntityTypeManagerInterface $entity_type_manager,
+    protected AccountCancellation $accountCancellation,
+  ) {
     $this->tempStoreFactory = $temp_store_factory;
     $this->userStorage = $user_storage;
     $this->entityTypeManager = $entity_type_manager;
@@ -74,7 +70,8 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
     return new static(
       $container->get('tempstore.private'),
       $container->get('entity_type.manager')->getStorage('user'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get(AccountCancellation::class),
     );
   }
 
@@ -171,7 +168,7 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
       '#access' => $selectCancel,
     ];
 
-    $form['user_cancel_method'] += user_cancel_methods();
+    $form['user_cancel_method'] += $this->accountCancellation->cancelMethods();
 
     if (!$selectCancel) {
       // Display an item to inform the user of the setting.
@@ -234,7 +231,7 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
           $admin_form->submitForm($admin_form_mock, $admin_form_state);
         }
         else {
-          user_cancel($form_state->getValues(), $uid, $form_state->getValue('user_cancel_method'));
+          $this->accountCancellation->cancel($form_state->getValues(), $uid, $form_state->getValue('user_cancel_method'));
         }
       }
     }
