@@ -134,6 +134,10 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
     }
 
     if (isset($extension)) {
+      $base_path = base_path();
+      if (str_starts_with($logo_uri, $base_path)) {
+        $logo_uri = substr($logo_uri, strlen($base_path));
+      }
       $logo_uri = ltrim($logo_uri, '/');
       $build['site_logo'] = [
         '#access' => $this->configuration['use_site_logo'],
