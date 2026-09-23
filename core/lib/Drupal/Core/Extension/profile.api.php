@@ -20,6 +20,7 @@
  * - name: The human-readable name of the profile. (Required)
  * - type: Must be set to 'profile'. (Required)
  * - core_version_requirement: Specifies the compatible Drupal core version.
+ *   You may provide multiple versions and use >, <, >=, and <= comparators.
  *   (Required)
  *
  * @subsection optional Optional keys
@@ -66,7 +67,7 @@
  * name: My Profile
  * type: profile
  * description: 'A custom installation profile.'
- * core_version_requirement: ^11
+ * core_version_requirement: ^11.3 || ^12
  * install:
  *   - block
  *   - dblog
@@ -79,7 +80,7 @@
  * name: My Distribution
  * type: profile
  * description: 'A complete distribution built on Drupal.'
- * core_version_requirement: ^11
+ * core_version_requirement: ^11.3 || ^12
  * distribution:
  *   name: 'My Distribution'
  *   install:
