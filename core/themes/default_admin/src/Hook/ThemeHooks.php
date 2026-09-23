@@ -9,7 +9,6 @@ use Drupal\default_admin\Settings;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Asset\AssetQueryStringInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
-use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Security\TrustedCallbackInterface;
@@ -25,7 +24,6 @@ class ThemeHooks implements TrustedCallbackInterface {
    */
   public function __construct(
     protected readonly ThemeExtensionList $themeExtensionList,
-    protected readonly ThemeHandlerInterface $themeHandler,
     protected readonly RequestStack $requestStack,
     protected readonly AssetQueryStringInterface $assetQueryString,
   ) {}
@@ -42,29 +40,6 @@ class ThemeHooks implements TrustedCallbackInterface {
       'textFormat',
       'verticalTabs',
     ];
-  }
-
-  /**
-   * Implements hook_css_alter().
-   *
-   * Set admin CSS on top of all other CSS files.
-   */
-  #[Hook('css_alter')]
-  public function cssAlter(array &$css): void {
-    // Use anything greater than 100 to have it load after the theme as
-    // CSS_AGGREGATE_THEME is set to 100. Let's be on the safe side and assign a
-    // high number to it.
-    $base_css = $this->themeExtensionList->getPath('default_admin') . '/migration/css/base/gin.css';
-
-    if (isset($css[$base_css])) {
-      $css[$base_css]['group'] = 200;
-    }
-
-    // The admin-custom.css file should be loaded just after admin.css file.
-    $custom_css = 'public://admin-custom.css';
-    if (isset($css[$custom_css])) {
-      $css[$custom_css]['group'] = 201;
-    }
   }
 
   /**
@@ -126,33 +101,6 @@ class ThemeHooks implements TrustedCallbackInterface {
   }
 
   /**
-   * Implements hook_library_info_alter().
-   */
-  #[Hook('library_info_alter')]
-  public function libraryInfoAlter(array &$libraries, string $extension): void {
-    if ($extension === 'toolbar') {
-      $gin_info = $this->themeHandler->listInfo()['default_admin']->info;
-      $path_prefix = '/core/themes/default_admin/';
-      $gin_toolbar_overrides = $gin_info['libraries-override']['toolbar/toolbar'];
-      foreach ($gin_toolbar_overrides['css'] as $concern => $overrides) {
-        foreach ($gin_toolbar_overrides['css'][$concern] as $key => $value) {
-          $config = $libraries['toolbar']['css'][$concern][$key];
-          $libraries['toolbar']['css'][$concern][$path_prefix . $value] = $config;
-          unset($libraries['toolbar']['css'][$concern][$key]);
-        }
-      }
-      $gin_toolbar_menu_overrides = $gin_info['libraries-override']['toolbar/toolbar.menu'];
-      foreach ($gin_toolbar_menu_overrides['css'] as $concern => $overrides) {
-        foreach ($gin_toolbar_menu_overrides['css'][$concern] as $key => $value) {
-          $config = $libraries['toolbar.menu']['css'][$concern][$key];
-          $libraries['toolbar.menu']['css'][$concern][$path_prefix . $value] = $config;
-          unset($libraries['toolbar.menu']['css'][$concern][$key]);
-        }
-      }
-    }
-  }
-
-  /**
    * Implements hook_page_attachments_alter().
    */
   #[Hook('page_attachments_alter')]
@@ -198,39 +146,34 @@ class ThemeHooks implements TrustedCallbackInterface {
     // Attach sticky library.
     $page['#attached']['library'][] = 'default_admin/sticky';
 
-    // Custom CSS file.
-    if (file_exists('public://admin-custom.css')) {
-      $page['#attached']['library'][] = 'default_admin/admin_custom_css';
-    }
-
     $settings = Settings::getInstance();
     // Expose theme settings to JS.
-    $page['#attached']['drupalSettings']['gin']['dark_mode'] = $settings->get('enable_dark_mode');
-    $page['#attached']['drupalSettings']['gin']['dark_mode_class'] = 'gin--dark-mode';
-    $page['#attached']['drupalSettings']['gin']['accent_colors'] = Helper::accentColors();
-    $page['#attached']['drupalSettings']['gin']['preset_accent_color'] = $settings->get('preset_accent_color');
-    $page['#attached']['drupalSettings']['gin']['accent_color'] = $settings->get('accent_color');
-    $page['#attached']['drupalSettings']['gin']['preset_focus_color'] = $settings->get('preset_focus_color');
-    $page['#attached']['drupalSettings']['gin']['focus_color'] = $settings->get('focus_color');
-    $page['#attached']['drupalSettings']['gin']['high_contrast_mode'] = $settings->get('high_contrast_mode');
-    $page['#attached']['drupalSettings']['gin']['high_contrast_mode_class'] = 'gin--high-contrast-mode';
-    $page['#attached']['drupalSettings']['gin']['show_user_theme_settings'] = $settings->get('show_user_theme_settings');
-
-    // Expose stylesheets to JS.
-    $base_theme_url = '/' . $this->themeExtensionList->getPath('default_admin');
-    $page['#attached']['drupalSettings']['gin']['variables_css_path'] = $base_theme_url . '/migration/css/theme/variables.css';
-    $page['#attached']['drupalSettings']['gin']['accent_css_path'] = $base_theme_url . '/migration/css/theme/accent.css';
+    $default_admin_settings = [
+      'dark_mode' => $settings->get('enable_dark_mode'),
+      'dark_mode_class' => 'dark-mode',
+      'accent_colors' => Helper::accentColors(),
+      'preset_accent_color' => $settings->get('preset_accent_color'),
+      'accent_color' => $settings->get('accent_color'),
+      'preset_focus_color' => $settings->get('preset_focus_color'),
+      'focus_color' => $settings->get('focus_color'),
+      'high_contrast_mode' => $settings->get('high_contrast_mode'),
+      'high_contrast_mode_class' => 'high-contrast-mode',
+      'show_user_theme_settings' => $settings->get('show_user_theme_settings'),
+    ];
+    $page['#attached']['drupalSettings']['defaultAdmin'] = $default_admin_settings;
+    // Retain the previous key for integrations while the theme is experimental.
+    $page['#attached']['drupalSettings']['gin'] = $default_admin_settings;
 
     $page['#attached']['html_head'][] = [
       [
         '#tag' => 'script',
         '#attributes' => [
           'type' => 'application/json',
-          'id' => 'gin-setting-dark_mode',
+          'id' => 'default-admin-setting-dark_mode',
         ],
-        '#value' => new FormattableMarkup('{ "ginDarkMode": "@value" }', ['@value' => $settings->get('enable_dark_mode') ?? 'unknown']),
+        '#value' => new FormattableMarkup('{ "defaultAdminDarkMode": "@value" }', ['@value' => $settings->get('enable_dark_mode') ?? 'unknown']),
       ],
-      'gin_dark_mode',
+      'default_admin_dark_mode',
     ];
   }
 

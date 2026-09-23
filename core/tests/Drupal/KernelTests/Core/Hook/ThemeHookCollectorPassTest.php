@@ -127,7 +127,8 @@ class ThemeHookCollectorPassTest extends KernelTestBase {
   public function testHookExecution(): void {
     $this->container->get('theme_installer')->install(['oop_hook_theme']);
     $theme_manager = $this->container->get('theme.manager');
-    $theme_manager->setActiveTheme(\Drupal::service('theme.initialization')->initTheme('oop_hook_theme'));
+    $theme_manager->setActiveTheme(\Drupal::service('theme.initialization')
+      ->initTheme('oop_hook_theme'));
     $expected_calls = [
       'Drupal\oop_hook_theme\Hook\TestHookCollectionHooks::testHookAlter',
     ];

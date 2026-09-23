@@ -18,7 +18,7 @@ class FilterCriteriaTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'views', 'views_ui'];
+  protected static $modules = ['node', 'views', 'views_ui', 'node_block_test'];
 
   /**
    * {@inheritdoc}
@@ -47,18 +47,22 @@ class FilterCriteriaTest extends WebDriverTestBase {
    * Tests dialog for filter criteria.
    */
   public function testFilterCriteriaDialog(): void {
-    // Checks that the admin summary is not double escaped.
-    $this->drupalGet('admin/structure/views/view/who_s_online');
-    $page = $this->getSession()->getPage();
-    $this->assertNotNull($page->findLink('User: Last access (>= -15 minutes)'));
-
-    $this->drupalGet('admin/structure/views/view/content_recent');
     $assert_session = $this->assertSession();
     $session = $this->getSession();
     $page = $session->getPage();
 
-    $this->openFilterDialog();
+    // Checks that the admin summary is not double escaped.
+    $this->drupalGet('admin/structure/views/nojs/add-handler/test_content_recent/block_1/filter');
+    $this->getSession()->getPage()->checkField('name[node_field_data.changed]');
+    $this->submitForm([], 'Add and configure filter criteria');
+    $this->submitForm([
+      'options[operator]' => '>',
+      'options[value][value]' => '1 day',
+      'options[value][type]' => 'offset',
+    ], 'Apply');
+    $this->assertNotNull($page->findLink('Content: Changed (> 1 day)'));
 
+    $this->openFilterDialog();
     // Add a new filter group.
     $create_new_filter_group = $page->findById('views-add-group-link');
     $this->assertTrue($create_new_filter_group->isVisible(), 'Add group link found.');
@@ -133,8 +137,8 @@ class FilterCriteriaTest extends WebDriverTestBase {
    * Tests operator labels.
    */
   public function testOperatorLabels(): void {
-    // Open the "Frontpage" view.
-    $this->drupalGet('admin/structure/views/view/frontpage');
+    // Open the "Promoted Content" view.
+    $this->drupalGet('admin/structure/views/view/promoted_content');
     $session = $this->getSession();
     $page = $session->getPage();
 

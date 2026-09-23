@@ -18,22 +18,22 @@
 #}
 {{ attach_library('core/drupal.collapse') }}
 
-<div class="system-status-report gin-layer-wrapper">
+<div class="system-status-report layer-wrapper">
   <h2 class="system-status-general-info__header">{{ 'Status Details'|t }}</h2>
   {% for group in grouped_requirements %}
-    <details class="gin-details" open>
-      <summary id="{{ group.type }}" class="gin-details__summary gin-details__summary--system-status-report">{{ group.title }}</summary>
-      <div class="gin-details__wrapper gin-details__wrapper--system-status-report">
+    <details class="details" open>
+      <summary id="{{ group.type }}" class="details__summary details__summary--system-status-report">{{ group.title }}</summary>
+      <div class="details__wrapper details__wrapper--system-status-report">
         {% for requirement in group.items %}
           <div class="system-status-report__row">
               {%
                 set summary_classes = [
                   'system-status-report__status-title',
-                  group.type in ['warning', 'error'] ? 'system-status-report__status-icon system-status-report__status-icon--' ~ group.type
+                  group.type in ['warning', 'error'] ? 'system-status-report__status-icon system-status-report__status-icon--' ~ group.type,
                 ]
               %}
-              <div{{ create_attribute({'class': summary_classes}) }} role="button">
-                {% if requirement.severity_title  %}
+              <div{{ create_attribute({class: summary_classes}) }} role="button">
+                {% if requirement.severity_title %}
                   <span class="visually-hidden">{{ requirement.severity_title }}</span>
                 {% endif %}
                 {{ requirement.title }}

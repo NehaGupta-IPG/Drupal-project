@@ -10,68 +10,18 @@
  * Breadcrumbs.
  */
 
-.breadcrumb {
-  padding: 0;
-  color: var(--admin-color-text);
-  font-size: 0.79rem;
-}
-
-.breadcrumb__list,
-[dir="rtl"] .breadcrumb__list {
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
-}
-
-.breadcrumb__item,
-.breadcrumb__link {
-  display: inline-block;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  color: var(--admin-color-text);
-  font-weight: bold;
-  line-height: 1.5rem;
-}
-
-.breadcrumb__item + .breadcrumb__item::before {
-  display: inline-block;
-  padding: 0 0.75rem;
-  content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' height='8' width='5'%3e%3cpath fill='currentColor' d='M1.207.647L.5 1.354 3.146 4 .5 6.647l.707.707L4.561 4z'/%3e%3c/svg%3e");
-
-  [dir="rtl"] & {
-    transform: scaleX(-1);
-  }
-
-  @media (forced-colors: active) {
-    width: 0.3125rem; /* Width and height of the SVG. */
-    height: 0.5rem;
-    content: "";
-    background-color: canvastext;
-    mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' height='8' width='5'%3e%3cpath fill='currentColor' d='M1.207.647L.5 1.354 3.146 4 .5 6.647l.707.707L4.561 4z'/%3e%3c/svg%3e");
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    mask-position: center;
-  }
-}
-
-.breadcrumb__link:hover,
-.breadcrumb__link:focus {
-  -webkit-text-decoration: none;
-  text-decoration: none;
-}
-
-:where(*),
+*,
 :is(#extra-specificity-hack, [data-drupal-admin-styles]) {
-  .gin-breadcrumb {
+  .breadcrumb {
     padding: 0;
     color: var(--admin-color-text);
   }
 
-  .gin-breadcrumb-wrapper {
+  .breadcrumb-wrapper {
     min-width: 1px;
   }
 
-  .gin-breadcrumb__list {
+  .breadcrumb__list {
     overflow: hidden;
     width: auto;
     margin: 0;
@@ -83,9 +33,9 @@
     text-overflow: ellipsis;
   }
 
-  .gin-breadcrumb__item,
-  .gin-breadcrumb__link,
-  .gin-breadcrumb__text {
+  .breadcrumb__item,
+  .breadcrumb__link,
+  .breadcrumb__text {
     display: inline;
     vertical-align: middle;
     -webkit-text-decoration: none;
@@ -94,13 +44,13 @@
     font-weight: var(--admin-font-weight-normal);
   }
 
-  .gin-breadcrumb__item {
+  .breadcrumb__item {
     font-size: 0;
 
-    & + .gin-breadcrumb__item::before {
+    & + .breadcrumb__item::before {
       display: inline-block;
       padding: 0 0.5em;
-      content: "/";
+      content: "/" / "";
       vertical-align: middle;
       opacity: 0.3;
       background: none;
@@ -111,7 +61,12 @@
       }
     }
 
-    &:first-of-type .gin-breadcrumb__link {
+    /* Flip separator horizontally for RTL. */
+    &:not(:first-of-type) + .breadcrumb__item:dir(rtl)::before {
+      scale: -1 1;
+    }
+
+    &:first-of-type .breadcrumb__link {
       position: relative;
       padding-inline-start: 1.75em;
 
@@ -144,7 +99,7 @@
       }
     }
 
-    &:first-of-type + .gin-breadcrumb__item::before {
+    &:first-of-type + .breadcrumb__item::before {
       width: 1px;
       height: 1.25rem;
       margin-inline-end: 0.75em;
@@ -160,36 +115,36 @@
     }
   }
 
-  .gin-breadcrumb__link,
-  .gin-breadcrumb__text {
+  .breadcrumb__link,
+  .breadcrumb__text {
     border-radius: var(--admin-radius-2xs);
     font-size: var(--admin-font-size-xs);
     line-height: 2;
   }
 
-  .gin-breadcrumb__link,
-  .gin-breadcrumb__link:link,
-  .gin-breadcrumb__link:visited,
-  .gin-breadcrumb__link em,
-  .gin-breadcrumb__link em:link,
-  .gin-breadcrumb__link em:visited,
-  .gin-breadcrumb__text,
-  .gin-breadcrumb__text:link,
-  .gin-breadcrumb__text:visited,
-  .gin-breadcrumb__text em,
-  .gin-breadcrumb__text em:link,
-  .gin-breadcrumb__text em:visited {
+  .breadcrumb__link,
+  .breadcrumb__link:link,
+  .breadcrumb__link:visited,
+  .breadcrumb__link em,
+  .breadcrumb__link em:link,
+  .breadcrumb__link em:visited,
+  .breadcrumb__text,
+  .breadcrumb__text:link,
+  .breadcrumb__text:visited,
+  .breadcrumb__text em,
+  .breadcrumb__text em:link,
+  .breadcrumb__text em:visited {
     color: var(--admin-color-text-soft);
     font-weight: var(--admin-font-weight-normal);
   }
 
-  .gin-breadcrumb__link em,
-  .gin-breadcrumb__text em {
+  .breadcrumb__link em,
+  .breadcrumb__text em {
     font-style: italic;
   }
 
-  .gin-breadcrumb__link:hover,
-  .gin-breadcrumb__link:hover em {
+  .breadcrumb__link:hover,
+  .breadcrumb__link:hover em {
     color: var(--admin-color-primary-hover);
   }
 }
