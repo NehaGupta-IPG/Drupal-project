@@ -42,13 +42,14 @@ class ViewAjaxResponse extends CacheableAjaxResponse {
   }
 
   /**
-   * {@inheritdoc}
+   * Serialize the ViewAjaxResponse object.
    */
   public function __serialize(): array {
     // Get all properties.
     $data = get_object_vars($this);
 
-    // Replace view by values allowing to rebuild it when unserializing.
+    // Replace the ViewExecutable by values allowing to rebuild it when
+    // unserializing.
     unset($data['view']);
     $data['request'] = serialize($this->view->getRequest());
     $data['view_id'] = $this->view->id();
@@ -58,10 +59,10 @@ class ViewAjaxResponse extends CacheableAjaxResponse {
   }
 
   /**
-   * {@inheritdoc}
+   * Unserialize the ViewAjaxResponse object.
    */
   public function __unserialize(array $data): void {
-    // Rebuild ViewExecutable instance.
+    // Rebuild ViewExecutable instance from serialized values.
     \Drupal::requestStack()->push(unserialize($data['request']));
     $this->view = Views::getView($data['view_id']);
     $this->view->setDisplay($data['display_id']);
