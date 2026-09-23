@@ -210,7 +210,7 @@ YAML,
       $this->expectException($expected_exception);
     }
     if ($expected_message) {
-      $this->expectExceptionMessage($expected_message);
+      $this->expectExceptionMessageIs($expected_message);
     }
     $container = $this->mockModuleInVfs('ckeditor5_invalid_plugin', $yaml, $additional_files);
     $pluginManager = $container->get('plugin.manager.ckeditor5.plugin');
@@ -1098,7 +1098,7 @@ PHP,
     // editor config entity is passed: only then can a subset be generated based
     // on configuration.
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage($expected_exception_message);
+    $this->expectExceptionMessageIs($expected_exception_message);
     $this->manager->getProvidedElements([$sneaky_plugin_id], $text_editor);
   }
 
@@ -1386,7 +1386,7 @@ PHP,
             'class' => $text_align_classes,
           ],
         ],
-        'expected_readable_string' => '<p class="text-align-left text-align-center text-align-right text-align-justify"> <h2 class="text-align-left text-align-center text-align-right text-align-justify"> <h3 class="text-align-left text-align-center text-align-right text-align-justify"> <h4 class="text-align-left text-align-center text-align-right text-align-justify"> <h5 class="text-align-left text-align-center text-align-right text-align-justify"> <h6 class="text-align-left text-align-center text-align-right text-align-justify">',
+        'expected_readable_string' => '<h2 class="text-align-left text-align-center text-align-right text-align-justify"> <h3 class="text-align-left text-align-center text-align-right text-align-justify"> <h4 class="text-align-left text-align-center text-align-right text-align-justify"> <h5 class="text-align-left text-align-center text-align-right text-align-justify"> <h6 class="text-align-left text-align-center text-align-right text-align-justify"> <p class="text-align-left text-align-center text-align-right text-align-justify">',
       ],
       'alignment and heading, but all class values allowed for headings' => [
         'plugins' => [
@@ -1423,7 +1423,7 @@ PHP,
             'class' => TRUE,
           ],
         ],
-        'expected_readable_string' => '<p class="text-align-left text-align-center text-align-right text-align-justify"> <h2 class> <h3 class> <h4 class> <h5 class> <h6 class> <h1 class>',
+        'expected_readable_string' => '<h1 class> <h2 class> <h3 class> <h4 class> <h5 class> <h6 class> <p class="text-align-left text-align-center text-align-right text-align-justify">',
       ],
       'heading text container combo' => [
         'plugins' => [
@@ -1446,7 +1446,7 @@ PHP,
             'data-everytextcontainer' => TRUE,
           ],
         ],
-        'expected_readable_string' => '<p data-everytextcontainer> <h1 data-justheading data-everytextcontainer>',
+        'expected_readable_string' => '<h1 data-justheading data-everytextcontainer> <p data-everytextcontainer>',
       ],
       'headings plus headings with attributes' => [
         'plugins' => [
@@ -1482,7 +1482,7 @@ PHP,
             'data-just-h1' => TRUE,
           ],
         ],
-        'expected_readable_string' => '<h2 class="additional-allowed-class"> <h3 data-just-h3 data-just-h3-limited="i-am-the-only-allowed-value"> <h4> <h5 data-just-h5-limited="first-allowed-value second-allowed-value"> <h6> <h1 data-just-h1>',
+        'expected_readable_string' => '<h1 data-just-h1> <h2 class="additional-allowed-class"> <h3 data-just-h3 data-just-h3-limited="i-am-the-only-allowed-value"> <h4> <h5 data-just-h5-limited="first-allowed-value second-allowed-value"> <h6>',
       ],
       'headings plus headings with attributes and alignment' => [
         'plugins' => [
@@ -1524,7 +1524,7 @@ PHP,
             'class' => $text_align_classes,
           ],
         ],
-        'expected_readable_string' => '<h2 class="additional-allowed-class text-align-left text-align-center text-align-right text-align-justify"> <h3 data-just-h3 data-just-h3-limited="i-am-the-only-allowed-value" class="text-align-left text-align-center text-align-right text-align-justify"> <h4 class="text-align-left text-align-center text-align-right text-align-justify"> <h5 data-just-h5-limited="first-allowed-value second-allowed-value" class="text-align-left text-align-center text-align-right text-align-justify"> <h6 class="text-align-left text-align-center text-align-right text-align-justify"> <h1 data-just-h1 class="text-align-left text-align-center text-align-right text-align-justify">',
+        'expected_readable_string' => '<h1 data-just-h1 class="text-align-left text-align-center text-align-right text-align-justify"> <h2 class="additional-allowed-class text-align-left text-align-center text-align-right text-align-justify"> <h3 data-just-h3 data-just-h3-limited="i-am-the-only-allowed-value" class="text-align-left text-align-center text-align-right text-align-justify"> <h4 class="text-align-left text-align-center text-align-right text-align-justify"> <h5 data-just-h5-limited="first-allowed-value second-allowed-value" class="text-align-left text-align-center text-align-right text-align-justify"> <h6 class="text-align-left text-align-center text-align-right text-align-justify">',
       ],
     ];
   }
@@ -1595,7 +1595,7 @@ PHP,
    */
   public function testAutomaticLinkDecoratorsDisallowed(): void {
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The "ckeditor5_automatic_link_decorator_test_llamaClass" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
+    $this->expectExceptionMessageIs('The "ckeditor5_automatic_link_decorator_test_llamaClass" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
 
     $this->enableModules(['ckeditor5_automatic_link_decorator_test']);
 
@@ -1609,7 +1609,7 @@ PHP,
    */
   public function testExternalLinkAutomaticLinkDecoratorDisallowed(): void {
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The "ckeditor5_automatic_link_decorator_test_2_addTargetToExternalLinks" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
+    $this->expectExceptionMessageIs('The "ckeditor5_automatic_link_decorator_test_2_addTargetToExternalLinks" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
 
     $this->enableModules(['ckeditor5_automatic_link_decorator_test_2']);
 
@@ -1628,7 +1628,7 @@ PHP,
       $this->expectException($expected_exception);
     }
     if ($expected_message) {
-      $this->expectExceptionMessage($expected_message);
+      $this->expectExceptionMessageIs($expected_message);
     }
     if ($expected_deprecation_message) {
       $this->expectUserDeprecationMessage($expected_deprecation_message);
