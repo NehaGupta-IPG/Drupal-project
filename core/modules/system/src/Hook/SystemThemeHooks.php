@@ -3,6 +3,7 @@
 namespace Drupal\system\Hook;
 
 use Drupal\Core\Theme\ThemeCommonElements;
+use Drupal\Core\Render\Element;
 use Drupal\system\Theme\SystemAdminThemePreprocess;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -242,20 +243,10 @@ class SystemThemeHooks {
   public function preprocessBlock(&$variables): void {
     switch ($variables['base_plugin_id']) {
       case 'system_branding_block':
-        $variables['site_logo'] = '';
-        if (isset($variables['content']['site_logo']['#access']) && $variables['content']['site_logo']['#access'] === TRUE) {
-          $variables['site_logo'] = $variables['content']['site_logo'];
-        }
-        $variables['site_name'] = '';
-        if ($variables['content']['site_name']['#access'] && $variables['content']['site_name']['#markup']) {
-          $variables['site_name'] = $variables['content']['site_name']['#markup'];
-        }
-        $variables['site_slogan'] = '';
-        if ($variables['content']['site_slogan']['#access'] && $variables['content']['site_slogan']['#markup']) {
-          $variables['site_slogan'] = [
-            '#markup' => $variables['content']['site_slogan']['#markup'],
-          ];
-        }
+        $content = $variables['content'];
+        $variables['site_logo'] = (isset($content['site_logo']) && Element::isVisibleElement($content['site_logo'])) ? $content['site_logo'] : '';
+        $variables['site_name'] = (isset($content['site_name']) && Element::isVisibleElement($content['site_name']) && !empty($content['site_name']['#markup'])) ? $content['site_name']['#markup'] : '';
+        $variables['site_slogan'] = (isset($content['site_slogan']) && Element::isVisibleElement($content['site_slogan']) && !empty($content['site_slogan']['#markup'])) ? ['#markup' => $content['site_slogan']['#markup']] : '';
         break;
     }
   }
