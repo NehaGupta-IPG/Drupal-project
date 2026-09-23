@@ -2,19 +2,13 @@
 
 drupal-dialog {
   display: contents;
-  --dialog-width-narrow: 500px;
-  --dialog-max-width-narrow: 500px;
-  --dialog-width-default: 880px;
-  --dialog-max-width-default: 880px;
-  --dialog-width-wide: 1100px;
-  --dialog-max-width-wide: 1100px;
-  --dialog-height-x-wide: 600px;
 }
 
 dialog {
   display: flex;
   flex-direction: column;
-  max-width: min(600px, 90vw);
+  width: min(var(--dialog-width, 880px), 95vw);
+  max-width: var(--dialog-max-width, 880px);
   max-height: 90dvh;
   padding: 0;
   color: #333;
@@ -74,7 +68,7 @@ dialog::backdrop {
 }
 
 /* Close button */
-.dialog__titlebar .dialog__titlebar--close {
+.dialog__titlebar-close {
   position: absolute;
   top: 50%;
   inset-inline: auto 0.625rem;
@@ -117,22 +111,24 @@ dialog::backdrop {
 
 /* Sizing classes */
 .dialog--narrow {
-  width: min(var(--dialog-width-narrow), 95vw);
-  max-width: var(--dialog-max-width-narrow);
-}
+  --dialog-width: 500px;
+  --dialog-max-width: 500px;
 
-.dialog--default {
-  width: min(var(--dialog-width-default), 95vw);
-  max-width: var(--dialog-max-width-default);
+  --dialog-width-narrow: 500px;
+  --dialog-max-width-narrow: 500px;
+  --dialog-width-wide: 1100px;
+  --dialog-max-width-wide: 1100px;
+  --dialog-height-x-wide: 600px;
 }
 
 .dialog--wide {
-  width: min(var(--dialog-width-wide), 95vw);
-  max-width: var(--dialog-max-width-wide);
+  --dialog-width: 1100px;
+  --dialog-max-width: 1100px;
 }
 
 .dialog--x-wide {
-  width: 95vw;
+  --dialog-width: 95vw;
+  --dialog-max-width: 95vw;
   min-height: min(75vh, var(--dialog-height-x-wide));
 }
 
