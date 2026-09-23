@@ -113,9 +113,9 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
       'comment_type' => $comment_type_id,
       'pid' => NULL,
     ];
-    $comment = $this->entityTypeManager->getStorage('comment')->create($values);
-    $access = $comment->access('create', $this->currentUser, TRUE);
-    $form = $access->isAllowed() ? $this->entityFormBuilder->getForm($comment) : [];
+    $host = $this->entityTypeManager->getStorage($commented_entity_type_id)->load($commented_entity_id);
+    $access = $host->get($field_name)->access('create', $this->currentUser, TRUE);
+    $form = $access->isAllowed() ? $this->entityFormBuilder->getForm($this->entityTypeManager->getStorage('comment')->create($values)) : [];
 
     // Merge access cacheable metadata into the form render array.
     CacheableMetadata::createFromRenderArray($form)

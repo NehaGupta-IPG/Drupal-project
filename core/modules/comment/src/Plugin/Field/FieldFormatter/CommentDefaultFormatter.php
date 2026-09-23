@@ -146,7 +146,7 @@ class CommentDefaultFormatter extends FormatterBase {
       $cacheability->addCacheContexts(['user.permissions']);
       $items_access = $items->access('view comment list', $this->currentUser, TRUE);
       $cacheability->addCacheableDependency($items_access);
-      if ($comment_admin || $items_access->isAllowed()) {
+      if ($comment_admin || !$items_access->isForbidden()) {
         $output['comments'] = [];
 
         if ($items->comment_count || $comment_admin) {
