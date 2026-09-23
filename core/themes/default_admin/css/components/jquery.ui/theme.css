@@ -15,10 +15,6 @@
  * Component containers.
  */
 
-.ui-widget {
-  background: none;
-}
-
 .ui-widget-content {
   border: none;
 }
