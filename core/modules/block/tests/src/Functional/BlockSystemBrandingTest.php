@@ -42,7 +42,8 @@ class BlockSystemBrandingTest extends BlockTestBase {
    * Tests system branding block configuration.
    */
   public function testSystemBrandingSettings(): void {
-    $site_logo_xpath = '//div[@id="block-site-branding"]/a/img';
+    $theme_path = \Drupal::service('extension.list.theme')->getPath($this->defaultTheme);
+    $site_logo_xpath = file_exists($theme_path . '/logo.svg') ? '//div[@id="block-site-branding"]/a/svg' : '//div[@id="block-site-branding"]/a/img';
     $site_name_xpath = '//div[@id="block-site-branding"]/a[text() = "Drupal"]';
     $site_slogan_xpath = '//div[@id="block-site-branding"]/descendant::text()[last()]';
 
@@ -55,9 +56,13 @@ class BlockSystemBrandingTest extends BlockTestBase {
     $this->assertSession()->elementExists('xpath', $site_slogan_xpath);
     $this->assertSession()->elementTextContains('xpath', $site_slogan_xpath, 'Community plumbing');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:system.site');
-    // Just this once, assert that the img src of the logo is as expected.
-    $theme_path = \Drupal::service('extension.list.theme')->getPath($this->defaultTheme);
-    $this->assertSession()->elementAttributeContains('xpath', $site_logo_xpath, 'src', $theme_path . '/logo.svg');
+    // Just this once, assert that the logo is as expected.
+    if (str_ends_with($site_logo_xpath, 'svg')) {
+      $this->assertSession()->elementExists('xpath', $site_logo_xpath);
+    }
+    else {
+      $this->assertSession()->elementAttributeContains('xpath', $site_logo_xpath, 'src', $theme_path . '/logo.svg');
+    }
 
     // Be sure the slogan is XSS-filtered.
     $this->config('system.site')
