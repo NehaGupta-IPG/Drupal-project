@@ -64,7 +64,11 @@ class FilterUITest extends ViewsKernelTestBase {
 
     $view = View::load('test_filter_groups');
     $display = $view->get('display');
+    // Set two filters to reference a non-existent group (3) when only groups
+    // 1 and 2 exist. This ensures that the conjunction operator between filters
+    // within the group is rendered, triggering the missing group lookup.
     $display['page']['display_options']['filters']['status']['group'] = 3;
+    $display['page']['display_options']['filters']['nid']['group'] = 3;
     $view->set('display', $display);
     $view->save();
 
