@@ -9,7 +9,6 @@ use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
-use Drupal\Tests\Core\Database\Stub\StubPDO;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -55,26 +54,6 @@ class SelectExtenderTest extends KernelTestBase {
         '\Drupal\Core\Database\Query\TableSortExtender',
       ],
       [
-        'Drupal\search\SearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        'Drupal\search\SearchQuery',
-      ],
-      [
-        'Drupal\search\SearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        '\Drupal\search\SearchQuery',
-      ],
-      [
-        'Drupal\search\ViewsSearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        'Drupal\search\ViewsSearchQuery',
-      ],
-      [
-        'Drupal\search\ViewsSearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        '\Drupal\search\ViewsSearchQuery',
-      ],
-      [
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\PagerSelectExtender',
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
         'Drupal\Core\Database\Query\PagerSelectExtender',
@@ -94,26 +73,6 @@ class SelectExtenderTest extends KernelTestBase {
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
         '\Drupal\Core\Database\Query\TableSortExtender',
       ],
-      [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\SearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        'Drupal\search\SearchQuery',
-      ],
-      [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\SearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        '\Drupal\search\SearchQuery',
-      ],
-      [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\ViewsSearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        'Drupal\search\ViewsSearchQuery',
-      ],
-      [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\ViewsSearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        '\Drupal\search\ViewsSearchQuery',
-      ],
     ];
   }
 
@@ -130,8 +89,7 @@ class SelectExtenderTest extends KernelTestBase {
     $additional_class_loader->addPsr4("Drupal\\core_fake\\Driver\\Database\\CoreFakeWithAllCustomClasses\\", __DIR__ . "/../../../../../tests/fixtures/database_drivers/module/core_fake/src/Driver/Database/CoreFakeWithAllCustomClasses");
     $additional_class_loader->register(TRUE);
 
-    $mock_pdo = $this->createStub(StubPDO::class);
-    $connection = new StubConnection($mock_pdo, ['namespace' => $namespace]);
+    $connection = new StubConnection($this->createStub(\PDO::class), ['namespace' => $namespace]);
 
     // Tests the method \Drupal\Core\Database\Query\Select::extend().
     $select = $connection->select('test')->extend($extend);

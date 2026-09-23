@@ -103,7 +103,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
    * @param string $site_path
    *   The sites directory path, such as 'sites/default'.
    */
-  protected function makeWritable($site_path): void {
+  protected function makeWritable(string $site_path): void {
     chmod($site_path, 0755);
     chmod($this->settingsFile($site_path), 0644);
   }
@@ -118,8 +118,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
    *   The path to settings.php.
    */
   protected function settingsFile(string $site_path): string {
-    $settings_file = $site_path . '/settings.php';
-    return $settings_file;
+    return $site_path . '/settings.php';
   }
 
 }

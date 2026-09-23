@@ -51,7 +51,7 @@ class FetchTest extends DatabaseTestBase {
    */
   public function testQueryFetchColumnOutOfRange(): void {
     $this->expectException(\ValueError::class);
-    $this->expectExceptionMessage('Invalid column index');
+    $this->expectExceptionMessageIs('Invalid column index');
     $statement = $this->connection
       ->query('SELECT [name] FROM {test} WHERE [age] = :age', [':age' => 25]);
     $statement->setFetchMode(FetchAs::Column, 200);
@@ -181,7 +181,7 @@ class FetchTest extends DatabaseTestBase {
     $query_result = $query->execute()->fetchAll();
 
     $this->assertContainsOnlyInstancesOf(FakeRecord::class, $query_result);
-    $names = array_map(fn(FakeRecord $record) => $record->name, $query_result);
+    $names = array_map(fn(FakeRecord $record): string => $record->name, $query_result);
     $expected_names = ['George', 'John', 'Paul', 'Ringo'];
     $this->assertEquals($expected_names, $names);
   }
@@ -198,7 +198,7 @@ class FetchTest extends DatabaseTestBase {
 
     $query_result = $query->fetchAll();
 
-    $arrayed = array_map(fn (FakeRecord $record) => \get_object_vars($record), $query_result);
+    $arrayed = array_map(fn (FakeRecord $record): array => \get_object_vars($record), $query_result);
     $this->assertEquals(['George', 'John', 'Paul', 'Ringo'], array_column($arrayed, 'name'));
     $this->assertEquals([10, 10, 10, 10], array_column($arrayed, 'fakeArg'));
   }
@@ -259,7 +259,7 @@ class FetchTest extends DatabaseTestBase {
    */
   public function testQueryFetchColIndexOutOfRange(): void {
     $this->expectException(\ValueError::class);
-    $this->expectExceptionMessage('Invalid column index');
+    $this->expectExceptionMessageIs('Invalid column index');
     $this->connection
       ->query('SELECT [name] FROM {test} WHERE [age] > :age', [':age' => 25])
       ->fetchCol(200);
@@ -391,7 +391,7 @@ class FetchTest extends DatabaseTestBase {
    */
   public function testQueryFetchFieldIndexOutOfRange(): void {
     $this->expectException(\ValueError::class);
-    $this->expectExceptionMessage('Invalid column index');
+    $this->expectExceptionMessageIs('Invalid column index');
     $this->connection
       ->query('SELECT [name] FROM {test} WHERE [age] = :age', [':age' => 25])
       ->fetchField(200);
