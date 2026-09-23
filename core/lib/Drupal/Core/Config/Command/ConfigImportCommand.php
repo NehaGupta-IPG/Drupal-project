@@ -96,7 +96,7 @@ final class ConfigImportCommand extends Command {
       return Command::SUCCESS;
     }
 
-    $io->error((string) $this->t('The import failed due to the following reasons:'));
+    $io->error((string) $this->t('The configuration was imported with errors.'));
     foreach ($errors as $error) {
       $io->error((string) $error);
     }

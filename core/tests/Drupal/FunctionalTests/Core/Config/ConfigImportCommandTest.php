@@ -307,6 +307,80 @@ class ConfigImportCommandTest extends BrowserTestBase {
   }
 
   /**
+   * Tests an import that results in an error.
+   */
+  public function testImportErrorLog(): void {
+    $name_primary = 'config_test.dynamic.primary';
+    $name_secondary = 'config_test.dynamic.secondary';
+    $sync = $this->container->get('config.storage.sync');
+    $uuid = $this->container->get('uuid');
+
+    $values_primary = [
+      'uuid' => $uuid->generate(),
+      'langcode' => 'en',
+      'status' => TRUE,
+      'dependencies' => [],
+      'id' => 'primary',
+      'label' => 'Primary',
+      'weight' => 0,
+      'style' => NULL,
+      'size' => NULL,
+      'size_value' => NULL,
+      'protected_property' => NULL,
+    ];
+    $sync->write($name_primary, $values_primary);
+    $values_secondary = [
+      'uuid' => $uuid->generate(),
+      'langcode' => 'en',
+      'status' => TRUE,
+      // Add a dependency on primary, to ensure that is synced first.
+      'dependencies' => [
+        'config' => [$name_primary],
+      ],
+      'id' => 'secondary',
+      'label' => 'Secondary Sync',
+      'weight' => 0,
+      'style' => NULL,
+      'size' => NULL,
+      'size_value' => NULL,
+      'protected_property' => NULL,
+    ];
+    $sync->write($name_secondary, $values_secondary);
+
+    // Run the import command.
+    $tester = $this->commandTester();
+    $code = $tester->execute(['--yes' => TRUE]);
+    self::assertSame(Command::FAILURE, $code);
+    $display = preg_replace('/\s+/', ' ', $tester->getDisplay());
+    // Verify that both appear as ready to import.
+    self::assertStringContainsString($name_primary . ' Create', $display);
+    self::assertStringContainsString($name_secondary . ' Create', $display);
+    self::assertStringContainsString('[ERROR] Deleted and replaced configuration entity "' . $name_secondary . '"', $display);
+
+    self::assertStringContainsString('[ERROR] The configuration was imported with errors.', $display);
+    self::assertStringNotContainsString('The configuration was imported successfully.', $display);
+  }
+
+  /**
+   * Tests that errors set in the batch and on the ConfigImporter are merged.
+   */
+  public function testBatchErrors(): void {
+    $new_site_name = 'Config import test ' . $this->randomString();
+    $this->prepareSiteNameUpdate($new_site_name);
+    \Drupal::state()->set('config_import_steps_alter.error', TRUE);
+
+    $tester = $this->commandTester();
+    $code = $tester->execute(['--yes' => TRUE]);
+    self::assertSame(Command::FAILURE, $code);
+    $display = preg_replace('/\s+/', ' ', $tester->getDisplay());
+    // The dr command does not do batches yet.
+    self::assertStringNotContainsString('[ERROR] _config_import_test_config_import_steps_alter batch error', $display);
+    self::assertStringContainsString('[ERROR] _config_import_test_config_import_steps_alter ConfigImporter error', $display);
+    self::assertStringNotContainsString('The configuration was imported successfully.', $display);
+    self::assertStringContainsString('The configuration was imported with errors.', $display);
+  }
+
+  /**
    * Tests that import storage transformation event subscribers run.
    *
    * @see \Drupal\Tests\config\Functional\TransformedConfigExportImportUITest
