@@ -39,7 +39,27 @@ final class Condition {
   }
 
   /**
-   * {@inheritdoc}
+   * Builds the most common conditional clauses.
+   *
+   * @param string|Condition|Select|null $variable
+   *   The name of the column to check. This can also be a Condition in itself
+   *   or a Select object.
+   * @param Operator|string $operator
+   *   The operator to use:
+   *   - The comparison operators =, <>, <, <=, >, >=.
+   *   - The operators (NOT) BETWEEN, (NOT) IN, (NOT) EXISTS, (NOT) LIKE,
+   *     (NOT) REGEXP.
+   * @param string|int|bool|float|array|Select|null $value
+   *   The value to test the field against. In most cases, and depending on the
+   *   operator, this will be a scalar or an array. As SQL accepts select
+   *   queries on any place where a scalar value or set is expected, $value may
+   *   also be a Select or an array of Select. If $operator is a unary
+   *   operator, e.g. IS NULL, $value will be ignored and should be null. If
+   *   the operator requires a subquery, e.g. EXISTS, the $variable will be
+   *   ignored and $value should be a Select object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If passed invalid arguments, such as an empty array as $value.
    */
   public function condition(string|Condition|Select|null $variable, Operator|string $operator = Operator::Equal, string|int|bool|float|array|Select|null $value = NULL): static {
     if (is_string($operator)) {
@@ -83,7 +103,10 @@ final class Condition {
   }
 
   /**
-   * {@inheritdoc}
+   * Adds an arbitrary WHERE clause to the query.
+   *
+   * @param Expression $expression
+   *   A portion of a WHERE clause as a prepared statement.
    */
   public function where(Expression $expression): static {
     $this->conditions[] = $expression;
@@ -91,49 +114,61 @@ final class Condition {
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a condition that the specified column be NULL.
+   *
+   * @param string|Condition $variable
+   *   The name of the column or a condition to check.
    */
   public function isNull(string|Condition $variable): static {
     return $this->condition($variable, Operator::IsNull);
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a condition that the specified column be NOT NULL.
+   *
+   * @param string|Condition $variable
+   *   The name of the column or a condition to check.
    */
   public function isNotNull(string|Condition $variable): static {
     return $this->condition($variable, Operator::IsNotNull);
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a condition that the specified subquery returns values.
+   *
+   * @param Select $select
+   *   The subquery that must contain results.
    */
   public function exists(Select $select): static {
     return $this->condition(NULL, Operator::Exists, $select);
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a condition that the specified subquery returns no values.
+   *
+   * @param Select $select
+   *   The subquery that must not contain results.
    */
   public function notExists(Select $select): static {
     return $this->condition(NULL, Operator::NotExists, $select);
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a condition that is always false.
    */
   public function alwaysFalse(): static {
     return $this->where(new Expression('1 = 0'));
   }
 
   /**
-   * {@inheritdoc}
+   * Creates a new condition to AND a group of conditions together.
    */
   public static function and(): static {
     return new static(Conjunction::And);
   }
 
   /**
-   * {@inheritdoc}
+   * Creates a new condition to OR a group of conditions together.
    */
   public static function or(): static {
     return new static(Conjunction::Or);

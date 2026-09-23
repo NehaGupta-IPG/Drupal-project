@@ -45,8 +45,6 @@ final class Select {
 
   /**
    * The condition object for this query.
-   *
-   * Condition handling is handled via composition.
    */
   public private(set) ?Condition $condition = NULL;
 
@@ -73,11 +71,11 @@ final class Select {
    *
    * @code
    * [
-   *   'join type' => $join_type (one of INNER, LEFT OUTER, RIGHT OUTER),
+   *   'join type' => a case of JoinType. ::BaseTable, ::Inner or ::Left.
    *   'table' => $table,
    *   'alias' => $alias_of_the_table,
-   *   'condition' => $join_condition (string or Condition object),
-   *   'arguments' => $array_of_arguments_for_placeholders_in_the condition.
+   *   'condition' => $join_condition (a string, a Condition object, or NULL),
+   *   'arguments' => $array of arguments for placeholders in the condition.
    *   'all_fields' => TRUE to SELECT $alias.*, FALSE or NULL otherwise.
    * ]
    * @endcode
@@ -94,7 +92,7 @@ final class Select {
    * The columns by which to order this query.
    *
    * This is an associative array. The keys are the columns to order, and the
-   * value is the direction to order, either ASC or DESC.
+   * value is the direction to order, Order::Asc or Order::Desc.
    *
    * @var array<string,Order>
    */
@@ -127,8 +125,7 @@ final class Select {
   /**
    * An array whose elements specify a query to UNION, and the UNION type.
    *
-   * The 'type' key may be '', 'ALL', or 'DISTINCT' to represent a 'UNION',
-   * 'UNION ALL', or 'UNION DISTINCT' statement, respectively.
+   * The 'type' key is a case of UnionType. ::Distinct or ::All.
    *
    * All entries in this array will be applied from front to back, with the
    * first query to union on the right of the original query, the second union
@@ -145,6 +142,8 @@ final class Select {
 
   /**
    * The query metadata for alter purposes.
+   *
+   * @var array<string,mixed>
    */
   private array $alterMetadata = [];
 
@@ -198,18 +197,8 @@ final class Select {
   /**
    * Adds a comment to the query.
    *
-   * By adding a comment to a query, you can more easily find it in your
-   * query log or the list of active queries on an SQL server. This allows
-   * for easier debugging and allows you to more easily find where a query
-   * with a performance problem is being generated.
-   *
-   * The comment string will be sanitized to remove * / and other characters
-   * that may terminate the string early so as to avoid SQL injection attacks.
-   *
    * @param string $comment
    *   The comment string to be inserted into the query.
-   *
-   * @return $this
    */
   public function comment(string $comment): static {
     $this->comments[] = $comment;
@@ -217,7 +206,12 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Adds a tag to a query.
+   *
+   * @param string $tag
+   *   The tag to add.
+   *
+   * @see \Drupal\Core\Database\Query\AlterableInterface
    */
   public function addTag(string $tag): static {
     $this->alterTags[$tag] = 1;
@@ -225,7 +219,14 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Adds additional metadata to the query.
+   *
+   * @param string $key
+   *   The unique identifier for this piece of metadata.
+   * @param mixed $object
+   *   The additional data to add to the query. May be any valid PHP variable.
+   *
+   * @see \Drupal\Core\Database\Query\AlterableInterface
    */
   public function addMetadata(string $key, mixed $object): static {
     $this->alterMetadata[$key] = $object;
@@ -233,7 +234,10 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Adds an arbitrary HAVING clause to the query.
+   *
+   * @param Expression $expression
+   *   A portion of a HAVING clause.
    */
   public function having(Expression $expression): static {
     if (!isset($this->having)) {
@@ -244,7 +248,10 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a HAVING condition that the specified column be NULL.
+   *
+   * @param string|Condition $variable
+   *   The name of the column or the Condition to check.
    */
   public function havingIsNull(string|Condition $variable): static {
     if (!isset($this->having)) {
@@ -255,7 +262,10 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a HAVING condition that the specified column be NOT NULL.
+   *
+   * @param string|Condition $variable
+   *   The name of the column or the Condition to check.
    */
   public function havingIsNotNull(string|Condition $variable): static {
     if (!isset($this->having)) {
@@ -266,7 +276,10 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a HAVING condition that the specified subquery returns values.
+   *
+   * @param Select $select
+   *   The subquery that must contain results.
    */
   public function havingExists(Select $select): static {
     if (!isset($this->having)) {
@@ -277,7 +290,10 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a HAVING condition that the specified subquery returns no values.
+   *
+   * @param Select $select
+   *   The subquery that must not contain results.
    */
   public function havingNotExists(Select $select): static {
     if (!isset($this->having)) {
@@ -288,7 +304,12 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Add FOR UPDATE to the query.
+   *
+   * @param bool $set
+   *   IF TRUE, FOR UPDATE will be added to the query, if FALSE then it won't.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::forUpdate()
    */
   public function forUpdate(bool $set = TRUE): static {
     $this->forUpdate = $set;
@@ -296,15 +317,20 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Resets the orderBy array.
    */
-  public function resetOrderBy(): static {
+  private function resetOrderBy(): static {
     $this->orderBy = [];
     return $this;
   }
 
   /**
-   * {@inheritdoc}
+   * Sets this query to be DISTINCT.
+   *
+   * @param bool $distinct
+   *   TRUE to flag this query DISTINCT, FALSE to disable it.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::distinct()
    */
   public function distinct(bool $distinct = TRUE): static {
     $this->distinct = $distinct;
@@ -312,7 +338,19 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Adds a column to the list to be SELECTed.
+   *
+   * @param string $tableAlias
+   *   The name of the table from which the column comes, as an alias.
+   * @param string $column
+   *   The name of the column.
+   * @param string $alias
+   *   The alias for this column. If not specified, one will be generated
+   *   automatically based on the $table_alias and $column. The alias will be
+   *   checked for uniqueness, so the requested alias may not be the alias
+   *   that is assigned in all cases.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::addField()
    */
   public function column(string $tableAlias, string $column, ?string $alias = NULL): static {
     // If no alias is specified, first try the column name itself.
@@ -354,6 +392,8 @@ final class Select {
    *   An indexed array of columns present in the specified table that should
    *   be included in this query. If not specified, $tableAlias.* will be
    *   generated without any aliases.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::fields()
    */
   public function columns(string $tableAlias, array $columns = []): static {
     if ($columns) {
@@ -382,6 +422,8 @@ final class Select {
    *   in all cases.
    * @param array<string,string|int|float|bool> $arguments
    *   Any placeholder arguments needed for this expression.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::addExpression()
    */
   public function expression(string $expression, ?string $alias = NULL, array $arguments = []): static {
     if (empty($alias)) {
@@ -401,28 +443,65 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Default join against another table in the database.
+   *
+   * @param Select|string $table
+   *   The table against which to join. May be a string or another Select
+   *   object. If a query object is passed, it will be used as a subselect.
+   * @param string|null $alias
+   *   The alias for the table. In most cases this should be the first letter
+   *   of the table, or the first letter of each "word" in the table.
+   * @param string|Condition|Expression|null $condition
+   *   The condition on which to join this table. If the join requires values,
+   *   this clause should use a named placeholder and the value or values to
+   *   insert should be passed in the 4th parameter. For the first table joined
+   *   on a query, this value is ignored as the first table is taken as the base
+   *   table. The token %alias can be used in this string to be replaced with
+   *   the actual alias. This is useful when $alias is modified by the database
+   *   system, for example, when joining the same table more than once.
+   * @param array $arguments
+   *   An array of arguments to replace into the $condition of this join.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::join()
    */
   public function join(string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
     return $this->addJoin(JoinType::Inner, $table, $alias, $condition, $arguments);
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function innerJoin(string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
-    return $this->addJoin(JoinType::Inner, $table, $alias, $condition, $arguments);
-  }
-
-  /**
-   * {@inheritdoc}
+   * Left outer join against another table in the database.
+   *
+   * @param Select|string $table
+   *   The table against which to join.
+   * @param string|null $alias
+   *   The alias for the table.
+   * @param string|null $condition
+   *   The condition on which to join this table.
+   * @param array $arguments
+   *   An array of arguments to replace into the $condition of this join.
+   *
+   * @see ::join()
    */
   public function leftJoin(string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
     return $this->addJoin(JoinType::Left, $table, $alias, $condition, $arguments);
   }
 
   /**
-   * {@inheritdoc}
+   * Join against another table in the database.
+   *
+   * @param JoinType $type
+   *   The type of join.
+   * @param Select|string $table
+   *   The table against which to join. May be a string or another Select
+   *   object. If a query object is passed, it will be used as a subselect.
+   * @param ?string $alias
+   *   The alias for the table.
+   * @param string|Condition|Expression|null $condition
+   *   The condition on which to join this table.
+   * @param array $arguments
+   *   An array of arguments to replace into the $condition of this join.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::addJoin()
    */
   private function addJoin(JoinType $type, string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
     if (empty($alias)) {
@@ -463,7 +542,14 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Orders the result set by a given column.
+   *
+   * @param string $column
+   *   The column on which to order.
+   * @param Order $direction
+   *   The direction to sort.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::orderBy()
    */
   public function orderBy(string $column, Order $direction = Order::Asc): static {
     $this->orderBy[$column] = $direction;
@@ -471,7 +557,12 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Orders the result set by a random value.
+   *
+   * @param string $alias
+   *   A column alias to use for the random value order.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::orderRandom()
    */
   public function orderRandom(string $alias): static {
     $this->expression('RAND()', $alias);
@@ -480,7 +571,18 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Restricts a query to a given range in the result set.
+   *
+   * If this method is called with no parameters, will remove any range
+   * directives that have been set.
+   *
+   * @param int|null $start
+   *   The first record from the result set to return. If NULL, removes any
+   *   range directives that are set.
+   * @param int|null $length
+   *   The number of records to return from the result set.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::range()
    */
   public function range(?int $start = NULL, ?int $length = NULL): static {
     $this->range = $start !== NULL ? ['start' => $start, 'length' => $length] : NULL;
@@ -488,7 +590,22 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Add another Select query to UNION to this one.
+   *
+   * Union queries consist of two or more queries whose results are effectively
+   * concatenated together. Queries will be UNIONed in the order they are
+   * specified, with this object's query coming first. Duplicate columns will
+   * be discarded.
+   *
+   * Note: All queries UNIONed together must have the same column structure, in
+   * the same order. It is up to the caller to ensure that they match properly.
+   *
+   * @param Select $query
+   *   The query to UNION to this query.
+   * @param UnionType $type
+   *   The type of UNION to add to the query.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::union()
    */
   public function union(Select $query, UnionType $type = UnionType::Distinct): static {
     $this->union[] = [
@@ -499,7 +616,12 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Groups the result set by the specified column.
+   *
+   * @param string $column
+   *   The column on which to group. This should be the column as aliased.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::groupBy()
    */
   public function groupBy(string $column): static {
     $this->groupBy[$column] = $column;
@@ -507,7 +629,12 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Get the equivalent COUNT query of this query as a new query object.
+   *
+   * @return Select
+   *   A new Select object with no columns or expressions besides COUNT(*).
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::countQuery()
    */
   public function countQuery(): static {
     $count = $this->prepareCountQuery();
@@ -579,7 +706,27 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Builds the most common conditional clauses.
+   *
+   * @param string|Condition|Select|null $variable
+   *   The name of the column to check. This can also be a Condition in itself
+   *   or a Select object.
+   * @param Operator|string $operator
+   *   The operator to use:
+   *   - The comparison operators =, <>, <, <=, >, >=.
+   *   - The operators (NOT) BETWEEN, (NOT) IN, (NOT) EXISTS, (NOT) LIKE,
+   *     (NOT) REGEXP.
+   * @param string|int|bool|float|array|Select|null $value
+   *   The value to test the field against. In most cases, and depending on the
+   *   operator, this will be a scalar or an array. As SQL accepts select
+   *   queries on any place where a scalar value or set is expected, $value may
+   *   also be a Select or an array of Select. If $operator is a unary
+   *   operator, e.g. IS NULL, $value will be ignored and should be null. If
+   *   the operator requires a subquery, e.g. EXISTS, the $variable will be
+   *   ignored and $value should be a Select object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If passed invalid arguments, such as an empty array as $value.
    */
   public function condition(string|Condition|Select|null $variable, Operator|string $operator = Operator::Equal, string|int|bool|float|array|Select|null $value = NULL): static {
     if (!isset($this->condition)) {
@@ -590,7 +737,10 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a condition that the specified column be NULL.
+   *
+   * @param string|Condition $variable
+   *   The name of the column or a condition to check.
    */
   public function isNull(string|Condition $variable): static {
     if (!isset($this->condition)) {
@@ -601,7 +751,10 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a condition that the specified column be NOT NULL.
+   *
+   * @param string|Condition $variable
+   *   The name of the column or a condition to check.
    */
   public function isNotNull(string|Condition $variable): static {
     if (!isset($this->condition)) {
@@ -612,7 +765,10 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a condition that the specified subquery returns values.
+   *
+   * @param Select $select
+   *   The subquery that must contain results.
    */
   public function exists(Select $select): static {
     if (!isset($this->condition)) {
@@ -623,7 +779,10 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a condition that the specified subquery returns no values.
+   *
+   * @param Select $select
+   *   The subquery that must not contain results.
    */
   public function notExists(Select $select): static {
     if (!isset($this->condition)) {
@@ -634,7 +793,7 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Sets a condition that is always false.
    */
   public function alwaysFalse(): static {
     if (!isset($this->condition)) {
@@ -645,7 +804,10 @@ final class Select {
   }
 
   /**
-   * {@inheritdoc}
+   * Adds an arbitrary WHERE clause to the query.
+   *
+   * @param Expression $expression
+   *   A portion of a WHERE clause as a prepared statement.
    */
   public function where(Expression $expression): static {
     if (!isset($this->condition)) {
