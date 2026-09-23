@@ -4,29 +4,30 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Form;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Form\FormErrorHandler;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Form\FormErrorHandler
- * @group Form
+ * Tests Drupal\Core\Form\FormErrorHandler.
  */
+#[CoversClass(FormErrorHandler::class)]
+#[Group('Form')]
 class FormErrorHandlerTest extends UnitTestCase {
 
   /**
    * The form error handler.
-   *
-   * @var \Drupal\Core\Form\FormErrorHandler|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $formErrorHandler;
+  protected FormErrorHandler $formErrorHandler;
 
   /**
    * The messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $messenger;
+  protected MessengerInterface $messenger;
 
   /**
    * {@inheritdoc}
@@ -34,22 +35,33 @@ class FormErrorHandlerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->messenger = $this->createMock(MessengerInterface::class);
+    $this->messenger = $this->createStub(MessengerInterface::class);
+    $container = new ContainerBuilder();
+    $container->set('messenger', $this->messenger);
+    \Drupal::setContainer($container);
 
-    $this->formErrorHandler = $this->getMockBuilder('Drupal\Core\Form\FormErrorHandler')
-      ->onlyMethods(['messenger'])
-      ->getMock();
-
-    $this->formErrorHandler->expects($this->atLeastOnce())
-      ->method('messenger')
-      ->willReturn($this->messenger);
+    $this->formErrorHandler = new FormErrorHandler();
   }
 
   /**
-   * @covers ::handleFormErrors
-   * @covers ::displayErrorMessages
+   * Initializes the messenger as a mock object.
+   */
+  protected function setUpMockMessenger(): void {
+    $this->messenger = $this->createMock(MessengerInterface::class);
+    $container = new ContainerBuilder();
+    $container->set('messenger', $this->messenger);
+    \Drupal::setContainer($container);
+  }
+
+  /**
+   * Tests display error messages.
+   *
+   * @legacy-covers ::handleFormErrors
+   * @legacy-covers ::displayErrorMessages
    */
   public function testDisplayErrorMessages(): void {
+    $this->setUpMockMessenger();
+
     $messages = [
       'invalid',
       'invalid',
@@ -122,8 +134,10 @@ class FormErrorHandlerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::handleFormErrors
-   * @covers ::setElementErrorsFromFormState
+   * Tests set element errors from form state.
+   *
+   * @legacy-covers ::handleFormErrors
+   * @legacy-covers ::setElementErrorsFromFormState
    */
   public function testSetElementErrorsFromFormState(): void {
     $form = [

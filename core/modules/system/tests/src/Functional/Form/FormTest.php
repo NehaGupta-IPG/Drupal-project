@@ -4,22 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Form;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\form_test\Form\FormTestDisabledElementsForm;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use Drupal\filter\Entity\FilterFormat;
-use Behat\Mink\Element\NodeElement;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests various form element validation mechanisms.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class FormTest extends BrowserTestBase {
 
   /**
@@ -45,7 +48,7 @@ class FormTest extends BrowserTestBase {
     $filtered_html_format->save();
 
     $filtered_html_permission = $filtered_html_format->getPermissionName();
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [$filtered_html_permission]);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([$filtered_html_permission])->save();
   }
 
   /**
@@ -59,7 +62,14 @@ class FormTest extends BrowserTestBase {
   public function testRequiredFields(): void {
     // Originates from https://www.drupal.org/node/117748.
     // Sets of empty strings and arrays.
-    $empty_strings = ['""' => "", '"\n"' => "\n", '" "' => " ", '"\t"' => "\t", '" \n\t "' => " \n\t ", '"\n\n\n\n\n"' => "\n\n\n\n\n"];
+    $empty_strings = [
+      '""' => "",
+      '"\n"' => "\n",
+      '" "' => " ",
+      '"\t"' => "\t",
+      '" \n\t "' => " \n\t ",
+      '"\n\n\n\n\n"' => "\n\n\n\n\n",
+    ];
     $empty_arrays = ['array()' => []];
     $empty_checkbox = [NULL];
 
@@ -87,16 +97,46 @@ class FormTest extends BrowserTestBase {
     $elements['textarea']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'textarea'];
     $elements['textarea']['empty_values'] = $empty_strings;
 
-    $elements['radios']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'radios', '#options' => ['' => 'None', $this->randomMachineName(), $this->randomMachineName(), $this->randomMachineName()]];
+    $elements['radios']['element'] = [
+      '#title' => $this->randomMachineName(),
+      '#type' => 'radios',
+      '#options' => [
+        '' => 'None',
+        $this->randomMachineName(),
+        $this->randomMachineName(),
+        $this->randomMachineName(),
+      ],
+    ];
     $elements['radios']['empty_values'] = $empty_arrays;
 
-    $elements['checkbox']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'checkbox', '#required' => TRUE];
+    $elements['checkbox']['element'] = [
+      '#title' => $this->randomMachineName(),
+      '#type' => 'checkbox',
+      '#required' => TRUE,
+    ];
     $elements['checkbox']['empty_values'] = $empty_checkbox;
 
-    $elements['checkboxes']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'checkboxes', '#options' => [$this->randomMachineName(), $this->randomMachineName(), $this->randomMachineName()]];
+    $elements['checkboxes']['element'] = [
+      '#title' => $this->randomMachineName(),
+      '#type' => 'checkboxes',
+      '#options' => [
+        $this->randomMachineName(),
+        $this->randomMachineName(),
+        $this->randomMachineName(),
+      ],
+    ];
     $elements['checkboxes']['empty_values'] = $empty_arrays;
 
-    $elements['select']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'select', '#options' => ['' => 'None', $this->randomMachineName(), $this->randomMachineName(), $this->randomMachineName()]];
+    $elements['select']['element'] = [
+      '#title' => $this->randomMachineName(),
+      '#type' => 'select',
+      '#options' => [
+        '' => 'None',
+        $this->randomMachineName(),
+        $this->randomMachineName(),
+        $this->randomMachineName(),
+      ],
+    ];
     $elements['select']['empty_values'] = $empty_strings;
 
     $elements['file']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'file'];
@@ -193,7 +233,7 @@ class FormTest extends BrowserTestBase {
     }
 
     // Check the page for error messages.
-    $errors = $this->xpath('//div[contains(@class, "error")]//li');
+    $errors = $this->getNodeElementsByXpath('//div[contains(@class, "error")]//li');
     foreach ($errors as $error) {
       $expected_key = array_search($error->getText(), $expected);
       // If the error message is not one of the expected messages, fail.
@@ -589,7 +629,7 @@ class FormTest extends BrowserTestBase {
    * @param string[] $order
    *   Expected order of its options.
    */
-  protected function validateSelectSorting($select, array $order): void {
+  protected function validateSelectSorting(string $select, array $order): void {
     $option_map_function = function (NodeElement $node) {
       return ($node->getTagName() === 'optgroup') ?
         $node->getAttribute('label') : $node->getValue();
@@ -760,7 +800,7 @@ class FormTest extends BrowserTestBase {
     // disabled elements, so we need to un-disable those elements first.
     $this->drupalGet('form-test/disabled-elements');
     $disabled_elements = [];
-    foreach ($this->xpath('//*[@disabled]') as $element) {
+    foreach ($this->getNodeElementsByXpath('//*[@disabled]') as $element) {
       $disabled_elements[] = (string) $element->getAttribute('name');
     }
 

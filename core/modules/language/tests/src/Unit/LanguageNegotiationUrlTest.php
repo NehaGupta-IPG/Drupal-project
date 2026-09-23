@@ -5,25 +5,31 @@ declare(strict_types=1);
 namespace Drupal\Tests\language\Unit;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\Tests\UnitTestCase;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl
- * @group language
+ * Tests Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl.
  */
+#[CoversClass(LanguageNegotiationUrl::class)]
+#[Group('language')]
 class LanguageNegotiationUrlTest extends UnitTestCase {
 
   /**
    * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
    */
-  protected $languageManager;
+  protected LanguageManagerInterface&MockObject $languageManager;
 
   /**
    * The test user.
@@ -44,12 +50,12 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
     parent::setUp();
 
     // Set up some languages to be used by the language-based path processor.
-    $language_de = $this->createMock('\Drupal\Core\Language\LanguageInterface');
-    $language_de->expects($this->any())
+    $language_de = $this->createStub(LanguageInterface::class);
+    $language_de
       ->method('getId')
       ->willReturn('de');
-    $language_en = $this->createMock('\Drupal\Core\Language\LanguageInterface');
-    $language_en->expects($this->any())
+    $language_en = $this->createStub(LanguageInterface::class);
+    $language_en
       ->method('getId')
       ->willReturn('en');
     $languages = [
@@ -61,18 +67,15 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
     // Create a language manager stub.
     $language_manager = $this->getMockBuilder('Drupal\language\ConfigurableLanguageManagerInterface')
       ->getMock();
-    $language_manager->expects($this->any())
+    $language_manager->expects($this->atLeastOnce())
       ->method('getLanguages')
       ->willReturn($languages);
     $this->languageManager = $language_manager;
 
     // Create a user stub.
-    $this->user = $this->getMockBuilder('Drupal\Core\Session\AccountInterface')
-      ->getMock();
+    $this->user = $this->createStub(AccountInterface::class);
 
-    $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $cache_contexts_manager = $this->createStub(CacheContextsManager::class);
     $cache_contexts_manager->method('assertValidTokens')->willReturn(TRUE);
     $container = new ContainerBuilder();
     $container->set('cache_contexts_manager', $cache_contexts_manager);
@@ -81,11 +84,10 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
 
   /**
    * Tests path prefix language negotiation and outbound path processing.
-   *
-   * @dataProvider providerTestPathPrefix
    */
-  public function testPathPrefix($prefix, $prefixes, $expected_langcode): void {
-    $this->languageManager->expects($this->any())
+  #[DataProvider('providerTestPathPrefix')]
+  public function testPathPrefix(string $prefix, $prefixes, $expected_langcode): void {
+    $this->languageManager
       ->method('getCurrentLanguage')
       ->willReturn($this->languages[(in_array($expected_langcode, [
         'en',
@@ -128,7 +130,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    * @return array
    *   An array of data for checking path prefix negotiation.
    */
-  public static function providerTestPathPrefix() {
+  public static function providerTestPathPrefix(): array {
     $path_prefix_configuration[] = [
       'prefix' => 'de',
       'prefixes' => [
@@ -173,10 +175,9 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
 
   /**
    * Tests outbound path processing for neutral languages.
-   *
-   * @dataProvider providerNeutralLanguages
    */
-  public function testNeutralLanguages($langcode, $expected_langcode): void {
+  #[DataProvider('providerNeutralLanguages')]
+  public function testNeutralLanguages(string $langcode, ?string $expected_langcode): void {
     if ($expected_langcode) {
       $this->languageManager->expects($this->once())
         ->method('getCurrentLanguage')
@@ -202,8 +203,8 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
     $method->setCurrentUser($this->user);
     $this->assertNull($method->getLangcode($request));
 
-    $language = $this->createMock(LanguageInterface::class);
-    $language->expects($this->any())
+    $language = $this->createStub(LanguageInterface::class);
+    $language
       ->method('getId')
       ->willReturn($langcode);
     $cacheability = new BubbleableMetadata();
@@ -229,7 +230,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    *   An array of data for checking path prefix negotiation for neutral
    *   languages.
    */
-  public static function providerNeutralLanguages() {
+  public static function providerNeutralLanguages(): array {
     return [
       [LanguageInterface::LANGCODE_NOT_APPLICABLE, NULL],
       [LanguageInterface::LANGCODE_NOT_SPECIFIED, 'en'],
@@ -238,11 +239,10 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
 
   /**
    * Tests domain language negotiation and outbound path processing.
-   *
-   * @dataProvider providerTestDomain
    */
+  #[DataProvider('providerTestDomain')]
   public function testDomain($http_host, $domains, $expected_langcode): void {
-    $this->languageManager->expects($this->any())
+    $this->languageManager
       ->method('getCurrentLanguage')
       ->willReturn($this->languages['en']);
 
@@ -279,7 +279,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    * @return array
    *   An array of data for checking domain negotiation.
    */
-  public static function providerTestDomain() {
+  public static function providerTestDomain(): array {
 
     $domain_configuration[] = [
       'http_host' => 'example.de',
@@ -342,7 +342,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    * Tests path outbound processing correctly setting relative/absolute paths.
    */
   public function testProcessOutboundOutputsRelativePathsForSameDomain(): void {
-    $this->languageManager->expects($this->any())
+    $this->languageManager
       ->method('getCurrentLanguage')
       ->willReturn($this->languages['en']);
 
@@ -393,7 +393,7 @@ if (!function_exists('base_path')) {
   /**
    * Returns the base path.
    */
-  function base_path() {
+  function base_path(): string {
     return '/';
   }
 

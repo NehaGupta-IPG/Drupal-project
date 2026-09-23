@@ -4,30 +4,32 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Theme\Component;
 
+use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\Component\ComponentMetadata;
-use Drupal\Core\Render\Component\Exception\InvalidComponentException;
-use Drupal\Tests\UnitTestCaseTest;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Unit tests for the component metadata class.
- *
- * @coversDefaultClass \Drupal\Core\Theme\Component\ComponentMetadata
- * @group sdc
  */
-class ComponentMetadataTest extends UnitTestCaseTest {
+#[CoversClass(ComponentMetadata::class)]
+#[Group('sdc')]
+class ComponentMetadataTest extends UnitTestCase {
 
   /**
    * Tests that the correct data is returned for each property.
    */
   #[DataProvider('dataProviderMetadata')]
-  public function testMetadata(array $metadata_info, array $expectations): void {
+  public function testMetadata(array $metadata_info, array $expectations, bool $missing_schema): void {
     $metadata = new ComponentMetadata($metadata_info, 'foo/', FALSE);
     $this->assertSame($expectations['path'], $metadata->path);
     $this->assertSame($expectations['status'], $metadata->status);
     $this->assertSame($expectations['thumbnail'], $metadata->getThumbnailPath());
     $this->assertEquals($expectations['props'], $metadata->schema);
+    $this->assertEquals($expectations['noUi'] ?? TRUE, $metadata->noUi);
   }
 
   /**
@@ -37,7 +39,7 @@ class ComponentMetadataTest extends UnitTestCaseTest {
   public function testMetadataEnforceSchema(array $metadata_info, array $expectations, bool $missing_schema): void {
     if ($missing_schema) {
       $this->expectException(InvalidComponentException::class);
-      $this->expectExceptionMessage('The component "' . $metadata_info['id'] . '" does not provide schema information. Schema definitions are mandatory for components declared in modules. For components declared in themes, schema definitions are only mandatory if the "enforce_prop_schemas" key is set to "true" in the theme info file.');
+      $this->expectExceptionMessageIs('The component "' . $metadata_info['id'] . '" does not provide schema information. Schema definitions are mandatory for components declared in modules. For components declared in themes, schema definitions are only mandatory if the "enforce_prop_schemas" key is set to "true" in the theme info file.');
       new ComponentMetadata($metadata_info, 'foo/', TRUE);
     }
     else {
@@ -62,12 +64,14 @@ class ComponentMetadataTest extends UnitTestCaseTest {
           'libraryOverrides' => ['dependencies' => ['core/drupal']],
           'group' => 'my-group',
           'description' => 'My description',
+          'noUi' => TRUE,
         ],
         [
           'path' => 'bar/component-name',
           'status' => 'stable',
           'thumbnail' => '',
           'props' => NULL,
+          'noUi' => TRUE,
         ],
         TRUE,
       ],
@@ -81,6 +85,7 @@ class ComponentMetadataTest extends UnitTestCaseTest {
           'description' => 'JavaScript enhanced button that tracks the number of times a user clicked it.',
           'libraryOverrides' => ['dependencies' => ['core/drupal']],
           'group' => 'my-group',
+          'noUi' => FALSE,
           'props' => [
             'type' => 'object',
             'required' => ['text'],
@@ -110,20 +115,21 @@ class ComponentMetadataTest extends UnitTestCaseTest {
           'thumbnail' => '',
           'group' => 'my-group',
           'additionalProperties' => FALSE,
+          'noUi' => FALSE,
           'props' => [
             'type' => 'object',
             'required' => ['text'],
             'additionalProperties' => FALSE,
             'properties' => [
               'text' => [
-                'type' => ['string', 'object'],
+                'type' => 'string',
                 'title' => 'Title',
                 'description' => 'The title for the button',
                 'minLength' => 2,
                 'examples' => ['Press', 'Submit now'],
               ],
               'iconType' => [
-                'type' => ['string', 'object'],
+                'type' => 'string',
                 'title' => 'Icon Type',
                 'enum' => [
                   'power',
@@ -185,20 +191,21 @@ class ComponentMetadataTest extends UnitTestCaseTest {
           'thumbnail' => '',
           'group' => 'my-group',
           'additionalProperties' => FALSE,
+          'noUi' => FALSE,
           'props' => [
             'type' => 'object',
             'required' => ['text'],
             'additionalProperties' => FALSE,
             'properties' => [
               'text' => [
-                'type' => ['string', 'object'],
+                'type' => 'string',
                 'title' => 'Title',
                 'description' => 'The title for the button',
                 'minLength' => 2,
                 'examples' => ['Press', 'Submit now'],
               ],
               'iconType' => [
-                'type' => ['string', 'object'],
+                'type' => 'string',
                 'title' => 'Icon Type',
                 'enum' => [
                   'power',
@@ -248,13 +255,14 @@ class ComponentMetadataTest extends UnitTestCaseTest {
           'thumbnail' => '',
           'group' => 'my-group',
           'additionalProperties' => FALSE,
+          'noUi' => FALSE,
           'props' => [
             'type' => 'object',
             'required' => ['text'],
             'additionalProperties' => FALSE,
             'properties' => [
               'col' => [
-                'type' => ['string', 'object'],
+                'type' => 'string',
                 'title' => 'Column',
                 'enum' => [
                   1,
@@ -316,20 +324,21 @@ class ComponentMetadataTest extends UnitTestCaseTest {
           'thumbnail' => '',
           'group' => 'my-group',
           'additionalProperties' => FALSE,
+          'noUi' => FALSE,
           'props' => [
             'type' => 'object',
             'required' => ['text'],
             'additionalProperties' => FALSE,
             'properties' => [
               'text' => [
-                'type' => ['string', 'object'],
+                'type' => 'string',
                 'title' => 'Title',
                 'description' => 'The title for the button',
                 'minLength' => 2,
                 'examples' => ['Press', 'Submit now'],
               ],
               'iconType' => [
-                'type' => ['string', 'object'],
+                'type' => 'string',
                 'title' => 'Icon Type',
                 'enum' => [
                   'power',
@@ -392,20 +401,21 @@ class ComponentMetadataTest extends UnitTestCaseTest {
           'thumbnail' => '',
           'group' => 'my-group',
           'additionalProperties' => FALSE,
+          'noUi' => FALSE,
           'props' => [
             'type' => 'object',
             'required' => ['text'],
             'additionalProperties' => FALSE,
             'properties' => [
               'text' => [
-                'type' => ['string', 'object'],
+                'type' => 'string',
                 'title' => 'Title',
                 'description' => 'The title for the button',
                 'minLength' => 2,
                 'examples' => ['Press', 'Submit now'],
               ],
               'iconType' => [
-                'type' => ['string', 'object'],
+                'type' => 'string',
                 'title' => 'Icon Type',
                 'enum' => [
                   'power',
@@ -467,20 +477,21 @@ class ComponentMetadataTest extends UnitTestCaseTest {
           'thumbnail' => '',
           'group' => 'my-group',
           'additionalProperties' => FALSE,
+          'noUi' => FALSE,
           'props' => [
             'type' => 'object',
             'required' => ['text'],
             'additionalProperties' => FALSE,
             'properties' => [
               'text' => [
-                'type' => ['string', 'object'],
+                'type' => 'string',
                 'title' => 'Title',
                 'description' => 'The title for the button',
                 'minLength' => 2,
                 'examples' => ['Press', 'Submit now'],
               ],
               'target' => [
-                'type' => ['string', 'object'],
+                'type' => 'string',
                 'title' => 'Icon Type',
                 'enum' => [
                   '',

@@ -5,17 +5,23 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Unit\Pager;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+use Drupal\Core\Pager\Pager;
+use Drupal\Core\Pager\PagerManager;
 use Drupal\Core\Pager\PagerPreprocess;
+use Drupal\Core\Routing\UrlGenerator;
 use Drupal\Core\Template\AttributeString;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Tests pager preprocessing.
- *
- * @group system
- *
- * @coversDefaultClass \Drupal\Core\Pager\PagerPreprocess
  */
+#[CoversClass(PagerPreprocess::class)]
+#[Group('system')]
 class PreprocessPagerTest extends UnitTestCase {
 
   /**
@@ -29,17 +35,11 @@ class PreprocessPagerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $pager_manager = $this->getMockBuilder('Drupal\Core\Pager\PagerManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $pager = $this->getMockBuilder('Drupal\Core\Pager\Pager')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $url_generator = $this->getMockBuilder('Drupal\Core\Routing\UrlGenerator')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $pager_manager = $this->createStub(PagerManager::class);
+    $pager = $this->createStub(Pager::class);
+    $url_generator = $this->createStub(UrlGenerator::class);
 
-    $pager->method('getTotalPages')->willReturn(2);
+    $pager->method('getTotalPages')->willReturn(3);
     $pager->method('getCurrentPage')->willReturn(1);
 
     $url_generator->method('generateFromRoute')->willReturn('');
@@ -47,7 +47,16 @@ class PreprocessPagerTest extends UnitTestCase {
     $pager_manager->method('getPager')->willReturn($pager);
     $pager_manager->method('getUpdatedParameters')->willReturn('');
 
-    $this->pagerPreprocess = new PagerPreprocess($pager_manager);
+    $request_stack = $this->createStub(RequestStack::class);
+    $request = Request::createFromGlobals();
+    $request->query->set(MainContentViewSubscriber::WRAPPER_FORMAT, 'drupal_modal');
+
+    // Mocks the request stack getting the current request.
+    $request_stack
+      ->method('getCurrentRequest')
+      ->willReturn($request);
+
+    $this->pagerPreprocess = new PagerPreprocess($pager_manager, $request_stack);
 
     $container = new ContainerBuilder();
     $container->set('url_generator', $url_generator);
@@ -57,7 +66,7 @@ class PreprocessPagerTest extends UnitTestCase {
   /**
    * Tests when an empty #quantity is passed.
    *
-   * @covers ::preprocessPager
+   * @legacy-covers ::preprocessPager
    */
   public function testQuantityNotSet(): void {
     $variables = [
@@ -71,13 +80,13 @@ class PreprocessPagerTest extends UnitTestCase {
     ];
     $this->pagerPreprocess->preprocessPager($variables);
 
-    $this->assertEquals(['first', 'previous'], array_keys($variables['items']));
+    $this->assertEquals(['first', 'previous', 'next', 'last'], array_keys($variables['items']));
   }
 
   /**
    * Tests when a #quantity value is passed.
    *
-   * @covers ::preprocessPager
+   * @legacy-covers ::preprocessPager
    */
   public function testQuantitySet(): void {
     $variables = [
@@ -91,7 +100,7 @@ class PreprocessPagerTest extends UnitTestCase {
     ];
     $this->pagerPreprocess->preprocessPager($variables);
 
-    $this->assertEquals(['first', 'previous', 'pages'], array_keys($variables['items']));
+    $this->assertEquals(['first', 'previous', 'pages', 'next', 'last'], array_keys($variables['items']));
     /** @var \Drupal\Core\Template\AttributeString $attribute */
     $attribute = $variables['items']['pages']['2']['attributes']->offsetGet('aria-current');
     $this->assertInstanceOf(AttributeString::class, $attribute);
@@ -101,7 +110,7 @@ class PreprocessPagerTest extends UnitTestCase {
   /**
    * Tests when an empty #pagination_heading_level value is passed.
    *
-   * @covers ::preprocessPager
+   * @legacy-covers ::preprocessPager
    */
   public function testEmptyPaginationHeadingLevelSet(): void {
     $variables = [
@@ -122,7 +131,7 @@ class PreprocessPagerTest extends UnitTestCase {
   /**
    * Tests when no #pagination_heading_level is passed.
    *
-   * @covers ::preprocessPager
+   * @legacy-covers ::preprocessPager
    */
   public function testPaginationHeadingLevelNotSet(): void {
     $variables = [
@@ -142,7 +151,7 @@ class PreprocessPagerTest extends UnitTestCase {
   /**
    * Tests when a #pagination_heading_level value is passed.
    *
-   * @covers ::preprocessPager
+   * @legacy-covers ::preprocessPager
    */
   public function testPaginationHeadingLevelSet(): void {
     $variables = [
@@ -163,7 +172,7 @@ class PreprocessPagerTest extends UnitTestCase {
   /**
    * Test with an invalid #pagination_heading_level.
    *
-   * @covers ::preprocessPager
+   * @legacy-covers ::preprocessPager
    */
   public function testPaginationHeadingLevelInvalid(): void {
     $variables = [
@@ -179,6 +188,27 @@ class PreprocessPagerTest extends UnitTestCase {
     $this->pagerPreprocess->preprocessPager($variables);
 
     $this->assertEquals('h4', $variables['pagination_heading_level']);
+  }
+
+  /**
+   * Tests pager links get modal attributes when request is in a modal.
+   */
+  public function testPagerModalAttributes(): void {
+    $variables = [
+      'pager' => [
+        '#element' => '',
+        '#parameters' => [],
+        '#quantity' => '',
+        '#route_name' => '',
+        '#tags' => '',
+      ],
+    ];
+    $this->pagerPreprocess->preprocessPager($variables);
+
+    foreach (['first', 'previous', 'next', 'last'] as $key) {
+      $attributes = $variables['items'][$key]['attributes']->toArray();
+      $this->assertEquals(['use-ajax'], $attributes['class']);
+    }
   }
 
 }

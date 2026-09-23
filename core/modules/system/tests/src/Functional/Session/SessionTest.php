@@ -7,12 +7,14 @@ namespace Drupal\Tests\system\Functional\Session;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Database;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Drupal session handling tests.
- *
- * @group Session
  */
+#[Group('Session')]
+#[RunTestsInSeparateProcesses]
 class SessionTest extends BrowserTestBase {
 
   /**
@@ -28,9 +30,9 @@ class SessionTest extends BrowserTestBase {
   /**
    * Tests session writing and regeneration.
    *
-   * @covers \Drupal\Core\Session\WriteSafeSessionHandler::setSessionWritable
-   * @covers \Drupal\Core\Session\WriteSafeSessionHandler::isSessionWritable
-   * @covers \Drupal\Core\Session\SessionManager::regenerate
+   * @legacy-covers \Drupal\Core\Session\WriteSafeSessionHandler::setSessionWritable
+   * @legacy-covers \Drupal\Core\Session\WriteSafeSessionHandler::isSessionWritable
+   * @legacy-covers \Drupal\Core\Session\SessionManager::regenerate
    */
   public function testSessionSaveRegenerate(): void {
     $session_handler = $this->container->get('session_handler.write_safe');
@@ -182,7 +184,7 @@ class SessionTest extends BrowserTestBase {
   /**
    * Tests that an invalid session ID in the cookie is rejected.
    *
-   * @covers \Drupal\Core\Session\SessionManager::start
+   * @legacy-covers \Drupal\Core\Session\SessionManager::start
    */
   public function testAnonymousSessionFixation(): void {
 
@@ -252,14 +254,6 @@ class SessionTest extends BrowserTestBase {
    * Tests that empty anonymous sessions are destroyed.
    */
   public function testEmptyAnonymousSession(): void {
-    // Disable the dynamic_page_cache module; it'd cause session_test's debug
-    // output (that is added in
-    // SessionTestSubscriber::onKernelResponseSessionTest()) to not be added.
-    $this->container->get('module_installer')->uninstall(['dynamic_page_cache']);
-
-    // Verify that no session is automatically created for anonymous user when
-    // page caching is disabled.
-    $this->container->get('module_installer')->uninstall(['page_cache']);
     $this->drupalGet('');
     $this->assertSessionCookie(FALSE);
     $this->assertSessionEmpty(TRUE);

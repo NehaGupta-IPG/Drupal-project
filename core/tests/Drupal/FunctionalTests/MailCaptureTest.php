@@ -7,6 +7,7 @@ namespace Drupal\FunctionalTests;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the collection of emails during testing.
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
  * during a test so it does not leave the test server.
  */
 #[Group('browsertestbase')]
+#[RunTestsInSeparateProcesses]
 class MailCaptureTest extends BrowserTestBase {
   use AssertMailTrait {
     getMails as drupalGetMails;
@@ -78,7 +80,11 @@ class MailCaptureTest extends BrowserTestBase {
     $this->assertCount(1, $captured_emails, 'Only one email is returned when filtering by id.');
     $captured_emails = $this->drupalGetMails(['id' => 'drupal_mail_test', 'subject' => $subject]);
     $this->assertCount(1, $captured_emails, 'Only one email is returned when filtering by id and subject.');
-    $captured_emails = $this->drupalGetMails(['id' => 'drupal_mail_test', 'subject' => $subject, 'from' => 'this_was_not_used@example.com']);
+    $captured_emails = $this->drupalGetMails([
+      'id' => 'drupal_mail_test',
+      'subject' => $subject,
+      'from' => 'this_was_not_used@example.com',
+    ]);
     $this->assertCount(0, $captured_emails, 'No emails are returned when querying with an unused from address.');
 
     // Send the last email again, so we can confirm that the

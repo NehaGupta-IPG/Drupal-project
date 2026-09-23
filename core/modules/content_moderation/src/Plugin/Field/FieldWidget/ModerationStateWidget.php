@@ -9,12 +9,11 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldWidget\OptionsSelectWidget;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\content_moderation\ModerationInformation;
 use Drupal\content_moderation\StateTransitionValidationInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Plugin implementation of the 'moderation_state_default' widget.
@@ -67,8 +66,6 @@ class ModerationStateWidget extends OptionsSelectWidget {
    *   Field settings.
    * @param array $third_party_settings
    *   Third party settings.
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfoManager
-   *   The element info manager.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   Current user service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -78,30 +75,23 @@ class ModerationStateWidget extends OptionsSelectWidget {
    * @param \Drupal\content_moderation\StateTransitionValidationInterface $validator
    *   Moderation state transition validation service.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $elementInfoManager, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, ModerationInformation $moderation_information, StateTransitionValidationInterface $validator) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $elementInfoManager);
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    array $third_party_settings,
+    AccountInterface $current_user,
+    EntityTypeManagerInterface $entity_type_manager,
+    #[Autowire(service: 'content_moderation.moderation_information')]
+    ModerationInformation $moderation_information,
+    StateTransitionValidationInterface $validator,
+  ) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->entityTypeManager = $entity_type_manager;
     $this->currentUser = $current_user;
     $this->moderationInformation = $moderation_information;
     $this->validator = $validator;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $plugin_id,
-      $plugin_definition,
-      $configuration['field_definition'],
-      $configuration['settings'],
-      $configuration['third_party_settings'],
-      $container->get('plugin.manager.element_info'),
-      $container->get('current_user'),
-      $container->get('entity_type.manager'),
-      $container->get('content_moderation.moderation_information'),
-      $container->get('content_moderation.state_transition_validation')
-    );
   }
 
   /**

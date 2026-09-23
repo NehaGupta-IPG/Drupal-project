@@ -7,6 +7,8 @@ This takes care of:
   - Placing scaffold files (like `index.php`, `update.php`, …) from the
     `drupal/core` project into their desired location inside the web root. Only
     individual files may be scaffolded with this plugin.
+  - Writing a DrupalInstalled.php file, which holds a PHP class that defines
+    values about the current installation as class constants.
   - Writing an autoload.php file to the web root, which includes the Composer
     autoload.php file.
 
@@ -436,10 +438,7 @@ Sample composer.json for composer-scaffold files in drupal/assets:
   "extra": {
     "drupal-scaffold": {
       "file-mapping": {
-        "[web-root]/.csslintrc": "assets/.csslintrc",
         "[web-root]/.editorconfig": "assets/.editorconfig",
-        "[web-root]/.eslintignore": "assets/.eslintignore",
-        "[web-root]/.eslintrc.json": "assets/.eslintrc.json",
         "[web-root]/.gitattributes": "assets/.gitattributes",
         "[web-root]/.ht.router.php": "assets/.ht.router.php",
         "[web-root]/.htaccess": "assets/.htaccess",

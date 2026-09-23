@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Functional;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\Core\Url;
 use Drupal\locale\StringStorageInterface;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore espagnol
-
 /**
  * Adds a new language with translations and tests language list order.
- *
- * @group language
  */
+#[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LanguageLocaleListTest extends BrowserTestBase {
 
   /**
@@ -28,7 +30,7 @@ class LanguageLocaleListTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * @var \Drupal\locale\StringStorageInterface
+   * The string storage.
    */
   protected StringStorageInterface $storage;
 
@@ -76,7 +78,7 @@ class LanguageLocaleListTest extends BrowserTestBase {
     // Get language list displayed in select list.
     $this->drupalGet('fr/admin/config/regional/language/add');
     $options = $this->assertSession()->selectExists('edit-predefined-langcode')->findAll('css', 'option');
-    $options = array_map(function ($item) {
+    $options = array_map(function (NodeElement $item) {
       return $item->getText();
     }, $options);
     // Remove the 'Custom language...' option form the end.

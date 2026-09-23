@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\config_test\Entity\ConfigQueryTest;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Config\Entity\Query\QueryFactory;
-use Drupal\config_test\Entity\ConfigQueryTest;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Config Entity Query functionality.
  *
- * @group Entity
  * @see \Drupal\Core\Config\Entity\Query
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ConfigEntityQueryTest extends KernelTestBase {
 
   /**
@@ -28,13 +31,6 @@ class ConfigEntityQueryTest extends KernelTestBase {
    * @var array
    */
   protected $queryResults;
-
-  /**
-   * The query factory used to construct all queries in the test.
-   *
-   * @var \Drupal\Core\Config\Entity\Query\QueryFactory
-   */
-  protected $factory;
 
   /**
    * The config entity storage used for testing.
@@ -508,7 +504,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
 
     // Explicitly pass NULL for the range and sort.
     $this->queryResults = $this->entityStorage->getQuery()
-      ->range(NULL, NULL)
+      ->range()
       ->sort('id')
       ->execute();
     $this->assertSame(['1', '2', '3', '4', '5', '6', '7'], array_values($this->queryResults));

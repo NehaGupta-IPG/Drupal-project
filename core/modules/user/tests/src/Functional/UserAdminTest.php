@@ -8,12 +8,14 @@ use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests user administration page functionality.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserAdminTest extends BrowserTestBase {
 
   use AssertMailTrait {
@@ -91,12 +93,12 @@ class UserAdminTest extends BrowserTestBase {
 
     // Filter the users by name/email.
     $this->drupalGet('admin/people', ['query' => ['user' => $user_a->getAccountName()]]);
-    $result = $this->xpath('//table/tbody/tr');
+    $result = $this->getNodeElementsByXpath('//table/tbody/tr');
     $this->assertCount(1, $result, 'Filter by username returned the right amount.');
     $this->assertEquals($user_a->getAccountName(), $result[0]->find('xpath', '/td[2]/a')->getText(), 'Filter by username returned the right user.');
 
     $this->drupalGet('admin/people', ['query' => ['user' => $user_a->getEmail()]]);
-    $result = $this->xpath('//table/tbody/tr');
+    $result = $this->getNodeElementsByXpath('//table/tbody/tr');
     $this->assertCount(1, $result, 'Filter by username returned the right amount.');
     $this->assertEquals($user_a->getAccountName(), $result[0]->find('xpath', '/td[2]/a')->getText(), 'Filter by username returned the right user.');
 

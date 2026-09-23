@@ -5,24 +5,29 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Access;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\CsrfAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
-use Drupal\Core\Access\CsrfAccessCheck;
-use Drupal\Tests\UnitTestCase;
 
 /**
- * @coversDefaultClass \Drupal\Core\Access\CsrfAccessCheck
- * @group Access
+ * Tests Drupal\Core\Access\CsrfAccessCheck.
  */
+#[CoversClass(CsrfAccessCheck::class)]
+#[Group('Access')]
 class CsrfAccessCheckTest extends UnitTestCase {
 
   /**
    * The mock CSRF token generator.
    */
-  protected CsrfTokenGenerator $csrfToken;
+  protected CsrfTokenGenerator&MockObject $csrfToken;
 
   /**
    * The access checker.
@@ -32,12 +37,12 @@ class CsrfAccessCheckTest extends UnitTestCase {
   /**
    * The mock route match.
    */
-  protected RouteMatchInterface $routeMatch;
+  protected RouteMatchInterface&MockObject $routeMatch;
 
   /**
-   * The mock parameter bag.
+   * The stub parameter bag.
    */
-  protected ParameterBagInterface $parameterBag;
+  protected ParameterBagInterface&Stub $parameterBag;
 
   /**
    * {@inheritdoc}
@@ -49,7 +54,7 @@ class CsrfAccessCheckTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->parameterBag = $this->createMock(ParameterBagInterface::class);
+    $this->parameterBag = $this->createStub(ParameterBagInterface::class);
 
     $this->routeMatch = $this->createMock(RouteMatchInterface::class);
 
@@ -80,7 +85,9 @@ class CsrfAccessCheckTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::access
+   * Tests csrf token invalid.
+   *
+   * @legacy-covers ::access
    */
   public function testCsrfTokenInvalid(): void {
     $this->csrfToken->expects($this->once())
@@ -103,7 +110,9 @@ class CsrfAccessCheckTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::access
+   * Tests csrf token missing.
+   *
+   * @legacy-covers ::access
    */
   public function testCsrfTokenMissing(): void {
     $this->csrfToken->expects($this->once())

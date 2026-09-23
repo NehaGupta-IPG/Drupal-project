@@ -6,18 +6,23 @@ namespace Drupal\Tests\Core\Plugin;
 
 use Drupal\Core\Plugin\ConfigurablePluginBase;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
 
 /**
- * @coversDefaultClass \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
- * @group Plugin
+ * Tests Drupal\Core\Plugin\DefaultSingleLazyPluginCollection.
  */
+#[CoversClass(DefaultSingleLazyPluginCollection::class)]
+#[Group('Plugin')]
 class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected function setupPluginCollection(?InvocationOrder $create_count = NULL): void {
+    $this->setUpMockPluginManager();
+
     $definitions = $this->getPluginDefinitions();
     $this->pluginInstances['apple'] = new ConfigurablePlugin(['id' => 'apple', 'key' => 'value'], 'apple', $definitions['apple']);
     $this->pluginInstances['banana'] = new ConfigurablePlugin(['id' => 'banana', 'key' => 'other_value'], 'banana', $definitions['banana']);
@@ -29,7 +34,10 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
         return $this->pluginInstances[$id];
       });
 
-    $this->defaultPluginCollection = new DefaultSingleLazyPluginCollection($this->pluginManager, 'apple', ['id' => 'apple', 'key' => 'value']);
+    $this->defaultPluginCollection = new DefaultSingleLazyPluginCollection($this->pluginManager, 'apple', [
+      'id' => 'apple',
+      'key' => 'value',
+    ]);
   }
 
   /**
@@ -43,12 +51,14 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
   }
 
   /**
-   * @covers ::addInstanceId
-   * @covers ::getConfiguration
-   * @covers ::setConfiguration
+   * Tests add instance id.
+   *
+   * @legacy-covers ::addInstanceId
+   * @legacy-covers ::getConfiguration
+   * @legacy-covers ::setConfiguration
    */
   public function testAddInstanceId(): void {
-    $this->setupPluginCollection($this->any());
+    $this->setupPluginCollection($this->atLeastOnce());
 
     $this->assertEquals(['id' => 'apple', 'key' => 'value'], $this->defaultPluginCollection->get('apple')->getConfiguration());
     $this->assertEquals(['id' => 'apple', 'key' => 'value'], $this->defaultPluginCollection->getConfiguration());
@@ -61,10 +71,10 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
   }
 
   /**
-   * @covers ::getInstanceIds
+   * Tests get instance ids.
    */
   public function testGetInstanceIds(): void {
-    $this->setupPluginCollection($this->any());
+    $this->setupPluginCollection($this->atLeastOnce());
     $this->assertEquals(['apple' => 'apple'], $this->defaultPluginCollection->getInstanceIds());
 
     $this->defaultPluginCollection->addInstanceId('banana', ['id' => 'banana', 'key' => 'other_value']);
@@ -72,10 +82,12 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
   }
 
   /**
-   * @covers ::setConfiguration
+   * Tests configurable set configuration.
+   *
+   * @legacy-covers ::setConfiguration
    */
   public function testConfigurableSetConfiguration(): void {
-    $this->setupPluginCollection($this->any());
+    $this->setupPluginCollection($this->atLeastOnce());
 
     $this->defaultPluginCollection->setConfiguration(['apple' => ['value' => 'pineapple', 'id' => 'apple']]);
     $config = $this->defaultPluginCollection->getConfiguration();

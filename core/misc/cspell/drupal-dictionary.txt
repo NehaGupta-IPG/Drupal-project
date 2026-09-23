@@ -3,6 +3,7 @@ autoplay
 bartik
 bubbleable
 buytaert
+buytaert's
 daterange
 dbtng
 dependee
@@ -18,6 +19,7 @@ drupalmedia
 drupalorg
 druplicon
 drush
+exin
 fapi
 fieldable
 fulldate
@@ -28,12 +30,9 @@ jswebassert
 keyvalue
 langcode
 langcodes
-lullabot
-mabe
 mulrev
 mulrevpub
 olivero
-olivero's
 prerender
 renderable
 revlog
@@ -41,6 +40,7 @@ revpub
 simpletest
 sitename
 tempstore
+tempstore's
 umami
 unpromote
 unsticky

@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests SQL syntax interpretation.
  *
  * In order to ensure consistent SQL handling throughout Drupal
  * across multiple kinds of database systems, we test that the
  * database system interprets SQL syntax in an expected fashion.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class BasicSyntaxTest extends DatabaseTestBase {
 
   /**

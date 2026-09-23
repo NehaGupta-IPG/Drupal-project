@@ -10,7 +10,7 @@ status: experimental
 # Use this key to organize components together.
 group: Navigation
 
-# Schema for the props. We support www.json-schema.org. Learn more about the
+# Schema for the props. We support https://json-schema.org/. Learn more about the
 # syntax there.
 props:
   # Props are always an object with keys. Each key is a variable in your
@@ -23,8 +23,10 @@ props:
       title: Attributes
       description: Wrapper attributes.
     site_logo:
-      type: string
-      format: iri-reference
+      type:
+        - string
+        - array
+        - object
     url:
       type: string
       title: Branding url

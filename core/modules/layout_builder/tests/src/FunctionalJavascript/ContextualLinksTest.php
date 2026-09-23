@@ -8,12 +8,14 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore blocktest
 /**
  * Test contextual links compatibility with the Layout Builder.
  */
 #[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class ContextualLinksTest extends WebDriverTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -29,6 +31,7 @@ class ContextualLinksTest extends WebDriverTestBase {
     'layout_test',
     'block',
     'node',
+    'node_block_test',
     'contextual',
   ];
 
@@ -130,7 +133,7 @@ class ContextualLinksTest extends WebDriverTestBase {
    * @param string $block_name
    *   The block name as it appears in the Add block form.
    */
-  protected function addBlock($block_name): void {
+  protected function addBlock(string $block_name): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

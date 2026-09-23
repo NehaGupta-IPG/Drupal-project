@@ -6,23 +6,24 @@ namespace Drupal\Tests\user\Unit;
 
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\PermissionHandler;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamWrapper;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests the permission handler.
- *
- * @group user
- *
- * @coversDefaultClass \Drupal\user\PermissionHandler
- * @runTestsInSeparateProcesses
  */
+#[CoversClass(PermissionHandler::class)]
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class PermissionHandlerTest extends UnitTestCase {
 
   /**
@@ -34,24 +35,13 @@ class PermissionHandlerTest extends UnitTestCase {
 
   /**
    * The mocked module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $moduleHandler;
-
-  /**
-   * The mocked string translation.
-   *
-   * @var \Drupal\Tests\user\Unit\TestTranslationManager
-   */
-  protected $stringTranslation;
+  protected ModuleHandlerInterface&MockObject $moduleHandler;
 
   /**
    * The mocked callable resolver.
-   *
-   * @var \Drupal\Core\Utility\CallableResolver|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $callableResolver;
+  protected CallableResolver&MockObject $callableResolver;
 
   /**
    * {@inheritdoc}
@@ -59,7 +49,6 @@ class PermissionHandlerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->stringTranslation = new TestTranslationManager();
     $this->callableResolver = $this->createMock('Drupal\Core\Utility\CallableResolver');
   }
 
@@ -74,7 +63,7 @@ class PermissionHandlerTest extends UnitTestCase {
    * @return \Drupal\Core\Extension\Extension
    *   The extension object.
    */
-  protected function mockModuleExtension($module, $name) {
+  protected function mockModuleExtension($module, $name): Extension {
     $extension = new Extension('vfs:/', $module, "modules/$module");
     $extension->info['name'] = $name;
     return $extension;
@@ -83,10 +72,10 @@ class PermissionHandlerTest extends UnitTestCase {
   /**
    * Tests permissions provided by YML files.
    *
-   * @covers ::__construct
-   * @covers ::getPermissions
-   * @covers ::buildPermissionsYaml
-   * @covers ::moduleProvidesPermissions
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getPermissions
+   * @legacy-covers ::buildPermissionsYaml
+   * @legacy-covers ::moduleProvidesPermissions
    */
   public function testBuildPermissionsYaml(): void {
     vfsStreamWrapper::register();
@@ -125,16 +114,16 @@ EOF
     );
     $modules = ['module_a', 'module_b', 'module_c'];
 
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler
       ->method('getModuleList')
       ->willReturn(array_flip($modules));
 
     $this->callableResolver->expects($this->never())
       ->method('getCallableFromDefinition');
 
-    $module_extension_list = $this->createMock(ModuleExtensionList::class);
+    $module_extension_list = $this->createStub(ModuleExtensionList::class);
 
-    $this->permissionHandler = new PermissionHandler($this->moduleHandler, $this->stringTranslation, $this->callableResolver, $module_extension_list);
+    $this->permissionHandler = new PermissionHandler($this->moduleHandler, $this->getStringTranslationStub(), $this->callableResolver, $module_extension_list);
 
     $actual_permissions = $this->permissionHandler->getPermissions();
     $this->assertPermissions($actual_permissions);
@@ -148,12 +137,15 @@ EOF
   /**
    * Tests permissions sort inside a module.
    *
-   * @covers ::__construct
-   * @covers ::getPermissions
-   * @covers ::buildPermissionsYaml
-   * @covers ::sortPermissions
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getPermissions
+   * @legacy-covers ::buildPermissionsYaml
+   * @legacy-covers ::sortPermissions
    */
   public function testBuildPermissionsSortPerModule(): void {
+    $this->callableResolver->expects($this->never())
+      ->method('getCallableFromDefinition');
+
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
@@ -196,7 +188,7 @@ EOF
       ->method('getModuleList')
       ->willReturn(array_flip($modules));
 
-    $permissionHandler = new PermissionHandler($this->moduleHandler, $this->stringTranslation, $this->callableResolver, $module_extension_list);
+    $permissionHandler = new PermissionHandler($this->moduleHandler, $this->getStringTranslationStub(), $this->callableResolver, $module_extension_list);
     $actual_permissions = $permissionHandler->getPermissions();
     $this->assertEquals(['access_module_a4', 'access_module_a1', 'access_module_a2', 'access_module_a3'],
       array_keys($actual_permissions));
@@ -205,9 +197,9 @@ EOF
   /**
    * Tests dynamic callback permissions provided by YML files.
    *
-   * @covers ::__construct
-   * @covers ::getPermissions
-   * @covers ::buildPermissionsYaml
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getPermissions
+   * @legacy-covers ::buildPermissionsYaml
    */
   public function testBuildPermissionsYamlCallback(): void {
     vfsStreamWrapper::register();
@@ -246,7 +238,7 @@ EOF
 
     $modules = ['module_a', 'module_b', 'module_c'];
 
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler
       ->method('getModuleList')
       ->willReturn(array_flip($modules));
 
@@ -271,9 +263,9 @@ EOF
         ],
       ]);
 
-    $module_extension_list = $this->createMock(ModuleExtensionList::class);
+    $module_extension_list = $this->createStub(ModuleExtensionList::class);
 
-    $this->permissionHandler = new PermissionHandler($this->moduleHandler, $this->stringTranslation, $this->callableResolver, $module_extension_list);
+    $this->permissionHandler = new PermissionHandler($this->moduleHandler, $this->getStringTranslationStub(), $this->callableResolver, $module_extension_list);
 
     $actual_permissions = $this->permissionHandler->getPermissions();
     $this->assertPermissions($actual_permissions);
@@ -307,7 +299,7 @@ EOF
 
     $modules = ['module_a'];
 
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler
       ->method('getModuleList')
       ->willReturn(array_flip($modules));
 
@@ -316,9 +308,9 @@ EOF
       ->with('Drupal\\user\\Tests\\TestPermissionCallbacks::titleDescription')
       ->willReturn([new TestPermissionCallbacks(), 'titleDescription']);
 
-    $module_extension_list = $this->createMock(ModuleExtensionList::class);
+    $module_extension_list = $this->createStub(ModuleExtensionList::class);
 
-    $this->permissionHandler = new PermissionHandler($this->moduleHandler, $this->stringTranslation, $this->callableResolver, $module_extension_list);
+    $this->permissionHandler = new PermissionHandler($this->moduleHandler, $this->getStringTranslationStub(), $this->callableResolver, $module_extension_list);
 
     $actual_permissions = $this->permissionHandler->getPermissions();
 
@@ -361,7 +353,7 @@ class TestPermissionCallbacks {
   /**
    * Callback that returns a single description.
    */
-  public function singleDescription() {
+  public function singleDescription(): array {
     return [
       'access_module_a' => 'single_description',
     ];
@@ -370,7 +362,7 @@ class TestPermissionCallbacks {
   /**
    * Callback that returns the title and description.
    */
-  public function titleDescription() {
+  public function titleDescription(): array {
     return [
       'access module b' => [
         'title' => 'Access B',
@@ -382,7 +374,7 @@ class TestPermissionCallbacks {
   /**
    * Callback that returns restricted access.
    */
-  public function titleDescriptionRestrictAccess() {
+  public function titleDescriptionRestrictAccess(): array {
     return [
       'access_module_c' => [
         'title' => 'Access C',
@@ -395,42 +387,13 @@ class TestPermissionCallbacks {
   /**
    * Callback that returns the title.
    */
-  public function titleProvider() {
+  public function titleProvider(): array {
     return [
       'access module a via module b' => [
         'title' => 'Access A via B',
         'provider' => 'module_a',
       ],
     ];
-  }
-
-}
-
-/**
- * Implements a translation manager in tests.
- */
-class TestTranslationManager implements TranslationInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function translate($string, array $args = [], array $options = []) {
-    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-    return new TranslatableMarkup($string, $args, $options, $this);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function translateString(TranslatableMarkup $translated_string) {
-    return $translated_string->getUntranslatedString();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function formatPlural($count, $singular, $plural, array $args = [], array $options = []) {
-    return new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $this);
   }
 
 }

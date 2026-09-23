@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the generation of 'theme_token' key in Drupal settings.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class ThemeTokenTest extends BrowserTestBase {
 
   /**
@@ -48,11 +50,11 @@ class ThemeTokenTest extends BrowserTestBase {
     $settings = $this->getDrupalSettings();
     $this->assertNull($settings['ajaxPageState']['theme_token']);
 
-    // Install 'claro' and configure it as administrative theme.
-    $this->container->get('theme_installer')->install(['claro']);
-    $this->config('system.theme')->set('admin', 'claro')->save();
+    // Install 'default_admin' and configure it as administrative theme.
+    $this->container->get('theme_installer')->install(['default_admin']);
+    $this->config('system.theme')->set('admin', 'default_admin')->save();
 
-    // Revisit the page. This time the page is displayed using the 'claro' theme
+    // Revisit the page. This time the page is displayed using the 'default_admin' theme
     // and that is different from the default theme ('stark').
     $this->drupalGet('admin/structure/block');
     $settings = $this->getDrupalSettings();

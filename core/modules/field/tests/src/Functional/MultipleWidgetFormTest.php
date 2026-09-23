@@ -10,12 +10,14 @@ use Drupal\entity_test\Entity\EntityTestBaseFieldDisplay;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests field form handling.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class MultipleWidgetFormTest extends FieldTestBase {
 
   /**
@@ -210,7 +212,7 @@ class MultipleWidgetFormTest extends FieldTestBase {
   /**
    * Tests widget alter hooks for a given hook name.
    */
-  protected function widgetAlterTest($hook, $widget) {
+  protected function widgetAlterTest(string $hook, $widget) {
     // Create a field with fixed cardinality, configure the form to use a
     // "multiple" widget.
     $field_storage = $this->fieldStorageMultiple;

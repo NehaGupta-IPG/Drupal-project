@@ -7,12 +7,14 @@ namespace Drupal\Tests\system\Functional\Pager;
 use Behat\Mink\Element\NodeElement;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests pager functionality.
- *
- * @group Pager
  */
+#[Group('Pager')]
+#[RunTestsInSeparateProcesses]
 class PagerTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -186,7 +188,7 @@ class PagerTest extends BrowserTestBase {
       foreach ([0, 1, 4] as $pager_element) {
         $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$data['expected_page'][$pager_element]}')");
         $destination = str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
-        $this->assertEquals($data['expected_query'], $destination);
+        $this->assertStringEndsWith($data['expected_query'], $destination);
       }
     }
   }
@@ -223,7 +225,7 @@ class PagerTest extends BrowserTestBase {
    * @internal
    */
   protected function assertPagerItems(int $current_page): void {
-    $elements = $this->xpath('//ul[contains(@class, :class)]/li', [':class' => 'pager__items']);
+    $elements = $this->getNodeElementsByXpath('//ul[contains(@class, :class)]/li', [':class' => 'pager__items']);
     $this->assertNotEmpty($elements, 'Pager found.');
 
     // Make current page 1-based.

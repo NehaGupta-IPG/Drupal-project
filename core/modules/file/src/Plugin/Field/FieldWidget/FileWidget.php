@@ -15,7 +15,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\file\Element\ManagedFile;
 use Drupal\file\Entity\File;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -29,17 +28,16 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 class FileWidget extends WidgetBase {
 
   /**
-   * {@inheritdoc}
+   * The element info manager.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $element_info) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $element_info);
-  }
+  protected ElementInfoManagerInterface $elementInfo;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($plugin_id, $plugin_definition, $configuration['field_definition'], $configuration['settings'], $configuration['third_party_settings'], $container->get('element_info'));
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $element_info) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+    $this->elementInfo = $element_info;
   }
 
   /**
@@ -232,7 +230,7 @@ class FileWidget extends WidgetBase {
 
     // Essentially we use the managed_file type, extended with some
     // enhancements.
-    $element_info = $this->elementInfoManager->getInfo('managed_file');
+    $element_info = $this->elementInfo->getInfo('managed_file');
     $element += [
       '#type' => 'managed_file',
       '#upload_location' => $items[$delta]->getUploadLocation(),
@@ -545,9 +543,10 @@ class FileWidget extends WidgetBase {
   /**
    * Form submission handler for upload/remove button of formElement().
    *
-   * This runs in addition to and after file_managed_file_submit().
+   * This runs in addition to and after
+   * \Drupal\file\Element\ManagedFile::submit().
    *
-   * @see file_managed_file_submit()
+   * @see \Drupal\file\Element\ManagedFile::submit()
    */
   public static function submit($form, FormStateInterface $form_state) {
     // During the form rebuild, formElement() will create field item widget

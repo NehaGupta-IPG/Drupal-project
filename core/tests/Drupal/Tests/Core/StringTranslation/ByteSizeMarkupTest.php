@@ -9,18 +9,24 @@ use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\StringTranslation\ByteSizeMarkup
- * @group StringTranslation
+ * Tests Drupal\Core\StringTranslation\ByteSizeMarkup.
  */
+#[CoversClass(ByteSizeMarkup::class)]
+#[Group('StringTranslation')]
 class ByteSizeMarkupTest extends UnitTestCase {
 
   /**
-   * @covers ::create
-   * @dataProvider providerTestCommonFormatSize
+   * Tests common format size.
+   *
+   * @legacy-covers ::create
    */
-  public function testCommonFormatSize($expected, $input): void {
+  #[DataProvider('providerTestCommonFormatSize')]
+  public function testCommonFormatSize(string $expected, int|float $input): void {
     $size = ByteSizeMarkup::create($input, NULL, $this->getStringTranslationStub());
     $this->assertInstanceOf(TranslatableMarkup::class, $size);
     $this->assertEquals($expected, $size);
@@ -29,12 +35,12 @@ class ByteSizeMarkupTest extends UnitTestCase {
   /**
    * Provides a list of byte size to test.
    */
-  public static function providerTestCommonFormatSize() {
+  public static function providerTestCommonFormatSize(): array {
     $kb = Bytes::KILOBYTE;
     return [
       ['0 bytes', 0],
       // @todo https://www.drupal.org/node/3161118 Prevent display of fractional
-      //   bytes for size less then 1KB.
+      // bytes for size less then 1KB.
       ['0.1 bytes', 0.1],
       ['0.6 bytes', 0.6],
       ['1 byte', 1],
@@ -65,7 +71,9 @@ class ByteSizeMarkupTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::create
+   * Tests translatable markup object.
+   *
+   * @legacy-covers ::create
    */
   public function testTranslatableMarkupObject(): void {
     $result = ByteSizeMarkup::create(1, NULL, $this->getStringTranslationStub());

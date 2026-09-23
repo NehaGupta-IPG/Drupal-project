@@ -14,6 +14,8 @@ use Drupal\Core\Plugin\Discovery\YamlDiscoveryDecorator;
 use Drupal\Core\Layout\Attribute\Layout;
 use Drupal\Core\Plugin\FilteredPluginManagerTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\layout_discovery\Hook\LayoutDiscoveryThemeHooks;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Provides a plugin manager for layouts.
@@ -22,29 +24,15 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
 
   use FilteredPluginManagerTrait;
 
-  /**
-   * The theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
-
-  /**
-   * LayoutPluginManager constructor.
-   *
-   * @param \Traversable $namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler to invoke the alter hook with.
-   */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler) {
+  public function __construct(
+    #[Autowire(service: 'container.namespaces')]
+    \Traversable $namespaces,
+    #[Autowire(service: 'cache.discovery')]
+    CacheBackendInterface $cache_backend,
+    ModuleHandlerInterface $module_handler,
+    protected ThemeHandlerInterface $themeHandler,
+  ) {
     parent::__construct('Plugin/Layout', $namespaces, $module_handler, LayoutInterface::class, Layout::class, 'Drupal\Core\Layout\Annotation\Layout');
-    $this->themeHandler = $theme_handler;
 
     $type = $this->getType();
     $this->setCacheBackend($cache_backend, $type);
@@ -93,17 +81,30 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
       throw new InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" layout definition must extend %s', $plugin_id, LayoutDefinition::class));
     }
 
-    // Add the module or theme path to the 'path'.
+    if (empty($definition->getLabel())) {
+      throw new InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" layout definition must have a label.', $plugin_id));
+    }
+
+    // Ensure that every plugin has a category.
     $provider = $definition->getProvider();
     if ($this->moduleHandler->moduleExists($provider)) {
-      $base_path = $this->moduleHandler->getModule($provider)->getPath();
+      $extension = $this->moduleHandler->getModule($provider);
     }
     elseif ($this->themeHandler->themeExists($provider)) {
-      $base_path = $this->themeHandler->getTheme($provider)->getPath();
+      $extension = $this->themeHandler->getTheme($provider);
     }
     else {
-      $base_path = '';
+      $extension = NULL;
     }
+    if (empty($definition->getCategory())) {
+      // Default to the human-readable name if the provider is a module or
+      // theme; otherwise the provider machine name is used.
+      $category = $extension ? $extension->getName() : $provider;
+      $definition->setCategory($category);
+    }
+
+    // Add the module or theme path to the 'path'.
+    $base_path = $extension ? $extension->getPath() : '';
 
     $path = $definition->getPath();
     $path = !empty($path) ? $base_path . '/' . $path : $base_path;
@@ -164,6 +165,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     $hooks = [];
     $hooks['layout'] = [
       'render element' => 'content',
+      'initial preprocess' => LayoutDiscoveryThemeHooks::class . ':preprocessLayout',
     ];
     /** @var \Drupal\Core\Layout\LayoutDefinition[] $definitions */
     $definitions = $this->getDefinitions();
@@ -198,7 +200,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    * @return \Drupal\Core\Layout\LayoutDefinition[]
    *   An array of plugin definitions, sorted by category and label.
    */
-  public function getSortedDefinitions(?array $definitions = NULL, $label_key = 'label') {
+  public function getSortedDefinitions(?array $definitions = NULL, string $label_key = 'label') {
     // Sort the plugins first by category, then by label.
     $definitions = $definitions ?? $this->getDefinitions();
     uasort($definitions, function (LayoutDefinition $a, LayoutDefinition $b) {
@@ -217,7 +219,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    *   Keys are category names, and values are arrays of which the keys are
    *   plugin IDs and the values are plugin definitions.
    */
-  public function getGroupedDefinitions(?array $definitions = NULL, $label_key = 'label') {
+  public function getGroupedDefinitions(?array $definitions = NULL, string $label_key = 'label') {
     $definitions = $this->getSortedDefinitions($definitions ?? $this->getDefinitions(), $label_key);
     $grouped_definitions = [];
     foreach ($definitions as $id => $definition) {

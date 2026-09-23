@@ -8,12 +8,14 @@ use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests distribution profile support with existing settings.
  */
 #[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class DistributionProfileExistingSettingsTest extends InstallerTestBase {
 
   /**
@@ -31,6 +33,11 @@ class DistributionProfileExistingSettingsTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $profile;
+
+  /**
+   * {@inheritdoc}
+   */
   protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     $this->info = [
@@ -40,7 +47,7 @@ class DistributionProfileExistingSettingsTest extends InstallerTestBase {
       'distribution' => [
         'name' => 'My Distribution',
         'install' => [
-          'theme' => 'olivero',
+          'theme' => 'default_admin',
         ],
       ],
     ];
@@ -95,13 +102,6 @@ class DistributionProfileExistingSettingsTest extends InstallerTestBase {
     $this->assertSession()->pageTextNotContains('profile');
 
     parent::setUpLanguage();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUpProfile(): void {
-    // This step is skipped, because there is a distribution profile.
   }
 
   /**

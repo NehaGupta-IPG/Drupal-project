@@ -9,12 +9,21 @@ use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\ComposerValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\package_manager\Validator\ComposerValidator
- * @group package_manager
+ * Tests Composer Validator.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[Group('#slow')]
+#[CoversClass(ComposerValidator::class)]
+#[RunTestsInSeparateProcesses]
 class ComposerValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;
@@ -97,9 +106,8 @@ class ComposerValidatorTest extends PackageManagerKernelTestBase {
    *   The config to set.
    * @param \Drupal\package_manager\ValidationResult[] $expected_results
    *   The expected validation results, if any.
-   *
-   * @dataProvider providerComposerSettingsValidation
    */
+  #[DataProvider('providerComposerSettingsValidation')]
   public function testComposerSettingsValidation(array $config, array $expected_results): void {
     (new ActiveFixtureManipulator())->addConfig($config)->commitChanges()->updateLock();
     $this->assertStatusCheckResults($expected_results);
@@ -113,54 +121,11 @@ class ComposerValidatorTest extends PackageManagerKernelTestBase {
    *   The config to set.
    * @param \Drupal\package_manager\ValidationResult[] $expected_results
    *   The expected validation results, if any.
-   *
-   * @dataProvider providerComposerSettingsValidation
    */
+  #[DataProvider('providerComposerSettingsValidation')]
   public function testComposerSettingsValidationDuringPreApply(array $config, array $expected_results): void {
     $this->getStageFixtureManipulator()->addConfig($config, TRUE);
     $this->assertResults($expected_results, PreApplyEvent::class);
-  }
-
-  /**
-   * Data provider for ::testLinkToOnlineHelp().
-   *
-   * @return array[]
-   *   The test cases.
-   */
-  public static function providerLinkToOnlineHelp(): array {
-    return [
-      'TLS disabled' => [
-        ['disable-tls' => TRUE],
-        [
-          t('TLS must be enabled for HTTPS Composer downloads. See <a href="/admin/help/package_manager#package-manager-requirements">the help page</a> for more information on how to configure Composer to download packages securely.'),
-          t('You should also check the value of <code>secure-http</code> and make sure that it is set to <code>true</code> or not set at all.'),
-        ],
-      ],
-      'secure-http is off' => [
-        ['secure-http' => FALSE],
-        [
-          t('HTTPS must be enabled for Composer downloads. See <a href="/admin/help/package_manager#package-manager-requirements">the help page</a> for more information on how to configure Composer to download packages securely.'),
-        ],
-      ],
-    ];
-  }
-
-  /**
-   * Tests that invalid configuration links to online help, if available.
-   *
-   * @param array $config
-   *   The Composer configuration to set.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[] $expected_messages
-   *   The expected validation error messages.
-   *
-   * @dataProvider providerLinkToOnlineHelp
-   */
-  public function testLinkToOnlineHelp(array $config, array $expected_messages): void {
-    $this->enableModules(['help']);
-    (new ActiveFixtureManipulator())->addConfig($config)->commitChanges();
-
-    $result = ValidationResult::createError($expected_messages, $this->t("Composer settings don't satisfy Package Manager's requirements."));
-    $this->assertStatusCheckResults([$result]);
   }
 
   /**

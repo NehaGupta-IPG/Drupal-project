@@ -4,8 +4,6 @@ namespace Drupal\Core\Session;
 
 /**
  * An implementation of the user account interface for the global user.
- *
- * @todo Change all properties to protected.
  */
 #[\AllowDynamicProperties]
 class UserSession implements AccountInterface {
@@ -29,7 +27,7 @@ class UserSession implements AccountInterface {
   /**
    * The Unix timestamp when the user last accessed the site.
    *
-   * @var string
+   * @var int
    */
   protected $access;
 
@@ -38,14 +36,14 @@ class UserSession implements AccountInterface {
    *
    * @var string
    */
-  public $name = '';
+  protected $name = '';
 
   /**
    * The preferred language code of the account.
    *
    * @var string
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $preferred_langcode;
 
   /**
@@ -53,7 +51,7 @@ class UserSession implements AccountInterface {
    *
    * @var string
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $preferred_admin_langcode;
 
   /**
@@ -110,9 +108,6 @@ class UserSession implements AccountInterface {
    *
    * @return bool
    *   Returns TRUE if the user has the role, otherwise FALSE.
-   *
-   * @todo in Drupal 11, add method to Drupal\Core\Session\AccountInterface.
-   * @see https://www.drupal.org/node/3228209
    */
   public function hasRole(string $rid): bool {
     return in_array($rid, $this->getRoles(), TRUE);
@@ -199,7 +194,7 @@ class UserSession implements AccountInterface {
    * {@inheritdoc}
    */
   public function getLastAccessedTime() {
-    return $this->access;
+    return (int) $this->access;
   }
 
   /**

@@ -7,17 +7,17 @@ namespace Drupal\Tests\Core\Theme\Component;
 use Drupal\Core\Plugin\Component;
 use Drupal\Core\Template\Loader\ComponentLoader;
 use Drupal\Core\Theme\ComponentPluginManager;
-use Drupal\Tests\UnitTestCaseTest;
+use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
-use Psr\Log\LoggerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Unit tests for the component loader class.
- *
- * @coversDefaultClass \Drupal\Core\Template\Loader\ComponentLoader
- * @group sdc
  */
-class ComponentLoaderTest extends UnitTestCaseTest {
+#[CoversClass(ComponentLoader::class)]
+#[Group('sdc')]
+class ComponentLoaderTest extends UnitTestCase {
 
   /**
    * Tests the is fresh function for component loader.
@@ -55,10 +55,7 @@ class ComponentLoaderTest extends UnitTestCaseTest {
 
     $component_manager = $this->prophesize(ComponentPluginManager::class);
     $component_manager->find('sdc_test:loader-test')->willReturn($component);
-    $component_loader = new ComponentLoader(
-      $component_manager->reveal(),
-      $this->createMock(LoggerInterface::class),
-    );
+    $component_loader = new ComponentLoader($component_manager->reveal());
 
     // Assert the component is fresh, as it changed before the current time.
     $this->assertTrue($component_loader->isFresh('sdc_test:loader-test', $current_time), 'Twig and YAML files were supposed to be fresh');

@@ -19,15 +19,17 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
-use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
+use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests using entity fields of the image field type.
- *
- * @group image
  */
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageItemTest extends FieldKernelTestBase {
 
   /**
@@ -245,8 +247,8 @@ class ImageItemTest extends FieldKernelTestBase {
    */
   private function validateImageUriForDirectory(string $file_directory, string $expected_start): void {
     // Mock the field definition with the specified file directory.
-    $definition = $this->createMock(FieldDefinitionInterface::class);
-    $definition->expects($this->any())
+    $definition = $this->createStub(FieldDefinitionInterface::class);
+    $definition
       ->method('getSettings')
       ->willReturn([
         'file_extensions' => 'jpg',

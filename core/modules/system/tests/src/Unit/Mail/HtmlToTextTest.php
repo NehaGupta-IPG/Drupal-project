@@ -8,12 +8,12 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for \Drupal\Core\Mail\MailFormatHelper::htmlToText().
- *
- * @group Mail
  */
+#[Group('Mail')]
 class HtmlToTextTest extends UnitTestCase {
 
   /**
@@ -35,7 +35,7 @@ class HtmlToTextTest extends UnitTestCase {
    *   An HTML representation of the text string that, when displayed in a
    *   browser, represents the PHP source code equivalent of $text.
    */
-  protected function stringToHtml($text): string {
+  protected function stringToHtml(string $text): string {
     return '"' .
       str_replace(
         ["\n", ' '],

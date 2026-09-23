@@ -10,6 +10,8 @@ use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\layout_builder\Traits\EnableLayoutBuilderTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests overrides editing uses the correct theme.
@@ -17,9 +19,9 @@ use Drupal\user\UserInterface;
  * Block content is used for this test as its canonical & editing routes
  * are in the admin section, so we need to test that layout builder editing
  * uses the front end theme.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderOverridesEditingThemeTest extends LayoutBuilderTestBase {
 
   use EnableLayoutBuilderTrait;
@@ -80,8 +82,8 @@ class LayoutBuilderOverridesEditingThemeTest extends LayoutBuilderTestBase {
     ]);
     // Set a different theme for the admin pages. So we can assert the theme
     // in Layout Builder is not the same as the admin theme.
-    \Drupal::service('theme_installer')->install(['claro']);
-    $this->config('system.theme')->set('admin', 'claro')->save();
+    \Drupal::service('theme_installer')->install(['default_admin']);
+    $this->config('system.theme')->set('admin', 'default_admin')->save();
 
     // Enable layout builder for the block content display.
     $display = LayoutBuilderEntityViewDisplay::create([
@@ -110,13 +112,13 @@ class LayoutBuilderOverridesEditingThemeTest extends LayoutBuilderTestBase {
     $this->assertSession()->statusCodeEquals(200);
     // Assert the test_theme is being used.
     $this->assertSession()->responseContains('test_theme/kitten.css');
-    // Assert the claro theme is not being used.
-    $this->assertSession()->elementNotExists('css', '#block-claro-content');
+    // Assert the default_admin theme is not being used.
+    $this->assertSession()->elementNotExists('css', '#block-default_admin-content');
     // Assert the default still uses the test_theme.
     $this->drupalGet('admin/structure/block-content/manage/basic/display/default/layout');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('test_theme/kitten.css');
-    $this->assertSession()->elementNotExists('css', '#block-claro-content');
+    $this->assertSession()->elementNotExists('css', '#block-default_admin-content');
   }
 
 }

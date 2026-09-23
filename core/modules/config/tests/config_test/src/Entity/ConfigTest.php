@@ -77,7 +77,7 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
    *
    * @var int
    */
-  public $weight = 0;
+  public int $weight = 0;
 
   /**
    * The image style to use.
@@ -111,7 +111,7 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
   /**
    * {@inheritdoc}
    */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+  public function postSave(EntityStorageInterface $storage, $update = TRUE): void {
     // Used to test secondary writes during config sync.
     if ($this->id() == 'primary') {
       $secondary = $storage->create([
@@ -129,7 +129,7 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
   /**
    * {@inheritdoc}
    */
-  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+  public static function postDelete(EntityStorageInterface $storage, array $entities): void {
     parent::postDelete($storage, $entities);
     foreach ($entities as $entity) {
       if ($entity->id() == 'dependency') {

@@ -85,48 +85,8 @@ class NavigationHooks {
     if (!$this->currentUser->hasPermission('access navigation')) {
       return;
     }
-    $this->navigationRenderer->removeToolbar($page_top);
     $this->navigationRenderer->buildNavigation($page_top);
     $this->navigationRenderer->buildTopBar($page_top);
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme($existing, $type, $theme, $path) : array {
-    $items['top_bar'] = ['render element' => 'element'];
-    $items['top_bar_page_actions'] = ['variables' => ['page_actions' => [], 'featured_page_actions' => []]];
-    $items['top_bar_page_action'] = ['variables' => ['link' => []]];
-    $items['block__navigation'] = ['render element' => 'elements', 'base hook' => 'block'];
-    $items['navigation_menu'] = [
-      'base hook' => 'menu',
-      'variables' => [
-        'menu_name' => NULL,
-        'title' => NULL,
-        'items' => [],
-        'attributes' => [],
-      ],
-    ];
-    $items['navigation_content_top'] = [
-      'variables' => [
-        'items' => [],
-      ],
-    ];
-    $items['navigation__messages'] = [
-      'variables' => [
-        'message_list' => NULL,
-      ],
-    ];
-    $items['navigation__message'] = [
-      'variables' => [
-        'attributes' => [],
-        'url' => NULL,
-        'content' => NULL,
-        'type' => 'status',
-      ],
-    ];
-    return $items;
   }
 
   /**
@@ -191,7 +151,6 @@ class NavigationHooks {
       //   https://www.drupal.org/project/drupal/issues/3443882 is merged.
       $allow_in_navigation = [
         'navigation_user',
-        'navigation_shortcuts',
         'navigation_menu',
       ];
       if (in_array($base_plugin_id, $allow_in_navigation, TRUE)) {
@@ -199,7 +158,7 @@ class NavigationHooks {
       }
 
       // Hide Navigation specific blocks from the generic UI.
-      $hidden = ['navigation_user', 'navigation_shortcuts', 'navigation_menu', 'navigation_link'];
+      $hidden = ['navigation_user', 'navigation_menu', 'navigation_link'];
       if (in_array($base_plugin_id, $hidden, TRUE)) {
         $definition['_block_ui_hidden'] = TRUE;
       }
@@ -222,7 +181,7 @@ class NavigationHooks {
   #[Hook('navigation_content_top')]
   public function navigationWorkspaces(): array {
     // This navigation item requires the Workspaces UI module.
-    if (!\Drupal::moduleHandler()->moduleExists('workspaces_ui')) {
+    if (!$this->moduleHandler->moduleExists('workspaces_ui')) {
       return [];
     }
 

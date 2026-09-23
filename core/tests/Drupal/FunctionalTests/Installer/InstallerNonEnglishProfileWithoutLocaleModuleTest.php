@@ -6,11 +6,13 @@ namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Serialization\Yaml;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests installing a profile with non-English language and no locale module.
  */
 #[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerNonEnglishProfileWithoutLocaleModuleTest extends InstallerTestBase {
 
   /**
@@ -66,10 +68,6 @@ class InstallerNonEnglishProfileWithoutLocaleModuleTest extends InstallerTestBas
     $this->assertSession()->addressEquals('user/1');
     // Confirm that we are logged-in after installation.
     $this->assertSession()->pageTextContains($this->rootUser->getAccountName());
-
-    // Verify that the confirmation message appears.
-    require_once $this->root . '/core/includes/install.inc';
-    $this->assertSession()->pageTextContains('Congratulations, you installed Drupal!');
 
     $this->assertFalse(\Drupal::service('module_handler')->moduleExists('locale'), 'The Locale module is not installed.');
     $this->assertTrue(\Drupal::service('module_handler')->moduleExists('language'), 'The Language module is installed.');

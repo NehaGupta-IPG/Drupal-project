@@ -7,11 +7,15 @@ namespace Drupal\Tests\Core\StringTranslation;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\StringTranslation\TranslationManager
- * @group StringTranslation
+ * Tests Drupal\Core\StringTranslation\TranslationManager.
  */
+#[CoversClass(TranslationManager::class)]
+#[Group('StringTranslation')]
 class TranslationManagerTest extends UnitTestCase {
 
   /**
@@ -36,22 +40,38 @@ class TranslationManagerTest extends UnitTestCase {
    * @return array
    *   An array of test data for formatPlural().
    */
-  public static function providerTestFormatPlural() {
+  public static function providerTestFormatPlural(): array {
     return [
       [1, 'Singular', '@count plural', [], [], 'Singular'],
       [2, 'Singular', '@count plural', [], [], '2 plural'],
-      // @todo support locale_get_plural
       [2, 'Singular', '@count @arg', ['@arg' => '<script>'], [], '2 &lt;script&gt;'],
       [2, 'Singular', '@count %arg', ['%arg' => '<script>'], [], '2 <em class="placeholder">&lt;script&gt;</em>'],
       [1, 'Singular', '@count plural', [], ['langcode' => NULL], 'Singular'],
       [1, 'Singular', '@count plural', [], ['langcode' => 'es'], 'Singular'],
+      // The count is documented as int|float, and formatPlural() itself is not
+      // typed, so callers also pass numeric strings. A count must never be
+      // truncated for display, and only a count that is exactly one may use
+      // the singular form. Both forms carry @count here, so that a wrongly
+      // selected form and a truncated count are each visible in the result.
+      [1, '@count hour', '@count hours', [], [], '1 hour'],
+      ['1', '@count hour', '@count hours', [], [], '1 hour'],
+      [1.0, '@count hour', '@count hours', [], [], '1 hour'],
+      ['1.0', '@count hour', '@count hours', [], [], '1.0 hour'],
+      [2, '@count hour', '@count hours', [], [], '2 hours'],
+      ['2', '@count hour', '@count hours', [], [], '2 hours'],
+      [0.6, '@count hour', '@count hours', [], [], '0.6 hours'],
+      ['0.6', '@count hour', '@count hours', [], [], '0.6 hours'],
+      [1.5, '@count hour', '@count hours', [], [], '1.5 hours'],
+      ['1.5', '@count hour', '@count hours', [], [], '1.5 hours'],
+      [-1.5, '@count hour', '@count hours', [], [], '-1.5 hours'],
     ];
   }
 
   /**
-   * @dataProvider providerTestFormatPlural
+   * Tests format plural.
    */
-  public function testFormatPlural($count, $singular, $plural, array $args, array $options, $expected): void {
+  #[DataProvider('providerTestFormatPlural')]
+  public function testFormatPlural(int|float|string $count, string $singular, string $plural, array $args, array $options, string $expected): void {
     $langcode = empty($options['langcode']) ? 'fr' : $options['langcode'];
     $translator = $this->createMock('\Drupal\Core\StringTranslation\Translator\TranslatorInterface');
     $translator->expects($this->once())
@@ -63,8 +83,16 @@ class TranslationManagerTest extends UnitTestCase {
     $this->translationManager->setDefaultLangcode('fr');
     $this->translationManager->addTranslator($translator);
     $result = $this->translationManager->formatPlural($count, $singular, $plural, $args, $options);
-    $this->assertEquals($expected, $result);
+    $this->assertSame($expected, (string) $result);
     $this->assertInstanceOf(MarkupInterface::class, $result);
+  }
+
+  /**
+   * Tests that a non-numeric count is rejected rather than rendered.
+   */
+  public function testFormatPluralWithNonNumericCount(): void {
+    $this->expectException(\TypeError::class);
+    $this->translationManager->formatPlural('not a number', 'Singular', '@count plural')->render();
   }
 
   /**
@@ -76,10 +104,9 @@ class TranslationManagerTest extends UnitTestCase {
    *   An associative array of replacements to make after translation.
    * @param string $expected_string
    *   The expected translated string value.
-   *
-   * @dataProvider providerTestTranslatePlaceholder
    */
-  public function testTranslatePlaceholder($string, array $args, $expected_string): void {
+  #[DataProvider('providerTestTranslatePlaceholder')]
+  public function testTranslatePlaceholder(string $string, array $args, string $expected_string): void {
     $actual = $this->translationManager->translate($string, $args);
     $this->assertInstanceOf(MarkupInterface::class, $actual);
     $this->assertEquals($expected_string, (string) $actual);
@@ -91,7 +118,7 @@ class TranslationManagerTest extends UnitTestCase {
    * @return array
    *   An array of test data for translate().
    */
-  public static function providerTestTranslatePlaceholder() {
+  public static function providerTestTranslatePlaceholder(): array {
     return [
       ['foo @bar', ['@bar' => 'bar'], 'foo bar'],
       ['bar %baz', ['%baz' => 'baz'], 'bar <em class="placeholder">baz</em>'],

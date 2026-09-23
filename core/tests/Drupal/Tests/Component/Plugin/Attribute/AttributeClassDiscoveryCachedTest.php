@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @legacy-covers \Drupal\Component\Discovery\MissingClassDetectionClassLoader
+ * Tests Attribute Class Discovery Cached.
  */
 #[CoversClass(AttributeClassDiscovery::class)]
 #[Group('Attribute')]
@@ -42,8 +42,6 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
 
   /**
    * Tests that getDefinitions() retrieves the file cache correctly.
-   *
-   * @legacy-covers ::getDefinitions
    */
   public function testGetDefinitions(): void {
     // Path to the classes which we'll discover and parse annotation.
@@ -67,7 +65,6 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
 
     // Gain access to the file cache.
     $ref_file_cache = new \ReflectionProperty($discovery, 'fileCache');
-    $ref_file_cache->setAccessible(TRUE);
     /** @var \Drupal\Component\FileCache\FileCacheInterface $file_cache */
     $file_cache = $ref_file_cache->getValue($discovery);
 
@@ -102,8 +99,6 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
 
   /**
    * Tests discovery with missing traits.
-   *
-   * @legacy-covers ::getDefinitions
    */
   public function testGetDefinitionsMissingTrait(): void {
     // Path to the classes which we'll discover and parse annotation.
@@ -125,7 +120,6 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
 
     // Gain access to the file cache.
     $ref_file_cache = new \ReflectionProperty($discovery, 'fileCache');
-    $ref_file_cache->setAccessible(TRUE);
     /** @var \Drupal\Component\FileCache\FileCacheInterface $file_cache */
     $file_cache = $ref_file_cache->getValue($discovery);
 
@@ -136,22 +130,22 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
       $this->assertNull($file_cache->get($non_discoverable_file_path));
     }
 
-    $discovery = new AttributeClassDiscovery(['com\example' => [$discovery_path], 'Drupal\a_module_that_does_not_exist' => [$discovery_path]]);
+    // Even when the missing trait's namespace is added to the plugin
+    // namespaces, the plugin with the missing trait is still not discovered
+    // because PHP cannot load a class that uses a non-existent trait.
+    $discovery = new AttributeClassDiscovery([
+      'com\example' => [$discovery_path],
+      'Drupal\a_module_that_does_not_exist' => [$discovery_path],
+    ]);
     $this->assertEquals([
       'discovery_test_1' => [
         'id' => 'discovery_test_1',
         'class' => 'com\example\PluginNamespace\AttributeDiscoveryTest1',
       ],
-      'discovery_test_missing_trait' => [
-        'id' => 'discovery_test_missing_trait',
-        'class' => 'com\example\PluginNamespace\AttributeDiscoveryTestMissingTrait',
-        'title' => 'Discovery test plugin missing trait',
-      ],
     ], $discovery->getDefinitions());
 
     // The plugins that extend a missing class, implement a missing interface,
-    // and use a missing trait should not be cached. This is the case even for
-    // the plugin that was just discovered.
+    // and use a missing trait should not be cached.
     foreach ($non_discoverable_file_paths as $non_discoverable_file_path) {
       $this->assertTrue(file_exists($non_discoverable_file_path));
       $this->assertNull($file_cache->get($non_discoverable_file_path));

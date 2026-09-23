@@ -103,6 +103,11 @@ class ComponentMetadata {
   public readonly array $variants;
 
   /**
+   * Internal component, hidden in ui.
+   */
+  public readonly bool $noUi;
+
+  /**
    * ComponentMetadata constructor.
    *
    * @param array $metadata_info
@@ -140,6 +145,7 @@ class ComponentMetadata {
     $this->schema = $this->parseSchemaInfo($metadata_info);
     $this->slots = $metadata_info['slots'] ?? [];
     $this->variants = $metadata_info['variants'] ?? [];
+    $this->noUi = $metadata_info['noUi'] ?? FALSE;
   }
 
   /**
@@ -188,14 +194,6 @@ class ComponentMetadata {
 
           $schema['properties'][$name] = $prop_schema;
         }
-
-        // All props should also support "object" this allows deferring
-        // rendering in Twig to the render pipeline.
-        $type = $prop_schema['type'] ?? '';
-        $schema['properties'][$name]['type'] = array_unique([
-          ...(array) $type,
-          'object',
-        ]);
       }
     }
     return $schema;
