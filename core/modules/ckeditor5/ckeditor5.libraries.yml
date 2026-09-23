@@ -80,6 +80,9 @@ internal.drupal.ckeditor5.link-entity-suggestions:
   dependencies:
     - core/ckeditor5
     - core/drupal
+    - core/jquery
+    - core/drupal.autocomplete
+    - link/link.entity_link_suggestions_autocomplete
     - core/drupal.autocomplete
 
 internal.drupal.ckeditor5.media:

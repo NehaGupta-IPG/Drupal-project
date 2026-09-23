@@ -30,6 +30,7 @@ class EntityLinkSuggestionsTest extends CKEditor5TestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'link',
     'node',
     'media',
     'ckeditor5',

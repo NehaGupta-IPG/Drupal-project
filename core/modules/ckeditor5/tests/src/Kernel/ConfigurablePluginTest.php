@@ -29,6 +29,8 @@ class ConfigurablePluginTest extends KernelTestBase {
     // @see \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition::validateDrupalAspects()
     'filter',
     'editor',
+    // Provides the link_entity_suggestions plugin (provider: link).
+    'link',
   ];
 
   /**
@@ -93,7 +95,7 @@ class ConfigurablePluginTest extends KernelTestBase {
           ['language' => 'xml', 'label' => 'XML'],
         ],
       ],
-      'ckeditor5_link_entity_suggestions' => [],
+      'link_entity_suggestions' => [],
       'ckeditor5_list' => [
         'properties' => [
           'reversed' => TRUE,

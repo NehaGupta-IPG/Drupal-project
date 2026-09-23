@@ -348,7 +348,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
         'title' => LinkTitleVisibility::Disabled->value,
       ])
       ->setDisplayOptions('form', [
-        'type' => 'link_default',
+        'type' => 'link_autocomplete',
         'weight' => -2,
       ]);
 

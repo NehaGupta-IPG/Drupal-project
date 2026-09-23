@@ -160,6 +160,20 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
 
       // Load links matching this route.
       $links = $this->menuLinkManager->loadLinksByRoute($route_name, $route_parameters, $menu_name);
+
+      // Some menu links store only the route's path variables and not extra
+      // route defaults contributed by a route enhancer (for example, a view
+      // serving an entity's canonical route injects view_id/display_id). Those
+      // links can't match the full raw parameters above, so retry with just the
+      // route's path variables. This keeps links pointing at the same page in
+      // the active trail regardless of how their URI was stored (e.g. an
+      // "entity:" URI versus an "internal:" path).
+      if (empty($links) && ($route = $this->routeMatch->getRouteObject())) {
+        $path_parameters = array_intersect_key($route_parameters, array_flip($route->compile()->getPathVariables()));
+        if ($path_parameters !== $route_parameters) {
+          $links = $this->menuLinkManager->loadLinksByRoute($route_name, $path_parameters, $menu_name);
+        }
+      }
     }
 
     // If the request is for the site's front page, then menu links containing

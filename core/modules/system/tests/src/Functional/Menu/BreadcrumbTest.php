@@ -301,7 +301,9 @@ class BreadcrumbTest extends BrowserTestBase {
       $this->submitForm($edit, 'Save');
       $menu_links = \Drupal::entityTypeManager()->getStorage('menu_link_content')->loadByProperties([
         'title' => $edit['title[0][value]'],
-        'link.uri' => 'internal:/taxonomy/term/' . $term->id(),
+        // The link_autocomplete widget resolves the path to an entity
+        // reference, so the stored URI uses the entity: scheme.
+        'link.uri' => 'entity:taxonomy_term/' . $term->id(),
       ]);
       $tags[$name]['link'] = reset($menu_links);
       $parent_menu_link_id = $tags[$name]['link']->getPluginId();

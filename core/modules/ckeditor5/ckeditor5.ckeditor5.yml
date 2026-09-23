@@ -337,7 +337,8 @@ ckeditor5_link:
       - <a>
       - <a href>
 
-ckeditor5_link_entity_suggestions:
+link_entity_suggestions:
+  provider: link
   ckeditor5:
     plugins:
       - drupalEntityLinkSuggestions.DrupalEntityLinkSuggestions
@@ -370,7 +371,8 @@ ckeditor5_linkImage:
         - ckeditor5_link
         - ckeditor5_image
 
-ckeditor5_entityLinkImage:
+link_entityLinkImage:
+  provider: link
   ckeditor5:
     plugins: []
   drupal:
@@ -379,7 +381,7 @@ ckeditor5_entityLinkImage:
       - <img data-link-entity-type data-link-entity-uuid>
     conditions:
       plugins:
-        - ckeditor5_link_entity_suggestions
+        - link_entity_suggestions
         - ckeditor5_image
 
 ckeditor5_linkMedia:
@@ -846,7 +848,8 @@ media_library_mediaLibrary:
       filter: media_embed
       toolbarItem: drupalMedia
 
-ckeditor5_entityLinkMedia:
+link_entityLinkMedia:
+  provider: link
   ckeditor5:
     plugins: []
   drupal:
@@ -857,5 +860,5 @@ ckeditor5_entityLinkMedia:
       - <drupal-media data-link-entity-type data-link-entity-uuid data-link-entity-metadata>
     conditions:
       plugins:
-        - ckeditor5_link_entity_suggestions
+        - link_entity_suggestions
         - media_media

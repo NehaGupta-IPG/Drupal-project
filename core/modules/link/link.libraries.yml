@@ -5,3 +5,26 @@ drupal.link-icon:
       css/link.icon.theme.css: {}
   dependencies:
     - field_ui/drupal.field_ui.manage_fields
+
+link.entity_link_suggestions_autocomplete:
+  version: VERSION
+  js:
+    js/entity-link-suggestions-autocomplete.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal.autocomplete
+    - core/drupal
+
+link.autocomplete_widget:
+  version: VERSION
+  js:
+    js/link-autocomplete-widget.js: {}
+  css:
+    component:
+      css/link-autocomplete-widget.css: {}
+  dependencies:
+    - core/jquery
+    - core/drupal.autocomplete
+    - core/once
+    - core/drupal
+    - link/link.entity_link_suggestions_autocomplete
