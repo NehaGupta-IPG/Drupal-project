@@ -1166,12 +1166,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Action/Plugin/Action/EmailAction.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Storing entity storage as a class property is not recommended\\. Call Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStoragePropertyAssignment',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Action/Plugin/Action/EmailAction.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Action\\\\Plugin\\\\Action\\\\GotoAction\\:\\:execute\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -32569,19 +32563,19 @@ $ignoreErrors[] = [
 	'message' => '#^Function views_ui_add_ajax_wrapper\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/admin.inc',
+	'path' => __DIR__ . '/modules/views_ui/views_ui.module',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function views_ui_add_limited_validation\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/admin.inc',
+	'path' => __DIR__ . '/modules/views_ui/views_ui.module',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function views_ui_form_button_was_clicked\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/admin.inc',
+	'path' => __DIR__ . '/modules/views_ui/views_ui.module',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_ui\\\\Ajax\\\\SetFormCommand\\:\\:render\\(\\) has no return type specified\\.$#',
