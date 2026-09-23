@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\locale\EventSubscriber;
 
+use Drupal\Core\Site\Settings;
 use Drupal\language\Event\LanguageDefaultLangcodeChangeEvent;
 use Drupal\locale\LocaleConfigManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -50,11 +51,18 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
    * @see \Drupal\language\DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation()
    */
   public function translateUpdatedConfigOperation(string $new_langcode, &$context): void {
-    $names = $context['results']['updated_names'] ?? [];
+    if (!isset($context['sandbox']['names'])) {
+      $context['sandbox']['names'] = $context['results']['updated_names'] ?? [];
+      $context['sandbox']['max'] = count($context['sandbox']['names']);
+    }
+
+    $names = array_splice($context['sandbox']['names'], 0, Settings::get('entity_update_batch_size', 50));
     if (!empty($names)) {
       $this->localeConfigManager->updateConfigTranslations($names, [$new_langcode]);
     }
-    $context['finished'] = 1;
+
+    $context['sandbox']['progress'] = ($context['sandbox']['progress'] ?? 0) + count($names);
+    $context['finished'] = empty($context['sandbox']['max']) ? 1 : $context['sandbox']['progress'] / $context['sandbox']['max'];
   }
 
   /**
