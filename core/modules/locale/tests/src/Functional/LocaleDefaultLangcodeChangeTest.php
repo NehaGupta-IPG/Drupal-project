@@ -44,6 +44,14 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    // Ensure that batching in
+    // LanguageDefaultLangcodeChangeSubscriber::translateUpdatedConfigOperation()
+    // is tested.
+    $settings['settings']['entity_update_batch_size'] = (object) [
+      'value' => 1,
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
     $this->stringStorage = $this->container->get('locale.storage');
   }
 
