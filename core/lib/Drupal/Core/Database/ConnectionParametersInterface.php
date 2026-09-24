@@ -53,7 +53,7 @@ interface ConnectionParametersInterface {
    * @param UnprocessedConnectionInfoArray $options
    *   An array of connection options.
    *
-   * @return ConnectionInfoArray
+   * @return array
    *   The processed options.
    *
    * @internal

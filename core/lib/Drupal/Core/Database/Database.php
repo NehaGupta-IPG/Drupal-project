@@ -29,7 +29,7 @@ use Drupal\Core\Cache\NullBackend;
  *   'collation'?: string,
  *   'pdo'?: array<mixed>,
  *   'isolation_level'?: int|string,
- *   'init_commands'?: list<string>,
+ *   'init_commands'?: array<string,string|int>,
  *   'dependencies'?: array<string,array{
  *     'autoload': string,
  *     'namespace': string,
@@ -48,7 +48,7 @@ use Drupal\Core\Cache\NullBackend;
  *   'collation'?: string,
  *   'pdo'?: array<mixed>,
  *   'isolation_level'?: int|string,
- *   'init_commands'?: list<string>,
+ *   'init_commands'?: array<string,string|int>,
  *   'dependencies'?: array<string,array{
  *     'autoload': string,
  *     'namespace': string,
