@@ -60,6 +60,11 @@
     "reason": "The test covers migration and removal of legacy local-storage keys."
   },
   {
+    "path": "tests/src/Kernel/ThemeHooksTest.php",
+    "pattern": "['gin']",
+    "reason": "The test covers the temporary drupalSettings compatibility alias."
+  },
+  {
     "path": "tests/src/Kernel/FocusColorPresetUpdateTest.php",
     "pattern": "'gin'",
     "reason": "The test covers the update of the legacy stored focus-color value."

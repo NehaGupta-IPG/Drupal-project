@@ -6,7 +6,6 @@ namespace Drupal\default_admin\Hook;
 
 use Drupal\default_admin\Helper;
 use Drupal\default_admin\Settings;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Block\BlockManagerInterface;
@@ -15,7 +14,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Installer\InstallerKernel;
@@ -23,7 +21,6 @@ use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Template\Attribute;
@@ -40,7 +37,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Provides preprocess implementations.
  */
-final class PreprocessHooks implements TrustedCallbackInterface {
+final class PreprocessHooks {
 
   use StringTranslationTrait;
 
@@ -53,31 +50,11 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     protected readonly RouteMatchInterface $currentRouteMatch,
     protected readonly ConfigFactoryInterface $configFactory,
     protected readonly AccountInterface $currentUser,
-    protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly EntityTypeBundleInfoInterface $entityTypeBundleInfo,
     protected readonly BlockManagerInterface $blockManager,
     protected readonly RendererInterface $renderer,
     protected readonly ModuleHandlerInterface $moduleHandler,
   ) {}
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function trustedCallbacks(): array {
-    return [
-      'lazyToolbarUserPicture',
-    ];
-  }
-
-  /**
-   * Static lazy loader for the user picture.
-   *
-   * @return array
-   *   The user picture as a render array.
-   */
-  public static function lazyToolbarUserPicture(): array {
-    return \Drupal::classResolver(PreprocessHooks::class)->toolbarUserPicture();
-  }
 
   /**
    * Implements hook_preprocess_HOOK() for admin_block.
@@ -117,40 +94,6 @@ final class PreprocessHooks implements TrustedCallbackInterface {
       unset($variables['title_suffix']['contextual_links'], $variables['elements']['#contextual_links']);
 
       $variables['attributes']['class'] = array_diff($variables['attributes']['class'], ['contextual-region']);
-    }
-  }
-
-  /**
-   * Implements hook_preprocess_HOOK() for block_content_add_list.
-   *
-   * Makes block_content_add_list variables compatible with entity_add_list.
-   */
-  #[Hook('preprocess_block_content_add_list')]
-  public function preprocessBlockContentAddList(array &$variables): void {
-    if (!empty($variables['content'])) {
-      $query = $this->requestStack->getCurrentRequest()->query->all();
-      /** @var \Drupal\block_content\BlockContentTypeInterface $type */
-      foreach ($variables['content'] as $type) {
-        $label = $type->label();
-        $description = $type->getDescription();
-        $type_id = $type->id();
-        $add_url = Url::fromRoute('block_content.add_form', [
-          'block_content_type' => $type_id,
-        ], [
-          'query' => $query,
-        ]);
-        $variables['bundles'][$type_id] = [
-          'label' => $label,
-          'add_link' => Link::fromTextAndUrl($label, $add_url),
-          'description' => [],
-        ];
-
-        if (!empty($description)) {
-          $variables['bundles'][$type_id]['description'] = [
-            '#markup' => $description,
-          ];
-        }
-      }
     }
   }
 
@@ -780,7 +723,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    */
   #[Hook('preprocess_links')]
   public function preprocessLinks(array &$variables): void {
-    foreach ($variables['links'] as $links_item) {
+    foreach ($variables['links'] as &$links_item) {
       if (!empty($links_item['link']) && !empty($links_item['link']['#url']) && $links_item['link']['#url'] instanceof Url && $links_item['link']['#url']->isRouted()) {
         switch ($links_item['link']['#url']->getRouteName()) {
           case 'system.theme_settings_theme':
@@ -802,6 +745,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
         }
       }
     }
+    unset($links_item);
 
     // This makes it so array keys of #links items are added as a class. This
     // functionality was removed in Drupal 8.1, but still necessary in some
@@ -1227,74 +1171,6 @@ final class PreprocessHooks implements TrustedCallbackInterface {
       $variables['description_display'] = 'invisible';
       $variables['description_toggle'] = TRUE;
     }
-  }
-
-  /**
-   * Lazy builder callback for the user picture.
-   */
-  #[Hook('preprocess_toolbar_user_picture')]
-  public function preprocessToolbarUserPicture(): array {
-    $user = $this->entityTypeManager->getStorage('user')->load($this->currentUser->id());
-    $url = $user->toUrl();
-
-    // If the user is anonymous, we cannot link to the user profile.
-    if ($user->isAnonymous()) {
-      $url = Url::fromUri('route:<nolink>');
-    }
-
-    $build = [
-      '#type' => 'link',
-      '#url' => $url,
-      '#title' => [
-        '#markup' => $user->getDisplayName(),
-      ],
-      '#attributes' => [
-        'id' => 'toolbar-item-user-secondary',
-        'class' => [
-          'toolbar-icon',
-          'toolbar-icon-user',
-          'trigger',
-          'toolbar-item',
-        ],
-        'role' => 'button',
-      ],
-    ];
-
-    /** @var \Drupal\image\ImageStyleInterface|null $style */
-    $style = NULL;
-    try {
-      $style = $this->entityTypeManager->getStorage('image_style')->load('thumbnail');
-    }
-    catch (PluginNotFoundException) {
-      // The image style plugin does not exists. $style stays NULL and no user
-      // picture will be added.
-    }
-    if ($style === NULL) {
-      return ['link' => $build];
-    }
-
-    /** @var \Drupal\file\FileInterface|null $file */
-    $file = $user->user_picture->entity;
-    if ($file === NULL) {
-      return ['link' => $build];
-    }
-
-    $image_url = $style->buildUrl($file->getFileUri());
-
-    $build['#attributes']['class'] = ['toolbar-item icon-user'];
-    $build['#title'] = [
-      '#type' => 'html_tag',
-      '#tag' => 'img',
-      '#attributes' => [
-        'src' => $image_url,
-        'alt' => $user->getAccountName(),
-        'class' => [
-          'icon-user__image',
-        ],
-      ],
-    ];
-
-    return ['link' => $build];
   }
 
   /**

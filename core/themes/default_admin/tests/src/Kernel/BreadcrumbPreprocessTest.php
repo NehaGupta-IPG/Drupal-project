@@ -140,7 +140,6 @@ class BreadcrumbPreprocessTest extends KernelTestBase {
       $route_match,
       $this->container->get('config.factory'),
       $this->container->get('current_user'),
-      $this->container->get('entity_type.manager'),
       $this->container->get('entity_type.bundle.info'),
       $this->container->get('plugin.manager.block'),
       $this->container->get('renderer'),

@@ -1,6 +1,7 @@
 const mainContent = '.region-content';
-const mainMessagesContainer =
-  '[data-drupal-messages] > .messages-list__wrapper';
+const mainMessagesRegion = '[data-drupal-messages]';
+const mainMessagesContainer = `${mainMessagesRegion} > .messages__wrapper`;
+const jsMessages = `${mainMessagesContainer} > [data-drupal-message-id]`;
 const secondaryMessagesContainer = '[data-drupal-messages-other]';
 
 const mainButtons = {
@@ -39,6 +40,11 @@ module.exports = {
       .waitForElementVisible(mainContent)
       .assert.elementPresent(mainMessagesContainer)
 
+      // status-messages.html.twig:30 renders the message list, and
+      // core/misc/message.js:63 reuses its first child element as the wrapper
+      // for messages added by JavaScript.
+      .assert.hasClass(mainMessagesRegion, 'messages-list')
+
       // We should load 3 messages on page load from \Drupal::messenger()
       .assert.elementCount(`${mainMessagesContainer} > .messages-list__item`, 3)
 
@@ -58,7 +64,14 @@ module.exports = {
       // We should have 2 messages of each type
       .assert.elementCount(`${mainMessagesContainer} > .messages--status`, 2)
       .assert.elementCount(`${mainMessagesContainer} > .messages--warning`, 2)
-      .assert.elementCount(`${mainMessagesContainer} > .messages--error`, 2);
+      .assert.elementCount(`${mainMessagesContainer} > .messages--error`, 2)
+
+      // Only the three messages created by JavaScript carry the identifier of
+      // migration/js/messages.js:38, and each of them renders the dismiss
+      // button of migration/js/messages.js:52.
+      .assert.elementCount(jsMessages, 3)
+      .assert.elementCount(`${jsMessages} > .js-message-button-hide`, 3)
+      .assert.elementCount(`${jsMessages}[data-drupal-message-type]`, 3);
   },
 
   'Verify customized placement of javascript-created messages': (browser) => {
