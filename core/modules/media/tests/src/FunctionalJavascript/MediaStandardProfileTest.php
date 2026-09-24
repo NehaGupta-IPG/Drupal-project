@@ -290,7 +290,7 @@ class MediaStandardProfileTest extends MediaJavascriptTestBase {
     // src attribute uses the large image style, the label is visually hidden,
     // and there is no link to the image file.
     $image_element = $assert_session->elementExists('css', '#block-default-admin-content img');
-    $expected_image_src = $file_url_generator->generate(\Drupal::token()->replace('public://styles/large/public/[date:custom:Y]-[date:custom:m]/' . $image_media_name_updated))->toString();
+    $expected_image_src = $file_url_generator->generate(ImageStyle::load('large')->buildUri(\Drupal::token()->replace('public://[date:custom:Y]-[date:custom:m]/' . $image_media_name_updated)))->toString();
     $this->assertStringContainsString($expected_image_src, $image_element->getAttribute('src'));
     $assert_session->elementExists('css', '#block-default-admin-content div.visually-hidden');
     $assert_session->elementNotExists('css', '#block-default-admin-content img a');
