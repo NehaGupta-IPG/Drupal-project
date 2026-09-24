@@ -154,6 +154,10 @@ class TwigNodeTrans extends Node {
               case 'placeholder':
                 $argPrefix = '%';
                 break;
+
+              case 'url_filter':
+                $argPrefix = ':';
+                break;
             }
             $args = $args->getNode('node');
           }

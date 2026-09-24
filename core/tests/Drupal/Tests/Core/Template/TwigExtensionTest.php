@@ -288,6 +288,19 @@ class TwigExtensionTest extends UnitTestCase {
   }
 
   /**
+   * Tests the escaping of objects implementing SafeStringInterface.
+   *
+   * @legacy-covers ::urlFilter
+   */
+  public function testUrlEscaping(): void {
+    $loader = new StringLoader();
+    $twig = new Environment($loader);
+    $twig->addExtension($this->systemUnderTest);
+    $result = $twig->render("{{ 'javascript:alert(0)'|url_filter }}");
+    $this->assertEquals('alert(0)', $result);
+  }
+
+  /**
    * Tests safe join.
    */
   public function testSafeJoin(): void {
