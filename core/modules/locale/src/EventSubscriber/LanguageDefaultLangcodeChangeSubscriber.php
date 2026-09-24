@@ -58,7 +58,11 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
 
     $names = array_splice($context['sandbox']['names'], 0, Settings::get('entity_update_batch_size', 50));
     if (!empty($names)) {
-      $this->localeConfigManager->updateConfigTranslations($names, [$new_langcode]);
+      // Key paths DefaultLangcodeConfigUpdater found no override for. These
+      // keys still have value from the previous default language and should
+      // fall back to the English value, if it exists.
+      $untranslated_keys = array_intersect_key($context['results']['untranslated_keys'] ?? [], array_flip($names));
+      $this->localeConfigManager->updateConfigTranslations($names, [$new_langcode], $untranslated_keys);
     }
 
     $context['sandbox']['progress'] = ($context['sandbox']['progress'] ?? 0) + count($names);

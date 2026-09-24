@@ -504,12 +504,22 @@ class LocaleConfigManager {
    * @param array $langcodes
    *   (optional) Array of language codes to update. Defaults to all
    *   configurable languages.
+   * @param array $untranslated_keys
+   *   (optional) Keyed by configuration name, a nested array in the shape
+   *   \Drupal\language\DefaultLangcodeConfigUpdater::extractUntranslatedKeys()
+   *   produces. The translatable key paths whose active value is known to
+   *   still be content from some other language, and so must fall back to
+   *   the English source rather than keep whatever the active langcode's
+   *   real translation search finds (or does not find). A name absent from
+   *   this array is treated the normal way: a translatable key with no real
+   *   translation simply keeps whatever the active configuration already
+   *   has. Only the default langcode change reconciliation passes this.
    *
    * @return int
    *   Total number of configuration override and active configuration objects
    *   updated (saved or removed).
    */
-  public function updateConfigTranslations(array $names, array $langcodes = []) {
+  public function updateConfigTranslations(array $names, array $langcodes = [], array $untranslated_keys = []) {
     $langcodes = $langcodes ?: array_keys($this->languageManager->getLanguages());
     $count = 0;
     foreach ($names as $name) {
@@ -552,7 +562,17 @@ class LocaleConfigManager {
           // If the language code is the active storage language, we should
           // update. If it is English, we should only update if English is also
           // translatable.
-          $data = NestedArray::mergeDeepArray([$active, $processed], TRUE);
+          if (empty($untranslated_keys[$name])) {
+            $data = NestedArray::mergeDeepArray([$active, $processed], TRUE);
+          }
+          else {
+            // These specific key paths are known to still hold content from
+            // some other language, fall back to the English source. A real
+            // translation, if one is found above, still wins over the source
+            // fallback.
+            $source = $this->getSourceStrings($active, $translatable, $untranslated_keys[$name]);
+            $data = NestedArray::mergeDeepArray([$active, $source, $processed], TRUE);
+          }
           if ($data !== $active) {
             $this->saveTranslationActive($name, $data);
             $count++;
@@ -596,6 +616,42 @@ class LocaleConfigManager {
       }
     }
     return $filtered_data;
+  }
+
+  /**
+   * Gets the English source string for each key path present in $mask.
+   *
+   * @param array $active
+   *   The active configuration data.
+   * @param array $translatable
+   *   Translatable data array.
+   * @param array $mask
+   *   A nested array whose key paths select which entries of $translatable to
+   *   resolve to a source string.
+   *
+   * @return array
+   *   Nested array containing the untranslated source string for each key
+   *   path present in both $mask and $active. Empty if none are.
+   *
+   * @see \Drupal\language\DefaultLangcodeConfigUpdater::extractUntranslatedKeys()
+   */
+  protected function getSourceStrings(array $active, array $translatable, array $mask) {
+    $source = [];
+    foreach ($mask as $key => $masked_value) {
+      if (!isset($active[$key]) || !isset($translatable[$key])) {
+        continue;
+      }
+      if (is_array($masked_value)) {
+        $value = $this->getSourceStrings($active[$key], $translatable[$key], $masked_value);
+        if (!empty($value)) {
+          $source[$key] = $value;
+        }
+      }
+      else {
+        $source[$key] = $translatable[$key]->getUntranslatedString();
+      }
+    }
+    return $source;
   }
 
   /**

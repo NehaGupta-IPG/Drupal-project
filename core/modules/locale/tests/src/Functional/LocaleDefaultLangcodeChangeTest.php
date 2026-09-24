@@ -12,6 +12,7 @@ use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore chaine cadena
 /**
  * Tests that changing the site default language retranslates configuration.
  *
@@ -332,6 +333,119 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
     // The round trip must not have left a second, duplicate row behind, nor
     // touched the customized flag on the one row it started with.
     $this->assertTranslation('locale_test.translation', 'French test', 'fr', FALSE);
+  }
+
+  /**
+   * Tests switching between two non-English defaults with no translation.
+   *
+   * Neither language here is English, and the new default has no
+   * translation at all - so DefaultLangcodeConfigUpdater finds no override
+   * to absorb, and the active configuration is left holding the previous
+   * default's content, mislabelled with the new default's langcode. Locale
+   * module must correct that back to the English source rather than leaving
+   * it mislabelled.
+   *
+   * @see \Drupal\language\DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation()
+   */
+  public function testDefaultLanguageChangeBetweenForeignLanguagesWithNoTranslation(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    ConfigurableLanguage::createFromLangcode('es')->save();
+
+    \Drupal::service(LocaleConfigManager::class)
+      ->getStringTranslation('locale_test.translation', 'fr', 'English test', '')
+      ->setString('French test')
+      ->setCustomized(FALSE)
+      ->save();
+
+    $admin_user = $this->drupalCreateUser(['administer languages']);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
+    $this->rebuildContainer();
+    $this->assertSame('fr', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('French test', $this->config('locale_test.translation')->get('test'));
+
+    // Spanish has no translation at all for this string.
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'es'], 'Save configuration');
+    $this->rebuildContainer();
+
+    // The langcode is Spanish, matching the site's new default - but the
+    // content must be the English source, not the French text left behind
+    // by the previous default.
+    $this->assertSame('es', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('English test', $this->config('locale_test.translation')->get('test'));
+    $this->assertNoTranslation('locale_test.translation', 'es');
+
+    // Moving off French still preserves the French translation as an
+    // override, the same as any other switch away from a translated
+    // default.
+    /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */
+    $language_manager = \Drupal::service('language_manager');
+    $french_override = $language_manager->getLanguageConfigOverride('fr', 'locale_test.translation');
+    $this->assertFalse($french_override->isNew());
+    $this->assertSame('French test', $french_override->get('test'));
+  }
+
+  /**
+   * Tests a partial translation falls back to source per key, not per object.
+   *
+   * The override for the new default only covers one of several translatable
+   * keys, so DefaultLangcodeConfigUpdater absorbs that one key but leaves the
+   * others holding the previous default's content. Locale module must fall
+   * back to the English source for exactly those keys, without disturbing
+   * the one key that genuinely was translated.
+   *
+   * @see \Drupal\language\DefaultLangcodeConfigUpdater::extractTranslatableData()
+   */
+  public function testDefaultLanguageChangeWithPartialTranslationFallsBackPerKey(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    ConfigurableLanguage::createFromLangcode('es')->save();
+
+    $config_name = 'locale_test.translation_multiple';
+
+    \Drupal::service(LocaleConfigManager::class)
+      ->getStringTranslation($config_name, 'fr', 'English test', '')
+      ->setString('French test')
+      ->setCustomized(FALSE)
+      ->save();
+    \Drupal::service(LocaleConfigManager::class)
+      ->getStringTranslation($config_name, 'fr', 'A string', '')
+      ->setString('Une chaine')
+      ->setCustomized(FALSE)
+      ->save();
+
+    $admin_user = $this->drupalCreateUser(['administer languages']);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
+    $this->rebuildContainer();
+    $this->assertSame('fr', $this->config($config_name)->get('langcode'));
+    $this->assertSame('French test', $this->config($config_name)->get('test'));
+    $this->assertSame('Une chaine', $this->config($config_name)->get('test_multiple.string'));
+
+    // Create a Spanish override covering only test_multiple.string, written
+    // straight to storage bypassing Config and its events.
+    \Drupal::service('config.storage')
+      ->createCollection('language.es')
+      ->write($config_name, ['test_multiple' => ['string' => 'Una cadena']]);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'es'], 'Save configuration');
+    $this->rebuildContainer();
+
+    $config = $this->config($config_name);
+    $this->assertSame('es', $config->get('langcode'));
+    // The one key that was translated is absorbed as-is.
+    $this->assertSame('Una cadena', $config->get('test_multiple.string'));
+    // Every other translatable key falls back to the English source, not the
+    // French text the previous default left behind.
+    $this->assertSame('English test', $config->get('test'));
+    $this->assertSame('Another string', $config->get('test_multiple.another_string'));
+    $this->assertSame('After a string', $config->get('test_after_multiple.string'));
+    $this->assertSame('After another string', $config->get('test_after_multiple.another_string'));
   }
 
   /**
