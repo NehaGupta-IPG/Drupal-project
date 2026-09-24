@@ -27,11 +27,11 @@ class DatabaseUpdate {
 
   public function __construct(
     protected UpdateHookRegistry $updateRegistry,
-    protected UpdateRegistry $postUpdateRegistry,
-    protected ModuleExtensionList $moduleExtensionList,
     protected ModuleHandlerInterface $moduleHandler,
     protected MessengerInterface $messenger,
     protected LoggerChannelFactoryInterface $loggerChannelFactory,
+    protected UpdateRegistry $postUpdateRegistry,
+    protected ModuleExtensionList $moduleExtensionList,
   ) {}
 
   /**
