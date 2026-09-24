@@ -371,7 +371,7 @@ EOF
 
     $this->permissionHandler = new PermissionHandler(
       $this->moduleHandler,
-      $this->stringTranslation,
+      $this->getStringTranslationStub(),
       $this->callableResolver,
       $module_extension_list,
       $providers,
