@@ -11,26 +11,13 @@ use Drupal\Core\Database\ConnectionParametersBase;
  */
 class ConnectionParameters extends ConnectionParametersBase {
 
-  public function __construct(
-    public string $driver,
-    public string $namespace,
-    public string $autoload,
-    public string $database,
-    public string $prefix = '',
-    public string $module = 'sqlite',
-    public readonly array $init_commands = [],
-    public readonly array $pdo = [],
-    array $unknownOptions = [],
-  ) {
-    parent::__construct($unknownOptions);
-  }
-
   /**
    * {@inheritdoc}
    */
   public static function processOptionsArray(array $options): array {
     // Initialize 'init_commands' and 'pdo' if not defined in the input array.
     $options = array_merge([
+      'module' => 'sqlite',
       'init_commands' => [],
       'pdo' => [],
     ], $options);
@@ -49,15 +36,21 @@ class ConnectionParameters extends ConnectionParametersBase {
       'wal' => "PRAGMA journal_mode=WAL",
     ];
 
-    // Additional keys found in the options array, that are not first-class
-    // properties, will be stored in the $unknownOptions property.
-    $unknownOptions = array_diff_key($options, array_flip(static::getNames()));
-    foreach (array_keys($unknownOptions) as $key) {
-      unset($options[$key]);
-    }
-    $options['unknownOptions'] = $unknownOptions;
+    return parent::processOptionsArray($options);
+  }
 
-    return $options;
+  public function __construct(
+    public string $driver,
+    public string $namespace,
+    public string $autoload,
+    public string $database,
+    public string $prefix,
+    public string $module,
+    public readonly array $init_commands,
+    public readonly array $pdo,
+    array $unknownOptions,
+  ) {
+    parent::__construct($unknownOptions);
   }
 
 }

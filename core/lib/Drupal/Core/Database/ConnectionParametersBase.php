@@ -83,6 +83,30 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   }
   // phpcs:enable
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function processOptionsArray(array $options): array {
+    $options = array_merge([
+      'driver' => '',
+      'module' => '',
+      'namespace' => '',
+      'autoload' => '',
+      'database' => '',
+      'prefix' => '',
+    ], $options);
+
+    // Additional keys found in the options array, that are not first-class
+    // properties, will be stored in the $unknownOptions property.
+    $unknownOptions = array_diff_key($options, array_flip(static::getNames()));
+    foreach (array_keys($unknownOptions) as $key) {
+      unset($options[$key]);
+    }
+    $options['unknownOptions'] = $unknownOptions;
+
+    return $options;
+  }
+
   public function __construct(
     // Unknown connection options. The user input may include options that the
     // driver cannot handle, but we still can provide access to them.
@@ -109,13 +133,6 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public function getConnectionClass(): string {
     return $this->namespace . '\\Connection';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function processOptionsArray(array $options): array {
-    return $options;
   }
 
   /**

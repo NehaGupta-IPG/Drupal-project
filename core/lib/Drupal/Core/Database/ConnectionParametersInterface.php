@@ -45,6 +45,22 @@ interface ConnectionParametersInterface {
   // phpcs:enable
 
   /**
+   * Processes an array of connection options for driver specific defaults.
+   *
+   * This is used internally by the database layer, should not be called
+   * otherwise.
+   *
+   * @param UnprocessedConnectionInfoArray $options
+   *   An array of connection options.
+   *
+   * @return ConnectionInfoArray
+   *   The processed options.
+   *
+   * @internal
+   */
+  public static function processOptionsArray(array $options): array;
+
+  /**
    * Returns the list of parameters.
    *
    * Only the parameters defined as properties are returned, those added to
@@ -78,21 +94,5 @@ interface ConnectionParametersInterface {
    *   The connection parameters as as a URL.
    */
   public function asUrl(): string;
-
-  /**
-   * Processes an array of connection options for driver specific defaults.
-   *
-   * This is used internally by the database layer, should not be called
-   * otherwise.
-   *
-   * @param UnprocessedConnectionInfoArray $options
-   *   An array of connection options.
-   *
-   * @return ConnectionInfoArray
-   *   The processed options.
-   *
-   * @internal
-   */
-  public static function processOptionsArray(array $options): array;
 
 }
