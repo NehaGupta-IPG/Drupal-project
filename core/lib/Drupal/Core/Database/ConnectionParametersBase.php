@@ -84,7 +84,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   // phpcs:enable
 
   /**
-   * Allows BC to access publicly a propert as an array element for writing.
+   * Allows BC to access publicly a property as an array element for writing.
    *
    * @internal
    */
