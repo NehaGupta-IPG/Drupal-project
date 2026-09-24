@@ -128,6 +128,7 @@ class DefaultLangcodeConfigUpdater {
 
         $override = $this->getRawLanguageConfigOverride($new_override_storage, $name);
         $had_override = !$override->isNew();
+        $override_data = $had_override ? $override->get() : [];
         if ($had_override) {
           // The override predates the new default and holds deliberately
           // authored values for it - more authoritative than whatever the
@@ -135,7 +136,7 @@ class DefaultLangcodeConfigUpdater {
           // configuration is saved, so a subscriber reacting to the override's
           // removal below sees the merged content already in place, not the
           // pre-merge values it is replacing.
-          $config->setData(NestedArray::mergeDeepArray([$data, $override->get()], TRUE));
+          $config->setData(NestedArray::mergeDeepArray([$data, $override_data], TRUE));
         }
         $config->set('langcode', $new_langcode)->save();
         if ($had_override) {
@@ -148,6 +149,17 @@ class DefaultLangcodeConfigUpdater {
         // other batch operations (for example locale module translating
         // them) know what to act on.
         $context['results']['updated_names'][] = $name;
+
+        // The override may not have existed at all, or it may only have
+        // translated some of the translatable keys. Record the translatable
+        // keys not covered by the override separately, so a subscriber
+        // reconciling actual translation content (for example, the Locale
+        // module) knows which keys are still in the original language and which
+        // have been translated.
+        $untranslated_keys = static::extractUntranslatedKeys($translatable_data, $override_data);
+        if (!empty($untranslated_keys)) {
+          $context['results']['untranslated_keys'][$name] = $untranslated_keys;
+        }
       }
     }
 
@@ -234,6 +246,39 @@ class DefaultLangcodeConfigUpdater {
       return $value;
     }
     return [];
+  }
+
+  /**
+   * Finds the translatable key paths an override's data does not cover.
+   *
+   * @param array $translatable_data
+   *   A nested array in the shape self::extractTranslatableData() produces:
+   *   every translatable key path this configuration currently has a
+   *   non-empty value under.
+   * @param array $override_data
+   *   A nested array of the key paths present in the override data. May be
+   *   empty.
+   *
+   * @return array
+   *   A nested array matching the structure of $translatable_data, containing
+   *   only the key paths not present in $override_data. Empty if $override_data
+   *   accounts for everything in $translatable_data.
+   */
+  protected static function extractUntranslatedKeys(array $translatable_data, array $override_data): array {
+    $untranslated = [];
+    foreach ($translatable_data as $key => $value) {
+      if (is_array($value)) {
+        $override_value = is_array($override_data[$key] ?? NULL) ? $override_data[$key] : [];
+        $diff = static::extractUntranslatedKeys($value, $override_value);
+        if ($diff !== []) {
+          $untranslated[$key] = $diff;
+        }
+      }
+      elseif (!array_key_exists($key, $override_data)) {
+        $untranslated[$key] = $value;
+      }
+    }
+    return $untranslated;
   }
 
 }
