@@ -122,14 +122,14 @@ function update_do_one($module, $number, $dependency_map, &$context): void {
  * @param array $context
  *   The batch context array.
  *
- * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(DatabaseUpdate::class)->invokePostUpdate()
  *   instead.
  *
- * @see https://www.drupal.org/node/3013060
+ * @see https://www.drupal.org/node/3625487
  */
 function update_invoke_post_update($function, &$context): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->invokePostUpdate() instead. See https://www.drupal.org/node/3013060', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->invokePostUpdate() instead. See https://www.drupal.org/node/3625487', E_USER_DEPRECATED);
   \Drupal::service(DatabaseUpdate::class)->invokePostUpdate($function, $context);
 }
 
@@ -151,14 +151,14 @@ function update_invoke_post_update($function, &$context): void {
  *       the update number and the description from source code comment for
  *       each update function. This array is keyed by the update number.
  *
- * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(DatabaseUpdate::class)->getUpdateList()
  *   instead.
  *
- * @see https://www.drupal.org/node/3013060
+ * @see https://www.drupal.org/node/3625487
  */
 function update_get_update_list(): array {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->getUpdateList() instead. See https://www.drupal.org/node/3013060', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->getUpdateList() instead. See https://www.drupal.org/node/3625487', E_USER_DEPRECATED);
   return \Drupal::service(DatabaseUpdate::class)->getUpdateList();
 }
 
@@ -201,15 +201,15 @@ function update_get_update_list(): array {
  *   - 'module': The name of the module that this update function belongs to.
  *   - 'number': The number of this update function within that module.
  *
- * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(DatabaseUpdate::class)->resolveDependencies()
  *   instead.
  *
- * @see https://www.drupal.org/node/3013060
+ * @see https://www.drupal.org/node/3625487
  * @see \Drupal\Component\Graph\Graph::searchAndSort()
  */
 function update_resolve_dependencies($starting_updates) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->resolveDependencies() instead. See https://www.drupal.org/node/3013060', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->resolveDependencies() instead. See https://www.drupal.org/node/3625487', E_USER_DEPRECATED);
   return \Drupal::service(DatabaseUpdate::class)->resolveDependencies($starting_updates);
 }
 
@@ -227,15 +227,15 @@ function update_resolve_dependencies($starting_updates) {
  *   each value is an ordered array of update functions, keyed by the update
  *   number.
  *
- * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(DatabaseUpdate::class)->getUpdateFunctionList()
  *   instead.
  *
- * @see https://www.drupal.org/node/3013060
+ * @see https://www.drupal.org/node/3625487
  * @see update_resolve_dependencies()
  */
 function update_get_update_function_list($starting_updates): array {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->getUpdateFunctionList() instead. See https://www.drupal.org/node/3013060', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->getUpdateFunctionList() instead. See https://www.drupal.org/node/3625487', E_USER_DEPRECATED);
   return \Drupal::service(DatabaseUpdate::class)->getUpdateFunctionList($starting_updates);
 }
 
@@ -279,16 +279,16 @@ function update_get_update_function_list($starting_updates): array {
  *   - 'module': The name of the module that this update function belongs to.
  *   - 'number': The number of this update function within that module.
  *
- * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(DatabaseUpdate::class)->buildDependencyGraph()
  *   instead.
  *
- * @see https://www.drupal.org/node/3013060
+ * @see https://www.drupal.org/node/3625487
  * @see \Drupal\Component\Graph\Graph::searchAndSort()
  * @see update_resolve_dependencies()
  */
 function update_build_dependency_graph($update_functions): array {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->buildDependencyGraph() instead. See https://www.drupal.org/node/3013060', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->buildDependencyGraph() instead. See https://www.drupal.org/node/3625487', E_USER_DEPRECATED);
   return \Drupal::service(DatabaseUpdate::class)->buildDependencyGraph($update_functions);
 }
 
@@ -308,14 +308,14 @@ function update_build_dependency_graph($update_functions): array {
  *   TRUE if the provided module update is not installed or is not in the
  *   provided list of updates to run; FALSE otherwise.
  *
- * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(DatabaseUpdate::class)->isMissing()
  *   instead.
  *
- * @see https://www.drupal.org/node/3013060
+ * @see https://www.drupal.org/node/3625487
  */
 function update_is_missing($module, $number, $update_functions) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->isMissing() instead. See https://www.drupal.org/node/3013060', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->isMissing() instead. See https://www.drupal.org/node/3625487', E_USER_DEPRECATED);
   return \Drupal::service(DatabaseUpdate::class)->isMissing($module, (int) $number, $update_functions);
 }
 
@@ -331,14 +331,14 @@ function update_is_missing($module, $number, $update_functions) {
  *   TRUE if the database schema indicates that the update has already been
  *   performed; FALSE otherwise.
  *
- * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(DatabaseUpdate::class)->alreadyPerformed()
  *   instead.
  *
- * @see https://www.drupal.org/node/3013060
+ * @see https://www.drupal.org/node/3625487
  */
 function update_already_performed($module, $number) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->alreadyPerformed() instead. See https://www.drupal.org/node/3013060', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->alreadyPerformed() instead. See https://www.drupal.org/node/3625487', E_USER_DEPRECATED);
   return \Drupal::service(DatabaseUpdate::class)->alreadyPerformed($module, (int) $number);
 }
 
@@ -354,15 +354,15 @@ function update_already_performed($module, $number) {
  *   An array of return values obtained by merging the results of the
  *   hook_update_dependencies() implementations in all installed modules.
  *
- * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(DatabaseUpdate::class)->retrieveDependencies()
  *   instead.
  *
- * @see https://www.drupal.org/node/3013060
+ * @see https://www.drupal.org/node/3625487
  * @see \Drupal\Core\Extension\ModuleHandlerInterface::invokeAll()
  * @see hook_update_dependencies()
  */
 function update_retrieve_dependencies(): array {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->retrieveDependencies() instead. See https://www.drupal.org/node/3013060', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(DatabaseUpdate::class)->retrieveDependencies() instead. See https://www.drupal.org/node/3625487', E_USER_DEPRECATED);
   return \Drupal::service(DatabaseUpdate::class)->retrieveDependencies();
 }
