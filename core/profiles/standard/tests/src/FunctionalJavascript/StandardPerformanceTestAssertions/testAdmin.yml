@@ -33,6 +33,7 @@ CacheTagGroupedLookups:
     - 'config:node_type_list'
     - 'config:system.menu.admin'
     - 'config:system.menu.content'
+    - 'config:system.site'
   -
     - 'config:system.menu.navigation-user-links'
     - 'config:user.role.administrator'
