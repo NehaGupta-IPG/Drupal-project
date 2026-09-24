@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  * @see _batch_shutdown()
  */
 function _batch_page(Request $request) {
-  return \Drupal::service(BatchProcessor::class)->batchPage($request);
+  return \Drupal::service(BatchProcessor::class)->page($request);
 }
 
 /**
@@ -495,7 +495,7 @@ function _batch_finished() {
 /**
  * Shutdown function: Stores the current batch data for the next request.
  *
- * @see BatchProcessor::batchPage()
+ * @see BatchProcessor::page()
  * @see drupal_register_shutdown_function()
  */
 function _batch_shutdown(): void {

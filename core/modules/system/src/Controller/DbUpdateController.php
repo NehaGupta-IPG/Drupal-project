@@ -200,7 +200,7 @@ class DbUpdateController extends ControllerBase {
         default:
           require_once $this->root . '/core/includes/batch.inc';
           $regions['sidebar_first'] = $this->updateTasksList('run');
-          $output = $this->batchProcessor->batchPage($request);
+          $output = $this->batchProcessor->page($request);
           break;
       }
     }

@@ -42,7 +42,7 @@ class BatchProcessor {
    *
    * @see _batch_shutdown()
    */
-  public function batchPage(Request $request): bool|array|JsonResponse|RedirectResponse {
+  public function page(Request $request): bool|array|JsonResponse|RedirectResponse {
     $batch = &batch_get();
 
     if (!($request_id = $request->query->get('id'))) {
