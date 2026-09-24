@@ -67,11 +67,11 @@ class UpdateOrderingTest extends UnitTestCase {
 
     $this->databaseUpdate = new DatabaseUpdate(
       $registry->reveal(),
-      $post_update_registry->reveal(),
-      $extension_list->reveal(),
       $module_handler->reveal(),
       $messenger->reveal(),
       $logger_factory->reveal(),
+      $post_update_registry->reveal(),
+      $extension_list->reveal(),
     );
   }
 
