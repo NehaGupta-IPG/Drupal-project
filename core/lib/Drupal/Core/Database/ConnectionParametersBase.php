@@ -15,7 +15,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public string $driver {
     set(string $value) {
-      if (isset($this->driver)) {
+      if (isset($this->driver) && !$this->arrayAccessPropertySetting) {
         throw new \RuntimeException('The $driver property is already set');
       }
       $this->driver = $value;
@@ -27,7 +27,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public string $module {
     set(string $value) {
-      if (isset($this->module)) {
+      if (isset($this->module) && !$this->arrayAccessPropertySetting) {
         throw new \RuntimeException('The $module property is already set');
       }
       $this->module = $value;
@@ -39,7 +39,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public string $namespace {
     set(string $value) {
-      if (isset($this->namespace)) {
+      if (isset($this->namespace) && !$this->arrayAccessPropertySetting) {
         throw new \RuntimeException('The $namespace property is already set');
       }
       $this->namespace = $value;
@@ -51,7 +51,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public string $autoload {
     set(string $value) {
-      if (isset($this->autoload)) {
+      if (isset($this->autoload) && !$this->arrayAccessPropertySetting) {
         throw new \RuntimeException('The $autoload property is already set');
       }
       $this->autoload = $value;
@@ -63,7 +63,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public string $database {
     set(string $value) {
-      if (isset($this->database)) {
+      if (isset($this->database) && !$this->arrayAccessPropertySetting) {
         throw new \RuntimeException('The $database property is already set');
       }
       $this->database = $value;
@@ -75,13 +75,20 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public string $prefix {
     set(string $value) {
-      if (isset($this->prefix)) {
+      if (isset($this->prefix) && !$this->arrayAccessPropertySetting) {
         throw new \RuntimeException('The $prefix property is already set');
       }
       $this->prefix = $value;
     }
   }
   // phpcs:enable
+
+  /**
+   * Allows BC to access publicly a propert as an array element for writing.
+   *
+   * @internal
+   */
+  protected bool $arrayAccessPropertySetting = FALSE;
 
   /**
    * {@inheritdoc}
@@ -234,7 +241,9 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public function offsetSet(mixed $offset, mixed $value): void {
     if (property_exists($this, $offset)) {
+      $this->arrayAccessPropertySetting = TRUE;
       $this->{$offset} = $value;
+      $this->arrayAccessPropertySetting = FALSE;
       return;
     }
     $this->unknownOptions[$offset] = $value;

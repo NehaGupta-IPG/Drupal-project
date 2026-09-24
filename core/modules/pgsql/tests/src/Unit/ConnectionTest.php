@@ -43,6 +43,7 @@ class ConnectionTest extends UnitTestCase {
       ->with("SET timezone = 'UTC'");
 
     new Connection($pdo, [
+      'driver' => 'pgsql',
       'init_commands' => [
         "SET timezone = 'UTC'",
       ],

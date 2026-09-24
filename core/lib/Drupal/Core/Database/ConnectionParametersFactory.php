@@ -90,6 +90,10 @@ abstract class ConnectionParametersFactory {
       }
     }
 
+    // Use the namespace to determine the module name when the module name is
+    // not provided.
+    $options['module'] ??= explode('\\', $options['namespace'])[1] ?? $options['driver'] ?? '';
+
     // If the database driver is provided by a module, then its code may need
     // to be instantiated prior to when the module's root namespace is added
     // to the autoloader, because that happens during service container

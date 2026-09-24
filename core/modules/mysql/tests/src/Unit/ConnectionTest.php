@@ -10,7 +10,7 @@ use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 
 // cspell:ignore djarin grogu kuiil
 
@@ -24,17 +24,17 @@ class ConnectionTest extends UnitTestCase {
   /**
    * A mocked MySql connection.
    */
-  private Connection&MockObject $connection;
+  private Connection&Stub $connection;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->connection = $this->getMockBuilder(Connection::class)
+    $this->connection = $this->getStubBuilder(Connection::class)
       ->setConstructorArgs([$this->createStub(Mysql::class), []])
       ->onlyMethods(['getServerVersion'])
-      ->getMock();
+      ->getStub();
   }
 
   /**
