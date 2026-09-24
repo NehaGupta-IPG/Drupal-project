@@ -120,7 +120,6 @@ tr.selected td {
     margin-block-end: 0;
   }
 }
-
 .views-bulk-actions__item--status {
   width: 100%;
   margin-inline-end: var(--admin-space-l);
@@ -152,8 +151,8 @@ tr.selected td {
   z-index: 2000;
 }
 
-.block-system > .views-form .gin-details,
-.view-content .views-form .gin-details {
+.block-system > .views-form .details,
+.view-content .views-form .details {
   box-shadow: none;
 }
 

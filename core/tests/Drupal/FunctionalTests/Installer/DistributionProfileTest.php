@@ -65,12 +65,25 @@ class DistributionProfileTest extends InstallerTestBase {
     // should be visible.
     $this->assertSession()->pageTextContains('Added by custom installer theme.');
     // Verify the base theme CSS is loaded.
-    $this->assertSession()->responseContains("claro/css/theme/install-page.css");
+    $this->assertSession()->responseContains("default_admin/css/theme/install-page.css");
 
     // Verify that the "Choose profile" step does not appear.
     $this->assertSession()->pageTextNotContains('profile');
 
     parent::setUpLanguage();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpSite(): void {
+    // This is the last installer step. The profile has installed its own themes
+    // by now, and the install theme still renders this page, so the install
+    // theme and its base theme must both keep their hook implementations.
+    $this->assertSession()->pageTextContains('Added by custom installer theme on the last step.');
+    $this->assertSession()->responseContains("default_admin/css/theme/install-page.css");
+
+    parent::setUpSite();
   }
 
   /**
