@@ -358,6 +358,8 @@ class PageCache implements HttpKernelInterface {
    *   The cache ID for this request.
    */
   protected function getCacheId(Request $request) {
+    // The same middleware instance can handle multiple main requests, so each
+    // request needs its own cache ID.
     if (!isset($this->cacheIds[$request])) {
       $cid_parts = [
         $request->getSchemeAndHttpHost() . $request->getRequestUri(),
