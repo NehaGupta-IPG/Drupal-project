@@ -86,7 +86,6 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
 
     $this->assertQueriesByName('jsonapi_node_individual_invalidated', $performance_data->getQueries());
     $this->assertMetricsByName('jsonapi_node_individual_invalidated', $performance_data);
-
     $this->assertSame([
       'jsonapi.resource_types',
       'jsonapi.resource_type.node.article',
