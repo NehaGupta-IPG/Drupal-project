@@ -8,6 +8,7 @@
 use Drupal\user\LoginFinalizer;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Batch\BatchProcessor;
 use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Config\ConfigImporterException;
 use Drupal\Core\Config\ConfigImporterFactory;
@@ -658,7 +659,7 @@ function install_run_task($task, &$install_state) {
     // If we are in the middle of processing this batch, keep sending back
     // any output from the batch process, until the task is complete.
     elseif ($current_batch == $function) {
-      $output = _batch_page(\Drupal::request());
+      $output = \Drupal::service(BatchProcessor::class)->batchPage(\Drupal::request());
       // Because Batch API now returns a JSON response for intermediary steps,
       // but the installer doesn't handle Response objects yet, just send the
       // output here and emulate the old model.

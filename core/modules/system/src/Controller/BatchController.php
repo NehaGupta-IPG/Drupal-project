@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Controller;
 
+use Drupal\Core\Batch\BatchProcessor;
 use Drupal\Core\Batch\BatchStorageInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -21,19 +22,17 @@ class BatchController implements ContainerInjectionInterface {
    * Constructs a new BatchController.
    */
   public function __construct(
-    protected string $root,
     protected BatchStorageInterface $batchStorage,
-  ) {
-    require_once $this->root . '/core/includes/batch.inc';
-  }
+    protected BatchProcessor $batchProcessor,
+  ) {}
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->getParameter('app.root'),
       $container->get('batch.storage'),
+      $container->get(BatchProcessor::class),
     );
   }
 
@@ -49,7 +48,7 @@ class BatchController implements ContainerInjectionInterface {
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    */
   public function batchPage(Request $request) {
-    $output = _batch_page($request);
+    $output = $this->batchProcessor->batchPage($request);
 
     if ($output === FALSE) {
       throw new AccessDeniedHttpException();
