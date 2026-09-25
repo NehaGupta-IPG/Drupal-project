@@ -177,7 +177,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
   }
 
   /**
-   * Defines the database schema for run-tests.php and simpletest module.
+   * Defines the database schema for run-tests.php.
    *
    * @return array
    *   Array suitable for use in a hook_schema() implementation.

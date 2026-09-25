@@ -109,8 +109,9 @@ $config['system.performance']['js']['preprocess'] = FALSE;
  *
  * This setting can be enabled to allow Drupal's php and database cached
  * storage to be cleared via the rebuild.php page. Access to this page can also
- * be gained by generating a query string from rebuild_token_calculator.php and
- * using these parameters in a request to rebuild.php.
+ * be gained by generating a query string from the command line script
+ * rebuild_token_calculator.php and using these parameters in a request to
+ * rebuild.php.
  */
 $settings['rebuild_access'] = TRUE;
 
