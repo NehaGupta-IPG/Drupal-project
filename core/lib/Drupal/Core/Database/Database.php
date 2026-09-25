@@ -447,14 +447,10 @@ abstract class Database {
     }
 
     $connection_parameters = self::$databaseInfo[$key][$target];
-    $driver = property_exists($connection_parameters, 'driver') ? $connection_parameters->driver : NULL;
-
-    if (!$driver) {
-      throw new DriverNotSpecifiedException('Driver not specified for this database connection: ' . $key);
-    }
+    $driver = $connection_parameters->driver;
 
     $driver_class = $connection_parameters->getConnectionClass();
-    $options = property_exists($connection_parameters, 'driver') ? $connection_parameters : $connection_parameters->toArray();
+    $options = $connection_parameters->toArray();
     $client_connection = $driver_class::open($options);
     $new_connection = new $driver_class($client_connection, $options);
     assert($new_connection instanceof Connection);
@@ -563,7 +559,7 @@ abstract class Database {
    *
    * @see https://www.drupal.org/node/7654123
    */
-  public static function convertDbUrlToConnectionInfo(string $url, ?bool $include_test_drivers = NULL): ConnectionInfoArray {
+  public static function convertDbUrlToConnectionInfo(string $url, ?bool $include_test_drivers = NULL): array {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersFactory::createFromUrl() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     return ConnectionParametersFactory::createFromUrl($url, $include_test_drivers);
   }
