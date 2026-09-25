@@ -37,25 +37,11 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   use RefinableDependentAccessTrait;
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * The block content entity.
    *
    * @var \Drupal\block_content\BlockContentInterface
    */
   protected $blockContent;
-
-  /**
-   * The entity display repository.
-   *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
-   */
-  protected $entityDisplayRepository;
 
   /**
    * Whether a new block is being created.
@@ -64,45 +50,17 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
    */
   protected $isNew = TRUE;
 
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected LoggerInterface $logger;
-
-  /**
-   * Constructs a new InlineBlock.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
-   *   The entity display repository.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, AccountInterface $current_user, #[Autowire(service: 'logger.channel.layout_builder')] LoggerInterface $logger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+    protected AccountInterface $currentUser,
+    #[Autowire(service: 'logger.channel.layout_builder')] protected LoggerInterface $logger,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $this->entityTypeManager = $entity_type_manager;
-    $this->entityDisplayRepository = $entity_display_repository;
-    $this->currentUser = $current_user;
-    $this->logger = $logger;
     if (!empty($this->configuration['block_revision_id']) || !empty($this->configuration['block_serialized'])) {
       $this->isNew = FALSE;
     }
