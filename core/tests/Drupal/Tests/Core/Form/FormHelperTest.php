@@ -221,9 +221,9 @@ class FormHelperTest extends UnitTestCase {
           ],
           '#markup' => '',
         ],
-        // Note that is testing the incorrect heuristic that was added in 10.3.7
-        // still works, this test case can be removed when that heuristic is
-        // also removed, see: https://www.drupal.org/node/3490435
+        // Note that this is testing the incorrect heuristic, that was added in
+        // 10.3.7, still works. This test case can be removed when that
+        // heuristic is also removed, see: https://www.drupal.org/node/3490435
         '#attributes',
       ],
       'empty item with input no target key' => [
@@ -237,9 +237,9 @@ class FormHelperTest extends UnitTestCase {
           '#markup' => '',
           '#input' => TRUE,
         ],
-        // Note that is testing the incorrect heuristic that was added in 10.3.7
-        // still works, this test case can be removed when that heuristic is
-        // also removed, see: https://www.drupal.org/node/3490435
+        // Note that this is testing the incorrect heuristic, that was added in
+        // 10.3.7, still works. This test case can be removed when that
+        // heuristic is also removed, see: https://www.drupal.org/node/3490435
         '#wrapper_attributes',
         // Flag that we expect a deprecation from this code.
         TRUE,
@@ -254,9 +254,9 @@ class FormHelperTest extends UnitTestCase {
           ],
           '#markup' => 'a non empty string value',
         ],
-        // Note that is testing the incorrect heuristic that was added in 10.3.7
-        // still works, this test case can be removed when that heuristic is
-        // also removed, see: https://www.drupal.org/node/3490435
+        // Note that this is testing the incorrect heuristic, that was added in
+        // 10.3.7, still works. This test case can be removed when that
+        // heuristic is also removed, see: https://www.drupal.org/node/3490435
         '#attributes',
       ],
       'item with markup and input no target key' => [
@@ -270,9 +270,9 @@ class FormHelperTest extends UnitTestCase {
           '#markup' => 'a non empty string value',
           '#input' => TRUE,
         ],
-        // Note that is testing the incorrect heuristic that was added in 10.3.7
-        // still works, this test case can be removed when that heuristic is
-        // also removed, see: https://www.drupal.org/node/3490435
+        // Note that this is testing the incorrect heuristic, that was added in
+        // 10.3.7, still works. This test case can be removed when that
+        // heuristic is also removed, see: https://www.drupal.org/node/3490435
         '#attributes',
       ],
     ];
