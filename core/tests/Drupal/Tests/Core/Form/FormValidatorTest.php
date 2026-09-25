@@ -559,6 +559,41 @@ class FormValidatorTest extends UnitTestCase {
   }
 
   /**
+   * Tests that required-field suppression does not apply to non-AJAX requests.
+   */
+  public function testRequiredErrorMessageNotSuppressedForNonAjax(): void {
+    $request_stack = new RequestStack();
+    $request_stack->push(Request::create('/test'));
+    $form_validator = new FormValidator(
+      $request_stack,
+      $this->getStringTranslationStub(),
+      $this->csrfToken,
+      $this->logger,
+      $this->formErrorHandler,
+      $this->callableResolver,
+    );
+
+    $form['test'] = [
+      '#type' => 'textfield',
+      '#title' => 'Test',
+      '#value' => '',
+      '#needs_validation' => TRUE,
+      '#required' => TRUE,
+      '#parents' => ['test'],
+    ];
+    $form_state = (new FormState())
+      ->setTriggeringElement([
+        '#limit_validation_errors' => FALSE,
+        '#ajax' => ['suppress_required_fields_validation' => TRUE],
+      ]);
+
+    $form_validator->validateForm('test_form_id', $form, $form_state);
+
+    $this->assertCount(1, $form_state->getErrors());
+    $this->assertSame('Test field is required.', (string) $form_state->getError($form['test']));
+  }
+
+  /**
    * Tests element validate.
    *
    * @legacy-covers ::doValidateForm
