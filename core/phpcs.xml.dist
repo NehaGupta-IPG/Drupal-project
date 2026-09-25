@@ -23,8 +23,8 @@
   <file>.</file>
   <file>../composer</file>
   <file>scripts/drupal</file>
-  <file>scripts/password-hash.sh</file>
-  <file>scripts/rebuild_token_calculator.sh</file>
+  <file>scripts/password-hash.php</file>
+  <file>scripts/rebuild_token_calculator.php</file>
   <file>scripts/run-tests.sh</file>
   <file>scripts/update-countries.sh</file>
 

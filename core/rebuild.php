@@ -5,7 +5,7 @@
  * Rebuilds all Drupal caches even when Drupal itself does not work.
  *
  * Needs a token query argument which can be calculated using the
- * scripts/rebuild_token_calculator.sh script.
+ * scripts/rebuild_token_calculator.php script.
  *
  * @see drupal_rebuild()
  */
