@@ -12,13 +12,6 @@ use Drupal\Core\Url;
 class PathMatcher implements PathMatcherInterface {
 
   /**
-   * Whether the current page is the front page.
-   *
-   * @var bool
-   */
-  protected $isCurrentFrontPage;
-
-  /**
    * The default front page.
    *
    * @var string
@@ -89,17 +82,13 @@ class PathMatcher implements PathMatcherInterface {
    * {@inheritdoc}
    */
   public function isFrontPage() {
-    // Cache the result as this is called often.
-    if (!isset($this->isCurrentFrontPage)) {
-      $this->isCurrentFrontPage = FALSE;
-      // Ensure that the code can also be executed when there is no active
-      // route match, like on exception responses.
-      if ($this->routeMatch->getRouteName()) {
-        $url = Url::fromRouteMatch($this->routeMatch);
-        $this->isCurrentFrontPage = ($url->getRouteName() && '/' . $url->getInternalPath() === $this->getFrontPagePath());
-      }
+    // Ensure that the code can also be executed when there is no active
+    // route match, like on exception responses.
+    if (!$this->routeMatch->getRouteName()) {
+      return FALSE;
     }
-    return $this->isCurrentFrontPage;
+    $url = Url::fromRouteMatch($this->routeMatch);
+    return $url->getRouteName() && '/' . $url->getInternalPath() === $this->getFrontPagePath();
   }
 
   /**
