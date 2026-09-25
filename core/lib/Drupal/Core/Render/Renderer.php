@@ -52,7 +52,10 @@ class Renderer implements RendererInterface {
    * fail to render correctly. As soon as it is guaranteed that during a request
    * the same container is used, it no longer needs to be static.
    *
-   * @var \Drupal\Core\Render\RenderContext[]
+   * Weak keys prevent the collection from keeping requests alive after all
+   * other references to them have been released.
+   *
+   * @var \WeakMap<\Symfony\Component\HttpFoundation\Request, \Drupal\Core\Render\RenderContext|null>
    */
   protected static $contextCollection;
 
@@ -90,7 +93,7 @@ class Renderer implements RendererInterface {
 
     // Initialize the context collection if needed.
     if (!isset(static::$contextCollection)) {
-      static::$contextCollection = new \SplObjectStorage();
+      static::$contextCollection = new \WeakMap();
     }
   }
 
