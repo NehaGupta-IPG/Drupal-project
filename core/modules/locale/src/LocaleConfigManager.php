@@ -60,6 +60,7 @@ class LocaleConfigManager {
     protected ConfigurableLanguageManagerInterface $languageManager,
     protected LocaleDefaultConfigStorage $defaultConfigStorage,
     protected ConfigManagerInterface $configManager,
+    protected readonly LocaleLanguages $localeLanguages,
   ) {}
 
   /**
@@ -163,7 +164,7 @@ class LocaleConfigManager {
         }
       }
       else {
-        if (locale_is_translatable($langcode)) {
+        if ($this->localeLanguages->isTranslatable($langcode)) {
           $value = $this->translateString($name, $langcode, $item->getUntranslatedString(), $item->getOption('context'));
         }
         else {
@@ -547,7 +548,7 @@ class LocaleConfigManager {
             $count++;
           }
         }
-        elseif (locale_is_translatable($langcode)) {
+        elseif ($this->localeLanguages->isTranslatable($langcode)) {
           // If the language code is the active storage language, we should
           // update. If it is English, we should only update if English is also
           // translatable.
@@ -618,12 +619,12 @@ class LocaleConfigManager {
         // module is enabled later, then some configuration may not exist
         // anymore.
         if (!$config->isNew()) {
-          $typed_config = $this->typedConfigManager->createFromNameAndData($config->getName(), $config->getRawData());
           $langcode = $config->get('langcode');
-          // Only set a `langcode` if this config actually contains translatable
-          // data.
-          // @see \Drupal\Core\Config\Plugin\Validation\Constraint\LangcodeRequiredIfTranslatableValuesConstraint
-          if (!empty($this->getTranslatableData($typed_config)) && (empty($langcode) || $langcode == 'en')) {
+          $typed_config = $this->typedConfigManager->createFromNameAndData($config->getName(), $config->getRawData());
+          // Translatable simple configuration and any configuration entity
+          // should get the site language code even when they do not currently
+          // have translatable data.
+          if (($this->configManager->getEntityTypeIdByName($config->getName()) || !empty($this->getTranslatableData($typed_config))) && (empty($langcode) || $langcode == 'en')) {
             $config->set('langcode', $default_langcode)->save();
           }
         }
