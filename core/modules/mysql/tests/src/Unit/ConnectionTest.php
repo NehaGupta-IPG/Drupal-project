@@ -32,7 +32,7 @@ class ConnectionTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->connection = $this->getStubBuilder(Connection::class)
-      ->setConstructorArgs([$this->createStub(Mysql::class), []])
+      ->setConstructorArgs([$this->createStub(Mysql::class), ['driver' => 'mysql']])
       ->onlyMethods(['getServerVersion'])
       ->getStub();
   }

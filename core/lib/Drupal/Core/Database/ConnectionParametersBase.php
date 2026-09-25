@@ -137,11 +137,8 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public static function getNames(): array {
     $properties = [];
-    foreach ((new \ReflectionClass(static::class))->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
-      $name = $property->getName();
-      if ($name !== 'unknownOptions') {
-        $properties[] = $property->getName();
-      }
+    foreach (new \ReflectionClass(static::class)->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+      $properties[] = $property->getName();
     }
     return $properties;
   }
@@ -159,8 +156,10 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * {@inheritdoc}
    */
   public function toArray(): array {
-    $tmp = get_object_vars($this);
-    unset($tmp['unknownOptions']);
+    $tmp = [];
+    foreach (static::getNames() as $property) {
+      $tmp[$property] = $this->{$property};
+    }
     /** @var ConnectionInfoArray $tmp */
     $tmp = array_merge($this->unknownOptions, $tmp);
     return $tmp;
@@ -170,21 +169,50 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * {@inheritdoc}
    */
   public function asUrl(): string {
-    $user = '';
     if (property_exists($this, 'username') && is_string($this->username)) {
       $user = $this->username;
-      if (property_exists($this, 'password') && is_string($this->password)) {
-        $user .= ':' . $this->password;
+    }
+    elseif (isset($this->unknownOptions['username']) && is_string($this->unknownOptions['username'])) {
+      $user = $this->unknownOptions['username'];
+    }
+    else {
+      $user = '';
+    }
+
+    if (property_exists($this, 'password') && is_string($this->password)) {
+      $password = $this->password;
+    }
+    elseif (isset($this->unknownOptions['password']) && is_string($this->unknownOptions['password'])) {
+      $password = $this->unknownOptions['password'];
+    }
+    else {
+      $password = '';
+    }
+
+    if ($user !== '') {
+      if ($password !== '') {
+        $user .= ':' . $password;
       }
       $user .= '@';
     }
 
-    $host = property_exists($this, 'host') && is_string($this->host) ? $this->host : 'localhost';
+    if (property_exists($this, 'host') && is_string($this->host)) {
+      $host = $this->host;
+    }
+    elseif (isset($this->unknownOptions['host']) && is_string($this->unknownOptions['host'])) {
+      $host = $this->unknownOptions['host'];
+    }
+    else {
+      $host = 'localhost';
+    }
 
     $url = $this->driver . '://' . $user . $host;
 
-    if (property_exists($this, 'port') && is_string($this->port)) {
-      $url .= ':' . $this->port;
+    if (property_exists($this, 'port') && (is_string($this->port) || is_numeric($this->port))) {
+      $url .= ':' . (string) $this->port;
+    }
+    elseif (isset($this->unknownOptions['port']) && (is_string($this->unknownOptions['port']) || is_numeric($this->unknownOptions['port']))) {
+      $url .= ':' . (string) $this->unknownOptions['port'];
     }
 
     $url .= '/' . $this->database;
