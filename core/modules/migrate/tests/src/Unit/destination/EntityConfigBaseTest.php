@@ -14,13 +14,14 @@ use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\migrate\Plugin\Migration;
 use Drupal\migrate\Plugin\migrate\destination\EntityConfigBase;
 use Drupal\migrate\Row;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests configuration entity destinations.
- *
- * @group migrate
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\destination\EntityConfigBase
  */
+#[CoversMethod(EntityConfigBase::class, 'import')]
+#[Group('migrate')]
 class EntityConfigBaseTest extends UnitTestCase {
 
   /**
@@ -125,8 +126,6 @@ class EntityConfigBaseTest extends UnitTestCase {
 
   /**
    * Tests the initial and update imports of a config entity.
-   *
-   * @covers ::import
    */
   public function testEntityImportUpdate(): void {
     // Execute an initial import: no previous destination IDs.

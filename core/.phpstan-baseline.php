@@ -19474,6 +19474,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate/tests/src/Unit/Plugin/migrate/destination/EntityRevisionTest.php',
 ];
 $ignoreErrors[] = [
+  'message' => '#^Storing entity storage as a class property is not recommended\\. Call Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getStorage\\(\\) at the call\\-site instead\\.$#',
+	'identifier' => 'drupal.entityStoragePropertyAssignment',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/tests/src/Unit/destination/EntityConfigBaseTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Unit\\\\destination\\\\TestPerComponentEntityDisplay\\:\\:getTestValues\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
