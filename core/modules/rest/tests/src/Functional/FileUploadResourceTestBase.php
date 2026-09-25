@@ -229,6 +229,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
    * Returns the normalized POST entity referencing the uploaded file.
    *
    * @return array
+   *   The normalized POST entity.
    *
    * @see ::testPostFileUpload()
    * @see \Drupal\Tests\rest\Functional\EntityResource\EntityTest\EntityTestResourceTestBase::getNormalizedPostEntity()
@@ -681,12 +682,12 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
    * @return array
    *   The expected normalized data array.
    */
-  protected function getExpectedNormalizedEntity($fid = 1, $expected_filename = 'example.txt', $expected_as_filename = FALSE) {
+  protected function getExpectedNormalizedEntity($fid = 1, string $expected_filename = 'example.txt', $expected_as_filename = FALSE) {
     $author = User::load(static::$auth ? $this->account->id() : 0);
     $file = File::load($fid);
     $this->assertInstanceOf(FileInterface::class, $file);
 
-    $expected_normalization = [
+    return [
       'fid' => [
         [
           'value' => (int) $file->id(),
@@ -749,14 +750,10 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
         ],
       ],
     ];
-
-    return $expected_normalization;
   }
 
   /**
    * Performs a file upload request. Wraps the Guzzle HTTP client.
-   *
-   * @see \GuzzleHttp\ClientInterface::request()
    *
    * @param \Drupal\Core\Url $url
    *   URL to request.
@@ -768,8 +765,11 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
    *   the header value to FALSE.
    *
    * @return \Psr\Http\Message\ResponseInterface
+   *   The response object.
+   *
+   * @see \GuzzleHttp\ClientInterface::request()
    */
-  protected function fileRequest(Url $url, $file_contents, array $headers = []) {
+  protected function fileRequest(Url $url, $file_contents, array $headers = []): ResponseInterface {
     // Set the format for the response.
     $url->setOption('query', ['_format' => static::$format]);
 
@@ -780,7 +780,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
       // Set the required Content-Disposition header for the file name.
       'Content-Disposition' => 'file; filename="example.txt"',
     ];
-    $request_options[RequestOptions::HEADERS] = array_filter($headers, function ($value) {
+    $request_options[RequestOptions::HEADERS] = array_filter($headers, function ($value): bool {
       return $value !== FALSE;
     });
     $request_options[RequestOptions::BODY] = $file_contents;

@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Plugin;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Component\Gettext\PoHeader;
 use Drupal\Component\Gettext\PoItem;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation of numeric fields.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class NumericFormatPluralTest extends ViewTestBase {
 
   /**
@@ -45,6 +47,9 @@ class NumericFormatPluralTest extends ViewTestBase {
       'administer languages',
     ]);
     $this->drupalLogin($web_user);
+    $config = $this->config('locale.settings');
+    $config->set('translate_english', TRUE)->save();
+    $this->rebuildContainer();
   }
 
   /**
@@ -85,7 +90,7 @@ class NumericFormatPluralTest extends ViewTestBase {
       \Drupal::service('file.usage')->add($file, 'views_ui', 'dummy', $i, $number);
     }
     $this->drupalGet('numeric-test');
-    foreach ($numbers as $i => $number) {
+    foreach ($numbers as $number) {
       $this->assertSession()->responseContains('<span class="field-content">' . $number . ($number == 1 ? ' time' : ' times') . '</span>');
     }
 

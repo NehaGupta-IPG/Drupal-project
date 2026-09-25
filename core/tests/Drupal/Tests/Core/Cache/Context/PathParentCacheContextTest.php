@@ -6,21 +6,24 @@ namespace Drupal\Tests\Core\Cache\Context;
 
 use Drupal\Core\Cache\Context\PathParentCacheContext;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\Core\Cache\Context\PathParentCacheContext
- * @group Cache
+ * Tests Drupal\Core\Cache\Context\PathParentCacheContext.
  */
+#[CoversClass(PathParentCacheContext::class)]
+#[Group('Cache')]
 class PathParentCacheContextTest extends UnitTestCase {
 
   /**
-   * @covers ::getContext
-   *
-   * @dataProvider providerTestGetContext
+   * Tests get context.
    */
-  public function testGetContext($original_path, $context): void {
+  #[DataProvider('providerTestGetContext')]
+  public function testGetContext(string $original_path, string $context): void {
     $request_stack = new RequestStack();
     $request = Request::create($original_path);
     $request_stack->push($request);
@@ -31,7 +34,7 @@ class PathParentCacheContextTest extends UnitTestCase {
   /**
    * Provides a list of paths and expected cache contexts.
    */
-  public static function providerTestGetContext() {
+  public static function providerTestGetContext(): array {
     return [
       ['/some/path', 'some'],
       ['/some/other-path', 'some'],

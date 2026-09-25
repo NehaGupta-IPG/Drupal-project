@@ -1,3 +1,5 @@
+/* cspell:ignore xmlhttprequest */
+
 /**
  * @file
  * Provides Ajax page updating via jQuery $.ajax.
@@ -71,21 +73,21 @@ function getIndexInAllElements(element, selector) {
 
       // This class means to submit the form to the action using Ajax.
       once('ajax', '.use-ajax-submit').forEach((el) => {
-        const elementSettings = {};
-
-        // Ajax submits specified in this manner automatically submit to the
-        // normal form action.
-        elementSettings.url = $(el.form).attr('action');
-        // Form submit button clicks need to tell the form what was clicked so
-        // it gets passed in the POST request.
-        elementSettings.setClick = true;
-        // Form buttons use the 'click' event rather than mousedown.
-        elementSettings.event = 'click';
-        // Clicked form buttons look better with the throbber than the progress
-        // bar.
-        elementSettings.progress = { type: 'throbber' };
-        elementSettings.base = el.id;
-        elementSettings.element = el;
+        const elementSettings = {
+          // Ajax submits specified in this manner automatically submit to the
+          // normal form action.
+          url: $(el.form).attr('action'),
+          // Form submit button clicks need to tell the form what was clicked so
+          // it gets passed in the POST request.
+          setClick: true,
+          // Form buttons use the 'click' event rather than mousedown.
+          event: 'click',
+          // Clicked form buttons look better with the throbber than the progress
+          // bar.
+          progress: { type: 'throbber' },
+          base: el.id,
+          element: el,
+        };
 
         Drupal.ajax(elementSettings);
       });
@@ -503,7 +505,7 @@ function getIndexInAllElements(element, selector) {
 
     // If there isn't a form, jQuery.ajax() will be used instead, allowing us to
     // bind Ajax to links as well.
-    if (this.element && this.element.form) {
+    if (this.element?.form) {
       /**
        * @type {jQuery}
        */
@@ -537,7 +539,7 @@ function getIndexInAllElements(element, selector) {
     this.url = this.url.replace(/\/nojs(\/|$|\?|#)/, '/ajax$1');
     // If the 'nojs' version of the URL is trusted, also trust the 'ajax'
     // version.
-    if (drupalSettings.ajaxTrustedUrl[originalUrl]) {
+    if (drupalSettings.ajaxTrustedUrl.hasOwnProperty(originalUrl)) {
       drupalSettings.ajaxTrustedUrl[this.url] = true;
     }
 
@@ -631,7 +633,10 @@ function getIndexInAllElements(element, selector) {
         //   #ajax) can bypass header verification. This is especially useful
         //   for Ajax with multipart forms. Because IFRAME transport is used,
         //   the response headers cannot be accessed for verification.
-        if (response !== null && !drupalSettings.ajaxTrustedUrl[ajax.url]) {
+        if (
+          response !== null &&
+          !drupalSettings.ajaxTrustedUrl.hasOwnProperty(ajax.url)
+        ) {
           if (xmlhttprequest.getResponseHeader('X-Drupal-Ajax-Token') !== '1') {
             const customMessage = Drupal.t(
               'The response failed verification so will not be processed.',
@@ -698,7 +703,7 @@ function getIndexInAllElements(element, selector) {
     // Bind the ajaxSubmit function to the element event.
     $(ajax.element).on(elementSettings.event, function (event) {
       if (
-        !drupalSettings.ajaxTrustedUrl[ajax.url] &&
+        !drupalSettings.ajaxTrustedUrl.hasOwnProperty(ajax.url) &&
         !Drupal.url.isLocal(ajax.url)
       ) {
         throw new Error(
@@ -1324,7 +1329,7 @@ function getIndexInAllElements(element, selector) {
    * @param {object} response
    *   The response from the Ajax request.
    *
-   * @deprecated in drupal:8.6.0 and is removed from drupal:12.0.0.
+   * @deprecated in drupal:8.6.0 and is removed from drupal:13.0.0.
    *   Use data with desired wrapper.
    *
    * @see https://www.drupal.org/node/2940704
@@ -1339,11 +1344,9 @@ function getIndexInAllElements(element, selector) {
         !(
           // We can not consider HTML comments or whitespace text as separate
           // roots, since they do not cause visual regression with effect.
-          (
-            $newContent[i].nodeName === '#comment' ||
-            ($newContent[i].nodeName === '#text' &&
-              /^(\s|\n|\r)*$/.test($newContent[i].textContent))
-          )
+          $newContent[i].nodeName === '#comment' ||
+          ($newContent[i].nodeName === '#text' &&
+            /^(\s|\n|\r)*$/.test($newContent[i].textContent))
         ),
     ).length > 1
       ? Drupal.theme('ajaxWrapperMultipleRootElements', $newContent)
@@ -1355,7 +1358,7 @@ function getIndexInAllElements(element, selector) {
    * @param {jQuery} $elements
    *   Response elements after parsing.
    *
-   * @deprecated in drupal:8.6.0 and is removed from drupal:12.0.0.
+   * @deprecated in drupal:8.6.0 and is removed from drupal:13.0.0.
    *   Use data with desired wrapper.
    *
    * @see https://www.drupal.org/node/2940704
@@ -1427,14 +1430,16 @@ function getIndexInAllElements(element, selector) {
       // Parse response.data into an element collection.
       const parseHTML = (htmlString) => {
         const fragment = document.createDocumentFragment();
-        // Create a temporary div element
-        const tempDiv = fragment.appendChild(document.createElement('div'));
+        // Create a temporary template element.
+        const template = fragment.appendChild(
+          document.createElement('template'),
+        );
 
-        // Set the innerHTML of the div to the provided HTML string
-        tempDiv.innerHTML = htmlString;
+        // Set the innerHTML of the template to the provided HTML string.
+        template.innerHTML = htmlString;
 
-        // Return the contents of the temporary div
-        return tempDiv.childNodes;
+        // Return the contents of the temporary template.
+        return template.content.childNodes;
       };
 
       let $newContent = $(parseHTML(response.data));
@@ -1950,23 +1955,7 @@ function getIndexInAllElements(element, selector) {
      *   Selector to use.
      */
     scrollTop(ajax, response) {
-      const offset = $(response.selector).offset();
-      // We can't guarantee that the scrollable object should be
-      // the body, as the element could be embedded in something
-      // more complex such as a modal popup. Recurse up the DOM
-      // and scroll the first element that has a non-zero top.
-      let scrollTarget = response.selector;
-      while ($(scrollTarget).scrollTop() === 0 && $(scrollTarget).parent()) {
-        scrollTarget = $(scrollTarget).parent();
-      }
-
-      // Only scroll upward.
-      if (offset.top - 10 < $(scrollTarget).scrollTop()) {
-        scrollTarget.get(0).scrollTo({
-          top: offset.top - 10,
-          behavior: 'smooth',
-        });
-      }
+      document.querySelector(response.selector)?.scrollIntoView();
     },
   };
 
@@ -1986,7 +1975,7 @@ function getIndexInAllElements(element, selector) {
       xhr.getResponseHeader('X-Drupal-Ajax-Token') === '1' &&
       // The isInProgress() function might not be defined if the Ajax request
       // was initiated without Drupal.ajax() or new Drupal.Ajax().
-      settings.isInProgress &&
+      typeof settings.isInProgress === 'function' &&
       // Until this is false, the Ajax request isn't completely done (the
       // response's commands might still be running).
       settings.isInProgress()

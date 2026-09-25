@@ -10,7 +10,7 @@
 /**
  * Implements hook_removed_post_updates().
  */
-function ckeditor5_removed_post_updates() {
+function ckeditor5_removed_post_updates(): array {
   return [
     'ckeditor5_post_update_alignment_buttons' => '10.0.0',
     'ckeditor5_post_update_image_toolbar_item' => '11.0.0',
@@ -18,5 +18,7 @@ function ckeditor5_removed_post_updates() {
     'ckeditor5_post_update_code_block' => '11.0.0',
     'ckeditor5_post_update_list_multiblock' => '11.0.0',
     'ckeditor5_post_update_list_start_reversed' => '11.0.0',
+    'ckeditor5_post_update_list_type' => '12.0.0',
+    'ckeditor5_post_update_list_type_again' => '12.0.0',
   ];
 }

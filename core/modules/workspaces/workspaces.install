@@ -5,84 +5,15 @@
  * Contains install, update and uninstall functions for the Workspaces module.
  */
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\workspaces\Entity\Workspace;
-
-/**
- * Implements hook_requirements().
- */
-function workspaces_requirements($phase) {
-  $requirements = [];
-  if ($phase === 'install') {
-    if (\Drupal::moduleHandler()->moduleExists('workspace')) {
-      $requirements['workspace_incompatibility'] = [
-        'severity' => REQUIREMENT_ERROR,
-        'description' => t('Workspaces can not be installed when the contributed Workspace module is also installed. See the <a href=":link">upgrade path</a> page for more information on how to upgrade.', [
-          ':link' => 'https://www.drupal.org/node/2987783',
-        ]),
-      ];
-    }
-  }
-
-  return $requirements;
-}
-
-/**
- * Implements hook_module_preinstall().
- */
-function workspaces_module_preinstall($module) {
-  if ($module !== 'workspaces') {
-    return;
-  }
-
-  /** @var \Drupal\workspaces\WorkspaceInformationInterface $workspace_info */
-  $workspace_info = \Drupal::service('workspaces.information');
-  $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
-  foreach ($entity_definition_update_manager->getEntityTypes() as $entity_type) {
-    if ($workspace_info->isEntityTypeSupported($entity_type)) {
-      $entity_type->setRevisionMetadataKey('workspace', 'workspace');
-      $entity_definition_update_manager->updateEntityType($entity_type);
-    }
-  }
-}
-
-/**
- * Implements hook_install().
- */
-function workspaces_install() {
-  // Set the owner of these default workspaces to be first user which has the
-  // 'administrator' role. This way we avoid hard coding user ID 1 for sites
-  // that prefer to not give it any special meaning.
-  $admin_roles = \Drupal::entityTypeManager()->getStorage('user_role')->getQuery()
-    ->condition('is_admin', TRUE)
-    ->execute();
-  if (!empty($admin_roles)) {
-    $query = \Drupal::entityTypeManager()->getStorage('user')->getQuery()
-      ->accessCheck(FALSE)
-      ->condition('roles', $admin_roles, 'IN')
-      ->condition('status', 1)
-      ->sort('uid', 'ASC')
-      ->range(0, 1);
-    $result = $query->execute();
-  }
-
-  // Default to user ID 1 if we could not find any other administrator users.
-  $owner_id = !empty($result) ? reset($result) : 1;
-
-  // Create a 'stage' workspace by default.
-  Workspace::create([
-    'id' => 'stage',
-    'label' => 'Stage',
-    'uid' => $owner_id,
-  ])->save();
-}
 
 /**
  * Implements hook_schema().
  */
-function workspaces_schema() {
+function workspaces_schema(): array {
   $schema['workspace_association'] = [
-    'description' => 'Stores the association between entity revisions and their workspace.',
+    'description' => 'Stores the latest entity revisions tracked by a workspace.',
     'fields' => [
       'workspace' => [
         'type' => 'varchar_ascii',
@@ -102,7 +33,15 @@ function workspaces_schema() {
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
+        'default' => 0,
         'description' => 'The ID of the associated entity.',
+      ],
+      'target_entity_id_string' => [
+        'type' => 'varchar_ascii',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The string ID of the associated entity.',
       ],
       'target_entity_revision_id' => [
         'type' => 'int',
@@ -111,10 +50,33 @@ function workspaces_schema() {
         'description' => 'The revision ID of the associated entity.',
       ],
     ],
+    'primary key' => ['workspace', 'target_entity_type_id', 'target_entity_id', 'target_entity_id_string'],
     'indexes' => [
       'target_entity_revision_id' => ['target_entity_revision_id'],
     ],
-    'primary key' => ['workspace', 'target_entity_type_id', 'target_entity_id'],
+  ];
+
+  $schema['workspace_association_revision'] = NestedArray::mergeDeep($schema['workspace_association'], [
+    'description' => 'Stores all entity revisions tracked by a workspace.',
+    'fields' => [
+      'initial_revision' => [
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Whether this entity was created in the workspace.',
+      ],
+    ],
+  ]);
+  $schema['workspace_association_revision']['primary key'] = [
+    'workspace',
+    'target_entity_type_id',
+    'target_entity_id',
+    'target_entity_id_string',
+    'target_entity_revision_id',
+  ];
+  $schema['workspace_association_revision']['indexes'] = [
+    'initial_revision' => ['initial_revision'],
   ];
 
   return $schema;
@@ -123,6 +85,18 @@ function workspaces_schema() {
 /**
  * Implements hook_update_last_removed().
  */
-function workspaces_update_last_removed() {
-  return 8803;
+function workspaces_update_last_removed(): int {
+  return 11303;
+}
+
+/**
+ * Implements hook_update_dependencies().
+ */
+function workspaces_update_dependencies(): array {
+  // The workspaces updates must run after the router table is
+  // updated since it triggers route rebuilds due to the module install.
+  $dependencies['workspaces'][11102] = [
+    'system' => 11201,
+  ];
+  return $dependencies;
 }

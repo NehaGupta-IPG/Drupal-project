@@ -22,15 +22,13 @@ license, including:
 
 JavaScript
 
-  Backbone - Copyright (c) 2010 Jeremy Ashkenas and DocumentCloud
-
   CKEditor5 - Copyright (c) 2003 CKSource Holding sp. z o.o.
 
-  JavaScript Cookie - Copyright (c) 2018 Copyright 2018 Klaus Hartl, Fagner Brack, GitHub Contributors
+  Floating UI - Copyright (c) 2021 Floating UI contributors
+
+  htmx - Zero-Clause BSD
 
   jQuery - Copyright (c) OpenJS Foundation and other contributors
-
-  jQuery Form - Copyright (c) 2017 Kevin Morris
 
   jQuery UI - Copyright (c) OpenJS Foundation and other contributors
 
@@ -40,8 +38,9 @@ JavaScript
 
   Tabbable - Copyright (c) 2015 David Clark
 
-  Underscore.js - Copyright (c) 2009 Jeremy Ashkenas, Julian Gonggrijp, and
-   DocumentCloud and Investigative Reporters & Editors
+  transliteration Copyright (c) 2019 Daniel W. Hieber
+
+  tua-body-scroll-lock Copyright (c) 2018 Evinma, StEve Young
 
 CSS
 

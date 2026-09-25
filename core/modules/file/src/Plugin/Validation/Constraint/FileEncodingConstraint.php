@@ -17,18 +17,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class FileEncodingConstraint extends SymfonyConstraint {
 
-  /**
-   * The error message.
-   *
-   * @var string
-   */
-  public string $message = "The file is encoded with %detected. It must be encoded with %encoding";
-
-  /**
-   * The allowed file encodings.
-   *
-   * @var array
-   */
-  public array $encodings;
+  public function __construct(
+    public array $encodings,
+    public string $message = "The file is encoded with %detected. It must be encoded with %encoding",
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

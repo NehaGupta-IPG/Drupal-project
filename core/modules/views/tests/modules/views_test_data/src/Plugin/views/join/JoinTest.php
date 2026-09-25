@@ -23,6 +23,7 @@ class JoinTest extends JoinPluginBase {
    * Returns the joinValue property.
    *
    * @return int
+   *   The value of the join.
    */
   public function getJoinValue() {
     return $this->joinValue;
@@ -34,14 +35,14 @@ class JoinTest extends JoinPluginBase {
    * @param int $join_value
    *   The value of the join.
    */
-  public function setJoinValue($join_value) {
+  public function setJoinValue($join_value): void {
     $this->joinValue = $join_value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildJoin($select_query, $table, $view_query) {
+  public function buildJoin($select_query, $table, $view_query): void {
     // Add an additional hardcoded condition to the query.
     $this->extra = 'views_test_data.uid = ' . $this->getJoinValue();
     parent::buildJoin($select_query, $table, $view_query);

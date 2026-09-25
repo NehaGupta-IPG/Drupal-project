@@ -8,20 +8,22 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\filter\NumericFilter;
 use Drupal\views\ViewExecutable;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\views\Plugin\views\filter\NumericFilter
- * @group Views
+ * Tests Drupal\views\Plugin\views\filter\NumericFilter.
  */
+#[CoversClass(NumericFilter::class)]
+#[Group('Views')]
 class NumericFilterTest extends UnitTestCase {
 
   /**
    * Tests the acceptExposedInput method.
-   *
-   * @covers ::acceptExposedInput
-   * @dataProvider provideAcceptExposedInput
    */
-  public function testAcceptExposedInput($options, $value, $expected): void {
+  #[DataProvider('provideAcceptExposedInput')]
+  public function testAcceptExposedInput(array $options, array $value, bool $expected): void {
     $plugin_definition = [
       'title' => $this->randomMachineName(),
     ];

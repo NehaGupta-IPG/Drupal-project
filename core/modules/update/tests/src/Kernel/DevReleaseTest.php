@@ -12,12 +12,14 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Utils;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the project data when the installed version is a dev version.
- *
- * @group update
  */
+#[Group('update')]
+#[RunTestsInSeparateProcesses]
 class DevReleaseTest extends KernelTestBase {
 
   /**
@@ -36,8 +38,8 @@ class DevReleaseTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // The Update module's default configuration must be installed for our
-    // fake release metadata to be fetched.
+    // The Update Status module's default configuration must be installed for
+    // our fake release metadata to be fetched.
     $this->installConfig('update');
     $this->installConfig('update_test');
     $this->setCoreVersion('8.1.0-dev');
@@ -46,7 +48,7 @@ class DevReleaseTest extends KernelTestBase {
   }
 
   /**
-   * Sets the current (running) version of core, as known to the Update module.
+   * Sets the current version of core, as known to the Update Status module.
    *
    * @param string $version
    *   The current version of core.
@@ -119,13 +121,14 @@ class DevReleaseTest extends KernelTestBase {
   }
 
   /**
-   * Gets project data from update_calculate_project_data().
+   * Gets project data from \Drupal\update\UpdateManagerInterface::calculateProjectData().
    *
    * @param array $system_info
    *   System test information as used by update_test_system_info_alter().
    *
    * @return array[]
-   *   The project data as returned by update_calculate_project_data().
+   *   The project data as returned by
+   *   \Drupal\update\UpdateManagerInterface::calculateProjectData().
    *
    * @see update_test_system_info_alter()
    */
@@ -133,9 +136,10 @@ class DevReleaseTest extends KernelTestBase {
     $this->config('update_test.settings')
       ->set('system_info', $system_info)
       ->save();
-    update_storage_clear();
-    $available = update_get_available(TRUE);
-    return update_calculate_project_data($available);
+
+    \Drupal::service(UpdateManagerInterface::class)->reset();
+    $available = \Drupal::service(UpdateManagerInterface::class)->getAvailable(TRUE);
+    return \Drupal::service(UpdateManagerInterface::class)->calculateProjectData($available);
   }
 
 }

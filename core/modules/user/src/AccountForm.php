@@ -33,7 +33,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
   protected $languageManager;
 
   /**
-   * Constructs a new EntityForm object.
+   * Constructs a new AccountForm object.
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository.
@@ -105,7 +105,8 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#access' => $account->mail->access('edit'),
     ];
 
-    // Only show name field on registration form or user can change own username.
+    // Only show name field on registration form or user can change own
+    // username.
     $form['account']['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Username'),
@@ -120,6 +121,13 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       ],
       '#default_value' => (!$register ? $account->getAccountName() : ''),
       '#access' => $account->name->access('edit'),
+    ];
+
+    $form['account']['notify'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Email user with password setup instructions'),
+      '#access' => $admin_create,
+      '#default_value' => $admin_create,
     ];
 
     // Display password field only for existing users or when user is allowed to
@@ -157,9 +165,12 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
         ];
         $form_state->set('user', $account);
 
-        // The user may only change their own password without their current
-        // password if they logged in via a one-time login link.
-        if (!$form_state->get('user_pass_reset')) {
+        // If logged in via a one-time login link entering a new password is
+        // required and the user does not need to enter their current password.
+        if ($form_state->get('user_pass_reset')) {
+          $form['account']['pass']['#required'] = TRUE;
+        }
+        else {
           $form['account']['current_pass']['#description'] = $this->t('Required if you want to change the <em>Email address</em> or the <em>Password</em> field below. <a href=":request_new_url" title="Send password reset instructions via email.">Reset your password</a>.', [
             ':request_new_url' => Url::fromRoute('user.pass')->toString(),
           ]);
@@ -171,7 +182,11 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
         '#type' => 'password_confirm',
         '#size' => 25,
         '#description' => $this->t('Provide a password for the new account in both fields.'),
-        '#required' => TRUE,
+        '#states' => [
+          'invisible' => [
+            ':input[name="notify"]' => ['checked' => TRUE],
+          ],
+        ],
       ];
     }
 
@@ -197,7 +212,12 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#title' => $this->t('Status'),
       '#default_value' => $status,
       '#options' => [$this->t('Blocked'), $this->t('Active')],
-      '#access' => $account->status->access('edit'),
+      '#access' => $account->status->access('edit') && $user->id() !== $account->id(),
+      '#states' => [
+        'invisible' => [
+          ':input[name="notify"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     $roles = Role::loadMultiple();
@@ -216,12 +236,6 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     $form['account']['roles'][RoleInterface::AUTHENTICATED_ID] = [
       '#default_value' => TRUE,
       '#disabled' => TRUE,
-    ];
-
-    $form['account']['notify'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Notify user of new account'),
-      '#access' => $admin_create,
     ];
 
     $user_preferred_langcode = $register ? $language_interface->getId() : $account->getPreferredLangcode();
@@ -398,6 +412,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       'name',
       'pass',
       'mail',
+      'roles',
       'timezone',
       'langcode',
       'preferred_langcode',
@@ -416,6 +431,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       'name',
       'pass',
       'mail',
+      'roles',
       'timezone',
       'langcode',
       'preferred_langcode',

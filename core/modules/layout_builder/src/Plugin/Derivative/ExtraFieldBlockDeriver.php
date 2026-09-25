@@ -99,22 +99,21 @@ class ExtraFieldBlockDeriver extends DeriverBase implements ContainerDeriverInte
   public function getDerivativeDefinitions($base_plugin_definition) {
     $entity_type_labels = $this->entityTypeRepository->getEntityTypeLabels();
     $enabled_bundle_ids = $this->bundleIdsWithLayoutBuilderDisplays();
-    $expose_all_fields = $this->moduleHandler->moduleExists('layout_builder_expose_all_field_blocks');
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type_id => $entity_type) {
       // Only process fieldable entity types.
       if (!$entity_type->entityClassImplements(FieldableEntityInterface::class)) {
         continue;
       }
 
-      // If not loading everything, skip entity types that aren't included.
-      if (!$expose_all_fields && !isset($enabled_bundle_ids[$entity_type_id])) {
+      // Skip entity types that aren't included.
+      if (!isset($enabled_bundle_ids[$entity_type_id])) {
         continue;
       }
 
       $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
       foreach ($bundles as $bundle_id => $bundle) {
-        // If not loading everything, skip bundle types that aren't included.
-        if (!$expose_all_fields && !isset($enabled_bundle_ids[$entity_type_id][$bundle_id])) {
+        // Skip bundle types that aren't included.
+        if (!isset($enabled_bundle_ids[$entity_type_id][$bundle_id])) {
           continue;
         }
 
@@ -132,7 +131,7 @@ class ExtraFieldBlockDeriver extends DeriverBase implements ContainerDeriverInte
           $derivative['admin_label'] = $extra_field['label'];
 
           $context_definition = EntityContextDefinition::fromEntityType($entity_type)
-            ->addConstraint('Bundle', [$bundle_id]);
+            ->addConstraint('Bundle', ['bundle' => [$bundle_id]]);
           $derivative['context_definitions'] = [
             'entity' => $context_definition,
           ];
@@ -146,7 +145,7 @@ class ExtraFieldBlockDeriver extends DeriverBase implements ContainerDeriverInte
   }
 
   /**
-   * Gets a list of entity type and bundle tuples that have layout builder enabled.
+   * Gets the list of entity type and bundle tuples with layout builder enabled.
    *
    * @return array
    *   A structured array with entity type as first key, bundle as second.

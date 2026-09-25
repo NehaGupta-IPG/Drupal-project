@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
-use Drupal\FunctionalTests\Installer\InstallerTestBase;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Serialization\Yaml;
+use Drupal\FunctionalTests\Installer\InstallerTestBase;
 use Drupal\Tests\RequirementsPageTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests install profile config overrides can not add unmet dependencies.
- *
- * @group Config
  */
+#[Group('Config')]
+#[RunTestsInSeparateProcesses]
 class ConfigInstallProfileUnmetDependenciesTest extends InstallerTestBase {
 
   use RequirementsPageTrait;
@@ -75,7 +77,7 @@ class ConfigInstallProfileUnmetDependenciesTest extends InstallerTestBase {
   protected function copyTestingOverrides(): void {
     $dest = $this->siteDirectory . '/profiles/testing_config_overrides';
     mkdir($dest, 0777, TRUE);
-    $source = DRUPAL_ROOT . '/core/profiles/testing_config_overrides';
+    $source = DRUPAL_ROOT . '/core/profiles/tests/testing_config_overrides';
     $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
     foreach ($iterator as $item) {
       if ($item->isDir()) {

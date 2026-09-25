@@ -13,16 +13,18 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\StringFormatter;
 use Drupal\Core\Field\Plugin\Field\FieldType\StringItem;
+use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the string field formatter.
- *
- * @group field
- *
- * @coversDefaultClass \Drupal\Core\Field\Plugin\Field\FieldFormatter\StringFormatter
  */
+#[CoversClass(StringFormatter::class)]
+#[Group('field')]
 final class StringFormatterTest extends UnitTestCase {
 
   /**
@@ -36,9 +38,8 @@ final class StringFormatterTest extends UnitTestCase {
    *   Whether to expect the text to be wrapped in a link element.
    *
    * @phpstan-param class-string<\Drupal\Core\Access\AccessResultInterface>|null $accessClass
-   *
-   * @dataProvider providerAccessLinkToEntity
    */
+  #[DataProvider('providerAccessLinkToEntity')]
   public function testLinkToEntity(bool $hasUrl, ?string $accessClass, bool $expectIsLinkElement): void {
     $fieldDefinition = $this->prophesize(FieldDefinitionInterface::class);
     $entityTypeManager = $this->prophesize(EntityTypeManagerInterface::class);
@@ -58,10 +59,10 @@ final class StringFormatterTest extends UnitTestCase {
       $entity->toUrl('canonical')->willReturn($url);
     }
 
-    $item = $this->getMockBuilder(StringItem::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods([])
-      ->getMock();
+    $definition = $this->createStub(ComplexDataDefinitionInterface::class);
+    $definition->method('getPropertyDefinitions')
+      ->willReturn([]);
+    $item = new StringItem($definition);
     $item->setValue(['value' => 'FooText']);
 
     $items = $this->prophesize(FieldItemListInterface::class);

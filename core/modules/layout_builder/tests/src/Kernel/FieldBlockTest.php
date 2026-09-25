@@ -12,12 +12,16 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterPluginManager;
-use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Form\EnforcedResponseException;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\layout_builder\Plugin\Block\FieldBlock;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Prophecy\Promise\PromiseInterface;
 use Prophecy\Promise\ReturnPromise;
@@ -27,9 +31,11 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @coversDefaultClass \Drupal\layout_builder\Plugin\Block\FieldBlock
- * @group Field
+ * Tests Drupal\layout_builder\Plugin\Block\FieldBlock.
  */
+#[CoversClass(FieldBlock::class)]
+#[Group('Field')]
+#[RunTestsInSeparateProcesses]
 class FieldBlockTest extends EntityKernelTestBase {
 
   /**
@@ -58,10 +64,8 @@ class FieldBlockTest extends EntityKernelTestBase {
 
   /**
    * Tests entity access.
-   *
-   * @covers ::blockAccess
-   * @dataProvider providerTestBlockAccessNotAllowed
    */
+  #[DataProvider('providerTestBlockAccessNotAllowed')]
   public function testBlockAccessEntityNotAllowed($expected, $entity_access): void {
     $entity = $this->prophesize(FieldableEntityInterface::class);
     $block = $this->getTestBlock($entity);
@@ -77,7 +81,7 @@ class FieldBlockTest extends EntityKernelTestBase {
   /**
    * Provides test data for ::testBlockAccessEntityNotAllowed().
    */
-  public static function providerTestBlockAccessNotAllowed() {
+  public static function providerTestBlockAccessNotAllowed(): array {
     $data = [];
     $data['entity_forbidden'] = [
       FALSE,
@@ -92,8 +96,6 @@ class FieldBlockTest extends EntityKernelTestBase {
 
   /**
    * Tests unfieldable entity.
-   *
-   * @covers ::blockAccess
    */
   public function testBlockAccessEntityAllowedNotFieldable(): void {
     $entity = $this->prophesize(EntityInterface::class);
@@ -108,8 +110,6 @@ class FieldBlockTest extends EntityKernelTestBase {
 
   /**
    * Tests fieldable entity without a particular field.
-   *
-   * @covers ::blockAccess
    */
   public function testBlockAccessEntityAllowedNoField(): void {
     $entity = $this->prophesize(FieldableEntityInterface::class);
@@ -126,10 +126,8 @@ class FieldBlockTest extends EntityKernelTestBase {
 
   /**
    * Tests field access.
-   *
-   * @covers ::blockAccess
-   * @dataProvider providerTestBlockAccessNotAllowed
    */
+  #[DataProvider('providerTestBlockAccessNotAllowed')]
   public function testBlockAccessEntityAllowedFieldNotAllowed($expected, $field_access): void {
     $entity = $this->prophesize(FieldableEntityInterface::class);
     $block = $this->getTestBlock($entity);
@@ -150,10 +148,10 @@ class FieldBlockTest extends EntityKernelTestBase {
   /**
    * Tests populated vs empty build.
    *
-   * @covers ::blockAccess
-   * @covers ::build
-   * @dataProvider providerTestBlockAccessEntityAllowedFieldHasValue
+   * @legacy-covers ::blockAccess
+   * @legacy-covers ::build
    */
+  #[DataProvider('providerTestBlockAccessEntityAllowedFieldHasValue')]
   public function testBlockAccessEntityAllowedFieldHasValue($expected, $is_empty, $default_value): void {
     $entity = $this->prophesize(FieldableEntityInterface::class);
     $block = $this->getTestBlock($entity);
@@ -178,7 +176,7 @@ class FieldBlockTest extends EntityKernelTestBase {
   /**
    * Provides test data for ::testBlockAccessEntityAllowedFieldHasValue().
    */
-  public static function providerTestBlockAccessEntityAllowedFieldHasValue() {
+  public static function providerTestBlockAccessEntityAllowedFieldHasValue(): array {
     $data = [];
     $data['empty'] = [
       FALSE,
@@ -211,7 +209,7 @@ class FieldBlockTest extends EntityKernelTestBase {
    * @return \Drupal\layout_builder\Plugin\Block\FieldBlock
    *   The block to test.
    */
-  protected function getTestBlock(ProphecyInterface $entity_prophecy, array $configuration = [], array $plugin_definition = []) {
+  protected function getTestBlock(ProphecyInterface $entity_prophecy, array $configuration = [], array $plugin_definition = []): FieldBlock {
     $entity_prophecy->getCacheContexts()->willReturn([]);
     $entity_prophecy->getCacheTags()->willReturn([]);
     $entity_prophecy->getCacheMaxAge()->willReturn(0);
@@ -245,10 +243,10 @@ class FieldBlockTest extends EntityKernelTestBase {
   }
 
   /**
-   * @covers ::build
-   * @dataProvider providerTestBuild
+   * Tests build.
    */
-  public function testBuild(PromiseInterface $promise, $expected_markup, $log_message = '', $log_arguments = []): void {
+  #[DataProvider('providerTestBuild')]
+  public function testBuild(PromiseInterface $promise, $expected_markup, $log_message = '', array $log_arguments = []): void {
     $entity = $this->prophesize(FieldableEntityInterface::class);
     $field = $this->prophesize(FieldItemListInterface::class);
     $entity->get('the_field_name')->willReturn($field->reveal());
@@ -284,7 +282,7 @@ class FieldBlockTest extends EntityKernelTestBase {
   /**
    * Provides test data for ::testBuild().
    */
-  public static function providerTestBuild() {
+  public static function providerTestBuild(): array {
     $data = [];
     $data['array'] = [
       new ReturnPromise([['content' => ['#markup' => 'The field value']]]),
@@ -298,7 +296,7 @@ class FieldBlockTest extends EntityKernelTestBase {
   }
 
   /**
-   * @covers ::build
+   * Tests build exception.
    */
   public function testBuildException(): void {
     // In PHP 7.4 ReflectionClass cannot be serialized so this cannot be part of

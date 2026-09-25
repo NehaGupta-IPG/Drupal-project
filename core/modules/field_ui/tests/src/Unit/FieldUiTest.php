@@ -5,22 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\field_ui\Unit;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\field_ui\FieldUI;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\field_ui\FieldUI
- *
- * @group field_ui
+ * Tests Drupal\field_ui\FieldUI.
  */
+#[CoversClass(FieldUI::class)]
+#[Group('field_ui')]
 class FieldUiTest extends UnitTestCase {
-
-  /**
-   * The path validator.
-   *
-   * @var \Drupal\Core\Path\PathValidatorInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $pathValidator;
 
   /**
    * {@inheritdoc}
@@ -28,14 +24,13 @@ class FieldUiTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->pathValidator = $this->createMock('Drupal\Core\Path\PathValidatorInterface');
     $container = new ContainerBuilder();
-    $container->set('path.validator', $this->pathValidator);
+    $container->set('path.validator', $this->createStub(PathValidatorInterface::class));
     \Drupal::setContainer($container);
   }
 
   /**
-   * @covers ::getNextDestination
+   * Tests get next destination.
    */
   public function testGetNextDestination(): void {
     $destinations = ['admin', 'admin/content'];
@@ -49,7 +44,7 @@ class FieldUiTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getNextDestination
+   * Tests get next destination empty.
    */
   public function testGetNextDestinationEmpty(): void {
     $destinations = [];
@@ -58,7 +53,7 @@ class FieldUiTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getNextDestination
+   * Tests get next destination route name.
    */
   public function testGetNextDestinationRouteName(): void {
     $destinations = [['route_name' => 'system.admin'], ['route_name' => 'system.admin_content']];

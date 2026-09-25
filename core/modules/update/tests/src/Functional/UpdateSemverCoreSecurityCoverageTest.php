@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\update\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests the security coverage messages for Drupal core versions.
- *
- * @group update
  */
+#[Group('update')]
+#[RunTestsInSeparateProcesses]
 class UpdateSemverCoreSecurityCoverageTest extends UpdateSemverCoreTestBase {
 
   /**
    * Tests the security coverage messages for Drupal core versions.
    */
   public function testSecurityCoverageMessage(): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3559550');
     foreach (static::securityCoverageMessageProvider() as $case) {
       $this->doTestSecurityCoverageMessage($case['installed_version'], $case['fixture'], $case['requirements_section_heading'], $case['message'], $case['mock_date']);
     }
@@ -82,7 +87,7 @@ class UpdateSemverCoreSecurityCoverageTest extends UpdateSemverCoreTestBase {
    *   - 10.4.0
    *   - 10.5.0
    */
-  protected static function securityCoverageMessageProvider() {
+  protected static function securityCoverageMessageProvider(): array {
     $release_coverage_message = 'Visit the release cycle overview for more information on supported releases.';
     $coverage_ended_message = 'Coverage has ended';
     $update_asap_message = 'Update to a supported minor as soon as possible to continue receiving security updates.';

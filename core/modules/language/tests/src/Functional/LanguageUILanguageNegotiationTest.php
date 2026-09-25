@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Functional;
 
+use Drupal\block\Entity\Block;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\language\LanguageNegotiatorInterface;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationBrowser;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationSelected;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationSession;
@@ -15,11 +19,9 @@ use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUser;
 use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUserAdmin;
-use Drupal\Core\Language\Language;
-use Drupal\Core\Language\LanguageInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\language\LanguageNegotiatorInterface;
-use Drupal\block\Entity\Block;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
@@ -40,9 +42,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  * - admin/config: Tests the UI using the precedence rules.
  * - zh-hans/admin/config: Tests the UI in Chinese.
  * - blah-blah/admin/config: Tests the 404 page.
- *
- * @group language
  */
+#[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LanguageUILanguageNegotiationTest extends BrowserTestBase {
 
   /**
@@ -126,10 +128,10 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     $file->save();
 
     // Setup the site languages by installing two languages.
-    // Set the default language in order for the translated string to be registered
-    // into database when seen by t(). Without doing this, our target string
-    // is for some reason not found when doing translate search. This might
-    // be some bug.
+    // Set the default language in order for the translated string to be
+    // registered into database when seen by t(). Without doing this, our target
+    // string is for some reason not found when doing translate search. This
+    // might be some bug.
     $default_language = \Drupal::languageManager()->getDefaultLanguage();
     ConfigurableLanguage::createFromLangcode($langcode_browser_fallback)->save();
     $this->config('system.site')->set('default_langcode', $langcode_browser_fallback)->save();
@@ -258,7 +260,11 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
       ],
       // Default, browser language preference is not one of site's lang.
       [
-        'language_negotiation' => [LanguageNegotiationUrl::METHOD_ID, LanguageNegotiationBrowser::METHOD_ID, LanguageNegotiationSelected::METHOD_ID],
+        'language_negotiation' => [
+          LanguageNegotiationUrl::METHOD_ID,
+          LanguageNegotiationBrowser::METHOD_ID,
+          LanguageNegotiationSelected::METHOD_ID,
+        ],
         'path' => 'admin/config',
         'expect' => $default_string,
         'expected_method_id' => LanguageNegotiatorInterface::METHOD_ID,
@@ -275,7 +281,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     $definitions = \Drupal::languageManager()->getNegotiator()->getNegotiationMethods();
     // Enable only methods, which are either not limited to a specific language
     // type or are supporting the interface language type.
-    $language_interface_method_definitions = array_filter($definitions, function ($method_definition) {
+    $language_interface_method_definitions = array_filter($definitions, function (array $method_definition): bool {
       return !isset($method_definition['types']) || (isset($method_definition['types']) && in_array(LanguageInterface::TYPE_INTERFACE, $method_definition['types']));
     });
     $this->config('language.types')
@@ -414,7 +420,10 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     }
   }
 
-  protected function doRunTest($test): void {
+  /**
+   * Runs common tests for the language user interface.
+   */
+  protected function doRunTest(array $test): void {
     $test += ['path_options' => []];
     if (!empty($test['language_negotiation'])) {
       $method_weights = array_flip($test['language_negotiation']);

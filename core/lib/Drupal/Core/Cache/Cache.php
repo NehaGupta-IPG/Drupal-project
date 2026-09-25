@@ -19,12 +19,13 @@ class Cache {
   /**
    * Merges lists of cache contexts and removes duplicates.
    *
-   * @param list<string> ...
+   * @param list<string> ...$cache_contexts
    *   Cache contexts to merge.
    *
    * @return list<string>
    *   The merged list of cache contexts.
    */
+  #[\NoDiscard]
   public static function mergeContexts(array ...$cache_contexts) {
     $cache_contexts = array_values(array_unique(array_merge(...$cache_contexts)));
     assert(\Drupal::service('cache_contexts_manager')->assertValidTokens($cache_contexts), sprintf('Failed to assert that "%s" are valid cache contexts.', implode(', ', $cache_contexts)));
@@ -42,12 +43,13 @@ class Cache {
    * allows items to be invalidated based on all tags attached to the content
    * they're constituted from.
    *
-   * @param list<string> ...
+   * @param list<string> ...$cache_tags
    *   Cache tags to merge.
    *
    * @return list<string>
    *   The merged list of cache tags.
    */
+  #[\NoDiscard]
   public static function mergeTags(array ...$cache_tags) {
     $cache_tags = array_values(array_unique(array_merge(...$cache_tags)));
     assert(Inspector::assertAllStrings($cache_tags), 'Cache tags must be valid strings');
@@ -59,12 +61,13 @@ class Cache {
    *
    * Ensures infinite max-age (Cache::PERMANENT) is taken into account.
    *
-   * @param int ...
+   * @param int ...$max_ages
    *   Max age values to merge.
    *
    * @return int
    *   The minimum max-age value.
    */
+  #[\NoDiscard]
   public static function mergeMaxAges(...$max_ages) {
     // Remove Cache::PERMANENT values to return the correct minimum value.
     $max_ages = array_filter($max_ages, function ($max_age) {

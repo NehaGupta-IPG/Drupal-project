@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\State\StateInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\EntityTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -45,10 +46,8 @@ abstract class EntityKernelTestBase extends KernelTestBase {
 
   /**
    * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
    */
-  protected $state;
+  protected StateInterface $state;
 
   /**
    * {@inheritdoc}
@@ -75,6 +74,9 @@ abstract class EntityKernelTestBase extends KernelTestBase {
         if ($rp->class == $class) {
           foreach (array_intersect(['node', 'comment'], $class::$modules) as $module) {
             $this->installEntitySchema($module);
+          }
+          if (in_array('taxonomy', $class::$modules, TRUE)) {
+            $this->installEntitySchema('taxonomy_term');
           }
         }
       }
@@ -124,7 +126,7 @@ abstract class EntityKernelTestBase extends KernelTestBase {
    * @param string $module
    *   The module to install.
    */
-  protected function installModule($module) {
+  protected function installModule($module): void {
     $this->enableModules([$module]);
     $this->refreshServices();
   }
@@ -135,7 +137,7 @@ abstract class EntityKernelTestBase extends KernelTestBase {
    * @param string $module
    *   The module to uninstall.
    */
-  protected function uninstallModule($module) {
+  protected function uninstallModule($module): void {
     $this->disableModules([$module]);
     $this->refreshServices();
   }
@@ -143,7 +145,7 @@ abstract class EntityKernelTestBase extends KernelTestBase {
   /**
    * Refresh services.
    */
-  protected function refreshServices() {
+  protected function refreshServices(): void {
     $this->container = \Drupal::getContainer();
 
     $this->entityTypeManager = $this->container->get('entity_type.manager');

@@ -7,12 +7,14 @@ namespace Drupal\Tests\dblog\Kernel;
 use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\dblog\Functional\FakeLogEntries;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Generate events and verify dblog entries.
- *
- * @group dblog
  */
+#[Group('dblog')]
+#[RunTestsInSeparateProcesses]
 class DbLogTest extends KernelTestBase {
 
   use FakeLogEntries;
@@ -47,7 +49,7 @@ class DbLogTest extends KernelTestBase {
     $implementation_count = 0;
     \Drupal::moduleHandler()->invokeAllWith(
       'cron',
-      function (callable $hook, string $module) use (&$implementation_count) {
+      function (callable $hook, string $module) use (&$implementation_count): void {
         $implementation_count++;
       }
     );
@@ -66,7 +68,12 @@ class DbLogTest extends KernelTestBase {
    * Tests that only valid placeholders are stored in the variables column.
    */
   public function testInvalidPlaceholders(): void {
-    \Drupal::logger('my_module')->warning('Hello @string @array @object', ['@string' => '', '@array' => [], '@object' => new \stdClass()]);
+    \Drupal::logger('my_module')
+      ->warning('Hello @string @array @object', [
+        '@string' => '',
+        '@array' => [],
+        '@object' => new \stdClass(),
+      ]);
     $variables = \Drupal::database()
       ->select('watchdog', 'w')
       ->fields('w', ['variables'])

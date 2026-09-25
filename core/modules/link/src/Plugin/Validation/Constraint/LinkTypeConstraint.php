@@ -15,6 +15,14 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class LinkTypeConstraint extends SymfonyConstraint {
 
-  public $message = "The path '@uri' is invalid.";
+  public function __construct(
+    public string $invalidMessage = "The URL '@uri' is invalid.",
+    public string $onlyInternalMessage = "The URL '@uri' is external, but the @field-label field only supports internal paths.",
+    public string $onlyExternalMessage = "The URL '@uri' is internal, but the @field-label field only supports external URLs.",
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

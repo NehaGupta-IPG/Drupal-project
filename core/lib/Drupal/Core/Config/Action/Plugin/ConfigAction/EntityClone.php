@@ -42,20 +42,42 @@ final class EntityClone implements ConfigActionPluginInterface, ContainerFactory
   /**
    * {@inheritdoc}
    */
-  public function apply(string $configName, mixed $duplicate_id): void {
-    assert(is_string($duplicate_id));
+  public function apply(string $configName, mixed $value): void {
+    if (!is_array($value)) {
+      $value = ['id' => $value];
+    }
+    assert(is_string($value['id']));
+
+    $value += ['fail_if_exists' => FALSE];
+    assert(is_bool($value['fail_if_exists']));
 
     // If the original doesn't exist, there's nothing to clone.
     $original = $this->configManager->loadConfigEntityByName($configName);
     if (empty($original)) {
       throw new ConfigActionException("Cannot clone '$configName' because it does not exist.");
     }
-    $clone = $original->createDuplicate();
-    $clone->set($original->getEntityType()->getKey('id'), $duplicate_id);
 
-    // Use the config action manager to invoke the `entity_create` action on
-    // the clone, so that it will be validated.
-    $this->configActionManager->applyAction('entity_create:createIfNotExists', $clone->getConfigDependencyName(), $clone->toArray());
+    // Treat the original ID like a period-separated array of strings, and
+    // replace any `%` parts in the clone's ID with the corresponding part of
+    // the original ID. For example, if we're cloning an entity view display
+    // with the ID `node.foo.teaser`, and the clone's ID is
+    // `node.%.search_result`, the final ID of the clone will be
+    // `node.foo.search_result`.
+    $original_id_parts = explode('.', $original->id());
+    $clone_id_parts = explode('.', $value['id']);
+    assert(count($original_id_parts) === count($clone_id_parts));
+    foreach ($clone_id_parts as $index => $part) {
+      $clone_id_parts[$index] = $part === '%' ? $original_id_parts[$index] : $part;
+    }
+    $value['id'] = implode('.', $clone_id_parts);
+
+    $clone = $original->createDuplicate();
+    $clone->set($original->getEntityType()->getKey('id'), $value['id']);
+
+    $create_action = 'entity_create:' . ($value['fail_if_exists'] ? 'create' : 'createIfNotExists');
+    // Use the config action manager to invoke the create action on the clone,
+    // so that it will be validated.
+    $this->configActionManager->applyAction($create_action, $clone->getConfigDependencyName(), $clone->toArray());
   }
 
 }

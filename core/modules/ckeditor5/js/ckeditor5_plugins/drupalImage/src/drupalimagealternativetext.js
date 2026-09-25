@@ -1,11 +1,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* cspell:ignore imagealternativetext imagetextalternativeediting drupalimagealternativetextediting drupalimagealternativetextui */
+/* cspell:ignore imagealternativetext imagetextalternative */
+/* cspell:ignore imagetextalternativeediting drupalimagealternativetextediting */
+/* cspell:ignore drupalimagealternativetextui */
 
 /**
  * @module drupalImage/imagealternativetext
  */
 
-import { Plugin } from 'ckeditor5/src/core';
+import { Plugin } from 'ckeditor5';
 import DrupalImageAlternativeTextEditing from './imagealternativetext/drupalimagealternativetextediting';
 import DrupalImageAlternativeTextUi from './imagealternativetext/drupalimagealternativetextui';
 

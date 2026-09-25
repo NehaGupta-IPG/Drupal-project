@@ -15,12 +15,12 @@ trait SchemaIntrospectionTestTrait {
    * @param string $table_name
    *   A non-prefixed table name.
    * @param array $column_names
-   *   An array of column names
+   *   An array of column names.
    * @param string $index_type
    *   (optional) The type of the index. Can be one of 'index', 'unique' or
    *   'primary'. Defaults to 'index'.
    */
-  protected function assertIndexOnColumns($table_name, array $column_names, $index_type = 'index') {
+  protected function assertIndexOnColumns($table_name, array $column_names, $index_type = 'index'): void {
     foreach ($this->getIndexColumnNames($table_name, $index_type) as $index_columns) {
       if ($column_names == $index_columns) {
         $this->assertTrue(TRUE);
@@ -36,12 +36,12 @@ trait SchemaIntrospectionTestTrait {
    * @param string $table_name
    *   A non-prefixed table name.
    * @param array $column_names
-   *   An array of column names
+   *   An array of column names.
    * @param string $index_type
    *   (optional) The type of the index. Can be one of 'index', 'unique' or
    *   'primary'. Defaults to 'index'.
    */
-  protected function assertNoIndexOnColumns($table_name, array $column_names, $index_type = 'index') {
+  protected function assertNoIndexOnColumns($table_name, array $column_names, $index_type = 'index'): void {
     foreach ($this->getIndexColumnNames($table_name, $index_type) as $index_columns) {
       if ($column_names == $index_columns) {
         $this->assertTrue(FALSE);
@@ -62,7 +62,7 @@ trait SchemaIntrospectionTestTrait {
    *   A multi-dimensional array containing the column names for each index of
    *   the given type.
    */
-  protected function getIndexColumnNames($table_name, $index_type) {
+  protected function getIndexColumnNames($table_name, $index_type): array {
     assert(in_array($index_type, ['index', 'unique', 'primary'], TRUE));
 
     $schema = \Drupal::database()->schema();
