@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\Form\FormState;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -51,6 +52,40 @@ class DrupalKernelRequestStackTest extends KernelTestBase implements EventSubscr
     $this->container->set(self::class, $this);
     $container->getDefinition(self::class)
       ->addTag('event_subscriber');
+  }
+
+  /**
+   * Tests that each main request's form errors are isolated in a reused kernel.
+   */
+  public function testFormErrorsAcrossRequests(): void {
+    $this->container->get('request_stack')->pop();
+    $kernel = $this->container->get('kernel');
+    $request = Request::create('/http-kernel-test');
+    $response = $kernel->handle($request);
+    $this->assertSame(200, $response->getStatusCode());
+
+    $form_state = new FormState();
+    try {
+      $form_state->setErrorByName('message', 'Invalid message.');
+      $this->assertTrue(FormState::hasAnyErrors());
+
+      // Subrequests must not erase errors belonging to the main request.
+      $sub_response = $kernel->handle(Request::create('/http-kernel-test'), HttpKernelInterface::SUB_REQUEST);
+      $this->assertSame(200, $sub_response->getStatusCode());
+      $this->assertTrue(FormState::hasAnyErrors());
+      $kernel->terminate($request, $response);
+
+      // An unrelated form in a subsequent main request must be submittable.
+      $next_request = Request::create('/http-kernel-test');
+      $next_response = $kernel->handle($next_request);
+      $this->assertSame(200, $next_response->getStatusCode());
+      $this->assertSame($kernel, $this->container->get('kernel'));
+      $this->assertFalse(FormState::hasAnyErrors());
+      $kernel->terminate($next_request, $next_response);
+    }
+    finally {
+      $form_state->clearErrors();
+    }
   }
 
   /**
