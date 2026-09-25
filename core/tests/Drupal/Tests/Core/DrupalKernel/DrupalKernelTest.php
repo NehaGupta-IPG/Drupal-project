@@ -23,6 +23,36 @@ use Symfony\Component\HttpFoundation\Response;
 class DrupalKernelTest extends UnitTestCase {
 
   /**
+   * Tests repeated registration keeps the same order without adding duplicate paths.
+   */
+  public function testRepeatedNamespaceRegistration(): void {
+    $loader = new ClassLoader();
+    $loader->addPsr4('Drupal\\example\\', '/external');
+    $kernel = new DrupalKernel('test', $loader, TRUE, '/drupal');
+    $register = new \ReflectionMethod(DrupalKernel::class, 'classLoaderAddMultiplePsr4');
+    $namespaces = [
+      'Drupal\\example' => ['modules/example/src', 'modules/example/src'],
+      'Drupal\\other' => 'modules/other/src',
+    ];
+    for ($i = 0; $i < 10; $i++) {
+      $register->invoke($kernel, $namespaces);
+    }
+    $this->assertSame([
+      'Drupal\\example\\' => ['/external', '/drupal/modules/example/src'],
+      'Drupal\\other\\' => ['/drupal/modules/other/src'],
+    ], $loader->getPrefixesPsr4());
+
+    // Another boot may discover a new path for an existing namespace.
+    $register->invoke($kernel, ['Drupal\\example' => ['modules/example/src', 'modules/new/src']]);
+    $this->assertSame(['/external', '/drupal/modules/example/src', '/drupal/modules/new/src'], $loader->getPrefixesPsr4()['Drupal\\example\\']);
+    // Respect the explicitly provided loader, including previously added paths.
+    $other_loader = new ClassLoader();
+    $register->invoke($kernel, $namespaces, $other_loader);
+    $register->invoke($kernel, $namespaces, $other_loader);
+    $this->assertSame(['/drupal/modules/example/src'], $other_loader->getPrefixesPsr4()['Drupal\\example\\']);
+  }
+
+  /**
    * Tests hostname validation with settings.
    *
    * @legacy-covers ::setupTrustedHosts

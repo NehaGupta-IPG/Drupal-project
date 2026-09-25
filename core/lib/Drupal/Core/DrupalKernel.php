@@ -1771,7 +1771,14 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       elseif (is_string($paths)) {
         $paths = $this->root . '/' . $paths;
       }
-      $class_loader->addPsr4($prefix . '\\', $paths);
+      // A persistent kernel may boot repeatedly with the same class loader.
+      // Do not append paths that have already been appended, and keep the
+      // same order.
+      $existing_paths = $class_loader->getPrefixesPsr4()[$prefix . '\\'] ?? [];
+      $new_paths = array_values(array_diff(array_unique((array) $paths), $existing_paths));
+      if ($new_paths) {
+        $class_loader->addPsr4($prefix . '\\', $new_paths);
+      }
     }
   }
 
