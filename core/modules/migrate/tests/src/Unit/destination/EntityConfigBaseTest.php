@@ -18,6 +18,7 @@ use Drupal\migrate\Row;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests configuration entity destinations.
@@ -46,7 +47,7 @@ class EntityConfigBaseTest extends UnitTestCase {
   /**
    * The configurable language manager.
    */
-  protected ConfigurableLanguageManagerInterface|MockObject $languageManager;
+  protected ConfigurableLanguageManagerInterface|Stub $languageManager;
 
   /**
    * The configuration factory service.
@@ -75,17 +76,16 @@ class EntityConfigBaseTest extends UnitTestCase {
     $this->entityStorage->method('getEntityType')->willReturn($entity_type->reveal());
     $this->entityStorage->method('create')
       ->willReturnCallback(function ($values) {
-        return $this->getMockBuilder(ConfigEntityBase::class)
+        return $this->getStubBuilder(ConfigEntityBase::class)
           ->setConstructorArgs([
             $values,
             self::ENTITY_TYPE_ID,
           ])
           ->onlyMethods([])
-          ->getMock();
+          ->getStub();
       });
 
-    $this->languageManager = $this->getMockBuilder(ConfigurableLanguageManagerInterface::class)
-      ->getMock();
+    $this->languageManager = $this->createStub(ConfigurableLanguageManagerInterface::class);
     $this->configFactory = $this->getConfigFactoryStub();
 
     $entity_type_manager = $this->getMockBuilder(EntityTypeManagerInterface::class)
@@ -130,13 +130,13 @@ class EntityConfigBaseTest extends UnitTestCase {
 
     // Test an update.
     // Initialize a preexisting configuration entity.
-    $preexisting_config = $this->getMockBuilder(ConfigEntityBase::class)
+    $preexisting_config = $this->getStubBuilder(ConfigEntityBase::class)
       ->setConstructorArgs([
         $this->row->getDestination(),
         self::ENTITY_TYPE_ID,
       ])
       ->onlyMethods([])
-      ->getMock();
+      ->getStub();
     // Ensure that the preexisting config entity has the expected initial
     // property value. In this test, the source and destination IDs are the
     // same.
