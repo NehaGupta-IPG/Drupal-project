@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
 // cspell:ignore testbots
 
 /**
- * Helper class to manage run-tests.sh configuration.
+ * Helper class to manage run-tests.php configuration.
  */
 final class Configuration {
 
@@ -215,7 +215,7 @@ final class Configuration {
       'types',
       NULL,
       InputOption::VALUE_REQUIRED,
-      'Runs just tests from the specified test type, for example run-tests.sh --types "unit,kernel"',
+      'Runs just tests from the specified test type, for example run-tests.php --types "unit,kernel"',
     ));
     $inputDefinition->addOption(new InputOption(
       'directory',

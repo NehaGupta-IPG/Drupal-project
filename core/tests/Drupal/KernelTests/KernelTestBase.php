@@ -406,7 +406,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     // If the test is run with argument dburl then use it.
     $db_url = getenv('SIMPLETEST_DB');
     if (empty($db_url)) {
-      throw new \Exception('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.sh. See https://www.drupal.org/node/2116263#skipped-tests for more information.');
+      throw new \Exception('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.php. See https://www.drupal.org/node/2116263#skipped-tests for more information.');
     }
     else {
       $database = Database::convertDbUrlToConnectionInfo($db_url, TRUE);

@@ -34021,13 +34021,13 @@ $ignoreErrors[] = [
 	'message' => '#^Function simpletest_script_execute_batch\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/scripts/run-tests.sh',
+	'path' => __DIR__ . '/scripts/run-tests.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function simpletest_script_setup_test_run_results_storage\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/scripts/run-tests.sh',
+	'path' => __DIR__ . '/scripts/run-tests.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:

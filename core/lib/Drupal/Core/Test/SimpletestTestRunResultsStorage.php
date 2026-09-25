@@ -32,7 +32,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
    */
   public static function getConnection(): Connection {
     // Check whether there is a test runner connection.
-    // @see run-tests.sh
+    // @see run-tests.php
     try {
       $connection = Database::getConnection('default', 'test-runner');
     }
@@ -177,7 +177,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
   }
 
   /**
-   * Defines the database schema for run-tests.sh and simpletest module.
+   * Defines the database schema for run-tests.php and simpletest module.
    *
    * @return array
    *   Array suitable for use in a hook_schema() implementation.

@@ -157,7 +157,7 @@ trait TestSetupTrait {
     // Clone the current connection and replace the current prefix.
     $connection_info = Database::getConnectionInfo('default');
     if (is_null($connection_info)) {
-      throw new \InvalidArgumentException('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.sh.');
+      throw new \InvalidArgumentException('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.php.');
     }
     else {
       Database::renameConnection('default', 'simpletest_original_default');
