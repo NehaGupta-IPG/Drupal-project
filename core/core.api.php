@@ -2549,6 +2549,13 @@ function hook_validation_constraint_alter(array &$definitions) {
  *   necessary to support Drupal's content negotiation. It is recommended to
  *   omit this key and use Drupal's content negotiation rather than using
  *   substantially different URLs between Ajax and non-Ajax.
+ * - suppress_required_fields_validation: (bool) If TRUE, suppresses the
+ *   standard required-field errors during Ajax requests triggered by this
+ *   element.
+ *   Defaults to FALSE. Other validation, including #element_validate and
+ *   form-level validation handlers, still runs and can report errors, subject
+ *   to #limit_validation_errors. This option has no effect on non-Ajax
+ *   submissions.
  *
  * @subsection sub_callback Setting up a callback to process Ajax
  * Once you have set up your form to trigger an Ajax response (see @ref sub_form
