@@ -209,9 +209,8 @@ class FormValidator implements FormValidatorInterface {
     // server-side form structure rather than a request parameter, so the
     // suppression cannot be forced by a crafted request.
     $request = $this->requestStack->getCurrentRequest();
-    $requires_validation = isset($elements['#required']) && $elements['#required'];
     $triggering_element = $form_state->getTriggeringElement();
-    $suppress_required_fields_validation = $requires_validation && $request && $request->query->has(FormBuilderInterface::AJAX_FORM_REQUEST) && !empty($triggering_element['#ajax']['suppress_required_fields_validation']);
+    $suppress_required_fields_validation = $request && $request->query->has(FormBuilderInterface::AJAX_FORM_REQUEST) && !empty($triggering_element['#ajax']['suppress_required_fields_validation']);
 
     // Validate the current input.
     if (!isset($elements['#validated']) || !$elements['#validated']) {
