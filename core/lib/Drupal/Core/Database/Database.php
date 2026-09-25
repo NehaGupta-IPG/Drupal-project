@@ -447,7 +447,6 @@ abstract class Database {
     }
 
     $connection_parameters = self::$databaseInfo[$key][$target];
-    $driver = $connection_parameters->driver;
 
     $driver_class = $connection_parameters->getConnectionClass();
     $options = $connection_parameters->toArray();
