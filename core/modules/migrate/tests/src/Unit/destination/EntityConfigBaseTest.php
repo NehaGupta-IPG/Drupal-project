@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit\destination;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -16,6 +17,7 @@ use Drupal\migrate\Plugin\migrate\destination\EntityConfigBase;
 use Drupal\migrate\Row;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests configuration entity destinations.
@@ -33,40 +35,30 @@ class EntityConfigBaseTest extends UnitTestCase {
 
   /**
    * The plugin being tested.
-   *
-   * @var \Drupal\migrate\Plugin\migrate\destination\EntityConfigBase
    */
-  protected $plugin;
+  protected EntityConfigBase $plugin;
 
   /**
    * The storage of the test configuration entity.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityStorage;
+  protected EntityStorageInterface|MockObject $entityStorage;
 
   /**
    * The configurable language manager.
-   *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $languageManager;
+  protected ConfigurableLanguageManagerInterface|MockObject $languageManager;
 
   /**
    * The configuration factory service.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
-   *
    * @see \Drupal\Tests\UnitTestCase::getConfigFactoryStub
    */
-  protected $configFactory;
+  protected ConfigFactoryInterface|MockObject $configFactory;
 
   /**
    * A fully initialized migration Row object.
-   *
-   * @var \Drupal\migrate\Row
    */
-  protected $row;
+  protected Row $row;
 
   /**
    * {@inheritdoc}
