@@ -53,7 +53,7 @@ interface ConnectionParametersInterface {
    * @param UnprocessedConnectionInfoArray $options
    *   An array of connection options.
    *
-   * @return array
+   * @return ConnectionInfoArray
    *   The processed options.
    *
    * @internal
@@ -74,7 +74,7 @@ interface ConnectionParametersInterface {
   /**
    * Returns the PHP class name of the connection.
    *
-   * @return class-string
+   * @return class-string<Connection>
    *   The PHP class name of the connection.
    */
   public function getConnectionClass(): string;

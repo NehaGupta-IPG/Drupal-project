@@ -10,6 +10,7 @@ use Composer\Autoload\ClassLoader;
  * The factory for database connection parameters.
  *
  * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
+ * @phpstan-import-type ConnectionInfoArray from \Drupal\Core\Database\Database
  *
  * @final
  */
@@ -42,6 +43,11 @@ abstract class ConnectionParametersFactory {
     /** @var UnprocessedConnectionInfoArray $options */
     $options = $info_pick ?? $connection_options;
 
+    // Without driver name, we cannot proceed.
+    if (!isset($options['driver'])) {
+      throw new \RuntimeException("Database driver name missing from the connection options");
+    }
+
     $options = array_merge([
       'namespace' => '',
       'autoload' => '',
@@ -56,43 +62,30 @@ abstract class ConnectionParametersFactory {
     // arrays. Those have the wrong 'namespace' key set, or not set at all
     // for core supported database drivers.
     if (empty($options['namespace']) || str_starts_with($options['namespace'], 'Drupal\\Core\\Database\\Driver\\')) {
-      switch (strtolower($options['driver'] ?? '')) {
-        case 'mysql':
-          $options['namespace'] = 'Drupal\\mysql\\Driver\\Database\\mysql';
-          break;
-
-        case 'pgsql':
-          $options['namespace'] = 'Drupal\\pgsql\\Driver\\Database\\pgsql';
-          break;
-
-        case 'sqlite':
-          $options['namespace'] = 'Drupal\\sqlite\\Driver\\Database\\sqlite';
-          break;
-      }
+      $driver = strtolower($options['driver']);
+      $options['namespace'] = match ($driver) {
+        'mysql' => 'Drupal\\mysql\\Driver\\Database\\mysql',
+        'pgsql' => 'Drupal\\pgsql\\Driver\\Database\\pgsql',
+        'sqlite' => 'Drupal\\sqlite\\Driver\\Database\\sqlite',
+        default => throw new \RuntimeException("Unknown database driver {$options['driver']}"),
+      };
     }
 
     // Backwards compatibility layer for Drupal 8 style database connection
     // arrays. Those do not have the 'autoload' key set for core database
     // drivers.
-    if (empty($options['autoload']) && isset($options['namespace'])) {
-      switch (trim($options['namespace'], '\\')) {
-        case "Drupal\\mysql\\Driver\\Database\\mysql":
-          $options['autoload'] = "core/modules/mysql/src/Driver/Database/mysql/";
-          break;
-
-        case "Drupal\\pgsql\\Driver\\Database\\pgsql":
-          $options['autoload'] = "core/modules/pgsql/src/Driver/Database/pgsql/";
-          break;
-
-        case "Drupal\\sqlite\\Driver\\Database\\sqlite":
-          $options['autoload'] = "core/modules/sqlite/src/Driver/Database/sqlite/";
-          break;
-      }
+    if (empty($options['autoload'])) {
+      $options['autoload'] = match (trim($options['namespace'], '\\')) {
+        "Drupal\\mysql\\Driver\\Database\\mysql" => "core/modules/mysql/src/Driver/Database/mysql/",
+        "Drupal\\pgsql\\Driver\\Database\\pgsql" => "core/modules/pgsql/src/Driver/Database/pgsql/",
+        "Drupal\\sqlite\\Driver\\Database\\sqlite" => "core/modules/sqlite/src/Driver/Database/sqlite/",
+        default => throw new \RuntimeException("Unknown database driver {$options['driver']}"),
+      };
     }
 
     // Use the namespace to determine the module name when the module name is
     // not provided.
-    $options['module'] ??= explode('\\', $options['namespace'])[1] ?? $options['driver'] ?? '';
+    $options['module'] ??= explode('\\', $options['namespace'])[1] ?? $options['driver'];
 
     // If the database driver is provided by a module, then its code may need
     // to be instantiated prior to when the module's root namespace is added
@@ -116,6 +109,7 @@ abstract class ConnectionParametersFactory {
     // Return the driver's ConnectionParameters object if the driver supports
     // it, otherwise a fallback wrapper closure.
     // @todo in drupal:43.0.0 remove the wrapper.
+    /** @var class-string<ConnectionParametersInterface> $class */
     $class = $options['namespace'] . '\\ConnectionParameters';
 
     if (class_exists($class)) {
@@ -123,6 +117,14 @@ abstract class ConnectionParametersFactory {
       return new $class(...$options);
     }
 
+    /** @var array{
+      'driver': string,
+      'namespace': string,
+      'autoload': string,
+      'database': string,
+      'prefix': string,
+      'module': string,
+      } $options */
     $options = ConnectionParametersBase::processOptionsArray($options);
     return new class (...$options) extends ConnectionParametersBase {
 
@@ -209,6 +211,7 @@ abstract class ConnectionParametersFactory {
 
     $additional_class_loader->register(TRUE);
 
+    /** @var UnprocessedConnectionInfoArray $options */
     $options = $connection_class::createConnectionOptionsFromUrl($url);
 
     // Add the necessary information to autoload code.

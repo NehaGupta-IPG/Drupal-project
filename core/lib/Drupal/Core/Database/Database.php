@@ -17,7 +17,8 @@ use Drupal\Core\Cache\NullBackend;
  * globals.
  *
  * @phpstan-type UnprocessedConnectionInfoArray array{
- *   'driver': string,
+ *   'driver'?: string,
+ *   'module'?: string,
  *   'autoload'?: string,
  *   'namespace'?: string,
  *   'database': string,
@@ -29,7 +30,7 @@ use Drupal\Core\Cache\NullBackend;
  *   'collation'?: string,
  *   'pdo'?: array<mixed>,
  *   'isolation_level'?: int|string,
- *   'init_commands'?: array<string,string|int>,
+ *   'init_commands'?: array<string|int,string|int>,
  *   'dependencies'?: array<string,array{
  *     'autoload': string,
  *     'namespace': string,
@@ -37,6 +38,7 @@ use Drupal\Core\Cache\NullBackend;
  * }
  * @phpstan-type ConnectionInfoArray array{
  *   'driver': string,
+ *   'module': string,
  *   'autoload': string,
  *   'namespace': string,
  *   'database': string,
@@ -48,7 +50,7 @@ use Drupal\Core\Cache\NullBackend;
  *   'collation'?: string,
  *   'pdo'?: array<mixed>,
  *   'isolation_level'?: int|string,
- *   'init_commands'?: array<string,string|int>,
+ *   'init_commands'?: array<string|int,string|int>,
  *   'dependencies'?: array<string,array{
  *     'autoload': string,
  *     'namespace': string,
@@ -68,7 +70,7 @@ abstract class Database {
   protected static array $connections = [];
 
   /**
-   * A processed copy of the database connection information from settings.php.
+   * The connection pararmeters of the connections, parsed from settings.php.
    *
    * @var array<string|int,array<string|int,ConnectionParametersInterface>>
    */
@@ -254,7 +256,7 @@ abstract class Database {
    * @param string|null $app_root
    *   (optional) The app root.
    *
-   * @return \Drupal\Core\Database\ConnectionParametersInterface
+   * @return ConnectionInfoArray
    *   A validated connection info array.
    *
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
@@ -262,9 +264,9 @@ abstract class Database {
    *
    * @see https://www.drupal.org/node/7654123
    */
-  final public static function parseConnectionInfo(array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): ConnectionParametersInterface {
+  final public static function parseConnectionInfo(array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): array {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersFactory::createFromArrayOptions() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    return ConnectionParametersFactory::createFromOptionsArray($info, $class_loader, $app_root);
+    return ConnectionParametersFactory::createFromOptionsArray($info, $class_loader, $app_root)->toArray();
   }
 
   /**
@@ -317,7 +319,7 @@ abstract class Database {
    *   (optional) The connection key for which to return information. If not
    *   specified, the 'default' connection key will be returned.
    *
-   * @return array<string|int,ConnectionParametersInterface>
+   * @return array<string|int,ConnectionInfoArray>
    *   An associative array of database information, keyed by target. Defaults
    *   to an empty array.
    */
@@ -334,7 +336,7 @@ abstract class Database {
   /**
    * Gets connection information for all available databases.
    *
-   * @return array<string|int,array<string|int,ConnectionParametersInterface>>
+   * @return array<string|int,array<string|int,ConnectionInfoArray>>
    *   An associative array of database information for all available database,
    *   keyed by the database key and target. Defaults to an empty array.
    */
@@ -547,7 +549,7 @@ abstract class Database {
    *   directories are excluded in the search. When NULL will be determined by
    *   the extension_discovery_scan_tests setting.
    *
-   * @return ConnectionParametersInterface
+   * @return ConnectionInfoArray
    *   The database connection info.
    *
    * @throws \InvalidArgumentException
@@ -561,7 +563,7 @@ abstract class Database {
    *
    * @see https://www.drupal.org/node/7654123
    */
-  public static function convertDbUrlToConnectionInfo(string $url, ?bool $include_test_drivers = NULL): ConnectionParametersInterface {
+  public static function convertDbUrlToConnectionInfo(string $url, ?bool $include_test_drivers = NULL): ConnectionInfoArray {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersFactory::createFromUrl() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     return ConnectionParametersFactory::createFromUrl($url, $include_test_drivers);
   }

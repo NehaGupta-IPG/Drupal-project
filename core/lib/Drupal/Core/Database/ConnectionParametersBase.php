@@ -6,6 +6,10 @@ namespace Drupal\Core\Database;
 
 /**
  * Base class for connection parameters objects.
+ *
+ * @phpstan-import-type ConnectionInfoArray from \Drupal\Core\Database\Database
+ *
+ * @implements \ArrayAccess<string|int,int|string|float|bool|array|null>
  */
 abstract class ConnectionParametersBase implements ConnectionParametersInterface, \ArrayAccess {
 
@@ -111,9 +115,16 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     }
     $options['unknownOptions'] = $unknownOptions;
 
+    /** @var ConnectionInfoArray $options */
     return $options;
   }
 
+  /**
+   * Constructor.
+   *
+   * @param array<string|int,int|string|float|bool|array|null> $unknownOptions
+   *   The options that are not relevant for the driver.
+   */
   public function __construct(
     // Unknown connection options. The user input may include options that the
     // driver cannot handle, but we still can provide access to them.
@@ -139,7 +150,9 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * {@inheritdoc}
    */
   public function getConnectionClass(): string {
-    return $this->namespace . '\\Connection';
+    /** @var class-string<Connection> $class */
+    $class = $this->namespace . '\\Connection';
+    return $class;
   }
 
   /**
@@ -148,7 +161,9 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   public function toArray(): array {
     $tmp = get_object_vars($this);
     unset($tmp['unknownOptions']);
-    return array_merge($this->unknownOptions, $tmp);
+    /** @var ConnectionInfoArray $tmp */
+    $tmp = array_merge($this->unknownOptions, $tmp);
+    return $tmp;
   }
 
   /**
@@ -156,19 +171,19 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public function asUrl(): string {
     $user = '';
-    if (isset($this->username)) {
+    if (property_exists($this, 'username') && is_string($this->username)) {
       $user = $this->username;
-      if (isset($this->password)) {
+      if (property_exists($this, 'password') && is_string($this->password)) {
         $user .= ':' . $this->password;
       }
       $user .= '@';
     }
 
-    $host = empty($this->host) ? 'localhost' : $this->host;
+    $host = property_exists($this, 'host') && is_string($this->host) ? $this->host : 'localhost';
 
     $url = $this->driver . '://' . $user . $host;
 
-    if (isset($this->port)) {
+    if (property_exists($this, 'port') && is_string($this->port)) {
       $url .= ':' . $this->port;
     }
 
@@ -215,6 +230,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * This is for BC support only.
    */
   public function offsetExists(mixed $offset): bool {
+    $offset = (string) $offset;
     if (property_exists($this, $offset)) {
       return TRUE;
     }
@@ -225,12 +241,14 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * This is for BC support only.
    */
   public function &offsetGet(mixed $offset): mixed {
+    $offset = (string) $offset;
     if (property_exists($this, $offset)) {
       // Need to use a temp variable and not $this->{$offset} directly here
       // because if properties are defined as readonly, the & reference
       // operator in the method name would result in an attempt to modify the
       // property value.
       $tmp = $this->{$offset};
+      assert(is_null($tmp) || is_bool($tmp) || is_string($tmp) || is_numeric($tmp) || is_array($tmp));
       return $tmp;
     }
     return $this->unknownOptions[$offset];
@@ -240,6 +258,8 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * This is for BC support only.
    */
   public function offsetSet(mixed $offset, mixed $value): void {
+    $offset = (string) $offset;
+    assert(is_null($value) || is_bool($value) || is_string($value) || is_numeric($value));
     if (property_exists($this, $offset)) {
       $this->arrayAccessPropertySetting = TRUE;
       $this->{$offset} = $value;
@@ -253,6 +273,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * This is for BC support only.
    */
   public function offsetUnset(mixed $offset): void {
+    $offset = (string) $offset;
     if (property_exists($this, $offset)) {
       $this->{$offset} = NULL;
       return;
