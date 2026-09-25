@@ -118,13 +118,14 @@ abstract class ConnectionParametersFactory {
     }
 
     /** @var array{
-      'driver': string,
-      'namespace': string,
-      'autoload': string,
-      'database': string,
-      'prefix': string,
-      'module': string,
-      } $options */
+     *     'driver': string,
+     *     'namespace': string,
+     *     'autoload': string,
+     *     'database': string,
+     *     'prefix': string,
+     *     'module': string,
+     *   } $options
+     */
     $options = ConnectionParametersBase::processOptionsArray($options);
     return new class (...$options) extends ConnectionParametersBase {
 

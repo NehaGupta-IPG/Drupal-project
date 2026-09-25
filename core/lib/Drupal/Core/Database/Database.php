@@ -70,7 +70,7 @@ abstract class Database {
   protected static array $connections = [];
 
   /**
-   * The connection pararmeters of the connections, parsed from settings.php.
+   * The connection parameters of the connections, parsed from settings.php.
    *
    * @var array<string|int,array<string|int,ConnectionParametersInterface>>
    */
