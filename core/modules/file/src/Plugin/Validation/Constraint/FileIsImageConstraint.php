@@ -18,11 +18,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class FileIsImageConstraint extends SymfonyConstraint {
 
-  /**
-   * The error message.
-   *
-   * @var string
-   */
-  public string $message = 'The image file is invalid or the image type is not allowed. Allowed types: %types';
+  public function __construct(
+    public string $message = 'The image file is invalid or the image type is not allowed. Allowed types: %types',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

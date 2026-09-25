@@ -7,11 +7,12 @@ use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Menu\LocalActionManagerInterface;
-use Drupal\Core\Plugin\Context\LazyContextRepository;
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides a list of block plugins to be added to the layout.
@@ -51,30 +52,18 @@ class BlockLibraryController extends ControllerBase {
    *
    * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
    *   The block manager.
-   * @param \Drupal\Core\Plugin\Context\LazyContextRepository $context_repository
+   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
    *   The context repository.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The current route match.
    * @param \Drupal\Core\Menu\LocalActionManagerInterface $local_action_manager
    *   The local action manager.
    */
-  public function __construct(BlockManagerInterface $block_manager, LazyContextRepository $context_repository, RouteMatchInterface $route_match, LocalActionManagerInterface $local_action_manager) {
+  public function __construct(BlockManagerInterface $block_manager, ContextRepositoryInterface $context_repository, RouteMatchInterface $route_match, LocalActionManagerInterface $local_action_manager) {
     $this->blockManager = $block_manager;
     $this->routeMatch = $route_match;
     $this->localActionManager = $local_action_manager;
     $this->contextRepository = $context_repository;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('plugin.manager.block'),
-      $container->get('context.repository'),
-      $container->get('current_route_match'),
-      $container->get('plugin.manager.menu.local_action')
-    );
   }
 
   /**
@@ -88,6 +77,15 @@ class BlockLibraryController extends ControllerBase {
    * @return array
    *   A render array as expected by the renderer.
    */
+  #[Route(
+    path: '/admin/structure/block/library/{theme}',
+    name: 'block.admin_library',
+    requirements: [
+      '_access_theme' => 'TRUE',
+      '_permission' => 'administer blocks',
+    ],
+    defaults: ['_title' => new TranslatableMarkup('Place block')],
+  )]
   public function listBlocks(Request $request, $theme) {
     // Since modals do not render any other part of the page, we need to render
     // them manually as part of this listing.

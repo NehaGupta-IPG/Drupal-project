@@ -7,12 +7,12 @@ module.exports.assertion = function (expected) {
     const deprecationMessages =
       sessionStorageEntries !== null
         ? sessionStorageEntries.filter((message) =>
-            new RegExp('[Deprecation]').test(message),
+            message.includes('[Deprecation]'),
           )
         : [];
 
     return deprecationMessages.map((message) =>
-      message.replace('[Deprecation] ', ''),
+      message.replace(/.*\[Deprecation\] /, ''),
     );
   };
   this.command = (callback) =>

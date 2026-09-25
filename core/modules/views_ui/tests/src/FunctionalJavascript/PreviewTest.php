@@ -8,12 +8,14 @@ use Behat\Mink\Element\NodeElement;
 use Drupal\Core\Database\Database;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the UI preview functionality.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class PreviewTest extends WebDriverTestBase {
 
   /**
@@ -67,7 +69,8 @@ class PreviewTest extends WebDriverTestBase {
    * using it, it cannot be enabled normally.
    */
   protected function enableViewsTestModule(): void {
-    // Define the schema and views data variable before enabling the test module.
+    // Define the schema and views data variable before enabling the test
+    // module.
     \Drupal::state()->set('views_test_data_schema', $this->schemaDefinition());
     \Drupal::state()->set('views_test_data_views_data', $this->viewsData());
 
@@ -135,7 +138,7 @@ class PreviewTest extends WebDriverTestBase {
     $this->getPreviewAJAX('test_pager_full_ajax', 'default', 5);
 
     // Test that the pager is present and rendered.
-    $elements = $this->xpath('//ul[contains(@class, "pager__items")]/li');
+    $elements = $this->getNodeElementsByXpath('//ul[contains(@class, "pager__items")]/li');
     $this->assertNotEmpty($elements);
 
     // Verify elements and links to pages.
@@ -161,7 +164,7 @@ class PreviewTest extends WebDriverTestBase {
     $this->clickPreviewLinkAJAX($element, 5);
 
     // Test that the pager is present and rendered.
-    $elements = $this->xpath('//ul[contains(@class, "pager__items")]/li');
+    $elements = $this->getNodeElementsByXpath('//ul[contains(@class, "pager__items")]/li');
     $this->assertNotEmpty($elements);
 
     // Verify elements and links to pages.
@@ -193,7 +196,7 @@ class PreviewTest extends WebDriverTestBase {
     $this->getPreviewAJAX('test_mini_pager_ajax', 'default', 3);
 
     // Test that the pager is present and rendered.
-    $elements = $this->xpath('//ul[contains(@class, "pager__items")]/li');
+    $elements = $this->getNodeElementsByXpath('//ul[contains(@class, "pager__items")]/li');
     $this->assertNotEmpty($elements);
 
     // Verify elements and links to pages.
@@ -209,7 +212,7 @@ class PreviewTest extends WebDriverTestBase {
     $this->clickPreviewLinkAJAX($next_page_link, 3);
 
     // Test that the pager is present and rendered.
-    $elements = $this->xpath('//ul[contains(@class, "pager__items")]/li');
+    $elements = $this->getNodeElementsByXpath('//ul[contains(@class, "pager__items")]/li');
     $this->assertNotEmpty($elements);
 
     // Verify elements and links to pages.
@@ -259,7 +262,7 @@ class PreviewTest extends WebDriverTestBase {
    * @param int $row_count
    *   The expected number of rows in the preview.
    */
-  protected function getPreviewAJAX($view_name, $panel_id, $row_count): void {
+  protected function getPreviewAJAX(string $view_name, string $panel_id, int $row_count): void {
     $this->drupalGet('admin/structure/views/view/' . $view_name . '/edit/' . $panel_id);
     $this->getSession()->getPage()->pressButton('Update preview');
     $this->assertSession()->assertWaitOnAjaxRequest();
@@ -274,7 +277,7 @@ class PreviewTest extends WebDriverTestBase {
    * @param int $row_count
    *   The expected number of rows in the preview.
    */
-  protected function clickPreviewLinkAJAX(NodeElement $element, $row_count): void {
+  protected function clickPreviewLinkAJAX(NodeElement $element, int $row_count): void {
     $element->click();
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertPreviewAJAX($row_count);

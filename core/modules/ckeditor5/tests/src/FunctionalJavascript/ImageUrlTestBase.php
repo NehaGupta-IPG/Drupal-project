@@ -12,12 +12,11 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 // cspell:ignore imageresize
 
 /**
- * @coversDefaultClass \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Image
- * @group ckeditor5
- * @group #slow
+ * Provides a base class for testing CKEditor 5 image URL insertion.
+ *
  * @internal
  */
-class ImageUrlTestBase extends ImageTestBase {
+abstract class ImageUrlTestBase extends ImageTestBase {
 
   /**
    * {@inheritdoc}
@@ -65,7 +64,7 @@ class ImageUrlTestBase extends ImageTestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(

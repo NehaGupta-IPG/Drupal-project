@@ -39,7 +39,7 @@ abstract class FieldTestBase extends BrowserTestBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to test.
    * @param string $field_name
-   *   The name of the field to test
+   *   The name of the field to test.
    * @param array $expected_values
    *   The array of expected values.
    * @param string $langcode
@@ -48,7 +48,7 @@ abstract class FieldTestBase extends BrowserTestBase {
    * @param string $column
    *   (Optional) The name of the column to check. Defaults to 'value'.
    */
-  public function assertFieldValues(EntityInterface $entity, $field_name, $expected_values, $langcode = LanguageInterface::LANGCODE_DEFAULT, $column = 'value') {
+  public function assertFieldValues(EntityInterface $entity, $field_name, \Countable|iterable $expected_values, $langcode = LanguageInterface::LANGCODE_DEFAULT, $column = 'value'): void {
     // Re-load the entity to make sure we have the latest changes.
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($entity->getEntityTypeId());

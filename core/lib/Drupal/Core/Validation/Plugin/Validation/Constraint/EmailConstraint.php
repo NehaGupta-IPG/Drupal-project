@@ -21,9 +21,15 @@ class EmailConstraint extends Email {
   /**
    * {@inheritdoc}
    */
-  public function __construct(...$args) {
+  public function __construct(
+    ?string $message = NULL,
+    ?string $mode = NULL,
+    ?callable $normalizer = NULL,
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(NULL, $message, $mode, $normalizer, $groups, $payload);
     $this->mode = static::VALIDATION_MODE_STRICT;
-    parent::__construct(...$args);
   }
 
   /**

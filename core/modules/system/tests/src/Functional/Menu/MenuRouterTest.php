@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Menu;
 
 use Drupal\Core\Url;
+use Drupal\menu_test\MenuTestHelper;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests menu router and default menu link functionality.
- *
- * @group Menu
  */
+#[Group('Menu')]
+#[RunTestsInSeparateProcesses]
 class MenuRouterTest extends BrowserTestBase {
 
   /**
@@ -121,7 +124,7 @@ class MenuRouterTest extends BrowserTestBase {
 
     // Change the menu_name parameter in menu_test.module, then force a menu
     // rebuild.
-    menu_test_menu_name('changed');
+    MenuTestHelper::menuName('changed');
     $menu_link_manager->rebuild();
 
     $menu_links = $menu_link_manager->loadLinksByRoute('menu_test.menu_name_test');
@@ -246,8 +249,8 @@ class MenuRouterTest extends BrowserTestBase {
    * Tests theme integration.
    */
   public function testThemeIntegration(): void {
-    $this->defaultTheme = 'olivero';
-    $this->adminTheme = 'claro';
+    $this->defaultTheme = 'stark';
+    $this->adminTheme = 'default_admin';
 
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = $this->container->get('theme_installer');
@@ -273,8 +276,8 @@ class MenuRouterTest extends BrowserTestBase {
    */
   protected function doTestThemeCallbackAdministrative(): void {
     $this->drupalGet('menu-test/theme-callback/use-admin-theme');
-    $this->assertSession()->pageTextContains('Active theme: claro. Actual theme: claro.');
-    $this->assertSession()->responseContains('claro/css/base/elements.css');
+    $this->assertSession()->pageTextContains('Active theme: default_admin. Actual theme: default_admin.');
+    $this->assertSession()->responseContains('default_admin/css/base/elements.css');
   }
 
   /**
@@ -286,16 +289,17 @@ class MenuRouterTest extends BrowserTestBase {
     // For a regular user, the fact that the site is in maintenance mode means
     // we expect the theme callback system to be bypassed entirely.
     $this->drupalGet('menu-test/theme-callback/use-admin-theme');
-    // Check that the maintenance theme's CSS appears on the page.
-    $this->assertSession()->responseContains('olivero/css/base/base.css');
+    // Since Stark does not provide any CSS, check there is no CSS provided
+    // by themes.
+    $this->assertSession()->responseNotMatches('/themes\/.*\.css/');
 
     // An administrator, however, should continue to see the requested theme.
     $admin_user = $this->drupalCreateUser(['access site in maintenance mode']);
     $this->drupalLogin($admin_user);
     $this->drupalGet('menu-test/theme-callback/use-admin-theme');
-    $this->assertSession()->pageTextContains('Active theme: claro. Actual theme: claro.');
+    $this->assertSession()->pageTextContains('Active theme: default_admin. Actual theme: default_admin.');
     // Check that the administrative theme's CSS appears on the page.
-    $this->assertSession()->responseContains('claro/css/base/elements.css');
+    $this->assertSession()->responseContains('default_admin/css/base/elements.css');
 
     $this->container->get('state')->set('system.maintenance_mode', FALSE);
   }
@@ -306,9 +310,9 @@ class MenuRouterTest extends BrowserTestBase {
   protected function doTestThemeCallbackOptionalTheme(): void {
     // Request a theme that is not installed.
     $this->drupalGet('menu-test/theme-callback/use-test-theme');
-    $this->assertSession()->pageTextContains('Active theme: olivero. Actual theme: olivero.');
+    $this->assertSession()->pageTextContains('Active theme: stark. Actual theme: stark.');
     // Check that the default theme's CSS appears on the page.
-    $this->assertSession()->responseContains('olivero/css/base/base.css');
+    $this->assertSession()->responseNotMatches('/themes\/.*\.css/');
 
     // Now install the theme and request it again.
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
@@ -328,9 +332,10 @@ class MenuRouterTest extends BrowserTestBase {
    */
   protected function doTestThemeCallbackFakeTheme(): void {
     $this->drupalGet('menu-test/theme-callback/use-fake-theme');
-    $this->assertSession()->pageTextContains('Active theme: olivero. Actual theme: olivero.');
-    // Check that the default theme's CSS appears on the page.
-    $this->assertSession()->responseContains('olivero/css/base/base.css');
+    $this->assertSession()->pageTextContains('Active theme: stark. Actual theme: stark.');
+    // Check that the default theme's CSS appears on the page. Stark does not
+    // provide css.
+    $this->assertSession()->responseNotMatches('/themes\/.*\.css/');
   }
 
   /**
@@ -338,9 +343,9 @@ class MenuRouterTest extends BrowserTestBase {
    */
   protected function doTestThemeCallbackNoThemeRequested(): void {
     $this->drupalGet('menu-test/theme-callback/no-theme-requested');
-    $this->assertSession()->pageTextContains('Active theme: olivero. Actual theme: olivero.');
+    $this->assertSession()->pageTextContains('Active theme: stark. Actual theme: stark.');
     // Check that the default theme's CSS appears on the page.
-    $this->assertSession()->responseContains('olivero/css/base/base.css');
+    $this->assertSession()->responseNotMatches('/themes\/.*\.css/');
   }
 
 }

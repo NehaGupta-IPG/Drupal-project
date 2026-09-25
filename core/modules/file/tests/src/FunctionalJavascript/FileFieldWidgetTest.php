@@ -9,12 +9,15 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\Tests\file\Functional\FileFieldCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the file field widget, single and multi-valued, using AJAX upload.
- *
- * @group file
  */
+#[Group('file')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class FileFieldWidgetTest extends WebDriverTestBase {
 
   use FieldUiTestTrait;
@@ -93,14 +96,14 @@ class FileFieldWidgetTest extends WebDriverTestBase {
       $remaining = 3;
       // Test clicking each "Remove" button. For extra robustness, test them out
       // of sequential order. They are 0-indexed, and get renumbered after each
-      // iteration, so array(1, 1, 0) means:
+      // iteration, so [1, 1, 0] means:
       // - First remove the 2nd file.
       // - Then remove what is then the 2nd file (was originally the 3rd file).
       // - Then remove the first file.
       foreach ([1, 1, 0] as $delta) {
         // Ensure we have the expected number of Remove buttons, and that they
         // are numbered sequentially.
-        $buttons = $this->xpath('//input[@type="submit" and @value="Remove"]');
+        $buttons = $this->getNodeElementsByXpath('//input[@type="submit" and @value="Remove"]');
         $this->assertCount($num_expected_remove_buttons, $buttons, 'There are ' . $num_expected_remove_buttons . ' "Remove" buttons displayed.');
         foreach ($buttons as $i => $button) {
           $key = $i >= $remaining ? $i - $remaining : $i;

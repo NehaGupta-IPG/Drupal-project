@@ -4,6 +4,7 @@ namespace Drupal\sqlite\Driver\Database\sqlite;
 
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\StatementPrefetchIterator;
+use Drupal\Core\Database\Statement\FetchAs;
 
 /**
  * SQLite implementation of \Drupal\Core\Database\Statement.
@@ -86,6 +87,8 @@ class Statement extends StatementPrefetchIterator implements StatementInterface 
    * {@inheritdoc}
    */
   public function execute($args = [], $options = []) {
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to execute() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
+
     try {
       $return = parent::execute($args, $options);
     }
@@ -97,7 +100,8 @@ class Statement extends StatementPrefetchIterator implements StatementInterface 
       // @see http://www.sqlite.org/faq.html#q15
       // @see http://www.sqlite.org/rescode.html#schema
       if (!empty($e->errorInfo[1]) && $e->errorInfo[1] === 17) {
-        // The schema has changed. SQLite specifies that we must resend the query.
+        // The schema has changed. SQLite specifies that we must resend the
+        // query.
         $return = parent::execute($args, $options);
       }
       else {

@@ -288,7 +288,7 @@ final class HTMLRestrictions {
         if (array_key_exists('*', $html_tag_attribute_restrictions)) {
           throw new \InvalidArgumentException(sprintf('The "%s" HTML tag has an attribute restriction "%s" with a "*" allowed attribute value. This implies all attributes values are allowed. Remove the attribute value restriction instead, or use a prefix (`*-foo`), infix (`*-foo-*`) or suffix (`foo-*`) wildcard restriction instead.', $html_tag_name, $html_tag_attribute_name));
         }
-        // @codingStandardsIgnoreLine
+        // phpcs:ignore Drupal.Functions.MultiLineFunctionDeclaration.ContentAfterBrace, Drupal.WhiteSpace.CloseBracketSpacing.ClosingWhitespace, Drupal.WhiteSpace.OpenBracketSpacing.OpeningWhitespace, Drupal.WhiteSpace.ScopeClosingBrace.Line
         if (!Inspector::assertAll(function ($v) { return $v === TRUE; }, $html_tag_attribute_restrictions)) {
           throw new \InvalidArgumentException(sprintf('The "%s" HTML tag has attribute restriction "%s", but it is not an array of key-value pairs, with HTML tag attribute values as keys and TRUE as values.', $html_tag_name, $html_tag_attribute_name));
         }
@@ -393,6 +393,7 @@ final class HTMLRestrictions {
    * Creates the empty set of HTML restrictions: nothing is allowed.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
+   *   The empty set of HTML restrictions.
    */
   public static function emptySet(): HTMLRestrictions {
     return new self([]);
@@ -402,6 +403,7 @@ final class HTMLRestrictions {
    * Whether this set of HTML restrictions is unrestricted.
    *
    * @return bool
+   *   TRUE if the set of HTML restrictions is unrestricted, FALSE otherwise.
    */
   public function isUnrestricted(): bool {
     return $this->unrestricted;
@@ -411,6 +413,7 @@ final class HTMLRestrictions {
    * Whether this set of HTML restrictions allows nothing.
    *
    * @return bool
+   *   TRUE if the set of HTML restrictions allows nothing, FALSE otherwise.
    *
    * @see ::emptySet()
    */
@@ -428,6 +431,7 @@ final class HTMLRestrictions {
    *   A filter plugin instance to construct a HTML restrictions object for.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
+   *   The HTML restrictions object.
    */
   public static function fromFilterPluginInstance(FilterInterface $filter): HTMLRestrictions {
     return self::fromObjectWithHtmlRestrictions($filter);
@@ -440,6 +444,7 @@ final class HTMLRestrictions {
    *   A text format to construct a HTML restrictions object for.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
+   *   The HTML restrictions object.
    */
   public static function fromTextFormat(FilterFormatInterface $text_format): HTMLRestrictions {
     return self::fromObjectWithHtmlRestrictions($text_format);
@@ -449,6 +454,7 @@ final class HTMLRestrictions {
    * Constructs an unrestricted set of HTML restrictions.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
+   *   The HTML restrictions object.
    */
   private static function unrestricted(): self {
     $restrictions = HTMLRestrictions::emptySet();
@@ -470,6 +476,7 @@ final class HTMLRestrictions {
    *   object for.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
+   *   The HTML restrictions object.
    *
    * @see ::fromFilterPluginInstance()
    * @see ::fromTextFormat()
@@ -485,7 +492,7 @@ final class HTMLRestrictions {
     }
 
     // When allowing all tags on an attribute, transform FilterHtml output from
-    // ['tag' => ['*'=> TRUE]] to ['tag' => TRUE]
+    // "['tag' => ['*'=> TRUE]]" to "['tag' => TRUE]".
     $allowed = $restrictions['allowed'];
     foreach ($allowed as $element => $attributes) {
       if (is_array($attributes) && isset($attributes['*']) && $attributes['*'] === TRUE) {
@@ -530,6 +537,7 @@ final class HTMLRestrictions {
    *   A string representing a list of allowed HTML elements.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
+   *   The HTML restrictions object.
    *
    * @see ::toFilterHtmlAllowedTagsString()
    * @see ::toCKEditor5ElementsArray()
@@ -572,7 +580,7 @@ final class HTMLRestrictions {
     }
 
     // When allowing all tags on an attribute, transform FilterHtml output from
-    // ['tag' => ['*'=> TRUE]] to ['tag' => TRUE]
+    // "['tag' => ['*'=> TRUE]]" to "['tag' => TRUE]".
     foreach ($allowed_elements as $element => $attributes) {
       if (is_array($attributes) && isset($attributes['*']) && $attributes['*'] === TRUE) {
         $allowed_elements[$element] = TRUE;
@@ -617,8 +625,8 @@ final class HTMLRestrictions {
       // - An array value for a given tag/attribute provides an array keyed by
       //   specific attributes/attribute values with boolean values determining
       //   if they are allowed or not.
-      // - A value of TRUE for a given tag/attribute permits all attributes/attribute
-      //   values for that tag/attribute.
+      // - A value of TRUE for a given tag/attribute permits all
+      //   attributes/attribute values for that tag/attribute.
       // @see \Drupal\filter\Entity\FilterFormat::getHtmlRestrictions()
       function ($value, string $tag) use ($other) {
         // If this HTML restrictions object contains a tag that the other did
@@ -835,8 +843,10 @@ final class HTMLRestrictions {
       if (!(is_array($this->elements[$tag]) && is_array($other->elements[$tag]))) {
         continue;
       }
-      $other_wildcard_attributes = array_filter(array_keys($other->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
-      $this_wildcard_attributes = array_filter(array_keys($this->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
+      $other_wildcard_attributes = array_filter(
+        array_keys($other->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
+      $this_wildcard_attributes = array_filter(
+        array_keys($this->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
 
       // If the same wildcard attribute restrictions are present in both or
       // neither, no adjustment necessary: the intersection is already correct.
@@ -1020,10 +1030,10 @@ final class HTMLRestrictions {
 
     // Using the PHP array union operator is safe because the two operation
     // result arrays ensure there is no overlap between the array keys.
-    // @codingStandardsIgnoreStart
+    // phpcs:disable Drupal.Functions.MultiLineFunctionDeclaration.ContentAfterBrace, Drupal.WhiteSpace.CloseBracketSpacing.ClosingWhitespace, Drupal.WhiteSpace.OpenBracketSpacing.OpeningWhitespace, Drupal.WhiteSpace.ScopeClosingBrace.Line, Generic.Formatting.DisallowMultipleStatements.SameLine
     assert(Inspector::assertAll(function ($t) { return self::isWildcardTag($t); }, array_keys($wildcard_op_result->elements)));
     assert(Inspector::assertAll(function ($t) { return !self::isWildcardTag($t); }, array_keys($concrete_op_result->elements)));
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 
     return new self($concrete_op_result->elements + $wildcard_op_result->elements);
   }
@@ -1094,7 +1104,7 @@ final class HTMLRestrictions {
   }
 
   /**
-   * Extracts the subset of plain tags (attributes omitted) from allowed elements.
+   * Extracts plain tags (attributes omitted) from allowed elements.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
    *   The extracted subset of the given set of HTML restrictions.
@@ -1180,6 +1190,7 @@ final class HTMLRestrictions {
    *   applied hence no resolved wildcards).
    *
    * @return array
+   *   The allowed elements.
    *
    * @see \Drupal\filter\Plugin\FilterInterface::getHTMLRestrictions()
    */
@@ -1236,6 +1247,8 @@ final class HTMLRestrictions {
       array_push($readable, $joined);
     }
     assert(Inspector::assertAllStrings($readable));
+
+    sort($readable);
     return $readable;
   }
 

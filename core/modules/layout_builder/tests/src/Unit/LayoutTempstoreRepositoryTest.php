@@ -9,16 +9,21 @@ use Drupal\Core\TempStore\SharedTempStoreFactory;
 use Drupal\layout_builder\LayoutTempstoreRepository;
 use Drupal\layout_builder\SectionStorageInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\layout_builder\LayoutTempstoreRepository
- * @group layout_builder
+ * Tests Drupal\layout_builder\LayoutTempstoreRepository.
  */
+#[CoversClass(LayoutTempstoreRepository::class)]
+#[Group('layout_builder')]
 class LayoutTempstoreRepositoryTest extends UnitTestCase {
 
   /**
-   * @covers ::get
-   * @covers ::has
+   * Tests get empty tempstore.
+   *
+   * @legacy-covers ::get
+   * @legacy-covers ::has
    */
   public function testGetEmptyTempstore(): void {
     $section_storage = $this->prophesize(SectionStorageInterface::class);
@@ -40,8 +45,10 @@ class LayoutTempstoreRepositoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::get
-   * @covers ::has
+   * Tests get loaded tempstore.
+   *
+   * @legacy-covers ::get
+   * @legacy-covers ::has
    */
   public function testGetLoadedTempstore(): void {
     $section_storage = $this->prophesize(SectionStorageInterface::class);
@@ -64,7 +71,7 @@ class LayoutTempstoreRepositoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::get
+   * Tests get invalid entry.
    */
   public function testGetInvalidEntry(): void {
     $section_storage = $this->prophesize(SectionStorageInterface::class);
@@ -80,7 +87,7 @@ class LayoutTempstoreRepositoryTest extends UnitTestCase {
     $repository = new LayoutTempstoreRepository($tempstore_factory->reveal());
 
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage('The entry with storage type "my_storage_type" and ID "my_storage_id" is invalid');
+    $this->expectExceptionMessageIs('The entry with storage type "my_storage_type" and ID "my_storage_id" is invalid');
     $repository->get($section_storage->reveal());
   }
 

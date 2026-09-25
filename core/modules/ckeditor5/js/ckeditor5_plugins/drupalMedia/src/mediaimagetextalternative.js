@@ -1,5 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Plugin } from 'ckeditor5/src/core';
+/* cspell:ignore mediaimagetextalternative mediaimagetextalternativeediting */
+/* cspell:ignore mediaimagetextalternativeui */
+import { Plugin } from 'ckeditor5';
 import MediaImageTextAlternativeEditing from './mediaimagetextalternative/mediaimagetextalternativeediting';
 import MediaImageTextAlternativeUi from './mediaimagetextalternative/mediaimagetextalternativeui';
 

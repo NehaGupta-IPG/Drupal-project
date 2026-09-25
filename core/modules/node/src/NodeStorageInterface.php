@@ -19,6 +19,11 @@ interface NodeStorageInterface extends ContentEntityStorageInterface {
    *
    * @return int[]
    *   Node revision IDs (in ascending order).
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use an
+   *   entity query instead.
+   *
+   * @see https://www.drupal.org/node/3519187
    */
   public function revisionIds(NodeInterface $node);
 
@@ -30,6 +35,11 @@ interface NodeStorageInterface extends ContentEntityStorageInterface {
    *
    * @return int[]
    *   Node revision IDs (in ascending order).
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use an
+   *    entity query instead.
+   *
+   * @see https://www.drupal.org/node/3519187
    */
   public function userRevisionIds(AccountInterface $account);
 
@@ -41,21 +51,13 @@ interface NodeStorageInterface extends ContentEntityStorageInterface {
    *
    * @return int
    *   The number of revisions in the default language.
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3519187
    */
   public function countDefaultLanguageRevisions(NodeInterface $node);
-
-  /**
-   * Updates all nodes of one type to be of another type.
-   *
-   * @param string $old_type
-   *   The current node type of the nodes.
-   * @param string $new_type
-   *   The new node type of the nodes.
-   *
-   * @return int
-   *   The number of nodes whose node type field was modified.
-   */
-  public function updateType($old_type, $new_type);
 
   /**
    * Unsets the language for all nodes with the given language.

@@ -6,18 +6,21 @@ namespace Drupal\Tests\views\Unit\Plugin\filter;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\filter\FilterPluginBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\views\Plugin\views\filter\FilterPluginBase
- * @group views
+ * Tests Drupal\views\Plugin\views\filter\FilterPluginBase.
  */
+#[CoversClass(FilterPluginBase::class)]
+#[Group('views')]
 class FilterPluginBaseTest extends UnitTestCase {
 
   /**
-   * @covers ::acceptExposedInput
-   *
-   * @dataProvider acceptExposedInputProvider
+   * Tests accept exposed input.
    */
+  #[DataProvider('acceptExposedInputProvider')]
   public function testAcceptExposedInput(bool $expected_result, array $options, array $input): void {
     $definition = [
       'title' => 'Accept exposed input Test',
@@ -34,7 +37,7 @@ class FilterPluginBaseTest extends UnitTestCase {
    * @return array
    *   The data set.
    */
-  public static function acceptExposedInputProvider() {
+  public static function acceptExposedInputProvider(): array {
     return [
       'not-exposed' => [TRUE, ['exposed' => FALSE], []],
       'exposed-no-input' => [TRUE, ['exposed' => TRUE], []],
@@ -63,4 +66,7 @@ class FilterPluginBaseTest extends UnitTestCase {
 
 }
 
+/**
+ * Empty class to support testing filter plugins.
+ */
 class FilterPluginBaseStub extends FilterPluginBase {}

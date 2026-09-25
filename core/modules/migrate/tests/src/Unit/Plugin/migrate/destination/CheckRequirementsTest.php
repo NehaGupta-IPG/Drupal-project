@@ -7,16 +7,16 @@ namespace Drupal\Tests\migrate\Unit\Plugin\migrate\destination;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Tests\UnitTestCase;
 use Drupal\migrate\Exception\RequirementsException;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\destination\Config;
+use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests check requirements exception on DestinationBase.
- *
- * @group migrate
  */
+#[Group('migrate')]
 class CheckRequirementsTest extends UnitTestCase {
 
   /**
@@ -33,7 +33,7 @@ class CheckRequirementsTest extends UnitTestCase {
       $this->prophesize(TypedConfigManagerInterface::class)->reveal(),
     );
     $this->expectException(RequirementsException::class);
-    $this->expectExceptionMessage("Destination plugin 'test' did not meet the requirements");
+    $this->expectExceptionMessageIs("Destination plugin 'test' did not meet the requirements");
     $destination->checkRequirements();
   }
 

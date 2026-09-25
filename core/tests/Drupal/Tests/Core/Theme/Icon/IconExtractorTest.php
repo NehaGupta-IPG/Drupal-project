@@ -9,18 +9,18 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Theme\Icon\Attribute\IconExtractor;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Theme\Icon\Attribute\IconExtractor
- *
- * @group icon
+ * Tests Drupal\Core\Theme\Icon\Attribute\IconExtractor.
  */
+#[CoversClass(IconExtractor::class)]
+#[Group('icon')]
 class IconExtractorTest extends UnitTestCase {
 
   /**
    * The container.
-   *
-   * @var \Drupal\Core\DependencyInjection\ContainerBuilder
    */
   private ContainerBuilder $container;
 
@@ -31,7 +31,7 @@ class IconExtractorTest extends UnitTestCase {
     parent::setUp();
 
     $this->container = new ContainerBuilder();
-    $this->container->set('string_translation', $this->createMock(TranslationInterface::class));
+    $this->container->set('string_translation', $this->createStub(TranslationInterface::class));
     \Drupal::setContainer($this->container);
   }
 

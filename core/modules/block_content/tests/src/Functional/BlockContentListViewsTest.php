@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\block_content\Functional;
 
 use Drupal\block_content\Entity\BlockContent;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Views-powered listing of content blocks.
  *
- * @group block_content
  * @see \Drupal\block\BlockContentListBuilder
  * @see \Drupal\block_content\Tests\BlockContentListTest
  */
+#[Group('block_content')]
+#[RunTestsInSeparateProcesses]
 class BlockContentListViewsTest extends BlockContentTestBase {
 
   /**
@@ -180,7 +183,7 @@ class BlockContentListViewsTest extends BlockContentTestBase {
     $this->drupalGet('admin/content/block');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->linkNotExists('Add content block');
-    $matches = $this->xpath('//td[1]');
+    $matches = $this->getNodeElementsByXpath('//td[1]');
     $actual = $matches[0]->getText();
     $this->assertEquals($label, $actual, 'Label found for test block.');
     $this->assertSession()->linkNotExists('Edit');
@@ -194,7 +197,7 @@ class BlockContentListViewsTest extends BlockContentTestBase {
     $this->drupalGet('admin/content/block');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->linkExists('Add content block');
-    $matches = $this->xpath('//td/a');
+    $matches = $this->getNodeElementsByXpath('//td/a');
     $actual = $matches[0]->getText();
     $this->assertEquals($label, $actual, 'Label found for test block.');
     $this->assertSession()->linkByHrefExists('admin/content/block/' . $test_block->id());
