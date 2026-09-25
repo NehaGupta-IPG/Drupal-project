@@ -26,7 +26,7 @@
   <file>scripts/password-hash.php</file>
   <file>scripts/rebuild_token_calculator.php</file>
   <file>scripts/run-tests.php</file>
-  <file>scripts/update-countries.sh</file>
+  <file>scripts/update-countries.php</file>
 
   <!-- Only include specific sniffs that pass. This ensures that, if new sniffs are added, HEAD does not fail.-->
 
