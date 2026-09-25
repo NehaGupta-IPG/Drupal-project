@@ -180,13 +180,13 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
     if (!empty($this->definition['allow empty'])) {
       $operators += [
         'empty' => [
-          'title' => $this->t('Is empty (NULL)'),
+          'title' => $this->t('Is empty'),
           'method' => 'opEmpty',
           'short' => $this->t('empty'),
           'values' => 0,
         ],
         'not empty' => [
-          'title' => $this->t('Is not empty (NOT NULL)'),
+          'title' => $this->t('Is not empty'),
           'method' => 'opEmpty',
           'short' => $this->t('not empty'),
           'values' => 0,
@@ -493,13 +493,13 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
    */
   protected function opEmpty($field) {
     if ($this->operator == 'empty') {
-      $operator = "IS NULL";
+      $expression = "($field IS NULL OR $field = '')";
     }
     else {
-      $operator = "IS NOT NULL";
+      $expression = "($field IS NOT NULL AND $field <> '')";
     }
 
-    $this->query->addWhere($this->options['group'], $field, NULL, $operator);
+    $this->query->addWhereExpression($this->options['group'], $expression);
   }
 
 }

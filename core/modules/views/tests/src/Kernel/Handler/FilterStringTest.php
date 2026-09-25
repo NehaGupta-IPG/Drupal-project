@@ -888,6 +888,19 @@ class FilterStringTest extends ViewsKernelTestBase {
    * Tests filtering by string using the "empty" operator.
    */
   public function testFilterStringEmpty(): void {
+    $data_set = $this->dataSet();
+    Database::getConnection()->insert('views_test_data')
+      ->fields(array_keys($data_set[0]))
+      ->values([
+        'name' => 'Empty',
+        'age' => 31,
+        'job' => 'Tester',
+        'created' => gmmktime(0, 0, 0, 1, 3, 2000),
+        'status' => 1,
+        'description' => '',
+      ])
+      ->execute();
+
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -907,6 +920,48 @@ class FilterStringTest extends ViewsKernelTestBase {
       [
         'name' => 'Meredith',
       ],
+      [
+        'name' => 'Empty',
+      ],
+    ];
+    $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
+  }
+
+  /**
+   * Tests filtering by string using the "not empty" operator.
+   */
+  public function testFilterStringNotEmpty(): void {
+    $data_set = $this->dataSet();
+    Database::getConnection()->insert('views_test_data')
+      ->fields(array_keys($data_set[0]))
+      ->values([
+        'name' => 'Empty',
+        'age' => 31,
+        'job' => 'Tester',
+        'created' => gmmktime(0, 0, 0, 1, 3, 2000),
+        'status' => 1,
+        'description' => '',
+      ])
+      ->execute();
+
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+    $view->displayHandlers->get('default')->overrideOption('filters', [
+      'description' => [
+        'id' => 'description',
+        'table' => 'views_test_data',
+        'field' => 'description',
+        'relationship' => 'none',
+        'operator' => 'not empty',
+      ],
+    ]);
+
+    $this->executeView($view);
+    $resultset = [
+      ['name' => 'John'],
+      ['name' => 'George'],
+      ['name' => 'Ringo'],
+      ['name' => 'Paul'],
     ];
     $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
   }
