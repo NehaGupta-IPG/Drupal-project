@@ -8,6 +8,7 @@ use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormErrorHandlerInterface;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormValidator;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
@@ -450,6 +451,60 @@ class FormValidatorTest extends UnitTestCase {
     $form_state->expects($this->never())
       ->method('setError');
     $form_validator->validateForm('test_form_id', $form, $form_state);
+  }
+
+  /**
+   * Tests that AJAX required-field suppression preserves custom validation.
+   */
+  public function testElementValidateWithRequiredValidationSuppressedForAjax(): void {
+    $request_stack = new RequestStack();
+    $request_stack->push(Request::create('/test?' . FormBuilderInterface::AJAX_FORM_REQUEST . '=1'));
+    $this->callableResolver->method('getCallableFromDefinition')
+      ->willReturnArgument(0);
+    $form_validator = new FormValidator(
+      $request_stack,
+      $this->getStringTranslationStub(),
+      $this->csrfToken,
+      $this->logger,
+      $this->formErrorHandler,
+      $this->callableResolver,
+    );
+
+    $form['custom'] = [
+      '#type' => 'textfield',
+      '#title' => 'Custom',
+      '#value' => '',
+      '#needs_validation' => TRUE,
+      '#required' => TRUE,
+      '#parents' => ['custom'],
+      '#element_validate' => [
+        static function (array &$element, FormStateInterface $form_state): void {
+          $form_state->setError($element, 'Custom validation failed.');
+        },
+      ],
+    ];
+    // Use a separate element so the custom error cannot hide a required error
+    // recorded for the same element.
+    $form['required'] = [
+      '#type' => 'textfield',
+      '#title' => 'Required',
+      '#value' => '',
+      '#needs_validation' => TRUE,
+      '#required' => TRUE,
+      '#parents' => ['required'],
+    ];
+    $values = ['custom' => '', 'required' => ''];
+    $form_state = (new FormState())
+      ->setValues($values)
+      ->setTriggeringElement([
+        '#limit_validation_errors' => FALSE,
+        '#ajax' => ['suppress_required_fields_validation' => TRUE],
+      ]);
+
+    $form_validator->validateForm('test_form_id', $form, $form_state);
+
+    $this->assertSame(['custom' => 'Custom validation failed.'], $form_state->getErrors());
+    $this->assertSame($values, $form_state->getValues());
   }
 
   /**
