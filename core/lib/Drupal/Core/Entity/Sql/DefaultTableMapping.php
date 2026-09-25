@@ -12,6 +12,32 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 class DefaultTableMapping implements TableMappingInterface {
 
   /**
+   * Columns that every dedicated field table has regardless of field type.
+   *
+   * Unlike TableMappingInterface::getReservedColumns(), which is also used
+   * to validate a field type's own column names, this list is specific to
+   * resolving column names for a dedicated-table field (e.g. when building
+   * an index) and must not be used for that broader validation.
+   *
+   * A field type's own column takes precedence when its name collides with
+   * one of these (see getFieldColumnName()). This means a field type that
+   * owns e.g. its own "langcode" property (such as the contrib "address"
+   * field type) has no way to build an index against the table's built-in
+   * "langcode" column instead: any index naming "langcode" always resolves
+   * to the field's own column. This is a deliberate, permanent limitation,
+   * not a gap to be closed later - disambiguating the two would require
+   * disallowing field types from using these names for their own columns,
+   * which is a backward-incompatible change existing field types already
+   * violate, and is out of scope here. It does not regress anything: prior
+   * to this class distinguishing dedicated-table reserved columns from a
+   * field's own columns at all, there was no way to reference the table's
+   * built-in columns for indexing purposes either, colliding or not.
+   *
+   * @see \Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema::getDedicatedTableSchema()
+   */
+  const DEDICATED_TABLE_COLUMNS = ['bundle', 'deleted', 'entity_id', 'revision_id', 'langcode'];
+
+  /**
    * The entity type definition.
    *
    * @var \Drupal\Core\Entity\ContentEntityTypeInterface
@@ -436,7 +462,17 @@ class DefaultTableMapping implements TableMappingInterface {
         $column_name = 'delta';
       }
       else {
-        $column_name = !in_array($property_name, $this->getReservedColumns()) ? $field_name . '_' . $property_name : $property_name;
+        // A field's own columns always take precedence over the dedicated
+        // table's built-in reserved columns: some field types define their
+        // own property using one of those same names (e.g. the "address"
+        // field type has its own "langcode" property), and that must keep
+        // resolving to its normal, prefixed column rather than colliding
+        // with the table's own column of the same name.
+        $reserved_columns = array_diff(
+          array_merge($this->getReservedColumns(), static::DEDICATED_TABLE_COLUMNS),
+          array_keys($storage_definition->getColumns())
+        );
+        $column_name = !in_array($property_name, $reserved_columns) ? $field_name . '_' . $property_name : $property_name;
       }
     }
     else {

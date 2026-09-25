@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\Core\Field\FieldException;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field_test\FieldTestHelper;
@@ -487,6 +488,328 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
       $field_storage->setCardinality(++$cardinality);
       $field_storage->save();
     } while ($cardinality < 6);
+  }
+
+  /**
+   * Tests adding an index to a dedicated-table field storage that has data.
+   *
+   * The entity_test entity type is not revisionable, so its dedicated field
+   * tables have no revision counterpart. Updating the indexes of a field
+   * storage that already has data goes through
+   * SqlContentEntityStorageSchema::updateDedicatedTableSchema(), which must
+   * not assume a revision table exists for every entity type.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3305627
+   */
+  public function testUpdateIndexesWithDataNonRevisionable(): void {
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_update_indexes',
+      'entity_type' => 'entity_test',
+      'type' => 'test_field',
+      // Force dedicated-table storage.
+      'cardinality' => 2,
+    ]);
+    $field_storage->save();
+    FieldConfig::create([
+      'field_storage' => $field_storage,
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+    ])->save();
+
+    // Save an entity so the field's dedicated table has data. This is what
+    // sends FieldStorageConfig::preSave() down the "has data" branch of
+    // updateDedicatedTableSchema() when the storage is updated below.
+    $entity = EntityTest::create();
+    $entity->field_update_indexes = 1;
+    $entity->save();
+
+    // Add a second index. Prior to the fix for #3305627, this throws
+    // a fatal TypeError because updateDedicatedTableSchema() unconditionally
+    // reads $actual_schema[$revision_table], which does not exist for a
+    // non-revisionable entity type.
+    $field_storage->setIndexes([
+      'value' => ['value'],
+      'value_2' => ['value'],
+    ]);
+    $field_storage->save();
+
+    $table_mapping = \Drupal::entityTypeManager()->getStorage('entity_test')->getTableMapping();
+    $table = $table_mapping->getDedicatedDataTableName($field_storage);
+    $this->assertTrue(
+      \Drupal::database()->schema()->indexExists($table, 'field_update_indexes_value_2'),
+      'The new index was created on the dedicated field table.'
+    );
+
+    // Removing the index again must likewise not throw.
+    $field_storage->setIndexes([
+      'value' => ['value'],
+    ]);
+    $field_storage->save();
+    $this->assertFalse(
+      \Drupal::database()->schema()->indexExists($table, 'field_update_indexes_value_2'),
+      'The removed index no longer exists on the dedicated field table.'
+    );
+  }
+
+  /**
+   * Tests adding/removing an index on a revisionable entity's dedicated table.
+   *
+   * This is the counterpart to testUpdateIndexesWithDataNonRevisionable():
+   * that test alone would pass even if the revision-table index operations
+   * were skipped unconditionally, since it never has a revision table to
+   * update. This test is what actually exercises and pins down the "index
+   * still gets created on/removed from the revision table when one exists"
+   * behavior, so a future change cannot silently drop that maintenance
+   * without a test catching it.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3305627
+   */
+  public function testUpdateIndexesWithDataRevisionable(): void {
+    $this->installEntitySchema('entity_test_rev');
+
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_update_indexes',
+      'entity_type' => 'entity_test_rev',
+      'type' => 'test_field',
+      'cardinality' => 2,
+    ]);
+    $field_storage->save();
+    FieldConfig::create([
+      'field_storage' => $field_storage,
+      'entity_type' => 'entity_test_rev',
+      'bundle' => 'entity_test_rev',
+    ])->save();
+
+    $entity = EntityTestRev::create();
+    $entity->field_update_indexes = 1;
+    $entity->save();
+
+    $table_mapping = \Drupal::entityTypeManager()->getStorage('entity_test_rev')->getTableMapping();
+    $table = $table_mapping->getDedicatedDataTableName($field_storage);
+    $revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage);
+    $schema = \Drupal::database()->schema();
+
+    // Add a second index. This must be created on both the data table and
+    // the revision table.
+    $field_storage->setIndexes([
+      'value' => ['value'],
+      'value_2' => ['value'],
+    ]);
+    $field_storage->save();
+    $this->assertTrue(
+      $schema->indexExists($table, 'field_update_indexes_value_2'),
+      'The new index was created on the dedicated field data table.'
+    );
+    $this->assertTrue(
+      $schema->indexExists($revision_table, 'field_update_indexes_value_2'),
+      'The new index was created on the dedicated field revision table.'
+    );
+
+    // Removing the index must remove it from both tables too.
+    $field_storage->setIndexes([
+      'value' => ['value'],
+    ]);
+    $field_storage->save();
+    $this->assertFalse(
+      $schema->indexExists($table, 'field_update_indexes_value_2'),
+      'The removed index no longer exists on the dedicated field data table.'
+    );
+    $this->assertFalse(
+      $schema->indexExists($revision_table, 'field_update_indexes_value_2'),
+      'The removed index no longer exists on the dedicated field revision table.'
+    );
+  }
+
+  /**
+   * Tests indexing a dedicated table's own reserved columns while it has data.
+   *
+   * Dedicated field tables always have bundle, deleted, entity_id,
+   * revision_id, and langcode columns in addition to the field type's own
+   * value column(s). Prior to the fix for #3305627,
+   * DefaultTableMapping::getFieldColumnName() only recognized "deleted" as
+   * such a reserved column, so an index referencing e.g. "entity_id" was
+   * incorrectly resolved to a prefixed, non-existent column name such as
+   * "field_update_indexes_entity_id".
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3305627
+   */
+  public function testUpdateIndexOnReservedColumnWithData(): void {
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_update_indexes',
+      'entity_type' => 'entity_test',
+      'type' => 'test_field',
+      'cardinality' => 2,
+    ]);
+    $field_storage->save();
+    FieldConfig::create([
+      'field_storage' => $field_storage,
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+    ])->save();
+
+    $entity = EntityTest::create();
+    $entity->field_update_indexes = 1;
+    $entity->save();
+
+    // Add an index over the field's own value column and the dedicated
+    // table's built-in entity_id column. This must resolve "entity_id" to
+    // the real, unprefixed column rather than throwing a database exception
+    // for a non-existent "field_update_indexes_entity_id" column.
+    $field_storage->setIndexes([
+      'value' => ['value'],
+      'value_entity_id' => ['value', 'entity_id'],
+    ]);
+    $field_storage->save();
+
+    $table_mapping = \Drupal::entityTypeManager()->getStorage('entity_test')->getTableMapping();
+    $table = $table_mapping->getDedicatedDataTableName($field_storage);
+    $this->assertTrue(
+      \Drupal::database()->schema()->indexExists($table, 'field_update_indexes_value_entity_id'),
+      'The new index over the reserved entity_id column was created on the dedicated field table.'
+    );
+  }
+
+  /**
+   * Tests indexing a field type with more than one value property.
+   *
+   * All the other index tests in this class use test_field, which has a
+   * single "value" property, so getFieldColumnName() only ever has to
+   * disambiguate one field-owned column from the dedicated table's built-in
+   * columns. This uses "daterange" (value and end_value) to confirm that
+   * column resolution also works correctly when an index spans more than
+   * one of the field's own columns, together with one of the dedicated
+   * table's reserved columns.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3305627
+   */
+  public function testUpdateIndexOnMultiColumnFieldWithData(): void {
+    $this->enableModules(['datetime', 'datetime_range']);
+
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_update_daterange',
+      'entity_type' => 'entity_test',
+      'type' => 'daterange',
+      'cardinality' => 2,
+    ]);
+    $field_storage->save();
+    FieldConfig::create([
+      'field_storage' => $field_storage,
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+    ])->save();
+
+    $entity = EntityTest::create();
+    $entity->field_update_daterange = [
+      'value' => '2016-09-21',
+      'end_value' => '2016-09-25',
+    ];
+    $entity->save();
+
+    // Add an index spanning both of the field's own columns (value and
+    // end_value) plus the dedicated table's built-in entity_id column.
+    $field_storage->setIndexes([
+      'value' => ['value'],
+      'range_entity_id' => ['value', 'end_value', 'entity_id'],
+    ]);
+    $field_storage->save();
+
+    $table_mapping = \Drupal::entityTypeManager()->getStorage('entity_test')->getTableMapping();
+    $table = $table_mapping->getDedicatedDataTableName($field_storage);
+    $this->assertTrue(
+      \Drupal::database()->schema()->indexExists($table, 'field_update_daterange_range_entity_id'),
+      'The new multi-column index was created on the dedicated field table.'
+    );
+
+    // Removing it must likewise not throw.
+    $field_storage->setIndexes([
+      'value' => ['value'],
+    ]);
+    $field_storage->save();
+    $this->assertFalse(
+      \Drupal::database()->schema()->indexExists($table, 'field_update_daterange_range_entity_id'),
+      'The removed multi-column index no longer exists on the dedicated field table.'
+    );
+  }
+
+  /**
+   * Tests a field type whose own property name collides with a reserved one.
+   *
+   * A dedicated field table has its own built-in "langcode" column, but some
+   * field types have their own property that happens to be called
+   * "langcode" too (e.g. the contrib "address" field type). A field's own
+   * column must always win that naming collision: it needs to keep
+   * resolving to its normal, prefixed column, not the table's built-in one,
+   * or the field's data silently collides with (and is overwritten by) the
+   * table's own langcode column.
+   *
+   * Uses field_test's test_field_reserved_column field type, which defines
+   * a "langcode" property for exactly this purpose.
+   *
+   * The "own_langcode" index below is also this class's proof that a
+   * collision like this permanently forfeits the ability to index the
+   * table's own reserved column under that name: there is no way to write
+   * an index that reaches the table's built-in langcode column once a
+   * field type has claimed that name for itself. That's a known, accepted
+   * limitation rather than a bug - see the DEDICATED_TABLE_COLUMNS docblock
+   * on DefaultTableMapping for why it isn't (and shouldn't be) resolved
+   * here.
+   *
+   * @see \Drupal\Core\Entity\Sql\DefaultTableMapping::DEDICATED_TABLE_COLUMNS
+   * @see https://www.drupal.org/project/drupal/issues/3305627
+   */
+  public function testFieldOwnColumnTakesPrecedenceOverReservedColumn(): void {
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_reserved_lang',
+      'entity_type' => 'entity_test',
+      'type' => 'test_field_reserved_column',
+      'cardinality' => 2,
+    ]);
+    $field_storage->save();
+    FieldConfig::create([
+      'field_storage' => $field_storage,
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+    ])->save();
+
+    $table_mapping = \Drupal::entityTypeManager()->getStorage('entity_test')->getTableMapping();
+
+    // The field's own "langcode" property must resolve to its normal
+    // prefixed column, exactly as it would for any other property name.
+    $this->assertSame(
+      'field_reserved_lang_langcode',
+      $table_mapping->getFieldColumnName($field_storage, 'langcode'),
+      "The field's own langcode property is not resolved to the dedicated table's built-in langcode column."
+    );
+
+    // Save an entity with distinct values in the field's own "langcode"
+    // property and verify, by reading the raw table row, that it landed in
+    // the field's own column rather than being collapsed into (or
+    // overwriting) the table's built-in langcode column.
+    $entity = EntityTest::create();
+    $entity->field_reserved_lang = ['value' => 1, 'langcode' => 'xx'];
+    $entity->save();
+
+    $table = $table_mapping->getDedicatedDataTableName($field_storage);
+    $row = \Drupal::database()->select($table, 't')
+      ->fields('t')
+      ->condition('entity_id', $entity->id())
+      ->execute()
+      ->fetchAssoc();
+    $this->assertSame('xx', $row['field_reserved_lang_langcode'], "The field's own langcode value was stored in its own column.");
+    $this->assertNotSame('xx', $row['langcode'], "The table's own langcode column was not overwritten by the field's own langcode value.");
+
+    // An index over the field's own "langcode" property must likewise
+    // target its own column, and must not throw or collide with the
+    // table's built-in langcode index.
+    $field_storage->setIndexes([
+      'value' => ['value'],
+      'own_langcode' => ['langcode'],
+    ]);
+    $field_storage->save();
+    $this->assertTrue(
+      \Drupal::database()->schema()->indexExists($table, 'field_reserved_lang_own_langcode'),
+      "The new index over the field's own langcode column was created on the dedicated field table."
+    );
   }
 
   /**
