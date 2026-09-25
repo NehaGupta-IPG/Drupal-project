@@ -9,11 +9,15 @@ use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @group page_cache
+ * Tests page caching with multiple requests.
  */
+#[Group('page_cache')]
+#[RunTestsInSeparateProcesses]
 final class PageCacheTest extends KernelTestBase implements ServiceModifierInterface {
 
   /**
@@ -24,7 +28,7 @@ final class PageCacheTest extends KernelTestBase implements ServiceModifierInter
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     $page_cache_request_policy = $this->createMock(RequestPolicyInterface::class);
     $page_cache_request_policy
       ->method('check')
