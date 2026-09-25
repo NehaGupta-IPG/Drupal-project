@@ -29,7 +29,7 @@ final class PageCacheTest extends KernelTestBase implements ServiceModifierInter
    * {@inheritdoc}
    */
   public function alter(ContainerBuilder $container): void {
-    $page_cache_request_policy = $this->createMock(RequestPolicyInterface::class);
+    $page_cache_request_policy = $this->createStub(RequestPolicyInterface::class);
     $page_cache_request_policy
       ->method('check')
       ->willReturn(RequestPolicyInterface::ALLOW);
