@@ -415,13 +415,23 @@ class Schema extends DatabaseSchema {
           'arguments' => [':new_field_initial' => $specification['initial']],
         ];
       }
+      elseif (isset($specification['initialization_expression'])) {
+        $mapping[$field] = [
+          'expression' => $specification['initialization_expression']->expression,
+          'arguments' => $specification['initialization_expression']->arguments,
+        ];
+      }
       else {
         // Else use the default of the field.
         $mapping[$field] = NULL;
       }
 
       // Add the new indexes.
+      $tempUniqueKeys = $new_schema['unique keys'];
+      $tempIndexes = $new_schema['indexes'];
       $new_schema = array_merge($new_schema, $keys_new);
+      $new_schema['unique keys'] = array_merge($new_schema['unique keys'], $tempUniqueKeys);
+      $new_schema['indexes'] = array_merge($new_schema['indexes'], $tempIndexes);
 
       $this->alterTable($table, $old_schema, $new_schema, $mapping);
     }

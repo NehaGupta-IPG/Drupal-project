@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Database;
 
+use Drupal\Core\Database\Exception\SchemaTablePrimaryKeyException;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
@@ -463,6 +464,21 @@ abstract class Schema implements PlaceholderInterface {
   abstract public function dropUniqueKey($table, $name);
 
   /**
+   * Checks if a unique key exists in the given table.
+   *
+   * @param string $tableName
+   *   The name of the table in drupal (no prefixing).
+   * @param string $uniqueKeyName
+   *   The name of the key in drupal (no prefixing).
+   *
+   * @return bool
+   *   TRUE if the given key exists, otherwise FALSE.
+   */
+  public function uniqueKeyExists(string $tableName, string $uniqueKeyName): bool {
+    return $this->indexExists($tableName, $uniqueKeyName);
+  }
+
+  /**
    * Add an index.
    *
    * @param string $table
@@ -664,6 +680,198 @@ abstract class Schema implements PlaceholderInterface {
    */
   final public function createTableFromDefinition(SchemaDefinitionType $schemaDefinitionType, string $schemaName, TableDefinition $table): void {
     $this->createTable($table->name, $table->toArray());
+  }
+
+  /**
+   * Adds a table column based on a schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $targetSchema
+   *   The target Schema definition where the table is defined with the changed
+   *   column and all defined indexes.
+   * @param string $tableName
+   *   Name of the table.
+   * @param string $targetColumnName
+   *   The name of the column as defined in the target schema definition.
+   * @param Expression|null $initializationExpression
+   *   (optional) An expression to be used to initialize the newly added
+   *   column. This is most useful for creating NOT NULL columns with no
+   *   default value in existing tables. If not specified, the column will be
+   *   initialized to the default value indicated in the schema definition (if
+   *   present).
+   *   Examples:
+   *   @code
+   *     new Expression('[age]')
+   *   @endcode
+   *   copies the content of the 'age' column to the new column;
+   *   @code
+   *     new Expression(':initial_value', [':initial_value' => 10])
+   *   @endcode
+   *   sets the new column's values to 10 for all rows;
+   *   @code
+   *     new Expression(
+   *       'COALESCE([age], :fallback_value)',
+   *       [':fallback_value' => 59],
+   *     )
+   *   @endcode
+   *   copies the content of the 'age' column to the new column, falling back
+   *   to the value 59 if the 'age' column of a row is missing.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   *   If the specified table or source field doesn't exist.
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified destination field already exists.
+   */
+  final public function addTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName, ?Expression $initializationExpression = NULL): void {
+    if (!$this->tableExists($tableName)) {
+      throw new SchemaObjectDoesNotExistException("Cannot add column '$tableName.$targetColumnName': table doesn't exist.");
+    }
+    if ($this->fieldExists($tableName, $targetColumnName)) {
+      throw new SchemaObjectExistsException("Cannot add column '$tableName.$targetColumnName': column already exists.");
+    }
+
+    $table = $targetSchema->getTableDefinition($tableName);
+    if (!in_array($targetColumnName, $table->columnNames())) {
+      throw new SchemaException("Cannot add column '$tableName.$targetColumnName': column is not defined in the schema.");
+    }
+
+    // Handles keys/indexes that are impacted by the addition.
+    // Remove existing current keys if in the target schema the added column
+    // is part of them.
+    foreach ($table->indexes ?? [] as $index) {
+      if (in_array($targetColumnName, $index->columnNames(), TRUE) && $this->indexExists($tableName, $index->name)) {
+        $this->dropIndex($tableName, $index->name);
+      }
+    }
+    foreach ($table->uniqueKeys ?? [] as $key) {
+      if (in_array($targetColumnName, $key->columnNames(), TRUE) && $this->uniqueKeyExists($tableName, $key->name)) {
+        $this->dropUniqueKey($tableName, $key->name);
+      }
+    }
+    if (in_array($targetColumnName, $table->primaryKey?->columnNames() ?? [], TRUE)) {
+      try {
+        $this->dropPrimaryKey($tableName);
+      }
+      catch (SchemaTablePrimaryKeyException) {
+        // It may not be possible to drop the primary key. For example, in
+        // MySQL primary keys based on a serial column.
+      }
+    }
+    // Add target keys that are needed.
+    $newKeys = [];
+    $hasPrimaryKey = $this->findPrimaryKeyColumns($tableName) !== [];
+    $needsPrimaryKey = (bool) $table->primaryKey;
+    if (!$hasPrimaryKey && $needsPrimaryKey) {
+      $newKeys['primary key'] = $table->primaryKey->toArray();
+    }
+    foreach ($table->uniqueKeys ?? [] as $key) {
+      if (!$this->uniqueKeyExists($tableName, $key->name)) {
+        $newKeys['unique keys'][$key->name] = $key->toArray();
+      }
+    }
+    foreach ($table->indexes ?? [] as $index) {
+      if (!$this->indexExists($tableName, $index->name)) {
+        $newKeys['indexes'][$index->name] = $index->toArray();
+      }
+    }
+
+    $tableAsArray = $table->toArray();
+    unset($tableAsArray['primary key'], $tableAsArray['unique keys'], $tableAsArray['indexes']);
+    if ($initializationExpression) {
+      $tableAsArray['fields'][$targetColumnName]['initialization_expression'] = $initializationExpression;
+    }
+    $this->addField(
+      $tableName,
+      $targetColumnName,
+      $tableAsArray['fields'][$targetColumnName],
+      array_merge($tableAsArray, $newKeys),
+    );
+  }
+
+  /**
+   * Changes a table column to a target schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $targetSchema
+   *   The target Schema definition where the table is defined with the changed
+   *   column and all defined indexes.
+   * @param string $tableName
+   *   Name of the table.
+   * @param string $targetColumnName
+   *   The name of the column as defined in the target schema definition.
+   * @param string|null $currentColumnName
+   *   The current name of the column in the table. Skip if the name does not
+   *   change.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   *   If the specified table or source field doesn't exist.
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified destination field already exists.
+   */
+  final public function changeTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName, ?string $currentColumnName = NULL): void {
+    $currentColumnName ??= $targetColumnName;
+    if (!$this->tableExists($tableName)) {
+      throw new SchemaObjectDoesNotExistException("Cannot change the definition of column '$tableName.$currentColumnName': table doesn't exist.");
+    }
+    if (!$this->fieldExists($tableName, $currentColumnName)) {
+      throw new SchemaObjectDoesNotExistException("Cannot change the definition of column '$tableName.$currentColumnName': column doesn't exist.");
+    }
+    if (($currentColumnName != $targetColumnName) && $this->fieldExists($tableName, $targetColumnName)) {
+      throw new SchemaObjectExistsException("Cannot rename column '$tableName.$currentColumnName' to '$targetColumnName': target column already exists.");
+    }
+
+    $table = $targetSchema->getTableDefinition($tableName);
+    if (!in_array($targetColumnName, $table->columnNames())) {
+      throw new SchemaException("Cannot handle changes to column '$tableName.$currentColumnName': the target column '$targetColumnName' is not defined in the schema.");
+    }
+
+    // Handles keys/indexes that are impacted by the change.
+    $currentKeys = $this->introspectIndexSchema($tableName);
+    // Remove current keys that include the column to be changed.
+    foreach ($currentKeys['indexes'] as $key => $data) {
+      if (in_array($currentColumnName, $data, TRUE)) {
+        $this->dropIndex($tableName, $key);
+      }
+    }
+    foreach ($currentKeys['unique keys'] as $key => $data) {
+      if (in_array($currentColumnName, $data, TRUE)) {
+        $this->dropUniqueKey($tableName, $key);
+      }
+    }
+    if (in_array($currentColumnName, $currentKeys['primary key'], TRUE)) {
+      try {
+        $this->dropPrimaryKey($tableName);
+      }
+      catch (SchemaTablePrimaryKeyException) {
+        // It may not be possible to drop the primary key. For example, in
+        // MySQL primary keys based on a serial column.
+      }
+    }
+    // Add target keys that are needed.
+    $newKeys = [];
+    $hasPrimaryKey = $this->findPrimaryKeyColumns($tableName) !== [];
+    $needsPrimaryKey = (bool) $table->primaryKey;
+    if (!$hasPrimaryKey && $needsPrimaryKey) {
+      $newKeys['primary key'] = $table->primaryKey->toArray();
+    }
+    foreach ($table->uniqueKeys ?? [] as $key) {
+      if (!$this->uniqueKeyExists($tableName, $key->name)) {
+        $newKeys['unique keys'][$key->name] = $key->toArray();
+      }
+    }
+    foreach ($table->indexes ?? [] as $index) {
+      if (!$this->indexExists($tableName, $index->name)) {
+        $newKeys['indexes'][$index->name] = $index->toArray();
+      }
+    }
+
+    $tableAsArray = $table->toArray();
+    unset($tableAsArray['primary key'], $tableAsArray['unique keys'], $tableAsArray['indexes']);
+    $this->changeField(
+      $tableName,
+      $currentColumnName,
+      $targetColumnName,
+      $tableAsArray['fields'][$targetColumnName],
+      array_merge($tableAsArray, $newKeys),
+    );
   }
 
   /**

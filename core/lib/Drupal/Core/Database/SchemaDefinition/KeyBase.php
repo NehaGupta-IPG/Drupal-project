@@ -75,6 +75,19 @@ abstract class KeyBase implements SchemaDefinitionInterface {
   }
 
   /**
+   * Returns the names of the columns in the key.
+   *
+   * @return list<string>
+   *   The names of the columns.
+   */
+  public function columnNames(): array {
+    return array_map(
+      fn(KeyColumn $keyColumn): string => $keyColumn->name,
+      $this->columns,
+    );
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function toArray(): array {

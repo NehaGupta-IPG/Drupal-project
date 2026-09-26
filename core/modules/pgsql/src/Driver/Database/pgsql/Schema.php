@@ -709,6 +709,11 @@ EOD;
         ->fields([$field => $spec['initial']])
         ->execute();
     }
+    elseif (isset($spec['initialization_expression'])) {
+      $this->connection->update($table)
+        ->expression($field, $spec['initialization_expression']->expression, $spec['initialization_expression']->arguments)
+        ->execute();
+    }
     if ($fix_null) {
       $this->executeDdlStatement("ALTER TABLE {" . $table . "} ALTER $field SET NOT NULL");
     }
@@ -769,6 +774,13 @@ EOD;
       ':index' => $index_name,
     ];
     return (bool) $this->connection->query("SELECT 1 FROM pg_indexes WHERE schemaname = :schema AND tablename = :table AND indexname = :index", $sql_params)->fetchField();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function uniqueKeyExists(string $tableName, string $uniqueKeyName): bool {
+    return $this->constraintExists($tableName, $uniqueKeyName . '__key');
   }
 
   /**
@@ -862,11 +874,18 @@ EOD;
    * {@inheritdoc}
    */
   public function dropUniqueKey($table, $name) {
-    if (!$this->constraintExists($table, $name . '__key')) {
-      return FALSE;
+    // If we have a $name argument that ends with '_key' we are dropping a key
+    // whose name was already processed (most likely resulting from a schema
+    // introspection.
+    if (str_ends_with($name, '_key')) {
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP CONSTRAINT "' . $name . '"');
     }
-
-    $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP CONSTRAINT ' . $this->ensureIdentifiersLength($table, $name, 'key'));
+    else {
+      if (!$this->constraintExists($table, $name . '__key')) {
+        return FALSE;
+      }
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP CONSTRAINT ' . $this->ensureIdentifiersLength($table, $name, 'key'));
+    }
     $this->resetTableInformation($table);
     return TRUE;
   }
@@ -890,11 +909,18 @@ EOD;
    * {@inheritdoc}
    */
   public function dropIndex($table, $name) {
-    if (!$this->indexExists($table, $name)) {
-      return FALSE;
+    // If we have a $name argument that ends with '_idx' we are dropping an
+    // index whose name was already processed (most likely resulting from a
+    // schema introspection.
+    if (str_ends_with($name, '_idx')) {
+      $this->executeDdlStatement('DROP INDEX ' . $this->defaultSchema . '."' . $name . '"');
     }
-
-    $this->executeDdlStatement('DROP INDEX ' . $this->defaultSchema . '.' . $this->ensureIdentifiersLength($table, $name, 'idx'));
+    else {
+      if (!$this->indexExists($table, $name)) {
+        return FALSE;
+      }
+      $this->executeDdlStatement('DROP INDEX ' . $this->defaultSchema . '.' . $this->ensureIdentifiersLength($table, $name, 'idx'));
+    }
     $this->resetTableInformation($table);
     return TRUE;
   }
