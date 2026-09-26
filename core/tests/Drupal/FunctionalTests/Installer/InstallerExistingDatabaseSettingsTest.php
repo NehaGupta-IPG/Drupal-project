@@ -31,7 +31,7 @@ class InstallerExistingDatabaseSettingsTest extends InstallerTestBase {
     unset($connection_info['init_commands']);
 
     $this->settings['databases']['default'] = (object) [
-      'value' => ['default' => $connection_info],
+      'value' => $connection_info,
       'required' => TRUE,
     ];
   }

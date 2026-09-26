@@ -26,10 +26,7 @@ class InstallerBrokenDatabaseCredentialsTest extends InstallerTestBase {
   protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     // Pre-configure database credentials in settings.php.
-    $connection_info = [];
-    foreach (Database::getConnectionInfo() as $target => $parameters) {
-      $connection_info[$target] = $parameters->toArray();
-    }
+    $connection_info = Database::getConnectionInfo();
 
     if ($connection_info['default']['driver'] !== 'mysql') {
       $this->markTestSkipped('This test relies on overriding the mysql driver');
