@@ -93,7 +93,7 @@ class DrupalKernelRequestStackTest extends KernelTestBase implements EventSubscr
    *
    * It compares master, current, and parent Request objects before and after
    * StackedHttpKernel::handle(), StackedHttpKernel::terminate(), and sub
-   * requests
+   * requests.
    */
   public function testRequestStackHandling(): void {
     /** @var \Symfony\Component\HttpFoundation\RequestStack $request_stack */
@@ -228,9 +228,9 @@ class DrupalKernelRequestStackTest extends KernelTestBase implements EventSubscr
    *   The number of requests in the stack.
    */
   private function getRequestStackCount(RequestStack $request_stack): int {
-    // Create reflection object
+    // Create reflection object.
     $reflection = new \ReflectionClass($request_stack);
-    // Get the private property
+    // Get the private property.
     return count($reflection->getProperty('requests')->getValue($request_stack));
   }
 
