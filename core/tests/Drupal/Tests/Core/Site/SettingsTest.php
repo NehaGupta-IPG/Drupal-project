@@ -393,7 +393,7 @@ class SettingsTest extends UnitTestCase {
 
     Settings::initialize(vfsStream::url('root'), 'sites', $class_loader);
 
-    $mock_connection_parameters = Database::getConnectionInfo('mock')[$driver];
+    $mock_connection_parameters = Database::getConnectionParameters('mock')[$driver];
     $this->assertInstanceOf(ConnectionParametersInterface::class, $mock_connection_parameters);
     $this->assertSame($driver, $mock_connection_parameters->driver);
     $this->assertSame($expected_namespace, $mock_connection_parameters->namespace);

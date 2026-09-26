@@ -35,7 +35,7 @@ class UrlConversionTest extends UnitTestCase {
    */
   #[DataProvider('providerConvertDbUrlToConnectionInfo')]
   #[IgnoreDeprecations]
-  public function testDbUrlToConnectionConversion(string $url, array $database_array, bool $include_test_drivers): void {
+  public function testDbUrlToConnectionConversion(string $url, array $database_array, array $expected_public_connection_parameters, bool $include_test_drivers): void {
     $result = Database::convertDbUrlToConnectionInfo($url, $include_test_drivers);
     $this->assertEquals($database_array, $result);
   }
@@ -44,10 +44,11 @@ class UrlConversionTest extends UnitTestCase {
    * Tests db url to connection conversion.
    */
   #[DataProvider('providerConvertDbUrlToConnectionInfo')]
-  public function testConnectionParametersCreateFromUrl($url, $database_array, $include_test_drivers): void {
+  public function testConnectionParametersCreateFromUrl(string $url, array $database_array, array $expected_public_connection_parameters, bool $include_test_drivers): void {
     $result = ConnectionParametersFactory::createFromUrl($url, $include_test_drivers);
     $this->assertInstanceOf(ConnectionParametersInterface::class, $result);
     $this->assertEquals($database_array, array_intersect_key($result->toArray(), $database_array));
+    $this->assertEquals($expected_public_connection_parameters, get_object_vars($result));
   }
 
   /**
@@ -74,6 +75,14 @@ class UrlConversionTest extends UnitTestCase {
           'namespace' => 'Drupal\mysql\Driver\Database\mysql',
           'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
         ],
+        [
+          'driver' => 'mysql',
+          'module' => 'mysql',
+          'namespace' => 'Drupal\mysql\Driver\Database\mysql',
+          'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
+          'database' => 'test_database',
+          'prefix' => '',
+        ],
         FALSE,
       ],
       'SQLite, relative to root, without prefix' => [
@@ -87,7 +96,22 @@ class UrlConversionTest extends UnitTestCase {
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
           'init_commands' => [
-            'wal' => "PRAGMA journal_mode=WAL",
+            'wal' => 'PRAGMA journal_mode=WAL',
+          ],
+          'pdo' => [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
+          ],
+        ],
+        [
+          'driver' => 'sqlite',
+          'module' => 'sqlite',
+          'database' => 'test_database',
+          'prefix' => '',
+          'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
+          'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
+          'init_commands' => [
+            'wal' => 'PRAGMA journal_mode=WAL',
           ],
           'pdo' => [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
@@ -110,6 +134,14 @@ class UrlConversionTest extends UnitTestCase {
           'namespace' => 'Drupal\mysql\Driver\Database\mysql',
           'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
         ],
+        [
+          'driver' => 'mysql',
+          'module' => 'mysql',
+          'namespace' => 'Drupal\mysql\Driver\Database\mysql',
+          'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
+          'database' => 'test_database',
+          'prefix' => 'bar',
+        ],
         FALSE,
       ],
       'SQLite, relative to root, with prefix' => [
@@ -123,7 +155,22 @@ class UrlConversionTest extends UnitTestCase {
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
           'init_commands' => [
-            'wal' => "PRAGMA journal_mode=WAL",
+            'wal' => 'PRAGMA journal_mode=WAL',
+          ],
+          'pdo' => [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
+          ],
+        ],
+        [
+          'driver' => 'sqlite',
+          'module' => 'sqlite',
+          'database' => 'test_database',
+          'prefix' => 'foo',
+          'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
+          'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
+          'init_commands' => [
+            'wal' => 'PRAGMA journal_mode=WAL',
           ],
           'pdo' => [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
@@ -143,7 +190,22 @@ class UrlConversionTest extends UnitTestCase {
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
           'prefix' => '',
           'init_commands' => [
-            'wal' => "PRAGMA journal_mode=WAL",
+            'wal' => 'PRAGMA journal_mode=WAL',
+          ],
+          'pdo' => [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
+          ],
+        ],
+        [
+          'driver' => 'sqlite',
+          'module' => 'sqlite',
+          'database' => '/baz/test_database',
+          'prefix' => '',
+          'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
+          'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
+          'init_commands' => [
+            'wal' => 'PRAGMA journal_mode=WAL',
           ],
           'pdo' => [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
@@ -176,6 +238,14 @@ class UrlConversionTest extends UnitTestCase {
             ],
           ],
         ],
+        [
+          'driver' => 'DriverTestMysql',
+          'module' => 'driver_test',
+          'namespace' => 'Drupal\driver_test\Driver\Database\DriverTestMysql',
+          'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTestMysql/',
+          'database' => 'test_database',
+          'prefix' => '',
+        ],
         TRUE,
       ],
       'MySQL contrib test driver with prefix' => [
@@ -201,6 +271,14 @@ class UrlConversionTest extends UnitTestCase {
               'autoload' => 'core/modules/pgsql/src/',
             ],
           ],
+        ],
+        [
+          'driver' => 'DriverTestMysql',
+          'module' => 'driver_test',
+          'namespace' => 'Drupal\driver_test\Driver\Database\DriverTestMysql',
+          'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTestMysql/',
+          'database' => 'test_database',
+          'prefix' => 'bar',
         ],
         TRUE,
       ],
@@ -228,6 +306,14 @@ class UrlConversionTest extends UnitTestCase {
             ],
           ],
         ],
+        [
+          'driver' => 'DriverTestPgsql',
+          'module' => 'driver_test',
+          'namespace' => 'Drupal\driver_test\Driver\Database\DriverTestPgsql',
+          'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTestPgsql/',
+          'database' => 'test_database',
+          'prefix' => '',
+        ],
         TRUE,
       ],
       'PostgreSQL contrib test driver with prefix' => [
@@ -254,6 +340,14 @@ class UrlConversionTest extends UnitTestCase {
             ],
           ],
         ],
+        [
+          'driver' => 'DriverTestPgsql',
+          'module' => 'driver_test',
+          'namespace' => 'Drupal\driver_test\Driver\Database\DriverTestPgsql',
+          'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTestPgsql/',
+          'database' => 'test_database',
+          'prefix' => 'bar',
+        ],
         TRUE,
       ],
       'MySql with a custom query parameter' => [
@@ -269,6 +363,14 @@ class UrlConversionTest extends UnitTestCase {
           'prefix' => '',
           'namespace' => 'Drupal\mysql\Driver\Database\mysql',
           'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
+        ],
+        [
+          'driver' => 'mysql',
+          'module' => 'mysql',
+          'namespace' => 'Drupal\mysql\Driver\Database\mysql',
+          'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
+          'database' => 'test_database',
+          'prefix' => '',
         ],
         FALSE,
       ],
@@ -286,6 +388,14 @@ class UrlConversionTest extends UnitTestCase {
           'namespace' => 'Drupal\mysql\Driver\Database\mysql',
           'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
         ],
+        [
+          'driver' => 'mysql',
+          'module' => 'mysql',
+          'namespace' => 'Drupal\mysql\Driver\Database\mysql',
+          'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
+          'database' => 'test_database',
+          'prefix' => '',
+        ],
         FALSE,
       ],
       'PostgreSql without the module name set' => [
@@ -300,6 +410,14 @@ class UrlConversionTest extends UnitTestCase {
           'prefix' => '',
           'namespace' => 'Drupal\pgsql\Driver\Database\pgsql',
           'autoload' => 'core/modules/pgsql/src/Driver/Database/pgsql/',
+        ],
+        [
+          'driver' => 'pgsql',
+          'module' => 'pgsql',
+          'namespace' => 'Drupal\pgsql\Driver\Database\pgsql',
+          'autoload' => 'core/modules/pgsql/src/Driver/Database/pgsql/',
+          'database' => 'test_database',
+          'prefix' => '',
         ],
         FALSE,
       ],
@@ -316,6 +434,14 @@ class UrlConversionTest extends UnitTestCase {
           'namespace' => 'Drupal\pgsql\Driver\Database\pgsql',
           'autoload' => 'core/modules/pgsql/src/Driver/Database/pgsql/',
         ],
+        [
+          'driver' => 'pgsql',
+          'module' => 'pgsql',
+          'namespace' => 'Drupal\pgsql\Driver\Database\pgsql',
+          'autoload' => 'core/modules/pgsql/src/Driver/Database/pgsql/',
+          'database' => 'test_database',
+          'prefix' => '',
+        ],
         FALSE,
       ],
       'SQLite, relative to root, without prefix and with the module name sqlite' => [
@@ -329,7 +455,22 @@ class UrlConversionTest extends UnitTestCase {
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
           'init_commands' => [
-            'wal' => "PRAGMA journal_mode=WAL",
+            'wal' => 'PRAGMA journal_mode=WAL',
+          ],
+          'pdo' => [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
+          ],
+        ],
+        [
+          'driver' => 'sqlite',
+          'module' => 'sqlite',
+          'database' => 'test_database',
+          'prefix' => '',
+          'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
+          'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
+          'init_commands' => [
+            'wal' => 'PRAGMA journal_mode=WAL',
           ],
           'pdo' => [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
