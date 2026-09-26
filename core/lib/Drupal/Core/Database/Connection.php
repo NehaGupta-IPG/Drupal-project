@@ -23,7 +23,7 @@ use Drupal\Core\Pager\PagerManagerInterface;
  * of it to support special handling required by that database.
  * The most common database abstraction layer in PHP is PDO.
  *
- * @phpstan-import-type ConnectionInfoArray from \Drupal\Core\Database\Database
+ * @phpstan-import-type ConnectionInfoBaseArray from \Drupal\Core\Database\Database
  *
  * @see http://php.net/manual/book.pdo.php
  */
@@ -173,7 +173,7 @@ abstract class Connection {
    *
    * @param object $connection
    *   An object of the client class representing a database connection.
-   * @param \Drupal\Core\Database\ConnectionParametersInterface|ConnectionInfoArray $connection_options
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|ConnectionInfoBaseArray $connection_options
    *   The database connection settings. May include the following:
    *   - prefix
    *   - namespace
@@ -199,7 +199,7 @@ abstract class Connection {
   /**
    * Opens a client connection.
    *
-   * @param ConnectionInfoArray $connection_options
+   * @param ConnectionInfoBaseArray $connection_options
    *   The database connection settings.
    *
    * @return object

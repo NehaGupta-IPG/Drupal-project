@@ -7,7 +7,7 @@ namespace Drupal\Core\Database;
 /**
  * Interface for a database connection parameters object.
  *
- * @phpstan-import-type ConnectionInfoArray from \Drupal\Core\Database\Database
+ * @phpstan-import-type ConnectionInfoBaseArray from \Drupal\Core\Database\Database
  * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
  */
 interface ConnectionParametersInterface {
@@ -53,7 +53,7 @@ interface ConnectionParametersInterface {
    * @param UnprocessedConnectionInfoArray $options
    *   An array of connection options.
    *
-   * @return ConnectionInfoArray
+   * @return ConnectionInfoBaseArray
    *   The processed options.
    *
    * @internal
@@ -82,7 +82,7 @@ interface ConnectionParametersInterface {
   /**
    * Returns the connection parameters as an associative array.
    *
-   * @return ConnectionInfoArray
+   * @return ConnectionInfoBaseArray
    *   The connection parameters as an associative array.
    */
   public function toArray(): array;

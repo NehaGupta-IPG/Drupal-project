@@ -18,7 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests schema API for non-public schema for the PostgreSQL driver.
  *
- * @phpstan-import-type ConnectionInfoArray from \Drupal\Core\Database\Database
+ * @phpstan-import-type ConnectionInfoBaseArray from \Drupal\Core\Database\Database
  */
 #[CoversClass(Schema::class)]
 #[Group('Database')]
@@ -43,7 +43,7 @@ class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
     $info = Database::getConnectionInfo('default');
     $info['default']['schema'] = 'testing_fake';
     Database::getConnection()->query('CREATE SCHEMA IF NOT EXISTS testing_fake');
-    /** @var ConnectionInfoArray $info */
+    /** @var ConnectionInfoBaseArray $info */
     Database::addConnectionInfo('default', 'testing_fake', $info['default']);
 
     $this->testingFakeConnection = Database::getConnection('testing_fake', 'default');

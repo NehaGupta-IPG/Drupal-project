@@ -7,7 +7,7 @@ namespace Drupal\Core\Database;
 /**
  * Base class for connection parameters objects.
  *
- * @phpstan-import-type ConnectionInfoArray from \Drupal\Core\Database\Database
+ * @phpstan-import-type ConnectionInfoBaseArray from \Drupal\Core\Database\Database
  *
  * @implements \ArrayAccess<string|int,int|string|float|bool|array|null>
  */
@@ -95,12 +95,25 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   protected bool $arrayAccessPropertySetting = FALSE;
 
   /**
+   * Constructor.
+   *
+   * @param array<string|int,scalar|array|null> $unknownOptions
+   *   The options that are not relevant for the driver.
+   */
+  public function __construct(
+    // Unknown connection options. The user input may include options that the
+    // driver cannot handle, but we still can provide access to them.
+    protected array $unknownOptions = [],
+  ) {
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function processOptionsArray(array $options): array {
     $options = array_merge([
       'driver' => '',
-      'module' => '',
+      'module' => explode('\\', static::class)[1],
       'namespace' => '',
       'autoload' => '',
       'database' => '',
@@ -115,21 +128,8 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     }
     $options['unknownOptions'] = $unknownOptions;
 
-    /** @var ConnectionInfoArray $options */
+    /** @var ConnectionInfoBaseArray $options */
     return $options;
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param array<string|int,int|string|float|bool|array|null> $unknownOptions
-   *   The options that are not relevant for the driver.
-   */
-  public function __construct(
-    // Unknown connection options. The user input may include options that the
-    // driver cannot handle, but we still can provide access to them.
-    protected array $unknownOptions = [],
-  ) {
   }
 
   /**
@@ -160,7 +160,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     foreach (static::getNames() as $property) {
       $tmp[$property] = $this->{$property};
     }
-    /** @var ConnectionInfoArray $tmp */
+    /** @var ConnectionInfoBaseArray $tmp */
     $tmp = array_merge($this->unknownOptions, $tmp);
     return $tmp;
   }

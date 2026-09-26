@@ -10,7 +10,6 @@ use Composer\Autoload\ClassLoader;
  * The factory for database connection parameters.
  *
  * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
- * @phpstan-import-type ConnectionInfoArray from \Drupal\Core\Database\Database
  *
  * @final
  */
@@ -30,7 +29,7 @@ abstract class ConnectionParametersFactory {
    *   (optional) The app root.
    *
    * @return \Drupal\Core\Database\ConnectionParametersInterface
-   *   A validated connection info array.
+   *   The connection parameters.
    */
   final public static function createFromOptionsArray(array $connectionOptions, ?ClassLoader $classLoader = NULL, ?string $appRoot = NULL): ConnectionParametersInterface {
     // If there is no "driver" property, then we assume it's an array of
@@ -155,7 +154,7 @@ abstract class ConnectionParametersFactory {
    *   the extension_discovery_scan_tests setting.
    *
    * @return ConnectionParametersInterface
-   *   The database connection info.
+   *   The connection parameters.
    *
    * @throws \InvalidArgumentException
    *   Exception thrown when the provided URL does not meet the minimum

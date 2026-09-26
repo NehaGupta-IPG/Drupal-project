@@ -36,25 +36,15 @@ use Drupal\Core\Cache\NullBackend;
  *     'namespace': string,
  *   }>,
  * }
- * @phpstan-type ConnectionInfoArray array{
+ * @phpstan-type ConnectionInfoBaseArray array{
  *   'driver': string,
  *   'module': string,
- *   'autoload': string,
  *   'namespace': string,
+ *   'autoload': string,
  *   'database': string,
- *   'username'?: string,
- *   'password'?: string,
- *   'host'?: string,
- *   'port'?: string|int,
  *   'prefix': string,
- *   'collation'?: string,
- *   'pdo'?: array<mixed>,
- *   'isolation_level'?: int|string,
- *   'init_commands'?: array<string|int,string|int>,
- *   'dependencies'?: array<string,array{
- *     'autoload': string,
- *     'namespace': string,
- *   }>,
+ *   'unknownOptions': array<string|int,scalar|array|null>,
+ *   ...
  * }
  * @phpstan-import-type DatabaseLogEntry from \Drupal\Core\Database\Log
  *
@@ -256,7 +246,7 @@ abstract class Database {
    * @param string|null $app_root
    *   (optional) The app root.
    *
-   * @return ConnectionInfoArray
+   * @return ConnectionInfoBaseArray
    *   A validated connection info array.
    *
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
@@ -287,7 +277,7 @@ abstract class Database {
    *   The database key.
    * @param string $target
    *   The database target name.
-   * @param \Drupal\Core\Database\ConnectionParametersInterface|ConnectionInfoArray|list<ConnectionInfoArray> $info
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $info
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.
@@ -319,7 +309,7 @@ abstract class Database {
    *   (optional) The connection key for which to return information. If not
    *   specified, the 'default' connection key will be returned.
    *
-   * @return array<string|int,ConnectionInfoArray>
+   * @return array<string|int,ConnectionInfoBaseArray>
    *   An associative array of database information, keyed by target. Defaults
    *   to an empty array.
    *
@@ -365,7 +355,7 @@ abstract class Database {
   /**
    * Gets connection information for all available databases.
    *
-   * @return array<string|int,array<string|int,ConnectionInfoArray>>
+   * @return array<string|int,array<string|int,ConnectionInfoBaseArray>>
    *   An associative array of database information for all available database,
    *   keyed by the database key and target. Defaults to an empty array.
    *
@@ -602,7 +592,7 @@ abstract class Database {
    *   directories are excluded in the search. When NULL will be determined by
    *   the extension_discovery_scan_tests setting.
    *
-   * @return ConnectionInfoArray
+   * @return ConnectionInfoBaseArray
    *   The database connection info.
    *
    * @throws \InvalidArgumentException
