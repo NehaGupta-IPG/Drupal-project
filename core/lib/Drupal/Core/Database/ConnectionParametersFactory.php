@@ -45,7 +45,7 @@ abstract class ConnectionParametersFactory {
 
     // Without driver name, we cannot proceed.
     if (!isset($options['driver'])) {
-        throw new \RuntimeException("Database driver name missing from the connection options");
+      throw new \RuntimeException("Database driver name missing from the connection options");
     }
 
     $options = array_merge([

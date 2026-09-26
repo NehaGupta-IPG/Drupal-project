@@ -211,7 +211,7 @@ abstract class Connection {
   abstract public static function open(#[\SensitiveParameter] /* ConnectionParametersInterface| */  array &$connection_options = []);
 
   /**
-   * Informs the factory if the cannection can use ConnectionParameters.
+   * Informs the factory if the connection can use ConnectionParameters.
    */
   public static function acceptsConnectionParametersObject(): bool {
     return FALSE;

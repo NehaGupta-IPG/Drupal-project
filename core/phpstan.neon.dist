@@ -72,6 +72,9 @@ parameters:
     # @todo Fix this in https://www.drupal.org/project/drupal/issues/3624168
     - identifier: loadIncludes.fileNotLoadable
 
+    # @todo Fix this in https://www.drupal.org/project/drupal/issues/7654123
+    - "#^Call to deprecated method get.*ConnectionInfo.* of class .*Database#"
+
   disallowedFunctionCalls:
     -
        function: 'crc32()'

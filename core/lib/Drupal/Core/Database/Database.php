@@ -337,7 +337,7 @@ abstract class Database {
     $tmp = [];
     foreach ($targets as $target => $parameters) {
       $tmp[$target] = $parameters->toArray();
-    };
+    }
     return $tmp;
   }
 
@@ -382,7 +382,7 @@ abstract class Database {
       foreach ($targets as $target => $parameters) {
         $tmp[$key][$target] = $parameters->toArray();
       }
-    };
+    }
     return $tmp;
   }
 
