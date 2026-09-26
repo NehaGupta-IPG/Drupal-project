@@ -16,6 +16,8 @@ use Drupal\Core\Cache\NullBackend;
  * shepherding of database connections into a single location without the use of
  * globals.
  *
+ * @phpstan-import-type DatabaseLogEntry from \Drupal\Core\Database\Log
+ *
  * @phpstan-type UnprocessedConnectionInfoArray array{
  *   'driver'?: string,
  *   'module'?: string,
@@ -46,7 +48,6 @@ use Drupal\Core\Cache\NullBackend;
  *   'unknownOptions': array<string|int,scalar|array|null>,
  *   ...
  * }
- * @phpstan-import-type DatabaseLogEntry from \Drupal\Core\Database\Log
  *
  * @final
  */
@@ -277,7 +278,7 @@ abstract class Database {
    *   The database key.
    * @param string $target
    *   The database target name.
-   * @param \Drupal\Core\Database\ConnectionParametersInterface|UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $info
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|ConnectionInfoBaseArray|UnprocessedConnectionInfoArray $info
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.
@@ -299,7 +300,13 @@ abstract class Database {
     if (!empty(self::$databaseInfo[$key][$target])) {
       return;
     }
-    self::$databaseInfo[$key][$target] = is_array($info) ? ConnectionParametersFactory::createFromOptionsArray($info, $class_loader, $app_root) : $info;
+    if (is_array($info)) {
+      /** @var UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $info */
+      self::$databaseInfo[$key][$target] = ConnectionParametersFactory::createFromOptionsArray($info, $class_loader, $app_root);
+    }
+    else {
+      self::$databaseInfo[$key][$target] = $info;
+    }
   }
 
   /**

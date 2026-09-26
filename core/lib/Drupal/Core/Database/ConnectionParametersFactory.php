@@ -10,6 +10,7 @@ use Composer\Autoload\ClassLoader;
  * The factory for database connection parameters.
  *
  * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
+ * @phpstan-import-type ConnectionInfoBaseArray from \Drupal\Core\Database\Database
  *
  * @final
  */
@@ -116,16 +117,9 @@ abstract class ConnectionParametersFactory {
       return new $class(...$options);
     }
 
-    /** @var array{
-     *     'driver': string,
-     *     'namespace': string,
-     *     'autoload': string,
-     *     'database': string,
-     *     'prefix': string,
-     *     'module': string,
-     *   } $options
-     */
     $options = ConnectionParametersBase::processOptionsArray($options);
+    /** @var ConnectionInfoBaseArray $options */
+    // @phpstan-ignore argument.type
     return new class (...$options) extends ConnectionParametersBase {
 
       public function __construct(
