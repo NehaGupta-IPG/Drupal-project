@@ -15,7 +15,6 @@ use Drupal\Core\Config\Importer\ConfigImporterBatch;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\DrupalKernel;
-use Drupal\Core\Database\ConnectionParametersInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ExtensionDiscovery;
@@ -1191,9 +1190,8 @@ function install_verify_database_ready(): void {
 /**
  * Checks a database connection and returns any errors.
  */
-function install_database_errors(ConnectionParametersInterface|array $database, $settings_file) {
+function install_database_errors($database, $settings_file) {
   $errors = [];
-  $database = is_array($database) ? $database : $database->toArray();
 
   try {
     $driverExtension = Database::getDriverList()->get($database['namespace']);

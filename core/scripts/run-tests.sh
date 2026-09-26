@@ -16,7 +16,6 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Timer;
 use Drupal\Core\Composer\Composer;
-use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Test\EnvironmentCleaner;
 use Drupal\Core\Test\PhpUnitTestDiscovery;
@@ -424,7 +423,7 @@ function simpletest_script_setup_database(): void {
     // Remove a possibly existing default connection (from settings.php).
     Database::removeConnection('default');
     try {
-      $databases['default']['default'] = ConnectionParametersFactory::createFromUrl(Config::get('dburl'), TRUE);
+      $databases['default']['default'] = Database::convertDbUrlToConnectionInfo(Config::get('dburl'), TRUE);
     }
     catch (\InvalidArgumentException $e) {
       simpletest_script_print_error('Invalid --dburl. Reason: ' . $e->getMessage());
