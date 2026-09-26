@@ -11,6 +11,8 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
+use Drupal\Core\Routing\RouteProviderInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 // cspell:ignore mlid
 
@@ -97,14 +99,38 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   The cache tags invalidator.
    * @param string $table
    *   A database table name to store configuration data in.
+   * @param \Drupal\Core\Routing\RouteProviderInterface|array|null $routeProvider
+   *   (optional) The route provider to use for loading routes.
+   *   Passing an array instead is deprecated as of Drupal 11.5.0, and used to
+   *   be for passing options. Use the $options parameter instead.
    * @param array $options
-   *   (optional) Any additional database connection options to use in queries.
+   *   (optional) Additional database connection options to use in queries.
    */
-  public function __construct(Connection $connection, CacheBackendInterface $menu_cache_backend, CacheTagsInvalidatorInterface $cache_tags_invalidator, $table, array $options = []) {
+  public function __construct(
+    Connection $connection,
+    CacheBackendInterface $menu_cache_backend,
+    CacheTagsInvalidatorInterface $cache_tags_invalidator,
+    string $table,
+    protected RouteProviderInterface|array|null $routeProvider = NULL,
+    array $options = [],
+  ) {
     $this->connection = $connection;
     $this->menuCacheBackend = $menu_cache_backend;
     $this->cacheTagsInvalidator = $cache_tags_invalidator;
     $this->table = $table;
+
+    // Handle backwards compatibility.
+    if (!$this->routeProvider instanceof RouteProviderInterface) {
+      if (is_array($this->routeProvider)) {
+        $options = $this->routeProvider;
+      }
+      $this->routeProvider = \Drupal::service('router.route_provider');
+      @trigger_error(
+        'Calling ' . __METHOD__ . '() without the $route_provider argument is deprecated in drupal:11.5.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3364323',
+        E_USER_DEPRECATED
+      );
+    }
+
     $this->options = $options;
   }
 
@@ -689,17 +715,40 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    * {@inheritdoc}
    */
   public function loadByRoute($route_name, array $route_parameters = [], $menu_name = NULL) {
+    // Also query without any default route parameters as they may not be
+    // present in the computed route_param_key.
+    $route_parameters_without_defaults = $route_parameters;
+    try {
+      $route = $this->routeProvider->getRouteByName($route_name);
+      foreach (array_keys($route_parameters_without_defaults) as $param) {
+        if ($route->hasDefault($param)) {
+          unset($route_parameters_without_defaults[$param]);
+        }
+      }
+    }
+    catch (RouteNotFoundException) {
+      // No such route, we cannot remove defaults from the route parameters.
+    }
     // Sort the route parameters so that the query string will be the same.
     asort($route_parameters);
+    asort($route_parameters_without_defaults);
     // Since this will be urlencoded, it's safe to store and match against a
     // text field.
     // @todo Standardize an efficient way to load by route name and parameters
     //   in place of system path. https://www.drupal.org/node/2302139
     $param_key = $route_parameters ? UrlHelper::buildQuery($route_parameters) : '';
+    $param_key_without_defaults = $route_parameters_without_defaults ? UrlHelper::buildQuery($route_parameters_without_defaults) : '';
     $query = $this->connection->select($this->table, NULL, $this->options);
     $query->fields($this->table, $this->definitionFields());
     $query->condition('route_name', $route_name);
-    $query->condition('route_param_key', $param_key);
+    // Adds condition for a route param key without defaults only when it is
+    // different from the route param key with defaults.
+    if (empty(array_diff_assoc($route_parameters, $route_parameters_without_defaults))) {
+      $query->condition('route_param_key', $param_key);
+    }
+    else {
+      $query->condition('route_param_key', [$param_key, $param_key_without_defaults], 'IN');
+    }
     if ($menu_name) {
       $query->condition('menu_name', $menu_name);
     }
@@ -707,6 +756,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     $query->orderBy('depth');
     $query->orderBy('weight');
     $query->orderBy('id');
+    $query->orderBy('route_param_key');
     $loaded = $this->safeExecuteSelect($query)->fetchAllAssoc('id', FetchAs::Associative);
     foreach ($loaded as $id => $link) {
       $loaded[$id] = $this->prepareLink($link);
