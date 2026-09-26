@@ -60,11 +60,7 @@ final class Settings implements ContainerInjectionInterface {
    *   The admin settings.
    */
   public static function getInstance(): Settings {
-    static $settings;
-    if ($settings === NULL) {
-      $settings = \Drupal::classResolver(Settings::class);
-    }
-    return $settings;
+    return \Drupal::classResolver(Settings::class);
   }
 
   /**
