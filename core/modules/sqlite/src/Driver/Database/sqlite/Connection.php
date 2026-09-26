@@ -5,6 +5,7 @@ namespace Drupal\sqlite\Driver\Database\sqlite;
 use Drupal\Component\Utility\FilterArray;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Connection as DatabaseConnection;
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\Database\ConnectionParametersInterface;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
@@ -71,13 +72,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   protected $identifierQuotes = ['"', '"'];
 
   /**
-   * {@inheritdoc}
-   */
-  public static function acceptsConnectionParametersObject(): bool {
-    return TRUE;
-  }
-
-  /**
    * Constructs a \Drupal\sqlite\Driver\Database\sqlite\Connection object.
    */
   public function __construct(SqliteConnection $connection, ConnectionParameters $connection_options) {
@@ -97,13 +91,17 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   }
 
   /**
-   * {@inheritdoc}
+   * Opens a client connection.
+   *
+   * @param \Drupal\Core\Database\ConnectionParametersInterface $connectionParameters
+   *   The database connection settings.
+   *
+   * @return object
+   *   A client connection object.
    */
-  public static function open(ConnectionParametersInterface|array &$connection_options = []) {
-    assert($connection_options instanceof ConnectionParameters);
-
+  public static function openWithParameters(ConnectionParametersInterface $connectionParameters): SqliteConnection {
     try {
-      $sqlite = new SqliteConnection('sqlite:' . $connection_options->database, '', '', $connection_options->pdo);
+      $sqlite = new SqliteConnection('sqlite:' . $connectionParameters->database, '', '', $connectionParameters->pdo);
     }
     catch (\PDOException $e) {
       if ($e->getCode() == static::DATABASE_NOT_FOUND) {
@@ -144,6 +142,19 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
 
     return $sqlite;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   ::openWithParameters() instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  public static function open(array &$connection_options = []) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ::openWithParameters() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    return static::openWithParameters(ConnectionParametersFactory::createFromOptionsArray($connection_options));
   }
 
   /**

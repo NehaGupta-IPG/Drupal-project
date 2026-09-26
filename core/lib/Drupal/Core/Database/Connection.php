@@ -199,30 +199,24 @@ abstract class Connection {
   /**
    * Opens a client connection.
    *
-   * @param \Drupal\Core\Database\ConnectionParametersInterface|ConnectionInfoArray $connection_options
+   * @param ConnectionInfoArray $connection_options
    *   The database connection settings.
    *
    * @return object
    *   A client connection object.
-   *
-   * @todo adjust type of the $connection_options parameter to
-   *   ConnectionParametersInterface once all drivers implement it.
    */
-  abstract public static function open(#[\SensitiveParameter] /* ConnectionParametersInterface| */  array &$connection_options = []);
+  abstract public static function open(#[\SensitiveParameter] array &$connection_options = []);
 
   /**
    * Opens a client connection.
    *
-   * @param \Drupal\Core\Database\ConnectionParametersInterface $connection_options
+   * @param \Drupal\Core\Database\ConnectionParametersInterface $connectionParameters
    *   The database connection settings.
    *
    * @return object
    *   A client connection object.
-   *
-   * @todo adjust type of the $connection_options parameter to
-   *   ConnectionParametersInterface once all drivers implement it.
    */
-  abstract public static function openWithParameters(ConnectionParametersInterface $connectionParameters);
+  // abstract public static function openWithParameters(ConnectionParametersInterface $connectionParameters): object;
 
   /**
    * Ensures that the client connection can be garbage collected.

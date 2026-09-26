@@ -502,11 +502,15 @@ abstract class Database {
     $connection_parameters = self::$databaseInfo[$key][$target];
 
     $driver_class = $connection_parameters->getConnectionClass();
-    $options = $driver_class::acceptsConnectionParametersObject() ?
-      $connection_parameters :
-      $connection_parameters->toArray();
-    $client_connection = $driver_class::open($options);
-    $new_connection = new $driver_class($client_connection, $options);
+    if (method_exists($driver_class, 'openWithParameters')) {
+      $client_connection = $driver_class::openWithParameters($connection_parameters);
+      $new_connection = new $driver_class($client_connection, $connection_parameters);
+    }
+    else {
+      $options = $connection_parameters->toArray();
+      $client_connection = $driver_class::open($options);
+      $new_connection = new $driver_class($client_connection, $options);
+    }
     $new_connection->setTarget((string) $target);
     $new_connection->setKey((string) $key);
 

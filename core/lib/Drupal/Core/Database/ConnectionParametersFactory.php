@@ -19,29 +19,29 @@ abstract class ConnectionParametersFactory {
   /**
    * Converts a connection options array to a ConnectionParameters object.
    *
-   * @param UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $connection_options
+   * @param UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $connectionOptions
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.
-   * @param \Composer\Autoload\ClassLoader|null $class_loader
+   * @param \Composer\Autoload\ClassLoader|null $classLoader
    *   (optional) The class loader. Used for adding the database driver to the
    *   autoloader if $info['autoload'] is set.
-   * @param string|null $app_root
+   * @param string|null $appRoot
    *   (optional) The app root.
    *
    * @return \Drupal\Core\Database\ConnectionParametersInterface
    *   A validated connection info array.
    */
-  final public static function createFromOptionsArray(array $connection_options, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): ConnectionParametersInterface {
+  final public static function createFromOptionsArray(array $connectionOptions, ?ClassLoader $classLoader = NULL, ?string $appRoot = NULL): ConnectionParametersInterface {
     // If there is no "driver" property, then we assume it's an array of
     // possible connections for this target. Pick one at random. That allows
     // us to have, for example, multiple replica servers.
-    if (!isset($connection_options['driver']) && count($connection_options) > 0) {
-      $info_pick = $connection_options[mt_rand(0, count($connection_options) - 1)];
+    if (!isset($connectionOptions['driver']) && count($connectionOptions) > 0) {
+      $info_pick = $connectionOptions[mt_rand(0, count($connectionOptions) - 1)];
     }
 
     /** @var UnprocessedConnectionInfoArray $options */
-    $options = $info_pick ?? $connection_options;
+    $options = $info_pick ?? $connectionOptions;
 
     // Without driver name, we cannot proceed.
     if (!isset($options['driver'])) {
@@ -93,15 +93,15 @@ abstract class ConnectionParametersFactory {
     // initialization but the container definition is likely in the database.
     // Therefore, allow the connection info to specify an autoload directory
     // for the driver.
-    if ($class_loader && $app_root) {
-      $class_loader->setPsr4($options['namespace'] . '\\', $app_root . DIRECTORY_SEPARATOR . $options['autoload']);
+    if ($classLoader && $appRoot) {
+      $classLoader->setPsr4($options['namespace'] . '\\', $appRoot . DIRECTORY_SEPARATOR . $options['autoload']);
 
       // When the database driver is extending from other database drivers,
       // then add autoload directory for the parent database driver modules
       // as well.
       if (!empty($options['dependencies'])) {
         foreach ($options['dependencies'] as $dependency) {
-          $class_loader->setPsr4($dependency['namespace'] . '\\', $app_root . DIRECTORY_SEPARATOR . $dependency['autoload']);
+          $classLoader->setPsr4($dependency['namespace'] . '\\', $appRoot . DIRECTORY_SEPARATOR . $dependency['autoload']);
         }
       }
     }
