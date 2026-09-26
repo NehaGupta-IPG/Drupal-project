@@ -4,7 +4,6 @@ namespace Drupal\views_ui\Hook;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Xss;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -25,7 +24,6 @@ class ViewsUiThemeHooks {
   use StringTranslationTrait;
 
   public function __construct(
-    protected ConfigFactoryInterface $configFactory,
     protected ModuleHandlerInterface $moduleHandler,
   ) {
   }
@@ -223,7 +221,7 @@ class ViewsUiThemeHooks {
       ['data' => $form['default_group']['All']],
       '',
       [
-        'data' => $this->configFactory->get('views.settings')->get('ui.exposed_filter_any_label') == 'old_any' ? $this->t('&lt;Any&gt;') : $this->t('- Any -'),
+        'data' => $this->t('- Any -'),
         'colspan' => 4,
         'class' => ['class' => 'any-default-radios-row'],
       ],

@@ -77,3 +77,12 @@ function views_post_update_filter_min_max_labels(?array &$sandbox = NULL): void 
     return $view_config_updater->needsMinMaxLabelUpdate($view);
   });
 }
+
+/**
+ * Remove the unused exposed filter "Any" label setting.
+ */
+function views_post_update_remove_exposed_filter_any_label(): void {
+  \Drupal::configFactory()->getEditable('views.settings')
+    ->clear('ui.exposed_filter_any_label')
+    ->save(TRUE);
+}
