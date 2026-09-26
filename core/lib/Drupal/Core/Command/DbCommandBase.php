@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Command;
 
-use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\Database\Database;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,7 +38,8 @@ class DbCommandBase extends Command {
       if (Database::getConnectionInfo('db-tools')) {
         throw new \RuntimeException('Database "db-tools" is already defined. Cannot define database provided.');
       }
-      Database::addConnectionInfo('db-tools', 'default', ConnectionParametersFactory::createFromUrl($input->getOption('database-url')));
+      $info = Database::convertDbUrlToConnectionInfo($input->getOption('database-url'));
+      Database::addConnectionInfo('db-tools', 'default', $info);
       $key = 'db-tools';
     }
     else {

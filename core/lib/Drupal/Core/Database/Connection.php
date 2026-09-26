@@ -211,11 +211,18 @@ abstract class Connection {
   abstract public static function open(#[\SensitiveParameter] /* ConnectionParametersInterface| */  array &$connection_options = []);
 
   /**
-   * Informs the factory if the connection can use ConnectionParameters.
+   * Opens a client connection.
+   *
+   * @param \Drupal\Core\Database\ConnectionParametersInterface $connection_options
+   *   The database connection settings.
+   *
+   * @return object
+   *   A client connection object.
+   *
+   * @todo adjust type of the $connection_options parameter to
+   *   ConnectionParametersInterface once all drivers implement it.
    */
-  public static function acceptsConnectionParametersObject(): bool {
-    return FALSE;
-  }
+  abstract public static function openWithParameters(ConnectionParametersInterface $connectionParameters);
 
   /**
    * Ensures that the client connection can be garbage collected.

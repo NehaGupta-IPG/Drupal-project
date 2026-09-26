@@ -60,13 +60,13 @@ class DbCommandBaseTest extends KernelTestBase {
     $command = new DbCommandBaseTester();
     $command_tester = new CommandTester($command);
     $command_tester->execute([
-      '-db-url' => Database::getConnectionInfo()['default']->asUrl(),
+      '-db-url' => Database::getConnectionInfoAsUrl(),
     ]);
     $this->assertEquals('db-tools', $command->getDatabaseConnection($command_tester->getInput())->getKey());
 
     Database::removeConnection('db-tools');
     $command_tester->execute([
-      '--database-url' => Database::getConnectionInfo()['default']->asUrl(),
+      '--database-url' => Database::getConnectionInfoAsUrl(),
     ]);
     $this->assertEquals('db-tools', $command->getDatabaseConnection($command_tester->getInput())->getKey());
   }
@@ -89,7 +89,7 @@ class DbCommandBaseTest extends KernelTestBase {
     $this->assertEquals('extra', $command->getDatabaseConnection($command_tester->getInput())->getPrefix());
 
     $command_tester->execute([
-      '-db-url' => Database::getConnectionInfo()['default']->asUrl(),
+      '-db-url' => Database::getConnectionInfoAsUrl(),
       '--prefix' => 'extra2',
     ]);
     $this->assertEquals('extra2', $command->getDatabaseConnection($command_tester->getInput())->getPrefix());

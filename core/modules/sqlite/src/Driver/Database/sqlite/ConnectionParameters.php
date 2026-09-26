@@ -42,13 +42,13 @@ class ConnectionParameters extends ConnectionParametersBase {
   public function __construct(
     public string $driver,
     public string $namespace,
-    public string $autoload,
-    public string $database,
-    public string $prefix,
+    #[\SensitiveParameter] public string $autoload,
+    #[\SensitiveParameter] public string $database,
+    #[\SensitiveParameter] public string $prefix,
     public string $module,
-    public readonly array $init_commands,
-    public readonly array $pdo,
-    array $unknownOptions,
+    #[\SensitiveParameter] public readonly array $init_commands,
+    #[\SensitiveParameter] public readonly array $pdo,
+    #[\SensitiveParameter] array $unknownOptions,
   ) {
     parent::__construct($unknownOptions);
   }
