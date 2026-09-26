@@ -322,8 +322,37 @@ abstract class Database {
    * @return array<string|int,ConnectionInfoArray>
    *   An associative array of database information, keyed by target. Defaults
    *   to an empty array.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   ::getConnectionParameters() instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   final public static function getConnectionInfo(string|int $key = 'default'): array {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ::getConnectionParameters() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    if (is_int($key)) {
+      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+    }
+    $targets = self::getConnectionParameters($key);
+    $tmp = [];
+    foreach ($targets as $target => $parameters) {
+      $tmp[$target] = $parameters->toArray();
+    };
+    return $tmp;
+  }
+
+  /**
+   * Gets parameters for the specified database connection.
+   *
+   * @param string $key
+   *   (optional) The connection key for which to return information. If not
+   *   specified, the 'default' connection key will be returned.
+   *
+   * @return array<string|int,ConnectionParametersInterface>
+   *   An associative array of database connection parameters, keyed by target.
+   *   Defaults to an empty array.
+   */
+  final public static function getConnectionParameters(string|int $key = 'default'): array {
     if (is_int($key)) {
       @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
     }
@@ -339,8 +368,32 @@ abstract class Database {
    * @return array<string|int,array<string|int,ConnectionInfoArray>>
    *   An associative array of database information for all available database,
    *   keyed by the database key and target. Defaults to an empty array.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   ::getAllConnectionParameters() instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   final public static function getAllConnectionInfo(): array {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ::getAllConnectionParameters() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    $targets = self::getAllConnectionParameters();
+    $tmp = [];
+    foreach (self::$databaseInfo as $key => $targets) {
+      foreach ($targets as $target => $parameters) {
+        $tmp[$key][$target] = $parameters->toArray();
+      }
+    };
+    return $tmp;
+  }
+
+  /**
+   * Gets connection parameters for all available databases.
+   *
+   * @return array<string|int,array<string|int,ConnectionParametersInterface>>
+   *   An associative array of database parameters for all available database,
+   *   keyed by the database key and target.
+   */
+  final public static function getAllConnectionParameters(): array {
     return self::$databaseInfo;
   }
 
@@ -449,10 +502,11 @@ abstract class Database {
     $connection_parameters = self::$databaseInfo[$key][$target];
 
     $driver_class = $connection_parameters->getConnectionClass();
-    $options = $connection_parameters->toArray();
+    $options = $driver_class::acceptsConnectionParametersObject() ?
+      $connection_parameters :
+      $connection_parameters->toArray();
     $client_connection = $driver_class::open($options);
     $new_connection = new $driver_class($client_connection, $options);
-    assert($new_connection instanceof Connection);
     $new_connection->setTarget((string) $target);
     $new_connection->setKey((string) $key);
 
@@ -598,7 +652,7 @@ abstract class Database {
    */
   public static function getConnectionInfoAsUrl(string|int $key = 'default'): string {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use Database::getConnectionInfo()[\'default\']->asUrl() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    $db_info = static::getConnectionInfo($key);
+    $db_info = static::getConnectionParameters($key);
     if (empty($db_info) || empty($db_info['default'])) {
       throw new \RuntimeException("Database connection $key not defined or missing the 'default' settings");
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests;
 
-use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\Database\Database;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -30,7 +29,7 @@ class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
       throw new \Exception('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.sh. See https://www.drupal.org/node/2116263#skipped-tests for more information.');
     }
     else {
-      $database = ConnectionParametersFactory::createFromUrl($db_url)->toArray();
+      $database = Database::convertDbUrlToConnectionInfo($db_url);
 
       if (in_array($database['driver'], ['mysql', 'pgsql'])) {
         // Change the used database driver to the one provided by the module
@@ -49,11 +48,9 @@ class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
     if (!empty($connection_info)) {
       Database::renameConnection('default', 'simpletest_original_default');
       foreach ($connection_info as $target => $value) {
-        $options = $value->toArray();
         // Replace the table prefix definition to ensure that no table of the
         // test runner leak into the test.
-        $options['prefix'] = $this->databasePrefix ?? '';
-        $connection_info[$target] = ConnectionParametersFactory::createFromOptionsArray($options);
+        $connection_info[$target]['prefix'] = $this->databasePrefix ?? '';
       }
     }
     return $connection_info;

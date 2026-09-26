@@ -23,6 +23,8 @@ use Drupal\Core\Pager\PagerManagerInterface;
  * of it to support special handling required by that database.
  * The most common database abstraction layer in PHP is PDO.
  *
+ * @phpstan-import-type ConnectionInfoArray from \Drupal\Core\Database\Database
+ *
  * @see http://php.net/manual/book.pdo.php
  */
 abstract class Connection {
@@ -171,7 +173,7 @@ abstract class Connection {
    *
    * @param object $connection
    *   An object of the client class representing a database connection.
-   * @param \Drupal\Core\Database\ConnectionParametersInterface|array $connection_options
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|ConnectionInfoArray $connection_options
    *   The database connection settings. May include the following:
    *   - prefix
    *   - namespace
@@ -197,7 +199,7 @@ abstract class Connection {
   /**
    * Opens a client connection.
    *
-   * @param \Drupal\Core\Database\ConnectionParametersInterface|array $connection_options
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|ConnectionInfoArray $connection_options
    *   The database connection settings.
    *
    * @return object
@@ -206,7 +208,14 @@ abstract class Connection {
    * @todo adjust type of the $connection_options parameter to
    *   ConnectionParametersInterface once all drivers implement it.
    */
-  abstract public static function open(#[\SensitiveParameter] array &$connection_options = []);
+  abstract public static function open(#[\SensitiveParameter] /* ConnectionParametersInterface| */  array &$connection_options = []);
+
+  /**
+   * Informs the factory if the cannection can use ConnectionParameters.
+   */
+  public static function acceptsConnectionParametersObject(): bool {
+    return FALSE;
+  }
 
   /**
    * Ensures that the client connection can be garbage collected.

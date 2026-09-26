@@ -178,7 +178,11 @@ class BackendCompilerPassTest extends UnitTestCase {
   protected function getDriverTestMysqlContainer(Definition $service): ContainerBuilder {
     $container = new ContainerBuilder();
     $container->setDefinition('service', $service);
-    $database = new TestDatabase($this->createStub(Mysql::class), []);
+    $database = new TestDatabase($this->createStub(Mysql::class), [
+      'driver' => 'driver_test',
+      'namespace' => 'Drupal\driver_test\Driver\Database\DriverTestMysql',
+      'autoload' => $this->root . '/core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTestMysql',
+    ]);
     $container->set('database', $database);
     return $container;
   }

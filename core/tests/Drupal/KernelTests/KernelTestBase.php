@@ -11,7 +11,6 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\Development\ConfigSchemaChecker;
-use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Core\Database\SchemaDefinition\Schema;
@@ -410,11 +409,8 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
       throw new \Exception('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.sh. See https://www.drupal.org/node/2116263#skipped-tests for more information.');
     }
     else {
-      Database::addConnectionInfo(
-        'default',
-        'default',
-        ConnectionParametersFactory::createFromUrl($db_url, TRUE),
-      );
+      $database = Database::convertDbUrlToConnectionInfo($db_url, TRUE);
+      Database::addConnectionInfo('default', 'default', $database);
     }
 
     // Clone the current connection and replace the current prefix.
@@ -422,11 +418,9 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     if (!empty($connection_info)) {
       Database::renameConnection('default', 'simpletest_original_default');
       foreach ($connection_info as $target => $value) {
-        $options = $value->toArray();
         // Replace the full table prefix definition to ensure that no table
         // prefixes of the test runner leak into the test.
-        $options['prefix'] = $this->databasePrefix ?? '';
-        $connection_info[$target] = ConnectionParametersFactory::createFromOptionsArray($options);
+        $connection_info[$target]['prefix'] = $this->databasePrefix ?? '';
       }
     }
     return $connection_info;

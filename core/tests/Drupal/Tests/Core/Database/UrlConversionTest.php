@@ -405,12 +405,12 @@ class UrlConversionTest extends UnitTestCase {
   /**
    * Tests ConnectionParametersFactory::asUrl() to get connection info as a URL.
    */
+  #[DataProvider('providerGetConnectionInfoAsUrl')]
   #[PreserveGlobalState(FALSE)]
   #[RunInSeparateProcess]
-  #[DataProvider('providerGetConnectionInfoAsUrl')]
   public function testConnectionParametersAsUrl(array $info, string $expectedUrl): void {
     Database::addConnectionInfo('default', 'default', $info);
-    $this->assertEquals($expectedUrl, Database::getConnectionInfo()['default']->asUrl());
+    $this->assertEquals($expectedUrl, Database::getConnectionParameters()['default']->asUrl());
   }
 
   /**
