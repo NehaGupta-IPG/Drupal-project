@@ -407,7 +407,7 @@ class ViewsTest extends UnitTestCase {
       /**
        * {@inheritdoc}
        */
-      public function reset() {
+      public function reset(): void {
       }
 
     };
