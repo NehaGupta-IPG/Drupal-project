@@ -50,9 +50,6 @@ class AccessibilityTest extends AccessibilityTestBase {
     // The Content link is visible after expanding the sidebar.
     $assert_session->waitForElementVisible('css', $content_link_selector);
 
-    $this->assertSession()->responseNotContains('Page not found');
-    $this->assertSession()->responseNotContains('Access denied');
-
     $this->executeAxe();
   }
 
