@@ -119,7 +119,6 @@ abstract class ConnectionParametersFactory {
 
     $options = ConnectionParametersBase::processOptionsArray($options);
     /** @var ConnectionInfoBaseArray $options */
-    // @phpstan-ignore argument.type
     return new class (...$options) extends ConnectionParametersBase {
 
       public function __construct(

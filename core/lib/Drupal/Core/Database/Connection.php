@@ -23,6 +23,7 @@ use Drupal\Core\Pager\PagerManagerInterface;
  * of it to support special handling required by that database.
  * The most common database abstraction layer in PHP is PDO.
  *
+ * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
  * @phpstan-import-type ConnectionInfoBaseArray from \Drupal\Core\Database\Database
  *
  * @see http://php.net/manual/book.pdo.php
@@ -186,6 +187,8 @@ abstract class Connection {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
     if (is_array($connection_options)) {
+      /** @var UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $connection_options */
+      // @phpstan-ignore argument.type
       $connection_options = ConnectionParametersFactory::createFromOptionsArray($connection_options);
     }
 
