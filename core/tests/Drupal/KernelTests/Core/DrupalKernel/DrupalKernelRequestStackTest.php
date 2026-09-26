@@ -187,6 +187,7 @@ class DrupalKernelRequestStackTest extends KernelTestBase implements EventSubscr
     $this->assertSame($other_request, $request_stack->getMainRequest());
     $this->assertSame(1, $this->getRequestStackCount($request_stack));
 
+    $request_stack->pop();
     $this->throwOnTerminate = FALSE;
   }
 
