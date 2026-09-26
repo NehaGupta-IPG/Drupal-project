@@ -13,6 +13,11 @@ class Views {
    * The translation manager.
    *
    * @var \Drupal\Core\StringTranslation\TranslationInterface
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is
+   *   no replacement.
+   *
+   * @see https://www.drupal.org/node/3626175
    */
   protected static $translationManager;
 
@@ -20,6 +25,11 @@ class Views {
    * A static cache for handler types data.
    *
    * @var array
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\views\Views::getHandlerTypes() instead.
+   *
+   * @see https://www.drupal.org/node/3626175
    */
   protected static $handlerTypes;
 
@@ -552,13 +562,16 @@ class Views {
    * Translates a string to the current language or to a given language.
    *
    * See the t() documentation for details.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\StringTranslation\TranslatableMarkup instead.
+   *
+   * @see https://www.drupal.org/node/3626175
    */
   protected static function t($string, array $args = [], array $options = []) {
-    if (empty(static::$translationManager)) {
-      static::$translationManager = \Drupal::service('string_translation');
-    }
-
-    return static::$translationManager->translate($string, $args, $options);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\StringTranslation\\TranslatableMarkup instead. See https://www.drupal.org/node/3626175', E_USER_DEPRECATED);
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
+    return new TranslatableMarkup($string, $args, $options);
   }
 
   /**

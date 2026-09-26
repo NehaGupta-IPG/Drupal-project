@@ -270,6 +270,22 @@ class ViewsTest extends UnitTestCase {
   }
 
   /**
+   * Tests the ::t() deprecation.
+   */
+  #[IgnoreDeprecations]
+  public function testTranslateDeprecation(): void {
+    $this->expectUserDeprecationMessage('Drupal\views\Views::t() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\Core\StringTranslation\TranslatableMarkup instead. See https://www.drupal.org/node/3626175');
+
+    $this->container->set('string_translation', $this->createTranslationManager('ja', $this->createTranslator()));
+    $result = (new \ReflectionMethod(Views::class, 't'))->invoke(NULL, '@count fields', ['@count' => 3], ['context' => 'views']);
+    $this->assertInstanceOf(TranslatableMarkup::class, $result);
+    $this->assertSame('@count fields', $result->getUntranslatedString());
+    $this->assertSame(['@count' => 3], $result->getArguments());
+    $this->assertSame('views', $result->getOption('context'));
+    $this->assertSame('JA:3 fields', (string) $result);
+  }
+
+  /**
    * Tests that handler labels use the current container's translation service.
    */
   #[DataProvider('providerTestGetHandlerTypesUsesCurrentTranslation')]
