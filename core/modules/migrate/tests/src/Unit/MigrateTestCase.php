@@ -120,7 +120,7 @@ abstract class MigrateTestCase extends UnitTestCase {
         'autoload' => $connection_options['autoload'] ?? '',
         'database' => ':memory:',
       ]);
-      $pdo = Connection::open($connection_parameters);
+      $pdo = Connection::openWithParameters($connection_parameters);
       $this->assertInstanceOf(ConnectionParameters::class, $connection_parameters);
       $connection = new Connection($pdo, $connection_parameters);
     }

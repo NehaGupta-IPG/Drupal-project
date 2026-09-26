@@ -137,8 +137,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     $sqlite->createCollation('NOCASE_UTF8', Unicode::strcasecmp(...));
 
     // Execute sqlite init_commands.
-    if (!empty($connection_options->init_commands)) {
-      $sqlite->exec(implode('; ', $connection_options->init_commands));
+    if (!empty($connectionParameters->init_commands)) {
+      $sqlite->exec(implode('; ', $connectionParameters->init_commands));
     }
 
     return $sqlite;

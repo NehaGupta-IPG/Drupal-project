@@ -1024,7 +1024,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       'database' => ':memory:',
       'prefix' => 'prefix',
     ]);
-    $pdo = Connection::open($connection_parameters);
+    $pdo = Connection::openWithParameters($connection_parameters);
     $this->assertInstanceOf(ConnectionParameters::class, $connection_parameters);
     $this->database = new Connection($pdo, $connection_parameters);
     $qualified_map_table = $this->getIdMap()->getQualifiedMapTableName();

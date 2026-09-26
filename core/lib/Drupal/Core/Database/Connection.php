@@ -216,7 +216,9 @@ abstract class Connection {
    * @return object
    *   A client connection object.
    */
+  // phpcs:disable
   // abstract public static function openWithParameters(ConnectionParametersInterface $connectionParameters): object;
+  // phpcs:enable
 
   /**
    * Ensures that the client connection can be garbage collected.
