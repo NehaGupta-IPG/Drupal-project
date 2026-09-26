@@ -2,6 +2,8 @@
 
 namespace Drupal\views;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
 /**
  * Static service container wrapper for views.
  */
@@ -455,77 +457,71 @@ class Views {
    *     just used for header,footer,empty to link to the internal type: area.
    */
   public static function getHandlerTypes() {
-    // Statically cache this so translation only occurs once per request for all
-    // of these values.
-    if (!isset(static::$handlerTypes)) {
-      static::$handlerTypes = [
-        'field' => [
-          // Title.
-          'title' => static::t('Fields'),
-          // Lowercase title for mid-sentence.
-          'ltitle' => static::t('fields'),
-          // Singular title.
-          'stitle' => static::t('Field'),
-          // Singular lowercase title for mid sentence.
-          'lstitle' => static::t('field'),
-          'plural' => 'fields',
-        ],
-        'argument' => [
-          'title' => static::t('Contextual filters'),
-          'ltitle' => static::t('contextual filters'),
-          'stitle' => static::t('Contextual filter'),
-          'lstitle' => static::t('contextual filter'),
-          'plural' => 'arguments',
-        ],
-        'sort' => [
-          'title' => static::t('Sort criteria'),
-          'ltitle' => static::t('sort criteria'),
-          'stitle' => static::t('Sort criterion'),
-          'lstitle' => static::t('sort criterion'),
-          'plural' => 'sorts',
-        ],
-        'filter' => [
-          'title' => static::t('Filter criteria'),
-          'ltitle' => static::t('filter criteria'),
-          'stitle' => static::t('Filter criterion'),
-          'lstitle' => static::t('filter criterion'),
-          'plural' => 'filters',
-        ],
-        'relationship' => [
-          'title' => static::t('Relationships'),
-          'ltitle' => static::t('relationships'),
-          'stitle' => static::t('Relationship'),
-          'lstitle' => static::t('Relationship'),
-          'plural' => 'relationships',
-        ],
-        'header' => [
-          'title' => static::t('Header'),
-          'ltitle' => static::t('header'),
-          'stitle' => static::t('Header'),
-          'lstitle' => static::t('Header'),
-          'plural' => 'header',
-          'type' => 'area',
-        ],
-        'footer' => [
-          'title' => static::t('Footer'),
-          'ltitle' => static::t('footer'),
-          'stitle' => static::t('Footer'),
-          'lstitle' => static::t('Footer'),
-          'plural' => 'footer',
-          'type' => 'area',
-        ],
-        'empty' => [
-          'title' => static::t('No results behavior'),
-          'ltitle' => static::t('no results behavior'),
-          'stitle' => static::t('No results behavior'),
-          'lstitle' => static::t('No results behavior'),
-          'plural' => 'empty',
-          'type' => 'area',
-        ],
-      ];
-    }
-
-    return static::$handlerTypes;
+    return [
+      'field' => [
+        // Title.
+        'title' => new TranslatableMarkup('Fields'),
+        // Lowercase title for mid-sentence.
+        'ltitle' => new TranslatableMarkup('fields'),
+        // Singular title.
+        'stitle' => new TranslatableMarkup('Field'),
+        // Singular lowercase title for mid sentence.
+        'lstitle' => new TranslatableMarkup('field'),
+        'plural' => 'fields',
+      ],
+      'argument' => [
+        'title' => new TranslatableMarkup('Contextual filters'),
+        'ltitle' => new TranslatableMarkup('contextual filters'),
+        'stitle' => new TranslatableMarkup('Contextual filter'),
+        'lstitle' => new TranslatableMarkup('contextual filter'),
+        'plural' => 'arguments',
+      ],
+      'sort' => [
+        'title' => new TranslatableMarkup('Sort criteria'),
+        'ltitle' => new TranslatableMarkup('sort criteria'),
+        'stitle' => new TranslatableMarkup('Sort criterion'),
+        'lstitle' => new TranslatableMarkup('sort criterion'),
+        'plural' => 'sorts',
+      ],
+      'filter' => [
+        'title' => new TranslatableMarkup('Filter criteria'),
+        'ltitle' => new TranslatableMarkup('filter criteria'),
+        'stitle' => new TranslatableMarkup('Filter criterion'),
+        'lstitle' => new TranslatableMarkup('filter criterion'),
+        'plural' => 'filters',
+      ],
+      'relationship' => [
+        'title' => new TranslatableMarkup('Relationships'),
+        'ltitle' => new TranslatableMarkup('relationships'),
+        'stitle' => new TranslatableMarkup('Relationship'),
+        'lstitle' => new TranslatableMarkup('Relationship'),
+        'plural' => 'relationships',
+      ],
+      'header' => [
+        'title' => new TranslatableMarkup('Header'),
+        'ltitle' => new TranslatableMarkup('header'),
+        'stitle' => new TranslatableMarkup('Header'),
+        'lstitle' => new TranslatableMarkup('Header'),
+        'plural' => 'header',
+        'type' => 'area',
+      ],
+      'footer' => [
+        'title' => new TranslatableMarkup('Footer'),
+        'ltitle' => new TranslatableMarkup('footer'),
+        'stitle' => new TranslatableMarkup('Footer'),
+        'lstitle' => new TranslatableMarkup('Footer'),
+        'plural' => 'footer',
+        'type' => 'area',
+      ],
+      'empty' => [
+        'title' => new TranslatableMarkup('No results behavior'),
+        'ltitle' => new TranslatableMarkup('no results behavior'),
+        'stitle' => new TranslatableMarkup('No results behavior'),
+        'lstitle' => new TranslatableMarkup('No results behavior'),
+        'plural' => 'empty',
+        'type' => 'area',
+      ],
+    ];
   }
 
   /**
