@@ -275,6 +275,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
         '#title' => $this->t('Value'),
         '#size' => 30,
         '#default_value' => $this->value,
+        '#maxlength' => 256,
       ];
       if (!empty($this->options['expose']['placeholder'])) {
         $form['value']['#attributes']['placeholder'] = $this->options['expose']['placeholder'];

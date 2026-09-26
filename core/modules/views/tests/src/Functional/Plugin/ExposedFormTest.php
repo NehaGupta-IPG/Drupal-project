@@ -38,6 +38,7 @@ class ExposedFormTest extends ViewTestBase {
     'test_exposed_form_sort_items_per_page',
     'test_exposed_form_pager',
     'test_remember_selected',
+    'test_exposed_string_filter',
   ];
 
   /**
@@ -599,6 +600,18 @@ class ExposedFormTest extends ViewTestBase {
     // Reload the page and ensure the filter is selected.
     $this->drupalGet('test_remember_selected');
     $this->assertTrue($this->assertSession()->optionExists('type', 'page')->isSelected());
+  }
+
+  /**
+   * Tests long values in string filters.
+   */
+  public function testLongStringFilter(): void {
+    $this->drupalGet('test_exposed_string_filter');
+    $field = $this->assertSession()->fieldExists("body_value");
+    $this->assertEquals(256, $field->getAttribute('maxlength'));
+    $long_string = 'this is a really long search request that is supposed to go more than 128 characters as a test of an issue where text inputs are being limited by Drupal Views.';
+    $this->getSession()->getPage()->fillField('body_value', $long_string);
+    $this->assertSession()->fieldValueEquals('body_value', $long_string);
   }
 
 }
