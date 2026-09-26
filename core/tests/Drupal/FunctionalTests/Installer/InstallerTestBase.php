@@ -266,7 +266,6 @@ abstract class InstallerTestBase extends BrowserTestBase {
     unset(
       $parameters[$driver]['dependencies'],
       $parameters[$driver]['module'],
-      $parameters[$driver]['arrayAccessPropertySetting'],
     );
     $edit = $this->translatePostValues($parameters);
     $this->submitForm($edit, $this->translations['Save and continue']);

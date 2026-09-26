@@ -141,7 +141,7 @@ class ConnectionTest extends DatabaseTestBase {
     $this->assertEquals($connectionOptions2, $connectionOptions);
 
     // Set up a new connection with different connection info.
-    $test = $connection_info['default']->toArray();
+    $test = $connection_info['default'];
     $test['database'] .= 'test';
     Database::addConnectionInfo('test', 'default', $test);
     $connection_info = Database::getConnectionInfo('test');
