@@ -17,11 +17,6 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [];
-
-  /**
-   * {@inheritdoc}
-   */
   protected $profile = 'nightwatch_a11y_testing';
 
   /**
