@@ -25,14 +25,15 @@ class AccessibilityTest extends AccessibilityTestBase {
    * Tests the 'Admin page, mobile, sidebar open' case.
    *
    * This is a standalone test because resizing the window after loading the
-   * page doesn't work in the CI environment: the button never passes the
-   * isVisible() assertion, even with a very long timeout or a sleep()
+   * page doesn't work in the CI environment: the link never passes the
+   * visibility assertion, even with a very long timeout or a sleep()
    * before the assertion.
    *
    * @todo Determine why loading the page first doesn't work and fix it.
    */
   public function testAxeScanAdminPageMobileSidebarOpen(): void {
     $session = $this->getSession();
+    $assert_session = $this->assertSession();
 
     // Set the viewport before Navigation and page load.
     $session->resizeWindow(500, 800);
@@ -40,27 +41,18 @@ class AccessibilityTest extends AccessibilityTestBase {
     $this->drupalLogin($this->drupalCreateUser(admin: TRUE));
     $this->drupalGet('/admin');
 
-    $menu_button = $session->getPage()
-      ->find('css', '#admin-toolbar')
-      ->findButton('Create');
-
     // A mobile page initially loads with its sidebar closed.
-    $this->assertTrue($menu_button->waitFor(2, function ($menu_button): bool {
-      return !$menu_button->isVisible();
-    }));
+    $content_link_selector = '.toolbar-button--icon--navigation-content';
+    $assert_session->assertNotVisibleInViewport('css', $content_link_selector);
 
     $session->getPage()->pressButton('Expand sidebar');
 
-    // The Create button is visible after expanding the sidebar.
-    $this->assertTrue($menu_button->waitFor(2, function ($menu_button): bool {
-      return $menu_button->isVisible();
-    }));
+    // The Content link is visible after expanding the sidebar.
+    $assert_session->waitForElementVisible('css', $content_link_selector);
 
     $this->assertSession()->responseNotContains('Page not found');
     $this->assertSession()->responseNotContains('Access denied');
 
-    // Sleep prevents intermittent flakiness from scanning too quickly.
-    sleep(1);
     $this->executeAxe();
   }
 
