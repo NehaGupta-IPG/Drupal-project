@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel;
 
-use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\KernelTests\KernelTestBase;
@@ -99,10 +98,9 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
     }
     $connection_info = Database::getConnectionInfo('default');
     foreach ($connection_info as $target => $value) {
-      $options = $value->toArray();
+      $prefix = $value['prefix'];
       // Tests use 7 character prefixes at most so this can't cause collisions.
-      $options['prefix'] = $value->prefix . '0';
-      $connection_info[$target] = ConnectionParametersFactory::createFromOptionsArray($options);
+      $connection_info[$target]['prefix'] = $prefix . '0';
     }
     Database::addConnectionInfo('migrate', 'default', $connection_info['default']);
   }

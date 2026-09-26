@@ -82,7 +82,7 @@ class SiteSettingsForm extends FormBase {
     $input = &$form_state->getUserInput();
     if (!isset($input['driver']) && $database = Database::getConnectionInfo()) {
       $input['driver'] = $database['default']['namespace'];
-      $input[$database['default']['namespace']] = $database['default']->toArray();
+      $input[$database['default']['namespace']] = $database['default'];
     }
 
     if (isset($input['driver'])) {

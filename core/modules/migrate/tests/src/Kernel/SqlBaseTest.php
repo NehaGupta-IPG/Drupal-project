@@ -109,7 +109,7 @@ class SqlBaseTest extends MigrateTestBase {
 
     $target = 'test_state_db_target2';
     $key = 'test_state_migrate_connection2';
-    $database = Database::getConnectionInfo('default')['default']->toArray();
+    $database = Database::getConnectionInfo('default')['default'];
     $config = ['target' => $target, 'key' => $key, 'database' => $database];
     $database_state_key = 'migrate_sql_base_test2';
     \Drupal::state()->set($database_state_key, $config);
@@ -119,7 +119,7 @@ class SqlBaseTest extends MigrateTestBase {
     $sql_base->getDatabase();
 
     // Validate the connection has been created with the right values.
-    $this->assertSame(Database::getConnectionInfo($key)[$target]->toArray(), $database);
+    $this->assertSame(Database::getConnectionInfo($key)[$target], $database);
 
     // Verify that falling back to 'migrate' when the connection is not defined
     // throws a RequirementsException.
@@ -142,7 +142,7 @@ class SqlBaseTest extends MigrateTestBase {
     $sql_base = new TestSqlBase([], $this->migration);
     $target = 'test_state_db_target2';
     $key = 'test_state_migrate_connection2';
-    $database = Database::getConnectionInfo('default')['default']->toArray();
+    $database = Database::getConnectionInfo('default')['default'];
     $database['database'] = 'godot';
     $config = ['target' => $target, 'key' => $key, 'database' => $database];
     $database_state_key = 'migrate_sql_base_test2';

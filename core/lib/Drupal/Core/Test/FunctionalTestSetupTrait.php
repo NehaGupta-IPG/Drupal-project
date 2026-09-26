@@ -565,7 +565,7 @@ trait FunctionalTestSetupTrait {
    *   Array of parameters for use in install_drupal().
    */
   protected function installParameters(): array {
-    $formInput = Database::getConnectionInfo()['default']->toArray();
+    $formInput = Database::getConnectionInfo()['default'];
     $driverName = $formInput['driver'];
     $driverNamespace = $formInput['namespace'];
     $modules = $this->getModulesFromClassProperty();
