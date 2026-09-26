@@ -279,20 +279,20 @@ class ViewsTest extends UnitTestCase {
     $english_types = Views::getHandlerTypes();
     $this->assertSame('EN:Fields', (string) $english_types['field']['title']);
 
-    $french_manager = $this->createTranslationManager('fr', $translator);
+    $japanese_manager = $this->createTranslationManager('ja', $translator);
     if ($replace_container) {
       $container = new ContainerBuilder();
-      $container->set('string_translation', $french_manager);
+      $container->set('string_translation', $japanese_manager);
       \Drupal::setContainer($container);
     }
     else {
-      $this->container->set('string_translation', $french_manager);
+      $this->container->set('string_translation', $japanese_manager);
     }
 
-    $french_types = Views::getHandlerTypes();
-    $this->assertSame('FR:Fields', (string) $french_types['field']['title']);
-    $this->assertSame('FR:no results behavior', (string) $french_types['empty']['ltitle']);
-    $this->assertNotSame($english_types['field']['title'], $french_types['field']['title']);
+    $japanese_types = Views::getHandlerTypes();
+    $this->assertSame('JA:Fields', (string) $japanese_types['field']['title']);
+    $this->assertSame('JA:no results behavior', (string) $japanese_types['empty']['ltitle']);
+    $this->assertNotSame($english_types['field']['title'], $japanese_types['field']['title']);
     $this->assertSame('EN:Fields', (string) $english_types['field']['title']);
   }
 
@@ -324,7 +324,7 @@ class ViewsTest extends UnitTestCase {
       }
     }
 
-    $this->container->set('string_translation', $this->createTranslationManager('fr', $translator));
+    $this->container->set('string_translation', $this->createTranslationManager('ja', $translator));
     unset($english_manager, $types, $type);
     gc_collect_cycles();
     $this->assertNull($reference->get());
