@@ -1388,45 +1388,15 @@ abstract class Connection {
    *   \Drupal\Core\Database\Database::convertDbUrlToConnectionInfo().
    *
    * @see \Drupal\Core\Database\Database::convertDbUrlToConnectionInfo()
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   ConnectionParametersFactory::asUrl() instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public static function createConnectionOptionsFromUrl($url) {
-    $url_components = parse_url($url);
-    if (!isset($url_components['scheme'], $url_components['host'], $url_components['path'])) {
-      throw new \InvalidArgumentException("The database connection URL '$url' is invalid. The minimum requirement is: 'driver://host/database'");
-    }
-
-    $url_components += [
-      'user' => '',
-      'pass' => '',
-      'fragment' => '',
-    ];
-
-    // Remove leading slash from the URL path.
-    if ($url_components['path'][0] === '/') {
-      $url_components['path'] = substr($url_components['path'], 1);
-    }
-
-    // Use reflection to get the namespace of the class being called.
-    $reflector = new \ReflectionClass(static::class);
-
-    $database = [
-      'driver' => $url_components['scheme'],
-      'username' => $url_components['user'],
-      'password' => $url_components['pass'],
-      'host' => $url_components['host'],
-      'database' => $url_components['path'],
-      'namespace' => $reflector->getNamespaceName(),
-    ];
-
-    if (isset($url_components['port'])) {
-      $database['port'] = $url_components['port'];
-    }
-
-    if (!empty($url_components['fragment'])) {
-      $database['prefix'] = $url_components['fragment'];
-    }
-
-    return $database;
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersFactory::createFromUrl() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    return ConnectionParametersFactory::createFromUrl($url)->toArray();
   }
 
   /**

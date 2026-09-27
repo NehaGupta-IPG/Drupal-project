@@ -450,35 +450,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function createConnectionOptionsFromUrl($url) {
-    $url_components = array_merge(['fragment' => ''], parse_url($url));
-    if (!isset($url_components['scheme'], $url_components['path'])) {
-      throw new \InvalidArgumentException("The SQLite database connection URL '$url' is invalid. The minimum requirement is: 'driver:///database'");
-    }
-
-    $namespace = substr(static::class, 0, strlen(static::class) - strlen('\\Connection'));
-
-    $options = [
-      'driver' => $url_components['scheme'],
-      'namespace' => $namespace,
-      'module' => explode('\\', $namespace)[1],
-      'host' => $url_components['host'] ?? '',
-      'prefix' => $url_components['fragment'] ?? '',
-    ];
-
-    // A SQLite database path with two leading slashes indicates a system path.
-    // Otherwise the path is relative to the Drupal root.
-    if ($url_components['path'][0] === '/') {
-      $url_components['path'] = substr($url_components['path'], 1);
-    }
-    $options['database'] = $url_components['path'];
-
-    return $options;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function exceptionHandler() {
     return new ExceptionHandler();
   }

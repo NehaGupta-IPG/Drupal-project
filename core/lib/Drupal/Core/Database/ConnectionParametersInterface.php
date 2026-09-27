@@ -9,6 +9,17 @@ namespace Drupal\Core\Database;
  *
  * @phpstan-import-type ConnectionInfoBaseArray from \Drupal\Core\Database\Database
  * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
+ *
+ * @phpstan-type UrlComponents array{
+ *   'scheme'?: string,
+ *   'path'?: string,
+ *   'user'?: string,
+ *   'pass'?: string,
+ *   'host'?: string,
+ *   'port'?: string|int,
+ *   'fragment'?: string,
+ *   'query'?: string,
+ * }
  */
 interface ConnectionParametersInterface {
 
@@ -45,26 +56,10 @@ interface ConnectionParametersInterface {
   // phpcs:enable
 
   /**
-   * Processes an array of connection options for driver specific defaults.
-   *
-   * This is used internally by the database layer, should not be called
-   * otherwise.
-   *
-   * @param UnprocessedConnectionInfoArray $options
-   *   An array of connection options.
-   *
-   * @return ConnectionInfoBaseArray
-   *   The processed options.
-   *
-   * @internal
-   */
-  public static function processOptionsArray(array $options): array;
-
-  /**
    * Returns the list of parameters.
    *
    * Only the parameters defined as properties are returned, those added to
-   * static::$unknownOptions are ignored.
+   * ::$unknownOptions are ignored.
    *
    * @return list<string>
    *   The list of parameters' names.
@@ -94,5 +89,39 @@ interface ConnectionParametersInterface {
    *   The connection parameters as as a URL.
    */
   public function asUrl(): string;
+
+  /**
+   * Processes an array of connection options for driver specific defaults.
+   *
+   * This is used internally by the database layer, should not be called
+   * otherwise.
+   *
+   * @param UnprocessedConnectionInfoArray $options
+   *   An array of connection options.
+   *
+   * @return ConnectionInfoBaseArray
+   *   The processed options.
+   *
+   * @internal
+   */
+  public static function processOptionsArray(array $options): array;
+
+  /**
+   * Parses an array of URL parts into an array of connection options.
+   *
+   * This is used internally by the database layer, should not be called
+   * otherwise.
+   *
+   * @param UrlComponents $urlComponents
+   *   The URL components.
+   * @param array<int|string, array<mixed>|string> $queryComponents
+   *   The Query URL sub-components.
+   *
+   * @return UnprocessedConnectionInfoArray
+   *   The connection options.
+   *
+   * @internal
+   */
+  public static function parseUrlPartsIntoOptions(array $urlComponents, array $queryComponents): array;
 
 }

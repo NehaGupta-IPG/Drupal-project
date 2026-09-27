@@ -229,6 +229,45 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function parseUrlPartsIntoOptions(array $urlComponents, array $queryComponents): array {
+    if (!isset($urlComponents['scheme'], $urlComponents['host'], $urlComponents['path'])) {
+      throw new \InvalidArgumentException("The database connection URL is invalid. The minimum requirement is: 'driver://host/database'");
+    }
+
+    // Remove leading slash from the URL path.
+    if (str_starts_with($urlComponents['path'], '/')) {
+      $urlComponents['path'] = substr($urlComponents['path'], 1);
+    }
+
+    $options = [
+      'driver' => $urlComponents['scheme'],
+      'database' => $urlComponents['path'],
+    ];
+
+    if (isset($urlComponents['user'])) {
+      $options['username'] = $urlComponents['user'];
+    }
+
+    if (isset($urlComponents['pass'])) {
+      $options['password'] = $urlComponents['pass'];
+    }
+
+    $options['host'] = $urlComponents['host'];
+
+    if (isset($urlComponents['port'])) {
+      $options['port'] = $urlComponents['port'];
+    }
+
+    if (!empty($urlComponents['fragment'])) {
+      $options['prefix'] = $urlComponents['fragment'];
+    }
+
+    return $options;
+  }
+
+  /**
    * Gets an unknownOptions element as a property value.
    */
   public function __get(string $name): mixed {

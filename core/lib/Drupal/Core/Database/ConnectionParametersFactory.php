@@ -167,8 +167,8 @@ abstract class ConnectionParametersFactory {
     // @todo https://www.drupal.org/project/drupal/issues/3250999. Refactor when
     // all database drivers are provided by modules.
     $url_components = parse_url($url);
-    $url_component_query = $url_components['query'] ?? '';
-    parse_str($url_component_query, $query);
+    assert(is_array($url_components));
+    parse_str($url_components['query'] ?? '', $query);
 
     // Use the driver name as the module name when the module name is not
     // provided.
@@ -204,11 +204,19 @@ abstract class ConnectionParametersFactory {
 
     $additional_class_loader->register(TRUE);
 
-    /** @var UnprocessedConnectionInfoArray $options */
-    $options = $connection_class::createConnectionOptionsFromUrl($url);
+    /** @var class-string<ConnectionParametersInterface> $class */
+    $class = $driverNamespace . '\\ConnectionParameters';
+
+    if (class_exists($class)) {
+      $options = $class::parseUrlPartsIntoOptions($url_components, $query);
+    }
+    else {
+      $options = ConnectionParametersBase::parseUrlPartsIntoOptions($url_components, $query);
+    }
 
     // Add the necessary information to autoload code.
     // @see \Drupal\Core\Site\Settings::initialize()
+    $options['namespace'] = $driverNamespace;
     $options['autoload'] = $driver->getPath() . DIRECTORY_SEPARATOR;
     if (isset($autoloadInfo['dependencies'])) {
       $options['dependencies'] = $autoloadInfo['dependencies'];
