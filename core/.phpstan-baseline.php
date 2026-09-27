@@ -176,6 +176,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/includes/form.inc',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 3,
+	'path' => __DIR__ . '/includes/install.core.inc',
+];
+$ignoreErrors[] = [
 	'message' => '#^Function install_check_requirements\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -2486,6 +2494,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Cache/PhpBackend.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Command/DbCommandBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/lib/Drupal/Core/Command/DbCommandBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Command\\\\DbDumpCommand\\:\\:getTableCollation\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -2508,6 +2532,14 @@ $ignoreErrors[] = [
 	'identifier' => 'disallowed.function',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Command/GenerateTheme.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Command/InstallCommand.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Command\\\\ServerCommand\\:\\:openBrowser\\(\\) has no return type specified\\.$#',
@@ -3548,6 +3580,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Update.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Database/ReplicaKillSwitch.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\ReplicaKillSwitch\\:\\:checkReplicaServer\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3768,6 +3808,14 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Display/VariantInterface.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Calling crc32\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
@@ -6110,6 +6158,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/EventSubscriber/EntityRouteProviderSubscriber.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/EventSubscriber/ExceptionDetectNeedsInstallSubscriber.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\EventSubscriber\\\\ExceptionDetectNeedsInstallSubscriber\\:\\:onException\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -7662,6 +7718,14 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Installer/Form/SiteConfigureForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Installer/Form/SiteSettingsForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Installer\\\\Form\\\\SiteSettingsForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -9926,6 +9990,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Test/PerformanceTestRecorder.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfoAsUrl\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  Database\\:\\:getConnectionInfo\\(\\)\\[\'default\'\\]\\-\\>asUrl\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Test/PhpUnitTestRunner.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$class_loader of class Drupal\\\\Core\\\\DrupalKernel constructor expects Composer\\\\Autoload\\\\ClassLoader, null given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
@@ -10394,6 +10466,14 @@ $ignoreErrors[] = [
 	'identifier' => 'drupal.entityStoragePropertyAssignment',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Url.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Utility/Error.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Utility\\\\ProjectInfo\\:\\:processInfoList\\(\\) has no return type specified\\.$#',
@@ -13238,6 +13318,14 @@ $ignoreErrors[] = [
 	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/dblog/src/Hook/DblogHooks.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/dblog/src/Logger/DbLog.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Storing entity storage as a class property is not recommended\\. Call Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getStorage\\(\\) at the call\\-site instead\\.$#',
@@ -19396,6 +19484,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/MigrateEntityContentBaseTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/MigrateMissingDatabaseTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 4,
+	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/MigrateTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Cannot unset property Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\MigrateTestBase\\:\\:\\$migrateMessages because it might have hooks in a subclass\\.$#',
 	'identifier' => 'unset.possiblyHookedProperty',
 	'count' => 1,
@@ -19442,6 +19546,14 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/MigrateTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 8,
+	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/SqlBaseTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Unit\\\\StubSourceGeneratorPlugin\\:\\:getCacheCounts\\(\\) has no return type specified\\.$#',
@@ -19502,6 +19614,14 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/mysql/src/Driver/Database/mysql/Connection.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/mysql/src/Driver/Database/mysql/Install/Tasks.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\mysql\\\\Driver\\\\Database\\\\mysql\\\\Install\\\\Tasks\\:\\:ensureInnoDbAvailable\\(\\) has no return type specified\\.$#',
@@ -19576,10 +19696,42 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/mysql/src/Driver/Database/mysql/Schema.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/mysql/tests/src/Functional/InstallerIsolationLevelExistingSettingsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/mysql/tests/src/Functional/InstallerIsolationLevelNoDatabaseSettingsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/mysql/tests/src/Kernel/mysql/DatabaseExceptionWrapperTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$required of static method Drupal\\\\Component\\\\Utility\\\\Environment\\:\\:checkMemoryLimit\\(\\) expects string, \\(float\\|int\\) given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/mysql/tests/src/Kernel/mysql/LargeQueryTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/mysql/tests/src/Kernel/mysql/PrefixInfoTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$string_ascii_check might not be defined\\.$#',
@@ -19592,6 +19744,14 @@ $ignoreErrors[] = [
 	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/mysql/tests/src/Kernel/mysql/SchemaTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/mysqli/tests/src/Kernel/mysqli/LargeQueryTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$required of static method Drupal\\\\Component\\\\Utility\\\\Environment\\:\\:checkMemoryLimit\\(\\) expects string, \\(float\\|int\\) given\\.$#',
@@ -20608,6 +20768,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Connection.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Install/Tasks.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\pgsql\\\\Driver\\\\Database\\\\pgsql\\\\Install\\\\Tasks\\:\\:checkBinaryOutput\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -20738,6 +20906,22 @@ $ignoreErrors[] = [
 	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Select.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/pgsql/tests/src/Kernel/pgsql/ConnectionTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/pgsql/tests/src/Kernel/pgsql/NonPublicSchemaTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Direct injection of entity storage via \\$imageStyleStorage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
@@ -21752,6 +21936,14 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Form/ThemeUninstallConfirmForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/src/Hook/SystemRequirementsHooks.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$pdo_message might not be defined\\.$#',
@@ -23496,6 +23688,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/Render/HtmlResponseAttachmentsTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/System/DatabaseDriverProvidedByModuleTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\System\\\\SiteMaintenanceTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -23514,10 +23714,98 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/Theme/ThemeUiTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/Theme/ThemeUpdateTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/UpdateSystem/BrokenCacheUpdateTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/UpdateSystem/EntityUpdateInitialTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/UpdateSystem/UpdatePathLastRemovedTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/UpdateSystem/UpdatePathNewDependencyTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/UpdateSystem/UpdatePathTestJavaScriptTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/UpdateSystem/UpdatePathWithBrokenRoutingTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$update_url of method Drupal\\\\Tests\\\\system\\\\Functional\\\\UpdateSystem\\\\UpdatePathWithBrokenRoutingTest\\:\\:runUpdates\\(\\) expects string\\|null, Drupal\\\\Core\\\\Url given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/UpdateSystem/UpdatePathWithBrokenRoutingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/UpdateSystem/UpdatePostUpdateExceptionTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/UpdateSystem/UpdatePostUpdateFailingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/UpdateSystem/UpdatePostUpdateTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/UpdateSystem/UpdateRemovedPostUpdateTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\FunctionalJavascript\\\\OffCanvasTestBase\\:\\:assertAllContextualLinksLoaded\\(\\) has no return type specified\\.$#',
@@ -23584,6 +23872,22 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/src/Kernel/Form/FormElementMaxlengthTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/system/tests/src/Kernel/Scripts/DbCommandBaseTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfoAsUrl\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  Database\\:\\:getConnectionInfo\\(\\)\\[\'default\'\\]\\-\\>asUrl\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/system/tests/src/Kernel/Scripts/DbCommandBaseTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$string of static method Drupal\\\\Component\\\\Utility\\\\Xss\\:\\:filter\\(\\) expects string, int given\\.$#',
@@ -32158,6 +32462,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Functional/ViewTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Functional/ViewsConfigUpdaterTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\ViewsFormMultipleTest\\:\\:viewsData\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -32426,6 +32738,14 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/RelationshipJoinTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/SqlQueryTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Plugin\\\\SqlQueryTest\\:\\:viewsData\\(\\) has no return type specified\\.$#',
@@ -33598,6 +33918,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/PathWorkspacesTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/UpdateSystem/ActiveWorkspaceUpdateTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\WorkspaceBypassTest\\:\\:isLabelInContentOverview\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34018,6 +34346,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/profiles/tests/testing/modules/drupal_system_listing_compatible_test/tests/src/Kernel/SystemListingCrossProfileCompatibleTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/scripts/run-tests.sh',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/scripts/run-tests.sh',
+];
+$ignoreErrors[] = [
 	'message' => '#^Function simpletest_script_execute_batch\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34080,6 +34424,70 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/FunctionalJavascriptTests/Tests/DrupalSelenium2DriverTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/DistributionProfileExistingSettingsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerBrokenDatabaseCredentialsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerBrokenDatabasePortSettingsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerExistingBrokenDatabaseSettingsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerExistingConfigExistingSettingsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerExistingDatabaseSettingsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerExistingSettingsNoProfileTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerExistingSettingsTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\FunctionalTests\\\\MailCaptureTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34090,6 +34498,22 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/MailCaptureTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Update/UpdatePathTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Update/UpdatePathTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Action\\\\EmailActionTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
@@ -34108,6 +34532,54 @@ $ignoreErrors[] = [
 	'identifier' => 'drupal.entityStoragePropertyAssignment',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigEntityUnitTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 4,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 4,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificConnectionUnitTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificTransactionTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/LoggingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/ReplicaKillSwitchTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/TransactionTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Storing entity storage as a class property is not recommended\\. Call Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getStorage\\(\\) at the call\\-site instead\\.$#',
@@ -34162,6 +34634,14 @@ $ignoreErrors[] = [
 	'identifier' => 'drupal.entityStoragePropertyAssignment',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityQueryTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Installer/InstallerRedirectTraitMockableClass.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Plugin\\\\Context\\\\TestContextAwarePlugin\\:\\:getCacheContexts\\(\\) has no return type specified\\.$#',
@@ -34242,16 +34722,64 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/TypedData/TypedDataDefinitionEntityBundleTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 4,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBaseDatabaseDriverModuleTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBaseDatabaseDriverModuleTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Storing entity storage as a class property is not recommended\\. Call Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getStorage\\(\\) at the call\\-site instead\\.$#',
 	'identifier' => 'drupal.entityStoragePropertyAssignment',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/RouteProvider.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Scripts/TestSiteApplicationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\TestSite\\\\Commands\\\\TestSiteInstallCommand\\:\\:assertTrue\\(\\)\\.$#',
@@ -34263,6 +34791,22 @@ $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\TestSite\\\\Commands\\\\TestSiteInstallCommand\\:\\:fail\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteInstallCommand.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteInstallCommand.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 2,
 	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteInstallCommand.php',
 ];
 $ignoreErrors[] = [
@@ -34374,6 +34918,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteInstallCommand.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteTearDownCommand.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\TestSite\\\\TestPreinstallInterface\\:\\:preinstall\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34384,6 +34936,22 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/TestSite/TestSetupInterface.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 4,
+	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\BrowserTestBase\\:\\:cleanupEnvironment\\(\\) has no return type specified\\.$#',
@@ -34690,6 +35258,22 @@ $ignoreErrors[] = [
 	'identifier' => 'drupal.symfonyYamlParse',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Recipe/RecipeMultipleModulesConfigStorageTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Test/TestSetupTraitTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
+in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+  \\:\\:getConnectionParameters\\(\\) instead\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 5,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Test/TestSetupTraitTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$constraint of method JsonSchema\\\\Constraints\\\\BaseConstraint\\:\\:addError\\(\\) expects JsonSchema\\\\ConstraintError, string given\\.$#',
