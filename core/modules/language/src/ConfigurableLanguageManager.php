@@ -10,6 +10,7 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\FiberResumeType;
 use Drupal\language\Config\LanguageConfigFactoryOverrideInterface;
@@ -92,6 +93,13 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   protected $renderOverrideLanguages;
 
   /**
+   * The translation manager service closure.
+   *
+   * @var \Closure(): \Drupal\Core\StringTranslation\TranslationManager
+   */
+  protected \Closure $translationManagerClosure;
+
+  /**
    * Whether or not the language manager has been initialized.
    *
    * @var bool
@@ -130,12 +138,17 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    * @param \Closure(): \Drupal\Core\StringTranslation\TranslationManager $translationManagerClosure
    *   The translation manager service closure.
    */
-  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected CacheBackendInterface $cacheBackend, protected readonly \Closure $translationManagerClosure) {
+  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected CacheBackendInterface $cacheBackend, ?\Closure $translationManagerClosure = NULL) {
     $this->defaultLanguage = $default_language;
     $this->configFactory = $config_factory;
     $this->moduleHandler = $module_handler;
     $this->configFactoryOverride = $config_override;
     $this->requestStack = $request_stack;
+    if ($translationManagerClosure === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $translationManagerClosure argument is deprecated in drupal:11.5.0 and it will be required in drupal:14.0.0. See https://www.drupal.org/node/3626335', E_USER_DEPRECATED);
+      $translationManagerClosure = static fn() => \Drupal::service(TranslationInterface::class);
+    }
+    $this->translationManagerClosure = $translationManagerClosure;
   }
 
   /**
