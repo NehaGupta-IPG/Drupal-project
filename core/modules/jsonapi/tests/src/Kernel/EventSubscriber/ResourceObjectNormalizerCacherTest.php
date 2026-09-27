@@ -252,24 +252,39 @@ class ResourceObjectNormalizerCacherTest extends KernelTestBase {
 
       public function __construct(protected VariationCacheInterface $inner) {}
 
+      /**
+       * {@inheritdoc}
+       */
       public function get(array $keys, CacheableDependencyInterface $initial_cacheability) {
         $this->calls[] = 'get';
         return $this->inner->get($keys, $initial_cacheability);
       }
 
+      /**
+       * {@inheritdoc}
+       */
       public function getMultiple(array $items): array {
         $this->calls[] = 'getMultiple';
         return $this->inner->getMultiple($items);
       }
 
+      /**
+       * {@inheritdoc}
+       */
       public function set(array $keys, $data, CacheableDependencyInterface $cacheability, CacheableDependencyInterface $initial_cacheability): void {
         $this->inner->set($keys, $data, $cacheability, $initial_cacheability);
       }
 
+      /**
+       * {@inheritdoc}
+       */
       public function delete(array $keys, CacheableDependencyInterface $initial_cacheability): void {
         $this->inner->delete($keys, $initial_cacheability);
       }
 
+      /**
+       * {@inheritdoc}
+       */
       public function invalidate(array $keys, CacheableDependencyInterface $initial_cacheability): void {
         $this->inner->invalidate($keys, $initial_cacheability);
       }
