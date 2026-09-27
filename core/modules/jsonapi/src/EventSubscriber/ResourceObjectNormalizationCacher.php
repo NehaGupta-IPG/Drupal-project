@@ -7,6 +7,7 @@ use Drupal\Core\Cache\VariationCacheInterface;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
 use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -62,6 +63,20 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
   protected $toCache = [];
 
   /**
+   * Cache items read by ::prefetch(), keyed by joined cache keys.
+   *
+   * FALSE indicates a cache miss. Items are removed when read by ::get().
+   *
+   * @var array<string, object|false>
+   */
+  protected array $prefetched = [];
+
+  /**
+   * The request for which the items in ::$prefetched were read.
+   */
+  protected ?Request $prefetchedRequest = NULL;
+
+  /**
    * Sets the variation cache.
    *
    * @param \Drupal\Core\Cache\VariationCacheInterface $variation_cache
@@ -106,7 +121,15 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
       return FALSE;
     }
 
-    $cached = $this->variationCache->get($this->generateCacheKeys($object), new CacheableMetadata());
+    $keys = $this->generateCacheKeys($object);
+    $prefetch_key = implode(':', $keys);
+    if ($this->prefetchedRequest === $this->requestStack->getCurrentRequest() && array_key_exists($prefetch_key, $this->prefetched)) {
+      $cached = $this->prefetched[$prefetch_key];
+      unset($this->prefetched[$prefetch_key]);
+    }
+    else {
+      $cached = $this->variationCache->get($keys, new CacheableMetadata());
+    }
     if (!$cached) {
       return FALSE;
     }
@@ -140,6 +163,47 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
       }
     }
     return $normalizer_values;
+  }
+
+  /**
+   * Reads the cached normalizations of multiple resource objects in bulk.
+   *
+   * Later calls to ::get() for these objects during the same request use the
+   * prefetched items instead of reading from the cache individually.
+   *
+   * @param array $objects
+   *   The objects to prefetch. Anything not a resource object is ignored.
+   */
+  public function prefetch(array $objects): void {
+    $request = $this->requestStack->getCurrentRequest();
+    // Prefetched items are only valid for the request that read them.
+    if ($this->prefetchedRequest !== $request) {
+      $this->prefetched = [];
+      $this->prefetchedRequest = $request;
+    }
+
+    // @todo Investigate whether to cache POST and PATCH requests.
+    // @todo Follow up on https://www.drupal.org/project/drupal/issues/3381898.
+    if (!$request->isMethodCacheable()) {
+      return;
+    }
+
+    $items = [];
+    foreach ($objects as $object) {
+      if (!$object instanceof ResourceObject || $object->getCacheMaxAge() === 0) {
+        continue;
+      }
+      $keys = $this->generateCacheKeys($object);
+      $items[implode(':', $keys)] = [$keys, new CacheableMetadata()];
+    }
+    if (empty($items)) {
+      return;
+    }
+
+    $cached = $this->variationCache->getMultiple($items);
+    foreach (array_keys($items) as $prefetch_key) {
+      $this->prefetched[$prefetch_key] = $cached[$prefetch_key] ?? FALSE;
+    }
   }
 
   /**

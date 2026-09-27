@@ -2,8 +2,10 @@
 
 namespace Drupal\jsonapi\Normalizer;
 
+use Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher;
 use Drupal\jsonapi\JsonApiResource\Data;
 use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Normalizes JSON:API Data objects.
@@ -11,6 +13,11 @@ use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
  * @internal
  */
 class DataNormalizer extends NormalizerBase {
+
+  public function __construct(
+    #[Autowire(service: 'jsonapi.normalization_cacher')]
+    protected ResourceObjectNormalizationCacher $cacher,
+  ) {}
 
   /**
    * Normalizes data into a set of arrays/scalars.
@@ -28,6 +35,8 @@ class DataNormalizer extends NormalizerBase {
    */
   public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     assert($object instanceof Data);
+    // Read the cached normalizations of all resource objects in one batch.
+    $this->cacher->prefetch($object->toArray());
     $cacheable_normalizations = array_map(function ($resource) use ($format, $context) {
       return $this->serializer->normalize($resource, $format, $context);
     }, $object->toArray());

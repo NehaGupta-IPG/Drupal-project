@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Kernel\EventSubscriber;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\VariationCacheInterface;
 use Drupal\entity_test\Entity\EntityTestComputedField;
 use Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
@@ -211,6 +213,92 @@ class ResourceObjectNormalizerCacherTest extends KernelTestBase {
 
     // The cacher should not cache the normalization since max-age is 0.
     $this->assertFalse($this->cacher->get($resource_object));
+  }
+
+  /**
+   * Tests that prefetched normalizations are read in one batch.
+   */
+  public function testPrefetch(): void {
+    $resource_objects = [];
+    for ($i = 0; $i < 3; $i++) {
+      $user = User::create(['name' => $this->randomMachineName()]);
+      $user->save();
+      $resource_type = $this->resourceTypeRepository->get($user->getEntityTypeId(), $user->bundle());
+      $resource_objects[] = ResourceObject::createFromEntity($resource_type, $user);
+    }
+    [$cached_object, $other_cached_object, $uncached_object] = $resource_objects;
+    foreach ([$cached_object, $other_cached_object] as $resource_object) {
+      $this->cacher->saveOnTerminate($resource_object, [
+        ResourceObjectNormalizationCacher::RESOURCE_CACHE_SUBSET_BASE => [
+          'id' => CacheableNormalization::permanent($resource_object->getId()),
+        ],
+        ResourceObjectNormalizationCacher::RESOURCE_CACHE_SUBSET_FIELDS => [],
+      ]);
+    }
+    $http_kernel = $this->prophesize(HttpKernelInterface::class);
+    $request = $this->prophesize(Request::class);
+    $response = $this->prophesize(Response::class);
+    $this->cacher->onTerminate(new TerminateEvent($http_kernel->reveal(), $request->reveal(), $response->reveal()));
+
+    // Record the calls to the variation cache.
+    $variation_cache = new class($this->container->get('variation_cache.jsonapi_normalizations')) implements VariationCacheInterface {
+
+      /**
+       * The names of the called methods, in call order.
+       *
+       * @var string[]
+       */
+      public array $calls = [];
+
+      public function __construct(protected VariationCacheInterface $inner) {}
+
+      public function get(array $keys, CacheableDependencyInterface $initial_cacheability) {
+        $this->calls[] = 'get';
+        return $this->inner->get($keys, $initial_cacheability);
+      }
+
+      public function getMultiple(array $items): array {
+        $this->calls[] = 'getMultiple';
+        return $this->inner->getMultiple($items);
+      }
+
+      public function set(array $keys, $data, CacheableDependencyInterface $cacheability, CacheableDependencyInterface $initial_cacheability): void {
+        $this->inner->set($keys, $data, $cacheability, $initial_cacheability);
+      }
+
+      public function delete(array $keys, CacheableDependencyInterface $initial_cacheability): void {
+        $this->inner->delete($keys, $initial_cacheability);
+      }
+
+      public function invalidate(array $keys, CacheableDependencyInterface $initial_cacheability): void {
+        $this->inner->invalidate($keys, $initial_cacheability);
+      }
+
+    };
+    $this->cacher->setVariationCache($variation_cache);
+
+    // Items that are not resource objects are ignored.
+    $this->cacher->prefetch([...$resource_objects, NULL]);
+    $this->assertSame(['getMultiple'], $variation_cache->calls);
+
+    // Prefetched hits and misses do not read from the cache again.
+    $normalization = $this->cacher->get($cached_object);
+    $this->assertSame($cached_object->getId(), $normalization[ResourceObjectNormalizationCacher::RESOURCE_CACHE_SUBSET_BASE]['id']->getNormalization());
+    $this->assertFalse($this->cacher->get($uncached_object));
+    $this->assertSame(['getMultiple'], $variation_cache->calls);
+
+    // A prefetched item is used only once. The next read uses the cache and
+    // returns the same normalization.
+    $this->assertEquals($normalization, $this->cacher->get($cached_object));
+    $this->assertSame(['getMultiple', 'get'], $variation_cache->calls);
+
+    // Prefetched items cannot be used for a different request.
+    $request_stack = $this->container->get('request_stack');
+    $request_stack->push(Request::create('/'));
+    $normalization = $this->cacher->get($other_cached_object);
+    $request_stack->pop();
+    $this->assertSame($other_cached_object->getId(), $normalization[ResourceObjectNormalizationCacher::RESOURCE_CACHE_SUBSET_BASE]['id']->getNormalization());
+    $this->assertSame(['getMultiple', 'get', 'get'], $variation_cache->calls);
   }
 
 }
