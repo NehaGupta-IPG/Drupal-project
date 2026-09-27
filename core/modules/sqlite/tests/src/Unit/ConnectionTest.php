@@ -103,4 +103,30 @@ class ConnectionTest extends UnitTestCase {
     $this->assertEquals('qux', $sqlite_connection->getConnectionOptions()['foo']);
   }
 
+  /**
+   * Checks with* methods of ConnectionParameters.
+   */
+  public function testConnectionParametersWithMethods(): void {
+    /** @var UnprocessedConnectionInfoArray $connectionArray */
+    $connectionArray = [
+      'driver' => 'sqlite',
+      'database' => ':memory:',
+      'foo' => 'bar',
+      'prefix' => 'baz',
+    ];
+    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray($connectionArray);
+    $this->assertInstanceOf(ConnectionParameters::class, $connectionParameters);
+    $this->assertEquals('sqlite', $connectionParameters->driver);
+    $this->assertEquals(':memory:', $connectionParameters->database);
+    $this->assertEquals('baz', $connectionParameters->prefix);
+
+    $testParameters = $connectionParameters
+      ->withDatabase('sanday')
+      ->withPrefix('westray');
+    $this->assertInstanceOf(ConnectionParameters::class, $testParameters);
+    $this->assertEquals('sqlite', $testParameters->driver);
+    $this->assertEquals('sanday', $testParameters->database);
+    $this->assertEquals('westray', $testParameters->prefix);
+  }
+
 }

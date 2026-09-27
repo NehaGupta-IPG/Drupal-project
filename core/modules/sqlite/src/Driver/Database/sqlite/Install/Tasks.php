@@ -81,17 +81,12 @@ class Tasks extends InstallTasks {
 
         // In order to change the Database::$databaseInfo array, need to remove
         // the active connection, then re-add it with the new info.
-        $attemptParameters = ConnectionParametersFactory::createFromOptionsArray([
-          'driver' => $liveParameters['default']->driver,
-          'module' => $liveParameters['default']->module,
-          'namespace' => $liveParameters['default']->namespace,
-          'autoload' => $liveParameters['default']->autoload,
-          // We cannot use \Drupal::service('file_system')->getTempDirectory()
-          // here because we haven't yet successfully connected to the
-          // database.
-          'database' => \Drupal::service('file_system')->tempnam(sys_get_temp_dir(), 'sqlite'),
-          'prefix' => $liveParameters['default']->prefix,
-        ]);
+        // We cannot use \Drupal::service('file_system')->getTempDirectory()
+        // here because we haven't yet successfully connected to the
+        // database.
+        $attemptParameters = $liveParameters->withDatabase(
+          \Drupal::service('file_system')->tempnam(sys_get_temp_dir(), 'sqlite'),
+        );
         Database::removeConnection('default');
         Database::addConnectionInfo('default', 'default', $attemptParameters);
 

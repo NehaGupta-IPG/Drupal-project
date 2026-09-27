@@ -91,6 +91,22 @@ interface ConnectionParametersInterface {
   public function asUrl(): string;
 
   /**
+   * Returns the connection parameters for a different database.
+   *
+   * @param string $database
+   *   The new database for the parameters.
+   */
+  public function withDatabase(string $database): static;
+
+  /**
+   * Returns the connection parameters for a different table prefix.
+   *
+   * @param string $prefix
+   *   The new table prefix for the parameters.
+   */
+  public function withPrefix(string $prefix): static;
+
+  /**
    * Processes an array of connection options for driver specific defaults.
    *
    * This is used internally by the database layer, should not be called

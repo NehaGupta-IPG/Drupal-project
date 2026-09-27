@@ -20,7 +20,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public string $driver {
     set(string $value) {
-      if (isset($this->driver) && !$this->arrayAccessPropertySetting) {
+      if (isset($this->driver) && $this->sealed) {
         throw new \RuntimeException('The $driver property is already set');
       }
       $this->driver = $value;
@@ -32,7 +32,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public string $module {
     set(string $value) {
-      if (isset($this->module) && !$this->arrayAccessPropertySetting) {
+      if (isset($this->module) && $this->sealed) {
         throw new \RuntimeException('The $module property is already set');
       }
       $this->module = $value;
@@ -44,7 +44,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public string $namespace {
     set(string $value) {
-      if (isset($this->namespace) && !$this->arrayAccessPropertySetting) {
+      if (isset($this->namespace) && $this->sealed) {
         throw new \RuntimeException('The $namespace property is already set');
       }
       $this->namespace = $value;
@@ -56,7 +56,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public string $autoload {
     set(string $value) {
-      if (isset($this->autoload) && !$this->arrayAccessPropertySetting) {
+      if (isset($this->autoload) && $this->sealed) {
         throw new \RuntimeException('The $autoload property is already set');
       }
       $this->autoload = $value;
@@ -68,7 +68,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public string $database {
     set(string $value) {
-      if (isset($this->database) && !$this->arrayAccessPropertySetting) {
+      if (isset($this->database) && $this->sealed) {
         throw new \RuntimeException('The $database property is already set');
       }
       $this->database = $value;
@@ -80,7 +80,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public string $prefix {
     set(string $value) {
-      if (isset($this->prefix) && !$this->arrayAccessPropertySetting) {
+      if (isset($this->prefix) && $this->sealed) {
         throw new \RuntimeException('The $prefix property is already set');
       }
       $this->prefix = $value;
@@ -89,11 +89,11 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   // phpcs:enable
 
   /**
-   * Allows BC to access publicly a property as an array element for writing.
+   * Indicates if the object properties are sealed.
    *
    * @internal
    */
-  protected bool $arrayAccessPropertySetting = FALSE;
+  protected bool $sealed = FALSE;
 
   /**
    * Constructor.
@@ -106,6 +106,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     // driver cannot handle, but we still can provide access to them.
     protected array $unknownOptions = [],
   ) {
+    $this->sealed = TRUE;
   }
 
   /**
@@ -232,6 +233,28 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   /**
    * {@inheritdoc}
    */
+  public function withDatabase(string $database): static{
+    $instance = clone $this;
+    $instance->sealed = FALSE;
+    $instance->database = $database;
+    $instance->sealed = TRUE;
+    return $instance;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function withPrefix(string $prefix): static{
+    $instance = clone $this;
+    $instance->sealed = FALSE;
+    $instance->prefix = $prefix;
+    $instance->sealed = TRUE;
+    return $instance;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function parseUrlPartsIntoOptions(array $urlComponents, array $queryComponents): array {
     if (!isset($urlComponents['scheme'], $urlComponents['host'], $urlComponents['path'])) {
       throw new \InvalidArgumentException("The database connection URL is invalid. The minimum requirement is: 'driver://host/database'");
@@ -331,9 +354,9 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     $offset = (string) $offset;
     assert(is_null($value) || is_bool($value) || is_string($value) || is_numeric($value));
     if (property_exists($this, $offset)) {
-      $this->arrayAccessPropertySetting = TRUE;
+      $this->sealed = FALSE;
       $this->{$offset} = $value;
-      $this->arrayAccessPropertySetting = FALSE;
+      $this->sealed = TRUE;
       return;
     }
     $this->unknownOptions[$offset] = $value;
