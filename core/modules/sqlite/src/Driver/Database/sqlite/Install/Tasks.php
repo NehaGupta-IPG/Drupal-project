@@ -76,8 +76,8 @@ class Tasks extends InstallTasks {
       // Attempt to create the database if it is not found.
       if ($e->getCode() == Connection::DATABASE_NOT_FOUND) {
         // Remove the database string from connection info.
-        $liveParameters = Database::getConnectionParameters();
-        $liveDatabase = $liveParameters['default']->database;
+        $liveParameters = Database::getConnectionParameters()['default'];
+        $liveDatabase = $liveParameters->database;
 
         // In order to change the Database::$databaseInfo array, need to remove
         // the active connection, then re-add it with the new info.
@@ -96,7 +96,7 @@ class Tasks extends InstallTasks {
 
           // Now, restore the database config.
           Database::removeConnection('default');
-          Database::addConnectionInfo('default', 'default', $liveParameters['default']);
+          Database::addConnectionInfo('default', 'default', $liveParameters);
 
           // Check the database connection.
           Database::getConnection();
