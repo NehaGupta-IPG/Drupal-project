@@ -508,10 +508,10 @@ abstract class Connection {
    * signature. We therefore also ensure that this function is only ever
    * called once.
    *
-   * @param string $target
+   * @param string|null $target
    *   (optional) The target this connection is for.
    */
-  public function setTarget(string $target = NULL) {
+  public function setTarget(?string $target = NULL) {
     if (!isset($this->target)) {
       $this->target = $target;
     }
