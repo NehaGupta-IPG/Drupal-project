@@ -15,15 +15,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Finalize user logout.
  */
-final readonly class LogoutFinalizer {
+final class LogoutFinalizer {
 
   public function __construct(
-    protected AccountProxyInterface $accountProxy,
+    readonly protected AccountProxyInterface $accountProxy,
     #[Autowire(service: RequestStack::class)]
     protected RequestStack|SessionManagerInterface $requestStack,
-    protected ModuleHandlerInterface $moduleHandler,
+    readonly protected ModuleHandlerInterface $moduleHandler,
     #[Autowire(service: 'logger.channel.user')]
-    protected LoggerInterface $logger,
+    readonly protected LoggerInterface $logger,
   ) {
     if ($requestStack instanceof SessionManagerInterface) {
       @trigger_error('Calling ' . __METHOD__ . '() with a $sessionManager argument is deprecated in drupal:11.5.0 and it will throw an error in drupal:14.0.0. Pass $requestStack instead. See https://www.drupal.org/node/3570844', E_USER_DEPRECATED);
