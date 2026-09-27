@@ -144,8 +144,9 @@ class IncludeResolver {
             continue;
           }
 
-          // If the field definition contains the target entity type, collect the
-          // target ID to load all targets in a batch with ::loadMultiple() below.
+          // If the field definition contains the target entity type, collect
+          // the target ID to load all targets in a batch with ::loadMultiple()
+          // below.
           $target_definition = $entity_property->getTargetDefinition();
           $target_type = $target_definition instanceof EntityDataDefinitionInterface ? $target_definition->getEntityTypeId() : NULL;
           if ($target_type !== NULL) {
