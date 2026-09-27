@@ -1390,7 +1390,7 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Database::convertDbUrlToConnectionInfo()
    *
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
-   *   ConnectionParametersFactory::asUrl() instead.
+   *   ConnectionParametersFactory::createFromUrl() instead.
    *
    * @see https://www.drupal.org/node/7654123
    */

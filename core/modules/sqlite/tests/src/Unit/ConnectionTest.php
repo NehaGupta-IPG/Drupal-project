@@ -28,22 +28,18 @@ class ConnectionTest extends UnitTestCase {
    * @param string $url
    *   SQLite URL.
    * @param string $expected
-   *   Expected connection option.
+   *   Expected database name.
+   * @param string $expected_prefix
+   *   Expected database table prefix.
    */
   #[DataProvider('providerCreateConnectionOptionsFromUrl')]
-  public function testCreateConnectionOptionsFromUrl(string $url, string $expected): void {
-    /** @var UnprocessedConnectionInfoArray $connectionArray */
-    $connectionArray = [
-      'driver' => 'sqlite',
-      'database' => ':memory:',
-      'foo' => 'bar',
-    ];
-    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray($connectionArray);
-    $this->assertInstanceOf(ConnectionParameters::class, $connectionParameters);
-    $sqlite_connection = new Connection($this->createStub(SqliteConnection::class), $connectionParameters);
-    $database = $sqlite_connection->createConnectionOptionsFromUrl($url);
-    $this->assertEquals('sqlite', $database['driver']);
-    $this->assertEquals($expected, $database['database']);
+  public function testCreateConnectionOptionsFromUrl(string $url, string $expected, string $expected_prefix): void {
+    $parameters = ConnectionParametersFactory::createFromUrl($url);
+    $this->assertInstanceOf(ConnectionParameters::class, $parameters);
+    $this->assertEquals('sqlite', $parameters->driver);
+    $this->assertEquals('sqlite', $parameters->module);
+    $this->assertEquals($expected, $parameters->database);
+    $this->assertEquals($expected_prefix, $parameters->prefix);
   }
 
   /**
@@ -52,13 +48,23 @@ class ConnectionTest extends UnitTestCase {
    * @return string[][]
    *   Associative array of arrays with the following elements:
    *   - SQLite database URL
-   *   - Expected database connection option
+   *   - Expected database name
+   *   - Expected database table prefix
    */
   public static function providerCreateConnectionOptionsFromUrl(): array {
     return [
-      'sqlite relative path' => ['sqlite://localhost/tmp/test', 'tmp/test'],
-      'sqlite absolute path' => ['sqlite://localhost//tmp/test', '/tmp/test'],
-      'in memory sqlite path' => ['sqlite://localhost/:memory:', ':memory:'],
+      'sqlite relative path' => ['sqlite://localhost/tmp/test', 'tmp/test', ''],
+      'sqlite absolute path' => ['sqlite://localhost//tmp/test', '/tmp/test', ''],
+      'in memory sqlite path' => ['sqlite://localhost/:memory:', ':memory:', ''],
+      'sqlite relative path with module' => ['sqlite://localhost/tmp/test?module=sqlite', 'tmp/test', ''],
+      'sqlite absolute path with module' => ['sqlite://localhost//tmp/test?module=sqlite', '/tmp/test', ''],
+      'in memory sqlite path with module' => ['sqlite://localhost/:memory:?module=sqlite', ':memory:', ''],
+      'sqlite relative path with prefix' => ['sqlite://localhost/tmp/test#bar', 'tmp/test', 'bar'],
+      'sqlite absolute path with prefix' => ['sqlite://localhost//tmp/test#bar', '/tmp/test', 'bar'],
+      'in memory sqlite path with prefix' => ['sqlite://localhost/:memory:#bar', ':memory:', 'bar'],
+      'sqlite relative path with module and prefix' => ['sqlite://localhost/tmp/test?module=sqlite#foo', 'tmp/test', 'foo'],
+      'sqlite absolute path with module and prefix' => ['sqlite://localhost//tmp/test?module=sqlite#foo', '/tmp/test', 'foo'],
+      'in memory sqlite path with module and prefix' => ['sqlite://localhost/:memory:?module=sqlite#foo', ':memory:', 'foo'],
     ];
   }
 
