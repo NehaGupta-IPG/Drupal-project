@@ -11,7 +11,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\TypedData\TypedDataInternalPropertiesHelper;
 use Drupal\Core\Url;
 use Drupal\jsonapi\JsonApiSpec;
 use Drupal\jsonapi\ResourceType\ResourceType;
@@ -303,12 +302,6 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
    */
   protected static function extractContentEntityFields(ResourceType $resource_type, ContentEntityInterface $entity) {
     $output = [];
-    $fields = TypedDataInternalPropertiesHelper::getNonInternalProperties($entity->getTypedData());
-    // Filter the array based on the field names.
-    $enabled_field_names = array_filter(
-      array_keys($fields),
-      [$resource_type, 'isFieldEnabled']
-    );
 
     // Special handling for user entities that allows a JSON:API user agent to
     // access the display name of a user. For example, this is useful when
@@ -321,11 +314,13 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
       $output[$display_name] = $entity->getDisplayName();
     }
 
-    // Return a sub-array of $output containing the keys in $enabled_fields.
-    $input = array_intersect_key($fields, array_flip($enabled_field_names));
-    foreach ($input as $field_name => $field_value) {
+    // Do not instantiate internal or disabled fields.
+    foreach ($entity->getFieldDefinitions() as $field_name => $definition) {
+      if ($definition->isInternal() || !$resource_type->isFieldEnabled($field_name)) {
+        continue;
+      }
       $public_field_name = $resource_type->getPublicName($field_name);
-      $output[$public_field_name] = $field_value;
+      $output[$public_field_name] = $entity->get($field_name);
     }
 
     return $output;
