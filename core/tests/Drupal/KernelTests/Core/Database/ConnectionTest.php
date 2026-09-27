@@ -54,35 +54,6 @@ class ConnectionTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests deprecation of integer values for connection $key and $target.
-   */
-  #[IgnoreDeprecations]
-  public function testConnectionWithIntegerKeyAndTarget(): void {
-    $this->expectUserDeprecationMessage('Passing an integer value to the $target parameter in Drupal\Core\Database\Database::addConnectionInfo() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925');
-    $this->expectUserDeprecationMessage('Passing an integer value to the $key parameter in Drupal\Core\Database\Database::addConnectionInfo() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925');
-    $this->expectUserDeprecationMessage('Passing an integer value to the $target parameter in Drupal\Core\Database\Database::getConnection() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925');
-    $this->expectUserDeprecationMessage('Passing an integer value to the $target parameter in Drupal\Core\Database\Database::openConnection() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925');
-    $this->expectUserDeprecationMessage('Passing an integer value to the $key parameter in Drupal\Core\Database\Database::getConnection() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925');
-    $this->expectUserDeprecationMessage('Passing an integer value to the $key parameter in Drupal\Core\Database\Database::openConnection() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925');
-    $this->expectUserDeprecationMessage('Passing an integer value to the $target parameter in Drupal\Core\Database\Database::closeConnection() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925');
-    $this->expectUserDeprecationMessage('Passing an integer value to the $key parameter in Drupal\Core\Database\Database::closeConnection() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925');
-
-    $connection_info = Database::getConnectionInfo('default');
-    Database::addConnectionInfo('default', 200, $connection_info['default']);
-    Database::addConnectionInfo(100, 300, $connection_info['default']);
-
-    $db1 = Database::getConnection('default', 'default');
-    $db2 = Database::getConnection(200, 'default');
-    $db3 = Database::getConnection(300, 100);
-
-    $this->assertNotNull($db1);
-    $this->assertNotNull($db2);
-    $this->assertNotNull($db3);
-
-    Database::closeConnection(300, 100);
-  }
-
-  /**
    * Tests that connections return appropriate connection objects.
    */
   public function testConnectionRoutingOverride(): void {

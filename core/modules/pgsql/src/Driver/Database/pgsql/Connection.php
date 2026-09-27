@@ -84,27 +84,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   protected $identifierQuotes = ['"', '"'];
 
   /**
-   * An array of transaction savepoints.
-   *
-   * The main use for this array is to store information about transaction
-   * savepoints opened to to mimic MySql's InnoDB functionality, which provides
-   * an inherent savepoint before any query in a transaction.
-   *
-   * @var array<string,Transaction>
-   *
-   * @see ::addSavepoint()
-   * @see ::releaseSavepoint()
-   * @see ::rollbackSavepoint()
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
-   *   TransactionManager to start a transaction then call ::commitOrRelease()
-   *   or ::rollback() on it.
-   *
-   * @see https://www.drupal.org/node/3524461
-   */
-  protected array $savepoints = [];
-
-  /**
    * Constructs a connection object.
    */
   public function __construct(Pgsql $connection, array $connection_options) {
@@ -261,28 +240,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
-    // PostgreSQL doesn't automatically cast fields to the right type for the
-    // (I)LIKE and regex operators. Query builder queries get a '::text'
-    // type-cast when their conditions are compiled (see
-    // static::$postgresqlConditionOperatorMap), but queries passed as raw SQL
-    // strings may still contain uncast fields, so add the type-cast here. The
-    // guard skips the rewrite for the many queries that use neither operator.
-    // The optional '::text' in the pattern makes the rewrite idempotent, so
-    // fields that are already cast are not cast again.
-    if (stripos($query, 'LIKE') !== FALSE || str_contains($query, '~*')) {
-      $rewritten = preg_replace('/ ([^ ]+?)(?:::text)? +(I*LIKE|NOT +I*LIKE|~\*|!~\*) /i', ' ${1}::text ${2} ', $query);
-      if ($rewritten !== $query) {
-        @trigger_error('Relying on the PostgreSQL database driver to add a ::text type-cast to fields used with LIKE and regular expression operators in SQL passed as a string is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Add the ::text cast to the field explicitly or use the query builder. See https://www.drupal.org/node/3615418', E_USER_DEPRECATED);
-        $query = $rewritten;
-      }
-    }
-    return parent::prepareStatement($query, $options, $allow_row_count);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function queryRange($query, $from, $count, array $args = [], array $options = []) {
     return $this->query($query . ' LIMIT ' . (int) $count . ' OFFSET ' . (int) $from, $args, $options);
   }
@@ -391,70 +348,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // The fully qualified table name in PostgreSQL is in the form of
     // <database>.<schema>.<table>.
     return $options['database'] . '.' . $schema . '.' . $this->getPrefix() . $table;
-  }
-
-  /**
-   * Add a new savepoint with a unique name.
-   *
-   * The main use for this method is to mimic InnoDB functionality, which
-   * provides an inherent savepoint before any query in a transaction.
-   *
-   * @param string $savepoint_name
-   *   A string representing the savepoint name. By default,
-   *   "mimic_implicit_commit" is used.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
-   *   TransactionManager to start a transaction then call ::commitOrRelease()
-   *   or ::rollback() on it.
-   *
-   * @see https://www.drupal.org/node/3524461
-   */
-  public function addSavepoint($savepoint_name = 'mimic_implicit_commit') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use TransactionManager to start a transaction then call ::commitOrRelease() or ::rollback() on it. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
-    if ($this->inTransaction()) {
-      $this->savepoints[$savepoint_name] = $this->startTransaction($savepoint_name);
-    }
-  }
-
-  /**
-   * Release a savepoint by name.
-   *
-   * @param string $savepoint_name
-   *   A string representing the savepoint name. By default,
-   *   "mimic_implicit_commit" is used.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
-   *   TransactionManager to start a transaction then call ::commitOrRelease()
-   *   or ::rollback() on it.
-   *
-   * @see https://www.drupal.org/node/3524461
-   */
-  public function releaseSavepoint($savepoint_name = 'mimic_implicit_commit') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use TransactionManager to start a transaction then call ::commitOrRelease() or ::rollback() on it. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
-    if ($this->inTransaction() && $this->transactionManager()->has($savepoint_name)) {
-      unset($this->savepoints[$savepoint_name]);
-    }
-  }
-
-  /**
-   * Rollback a savepoint by name if it exists.
-   *
-   * @param string $savepoint_name
-   *   A string representing the savepoint name. By default,
-   *   "mimic_implicit_commit" is used.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
-   *   TransactionManager to start a transaction then call ::commitOrRelease()
-   *   or ::rollback() on it.
-   *
-   * @see https://www.drupal.org/node/3524461
-   */
-  public function rollbackSavepoint($savepoint_name = 'mimic_implicit_commit') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use TransactionManager to start a transaction then call ::commitOrRelease() or ::rollback() on it. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
-    if ($this->inTransaction() && $this->transactionManager()->has($savepoint_name)) {
-      $this->savepoints[$savepoint_name]->rollBack();
-      unset($this->savepoints[$savepoint_name]);
-    }
   }
 
   /**
