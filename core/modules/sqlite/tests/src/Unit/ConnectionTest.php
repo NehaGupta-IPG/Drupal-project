@@ -62,9 +62,21 @@ class ConnectionTest extends UnitTestCase {
       'sqlite relative path with prefix' => ['sqlite://localhost/tmp/test#bar', 'tmp/test', 'bar'],
       'sqlite absolute path with prefix' => ['sqlite://localhost//tmp/test#bar', '/tmp/test', 'bar'],
       'in memory sqlite path with prefix' => ['sqlite://localhost/:memory:#bar', ':memory:', 'bar'],
-      'sqlite relative path with module and prefix' => ['sqlite://localhost/tmp/test?module=sqlite#foo', 'tmp/test', 'foo'],
-      'sqlite absolute path with module and prefix' => ['sqlite://localhost//tmp/test?module=sqlite#foo', '/tmp/test', 'foo'],
-      'in memory sqlite path with module and prefix' => ['sqlite://localhost/:memory:?module=sqlite#foo', ':memory:', 'foo'],
+      'sqlite relative path with module and prefix' => [
+        'sqlite://localhost/tmp/test?module=sqlite#foo',
+        'tmp/test',
+        'foo'
+      ],
+      'sqlite absolute path with module and prefix' => [
+        'sqlite://localhost//tmp/test?module=sqlite#foo',
+        '/tmp/test',
+        'foo'
+      ],
+      'in memory sqlite path with module and prefix' => [
+        'sqlite://localhost/:memory:?module=sqlite#foo',
+        ':memory:',
+        'foo'
+      ],
     ];
   }
 

@@ -169,6 +169,7 @@ abstract class ConnectionParametersFactory {
     $url_components = parse_url($url);
     assert(is_array($url_components));
     parse_str($url_components['query'] ?? '', $query);
+    unset($url_components['query']);
 
     // Use the driver name as the module name when the module name is not
     // provided.

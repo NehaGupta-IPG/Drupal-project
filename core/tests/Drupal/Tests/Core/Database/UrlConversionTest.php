@@ -35,20 +35,20 @@ class UrlConversionTest extends UnitTestCase {
    */
   #[DataProvider('providerConvertDbUrlToConnectionInfo')]
   #[IgnoreDeprecations]
-  public function testDbUrlToConnectionConversion(string $url, array $database_array, array $expected_public_connection_parameters, bool $include_test_drivers): void {
+  public function testDbUrlToConnectionConversion(string $url, array $expected_options, array $expected_public_connection_parameters, bool $include_test_drivers): void {
     $result = Database::convertDbUrlToConnectionInfo($url, $include_test_drivers);
-    $this->assertEquals($database_array, $result);
+    $this->assertEquals($expected_options, $result);
   }
 
   /**
    * Tests db url to connection conversion.
    */
   #[DataProvider('providerConvertDbUrlToConnectionInfo')]
-  public function testConnectionParametersCreateFromUrl(string $url, array $database_array, array $expected_public_connection_parameters, bool $include_test_drivers): void {
-    $result = ConnectionParametersFactory::createFromUrl($url, $include_test_drivers);
-    $this->assertInstanceOf(ConnectionParametersInterface::class, $result);
-    $this->assertEquals($database_array, array_intersect_key($result->toArray(), $database_array));
-    $this->assertEquals($expected_public_connection_parameters, get_object_vars($result));
+  public function testConnectionParametersCreateFromUrl(string $url, array $expected_options, array $expected_public_connection_parameters, bool $include_test_drivers): void {
+    $parameters = ConnectionParametersFactory::createFromUrl($url, $include_test_drivers);
+    $this->assertInstanceOf(ConnectionParametersInterface::class, $parameters);
+    $this->assertEquals($expected_options, array_intersect_key($parameters->toArray(), $expected_options));
+    $this->assertEquals($expected_public_connection_parameters, get_object_vars($parameters));
   }
 
   /**
@@ -361,6 +361,7 @@ class UrlConversionTest extends UnitTestCase {
           'database' => 'test_database',
           'port' => 3306,
           'prefix' => '',
+          'extra' => 'value',
           'namespace' => 'Drupal\mysql\Driver\Database\mysql',
           'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
         ],
@@ -479,6 +480,42 @@ class UrlConversionTest extends UnitTestCase {
         ],
         FALSE,
       ],
+      'SQLite, relative to root, with prefix, with the module name sqlite, with extra parameter' => [
+        'sqlite://localhost/test_database?module=sqlite&tree=palm#baz',
+        [
+          'driver' => 'sqlite',
+          'module' => 'sqlite',
+          'host' => 'localhost',
+          'database' => 'test_database',
+          'prefix' => 'baz',
+          'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
+          'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
+          'init_commands' => [
+            'wal' => 'PRAGMA journal_mode=WAL',
+          ],
+          'pdo' => [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
+          ],
+          'tree' => 'palm',
+        ],
+        [
+          'driver' => 'sqlite',
+          'module' => 'sqlite',
+          'database' => 'test_database',
+          'prefix' => 'baz',
+          'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
+          'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
+          'init_commands' => [
+            'wal' => 'PRAGMA journal_mode=WAL',
+          ],
+          'pdo' => [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
+          ],
+        ],
+        FALSE,
+      ],
     ];
   }
 
@@ -548,10 +585,9 @@ class UrlConversionTest extends UnitTestCase {
    */
   #[DataProvider('providerGetConnectionInfoAsUrl')]
   #[PreserveGlobalState(FALSE)]
-  #[RunInSeparateProcess]
-  public function testConnectionParametersAsUrl(array $info, string $expectedUrl): void {
-    Database::addConnectionInfo('default', 'default', $info);
-    $this->assertEquals($expectedUrl, Database::getConnectionParameters()['default']->asUrl());
+  public function testConnectionParametersAsUrl(array $options, string $expectedUrl): void {
+    $parameters = ConnectionParametersFactory::createFromOptionsArray($options);
+    $this->assertEquals($expectedUrl, $parameters->asUrl());
   }
 
   /**

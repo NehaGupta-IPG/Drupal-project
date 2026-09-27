@@ -264,7 +264,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
       $options['prefix'] = $urlComponents['fragment'];
     }
 
-    return $options;
+    return array_merge($options, $queryComponents);
   }
 
   /**
