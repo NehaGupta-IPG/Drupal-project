@@ -14,6 +14,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\RenderContext;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Provides the help topics list section for the help page.
@@ -44,6 +45,11 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
   protected $cacheableMetadata;
 
   /**
+   * The language manager.
+   */
+  protected LanguageManagerInterface $languageManager;
+
+  /**
    * Constructs a HelpTopicSection object.
    *
    * @param array $configuration
@@ -56,8 +62,6 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
    *   The help topic plugin manager service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Language\LanguageDefault $defaultLanguage
-   *   The default language object.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
@@ -67,10 +71,15 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
     $plugin_definition,
     protected HelpTopicPluginManagerInterface $pluginManager,
     protected RendererInterface $renderer,
-    protected LanguageDefault $defaultLanguage,
-    protected LanguageManagerInterface $languageManager,
+    #[Autowire(service: LanguageManagerInterface::class)]
+    LanguageManagerInterface|LanguageDefault $languageManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
+    if ($languageManager instanceof LanguageDefault) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $defaultLanguage argument is deprecated in drupal:11.5.0 and will throw an exception in drupal:14.0.0. See https://www.drupal.org/node/3626335', E_USER_DEPRECATED);
+      $languageManager = \Drupal::service(LanguageManagerInterface::class);
+    }
+    $this->languageManager = $languageManager;
   }
 
   /**
@@ -154,18 +163,16 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
     }
 
     // We are rendering this topic for search indexing or search results,
-    // possibly in a different language than the current language. The topic
-    // title and body come from translatable things in the Twig template, so we
-    // need to set the default language to the desired language, render them,
-    // then restore the default language so we do not affect other cron
-    // processes. Also, just in case there is an exception, wrap the whole
-    // thing in a try/finally block, and reset the language in the finally part.
-    $old_language = $this->defaultLanguage->get();
+    // possibly in a different language than the site default language. The
+    // topic title and body come from translatable things in the Twig template,
+    // so we need to set the render override language to the desired language,
+    // render them, then render override language to the sit default language
+    // so we do not affect other cron processes. Also, just in case there is an
+    // exception, wrap the whole thing in a try/finally block, and reset the
+    // language in the finally part.
+    $old_language = $this->languageManager->getRenderOverrideLanguage();
     try {
-      if ($old_language->getId() !== $language->getId()) {
-        $this->defaultLanguage->set($language);
-        $this->languageManager->setRenderOverrideLanguage($language);
-      }
+      $this->languageManager->setRenderOverrideLanguage($language);
       $topic = [];
 
       // Render the title in this language.
@@ -198,10 +205,7 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
     }
     finally {
       // Restore the original language.
-      if ($old_language->getId() !== $language->getId()) {
-        $this->defaultLanguage->set($old_language);
-        $this->languageManager->setRenderOverrideLanguage();
-      }
+      $this->languageManager->setRenderOverrideLanguage($old_language);
     }
 
     return $topic;
