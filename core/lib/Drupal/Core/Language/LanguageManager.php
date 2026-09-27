@@ -104,13 +104,6 @@ class LanguageManager implements LanguageManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getNegotiatedLanguage($type = LanguageInterface::TYPE_INTERFACE): LanguageInterface {
-    return $this->getDefaultLanguage();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getCurrentLanguage($type = LanguageInterface::TYPE_INTERFACE) {
     return $this->getDefaultLanguage();
   }

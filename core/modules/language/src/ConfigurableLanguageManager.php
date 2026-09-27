@@ -235,8 +235,16 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
 
   /**
    * Returns the negotiated language for the given type.
+   *
+   * @param string|null $type
+   *   (optional) The language type; e.g., the interface or the content
+   *   language. Defaults to
+   *   \Drupal\Core\Language\LanguageInterface::TYPE_INTERFACE.
+   *
+   * @return \Drupal\Core\Language\LanguageInterface
+   *   The negotiated language object for the given type of language.
    */
-  public function getNegotiatedLanguage($type = LanguageInterface::TYPE_INTERFACE): LanguageInterface {
+  protected function getNegotiatedLanguage(?string $type = LanguageInterface::TYPE_INTERFACE): LanguageInterface {
     if (!isset($this->negotiatedLanguages[$type])) {
       // Ensure we have a valid value for this language type.
       $this->negotiatedLanguages[$type] = $this->getDefaultLanguage();

@@ -38,11 +38,6 @@ interface LanguageManagerInterface {
   public function getDefinedLanguageTypesInfo();
 
   /**
-   * Returns the negotiated language for the given type.
-   */
-  public function getNegotiatedLanguage($type = LanguageInterface::TYPE_INTERFACE): LanguageInterface;
-
-  /**
    * Returns the current language for the given type.
    *
    * @param string $type
