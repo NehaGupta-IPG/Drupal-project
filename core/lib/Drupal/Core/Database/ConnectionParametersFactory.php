@@ -54,11 +54,19 @@ abstract class ConnectionParametersFactory {
 
     // If no module passed in, build it from driver.
     if (empty($options['module'])) {
-      $options['module'] = !empty($options['namespace']) ? explode('\\', $options['namespace'])[1] : strtolower($options['driver']);
+      if (!empty($options['namespace'])) {
+        $module = explode('\\', $options['namespace'])[1];
+        if ($module !== '' && $module !== 'Core') {
+          $options['module'] = $module;
+        }
+      }
+      if (empty($options['module'])) {
+        $options['module'] = strtolower($options['driver']);
+      }
     }
 
     // If no namespace passed in, build it from driver and module.
-    if (empty($options['namespace'])) {
+    if (empty($options['namespace']) || str_starts_with($options['namespace'], 'Drupal\\Core\\Database\\Driver\\')) {
       $options['namespace'] = "Drupal\\{$options['module']}\\Driver\\Database\\{$options['driver']}";
     }
 

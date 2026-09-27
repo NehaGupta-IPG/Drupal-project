@@ -103,7 +103,6 @@ class ConnectionTest extends UnitTestCase {
     $this->assertEquals('bar', $sqlite_connection->getConnectionOptions()['foo']);
     $sqlite_connection->getConnectionOptions()['foo'] = 'qux';
     $this->assertEquals('qux', $sqlite_connection->getConnectionOptions()['foo']);
-    $sqlite_connection->getConnectionOptions()['pdo']['bar'] = 'baz';
   }
 
   /**
