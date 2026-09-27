@@ -90,7 +90,6 @@ class UrlConversionTest extends UnitTestCase {
         [
           'driver' => 'sqlite',
           'module' => 'sqlite',
-          'host' => 'localhost',
           'database' => 'test_database',
           'prefix' => '',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
@@ -149,7 +148,6 @@ class UrlConversionTest extends UnitTestCase {
         [
           'driver' => 'sqlite',
           'module' => 'sqlite',
-          'host' => 'localhost',
           'database' => 'test_database',
           'prefix' => 'foo',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
@@ -184,7 +182,6 @@ class UrlConversionTest extends UnitTestCase {
         [
           'driver' => 'sqlite',
           'module' => 'sqlite',
-          'host' => 'localhost',
           'database' => '/baz/test_database',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
@@ -445,12 +442,11 @@ class UrlConversionTest extends UnitTestCase {
         ],
         FALSE,
       ],
-      'SQLite, relative to root, without prefix and with the module name sqlite' => [
-        'sqlite://localhost/test_database?module=sqlite',
+      'SQLite, all URL parts, relative to root, without prefix and with the module name sqlite' => [
+        'sqlite://foo:bar@localhost:214/test_database?module=sqlite',
         [
           'driver' => 'sqlite',
           'module' => 'sqlite',
-          'host' => 'localhost',
           'database' => 'test_database',
           'prefix' => '',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
@@ -485,7 +481,6 @@ class UrlConversionTest extends UnitTestCase {
         [
           'driver' => 'sqlite',
           'module' => 'sqlite',
-          'host' => 'localhost',
           'database' => 'test_database',
           'prefix' => 'baz',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',

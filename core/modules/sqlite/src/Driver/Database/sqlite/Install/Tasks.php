@@ -2,7 +2,6 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite\Install;
 
-use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\Database\Database;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;

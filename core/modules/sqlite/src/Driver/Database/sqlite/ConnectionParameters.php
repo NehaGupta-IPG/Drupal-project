@@ -74,4 +74,18 @@ class ConnectionParameters extends ConnectionParametersBase {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function parseUrlPartsIntoOptions(array $urlComponents, array $queryComponents): array {
+    $options = parent::parseUrlPartsIntoOptions($urlComponents, $queryComponents);
+    unset(
+      $options['username'],
+      $options['password'],
+      $options['host'],
+      $options['port'],
+    );
+    return $options;
+  }
+
 }
