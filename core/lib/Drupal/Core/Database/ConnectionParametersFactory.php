@@ -54,7 +54,7 @@ abstract class ConnectionParametersFactory {
 
     // If no module passed in, build it from driver.
     if (empty($options['module'])) {
-      $options['module'] = isset($options['namespace']) ? explode('\\', $options['namespace'])[1] : strtolower($options['driver']);
+      $options['module'] = !empty($options['namespace']) ? explode('\\', $options['namespace'])[1] : strtolower($options['driver']);
     }
 
     // If no namespace passed in, build it from driver and module.
