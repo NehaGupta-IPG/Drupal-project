@@ -23,9 +23,9 @@
 # Drupal 13.
 %The "cache.backend.memory" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use cache.backend.memory.memory instead. See https://www.drupal.org/node/3546856%
 %The "cache.static" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use the cache.memory bin instead. See https://www.drupal.org/node/3546856%
-%Drupal\\Core\\Database\\Database::get(AllConnection|Connection)Info\(\) is deprecated in drupal:42\.1\.0 and is removed from drupal:43\.0\.0. Use ::get(AllConnection|Connection)Parameters\(\) instead\. See https://www.drupal.org/node/7654123%
-%Drupal\\Core\\Database\\Database::convertDbUrlToConnectionInfo\(\) is deprecated in drupal:42\.1\.0 and is removed from drupal:43\.0\.0. Use ConnectionParametersFactory::createFromUrl\(\) instead\. See https://www.drupal.org/node/7654123%
-%Drupal\\Core\\Database\\Database::getConnectionInfoAsUrl\(\) is deprecated in drupal:42\.1\.0 and is removed from drupal:43\.0\.0. Use Database::getConnectionInfo\(\)\['default'\]->asUrl\(\) instead\. See https://www.drupal.org/node/7654123%
+%Drupal\\Core\\Database\\Database::get(AllConnection|Connection)Info\(\) is deprecated in drupal:42\.1\.0 and is removed from drupal:43\.0\.0. Use ::get(AllConnection|Connection)Parameters\(\) instead\. See https://www.drupal.org/node/3626243%
+%Drupal\\Core\\Database\\Database::convertDbUrlToConnectionInfo\(\) is deprecated in drupal:42\.1\.0 and is removed from drupal:43\.0\.0. Use ConnectionParametersFactory::createFromUrl\(\) instead\. See https://www.drupal.org/node/3626243%
+%Drupal\\Core\\Database\\Database::getConnectionInfoAsUrl\(\) is deprecated in drupal:42\.1\.0 and is removed from drupal:43\.0\.0. Use Database::getConnectionInfo\(\)\['default'\]->asUrl\(\) instead\. See https://www.drupal.org/node/3626243%
 
 # Symfony 8.
 %Since symfony/dependency-injection 8\.1: Calling "Drupal\\workspaces\\Provider\\DefaultWorkspaceProvider::getId\(\)" to get the "" index is deprecated, use the #\[AsTaggedItem\] attribute instead\.%
