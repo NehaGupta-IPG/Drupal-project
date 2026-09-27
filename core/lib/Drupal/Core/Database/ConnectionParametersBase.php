@@ -7,6 +7,7 @@ namespace Drupal\Core\Database;
 /**
  * Base class for connection parameters objects.
  *
+ * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
  * @phpstan-import-type ConnectionInfoBaseArray from \Drupal\Core\Database\Database
  *
  * @implements \ArrayAccess<string|int,int|string|float|bool|array|null>
@@ -264,7 +265,9 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
       $options['prefix'] = $urlComponents['fragment'];
     }
 
-    return array_merge($options, $queryComponents);
+    $return = array_merge($options, $queryComponents);
+    /** @var UnprocessedConnectionInfoArray $return */
+    return $return;
   }
 
   /**
