@@ -101,7 +101,7 @@ class Tasks extends InstallTasks {
 
           // Now, restore the database config.
           Database::removeConnection('default');
-          Database::addConnectionInfo('default', 'default', $liveParameters);
+          Database::addConnectionInfo('default', 'default', $liveParameters['default']);
 
           // Check the database connection.
           Database::getConnection();
