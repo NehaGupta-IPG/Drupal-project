@@ -39,53 +39,47 @@ abstract class ConnectionParametersFactory {
     if (!isset($connectionOptions['driver']) && count($connectionOptions) > 0) {
       $info_pick = $connectionOptions[mt_rand(0, count($connectionOptions) - 1)];
     }
-
     /** @var UnprocessedConnectionInfoArray $options */
     $options = $info_pick ?? $connectionOptions;
 
     // Without driver name, we cannot proceed.
     if (!isset($options['driver'])) {
-      throw new \RuntimeException("Database driver name missing from the connection options");
+      throw new \InvalidArgumentException("Database driver name missing from the connection options");
     }
-
-    $options = array_merge([
-      'namespace' => '',
-      'autoload' => '',
-    ], $options);
 
     // Force port to an int if it exists.
     if (isset($options['port'])) {
       $options['port'] = (int) $options['port'];
     }
 
-    // Backwards compatibility layer for Drupal 8 style database connection
-    // arrays. Those have the wrong 'namespace' key set, or not set at all
-    // for core supported database drivers.
-    if (empty($options['namespace']) || str_starts_with($options['namespace'], 'Drupal\\Core\\Database\\Driver\\')) {
-      $driver = strtolower($options['driver']);
-      $options['namespace'] = match ($driver) {
-        'mysql' => 'Drupal\\mysql\\Driver\\Database\\mysql',
-        'pgsql' => 'Drupal\\pgsql\\Driver\\Database\\pgsql',
-        'sqlite' => 'Drupal\\sqlite\\Driver\\Database\\sqlite',
-        default => throw new \RuntimeException("Unknown database driver {$options['driver']}"),
-      };
+    // If no module passed in, build it from driver.
+    if (empty($options['module'])) {
+      $options['module'] = isset($options['namespace']) ? explode('\\', $options['namespace'])[1] : strtolower($options['driver']);
     }
 
-    // Backwards compatibility layer for Drupal 8 style database connection
-    // arrays. Those do not have the 'autoload' key set for core database
-    // drivers.
+    // If no namespace passed in, build it from driver and module.
+    if (empty($options['namespace'])) {
+      $options['namespace'] = "Drupal\\{$options['module']}\\Driver\\Database\\{$options['driver']}";
+    }
+
+    // If no autoload passed in, build it from driver information.
+    // For performance, hardcode core drivers data.
     if (empty($options['autoload'])) {
       $options['autoload'] = match (trim($options['namespace'], '\\')) {
         "Drupal\\mysql\\Driver\\Database\\mysql" => "core/modules/mysql/src/Driver/Database/mysql/",
+        "Drupal\\mysqli\\Driver\\Database\\mysqli" => "core/modules/mysqli/src/Driver/Database/mysqli/",
         "Drupal\\pgsql\\Driver\\Database\\pgsql" => "core/modules/pgsql/src/Driver/Database/pgsql/",
         "Drupal\\sqlite\\Driver\\Database\\sqlite" => "core/modules/sqlite/src/Driver/Database/sqlite/",
-        default => throw new \RuntimeException("Unknown database driver {$options['driver']}"),
+        default => NULL,
       };
     }
-
-    // Use the namespace to determine the module name when the module name is
-    // not provided.
-    $options['module'] ??= explode('\\', $options['namespace'])[1] ?? $options['driver'];
+    if (empty($options['autoload'])) {
+      /** @var \Drupal\Core\Extension\DatabaseDriver $driver */
+      $driver = Database::getDriverList()
+        ->includeTestDrivers(TRUE)
+        ->get($options['namespace']);
+      $options['autoload'] = $driver->getPath() . DIRECTORY_SEPARATOR;
+    }
 
     // If the database driver is provided by a module, then its code may need
     // to be instantiated prior to when the module's root namespace is added
@@ -141,7 +135,7 @@ abstract class ConnectionParametersFactory {
    *
    * @param string $url
    *   The URL.
-   * @param bool|null $include_test_drivers
+   * @param bool|null $includeTestDrivers
    *   (optional) Whether to include test extensions. If FALSE, all 'tests'
    *   directories are excluded in the search. When NULL will be determined by
    *   the extension_discovery_scan_tests setting.
@@ -155,7 +149,7 @@ abstract class ConnectionParametersFactory {
    * @throws \RuntimeException
    *   Exception thrown when a module provided database driver does not exist.
    */
-  final public static function createFromUrl(string $url, ?bool $include_test_drivers = NULL): ConnectionParametersInterface {
+  final public static function createFromUrl(string $url, ?bool $includeTestDrivers = NULL): ConnectionParametersInterface {
     // Check that the URL is well formed, starting with 'scheme://', where
     // 'scheme' is a database driver name.
     if (preg_match('/^(.*):\/\//', $url, $matches) !== 1) {
@@ -163,35 +157,33 @@ abstract class ConnectionParametersFactory {
     }
     $driverName = $matches[1];
 
-    // Determine if the database driver is provided by a module.
-    // @todo https://www.drupal.org/project/drupal/issues/3250999. Refactor when
-    // all database drivers are provided by modules.
-    $url_components = parse_url($url);
-    assert(is_array($url_components));
-    parse_str($url_components['query'] ?? '', $query);
-    unset($url_components['query']);
+    // Explode the URL and the URL query string into their parts.
+    $urlParts = parse_url($url);
+    assert(is_array($urlParts));
+    parse_str($urlParts['query'] ?? '', $options);
+    unset($urlParts['query']);
 
     // Use the driver name as the module name when the module name is not
-    // provided.
-    $module = $query['module'] ?? $driverName;
-    assert(is_string($module));
-
-    $driverNamespace = "Drupal\\{$module}\\Driver\\Database\\{$driverName}";
-
+    // provided. Build the namespace and find the autoload directory from the
+    // module information.
+    $options['module'] ??= strtolower($driverName);
+    assert(is_string($options['module']));
+    $options['namespace'] = "Drupal\\{$options['module']}\\Driver\\Database\\{$driverName}";
     /** @var \Drupal\Core\Extension\DatabaseDriver $driver */
     $driver = Database::getDriverList()
-      ->includeTestDrivers($include_test_drivers)
-      ->get($driverNamespace);
+      ->includeTestDrivers($includeTestDrivers)
+      ->get($options['namespace']);
+    $options['autoload'] = $driver->getPath() . DIRECTORY_SEPARATOR;
 
     // Set up an additional autoloader. We don't use the main autoloader as
     // this method can be called before Drupal is installed and is never
     // called during regular runtime.
-    $additional_class_loader = new ClassLoader();
-    $additional_class_loader->addPsr4($driverNamespace . '\\', $driver->getPath());
-    $additional_class_loader->register();
-    $connection_class = $driverNamespace . '\\Connection';
-    if (!class_exists($connection_class)) {
-      throw new \InvalidArgumentException("Can not convert '$url' to a database connection, class '$connection_class' does not exist");
+    $additionalClassLoader = new ClassLoader();
+    $additionalClassLoader->addPsr4($options['namespace'] . '\\', $driver->getPath());
+    $additionalClassLoader->register();
+    $connectionClass = $options['namespace'] . '\\Connection';
+    if (!class_exists($connectionClass)) {
+      throw new \InvalidArgumentException("Can not convert '$url' to a database connection, class '$connectionClass' does not exist");
     }
 
     // When the database driver is extending another database driver, then
@@ -199,28 +191,21 @@ abstract class ConnectionParametersFactory {
     $autoloadInfo = $driver->getAutoloadInfo();
     if (isset($autoloadInfo['dependencies'])) {
       foreach ($autoloadInfo['dependencies'] as $dependency) {
-        $additional_class_loader->addPsr4($dependency['namespace'] . '\\', $dependency['autoload']);
+        $additionalClassLoader->addPsr4($dependency['namespace'] . '\\', $dependency['autoload']);
       }
+      $options['dependencies'] = $autoloadInfo['dependencies'];
     }
 
-    $additional_class_loader->register(TRUE);
+    $additionalClassLoader->register(TRUE);
 
     /** @var class-string<ConnectionParametersInterface> $class */
-    $class = $driverNamespace . '\\ConnectionParameters';
+    $class = $options['namespace'] . '\\ConnectionParameters';
 
     if (class_exists($class)) {
-      $options = $class::parseUrlPartsIntoOptions($url_components, $query);
+      $options = $class::parseUrlPartsIntoOptions($urlParts, $options);
     }
     else {
-      $options = ConnectionParametersBase::parseUrlPartsIntoOptions($url_components, $query);
-    }
-
-    // Add the necessary information to autoload code.
-    // @see \Drupal\Core\Site\Settings::initialize()
-    $options['namespace'] = $driverNamespace;
-    $options['autoload'] = $driver->getPath() . DIRECTORY_SEPARATOR;
-    if (isset($autoloadInfo['dependencies'])) {
-      $options['dependencies'] = $autoloadInfo['dependencies'];
+      $options = ConnectionParametersBase::parseUrlPartsIntoOptions($urlParts, $options);
     }
 
     return self::createFromOptionsArray($options);
