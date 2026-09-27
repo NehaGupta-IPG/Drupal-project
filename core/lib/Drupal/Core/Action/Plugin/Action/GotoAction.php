@@ -13,6 +13,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -85,10 +86,12 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
       $url = $this->unroutedUrlAssembler->assemble($uri, $options);
     }
     $response = new RedirectResponse($url);
-    $listener = function ($event) use ($response) {
+    $listener = function (ResponseEvent $event) use ($response, &$listener): void {
       $event->setResponse($response);
+      // Remove the listener so it does not redirect later requests handled by
+      // the same event dispatcher.
+      $this->dispatcher->removeListener(KernelEvents::RESPONSE, $listener);
     };
-    // Add the listener to the event dispatcher.
     $this->dispatcher->addListener(KernelEvents::RESPONSE, $listener);
   }
 

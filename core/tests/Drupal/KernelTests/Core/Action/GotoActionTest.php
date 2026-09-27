@@ -55,6 +55,10 @@ class GotoActionTest extends KernelTestBase {
 
     $this->assertSame(302, $response->getStatusCode());
     $this->assertSame($expected, $location);
+
+    // Verify that the next request is not redirected by this action.
+    $response = $this->container->get('http_kernel')->handle(Request::create(''));
+    $this->assertFalse($response->headers->has('Location'));
   }
 
   /**
