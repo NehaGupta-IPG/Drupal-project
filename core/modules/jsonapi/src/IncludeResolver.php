@@ -5,6 +5,7 @@ namespace Drupal\jsonapi;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 use Drupal\jsonapi\Access\EntityAccessChecker;
@@ -138,7 +139,20 @@ class IncludeResolver {
           continue;
         }
         foreach ($field_list as $field_item) {
-          if (!($field_item->getDataDefinition()->getPropertyDefinition('entity') instanceof DataReferenceDefinitionInterface)) {
+          $entity_property = $field_item->getDataDefinition()->getPropertyDefinition('entity');
+          if (!($entity_property instanceof DataReferenceDefinitionInterface)) {
+            continue;
+          }
+
+          // If the field definition contains the target entity type, collect the
+          // target ID to load all targets in a batch with ::loadMultiple() below.
+          $target_definition = $entity_property->getTargetDefinition();
+          $target_type = $target_definition instanceof EntityDataDefinitionInterface ? $target_definition->getEntityTypeId() : NULL;
+          if ($target_type !== NULL) {
+            $target_id = $field_item->get($field_item::mainPropertyName())->getValue();
+            if ($target_id !== NULL) {
+              $references[$target_type][] = $target_id;
+            }
             continue;
           }
 
