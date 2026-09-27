@@ -65,17 +65,17 @@ class ConnectionTest extends UnitTestCase {
       'sqlite relative path with module and prefix' => [
         'sqlite://localhost/tmp/test?module=sqlite#foo',
         'tmp/test',
-        'foo'
+        'foo',
       ],
       'sqlite absolute path with module and prefix' => [
         'sqlite://localhost//tmp/test?module=sqlite#foo',
         '/tmp/test',
-        'foo'
+        'foo',
       ],
       'in memory sqlite path with module and prefix' => [
         'sqlite://localhost/:memory:?module=sqlite#foo',
         ':memory:',
-        'foo'
+        'foo',
       ],
     ];
   }
