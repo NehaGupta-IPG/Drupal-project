@@ -51,7 +51,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     $time = NULL,
   ) {
     if ($time !== NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() with a $time argument is deprecated in drupal:11.4.0 and it will throw an error in drupal:13.0.0. Pass null instead. See https://www.drupal.org/node/3570844', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with a $time argument is deprecated in drupal:11.5.0 and it will throw an error in drupal:14.0.0. Pass null instead. See https://www.drupal.org/node/3570844', E_USER_DEPRECATED);
     }
     parent::__construct([], $handler, $metadata_bag);
   }

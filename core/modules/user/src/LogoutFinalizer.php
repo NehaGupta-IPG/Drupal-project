@@ -19,12 +19,17 @@ final readonly class LogoutFinalizer {
 
   public function __construct(
     protected AccountProxyInterface $accountProxy,
-    protected SessionManagerInterface $sessionManager,
+    #[Autowire(service: RequestStack::class)]
+    protected RequestStack|SessionManagerInterface $requestStack,
     protected ModuleHandlerInterface $moduleHandler,
     #[Autowire(service: 'logger.channel.user')]
     protected LoggerInterface $logger,
-    protected RequestStack $requestStack,
-  ) {}
+  ) {
+    if ($requestStack instanceof SessionManagerInterface) {
+      @trigger_error('Calling ' . __METHOD__ . '() with a $sessionManager argument is deprecated in drupal:11.5.0 and it will throw an error in drupal:14.0.0. Pass $requestStack instead. See https://www.drupal.org/node/3570844', E_USER_DEPRECATED);
+      $this->requestStack = \Drupal::requestStack();
+    }
+  }
 
   /**
    * Logs the current user out.
