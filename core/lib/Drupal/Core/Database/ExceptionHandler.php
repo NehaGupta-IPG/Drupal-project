@@ -75,4 +75,20 @@ class ExceptionHandler {
     throw $exception;
   }
 
+  /**
+   * Get the first exception thrown.
+   *
+   * @param \Throwable $e
+   *   An exception.
+   *
+   * @return \Throwable
+   *   The same exception with various wrappers removed.
+   */
+  public static function getRootException(\Throwable $e): \Throwable {
+    while ($next = $e->getPrevious()) {
+      $e = $next;
+    }
+    return $e;
+  }
+
 }

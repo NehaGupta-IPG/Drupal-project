@@ -548,14 +548,12 @@ abstract class Database {
       $key = self::$activeKey;
     }
     if (isset($target) && isset(self::$connections[$key][$target])) {
-      // @phpstan-ignore method.deprecated
-      self::$connections[$key][$target]->commitAll();
+      self::$connections[$key][$target]->closeClientConnection();
       unset(self::$connections[$key][$target]);
     }
     elseif (isset(self::$connections[$key])) {
       foreach (self::$connections[$key] as $connection) {
-        // @phpstan-ignore method.deprecated
-        $connection->commitAll();
+        $connection->closeClientConnection();
       }
       unset(self::$connections[$key]);
     }

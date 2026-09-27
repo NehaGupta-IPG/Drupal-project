@@ -36,44 +36,59 @@ class StatementWrapperIterator extends StatementBase {
     bool $rowCountEnabled = FALSE,
   ) {
     parent::__construct($connection, $clientConnection, $query, $rowCountEnabled);
-    $this->clientStatement = $this->clientConnection->prepare($query, $options);
+    $this->prepare($options);
     $this->setFetchMode(FetchAs::Object);
+  }
+
+  /**
+   * Returns the client-level database PDO statement object.
+   *
+   * This method should normally be used only within database driver code.
+   *
+   * @return \PDOStatement
+   *   The client-level database PDO statement.
+   *
+   * @throws \RuntimeException
+   *   If the client-level statement is not set.
+   */
+  public function getClientStatement(): \PDOStatement {
+    if (isset($this->clientStatement)) {
+      assert($this->clientStatement instanceof \PDOStatement);
+      return $this->clientStatement;
+    }
+    throw new \LogicException('\\PDOStatement not initialized');
+  }
+
+  /**
+   * Executes a prepared statement.
+   *
+   * @param array|null $args
+   *   (Optional) An array of values with as many elements as there are bound
+   *   parameters in the SQL statement being executed. This can be NULL.
+   * @param array $options
+   *   (Optional) An array of options for this query.
+   *
+   * @return bool
+   *   TRUE on success, or FALSE on failure.
+   */
+  public function doExecute(?array $args = [], array $options = []): bool {
+    $return = $this->clientExecute($args, $options);
+    $this->result = new PdoResult(
+      $this->fetchMode,
+      $this->fetchOptions,
+      $this->getClientStatement(),
+    );
+    $this->markResultsetIterable($return);
+    return $return;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function execute($args = [], $options = []) {
-    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to execute() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
-
-    if (isset($options['fetch'])) {
-      if (is_string($options['fetch'])) {
-        $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
-      }
-      else {
-        $this->setFetchMode($options['fetch']);
-      }
-    }
-
-    $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
-
-    try {
-      $return = $this->clientExecute($args, $options);
-      $this->result = new PdoResult(
-        $this->fetchMode,
-        $this->fetchOptions,
-        $this->getClientStatement(),
-      );
-      $this->markResultsetIterable($return);
-    }
-    catch (\Exception $e) {
-      $this->dispatchStatementExecutionFailureEvent($startEvent, $e);
-      throw $e;
-    }
-
-    $this->dispatchStatementExecutionEndEvent($startEvent);
-
-    return $return;
+  public function prepare(array $options): void {
+    $this->clientStatement = $this->connection
+      ->getClientConnection()
+      ->prepare($this->getQueryString(), $options);
   }
 
 }

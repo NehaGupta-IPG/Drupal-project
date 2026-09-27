@@ -421,7 +421,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
     try {
       return new Statement(
-        $this->connection,
+        $this->getClientConnection(),
         $this,
         $this->preprocessStatement($query, $options),
         $options['pdo'] ?? [],

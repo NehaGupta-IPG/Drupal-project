@@ -124,7 +124,57 @@ abstract class StatementBase implements \Iterator, StatementInterface {
   /**
    * {@inheritdoc}
    */
-  abstract public function execute(?array $args = [], array $options = []);
+  public function execute($args = [], $options = []) {
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to execute() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
+    if (isset($options['fetch'])) {
+      if (is_string($options['fetch'])) {
+        $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
+      }
+      else {
+        $this->setFetchMode($options['fetch']);
+      }
+    }
+
+    $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
+
+    try {
+      $args = $this->convertArgs($args);
+      $this->prepare($options);
+      return $this->attemptExecuteWithEvent($args, $startEvent);
+    }
+    catch (\Exception $e) {
+      if ($this->connection->reconnectOnLostConnection($e)) {
+        $this->prepare($options);
+        try {
+          return $this->attemptExecuteWithEvent($args, $startEvent);
+        }
+        // If there is a real problem this is going to be the same exception
+        // so overriding the previous is the correct thing to do.
+        catch (\Exception $e) {
+        }
+      }
+      $this->dispatchStatementExecutionFailureEvent($startEvent, $e);
+      throw $e;
+    }
+  }
+
+  /**
+   * Executes a prepared statement.
+   *
+   * @param array|null $args
+   *   (Optional) An array of values with as many elements as there are bound
+   *   parameters in the SQL statement being executed. This can be NULL.
+   * @param StatementExecutionStartEvent|null $startEvent
+   *   The start event.
+   *
+   * @return bool
+   *   TRUE on success, or FALSE on failure.
+   */
+  protected function attemptExecuteWithEvent(?array $args, ?StatementExecutionStartEvent $startEvent): bool {
+    $return = $this->doExecute($args);
+    $this->dispatchStatementExecutionEndEvent($startEvent);
+    return $return;
+  }
 
   /**
    * Dispatches an event informing that the statement execution begins.
@@ -347,6 +397,47 @@ abstract class StatementBase implements \Iterator, StatementInterface {
     else {
       throw new RowCountException();
     }
+  }
+
+  /**
+   * Convert query arguments.
+   *
+   * @param array $args
+   *   An array of values with as many elements as there are bound
+   *   parameters in the SQL statement being executed.
+   *
+   * @return array
+   *   These arguments converted as appropriate. For example, MySQLi changes
+   *   them to positional.
+   */
+  protected function convertArgs(array $args): array {
+    return $args;
+  }
+
+  /**
+   * Call the prepare method of the client connection.
+   *
+   * @param array $options
+   *   An array of options for this query.
+   */
+  protected function prepare(array $options): void {
+
+  }
+
+  /**
+   * Executes a prepared statement.
+   *
+   * @param array|null $args
+   *   (Optional) An array of values with as many elements as there are bound
+   *   parameters in the SQL statement being executed. This can be NULL.
+   * @param array $options
+   *   (Optional) An array of options for this query.
+   *
+   * @return bool
+   *   TRUE on success, or FALSE on failure.
+   */
+  public function doExecute(?array $args = [], array $options = []): bool {
+    return TRUE;
   }
 
 }
