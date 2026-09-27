@@ -100,7 +100,7 @@ function hook_extension_info_alter(array &$info, \Drupal\Core\Extension\Extensio
  *   Either 'module' or 'theme', depending on the type of .info.yml file that
  *   was passed.
  *
- * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
  *   hook_extension_info_alter() instead.
  * @see https://www.drupal.org/node/3624723
  */

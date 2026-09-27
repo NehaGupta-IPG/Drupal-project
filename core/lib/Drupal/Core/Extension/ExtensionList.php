@@ -327,7 +327,7 @@ abstract class ExtensionList {
       // Invoke hook_extension_info_alter() to give installed modules a chance
       // to modify the data in the .info.yml files if necessary.
       $this->moduleHandler->alter('extension_info', $extension->info, $extension, $this->type);
-      $this->moduleHandler->alterDeprecated('Deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use hook_extension_info_alter() instead. See https://www.drupal.org/node/3624723.', 'system_info', $extension->info, $extension, $this->type);
+      $this->moduleHandler->alterDeprecated('Deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use hook_extension_info_alter() instead. See https://www.drupal.org/node/3624723.', 'system_info', $extension->info, $extension, $this->type);
     }
 
     return $extensions;
