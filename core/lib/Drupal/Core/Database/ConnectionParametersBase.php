@@ -233,7 +233,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   /**
    * {@inheritdoc}
    */
-  public function withDatabase(string $database): static{
+  public function withDatabase(string $database): static {
     $instance = clone $this;
     $instance->sealed = FALSE;
     $instance->database = $database;
@@ -244,7 +244,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   /**
    * {@inheritdoc}
    */
-  public function withPrefix(string $prefix): static{
+  public function withPrefix(string $prefix): static {
     $instance = clone $this;
     $instance->sealed = FALSE;
     $instance->prefix = $prefix;

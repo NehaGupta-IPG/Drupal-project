@@ -13,6 +13,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore sanday westray
+
 /**
  * Tests Drupal\sqlite\Driver\Database\sqlite\Connection.
  *
