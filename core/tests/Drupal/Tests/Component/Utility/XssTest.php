@@ -817,6 +817,29 @@ class XssTest extends TestCase {
   }
 
   /**
+   * Tests that additional disallowed attributes are removed.
+   */
+  public function testDisallowedAttributes(): void {
+    $html = '<a href="/foo" X-Data="{}" x-onclick="alert(1)" x-onion="1" x-bind-class="c" title="t">x</a>';
+
+    // Without additional disallowed attributes everything is kept.
+    $this->assertSame('<a href="/foo" x-data="{}" x-onclick="alert(1)" x-onion="1" x-bind-class="c" title="t">x</a>', Xss::filter($html));
+
+    Xss::setDisallowedAttributes(['x-data', 'X-ON*', ' x-bind* ', '', '*', 'x-data']);
+    $this->assertSame(['x-data', 'x-on*', 'x-bind*'], Xss::getDisallowedAttributes());
+    $this->assertSame('<a href="/foo" title="t">x</a>', Xss::filter($html));
+    $this->assertSame('<a href="/foo" title="t">x</a>', Xss::filterAdmin($html));
+    // Valueless attributes are removed as well.
+    $this->assertSame('<a title="t">x</a>', Xss::filter('<a x-data title="t">x</a>'));
+    $this->assertSame('<a>x</a>', Xss::filter('<a x-data>x</a>'));
+
+    // Setting the list replaces the previous one.
+    Xss::setDisallowedAttributes([]);
+    $this->assertSame([], Xss::getDisallowedAttributes());
+    $this->assertSame('<a x-data="{}">x</a>', Xss::filter('<a x-data="{}">x</a>'));
+  }
+
+  /**
    * Asserts that a text transformed to lowercase with HTML entities decoded does contain a given string.
    *
    * Otherwise fails the test with a given message, similar to all the

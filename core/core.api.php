@@ -2324,6 +2324,35 @@ function hook_countries_alter(&$countries) {
 }
 
 /**
+ * Declare additional HTML attributes that XSS filtering must always remove.
+ *
+ * \Drupal\Component\Utility\Xss::filter() allows any attribute on an allowed
+ * tag, except for a hardcoded list of dangerous ones such as "style",
+ * "srcdoc" and event handlers ("on*"). Modules that make other attributes
+ * dangerous, for example by loading a JavaScript library that acts on custom
+ * attributes, can use this hook to have those attributes removed as well.
+ *
+ * This hook is invoked once at the start of every request that reaches the
+ * router, so implementations should be fast and not depend on the request.
+ *
+ * @return string[]
+ *   A list of attribute names, matched case-insensitively. A name ending with
+ *   "*" is treated as a prefix, e.g. "x-on*" removes every attribute whose name
+ *   starts with "x-on".
+ *
+ * @see \Drupal\Component\Utility\Xss::setDisallowedAttributes()
+ */
+function hook_xss_disallowed_attributes(): array {
+  return [
+    // Alpine.js directives can execute arbitrary JavaScript.
+    'x-data',
+    'x-init',
+    'x-on*',
+    'x-bind*',
+  ];
+}
+
+/**
  * Alter display variant plugin definitions.
  *
  * @param array $definitions
