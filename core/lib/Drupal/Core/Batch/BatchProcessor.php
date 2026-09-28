@@ -62,7 +62,7 @@ class BatchProcessor {
    *
    * @return bool|array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
    *
-   * @see _batch_shutdown()
+   * @see self::shutdown()
    */
   public function page(Request $request): bool|array|JsonResponse|RedirectResponse {
     $batch = &batch_get();
@@ -92,9 +92,9 @@ class BatchProcessor {
     // However, we must ensure to only update in the shutdown phase in this
     // particular case we track whether the batch information still needs to be
     // updated.
-    // @see _batch_shutdown()
+    // @see self::shutdown()
     // @see \Symfony\Component\HttpFoundation\Response::send()
-    drupal_register_shutdown_function('_batch_shutdown');
+    drupal_register_shutdown_function(self::class . '::shutdown');
     $this->needsUpdate(TRUE);
 
     $build = [];
@@ -558,6 +558,21 @@ class BatchProcessor {
         // Default to RedirectResponse objects when nothing specified.
         return new RedirectResponse($_batch['source_url']->setAbsolute()->toString());
       }
+    }
+  }
+
+  /**
+   * Shutdown function: Stores the current batch data for the next request.
+   *
+   * @see BatchProcessor::page()
+   * @see drupal_register_shutdown_function()
+   */
+  public static function shutdown(): void {
+    $cid = 'batch_needs_update';
+    $cached = \Drupal::service('cache.memory')->get($cid);
+    $needsUpdate = $cached->data ?? NULL;
+    if (($batch = batch_get()) && $needsUpdate) {
+      \Drupal::service('batch.storage')->update($batch);
     }
   }
 
