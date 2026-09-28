@@ -30,7 +30,7 @@ class UpdatePathTest extends UpdatePathTestBase {
   }
 
   /**
-   * Tests that, after update 11500, the 'wid' column is an unsigned integer.
+   * Tests that, after update 12100, the 'wid' column is an unsigned integer.
    */
   public function testLogEntryWithNegativeId(): void {
     $connection = Database::getConnection();
