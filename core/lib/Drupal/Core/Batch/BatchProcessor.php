@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -68,7 +69,7 @@ class BatchProcessor {
    *
    * @see self::shutdown()
    */
-  public function page(Request $request): bool|array|JsonResponse|RedirectResponse {
+  public function page(Request $request): bool|array|JsonResponse|RedirectResponse|Response|null {
     $batch = &batch_get();
 
     if (!($request_id = $request->query->get('id'))) {
@@ -157,7 +158,7 @@ class BatchProcessor {
    */
   public function process(): array|RedirectResponse|null {
     $batch = &batch_get();
-
+    $currentSet = &$this->currentSet();
     // Indicate that this batch set needs to be initialized.
     $setChanged = TRUE;
     $taskMessage = '';
@@ -476,28 +477,28 @@ class BatchProcessor {
     $batchFinishedRedirect = NULL;
 
     // Execute the 'finished' callbacks for each batch set, if defined.
-    foreach ($batch['sets'] as $batchset) {
-      if (isset($batchset['finished'])) {
+    foreach ($batch['sets'] as $batchSet) {
+      if (isset($batchSet['finished'])) {
         // Check if the set requires an additional file for function
         // definitions.
-        if (isset($batchset['file']) && is_file($batchset['file'])) {
-          include_once $this->root . '/' . $batchset['file'];
+        if (isset($batchSet['file']) && is_file($batchSet['file'])) {
+          include_once $this->root . '/' . $batchSet['file'];
         }
 
-        $queue = _batch_queue($batchset);
+        $queue = _batch_queue($batchSet);
         $operations = $queue->getAllItems();
-        $callable = $this->callableResolver->getCallableFromDefinition($batchset['finished']);
-        $batchsetResult = $callable(
-          $batchset['success'],
-          $batchset['results'],
+        $callable = $this->callableResolver->getCallableFromDefinition($batchSet['finished']);
+        $batchSetResult = $callable(
+          $batchSet['success'],
+          $batchSet['results'],
           $operations,
-          $this->dateFormatter->formatInterval((int) ($batchset['elapsed'] / 1000)),
+          $this->dateFormatter->formatInterval((int) ($batchSet['elapsed'] / 1000)),
         );
         // If a batch 'finished' callback requested a redirect after the batch
         // is complete, save that for later use. If more than one batch set
         // returned a redirect, the last one is used.
-        if ($batchsetResult instanceof RedirectResponse) {
-          $batchFinishedRedirect = $batchsetResult;
+        if ($batchSetResult instanceof RedirectResponse) {
+          $batchFinishedRedirect = $batchSetResult;
         }
       }
     }
@@ -505,8 +506,8 @@ class BatchProcessor {
     // Clean up the batch table and unset the static $batch variable.
     if ($batch['progressive']) {
       $this->batchStorage->delete($batch['id']);
-      foreach ($batch['sets'] as $batchset) {
-        if ($queue = _batch_queue($batchset)) {
+      foreach ($batch['sets'] as $batchSet) {
+        if ($queue = _batch_queue($batchSet)) {
           $queue->deleteQueue();
         }
       }

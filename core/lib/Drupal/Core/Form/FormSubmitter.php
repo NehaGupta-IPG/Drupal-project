@@ -44,8 +44,8 @@ class FormSubmitter implements FormSubmitterInterface {
 
       $batch['progressive'] = !$form_state->isProgrammed();
       $response = batch_process();
-      // If the batch has been completed and BatchProcessor::finished() called then
-      // $batch will be NULL.
+      // If the batch has been completed and BatchProcessor::finished() called
+      // then $batch will be NULL.
       if ($batch && $batch['progressive']) {
         return $response;
       }

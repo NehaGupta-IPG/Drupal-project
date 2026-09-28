@@ -272,7 +272,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
     if ($request->getSession()->has('batch_form_state')) {
       // We've been redirected here after a batch processing. The form has
-      // already been processed, but needs to be rebuilt. See BatchProcessor::finished().
+      // already been processed, but needs to be rebuilt. See
+      // BatchProcessor::finished().
       $session = $request->getSession();
       $form_state = $session->get('batch_form_state');
       $session->remove('batch_form_state');
