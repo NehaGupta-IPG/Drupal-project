@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\Stub;
 
-// cspell:ignore djarin grogu kuiil
+// cspell:ignore djarin grogu kuiil bokatan moff
 
 /**
  * Tests MySQL database connections.
