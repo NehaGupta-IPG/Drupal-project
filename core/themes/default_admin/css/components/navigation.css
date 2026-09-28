@@ -10,8 +10,6 @@
  * Navigation layout overrides for the admin toolbar.
  */
 
-/* cspell:ignore navigationcreate, toolsextra, xxxs */
-
 :root {
   --admin-theme-toolbar-height: 3rem;
   --admin-theme-toolbar-secondary-height: 3rem;

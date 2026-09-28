@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* cspell:ignore insertdrupalmedia JSONified drupalmediacaptioncommand downcasted */
+/* cspell:ignore drupalmediacaptioncommand downcasted */
 import { Plugin } from 'ckeditor5/src/core';
 import { ModelElement, enableViewPlaceholder } from 'ckeditor5/src/engine';
 import { toWidgetEditable } from 'ckeditor5/src/widget';

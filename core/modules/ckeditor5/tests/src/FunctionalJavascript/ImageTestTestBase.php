@@ -10,7 +10,7 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
-// cspell:ignore imageresize imageupload
+// cspell:ignore imageresize
 
 /**
  * Provides a base class for testing CKEditor 5 image embedding and uploads.
