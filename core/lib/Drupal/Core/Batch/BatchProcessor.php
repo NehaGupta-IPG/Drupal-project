@@ -106,7 +106,7 @@ class BatchProcessor {
 
       case 'do':
         // JavaScript-based progress page callback.
-        $response = _batch_do();
+        $response = $this->doBatch();
         break;
 
       case 'finished':
@@ -132,7 +132,7 @@ class BatchProcessor {
    * @return bool
    *   TRUE if the batch information needs to be updated; FALSE otherwise.
    */
-  public function needsUpdate(?bool $newValue = NULL): ?bool {
+  protected function needsUpdate(?bool $newValue = NULL): ?bool {
     $cid = 'batch_needs_update';
     $cached = $this->memoryCache->get($cid);
     $needsUpdate = $cached->data ?? NULL;
@@ -143,6 +143,18 @@ class BatchProcessor {
     }
 
     return $needsUpdate;
+  }
+
+  /**
+   * Does one execution pass with JavaScript and returns progress to the browser.
+   *
+   * @see _batch_process()
+   */
+  protected function doBatch(): JsonResponse {
+    // Perform actual processing.
+    [$percentage, $message, $label] = _batch_process();
+
+    return new JsonResponse(['status' => TRUE, 'percentage' => $percentage, 'message' => $message, 'label' => $label]);
   }
 
 }

@@ -31,9 +31,14 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  * @param \Symfony\Component\HttpFoundation\Request $request
  *   The current request object.
  *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Batch\BatchProcessor::page() instead.
+ *
+ * @see https://www.drupal.org/node/3593399
  * @see _batch_shutdown()
  */
 function _batch_page(Request $request) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(BatchProcessor::class)->page() instead. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   return \Drupal::service(BatchProcessor::class)->page($request);
 }
 
@@ -45,17 +50,38 @@ function _batch_page(Request $request) {
  *
  * @return bool
  *   TRUE if the batch information needs to be updated; FALSE otherwise.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
  */
 function _batch_needs_update($new_value = NULL) {
-  return \Drupal::service(BatchProcessor::class)->needsUpdate($new_value);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
+  $cid = __FUNCTION__;
+  $cached = \Drupal::cache('memory')->get($cid);
+  $needs_update = $cached->data ?? NULL;
+
+  if (isset($new_value)) {
+    $needs_update = $new_value;
+    \Drupal::cache('memory')->set($cid, $needs_update);
+  }
+
+  return $needs_update;
 }
 
 /**
  * Does one execution pass with JavaScript and returns progress to the browser.
  *
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
  * @see _batch_process()
  */
 function _batch_do() {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   // Perform actual processing.
   [$percentage, $message, $label] = _batch_process();
 
