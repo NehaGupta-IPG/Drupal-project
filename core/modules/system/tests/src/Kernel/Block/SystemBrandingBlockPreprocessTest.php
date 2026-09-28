@@ -59,7 +59,7 @@ class SystemBrandingBlockPreprocessTest extends KernelTestBase {
     $logo_url = \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.url');
     $this->assertSame($logo_url, $variables['site_logo']);
     $this->assertIsArray($variables['site_logo_element']);
-    $this->assertSame("'site_logo' is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. Use 'site_logo_element' instead. See https://www.drupal.org/node/3345259", $variables['deprecations']['site_logo']);
+    $this->assertSame("'site_logo' is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. Use 'site_logo_element' instead. See https://www.drupal.org/node/3626551", $variables['deprecations']['site_logo']);
     $this->assertSame('Drupal Test Site', $variables['site_name']);
     $this->assertSame(['#markup' => 'Test Slogan'], $variables['site_slogan']);
 
