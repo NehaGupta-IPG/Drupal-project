@@ -14,7 +14,6 @@ use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
-use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -29,7 +28,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class SetInlineBlockDependencyTest extends KernelTestBase {
 
   use UserCreationTrait;
-  use ContentModerationTestTrait;
   use BlockContentCreationTrait;
 
   /**
@@ -38,8 +36,6 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
   protected static $modules = [
     'layout_builder',
     'layout_discovery',
-    'workflows',
-    'content_moderation',
     'entity_test',
     'field',
     'block_content',
@@ -58,7 +54,6 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
 
     $this->installEntitySchema('entity_test_mulrevpub');
     $this->installEntitySchema('block_content');
-    $this->installEntitySchema('content_moderation_state');
 
     $this->createBlockContentType([
       'id' => 'basic',
@@ -75,10 +70,6 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
     $display->enableLayoutBuilder();
     $display->setOverridable();
     $display->save();
-
-    $workflow = $this->createEditorialWorkflow();
-    $workflow->getTypePlugin()->addEntityTypeAndBundle('entity_test_mulrevpub', 'entity_test_mulrevpub');
-    $workflow->save();
   }
 
   /**
@@ -100,8 +91,6 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
     $account = $this->createUser([
       'create and edit custom blocks',
       'view test entity',
-      'use editorial transition create_new_draft',
-      'use editorial transition publish',
     ]);
 
     // The access check that is ran here doesn't really matter; we're just
@@ -119,14 +108,15 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
    * Test inline block dependencies with a default revision entity host.
    */
   public function testInlineBlockDependencyDefaultRevision(): void {
-    $entity = EntityTestMulRevPub::create(['name' => $this->randomMachineName()]);
+    $entity = EntityTestMulRevPub::create([
+      'name' => $this->randomMachineName(),
+      'status' => FALSE,
+    ]);
     $entity->save();
     $block = $this->addInlineBlockToOverrideLayout($entity);
     $account = $this->createUser([
       'create and edit custom blocks',
       'view test entity',
-      'use editorial transition create_new_draft',
-      'use editorial transition publish',
     ]);
     $this->assertFalse($block->access('view', $account));
     $this->assertTrue($block->access('update', $account));
@@ -138,18 +128,17 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
    */
   public function testInlineBlockDependencyNonDefaultActiveRevision(): void {
     // Create the canonical revision.
-    $entity = EntityTestMulRevPub::create(['name' => $this->randomMachineName(), 'moderation_state' => 'published']);
+    $entity = EntityTestMulRevPub::create(['name' => $this->randomMachineName()]);
     $entity->save();
 
     // Create and add a custom block to a new active revision.
-    $entity->moderation_state = 'draft';
+    $entity->setNewRevision();
+    $entity->isDefaultRevision(FALSE);
     $block = $this->addInlineBlockToOverrideLayout($entity);
 
     $account = $this->createUser([
       'create and edit custom blocks',
       'view test entity',
-      'use editorial transition create_new_draft',
-      'use editorial transition publish',
     ]);
     // The block does not exist on the canonical revision, so access will not be
     // granted since the custom block will not have a resolved dependency via
@@ -172,20 +161,19 @@ class SetInlineBlockDependencyTest extends KernelTestBase {
    */
   public function testInlineBlockDependencyRemovedInActiveRevision(): void {
     // Create the canonical revision with an inline block.
-    $entity = EntityTestMulRevPub::create(['name' => $this->randomMachineName(), 'moderation_state' => 'published']);
+    $entity = EntityTestMulRevPub::create(['name' => $this->randomMachineName()]);
     $entity->save();
     $block = $this->addInlineBlockToOverrideLayout($entity);
 
     // Create an active revision that removes the inline block.
     $entity->{OverridesSectionStorage::FIELD_NAME} = [];
-    $entity->moderation_state = 'draft';
+    $entity->setNewRevision();
+    $entity->isDefaultRevision(FALSE);
     $entity->save();
 
     $account = $this->createUser([
       'create and edit custom blocks',
       'view test entity',
-      'use editorial transition create_new_draft',
-      'use editorial transition publish',
     ]);
     // Access to update the block will be resolved through the active revision
     // and denied, since the block has been removed from the layout.
