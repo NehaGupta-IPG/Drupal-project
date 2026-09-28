@@ -106,7 +106,7 @@ class BatchProcessor {
       case 'do_nojs':
         // Display the full progress page on startup and on each additional
         // non-JavaScript iteration.
-        $currentSet = _batch_current_set();
+        $currentSet = $this->currentSet();
         $build['#title'] = $currentSet['title'];
         $build['content'] = $this->progressPage();
 
@@ -145,7 +145,7 @@ class BatchProcessor {
    */
   public function process(): array|RedirectResponse|NULL {
     $batch = &batch_get();
-    $currentSet = &_batch_current_set();
+
     // Indicate that this batch set needs to be initialized.
     $setChanged = TRUE;
     $taskMessage = '';
@@ -209,7 +209,7 @@ class BatchProcessor {
       $setChanged = FALSE;
       $oldSet = $currentSet;
       while (empty($currentSet['count']) && ($currentSet['success'] = TRUE) && _batch_next_set()) {
-        $currentSet = &_batch_current_set();
+        $currentSet = &$this->currentSet();
         $currentSet['start'] = microtime(TRUE);
         $setChanged = TRUE;
       }
@@ -248,7 +248,7 @@ class BatchProcessor {
       // Total progress is the number of operations that have fully run plus the
       // completion level of the current operation.
       $current    = $total - $remaining + ($finished ?? 0);
-      $percentage = _batch_api_percentage($total, $current);
+      $percentage = Percentage::format($total, $current);
       $elapsed    = $currentSet['elapsed'] ?? 0;
       $values     = [
         '@remaining'  => $remaining,
@@ -266,6 +266,14 @@ class BatchProcessor {
       // If we are not in progressive mode, the entire batch has been processed.
       return _batch_finished();
     }
+  }
+
+  /**
+   * Returns the batch set being currently processed.
+   */
+  public function &currentSet() {
+    $batch = &batch_get();
+    return $batch['sets'][$batch['current_set']];
   }
 
   /**
@@ -310,7 +318,7 @@ class BatchProcessor {
   protected function progressPage(): array {
     $batch = &batch_get();
 
-    $currentSet = _batch_current_set();
+    $currentSet = $this->currentSet();
 
     $newOp = 'do_nojs';
 

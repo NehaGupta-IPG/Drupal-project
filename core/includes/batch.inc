@@ -228,18 +228,28 @@ function _batch_process() {
  *   until we are finished, but we also never print more decimal places than
  *   are meaningful.
  *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
  * @see _batch_process()
  */
 function _batch_api_percentage($total, $current) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   return Percentage::format($total, $current);
 }
 
 /**
  * Returns the batch set being currently processed.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal::service(BatchProcessor::class)->process() instead.
+ *
+ * @see https://www.drupal.org/node/3593399
  */
 function &_batch_current_set() {
-  $batch = &batch_get();
-  return $batch['sets'][$batch['current_set']];
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(BatchProcessor::class)->currentSet() instead. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
+  return \Drupal::service(BatchProcessor::class)->currentSet();
 }
 
 /**
