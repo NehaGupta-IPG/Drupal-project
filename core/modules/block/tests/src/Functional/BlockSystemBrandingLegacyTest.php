@@ -40,7 +40,7 @@ class BlockSystemBrandingLegacyTest extends BlockTestBase {
    * Tests that using site_logo variable triggers deprecation and renders logo URL.
    */
   public function testLegacySiteLogoDeprecation(): void {
-    $this->expectUserDeprecationMessage("'site_logo' is deprecated in drupal:12.0.0 and is removed in drupal:13.0.0. Use 'site_logo_element' instead. See https://www.drupal.org/node/3345259");
+    $this->expectUserDeprecationMessage("'site_logo' is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. Use 'site_logo_element' instead. See https://www.drupal.org/node/3345259");
     $this->drupalGet('');
     $this->assertSession()->elementExists('xpath', '//div[@id="block-site-branding"]//a[@class="legacy-site-logo"]/img');
     $logo_url = \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.url');
