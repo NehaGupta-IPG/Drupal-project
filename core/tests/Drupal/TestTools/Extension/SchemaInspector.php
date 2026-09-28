@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\TestTools\Extension;
 
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
