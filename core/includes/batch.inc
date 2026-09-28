@@ -293,8 +293,14 @@ function _batch_next_set() {
  *
  * Call the 'finished' callback of each batch set to allow custom handling of
  * the results and resolve page redirection.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
  */
 function _batch_finished() {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   $batch = &batch_get();
   $batch_finished_redirect = NULL;
 
