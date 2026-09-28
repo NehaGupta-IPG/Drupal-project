@@ -68,7 +68,6 @@ body.admin--navigation {
 }
 
 /* Workspaces. */
-
 .toolbar-button--workspaces {
   .dark-mode & {
     --toolbar-button-color: #222330;
