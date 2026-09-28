@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Tests\HttpKernelUiHelperTrait;
 use PHPUnit\Framework\Attributes\CoversTrait;
@@ -79,6 +80,47 @@ class KernelTestHttpRequestTest extends KernelTestBase {
     // We can't use WebAssert::responseHeaderExists() because of how header
     // names are normalized by Mink and Symfony.
     $this->assertEquals('header value', $this->getSession()->getResponseHeader('Test-Header'));
+  }
+
+  /**
+   * Tests that HTML IDs and AJAX mode are reset between browser requests.
+   */
+  public function testHtmlRequestState(): void {
+    try {
+      // The helper calls http_kernel directly, bypassing DrupalKernel::handle().
+      // Each page must start with the same unsuffixed ID.
+      for ($i = 0; $i < 2; $i++) {
+        $this->drupalGet('/kernel-test-html-id');
+        $this->assertSession()->statusCodeEquals(200);
+        $this->assertSession()->elementExists('css', '#request-id');
+      }
+
+      // Enable AJAX mode, which adds a random suffix to the ID.
+      $this->drupalGet('/kernel-test-html-id', ['query' => ['_drupal_ajax' => 1]]);
+      $this->assertSession()->statusCodeEquals(200);
+      $this->assertSession()->elementExists('css', '[id^="request-id--"]');
+
+      // A regular request must not inherit the previous request's AJAX mode.
+      $this->drupalGet('/kernel-test-html-id');
+      $this->assertSession()->statusCodeEquals(200);
+      $this->assertSession()->elementExists('css', '#request-id');
+    }
+    finally {
+      Html::resetSeenIds();
+      Html::setIsAjax(FALSE);
+    }
+  }
+
+  /**
+   * Returns an HTML response with a generated ID.
+   */
+  #[Route(
+    path: '/kernel-test-html-id',
+    name: 'kernel_test.html_id',
+    requirements: ['_access' => 'TRUE'],
+  )]
+  public function htmlIdRoute(): Response {
+    return new Response('<div id="' . Html::getUniqueId('request-id') . '">Test</div>');
   }
 
   /**
