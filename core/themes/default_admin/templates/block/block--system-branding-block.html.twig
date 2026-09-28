@@ -19,11 +19,6 @@
     <a href="{{ path('<front>') }}" rel="home" class="site-logo">
       {{ site_logo_element }}
     </a>
-  {% elseif site_logo %}
-    {# Fallback for backwards compatibility #}
-    <a href="{{ path('<front>') }}" rel="home" class="site-logo">
-      <img src="{{ site_logo }}" alt="{{ 'Home'|t }}" fetchpriority="high" />
-    </a>
   {% endif %}
   {% if site_name %}
     <div class="site-name">

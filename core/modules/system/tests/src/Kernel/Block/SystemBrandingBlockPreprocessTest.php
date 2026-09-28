@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Block;
 
 use Drupal\Core\Extension\ThemeSettingsProvider;
-use Drupal\Core\Render\RenderContext;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Hook\SystemThemeHooks;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -84,40 +82,6 @@ class SystemBrandingBlockPreprocessTest extends KernelTestBase {
     $this->assertSame('', $variables['site_logo_element']);
     $this->assertSame('', $variables['site_name']);
     $this->assertSame('', $variables['site_slogan']);
-  }
-
-  /**
-   * Tests template backwards-compatibility fallback when site_logo_element is empty.
-   */
-  #[IgnoreDeprecations]
-  public function testTemplateFallback(): void {
-    $twig = \Drupal::service('twig');
-    $renderer = \Drupal::service('renderer');
-
-    // 1. When site_logo_element is provided, it is rendered.
-    $output = $renderer->executeInRenderContext(new RenderContext(), fn() => $twig->render(
-      'core/modules/system/templates/block--system-branding-block.html.twig',
-      [
-        'site_logo_element' => ['#type' => 'inline_template', '#template' => '<svg class="test-logo"></svg>'],
-        'site_logo' => '/legacy/logo.png',
-        'site_name' => '',
-        'site_slogan' => '',
-      ]
-    ));
-    $this->assertStringContainsString('<svg class="test-logo"></svg>', (string) $output);
-    $this->assertStringNotContainsString('/legacy/logo.png', (string) $output);
-
-    // 2. When site_logo_element is empty and site_logo is provided, fallback is used.
-    $output = $renderer->executeInRenderContext(new RenderContext(), fn() => $twig->render(
-      'core/modules/system/templates/block--system-branding-block.html.twig',
-      [
-        'site_logo_element' => '',
-        'site_logo' => '/legacy/logo.png',
-        'site_name' => '',
-        'site_slogan' => '',
-      ]
-    ));
-    $this->assertStringContainsString('<img src="/legacy/logo.png" alt="Home" fetchpriority="high" />', (string) $output);
   }
 
 }
