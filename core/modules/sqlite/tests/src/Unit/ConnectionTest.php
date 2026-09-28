@@ -163,8 +163,10 @@ class ConnectionTest extends UnitTestCase {
     $this->assertEquals('baz', $connectionParameters->prefix);
 
     $testParameters = $connectionParameters
-      ->withDatabase('sanday')
-      ->withPrefix('westray');
+      ->with([
+        'database' => 'sanday',
+        'prefix' => 'westray',
+      ]);
     $this->assertInstanceOf(ConnectionParameters::class, $testParameters);
     $this->assertEquals('sqlite', $testParameters->driver);
     $this->assertEquals('sanday', $testParameters->database);

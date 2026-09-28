@@ -233,23 +233,11 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   /**
    * {@inheritdoc}
    */
-  public function withDatabase(string $database): static {
-    $instance = clone $this;
-    $instance->sealed = FALSE;
-    $instance->database = $database;
-    $instance->sealed = TRUE;
-    return $instance;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function withPrefix(string $prefix): static {
-    $instance = clone $this;
-    $instance->sealed = FALSE;
-    $instance->prefix = $prefix;
-    $instance->sealed = TRUE;
-    return $instance;
+  public function with(array $options): static {
+    $this->sealed = FALSE;
+    $clone = clone($this, $options);
+    $this->sealed = TRUE;
+    return $clone;
   }
 
   /**

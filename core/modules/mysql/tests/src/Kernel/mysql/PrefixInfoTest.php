@@ -50,7 +50,9 @@ class PrefixInfoTest extends DriverSpecificKernelTestBase {
     $reflection_class = new \ReflectionClass(Database::class);
     $property = $reflection_class->getProperty('databaseInfo');
     $info = $property->getValue();
-    $info['extra']['default']['database'] = 'foobar';
+    $info['extra']['default'] = $info['extra']['default']->with([
+      'database' => 'foobar',
+    ]);
     $property->setValue(NULL, $info);
 
     $extra_info = Database::getConnectionInfo('extra');
