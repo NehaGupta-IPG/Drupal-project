@@ -84,6 +84,11 @@ class CreateSampleEntityTest extends KernelTestBase {
       if ($label = $definition->getKey('label')) {
         $values[$label] = $this->randomString();
       }
+      // @todo Remove when https://www.drupal.org/node/3087632 limits the field
+      //   to the 32 characters the menu tree stores.
+      if ($entity_type_id === 'menu_link_content') {
+        $values['menu_name'] = 'tools';
+      }
 
       // Create sample entities with bundles.
       if ($bundle_type = $definition->getBundleEntityType()) {
