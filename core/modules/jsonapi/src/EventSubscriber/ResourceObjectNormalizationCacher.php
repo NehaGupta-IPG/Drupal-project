@@ -182,8 +182,7 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
       $this->prefetchedRequest = $request;
     }
 
-    // @todo Investigate whether to cache POST and PATCH requests.
-    // @todo Follow up on https://www.drupal.org/project/drupal/issues/3381898.
+    // See the @todo in ::get() about caching POST and PATCH requests.
     if (!$request->isMethodCacheable()) {
       return;
     }
