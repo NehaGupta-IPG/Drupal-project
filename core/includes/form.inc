@@ -428,7 +428,7 @@ function _batch_append_set(&$batch, $batch_set): void {
   // current set is being retrieved in BatchProcessor::process(). Additionally,
   // we have to preserve the original indexes, as they are used to generate the
   // queue name of each batch set, otherwise the operations of the new batch
-  // set will be\Drupal::service(BatchProcessor::class)->processqueued in the
+  // set will be queued in the
   // queue of a previous batch set.
   // @see _batch_populate_queue().
   $new_sets = [];
