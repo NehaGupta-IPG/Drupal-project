@@ -1,0 +1,19 @@
+{% extends 'block.html.twig' %}
+{#
+/**
+ * @file
+ * Template to test deprecation and BC for the site_logo variable.
+ * @see \Drupal\Tests\block\Functional\BlockSystemBrandingLegacyTest
+ */
+#}
+{% block content %}
+  {% if site_logo %}
+    <a href="{{ path('<front>') }}" rel="home" class="legacy-site-logo">
+      <img src="{{ site_logo }}" alt="Home" />
+    </a>
+  {% endif %}
+  {% if site_name %}
+    <a href="{{ path('<front>') }}" rel="home">{{ site_name }}</a>
+  {% endif %}
+  {{ site_slogan }}
+{% endblock %}
