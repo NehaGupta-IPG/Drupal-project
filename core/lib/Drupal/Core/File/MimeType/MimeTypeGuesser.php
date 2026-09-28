@@ -64,13 +64,47 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface {
    * extension or being able to run the system command file. Drupal's guesser
    * does not have these dependencies.
    *
+   * The registration holds only a weak reference to Drupal's guesser. After
+   * the container that owns the guesser is garbage collected, Symfony falls
+   * back to its default guessers until this method is called again.
+   *
    * @see \Symfony\Component\Mime\MimeTypes
    */
   public static function registerWithSymfonyGuesser(
     ContainerInterface $container,
   ): void {
     $guesser = new MimeTypes();
-    $guesser->registerGuesser($container->get('file.mime_type.guesser'));
+    // Symfony's static MIME registry outlives Drupal's container. Reference
+    // Drupal's guesser weakly so the registry does not keep a discarded
+    // container alive.
+    $guesser->registerGuesser(new class($container->get('file.mime_type.guesser')) implements MimeTypeGuesserInterface {
+
+      /**
+       * The guesser owned by Drupal's container.
+       *
+       * @var \WeakReference<\Symfony\Component\Mime\MimeTypeGuesserInterface>
+       */
+      private readonly \WeakReference $guesser;
+
+      public function __construct(MimeTypeGuesserInterface $guesser) {
+        $this->guesser = \WeakReference::create($guesser);
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function isGuesserSupported(): bool {
+        return $this->guesser->get()?->isGuesserSupported() ?? FALSE;
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function guessMimeType(string $path): ?string {
+        return $this->guesser->get()?->guessMimeType($path);
+      }
+
+    });
     MimeTypes::setDefault($guesser);
   }
 
