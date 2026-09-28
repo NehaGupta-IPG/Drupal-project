@@ -193,6 +193,11 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     // anonymous user cache hit rates) and as such we cannot use the Symfony
     // convenience method here.
     session_destroy();
+    // Keep the storage state in sync with PHP so that subsequent requests start
+    // their own sessions and reinitialize the session bags.
+    $this->started = FALSE;
+    $this->startedLazy = FALSE;
+    $this->closed = TRUE;
 
     // Unset the session cookies.
     $session_name = $this->getName();
