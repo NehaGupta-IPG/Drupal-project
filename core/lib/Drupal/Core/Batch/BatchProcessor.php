@@ -2,8 +2,10 @@
 
 namespace Drupal\Core\Batch;
 
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -30,6 +32,8 @@ class BatchProcessor {
   public function __construct(
     protected BatchStorageInterface $batchStorage,
     protected MessengerInterface $messenger,
+    #[Autowire(service: 'cache.memory')]
+    protected MemoryCacheInterface $memoryCache,
   ) {}
 
   /**
@@ -73,7 +77,7 @@ class BatchProcessor {
     // @see _batch_shutdown()
     // @see \Symfony\Component\HttpFoundation\Response::send()
     drupal_register_shutdown_function('_batch_shutdown');
-    _batch_needs_update(TRUE);
+    $this->needsUpdate(TRUE);
 
     $build = [];
 
@@ -114,9 +118,31 @@ class BatchProcessor {
     if ($batch) {
       $this->batchStorage->update($batch);
     }
-    _batch_needs_update(FALSE);
+    $this->needsUpdate(FALSE);
 
     return $response;
+  }
+
+  /**
+   * Checks whether the batch information needs to be updated in the storage.
+   *
+   * @param ?bool $newValue
+   *   (optional) A new value to set.
+   *
+   * @return bool
+   *   TRUE if the batch information needs to be updated; FALSE otherwise.
+   */
+  public function needsUpdate(?bool $newValue = NULL): ?bool {
+    $cid = 'batch_needs_update';
+    $cached = $this->memoryCache->get($cid);
+    $needsUpdate = $cached->data ?? NULL;
+
+    if (isset($newValue)) {
+      $needsUpdate = $newValue;
+      $this->memoryCache->set($cid, $needsUpdate);
+    }
+
+    return $needsUpdate;
   }
 
 }

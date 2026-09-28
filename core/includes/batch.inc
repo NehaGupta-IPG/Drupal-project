@@ -47,16 +47,7 @@ function _batch_page(Request $request) {
  *   TRUE if the batch information needs to be updated; FALSE otherwise.
  */
 function _batch_needs_update($new_value = NULL) {
-  $cid = __FUNCTION__;
-  $cached = \Drupal::cache('memory')->get($cid);
-  $needs_update = $cached->data ?? NULL;
-
-  if (isset($new_value)) {
-    $needs_update = $new_value;
-    \Drupal::cache('memory')->set($cid, $needs_update);
-  }
-
-  return $needs_update;
+  return \Drupal::service(BatchProcessor::class)->needsUpdate($new_value);
 }
 
 /**

@@ -1645,7 +1645,7 @@ services:
     tags:
       - { name: backend_overridable }
     lazy: true
-  Drupal\Core\Batch\BatchProcess:
+  Drupal\Core\Batch\BatchProcessor:
     autowire: true
   Drupal\Core\Batch\BatchStorageInterface: '@batch.storage'
   country_manager:

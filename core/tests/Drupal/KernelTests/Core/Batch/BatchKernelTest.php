@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Batch;
 
+use Drupal\Core\Batch\BatchProcessor;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -25,20 +26,20 @@ class BatchKernelTest extends KernelTestBase {
   }
 
   /**
-   * Tests _batch_needs_update().
+   * Tests BatchProcessor::needsUpdate().
    */
   public function testNeedsUpdate(): void {
     // Before ever being called, the return value should be FALSE.
-    $this->assertEquals(FALSE, _batch_needs_update());
+    $this->assertEquals(FALSE, $this->container->get(BatchProcessor::class)->needsUpdate());
 
     // Set the value to TRUE.
-    $this->assertEquals(TRUE, _batch_needs_update(TRUE));
+    $this->assertEquals(TRUE, $this->container->get(BatchProcessor::class)->needsUpdate(TRUE));
     // Check that without a parameter TRUE is returned.
-    $this->assertEquals(TRUE, _batch_needs_update());
+    $this->assertEquals(TRUE, $this->container->get(BatchProcessor::class)->needsUpdate());
 
     // Set the value to FALSE.
-    $this->assertEquals(FALSE, _batch_needs_update(FALSE));
-    $this->assertEquals(FALSE, _batch_needs_update());
+    $this->assertEquals(FALSE, $this->container->get(BatchProcessor::class)->needsUpdate(FALSE));
+    $this->assertEquals(FALSE, $this->container->get(BatchProcessor::class)->needsUpdate());
   }
 
 }
