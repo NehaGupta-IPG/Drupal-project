@@ -17,7 +17,7 @@ class WorkspacesRequirements implements InstallRequirementsInterface {
   /**
    * Check installation requirements.
    *
-   * @return array{}|array{'workspace_incompatibility': RequirementInfo}
+   * @return array{'workspace_incompatibility'?: RequirementInfo}
    *   The module's requirements.
    *
    * @see \Drupal\Core\Extension\InstallRequirementsInterface::getRequirements()
