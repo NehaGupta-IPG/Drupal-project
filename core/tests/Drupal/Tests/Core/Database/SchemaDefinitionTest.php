@@ -8,6 +8,8 @@ use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\FloatValue;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnExpression;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
@@ -99,6 +101,41 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
+   * Tests passing duplicate Table to Schema::$tables.
+   */
+  public function testDuplicateTableInSchema(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessageIs('Duplicate tables for \'test_foo_bar\' schema: foo, foo');
+    $schemaDefinition = new Schema(
+      type: SchemaDefinitionType::Test,
+      name: 'test_foo_bar',
+      tables: [
+        new Table(
+          name: 'foo',
+          description: 'Foo table for the database unit tests.',
+          columns: [
+            Column::serial(
+              name: 'id',
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+        new Table(
+          name: 'foo',
+          description: 'Foo table for the database unit tests.',
+          columns: [
+            Column::serial(
+              name: 'id',
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+      ],
+    );
+    $this->assertInstanceOf(Schema::class, $schemaDefinition);
+  }
+
+  /**
    * Tests passing a non Column array member to Table::$columns.
    */
   public function testInvalidColumnInTable(): void {
@@ -116,6 +153,27 @@ class SchemaDefinitionTest extends UnitTestCase {
           'default' => '',
           'binary' => TRUE,
         ],
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
+    $this->assertInstanceOf(Table::class, $table);
+  }
+
+  /**
+   * Tests passing duplicate Column to Table::$columns.
+   */
+  public function testDuplicateColumnInTable(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Duplicate columns for \'test\' table: id, id');
+    $table = new Table(
+      name: 'test',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'id',
+        ),
       ],
       primaryKey: new PrimaryKey(['id']),
     );
@@ -214,6 +272,50 @@ class SchemaDefinitionTest extends UnitTestCase {
         ),
       ],
       primaryKey: new PrimaryKey(['id']),
+    );
+  }
+
+  /**
+   * Tests Serial column.
+   */
+  public function testInvalidSerialForGeneratedExpression(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Cannot set \'generatedExpression\' for serial column \'id\'');
+    new Table(
+      name: 'test',
+      columns: [
+        Column::generated(
+          name: 'id',
+          type: ColumnType::Serial,
+          expression: new GeneratedColumnExpression('1 + 1'),
+          storage: GeneratedColumnStorage::Virtual,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
+  }
+
+  /**
+   * Tests that a generated column cannot be part of the primary key.
+   */
+  public function testInvalidPrimaryKeyForGeneratedColumn(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage("The primary key of the 'test' Table cannot include generated columns");
+    new Table(
+      name: 'test',
+      columns: [
+        Column::create(
+          name: 'age',
+          type: ColumnType::Int,
+        ),
+        Column::generated(
+          name: 'double_age',
+          type: ColumnType::Int,
+          expression: new GeneratedColumnExpression('[age] * 2'),
+          storage: GeneratedColumnStorage::Stored,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['double_age']),
     );
   }
 
@@ -547,6 +649,24 @@ class SchemaDefinitionTest extends UnitTestCase {
       ],
     );
     $this->assertInstanceOf(Table::class, $table);
+  }
+
+  /**
+   * Tests passing varchar columns without length.
+   */
+  public function testMissingVarcharColumnLength(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessageIs('Missing \'length\' for varchar column \'id\'');
+    new Table(
+      name: 'test',
+      columns: [
+        Column::varchar(
+          name: 'id',
+          default: new StringValue('foo'),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
   }
 
 }
