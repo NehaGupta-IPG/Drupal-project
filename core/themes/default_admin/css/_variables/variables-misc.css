@@ -4,7 +4,6 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
-
 /**
  * @file
  * Miscellaneous global custom properties.
@@ -14,17 +13,14 @@
  * Split out of the former css/base/variables.pcss.css as part of
  * https://www.drupal.org/i/3582351 (relocation only — no value changes).
  */
-
 :root {
   /*
    * Common.
    */
   --transition: all var(--admin-duration-fast) var(--admin-easing); /* Default Admin 'all' composite. */
-  --focus-border-size: calc(var(--admin-radius-2xs) - 1px);
-  --focus-border-offset-size: 0px;
   --outline-size: 0.25rem;
+  --outline-offset: 2px;
   --focus-outline: var(--outline-size) solid var(--admin-color-focus);
-  --focus-box-shadow: 0 0 0 var(--focus-border-offset-size) var(--admin-color-bg-surface), 0 0 0 calc(var(--focus-border-size) + var(--focus-border-offset-size)) var(--admin-color-focus);
 
   /**
    * Shadows.
