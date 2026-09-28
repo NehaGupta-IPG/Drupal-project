@@ -248,11 +248,28 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       $values += [$default_langcode_key => TRUE];
     }
 
+    // Fields maintained by the entity system keep the values it gives them. A
+    // random language ignores the configured default for the bundle, and
+    // random revision metadata contradicts the save that follows.
+    foreach (['langcode', 'revision_translation_affected'] as $key) {
+      if ($field_name = $this->entityType->getKey($key)) {
+        $forbidden_keys[] = $field_name;
+      }
+    }
+    if ($this->entityType instanceof ContentEntityTypeInterface) {
+      $forbidden_keys = array_merge($forbidden_keys, array_values($this->entityType->getRevisionMetadataKeys()));
+    }
+
     // Forbid sample generation on any keys whose values were submitted.
     $forbidden_keys = array_merge($forbidden_keys, array_keys($values));
     /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
     $entity = $this->create($values);
     foreach ($entity as $field_name => $value) {
+      // A changed field defaults to the request time, which a random sample
+      // value in the past would put before the created time.
+      if ($value->getFieldDefinition()->getType() === 'changed') {
+        continue;
+      }
       if (!in_array($field_name, $forbidden_keys, TRUE)) {
         $entity->get($field_name)->generateSampleItems();
       }

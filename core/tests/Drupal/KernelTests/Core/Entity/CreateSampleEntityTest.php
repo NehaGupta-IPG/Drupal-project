@@ -128,4 +128,30 @@ class CreateSampleEntityTest extends KernelTestBase {
     }
   }
 
+  /**
+   * Tests that fields maintained by the entity system are not randomized.
+   *
+   * @legacy-covers ::createWithSampleValues
+   */
+  public function testSampleValueEntityManagedFields(): void {
+    $storage = $this->entityTypeManager->getStorage('node');
+    $request_time = $this->container->get('datetime.time')->getRequestTime();
+    $default_langcode = $this->container->get('language.default')->get()->getId();
+    // Each of these fields would otherwise get a random value, so try enough
+    // times that a regression cannot pass by chance.
+    for ($i = 0; $i < 20; $i++) {
+      $node = $storage->createWithSampleValues('article');
+      $node->save();
+
+      $storage->resetCache([$node->id()]);
+      /** @var \Drupal\node\NodeInterface $node */
+      $node = $storage->load($node->id());
+      $this->assertSame($default_langcode, $node->language()->getId());
+      $this->assertEquals($request_time, $node->getChangedTime());
+      $this->assertEquals($request_time, $node->getRevisionCreationTime());
+      $this->assertTrue($node->isDefaultRevision());
+      $this->assertTrue((bool) $node->isRevisionTranslationAffected());
+    }
+  }
+
 }
