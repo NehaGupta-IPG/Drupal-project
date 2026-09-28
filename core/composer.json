@@ -40,7 +40,7 @@
         "twig/twig": "^3.28.0",
         "doctrine/lexer": "^3",
         "drupal/core-composer-scaffold": "self.version",
-        "guzzlehttp/guzzle": "^8.0",
+        "guzzlehttp/guzzle": "^8.0.1",
         "guzzlehttp/psr7": "^3.0",
         "egulias/email-validator": "^4.0",
         "masterminds/html5": "^2.7",
@@ -60,7 +60,8 @@
         "drupal/automatic_updates": "<4",
         "drupal/project_browser": "<2.1",
         "drush/drush": "<12.4.3",
-        "dealerdirect/phpcodesniffer-composer-installer": "1.1.0"
+        "dealerdirect/phpcodesniffer-composer-installer": "1.1.0",
+        "symfony/polyfill-intl-idn": "<1.38.1"
     },
     "replace": {
         "drupal/core-annotation": "self.version",
