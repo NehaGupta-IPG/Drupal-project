@@ -26,7 +26,7 @@ class BatchControllerTest extends UnitTestCase {
    */
   public function testBatchPageTitle(): void {
     $batch_storage = $this->createStub(BatchStorageInterface::class);
-    $batch_processor = $this->createStub(BatchProcessor::class);
+    $batch_processor = $this->createMock(BatchProcessor::class);
     $controller = new BatchController($batch_storage, $batch_processor);
     require_once $this->root . '/core/includes/form.inc';
     $this->assertSame('', $controller->batchPageTitle(new Request()));
@@ -34,6 +34,8 @@ class BatchControllerTest extends UnitTestCase {
     $batch = ['sets' => [['title' => 'foobar']], 'current_set' => 0];
     $batch_storage->method('load')->willReturn(FALSE, $batch);
     $this->assertSame('', $controller->batchPageTitle(new Request(['id' => 1234])));
+    $batch_processor->expects($this->exactly(2))->method('currentSet')
+      ->willReturn(['title' => 'foobar'], ['title' => 'Updated title']);
     $this->assertSame('foobar', $controller->batchPageTitle(new Request(['id' => 1234])));
     // Test batch returned by &batch_get() call.
     $batch = &batch_get();

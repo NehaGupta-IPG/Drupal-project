@@ -99,8 +99,7 @@ class BatchController implements ContainerInjectionInterface {
       return '';
     }
 
-    $batchProcessor = \Drupal::service(BatchProcessor::class);
-    $current_set = &$batchProcessor->currentSet();
+    $current_set = &$this->batchProcessor->currentSet();
     return !empty($current_set['title']) ? $current_set['title'] : '';
   }
 
