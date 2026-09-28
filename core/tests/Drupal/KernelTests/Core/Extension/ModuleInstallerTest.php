@@ -230,8 +230,8 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    */
   #[IgnoreDeprecations]
   public function testDeprecatedSchemaInstall(): void {
-    $this->expectUserDeprecationMessage("Not returning a Schema object from database_deprecation_test_schema() to Drupal\Core\Extension\ModuleInstaller::installSchema is deprecated in drupal:11.5.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405");
-    $this->expectUserDeprecationMessage("Not returning a Schema object from database_deprecation_test_schema() to Drupal\Core\Extension\ModuleInstaller::uninstallSchema is deprecated in drupal:11.5.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405");
+    $this->expectUserDeprecationMessage("Not returning a Schema object from database_deprecation_test_schema() to Drupal\Core\Extension\ModuleInstaller::installSchema is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405");
+    $this->expectUserDeprecationMessage("Not returning a Schema object from database_deprecation_test_schema() to Drupal\Core\Extension\ModuleInstaller::uninstallSchema is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405");
     \Drupal::service('module_installer')->install(['database_deprecation_test']);
     $this->assertTrue(\Drupal::service('module_handler')->moduleExists('database_deprecation_test'));
     \Drupal::service('module_installer')->uninstall(['database_deprecation_test']);
