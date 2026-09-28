@@ -371,7 +371,6 @@
 }
 
 /* Styles for details that contain child validation errors. */
-
 .details.error {
   position: relative;
   border-color: var(--input--error-color);

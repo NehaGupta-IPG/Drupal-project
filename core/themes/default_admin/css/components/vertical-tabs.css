@@ -210,7 +210,6 @@
 }
 
 /* Styles for vertical tabs that contain child validation errors. */
-
 .vertical-tabs__menu-item.error {
   & .vertical-tabs__menu-link {
     color: var(--input--error-color);
