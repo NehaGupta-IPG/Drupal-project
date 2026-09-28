@@ -148,10 +148,10 @@ class BatchProcessor {
    * exceeded. It will continue with the next operation of the same batch set in
    * the next request.
    *
-   * @return array
+   * @return array|\Symfony\Component\HttpFoundation\RedirectResponse|null
    *   An array containing a completion value (in percent) and a status message.
    */
-  public function process(): array|RedirectResponse|NULL {
+  public function process(): array|RedirectResponse|null {
     $batch = &batch_get();
 
     // Indicate that this batch set needs to be initialized.
@@ -278,8 +278,11 @@ class BatchProcessor {
 
   /**
    * Returns the batch set being currently processed.
+   *
+   * @return int|string|array
+   *   The current set for the batch.
    */
-  public function &currentSet() {
+  public function &currentSet(): int|string|array {
     $batch = &batch_get();
     return $batch['sets'][$batch['current_set']];
   }
@@ -290,7 +293,7 @@ class BatchProcessor {
    * @param ?bool $newValue
    *   (optional) A new value to set.
    *
-   * @return bool
+   * @return ?bool
    *   TRUE if the batch information needs to be updated; FALSE otherwise.
    */
   protected function needsUpdate(?bool $newValue = NULL): ?bool {
@@ -309,6 +312,8 @@ class BatchProcessor {
   /**
    * Does one execution pass with JavaScript and returns progress to the browser.
    *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The JsonResponse.
    * @see self::process()
    */
   protected function doBatch(): JsonResponse {
@@ -320,6 +325,9 @@ class BatchProcessor {
 
   /**
    * Outputs a batch processing page.
+   *
+   * @return array
+   *   Progress bar render array.
    *
    * @see self::process()
    */
@@ -450,10 +458,12 @@ class BatchProcessor {
    *
    * Call the 'finished' callback of each batch set to allow custom handling of
    * the results and resolve page redirection.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
    */
-  protected function finished() {
+  protected function finished(): ?RedirectResponse {
     $batch = &batch_get();
-    $batchfinishedredirect = NULL;
+    $batchFinishedRedirect = NULL;
 
     // Execute the 'finished' callbacks for each batch set, if defined.
     foreach ($batch['sets'] as $batchset) {
@@ -476,7 +486,7 @@ class BatchProcessor {
         // is complete, save that for later use. If more than one batch set
         // returned a redirect, the last one is used.
         if ($batchsetResult instanceof RedirectResponse) {
-          $batchfinishedredirect = $batchsetResult;
+          $batchFinishedRedirect = $batchsetResult;
         }
       }
     }
@@ -512,8 +522,8 @@ class BatchProcessor {
       // Determine the target path to redirect to. If a batch 'finished' callback
       // returned a redirect response object, use that. Otherwise, fall back on
       // the form redirection.
-      if (isset($batchfinishedredirect)) {
-        return $batchfinishedredirect;
+      if (isset($batchFinishedRedirect)) {
+        return $batchFinishedRedirect;
       } elseif (!isset($_batch['form_state'])) {
         $_batch['form_state'] = new FormState();
       }
@@ -559,12 +569,13 @@ class BatchProcessor {
         return new RedirectResponse($_batch['source_url']->setAbsolute()->toString());
       }
     }
+    return NULL;
   }
 
   /**
    * Shutdown function: Stores the current batch data for the next request.
    *
-   * @see BatchProcessor::page()
+   * @see self::page()
    * @see drupal_register_shutdown_function()
    */
   public static function shutdown(): void {
