@@ -529,7 +529,7 @@ class BatchProcessor {
     if ($_batch['progressive']) {
       // Revert the 'destination' that was saved in batch_process().
       if (isset($_batch['destination'])) {
-        $this->requestStack->query->set('destination', $_batch['destination']);
+        $this->requestStack->getCurrentRequest()->query->set('destination', $_batch['destination']);
       }
 
       // Determine the target path to redirect to. If a batch 'finished'
