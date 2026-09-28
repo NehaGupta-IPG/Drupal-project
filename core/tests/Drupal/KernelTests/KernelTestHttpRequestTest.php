@@ -88,7 +88,7 @@ class KernelTestHttpRequestTest extends KernelTestBase {
   public function testHtmlRequestState(): void {
     try {
       // The helper calls http_kernel directly, bypassing DrupalKernel::handle().
-      // Each page must start with the same unsuffixed ID.
+      // Each page must start with the same ID (that has no suffix).
       for ($i = 0; $i < 2; $i++) {
         $this->drupalGet('/kernel-test-html-id');
         $this->assertSession()->statusCodeEquals(200);
