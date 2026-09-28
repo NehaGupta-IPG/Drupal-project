@@ -36,6 +36,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @internal
  */
+/**
+ * Processor for batches.
+ */
 class BatchProcessor {
   use StringTranslationTrait;
 
@@ -61,6 +64,7 @@ class BatchProcessor {
    *   The current request object.
    *
    * @return bool|array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+   *   The response for the page triggering the batch.
    *
    * @see self::shutdown()
    */
@@ -80,18 +84,18 @@ class BatchProcessor {
       }
     }
 
-    // We need to store the updated batch information in the batch storage after
-    // processing the batch. In order for the error page to work correctly this
-    // needs to be done even in case of a PHP fatal error in which case the end of
-    // this function is never reached. Therefore we register a shutdown function
-    // to handle this case. Because with FastCGI and fastcgi_finish_request()
-    // shutdown functions are called after the HTTP connection is closed, updating
-    // the batch information in a shutdown function would lead to race conditions
-    // between consecutive requests if the batch processing continues. In case of
-    // a fatal error the processing stops anyway, so it works even with FastCGI.
-    // However, we must ensure to only update in the shutdown phase in this
-    // particular case we track whether the batch information still needs to be
-    // updated.
+    // We need to store the updated batch information in the batch storage
+    // after processing the batch. In order for the error page to work
+    // correctly this needs to be done even in case of a PHP fatal error in
+    // which case the end of this function is never reached. Therefore we
+    // register a shutdown function to handle this case. Because with FastCGI
+    // and fastcgi_finish_request() shutdown functions are called after the
+    // HTTP connection is closed, updating the batch information in a shutdown
+    // function would lead to race conditions between consecutive requests if
+    // the batch processing continues. In case of a fatal error the processing
+    // stops anyway, so it works even with FastCGI. However, we must ensure to
+    // only update in the shutdown phase in this particular case we track
+    // whether the batch information still needs to be updated.
     // @see self::shutdown()
     // @see \Symfony\Component\HttpFoundation\Response::send()
     drupal_register_shutdown_function(self::class . '::shutdown');
@@ -143,10 +147,10 @@ class BatchProcessor {
   /**
    * Processes sets in a batch.
    *
-   * If the batch was marked for progressive execution (default), this executes as
-   * many operations in batch sets until an execution time of 1 second has been
-   * exceeded. It will continue with the next operation of the same batch set in
-   * the next request.
+   * If the batch was marked for progressive execution (default), this executes
+   * as many operations in batch sets until an execution time of 1 second has
+   * been exceeded. It will continue with the next operation of the same batch
+   * set in the next request.
    *
    * @return array|\Symfony\Component\HttpFoundation\RedirectResponse|null
    *   An array containing a completion value (in percent) and a status message.
@@ -158,10 +162,10 @@ class BatchProcessor {
     $setChanged = TRUE;
     $taskMessage = '';
 
-    // If this batch was marked for progressive execution (e.g. forms submitted by
-    // FormBuilderInterface::submitForm(), initialize a timer to determine
-    // whether we need to proceed with the same batch phase when a processing time
-    // of 1 second has been exceeded.
+    // If this batch was marked for progressive execution (e.g. forms submitted
+    // by FormBuilderInterface::submitForm(), initialize a timer to determine
+    // whether we need to proceed with the same batch phase when a processing
+    // time of 1 second has been exceeded.
     if ($batch['progressive']) {
       Timer::start('batch_processing');
     }
@@ -212,8 +216,8 @@ class BatchProcessor {
       // through the remaining sets, marking them 'successfully processed'
       // along the way, until we find a set that contains operations.
       // self::nextSet() executes form submit handlers stored in 'control'
-      // sets (see \Drupal::service('form_submitter')), which can in turn add new
-      // sets to the batch.
+      // sets (see \Drupal::service('form_submitter')), which can in turn add
+      // new sets to the batch.
       $setChanged = FALSE;
       $oldSet = $currentSet;
       while (empty($currentSet['count']) && ($currentSet['success'] = TRUE) && $this->nextSet()) {
@@ -242,14 +246,15 @@ class BatchProcessor {
       // we have to use the info from the new (unprocessed) set.
       if ($setChanged && isset($currentSet['queue'])) {
         // Processing will continue with a fresh batch set.
-        $remaining        = $currentSet['count'];
-        $total            = $currentSet['total'];
+        $remaining       = $currentSet['count'];
+        $total           = $currentSet['total'];
         $progressMessage = $currentSet['init_message'];
         $taskMessage     = '';
-      } else {
+      }
+      else {
         // Processing will continue with the current batch set.
-        $remaining        = $oldSet['count'] ?? 0;
-        $total            = $oldSet['total'] ?? 0;
+        $remaining       = $oldSet['count'] ?? 0;
+        $total           = $oldSet['total'] ?? 0;
         $progressMessage = $oldSet['progress_message'] ?? '';
       }
 
@@ -270,7 +275,8 @@ class BatchProcessor {
       $message    = strtr($progressMessage, $values);
 
       return [$percentage, $message, $taskMessage];
-    } else {
+    }
+    else {
       // If we are not in progressive mode, the entire batch has been processed.
       return $this->finished();
     }
@@ -310,10 +316,11 @@ class BatchProcessor {
   }
 
   /**
-   * Does one execution pass with JavaScript and returns progress to the browser.
+   * Does one execution pass with JavaScript and returns progress.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The JsonResponse.
+   *
    * @see self::process()
    */
   protected function doBatch(): JsonResponse {
@@ -344,7 +351,8 @@ class BatchProcessor {
       $message          = $currentSet['init_message'];
       $label            = '';
       $batch['running'] = TRUE;
-    } else {
+    }
+    else {
       // This is one of the later requests; do some processing first.
 
       // Error handling: if PHP dies due to a fatal error (e.g. a nonexistent
@@ -354,9 +362,9 @@ class BatchProcessor {
       $fallback = $currentSet['error_message'] . '<br />' . $batch['error_message'];
 
       // We strip the end of the page using a marker in the template, so any
-      // additional HTML output by PHP shows up inside the page rather than below
-      // it. While this causes invalid HTML, the same would be true if we didn't,
-      // as content is not allowed to appear after </html> anyway.
+      // additional HTML output by PHP shows up inside the page rather than
+      // below it. While this causes invalid HTML, the same would be true if
+      // we didn't, as content is not allowed to appear after </html> anyway.
       $response = $this->bareHtmlPageRenderer->renderBarePage(['#markup' => $fallback], $currentSet['title'], 'maintenance_page', [
         '#show_messages' => FALSE,
       ]);
@@ -377,8 +385,8 @@ class BatchProcessor {
       ob_end_clean();
     }
 
-    // Merge required query parameters for batch processing into those provided by
-    // batch_set() or hook_batch_alter().
+    // Merge required query parameters for batch processing into those provided
+    // by batch_set() or hook_batch_alter().
     $queryOptions = $batch['url']->getOption('query');
     $queryOptions['id'] = $batch['id'];
     $queryOptions['op'] = $newOp;
@@ -395,7 +403,8 @@ class BatchProcessor {
         'html_head' => [
           [
             [
-              // Redirect through a 'Refresh' meta tag if JavaScript is disabled.
+              // Redirect through a 'Refresh' meta tag if JavaScript is
+              // disabled.
               '#tag' => 'meta',
               '#noscript' => TRUE,
               '#attributes' => [
@@ -431,8 +440,8 @@ class BatchProcessor {
    * further sets to this batch.
    *
    * @return ?bool
-   *   TRUE if a subsequent set was found in the batch; no value will be returned
-   *   if no subsequent set was found.
+   *   TRUE if a subsequent set was found in the batch; no value will be
+   *   returned if no subsequent set was found.
    */
   protected function nextSet(): ?bool {
     $batch = &batch_get();
@@ -460,6 +469,7 @@ class BatchProcessor {
    * the results and resolve page redirection.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
+   *   Page to load after the batch finished.
    */
   protected function finished(): ?RedirectResponse {
     $batch = &batch_get();
@@ -468,7 +478,8 @@ class BatchProcessor {
     // Execute the 'finished' callbacks for each batch set, if defined.
     foreach ($batch['sets'] as $batchset) {
       if (isset($batchset['finished'])) {
-        // Check if the set requires an additional file for function definitions.
+        // Check if the set requires an additional file for function
+        // definitions.
         if (isset($batchset['file']) && is_file($batchset['file'])) {
           include_once $this->root . '/' . $batchset['file'];
         }
@@ -505,7 +516,8 @@ class BatchProcessor {
       unset($batches[$batch['id']]);
       if (empty($batches)) {
         $session->remove('batches');
-      } else {
+      }
+      else {
         $session->set('batches', $batches);
       }
     }
@@ -519,12 +531,13 @@ class BatchProcessor {
         $this->requestStack->query->set('destination', $_batch['destination']);
       }
 
-      // Determine the target path to redirect to. If a batch 'finished' callback
-      // returned a redirect response object, use that. Otherwise, fall back on
-      // the form redirection.
+      // Determine the target path to redirect to. If a batch 'finished'
+      // callback returned a redirect response object, use that. Otherwise,
+      // fall back on the form redirection.
       if (isset($batchFinishedRedirect)) {
         return $batchFinishedRedirect;
-      } elseif (!isset($_batch['form_state'])) {
+      }
+      elseif (!isset($_batch['form_state'])) {
         $_batch['form_state'] = new FormState();
       }
       if ($_batch['form_state']->getRedirect() === NULL) {
@@ -534,7 +547,8 @@ class BatchProcessor {
           $options = UrlHelper::parse($redirect);
           if (parse_url($options['path'], PHP_URL_SCHEME)) {
             $redirect = Url::fromUri($options['path'], $options);
-          } else {
+          }
+          else {
             $redirect = $this->pathValidator->getUrlIfValid($options['path']);
             if (!$redirect) {
               // Stay on the same page if the redirect was invalid.
@@ -553,8 +567,8 @@ class BatchProcessor {
         return $redirect;
       }
 
-      // If no redirection happened, redirect to the originating page. In case the
-      // form needs to be rebuilt, save the final $form_state for
+      // If no redirection happened, redirect to the originating page. In case
+      // the form needs to be rebuilt, save the final $form_state for
       // \Drupal\Core\Form\FormBuilderInterface::buildForm().
       if ($_batch['form_state']->isRebuilding()) {
         $session = $this->requestStack->getSession();
@@ -564,7 +578,8 @@ class BatchProcessor {
       $_batch['source_url']->mergeOptions(['query' => ['op' => 'finish', 'id' => $_batch['id']]]);
       if (is_callable($callback)) {
         $callback($_batch['source_url'], $_batch['source_url']->getOption('query'));
-      } elseif ($callback === NULL) {
+      }
+      elseif ($callback === NULL) {
         // Default to RedirectResponse objects when nothing specified.
         return new RedirectResponse($_batch['source_url']->setAbsolute()->toString());
       }
