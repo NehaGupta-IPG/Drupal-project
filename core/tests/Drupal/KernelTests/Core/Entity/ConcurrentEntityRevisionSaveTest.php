@@ -5,14 +5,16 @@ namespace Drupal\KernelTests\Core\Entity;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\entity_test\Entity\EntityTestMulRevChanged;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests concurrent entity saves and revisions.
  *
- * @group Entity
- *
  * @coversDefaultClass \Drupal\Core\Entity\Plugin\Validation\Constraint\SequentialEntityRevisionCreationConstraintValidator
  */
+ #[Group('Entity')]
+ #[RunTestsInSeparateProcesses]
 class ConcurrentEntityRevisionSaveTest extends EntityKernelTestBase {
 
   const SAVE_NO_REVISION = 0;
@@ -54,7 +56,7 @@ class ConcurrentEntityRevisionSaveTest extends EntityKernelTestBase {
   /**
    * Data provider for testConcurrentSave().
    */
-  public function dataTestConcurrentSave() {
+  public static function dataTestConcurrentSave() {
     return [
       'pending revision - pending revision' => [static::SAVE_PENDING_REVISION, static::SAVE_PENDING_REVISION],
       'no revision - pending revision' => [static::SAVE_NO_REVISION, static::SAVE_PENDING_REVISION],
