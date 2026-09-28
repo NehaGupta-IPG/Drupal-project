@@ -253,8 +253,12 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
   public function generateSampleItems($count = 1) {
     $field_definition = $this->getFieldDefinition();
     $field_type_class = $field_definition->getItemDefinition()->getClass();
+    $values = $this->getValue();
     for ($delta = 0; $delta < $count; $delta++) {
-      $values[$delta] = $field_type_class::generateSampleValue($field_definition);
+      $value = $field_type_class::generateSampleValue($field_definition);
+      if (!is_null($value)) {
+        $values[$delta] = $value;
+      }
     }
     $this->setValue($values);
   }
