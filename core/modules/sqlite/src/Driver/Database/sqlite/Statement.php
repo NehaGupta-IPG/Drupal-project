@@ -22,19 +22,19 @@ class Statement extends StatementBase {
   /**
    * Constructor.
    *
-   * @param object $clientConnection
+   * @param \Drupal\sqlite\Driver\Database\sqlite\SqliteConnection $clientConnection
    *   Client database connection object, for example \PDO.
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
    * @param string $queryString
    *   The query string.
    * @param array $driverOptions
-   *   Driver-specific options.
+   *   (optional) Driver-specific options.
    * @param bool $rowCountEnabled
    *   (optional) Enables counting the rows matched. Defaults to FALSE.
    */
   public function __construct(
-    object $clientConnection,
+    SqliteConnection $clientConnection,
     Connection $connection,
     string $queryString,
     protected array $driverOptions = [],
