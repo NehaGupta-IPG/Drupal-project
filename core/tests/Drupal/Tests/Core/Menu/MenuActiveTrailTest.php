@@ -17,6 +17,8 @@ use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -31,51 +33,38 @@ class MenuActiveTrailTest extends UnitTestCase {
 
   /**
    * The tested active menu trail service.
-   *
-   * @var \Drupal\Core\Menu\MenuActiveTrail
    */
-  protected $menuActiveTrail;
+  protected MenuActiveTrail $menuActiveTrail;
 
   /**
    * The test request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected $requestStack;
+  protected RequestStack $requestStack;
 
   /**
    * The current route match service.
-   *
-   * @var \Drupal\Core\Routing\CurrentRouteMatch
    */
-  protected $currentRouteMatch;
+  protected CurrentRouteMatch $currentRouteMatch;
 
   /**
    * The mocked menu link manager.
-   *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $menuLinkManager;
+  protected MenuLinkManagerInterface&MockObject $menuLinkManager;
 
   /**
-   * The mocked cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * The cache backend.
    */
-  protected $cache;
+  protected CacheBackendInterface&Stub $cache;
 
   /**
-   * The mocked lock.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\Stub
+   * The lock.
    */
-  protected $lock;
-
+  protected LockBackendInterface&Stub $lock;
 
   /**
-   * The mocked path matcher.
+   * The path matcher.
    */
-  protected PathMatcherInterface $pathMatcher;
+  protected PathMatcherInterface&Stub $pathMatcher;
 
   /**
    * {@inheritdoc}
@@ -306,7 +295,7 @@ class MenuActiveTrailTest extends UnitTestCase {
     $cacheTagsInvalidator->expects($this->exactly(2))
       ->method('invalidateTags')
       ->willReturnCallback(fn($tags): NULL =>
-        match($tags) {
+        match ($tags) {
           ['config:system.menu.' . $menu_name] => NULL,
           [
             'config:system.menu.' . $menu_name,
@@ -340,7 +329,7 @@ class MenuActiveTrailTest extends UnitTestCase {
     $request->attributes->get('_raw_variables')->add(['b' => 1, 'a' => 0]);
     $this->requestStack->push($request);
 
-    $this->menuLinkManager
+    $this->menuLinkManager->expects($this->once())
       ->method('loadLinksByRoute')
       ->with('baby_llama')
       ->willReturn($data[1]);
@@ -361,9 +350,6 @@ class MenuActiveTrailTest extends UnitTestCase {
       ->method('set')
       // Ensure we normalize the serialized data by sorting them.
       ->with('active-trail:route:baby_llama:route_parameters:' . serialize(['a' => 0, 'b' => 1]));
-    $this->lock
-      ->method('acquire')
-      ->willReturn(TRUE);
     $this->menuActiveTrail->destruct();
   }
 

@@ -6,11 +6,13 @@ namespace Drupal\Tests\path_alias\Unit\PathProcessor;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\path_alias\AliasManagerInterface;
 use Drupal\path_alias\PathProcessor\AliasPathProcessor;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -23,10 +25,8 @@ class AliasPathProcessorTest extends UnitTestCase {
 
   /**
    * The mocked alias manager.
-   *
-   * @var \Drupal\path_alias\AliasManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $aliasManager;
+  protected AliasManagerInterface&MockObject $aliasManager;
 
   /**
    * The tested path processor.
@@ -68,7 +68,7 @@ class AliasPathProcessorTest extends UnitTestCase {
    * Tests process outbound.
    */
   #[DataProvider('providerTestProcessOutbound')]
-  public function testProcessOutbound($path, array $options, $expected_path): void {
+  public function testProcessOutbound(string $path, array $options, string $expected_path): void {
     if (isset($options['alias']) && $options['alias']) {
       $this->aliasManager->expects($this->never())
         ->method('getAliasByPath');
@@ -95,7 +95,7 @@ class AliasPathProcessorTest extends UnitTestCase {
    * @return array
    *   The data provider for testProcessOutbound.
    */
-  public static function providerTestProcessOutbound() {
+  public static function providerTestProcessOutbound(): array {
     return [
       ['internal-url', [], 'url-alias'],
       ['internal-url', ['alias' => TRUE], 'internal-url'],

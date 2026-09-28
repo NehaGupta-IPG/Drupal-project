@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\KernelTests\KernelTestBase;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -99,7 +101,7 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertEquals(array_values($modules_enabled), $module_list);
 
     // Get the container another time, simulating a "production" environment.
-    $container = $this->getTestKernel($request, NULL)
+    $container = $this->getTestKernel($request)
       ->getContainer();
 
     $refClass = new \ReflectionClass($container);
@@ -160,6 +162,29 @@ class DrupalKernelTest extends KernelTestBase {
     // does not make sense to persist the container itself.
     $persist_ids = $container->getParameter('persist_ids');
     $this->assertNotContains('service_container', $persist_ids);
+  }
+
+  /**
+   * Tests that dot-prefixed build parameters are removed from the container.
+   *
+   * Build parameters (e.g. '.hook_data') are used to pass data between
+   * compiler passes. RemoveBuildParametersPass strips them so they don't
+   * bloat the cached container definition with data that is only needed at
+   * build time.
+   */
+  public function testBuildParametersRemoved(): void {
+    $request = Request::createFromGlobals();
+    $kernel = $this->getTestKernel($request);
+    $container = $kernel->getContainer();
+
+    $build_only = array_filter(
+      array_keys($container->getParameterBag()->all()),
+      fn(string $name): bool => str_starts_with($name, '.'),
+    );
+    $this->assertEmpty($build_only, sprintf(
+      'Dot-prefixed build parameters should not be in the compiled container, but found: %s',
+      implode(', ', $build_only),
+    ));
   }
 
   /**
@@ -277,7 +302,9 @@ class DrupalKernelTest extends KernelTestBase {
   /**
    * Tests reset container.
    */
-  public function testResetContainer(): void {
+  #[TestWith([TRUE])]
+  #[TestWith([FALSE])]
+  public function testResetContainer(bool $config_installer_syncing): void {
     $modules_enabled = [
       'system' => 'system',
       'user' => 'user',
@@ -300,6 +327,10 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertEmpty($container->get('messenger')->messagesByType('Container reset'));
     $container->get('messenger')->addMessage('Test reset', 'Container reset');
     $this->assertSame(['Test reset'], $container->get('messenger')->messagesByType('Container reset'));
+
+    // Ensure config installer isSyncing status is maintained through a
+    // container reset.
+    \Drupal::service(ConfigInstallerInterface::class)->setSyncing($config_installer_syncing);
 
     // Ensure persisted services are persisted.
     $request_stack = $container->get('request_stack');
@@ -327,6 +358,10 @@ class DrupalKernelTest extends KernelTestBase {
 
     // Ensure messages are maintained through a container reset.
     $this->assertSame(['Test reset'], $container->get('messenger')->messagesByType('Container reset'));
+
+    // Ensure config installer isSyncing status is maintained through a
+    // container reset.
+    $this->assertSame($config_installer_syncing, \Drupal::service(ConfigInstallerInterface::class)->isSyncing());
 
     // Ensure persisted services are persisted.
     $this->assertSame($request_stack, $container->get('request_stack'));

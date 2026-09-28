@@ -14,6 +14,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Route;
@@ -27,34 +28,29 @@ use Symfony\Component\Routing\RouterInterface;
 class AccessAwareRouterTest extends UnitTestCase {
 
   /**
-   * @var \Symfony\Component\Routing\RouterInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The router.
    */
-  protected RouterInterface|MockObject $router;
+  protected RouterInterface&MockObject $router;
 
   /**
-   * @var \Symfony\Component\Routing\Route
+   * The route.
    */
-  protected $route;
+  protected Route $route;
 
   /**
-   * @var \Drupal\Core\Routing\Router|\PHPUnit\Framework\MockObject\MockObject
+   * The access manager.
    */
-  protected $coreRouter;
+  protected AccessManagerInterface&Stub $accessManager;
 
   /**
-   * @var \Drupal\Core\Access\AccessManagerInterface
+   * The account.
    */
-  protected $accessManager;
+  protected AccountInterface&Stub $currentUser;
 
   /**
-   * @var \Drupal\Core\Session\AccountInterface
+   * The access aware router.
    */
-  protected $currentUser;
-
-  /**
-   * @var \Drupal\Core\Routing\AccessAwareRouter
-   */
-  protected $accessAwareRouter;
+  protected AccessAwareRouter $accessAwareRouter;
 
   /**
    * {@inheritdoc}
@@ -136,7 +132,7 @@ class AccessAwareRouterTest extends UnitTestCase {
       ->with($request)
       ->willReturn($access_result);
     $this->expectException(AccessDeniedHttpException::class);
-    $this->expectExceptionMessage($reason);
+    $this->expectExceptionMessageIs($reason);
     $this->accessAwareRouter->matchRequest($request);
   }
 
@@ -174,6 +170,6 @@ interface MockRouterInterface extends RouterInterface {
    * @param \Symfony\Component\Routing\RouterInterface $router
    *   The mocked router.
    */
-  public function add(RouterInterface $router);
+  public function add(RouterInterface $router): static;
 
 }

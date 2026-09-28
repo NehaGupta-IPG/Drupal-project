@@ -19,6 +19,8 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -30,11 +32,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class DateTest extends UnitTestCase {
 
   /**
-   * The mocked entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\Stub
+   * The entity type manager.
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&Stub $entityTypeManager;
 
   /**
    * The mocked language manager.
@@ -44,18 +44,14 @@ class DateTest extends UnitTestCase {
   protected $languageManager;
 
   /**
-   * The mocked string translation.
-   *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\Stub
+   * The string translation.
    */
-  protected $stringTranslation;
+  protected TranslationInterface $stringTranslation;
 
   /**
-   * The mocked string translation.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack|\PHPUnit\Framework\MockObject\Stub
+   * The string translation.
    */
-  protected $requestStack;
+  protected RequestStack&Stub $requestStack;
 
   /**
    * The mocked date formatter class.
@@ -66,10 +62,8 @@ class DateTest extends UnitTestCase {
 
   /**
    * The date formatter class where methods can be stubbed.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatter|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $dateFormatterStub;
+  protected DateFormatter&MockObject $dateFormatterStub;
 
   /**
    * {@inheritdoc}
@@ -86,13 +80,13 @@ class DateTest extends UnitTestCase {
     $this->languageManager
       ->method('getCurrentLanguage')
       ->willReturn(new Language(['id' => $this->randomMachineName(2)]));
-    $this->stringTranslation = $this->createStub(TranslationInterface::class);
+    $this->stringTranslation = $this->getStringTranslationStub();
     $this->requestStack = $this->createStub(RequestStack::class);
 
     $config_factory = $this->getConfigFactoryStub(['system.date' => ['country' => ['default' => 'GB']]]);
     $container = new ContainerBuilder();
     $container->set('config.factory', $config_factory);
-    $container->set('string_translation', $this->getStringTranslationStub());
+    $container->set('string_translation', $this->stringTranslation);
     $container->set('language_manager', $this->languageManager);
     \Drupal::setContainer($container);
 
@@ -120,13 +114,6 @@ class DateTest extends UnitTestCase {
    */
   #[DataProvider('providerTestFormatInterval')]
   public function testFormatInterval($interval, $granularity, $expected, $langcode = NULL): void {
-    // Mocks a simple formatPlural implementation.
-    $this->stringTranslation
-      ->method('translateString')
-      ->willReturnCallback(function (TranslatableMarkup $arg) {
-        return $arg->getUntranslatedString();
-      });
-
     // Check if the granularity is specified.
     if ($granularity) {
       $result = $this->dateFormatter->formatInterval($interval, $granularity, $langcode);
@@ -142,7 +129,7 @@ class DateTest extends UnitTestCase {
    * Provides some test data for the format interval test.
    */
   public static function providerTestFormatInterval(): array {
-    $data = [
+    return [
       // Checks for basic seconds.
       [1, 1, '1 sec'],
       [1, 2, '1 sec'],
@@ -169,8 +156,6 @@ class DateTest extends UnitTestCase {
       // Check with an unspecified granularity.
       [61, NULL, '1 min 1 sec'],
     ];
-
-    return $data;
   }
 
   /**
@@ -270,13 +255,6 @@ class DateTest extends UnitTestCase {
    */
   #[DataProvider('providerTestFormatDiff')]
   public function testFormatDiff(string $expected, int $max_age, int $timestamp1, int $timestamp2, array $options = []): void {
-    // Mocks a simple translateString implementation.
-    $this->stringTranslation
-      ->method('translateString')
-      ->willReturnCallback(function (TranslatableMarkup $arg) {
-        return $arg->getUntranslatedString();
-      });
-
     if (isset($options['langcode'])) {
       // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $expected_markup = new TranslatableMarkup($expected, [], ['langcode' => $options['langcode']], $this->stringTranslation);
@@ -307,7 +285,7 @@ class DateTest extends UnitTestCase {
 
     $non_strict = ['strict' => FALSE];
 
-    $data = [
+    return [
       // Checks for equal timestamps.
       ['0 seconds', 0, $request_time, $request_time],
 
@@ -515,8 +493,6 @@ class DateTest extends UnitTestCase {
         $granularity_3,
       ],
     ];
-
-    return $data;
   }
 
   /**

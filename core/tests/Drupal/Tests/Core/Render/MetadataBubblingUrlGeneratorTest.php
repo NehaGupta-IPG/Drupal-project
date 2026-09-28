@@ -13,6 +13,7 @@ use Drupal\Tests\Core\Routing\UrlGeneratorTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Confirm that the MetadataBubblingUrlGenerator is functioning properly.
@@ -23,15 +24,11 @@ class MetadataBubblingUrlGeneratorTest extends UrlGeneratorTest {
 
   /**
    * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  protected RendererInterface&Stub $renderer;
 
   /**
    * The URL generator.
-   *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface|\Drupal\Core\Render\MetadataBubblingUrlGenerator
    */
   protected UrlGeneratorInterface $urlGenerator;
 

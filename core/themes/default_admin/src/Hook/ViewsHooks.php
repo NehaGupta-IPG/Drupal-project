@@ -123,7 +123,7 @@ readonly class ViewsHooks {
    * Implements hook_views_pre_render().
    */
   #[Hook('views_pre_render')]
-  public function preRender(ViewExecutable $view): void {
+  public function viewsPreRender(ViewExecutable $view): void {
     $add_classes = static function (&$option, array $classes_to_add) {
       $classes = preg_split('/\s+/', $option);
       $classes = array_filter($classes);
@@ -132,6 +132,7 @@ readonly class ViewsHooks {
     };
 
     if ($view->id() === 'media_library') {
+      $add_classes($view->style_plugin->options['row_class'], ['media-library-item']);
       if ($view->display_handler->options['defaults']['css_class']) {
         $add_classes($view->displayHandlers->get('default')->options['css_class'], ['media-library-view']);
       }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Unit;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Password\PasswordInterface;
@@ -17,6 +18,7 @@ use Drupal\user\Entity\User;
 use Drupal\user\UserAuthentication;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -32,36 +34,28 @@ class UserAuthenticationTest extends UnitTestCase {
 
   /**
    * The mock user storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $userStorage;
+  protected EntityStorageInterface&MockObject $userStorage;
 
   /**
    * The mocked password service.
    *
-   * @var \Drupal\Core\Password\PasswordInterface|\PHPUnit\Framework\MockObject\Stub
+   * @var \Drupal\Core\Password\PasswordInterface
    */
   protected $passwordService;
 
   /**
    * The user auth object under test.
-   *
-   * @var \Drupal\user\UserAuthentication
    */
   protected UserAuthentication $userAuth;
 
   /**
    * The test username.
-   *
-   * @var string
    */
   protected string $username = 'test_user';
 
   /**
    * The test password.
-   *
-   * @var string
    */
   protected string $password = 'password';
 
@@ -77,12 +71,20 @@ class UserAuthenticationTest extends UnitTestCase {
     $entity_type_manager = $this->createStub(EntityTypeManagerInterface::class);
     $entity_type_manager
       ->method('getStorage')
-      ->with('user')
       ->willReturn($this->userStorage);
 
     $this->passwordService = $this->createStub(PasswordInterface::class);
 
     $this->userAuth = new UserAuthentication($entity_type_manager, $this->passwordService);
+  }
+
+  /**
+   * Reinitializes the password service as a mock object.
+   */
+  protected function setUpMockPasswordService(): void {
+    $this->passwordService = $this->createMock(PasswordInterface::class);
+    $reflection = new \ReflectionProperty($this->userAuth, 'passwordChecker');
+    $reflection->setValue($this->userAuth, $this->passwordService);
   }
 
   /**
@@ -128,11 +130,10 @@ class UserAuthenticationTest extends UnitTestCase {
    * Tests the authenticate method with a correct password.
    */
   public function testAuthenticateWithCorrectPassword(): void {
-    $testUser = $this->createPartialMock(User::class, ['id', 'getPassword']);
     $this->userStorage->expects($this->once())
       ->method('loadByProperties')
       ->with(['name' => $this->username])
-      ->willReturn([$testUser]);
+      ->willReturn([$this->createStub(User::class)]);
 
     $this->passwordService
       ->method('check')
@@ -149,12 +150,12 @@ class UserAuthenticationTest extends UnitTestCase {
    * this regression can't happen again.
    */
   public function testAuthenticateWithZeroPassword(): void {
-    $testUser = $this->createPartialMock(User::class, ['id', 'getPassword']);
+    $this->setUpMockPasswordService();
 
     $this->userStorage->expects($this->once())
       ->method('loadByProperties')
       ->with(['name' => $this->username])
-      ->willReturn([$testUser]);
+      ->willReturn([$this->createStub(User::class)]);
 
     $this->passwordService
       ->method('check')

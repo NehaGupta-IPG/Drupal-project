@@ -62,6 +62,12 @@ class AutowireTest extends KernelTestBase {
           $aliases[$id] = substr($service, 1);
         }
         elseif (isset($service['class']) && class_exists($service['class'])) {
+          // Check that the number of arguments matches the constructor.
+          if (isset($service['arguments'])) {
+            $constructor = new \ReflectionMethod($service['class'], '__construct');
+            $this->assertLessThanOrEqual($constructor->getNumberOfParameters(), count($service['arguments']), sprintf('%s (%s): %d arguments defined, but constructor only accepts %d', $id, $service['class'], count($service['arguments']), $constructor->getNumberOfParameters()));
+          }
+
           // Ignore services named by their own class.
           if ($id === $service['class']) {
             continue;
@@ -271,8 +277,8 @@ class AutowireTest extends KernelTestBase {
    * @return string[]
    *   An array of filenames.
    */
-  private function getCoreServiceFiles() {
-    $filenames = array_map(fn($module) => "core/modules/{$module[0]}/{$module[0]}.services.yml", $this->coreModuleListDataProvider());
+  private function getCoreServiceFiles(): array {
+    $filenames = array_map(fn(array $module): string => "core/modules/{$module[0]}/{$module[0]}.services.yml", $this->coreModuleListDataProvider());
     $filenames[] = 'core/core.services.yml';
     return array_filter($filenames, 'file_exists');
   }

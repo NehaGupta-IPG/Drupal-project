@@ -68,8 +68,9 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
           }
         }
       }
+      $transaction->commitOrRelease();
     }
-    catch (\Exception $e) {
+    catch (\Throwable $e) {
       if (isset($transaction)) {
         $transaction->rollBack();
       }

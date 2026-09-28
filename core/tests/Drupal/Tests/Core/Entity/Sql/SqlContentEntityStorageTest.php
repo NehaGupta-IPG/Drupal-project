@@ -28,6 +28,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Prophecy\Argument;
 
 /**
@@ -45,11 +46,9 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   protected $entityStorage;
 
   /**
-   * The mocked entity type used in this test.
-   *
-   * @var \Drupal\Core\Entity\ContentEntityTypeInterface
+   * The entity type used in this test.
    */
-  protected $entityType;
+  protected ContentEntityTypeInterface&Stub $entityType;
 
   /**
    * An array of field definitions used for this test, keyed by field name.
@@ -66,11 +65,9 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   protected $entityTypeManager;
 
   /**
-   * The mocked entity type bundle info used in this test.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface|\PHPUnit\Framework\MockObject\Stub
+   * The entity type bundle info used in this test.
    */
-  protected $entityTypeBundleInfo;
+  protected EntityTypeBundleInfoInterface&Stub $entityTypeBundleInfo;
 
   /**
    * The mocked entity field manager used in this test.
@@ -95,31 +92,23 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
   /**
    * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
    * The cache backend to use.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $cache;
+  protected CacheBackendInterface&Stub $cache;
 
   /**
    * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $languageManager;
+  protected LanguageManagerInterface&Stub $languageManager;
 
   /**
    * The database connection to use.
-   *
-   * @var \Drupal\Core\Database\Connection|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $connection;
+  protected Connection&Stub $connection;
 
   /**
    * {@inheritdoc}
@@ -443,7 +432,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $schema_handler = $this->getMockBuilder('Drupal\Core\Database\Schema')
       ->disableOriginalConstructor()
       ->getMock();
-    $schema_handler
+    $schema_handler->expects($this->once())
       ->method('createTable')
       ->with($this->equalTo('entity_test'), $this->equalTo($expected));
 
@@ -1375,6 +1364,9 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $this->entityType
       ->method('isPersistentlyCacheable')
       ->willReturn(TRUE);
+    $this->entityType
+      ->method('isStaticallyCacheable')
+      ->willReturn(TRUE);
     $this->entityType->expects($this->atLeastOnce())
       ->method('id')
       ->willReturn($this->entityTypeId);
@@ -1401,6 +1393,68 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       ->getActiveDefinition($this->entityType->id())
       ->willReturn($this->entityType);
 
+    $memory_cache = new MemoryCache(new Time());
+    $entity_storage = $this->getMockBuilder('Drupal\Core\Entity\Sql\SqlContentEntityStorage')
+      ->setConstructorArgs([
+        $this->entityType,
+        $this->connection,
+        $this->entityFieldManager->reveal(),
+        $this->cache,
+        $this->languageManager,
+        $memory_cache, $this->entityTypeBundleInfo, $this->entityTypeManager->reveal(),
+      ])
+      ->onlyMethods(['getFromStorage', 'invokeStorageLoadHook', 'initTableLayout'])
+      ->getMock();
+    $entity_storage->method('invokeStorageLoadHook')
+      ->willReturn(NULL);
+    $entity_storage->method('initTableLayout')
+      ->willReturn(NULL);
+    $entity_storage->expects($this->once())
+      ->method('getFromStorage')
+      ->with([$id])
+      ->willReturn([$id => $entity]);
+
+    $entities = $entity_storage->loadMultiple([$id]);
+    $this->assertEquals($entity, $entities[$id]);
+    // A not-found record should keep the ID out of storage queries for the rest
+    // of the request.
+    $this->assertFalse($memory_cache->get('not_found:' . $key));
+  }
+
+  /**
+   * Tests load multiple with no result.
+   */
+  public function testLoadMultipleNoResult(): void {
+    $this->setUpModuleHandlerNoImplementations();
+    $this->setUpMockEntityType();
+
+    $this->entityType
+      ->method('isPersistentlyCacheable')
+      ->willReturn(TRUE);
+    $this->entityType
+      ->method('isStaticallyCacheable')
+      ->willReturn(TRUE);
+    $this->entityType->expects($this->atLeastOnce())
+      ->method('id')
+      ->willReturn($this->entityTypeId);
+
+    // Override the cache backend so we can set expectations.
+    $this->cache = $this->createMock(CacheBackendInterface::class);
+    // When the entity is not loaded at all, this will be recorded in the
+    // static cache but not the persistent cache.
+    $id = 1;
+    $key = 'values:' . $this->entityTypeId . ':1';
+    $this->cache->expects($this->once())
+      ->method('getMultiple')
+      ->with([$key])
+      ->willReturn([]);
+    $this->cache->expects($this->never())
+      ->method('setMultiple');
+
+    $this->entityTypeManager
+      ->getActiveDefinition($this->entityType->id())
+      ->willReturn($this->entityType);
+
     $entity_storage = $this->getMockBuilder('Drupal\Core\Entity\Sql\SqlContentEntityStorage')
       ->setConstructorArgs([
         $this->entityType,
@@ -1419,10 +1473,13 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $entity_storage->expects($this->once())
       ->method('getFromStorage')
       ->with([$id])
-      ->willReturn([$id => $entity]);
+      ->willReturn([]);
 
+    // Loading the same missing entity ID twice should only result in a
+    // single persistent cache get.
     $entities = $entity_storage->loadMultiple([$id]);
-    $this->assertEquals($entity, $entities[$id]);
+    $entities = $entity_storage->loadMultiple([$id]);
+    $this->assertSame($entities, []);
   }
 
   /**

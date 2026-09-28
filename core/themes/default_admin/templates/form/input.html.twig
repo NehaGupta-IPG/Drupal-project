@@ -7,13 +7,13 @@
  * - attributes: A list of HTML attributes for the input element.
  * - children: Optional additional rendered elements.
  *
- * @see\Drupal\Core\Form\FormPreprocess::preprocessInput()
- * @see gin_preprocess_input()
+ * @see \Drupal\Core\Form\FormPreprocess::preprocessInput()
+ * @see \Drupal\default_admin\Hook\PreprocessHooks::preprocessInput()
  */
 #}
 {% if autocomplete_message %}
-  <div class="gin-autocomplete">
-    <input{{ attributes }}/><div class="gin-autocomplete__message hidden" data-drupal-selector="autocomplete-message">{{ autocomplete_message }}</div>
+  <div class="admin-autocomplete">
+    <input{{ attributes }}/><div class="admin-autocomplete__message hidden" data-drupal-selector="autocomplete-message">{{ autocomplete_message }}</div>
   </div>
   {{- children -}}
 {% else %}

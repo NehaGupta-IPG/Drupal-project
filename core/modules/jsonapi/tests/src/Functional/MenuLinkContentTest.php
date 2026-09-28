@@ -78,6 +78,7 @@ class MenuLinkContentTest extends ResourceTestBase {
       'title' => 'Llama Gabilondo',
       'description' => 'Llama Gabilondo',
       'link' => 'https://nl.wikipedia.org/wiki/Llama',
+      'resolvable_uri' => 'https://nl.wikipedia.org/wiki/Llama',
       'weight' => 0,
       'menu_name' => 'main',
     ]);
@@ -117,6 +118,7 @@ class MenuLinkContentTest extends ResourceTestBase {
           'bundle' => 'menu_link_content',
           'link' => [
             'uri' => 'https://nl.wikipedia.org/wiki/Llama',
+            'resolvable_uri' => 'https://nl.wikipedia.org/wiki/Llama',
             'title' => NULL,
             'options' => [],
           ],
@@ -219,7 +221,7 @@ class MenuLinkContentTest extends ResourceTestBase {
 
     // Ensure that an exception is thrown.
     $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(500, (string) 'The generic FieldItemNormalizer cannot denormalize string values for "options" properties of the "link" field (field item class: Drupal\link\Plugin\Field\FieldType\LinkItem).', $url, $response);
+    $this->assertResourceErrorResponse(500, 'The generic FieldItemNormalizer cannot denormalize string values for "options" properties of the "link" field (field item class: Drupal\link\Plugin\Field\FieldType\LinkItem).', $url, $response);
 
     // Create a menu link content entity without the serialized property.
     unset($document['data']['attributes']['link']['options']);

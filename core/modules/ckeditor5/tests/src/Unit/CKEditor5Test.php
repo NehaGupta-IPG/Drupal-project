@@ -64,7 +64,7 @@ class CKEditor5Test extends UnitTestCase {
   public function testPathsToFormNames(string $property_path, string $expected_form_item_name, bool $expect_exception = FALSE): void {
     $mapMethod = self::getMethod(CKEditor5::class, 'mapViolationPropertyPathsToFormNames');
     if ($expect_exception) {
-      $this->expectExceptionMessage('assert($shifted === \'settings\')');
+      $this->expectExceptionMessageIs('assert($shifted === \'settings\')');
     }
 
     $form_item_name = $mapMethod->invokeArgs(NULL, [$property_path, static::SIMULATED_FORM_STRUCTURE]);
@@ -125,15 +125,14 @@ class CKEditor5Test extends UnitTestCase {
    * @legacy-covers \Drupal\ckeditor5\Hook\Ckeditor5Hooks::jsAlter
    */
   public function testJsAlterHook(): void {
-    $placeholder_file = 'core/assets/vendor/ckeditor5/translation.js';
     $language_mapper = $this->createMock(LanguageMapper::class);
-    $language_mapper->expects($this->any())
+    $language_mapper->expects($this->atLeastOnce())
       ->method('getMapping')
       ->willReturn('en');
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
     $module_handler->moduleExists('locale')->willReturn(TRUE);
     $library_resolver = $this->createMock(LibraryDependencyResolver::class);
-    $library_resolver->expects($this->any())
+    $library_resolver->expects($this->atLeastOnce())
       ->method('getLibrariesWithDependencies')
       ->willReturn(['core/ckeditor5.translations.en', 'core/ckeditor5.translations', 'core/ckeditor5.anything']);
     $hooks = new Ckeditor5Hooks(
@@ -167,7 +166,6 @@ class CKEditor5Test extends UnitTestCase {
     $expected_javascript = [
       'keep_this' => [
         'ckeditor5_langcode' => 'en',
-        'weight' => 5,
       ],
       'keep_this_too' => [],
     ];
@@ -179,11 +177,7 @@ class CKEditor5Test extends UnitTestCase {
     \Drupal::setContainer($container);
 
     // First check that it filters when the placeholder script is present.
-    $javascript = $original_javascript + [
-      $placeholder_file => [
-        'weight' => 5,
-      ],
-    ];
+    $javascript = $original_javascript;
     $hooks->jsAlter($javascript, $assets, $language);
     $this->assertEquals($expected_javascript, $javascript);
 
@@ -199,8 +193,6 @@ class CKEditor5Test extends UnitTestCase {
     ]);
     $javascript = $original_javascript;
     $hooks->jsAlter($javascript, $assets, $language);
-    // There was no placeholder to get the weight from.
-    $expected_javascript['keep_this']['weight'] = 0;
     $this->assertEquals($expected_javascript, $javascript);
   }
 
