@@ -5,7 +5,6 @@ namespace Drupal\jsonapi\Normalizer;
 use Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher;
 use Drupal\jsonapi\JsonApiResource\Data;
 use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Normalizes JSON:API Data objects.
@@ -15,7 +14,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class DataNormalizer extends NormalizerBase {
 
   public function __construct(
-    #[Autowire(service: 'jsonapi.normalization_cacher')]
     protected ResourceObjectNormalizationCacher $cacher,
   ) {}
 

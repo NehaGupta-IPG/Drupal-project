@@ -39,6 +39,7 @@ services:
       - { name: jsonapi_normalizer }
   serializer.normalizer.data.jsonapi:
     class: Drupal\jsonapi\Normalizer\DataNormalizer
+    arguments: ['@jsonapi.normalization_cacher']
     tags:
       - { name: jsonapi_normalizer }
   serializer.normalizer.resource_object.jsonapi:
