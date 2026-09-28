@@ -11,7 +11,6 @@
  */
 
 /* cspell:ignore navigationcreate, toolsextra, xxxs */
-
 :root {
   --admin-theme-toolbar-height: 3rem;
   --admin-theme-toolbar-secondary-height: 3rem;
@@ -65,15 +64,9 @@ body.admin--navigation {
   &.admin-toolbar-control-bar {
     background: var(--admin-color-bg-surface-nested);
   }
-
-  /* Fix Control Bar hamburger button in dark mode. */
-  .admin-toolbar-control-bar__burger path {
-    stroke: currentColor;
-  }
 }
 
 /* Workspaces. */
-
 .toolbar-button--workspaces {
   .dark-mode & {
     --toolbar-button-color: #222330;

@@ -104,6 +104,12 @@ final class Table implements SchemaDefinitionInterface {
         }
       }
     }
+
+    $columnNames = $this->columnNames();
+    if (count($columnNames) !== count(array_unique($columnNames))) {
+      throw new SchemaDefinitionException("Duplicate columns for '{$this->name}' table: " . implode(', ', $columnNames));
+    }
+
     // MariaDB and SQLite do not allow generated columns in the primary key.
     if ($this->columns && $this->primaryKey) {
       $generatedColumnNames = array_map(
@@ -121,7 +127,7 @@ final class Table implements SchemaDefinitionInterface {
   }
 
   /**
-   * Returns the names of the columns in the table.
+   * Returns the names of the columns in this table.
    *
    * @return list<string>
    *   The names of the columns.
