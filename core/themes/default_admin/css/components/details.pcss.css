@@ -421,8 +421,14 @@
       }
     }
 
+    &.details__summary--accordion,
     &.details__summary--accordion-item,
     &.details__summary--vertical-tabs-item {
+      &:not(:hover) {
+        /* Don't obscure error border. */
+        background: transparent;
+      }
+
       & > span:first-child::before {
         padding-block-end: var(--summary-accordion-line-height);
       }
