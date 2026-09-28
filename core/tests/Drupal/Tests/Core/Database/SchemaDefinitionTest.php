@@ -778,5 +778,6 @@ class SchemaDefinitionTest extends UnitTestCase {
       ],
     );
     $this->assertInstanceOf(Table::class, $table);
+  }
 
 }
