@@ -5,6 +5,7 @@
  * Functions for form and batch generation and processing.
  */
 
+use Drupal\Core\Batch\BatchProcessor;
 use Drupal\Core\Batch\BatchStorageInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\CallableResolver;
@@ -423,11 +424,12 @@ function _batch_append_set(&$batch, $batch_set): void {
 
   // Iterate by reference over the existing batch sets and assign them by
   // reference in the new batch sets array in order not to break a retrieved
-  // reference to the current set. Among other places a reference to the current
-  // set is being retrieved in _batch_process(). Additionally, we have to
-  // preserve the original indexes, as they are used to generate the queue name
-  // of each batch set, otherwise the operations of the new batch set will be
-  // queued in the queue of a previous batch set.
+  // reference to the current set. Among other places a reference to the
+  // current set is being retrieved in BatchProcessor::process(). Additionally,
+  // we have to preserve the original indexes, as they are used to generate the
+  // queue name of each batch set, otherwise the operations of the new batch
+  // set will be\Drupal::service(BatchProcessor::class)->processqueued in the
+  // queue of a previous batch set.
   // @see _batch_populate_queue().
   $new_sets = [];
   foreach ($batch['sets'] as $index => &$set) {
@@ -553,7 +555,7 @@ function batch_process($redirect = NULL, ?Url $url = NULL, $redirect_callback = 
       // Non-progressive execution: bypass the whole progressbar workflow
       // and execute the batch in one pass.
       require_once __DIR__ . '/batch.inc';
-      _batch_process();
+      \Drupal::service(BatchProcessor::class)->process();
     }
   }
 }

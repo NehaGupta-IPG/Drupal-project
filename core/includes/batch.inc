@@ -14,7 +14,6 @@
  * @see batch_get()
  */
 
-use Drupal\Component\Utility\Timer;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Batch\BatchProcessor;
 use Drupal\Core\Batch\Percentage;
@@ -201,133 +200,15 @@ function _batch_progress_page(): array {
  *
  * @return array
  *   An array containing a completion value (in percent) and a status message.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal::service(BatchProcessor::class)->process() instead.
+ *
+ * @see https://www.drupal.org/node/3593399
  */
 function _batch_process() {
-  $batch       = &batch_get();
-  $current_set = &_batch_current_set();
-  // Indicate that this batch set needs to be initialized.
-  $set_changed = TRUE;
-  $task_message = '';
-
-  // If this batch was marked for progressive execution (e.g. forms submitted by
-  // \Drupal::formBuilder()->submitForm(), initialize a timer to determine
-  // whether we need to proceed with the same batch phase when a processing time
-  // of 1 second has been exceeded.
-  if ($batch['progressive']) {
-    Timer::start('batch_processing');
-  }
-
-  if (empty($current_set['start'])) {
-    $current_set['start'] = microtime(TRUE);
-  }
-
-  $queue = _batch_queue($current_set);
-
-  while (!$current_set['success']) {
-    // If this is the first time we iterate this batch set in the current
-    // request, we check if it requires an additional file for functions
-    // definitions.
-    if ($set_changed && isset($current_set['file']) && is_file($current_set['file'])) {
-      include_once \Drupal::root() . '/' . $current_set['file'];
-    }
-
-    $task_message = '';
-    // Assume a single pass operation and set the completion level to 1 by
-    // default.
-    $finished = 1;
-
-    if ($item = $queue->claimItem()) {
-      [$callback, $args] = $item->data;
-
-      // Build the 'context' array and execute the function call.
-      $batch_context = [
-        'sandbox'  => &$current_set['sandbox'],
-        'results'  => &$current_set['results'],
-        'finished' => &$finished,
-        'message'  => &$task_message,
-      ];
-      $callable_resolver = \Drupal::service(CallableResolver::class);
-      $callable = $callable_resolver->getCallableFromDefinition($callback);
-      $callable(...array_merge($args, [&$batch_context]));
-
-      if ($finished >= 1) {
-        // Make sure this step is not counted twice when computing $current.
-        $finished = 0;
-        // Remove the processed operation and clear the sandbox.
-        $queue->deleteItem($item);
-        $current_set['count']--;
-        $current_set['sandbox'] = [];
-      }
-    }
-
-    // When all operations in the current batch set are completed, browse
-    // through the remaining sets, marking them 'successfully processed'
-    // along the way, until we find a set that contains operations.
-    // _batch_next_set() executes form submit handlers stored in 'control'
-    // sets (see \Drupal::service('form_submitter')), which can in turn add new
-    // sets to the batch.
-    $set_changed = FALSE;
-    $old_set = $current_set;
-    while (empty($current_set['count']) && ($current_set['success'] = TRUE) && _batch_next_set()) {
-      $current_set = &_batch_current_set();
-      $current_set['start'] = microtime(TRUE);
-      $set_changed = TRUE;
-    }
-
-    // At this point, either $current_set contains operations that need to be
-    // processed or all sets have been completed.
-    $queue = _batch_queue($current_set);
-
-    // If we are in progressive mode, break processing after 1 second.
-    if ($batch['progressive'] && Timer::read('batch_processing') > 1000) {
-      // Record elapsed wall clock time.
-      $current_set['elapsed'] = round((microtime(TRUE) - $current_set['start']) * 1000, 2);
-      break;
-    }
-  }
-
-  if ($batch['progressive']) {
-    // Gather progress information.
-
-    // Reporting 100% progress will cause the whole batch to be considered
-    // processed. If processing was paused right after moving to a new set,
-    // we have to use the info from the new (unprocessed) set.
-    if ($set_changed && isset($current_set['queue'])) {
-      // Processing will continue with a fresh batch set.
-      $remaining        = $current_set['count'];
-      $total            = $current_set['total'];
-      $progress_message = $current_set['init_message'];
-      $task_message     = '';
-    }
-    else {
-      // Processing will continue with the current batch set.
-      $remaining        = $old_set['count'] ?? 0;
-      $total            = $old_set['total'] ?? 0;
-      $progress_message = $old_set['progress_message'] ?? '';
-    }
-
-    // Total progress is the number of operations that have fully run plus the
-    // completion level of the current operation.
-    $current    = $total - $remaining + ($finished ?? 0);
-    $percentage = _batch_api_percentage($total, $current);
-    $elapsed    = $current_set['elapsed'] ?? 0;
-    $values     = [
-      '@remaining'  => $remaining,
-      '@total'      => $total,
-      '@current'    => floor($current),
-      '@percentage' => $percentage,
-      '@elapsed'    => \Drupal::service('date.formatter')->formatInterval((int) ($elapsed / 1000)),
-      // If possible, estimate remaining processing time.
-      '@estimate'   => ($current > 0) ? \Drupal::service('date.formatter')->formatInterval((int) (($elapsed * ($total - $current) / $current) / 1000)) : '-',
-    ];
-    $message    = strtr($progress_message, $values);
-
-    return [$percentage, $message, $task_message];
-  }
-  else {
-    // If we are not in progressive mode, the entire batch has been processed.
-    return _batch_finished();
-  }
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(BatchProcessor::class)->process($request) instead. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
+  return \Drupal::service(BatchProcessor::class)->process();
 }
 
 /**
