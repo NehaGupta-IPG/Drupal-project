@@ -4,19 +4,16 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
-
 /**
  * @file
  * Vertical tabs module.
  *
  * Replaces /core/misc/vertical-tabs.css.
  */
-
 /**
  * Main wrapper of vertical tabs.
  * This wrapper div is added by JavaScript.
  */
-
 .vertical-tabs {
   box-sizing: border-box;
   margin-block: var(--vertical-tabs-margin-vertical);
@@ -32,7 +29,6 @@
 /**
  * Vertical tabs menu.
  */
-
 .vertical-tabs__menu {
   position: relative;
   display: block;
@@ -47,7 +43,6 @@
 /**
  * Vertical tabs menu item.
  */
-
 .vertical-tabs__menu-item {
   overflow: hidden; /* Necessary to cut off the end of the focus state. */
   margin-block: var(--vertical-tabs-menu-item--top-margin);
@@ -77,7 +72,7 @@
        dark (see the .is-selected dark override below), so mirror it here. */
     border-color: var(--admin-color-bg-surface);
 
-    .gin--dark-mode & {
+    .dark-mode & {
       border-color: var(--admin-color-bg);
     }
   }
@@ -110,7 +105,6 @@
 /**
  * Anchor link inside the vertical tabs menu item.
  */
-
 .vertical-tabs__menu-link {
   position: relative;
   display: block;
@@ -152,7 +146,7 @@
     background-clip: padding-box;
   }
 
-  .gin--dark-mode & {
+  .dark-mode & {
     color: var(--admin-color-text);
   }
 
@@ -201,7 +195,7 @@
       background: none;
     }
 
-    .gin--dark-mode & {
+    .dark-mode & {
       border-color: var(--admin-color-border);
       background: var(--admin-color-bg);
     }
@@ -223,14 +217,13 @@
 /**
  * Details summary in vertical tabs menu link and in the summary of the details.
  */
-
 .vertical-tabs__menu-link-summary {
   display: block;
   color: var(--admin-color-text-soft);
   font-size: var(--admin-font-size-s);
   font-weight: normal;
 
-  .gin--dark-mode & {
+  .dark-mode & {
     color: var(--admin-color-text-soft);
   }
 }
@@ -238,7 +231,6 @@
 /**
  * Wrapper of vertical tabs panes.
  */
-
 .vertical-tabs__items {
   box-sizing: border-box;
   margin-block: var(--vertical-tabs-margin-vertical);
@@ -248,7 +240,7 @@
   background-color: var(--admin-color-bg-surface);
   box-shadow: var(--vertical-tabs-shadow);
 
-  .gin--dark-mode & {
+  .dark-mode & {
     border-color: var(--admin-color-border);
     background: var(--admin-color-bg);
   }
@@ -259,7 +251,6 @@
 }
 
 /* This modifier is added by JavaScript (this is inherited from Drupal core). */
-
 .vertical-tabs__panes {
   position: relative;
   z-index: 1; /* Above the vertical tabs menu. */
@@ -285,9 +276,8 @@
 /**
  * The actual vertical tabs pane.
  *
- * This is a gin-details element which in this case is also vertical-tabs__item.
+ * This is a details element which in this case is also vertical-tabs__item.
  */
-
 .vertical-tabs__item {
   /* Render on top of the border of vertical-tabs__items. */
   margin-block: calc(var(--vertical-tabs-border-size) * -1) 0;
@@ -322,7 +312,7 @@
     }
   }
 
-  .gin--dark-mode & {
+  .dark-mode & {
     background: none;
   }
 
@@ -337,7 +327,7 @@
   }
 
   @media (min-width: 64em) {
-    .gin-details__summary {
+    .details__summary {
       padding-inline-start: var(--admin-space-2xl);
 
       &::before {
@@ -351,6 +341,6 @@
   font-weight: var(--admin-font-weight-bold);
 }
 
-[open] > .gin-details__summary--vertical-tabs-item:not(:focus, :active)::after {
+[open] > .details__summary--vertical-tabs-item:not(:focus, :active)::after {
   border-inline-start-width: 0.3125rem;
 }

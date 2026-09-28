@@ -1,21 +1,21 @@
 QueryCount: 264
-CacheGetCount: 257
+CacheGetCount: 259
 CacheGetCountByBin:
-  config: 52
+  config: 55
   bootstrap: 15
-  discovery: 87
-  data: 14
+  discovery: 86
+  data: 13
   entity: 24
   dynamic_page_cache: 1
   default: 8
-  routes: 18
-  render: 14
+  routes: 16
+  render: 17
   file_parsing: 2
   menu: 22
-CacheSetCount: 266
+CacheSetCount: 267
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
-CacheTagLookupQueryCount: 29
+CacheTagLookupQueryCount: 30
 CacheTagGroupedLookups:
   -
     - entity_types
@@ -61,9 +61,9 @@ CacheTagGroupedLookups:
   -
     - 'media:3'
   -
-    - 'config:core.entity_view_display.node.recipe.full'
-    - 'config:filter.format.basic_html'
     - 'node:1'
+  -
+    - 'config:filter.format.basic_html'
     - 'taxonomy_term:13'
     - 'taxonomy_term:22'
     - 'taxonomy_term:31'
@@ -86,6 +86,16 @@ CacheTagGroupedLookups:
     - 'config:system.menu.admin'
   -
     - 'config:system.menu.'
+  -
+    - 'config:navigation.block_layout'
+    - 'config:navigation.settings'
+    - 'config:node_type_list'
+  -
+    - 'config:system.menu.navigation-user-links'
+  -
+    - 'config:user.role.authenticated'
+    - 'config:user.role.test_admin'
+    - 'user:11'
   -
     - 'config:system.menu.account'
   -
@@ -113,22 +123,12 @@ CacheTagGroupedLookups:
     - 'taxonomy_term:9'
     - taxonomy_term_list
   -
-    - 'config:navigation.block_layout'
-    - 'config:navigation.settings'
-    - 'config:node_type_list'
-  -
-    - 'config:system.menu.navigation-user-links'
-  -
-    - 'config:user.role.authenticated'
-    - 'config:user.role.test_admin'
-    - 'user:11'
-  -
     - 'config:image.style.medium_8_7'
     - 'file:37'
     - 'media:19'
   -
     - block_content_view
 ScriptCount: 12
-ScriptBytes: 200509
-StylesheetCount: 12
-StylesheetBytes: 79807
+ScriptBytes: 187160
+StylesheetCount: 11
+StylesheetBytes: 73614
