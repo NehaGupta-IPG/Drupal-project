@@ -176,7 +176,7 @@ abstract class Upsert extends Query implements \Countable /* , QueryExecutionVoi
    */
   public function execute() /* : void */ {
     if ($this->queryOptions['return_affected_rows']) {
-      @trigger_error(__METHOD__ . '() returning a value is deprecated in drupal:11.5.0 and is removed in drupal:13.0.0. Pass \'return_affected_rows\' => FALSE in the $options for now to silence the deprecation, and adjust any code handling a returned value to not rely on it. See https://www.drupal.org/node/3615151', E_USER_DEPRECATED);
+      @trigger_error(__METHOD__ . '() returning a value is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. Pass \'return_affected_rows\' => FALSE in the $options for now to silence the deprecation, and adjust any code handling a returned value to not rely on it. See https://www.drupal.org/node/3615151', E_USER_DEPRECATED);
     }
 
     if (!$this->preExecute()) {
