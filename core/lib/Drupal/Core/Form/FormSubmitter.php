@@ -89,7 +89,7 @@ class FormSubmitter implements FormSubmitterInterface {
       if (($batch = &$this->batchGet()) && !isset($batch['id'])) {
         // Some previous submit handler has set a batch. To ensure correct
         // execution order, store the call in a special 'control' batch set.
-        // See _batch_next_set().
+        // See BatchProcessor::nextSet().
         $batch['sets'][] = ['form_submit' => $callback];
         $batch['has_form_submits'] = TRUE;
       }

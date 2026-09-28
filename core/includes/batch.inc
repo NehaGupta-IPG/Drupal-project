@@ -262,8 +262,14 @@ function &_batch_current_set() {
  * @return true|null
  *   TRUE if a subsequent set was found in the batch; no value will be returned
  *   if no subsequent set was found.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
  */
 function _batch_next_set() {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   $batch = &batch_get();
   $set_indexes = array_keys($batch['sets']);
   $current_set_index_key = array_search($batch['current_set'], $set_indexes);

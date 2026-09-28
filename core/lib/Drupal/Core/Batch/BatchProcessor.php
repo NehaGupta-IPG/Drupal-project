@@ -203,12 +203,12 @@ class BatchProcessor {
       // When all operations in the current batch set are completed, browse
       // through the remaining sets, marking them 'successfully processed'
       // along the way, until we find a set that contains operations.
-      // _batch_next_set() executes form submit handlers stored in 'control'
+      // self::nextSet() executes form submit handlers stored in 'control'
       // sets (see \Drupal::service('form_submitter')), which can in turn add new
       // sets to the batch.
       $setChanged = FALSE;
       $oldSet = $currentSet;
-      while (empty($currentSet['count']) && ($currentSet['success'] = TRUE) && _batch_next_set()) {
+      while (empty($currentSet['count']) && ($currentSet['success'] = TRUE) && $this->nextSet()) {
         $currentSet = &$this->currentSet();
         $currentSet['start'] = microtime(TRUE);
         $setChanged = TRUE;
@@ -405,6 +405,36 @@ class BatchProcessor {
       ],
     ];
     return $build;
+  }
+
+  /**
+   * Retrieves the next set in a batch.
+   *
+   * If there is a subsequent set in this batch, assign it as the new set to
+   * process and execute its form submit handler (if defined), which may add
+   * further sets to this batch.
+   *
+   * @return ?bool
+   *   TRUE if a subsequent set was found in the batch; no value will be returned
+   *   if no subsequent set was found.
+   */
+  protected function nextSet(): ?bool {
+    $batch = &batch_get();
+    $setIndexes = array_keys($batch['sets']);
+    $currentSetIndexKey = array_search($batch['current_set'], $setIndexes);
+    if (isset($setIndexes[$currentSetIndexKey + 1])) {
+      $batch['current_set'] = $setIndexes[$currentSetIndexKey + 1];
+      $currentSet = &$this->currentSet();
+      if (isset($currentSet['form_submit']) && ($callback = $currentSet['form_submit']) && is_callable($callback)) {
+        // We use our stored copies of $form and $form_state to account for
+        // possible alterations by previous form submit handlers.
+        $completeForm = &$batch['form_state']->getCompleteForm();
+        $callable = $this->callableResolver->getCallableFromDefinition($callback);
+        $callable(...[&$completeForm, &$batch['form_state']]);
+      }
+      return TRUE;
+    }
+    return NULL;
   }
 
 }
