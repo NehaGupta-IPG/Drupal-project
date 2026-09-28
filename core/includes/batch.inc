@@ -73,7 +73,6 @@ function _batch_needs_update($new_value = NULL) {
 /**
  * Does one execution pass with JavaScript and returns progress to the browser.
  *
- *
  * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
  *   is no replacement.
  *
@@ -91,9 +90,14 @@ function _batch_do() {
 /**
  * Outputs a batch processing page.
  *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
  * @see _batch_process()
  */
 function _batch_progress_page(): array {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   $batch = &batch_get();
 
   $current_set = _batch_current_set();
