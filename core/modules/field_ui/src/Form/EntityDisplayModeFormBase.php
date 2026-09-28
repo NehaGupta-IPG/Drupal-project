@@ -117,8 +117,9 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
 
     $bundles_by_entity = [];
     $defaults = [];
-    foreach (array_keys($bundles[$definition->id()]) as $bundle) {
-      $bundles_by_entity[$bundle] = $bundles[$definition->id()][$bundle]['label'];
+    $entity_bundles = $bundles[$definition->id()] ?? [];
+    foreach (array_keys($entity_bundles) as $bundle) {
+      $bundles_by_entity[$bundle] = $entity_bundles[$bundle]['label'];
       // Determine default display modes.
       if (!$this->entity->isNew()) {
         [, $display_mode_name] = explode('.', $this->entity->id());
@@ -236,7 +237,7 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
    *   An entity display.
    */
   private function getEntityDisplay($entity_type_id, $bundle, $mode) {
-    return match($this->displayContext) {
+    return match ($this->displayContext) {
       'view' => $this->entityDisplayRepository->getViewDisplay($entity_type_id, $bundle, $mode),
       'form' => $this->entityDisplayRepository->getFormDisplay($entity_type_id, $bundle, $mode),
     };
@@ -255,7 +256,7 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
    */
   private function getOverviewUrl($mode, $bundle): Url {
     $entity_type = $this->entityTypeManager->getDefinition($this->targetEntityTypeId);
-    return match($this->displayContext) {
+    return match ($this->displayContext) {
       'view' => Url::fromRoute('entity.entity_view_display.' . $this->targetEntityTypeId . '.view_mode', [
         'view_mode_name' => $mode,
       ] + FieldUI::getRouteBundleParameter($entity_type, $bundle)),
@@ -309,7 +310,7 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
    *   Returns the display, or NULL if one does not exist.
    */
   private function getDisplayByContext(string $bundle, string $display_mode_name): EntityFormDisplayInterface|EntityViewDisplayInterface|null {
-    return match($this->displayContext) {
+    return match ($this->displayContext) {
       'view' => $this->getViewDisplay($bundle, $display_mode_name),
       'form' => $this->getFormDisplay($bundle, $display_mode_name),
     };

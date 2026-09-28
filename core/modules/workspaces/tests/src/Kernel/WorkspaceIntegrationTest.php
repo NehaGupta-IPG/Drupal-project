@@ -11,6 +11,7 @@ use Drupal\entity_test\Entity\EntityTestMulRevPub;
 use Drupal\form_test\Form\FormTestAlterForm;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\node\NodeAccessRebuild;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
@@ -29,6 +30,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests a complete publishing scenario across different workspaces.
  */
 #[Group('workspaces')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class WorkspaceIntegrationTest extends KernelTestBase {
 
@@ -570,7 +572,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     // Check that a workspace that is not at the top level can not be published.
     $this->expectException(WorkspacePublishException::class);
-    $this->expectExceptionMessage('Only top-level workspaces can be published.');
+    $this->expectExceptionMessageIs('Only top-level workspaces can be published.');
     $this->workspaces['dev']->publish();
   }
 
@@ -635,7 +637,6 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     // references to the same base tables.
     $this->createEntityReferenceField('node', 'page', 'field_test_node', 'Test node reference', 'node');
 
-    $this->switchToWorkspace('live');
     $node_1 = $this->createNode([
       'title' => 'live node 1',
     ]);
@@ -661,6 +662,9 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     $node_2->save();
 
     $entity_test->name->value = 'stage entity_test_mulrevpub';
+    // Note: this value is essentially lost because the data for
+    // non-revisionable fields is not updated anywhere when creating pending
+    // revisions.
     $entity_test->non_rev_field->value = 'stage non-revisionable value';
     $entity_test->save();
 
@@ -690,15 +694,11 @@ class WorkspaceIntegrationTest extends KernelTestBase {
       ->condition('field_test_node.entity.uuid', $node_1->uuid());
 
     // Add conditions for a reference to a different entity type.
-    // @todo Re-enable the two conditions below when we find a way to not join
-    //   the workspace_association table for every duplicate entity base table
-    //   join.
-    // @see https://www.drupal.org/project/drupal/issues/2983639
     $query
       // Check a condition on the revision data table.
-      // ->condition('field_test_entity.entity.name', 'stage entity_test_mulrevpub')
+      ->condition('field_test_entity.entity.name', 'stage entity_test_mulrevpub')
       // Check a condition on the data table.
-      // ->condition('field_test_entity.entity.non_rev_field', 'stage non-revisionable value')
+      ->condition('field_test_entity.entity.non_rev_field', 'live non-revisionable value')
       // Check a condition on the base table.
       ->condition('field_test_entity.entity.uuid', $entity_test->uuid());
 
@@ -726,7 +726,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     if (!$allowed) {
       $this->expectException(EntityStorageException::class);
-      $this->expectExceptionMessage("The \"$entity_type_id\" entity type can only be saved in the default workspace.");
+      $this->expectExceptionMessageIs("The \"$entity_type_id\" entity type can only be saved in the default workspace.");
     }
     $entity->save();
   }
@@ -756,7 +756,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     if (!$allowed) {
       $this->expectException(EntityStorageException::class);
-      $this->expectExceptionMessage("The \"$entity_type_id\" entity type can only be saved in the default workspace.");
+      $this->expectExceptionMessageIs("The \"$entity_type_id\" entity type can only be saved in the default workspace.");
     }
     $entity->save();
   }
@@ -784,7 +784,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     if (!$allowed) {
       $this->expectException(EntityStorageException::class);
-      $this->expectExceptionMessage("This {$entity->getEntityType()->getSingularLabel()} can only be deleted in the Live workspace.");
+      $this->expectExceptionMessageIs("This {$entity->getEntityType()->getSingularLabel()} can only be deleted in the Live workspace.");
     }
     $entity->delete();
   }
@@ -919,18 +919,19 @@ class WorkspaceIntegrationTest extends KernelTestBase {
       // Check that entity queries return the correct results.
       $this->assertEntityQuery($expected_values, $entity_type_id);
 
-      // Check that the 'Frontpage' view only shows published content that is
+      // Check that the 'Promoted Content' view only shows published content that is
       // also considered as the default revision in the given workspace.
-      $expected_frontpage = array_filter($expected_values, function (array $expected_value): bool {
+      $expected_promoted_content = array_filter($expected_values, function (array $expected_value): bool {
         return $expected_value['status'] === TRUE && $expected_value['default_revision'] === TRUE;
       });
-      // The 'Frontpage' view will output nodes in reverse creation order.
-      usort($expected_frontpage, function (array $a, array $b): int|float {
+      // The 'Promoted Content' view will output nodes in reverse creation order.
+      usort($expected_promoted_content, function (array $a, array $b): int|float {
         return $b['nid'] - $a['nid'];
       });
-      $view = Views::getView('frontpage');
+
+      $view = Views::getView('promoted_content');
       $view->execute();
-      $this->assertIdenticalResultset($view, $expected_frontpage, ['nid' => 'nid']);
+      $this->assertIdenticalResultset($view, $expected_promoted_content, ['nid' => 'nid']);
 
       $rendered_view = $view->render('page_1');
       $output = \Drupal::service('renderer')->renderRoot($rendered_view);
@@ -1186,7 +1187,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   public function testNodeAccessDifferringRevisionIdsOnTarget(): void {
     $this->initializeWorkspacesModule();
     \Drupal::service('module_installer')->install(['node_access_test']);
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
     // Edit node 1 in 'stage'.
     $this->switchToWorkspace('stage');

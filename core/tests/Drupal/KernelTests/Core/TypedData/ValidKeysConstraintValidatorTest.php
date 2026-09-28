@@ -28,8 +28,6 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
   /**
    * The typed config under test.
    *
-   * @var \Drupal\Core\TypedData\TraversableTypedDataInterface
-   *
    * @see \Drupal\Core\Config\TypedConfigManagerInterface::get()
    */
   protected TraversableTypedDataInterface $config;
@@ -321,7 +319,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
     unset($value['south']);
     $violations = $typed_config->create(clone $definition, $value)->validate();
     $this->assertCount(0, $violations);
-    $definition->addConstraint('FullyValidatable', NULL);
+    $definition->addConstraint('FullyValidatable');
     $violations = $typed_config->create(clone $definition, $value)->validate();
     $this->assertCount(1, $violations);
     $this->assertSame("'south' is a required key.", (string) $violations->get(0)->getMessage());
@@ -352,7 +350,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
     // `<infer>`.
     $config->getDataDefinition()
       ->addConstraint('ValidKeys', ['allowedKeys' => 'infer']);
-    $this->expectExceptionMessage("'infer' is not a valid set of allowed keys.");
+    $this->expectExceptionMessageIs("'infer' is not a valid set of allowed keys.");
     $config->validate();
   }
 

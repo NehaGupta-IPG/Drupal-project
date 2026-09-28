@@ -6,6 +6,7 @@ namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Extension\ModuleUninstallValidatorException;
+use Drupal\Core\Field\FieldPurger;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
@@ -68,7 +69,7 @@ class CommentUninstallTest extends KernelTestBase {
 
     // Uninstall the comment module which should trigger an exception.
     $this->expectException(ModuleUninstallValidatorException::class);
-    $this->expectExceptionMessage('The following reasons prevent the modules from being uninstalled: The <em class="placeholder">Comments</em> field type is used in the following field: node.comment');
+    $this->expectExceptionMessageIs('The following reasons prevent the modules from being uninstalled: The <em class="placeholder">Comments</em> field type is used in the following field: node.comment');
     $this->container->get('module_installer')->uninstall(['comment']);
   }
 
@@ -93,7 +94,7 @@ class CommentUninstallTest extends KernelTestBase {
     $field_storage = FieldStorageConfig::loadByName('node', 'comment');
     $this->assertNull($field_storage);
 
-    field_purge_batch(10);
+    \Drupal::service(FieldPurger::class)->purgeBatch(10);
     // Ensure that uninstall succeeds even if the field has already been deleted
     // manually beforehand.
     $this->container->get('module_installer')->uninstall(['comment']);

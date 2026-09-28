@@ -36,8 +36,6 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * The normalizer.
-   *
-   * @var \Drupal\jsonapi\Normalizer\FieldItemNormalizer
    */
   private FieldItemNormalizer $normalizer;
 
@@ -84,6 +82,7 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
           'options' => [
             'query' => 'foo=bar',
           ],
+          'resolvable_uri' => 'https://www.drupal.org',
         ],
       ],
       'internal_property_value' => [
@@ -112,6 +111,7 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
       'options' => [
         'query' => 'foo=bar',
       ],
+      'resolvable_uri' => 'https://www.drupal.org',
     ], $result->getNormalization());
 
     // Verify a field with one public property and one internal only returns the

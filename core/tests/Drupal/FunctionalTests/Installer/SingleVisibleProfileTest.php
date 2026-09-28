@@ -22,7 +22,7 @@ class SingleVisibleProfileTest extends InstallerTestBase {
    *
    * @var string
    */
-  protected $profile = NULL;
+  protected $profile;
 
   /**
    * {@inheritdoc}
@@ -47,13 +47,6 @@ class SingleVisibleProfileTest extends InstallerTestBase {
       mkdir($path, 0777, TRUE);
       file_put_contents("$path/$profile.info.yml", Yaml::encode($info));
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUpProfile(): void {
-    // This step is skipped, because there is only one visible profile.
   }
 
   /**

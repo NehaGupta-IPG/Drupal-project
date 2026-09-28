@@ -32,15 +32,16 @@ class GarbageCollectionTest extends KernelTestBase {
       $store->setWithExpire('key_' . $i, $this->randomObject(), rand(500, 100000));
     }
     $this->assertCount(4, $store->getAll(), 'Four items were written to the storage.');
+    $this->assertCount(4, $store->getAllKeys(), 'Four items were written to the storage.');
 
     // Manually expire the data.
     for ($i = 0; $i <= 3; $i++) {
-      $connection->merge('key_value_expire')
-        ->keys([
+      $connection->upsert('key_value_expire')
+        ->key(['name', 'collection'])
+        ->fields([
           'name' => 'key_' . $i,
           'collection' => $collection,
-        ])
-        ->fields([
+          'value' => '',
           'expire' => \Drupal::time()->getRequestTime() - 1,
         ])
         ->execute();

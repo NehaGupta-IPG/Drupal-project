@@ -254,7 +254,7 @@ class ExtensionVersionTest extends UnitTestCase {
   #[DataProvider('providerInvalidVersionNumber')]
   public function testInvalidVersionNumber(string $version): void {
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage("Unexpected version number in: $version");
+    $this->expectExceptionMessageIs("Unexpected version number in: $version");
     ExtensionVersion::createFromVersionString($version);
   }
 
@@ -298,7 +298,7 @@ class ExtensionVersionTest extends UnitTestCase {
   #[DataProvider('providerInvalidVersionCorePrefix')]
   public function testInvalidVersionCorePrefix(string $version): void {
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage("Unexpected version core prefix in $version. The only core prefix expected in \Drupal\Core\Extension\ExtensionVersion is: 8.x-");
+    $this->expectExceptionMessageIs("Unexpected version core prefix in $version. The only core prefix expected in \Drupal\Core\Extension\ExtensionVersion is: 8.x-");
     ExtensionVersion::createFromVersionString($version);
   }
 
@@ -328,7 +328,7 @@ class ExtensionVersionTest extends UnitTestCase {
   #[DataProvider('providerInvalidBranchCorePrefix')]
   public function testInvalidBranchCorePrefix(string $branch): void {
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage("Unexpected version core prefix in {$branch}0. The only core prefix expected in \Drupal\Core\Extension\ExtensionVersion is: 8.x-");
+    $this->expectExceptionMessageIs("Unexpected version core prefix in {$branch}0. The only core prefix expected in \Drupal\Core\Extension\ExtensionVersion is: 8.x-");
     ExtensionVersion::createFromSupportBranch($branch);
   }
 
@@ -411,7 +411,7 @@ class ExtensionVersionTest extends UnitTestCase {
   #[DataProvider('provideInvalidBranch')]
   public function testInvalidBranch(string $branch): void {
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage("Invalid support branch: $branch");
+    $this->expectExceptionMessageIs("Invalid support branch: $branch");
     ExtensionVersion::createFromSupportBranch($branch);
   }
 
@@ -445,12 +445,17 @@ class ExtensionVersionTest extends UnitTestCase {
    *   as a single item array
    */
   protected static function createKeyedTestCases(array $test_arguments): array {
-    return array_combine(
+    $return = array_combine(
       $test_arguments,
       array_map(function (string $test_argument): array {
         return [$test_argument];
       }, $test_arguments)
     );
+    if (isset($return[''])) {
+      $return['empty_string'] = $return[''];
+      unset($return['']);
+    }
+    return $return;
   }
 
 }

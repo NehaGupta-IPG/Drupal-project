@@ -8,6 +8,7 @@ use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Field\FieldPurger;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\Tests\system\Functional\Module\ModuleTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -65,6 +66,9 @@ class ConfigImportAllTest extends ModuleTestBase {
 
     // Get a list of modules to install.
     $all_modules = $this->container->get('extension.list.module')->getList();
+    // @todo Delete the next line when removing Shortcut.
+    //   https://www.drupal.org/project/drupal/issues/3586214
+    unset($all_modules['shortcut']);
     $all_modules = array_filter($all_modules, function ($module): bool {
       // Filter out contrib, hidden, testing, experimental, and deprecated
       // modules. We also don't need to enable modules that are already enabled.
@@ -109,7 +113,7 @@ class ConfigImportAllTest extends ModuleTestBase {
     }
 
     // Purge the field data.
-    field_purge_batch(1000);
+    \Drupal::service(FieldPurger::class)->purgeBatch(1000);
 
     $all_modules = \Drupal::service('extension.list.module')->getList();
     $database_module = \Drupal::service('database')->getProvider();
