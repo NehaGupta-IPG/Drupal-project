@@ -396,6 +396,10 @@
     border-end-start-radius: var(--admin-radius-m);
   }
 
+  &.details--accordion-item::before {
+    z-index: 1;
+  }
+
   & > .details__summary {
     &:not(:hover) {
       color: var(--input--error-color);
