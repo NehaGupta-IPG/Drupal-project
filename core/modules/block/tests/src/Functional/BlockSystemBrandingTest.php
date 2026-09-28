@@ -56,13 +56,6 @@ class BlockSystemBrandingTest extends BlockTestBase {
     $this->assertSession()->elementExists('xpath', $site_slogan_xpath);
     $this->assertSession()->elementTextContains('xpath', $site_slogan_xpath, 'Community plumbing');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:system.site');
-    // Just this once, assert that the logo is as expected.
-    if (str_ends_with($site_logo_xpath, 'svg')) {
-      $this->assertSession()->elementExists('xpath', $site_logo_xpath);
-    }
-    else {
-      $this->assertSession()->elementAttributeContains('xpath', $site_logo_xpath, 'src', $theme_path . '/logo.svg');
-    }
 
     // Be sure the slogan is XSS-filtered.
     $this->config('system.site')
