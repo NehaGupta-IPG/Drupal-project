@@ -368,7 +368,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "453ac3f00641046a8d25b094d1385f9744dac2bf"
+                "reference": "56fdfed7e4ef932dad548e43ec17949f843b89eb"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -427,8 +427,7 @@
                 "dealerdirect/phpcodesniffer-composer-installer": "1.1.0",
                 "drupal/automatic_updates": "<4",
                 "drupal/project_browser": "<2.1",
-                "drush/drush": "<12.4.3",
-                "symfony/polyfill-intl-idn": "<1.38.1"
+                "drush/drush": "<12.4.3"
             },
             "replace": {
                 "drupal/core-annotation": "self.version",
