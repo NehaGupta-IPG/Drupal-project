@@ -155,18 +155,50 @@ class ConnectionTest extends UnitTestCase {
     $this->assertEquals('bar', $mysql_connection->getConnectionOptions()['foo']);
     $this->assertEquals(['djarin', 'grogu'], $mysql_connection->getConnectionOptions()['din']);
 
-    $mysql_connection->getConnectionOptions()['driver'] = 'qux';
-    $mysql_connection->getConnectionOptions()['database'] = 'qux';
-    $mysql_connection->getConnectionOptions()['foo'] = 'qux';
-    $mysql_connection->getConnectionOptions()['din']['also'] = 'kuiil';
-    $mysql_connection->getConnectionOptions()['pdo'][\PDO::ATTR_EMULATE_PREPARES] = TRUE;
-    $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['driver']);
-    $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['database']);
-    $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['foo']);
-    $this->assertEquals(['djarin', 'grogu', 'also' => 'kuiil'], $mysql_connection->getConnectionOptions()['din']);
-    $this->assertEquals(['djarin', 'grogu', 'also' => 'kuiil'], $mysql_connection->getConnectionOptions()->din);
-    $this->assertEquals([\PDO::ATTR_EMULATE_PREPARES => TRUE], $mysql_connection->getConnectionOptions()['pdo']);
-    $this->assertEquals([\PDO::ATTR_EMULATE_PREPARES => TRUE], $mysql_connection->getConnectionOptions()->pdo);
+    // ConnectionParameters is a value object, and should not be modifiable
+    // with array access.
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()['database']);
+    try {
+      $mysql_connection->getConnectionOptions()['database'] = 'qux';
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\LogicException $e) {
+      $this->assertMatchesRegularExpression('/^Drupal\\\\Core\\\\Database\\\\ConnectionParametersBase.* is a value objects, writing to \'database\' is forbidden/', $e->getMessage());
+    }
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()['database']);
+    try {
+      unset($mysql_connection->getConnectionOptions()['database']);
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\LogicException $e) {
+      $this->assertMatchesRegularExpression('/^Drupal\\\\Core\\\\Database\\\\ConnectionParametersBase.* is a value objects, unsetting \'database\' is forbidden/', $e->getMessage());
+    }
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()['database']);
+
+    // ConnectionParameters is a value object, reading/writing to non-existing
+    // variables should fail.
+    try {
+      $this->assertEquals('warp', $mysql_connection->getConnectionOptions()['time']);
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
+    }
+    try {
+      $mysql_connection->getConnectionOptions()['time'] = 'warp';
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
+    }
+    try {
+      unset($mysql_connection->getConnectionOptions()['time']);
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
+    }
+
   }
 
 }

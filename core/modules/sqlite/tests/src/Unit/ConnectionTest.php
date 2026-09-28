@@ -100,9 +100,49 @@ class ConnectionTest extends UnitTestCase {
     $this->assertEquals('sqlite', $sqlite_connection->getConnectionOptions()['driver']);
     $this->assertEquals(':memory:', $sqlite_connection->getConnectionOptions()['database']);
 
+    // ConnectionParameters is a value object, and should not be modifiable
+    // with array access.
     $this->assertEquals('bar', $sqlite_connection->getConnectionOptions()['foo']);
-    $sqlite_connection->getConnectionOptions()['foo'] = 'qux';
-    $this->assertEquals('qux', $sqlite_connection->getConnectionOptions()['foo']);
+    try {
+      $sqlite_connection->getConnectionOptions()['foo'] = 'qux';
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\LogicException $e) {
+      $this->assertEquals('Drupal\\sqlite\\Driver\\Database\\sqlite\\ConnectionParameters is a value objects, writing to \'foo\' is forbidden', $e->getMessage());
+    }
+    $this->assertEquals('bar', $sqlite_connection->getConnectionOptions()['foo']);
+    try {
+      unset($sqlite_connection->getConnectionOptions()['foo']);
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\LogicException $e) {
+      $this->assertEquals('Drupal\\sqlite\\Driver\\Database\\sqlite\\ConnectionParameters is a value objects, unsetting \'foo\' is forbidden', $e->getMessage());
+    }
+    $this->assertEquals('bar', $sqlite_connection->getConnectionOptions()['foo']);
+
+    // ConnectionParameters is a value object, reading/writing to non-existing
+    // variables should fail.
+    try {
+      $this->assertEquals('warp', $sqlite_connection->getConnectionOptions()['time']);
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
+    }
+    try {
+      $sqlite_connection->getConnectionOptions()['time'] = 'warp';
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
+    }
+    try {
+      unset($sqlite_connection->getConnectionOptions()['time']);
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
+    }
   }
 
   /**

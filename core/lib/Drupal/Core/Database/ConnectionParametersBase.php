@@ -104,7 +104,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   public function __construct(
     // Unknown connection options. The user input may include options that the
     // driver cannot handle, but we still can provide access to them.
-    protected array $unknownOptions = [],
+    protected readonly array $unknownOptions = [],
   ) {
     $this->sealed = TRUE;
   }
@@ -334,44 +334,45 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * This is for BC support only.
    */
   public function &offsetGet(mixed $offset): mixed {
+    // This is a value object, we return a copy of the requested variable. We
+    // need to use a temp variable because if properties are defined as
+    // readonly, the & reference operator in the method name would result in an
+    // attempt to modify the property value.
     $offset = (string) $offset;
+    if (!$this->offsetExists($offset)) {
+      throw new \InvalidArgumentException("Property '{$offset}' does not exist");
+    }
     if (property_exists($this, $offset)) {
-      // Need to use a temp variable and not $this->{$offset} directly here
-      // because if properties are defined as readonly, the & reference
-      // operator in the method name would result in an attempt to modify the
-      // property value.
       $tmp = $this->{$offset};
       assert(is_null($tmp) || is_bool($tmp) || is_string($tmp) || is_numeric($tmp) || is_array($tmp));
       return $tmp;
     }
-    return $this->unknownOptions[$offset];
+    $tmp = $this->unknownOptions[$offset];
+    return $tmp;
   }
 
   /**
    * This is for BC support only.
    */
   public function offsetSet(mixed $offset, mixed $value): void {
+    // This is a value object, we do not allow write access.
     $offset = (string) $offset;
-    assert(is_null($value) || is_bool($value) || is_string($value) || is_numeric($value));
-    if (property_exists($this, $offset)) {
-      $this->sealed = FALSE;
-      $this->{$offset} = $value;
-      $this->sealed = TRUE;
-      return;
+    if ($this->offsetExists($offset)) {
+      throw new \LogicException(get_class($this) . " is a value objects, writing to '{$offset}' is forbidden");
     }
-    $this->unknownOptions[$offset] = $value;
+    throw new \InvalidArgumentException("Property '{$offset}' does not exist");
   }
 
   /**
    * This is for BC support only.
    */
   public function offsetUnset(mixed $offset): void {
+    // This is a value object, we do not allow write access.
     $offset = (string) $offset;
-    if (property_exists($this, $offset)) {
-      $this->{$offset} = NULL;
-      return;
+    if ($this->offsetExists($offset)) {
+      throw new \LogicException(get_class($this) . " is a value objects, unsetting '{$offset}' is forbidden");
     }
-    unset($this->unknownOptions[$offset]);
+    throw new \InvalidArgumentException("Property '{$offset}' does not exist");
   }
 
 }
