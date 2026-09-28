@@ -198,7 +198,41 @@ class ConnectionTest extends UnitTestCase {
     catch (\InvalidArgumentException $e) {
       $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
     }
+  }
 
+  /**
+   * Confirms cloning of ConnectionParameters.
+   */
+  public function testConnectionParametersCloning(): void {
+    $mysql_connection = new Connection(
+      $this->createStub(Mysql::class),
+      [
+        'driver' => 'mysql',
+        'database' => 'kaboom',
+        'foo' => 'bar',
+        'din' => [
+          'djarin',
+          'grogu',
+        ],
+      ],
+    );
+    $this->assertEquals('mysql', $mysql_connection->getConnectionOptions()->driver);
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()->database);
+    $this->assertEquals('mysql', $mysql_connection->getConnectionOptions()['driver']);
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()['database']);
+    $this->assertEquals('bar', $mysql_connection->getConnectionOptions()['foo']);
+    $this->assertEquals(['djarin', 'grogu'], $mysql_connection->getConnectionOptions()['din']);
+
+    $newParameters = $mysql_connection->getConnectionOptions()->with([
+      'database' => 'bokatan',
+      'foo' => 'moff',
+      'qux' => ['boba'],
+    ]);
+    $this->assertEquals('mysql', $newParameters->driver);
+    $this->assertEquals('bokatan', $newParameters->database);
+    $this->assertEquals('moff', $newParameters->foo);
+    $this->assertEquals(['djarin', 'grogu'], $newParameters->din);
+    $this->assertEquals(['boba'], $newParameters->qux);
   }
 
 }

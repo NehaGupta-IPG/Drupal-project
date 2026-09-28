@@ -234,8 +234,21 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * {@inheritdoc}
    */
   public function with(array $options): static {
+    $publicProperties = $this->getNames();
+    $tmp = [];
+    $unknownOptionsCopy = $this->unknownOptions;
+    foreach ($options as $key => $option) {
+      if (in_array($key, $publicProperties, TRUE)) {
+        $tmp[$key] = $option;
+      }
+      else {
+        $unknownOptionsCopy[$key] = $option;
+      }
+    }
+    $tmp['unknownOptions'] = $unknownOptionsCopy;
     $this->sealed = FALSE;
-    $clone = clone($this, $options);
+    $clone = clone($this, $tmp);
+    $clone->sealed = TRUE;
     $this->sealed = TRUE;
     return $clone;
   }

@@ -83,9 +83,9 @@ class Tasks extends InstallTasks {
         // We cannot use \Drupal::service('file_system')->getTempDirectory()
         // here because we haven't yet successfully connected to the
         // database.
-        $attemptParameters = $liveParameters->withDatabase(
-          \Drupal::service('file_system')->tempnam(sys_get_temp_dir(), 'sqlite'),
-        );
+        $attemptParameters = $liveParameters->with([
+          'database' => \Drupal::service('file_system')->tempnam(sys_get_temp_dir(), 'sqlite'),
+        ]);
         Database::removeConnection('default');
         Database::addConnectionInfo('default', 'default', $attemptParameters);
 
