@@ -48,8 +48,12 @@ class SystemRequirements implements InstallRequirementsInterface {
     'migrate_drupal' => 'Migrate Drupal',
     'quickedit' => 'Quick Edit',
     'rdf' => 'RDF',
+    'settings_tray' => 'Settings Tray',
+    'shortcut' => 'Shortcut',
+    'search' => 'Search',
     'statistics' => 'Statistics',
     'telephone' => 'Telephone',
+    'toolbar' => 'Toolbar',
     'tour' => 'Tour',
     'tracker' => 'Tracker',
   ];
@@ -59,9 +63,12 @@ class SystemRequirements implements InstallRequirementsInterface {
    */
   public const DRUPAL_CORE_REMOVED_THEME_LIST = [
     'bartik' => 'Bartik',
+    'claro' => 'Claro',
     'classy' => 'Classy',
     'seven' => 'Seven',
     'stable' => 'Stable',
+    'stable9' => 'Stable 9',
+    'olivero' => 'Olivero',
   ];
 
   /**

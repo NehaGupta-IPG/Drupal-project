@@ -356,7 +356,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     // Retrieve messages with a specific level.
     $messages = $id_map->getMessages([], MigrationInterface::MESSAGE_WARNING);
     $count = 0;
-    foreach ($messages as $key => $message_row) {
+    foreach ($messages as $message_row) {
       $count = 1;
       $this->assertEquals(MigrationInterface::MESSAGE_WARNING, $message_row->level);
     }
@@ -466,7 +466,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * @return \Drupal\Tests\migrate\Unit\TestSqlIdMap
    *   An ID map instance for testing.
    */
-  protected function setupRows($source_keys, $dest_keys, $rows) {
+  protected function setupRows($source_keys, $dest_keys, $rows): TestSqlIdMap {
     $this->database = $this->getDatabase([]);
     $this->sourceIds = array_fill_keys($source_keys, []);
     $this->destinationIds = array_fill_keys($dest_keys, []);

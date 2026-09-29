@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\locale\Model\TranslationUpdateMode;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -25,6 +26,11 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile = 'testing_locale';
 
   /**
    * Tests update changes configuration translations if enabled after language.
@@ -51,7 +57,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->set('translation.use_source', TranslationUpdateMode::Local->value)
       ->save();
 
     // Add translation permissions now that the locale module has been enabled.
@@ -63,7 +69,8 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
 
     // Check and update the translation status. This will import the Afrikaans
     // translations of locale_test_translate module.
-    $this->drupalGet('admin/reports/translations/check');
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
 
     $this->drupalGet('admin/reports/translations');
     $this->submitForm([], 'Update translations');
@@ -92,7 +99,9 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
 
     $this->configImporter()->import();
 
-    $this->drupalGet('admin/reports/translations/check');
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
+    $this->checkForMetaRefresh();
     $this->drupalGet('admin/reports/translations');
     $this->submitForm([], 'Update translations');
 
@@ -128,7 +137,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->set('translation.use_source', TranslationUpdateMode::Local->value)
       ->save();
 
     // Add predefined language.
@@ -200,7 +209,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->set('translation.use_source', TranslationUpdateMode::Local->value)
       ->save();
 
     // Add predefined language.
@@ -246,7 +255,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->set('translation.use_source', TranslationUpdateMode::Local->value)
       ->save();
 
     // Add predefined language.
