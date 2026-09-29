@@ -6,6 +6,8 @@
  */
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Config\Entity\ConfigEntityType;
+use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Update\EquivalentUpdate;
 
@@ -33,115 +35,19 @@ function system_install(): void {
  * Implements hook_update_last_removed().
  */
 function system_update_last_removed(): int {
-  return 10201;
+  return 11300;
 }
 
 /**
- * Add a [time] column to the {simpletest} table, if existing.
+ * Moved to search_update_11401().
  */
-function system_update_11200(): void {
-  $schema = \Drupal::database()->schema();
-  if ($schema->tableExists('simpletest') && !$schema->fieldExists('simpletest', 'time')) {
-    $schema->addField('simpletest', 'time', [
-      'type' => 'float',
-      'not null' => TRUE,
-      'default' => 0,
-      'description' => 'Time elapsed for the execution of the test.',
-    ]);
-  }
+function system_update_11400(): void {
 }
 
 /**
- * Invalidate container because the module handler has changed.
+ * Moved to search_update_11402().
  */
-function system_update_11100(): void {
-  \Drupal::service('kernel')->invalidateContainer();
-}
-
-/**
- * Update length of menu_tree fields url and route_param_key from 255 to 2048.
- */
-function system_update_11001(): void {
-  $schema = \Drupal::database()->schema();
-  $spec = [
-    'description' => 'The external path this link points to (when not using a route).',
-    'type' => 'varchar',
-    'length' => 2048,
-    'not null' => TRUE,
-    'default' => '',
-  ];
-  $schema->changeField('menu_tree', 'url', 'url', $spec);
-
-  $spec = [
-    'description' => 'An encoded string of route parameters for loading by route.',
-    'type' => 'varchar',
-    'length' => 2048,
-  ];
-  $schema->changeField('menu_tree', 'route_param_key', 'route_param_key', $spec);
-}
-
-/**
- * Equivalent update to 10400.
- */
-function system_update_11102(): TranslatableMarkup|null {
-  // This is a no-op that exists to prevent an upgrade from 10.4+ to 11.0. That
-  // path is actually a downgrade.
-  $equivalent_update = \Drupal::service('update.update_hook_registry')
-    ->getEquivalentUpdate();
-  if ($equivalent_update instanceof EquivalentUpdate) {
-    return $equivalent_update->toSkipMessage();
-  }
-  return NULL;
-}
-
-/**
- * Add the [alias] field to the {router} table.
- */
-function system_update_11201(): void {
-  $schema = \Drupal::database()->schema();
-
-  if ($schema->tableExists('router') && !$schema->fieldExists('router', 'alias')) {
-    $spec = [
-      'fields' => [
-        'alias' => [
-          'description' => 'The alias of the route, if applicable.',
-          'type' => 'varchar_ascii',
-          'length' => 255,
-        ],
-      ],
-    ];
-    $schema->addField('router', 'alias', $spec['fields']['alias']);
-    $schema->addIndex('router', 'alias', ['alias'], $spec);
-  }
-}
-
-/**
- * Add an [exit_code] column to the {simpletest} table, if existing.
- */
-function system_update_11202(): void {
-  $schema = \Drupal::database()->schema();
-  if ($schema->tableExists('simpletest') && !$schema->fieldExists('simpletest', 'exit_code')) {
-    $schema->addField('simpletest', 'exit_code', [
-      'type' => 'int',
-      'not null' => TRUE,
-      'default' => 0,
-      'description' => 'The exit code of the test executed.',
-    ]);
-  }
-}
-
-/**
- * Equivalent update to 10600.
- */
-function system_update_11300(): TranslatableMarkup|null {
-  // This is a no-op that exists to prevent an upgrade from 10.6+ to 11.2. That
-  // path is actually a downgrade.
-  $equivalent_update = \Drupal::service('update.update_hook_registry')
-    ->getEquivalentUpdate();
-  if ($equivalent_update instanceof EquivalentUpdate) {
-    return $equivalent_update->toSkipMessage();
-  }
-  return NULL;
+function system_update_11401(): void {
 }
 
 /**
@@ -151,5 +57,54 @@ function system_update_12000(): void {
   $schema = \Drupal::database()->schema();
   if ($schema->tableExists('sequences')) {
     $schema->dropTable('sequences');
+  }
+}
+
+/**
+ * Equivalent update to 11102.
+ */
+function system_update_12001(): TranslatableMarkup|null {
+  // This is a no-op that exists to prevent an upgrade from 11.4+ to 12.0. That
+  // path is actually a downgrade.
+  $equivalent_update = \Drupal::service('update.update_hook_registry')
+    ->getEquivalentUpdate();
+  if ($equivalent_update instanceof EquivalentUpdate) {
+    return $equivalent_update->toSkipMessage();
+  }
+  return NULL;
+}
+
+/**
+ * Install new design token entity type.
+ */
+function system_update_12002(): void {
+  $entityDefinitionUpdateManager = \Drupal::entityDefinitionUpdateManager();
+  $changeList = $entityDefinitionUpdateManager->getChangeList();
+  if (isset($changeList['design_token']['entity_type']) && $changeList['design_token']['entity_type'] == EntityDefinitionUpdateManagerInterface::DEFINITION_CREATED) {
+    $designTokenEntityType = new ConfigEntityType([
+      'id' => 'design_token',
+      'label' => new TranslatableMarkup('Design token'),
+      'entity_keys' => [
+        'id' => 'id',
+        'label' => 'id',
+      ],
+      'admin_permission' => 'administer design tokens',
+      'constraints' => [
+        'ImmutableProperties' => [
+          'properties' => [
+            'id',
+            'path',
+            'type',
+          ],
+        ],
+      ],
+      'config_export' => [
+        'id',
+        'path',
+        'type',
+        'scopes',
+      ],
+    ]);
+    $entityDefinitionUpdateManager->installEntityType($designTokenEntityType);
   }
 }

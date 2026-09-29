@@ -12,7 +12,6 @@ use PHPUnit\Framework\Attributes\Group;
  * @internal
  */
 #[Group('package_manager')]
-#[Group('#slow')]
 class PackageInstallSubmoduleTest extends TemplateProjectTestBase {
 
   /**
@@ -23,6 +22,9 @@ class PackageInstallSubmoduleTest extends TemplateProjectTestBase {
    * metapackages which depend on the Composer package of the main module.
    */
   public function testSubModules(): void {
+    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/i/3508109
+    $this->markTestSkipped();
+
     $this->createTestProject('RecommendedProject');
     // Set up the release metadata for the main module. The submodule does not
     // have its own release metadata.

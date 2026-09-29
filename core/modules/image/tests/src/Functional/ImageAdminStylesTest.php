@@ -52,7 +52,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
   /**
    * Count the number of images currently create for a style.
    */
-  public function getImageCount(ImageStyleInterface $style) {
+  public function getImageCount(ImageStyleInterface $style): int {
     $count = 0;
     if (is_dir('public://styles/' . $style->id())) {
       $count = count(\Drupal::service('file_system')->scanDirectory('public://styles/' . $style->id(), '/.*/'));
@@ -408,7 +408,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     // Add another scale effect and make sure both exist. Click through from
     // the overview to make sure that it is possible to add new effect then.
     $this->drupalGet('admin/config/media/image-styles');
-    $rows = $this->xpath('//table/tbody/tr');
+    $rows = $this->getNodeElementsByXpath('//table/tbody/tr');
     $i = 0;
     foreach ($rows as $row) {
       if ($row->find('css', 'td')->getText() === 'Test style scale edit scale') {

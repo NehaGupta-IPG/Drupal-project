@@ -129,7 +129,7 @@ class FormStateTest extends UnitTestCase {
     $form_state = new FormState();
     $form_state->setValidationComplete();
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Form errors cannot be set after form validation has finished.');
+    $this->expectExceptionMessageIs('Form errors cannot be set after form validation has finished.');
     $form_state->setErrorByName('test', 'message');
   }
 
@@ -310,7 +310,7 @@ class FormStateTest extends UnitTestCase {
     $form_state = new FormState();
     $form_state->setRequestMethod('GET');
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Form state caching on GET requests is not allowed.');
+    $this->expectExceptionMessageIs('Form state caching on GET requests is not allowed.');
     $form_state->setCached();
   }
 
@@ -443,8 +443,8 @@ class PrepareCallbackTestForm implements FormInterface {
     return [];
   }
 
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
+  public function validateForm(array &$form, FormStateInterface $form_state): void {}
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
+  public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
 }

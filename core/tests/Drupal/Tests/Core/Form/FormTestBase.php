@@ -193,7 +193,6 @@ abstract class FormTestBase extends UnitTestCase {
       $this->redirectResponseSubscriber,
       $this->callableResolver,
     );
-    $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
 
     $this->formBuilder = new FormBuilder($this->formValidator, $this->formSubmitter, $this->formCache, $this->moduleHandler, $this->eventDispatcher, $this->requestStack, $this->classResolver, $this->elementInfo, $this->themeManager, $this->csrfToken, $this->callableResolver);
   }
@@ -295,7 +294,7 @@ abstract class FormTestBase extends UnitTestCase {
    *   (optional) The form key to look in. Otherwise the entire form will be
    *   compared.
    */
-  protected function assertFormElement(array $expected_form, array $actual_form, $form_key = NULL) {
+  protected function assertFormElement(array $expected_form, array $actual_form, $form_key = NULL): void {
     $expected_element = $form_key ? $expected_form[$form_key] : $expected_form;
     $actual_element = $form_key ? $actual_form[$form_key] : $actual_form;
     $this->assertSame(array_intersect_key($expected_element, $actual_element), $expected_element);
