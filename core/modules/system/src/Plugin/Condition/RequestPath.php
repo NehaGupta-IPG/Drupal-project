@@ -175,7 +175,19 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
    */
   public function getCacheContexts() {
     $contexts = parent::getCacheContexts();
-    $contexts[] = 'url.path';
+    $pages = trim($this->configuration['pages']);
+    // A lone '<front>' condition only ever depends on whether the current
+    // path is the front page, not on the exact path, so a much coarser
+    // cache context suffices and avoids a cache entry per unique URL.
+    if ($pages === '<front>') {
+      $contexts[] = 'url.path.is_front';
+    }
+    elseif (!empty($pages)) {
+      // Normalize newlines and excess whitespace so the cache context string
+      // remains safe for headers and cache keys.
+      $normalized_pages = preg_replace('/\s+/', ' ', $pages);
+      $contexts[] = 'path_condition:' . $normalized_pages;
+    }
     return $contexts;
   }
 
