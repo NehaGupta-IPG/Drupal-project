@@ -140,6 +140,9 @@ class TwigExtension extends AbstractExtension {
       new TwigFilter('e', [$this, 'escapeFilter'], $escape_options),
       new TwigFilter('drupal_escape', [$this, 'escapeFilter'], $escape_options),
 
+      // Replace Twig's spaceless filter to provide our own deprecation message.
+      new TwigFilter('spaceless', [self::class, 'spaceless'], ['pre_escape' => 'html', 'is_safe' => ['html']]),
+
       // Implements safe joining.
       // @todo Make that the default for |join? Upstream issue:
       //   https://github.com/fabpot/Twig/issues/1420
@@ -544,6 +547,19 @@ class TwigExtension extends AbstractExtension {
       ->applyTo($arg_bubbleable);
 
     $this->renderer->render($arg_bubbleable);
+  }
+
+  /**
+   * Removes whitespaces between HTML tags.
+   *
+   * @param string|null $content
+   *   The content to remove whitespaces from.
+   *
+   * @internal
+   */
+  public static function spaceless(?string $content): string {
+    @trigger_error('The "spaceless" filter is deprecated in drupal:11.5.0 and will be removed in drupal:13.0.0. Use other whitespace control strategies. See  See https://www.drupal.org/node/XXXXXXX', E_USER_DEPRECATED);
+    return trim(preg_replace('/>\s+</', '><', $content ?? ''));
   }
 
   /**

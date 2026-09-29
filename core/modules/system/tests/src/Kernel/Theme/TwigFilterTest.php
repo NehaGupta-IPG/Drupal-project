@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Kernel\Theme;
 
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore endapply
@@ -147,6 +148,7 @@ class TwigFilterTest extends KernelTestBase {
    * replacement spaceless filter provided by Drupal's Twig environment for
    * backwards compatibility.
    */
+  #[IgnoreDeprecations]
   public function testSpacelessFilter(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
@@ -161,6 +163,7 @@ class TwigFilterTest extends KernelTestBase {
 {% endapply %}
 EOT,
     ];
+    $this->expectUserDeprecationMessage('The "spaceless" filter is deprecated in drupal:11.5.0 and will be removed in drupal:13.0.0. Use other whitespace control strategies. See  See https://www.drupal.org/node/XXXXXXX');
     $this->assertSame('<div><span>Use the spaceless filter to remove whitespace between HTML tags, not whitespace within HTML tags or whitespace in plain text.</span></div>', (string) $renderer->renderRoot($element));
   }
 
