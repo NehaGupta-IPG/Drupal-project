@@ -16,7 +16,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests Recipe Validation.
  */
 #[Group('Recipe')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class RecipeValidationTest extends KernelTestBase {
 
@@ -228,7 +227,7 @@ YAML,
 name: 'Only installs extensions'
 install:
   - filter
-  - drupal:claro
+  - drupal:default_admin
 YAML,
       NULL,
     ];
@@ -238,8 +237,8 @@ name: 'Correct config import list'
 config:
   import:
     config_test: '*'
-    claro:
-      - claro.settings
+    default_admin:
+      - default_admin.settings
 YAML,
       NULL,
     ];

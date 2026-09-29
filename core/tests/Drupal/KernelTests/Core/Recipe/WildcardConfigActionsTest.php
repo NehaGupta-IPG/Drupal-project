@@ -131,7 +131,7 @@ YAML;
    */
   // phpcs:disable Drupal.Arrays.Array.LongLineDeclaration
   #[TestWith(["field.*.node.one.*", "No installed config entity type uses the prefix in the expression 'field.*.node.one.*'. Either there is a typo in the expression or this recipe should install an additional module or depend on another recipe."])]
-  #[TestWith(["field.field.node.*.body/", " could not be parsed."])]
+  #[TestWith(["field.field.node.*.body/", "The expression 'field\\.field\\.node\\.[^.:?*<>\"'\\/\\\\]+\\.body/' could not be parsed."])]
   // phpcs:enable
   public function testInvalidExpression(string $expression, string $expected_exception_message): void {
     $contents = <<<YAML
@@ -145,7 +145,7 @@ YAML;
     $recipe = $this->createRecipe($contents);
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage($expected_exception_message);
+    $this->expectExceptionMessageIs($expected_exception_message);
     RecipeRunner::processRecipe($recipe);
   }
 
@@ -252,8 +252,8 @@ YAML;
       'target_bundle' => 'one',
     ])->save();
 
-    $this->expectExceptionMessage(ConfigActionException::class);
-    $this->expectExceptionMessage('Entity language.content_settings.node.one exists');
+    $this->expectExceptionMessageIs(ConfigActionException::class);
+    $this->expectExceptionMessageIs('Entity language.content_settings.node.one exists');
     $this->container->get('plugin.manager.config_action')
       ->applyAction('createForEach', 'node.type.*', [
         'language.content_settings.node.%bundle' => [
@@ -272,7 +272,7 @@ YAML;
     // We should not be able to use this action on entities that aren't
     // themselves bundles of another entity type.
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage('The "language_content_settings" entity does not support the "createForEach" config action.');
+    $this->expectExceptionMessageIsOrContains('The "language_content_settings" entity does not support the "createForEach" config action.');
     $this->container->get('plugin.manager.config_action')
       ->applyAction('createForEach', 'language.content_settings.node.*', []);
   }
@@ -286,7 +286,7 @@ YAML;
     $manager = $this->container->get('plugin.manager.config_action');
     $manager->clearCachedDefinitions();
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The create_for_each_bundle:createForEach config action must be restricted to entity types that are bundles of another entity type.');
+    $this->expectExceptionMessageIs('The create_for_each_bundle:createForEach config action must be restricted to entity types that are bundles of another entity type.');
     $manager->applyAction('create_for_each_bundle:createForEach', 'node.type.*', []);
   }
 

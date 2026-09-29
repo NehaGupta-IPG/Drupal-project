@@ -48,7 +48,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    *   Array with string containing with the hook name, e.g. 'load', 'save',
    *   'insert', etc.
    */
-  public function assertFileHooksCalled($expected) {
+  public function assertFileHooksCalled($expected): void {
     \Drupal::state()->resetCache();
 
     // Determine which hooks were called.
@@ -83,7 +83,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    * @param string $message
    *   Optional translated string message.
    */
-  public function assertFileHookCalled($hook, $expected_count = 1, $message = NULL) {
+  public function assertFileHookCalled($hook, $expected_count = 1, $message = NULL): void {
     $actual_count = count(FileTestHelper::getCalls($hook));
 
     if (!isset($message)) {
@@ -108,7 +108,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    * @param \Drupal\file\FileInterface $after
    *   File object to compare.
    */
-  public function assertFileUnchanged(FileInterface $before, FileInterface $after) {
+  public function assertFileUnchanged(FileInterface $before, FileInterface $after): void {
     $this->assertEquals($before->id(), $after->id(), 'File id is the same');
     $this->assertEquals($before->getOwner()->id(), $after->getOwner()->id(), 'File owner is the same');
     $this->assertEquals($before->getFilename(), $after->getFilename(), 'File name is the same');
@@ -126,7 +126,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    * @param \Drupal\file\FileInterface $file2
    *   File object to compare.
    */
-  public function assertDifferentFile(FileInterface $file1, FileInterface $file2) {
+  public function assertDifferentFile(FileInterface $file1, FileInterface $file2): void {
     $this->assertNotEquals($file1->id(), $file2->id(), 'Files have different ids');
     $this->assertNotEquals($file1->getFileUri(), $file2->getFileUri(), 'Files have different paths');
   }
@@ -139,7 +139,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    * @param \Drupal\file\FileInterface $file2
    *   File object to compare.
    */
-  public function assertSameFile(FileInterface $file1, FileInterface $file2) {
+  public function assertSameFile(FileInterface $file1, FileInterface $file2): void {
     $this->assertEquals($file1->id(), $file2->id(), 'Files have the same ids');
     $this->assertEquals($file1->getFileUri(), $file2->getFileUri(), 'Files have the same path');
   }
@@ -160,7 +160,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    * @return \Drupal\file\FileInterface
    *   File entity.
    */
-  public function createFile($filepath = NULL, $contents = NULL, $scheme = NULL) {
+  public function createFile($filepath = NULL, $contents = NULL, $scheme = NULL): FileInterface {
     // Don't count hook invocations caused by creating the file.
     \Drupal::state()->set('file_test.count_hook_invocations', FALSE);
     $file = File::create([
@@ -193,7 +193,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    * @return string
    *   File URI.
    */
-  public function createUri($filepath = NULL, $contents = NULL, $scheme = NULL) {
+  public function createUri($filepath = NULL, $contents = NULL, $scheme = NULL): string {
     if (!isset($filepath)) {
       // Prefix with non-latin characters to ensure that all file-related
       // tests work with international filenames.

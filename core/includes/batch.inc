@@ -120,10 +120,13 @@ function _batch_page(Request $request) {
  *   TRUE if the batch information needs to be updated; FALSE otherwise.
  */
 function _batch_needs_update($new_value = NULL) {
-  $needs_update = &drupal_static(__FUNCTION__, FALSE);
+  $cid = __FUNCTION__;
+  $cached = \Drupal::cache('memory')->get($cid);
+  $needs_update = $cached->data ?? NULL;
 
   if (isset($new_value)) {
     $needs_update = $new_value;
+    \Drupal::cache('memory')->set($cid, $needs_update);
   }
 
   return $needs_update;
@@ -462,7 +465,13 @@ function _batch_finished() {
       $operations = $queue->getAllItems();
       $callable_resolver = \Drupal::service(CallableResolver::class);
       $callable = $callable_resolver->getCallableFromDefinition($batch_set['finished']);
-      $batch_set_result = $callable(...array_merge([$batch_set['success'], $batch_set['results'], $operations, \Drupal::service('date.formatter')->formatInterval((int) ($batch_set['elapsed'] / 1000))]));
+      $batch_set_result = $callable(
+        $batch_set['success'],
+        $batch_set['results'],
+        $operations,
+        \Drupal::service('date.formatter')
+          ->formatInterval((int) ($batch_set['elapsed'] / 1000)),
+      );
       // If a batch 'finished' callback requested a redirect after the batch
       // is complete, save that for later use. If more than one batch set
       // returned a redirect, the last one is used.

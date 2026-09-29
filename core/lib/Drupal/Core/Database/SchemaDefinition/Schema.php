@@ -8,26 +8,22 @@ use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Exception\SchemaDefinitionException;
 
 /**
- * Describes a database schema as a collection of Table objects.
- *
- * @implements \Iterator<int,Table>
+ * Describes a database schema as a collection of database objects.
  */
-final class Schema implements SchemaDefinitionInterface, \Iterator {
-
-  /**
-   * The position in the iteration when object is accessed via iterator.
-   */
-  private int $position = 0;
+final class Schema implements SchemaDefinitionInterface {
 
   /**
    * Constructor.
    *
+   * @param SchemaDefinitionType $type
+   *   The type of Drupal feature providing the schema.
    * @param string $name
    *   The schema name.
    * @param list<Table> $tables
    *   A list of Table objects.
    */
   public function __construct(
+    public readonly SchemaDefinitionType $type,
     public readonly string $name,
     public readonly array $tables,
   ) {
@@ -40,11 +36,13 @@ final class Schema implements SchemaDefinitionInterface, \Iterator {
    * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
    */
   private function validate(): void {
-
     if ($this->tables && !Inspector::assertAllObjects($this->tables, Table::class)) {
       throw new SchemaDefinitionException("All members of the 'tables' argument of a Schema must be Table objects");
     }
-
+    $tableNames = $this->tableNames();
+    if (count($tableNames) !== count(array_unique($tableNames))) {
+      throw new SchemaDefinitionException("Duplicate tables for '{$this->name}' schema: " . implode(', ', $tableNames));
+    }
   }
 
   /**
@@ -94,41 +92,6 @@ final class Schema implements SchemaDefinitionInterface, \Iterator {
       $spec[$table->name] = $table->toArray();
     }
     return $spec;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function rewind(): void {
-    $this->position = 0;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function current(): Table {
-    return $this->tables[$this->position];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function key(): int {
-    return $this->position;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function next(): void {
-    ++$this->position;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function valid(): bool {
-    return isset($this->tables[$this->position]);
   }
 
 }

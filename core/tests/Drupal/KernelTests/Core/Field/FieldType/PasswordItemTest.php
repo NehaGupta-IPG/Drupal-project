@@ -60,8 +60,6 @@ class PasswordItemTest extends FieldKernelTestBase {
 
   /**
    * Tests pre save pre hashed.
-   *
-   * @legacy-covers ::preSave
    */
   public function testPreSavePreHashed(): void {
     $entity = EntityTest::create([
@@ -77,8 +75,6 @@ class PasswordItemTest extends FieldKernelTestBase {
 
   /**
    * Tests pre save new null.
-   *
-   * @legacy-covers ::preSave
    */
   public function testPreSaveNewNull(): void {
     $entity = EntityTest::create([
@@ -92,8 +88,6 @@ class PasswordItemTest extends FieldKernelTestBase {
 
   /**
    * Tests pre save new empty string.
-   *
-   * @legacy-covers ::preSave
    */
   public function testPreSaveNewEmptyString(): void {
     $entity = EntityTest::create([
@@ -111,8 +105,6 @@ class PasswordItemTest extends FieldKernelTestBase {
 
   /**
    * Tests pre save new multiple spaces string.
-   *
-   * @legacy-covers ::preSave
    */
   public function testPreSaveNewMultipleSpacesString(): void {
     $entity = EntityTest::create([
@@ -130,8 +122,6 @@ class PasswordItemTest extends FieldKernelTestBase {
 
   /**
    * Tests pre save existing null.
-   *
-   * @legacy-covers ::preSave
    */
   public function testPreSaveExistingNull(): void {
     $entity = EntityTest::create();
@@ -148,8 +138,6 @@ class PasswordItemTest extends FieldKernelTestBase {
 
   /**
    * Tests pre save existing empty string.
-   *
-   * @legacy-covers ::preSave
    */
   public function testPreSaveExistingEmptyString(): void {
     $entity = EntityTest::create();
@@ -166,8 +154,6 @@ class PasswordItemTest extends FieldKernelTestBase {
 
   /**
    * Tests pre save existing multiple spaces string.
-   *
-   * @legacy-covers ::preSave
    */
   public function testPreSaveExistingMultipleSpacesString(): void {
     $entity = EntityTest::create();
@@ -183,21 +169,17 @@ class PasswordItemTest extends FieldKernelTestBase {
 
   /**
    * Tests pre save exception new.
-   *
-   * @legacy-covers ::preSave
    */
   public function testPreSaveExceptionNew(): void {
     $entity = EntityTest::create();
     $entity->test_field = str_repeat('a', PasswordInterface::PASSWORD_MAX_LENGTH + 1);
     $this->expectException(EntityStorageException::class);
-    $this->expectExceptionMessage('Failed to hash the Test entity password.');
+    $this->expectExceptionMessageIs('Failed to hash the Test entity password.');
     $entity->save();
   }
 
   /**
    * Tests pre save exception existing.
-   *
-   * @legacy-covers ::preSave
    */
   public function testPreSaveExceptionExisting(): void {
     $entity = EntityTest::create();
@@ -207,7 +189,7 @@ class PasswordItemTest extends FieldKernelTestBase {
     $this->assertNotEquals('will_be_hashed', $entity->test_field->value);
 
     $this->expectException(EntityStorageException::class);
-    $this->expectExceptionMessage('Failed to hash the Test entity password.');
+    $this->expectExceptionMessageIs('Failed to hash the Test entity password.');
     $entity->test_field = str_repeat('a', PasswordInterface::PASSWORD_MAX_LENGTH + 1);
     $entity->save();
   }

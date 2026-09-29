@@ -24,7 +24,7 @@ class HtmlEscapedTextTest extends TestCase {
    * @legacy-covers ::jsonSerialize
    */
   #[DataProvider('providerToString')]
-  public function testToString($text, $expected, $message): void {
+  public function testToString($text, $expected, string $message): void {
     $escapable_string = new HtmlEscapedText($text);
     $this->assertEquals($expected, (string) $escapable_string, $message);
     $this->assertEquals($expected, $escapable_string->jsonSerialize());
@@ -71,7 +71,7 @@ class HtmlEscapedTextTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::count
+   * Tests count.
    */
   public function testCount(): void {
     $string = 'Can I have a <em>kitten</em>';

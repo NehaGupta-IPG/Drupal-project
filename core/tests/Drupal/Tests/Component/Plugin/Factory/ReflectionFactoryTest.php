@@ -87,10 +87,10 @@ class ReflectionFactoryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::createInstance
+   * Tests create instance.
    */
   #[DataProvider('providerGetInstanceArguments')]
-  public function testCreateInstance($expected, $reflector_name, $plugin_id, $plugin_definition, $configuration): void {
+  public function testCreateInstance(array $expected, string $reflector_name, string $plugin_id, array $plugin_definition, array $configuration): void {
     // Create a mock DiscoveryInterface which can return our plugin definition.
     $mock_discovery = $this->getMockBuilder('Drupal\Component\Plugin\Discovery\DiscoveryInterface')
       ->onlyMethods(['getDefinition', 'getDefinitions', 'hasDefinition'])
@@ -112,13 +112,11 @@ class ReflectionFactoryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getInstanceArguments
+   * Tests get instance arguments.
    */
   #[DataProvider('providerGetInstanceArguments')]
-  public function testGetInstanceArguments($expected, $reflector_name, $plugin_id, $plugin_definition, $configuration): void {
-    $reflection_factory = $this->getMockBuilder('Drupal\Component\Plugin\Factory\ReflectionFactory')
-      ->disableOriginalConstructor()
-      ->getMock();
+  public function testGetInstanceArguments(array $expected, string $reflector_name, string $plugin_id, array $plugin_definition, array $configuration): void {
+    $reflection_factory = $this->createStub(ReflectionFactory::class);
     $get_instance_arguments_ref = new \ReflectionMethod($reflection_factory, 'getInstanceArguments');
 
     // Special case for plugin class without a constructor.
@@ -163,6 +161,7 @@ class StubReflectionFactory extends ReflectionFactory {
  */
 class ArgumentsPluginId {
 
+  // @phpstan-ignore constructor.unusedParameter
   public function __construct($plugin_id) {
     // No-op.
   }
@@ -176,6 +175,7 @@ class ArgumentsPluginId {
  */
 class ArgumentsMany {
 
+  // @phpstan-ignore constructor.unusedParameter,constructor.unusedParameter,constructor.unusedParameter,constructor.unusedParameter,constructor.unusedParameter
   public function __construct($configuration, $plugin_definition, $plugin_id, $foo = 'default_value', $what_am_i_doing_here = 'what_default') {
     // No-op.
   }
@@ -189,6 +189,7 @@ class ArgumentsMany {
  */
 class ArgumentsConfigArrayKey {
 
+  // @phpstan-ignore constructor.unusedParameter
   public function __construct($config_name) {
     // No-op.
   }
@@ -202,6 +203,7 @@ class ArgumentsConfigArrayKey {
  */
 class ArgumentsAllNull {
 
+  // @phpstan-ignore constructor.unusedParameter,constructor.unusedParameter,constructor.unusedParameter,constructor.unusedParameter
   public function __construct($charismatic, $demure, $delightful, $electrostatic) {
     // No-op.
   }

@@ -12,8 +12,8 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\entity_test\EntityTestHelper;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
 use Drupal\Tests\system\Traits\CacheTestTrait;
 use Drupal\user\Entity\Role;
@@ -187,7 +187,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
    * Prefers 'full', picks the first one otherwise, and if none are available,
    * chooses 'default'.
    */
-  protected function selectViewMode($entity_type) {
+  protected function selectViewMode(string $entity_type) {
     $view_modes = \Drupal::entityTypeManager()
       ->getStorage('entity_view_mode')
       ->loadByProperties(['targetEntityType' => $entity_type]);
@@ -612,24 +612,6 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
     $this->verifyPageCache($listing_url, 'HIT', $page_cache_tags);
     $this->verifyPageCache($empty_entity_listing_url, 'HIT', $empty_entity_listing_cache_tags);
     $this->verifyPageCache($nonempty_entity_listing_url, 'HIT', $nonempty_entity_listing_cache_tags);
-  }
-
-  /**
-   * Retrieves the render cache backend as a variation cache.
-   *
-   * This is how Drupal\Core\Render\RenderCache uses the render cache backend.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
-   * Use ::getRenderVariationCache() instead, which is inherited
-   * from CacheTestTrait.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/3085475
-   *
-   * @return \Drupal\Core\Cache\VariationCacheInterface
-   *   The render cache backend as a variation cache.
-   */
-  protected function getRenderCacheBackend() {
-    return $this->getRenderVariationCache();
   }
 
 }

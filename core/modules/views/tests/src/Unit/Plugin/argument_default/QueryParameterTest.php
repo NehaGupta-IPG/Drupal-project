@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit\Plugin\argument_default;
 
+use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\argument_default\QueryParameter;
+use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\views\Plugin\ViewsPluginManager;
+use Drupal\views\ViewEntityInterface;
+use Drupal\views\ViewExecutable;
+use Drupal\views\ViewsData;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,19 +27,18 @@ class QueryParameterTest extends UnitTestCase {
 
   /**
    * Tests the getArgument() method.
-   *
-   * @legacy-covers ::getArgument
    */
   #[DataProvider('providerGetArgument')]
-  public function testGetArgument($options, Request $request, $expected): void {
-    $view = $this->getMockBuilder('Drupal\views\ViewExecutable')
-      ->disableOriginalConstructor()
-      ->onlyMethods([])
-      ->getMock();
+  public function testGetArgument(?array $options, Request $request, $expected): void {
+    $view = new ViewExecutable(
+      $this->createStub(ViewEntityInterface::class),
+      $this->createStub(AccountInterface::class),
+      $this->createStub(ViewsData::class),
+      $this->createStub(RouteProviderInterface::class),
+      $this->createStub(ViewsPluginManager::class),
+    );
     $view->setRequest($request);
-    $display_plugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\DisplayPluginBase')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $display_plugin = $this->createStub(DisplayPluginBase::class);
 
     $raw = new QueryParameter([], 'query_parameter', []);
     $raw->init($view, $display_plugin, $options);
@@ -48,7 +54,7 @@ class QueryParameterTest extends UnitTestCase {
    *   - second entry: the request object to test with.
    *   - third entry: the expected default argument value.
    */
-  public static function providerGetArgument() {
+  public static function providerGetArgument(): array {
     $data = [];
 
     $data[] = [
@@ -91,6 +97,18 @@ class QueryParameterTest extends UnitTestCase {
       ['query_param' => 'test[tier1][tier2]'],
       new Request(['test' => 'foo']),
       NULL,
+    ];
+
+    $data[] = [
+      ['query_param' => 'test[tier1][tier2]', 'fallback' => 'baz'],
+      new Request(['test' => ['tier1' => 'foo']]),
+      'baz',
+    ];
+
+    $data[] = [
+      ['query_param' => 'test[tier1][tier2]', 'fallback' => 'baz'],
+      new Request(['test' => ['test2' => 'foo']]),
+      'baz',
     ];
 
     return $data;

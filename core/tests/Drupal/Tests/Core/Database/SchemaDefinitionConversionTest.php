@@ -7,6 +7,8 @@ namespace Drupal\Tests\Core\Database;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnExpression;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
@@ -15,6 +17,7 @@ use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 use Drupal\Tests\UnitTestCase;
@@ -57,6 +60,19 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
           'not null' => TRUE,
           'default' => 0,
         ],
+        'double_age' => [
+          'description' => "The person's age X 2",
+          'type' => 'int',
+          'generated' => Column::generated(
+            name: 'double_age',
+            type: ColumnType::Int,
+            description: "The person's age X 2",
+            storage: GeneratedColumnStorage::Virtual,
+            expression: new GeneratedColumnExpression('[age] * 2'),
+            dbSpecificExtra: ['pgsql' => ['pgsql_type' => 'bigint']],
+          ),
+          'pgsql_type' => 'bigint',
+        ],
         'job' => [
           'description' => "The person's job",
           'type' => 'varchar',
@@ -97,37 +113,41 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
       name: 'test',
       description: 'Basic test table for the database unit tests.',
       columns: [
-        new Column(
+        Column::serial(
           name: 'id',
-          type: ColumnType::Serial,
         ),
-        new Column(
+        Column::varcharAscii(
           name: 'name',
           description: "A person's name",
-          type: ColumnType::VarcharAscii,
           length: 255,
           notNull: TRUE,
           default: new StringValue(''),
           binary: TRUE,
         ),
-        new Column(
+        Column::int(
           name: 'age',
           description: "The person's age",
-          type: ColumnType::Int,
           size: ColumnSize::Small,
           unsigned: TRUE,
           notNull: TRUE,
           default: new IntValue(0),
         ),
-        new Column(
+        Column::generated(
+          name: 'double_age',
+          type: ColumnType::Int,
+          description: "The person's age X 2",
+          storage: GeneratedColumnStorage::Virtual,
+          expression: new GeneratedColumnExpression('[age] * 2'),
+          dbSpecificExtra: ['pgsql' => ['pgsql_type' => 'bigint']],
+        ),
+        Column::varchar(
           name: 'job',
           description: "The person's job",
-          type: ColumnType::Varchar,
           length: 255,
           notNull: TRUE,
           default: new StringValue('Undefined'),
         ),
-        new Column(
+        Column::create(
           name: 'db_timestamp',
           description: "The database timestamp",
           dbSpecificExtra: [
@@ -219,15 +239,15 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
     ];
 
     $schemaDefinition = new Schema(
+      type: SchemaDefinitionType::Test,
       name: 'test_foo_bar',
       tables: [
         new Table(
           name: 'foo',
           description: 'Foo table for the database unit tests.',
           columns: [
-            new Column(
+            Column::serial(
               name: 'id',
-              type: ColumnType::Serial,
             ),
           ],
           primaryKey: new PrimaryKey(['id']),
@@ -236,9 +256,8 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
           name: 'bar',
           description: 'Bar table for the database unit tests.',
           columns: [
-            new Column(
+            Column::serial(
               name: 'id',
-              type: ColumnType::Serial,
             ),
           ],
           primaryKey: new PrimaryKey(['id']),

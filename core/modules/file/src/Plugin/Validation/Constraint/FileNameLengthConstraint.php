@@ -16,25 +16,14 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class FileNameLengthConstraint extends SymfonyConstraint {
 
-  /**
-   * The maximum file name length.
-   *
-   * @var int
-   */
-  public int $maxLength = 240;
-
-  /**
-   * The message when file name is empty.
-   *
-   * @var string
-   */
-  public string $messageEmpty = "The file's name is empty. Enter a name for the file.";
-
-  /**
-   * The message when file name is too long.
-   *
-   * @var string
-   */
-  public string $messageTooLong = "The file's name exceeds the %maxLength characters limit. Rename the file and try again.";
+  public function __construct(
+    public int $maxLength = 240,
+    public string $messageEmpty = "The file's name is empty. Enter a name for the file.",
+    public string $messageTooLong = "The file's name exceeds the %maxLength characters limit. Rename the file and try again.",
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

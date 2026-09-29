@@ -77,7 +77,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     // If composer.json is removed, we should get an exception because
     // getConfig() should validate that $dir is Composer-ready.
     unlink($dir . '/composer.json');
-    $this->expectExceptionMessage("composer.json not found.");
+    $this->expectExceptionMessageIsOrContains("composer.json not found.");
     $inspector->getConfig('extra', $dir);
   }
 
@@ -110,8 +110,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests get installed packages list.
-   *
-   * @legacy-covers ::getInstalledPackagesList
    */
   public function testGetInstalledPackagesList(): void {
     $project_root = $this->container->get(PathLocator::class)
@@ -160,7 +158,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     // getInstalledPackagesList() should validate that $project_root is
     // Composer-ready.
     unlink($lock_file->getPath());
-    $this->expectExceptionMessage("composer.lock not found in $project_root.");
+    $this->expectExceptionMessageIs("composer.lock not found in $project_root.");
     $inspector->getInstalledPackagesList($project_root);
   }
 
@@ -195,7 +193,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
     // Call validate() again to ensure the precondition is called once.
     $this->expectException(ComposerNotReadyException::class);
-    $this->expectExceptionMessage("Well, that didn't work.");
+    $this->expectExceptionMessageIs("Well, that didn't work.");
     $inspector->validate($project_root);
   }
 
@@ -302,15 +300,13 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
     if (isset($expected_message)) {
       $this->expectException(ComposerNotReadyException::class);
-      $this->expectExceptionMessage($expected_message);
+      $this->expectExceptionMessageIs($expected_message);
     }
     $inspector->validate($project_root);
   }
 
   /**
    * Tests get version.
-   *
-   * @legacy-covers ::getVersion
    */
   #[TestWith(["2.5.6"])]
   #[TestWith([NULL])]
@@ -319,7 +315,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
     if (empty($reported_version)) {
       $this->expectException(\UnexpectedValueException::class);
-      $this->expectExceptionMessage('Unable to determine Composer version');
+      $this->expectExceptionMessageIs('Unable to determine Composer version');
     }
     $this->assertSame($reported_version, $this->container->get(ComposerInspector::class)->getVersion());
   }
@@ -444,7 +440,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     if ($exception_message) {
       $this->expectException(\UnexpectedValueException::class);
       $exception_message = str_replace('<PROJECT_ROOT>', $project_root, $exception_message);
-      $this->expectExceptionMessage($exception_message);
+      $this->expectExceptionMessageIs($exception_message);
     }
     $list = $inspector->getInstalledPackagesList($project_root);
     $this->assertArrayHasKey('test/package', $list);
@@ -506,9 +502,10 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
         [
           'example/plugin-a' => TRUE,
           'example/plugin-b' => FALSE,
-          // The scaffold plugin is explicitly disallowed by the fake_site
-          // fixture.
+          // The scaffold and runtime plugins are explicitly disallowed by the
+          // fake_site fixture.
           'drupal/core-composer-scaffold' => FALSE,
+          'symfony/runtime' => FALSE,
         ],
       ],
     ];

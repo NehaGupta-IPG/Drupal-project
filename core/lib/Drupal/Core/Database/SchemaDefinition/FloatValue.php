@@ -9,7 +9,13 @@ namespace Drupal\Core\Database\SchemaDefinition;
  */
 class FloatValue {
 
+  /**
+   * Human readable name.
+   */
+  public readonly string $name;
+
   public function __construct(public readonly float $value) {
+    $this->name = 'float';
   }
 
 }

@@ -18,7 +18,6 @@ use Drupal\ddd_hook_order_test\Hook\DHooks;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -36,7 +35,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(RemoveHook::class)]
 #[CoversClass(ReorderHook::class)]
 #[Group('Hook')]
-#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class HookOrderTest extends KernelTestBase {
 
@@ -196,17 +194,9 @@ class HookOrderTest extends KernelTestBase {
     );
 
     // Uninstall the B module, which contains the reorder targets.
-    $this->expectException(\TypeError::class);
-    $old_request = \Drupal::request();
-    try {
-      $this->disableModules(['bbb_hook_order_test']);
-    }
-    finally {
-      // Restore a request and session, to avoid error during tearDown().
-      /** @var \Symfony\Component\HttpFoundation\RequestStack $request_stack */
-      $request_stack = $this->container->get('request_stack');
-      $request_stack->push($old_request);
-    }
+    // This originally caused a TypeError, if this test completes successfully,
+    // then there is no TypeError.
+    $this->disableModules(['bbb_hook_order_test']);
   }
 
   /**

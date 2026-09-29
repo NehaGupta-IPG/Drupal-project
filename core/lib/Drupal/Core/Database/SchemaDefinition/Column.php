@@ -59,6 +59,10 @@ final class Column implements SchemaDefinitionInterface {
    *   has no effect on other database types for which case sensitivity is
    *   already the default behavior. If NULL, it is not specified. Defaults to
    *   NULL.
+   * @param ?GeneratedColumnStorage $generatedStorage
+   *   The storage strategy for a generated column (VIRTUAL or STORED).
+   * @param ?GeneratedColumnExpression $generatedExpression
+   *   The expression for a generated column.
    * @param array<string,array<string,mixed>>|null $dbSpecificExtra
    *   (Optional) If you need to use a column type not included in the
    *   officially supported list of types above, you can specify a type for
@@ -69,8 +73,10 @@ final class Column implements SchemaDefinitionInterface {
    *
    * @see \Drupal\Core\Database\SchemaDefinition\ColumnType
    * @see \Drupal\Core\Database\SchemaDefinition\ColumnSize
+   * @see \Drupal\Core\Database\SchemaDefinition\GeneratedColumnExpression
+   * @see \Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage
    */
-  public function __construct(
+  private function __construct(
     public readonly string $name,
     public readonly ?ColumnType $type = NULL,
     public readonly ?string $description = NULL,
@@ -83,9 +89,47 @@ final class Column implements SchemaDefinitionInterface {
     public readonly ?int $precision = NULL,
     public readonly ?int $scale = NULL,
     public readonly ?bool $binary = NULL,
+    public readonly ?GeneratedColumnStorage $generatedStorage = NULL,
+    public readonly ?GeneratedColumnExpression $generatedExpression = NULL,
     public readonly ?array $dbSpecificExtra = NULL,
   ) {
-    $this->validate();
+  }
+
+  /**
+   * Returns new a Column object.
+   */
+  public static function create(
+    string $name,
+    ?ColumnType $type = NULL,
+    ?string $description = NULL,
+    ?bool $serialize = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    StringValue|IntValue|FloatValue|NullValue|null $default = NULL,
+    ?int $length = NULL,
+    ?bool $unsigned = NULL,
+    ?int $precision = NULL,
+    ?int $scale = NULL,
+    ?bool $binary = NULL,
+    ?array $dbSpecificExtra = NULL,
+  ): self {
+    $instance = new self(
+      name: $name,
+      type: $type,
+      description: $description,
+      serialize: $serialize,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      length: $length,
+      unsigned: $unsigned,
+      precision: $precision,
+      scale: $scale,
+      binary: $binary,
+      dbSpecificExtra: $dbSpecificExtra,
+    );
+    $instance->validate();
+    return $instance;
   }
 
   /**
@@ -97,12 +141,18 @@ final class Column implements SchemaDefinitionInterface {
 
     // If no column type specified, a db specific one should be set.
     if ($this->type === NULL && $this->dbSpecificExtra === NULL) {
-      throw new SchemaDefinitionException("Neither 'type' not 'dbSpecificExtra' for column '{$this->name}'");
+      throw new SchemaDefinitionException("Neither 'type' nor 'dbSpecificExtra' for column '{$this->name}'");
     }
 
     // Cannot set notNull for serial columns.
     if ($this->notNull !== NULL && $this->type === ColumnType::Serial) {
       throw new SchemaDefinitionException("Cannot set 'notNull' for {$this->type->value} column '{$this->name}'");
+    }
+
+    // A serial column takes its value from a sequence, so it cannot also be
+    // computed from an expression.
+    if ($this->generatedExpression !== NULL && $this->type === ColumnType::Serial) {
+      throw new SchemaDefinitionException("Cannot set 'generatedExpression' for {$this->type->value} column '{$this->name}'");
     }
 
     // Can only set unsigned for some column types.
@@ -122,6 +172,14 @@ final class Column implements SchemaDefinitionInterface {
       ColumnType::Text,
     ], TRUE)) {
       throw new SchemaDefinitionException("Cannot set 'length' for {$this->type->value} column '{$this->name}'");
+    }
+
+    // Length is mandatory for varchar column types.
+    if ($this->length === NULL && $this->type !== NULL && in_array($this->type, [
+      ColumnType::Varchar,
+      ColumnType::VarcharAscii,
+    ], TRUE)) {
+      throw new SchemaDefinitionException("Missing 'length' for {$this->type->value} column '{$this->name}'");
     }
 
     // Can only set binary for some column types.
@@ -153,48 +211,15 @@ final class Column implements SchemaDefinitionInterface {
     }
 
     // Check validity of default type.
-    if ($this->type !== NULL && $this->default !== NULL) {
-      $typeClass = get_class($this->default);
-      $allowedTypes = $this->allowedDefaultTypes();
-      if (!in_array($typeClass, $allowedTypes)) {
-        throw new SchemaDefinitionException("Cannot set a $typeClass default for column '{$this->name}'");
-      }
+    if ($this->type !== NULL && $this->default !== NULL && !$this->type->isValidDefaultValue($this->default)) {
+      throw new SchemaDefinitionException("Cannot set a {$this->default->name} default for column '{$this->name}'");
     }
 
     // Cannot set a null value if notNull is true.
-    if ($this->notNull && $this->default && get_class($this->default) === NullValue::class) {
+    if ($this->notNull && $this->default && $this->default->value === NULL) {
       throw new SchemaDefinitionException("Cannot set a null default for column '{$this->name}': notNull is true");
     }
 
-  }
-
-  /**
-   * Returns the valid default value types for the column.
-   *
-   * @return list<class-string>
-   *   The valid value classes.
-   *
-   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
-   */
-  private function allowedDefaultTypes(): array {
-    if ($this->type === NULL) {
-      throw new SchemaDefinitionException("Cannot determine allowed default types for column '{$this->name}'");
-    }
-    return match ($this->type) {
-      ColumnType::Char, ColumnType::Varchar, ColumnType::VarcharAscii, ColumnType::Text, ColumnType::Blob => [
-        StringValue::class,
-        NullValue::class,
-      ],
-      ColumnType::Int => [
-        IntValue::class,
-        NullValue::class,
-      ],
-      ColumnType::Serial => [],
-      ColumnType::Float, ColumnType::Numeric => [
-        FloatValue::class,
-        NullValue::class,
-      ],
-    };
   }
 
   /**
@@ -211,6 +236,9 @@ final class Column implements SchemaDefinitionInterface {
     }
     if ($this->description !== NULL) {
       $spec['description'] = $this->description;
+    }
+    if ($this->generatedStorage) {
+      $spec['generated'] = $this;
     }
     if ($this->serialize !== NULL) {
       $spec['serialize'] = $this->serialize;
@@ -247,6 +275,252 @@ final class Column implements SchemaDefinitionInterface {
       }
     }
     return $spec;
+  }
+
+  /**
+   * Returns a Column object for a char column.
+   */
+  public static function char(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    StringValue|NullValue|null $default = NULL,
+    ?int $length = NULL,
+    ?bool $binary = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Char,
+      name: $name,
+      description: $description,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      length: $length,
+      binary: $binary,
+    );
+  }
+
+  /**
+   * Returns a Column object for a varchar column.
+   */
+  public static function varchar(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    StringValue|NullValue|null $default = NULL,
+    ?int $length = NULL,
+    ?bool $binary = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Varchar,
+      name: $name,
+      description: $description,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      length: $length,
+      binary: $binary,
+    );
+  }
+
+  /**
+   * Returns a Column object for a varcharAscii column.
+   */
+  public static function varcharAscii(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    StringValue|NullValue|null $default = NULL,
+    ?int $length = NULL,
+    ?bool $binary = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::VarcharAscii,
+      name: $name,
+      description: $description,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      length: $length,
+      binary: $binary,
+    );
+  }
+
+  /**
+   * Returns a Column object for a text column.
+   */
+  public static function text(
+    string $name,
+    ?string $description = NULL,
+    ?bool $serialize = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    StringValue|NullValue|null $default = NULL,
+    ?int $length = NULL,
+    ?bool $binary = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Text,
+      name: $name,
+      description: $description,
+      serialize: $serialize,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      length: $length,
+      binary: $binary,
+    );
+  }
+
+  /**
+   * Returns a Column object for an int column.
+   */
+  public static function int(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    IntValue|NullValue|null $default = NULL,
+    ?bool $unsigned = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Int,
+      name: $name,
+      description: $description,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      unsigned: $unsigned,
+    );
+  }
+
+  /**
+   * Returns a Column object for a serial column.
+   */
+  public static function serial(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Serial,
+      name: $name,
+      description: $description,
+      size: $size,
+    );
+  }
+
+  /**
+   * Returns a Column object for an float column.
+   */
+  public static function float(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    FloatValue|NullValue|null $default = NULL,
+    ?bool $unsigned = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Float,
+      name: $name,
+      description: $description,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      unsigned: $unsigned,
+    );
+  }
+
+  /**
+   * Returns a Column object for an numeric column.
+   */
+  public static function numeric(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    FloatValue|NullValue|null $default = NULL,
+    ?bool $unsigned = NULL,
+    ?int $precision = NULL,
+    ?int $scale = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Numeric,
+      name: $name,
+      description: $description,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      unsigned: $unsigned,
+      precision: $precision,
+      scale: $scale,
+    );
+  }
+
+  /**
+   * Returns a Column object for a blob column.
+   */
+  public static function blob(
+    string $name,
+    ?string $description = NULL,
+    ?bool $serialize = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    StringValue|NullValue|null $default = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Blob,
+      name: $name,
+      description: $description,
+      serialize: $serialize,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+    );
+  }
+
+  /**
+   * Returns a Column object for a generated column.
+   *
+   * @see https://dev.mysql.com/doc/refman/9.7/en/create-table-generated-columns.html
+   * @see https://mariadb.com/docs/server/reference/sql-statements/data-definition/create/generated-columns
+   * @see https://www.postgresql.org/docs/current/ddl-generated-columns.html
+   * @see https://sqlite.org/gencol.html
+   */
+  public static function generated(
+    string $name,
+    ColumnType $type,
+    GeneratedColumnExpression $expression,
+    GeneratedColumnStorage $storage,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?int $length = NULL,
+    ?bool $unsigned = NULL,
+    ?int $precision = NULL,
+    ?int $scale = NULL,
+    ?bool $binary = NULL,
+    ?array $dbSpecificExtra = NULL,
+  ): self {
+    $column = new self(
+      type: $type,
+      name: $name,
+      description: $description,
+      size: $size,
+      length: $length,
+      unsigned: $unsigned,
+      precision: $precision,
+      scale: $scale,
+      binary: $binary,
+      generatedStorage: $storage,
+      generatedExpression: $expression,
+      dbSpecificExtra: $dbSpecificExtra,
+    );
+    $column->validate();
+    return $column;
   }
 
 }

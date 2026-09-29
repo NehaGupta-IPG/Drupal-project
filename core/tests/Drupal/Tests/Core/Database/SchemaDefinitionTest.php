@@ -8,10 +8,13 @@ use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\FloatValue;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnExpression;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
@@ -34,15 +37,15 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testSchemaMethods(): void {
     $schemaDefinition = new Schema(
+      type: SchemaDefinitionType::Test,
       name: 'test_foo_bar',
       tables: [
         new Table(
           name: 'foo',
           description: 'Foo table for the database unit tests.',
           columns: [
-            new Column(
+            Column::serial(
               name: 'id',
-              type: ColumnType::Serial,
             ),
           ],
           primaryKey: new PrimaryKey(['id']),
@@ -51,9 +54,8 @@ class SchemaDefinitionTest extends UnitTestCase {
           name: 'bar',
           description: 'Bar table for the database unit tests.',
           columns: [
-            new Column(
+            Column::serial(
               name: 'id',
-              type: ColumnType::Serial,
             ),
           ],
           primaryKey: new PrimaryKey(['id']),
@@ -69,12 +71,6 @@ class SchemaDefinitionTest extends UnitTestCase {
     $this->assertInstanceOf(Table::class, $tableDefinition);
     $this->assertSame('foo', $tableDefinition->name);
     $this->assertSame('Foo table for the database unit tests.', $tableDefinition->description);
-
-    // Check iterability of the Schema object.
-    $expected = ['foo', 'bar'];
-    foreach ($schemaDefinition as $tableDefinition) {
-      $this->assertSame(array_shift($expected), $tableDefinition->name);
-    }
   }
 
   /**
@@ -84,7 +80,9 @@ class SchemaDefinitionTest extends UnitTestCase {
     $this->expectException(SchemaDefinitionException::class);
     $this->expectExceptionMessage('All members of the \'tables\' argument of a Schema must be Table objects');
     $table = new Schema(
+      type: SchemaDefinitionType::Test,
       name: 'test',
+      // @phpstan-ignore argument.type
       tables: [
         'foo' => [
           'description' => 'Foo table for the database unit tests.',
@@ -103,6 +101,41 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
+   * Tests passing duplicate Table to Schema::$tables.
+   */
+  public function testDuplicateTableInSchema(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessageIs('Duplicate tables for \'test_foo_bar\' schema: foo, foo');
+    $schemaDefinition = new Schema(
+      type: SchemaDefinitionType::Test,
+      name: 'test_foo_bar',
+      tables: [
+        new Table(
+          name: 'foo',
+          description: 'Foo table for the database unit tests.',
+          columns: [
+            Column::serial(
+              name: 'id',
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+        new Table(
+          name: 'foo',
+          description: 'Foo table for the database unit tests.',
+          columns: [
+            Column::serial(
+              name: 'id',
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+      ],
+    );
+    $this->assertInstanceOf(Schema::class, $schemaDefinition);
+  }
+
+  /**
    * Tests passing a non Column array member to Table::$columns.
    */
   public function testInvalidColumnInTable(): void {
@@ -110,6 +143,7 @@ class SchemaDefinitionTest extends UnitTestCase {
     $this->expectExceptionMessage('All members of the \'columns\' argument of the \'test\' Table must be Column objects');
     $table = new Table(
       name: 'test',
+      // @phpstan-ignore argument.type
       columns: [
         'name' => [
           'description' => "A person's name",
@@ -126,6 +160,27 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
+   * Tests passing duplicate Column to Table::$columns.
+   */
+  public function testDuplicateColumnInTable(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Duplicate columns for \'test\' table: id, id');
+    $table = new Table(
+      name: 'test',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'id',
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
+    $this->assertInstanceOf(Table::class, $table);
+  }
+
+  /**
    * Tests passing a non Column array member to Table::$columns.
    */
   public function testInvalidForeignKeyForMismatchingColumnCount(): void {
@@ -135,14 +190,12 @@ class SchemaDefinitionTest extends UnitTestCase {
       name: 'test',
       description: 'Basic test table for the database unit tests.',
       columns: [
-        new Column(
+        Column::serial(
           name: 'id',
-          type: ColumnType::Serial,
         ),
-        new Column(
+        Column::varcharAscii(
           name: 'name',
           description: "A person's name",
-          type: ColumnType::VarcharAscii,
           length: 255,
           notNull: TRUE,
           default: new StringValue(''),
@@ -167,18 +220,17 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidSerialForDefault(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set a Drupal\Core\Database\SchemaDefinition\IntValue default for column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set a int default for column \'id\'');
     new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Serial,
           default: new IntValue(1),
         ),
-        new Column(
+        Column::varcharAscii(
           name: 'foo',
-          type: ColumnType::VarcharAscii,
         ),
       ],
       primaryKey: new PrimaryKey(['id']),
@@ -194,7 +246,7 @@ class SchemaDefinitionTest extends UnitTestCase {
     new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Serial,
           notNull: TRUE,
@@ -213,7 +265,7 @@ class SchemaDefinitionTest extends UnitTestCase {
     new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Serial,
           unsigned: TRUE,
@@ -224,17 +276,60 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
+   * Tests Serial column.
+   */
+  public function testInvalidSerialForGeneratedExpression(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Cannot set \'generatedExpression\' for serial column \'id\'');
+    new Table(
+      name: 'test',
+      columns: [
+        Column::generated(
+          name: 'id',
+          type: ColumnType::Serial,
+          expression: new GeneratedColumnExpression('1 + 1'),
+          storage: GeneratedColumnStorage::Virtual,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
+  }
+
+  /**
+   * Tests that a generated column cannot be part of the primary key.
+   */
+  public function testInvalidPrimaryKeyForGeneratedColumn(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage("The primary key of the 'test' Table cannot include generated columns");
+    new Table(
+      name: 'test',
+      columns: [
+        Column::create(
+          name: 'age',
+          type: ColumnType::Int,
+        ),
+        Column::generated(
+          name: 'double_age',
+          type: ColumnType::Int,
+          expression: new GeneratedColumnExpression('[age] * 2'),
+          storage: GeneratedColumnStorage::Stored,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['double_age']),
+    );
+  }
+
+  /**
    * Tests passing a null default when notNull: TRUE is specified.
    */
   public function testNullDefaultForNotNullArgument(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set a null default for column \'id\': notNull is true');
+    $this->expectExceptionMessageIs('Cannot set a null default for column \'id\': notNull is true');
     new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::int(
           name: 'id',
-          type: ColumnType::Int,
           notNull: TRUE,
           default: new NullValue(),
         ),
@@ -248,11 +343,11 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testFloatDefaultForIntColumn(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set a Drupal\Core\Database\SchemaDefinition\FloatValue default for column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set a float default for column \'id\'');
     new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Int,
           default: new FloatValue(10),
@@ -269,9 +364,8 @@ class SchemaDefinitionTest extends UnitTestCase {
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::int(
           name: 'id',
-          type: ColumnType::Int,
           default: new IntValue(10),
         ),
       ],
@@ -287,9 +381,8 @@ class SchemaDefinitionTest extends UnitTestCase {
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::int(
           name: 'id',
-          type: ColumnType::Int,
           default: new NullValue(),
         ),
       ],
@@ -303,11 +396,11 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testStringDefaultForIntColumn(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set a Drupal\Core\Database\SchemaDefinition\StringValue default for column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set a string default for column \'id\'');
     new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Int,
           default: new StringValue('foo'),
@@ -322,11 +415,11 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testFloatDefaultForTextColumn(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set a Drupal\Core\Database\SchemaDefinition\FloatValue default for column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set a float default for column \'id\'');
     new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Text,
           default: new FloatValue(10),
@@ -341,11 +434,11 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testIntDefaultForTextColumn(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set a Drupal\Core\Database\SchemaDefinition\IntValue default for column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set a int default for column \'id\'');
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Text,
           default: new IntValue(10),
@@ -363,9 +456,8 @@ class SchemaDefinitionTest extends UnitTestCase {
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::text(
           name: 'id',
-          type: ColumnType::Text,
           default: new NullValue(),
         ),
       ],
@@ -381,9 +473,8 @@ class SchemaDefinitionTest extends UnitTestCase {
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::text(
           name: 'id',
-          type: ColumnType::Text,
           default: new StringValue('foo'),
         ),
       ],
@@ -401,7 +492,7 @@ class SchemaDefinitionTest extends UnitTestCase {
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Text,
           unsigned: TRUE,
@@ -421,7 +512,7 @@ class SchemaDefinitionTest extends UnitTestCase {
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Int,
           length: 20,
@@ -441,7 +532,7 @@ class SchemaDefinitionTest extends UnitTestCase {
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Int,
           binary: TRUE,
@@ -461,7 +552,7 @@ class SchemaDefinitionTest extends UnitTestCase {
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Text,
           scale: 4,
@@ -481,7 +572,7 @@ class SchemaDefinitionTest extends UnitTestCase {
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Text,
           precision: 2,
@@ -493,7 +584,7 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * Tests passing a serialize to a non-text/blog column.
+   * Tests passing a serialize to a non-text/blob column.
    */
   public function testInvalidColumnTypeForSerialize(): void {
     $this->expectException(SchemaDefinitionException::class);
@@ -501,7 +592,7 @@ class SchemaDefinitionTest extends UnitTestCase {
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::create(
           name: 'id',
           type: ColumnType::Int,
           serialize: TRUE,
@@ -521,13 +612,13 @@ class SchemaDefinitionTest extends UnitTestCase {
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::text(
           name: 'id',
-          type: ColumnType::Text,
           length: 40,
           default: new StringValue('foo'),
         ),
       ],
+      // @phpstan-ignore argument.type
       primaryKey: new PrimaryKey([['id', 10]]),
     );
     $this->assertInstanceOf(Table::class, $table);
@@ -542,9 +633,8 @@ class SchemaDefinitionTest extends UnitTestCase {
     $table = new Table(
       name: 'test',
       columns: [
-        new Column(
+        Column::text(
           name: 'id',
-          type: ColumnType::Text,
           length: 40,
           default: new StringValue('foo'),
         ),
@@ -553,11 +643,30 @@ class SchemaDefinitionTest extends UnitTestCase {
       uniqueKeys: [
         new UniqueKey(
           name: 'invalid',
+          // @phpstan-ignore argument.type
           columns: [['id', 10]],
         ),
       ],
     );
     $this->assertInstanceOf(Table::class, $table);
+  }
+
+  /**
+   * Tests passing varchar columns without length.
+   */
+  public function testMissingVarcharColumnLength(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessageIs('Missing \'length\' for varchar column \'id\'');
+    new Table(
+      name: 'test',
+      columns: [
+        Column::varchar(
+          name: 'id',
+          default: new StringValue('foo'),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
   }
 
 }

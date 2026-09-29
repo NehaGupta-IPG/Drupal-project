@@ -3,10 +3,10 @@
 namespace Drupal\contextual;
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Site\Settings;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -16,30 +16,12 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class ContextualController implements ContainerInjectionInterface {
 
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
+  use AutowireTrait;
 
-  /**
-   * Constructors a new ContextualController.
-   *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   */
-  public function __construct(RendererInterface $renderer) {
-    $this->renderer = $renderer;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('renderer')
-    );
+  public function __construct(
+    protected RendererInterface $renderer,
+    protected ContextualLinksSerializer $serializer,
+  ) {
   }
 
   /**
@@ -79,7 +61,7 @@ class ContextualController implements ContainerInjectionInterface {
       }
       $element = [
         '#type' => 'contextual_links',
-        '#contextual_links' => _contextual_id_to_links($id),
+        '#contextual_links' => $this->serializer->idToLinks($id),
       ];
       $rendered[$id] = $this->renderer->renderRoot($element);
     }

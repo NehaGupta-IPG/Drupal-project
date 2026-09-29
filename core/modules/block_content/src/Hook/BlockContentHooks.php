@@ -2,13 +2,9 @@
 
 namespace Drupal\block_content\Hook;
 
-use Drupal\block\BlockConfigUpdater;
 use Drupal\block\BlockInterface;
-use Drupal\block_content\Plugin\EntityReferenceSelection\BlockContentSelection;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\block_content\BlockContentInterface;
-use Drupal\Core\Database\Query\SelectInterface;
-use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -57,21 +53,6 @@ class BlockContentHooks {
   }
 
   /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme($existing, $type, $theme, $path) : array {
-    return [
-      'block_content_add_list' => [
-        'variables' => [
-          'content' => NULL,
-        ],
-        'deprecated' => 'The "block_content_add_list" template is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use "entity_add_list" instead. See https://www.drupal.org/node/3530643.',
-      ],
-    ];
-  }
-
-  /**
    * Implements hook_entity_type_alter().
    */
   #[Hook('entity_type_alter')]
@@ -89,40 +70,6 @@ class BlockContentHooks {
     unset($constraints['EntityChanged']);
     $constraints['BlockContentEntityChanged'] = NULL;
     $entity_types['block_content']->setConstraints($constraints);
-  }
-
-  /**
-   * Implements hook_query_TAG_alter().
-   *
-   * Alters any 'entity_reference' query where the entity type is
-   * 'block_content' and the query has the tag 'block_content_access'.
-   *
-   * These queries should only return reusable blocks unless a condition on
-   * 'reusable' is explicitly set.
-   *
-   * Block_content entities that are not reusable should by default not be
-   * selectable as entity reference values. A module can still create an
-   * instance of \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface
-   * that will allow selection of non-reusable blocks by explicitly setting a
-   * condition on the 'reusable' field.
-   *
-   * @see \Drupal\block_content\BlockContentAccessControlHandler
-   */
-  #[Hook('query_entity_reference_alter')]
-  public function queryEntityReferenceAlter(AlterableInterface $query): void {
-    if (($query->alterMetaData['entity_reference_selection_handler'] ?? NULL) instanceof BlockContentSelection) {
-      // The entity reference selection plugin module provided by this module
-      // already filters out non-reusable blocks so no altering of the query is
-      // needed.
-      return;
-    }
-    if ($query instanceof SelectInterface && $query->getMetaData('entity_type') === 'block_content' && $query->hasTag('block_content_access')) {
-      $data_table = \Drupal::entityTypeManager()->getDefinition('block_content')->getDataTable();
-      if (array_key_exists($data_table, $query->getTables()) && !_block_content_has_reusable_condition($query->conditions(), $query->getTables())) {
-        @trigger_error('Automatically filtering block_content entity reference selection queries to only reusable blocks is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Either add the condition manually in buildEntityQuery, or extend \Drupal\block_content\Plugin\EntityReferenceSelection\BlockContentSelection. See https://www.drupal.org/node/3521459', E_USER_DEPRECATED);
-        $query->condition("{$data_table}.reusable", TRUE);
-      }
-    }
   }
 
   /**
@@ -170,17 +117,6 @@ class BlockContentHooks {
       }
     }
     return $operations;
-  }
-
-  /**
-   * Implements hook_ENTITY_TYPE_presave().
-   */
-  #[Hook('block_presave')]
-  public function blockPreSave(BlockInterface $block): void {
-    // Use an inline service since DI would require enabling the block module
-    // in any Kernel test that installs block_content. This is BC code so will
-    // be removed in Drupal 12 anyway.
-    \Drupal::service(BlockConfigUpdater::class)->updateBlock($block);
   }
 
 }
