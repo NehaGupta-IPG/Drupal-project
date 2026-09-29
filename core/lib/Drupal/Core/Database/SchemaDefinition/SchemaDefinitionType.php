@@ -25,6 +25,9 @@ enum SchemaDefinitionType: string {
   // Schemas provided by migration.
   case Migrate = 'migrate';
 
+  // Schemas provided by database dump scripts.
+  case Dump = 'dump';
+
   // Schemas provided by test classes for test purposes.
   case Test = 'test';
 

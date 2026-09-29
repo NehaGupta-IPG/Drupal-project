@@ -13,6 +13,7 @@ use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
@@ -116,6 +117,7 @@ class DbDumpCommand extends DbCommandBase {
 
     // Create the schema with all the tables dumped.
     $schema = new Schema(
+      type: SchemaDefinitionType::Dump,
       name: 'db-dump',
       tables: $table_definitions,
     );
@@ -269,7 +271,7 @@ class DbDumpCommand extends DbCommandBase {
         $column_args['binary'] = TRUE;
       }
 
-      $column = new Column(
+      $column = Column::create(
         name: $column_args['name'],
         type: $column_args['type'] ?? NULL,
         description: $column_args['description'] ?? NULL,
