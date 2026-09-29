@@ -93,7 +93,7 @@ class PhpStorageFactory {
   /**
    * Gets the temporary directory.
    *
-   * @see \Drupal\Core\File\FileSystem::getTempDirectory())
+   * @see \Drupal\Core\File\FileSystem::getTempDirectory()
    *
    * @return string|null
    *   The temporary directory, or NULL if it cannot be determined.

@@ -24,7 +24,7 @@ interface ContainerStorageInterface {
    *
    * @param string $identifier
    *   A hash identifying the container version, computed by the kernel
-   *   from the environment, service providers, module filenames, etc.
+   *   from the environment, service providers, deployment identifier, etc.
    *
    * @return \Symfony\Component\DependencyInjection\ContainerInterface|null
    *   The loaded container, or NULL if no valid cached container exists.

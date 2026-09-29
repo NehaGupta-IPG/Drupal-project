@@ -359,7 +359,7 @@ class SystemRequirementsHooks {
           'value' => $this->t('Not written to disk'),
           'severity' => RequirementSeverity::Error,
           'description' => $this->t(
-            'The service container PHP file is not written to disk. Check file permissions and php_storage configuration.',
+            'The service container PHP file is not written to disk. Check file permissions and php_storage configuration. See the <a href=":drupal-php">system requirements</a> page for more information.',
             [':drupal-php' => 'https://www.drupal.org/docs/system-requirements/php-requirements']
           ),
         ];

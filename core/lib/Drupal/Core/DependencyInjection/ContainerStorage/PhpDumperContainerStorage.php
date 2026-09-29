@@ -104,7 +104,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
       }
     }
 
-    // Publish the hash only after the file is written, so the cache never
+    // Record the hash only after the file is written, so the cache never
     // points to a container that failed to save.
     $this->cache->set(static::CACHE_PREFIX . $identifier, $hash);
 
