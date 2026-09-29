@@ -92,20 +92,14 @@ class Statement extends StatementBase {
           $this->clientStatement = $this->clientConnection->prepare($convertedQueryString);
         }
         else {
-          $args = array_map(
-            fn (?string $arg): string => $arg === NULL ? 'NULL' : "'" . $this->clientConnection->real_escape_string($arg) . "'",
-            $args,
+          $executableQueryString = preg_replace_callback(
+            '/(?<!\?)\?(?!\?)/',
+            function () use (&$args): string {
+              $arg = array_shift($args);
+              return $arg === NULL ? 'NULL' : "'" . $this->clientConnection->real_escape_string($arg) . "'";
+            },
+            $convertedQueryString,
           );
-          preg_match_all('/(?<!\?)\?(?!\?)/', $convertedQueryString, $matches, \PREG_OFFSET_CAPTURE);
-          $executableQueryString = '';
-          $iStart = 0;
-          $iArg = 0;
-          foreach ($matches[0] as $match) {
-            $iLength = $match[1] - $iStart;
-            $executableQueryString .= substr($convertedQueryString, $iStart, $iLength) . $args[$iArg++];
-            $iStart = $iStart + $iLength + 1;
-          }
-          $executableQueryString .= substr($convertedQueryString, $iStart);
         }
       }
       else {
