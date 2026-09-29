@@ -697,14 +697,7 @@ class Select extends Query implements SelectInterface {
    */
   public function jsonOrderBy(string $field, string $jsonpath, string $direction = 'ASC', JsonCastType $cast = JsonCastType::Text): static {
     $expression = $this->connection->jsonExpression($field, $jsonpath);
-    $sql = $expression->toCastSql($cast);
-
-    // Sort NULL values last regardless of direction. The IS NULL expression is
-    // 0 for a value and 1 for NULL, so ordering it ASC puts NULLs after values.
-    $nullAlias = $this->addExpression("({$sql} IS NULL)");
-    $this->orderBy($nullAlias, 'ASC');
-
-    $alias = $this->addExpression($sql);
+    $alias = $this->addExpression($expression->toCastSql($cast));
     $this->orderBy($alias, $direction);
     return $this;
   }

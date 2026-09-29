@@ -278,8 +278,8 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    *   havingCondition(), and to read the value from a result row.
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
-   *   If the jsonpath is invalid, or contains a wildcard. A wildcard matches
-   *   any number of values, and a SELECT expression holds one.
+   *   If the jsonpath is invalid or contains a wildcard, since an expression
+   *   can only return a single value.
    *
    * @see \Drupal\Core\Database\Query\SelectInterface::addExpression()
    * @see \Drupal\Core\Database\Query\SelectInterface::jsonOrderBy()
@@ -441,7 +441,8 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    * Orders the result set by a value extracted from a JSON column.
    *
    * This adds the JSON extraction as an expression in the SELECT list and
-   * orders by its alias. NULLs are sorted last regardless of direction.
+   * orders by its alias. NULLs are sorted the same way as in orderBy(): first
+   * in ascending order, last in descending order.
    *
    * The extracted value is always cast, so that the sort order is the same on
    * all database backends. Without the cast the value sorts by MySQL's JSON
@@ -462,8 +463,8 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    *   The called object.
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
-   *   If the jsonpath is invalid, or contains a wildcard. A wildcard matches
-   *   any number of values, and a sort key is one value.
+   *   If the jsonpath is invalid or contains a wildcard, since a sort key
+   *   must be a single value.
    *
    * @see \Drupal\Core\Database\Query\SelectInterface::addJsonExpression()
    * @see https://dev.mysql.com/doc/refman/8.4/en/json.html#json-comparison

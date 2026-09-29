@@ -102,10 +102,9 @@ abstract class Insert extends Query implements \Countable {
    * The extracted value is always cast to give it a consistent type across
    * database backends.
    *
-   * The extraction is appended to the select list of the SELECT query, aliased
-   * to the target column name. When fields() is also called on this query, the
-   * columns are matched by position, not by name, so list the target column
-   * in the same position the extraction has in the select list.
+   * The extracted value is added to the SELECT query as an expression, which
+   * comes after its regular fields. When calling fields() on this query, list
+   * the target column in that position.
    *
    * @param string $field
    *   The column to insert the extracted value into.
@@ -123,9 +122,8 @@ abstract class Insert extends Query implements \Countable {
    * @throws \Drupal\Core\Database\InvalidQueryException
    *   If no source SELECT query has been set with from(), if the SELECT
    *   query already has a field or an expression named after the target
-   *   column, or if the jsonpath is invalid or contains a wildcard. A
-   *   wildcard matches any number of values, and an inserted column takes
-   *   one.
+   *   column, or if the jsonpath is invalid or contains a wildcard, since a
+   *   column can only be set to a single value.
    *
    * @see \Drupal\Core\Database\Query\Insert::from()
    * @see \Drupal\Core\Database\Query\SelectInterface::addJsonExpression()

@@ -358,7 +358,7 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * Tests passing a string default to a json column.
+   * Tests passing a string default to a JSON column.
    */
   public function testStringDefaultForJsonColumn(): void {
     $this->expectException(SchemaDefinitionException::class);

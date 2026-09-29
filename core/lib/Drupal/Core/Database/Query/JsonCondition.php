@@ -42,10 +42,10 @@ class JsonCondition extends Condition {
   /**
    * The operators that accept a path with a wildcard segment.
    *
-   * These are the operators that test one extracted value, so the same test
-   * can be applied to every value a wildcard matches. IS NULL, IS NOT NULL,
-   * HAS KEY and JSON_CONTAINS read the JSON value at the path as a whole, and
-   * a wildcard path names no single value.
+   * These operators compare one value at a time, so with a wildcard path the
+   * condition matches when any selected value satisfies it. The remaining
+   * operators (IS NULL, IS NOT NULL, HAS KEY and JSON_CONTAINS) need the path
+   * to address a single value.
    *
    * @see \Drupal\Core\Database\Query\JsonExpression::toPredicateSql()
    * @see \Drupal\Core\Database\Query\JsonExpression::assertNoWildcard()

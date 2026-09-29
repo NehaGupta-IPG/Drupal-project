@@ -131,11 +131,8 @@ class Condition implements ConditionInterface, \Countable {
    * {@inheritdoc}
    */
   public function jsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static {
-    // A condition group holds no connection, so it cannot use the
-    // Connection::jsonCondition() factory. All driver-specific SQL comes from
-    // the JsonExpression that JsonCondition::compile() gets from the
-    // connection passed to compile(). A driver that ships its own JsonCondition
-    // overrides this method along with the Condition class.
+    // Condition groups have no connection, so the driver-specific SQL is
+    // resolved later, in JsonCondition::compile().
     $this->condition(new JsonCondition($field, $jsonpath, $value, $operator));
     return $this;
   }

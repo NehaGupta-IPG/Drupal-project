@@ -484,19 +484,19 @@ final class Column implements SchemaDefinitionInterface {
   }
 
   /**
-   * Returns a Column object for a json column.
+   * Returns a Column object for a JSON column.
    *
    * @param string $name
    *   The column name.
    * @param ?string $description
-   *   (Optional) A string in non-markup plain text describing this field and
+   *   (optional) A string in non-markup plain text describing this field and
    *   its purpose.
    * @param ?bool $notNull
-   *   (Optional) If true, no NULL values will be allowed in this database
-   *   column. If false, NULL values will be allowed. If NULL, it is not
+   *   (optional) If TRUE, no NULL values will be allowed in this database
+   *   column. If FALSE, NULL values will be allowed. If NULL, it is not
    *   specified. Defaults to NULL.
    * @param NullValue|null $default
-   *   (Optional) Pass a NullValue for an explicit DEFAULT NULL, or NULL for no
+   *   (optional) Pass a NullValue for an explicit DEFAULT NULL, or NULL for no
    *   default. MySQL does not allow a literal default on a JSON column, see
    *   ColumnType::isValidDefaultValue().
    */
