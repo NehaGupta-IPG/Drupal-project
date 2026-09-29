@@ -1153,7 +1153,7 @@ services:
   router.route_provider.lazy_builder:
     class: Drupal\Core\Routing\RouteProviderLazyBuilder
     arguments: ['@router.route_provider', '@router.builder']
-    deprecated: 'The "%service_id%" service is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The router.route_provider service now rebuilds routes on demand itself. See https://www.drupal.org/node/9999999'
+    deprecated: 'The "%service_id%" service is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. The router.route_provider service now rebuilds routes on demand itself. See https://www.drupal.org/node/9999999'
   url_generator.non_bubbling:
     class: Drupal\Core\Routing\UrlGenerator
     arguments: ['@router.route_provider', '@path_processor_manager', '@route_processor_manager', '@request_stack', '%filter_protocols%']

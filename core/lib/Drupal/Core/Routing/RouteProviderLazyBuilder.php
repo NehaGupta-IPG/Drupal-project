@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * A Route Provider front-end for all Drupal-stored routes.
  *
- * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. The
  *   'router.route_provider' service now rebuilds routes on demand itself; use
  *   \Drupal\Core\Routing\RouteProvider::markStale() instead.
  *
@@ -58,7 +58,7 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface {
    */
   public function __construct(RouteProviderInterface $route_provider, RouteBuilderInterface $route_builder) {
     // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The router.route_provider service now rebuilds routes on demand itself. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. The router.route_provider service now rebuilds routes on demand itself. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
     $this->routeProvider = $route_provider;
     $this->routeBuilder = $route_builder;
   }
