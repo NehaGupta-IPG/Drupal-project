@@ -228,7 +228,7 @@ default:
     paths:
       - ./sites/default/files/simpletest/phpunit-*.xml
       - ./sites/simpletest/browser_output
-      - ./sites/simpletest/db-dump.txt
+      - ./sites/simpletest/db-dump.php
       - '*.log'
 
 ################

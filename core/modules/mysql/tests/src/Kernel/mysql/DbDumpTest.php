@@ -193,7 +193,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
     // This will load the data.
     $file = sys_get_temp_dir() . '/' . $this->randomMachineName();
     file_put_contents($file, $script);
-    file_put_contents($this->root . '/sites/simpletest/db-dump.txt', $script);
+    file_put_contents($this->root . '/sites/simpletest/db-dump.php', $script);
     require_once $file;
 
     // The tables should now exist and the schemas should match the originals.

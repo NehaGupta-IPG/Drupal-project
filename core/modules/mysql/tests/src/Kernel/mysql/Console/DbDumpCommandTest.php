@@ -52,7 +52,7 @@ class DbDumpCommandTest extends DriverSpecificKernelTestBase {
 
     // Assert that insert exists and that some expected fields exist.
     $output = $command_tester->getDisplay();
-    $this->assertStringContainsString("createTableFromDefinition(\$schema_dump->getTableDefinition('router", $output, 'Table router found');
+    $this->assertStringContainsString("createSchemaFromDefinition(\$schema_dump);", $output);
     $this->assertStringContainsString("insert('router", $output, 'Insert found');
     $this->assertStringContainsString("'name' => 'test", $output, 'Insert name field found');
     $this->assertStringContainsString("'path' => 'test", $output, 'Insert path field found');
@@ -72,7 +72,7 @@ class DbDumpCommandTest extends DriverSpecificKernelTestBase {
 
     // Assert that insert statement doesn't exist for schema only table.
     $output = $command_tester->getDisplay();
-    $this->assertStringContainsString("createTableFromDefinition(\$schema_dump->getTableDefinition('router", $output, 'Table router found');
+    $this->assertStringContainsString("createSchemaFromDefinition(\$schema_dump);", $output);
     $this->assertStringNotContainsString("insert('router", $output, 'Insert not found');
     $this->assertStringNotContainsString("'name' => 'test", $output, 'Insert name field not found');
     $this->assertStringNotContainsString("'path' => 'test", $output, 'Insert path field not found');
@@ -82,7 +82,7 @@ class DbDumpCommandTest extends DriverSpecificKernelTestBase {
     // match.
     $command_tester->execute(['--schema-only' => 'route.*']);
     $output = $command_tester->getDisplay();
-    $this->assertStringContainsString("createTableFromDefinition(\$schema_dump->getTableDefinition('router", $output, 'Table router found');
+    $this->assertStringContainsString("createSchemaFromDefinition(\$schema_dump);", $output);
     $this->assertStringNotContainsString("insert('router", $output, 'Insert not found');
     $this->assertStringNotContainsString("'name' => 'test", $output, 'Insert name field not found');
     $this->assertStringNotContainsString("'path' => 'test", $output, 'Insert path field not found');

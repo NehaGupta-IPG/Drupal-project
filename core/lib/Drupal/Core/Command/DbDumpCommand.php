@@ -286,9 +286,7 @@ class DbDumpCommand extends DbCommandBase {
         binary: $column_args['binary'] ?? NULL,
         dbSpecificExtra: $column_args['dbSpecificExtra'] ?? NULL,
       );
-      if ($row['Field'] == 'wid') {
-        dump([$table, $row, $column_args, $column]);
-      }
+
       $columns[] = $column;
     }
 
@@ -534,6 +532,10 @@ if ($connection->databaseType() === 'mysql') {
   $connection->query("SET sql_mode = '$sql_mode,NO_AUTO_VALUE_ON_ZERO'");
 }
 
+// Build the schema.
+$connection->schema()->createSchemaFromDefinition($schema_dump);
+
+// Insert data in the tables.
 {{TABLES}}
 
 // Reset the SQL mode.
@@ -549,7 +551,7 @@ END_OF_SCRIPT;
    *
    * @param string $table
    *   Table name.
-   * @param \Drupal\Core\Database\SchemaDefinition\Table $schema
+   * @param \Drupal\Core\Database\SchemaDefinition\Table $tableDefinition
    *   Drupal schema definition for the table.
    * @param array $data
    *   Data for the table.
@@ -559,9 +561,8 @@ END_OF_SCRIPT;
    * @return string
    *   The table create statement, and if there is data, the insert command.
    */
-  protected function getTableScript(string $table, Table $schema, array $data, int $insert_count = 1000): string {
+  protected function getTableScript(string $table, Table $tableDefinition, array $data, int $insert_count = 1000): string {
     $output = '';
-    $output .= "\$connection->schema()->createTableFromDefinition(\$schema_dump->getTableDefinition('" . $table . "'));\n\n";
     if (!empty($data)) {
       $data_chunks = array_chunk($data, $insert_count);
       foreach ($data_chunks as $data_chunk) {
@@ -569,7 +570,7 @@ END_OF_SCRIPT;
         foreach ($data_chunk as $record) {
           $insert .= "->values(" . Variable::export($record) . ")\n";
         }
-        $fields = Variable::export(array_keys($schema->toArray()['fields']));
+        $fields = Variable::export(array_keys($tableDefinition->toArray()['fields']));
         $output .= <<<EOT
 \$connection->insert('$table')
 ->fields($fields)
@@ -577,6 +578,7 @@ END_OF_SCRIPT;
 
 EOT;
       }
+      $output .= "\n\n";
     }
     return $output;
   }
