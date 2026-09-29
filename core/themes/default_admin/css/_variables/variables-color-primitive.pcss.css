@@ -3,8 +3,8 @@
  * Primitive CSS color variables.
  */
 
-.root,
-[data-gin-accent] {
+:root,
+[data-accent] {
   /*
    * Tier 1 (primitive colors).
    */

@@ -5,6 +5,7 @@
  * API functions for installing Drupal.
  */
 
+use Drupal\user\LoginFinalizer;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Cache\NullBackend;
@@ -251,7 +252,7 @@ function install_state_defaults(): array {
     // An array of available installation profiles.
     'profiles' => [],
     // The name of the theme to use during installation.
-    'theme' => 'claro',
+    'theme' => InstallerKernel::INSTALL_THEME,
     // The server URL where the interface translation files can be downloaded.
     // Tokens in the pattern will be replaced by appropriate values for the
     // required translation file.
@@ -1618,13 +1619,23 @@ function install_profile_modules(&$install_state) {
   arsort($required);
   arsort($non_required);
 
+  $module_order = $required + $non_required;
+  // The database driver module must be installed before any other module, so
+  // that it can override the hook_schema() implementations and the
+  // "backend_overridable" services of those modules. Sorting by weight above
+  // does not keep it in front, so move it back to the first position.
+  // @see _install_get_database_module_name()
+  if ($database_module !== NULL && isset($module_order[$database_module])) {
+    $module_order = [$database_module => $module_order[$database_module]] + $module_order;
+  }
+
   $batch_builder = new BatchBuilder();
 
   // Put modules into groups of up to the maximum batch size, or until a module
   // states that it needs a container rebuild before and after install.
   $index = 0;
   $module_groups = [];
-  foreach (array_keys($required + $non_required) as $module) {
+  foreach (array_keys($module_order) as $module) {
     // If the container needs to be rebuilt, ensure this happens both before and
     // after the module is installed.
     $container_rebuild_required = !empty($files[$module]->info['container_rebuild_required']);
@@ -1850,22 +1861,23 @@ function install_finished(&$install_state): void {
   if ($install_state['profile_info']['keep_profile'] ?? TRUE) {
     // Installation profiles are always loaded last.
     \Drupal::service(ModuleWeight::class)->set($profile, 1000);
+    // Build the router once after installing all modules.
+    // This would normally happen upon KernelEvents::TERMINATE, but since the
+    // installer does not use an HttpKernel, that event is never triggered.
+    // This is not necessary when the profile is uninstalled because
+    // uninstalling a module rebuilds the router anyway.
+    \Drupal::service('router.builder')->rebuild();
   }
   else {
     \Drupal::service('module_installer')->uninstall([$profile]);
   }
-
-  // Build the router once after installing all modules.
-  // This would normally happen upon KernelEvents::TERMINATE, but since the
-  // installer does not use an HttpKernel, that event is never triggered.
-  \Drupal::service('router.builder')->rebuild();
 
   if ($install_state['interactive']) {
     // Load current user and perform final login tasks.
     // This has to be done after drupal_flush_all_caches()
     // to avoid session regeneration.
     $account = User::load(1);
-    user_login_finalize($account);
+    \Drupal::service(LoginFinalizer::class)->finalizeLogin($account);
   }
 
   // Record when this install ran.
@@ -2560,6 +2572,14 @@ function install_recipe_required_modules(array $install_state) {
     }
   }
   arsort($required);
+  // The database driver module must be installed before any other module, so
+  // that it can override the hook_schema() implementations and the
+  // "backend_overridable" services of those modules. Sorting by weight above
+  // does not keep it in front, so move it back to the first position.
+  // @see _install_get_database_module_name()
+  if ($database_module !== NULL && isset($required[$database_module])) {
+    $required = [$database_module => $required[$database_module]] + $required;
+  }
 
   $modules = [];
   $names = [];
