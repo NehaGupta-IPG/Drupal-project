@@ -91,10 +91,9 @@
       // `type[]`.
       const stripArraySuffix = (name) => name.replace(/\[.*$/, '');
       const exposedFieldBaseNames = new Set(
-        this.$exposed_form
-          .find('[name]')
-          .map((i, el) => stripArraySuffix(el.name))
-          .get()
+        Array.from(this.$exposed_form[0].querySelectorAll('[name]'), (el) =>
+          stripArraySuffix(el.name),
+        ),
       );
 
       // Remove current exposed filters.
