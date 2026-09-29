@@ -129,11 +129,6 @@ Cache
 CKEditor 5
 - Ben Mullins 'bnjmnm' (bnjmnm) https://www.drupal.org/u/bnjmnm
 
-Claro
-- Cristina Chumillas 'ckrina' (ckrina) https://www.drupal.org/u/ckrina
-- Sascha Eggenberger 'saschaeggi' (saschaeggi) https://www.drupal.org/u/saschaeggi
-- Ben Mullins 'bnjmnm' (bnjmnm) https://www.drupal.org/u/bnjmnm
-
 Command Line Interface (CLI) - `dr`
 - Moshe Weitzman 'moshe weitzman' (weitzman) https://www.drupal.org/u/moshe-weitzman
 - Derek Wright 'dww' (dww) https://www.drupal.org/u/dww
@@ -320,12 +315,6 @@ Node Access
 - Moshe Weitzman 'moshe weitzman' (weitzman) https://www.drupal.org/u/moshe-weitzman
 - Jess Myrbo 'xjm' (xjm) https://www.drupal.org/u/xjm
 
-Olivero
-- Mike Herchel 'mherchel' (mherchel) https://www.drupal.org/u/mherchel
-- Jen Witkowski 'jwitkowski79' (jwitkowski79) https://www.drupal.org/u/jwitkowski79
-- Konstantin Shupenko 'kostyashupenko' (kostyashupenko) https://www.drupal.org/u/kostyashupenko
-- Andy Blum 'andy-blum' (ablum) https://www.drupal.org/u/andy-blum
-
 Options
 - Stephen Mustgrave 'smustgrave' (smustgrave) https://www.drupal.org/u/smustgrave
 
@@ -368,9 +357,6 @@ Responsive Image
 
 Routing
 - Tim Plunkett 'tim.plunkett' (tim.plunkett) https://www.drupal.org/u/tim.plunkett
-
-Search
-- Peter Wolanin 'pwolanin' (pwolanin) https://www.drupal.org/u/pwolanin
 
 Serialization
 - Brad Jones 'bradjones1' (bradjones1) https://www.drupal.org/u/bradjones1
