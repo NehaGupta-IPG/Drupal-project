@@ -89,16 +89,13 @@
       // trailing `[…]` is stripped so a multi-select field named `type[]`
       // matches URL params serialized by PHP as `type[0]`, `type[1]`, or
       // `type[]`.
-      const stripArraySuffix = (name) => {
-        const bracketIndex = name.indexOf('[');
-        return bracketIndex === -1 ? name : name.slice(0, bracketIndex);
-      };
-      const exposedFieldBaseNames = new Set();
-      this.$exposed_form
-        .find('input[name], select[name], textarea[name]')
-        .each(function () {
-          exposedFieldBaseNames.add(stripArraySuffix(this.name));
-        });
+      const stripArraySuffix = (name) => name.replace(/\[.*$/, '');
+      const exposedFieldBaseNames = new Set(
+        this.$exposed_form
+          .find('[name]')
+          .map((i, el) => stripArraySuffix(el.name))
+          .get()
+      );
 
       // Remove current exposed filters.
       const params = decodeURI(queryString)
