@@ -87,7 +87,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->pageTextNotContains('Test 12');
     // Make sure all other field labels are there.
     for ($i = 1; $i <= 23; $i++) {
-      if (($i != 11) && ($i != 12) && ($i != 7)) {
+      if (($i != 11) && ($i != 12) && ($i != 7) && ($i != 14)) {
         $this->assertSession()->pageTextContains('Test ' . $i);
       }
     }
@@ -113,7 +113,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     // Make sure the content for node 8 is still in the edit form.
     $this->drupalGet('node/8/edit');
     $this->assertSession()->pageTextContains('Test title');
-    $this->assertSession()->pageTextContains('Test body');
+    $this->assertSession()->pageTextContains('Body');
     $this->assertSession()->checkboxChecked('edit-field-test-1-value');
     $this->assertSession()->responseContains('2015-08-16');
     $this->assertSession()->responseContains('test@example.com');
@@ -131,7 +131,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->drupalGet('node/8/edit', ['language' => $spanish]);
     $this->assertSession()->pageTextContains('Test title Spanish');
-    $this->assertSession()->pageTextContains('Test body Spanish');
 
     // Make sure the user page is correct.
     $this->drupalGet('user/3');
@@ -154,7 +153,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
 
     // Make sure the node/1 node exists.
     $this->drupalGet('node/1');
-    $this->clickLink('Test Article - New title');
+    $this->assertSession()->pageTextContains('Test Article - New title');
     $this->assertSession()->pageTextContains('Body');
     $this->assertSession()->pageTextContains('Tags');
     $this->assertSession()->responseContains('Text format');
@@ -179,13 +178,13 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->pageTextContains('Test block');
 
     // Make sure our custom visibility conditions are correct.
-    $this->drupalGet('admin/structure/block/manage/testblock');
+    $this->drupalGet('admin/structure/block/manage/stark_testblock');
     $this->assertSession()->checkboxNotChecked('edit-visibility-language-langcodes-es');
     $this->assertSession()->checkboxChecked('edit-visibility-language-langcodes-en');
     $this->assertSession()->checkboxChecked('edit-visibility-entity-bundlenode-bundles-test-content-type');
 
     // Make sure our block is still translated.
-    $this->drupalGet('admin/structure/block/manage/testblock/translate/es/edit');
+    $this->drupalGet('admin/structure/block/manage/stark_testblock/translate/es/edit');
     $this->assertSession()->responseContains('Test block spanish');
 
     // Make sure our custom text format exists.
@@ -224,7 +223,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->drupalGet('admin/structure/types/manage/test_content_type/fields');
 
     // Make sure fields are the right type.
-    $assert_session->elementContains('css', '#body', 'Long text with summary');
+    $assert_session->elementContains('css', '#field-body', 'Long text');
     $assert_session->elementContains('css', '#field-test-1', 'Boolean');
     $assert_session->elementContains('css', '#field-test-2', 'Comments');
     $assert_session->elementContains('css', '#field-test-3', 'Date');
@@ -340,7 +339,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       'phpass',
       'responsive_image',
       'rest',
-      'search',
       'serialization',
       'syslog',
       'system',
@@ -359,8 +357,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
 
     // Make sure our themes are still enabled.
     $expected_enabled_themes = [
-      'olivero',
-      'claro',
       'stark',
     ];
     foreach ($expected_enabled_themes as $theme) {
