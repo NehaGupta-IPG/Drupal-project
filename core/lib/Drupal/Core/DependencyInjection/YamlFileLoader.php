@@ -26,8 +26,8 @@ if (!class_exists(SymfonyFileLoader::class)) {
  * YamlFileLoader loads YAML files service definitions.
  *
  * Thin subclass of Symfony's YamlFileLoader that:
- * - Decodes YAML through Drupal's Yaml component (so Drupal's YAML hooks
- *   apply) and caches the parsed array per file via FileCache.
+ * - Decodes YAML through Drupal's Yaml component and caches the parsed array
+ *   per file using Drupal's FileCache.
  * - Auto-injects a `_provider` tag on every service derived from the file's
  *   basename, and makes services public by default.
  *
