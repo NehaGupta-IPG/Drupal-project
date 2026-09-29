@@ -464,7 +464,15 @@
             },
           );
 
-          editor.model.document.on('change:data', () => {
+          editor.model.document.on('change:data', (event, batch) => {
+            // Changes made by plugins rather than the user, such as setting
+            // image dimensions or media metadata once they have loaded, are
+            // not undoable. They must not mark the field as changed, otherwise
+            // the original value is not restored on detach.
+            // @see Drupal.editorDetach
+            if (!batch.isUndoable) {
+              return;
+            }
             const callback = callbacks.get(id);
             if (callback) {
               // Marks the field as changed.
