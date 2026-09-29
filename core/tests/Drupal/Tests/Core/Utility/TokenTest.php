@@ -315,6 +315,29 @@ class TokenTest extends UnitTestCase {
     $this->assertEquals($expected, $result);
   }
 
+  /**
+   * Tests that numeric token types are passed to hooks as strings.
+   */
+  public function testNumericTokenType(): void {
+    $strict_hook = function (string $type, array $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
+      return [];
+    };
+
+    $this->moduleHandler
+      ->method('invokeAll')
+      ->willReturnCallback(function ($hook, array $args) use ($strict_hook): array {
+        if ($hook === 'tokens') {
+          $strict_hook(...$args);
+        }
+        return [];
+      });
+
+    $this->assertSame('[12:30]', $this->token->replace('[12:30]'));
+  }
+
+  /**
+   * Provides test cases for ::testReplaceEscaping().
+   */
   public static function providerTestReplaceEscaping(): array {
     $data = [];
 
