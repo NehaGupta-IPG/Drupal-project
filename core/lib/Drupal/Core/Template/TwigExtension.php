@@ -558,7 +558,7 @@ class TwigExtension extends AbstractExtension {
    * @internal
    */
   public static function spaceless(?string $content): string {
-    @trigger_error('The "spaceless" filter is deprecated in drupal:11.5.0 and will be removed in drupal:13.0.0. Use other whitespace control strategies. See  See https://www.drupal.org/node/XXXXXXX', E_USER_DEPRECATED);
+    @trigger_error('The "spaceless" filter is deprecated in drupal:11.5.0 and will be removed in drupal:13.0.0. Use other whitespace control strategies. See  See https://www.drupal.org/node/0000000', E_USER_DEPRECATED);
     return trim(preg_replace('/>\s+</', '><', $content ?? ''));
   }
 
