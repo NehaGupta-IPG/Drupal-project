@@ -284,6 +284,15 @@ class JavascriptStatesForm extends FormBase {
         ],
       ],
     ];
+    $form['text_format_required_when_checkbox_trigger_checked'] = [
+      '#type' => 'text_format',
+      '#title' => 'Text format required when checkbox trigger checked',
+      '#states' => [
+        'required' => [
+          ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
     $form['checkboxes_all_checked_when_checkbox_trigger_checked'] = [
       '#type' => 'checkboxes',
       '#title' => 'Checkboxes: all checked when checkbox trigger checked',
