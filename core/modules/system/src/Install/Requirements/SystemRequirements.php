@@ -50,6 +50,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     'rdf' => 'RDF',
     'settings_tray' => 'Settings Tray',
     'shortcut' => 'Shortcut',
+    'search' => 'Search',
     'statistics' => 'Statistics',
     'telephone' => 'Telephone',
     'toolbar' => 'Toolbar',
@@ -62,10 +63,12 @@ class SystemRequirements implements InstallRequirementsInterface {
    */
   public const DRUPAL_CORE_REMOVED_THEME_LIST = [
     'bartik' => 'Bartik',
+    'claro' => 'Claro',
     'classy' => 'Classy',
     'seven' => 'Seven',
     'stable' => 'Stable',
     'stable9' => 'Stable 9',
+    'olivero' => 'Olivero',
   ];
 
   /**
