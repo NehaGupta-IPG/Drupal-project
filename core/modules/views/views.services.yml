@@ -130,6 +130,5 @@ services:
   Drupal\views\ContextualLinksHelper: ~
   access_check.views.argument_validator:
     class: Drupal\views\Access\ArgumentValidatorAccessCheck
-    arguments: ['@plugin.manager.views.argument_validator', '@current_route_match']
     tags:
       - { name: access_check, applies_to: _argument_validator_access }

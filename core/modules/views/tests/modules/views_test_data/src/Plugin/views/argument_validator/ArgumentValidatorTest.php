@@ -37,9 +37,18 @@ class ArgumentValidatorTest extends ArgumentValidatorPluginBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Performs validation for a given argument.
+   *
+   * @param mixed $arg
+   *   The argument to validate.
+   * phpcs:ignore Drupal.Commenting.FunctionComment.ParamNameNoMatch
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $cacheability
+   *   (optional) Collects the cacheability of the validation result.
+   *
+   * @return bool
+   *   TRUE if the argument is valid, FALSE otherwise.
    */
-  public function validateArgument($arg) {
+  public function validateArgument($arg /* , RefinableCacheableDependencyInterface $cacheability = new CacheableMetadata() */) {
     if ($arg === 'this value should be replaced') {
       // Set the argument to a numeric value so this is valid on PostgreSQL for
       // numeric fields.

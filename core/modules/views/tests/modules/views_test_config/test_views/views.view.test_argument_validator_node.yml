@@ -202,3 +202,37 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
+  page_2:
+    display_plugin: page
+    id: page_2
+    display_title: 'Page 2'
+    position: 2
+    display_options:
+      display_extenders: {  }
+      path: test-argument-validator/%
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }
+  page_3:
+    display_plugin: page
+    id: page_3
+    display_title: 'Page 3'
+    position: 3
+    display_options:
+      display_extenders: {  }
+      path: node/%
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }

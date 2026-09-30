@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Kernel\Views;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -137,6 +138,11 @@ class ArgumentValidatorTermNameTest extends TaxonomyTestBase {
 
     $this->assertTrue($view->argument['name']->setArgument($this->names[4]));
     $this->assertEquals($this->names[4], $view->argument['name']->getTitle());
+
+    // Terms can be created or renamed to match any name.
+    $cacheability = new CacheableMetadata();
+    $this->assertFalse($view->argument['name']->getPlugin('argument_validator')->validateArgument('not a term name', $cacheability));
+    $this->assertContains('taxonomy_term_list', $cacheability->getCacheTags());
   }
 
   /**

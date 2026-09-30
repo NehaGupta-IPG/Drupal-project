@@ -10,6 +10,7 @@ use Drupal\Core\Routing\RouteCompiler;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Url;
+use Drupal\views\Access\ArgumentValidatorAccessCheck;
 use Drupal\views\PostSaveProcess;
 use Drupal\views\PostSaveViewInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -190,38 +191,13 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     }
     $access_plugin->alterRouteDefinition($route);
 
-    $arguments = $this->getOption('arguments');
-    // Some views return null arguments rather than []
-    if ($arguments === NULL) {
-      $arguments = [];
-    }
-
-    $validate_arguments = [];
-    $idx = -1;
-
-    // Collect arguments which have validation and have a fail behavior of
-    // "page not found" or "access denied".
-    foreach ($arguments as $argument) {
-      if (!empty($argument['specify_validation']) && !empty($argument['validate'])
-        && in_array($argument['validate']['fail'], ['not found', 'access denied'])) {
-        $validate_arguments[] = [
-          'plugin_id' => $argument['validate']['type'],
-          'plugin_options' => $argument['validate_options'],
-          'parameter_name' => $argument_map['arg_' . ++$idx],
-          'view_id' => $view_id,
-          'display_id' => $display_id,
-        ];
+    foreach ((array) $this->getOption('arguments') as $argument) {
+      if (ArgumentValidatorAccessCheck::appliesToArgument($argument)) {
+        $route->setRequirement('_argument_validator_access', 'TRUE');
+        if (($argument['validate']['fail'] ?? NULL) === 'access denied') {
+          $route->setOption('_argument_validator_access_denied', TRUE);
+        }
       }
-    }
-
-    if (!empty($validate_arguments)) {
-      // Add route requirement to enforce access based on argument validation.
-      // This is primarily used to avoid displaying broken menu links that will
-      // fail validation.
-      $route->setRequirement(
-        '_argument_validator_access',
-        serialize(['arguments' => $validate_arguments])
-      );
     }
 
     // Set the argument map, in order to support named parameters.
