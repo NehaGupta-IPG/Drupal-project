@@ -256,4 +256,19 @@ class RegistryTest extends KernelTestBase {
     $this->assertEquals($expected, array_values($registry['theme_test_registered_by_module']['preprocess functions']));
   }
 
+  /**
+   * Tests that the runtime registry still works after the registry destructs.
+   */
+  public function testRuntimeRegistryAfterDestruct(): void {
+    $registry = $this->container->get('theme.registry');
+    $this->assertTrue($registry->getRuntime()->has('container'));
+
+    // Destructing persists the runtime registry and resets its collector.
+    // Anything rendered later in the same request, for example by another
+    // destructable service, must still find the registered theme hooks.
+    $registry->destruct();
+    $this->assertTrue($registry->getRuntime()->has('container'));
+    $this->assertNotEmpty($registry->getRuntime()->get('container'));
+  }
+
 }
