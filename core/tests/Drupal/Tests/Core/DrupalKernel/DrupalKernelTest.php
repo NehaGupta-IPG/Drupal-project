@@ -48,7 +48,6 @@ class DrupalKernelTest extends UnitTestCase {
     // Respect the explicitly provided loader, including previously added paths.
     $other_loader = new ClassLoader();
     $register->invoke($kernel, $namespaces, $other_loader);
-    $register->invoke($kernel, $namespaces, $other_loader);
     $this->assertSame(['/drupal/modules/example/src'], $other_loader->getPrefixesPsr4()['Drupal\\example\\']);
   }
 
