@@ -84,6 +84,8 @@ class CommentCreationAccessTest extends KernelTestBase {
     $comment->access('create');
     $create_access_context = $state->get('comment_test.create_access.context');
     $this->assertSame('entity_test:1', $create_access_context['commented_entity']);
+    $this->assertSame('comment', $create_access_context['field']);
+    $this->assertArrayNotHasKey('parent', $create_access_context);
 
     $comment->access('reply');
     $create_access_context = $state->get('comment_test.create_access.context');

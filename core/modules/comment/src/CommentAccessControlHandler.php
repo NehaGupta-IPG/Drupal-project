@@ -34,7 +34,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
         [
           'commented_entity' => $entity->getCommentedEntity(),
           'field' => $entity->getFieldName(),
-          'parent' => $entity->getParentComment(),
+          'parent' => $entity,
         ],
         static fn (mixed $val): bool => $val !== NULL,
       );
