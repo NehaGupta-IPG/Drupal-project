@@ -59,6 +59,7 @@ class UpdateManager implements UpdateManagerInterface {
     protected ThemeHandlerInterface $themeHandler,
     protected ModuleExtensionList $moduleExtensionList,
     protected ThemeExtensionList $themeExtensionList,
+    protected UpdateCalculator $updateCalculator,
   ) {
     $this->updateSettings = $config_factory->get('update.settings');
     $this->stringTranslation = $translation;
@@ -240,6 +241,64 @@ class UpdateManager implements UpdateManagerInterface {
     }
 
     return $available;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateProjectData(array $available): array {
+    // Retrieve the projects from storage, if present.
+    $projects = $this->projectStorage('update_project_data');
+    // If $projects is empty, then the data must be rebuilt.
+    // Otherwise, return the data and skip the rest of the method.
+    if (!empty($projects)) {
+      return $projects;
+    }
+    $projects = $this->getProjects();
+    $this->updateCalculator->processProjectInfo($projects);
+    if (isset($projects['drupal']) && !empty($available['drupal'])) {
+      // Calculate core status first so that it is complete before
+      // \Drupal\update\ProjectCoreCompatibility::setReleaseMessage() is called
+      // for each module below.
+      $checked_project = $this->updateCalculator->updateProjectStatus(UpdateProject::createFromArray($projects['drupal']), UpdateServerProjectInfo::createFromArray($available['drupal']));
+      $projects['drupal'] = $checked_project->toArray();
+      if (isset($available['drupal']['releases']) && !empty($available['drupal']['supported_branches'])) {
+        $supported_branches = explode(',', $available['drupal']['supported_branches']);
+        $project_core_compatibility = new ProjectCoreCompatibility($projects['drupal'], $available['drupal']['releases'], $supported_branches);
+      }
+    }
+
+    foreach ($projects as $project => $project_info) {
+      if (isset($available[$project])) {
+        if ($project === 'drupal') {
+          continue;
+        }
+        $checked_project = $this->updateCalculator->updateProjectStatus(UpdateProject::createFromArray($projects[$project]), UpdateServerProjectInfo::createFromArray($available[$project]));
+        $projects[$project] = $checked_project->toArray();
+        // Inject the list of compatible core versions to show administrator(s)
+        // which versions of core a given available update can be installed
+        // with.  Since individual releases of a project can be compatible with
+        // different versions of core, and even multiple major versions of core
+        // (for example, 8.9.x and 9.0.x), this list will hopefully help
+        // administrator(s) know which available updates they can upgrade a
+        // given project to.
+        if (isset($project_core_compatibility)) {
+          $project_core_compatibility->setReleaseMessage($projects[$project]);
+        }
+      }
+      else {
+        $projects[$project]['status'] = UpdateFetcherInterface::UNKNOWN;
+        $projects[$project]['reason'] = $this->t('No available releases found');
+      }
+    }
+    // Give other modules a chance to alter the status (for example, to allow a
+    // contrib module to provide fine-grained settings to ignore specific
+    // projects or releases).
+    $this->moduleHandler->alter('update_status', $projects);
+
+    // Store the site's update status for at most 1 hour.
+    $this->keyValueStore->setWithExpire('update_project_data', $projects, 3600);
+    return $projects;
   }
 
   /**
