@@ -16,7 +16,7 @@ CacheGetCountByBin:
 CacheSetCount: 229
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
-CacheTagLookupQueryCount: 25
+CacheTagLookupQueryCount: 24
 CacheTagGroupedLookups:
   -
     - entity_types
@@ -74,10 +74,9 @@ CacheTagGroupedLookups:
     - 'block_content:1'
     - 'block_content:2'
     - 'config:configurable_language_list'
+    - 'config:system.site'
   -
     - 'config:system.menu.footer'
-  -
-    - 'config:system.site'
   -
     - 'node:1:revisions'
   -

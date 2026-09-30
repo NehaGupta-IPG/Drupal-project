@@ -8,6 +8,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\PathConditionCacheContext;
 use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -59,6 +60,7 @@ class PathConditionCacheContextTest extends UnitTestCase {
   /**
    * Tests get cacheable metadata.
    */
+  #[AllowMockObjectsWithoutExpectations]
   public function testGetCacheableMetadata(): void {
     $request_stack = new RequestStack();
     $request_stack->push(Request::create('/node/1'));

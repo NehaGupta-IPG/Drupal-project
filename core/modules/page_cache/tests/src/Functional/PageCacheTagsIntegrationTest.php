@@ -121,11 +121,11 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
 
     $cache_contexts = [
       'languages:' . LanguageInterface::TYPE_INTERFACE,
+      // The placed block is only visible on certain URLs through a visibility
+      // condition using path_condition cache context.
+      'path_condition:/node/' . $node_2->id(),
       'theme',
       'timezone',
-      // The placed block is only visible on certain URLs through a visibility
-      // condition.
-      'url.path',
       'url.query_args:' . MainContentViewSubscriber::WRAPPER_FORMAT,
       // rel=canonical links and friends have absolute URLs as their values.
       'url.site',

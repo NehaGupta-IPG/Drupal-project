@@ -16,7 +16,7 @@ CacheGetCountByBin:
 CacheSetCount: 240
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
-CacheTagLookupQueryCount: 25
+CacheTagLookupQueryCount: 24
 CacheTagGroupedLookups:
   -
     - entity_types
