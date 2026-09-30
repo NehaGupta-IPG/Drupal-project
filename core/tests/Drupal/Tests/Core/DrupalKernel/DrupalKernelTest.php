@@ -31,24 +31,30 @@ class DrupalKernelTest extends UnitTestCase {
     $kernel = new DrupalKernel('test', $loader, TRUE, '/drupal');
     $register = new \ReflectionMethod(DrupalKernel::class, 'classLoaderAddMultiplePsr4');
     $namespaces = [
-      'Drupal\\example' => ['modules/example/src', 'modules/example/src'],
+      // Deduplication must preserve lookup order, not sort the paths.
+      'Drupal\\example' => ['modules/example_z/src', 'modules/example/src', 'modules/example_z/src'],
       'Drupal\\other' => 'modules/other/src',
     ];
+    // Repeated boots must not accumulate paths in the shared loader.
     for ($i = 0; $i < 10; $i++) {
       $register->invoke($kernel, $namespaces);
     }
     $this->assertSame([
-      'Drupal\\example\\' => ['/external', '/drupal/modules/example/src'],
+      'Drupal\\example\\' => ['/external', '/drupal/modules/example_z/src', '/drupal/modules/example/src'],
       'Drupal\\other\\' => ['/drupal/modules/other/src'],
     ], $loader->getPrefixesPsr4());
 
     // Another boot may discover a new path for an existing namespace.
     $register->invoke($kernel, ['Drupal\\example' => ['modules/example/src', 'modules/new/src']]);
-    $this->assertSame(['/external', '/drupal/modules/example/src', '/drupal/modules/new/src'], $loader->getPrefixesPsr4()['Drupal\\example\\']);
-    // Respect the explicitly provided loader, including previously added paths.
+    $this->assertSame(['/external', '/drupal/modules/example_z/src', '/drupal/modules/example/src', '/drupal/modules/new/src'], $loader->getPrefixesPsr4()['Drupal\\example\\']);
+
+    // Preserve existing paths in the class loader passed to the method.
     $other_loader = new ClassLoader();
+    $other_loader->addPsr4('Drupal\\example\\', '/other-external');
     $register->invoke($kernel, $namespaces, $other_loader);
-    $this->assertSame(['/drupal/modules/example/src'], $other_loader->getPrefixesPsr4()['Drupal\\example\\']);
+    // Reusing the class loader must also avoid duplicate paths.
+    $register->invoke($kernel, $namespaces, $other_loader);
+    $this->assertSame(['/other-external', '/drupal/modules/example_z/src', '/drupal/modules/example/src'], $other_loader->getPrefixesPsr4()['Drupal\\example\\']);
   }
 
   /**
