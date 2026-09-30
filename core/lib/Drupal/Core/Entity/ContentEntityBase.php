@@ -302,6 +302,15 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
+  public function createRevision($default = TRUE, $keep_untranslatable_fields = NULL) {
+    $storage = $this->entityTypeManager()->getStorage($this->entityTypeId);
+    return $storage->createRevision($this, $default, $keep_untranslatable_fields);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setNewRevision($value = TRUE) {
     if (!$this->getEntityType()->hasKey('revision')) {
       throw new \LogicException("Entity type {$this->getEntityTypeId()} does not support revisions.");
