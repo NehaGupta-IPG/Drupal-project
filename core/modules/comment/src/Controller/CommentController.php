@@ -299,6 +299,7 @@ class CommentController extends ControllerBase {
       ->andIf(AccessResult::allowedIf($status === CommentingStatus::Open))
       ->addCacheableDependency($entity);
 
+    // $pid indicates that this is a reply to a comment.
     if ($pid) {
       // If replying, load the parent comment.
       $parent_comment = $this->entityTypeManager()->getStorage('comment')->load($pid);
