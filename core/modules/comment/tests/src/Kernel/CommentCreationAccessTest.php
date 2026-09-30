@@ -76,25 +76,35 @@ class CommentCreationAccessTest extends KernelTestBase {
       'entity_id' => $entity->id(),
     ]);
 
-    /** @var \Drupal\comment\CommentFieldItemList $field */
     $field = $entity->get('comment');
+    $this->assertInstanceOf(CommentFieldItemList::class, $field);
 
     // Check that the comment create access handler receives the commented
     // entity as context when called from the comment entity ::access() method.
     $comment->access('create');
-    $create_access_context = $state->get('comment_test.create_access.context');
-    $this->assertSame('entity_test:1', $create_access_context['commented_entity']);
-    $this->assertSame('comment', $create_access_context['field']);
-    $this->assertArrayNotHasKey('parent', $create_access_context);
+    $this->assertEquals([
+      'commented_entity' => 'entity_test:1',
+      'field' => 'comment',
+    ], $state->get('comment_test.create_access.context'));
+    $this->assertSame('create:comment:entity_test:1:comment:', $state->get('comment_test.create_access.cid'));
 
     $comment->access('reply');
-    $create_access_context = $state->get('comment_test.create_access.context');
-    $this->assertSame('entity_test:1', $create_access_context['commented_entity']);
+    $this->assertEquals([
+      'commented_entity' => 'entity_test:1',
+      'field' => 'comment',
+      'parent' => 'comment:1',
+    ], $state->get('comment_test.create_access.context'));
+    $this->assertSame('create:comment:entity_test:1:comment:1', $state->get('comment_test.create_access.cid'));
 
     // Check the same for comment field item list ::access() method.
     $field->access('create');
-    $create_access_context = $state->get('comment_test.create_access.context');
-    $this->assertSame('entity_test:1', $create_access_context['commented_entity']);
+    $this->assertEquals([
+      'commented_entity' => 'entity_test:1',
+      'field' => 'comment',
+    ], $state->get('comment_test.create_access.context'));
+    // But, the create access cid was calculated.
+    $this->assertSame('create:comment:entity_test:1:comment:', $state->get('comment_test.create_access.cid'));
+    $state->delete('comment_test.create_access.cid');
 
     // Reply to comment.
     $reply = $this->createComment(['pid' => $comment->id()]);
@@ -102,9 +112,12 @@ class CommentCreationAccessTest extends KernelTestBase {
     // Check that the comment create access handler receives the commented
     // entity and the parent comment entity as context.
     $reply->access('create');
-    $create_access_context = $state->get('comment_test.create_access.context');
-    $this->assertSame('entity_test:1', $create_access_context['commented_entity']);
-
+    $this->assertEquals([
+      'commented_entity' => 'entity_test:1',
+      'field' => 'comment',
+      'parent' => 'comment:1',
+    ], $state->get('comment_test.create_access.context'));
+    $this->assertSame('create:comment:entity_test:1:comment:1', $state->get('comment_test.create_access.cid'));
   }
 
   /**
@@ -165,11 +178,11 @@ class CommentCreationAccessTest extends KernelTestBase {
     }
     else {
       $this->assertFalse($state->get('comment_test.create_access.cid'));
-      $this->assertNotNull($state->get('comment_test.create_access.account'));
+      $this->assertNotNull($state->get('comment_test.check_create_access.account'));
     }
 
     $state->delete('comment_test.create_access.cid');
-    $state->delete('comment_test.create_access.context');
+    $state->delete('comment_test.check_create_access.context');
 
     // Second call, same account. Without context, this shouldn't be a cache
     // hit, so account or
@@ -181,13 +194,13 @@ class CommentCreationAccessTest extends KernelTestBase {
       // ::checkCreateAccess shouldn't be invoked, so context state value must
       // be empty (unset).
       $this->assertNull(
-        $state->get('comment_test.create_access.context'),
+        $state->get('comment_test.check_create_access.context'),
         "checkCreateAccess() was invoked but it wasn't expected to be called again",
       );
     }
     else {
       $this->assertFalse(
-        $state->get('comment_test.create_access.cid'),
+        $state->get('comment_test.check_create_access.cid'),
         'checkCreateAccess() must be called again when no commented entity context is provided.',
       );
     }

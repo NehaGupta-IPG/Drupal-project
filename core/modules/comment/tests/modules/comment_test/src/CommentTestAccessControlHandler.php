@@ -22,10 +22,18 @@ class CommentTestAccessControlHandler extends CommentAccessControlHandler {
   /**
    * {@inheritdoc}
    */
+  public function createAccess($entity_bundle = NULL, ?AccountInterface $account = NULL, array $context = [], $return_as_object = FALSE): bool|AccessResultInterface {
+    \Drupal::state()->set('comment_test.create_access.context', self::simplifyContext($context));
+    \Drupal::state()->set('comment_test.create_access.account', $account?->id());
+    return parent::createAccess($entity_bundle, $account, $context, $return_as_object);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL): AccessResultInterface {
-    array_walk($context, fn (&$val) => $val = $val instanceof EntityInterface ? "{$val->getEntityTypeId()}:{$val->id()}" : $val);
-    \Drupal::state()->set('comment_test.create_access.context', $context);
-    \Drupal::state()->set('comment_test.create_access.account', $account->id());
+    \Drupal::state()->set('comment_test.check_create_access.context', self::simplifyContext($context));
+    \Drupal::state()->set('comment_test.check_create_access.account', $account->id());
     return parent::checkCreateAccess($account, $context, $entity_bundle);
   }
 
@@ -39,6 +47,26 @@ class CommentTestAccessControlHandler extends CommentAccessControlHandler {
     $cid = !is_string($cid) ? FALSE : $cid;
     \Drupal::state()->set('comment_test.create_access.cid', $cid);
     return $cid ?: NULL;
+  }
+
+  /**
+   * Simplifies entities found in the context array.
+   *
+   * Entity objects are replaced by a string containing their type and ID.
+   *
+   * @param array $context
+   *   Context array used at create access check.
+   *
+   * @return array
+   *   The simplified context array.
+   */
+  protected static function simplifyContext(array $context): array {
+    return array_map(
+      fn ($val) => $val instanceof EntityInterface
+        ? "{$val->getEntityTypeId()}:{$val->id()}"
+        : $val,
+      $context,
+    );
   }
 
 }
