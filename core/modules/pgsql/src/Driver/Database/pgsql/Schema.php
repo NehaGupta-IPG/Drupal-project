@@ -293,6 +293,8 @@ EOD;
     }
 
     $field_information = $checks->fetchCol();
+
+    return $field_information;
   }
 
   /**
