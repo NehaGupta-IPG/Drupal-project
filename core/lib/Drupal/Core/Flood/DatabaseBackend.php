@@ -5,12 +5,15 @@ namespace Drupal\Core\Flood;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\TableVerifyTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Defines the database flood backend. This is the default Drupal backend.
  */
 class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
+
+  use TableVerifyTrait;
 
   /**
    * The database table name.
@@ -39,6 +42,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
    * {@inheritdoc}
    */
   public function register($name, $window = 3600, $identifier = NULL) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     if (!isset($identifier)) {
       $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
     }
@@ -84,6 +88,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
    * {@inheritdoc}
    */
   public function clear($name, $identifier = NULL) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     if (!isset($identifier)) {
       $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
     }
@@ -102,6 +107,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
    * {@inheritdoc}
    */
   public function clearByPrefix(string $name, string $prefix): void {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     try {
       $this->connection->delete(static::TABLE_NAME)
         ->condition('event', $name)
@@ -117,6 +123,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
    * {@inheritdoc}
    */
   public function isAllowed($name, $threshold, $window = 3600, $identifier = NULL) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     if (!isset($identifier)) {
       $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
     }
@@ -142,6 +149,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
    * {@inheritdoc}
    */
   public function garbageCollection() {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     try {
       $this->connection->delete(static::TABLE_NAME)
         ->condition('expiration', $this->time->getRequestTime(), '<')

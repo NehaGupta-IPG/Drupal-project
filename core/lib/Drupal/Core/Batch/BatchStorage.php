@@ -13,12 +13,15 @@ use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\TableVerifyTrait;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Defines the storage handler class for batches.
  */
 class BatchStorage implements BatchStorageInterface {
+
+  use TableVerifyTrait;
 
   /**
    * The table name.
@@ -49,6 +52,7 @@ class BatchStorage implements BatchStorageInterface {
    * {@inheritdoc}
    */
   public function load($id) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     // Ensure that a session is started before using the CSRF token generator.
     $this->session->start();
     try {
@@ -73,6 +77,7 @@ class BatchStorage implements BatchStorageInterface {
    * {@inheritdoc}
    */
   public function delete($id) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     try {
       $this->connection->delete('batch')
         ->condition('bid', $id)
@@ -87,6 +92,7 @@ class BatchStorage implements BatchStorageInterface {
    * {@inheritdoc}
    */
   public function update(array $batch) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     try {
       $this->connection->update('batch')
         ->fields(['batch' => serialize($batch)])
@@ -102,6 +108,7 @@ class BatchStorage implements BatchStorageInterface {
    * {@inheritdoc}
    */
   public function cleanup() {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     try {
       // Cleanup the batch table and the queue for failed batches.
       $this->connection->delete('batch')
@@ -133,6 +140,7 @@ class BatchStorage implements BatchStorageInterface {
    * {@inheritdoc}
    */
   public function getId(): int {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     $try_again = FALSE;
     try {
       // The batch table might not yet exist.
@@ -166,6 +174,15 @@ class BatchStorage implements BatchStorageInterface {
         'batch' => NULL,
       ])
       ->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * The batch storage describes its table with a schema object.
+   */
+  protected function createVerifiedTable(string $table): void {
+    $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition());
   }
 
   /**

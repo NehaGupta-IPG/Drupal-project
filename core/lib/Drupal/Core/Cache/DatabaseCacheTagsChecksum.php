@@ -5,6 +5,7 @@ namespace Drupal\Core\Cache;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Query\UpsertUpdateExpression;
+use Drupal\Core\Database\TableVerifyTrait;
 
 /**
  * Cache tags invalidations checksum implementation that uses the database.
@@ -12,6 +13,7 @@ use Drupal\Core\Database\Query\UpsertUpdateExpression;
 class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTagsInvalidatorInterface, CacheTagsChecksumPreloadInterface, CacheTagsPurgeInterface {
 
   use CacheTagsChecksumTrait;
+  use TableVerifyTrait;
 
   /**
    * The database connection.
@@ -34,6 +36,7 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
    * {@inheritdoc}
    */
   protected function doInvalidateTags(array $tags) {
+    $this->verifyTableInTransaction('cachetags');
     try {
       foreach ($tags as $tag) {
         $this->connection->upsert('cachetags')
@@ -63,6 +66,7 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
    * {@inheritdoc}
    */
   protected function getTagInvalidationCounts(array $tags) {
+    $this->verifyTableInTransaction('cachetags');
     try {
       return $this->connection->query('SELECT [tag], [invalidations] FROM {cachetags} WHERE [tag] IN ( :tags[] )', [':tags[]' => $tags])
         ->fetchAllKeyed();
@@ -80,6 +84,7 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
    * {@inheritdoc}
    */
   public function purge(): void {
+    $this->verifyTableInTransaction('cachetags');
     try {
       $this->connection->truncate('cachetags')->execute();
     }

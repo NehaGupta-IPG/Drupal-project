@@ -6,6 +6,7 @@ use Drupal\Component\Serialization\SerializationInterface;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\TableVerifyTrait;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
@@ -17,6 +18,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 class DatabaseStorage extends StorageBase {
 
   use DependencySerializationTrait;
+  use TableVerifyTrait;
 
   /**
    * The serialization class to use.
@@ -62,6 +64,7 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function has($key) {
+    $this->verifyTableInTransaction($this->table);
     try {
       return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key', [
         ':collection' => $this->collection,
@@ -78,6 +81,7 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function getMultiple(array $keys) {
+    $this->verifyTableInTransaction($this->table);
     $values = [];
     try {
       $result = $this->connection
@@ -104,6 +108,7 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function getAll() {
+    $this->verifyTableInTransaction($this->table);
     try {
       $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection', [':collection' => $this->collection]);
     }
@@ -125,6 +130,7 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function getAllKeys(): iterable {
+    $this->verifyTableInTransaction($this->table);
     try {
       $values = $this->connection->query(
         'SELECT [name] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection',
@@ -164,6 +170,7 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function set($key, $value) {
+    $this->verifyTableInTransaction($this->table);
     try {
       $this->doSet($key, $value);
     }
@@ -218,6 +225,7 @@ class DatabaseStorage extends StorageBase {
     if (empty($data)) {
       return;
     }
+    $this->verifyTableInTransaction($this->table);
     try {
       $this->doSetMultiple($data);
     }
@@ -262,6 +270,7 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function setIfNotExists($key, $value) {
+    $this->verifyTableInTransaction($this->table);
     try {
       return $this->doSetIfNotExists($key, $value);
     }
@@ -280,6 +289,7 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function rename($key, $new_key) {
+    $this->verifyTableInTransaction($this->table);
     try {
       $this->connection->update($this->table)
         ->fields(['name' => $new_key])
@@ -296,6 +306,7 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function deleteMultiple(array $keys) {
+    $this->verifyTableInTransaction($this->table);
     // Delete in chunks when a large array is passed.
     while ($keys) {
       try {
@@ -314,6 +325,7 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function deleteAll() {
+    $this->verifyTableInTransaction($this->table);
     try {
       $this->connection->delete($this->table)
         ->condition('collection', $this->collection)

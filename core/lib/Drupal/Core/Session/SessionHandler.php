@@ -6,6 +6,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\TableVerifyTrait;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
@@ -14,6 +15,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHand
  * Default session handler.
  */
 class SessionHandler extends AbstractSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface {
+
+  use TableVerifyTrait;
 
   use DependencySerializationTrait;
 
@@ -47,6 +50,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
   public function doRead(#[\SensitiveParameter] string $sessionId): string {
     $data = '';
     if (!empty($sessionId)) {
+      $this->verifyTableInTransaction('sessions');
       try {
         // Read the session data from the database.
         $query = $this->connection
@@ -64,6 +68,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    * {@inheritdoc}
    */
   public function doWrite(#[\SensitiveParameter] string $sessionId, string $data): bool {
+    $this->verifyTableInTransaction('sessions');
     $try_again = FALSE;
     $request = $this->requestStack->getCurrentRequest();
     $doWrite = fn() =>
@@ -114,6 +119,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    * {@inheritdoc}
    */
   protected function doDestroy(#[\SensitiveParameter] string $sessionId): bool {
+    $this->verifyTableInTransaction('sessions');
     try {
       // Delete session data.
       $this->connection->delete('sessions')
@@ -136,6 +142,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
     // for three weeks before deleting them, you need to set gc_maxlifetime
     // to '1814400'. At that value, only after a user doesn't log in after
     // three weeks (1814400 seconds) will their session be removed.
+    $this->verifyTableInTransaction('sessions');
     try {
       return $this->connection->delete('sessions')
         ->condition('timestamp', $this->time->getRequestTime() - $lifetime, '<')

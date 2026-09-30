@@ -46,6 +46,11 @@ abstract class Schema implements PlaceholderInterface {
    */
   protected $uniqueIdentifier;
 
+  /**
+   * The version of cached information after schema changes.
+   */
+  protected int $tableInformationVersion = 0;
+
   public function __construct($connection) {
     $this->uniqueIdentifier = bin2hex(random_bytes(12));
     $this->connection = $connection;
@@ -63,6 +68,21 @@ abstract class Schema implements PlaceholderInterface {
    */
   public function uniqueIdentifier() {
     return $this->uniqueIdentifier;
+  }
+
+  /**
+   * Returns the version used to invalidate cached table verification.
+   *
+   * Drivers that cache table information increment the version when they
+   * reset it, so that a dropped or renamed table invalidates verification.
+   *
+   * @return int
+   *   The version of cached table information.
+   *
+   * @internal
+   */
+  public function getTableInformationVersion(): int {
+    return $this->tableInformationVersion;
   }
 
   /**
