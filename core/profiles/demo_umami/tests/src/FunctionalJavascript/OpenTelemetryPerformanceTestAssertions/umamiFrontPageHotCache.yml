@@ -39,6 +39,7 @@ CacheTagGroupedLookups:
     - 'config:views.view.frontpage'
     - 'config:views.view.promoted_items'
     - 'config:views.view.recipe_collections'
+    - 'config:views.view.taxonomy_term'
     - 'file:37'
     - http_response
     - local_task
