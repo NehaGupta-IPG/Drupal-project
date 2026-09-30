@@ -73,4 +73,8 @@ class StubRevisionableEntity extends StubEntityBase implements RevisionableInter
   public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record): void {
   }
 
+  #[\NoDiscard]
+  public function createRevision($default = TRUE, $keep_untranslatable_fields = NULL) {
+  }
+
 }
