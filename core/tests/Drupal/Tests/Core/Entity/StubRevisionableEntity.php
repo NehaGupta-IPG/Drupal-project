@@ -75,6 +75,7 @@ class StubRevisionableEntity extends StubEntityBase implements RevisionableInter
 
   #[\NoDiscard]
   public function createRevision($default = TRUE, $keep_untranslatable_fields = NULL) {
+    return clone $this;
   }
 
 }
