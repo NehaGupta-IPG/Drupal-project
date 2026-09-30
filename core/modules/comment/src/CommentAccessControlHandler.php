@@ -20,7 +20,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\comment\CommentInterface|\Drupal\user\EntityOwnerInterface $entity */
+    /** @var \Drupal\comment\CommentInterface $entity */
 
     $comment_admin = $account->hasPermission('administer comments');
     if ($operation == 'approve') {
