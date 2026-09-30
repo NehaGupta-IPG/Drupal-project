@@ -458,8 +458,6 @@ class ContentModerationStateTest extends KernelTestBase {
 
   /**
    * Tests when a multilingual node exists but has no moderation state.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/3056670
    */
   public function testMultilingualNoModerationState(): void {
     $this->createContentType([
