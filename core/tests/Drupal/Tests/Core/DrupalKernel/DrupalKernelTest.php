@@ -46,7 +46,12 @@ class DrupalKernelTest extends UnitTestCase {
 
     // Another boot may discover a new path for an existing namespace.
     $register->invoke($kernel, ['Drupal\\example' => ['modules/example/src', 'modules/new/src']]);
-    $this->assertSame(['/external', '/drupal/modules/example_z/src', '/drupal/modules/example/src', '/drupal/modules/new/src'], $loader->getPrefixesPsr4()['Drupal\\example\\']);
+    $this->assertSame([
+      '/external',
+      '/drupal/modules/example_z/src',
+      '/drupal/modules/example/src',
+      '/drupal/modules/new/src',
+    ], $loader->getPrefixesPsr4()['Drupal\\example\\']);
 
     // Preserve existing paths in the class loader passed to the method.
     $other_loader = new ClassLoader();
@@ -54,7 +59,11 @@ class DrupalKernelTest extends UnitTestCase {
     $register->invoke($kernel, $namespaces, $other_loader);
     // Reusing the class loader must also avoid duplicate paths.
     $register->invoke($kernel, $namespaces, $other_loader);
-    $this->assertSame(['/other-external', '/drupal/modules/example_z/src', '/drupal/modules/example/src'], $other_loader->getPrefixesPsr4()['Drupal\\example\\']);
+    $this->assertSame([
+      '/other-external',
+      '/drupal/modules/example_z/src',
+      '/drupal/modules/example/src',
+    ], $other_loader->getPrefixesPsr4()['Drupal\\example\\']);
   }
 
   /**
