@@ -35,7 +35,7 @@ class DrupalKernelTest extends UnitTestCase {
       'Drupal\\example' => ['modules/example_z/src', 'modules/example/src', 'modules/example_z/src'],
       'Drupal\\other' => 'modules/other/src',
     ];
-    // Repeated boots must not accumulate paths in the shared loader.
+    // Repeated boots must not accumulate duplicate paths in the class loader.
     for ($i = 0; $i < 10; $i++) {
       $register->invoke($kernel, $namespaces);
     }
