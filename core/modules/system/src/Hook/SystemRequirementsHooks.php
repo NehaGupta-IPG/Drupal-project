@@ -11,6 +11,7 @@ use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Order\Order;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Site\Settings;
@@ -37,8 +38,8 @@ class SystemRequirementsHooks {
   /**
    * Implements hook_update_requirements().
    */
-  #[Hook('update_requirements')]
-  public function updateRequirements(): array {
+  #[Hook('update_requirements', order: Order::First)]
+  public function phpUpdateRequirements(): array {
     $requirements = [];
     $phpversion = phpversion();
     $requirements['php'] = [
@@ -47,18 +48,14 @@ class SystemRequirementsHooks {
     ];
     $this->minimumPhp($phpversion, $requirements, RequirementSeverity::Warning);
 
-    if ($this->skipPhpExtensionChecks($phpversion)) {
-      return $requirements;
-    }
-
-    return $this->checkRequirements('update', $requirements);
+    return $requirements;
   }
 
   /**
    * Implements hook_runtime_requirements().
    */
-  #[Hook('runtime_requirements')]
-  public function runtimeRequirements(): array {
+  #[Hook('runtime_requirements', order: Order::First)]
+  public function phpRuntimeRequirements(): array {
     $requirements = [];
     $phpversion = phpversion();
     $phpversion_label = $this->t('@phpversion (<a href=":url">more information</a>)', [
@@ -75,7 +72,31 @@ class SystemRequirementsHooks {
       $this->recommendedPhp($phpversion, $requirements);
     }
 
-    if ($this->skipPhpExtensionChecks($phpversion)) {
+    return $requirements;
+  }
+
+  /**
+   * Implements hook_update_requirements().
+   */
+  #[Hook('update_requirements')]
+  public function updateRequirements(): array {
+    $requirements = [];
+
+    if ($this->skipPhpExtensionChecks(phpversion())) {
+      return $requirements;
+    }
+
+    return $this->checkRequirements('update', $requirements);
+  }
+
+  /**
+   * Implements hook_runtime_requirements().
+   */
+  #[Hook('runtime_requirements')]
+  public function runtimeRequirements(): array {
+    $requirements = [];
+
+    if ($this->skipPhpExtensionChecks(phpversion())) {
       return $requirements;
     }
 
@@ -102,7 +123,7 @@ class SystemRequirementsHooks {
    *   The php version to check.
    * @param array[] $requirements
    *   The requirements array as specified in hook_*_requirements().
-   * @param Drupal\Core\Extension\Requirement\RequirementSeverity $fallback_severity
+   * @param \Drupal\Core\Extension\Requirement\RequirementSeverity $fallback_severity
    *   Default severity to use if minimum is not met.
    */
   protected function minimumPhp(string $phpversion, array &$requirements, RequirementSeverity $fallback_severity): void {
