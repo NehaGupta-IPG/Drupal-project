@@ -56,10 +56,10 @@ class Truncate extends QueryTruncate {
     // Create a sanitized comment string to prepend to the query.
     $comments = $this->connection->makeComment($this->comments);
 
-    $reset_serial_id = $this->queryOptions['reset_serial_id'] ?? TRUE;
-    $restart_identity = $reset_serial_id ? 'RESTART IDENTITY ' : '';
+    $resetSerialId = $this->queryOptions['reset_serial_id'] ?? TRUE;
+    $restartIdentity = $resetSerialId ? 'RESTART IDENTITY ' : '';
 
-    return $comments . 'TRUNCATE {' . $this->connection->escapeTable($this->table) . '} ' . $restart_identity;
+    return $comments . 'TRUNCATE {' . $this->connection->escapeTable($this->table) . '} ' . $restartIdentity;
   }
 
 }

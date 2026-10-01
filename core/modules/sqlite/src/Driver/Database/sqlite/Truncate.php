@@ -22,8 +22,8 @@ class Truncate extends QueryTruncate {
    * {@inheritdoc}
    */
   public function execute(): void {
-    $reset_serial_id = $this->queryOptions['reset_serial_id'] ?? TRUE;
-    if (!$reset_serial_id) {
+    $resetSerialId = $this->queryOptions['reset_serial_id'] ?? TRUE;
+    if (!$resetSerialId) {
       parent::execute();
       return;
     }
@@ -51,20 +51,20 @@ class Truncate extends QueryTruncate {
     // In this driver a prefix is an attached database, so the schema has to be
     // named explicitly instead of going through the query builder, which would
     // prefix the name of the internal table as if it were a Drupal one.
-    $schema_name = rtrim($this->connection->getPrefix(), '.') ?: 'main';
+    $schemaName = rtrim($this->connection->getPrefix(), '.') ?: 'main';
     try {
-      $this->connection->query("DELETE FROM [" . $schema_name . "].sqlite_sequence WHERE name = :name", [':name' => $this->table]);
+      $this->connection->query("DELETE FROM [" . $schemaName . "].sqlite_sequence WHERE name = :name", [':name' => $this->table]);
     }
     catch (DatabaseExceptionWrapper $e) {
       // sqlite_sequence only exists once a table of this schema uses
       // AUTOINCREMENT, so it is missing while no table has a serial column. The
       // statement is attempted before checking that, so the common case spends
       // one query here instead of two. Anything else is a real failure.
-      $sequence_exists = (bool) $this->connection->query("SELECT 1 FROM [" . $schema_name . "].sqlite_master WHERE type = :type AND name = :name", [
+      $sequenceExists = (bool) $this->connection->query("SELECT 1 FROM [" . $schemaName . "].sqlite_master WHERE type = :type AND name = :name", [
         ':type' => 'table',
         ':name' => 'sqlite_sequence',
       ])->fetchField();
-      if ($sequence_exists) {
+      if ($sequenceExists) {
         throw $e;
       }
     }

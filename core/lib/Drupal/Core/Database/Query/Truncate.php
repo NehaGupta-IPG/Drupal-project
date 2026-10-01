@@ -73,12 +73,17 @@ class Truncate extends Query implements QueryExecutionVoidInterface {
     // Create a sanitized comment string to prepend to the query.
     $comments = $this->connection->makeComment($this->comments);
 
-    // The statement actually built depends on what the caller asked to happen
-    // to the serial ID, and on whether a transaction is active when nothing
-    // was asked.
+    // If no explicit directive was provided about the serial ID, we need to
+    // check whether a transaction is active, in which case we cannot rely on
+    // TRUNCATE, as that would automatically commit the transaction.
     // @see ::execute()
-    $reset_serial_id = $this->queryOptions['reset_serial_id'] ?? NULL;
-    $truncate = $reset_serial_id ?? !$this->connection->inTransaction();
+    $resetSerialId = $this->queryOptions['reset_serial_id'] ?? NULL;
+    if (isset($resetSerialId)) {
+      $truncate = $resetSerialId;
+    }
+    else {
+      $truncate = !$this->connection->inTransaction();
+    }
     if (!$truncate) {
       return $comments . 'DELETE FROM {' . $this->connection->escapeTable($this->table) . '}';
     }
