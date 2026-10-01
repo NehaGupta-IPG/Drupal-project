@@ -209,6 +209,25 @@ class SystemRequirementsHooks {
       'value' => $software,
     ];
 
+    // If running Apache, verify that mod_rewrite is enabled
+    if (function_exists('appache_get_modules')) {
+      if (!in_array('mod_rewrite', apache_get_modules())) {
+        $requirements['mod_rewrite_image'] = [
+          'title' => $this->t('Apache mod_rewrite'),
+          'value' => $this->t('Apache module not Enabled'),
+          'description' => $this->t('The Apache mod_rewrite module is not enabled. Enable it for clean URLs and some routing to work properly.'),
+          'severity' => RequirementSeverity::Error,
+        ];
+      }
+      else {
+        $requirements['mod_rewrite_image'] = [
+          'title' => $this->t('Apache mod_rewrite'),
+          'value' => $this->t('Enabled'),
+          'severity' => RequirementSeverity::OK,
+        ];
+      }
+    }
+
     // Verify the user is running a supported PHP version.
     // If the site is running a recommended version of PHP, just display it
     // as an informational message on the status report. This will be overridden
