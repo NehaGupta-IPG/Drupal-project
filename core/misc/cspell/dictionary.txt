@@ -394,6 +394,7 @@ smtps
 squaresmall
 squiz
 ssess
+sslcert
 sslmode
 sslkey
 sslrootcert
