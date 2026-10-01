@@ -212,8 +212,6 @@ abstract class StorableConfigBase extends ConfigBase {
    *   top level mapping will be processed.
    * @param mixed $value
    *   Value to associate with the key.
-   * @param bool $is_translatable
-   *   Records whether the value is translatable.
    *
    * @return mixed
    *   The value cast to the type indicated in the schema.
@@ -221,16 +219,10 @@ abstract class StorableConfigBase extends ConfigBase {
    * @throws \Drupal\Core\Config\UnsupportedDataTypeConfigException
    *   If the value is unsupported in configuration.
    */
-  protected function castValue($key, $value, bool &$is_translatable = FALSE) {
-    if (func_num_args() === 2) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $is_translatable argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See \Drupal\Core\Config\Config::save() for how this should be used. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
-    }
+  protected function castValue($key, $value) {
     $element = $this->getSchemaWrapper();
     if ($key !== NULL) {
       $element = $element->get($key);
-    }
-    if ($element) {
-      $is_translatable = $is_translatable || $element->getDataDefinition()['translatable'];
     }
 
     // Do not cast value if it is unknown or defined to be ignored.
@@ -265,7 +257,7 @@ abstract class StorableConfigBase extends ConfigBase {
       // Recurse into any nested keys.
       foreach ($value as $nested_value_key => $nested_value) {
         $lookup_key = $key ? $key . '.' . $nested_value_key : $nested_value_key;
-        $value[$nested_value_key] = $this->castValue($lookup_key, $nested_value, $is_translatable);
+        $value[$nested_value_key] = $this->castValue($lookup_key, $nested_value);
       }
 
       // Only sort maps when we have more than 1 element to sort.
