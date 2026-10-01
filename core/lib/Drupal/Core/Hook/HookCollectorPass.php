@@ -12,7 +12,6 @@ use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\HookDependsOnModule;
-use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Hook\Attribute\LegacyRequirementsHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
@@ -432,7 +431,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
               break;
             }
 
-            $legacy_attributes = [LegacyHook::class, LegacyRequirementsHook::class];
+            $legacy_attributes = [LegacyRequirementsHook::class];
             if (!static::hasAnyAttribute($attributes, $legacy_attributes) && (preg_match($current_module_preg, $function, $matches) || preg_match($all_modules_preg, $function, $matches))) {
               // Skip hooks that are not supported by the new hook system, they
               // do not need to be added to the BC layer. Note that is different

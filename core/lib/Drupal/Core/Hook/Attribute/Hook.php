@@ -84,13 +84,6 @@ use Drupal\Core\Hook\Order\OrderInterface;
  * Hooks implemented by themes must remain procedural.
  *
  * @section sec_backwards_compatibility Backwards-compatibility
- *
- * To allow hook implementations to work on older versions of Drupal as well,
- * add both an attribute-based hook implementation and a procedural hook
- * implementation, with the \Drupal\Core\Hook\Attribute\LegacyHook attribute on
- * the procedural hook implementations.
- *
- * See \Drupal\Core\Hook\Attribute\LegacyHook for additional information.
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Hook implements HookAttributeInterface {

@@ -9,7 +9,6 @@ use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Hook\Attribute\ReorderHook;
@@ -288,7 +287,7 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
             if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
               break;
             }
-            if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && (preg_match($currentThemePreg, $function, $matches) || preg_match($allThemesPreg, $function, $matches))) {
+            if ((preg_match($currentThemePreg, $function, $matches) || preg_match($allThemesPreg, $function, $matches))) {
               assert($function === $matches['theme'] . '_' . $matches['hook']);
               $implementations['hooks'][] = ['theme' => $matches['theme'], 'hook' => $matches['hook']];
             }

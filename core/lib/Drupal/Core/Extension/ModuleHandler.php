@@ -7,7 +7,6 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
-use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\ImplementationList;
 use Drupal\Core\Hook\OrderOperation\OrderOperation;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
