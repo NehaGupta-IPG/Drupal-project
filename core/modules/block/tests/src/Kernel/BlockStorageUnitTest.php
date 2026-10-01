@@ -8,6 +8,7 @@ use Drupal\block\Entity\Block;
 use Drupal\block_test\Plugin\Block\TestHtmlBlock;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Block\Plugin\Block\Broken;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -62,6 +63,7 @@ class BlockStorageUnitTest extends KernelTestBase {
     try {
       $entity = $this->controller->create([]);
       $entity->getPlugin();
+      $this->assertInstanceOf(Broken::class, $plugin);
       $this->fail('A block without a plugin was created with no exception thrown.');
     }
     catch (PluginException $e) {

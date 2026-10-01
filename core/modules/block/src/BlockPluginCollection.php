@@ -59,26 +59,4 @@ class BlockPluginCollection extends DefaultSingleLazyPluginCollection {
     parent::addInstanceId($id, $configuration);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function initializePlugin($instance_id) {
-    if (!$instance_id) {
-      throw new PluginException("The block '{$this->blockId}' did not specify a plugin.");
-    }
-
-    try {
-      parent::initializePlugin($instance_id);
-    }
-    catch (PluginException $e) {
-      $module = $this->configuration['provider'];
-      // Ignore blocks belonging to uninstalled modules, but re-throw valid
-      // exceptions when the module is installed and the plugin is
-      // misconfigured.
-      if (!$module || \Drupal::moduleHandler()->moduleExists($module)) {
-        throw $e;
-      }
-    }
-  }
-
 }
