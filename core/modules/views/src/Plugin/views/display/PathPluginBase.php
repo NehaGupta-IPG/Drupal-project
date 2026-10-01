@@ -10,7 +10,7 @@ use Drupal\Core\Routing\RouteCompiler;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Url;
-use Drupal\views\Access\ArgumentValidatorAccessCheck;
+use Drupal\views\Access\ArgumentAccessCheck;
 use Drupal\views\PostSaveProcess;
 use Drupal\views\PostSaveViewInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -191,13 +191,16 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     }
     $access_plugin->alterRouteDefinition($route);
 
-    foreach ((array) $this->getOption('arguments') as $argument) {
-      if (ArgumentValidatorAccessCheck::appliesToArgument($argument)) {
-        $route->setRequirement('_argument_validator_access', 'TRUE');
-        if (($argument['validate']['fail'] ?? NULL) === 'access denied') {
-          $route->setOption('_argument_validator_access_denied', TRUE);
-        }
+    // If a NULL or invalid argument could lead to a 403 or 404 response, we
+    // need to make sure the route checks the argument and does the same.
+    $arguments_to_check = [];
+    foreach ((array) $this->getOption('arguments') as $name => $argument) {
+      if (ArgumentAccessCheck::requiresValue($argument) || ArgumentAccessCheck::requiresValidation($argument)) {
+        $arguments_to_check[] = $name;
       }
+    }
+    if ($arguments_to_check) {
+      $route->setRequirement('_views_argument_access', implode(',', $arguments_to_check));
     }
 
     // Set the argument map, in order to support named parameters.

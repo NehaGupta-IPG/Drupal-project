@@ -129,6 +129,6 @@ services:
   Drupal\views\ViewsConfigUpdater: ~
   Drupal\views\ContextualLinksHelper: ~
   access_check.views.argument_validator:
-    class: Drupal\views\Access\ArgumentValidatorAccessCheck
+    class: Drupal\views\Access\ArgumentAccessCheck
     tags:
-      - { name: access_check, applies_to: _argument_validator_access }
+      - { name: access_check, applies_to: _views_argument_access }
