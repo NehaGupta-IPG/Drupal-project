@@ -165,15 +165,12 @@ class ModuleHandlerTest extends UnitTestCase {
   #[PreserveGlobalState(FALSE)]
   #[RunInSeparateProcess]
   public function testLoadInclude(): void {
-    $moduleList = [
-      'module_handler_test_no_hook' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_no_hook',
-    ];
-    $module_handler = $this->getModuleHandler($moduleList);
+    $module_handler = $this->getModuleHandler();
     // Include exists.
-    $this->assertEquals(__DIR__ . '/modules/module_handler_test_no_hook/hook_include.inc', $module_handler->loadInclude('module_handler_test_no_hook', 'inc', 'hook_include'));
+    $this->assertEquals(__DIR__ . '/modules/module_handler_test/hook_include.inc', $module_handler->loadInclude('module_handler_test', 'inc', 'hook_include'));
     $this->assertTrue(function_exists('module_handler_test_hook_include'));
     // Include doesn't exist.
-    $this->assertFalse($module_handler->loadInclude('module_handler_test_no_hook', 'install'));
+    $this->assertFalse($module_handler->loadInclude('module_handler_test', 'install'));
   }
 
   /**
