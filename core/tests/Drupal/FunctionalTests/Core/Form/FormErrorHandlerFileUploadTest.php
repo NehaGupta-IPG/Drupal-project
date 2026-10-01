@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests file upload scenario's with new 'enable_inline_error_handling' setting.
  */
-#[Group('Form')]
+#[Group('form')]
 #[RunTestsInSeparateProcesses]
 class FormErrorHandlerFileUploadTest extends BrowserTestBase {
 

@@ -29,8 +29,14 @@ class FormErrorHandler implements FormErrorHandlerInterface {
   public function handleFormErrors(array &$form, FormStateInterface $form_state) {
     // After validation check if there are errors.
     if ($form_state->getErrors()) {
-      // Display error messages for each element.
-      $this->displayErrorMessagesNew($form, $form_state);
+      if (Settings::get('enable_inline_error_handling', FALSE)) {
+        // Display error messages for each element.
+        $this->displayErrorMessagesNew($form, $form_state);
+      }
+      else {
+        // Display error messages for each element.
+        $this->displayErrorMessages($form, $form_state);
+      }
 
       // Loop through and assign each element its errors.
       $this->setElementErrorsFromFormState($form, $form_state);
