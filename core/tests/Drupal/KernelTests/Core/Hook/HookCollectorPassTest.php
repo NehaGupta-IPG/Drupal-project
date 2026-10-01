@@ -113,22 +113,6 @@ class HookCollectorPassTest extends KernelTestBase {
   }
 
   /**
-   * Test procedural hooks for a module are skipped when skip is set.
-   */
-  public function testProceduralHooksSkippedWhenConfigured(): void {
-    $module_installer = $this->container->get('module_installer');
-    $this->assertTrue($module_installer->install(['hook_collector_skip_procedural']));
-    $this->assertTrue($module_installer->install(['hook_collector_on_behalf_procedural']));
-    $this->assertTrue($module_installer->install(['hook_collector_on_behalf']));
-    $this->assertFalse(isset($GLOBALS['skip_procedural_all']));
-    $this->assertFalse(isset($GLOBALS['skipped_procedural_oop_cache_flush']));
-    drupal_flush_all_caches();
-    $this->assertFalse(isset($GLOBALS['skip_procedural_all']));
-    $this->assertTrue(isset($GLOBALS['skipped_procedural_oop_cache_flush']));
-    $this->assertFalse($this->container->hasParameter('hook_collector_skip_procedural.skip_procedural_hook_scan'));
-  }
-
-  /**
    * Test Hook attribute with named arguments, and class with invoke method.
    */
   public function testHookAttribute(): void {

@@ -169,17 +169,12 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
     $parameters = $container->getParameterBag()->all();
     $themeList = $parameters['container.themes'];
 
-    $skipProcedural = array_filter(
-      array_keys($themeList),
-      static fn(string $theme) => !empty($parameters["$theme.skip_procedural_hook_scan"]),
-    );
     $themes = array_keys($themeList);
     $allThemesPreg = static::getThemeListPattern($themes);
     $collector = new static($themes);
     foreach ($themeList as $theme => $info) {
-      $shouldSkipProceduralScan = in_array($theme, $skipProcedural);
       $currentThemePreg = static::getThemeListPattern([$theme]);
-      $collector->collectThemeHookImplementations(dirname($info['pathname']), $theme, $currentThemePreg, $allThemesPreg, $shouldSkipProceduralScan);
+      $collector->collectThemeHookImplementations(dirname($info['pathname']), $theme, $currentThemePreg, $allThemesPreg);
     }
     return $collector;
   }
@@ -217,10 +212,8 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
    * @param string $allThemesPreg
    *   A regular expression matching every theme, longer theme names are
    *   matched first.
-   * @param bool $shouldSkipProceduralScan
-   *   Skip the procedural check for the current theme.
    */
-  protected function collectThemeHookImplementations($dir, $theme, $currentThemePreg, $allThemesPreg, bool $shouldSkipProceduralScan): void {
+  protected function collectThemeHookImplementations($dir, $theme, $currentThemePreg, $allThemesPreg): void {
     $hookFileCache = FileCacheFactory::get('theme_hook_implementations');
 
     foreach ($this->getHookFileIterator($dir, ["$theme.theme"]) as $fileinfo) {

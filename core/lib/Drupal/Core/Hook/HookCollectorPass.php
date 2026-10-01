@@ -268,19 +268,13 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
    */
   protected static function collectAllHookImplementations(ContainerBuilder $container): static {
     $module_list = $container->getParameter('container.modules');
-    $parameters = $container->getParameterBag()->all();
-    $skip_procedural_modules = array_filter(
-      array_keys($module_list),
-      static fn (string $module) => !empty($parameters["$module.skip_procedural_hook_scan"]),
-    );
 
     $modules = array_keys($module_list);
     $all_modules_preg = static::getModuleListPattern($modules);
     $collector = new static($modules);
     foreach ($module_list as $module => $info) {
-      $skip_procedural = in_array($module, $skip_procedural_modules);
       $current_module_preg = static::getModuleListPattern([$module]);
-      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $current_module_preg, $all_modules_preg, $skip_procedural);
+      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $current_module_preg, $all_modules_preg);
     }
     return $collector;
   }
@@ -318,10 +312,8 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
    * @param string $all_modules_preg
    *   A regular expression matching every module, longer module names are
    *   matched first.
-   * @param bool $skip_procedural
-   *   Skip the procedural check for the current module.
    */
-  protected function collectModuleHookImplementations($dir, $module, $current_module_preg, $all_modules_preg, bool $skip_procedural): void {
+  protected function collectModuleHookImplementations($dir, $module, $current_module_preg, $all_modules_preg): void {
     $hook_file_cache = FileCacheFactory::get('hook_implementations');
     $procedural_files = array_map(fn (string $extension): string => "$module.$extension", $this->proceduralFileExtensions);
     foreach ($this->getHookFileIterator($dir, $procedural_files) as $fileinfo) {
