@@ -149,15 +149,6 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface,
       }
     }
 
-    $name = $this->config->getName();
-    // Ensure that translatable config has `langcode` specified.
-    // @see \Drupal\Core\Config\Plugin\Validation\Constraint\LangcodeRequiredIfTranslatableValuesConstraint
-    if ($this->typedConfigManager->hasConfigSchema($name)
-      && $this->typedConfigManager->createFromNameAndData($name, $this->config->getRawData())->hasTranslatableElements()
-      && !$this->config->get('langcode')
-    ) {
-      $this->config->set('langcode', $this->language_manager->getDefaultLanguage()->getId());
-    }
     $this->config->save();
     $ids[] = $this->config->getName();
     if ($this->isTranslationDestination()) {
