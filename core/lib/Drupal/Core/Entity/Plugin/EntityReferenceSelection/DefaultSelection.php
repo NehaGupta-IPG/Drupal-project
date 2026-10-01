@@ -302,7 +302,6 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
             ':input[name="settings[handler_settings][auto_create]"]' => ['checked' => TRUE],
           ],
         ],
-        '#weight' => -1,
       ];
     }
 
