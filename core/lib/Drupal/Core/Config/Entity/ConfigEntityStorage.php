@@ -115,7 +115,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     $this->uuidService = $uuid_service;
     $this->languageManager = $language_manager;
     if ($event_dispatcher === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . '::__construct() without the $event_dispatcher argument is deprecated in drupal:11.5.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __CLASS__ . '::__construct() without the $event_dispatcher argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
       $event_dispatcher = \Drupal::service('event_dispatcher');
     }
     $this->eventDispatcher = $event_dispatcher;
