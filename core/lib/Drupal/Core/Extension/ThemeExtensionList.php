@@ -247,7 +247,7 @@ class ThemeExtensionList extends ExtensionList {
    * {@inheritdoc}
    */
   protected function subClassExtension(Extension $extension): Theme {
-    return new Theme($this->root, $extension->getPathname(), $extension->info, $extension->getExtensionFilename());
+    return new Theme($this->root, $extension->getPathname(), $extension->info);
   }
 
   /**
