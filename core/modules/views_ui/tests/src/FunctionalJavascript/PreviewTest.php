@@ -77,7 +77,6 @@ class PreviewTest extends WebDriverTestBase {
     \Drupal::service('module_installer')->install(['views_test_data']);
     $this->resetAll();
     $this->rebuildContainer();
-    $this->container->get('module_handler')->reload();
 
     // Load the test dataset.
     $data_set = $this->dataSet();

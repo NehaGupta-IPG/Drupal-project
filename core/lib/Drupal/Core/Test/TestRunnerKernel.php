@@ -62,8 +62,6 @@ class TestRunnerKernel extends DrupalKernel {
 
     parent::boot();
 
-    $this->getContainer()->get('module_handler')->loadAll();
-
     $test_discovery = new TestDiscovery(
       $this->getContainer()->getParameter('app.root'),
       $this->getContainer()->get('class_loader')

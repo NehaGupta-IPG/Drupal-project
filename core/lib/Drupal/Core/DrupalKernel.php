@@ -609,9 +609,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $this->loadLegacyIncludes();
 
-    // Load all enabled modules.
-    $this->container->get('module_handler')->loadAll();
-
     // Register stream wrappers.
     $this->container->get('stream_wrapper_manager')->register();
 
@@ -1313,9 +1310,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->themeExtensions = [];
     $this->containerNeedsRebuild = TRUE;
     $container = $this->initializeContainer();
-    // ThemeManager::render() fails without this. Normally ::preHandle() has
-    // a ->loadAll() call.
-    $container->get('module_handler')->loadAll();
     return $container;
   }
 
@@ -1325,16 +1319,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   public function resetContainer(): ContainerInterface {
     $session_started = FALSE;
     $subrequest = FALSE;
-    $reload_module_handler = FALSE;
     $stream_wrappers_registered = FALSE;
 
     // Save the id of the currently logged in user.
     if ($this->container->initialized('current_user')) {
       $current_user_id = $this->container->get('current_user')->id();
-    }
-
-    if ($this->container->initialized('module_handler') && $this->container->get('module_handler')->isLoaded()) {
-      $reload_module_handler = TRUE;
     }
 
     if ($this->container->initialized('stream_wrapper_manager') && !empty($this->container->get('stream_wrapper_manager')->getWrappers())) {
@@ -1383,10 +1372,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if ($stream_wrappers_registered) {
       // Re-register the stream wrappers with the manager service.
       $this->container->get('stream_wrapper_manager')->register();
-    }
-
-    if ($reload_module_handler) {
-      $this->container->get('module_handler')->reload();
     }
 
     if ($session_started) {

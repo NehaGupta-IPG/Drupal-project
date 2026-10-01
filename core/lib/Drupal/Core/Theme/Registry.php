@@ -199,10 +199,7 @@ class Registry implements DestructableInterface {
     }
     else {
       $this->build();
-      // Only persist it if all modules are loaded to ensure it is complete.
-      if ($this->moduleHandler->isLoaded()) {
-        $this->setCache();
-      }
+      $this->setCache();
     }
 
     return $this->registry[$this->theme->getName()];
@@ -240,7 +237,7 @@ class Registry implements DestructableInterface {
   public function getRuntime() {
     $this->init();
     if (!isset($this->runtimeRegistry[$this->theme->getName()])) {
-      $this->runtimeRegistry[$this->theme->getName()] = new ThemeRegistry('theme_registry:runtime:' . $this->theme->getName(), $this->runtimeCache ?: $this->cache, $this->lock, [], $this->moduleHandler->isLoaded());
+      $this->runtimeRegistry[$this->theme->getName()] = new ThemeRegistry('theme_registry:runtime:' . $this->theme->getName(), $this->runtimeCache ?: $this->cache, $this->lock, []);
     }
     return $this->runtimeRegistry[$this->theme->getName()];
   }
@@ -333,10 +330,7 @@ class Registry implements DestructableInterface {
         });
       }
 
-      // Only cache this registry if all modules are loaded.
-      if ($this->moduleHandler->isLoaded()) {
-        $this->cache->set("theme_registry:build:modules", $cache);
-      }
+      $this->cache->set("theme_registry:build:modules", $cache);
     }
 
     // Process each base theme.
