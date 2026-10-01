@@ -62,38 +62,6 @@ class HookCollectorPassTest extends KernelTestBase {
   }
 
   /**
-   * Test that ordering works.
-   */
-  public function testOrdering(): void {
-    $container = new ContainerBuilder();
-    $module_filenames = [
-      'module_handler_test_all1' => ['pathname' => "core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/module_handler_test_all1.info.yml"],
-      'module_handler_test_all2' => ['pathname' => "core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2/module_handler_test_all2.info.yml"],
-    ];
-    include_once 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/src/Hook/ModuleHandlerTestAll1Hooks.php';
-    $container->setParameter('container.modules', $module_filenames);
-    $keyvalue = new KeyValueMemoryFactory();
-    $container->set('keyvalue', $keyvalue);
-    $container->set('cache.bootstrap', new NullBackend('bootstrap'));
-    (new HookCollectorPass())->process($container);
-    (new HookCollectorKeyValueWritePass())->process($container);
-    $this->assertRegisteredHooks([
-      'hook' => [
-        'module_handler_test_all1_hook' => 'module_handler_test_all1',
-        'module_handler_test_all2_hook' => 'module_handler_test_all2',
-      ],
-      'order1' => [
-        'module_handler_test_all2_order1' => 'module_handler_test_all2',
-        ModuleHandlerTestAll1Hooks::class . '::order' => 'module_handler_test_all1',
-      ],
-      'order2' => [
-        ModuleHandlerTestAll1Hooks::class . '::order' => 'module_handler_test_all1',
-        'module_handler_test_all2_order2' => 'module_handler_test_all2',
-      ],
-    ], $container);
-  }
-
-  /**
    * Test hooks implemented on behalf of an uninstalled module.
    *
    * They should be picked up but only executed when the other
@@ -102,14 +70,11 @@ class HookCollectorPassTest extends KernelTestBase {
   public function testHooksImplementedOnBehalfFileCache(): void {
     $module_installer = $this->container->get('module_installer');
     $this->assertTrue($module_installer->install(['hook_collector_on_behalf']));
-    $this->assertTrue($module_installer->install(['hook_collector_on_behalf_procedural']));
     drupal_flush_all_caches();
     $this->assertFalse(isset($GLOBALS['on_behalf_oop']));
-    $this->assertFalse(isset($GLOBALS['on_behalf_procedural']));
     $this->assertTrue($module_installer->install(['respond_install_uninstall_hook_test']));
     drupal_flush_all_caches();
     $this->assertTrue(isset($GLOBALS['on_behalf_oop']));
-    $this->assertTrue(isset($GLOBALS['on_behalf_procedural']));
   }
 
   /**

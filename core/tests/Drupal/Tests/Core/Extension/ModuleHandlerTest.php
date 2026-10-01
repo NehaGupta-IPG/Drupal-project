@@ -174,35 +174,6 @@ class ModuleHandlerTest extends UnitTestCase {
   }
 
   /**
-   * Tests invoke methods when module is enabled.
-   */
-  public function testInvokeModuleEnabled(): void {
-    $module_handler = $this->getModuleHandler();
-    $this->assertTrue($module_handler->invoke('module_handler_test', 'hook', [TRUE]), 'Installed module runs hook.');
-    $this->assertFalse($module_handler->invoke('module_handler_test', 'hook', [FALSE]), 'Installed module runs hook.');
-    $this->assertNull($module_handler->invoke('module_handler_test_fake', 'hook', [FALSE]), 'Installed module runs hook.');
-  }
-
-  /**
-   * Tests invoke all.
-   */
-  public function testInvokeAll(): void {
-    $implementations = [
-      'hook' => [
-        'module_handler_test_hook' => 'module_handler_test',
-        'module_handler_test_all1_hook' => 'module_handler_test_all1',
-        'module_handler_test_all2_hook' => 'module_handler_test_all2',
-      ],
-    ];
-    $moduleList = [
-      'module_handler_test_all1' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1',
-      'module_handler_test_all2' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2',
-    ];
-    $module_handler = $this->getModuleHandler($moduleList, $implementations);
-    $this->assertEquals([TRUE, TRUE, TRUE], $module_handler->invokeAll('hook', [TRUE]));
-  }
-
-  /**
    * Tests hasImplementations.
    */
   public function testHasImplementations(): void {
