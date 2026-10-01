@@ -114,9 +114,6 @@ class ThemeManager implements ThemeManagerInterface {
    */
   public function setActiveTheme(ActiveTheme $active_theme) {
     $this->activeTheme = $active_theme;
-    if ($active_theme) {
-      $this->themeInitialization->loadActiveTheme($active_theme);
-    }
     return $this;
   }
 

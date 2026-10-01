@@ -85,7 +85,6 @@ class ThemeInitialization implements ThemeInitializationInterface {
    */
   public function initTheme($theme_name) {
     $active_theme = $this->getActiveThemeByName($theme_name);
-    $this->loadActiveTheme($active_theme);
 
     return $active_theme;
   }
@@ -101,9 +100,8 @@ class ThemeInitialization implements ThemeInitializationInterface {
 
     // If no theme could be negotiated, or if the negotiated theme is not within
     // the list of installed themes, fall back to the default theme output of
-    // core and modules (like Stark, but without a theme extension at all). This
-    // is possible, because loadActiveTheme() always loads the Twig theme
-    // engine. This is desired, because missing or malformed theme configuration
+    // core and modules (like Stark, but without a theme extension at all).
+    // This is desired, because missing or malformed theme configuration
     // should not leave the application in a broken state. By falling back to
     // default output, the user is able to reconfigure the theme through the UI.
     // Lastly, tests are expected to operate with no theme by default, so as to
@@ -135,17 +133,6 @@ class ThemeInitialization implements ThemeInitializationInterface {
 
     $this->cache->set('theme.active_theme.' . $theme_name, $active_theme);
     return $active_theme;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function loadActiveTheme(ActiveTheme $active_theme) {
-    // Initialize the theme.
-    foreach (array_reverse($active_theme->getBaseThemeExtensions()) as $base) {
-      $base->load();
-    }
-    $active_theme->getExtension()->load();
   }
 
   /**
