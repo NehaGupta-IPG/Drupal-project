@@ -377,9 +377,6 @@ class ConfigInstaller implements ConfigInstallerInterface {
       $config_names = array_keys($config_to_create);
     }
 
-    // The langcode missing-or-'en' shipped configuration resolves to.
-    $default_langcode = NULL;
-
     foreach ($config_names as $name) {
       // Allow config factory overriders to use a custom configuration object if
       // they are responsible for the collection.
@@ -402,23 +399,18 @@ class ConfigInstaller implements ConfigInstallerInterface {
           ] + $config_to_create[$name];
 
           if ($this->typedConfig->hasConfigSchema($name)) {
-            // The first time this point is reached, resolve the default
-            // langcode.
-            if (!isset($default_langcode)) {
-              $event = new ConfigLangcodeResolveEvent();
-              $this->eventDispatcher->dispatch($event);
-              $default_langcode = $event->getLangcode();
-            }
             // Building typed data here to check translatability is too
             // expensive to do twice for every piece of configuration being
-            // installed. Resolving unconditionally instead, including for
-            // configuration with no translatable values at all. This is
-            // harmless: a resolved langcode that Config::save() finds
-            // unwarranted is stripped straight back out by its own
-            // reconcileLangcodeWithTranslatability().
-            // Extension-shipped configuration is assumed to be English unless
-            // it ships with its own explicit langcode.
+            // installed. Resolve the langcode unconditionally instead,
+            // including for configuration with no translatable values at all.
+            // This is harmless: Config::save() will remove any langcodes added
+            // to untranslatable configuration. Extension-shipped configuration
+            // is assumed to be English unless it ships with its own explicit
+            // langcode.
             if (!isset($config_to_create[$name]['langcode']) || $config_to_create[$name]['langcode'] === 'en') {
+              // The first time this point is reached, resolve the default
+              // langcode.
+              $default_langcode ??= $this->eventDispatcher->dispatch(new ConfigLangcodeResolveEvent())->getLangcode();
               $config_to_create[$name]['langcode'] = $default_langcode;
             }
           }

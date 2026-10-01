@@ -25,14 +25,6 @@ class DefaultConfigLangcodeSubscriber implements EventSubscriberInterface {
    */
   protected const string CONFIG_KEY = 'default_langcode';
 
-  /**
-   * Constructs a new class object.
-   *
-   * @param \Drupal\language\DefaultLangcodeConfigUpdaterInterface $defaultLangcodeConfigUpdater
-   *   The default langcode configuration updater.
-   * @param \Drupal\Core\Config\ConfigInstallerInterface $configInstaller
-   *   The config installer, used to check whether configuration is syncing.
-   */
   public function __construct(protected readonly DefaultLangcodeConfigUpdaterInterface $defaultLangcodeConfigUpdater, protected readonly ConfigInstallerInterface $configInstaller) {
   }
 
