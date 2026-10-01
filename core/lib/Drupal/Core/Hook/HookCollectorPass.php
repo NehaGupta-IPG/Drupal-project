@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook;
 
-use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
-use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\OpCodeCache;
-use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\HookDependsOnModule;
@@ -396,17 +393,13 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
               }
             }
             elseif ($attribute instanceof ReorderHook) {
-              $identifier = $attribute->class === ProceduralCall::class
-                ? $attribute->method
-                : $attribute->class . '::' . $attribute->method;
+              $identifier = $attribute->class . '::' . $attribute->method;
               // Use a higher weight for order operations that target other hook
               // listeners.
               $this->orderOperations[$attribute->hook][1][] = $attribute->order->getOperation($identifier);
             }
             elseif ($attribute instanceof RemoveHook) {
-              $identifier = $attribute->class === ProceduralCall::class
-                ? $attribute->method
-                : $attribute->class . '::' . $attribute->method;
+              $identifier = $attribute->class . '::' . $attribute->method;
               $this->removeHookIdentifiers[$attribute->hook][] = $identifier;
             }
           }

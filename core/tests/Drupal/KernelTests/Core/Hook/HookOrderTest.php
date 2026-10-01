@@ -261,34 +261,4 @@ class HookOrderTest extends KernelTestBase {
     );
   }
 
-  /**
-   * Test procedural hook ordering using, 'test_procedural_reorder'.
-   *
-   * The order of 'test_procedural_reorder', without modification would be as
-   * follows.
-   * - \Drupal\aaa_hook_order_test\Hook\AHooks::testProceduralReorder()
-   * - bbb_hook_order_test_test_procedural_reorder()
-   * - ccc_hook_order_test_test_procedural_reorder()
-   *
-   * That order is modified using the Remove and Reorder as follows and the
-   *  resulting order asserted in this test.
-   * - The Reorder attribute is used to move
-   *   - bbb_hook_order_test_test_procedural_reorder() to the first position.
-   * - The Remove attribute is used to remove
-   *   - ccc_hook_order_test_test_procedural_reorder()
-   *
-   * @see \bbb_hook_order_test_test_procedural_reorder()
-   * @see \ccc_hook_order_test_test_procedural_reorder()
-   * @see \Drupal\aaa_hook_order_test\Hook\AHooks::testProceduralReorder()
-   */
-  public function testHookReorderProcedural(): void {
-    $this->assertSameCallList(
-      [
-        'bbb_hook_order_test_test_procedural_reorder',
-        AHooks::class . '::testProceduralReorder',
-      ],
-      \Drupal::moduleHandler()->invokeAll('test_procedural_reorder'),
-    );
-  }
-
 }
