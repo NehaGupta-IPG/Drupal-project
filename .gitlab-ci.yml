@@ -1,4 +1,4 @@
-# cspell:ignore codequality Micheh micheh webide testdox updatedb stylelintrc fastzip phpcscache Ksection drupaltestbot drupaltestbotpw Dwebdriver logfile XVFB
+# cspell:ignore codequality Micheh micheh webide testdox updatedb stylelintrc fastzip phpcscache Ksection drupaltestbot drupaltestbotpw Dwebdriver logfile XVFB phpspec
 
 ################
 # Drupal GitLabCI template.
@@ -135,6 +135,12 @@ default:
       patch -p1 --forward -d vendor/mikey179/vfsstream < fix-vfsstream-php86-spl-object-hash.patch
     fi
 
+.patch-guzzle-promises-php86: &patch-guzzle-promises-php86
+  - |
+    if patch -p1 --dry-run --forward -d vendor/guzzlehttp/promises < fix-guzzle-promises-php86-is.patch >/dev/null 2>&1; then
+      patch -p1 --forward -d vendor/guzzlehttp/promises < fix-guzzle-promises-php86-is.patch
+    fi
+
 .with-composer: &with-composer
   needs:
     - job: '🧹 PHP Coding standards (PHPCS)'
@@ -172,6 +178,7 @@ default:
   - composer install --optimize-autoloader
   - *patch-prophecy-php86
   - *patch-vfsstream-php86
+  - *patch-guzzle-promises-php86
   - composer run-script drupal-phpunit-upgrade-check
   - echo -e "\e[0Ksection_end:`date +%s`:composer_setup\r\e[0K"
 
@@ -290,6 +297,7 @@ default:
       fi
     - *patch-prophecy-php86
     - *patch-vfsstream-php86
+    - *patch-guzzle-promises-php86
   artifacts:
     expire_in: 1 week
     paths:
@@ -446,6 +454,7 @@ default:
     - composer install --optimize-autoloader
     - *patch-prophecy-php86
     - *patch-vfsstream-php86
+    - *patch-guzzle-promises-php86
     - export OTEL_COLLECTOR="$OPENTELEMETRY_COLLECTOR"
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/

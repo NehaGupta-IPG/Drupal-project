@@ -1,0 +1,121 @@
+--- a/composer.json
++++ b/composer.json
+@@ -37,7 +37,10 @@
+     "autoload": {
+         "psr-4": {
+             "GuzzleHttp\\Promise\\": "src/"
+-        }
++        },
++        "files": [
++            "src/Is.php"
++        ]
+     },
+     "autoload-dev": {
+         "psr-4": {
+--- a/resources/Is.php
++++ b/resources/Is.php
+@@ -0,0 +1,47 @@
++<?php
++
++declare(strict_types=1);
++
++namespace GuzzleHttp\Promise;
++
++/**
++ * Declared outside src/ and loaded through src/Is.php, see there.
++ */
++final class Is
++{
++    private function __construct()
++    {
++    }
++
++    /**
++     * Returns true if a promise is pending.
++     */
++    public static function pending(PromiseInterface $promise): bool
++    {
++        return $promise->getState() === PromiseInterface::PENDING;
++    }
++
++    /**
++     * Returns true if a promise is fulfilled or rejected.
++     */
++    public static function settled(PromiseInterface $promise): bool
++    {
++        return $promise->getState() !== PromiseInterface::PENDING;
++    }
++
++    /**
++     * Returns true if a promise is fulfilled.
++     */
++    public static function fulfilled(PromiseInterface $promise): bool
++    {
++        return $promise->getState() === PromiseInterface::FULFILLED;
++    }
++
++    /**
++     * Returns true if a promise is rejected.
++     */
++    public static function rejected(PromiseInterface $promise): bool
++    {
++        return $promise->getState() === PromiseInterface::REJECTED;
++    }
++}
+--- a/src/Is.php
++++ b/src/Is.php
+@@ -4,41 +4,17 @@
+ 
+ namespace GuzzleHttp\Promise;
+ 
+-final class Is
+-{
+-    private function __construct()
+-    {
+-    }
+-
+-    /**
+-     * Returns true if a promise is pending.
+-     */
+-    public static function pending(PromiseInterface $promise): bool
+-    {
+-        return $promise->getState() === PromiseInterface::PENDING;
+-    }
+-
+-    /**
+-     * Returns true if a promise is fulfilled or rejected.
+-     */
+-    public static function settled(PromiseInterface $promise): bool
+-    {
+-        return $promise->getState() !== PromiseInterface::PENDING;
+-    }
+-
+-    /**
+-     * Returns true if a promise is fulfilled.
+-     */
+-    public static function fulfilled(PromiseInterface $promise): bool
+-    {
+-        return $promise->getState() === PromiseInterface::FULFILLED;
+-    }
+-
+-    /**
+-     * Returns true if a promise is rejected.
+-     */
+-    public static function rejected(PromiseInterface $promise): bool
+-    {
+-        return $promise->getState() === PromiseInterface::REJECTED;
+-    }
++// PHP 8.6 deprecates "is" as a class name at compile time, so declaring the
++// class emits E_DEPRECATED on every load. Compile the declaration with only
++// fatal errors reported, the same mask the @ operator uses, so that error
++// handlers such as PHPUnit's treat the deprecation as suppressed. Using the
++// class is not affected.
++// @see https://github.com/guzzle/promises/issues/244
++// @see https://github.com/php/php-src/issues/23990
++$errorReporting = \error_reporting();
++\error_reporting($errorReporting & (\E_ERROR | \E_PARSE | \E_CORE_ERROR | \E_COMPILE_ERROR | \E_USER_ERROR | \E_RECOVERABLE_ERROR));
++try {
++    require_once __DIR__.'/../resources/Is.php';
++} finally {
++    \error_reporting($errorReporting);
+ }
