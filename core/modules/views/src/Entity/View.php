@@ -239,7 +239,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
   /**
    * {@inheritdoc}
    */
-  #[ActionMethod(adminLabel: new TranslatableMarkup('Duplicate display as type'), pluralize: FALSE)]
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Duplicate display as type'), pluralize: 'duplicateDisplaysAsType')]
   public function duplicateDisplayAsType($old_display_id, $new_display_type) {
     $executable = $this->getExecutable();
     $display = $executable->newDisplay($new_display_type);
