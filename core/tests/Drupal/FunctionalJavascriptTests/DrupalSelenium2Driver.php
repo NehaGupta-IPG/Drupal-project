@@ -10,6 +10,7 @@ use WebDriver\Element;
 use WebDriver\Exception;
 use WebDriver\Exception\JavaScriptError;
 use WebDriver\Exception\NoSuchWindow;
+use WebDriver\Exception\ScriptTimeout;
 use WebDriver\Exception\UnexpectedAlertOpen;
 use WebDriver\Exception\UnknownError;
 
@@ -127,26 +128,21 @@ class DrupalSelenium2Driver extends Selenium2Driver {
    */
   private function waitForRenderedFrame(): void {
     try {
-      // Wait for any page load to finish first, since it discards the flag.
-      $this->wait(10000, 'document.readyState === "complete"');
-      $this->getWebDriverSession()->execute([
+      $this->getWebDriverSession()->execute_async([
         'script' => <<<JS
-window.drupalFrameRendered = false;
+var done = arguments[arguments.length - 1];
+setTimeout(done, 2000);
 requestAnimationFrame(function () {
-  requestAnimationFrame(function () {
-    window.drupalFrameRendered = true;
-  });
+  requestAnimationFrame(done);
 });
 JS,
         'args' => [],
       ]);
-      // Use !== false so a navigation that replaces the document (making the
-      // flag undefined) returns immediately instead of waiting the timeout.
-      $this->wait(2000, 'window.drupalFrameRendered !== false');
     }
-    catch (JavaScriptError | NoSuchWindow | UnexpectedAlertOpen) {
-      // Best-effort: scripts may fail during navigation or while a dialog is
-      // open. Subsequent assertions will fail on their own if needed.
+    catch (JavaScriptError | NoSuchWindow | ScriptTimeout | UnexpectedAlertOpen) {
+      // Best-effort: scripts may fail while a dialog is open, and a navigation
+      // during the wait is reported as a script timeout. Subsequent assertions
+      // will fail on their own if needed.
     }
   }
 
