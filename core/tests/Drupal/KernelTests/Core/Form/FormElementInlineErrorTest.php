@@ -34,9 +34,12 @@ class FormElementInlineErrorTest extends KernelTestBase {
   public function testDisplayErrorMessagesNotInline(): void {
     $form_id = 'test';
 
+    $settings = Settings::getAll();
+    $settings['enable_inline_error_handling'] = FALSE;
+    new Settings($settings);
+
     $form = [
       '#parents' => [],
-      '#disable_inline_form_errors' => TRUE,
       '#array_parents' => [],
     ];
     $form['test'] = [

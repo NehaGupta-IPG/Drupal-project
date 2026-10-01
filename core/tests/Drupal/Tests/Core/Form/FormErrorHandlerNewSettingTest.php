@@ -51,9 +51,7 @@ class FormErrorHandlerNewSettingTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $settings = Settings::getAll();
-    $settings['enable_inline_error_handling'] = TRUE;
-    new Settings($settings);
+    new Settings(['enable_inline_error_handling' => TRUE]);
 
     $this->renderer = $this->createMock(RendererInterface::class);
     $this->messenger = $this->createMock(MessengerInterface::class);
@@ -194,9 +192,10 @@ class FormErrorHandlerNewSettingTest extends UnitTestCase {
         FALSE
       );
 
-    $settings = Settings::getAll();
-    $settings['enable_inline_error_handling'] = FALSE;
-    new Settings($settings);
+    $this->renderer->expects($this->never())
+      ->method('renderInIsolation');
+
+    new Settings(['enable_inline_error_handling' => FALSE]);
 
     $form_state = new FormState();
     $form_state->setErrorByName('test1', 'invalid');

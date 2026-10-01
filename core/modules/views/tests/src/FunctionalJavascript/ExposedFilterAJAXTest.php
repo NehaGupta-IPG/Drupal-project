@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\FunctionalJavascript;
 
+use Drupal\Core\Site\Settings;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
@@ -263,7 +264,9 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $this->assertSession()->waitForElement('css', 'div[aria-label="Error message"]');
     $this->assertSession()->pageTextContainsOnce(sprintf('There are no users matching "%s"', $name));
 
-    \Drupal::service('module_installer')->install(['inline_form_errors']);
+    $settings = Settings::getAll();
+    $settings['enable_inline_error_handling'] = TRUE;
+    new Settings($settings);
 
     $this->drupalGet('test_user_name');
     // Submit an invalid name, triggering validation errors.

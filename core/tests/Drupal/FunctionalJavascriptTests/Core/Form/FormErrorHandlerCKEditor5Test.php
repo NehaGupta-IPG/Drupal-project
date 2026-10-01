@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Core\Form;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
-use Drupal\Core\Site\Settings;
 use Drupal\editor\Entity\Editor;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -40,12 +39,23 @@ class FormErrorHandlerCKEditor5Test extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
+  protected function prepareSettings(): void {
+    parent::prepareSettings();
+    $this->writeSettings([
+      'settings' => [
+        'enable_inline_error_handling' => (object) [
+          'value' => TRUE,
+          'required' => TRUE,
+        ],
+      ],
+    ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
-
-    $settings = Settings::getAll();
-    $settings['enable_inline_error_handling'] = TRUE;
-    new Settings($settings);
 
     // Create a text format and associate CKEditor 5.
     FilterFormat::create([
