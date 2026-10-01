@@ -1294,4 +1294,17 @@ body {color:red}
     $this->assertStringNotContainsString($needle, strtolower(Html::decodeEntities($haystack)), $message);
   }
 
+  /**
+   * Theme hook test.
+   *
+   * Asserts that the 'text_format_wrapper' theme hook defines 'disabled' =>
+   * FALSE.
+   */
+  public function testTextFormatWrapperThemeVariables(): void {
+    $registry = \Drupal::service('theme.registry');
+    $runtime_registry = $registry->getRuntime();
+    $info = $runtime_registry->get('text_format_wrapper');
+    $this->assertFalse($info['variables']['disabled']);
+  }
+
 }
