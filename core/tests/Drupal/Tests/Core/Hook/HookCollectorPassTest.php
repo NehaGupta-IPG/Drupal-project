@@ -90,12 +90,7 @@ __EOF__
     $collector = new HookCollectorPass();
     $get_files = \Closure::bind(
       static function (HookCollectorPass $collector, string $directory, string $module): array {
-        $procedural_files = [
-          "$module.module",
-          "$module.profile",
-          "$module.install",
-        ];
-        return iterator_to_array($collector->getHookFileIterator($directory, $procedural_files));
+        return iterator_to_array($collector->getHookFileIterator($directory));
       },
       NULL,
       HookCollectorBase::class,

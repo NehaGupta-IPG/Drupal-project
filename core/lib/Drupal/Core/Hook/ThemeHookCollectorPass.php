@@ -170,34 +170,11 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
     $themeList = $parameters['container.themes'];
 
     $themes = array_keys($themeList);
-    $allThemesPreg = static::getThemeListPattern($themes);
     $collector = new static($themes);
     foreach ($themeList as $theme => $info) {
-      $currentThemePreg = static::getThemeListPattern([$theme]);
-      $collector->collectThemeHookImplementations(dirname($info['pathname']), $theme, $currentThemePreg, $allThemesPreg);
+      $collector->collectThemeHookImplementations(dirname($info['pathname']), $theme);
     }
     return $collector;
-  }
-
-  /**
-   * Get a pattern used to match hooks for the given theme list.
-   *
-   * The supplied theme list will be sorted by length in descending order so
-   * that longer names are matched first.
-   *
-   * @param list<string> $themeList
-   *   A list of theme names.
-   *
-   * @return string
-   *   The pattern used to match hooks for the given theme list.
-   */
-  protected static function getThemeListPattern(array $themeList): string {
-    usort($themeList, static fn($a, $b) => strlen($b) - strlen($a));
-    $themePattern = implode('|', array_map(
-      static fn($x) => preg_quote($x, '/'),
-      $themeList,
-    ));
-    return '/^(?<function>(?<theme>' . $themePattern . ')_(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
   }
 
   /**
@@ -207,23 +184,14 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
    *   The directory in which the theme resides.
    * @param string $theme
    *   The name of the theme.
-   * @param string $currentThemePreg
-   *   A regular expression matching only the theme being scanned.
-   * @param string $allThemesPreg
-   *   A regular expression matching every theme, longer theme names are
-   *   matched first.
    */
-  protected function collectThemeHookImplementations($dir, $theme, $currentThemePreg, $allThemesPreg): void {
+  protected function collectThemeHookImplementations($dir, $theme): void {
     $hookFileCache = FileCacheFactory::get('theme_hook_implementations');
 
-    foreach ($this->getHookFileIterator($dir, ["$theme.theme"]) as $fileinfo) {
+    foreach ($this->getHookFileIterator($dir) as $fileinfo) {
       assert($fileinfo instanceof \SplFileInfo);
       $fileExtension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
-
-      if ($fileExtension === 'theme') {
-        $this->deprecatedThemeFiles[pathinfo($filename, PATHINFO_FILENAME)] = TRUE;
-      }
 
       if ($fileExtension === 'php') {
         $cached = $hookFileCache->get($filename);

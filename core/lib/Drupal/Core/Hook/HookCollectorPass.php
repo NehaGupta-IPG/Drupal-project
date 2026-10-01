@@ -270,34 +270,11 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
     $module_list = $container->getParameter('container.modules');
 
     $modules = array_keys($module_list);
-    $all_modules_preg = static::getModuleListPattern($modules);
     $collector = new static($modules);
     foreach ($module_list as $module => $info) {
-      $current_module_preg = static::getModuleListPattern([$module]);
-      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $current_module_preg, $all_modules_preg);
+      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module);
     }
     return $collector;
-  }
-
-  /**
-   * Get a pattern used to match hooks for the given module list.
-   *
-   * The supplied module list will be sorted by length in descending order so
-   * that longer names are matched first.
-   *
-   * @param list<string> $module_list
-   *   A list of module names.
-   *
-   * @return string
-   *   The pattern used to match hooks for the given module list.
-   */
-  protected static function getModuleListPattern(array $module_list): string {
-    usort($module_list, static fn ($a, $b) => strlen($b) - strlen($a));
-    $module_pattern = implode('|', array_map(
-      static fn ($x) => preg_quote($x, '/'),
-      $module_list,
-    ));
-    return '/^(?<function>(?<module>' . $module_pattern . ')_(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
   }
 
   /**
@@ -307,16 +284,10 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
    *   The directory in which the module resides.
    * @param string $module
    *   The name of the module.
-   * @param string $current_module_preg
-   *   A regular expression matching only the module being scanned.
-   * @param string $all_modules_preg
-   *   A regular expression matching every module, longer module names are
-   *   matched first.
    */
-  protected function collectModuleHookImplementations($dir, $module, $current_module_preg, $all_modules_preg): void {
+  protected function collectModuleHookImplementations($dir, $module): void {
     $hook_file_cache = FileCacheFactory::get('hook_implementations');
-    $procedural_files = array_map(fn (string $extension): string => "$module.$extension", $this->proceduralFileExtensions);
-    foreach ($this->getHookFileIterator($dir, $procedural_files) as $fileinfo) {
+    foreach ($this->getHookFileIterator($dir) as $fileinfo) {
       assert($fileinfo instanceof \SplFileInfo);
       $extension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
