@@ -127,8 +127,7 @@ class SetDisplayOptionConfigActionTest extends ViewsKernelTestBase {
       [
         'option' => 'fields',
         'item' => 'type',
-        'item_sibling' => 'name',
-        'position' => 'before',
+        'position' => ['name', 'before'],
         'settings' => [
           'id' => 'type',
           'table' => 'entity_test',
@@ -274,8 +273,7 @@ class SetDisplayOptionConfigActionTest extends ViewsKernelTestBase {
   public function testSetFieldInDisplay() : void {
     $config_action_settings = [
       'field_name' => 'type',
-      'item_sibling' => 'name',
-      'position' => 'before',
+      'position' => ['name', 'before'],
       'settings' => [
         'id' => 'type',
         'table' => 'entity_test',
@@ -471,6 +469,57 @@ class SetDisplayOptionConfigActionTest extends ViewsKernelTestBase {
       ];
     }
     return $data;
+  }
+
+  /**
+   * Tests placing an item after a sibling, which is the default direction.
+   */
+  public function testSetFieldInDisplayAfterSibling() : void {
+    $config_action_settings = [
+      'field_name' => 'type',
+      'position' => ['id'],
+      'settings' => [
+        'id' => 'type',
+        'table' => 'entity_test',
+        'field' => 'type',
+        'entity_type' => 'entity_test',
+        'entity_field' => 'type',
+        'plugin_id' => 'field',
+      ],
+    ];
+    $this->container->get('plugin.manager.config_action')->applyAction('setFieldInDisplay', 'views.view.entity_test_fields', $config_action_settings);
+    $view = Views::getView('entity_test_fields');
+    $view->setDisplay();
+    $fields = array_keys($view->displayHandlers->get('default')->getOption('fields'));
+    $this->assertSame(array_search('id', $fields) + 1, array_search('type', $fields));
+  }
+
+  /**
+   * Tests that invalid positions are rejected.
+   */
+  #[DataProvider('invalidPositionProvider')]
+  public function testInvalidPosition(mixed $position, string $message) : void {
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage($message);
+    $config_action_settings = [
+      'field_name' => 'type',
+      'position' => $position,
+      'settings' => ['id' => 'type'],
+    ];
+    $this->container->get('plugin.manager.config_action')->applyAction('setFieldInDisplay', 'views.view.entity_test_fields', $config_action_settings);
+  }
+
+  /**
+   * Data provider for ::testInvalidPosition().
+   */
+  public static function invalidPositionProvider() : array {
+    return [
+      'string' => ['name', 'must be a list'],
+      'empty list' => [[], 'must be a list'],
+      'too many items' => [['name', 'before', 'x'], 'must be a list'],
+      'invalid direction' => [['name', 'next to'], "Position 'next to' is not valid"],
+      'unknown sibling' => [['missing', 'before'], 'Item sibling missing does not exist'],
+    ];
   }
 
 }

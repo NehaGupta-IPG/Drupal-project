@@ -32,8 +32,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * - item / <type>_name: The ID of the handler to add or update, for list
  *   options only. The generic action uses 'item', the derived actions use a
  *   typed key such as 'field_name' or 'filter_name'.
- * - item_sibling and position: Place the item 'before' or 'after' (default)
- *   an existing item instead of at the end of the list.
+ * - position: Place the item relative to an existing item instead of at the
+ *   end of the list. A list of the existing item's ID and, optionally,
+ *   'before' or 'after' (the default), for example [title, before].
  * - display_id: The display to change. Defaults to 'default'.
  * - override: Whether to override the default display for this display
  *   instead of changing the default. Defaults to FALSE.
@@ -59,8 +60,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *         display_id: page_1
  *         override: true
  *         field_name: changed
- *         item_sibling: title
- *         position: before
+ *         position: [title, before]
  *         settings:
  *           id: changed
  *           table: node_field_data
@@ -215,20 +215,21 @@ class SetDisplayOption implements ConfigActionPluginInterface, ContainerFactoryP
       // Check if the item needs to be placed in a specific position. This will
       // help in case a field or filter needs to be added not to the end of the
       // list.
-      // 'item_sibling' is the ID of the existing item to position relative to.
-      if (!empty($value['item_sibling'])) {
-        $sibling = $value['item_sibling'];
-        // 'position' is 'before' or 'after' the sibling; anything else, or
-        // nothing, means 'after'.
-        if (!empty($value['position']) && in_array($value['position'], ['before', 'after'])) {
-          $position = $value['position'];
+      // 'position' is a list: the ID of the existing item to position relative
+      // to, optionally followed by 'before' or 'after' (the default).
+      if (isset($value['position'])) {
+        $position = $value['position'];
+        if (!is_array($position) || !array_is_list($position) || count($position) < 1 || count($position) > 2) {
+          throw new ConfigActionException("The position must be a list of an item ID and optionally 'before' or 'after'");
         }
-        else {
-          $position = 'after';
+        $sibling = $position[0];
+        $direction = $position[1] ?? 'after';
+        if (!in_array($direction, ['before', 'after'], TRUE)) {
+          throw new ConfigActionException(sprintf("Position '%s' is not valid, use 'before' or 'after'", $direction));
         }
         $key_pos = array_search($sibling, array_keys($option_settings));
         if ($key_pos !== FALSE) {
-          if ($position == 'after') {
+          if ($direction === 'after') {
             $key_pos++;
           }
           if ($key_pos > 0) {
