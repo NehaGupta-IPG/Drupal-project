@@ -89,10 +89,14 @@ final class Recipe {
    *   The Recipe object.
    */
   public static function createFromDirectory(string $path): static {
+    // The extension lists need to be reset so that validation can find any
+    // new modules or themes added to the file system since they were cached.
+    $module_list = \Drupal::service('extension.list.module')->reset();
+    $theme_list = \Drupal::service('extension.list.theme')->reset();
     $recipe_data = self::parse($path . '/recipe.yml');
 
     $recipes = new RecipeConfigurator(is_array($recipe_data['recipes']) ? $recipe_data['recipes'] : [], dirname($path));
-    $install = new InstallConfigurator($recipe_data['install'], \Drupal::service('extension.list.module'), \Drupal::service('extension.list.theme'));
+    $install = new InstallConfigurator($recipe_data['install'], $module_list, $theme_list);
     $config = new ConfigConfigurator($recipe_data['config'], $path, \Drupal::service('config.storage'));
     $input = new InputConfigurator($recipe_data['input'] ?? [], $recipes, basename($path), \Drupal::typedDataManager());
     $content = new Finder($path . '/content');
