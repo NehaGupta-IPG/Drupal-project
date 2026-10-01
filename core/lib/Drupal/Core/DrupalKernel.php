@@ -1683,7 +1683,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $extensions[$extension] = [
           'type' => $data->getType(),
           'pathname' => $data->getPathname(),
-          'filename' => $data->getExtensionFilename(),
         ];
       }
     }
