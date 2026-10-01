@@ -10,8 +10,8 @@ use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Security\TrustedCallbackInterface;
-use Drupal\Core\Security\UntrustedCallbackException;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -61,11 +61,10 @@ class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
 
   /**
    * An untrusted #file_value_callbacks callback.
-   *
-   * This is never actually invoked: an exception is thrown before an
-   * untrusted callback is called.
    */
-  public function managedFileValueCallback(array &$element, $input, FormStateInterface $form_state): void {}
+  public function managedFileValueCallback(array &$element, $input, FormStateInterface $form_state): void {
+    $form_state->set('managedFileValueCallbackExecuted', TRUE);
+  }
 
   /**
    * Submits the test form, using the given #file_value_callbacks callback.
@@ -94,17 +93,19 @@ class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
   }
 
   /**
-   * Tests that exceptions are raised if untrusted callbacks are used.
+   * Tests that deprecations are triggered if untrusted callbacks are used.
    */
+  #[IgnoreDeprecations]
   public function testManagedFileElementUntrustedCallbacks(): void {
-    $this->expectException(UntrustedCallbackException::class);
-    $this->expectExceptionMessage(sprintf(
-      'ManagedFile element #file_value_callbacks callbacks must be tagged with the %s attribute, be methods of a class that implements %s, or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3620771',
+    $this->expectUserDeprecationMessage(sprintf(
+      'Using ManagedFile element #file_value_callbacks callbacks that are not tagged with the %s attribute, not methods of a class that implements %s, and not anonymous functions is deprecated in drupal:12.0.0 and will throw an exception in drupal:13.0.0. The callback was %s. See https://www.drupal.org/node/3620771',
       TrustedCallback::class,
       TrustedCallbackInterface::class,
       Variable::callableToString([$this, 'managedFileValueCallback'])
     ));
-    $this->submitManagedFileForm('managedFileValueCallback');
+    $form_state = $this->submitManagedFileForm('managedFileValueCallback');
+    // Untrusted callbacks are still executed during the deprecation period.
+    $this->assertTrue($form_state->get('managedFileValueCallbackExecuted'));
   }
 
 }
