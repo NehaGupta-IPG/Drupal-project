@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\Core\Routing\Exception\CacheableResourceNotFoundException;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -14,11 +15,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Tests access with argument validation.
+ * Tests the ArgumentAccessCheck route access checker.
  */
 #[Group("views")]
 #[RunTestsInSeparateProcesses]
-class ArgumentValidatorAccessTest extends ViewsKernelTestBase {
+class ArgumentAccessCheckTest extends ViewsKernelTestBase {
 
   use UserCreationTrait;
   use NodeCreationTrait;
@@ -74,6 +75,7 @@ class ArgumentValidatorAccessTest extends ViewsKernelTestBase {
 
     // test_argument_validator_node.page_1 has argument validation on node that
     // the content type must be article.
+    $this->expectException(CacheableResourceNotFoundException::class);
     $this->assertFalse($access_manager->checkNamedRoute($route_name, ['node' => $node_page->id()], $test_user));
     $this->assertTrue($access_manager->checkNamedRoute($route_name, ['node' => $node_article->id()], $test_user));
 
@@ -119,6 +121,7 @@ class ArgumentValidatorAccessTest extends ViewsKernelTestBase {
 
     $node->setUnpublished()->save();
     \Drupal::entityTypeManager()->getAccessControlHandler('node')->resetCache();
+    $this->expectException(CacheableResourceNotFoundException::class);
     $this->assertFalse($access_manager->checkNamedRoute($route_name, ['arg_0' => $node->id()], $test_user));
 
     // Missing entities can be created later.
