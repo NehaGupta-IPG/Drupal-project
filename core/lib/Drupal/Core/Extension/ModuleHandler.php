@@ -75,7 +75,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    *
    * @param string $root
    *   The app root.
-   * @param array<string, array{type: string, pathname: string, filename: string}> $module_list
+   * @param array<string, array{type: string, pathname: string}> $module_list
    *   An associative array whose keys are the names of installed modules and
    *   whose values are Extension class parameters. This is normally the
    *   %container.modules% parameter being set up by DrupalKernel.
