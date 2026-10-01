@@ -77,6 +77,9 @@ variables:
   PHPUNIT_CONFIGURATION_FILE_PATH: $CI_PROJECT_DIR/core
   PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
   _TARGET_PHP: "${PRIMARY_PHP}"
+  # The web server variant of the PHP image: "apache" or "unit" (FreeUnit).
+  _TARGET_SERVER: "apache"
+  _TARGET_IMAGE_TAG: "production"
   _TARGET_DB: "mysql-8.4"
   _TARGET_DB_DRIVER: "mysql"
   _TARGET_DB_DRIVER_MODULE: "mysql"
@@ -117,7 +120,7 @@ default:
       - runner_system_failure
       - scheduler_failure
   image:
-    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:production
+    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-$_TARGET_SERVER:$_TARGET_IMAGE_TAG
 
 #############
 # Templates #
