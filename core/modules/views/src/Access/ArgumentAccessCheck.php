@@ -74,10 +74,11 @@ class ArgumentAccessCheck implements AccessInterface {
    *   The access result.
    */
   public function access(Route $route, RouteMatchInterface $route_match, string $view_id, string $display_id, ?Request $request = NULL): AccessResultInterface {
-    $arguments_to_check = explode(',', $route->getRequirement('_views_argument_access'));
-    if (empty($arguments_to_check)) {
+    $requirement = $route->getRequirement('_views_argument_access');
+    if ($requirement === '') {
       return AccessResult::allowed();
     }
+    $arguments_to_check = explode(',', $requirement);
 
     $view = $this->entityTypeManager->getStorage('view')->load($view_id);
     $executable = $this->executableFactory->get($view);
