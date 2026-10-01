@@ -28,7 +28,7 @@ class FormElementInlineErrorTest extends KernelTestBase {
     new Settings($settings);
   }
 
-    /**
+  /**
    * Tests that no inline form errors are shown when disabled for a form.
    */
   public function testDisplayErrorMessagesNotInline(): void {
