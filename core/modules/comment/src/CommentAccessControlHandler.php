@@ -190,7 +190,15 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
     // Without a specific commented entity, or comment field, the CID would be
     // ambiguous across entities or fields and could cause stale cache hits for
     // the wrong entity context.
-    if (!$commented_entity || !$field) {
+    if (!$commented_entity instanceof EntityInterface || !$field) {
+      return NULL;
+    }
+
+    // Don't cache in case of a new, unsaved commented entity or parent.
+    if (
+      $commented_entity->isNew() ||
+      ($parent instanceof CommentInterface && !$parent->isNew())
+    ) {
       return NULL;
     }
 
