@@ -512,6 +512,9 @@ abstract class Connection {
    *   (optional) The target this connection is for.
    */
   public function setTarget($target = NULL) {
+    if (!is_string($target)) {
+      @trigger_error('Passing a non-string value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+    }
     if (!isset($this->target)) {
       $this->target = $target;
     }
@@ -534,6 +537,9 @@ abstract class Connection {
    *   The key this connection is for.
    */
   public function setKey($key) {
+    if (!is_string($key)) {
+      @trigger_error('Passing a non-string value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+    }
     if (!isset($this->key)) {
       $this->key = $key;
     }
@@ -1259,11 +1265,46 @@ abstract class Connection {
    *   The condition operator, such as "IN", "BETWEEN", etc. Case-sensitive.
    *
    * @return array|null
-   *   The extra handling directives for the specified operator, or NULL.
+   *   The extra handling directives for the specified operator, or NULL. The
+   *   directives are an array with any of the following keys:
+   *   - operator: The replacement operator.
+   *   - field_suffix: SQL to append to the field, such as a type cast.
+   *   - prefix: SQL to add before the value.
+   *   - postfix: SQL to add after the value.
+   *   - delimiter: The delimiter to implode multiple values with.
+   *   - use_value: Whether to compile the value part. Defaults to TRUE.
    *
    * @see \Drupal\Core\Database\Query\Condition::compile()
    */
   abstract public function mapConditionOperator($operator);
+
+  /**
+   * Gets the field suffix for the specified condition operator.
+   *
+   * Only needed when a condition is built as an SQL snippet, for example
+   * with where(). Conditions added with condition() get the suffix added
+   * when the condition is compiled.
+   *
+   * For example, on PostgreSQL the LIKE operator needs a '::text' type-cast
+   * on the field:
+   * @code
+   * $suffix = $connection->getConditionFieldSuffix('LIKE');
+   * $query->where("[title]$suffix LIKE :pattern", [
+   *   ':pattern' => '%foo%',
+   * ]);
+   * @endcode
+   *
+   * @param string $operator
+   *   The condition operator, such as "LIKE", "REGEXP", etc. Case-sensitive.
+   *
+   * @return string
+   *   The SQL the database driver needs appended to the field for this
+   *   operator, for example a type-cast, or an empty string.
+   */
+  public function getConditionFieldSuffix(string $operator): string {
+    $mapping = $this->mapConditionOperator($operator);
+    return $mapping['field_suffix'] ?? '';
+  }
 
   /**
    * Quotes a string for use in a query.
