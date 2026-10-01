@@ -41,17 +41,19 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
   protected $configuration;
 
   /**
-* @param array $configuration
-    *   A configuration array containing information about the plugin instance.
-+   *   If the plugin is being created by calling
-+   *   \Drupal\Core\Plugin\DefaultPluginManager::createInstance(),
-+   *   this is the configuration array passed to that method.
-    * @param string $plugin_id
-    *   The plugin_id for the plugin instance.
-    * @param mixed $plugin_definition
-    *   The plugin implementation definition.
-+   *   In the case of plugins using annotation discovery,
-+   *   this is the data from the annotation on the plugin class.
+   * Constructs a \Drupal\Component\Plugin\PluginBase object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   *   If the plugin is being created by calling
+   *   \Drupal\Core\Plugin\DefaultPluginManager::createInstance(),
+   *   this is the configuration array passed to that method.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   *   In the case of plugins using annotation discovery,
+   *   this is the data from the annotation on the plugin class.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     $this->configuration = $configuration;
