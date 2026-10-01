@@ -709,6 +709,13 @@ $settings['update_free_access'] = FALSE;
 # $settings['enable_html5_validation'] = TRUE;
 
 /**
+ * Enable new error reporting.
+ *
+ * @todo this needs to be way better.
+ */
+# $settings['enable_inline_error_handling'] = TRUE;
+
+/**
  * Load services definition file.
  */
 $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
