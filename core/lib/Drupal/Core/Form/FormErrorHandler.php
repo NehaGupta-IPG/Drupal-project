@@ -3,8 +3,13 @@
 namespace Drupal\Core\Form;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Link;
 use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
 
 /**
  * Handles form errors.
@@ -12,6 +17,11 @@ use Drupal\Core\Render\Element;
 class FormErrorHandler implements FormErrorHandlerInterface {
 
   use MessengerTrait;
+  use StringTranslationTrait;
+
+  public function __construct(
+    protected RendererInterface $renderer,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -20,7 +30,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
     // After validation check if there are errors.
     if ($form_state->getErrors()) {
       // Display error messages for each element.
-      $this->displayErrorMessages($form, $form_state);
+      $this->displayErrorMessagesNew($form, $form_state);
 
       // Loop through and assign each element its errors.
       $this->setElementErrorsFromFormState($form, $form_state);
@@ -43,6 +53,69 @@ class FormErrorHandler implements FormErrorHandlerInterface {
     // Loop through all form errors and set an error message.
     foreach ($errors as $error) {
       $this->messenger()->addMessage($error, 'error');
+    }
+  }
+
+  /**
+   * Loops through and displays all form errors.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
+  protected function displayErrorMessagesNew(array $form, FormStateInterface $form_state) {
+    // Skip generating inline form errors when opted out.
+    if (!Settings::get('enable_inline_error_handling', FALSE)) {
+      $this->displayErrorMessages($form, $form_state);
+      return;
+    }
+
+    $error_links = [];
+    $errors = $form_state->getErrors();
+    // Loop through all form errors and check if we need to display a link.
+    foreach ($errors as $name => $error) {
+      $form_element = FormElementHelper::getElementByName($name, $form);
+      $title = FormElementHelper::getElementTitle($form_element);
+
+      // Only show links to erroneous elements that are visible.
+      $is_visible_element = Element::isVisibleElement($form_element);
+      // Only show links for elements that have a title themselves or have
+      // children with a title.
+      $has_title = !empty($title);
+      // Only show links for elements with an ID.
+      $has_id = !empty($form_element['#id']);
+
+      // Do not show links to elements with suppressed messages. Most often
+      // their parent element is used for inline errors.
+      if (!empty($form_element['#error_no_message'])) {
+        unset($errors[$name]);
+      }
+      elseif ($is_visible_element && $has_title && $has_id) {
+        $url = Url::fromRoute('<none>', [], ['fragment' => $form_element['#id'], 'external' => TRUE]);
+        $error_links[] = Link::fromTextAndUrl($title, $url)->toRenderable();
+        unset($errors[$name]);
+      }
+    }
+
+    // Set normal error messages for all remaining errors.
+    foreach ($errors as $error) {
+      $this->messenger()->addError($error);
+    }
+
+    if (!empty($error_links)) {
+      $render_array = [
+        [
+          '#markup' => $this->formatPlural(count($error_links), '1 error has been found: ', '@count errors have been found: '),
+        ],
+        [
+          '#theme' => 'item_list',
+          '#items' => $error_links,
+          '#context' => ['list_style' => 'comma-list'],
+        ],
+      ];
+      $message = $this->renderer->renderInIsolation($render_array);
+      $this->messenger()->addError($message);
     }
   }
 

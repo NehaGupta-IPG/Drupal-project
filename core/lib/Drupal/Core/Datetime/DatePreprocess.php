@@ -103,8 +103,7 @@ class DatePreprocess {
       }
     }
 
-    // Suppress error messages.
-    $variables['errors'] = NULL;
+    $this->setErrors($variables);
 
     $variables['description'] = NULL;
     if (!empty($element['#description'])) {
@@ -124,6 +123,19 @@ class DatePreprocess {
       $variables['required'] = TRUE;
     }
     $variables['content'] = $element['#children'];
+  }
+
+  /**
+   * Populates form errors in the template variables.
+   *
+   * @param array $variables
+   *   The preprocess variables array, which must contain an 'element' key.
+   */
+  protected function setErrors(array &$variables): void {
+    $element = $variables['element'];
+    if (!empty($element['#errors']) && empty($element['#error_no_message'])) {
+      $variables['errors'] = $element['#errors'];
+    }
   }
 
 }

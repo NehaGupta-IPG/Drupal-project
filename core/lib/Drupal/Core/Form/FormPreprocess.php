@@ -117,8 +117,7 @@ class FormPreprocess {
     // Pass elements disabled status to template.
     $variables['disabled'] = !empty($element['#attributes']['disabled']) ? $element['#attributes']['disabled'] : NULL;
 
-    // Suppress error messages.
-    $variables['errors'] = NULL;
+    $this->setErrors($variables);
 
     // If #title is not set, we don't display any label.
     if (!isset($element['#title'])) {
@@ -331,8 +330,7 @@ class FormPreprocess {
       $variables['attributes']['aria-describedby'] = $description_id;
     }
 
-    // Suppress error messages.
-    $variables['errors'] = NULL;
+    $this->setErrors($variables);
   }
 
   /**
@@ -368,8 +366,7 @@ class FormPreprocess {
     $variables['value'] = (isset($element['#value'])) ? $element['#value'] : '';
     $variables['required'] = !empty($element['#required']) ? $element['#required'] : NULL;
 
-    // Suppress error messages.
-    $variables['errors'] = NULL;
+    $this->setErrors($variables);
   }
 
   /**
@@ -430,6 +427,19 @@ class FormPreprocess {
   public function preprocessVerticalTabs(array &$variables): void {
     $element = $variables['element'];
     $variables['children'] = (!empty($element['#children'])) ? $element['#children'] : '';
+  }
+
+  /**
+   * Populates form errors in the template variables.
+   *
+   * @param array $variables
+   *   The preprocess variables array, which must contain an 'element' key.
+   */
+  protected function setErrors(array &$variables): void {
+    $element = $variables['element'];
+    if (!empty($element['#errors']) && empty($element['#error_no_message'])) {
+      $variables['errors'] = $element['#errors'];
+    }
   }
 
 }
