@@ -101,7 +101,7 @@ class ManagedFile extends FormElementBase {
         if (isset($element['#file_value_callbacks'])) {
           foreach ($element['#file_value_callbacks'] as $callback) {
             $message = sprintf(
-              'Using ManagedFile element #file_value_callbacks callbacks that are not tagged with the %s attribute, not methods of a class that implements %s, and not anonymous functions is deprecated in drupal:12.0.0 and will throw an exception in drupal:13.0.0. The callback was %s. See https://www.drupal.org/node/3620771',
+              'Using ManagedFile element #file_value_callbacks callbacks that are not tagged with the %s attribute, not methods of a class that implements %s, and not anonymous functions is deprecated in drupal:12.1.0 and will throw an exception in drupal:13.0.0. The callback was %s. See https://www.drupal.org/node/3620771',
               TrustedCallback::class,
               TrustedCallbackInterface::class,
               Variable::callableToString($callback)
