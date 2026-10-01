@@ -270,20 +270,25 @@ class Config extends StorableConfigBase {
    *   The typed configuration wrapper for this configuration object.
    */
   protected function reconcileLangcodeWithTranslatability(Element $typed_config): void {
-    if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
-      // The configuration schema does not have a langcode, so it is not
-      // translatable. There is no langcode to reconcile.
+    if (!$typed_config instanceof Mapping) {
+      // Translatable configuration is only supported for mappings. Both
+      // config_object and config_entity schema types are mappings.
       return;
     }
+
+    $required_langcode = $typed_config->getDataDefinition()['mapping']['langcode']['requiredKey'] ?? FALSE;
     // This potentially loops through the config array again like call to
     // StorableConfigBase::castValue() but this is mitigated by the fact that
     // this only occurs for simple configuration as configuration entities have
-    // the translatable flag set on the top level mapping. Additionally, once
+    // a required langcode. Additionally, once
     // \Drupal\Core\Config\Schema\ArrayElement::hasTranslatableElements() has
     // found a translatable key it returns early.
-    // @todo consider if could somehow prepopulate the top level flag for simple
-    //   configuration when the config has no dynamic parts.
-    if (!$typed_config->hasTranslatableElements()) {
+    // @todo consider if could somehow prepopulate the set the langcode
+    //   requiredKey flag for simple configuration in
+    //   \Drupal\Core\Config\TypedConfigManager::buildDataDefinition(). This
+    //   potentially would remove the need for the
+    //   LangcodeRequiredIfTranslatableValues constraint.
+    if (!$required_langcode && !$typed_config->hasTranslatableElements()) {
       unset($this->data['langcode']);
       return;
     }
