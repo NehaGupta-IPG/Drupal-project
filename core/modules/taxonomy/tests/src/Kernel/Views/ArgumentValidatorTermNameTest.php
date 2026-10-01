@@ -126,6 +126,11 @@ class ArgumentValidatorTermNameTest extends TaxonomyTestBase {
     $view->argument['name']->validated_title = NULL;
     $view->argument['name']->argument_validated = NULL;
 
+    // Check that the bundle list cache tag is added.
+    $cacheability = new CacheableMetadata();
+    $this->assertFalse($view->argument['name']->getPlugin('argument_validator')->validateArgument('not a term name', $cacheability));
+    $this->assertContains('taxonomy_term_list:views_testing_tags_2', $cacheability->getCacheTags());
+
     // Allow any and all bundles.
     $view->argument['name']->options['validate_options']['bundles'] = [];
 
@@ -139,7 +144,7 @@ class ArgumentValidatorTermNameTest extends TaxonomyTestBase {
     $this->assertTrue($view->argument['name']->setArgument($this->names[4]));
     $this->assertEquals($this->names[4], $view->argument['name']->getTitle());
 
-    // Terms can be created or renamed to match any name.
+    // Check that the generic list cache tag is added.
     $cacheability = new CacheableMetadata();
     $this->assertFalse($view->argument['name']->getPlugin('argument_validator')->validateArgument('not a term name', $cacheability));
     $this->assertContains('taxonomy_term_list', $cacheability->getCacheTags());
