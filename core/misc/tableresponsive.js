@@ -103,9 +103,14 @@
        */
       eventhandlerEvaluateColumnVisibility(e) {
         const pegged = parseInt(this.$link.data('pegged'), 10);
-        const hiddenLength = this.$headers.filter(
-          '.priority-medium:hidden, .priority-low:hidden',
-        ).length;
+        const hiddenLength = this.$headers.get().filter(function (element) {
+          return (
+            (element.classList.contains('priority-medium') ||
+              element.classList.contains('priority-low')) &&
+            window.getComputedStyle(element).getPropertyValue('display') ===
+              'none'
+          );
+       }).length;
         // If the table has hidden columns, associate an action link with the
         // table to show the columns.
         if (hiddenLength > 0) {
@@ -132,13 +137,18 @@
       eventhandlerToggleColumns(e) {
         e.preventDefault();
         const self = this;
-        const $hiddenHeaders = this.$headers.filter(
-          '.priority-medium:hidden, .priority-low:hidden',
-        );
+        const hiddenHeaders = this.$headers.get().filter(function (element) {
+          return (
+            (element.classList.contains('priority-medium') ||
+              element.classList.contains('priority-low')) &&
+            window.getComputedStyle(element).getPropertyValue('display') ===
+              'none'
+          );
+        });
         this.$revealedCells = this.$revealedCells || $();
         // Reveal hidden columns.
-        if ($hiddenHeaders.length > 0) {
-          $hiddenHeaders.each(function (index, element) {
+        if (hiddenHeaders.length > 0) {
+          $(hiddenHeaders).each(function (index, element) {
             const $header = $(this);
             const position = $header.prevAll('th').length;
             self.$table.find('tbody tr').each(function () {

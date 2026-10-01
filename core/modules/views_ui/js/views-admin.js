@@ -289,7 +289,7 @@
      */
     this.$form = $form;
     this.$form
-      .find('.views-filterable-options :checkbox')
+      .find('.views-filterable-options [type=checkbox]')
       .on('click', this.handleCheck.bind(this));
 
     /**
@@ -1212,11 +1212,11 @@
   Drupal.viewsUi.Checkboxifier = function (button) {
     this.$button = $(button);
     this.$parent = this.$button.parent('div.views-expose, div.views-grouped');
-    this.$input = this.$parent.find('input:checkbox, input:radio');
+    
     // Hide the button and its description.
     this.$button.hide();
     this.$parent.find('.exposed-description, .grouped-description').hide();
-
+    this.$input = this.$parent.find('[type=checkbox], [type=radio]');
     this.$input.on('click', this.clickHandler.bind(this));
   };
 
