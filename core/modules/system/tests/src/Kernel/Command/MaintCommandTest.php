@@ -37,18 +37,21 @@ class MaintCommandTest extends KernelTestBase {
     $status = new CommandTester(new MaintStatusCommand($state));
 
     $this->assertSame(Command::SUCCESS, $set->execute(['value' => '1']));
-    $this->assertSame(MaintStatusCommand::EXIT_ERROR_WITH_CLARITY, $status->execute([]));
+    $code = $status->execute([]);
+    $this->assertSame(MaintStatusCommand::EXIT_ERROR_WITH_CLARITY, $code);
     $this->assertSame('1', trim($status->getDisplay()));
 
     $this->assertSame(Command::SUCCESS, $set->execute(['value' => '0']));
-    $this->assertSame(Command::SUCCESS, $status->execute([]));
+    $code = $status->execute([]);
+    $this->assertSame(Command::SUCCESS, $code);
     $this->assertSame('0', trim($status->getDisplay()));
 
     // With no argument, the command prompts for a value.
     $set->setInputs(['1']);
     $this->assertSame(Command::SUCCESS, $set->execute([]));
     $this->assertStringContainsString('Enable maintenance mode?', $set->getDisplay());
-    $this->assertSame(MaintStatusCommand::EXIT_ERROR_WITH_CLARITY, $status->execute([]));
+    $code = $status->execute([]);
+    $this->assertSame(MaintStatusCommand::EXIT_ERROR_WITH_CLARITY, $code);
 
     $this->expectException(InvalidArgumentException::class);
     $set->execute(['value' => 'maybe']);
