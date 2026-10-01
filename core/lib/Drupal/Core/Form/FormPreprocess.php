@@ -437,7 +437,7 @@ class FormPreprocess {
    */
   protected function setErrors(array &$variables): void {
     $element = $variables['element'];
-    if (!empty($element['#errors']) && empty($element['#error_no_message'])) {
+    if (!empty($element['#errors']) && empty($element['#error_no_message']) && Settings::get('enable_inline_error_handling', FALSE)) {
       $variables['errors'] = $element['#errors'];
     }
   }

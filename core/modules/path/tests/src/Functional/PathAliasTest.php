@@ -415,9 +415,14 @@ class PathAliasTest extends PathTestBase {
     // Enable the inline_form_errors module and try this again. This module
     // improves validation with a link in the error message(s) to the fields
     // which have invalid input.
-    $settings = Settings::getAll();
-    $settings['enable_inline_error_handling'] = TRUE;
-    new Settings($settings);
+    $this->writeSettings([
+      'settings' => [
+        'enable_inline_error_handling' => (object) [
+          'value' => TRUE,
+          'required' => TRUE,
+        ],
+      ],
+    ]);
     // Attempt to edit the second node again, as before.
     $this->drupalGet('node/' . $node_two->id() . '/edit');
     $this->submitForm($edit, 'Preview');

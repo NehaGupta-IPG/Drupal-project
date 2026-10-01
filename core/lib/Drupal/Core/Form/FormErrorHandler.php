@@ -78,6 +78,18 @@ class FormErrorHandler implements FormErrorHandlerInterface {
       $form_element = FormElementHelper::getElementByName($name, $form);
       $title = FormElementHelper::getElementTitle($form_element);
 
+      // If the element has no title, check the form's #info array. This is
+      // used by views exposed filters which strip #title from elements and
+      // store the label separately in $form['#info'][...]['label'].
+      if (empty($title) && !empty($form['#info'])) {
+        foreach ($form['#info'] as $info) {
+          if (!empty($info['value']) && $info['value'] === $name && !empty($info['label'])) {
+            $title = $info['label'];
+            break;
+          }
+        }
+      }
+
       // Only show links to erroneous elements that are visible.
       $is_visible_element = Element::isVisibleElement($form_element);
       // Only show links for elements that have a title themselves or have

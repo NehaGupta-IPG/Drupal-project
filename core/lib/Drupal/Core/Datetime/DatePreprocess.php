@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Datetime;
 
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Template\Attribute;
 
@@ -133,7 +134,7 @@ class DatePreprocess {
    */
   protected function setErrors(array &$variables): void {
     $element = $variables['element'];
-    if (!empty($element['#errors']) && empty($element['#error_no_message'])) {
+    if (!empty($element['#errors']) && empty($element['#error_no_message']) && Settings::get('enable_inline_error_handling', FALSE)) {
       $variables['errors'] = $element['#errors'];
     }
   }
