@@ -197,7 +197,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
     // Don't cache in case of a new, unsaved commented entity or parent.
     if (
       $commented_entity->isNew() ||
-      ($parent instanceof CommentInterface && !$parent->isNew())
+      ($parent instanceof CommentInterface && $parent->isNew())
     ) {
       return NULL;
     }

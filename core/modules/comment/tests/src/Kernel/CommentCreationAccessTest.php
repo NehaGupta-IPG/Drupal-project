@@ -102,7 +102,6 @@ class CommentCreationAccessTest extends KernelTestBase {
       'commented_entity' => 'entity_test:1',
       'field' => 'comment',
     ], $state->get('comment_test.create_access.context'));
-    // But, the create access cid was calculated.
     $this->assertSame('create:comment:entity_test:1:comment:', $state->get('comment_test.create_access.cid'));
     $state->delete('comment_test.create_access.cid');
 
@@ -200,7 +199,7 @@ class CommentCreationAccessTest extends KernelTestBase {
     }
     else {
       $this->assertFalse(
-        $state->get('comment_test.check_create_access.cid'),
+        $state->get('comment_test.create_access.cid'),
         'checkCreateAccess() must be called again when no commented entity context is provided.',
       );
     }
