@@ -6,12 +6,14 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\locale\File\LocaleFileManager;
 use Drupal\locale\File\RemoteFileStatus;
 use Drupal\locale\Model\SourceType;
 use Drupal\locale\Model\TranslationUpdateMode;
+use Drupal\locale\StreamWrapper\TranslationsStream;
 
 /**
  * Provides the locale fetch services.
@@ -30,6 +32,7 @@ class LocaleFetch {
     protected readonly LocaleImportBatch $localeImportBatch,
     protected readonly ConfigFactoryInterface $configFactory,
     protected readonly LocaleLanguages $localeLanguages,
+    protected readonly FileSystemInterface $fileSystem,
   ) {}
 
   /**
@@ -114,7 +117,9 @@ class LocaleFetch {
    *   Array of batch operations.
    */
   protected function getFetchOperations(array $projects, array $langcodes, array $options): array {
-    $operations = [];
+    // Make sure the translations directory exists before any file is
+    // downloaded or imported into it.
+    $operations = [[self::class . ':prepareTranslationsDirectory', []]];
     $useRemote = $this->configFactory->get('locale.settings')->get('translation.use_source') == TranslationUpdateMode::RemoteAndLocal->value;
 
     foreach ($projects as $project) {
@@ -127,6 +132,27 @@ class LocaleFetch {
     }
 
     return $operations;
+  }
+
+  /**
+   * Creates the interface translations directory.
+   *
+   * Also used as callback_batch_operation(); the batch context is unused.
+   *
+   * Uses TranslationsStream::basePath() so the path comes from
+   * $settings['locale_translation_path'] (or the deprecated
+   * locale.settings:translation.path BC layer), not from the removed
+   * translation.path config value alone.
+   *
+   * @param array|\ArrayAccess|null $context
+   *   The batch context when invoked as a batch operation.
+   *
+   * @see \Drupal\locale\StreamWrapper\TranslationsStream::basePath()
+   * @see https://www.drupal.org/node/3571594
+   */
+  public function prepareTranslationsDirectory(array|\ArrayAccess|null &$context = NULL): void {
+    $directory = TranslationsStream::basePath();
+    $this->fileSystem->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
   }
 
   /**
