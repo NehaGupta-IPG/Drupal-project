@@ -30,13 +30,6 @@ class Extension {
   protected $pathname;
 
   /**
-   * The filename of the main extension file (e.g., 'node.module').
-   *
-   * @var string|null
-   */
-  protected $filename;
-
-  /**
    * An SplFileInfo instance for the extension's info file.
    *
    * Note that SplFileInfo is a PHP resource and resources cannot be serialized.
@@ -127,42 +120,6 @@ class Extension {
    */
   public function getFilename() {
     return basename($this->pathname);
-  }
-
-  /**
-   * Returns the relative path of the main extension file, if any.
-   *
-   * @return string|null
-   *   The relative path for the main extension file, usually the *.module file.
-   */
-  public function getExtensionPathname() {
-    if ($this->filename) {
-      return $this->getPath() . '/' . $this->filename;
-    }
-  }
-
-  /**
-   * Returns the name of the main extension file, if any.
-   *
-   * @return string|null
-   *   The filename of the main extension file, usually the *.module file.
-   */
-  public function getExtensionFilename() {
-    return $this->filename;
-  }
-
-  /**
-   * Loads the main extension file, if any.
-   *
-   * @return bool
-   *   TRUE if this extension has a main extension file, FALSE otherwise.
-   */
-  public function load() {
-    if ($this->filename) {
-      include_once $this->root . '/' . $this->getPath() . '/' . $this->filename;
-      return TRUE;
-    }
-    return FALSE;
   }
 
   /**
