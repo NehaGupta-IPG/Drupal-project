@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
@@ -9,12 +11,14 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Kernel tests for taxonomy pending revisions.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class PendingRevisionTest extends KernelTestBase {
 
   /**
@@ -26,6 +30,7 @@ class PendingRevisionTest extends KernelTestBase {
     'user',
     'text',
     'field',
+    'filter',
     'system',
   ];
 
@@ -35,6 +40,7 @@ class PendingRevisionTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig(['taxonomy']);
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installEntitySchema('taxonomy_term');
@@ -44,7 +50,7 @@ class PendingRevisionTest extends KernelTestBase {
   /**
    * Tests that the taxonomy index work correctly with pending revisions.
    */
-  public function testTaxonomyIndexWithPendingRevision() {
+  public function testTaxonomyIndexWithPendingRevision(): void {
     \Drupal::configFactory()->getEditable('taxonomy.settings')->set('maintain_index_table', TRUE)->save();
 
     Vocabulary::create([
@@ -118,6 +124,9 @@ class PendingRevisionTest extends KernelTestBase {
     $this->assertEquals($term->id(), $taxonomy_index[$node->id()]->tid);
   }
 
+  /**
+   * Retrieves the taxonomy index from the database.
+   */
   protected function getTaxonomyIndex() {
     return \Drupal::database()->select('taxonomy_index')
       ->fields('taxonomy_index')

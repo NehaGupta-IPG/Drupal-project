@@ -53,7 +53,7 @@ class ParamConversionEnhancer implements EnhancerInterface, EventSubscriberInter
    * @param array $defaults
    *   The route defaults array.
    *
-   * @return \Symfony\Component\HttpFoundation\InputBag
+   * @return \Symfony\Component\HttpFoundation\InputBag<string|int|float|bool|null>
    *   The input bag container with the raw variables.
    */
   protected function copyRawVariables(array $defaults) {
@@ -70,7 +70,7 @@ class ParamConversionEnhancer implements EnhancerInterface, EventSubscriberInter
     // Route defaults that do not start with a leading "_" are also
     // parameters, even if they are not included in path or host patterns.
     foreach ($route->getDefaults() as $name => $value) {
-      if (!isset($raw_variables[$name]) && substr($name, 0, 1) !== '_') {
+      if (!isset($raw_variables[$name]) && !str_starts_with($name, '_')) {
         $raw_variables[$name] = $value;
       }
     }

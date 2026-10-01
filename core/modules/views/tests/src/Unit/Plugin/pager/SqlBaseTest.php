@@ -1,60 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Unit\Plugin\pager;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Pager\PagerManagerInterface;
+use Drupal\Core\Pager\PagerParametersInterface;
 use Drupal\Tests\UnitTestCase;
+use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\views\Plugin\views\pager\SqlBase;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\ViewExecutable;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\views\Plugin\views\pager\SqlBase
- * @group views
+ * Tests Drupal\views\Plugin\views\pager\SqlBase.
  */
+#[CoversClass(SqlBase::class)]
+#[Group('views')]
 class SqlBaseTest extends UnitTestCase {
 
   /**
    * The mock pager plugin instance.
    *
-   * @var \Drupal\views\Plugin\views\pager\SqlBase|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Plugin\views\pager\SqlBase
    */
   protected $pager;
 
   /**
    * The mock view instance.
    *
-   * @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\Stub
    */
   protected $view;
 
   /**
    * The mock display plugin instance.
    *
-   * @var \Drupal\views\Plugin\views\display\DisplayPluginBase|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Plugin\views\display\DisplayPluginBase|\PHPUnit\Framework\MockObject\Stub
    */
   protected $display;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
-    $this->pager = $this->getMockBuilder('Drupal\views\Plugin\views\pager\SqlBase')
-      ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+    $this->pager = new StubSqlBase(
+      [],
+      'test_plugin',
+      [],
+      $this->createStub(PagerManagerInterface::class),
+      $this->createStub(PagerParametersInterface::class),
+    );
 
-    /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
-    $this->view = $this->getMockBuilder('Drupal\views\ViewExecutable')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->view = $this->createStub(ViewExecutable::class);
 
-    $query = $this->getMockBuilder(QueryPluginBase::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $query = $this->createStub(QueryPluginBase::class);
 
     $this->view->query = $query;
 
-    $this->display = $this->getMockBuilder('Drupal\views\Plugin\views\display\DisplayPluginBase')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->display = $this->createStub(DisplayPluginBase::class);
 
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->getStringTranslationStub());
@@ -66,13 +76,13 @@ class SqlBaseTest extends UnitTestCase {
    *
    * @see \Drupal\views\Plugin\views\pager\SqlBase::query()
    */
-  public function testQuery() {
+  public function testQuery(): void {
     $request = new Request([
       'items_per_page' => 'All',
     ]);
-    $this->view->expects($this->any())
+    $this->view
       ->method('getRequest')
-      ->will($this->returnValue($request));
+      ->willReturn($request);
 
     $options = [];
     $this->pager->init($this->view, $this->display, $options);

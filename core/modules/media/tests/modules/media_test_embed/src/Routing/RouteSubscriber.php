@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\media_test_embed\Routing;
 
 use Drupal\Core\Routing\RouteSubscriberBase;
@@ -13,7 +15,7 @@ class RouteSubscriber extends RouteSubscriberBase {
   /**
    * {@inheritdoc}
    */
-  public function alterRoutes(RouteCollection $collection) {
+  public function alterRoutes(RouteCollection $collection): void {
     if ($route = $collection->get('media.filter.preview')) {
       $route->setDefault('_controller', '\Drupal\media_test_embed\Controller\TestMediaFilterController::preview');
     }

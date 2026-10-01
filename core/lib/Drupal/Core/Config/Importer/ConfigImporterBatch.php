@@ -46,7 +46,7 @@ class ConfigImporterBatch {
    * @param bool $success
    *   Indicate that the batch API tasks were all completed successfully.
    * @param array $results
-   *   An array of all the results that were updated in update_do_one().
+   *   An array of all the results that were updated.
    * @param array $operations
    *   A list of the operations that had not been completed by the batch API.
    */
@@ -70,7 +70,10 @@ class ConfigImporterBatch {
       // An error occurred.
       // $operations contains the operations that remained unprocessed.
       $error_operation = reset($operations);
-      $message = t('An error occurred while processing %error_operation with arguments: @arguments', ['%error_operation' => $error_operation[0], '@arguments' => print_r($error_operation[1], TRUE)]);
+      $message = t('An error occurred while processing %error_operation with arguments: @arguments', [
+        '%error_operation' => $error_operation[0],
+        '@arguments' => print_r($error_operation[1], TRUE),
+      ]);
       $messenger->addError($message);
     }
   }

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
+use Drupal\file_test\FileTestHelper;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 
@@ -14,9 +16,7 @@ use Drupal\user\Entity\User;
 abstract class FileManagedUnitTestBase extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['file_test', 'file', 'system', 'field', 'user'];
 
@@ -26,7 +26,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     // Clear out any hook calls.
-    file_test_reset();
+    FileTestHelper::reset();
 
     $this->installConfig(['system']);
     $this->installEntitySchema('file');
@@ -48,25 +48,25 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    *   Array with string containing with the hook name, e.g. 'load', 'save',
    *   'insert', etc.
    */
-  public function assertFileHooksCalled($expected) {
+  public function assertFileHooksCalled($expected): void {
     \Drupal::state()->resetCache();
 
     // Determine which hooks were called.
-    $actual = array_keys(array_filter(file_test_get_all_calls()));
+    $actual = array_keys(array_filter(FileTestHelper::getAllCalls()));
 
     // Determine if there were any expected that were not called.
     $uncalled = array_diff($expected, $actual);
     if (count($uncalled)) {
-      $this->assertTrue(FALSE, new FormattableMarkup('Expected hooks %expected to be called but %uncalled was not called.', ['%expected' => implode(', ', $expected), '%uncalled' => implode(', ', $uncalled)]));
+      $this->assertTrue(FALSE, sprintf('Expected hooks %s to be called but %s was not called.', implode(', ', $expected), implode(', ', $uncalled)));
     }
     else {
-      $this->assertTrue(TRUE, new FormattableMarkup('All the expected hooks were called: %expected', ['%expected' => empty($expected) ? '(none)' : implode(', ', $expected)]));
+      $this->assertTrue(TRUE, sprintf('All the expected hooks were called: %s', empty($expected) ? '(none)' : implode(', ', $expected)));
     }
 
     // Determine if there were any unexpected calls.
     $unexpected = array_diff($actual, $expected);
     if (count($unexpected)) {
-      $this->assertTrue(FALSE, new FormattableMarkup('Unexpected hooks were called: %unexpected.', ['%unexpected' => empty($unexpected) ? '(none)' : implode(', ', $unexpected)]));
+      $this->assertTrue(FALSE, sprintf('Unexpected hooks were called: %s.', empty($unexpected) ? '(none)' : implode(', ', $unexpected)));
     }
     else {
       $this->assertTrue(TRUE, 'No unexpected hooks were called.');
@@ -83,18 +83,18 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    * @param string $message
    *   Optional translated string message.
    */
-  public function assertFileHookCalled($hook, $expected_count = 1, $message = NULL) {
-    $actual_count = count(file_test_get_calls($hook));
+  public function assertFileHookCalled($hook, $expected_count = 1, $message = NULL): void {
+    $actual_count = count(FileTestHelper::getCalls($hook));
 
     if (!isset($message)) {
       if ($actual_count == $expected_count) {
-        $message = new FormattableMarkup('hook_file_@name was called correctly.', ['@name' => $hook]);
+        $message = "hook_file_$hook was called correctly.";
       }
       elseif ($expected_count == 0) {
-        $message = \Drupal::translation()->formatPlural($actual_count, 'hook_file_@name was not expected to be called but was actually called once.', 'hook_file_@name was not expected to be called but was actually called @count times.', ['@name' => $hook, '@count' => $actual_count]);
+        $message = "hook_file_$hook was not expected to be called but was actually called $actual_count time(s).";
       }
       else {
-        $message = new FormattableMarkup('hook_file_@name was expected to be called %expected times but was called %actual times.', ['@name' => $hook, '%expected' => $expected_count, '%actual' => $actual_count]);
+        $message = "hook_file_$hook was expected to be called $expected_count time(s) but was called $actual_count time(s).";
       }
     }
     $this->assertEquals($expected_count, $actual_count, $message);
@@ -108,7 +108,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    * @param \Drupal\file\FileInterface $after
    *   File object to compare.
    */
-  public function assertFileUnchanged(FileInterface $before, FileInterface $after) {
+  public function assertFileUnchanged(FileInterface $before, FileInterface $after): void {
     $this->assertEquals($before->id(), $after->id(), 'File id is the same');
     $this->assertEquals($before->getOwner()->id(), $after->getOwner()->id(), 'File owner is the same');
     $this->assertEquals($before->getFilename(), $after->getFilename(), 'File name is the same');
@@ -126,7 +126,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    * @param \Drupal\file\FileInterface $file2
    *   File object to compare.
    */
-  public function assertDifferentFile(FileInterface $file1, FileInterface $file2) {
+  public function assertDifferentFile(FileInterface $file1, FileInterface $file2): void {
     $this->assertNotEquals($file1->id(), $file2->id(), 'Files have different ids');
     $this->assertNotEquals($file1->getFileUri(), $file2->getFileUri(), 'Files have different paths');
   }
@@ -139,7 +139,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    * @param \Drupal\file\FileInterface $file2
    *   File object to compare.
    */
-  public function assertSameFile(FileInterface $file1, FileInterface $file2) {
+  public function assertSameFile(FileInterface $file1, FileInterface $file2): void {
     $this->assertEquals($file1->id(), $file2->id(), 'Files have the same ids');
     $this->assertEquals($file1->getFileUri(), $file2->getFileUri(), 'Files have the same path');
   }
@@ -160,7 +160,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    * @return \Drupal\file\FileInterface
    *   File entity.
    */
-  public function createFile($filepath = NULL, $contents = NULL, $scheme = NULL) {
+  public function createFile($filepath = NULL, $contents = NULL, $scheme = NULL): FileInterface {
     // Don't count hook invocations caused by creating the file.
     \Drupal::state()->set('file_test.count_hook_invocations', FALSE);
     $file = File::create([
@@ -193,7 +193,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    * @return string
    *   File URI.
    */
-  public function createUri($filepath = NULL, $contents = NULL, $scheme = NULL) {
+  public function createUri($filepath = NULL, $contents = NULL, $scheme = NULL): string {
     if (!isset($filepath)) {
       // Prefix with non-latin characters to ensure that all file-related
       // tests work with international filenames.

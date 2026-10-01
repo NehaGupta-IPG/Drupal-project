@@ -2,13 +2,14 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
+use Drupal\Component\Utility\FilterArray;
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Connection as DatabaseConnection;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
-use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 
 /**
@@ -22,26 +23,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   const DATABASE_NOT_FOUND = 14;
 
   /**
-   * {@inheritdoc}
-   */
-  protected $statementWrapperClass = NULL;
-
-  /**
-   * Whether or not the active transaction (if any) will be rolled back.
-   *
-   * @var bool
-   *
-   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. It is
-   *   unused.
-   *
-   * @see https://www.drupal.org/node/3381002
-   */
-  protected $willRollback;
-
-  /**
    * A map of condition operators to SQLite operators.
    *
    * We don't want to override any of the defaults.
+   *
+   * @var string[][]
    */
   protected static $sqliteConditionOperatorMap = [
     'LIKE' => ['postfix' => " ESCAPE '\\'"],
@@ -86,7 +72,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * Constructs a \Drupal\sqlite\Driver\Database\sqlite\Connection object.
    */
-  public function __construct(\PDO $connection, array $connection_options) {
+  public function __construct(SqliteConnection $connection, array $connection_options) {
     parent::__construct($connection, $connection_options);
 
     // Empty prefix means query the main database -- no need to attach anything.
@@ -105,7 +91,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(#[\SensitiveParameter] array &$connection_options = []) {
     // Allow PDO options to be overridden.
     $connection_options += [
       'pdo' => [],
@@ -117,7 +103,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     ];
 
     try {
-      $pdo = new PDOConnection('sqlite:' . $connection_options['database'], '', '', $connection_options['pdo']);
+      $sqlite = new SqliteConnection('sqlite:' . $connection_options['database'], '', '', $connection_options['pdo']);
     }
     catch (\PDOException $e) {
       if ($e->getCode() == static::DATABASE_NOT_FOUND) {
@@ -129,28 +115,28 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
 
     // Create functions needed by SQLite.
-    $pdo->sqliteCreateFunction('if', [__CLASS__, 'sqlFunctionIf']);
-    $pdo->sqliteCreateFunction('greatest', [__CLASS__, 'sqlFunctionGreatest']);
-    $pdo->sqliteCreateFunction('least', [__CLASS__, 'sqlFunctionLeast']);
-    $pdo->sqliteCreateFunction('pow', 'pow', 2);
-    $pdo->sqliteCreateFunction('exp', 'exp', 1);
-    $pdo->sqliteCreateFunction('length', 'strlen', 1);
-    $pdo->sqliteCreateFunction('md5', 'md5', 1);
-    $pdo->sqliteCreateFunction('concat', [__CLASS__, 'sqlFunctionConcat']);
-    $pdo->sqliteCreateFunction('concat_ws', [__CLASS__, 'sqlFunctionConcatWs']);
-    $pdo->sqliteCreateFunction('substring', [__CLASS__, 'sqlFunctionSubstring'], 3);
-    $pdo->sqliteCreateFunction('substring_index', [__CLASS__, 'sqlFunctionSubstringIndex'], 3);
-    $pdo->sqliteCreateFunction('rand', [__CLASS__, 'sqlFunctionRand']);
-    $pdo->sqliteCreateFunction('regexp', [__CLASS__, 'sqlFunctionRegexp']);
+    $sqlite->createFunction('if', self::sqlFunctionIf(...));
+    $sqlite->createFunction('greatest', self::sqlFunctionGreatest(...));
+    $sqlite->createFunction('least', self::sqlFunctionLeast(...));
+    $sqlite->createFunction('pow', pow(...), 2);
+    $sqlite->createFunction('exp', exp(...), 1);
+    $sqlite->createFunction('length', strlen(...), 1);
+    $sqlite->createFunction('md5', md5(...), 1);
+    $sqlite->createFunction('concat', self::sqlFunctionConcat(...));
+    $sqlite->createFunction('concat_ws', self::sqlFunctionConcatWs(...));
+    $sqlite->createFunction('substring', self::sqlFunctionSubstring(...), 3);
+    $sqlite->createFunction('substring_index', self::sqlFunctionSubstringIndex(...), 3);
+    $sqlite->createFunction('rand', self::sqlFunctionRand(...));
+    $sqlite->createFunction('regexp', self::sqlFunctionRegexp(...));
 
     // SQLite does not support the LIKE BINARY operator, so we overload the
     // non-standard GLOB operator for case-sensitive matching. Another option
     // would have been to override another non-standard operator, MATCH, but
     // that does not support the NOT keyword prefix.
-    $pdo->sqliteCreateFunction('glob', [__CLASS__, 'sqlFunctionLikeBinary']);
+    $sqlite->createFunction('glob', self::sqlFunctionLikeBinary(...));
 
     // Create a user-space case-insensitive collation with UTF-8 support.
-    $pdo->sqliteCreateCollation('NOCASE_UTF8', ['Drupal\Component\Utility\Unicode', 'strcasecmp']);
+    $sqlite->createCollation('NOCASE_UTF8', Unicode::strcasecmp(...));
 
     // Set SQLite init_commands if not already defined. Enable the Write-Ahead
     // Logging (WAL) for SQLite. See https://www.drupal.org/node/2348137 and
@@ -164,10 +150,10 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
     // Execute sqlite init_commands.
     if (isset($connection_options['init_commands'])) {
-      $pdo->exec(implode('; ', $connection_options['init_commands']));
+      $sqlite->exec(implode('; ', $connection_options['init_commands']));
     }
 
-    return $pdo;
+    return $sqlite;
   }
 
   /**
@@ -180,9 +166,13 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   public function __destruct() {
     if ($this->tableDropped && !empty($this->attachedDatabases)) {
       foreach ($this->attachedDatabases as $prefix) {
-        // Check if the database is now empty, ignore the internal SQLite tables.
+        // Check if the database is now empty, ignore the internal SQLite
+        // tables.
         try {
-          $count = $this->query('SELECT COUNT(*) FROM ' . $prefix . '.sqlite_master WHERE type = :type AND name NOT LIKE :pattern', [':type' => 'table', ':pattern' => 'sqlite_%'])->fetchField();
+          $count = $this->query('SELECT COUNT(*) FROM ' . $prefix . '.sqlite_master WHERE type = :type AND name NOT LIKE :pattern', [
+            ':type' => 'table',
+            ':pattern' => 'sqlite_%',
+          ])->fetchField();
 
           // We can prune the database file if it doesn't have any tables.
           if ($count == 0 && $this->connectionOptions['database'] != ':memory:' && file_exists($this->connectionOptions['database'] . '-' . $prefix)) {
@@ -192,7 +182,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
             unlink($this->connectionOptions['database'] . '-' . $prefix);
           }
         }
-        catch (\Exception $e) {
+        catch (\Exception) {
           // Ignore the exception and continue. There is nothing we can do here
           // to report the error or fail safe.
         }
@@ -211,7 +201,10 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       // http://www.sqlite.org/inmemorydb.html it will open a unique database so
       // attaching it twice is not a problem.
       $database_file = $this->connectionOptions['database'] !== ':memory:' ? $this->connectionOptions['database'] . '-' . $database : $this->connectionOptions['database'];
-      $this->query('ATTACH DATABASE :database_file AS :database', [':database_file' => $database_file, ':database' => $database]);
+      $this->query('ATTACH DATABASE :database_file AS :database', [
+        ':database_file' => $database_file,
+        ':database' => $database,
+      ]);
       $this->attachedDatabases[$database] = $database;
     }
   }
@@ -257,8 +250,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * SQLite compatibility implementation for the LEAST() SQL function.
    */
   public static function sqlFunctionLeast() {
-    // Remove all NULL, FALSE and empty strings values but leaves 0 (zero) values.
-    $values = array_filter(func_get_args(), 'strlen');
+    // Remove all NULL, FALSE and empty strings values but leaves 0 (zero)
+    // values.
+    $values = FilterArray::removeEmptyStrings(func_get_args());
 
     return count($values) < 1 ? NULL : min($values);
   }
@@ -358,6 +352,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return preg_match('/^' . $pattern . '$/', $subject);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function queryRange($query, $from, $count, array $args = [], array $options = []) {
     return $this->query($query . ' LIMIT ' . (int) $from . ', ' . (int) $count, $args, $options);
   }
@@ -366,7 +363,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function queryTemporary($query, array $args = [], array $options = []) {
-    $tablename = 'db_temporary_' . uniqid();
+    $tablename = 'db_temporary_' . bin2hex(random_bytes(12));
 
     $this->query('CREATE TEMPORARY TABLE ' . $tablename . ' AS ' . $query, $args, $options);
 
@@ -378,10 +375,16 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return 'temp.' . $tablename;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function driver() {
     return 'sqlite';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function databaseType() {
     return 'sqlite';
   }
@@ -402,6 +405,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function mapConditionOperator($operator) {
     return static::$sqliteConditionOperatorMap[$operator] ?? NULL;
   }
@@ -410,54 +416,21 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
-    if (isset($options['return'])) {
-      @trigger_error('Passing "return" option to ' . __METHOD__ . '() is deprecated in drupal:9.4.0 and is removed in drupal:11.0.0. For data manipulation operations, use dynamic queries instead. See https://www.drupal.org/node/3185520', E_USER_DEPRECATED);
-    }
+    assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to query() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     try {
-      $query = $this->preprocessStatement($query, $options);
-      $statement = new Statement($this->connection, $this, $query, $options['pdo'] ?? [], $allow_row_count);
+      return new Statement(
+        $this->connection,
+        $this,
+        $this->preprocessStatement($query, $options),
+        $options['pdo'] ?? [],
+        $allow_row_count,
+      );
     }
     catch (\Exception $e) {
       $this->exceptionHandler()->handleStatementException($e, $query, $options);
     }
-    return $statement;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function nextId($existing_id = 0) {
-    @trigger_error('Drupal\Core\Database\Connection::nextId() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Modules should use instead the keyvalue storage for the last used id. See https://www.drupal.org/node/3349345', E_USER_DEPRECATED);
-    try {
-      $this->startTransaction();
-    }
-    catch (\PDOException $e) {
-      // $this->exceptionHandler()->handleExecutionException()
-      // requires a $statement argument, so we cannot use that.
-      throw new DatabaseExceptionWrapper($e->getMessage(), 0, $e);
-    }
-
-    // We can safely use literal queries here instead of the slower query
-    // builder because if a given database breaks here then it can simply
-    // override nextId. However, this is unlikely as we deal with short strings
-    // and integers and no known databases require special handling for those
-    // simple cases. If another transaction wants to write the same row, it will
-    // wait until this transaction commits.
-    $stmt = $this->prepareStatement('UPDATE {sequences} SET [value] = GREATEST([value], :existing_id) + 1', [], TRUE);
-    $args = [':existing_id' => $existing_id];
-    try {
-      $stmt->execute($args);
-    }
-    catch (\Exception $e) {
-      $this->exceptionHandler()->handleExecutionException($e, $stmt, $args, []);
-    }
-    if ($stmt->rowCount() === 0) {
-      $this->query('INSERT INTO {sequences} ([value]) VALUES (:existing_id + 1)', $args);
-    }
-    // The transaction gets committed when the transaction object gets destroyed
-    // because it gets out of scope.
-    return $this->query('SELECT [value] FROM {sequences}')->fetchField();
   }
 
   /**
@@ -473,8 +446,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function createConnectionOptionsFromUrl($url, $root) {
-    $database = parent::createConnectionOptionsFromUrl($url, $root);
+  public static function createConnectionOptionsFromUrl($url) {
+    $database = parent::createConnectionOptionsFromUrl($url);
 
     // A SQLite database path with two leading slashes indicates a system path.
     // Otherwise the path is relative to the Drupal root.
@@ -482,12 +455,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     if ($url_components['path'][0] === '/') {
       $url_components['path'] = substr($url_components['path'], 1);
     }
-    if ($url_components['path'][0] === '/' || $url_components['path'] === ':memory:') {
-      $database['database'] = $url_components['path'];
-    }
-    else {
-      $database['database'] = $root . '/' . $url_components['path'];
-    }
+    $database['database'] = $url_components['path'];
 
     // User credentials and system port are irrelevant for SQLite.
     unset(
@@ -540,29 +508,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function merge($table, array $options = []) {
-    return new Merge($this, $table, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function upsert($table, array $options = []) {
     return new Upsert($this, $table, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function update($table, array $options = []) {
-    return new Update($this, $table, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function delete($table, array $options = []) {
-    return new Delete($this, $table, $options);
   }
 
   /**
@@ -585,22 +532,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function condition($conjunction) {
-    return new Condition($conjunction);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function driverTransactionManager(): TransactionManagerInterface {
     return new TransactionManager($this);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function startTransaction($name = '') {
-    return $this->transactionManager()->push($name);
   }
 
 }

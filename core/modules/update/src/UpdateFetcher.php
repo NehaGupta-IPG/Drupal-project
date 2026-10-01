@@ -4,11 +4,11 @@ namespace Drupal\update;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Site\Settings;
 use Drupal\Core\Utility\Error;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\TransferException;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Fetches project information from remote locations.
@@ -36,41 +36,14 @@ class UpdateFetcher implements UpdateFetcherInterface {
    */
   protected $updateSettings;
 
-  /**
-   * The HTTP client to fetch the feed data with.
-   *
-   * @var \GuzzleHttp\ClientInterface
-   */
-  protected $httpClient;
-
-  /**
-   * Whether to use HTTP fallback if HTTPS fails.
-   *
-   * @var bool
-   */
-  protected $withHttpFallback;
-
-  /**
-   * Constructs an UpdateFetcher.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \GuzzleHttp\ClientInterface $http_client
-   *   A Guzzle client object.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The settings instance.
-   * @param \Psr\Log\LoggerInterface|null $logger
-   *   The logger.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, ClientInterface $http_client, Settings $settings, protected ?LoggerInterface $logger = NULL) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected ClientInterface $httpClient,
+    #[Autowire(service: 'logger.channel.update')]
+    protected LoggerInterface $logger,
+  ) {
     $this->fetchUrl = $config_factory->get('update.settings')->get('fetch.url');
-    $this->httpClient = $http_client;
     $this->updateSettings = $config_factory->get('update.settings');
-    $this->withHttpFallback = $settings->get('update_fetch_with_http_fallback', FALSE);
-    if ($this->logger === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $logger argument is deprecated in drupal:10.1.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2932520', E_USER_DEPRECATED);
-      $this->logger = \Drupal::service('logger.channel.update');
-    }
   }
 
   /**
@@ -78,38 +51,29 @@ class UpdateFetcher implements UpdateFetcherInterface {
    */
   public function fetchProjectData(array $project, $site_key = '') {
     $url = $this->buildFetchUrl($project, $site_key);
-    return $this->doRequest($url, ['headers' => ['Accept' => 'text/xml']], $this->withHttpFallback);
+    return $this->doRequest($url, ['headers' => ['Accept' => 'text/xml']]);
   }
 
   /**
-   * Applies a GET request with a possible HTTP fallback.
-   *
-   * This method falls back to HTTP in case there was some certificate
-   * problem.
+   * Applies a GET request.
    *
    * @param string $url
    *   The URL.
    * @param array $options
    *   The guzzle client options.
-   * @param bool $with_http_fallback
-   *   Should the function fall back to HTTP.
    *
    * @return string
-   *   The body of the HTTP(S) request, or an empty string on failure.
+   *   The body of the request, or an empty string on failure.
    */
-  protected function doRequest(string $url, array $options, bool $with_http_fallback): string {
+  protected function doRequest(string $url, array $options): string {
     $data = '';
     try {
       $data = (string) $this->httpClient
         ->get($url, ['headers' => ['Accept' => 'text/xml']])
         ->getBody();
     }
-    catch (TransferException $exception) {
+    catch (ClientExceptionInterface $exception) {
       Error::logException($this->logger, $exception);
-      if ($with_http_fallback && !str_contains($url, "http://")) {
-        $url = str_replace('https://', 'http://', $url);
-        return $this->doRequest($url, $options, FALSE);
-      }
     }
     return $data;
   }
@@ -123,7 +87,8 @@ class UpdateFetcher implements UpdateFetcherInterface {
     $url .= '/' . $name . '/current';
 
     // Only append usage information if we have a site key and the project is
-    // enabled. We do not want to record usage statistics for disabled projects.
+    // installed. We do not want to record usage statistics for uninstalled
+    // projects.
     if (!empty($site_key) && !str_contains($project['project_type'], 'disabled')) {
       // Append the site key.
       $url .= str_contains($url, '?') ? '&' : '?';
@@ -136,7 +101,7 @@ class UpdateFetcher implements UpdateFetcherInterface {
         $url .= rawurlencode($project['info']['version']);
       }
 
-      // Append the list of modules or themes enabled.
+      // Append the list of modules or themes installed.
       $list = array_keys($project['includes']);
       $url .= '&list=';
       $url .= rawurlencode(implode(',', $list));

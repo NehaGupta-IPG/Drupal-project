@@ -1,15 +1,15 @@
 # Schema for the configuration files of the Configuration Schema Test module.
 
-config_schema_test.someschema:
+config_schema_test.some_schema:
   type: config_object
   label: 'Schema test data'
   mapping:
-    testitem:
+    test_item:
       label: 'Test item'
-    testlist:
+    test_list:
       label: 'Test list'
 
-config_schema_test.someschema.with_parents:
+config_schema_test.some_schema.with_parents:
   label: 'Schema test data with parenting'
   type: config_object
   mapping:
@@ -20,8 +20,8 @@ config_schema_test.someschema.with_parents:
         target_key:
           label: 'Key used in parent relation'
           type: string
-        testitem:
-          type: config_schema_test.someschema.with_parents.[%parent.target_key]
+        test_item:
+          type: config_schema_test.some_schema.with_parents.[%parent.target_key]
     two_levels:
       label: 'Parenting two levels up'
       type: mapping
@@ -33,8 +33,8 @@ config_schema_test.someschema.with_parents:
           label: 'Wrapper'
           type: mapping
           mapping:
-            testitem:
-              type: config_schema_test.someschema.with_parents.[%parent.%parent.target_key]
+            test_item:
+              type: config_schema_test.some_schema.with_parents.[%parent.%parent.target_key]
     three_levels:
       label: 'Parenting three levels up'
       type: mapping
@@ -50,27 +50,26 @@ config_schema_test.someschema.with_parents:
               label: 'Wrapper 2'
               type: mapping
               mapping:
-                testitem:
-                  type: config_schema_test.someschema.with_parents.[%parent.%parent.%parent.target_key]
-
-config_schema_test.someschema.with_parents.key_1:
+                test_item:
+                  type: config_schema_test.some_schema.with_parents.[%parent.%parent.%parent.target_key]
+config_schema_test.some_schema.with_parents.key_1:
   label: 'Test item nested one level'
   type: string
-config_schema_test.someschema.with_parents.key_2:
+config_schema_test.some_schema.with_parents.key_2:
   label: 'Test item nested two levels'
   type: string
-config_schema_test.someschema.with_parents.key_3:
+config_schema_test.some_schema.with_parents.key_3:
   label: 'Test item nested three levels'
   type: string
 
-config_schema_test.someschema.somemodule.*.*:
+config_schema_test.some_schema.some_module.*.*:
   type: config_object
   label: 'Schema multiple filesystem marker test'
   mapping:
-    testid:
+    test_id:
       type: string
       label: 'ID'
-    testdescription:
+    test_description:
       type: text
       label: 'Description'
 
@@ -78,10 +77,10 @@ config_schema_test.wildcard_fallback.*:
   type: config_object
   label: 'Schema wildcard fallback test'
   mapping:
-    testid:
+    test_id:
       type: string
       label: 'ID'
-    testdescription:
+    test_description:
       type: text
       label: 'Description'
 
@@ -120,11 +119,6 @@ config_schema_test.schema_data_types:
       type: sequence
       sequence:
         type: boolean
-    # @see \Drupal\Core\Config\Schema\Sequence::getElementDefinition()
-    sequence_bc:
-      type: sequence
-      sequence:
-        - type: boolean
 
 config_schema_test_integer:
   type: integer
@@ -144,7 +138,7 @@ config_schema_test.ignore:
       type: ignore
       label: 'Indescribable'
     weight:
-      type: integer
+      type: weight
       label: 'Weight'
 
 config_schema_test.plugin_types:

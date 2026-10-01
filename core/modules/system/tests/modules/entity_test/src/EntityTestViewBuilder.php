@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\entity_test;
 
 use Drupal\Core\Entity\EntityViewBuilder;
@@ -14,7 +16,7 @@ class EntityTestViewBuilder extends EntityViewBuilder {
   /**
    * {@inheritdoc}
    */
-  public function buildComponents(array &$build, array $entities, array $displays, $view_mode) {
+  public function buildComponents(array &$build, array $entities, array $displays, $view_mode): void {
     parent::buildComponents($build, $entities, $displays, $view_mode);
 
     foreach ($entities as $id => $entity) {

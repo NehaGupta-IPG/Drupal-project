@@ -4,6 +4,8 @@ namespace Drupal\options\Plugin\views\argument;
 
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\options\OptionsAllowedValuesInterface;
+use Drupal\views\Attribute\ViewsArgument;
 use Drupal\views\FieldAPIHandlerTrait;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
@@ -13,9 +15,10 @@ use Drupal\views\Plugin\views\argument\StringArgument;
  * Argument handler for list field to show the human readable name in summary.
  *
  * @ingroup views_argument_handlers
- *
- * @ViewsArgument("string_list_field")
  */
+#[ViewsArgument(
+  id: 'string_list_field',
+)]
 class StringListField extends StringArgument {
 
   use FieldAPIHandlerTrait;
@@ -27,14 +30,24 @@ class StringListField extends StringArgument {
    */
   protected $allowedValues = NULL;
 
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected OptionsAllowedValuesInterface $optionsAllowedValues,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+  }
+
   /**
    * {@inheritdoc}
    */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
     $field_storage = $this->getFieldStorageDefinition();
-    $this->allowedValues = options_allowed_values($field_storage);
+    $this->allowedValues = $this->optionsAllowedValues->getAllowedValues($field_storage);
   }
 
   /**

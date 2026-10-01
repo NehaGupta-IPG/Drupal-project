@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* cspell:words drupalmediacaption drupalmediacaptionediting drupalmediacaptionui */
-import { Plugin } from 'ckeditor5/src/core';
+/* cspell:ignore drupalmediacaption drupalmediacaptionediting drupalmediacaptionui */
+import { Plugin } from 'ckeditor5';
 import DrupalMediaCaptionEditing from './drupalmediacaption/drupalmediacaptionediting';
 import DrupalMediaCaptionUI from './drupalmediacaption/drupalmediacaptionui';
 

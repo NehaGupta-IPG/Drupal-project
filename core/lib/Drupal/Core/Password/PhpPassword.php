@@ -12,7 +12,7 @@ class PhpPassword implements PasswordInterface {
   /**
    * Constructs a new password hashing instance.
    *
-   * @param string $algorithm
+   * @param string|null $algorithm
    *   The hashing algorithm to use. Defaults to PHP default.
    * @param array $options
    *   List of options. Refer to password_hash() for available options.
@@ -20,9 +20,13 @@ class PhpPassword implements PasswordInterface {
    * @see https://www.php.net/password_hash
    */
   public function __construct(
-    protected string $algorithm = PASSWORD_DEFAULT,
-    protected array $options = []
+    protected ?string $algorithm = NULL,
+    protected array $options = [],
   ) {
+    if (!in_array($algorithm, password_algos(), TRUE)) {
+      $this->algorithm = NULL;
+      $this->options = [];
+    }
   }
 
   /**
@@ -43,6 +47,10 @@ class PhpPassword implements PasswordInterface {
   public function check(#[\SensitiveParameter] $password, #[\SensitiveParameter] $hash) {
     // Prevent DoS attacks by refusing to check large passwords.
     if (strlen($password) > static::PASSWORD_MAX_LENGTH) {
+      return FALSE;
+    }
+    // Newly created accounts may have empty passwords.
+    if ($hash === NULL || $hash === '') {
       return FALSE;
     }
 

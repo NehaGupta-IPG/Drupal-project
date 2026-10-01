@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -10,12 +12,14 @@ use Drupal\file\Entity\File;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
+use Drupal\Tests\jsonapi\Traits\GetDocumentFromResponseTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Provides helper methods for the JSON:API module's functional tests.
@@ -24,7 +28,8 @@ use GuzzleHttp\Exception\ServerException;
  */
 abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
 
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
+  use GetDocumentFromResponseTrait;
   use ImageFieldCreationTrait;
 
   const IS_MULTILINGUAL = TRUE;
@@ -40,6 +45,8 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
     'image',
     'taxonomy',
     'link',
+    'page_cache',
+    'dynamic_page_cache',
   ];
 
   /**
@@ -53,6 +60,13 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
    * @var \Drupal\user\Entity\User
    */
   protected $user;
+
+  /**
+   * Test admin user.
+   *
+   * @var \Drupal\user\Entity\User
+   */
+  protected $adminUser;
 
   /**
    * Test user with access to view profiles.
@@ -128,8 +142,8 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
         ],
         FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED
       );
-      $this->createImageField('field_image', 'article');
-      $this->createImageField('field_heroless', 'article');
+      $this->createImageField('field_image', 'node', 'article');
+      $this->createImageField('field_no_hero', 'node', 'article');
     }
 
     FieldStorageConfig::create([
@@ -180,6 +194,14 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
       'edit any article content',
       'delete any article content',
     ]);
+    $this->adminUser = $this->drupalCreateUser([
+      'create article content',
+      'edit any article content',
+      'delete any article content',
+    ],
+      'jsonapi_admin_user',
+      TRUE,
+    );
 
     // Create a user that can.
     $this->userCanViewProfiles = $this->drupalCreateUser([
@@ -210,11 +232,11 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   The request response.
    *
-   * @throws \GuzzleHttp\Exception\GuzzleException
+   * @throws \Psr\Http\Client\ClientExceptionInterface
    *
    * @see \GuzzleHttp\ClientInterface::request
    */
-  protected function request($method, Url $url, array $request_options) {
+  protected function request(string $method, Url $url, array $request_options): ResponseInterface {
     try {
       $response = $this->httpClient->request($method, $url->toString(), $request_options);
     }
@@ -264,6 +286,7 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
       $values = [
         'uid' => ['target_id' => $this->user->id()],
         'type' => 'article',
+        'promote' => TRUE,
       ];
 
       if ($referencing_twice) {
@@ -280,7 +303,7 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
           $tags[] = mt_rand(1, $num_tags);
           $tags = array_unique($tags);
         }
-        $values['field_tags'] = array_map(function ($tag) {
+        $values['field_tags'] = array_map(function ($tag): array {
           return ['target_id' => $tag];
         }, $tags);
       }

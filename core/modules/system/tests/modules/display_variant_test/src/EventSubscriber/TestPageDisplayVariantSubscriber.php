@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\display_variant_test\EventSubscriber;
 
 use Drupal\Core\Plugin\Context\Context;
@@ -19,7 +21,7 @@ class TestPageDisplayVariantSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Render\PageDisplayVariantSelectionEvent $event
    *   The event to process.
    */
-  public function onSelectPageDisplayVariant(PageDisplayVariantSelectionEvent $event) {
+  public function onSelectPageDisplayVariant(PageDisplayVariantSelectionEvent $event): void {
     $event->setPluginId('display_variant_test');
     $event->setPluginConfiguration(['required_configuration' => 'A very important, required value.']);
     $event->addCacheTags(['custom_cache_tag']);

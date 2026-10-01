@@ -1,7 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* cspell:words drupalmediatoolbar */
-import { Plugin } from 'ckeditor5/src/core';
-import { WidgetToolbarRepository } from 'ckeditor5/src/widget';
+/* cspell:ignore drupalmediatoolbar */
+import { Plugin, WidgetToolbarRepository } from 'ckeditor5';
 
 import { getClosestSelectedDrupalMediaWidget, isObject } from './utils';
 

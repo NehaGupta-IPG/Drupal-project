@@ -5,72 +5,86 @@
  * Install, update and uninstall functions for the user module.
  */
 
-use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\ForeignKey;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
 
 /**
  * Implements hook_schema().
  */
-function user_schema() {
-  $schema['users_data'] = [
-    'description' => 'Stores module data as key/value pairs per user.',
-    'fields' => [
-      'uid' => [
-        'description' => 'The {users}.uid this record affects.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ],
-      'module' => [
-        'description' => 'The name of the module declaring the variable.',
-        'type' => 'varchar_ascii',
-        'length' => DRUPAL_EXTENSION_NAME_MAX_LENGTH,
-        'not null' => TRUE,
-        'default' => '',
-      ],
-      'name' => [
-        'description' => 'The identifier of the data.',
-        'type' => 'varchar_ascii',
-        'length' => 128,
-        'not null' => TRUE,
-        'default' => '',
-      ],
-      'value' => [
-        'description' => 'The value.',
-        'type' => 'blob',
-        'not null' => FALSE,
-        'size' => 'big',
-      ],
-      'serialized' => [
-        'description' => 'Whether value is serialized.',
-        'type' => 'int',
-        'size' => 'tiny',
-        'unsigned' => TRUE,
-        'default' => 0,
-      ],
+function user_schema(): Schema {
+  $tables[] = new Table(
+    name: 'users_data',
+    description: 'Stores module data as key/value pairs per user.',
+    columns: [
+      Column::int(
+        name: 'uid',
+        description: 'The {users}.uid this record affects.',
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      Column::varcharAscii(
+        name: 'module',
+        description: 'The name of the module declaring the variable.',
+        length: DRUPAL_EXTENSION_NAME_MAX_LENGTH,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      Column::varcharAscii(
+        name: 'name',
+        description: 'The identifier of the data.',
+        length: 128,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      Column::blob(
+        name: 'value',
+        description: 'The value.',
+        size: ColumnSize::Big,
+        notNull: FALSE,
+      ),
+      Column::int(
+        name: 'serialized',
+        description: 'Whether value is serialized.',
+        size: ColumnSize::Tiny,
+        unsigned: TRUE,
+        default: new IntValue(0),
+      ),
     ],
-    'primary key' => ['uid', 'module', 'name'],
-    'indexes' => [
-      'module' => ['module'],
-      'name' => ['name'],
+    primaryKey: new PrimaryKey(['uid', 'module', 'name']),
+    indexes: [
+      new Index(name: 'module', columns: ['module']),
+      new Index(name: 'name', columns: ['name']),
     ],
-    'foreign keys' => [
-      'data_user' => [
-        'table' => 'users',
-        'columns' => [
-          'uid' => 'uid',
-        ],
-      ],
+    foreignKeys: [
+      new ForeignKey(
+        name: 'data_user',
+        foreignTable: 'users',
+        columns: ['uid'],
+        foreignColumns: ['uid'],
+      ),
     ],
-  ];
+  );
 
-  return $schema;
+  return new Schema(
+    type: SchemaDefinitionType::Module,
+    name: 'user',
+    tables: $tables,
+  );
 }
 
 /**
  * Implements hook_install().
  */
-function user_install() {
+function user_install(): void {
   $storage = \Drupal::entityTypeManager()->getStorage('user');
   // Insert a row for the anonymous user.
   $storage
@@ -96,43 +110,6 @@ function user_install() {
 /**
  * Implements hook_update_last_removed().
  */
-function user_update_last_removed() {
-  return 9301;
-}
-
-/**
- * Remove non-existent permissions created by migrations.
- */
-function user_update_10000() {
-  $cleaned_roles = [];
-  $existing_permissions = array_keys(\Drupal::service('user.permissions')
-    ->getPermissions());
-  $config_factory = \Drupal::configFactory();
-  $role_ids = $config_factory->listAll('user.role.');
-  foreach ($role_ids as $role_id) {
-    $role_config = $config_factory->getEditable($role_id);
-    $removed_permissions = array_diff($role_config->get('permissions'), $existing_permissions);
-    if (!empty($removed_permissions)) {
-      $cleaned_roles[] = $role_config->get('label');
-      \Drupal::logger('update')->notice(
-        'The role %role has had the following non-existent permission(s) removed: %permissions.',
-        [
-          '%role' => $role_config->get('label'),
-          '%permissions' => implode(', ', $removed_permissions),
-        ]
-      );
-      $permissions = array_intersect($role_config->get('permissions'), $existing_permissions);
-      $role_config->set('permissions', $permissions);
-      $role_config->save();
-    }
-  }
-
-  if (!empty($cleaned_roles)) {
-    return new PluralTranslatableMarkup(
-      count($cleaned_roles),
-      'The role %role_list has had non-existent permissions removed. Check the logs for details.',
-      'The roles %role_list have had non-existent permissions removed. Check the logs for details.',
-      ['%role_list' => implode(', ', $cleaned_roles)]
-    );
-  }
+function user_update_last_removed(): int {
+  return 10000;
 }

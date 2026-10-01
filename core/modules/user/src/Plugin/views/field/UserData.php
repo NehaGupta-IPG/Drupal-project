@@ -2,12 +2,13 @@
 
 namespace Drupal\user\Plugin\views\field;
 
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\ResultRow;
 use Drupal\user\UserDataInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides access to the user data service.
@@ -15,9 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @ingroup views_field_handlers
  *
  * @see \Drupal\user\UserDataInterface
- *
- * @ViewsField("user_data")
  */
+#[ViewsField("user_data")]
 class UserData extends FieldPluginBase {
 
   /**
@@ -35,18 +35,10 @@ class UserData extends FieldPluginBase {
   protected $moduleHandler;
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('user.data'), $container->get('module_handler'));
-  }
-
-  /**
    * Constructs a UserData object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, UserDataInterface $user_data, ModuleHandlerInterface $module_handler) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, UserDataInterface $user_data, ModuleHandlerInterface $module_handler, protected ModuleExtensionList $moduleExtensionList) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
     $this->userData = $user_data;
     $this->moduleHandler = $module_handler;
   }
@@ -72,7 +64,7 @@ class UserData extends FieldPluginBase {
     $modules = $this->moduleHandler->getModuleList();
     $names = [];
     foreach (array_keys($modules) as $name) {
-      $names[$name] = $this->moduleHandler->getName($name);
+      $names[$name] = $this->moduleExtensionList->getName($name);
     }
 
     $form['data_module'] = [

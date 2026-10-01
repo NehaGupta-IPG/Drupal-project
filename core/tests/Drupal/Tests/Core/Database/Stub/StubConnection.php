@@ -1,31 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Database\Stub;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\Log;
-use Drupal\Core\Database\Query\Delete;
-use Drupal\Core\Database\Query\Insert;
-use Drupal\Core\Database\Query\Merge;
-use Drupal\Core\Database\Query\Select;
-use Drupal\Core\Database\Query\Truncate;
-use Drupal\Core\Database\Query\Update;
-use Drupal\Core\Database\StatementWrapper;
-use Drupal\Core\Database\Transaction;
+use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Tests\Core\Database\Stub\Driver\Schema;
 
 /**
  * A stub of the abstract Connection class for testing purposes.
  *
  * Includes minimal implementations of Connection's abstract methods.
+ *
+ * @internal
  */
 class StubConnection extends Connection {
 
   /**
    * {@inheritdoc}
    */
-  protected $statementWrapperClass = StatementWrapper::class;
+  protected $statementWrapperClass = StatementWrapperIterator::class;
 
   /**
    * Public property so we can test driver loading mechanism.
@@ -42,10 +39,10 @@ class StubConnection extends Connection {
    *   An object of the PDO class representing a database connection.
    * @param array $connection_options
    *   An array of options for the connection.
-   * @param string[]|null $identifier_quotes
+   * @param array{0: string, 1: string}|null $identifier_quotes
    *   The identifier quote characters. Defaults to an empty strings.
    */
-  public function __construct(\PDO $connection, array $connection_options, $identifier_quotes = ['', '']) {
+  public function __construct(\PDO $connection, array $connection_options, ?array $identifier_quotes = ['', '']) {
     $this->identifierQuotes = $identifier_quotes;
     parent::__construct($connection, $connection_options);
   }
@@ -53,49 +50,41 @@ class StubConnection extends Connection {
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(array &$connection_options = []): \stdClass {
     return new \stdClass();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function queryRange($query, $from, $count, array $args = [], array $options = []) {
+  public function queryRange($query, $from, $count, array $args = [], array $options = []): NULL {
     return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function driver() {
+  public function driver(): string {
     return $this->driver;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function databaseType() {
+  public function databaseType(): string {
     return 'stub';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createDatabase($database) {}
+  public function createDatabase($database): void {}
 
   /**
    * {@inheritdoc}
    */
-  public function mapConditionOperator($operator) {
+  public function mapConditionOperator($operator): NULL {
     return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function nextId($existing_id = 0) {
-    @trigger_error('Drupal\Core\Database\Connection::nextId() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Modules should use instead the keyvalue storage for the last used id. See https://www.drupal.org/node/3349345', E_USER_DEPRECATED);
-    return 0;
   }
 
   /**
@@ -111,57 +100,21 @@ class StubConnection extends Connection {
   /**
    * {@inheritdoc}
    */
-  public function exceptionHandler() {
+  public function exceptionHandler(): ExceptionHandler {
     return new ExceptionHandler();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function select($table, $alias = NULL, array $options = []) {
-    return new Select($this, $table, $alias, $options);
+  public function insert($table, array $options = []): void {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function insert($table, array $options = []) {
-    return new Insert($this, $table, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function merge($table, array $options = []) {
-    return new Merge($this, $table, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function upsert($table, array $options = []) {
+  public function upsert($table, array $options = []): StubUpsert {
     return new StubUpsert($this, $table, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function update($table, array $options = []) {
-    return new Update($this, $table, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function delete($table, array $options = []) {
-    return new Delete($this, $table, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function truncate($table, array $options = []) {
-    return new Truncate($this, $table, $options);
   }
 
   /**
@@ -177,15 +130,8 @@ class StubConnection extends Connection {
   /**
    * {@inheritdoc}
    */
-  public function condition($conjunction) {
+  public function condition($conjunction): StubCondition {
     return new StubCondition($conjunction);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function startTransaction($name = '') {
-    return new Transaction($this, $name);
   }
 
 }

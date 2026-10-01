@@ -1,83 +1,94 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\dblog\Functional;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests update functions for the Database Logging module.
- *
- * @group dblog
  */
+#[Group('dblog')]
+#[RunTestsInSeparateProcesses]
 class UpdatePathTest extends UpdatePathTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
-      __DIR__ . '/../../../../system/tests/fixtures/update/drupal-9.4.0.bare.standard.php.gz',
+      __DIR__ . '/../../../../system/tests/fixtures/update/drupal-11.3.0.bare.standard.php.gz',
     ];
   }
 
   /**
-   * Tests that, after update 10101, the 'wid' column can be a 64-bit integer.
+   * Tests that, after update 12100, the 'wid' column is an unsigned integer.
    */
-  public function testLogEntryWithBigId() {
-    if (PHP_INT_SIZE < 8) {
-      $this->markTestSkipped('This test can only be run on a system that supports 64-bit integers (i.e., PHP_INT_SIZE is 8).');
-    }
+  public function testLogEntryWithNegativeId(): void {
+    $connection = Database::getConnection();
+
+    // Insert a normal row first. On PostgreSQL, inserting an explicit value
+    // into a serial column resyncs the sequence to GREATEST(MAX(wid), <value>),
+    // which fails while the table is empty.
+    $this->insertLogEntry($connection);
+
+    // Before updates, a negative WID should be possible.
+    $this->insertLogEntry($connection, -1000);
+    $this->assertEquals(1, $connection->select('watchdog')
+      ->condition('wid', 0, '<')
+      ->countQuery()
+      ->execute()
+      ->fetchField());
+
     $this->runUpdates();
 
+    // Check the primary key.
+    $method = new \ReflectionMethod($connection->schema(), 'findPrimaryKeyColumns');
+    $this->assertEquals(['wid'], $method->invoke($connection->schema(), 'watchdog'));
+
+    // After updates, a negative WID should not be allowed.
+    try {
+      $this->insertLogEntry($connection, -1000);
+      $this->fail('After updates, a negative WID should not be allowed.');
+    }
+    catch (IntegrityConstraintViolationException | DatabaseExceptionWrapper) {
+      // Expected.
+    }
+  }
+
+  /**
+   * Inserts a row into the watchdog table.
+   *
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
+   * @param int|null $wid
+   *   An explicit watchdog ID, or NULL to let the sequence assign one.
+   */
+  private function insertLogEntry(Connection $connection, ?int $wid = NULL): void {
     global $base_root;
 
-    $connection = Database::getConnection();
-    // Insert a row with a big value for wid.
-    $insert = $connection->insert('watchdog');
-    $insert->fields([
-      'wid'         => 2147483647000,
-      'message'     => 'Dblog test log message with big WID',
-      'type'        => 'test',
-      'variables'   => '',
-      'severity'    => RfcLogLevel::NOTICE,
-      'uid'         => 1,
-      'location'    => $base_root . \Drupal::request()->getRequestUri(),
-      'hostname'    => $base_root,
-      'timestamp'   => \Drupal::time()->getRequestTime(),
-    ]);
-    $insert->execute();
-
-    // Insert another row without a value for wid, to test auto-increment.
-    $insert = $connection->insert('watchdog');
-    $insert->fields([
-      'message'     => 'Dblog test log message with big WID',
-      'type'        => 'test',
-      'variables'   => '',
-      'severity'    => RfcLogLevel::NOTICE,
-      'uid'         => 1,
-      'location'    => $base_root . \Drupal::request()->getRequestUri(),
-      'hostname'    => $base_root,
-      'timestamp'   => \Drupal::time()->getRequestTime(),
-    ]);
-    $insert->execute();
-
-    // Test that the first row exists with the expected value for wid.
-    $result = $connection->select('watchdog')
-      ->fields('watchdog', ['wid'])
-      ->condition('wid', 2147483647000)
-      ->execute()
-      ->fetchAssoc();
-    $this->assertNotEmpty($result, 'The row with a big value for wid exists.');
-
-    // Test that the second row exists with the expected value for wid.
-    $result = $connection->select('watchdog')
-      ->fields('watchdog', ['wid'])
-      ->condition('wid', 2147483647000 + 1)
-      ->execute()
-      ->fetchAssoc();
-    $this->assertNotEmpty($result, 'The row without a value for wid exists, and has the correct auto-incremented value for wid.');
+    $fields = [
+      'message' => 'Dblog test log message',
+      'type' => 'test',
+      'variables' => '',
+      'severity' => RfcLogLevel::NOTICE,
+      'uid' => 1,
+      'location' => $base_root . \Drupal::request()->getRequestUri(),
+      'hostname' => $base_root,
+      'timestamp' => \Drupal::time()->getRequestTime(),
+    ];
+    if ($wid !== NULL) {
+      $fields['wid'] = $wid;
+    }
+    $connection->insert('watchdog')->fields($fields)->execute();
   }
 
 }

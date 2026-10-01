@@ -7,6 +7,7 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
 use Drupal\Core\StreamWrapper\AssetsStream;
 use Drupal\Core\StreamWrapper\PrivateStream;
 use Drupal\Core\StreamWrapper\PublicStream;
@@ -21,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  */
 class FileSystemForm extends ConfigFormBase {
+  use RedundantEditableConfigNamesTrait;
 
   /**
    * The date formatter service.
@@ -87,15 +89,7 @@ class FileSystemForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
-    return ['system.file'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('system.file');
     $form['file_public_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Public file system path'),
@@ -120,7 +114,7 @@ class FileSystemForm extends ConfigFormBase {
     $form['file_private_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Private file system path'),
-      '#markup' => (PrivateStream::basePath() ? PrivateStream::basePath() : $this->t('Not set')),
+      '#markup' => (PrivateStream::basePath() ?: $this->t('Not set')),
       '#description' => $this->t('An existing local file system path for storing private files. It should be writable by Drupal and not accessible over the web. This must be changed in settings.php'),
     ];
 
@@ -138,7 +132,7 @@ class FileSystemForm extends ConfigFormBase {
       $form['file_default_scheme'] = [
         '#type' => 'radios',
         '#title' => $this->t('Default download method'),
-        '#default_value' => $config->get('default_scheme'),
+        '#config_target' => 'system.file:default_scheme',
         '#options' => $options,
         '#description' => $this->t('This setting is used as the preferred download method. The use of public files is more efficient, but does not provide any access control.'),
       ];
@@ -150,27 +144,12 @@ class FileSystemForm extends ConfigFormBase {
     $form['temporary_maximum_age'] = [
       '#type' => 'select',
       '#title' => $this->t('Delete temporary files after'),
-      '#default_value' => $config->get('temporary_maximum_age'),
+      '#config_target' => 'system.file:temporary_maximum_age',
       '#options' => $period,
       '#description' => $this->t('Temporary files are not referenced, but are in the file system and therefore may show up in administrative lists. <strong>Warning:</strong> If enabled, temporary files will be permanently deleted and may not be recoverable.'),
     ];
 
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    $config = $this->config('system.file')
-      ->set('temporary_maximum_age', $form_state->getValue('temporary_maximum_age'));
-
-    if ($form_state->hasValue('file_default_scheme')) {
-      $config->set('default_scheme', $form_state->getValue('file_default_scheme'));
-    }
-    $config->save();
-
-    parent::submitForm($form, $form_state);
   }
 
 }

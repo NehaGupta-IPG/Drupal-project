@@ -3,15 +3,21 @@
 namespace Drupal\views\Plugin\views\area;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\filter\FilterFormatRepositoryInterface;
+use Drupal\views\Attribute\ViewsArea;
 
 /**
  * Views area text handler.
  *
  * @ingroup views_area_handlers
- *
- * @ViewsArea("text")
  */
+#[ViewsArea("text")]
 class Text extends TokenizeAreaPluginBase {
+
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected FilterFormatRepositoryInterface $formatRepository) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+  }
 
   /**
    * {@inheritdoc}
@@ -38,7 +44,7 @@ class Text extends TokenizeAreaPluginBase {
       '#type' => 'text_format',
       '#default_value' => $this->options['content']['value'],
       '#rows' => 6,
-      '#format' => $this->options['content']['format'] ?? filter_default_format(),
+      '#format' => $this->options['content']['format'] ?? $this->formatRepository->getDefaultFormat()->id(),
       '#editor' => FALSE,
     ];
   }
@@ -58,7 +64,7 @@ class Text extends TokenizeAreaPluginBase {
    * {@inheritdoc}
    */
   public function render($empty = FALSE) {
-    $format = $this->options['content']['format'] ?? filter_default_format();
+    $format = $this->options['content']['format'] ?? $this->formatRepository->getDefaultFormat()->id();
     if (!$empty || !empty($this->options['empty'])) {
       return [
         '#type' => 'processed_text',

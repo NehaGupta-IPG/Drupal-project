@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Plugin;
 
 use Drupal\Component\Plugin\Mapper\MapperInterface;
@@ -16,6 +18,7 @@ final class StubPluginManagerBaseWithMapper extends PluginManagerBase {
    * @param \Drupal\Component\Plugin\Mapper\MapperInterface $mapper
    *   The plugin mapper interface.
    */
+  // @phpstan-ignore pluginManagerSetsCacheBackend.missingCacheBackend
   public function __construct(MapperInterface $mapper) {
     $this->mapper = $mapper;
   }

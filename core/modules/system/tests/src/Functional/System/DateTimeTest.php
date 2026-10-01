@@ -1,25 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test date formatting and time zone handling, including daylight saving time.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class DateTimeTest extends BrowserTestBase {
 
   use FieldUiTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -57,7 +59,7 @@ class DateTimeTest extends BrowserTestBase {
   /**
    * Tests time zones and DST handling.
    */
-  public function testTimeZoneHandling() {
+  public function testTimeZoneHandling(): void {
     // Setup date/time settings for Honolulu time.
     $config = $this->config('system.date')
       ->set('timezone.default', 'Pacific/Honolulu')
@@ -84,7 +86,6 @@ class DateTimeTest extends BrowserTestBase {
 
     // Set time zone to Los Angeles time.
     $config->set('timezone.default', 'America/Los_Angeles')->save();
-    \Drupal::entityTypeManager()->getViewBuilder('node')->resetCache([$node1, $node2]);
 
     // Confirm date format and time zone.
     $this->drupalGet('node/' . $node1->id());
@@ -98,7 +99,7 @@ class DateTimeTest extends BrowserTestBase {
   /**
    * Tests date format configuration.
    */
-  public function testDateFormatConfiguration() {
+  public function testDateFormatConfiguration(): void {
     // Confirm 'no custom date formats available' message appears.
     $this->drupalGet('admin/config/regional/date-time');
 
@@ -207,7 +208,7 @@ class DateTimeTest extends BrowserTestBase {
   /**
    * Tests handling case with invalid data in selectors (like February, 31st).
    */
-  public function testEnteringDateTimeViaSelectors() {
+  public function testEnteringDateTimeViaSelectors(): void {
 
     $this->drupalCreateContentType(['type' => 'page_with_date', 'name' => 'Page with date']);
 
@@ -215,9 +216,9 @@ class DateTimeTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     $storage_edit = [
-      'settings[datetime_type]' => 'datetime',
-      'cardinality' => 'number',
-      'cardinality_number' => '1',
+      'field_storage[subform][settings][datetime_type]' => 'datetime',
+      'field_storage[subform][cardinality]' => 'number',
+      'field_storage[subform][cardinality_number]' => '1',
     ];
     $this->fieldUIAddNewField('admin/structure/types/manage/page_with_date', 'dt', 'dt', 'datetime', $storage_edit);
 
@@ -257,7 +258,7 @@ class DateTimeTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('Selected combination of day and month is not valid.');
 
     $this->drupalGet('node/1');
-    $this->assertSession()->pageTextContains('Mon, 02/29/2016 - 01:30');
+    $this->assertSession()->pageTextContains('Mon, 29 Feb 2016 - 01:30');
   }
 
 }

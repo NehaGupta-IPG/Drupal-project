@@ -1,5 +1,8 @@
 {
-  "extends": "stylelint-config-standard",
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-prettier/recommended"
+  ],
   "plugins": [
     "stylelint-order"
   ],
@@ -11,13 +14,12 @@
     "custom-property-pattern": "^[a-z][-_a-z0-9IE]*$",
     "declaration-block-no-redundant-longhand-properties": null,
     "function-url-quotes": null,
-    "function-whitespace-after": null,
     "hue-degree-notation": "number",
     "import-notation": "string",
     "no-descending-specificity": null,
     "no-duplicate-selectors": null,
     "no-unknown-animations": true,
-    "max-line-length": null,
+    "property-no-deprecated": null,
     "media-feature-name-no-unknown": [true, {
       "ignoreMediaFeatureNames": [
         "prefers-reduced-motion"
@@ -379,7 +381,7 @@
     "selector-id-pattern": "^[a-z][-_a-z0-9]*$",
     "selector-no-vendor-prefix": null,
     "shorthand-property-no-redundant-values": null,
-    "unit-allowed-list": ["ch", "deg", "dpcm", "em", "ex", "fr", "ms", "rem", "%", "s", "px", "vw", "vh"],
+    "unit-allowed-list": ["%", "cap", "ch", "cm", "cqb", "cqh", "cqi", "cqmax", "cqmin", "cqw", "deg", "dpcm", "dpi", "dppx", "dvb", "dvh", "dvi", "dvmax", "dvmin", "dvw", "em", "ex", "fr", "grad", "hz", "ic", "in", "khz", "lh", "lvb", "lvh", "lvi", "lvmax", "lvmin", "lvw", "mm", "ms", "pc", "pt", "px", "q", "rad", "rcap", "rch", "rem", "rex", "ric", "rlh", "s", "svb", "svh", "svi", "svmax", "svmin", "svw", "turn", "vb", "vh", "vi", "vmax", "vmin", "vw", "x"],
     "value-keyword-case": ["lower", {
       "camelCaseSvgKeywords": true,
       "ignoreProperties": [
@@ -391,7 +393,6 @@
   },
   "ignoreFiles": [
     "assets/vendor/**/*.css",
-    "tests/Drupal/Tests/Core/Asset/css_test_files/**/*.css",
-    "themes/stable9/css/core/assets/vendor/**/*.css"
+    "tests/Drupal/Tests/Core/Asset/css_test_files/**/*.css"
   ]
 }

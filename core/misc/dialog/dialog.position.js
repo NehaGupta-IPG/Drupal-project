@@ -63,6 +63,11 @@
    * @fires event:dialogContentResize
    */
   function resetSize(event) {
+    // Ensure the UI dialog instance exists/is valid.
+    if (!event.data?.$element?.data('ui-dialog')) {
+      return;
+    }
+
     const positionOptions = [
       'width',
       'height',
@@ -84,7 +89,7 @@
         // jQuery UI does not support percentages on heights, convert to pixels.
         if (
           typeof optionValue === 'string' &&
-          /%$/.test(optionValue) &&
+          optionValue.endsWith('%') &&
           /height/i.test(option)
         ) {
           // Take offsets in account.
@@ -96,7 +101,8 @@
           // Don't force the dialog to be bigger vertically than needed.
           if (
             option === 'height' &&
-            event.data.$element.parent().outerHeight() < adjustedValue
+            Math.round(event.data.$element.parent().outerHeight()) <
+              adjustedValue
           ) {
             adjustedValue = 'auto';
           }
@@ -108,33 +114,46 @@
     if (!event.data.settings.modal) {
       adjustedOptions = resetPosition(adjustedOptions);
     }
+    event.data.$element.dialog('option', adjustedOptions);
+
     event.data.$element
-      .dialog('option', adjustedOptions)
-      .trigger('dialogContentResize');
+      ?.get(0)
+      ?.dispatchEvent(
+        new CustomEvent('dialogContentResize', { bubbles: true }),
+      );
   }
 
-  $(window).on({
-    'dialog:aftercreate': function (event, dialog, $element, settings) {
-      const autoResize = debounce(resetSize, 20);
-      const eventData = { settings, $element };
-      if (settings.autoResize === true || settings.autoResize === 'true') {
-        const uiDialog = $element
-          .dialog('option', { resizable: false, draggable: false })
-          .dialog('widget');
-        uiDialog[0].style.position = 'fixed';
-        $(window)
-          .on('resize.dialogResize scroll.dialogResize', eventData, autoResize)
-          .trigger('resize.dialogResize');
-        $(document).on(
-          'drupalViewportOffsetChange.dialogResize',
-          eventData,
-          autoResize,
-        );
-      }
-    },
-    'dialog:beforeclose': function (event, dialog, $element) {
-      $(window).off('.dialogResize');
-      $(document).off('.dialogResize');
-    },
+  window.addEventListener('dialog:aftercreate', (e) => {
+    const autoResize = debounce(resetSize, 20);
+    const $element = $(e.target);
+    const { settings } = e;
+    const eventData = { settings, $element };
+
+    if (settings.autoResize === true || settings.autoResize === 'true') {
+      const uiDialog = $element
+        .dialog('option', { resizable: false, draggable: false })
+        .dialog('widget');
+      uiDialog[0].style.position = 'fixed';
+      // Keep a reference so that a scheduled call can be cancelled on close.
+      $element.data('drupalAutoResize', autoResize);
+      $(window)
+        .on('resize.dialogResize scroll.dialogResize', eventData, autoResize)
+        .trigger('resize.dialogResize');
+      $(document).on(
+        'drupalViewportOffsetChange.dialogResize',
+        eventData,
+        autoResize,
+      );
+    }
+  });
+
+  window.addEventListener('dialog:beforeclose', (e) => {
+    // Unbinding the handlers below does not stop a resize that is already
+    // scheduled. Closing a dialog removes its element from the DOM, which
+    // destroys the jQuery UI instance, so a call that runs after this point
+    // would act on a destroyed dialog and throw.
+    $(e.target).data('drupalAutoResize')?.cancel();
+    $(window).off('.dialogResize');
+    $(document).off('.dialogResize');
   });
 })(jQuery, Drupal, drupalSettings, Drupal.debounce, Drupal.displace);

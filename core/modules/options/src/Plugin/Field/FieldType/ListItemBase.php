@@ -7,6 +7,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\FocusFirstCommand;
 use Drupal\Core\Ajax\InsertCommand;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -15,6 +16,8 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\OptionsProviderInterface;
+use Drupal\options\OptionsAllowedValues;
+use Drupal\options\OptionsAllowedValuesInterface;
 
 /**
  * Plugin base class inherited by the options field types.
@@ -34,7 +37,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   /**
    * {@inheritdoc}
    */
-  public function getPossibleValues(AccountInterface $account = NULL) {
+  public function getPossibleValues(?AccountInterface $account = NULL) {
     // Flatten options firstly, because Possible Options may contain group
     // arrays.
     $flatten_options = OptGroup::flattenOptions($this->getPossibleOptions($account));
@@ -44,14 +47,14 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   /**
    * {@inheritdoc}
    */
-  public function getPossibleOptions(AccountInterface $account = NULL) {
+  public function getPossibleOptions(?AccountInterface $account = NULL) {
     return $this->getSettableOptions($account);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getSettableValues(AccountInterface $account = NULL) {
+  public function getSettableValues(?AccountInterface $account = NULL) {
     // Flatten options firstly, because Settable Options may contain group
     // arrays.
     $flatten_options = OptGroup::flattenOptions($this->getSettableOptions($account));
@@ -61,16 +64,20 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   /**
    * {@inheritdoc}
    */
-  public function getSettableOptions(AccountInterface $account = NULL) {
-    $allowed_options = options_allowed_values($this->getFieldDefinition()->getFieldStorageDefinition(), $this->getEntity());
-    return $allowed_options;
+  public function getSettableOptions(?AccountInterface $account = NULL) {
+    return \Drupal::service(OptionsAllowedValuesInterface::class)->getAllowedValues(
+      $this->getFieldDefinition()->getFieldStorageDefinition(),
+      $this->getEntity()
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
-    $allowed_options = options_allowed_values($field_definition->getFieldStorageDefinition());
+    $allowed_options = \Drupal::service(OptionsAllowedValuesInterface::class)
+      ->getAllowedValues($field_definition->getFieldStorageDefinition());
+
     if (empty($allowed_options)) {
       $values['value'] = NULL;
       return $values;
@@ -83,7 +90,9 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * {@inheritdoc}
    */
   public function isEmpty() {
-    return empty($this->value) && (string) $this->value !== '0';
+    $value = $this->get('value')->getValue();
+
+    return empty($value) && (string) $value !== '0';
   }
 
   /**
@@ -93,6 +102,8 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     if (!array_key_exists('allowed_values', $form_state->getStorage())) {
       $form_state->set('allowed_values', $this->getFieldDefinition()->getSetting('allowed_values'));
     }
+    $form['field_storage_submit']['#submit'][] = [static::class, 'submitFieldStorageUpdate'];
+    $form['field_storage_submit']['#limit_validation_errors'] = [];
 
     $allowed_values = $form_state->getStorage()['allowed_values'];
     $allowed_values_function = $this->getSetting('allowed_values_function');
@@ -103,12 +114,12 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
 
     $wrapper_id = Html::getUniqueId('allowed-values-wrapper');
     $element['allowed_values'] = [
+      '#type' => 'container',
       '#element_validate' => [[static::class, 'validateAllowedValues']],
       '#field_has_data' => $has_data,
       '#allowed_values' => $allowed_values,
       '#required' => TRUE,
-      '#prefix' => '<div id="' . $wrapper_id . '">',
-      '#suffix' => '</div>',
+      '#id' => $wrapper_id,
       '#access' => empty($allowed_values_function),
       'help_text' => ['#markup' => $this->allowedValuesDescription()],
     ];
@@ -122,6 +133,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
       '#attributes' => [
         'id' => 'allowed-values-order',
         'data-field-list-table' => TRUE,
+        'class' => ['allowed-values-table'],
       ],
       '#tabledrag' => [
         [
@@ -131,7 +143,10 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
         ],
       ],
       '#attached' => [
-        'library' => ['core/drupal.fieldListKeyboardNavigation'],
+        'library' => [
+          'core/drupal.fieldListKeyboardNavigation',
+          'field_ui/drupal.field_ui',
+        ],
       ],
     ];
 
@@ -293,12 +308,17 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     $remaining_allowed_values = array_diff($allowed_values, [$item_to_be_removed]);
     $form_state->set('allowed_values', $remaining_allowed_values);
 
-    $delta = $button['#delta'];
-    $user_input = $form_state->getUserInput();
     // The user input is directly modified to preserve the rest of the data on
     // the page as it cannot be rebuilt from a fresh form state.
-    unset($user_input['settings']['allowed_values']['table'][$delta]);
-    $user_input['settings']['allowed_values']['table'] = array_values($user_input['settings']['allowed_values']['table']);
+    $user_input = $form_state->getUserInput();
+    NestedArray::unsetValue($user_input, $element['#parents']);
+
+    // Reset the keys in the array.
+    $table_parents = $element['#parents'];
+    array_pop($table_parents);
+    $new_values = array_values(NestedArray::getValue($user_input, $table_parents));
+    NestedArray::setValue($user_input, $table_parents, $new_values);
+
     $form_state->setUserInput($user_input);
     $form_state->set('items_count', $form_state->get('items_count') - 1);
 
@@ -323,26 +343,32 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   abstract protected function allowedValuesDescription();
 
   /**
-   * #element_validate callback for options field allowed values.
+   * Render API callback: Validates the allowed values of an options field.
    *
-   * @param $element
+   * This function is assigned as a #element_validate callback.
+   *
+   * @param array $element
    *   An associative array containing the properties and children of the
    *   generic form element.
-   * @param $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form for the form this element belongs to.
    *
-   * @see \Drupal\Core\Render\Element\FormElement::processPattern()
+   * @see \Drupal\Core\Render\Element\FormElementBase::processPattern()
    */
   public static function validateAllowedValues($element, FormStateInterface $form_state) {
     $items = array_filter(array_map(function ($item) use ($element) {
       $current_element = $element['table'][$item];
-      if ($current_element['item']['key']['#value'] !== NULL && $current_element['item']['label']['#value']) {
-        return $current_element['item']['key']['#value'] . '|' . $current_element['item']['label']['#value'];
-      }
-      elseif ($current_element['item']['key']['#value']) {
+      $key_has_input = isset($current_element['item']['key']['#value']) && $current_element['item']['key']['#value'] !== '';
+      $label_has_input = isset($current_element['item']['label']['#value']) && $current_element['item']['label']['#value'] !== '';
+      if ($key_has_input) {
+        if ($label_has_input) {
+          return $current_element['item']['key']['#value'] . '|' . $current_element['item']['label']['#value'];
+        }
+
         return $current_element['item']['key']['#value'];
       }
-      elseif ($current_element['item']['label']['#value']) {
+
+      if ($label_has_input) {
         return $current_element['item']['label']['#value'];
       }
 
@@ -350,7 +376,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     }, Element::children($element['table'])), function ($item) {
       return $item;
     });
-    if ($reordered_items = $form_state->getValue(['settings', 'allowed_values', 'table'])) {
+    if ($reordered_items = $form_state->getValue([...$element['#parents'], 'table'])) {
       uksort($items, function ($a, $b) use ($reordered_items) {
         $a_weight = $reordered_items[$a]['weight'] ?? 0;
         $b_weight = $reordered_items[$b]['weight'] ?? 0;
@@ -378,7 +404,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   /**
    * Extracts the allowed values array from the allowed_values element.
    *
-   * @param string|array $list
+   * @param array $list
    *   The raw string or array to extract values from.
    * @param bool $has_data
    *   The current field already has data inserted or not.
@@ -388,15 +414,8 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    *
    * @see \Drupal\options\Plugin\Field\FieldType\ListItemBase::allowedValuesString()
    */
-  protected static function extractAllowedValues($list, $has_data) {
+  protected static function extractAllowedValues(array $list, bool $has_data) {
     $values = [];
-
-    if (is_string($list)) {
-      trigger_error('Passing a string to ' . __METHOD__ . '() is deprecated in drupal:10.2.0 and will be removed from drupal:11.0.0. Use an array instead.', E_USER_DEPRECATED);
-      $list = explode("\n", $list);
-      $list = array_map('trim', $list);
-      $list = array_filter($list, 'strlen');
-    }
 
     $generated_keys = $explicit_keys = FALSE;
     foreach ($list as $position => $text) {
@@ -440,10 +459,12 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * @param string $option
    *   The option value entered by the user.
    *
-   * @return string
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|string|null
    *   The error message if the specified value is invalid, NULL otherwise.
    */
-  protected static function validateAllowedValue($option) {}
+  protected static function validateAllowedValue($option) {
+    return NULL;
+  }
 
   /**
    * Generates a string representation of an array of 'allowed values'.
@@ -550,6 +571,17 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    */
   protected static function castAllowedValue($value) {
     return $value;
+  }
+
+  /**
+   * Resets the cached allowed values on field storage update.
+   *
+   * @todo Deprecate this method in #3583435.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3583435
+   */
+  public static function submitFieldStorageUpdate() {
+    Cache::invalidateTags([OptionsAllowedValues::CACHE_TAG]);
   }
 
 }

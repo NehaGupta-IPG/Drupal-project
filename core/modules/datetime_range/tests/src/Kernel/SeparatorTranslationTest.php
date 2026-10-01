@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\datetime_range\Kernel;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
@@ -10,12 +12,14 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test to ensure the datetime range separator is translatable.
- *
- * @group datetime
  */
+#[Group('datetime')]
+#[RunTestsInSeparateProcesses]
 class SeparatorTranslationTest extends KernelTestBase {
 
   /**
@@ -91,7 +95,7 @@ class SeparatorTranslationTest extends KernelTestBase {
   /**
    * Tests the translation of the range separator.
    */
-  public function testSeparatorTranslation() {
+  public function testSeparatorTranslation(): void {
     // Create an entity.
     $entity = EntityTest::create([
       'name' => $this->randomString(),

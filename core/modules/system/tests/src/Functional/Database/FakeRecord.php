@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Database;
 
 /**
@@ -22,8 +24,6 @@ class FakeRecord {
    * The property used in tests.
    *
    * @see \Drupal\KernelTests\Core\Database\FetchTest
-   *
-   * @var string
    */
   public string $name;
 
@@ -31,8 +31,6 @@ class FakeRecord {
    * The property used in tests.
    *
    * @see \Drupal\KernelTests\Core\Database\DatabaseTestBase
-   *
-   * @var string
    */
   public string $job;
 

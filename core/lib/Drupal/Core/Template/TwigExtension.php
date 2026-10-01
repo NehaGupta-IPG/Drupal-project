@@ -23,6 +23,7 @@ use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Node;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use Twig\Runtime\EscaperRuntime;
 
 /**
  * A class providing Drupal Twig extensions.
@@ -94,12 +95,12 @@ class TwigExtension extends AbstractExtension {
   /**
    * {@inheritdoc}
    */
-  public function getFunctions() {
+  public function getFunctions(): array {
     return [
       // This function will receive a renderable array, if an array is detected.
       new TwigFunction('render_var', [$this, 'renderVar']),
       // The URL and path function are defined in close parallel to those found
-      // in \Symfony\Bridge\Twig\Extension\RoutingExtension
+      // in \Symfony\Bridge\Twig\Extension\RoutingExtension.
       new TwigFunction('url', [$this, 'getUrl'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
       new TwigFunction('path', [$this, 'getPath'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
       new TwigFunction('link', [$this, 'getLink']),
@@ -114,7 +115,11 @@ class TwigExtension extends AbstractExtension {
   /**
    * {@inheritdoc}
    */
-  public function getFilters() {
+  public function getFilters(): array {
+    $escape_options = [
+      'needs_environment' => TRUE,
+      'is_safe_callback' => [static::class, 'escapeFilterIsSafe'],
+    ];
     return [
       // Translation filters.
       new TwigFilter('t', 't', ['is_safe' => ['html']]),
@@ -126,8 +131,14 @@ class TwigExtension extends AbstractExtension {
       // @see TwigNodeTrans::compileString()
       new TwigFilter('placeholder', [$this, 'escapePlaceholder'], ['is_safe' => ['html'], 'needs_environment' => TRUE]),
 
-      // Replace twig's escape filter with our own.
-      new TwigFilter('drupal_escape', [$this, 'escapeFilter'], ['needs_environment' => TRUE, 'is_safe_callback' => 'twig_escape_filter_is_safe']),
+      // Replace Twig's escape filters with our own MarkupInterface-aware
+      // filter. Filters registered by later extensions override those with
+      // the same name, and this extension is always added after Twig's
+      // EscaperExtension. Twig's auto-escaping always uses the filter
+      // named 'escape'.
+      new TwigFilter('escape', [$this, 'escapeFilter'], $escape_options),
+      new TwigFilter('e', [$this, 'escapeFilter'], $escape_options),
+      new TwigFilter('drupal_escape', [$this, 'escapeFilter'], $escape_options),
 
       // Implements safe joining.
       // @todo Make that the default for |join? Upstream issue:
@@ -154,35 +165,36 @@ class TwigExtension extends AbstractExtension {
   /**
    * {@inheritdoc}
    */
-  public function getNodeVisitors() {
+  public function getNodeVisitors(): array {
     // The node visitor is needed to wrap all variables with
     // render_var -> TwigExtension->renderVar() function.
-    return [
+    $visitors = [
       new TwigNodeVisitor(),
       new TwigNodeVisitorCheckDeprecations(),
     ];
+    if (\in_array('__toString', TwigSandboxPolicy::getMethodsAllowedOnAllObjects(), TRUE)) {
+      // When __toString is an allowed method, there is no point in running
+      // \Twig\Extension\SandboxExtension::ensureToStringAllowed, so we add a
+      // node visitor to remove any CheckToStringNode nodes added by the
+      // sandbox extension.
+      $visitors[] = new RemoveCheckToStringNodeVisitor();
+    }
+    return $visitors;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getTokenParsers() {
+  public function getTokenParsers(): array {
     return [
       new TwigTransTokenParser(),
     ];
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function getName() {
-    return 'drupal_core';
-  }
-
-  /**
    * Generates a URL path given a route name and parameters.
    *
-   * @param $name
+   * @param string $name
    *   The name of the route.
    * @param array $parameters
    *   (optional) An associative array of route parameters names and values.
@@ -205,7 +217,7 @@ class TwigExtension extends AbstractExtension {
   /**
    * Generates an absolute URL given a route name and parameters.
    *
-   * @param $name
+   * @param string $name
    *   The name of the route.
    * @param array $parameters
    *   An associative array of route parameter names and values.
@@ -387,6 +399,25 @@ class TwigExtension extends AbstractExtension {
   }
 
   /**
+   * Determines which strategies the output of the escape filter is safe for.
+   *
+   * @param \Twig\Node\Node $filter_args
+   *   The arguments passed to the escape filter.
+   *
+   * @return string[]
+   *   The escaping strategies the output is safe for.
+   */
+  public static function escapeFilterIsSafe(Node $filter_args): array {
+    foreach ($filter_args as $arg) {
+      if ($arg instanceof ConstantExpression) {
+        return [$arg->getAttribute('value')];
+      }
+      return [];
+    }
+    return ['html'];
+  }
+
+  /**
    * Overrides twig_escape_filter().
    *
    * Replacement function for Twig's escape filter.
@@ -423,8 +454,15 @@ class TwigExtension extends AbstractExtension {
 
     $this->bubbleArgMetadata($arg);
 
+    // Immediately cast and return MarkupInterface objects to a string to ensure
+    // that when Twig renders via yield, later manipulations to the object will
+    // not affect rendering.
+    if ($autoescape && ($arg instanceof MarkupInterface)) {
+      return (string) $arg;
+    }
+
     // Keep \Twig\Markup objects intact to support autoescaping.
-    if ($autoescape && ($arg instanceof TwigMarkup || $arg instanceof MarkupInterface)) {
+    if ($autoescape && ($arg instanceof TwigMarkup)) {
       return $arg;
     }
 
@@ -454,14 +492,17 @@ class TwigExtension extends AbstractExtension {
     // We have a string or an object converted to a string: Autoescape it!
     if (isset($return)) {
       if ($autoescape && $return instanceof MarkupInterface) {
-        return $return;
+        // Immediately cast and return MarkupInterface objects to a string to
+        // ensure that when Twig renders via yield, later manipulations to the
+        // object will not affect rendering.
+        return (string) $return;
       }
       // Drupal only supports the HTML escaping strategy, so provide a
       // fallback for other strategies.
       if ($strategy == 'html') {
         return Html::escape($return);
       }
-      return twig_escape_filter($env, $return, $strategy, $charset, $autoescape);
+      return $env->getRuntime(EscaperRuntime::class)->escape($arg, $strategy, $charset, $autoescape);
     }
 
     // This is a normal render array, which is safe by definition, with
@@ -481,12 +522,11 @@ class TwigExtension extends AbstractExtension {
    * For example: a generated link or generated URL object is passed as a Twig
    * template argument, and its bubbleable metadata must be bubbled.
    *
-   * @see \Drupal\Core\GeneratedLink
-   * @see \Drupal\Core\GeneratedUrl
-   *
    * @param mixed $arg
    *   A Twig template argument that is about to be printed.
    *
+   * @see \Drupal\Core\GeneratedLink
+   * @see \Drupal\Core\GeneratedUrl
    * @see \Drupal\Core\Theme\ThemeManager::render()
    * @see \Drupal\Core\Render\RendererInterface::render()
    */
@@ -554,6 +594,9 @@ class TwigExtension extends AbstractExtension {
       if ($arg instanceof RenderableInterface) {
         $arg = $arg->toRenderable();
       }
+      elseif ($arg instanceof MarkupInterface) {
+        return $arg;
+      }
       elseif (method_exists($arg, '__toString')) {
         return (string) $arg;
       }
@@ -606,15 +649,18 @@ class TwigExtension extends AbstractExtension {
   /**
    * Creates an Attribute object.
    *
-   * @param array $attributes
-   *   (optional) An associative array of key-value pairs to be converted to
-   *   HTML attributes.
+   * @param Attribute|array $attributes
+   *   (optional) An existing attribute object or an associative array of
+   *   key-value pairs to be converted to HTML attributes.
    *
    * @return \Drupal\Core\Template\Attribute
    *   An attributes object that has the given attributes.
    */
-  public function createAttribute(array $attributes = []) {
-    return new Attribute($attributes);
+  public function createAttribute(Attribute|array $attributes = []) {
+    if (\is_array($attributes)) {
+      return new Attribute($attributes);
+    }
+    return $attributes;
   }
 
   /**
@@ -627,22 +673,20 @@ class TwigExtension extends AbstractExtension {
    *
    * @param array|object $element
    *   The parent renderable array to exclude the child items.
-   * @param string[]|string ...
+   * @param string[]|string ...$args
    *   The string keys of $element to prevent printing. Arguments can include
    *   string keys directly, or arrays of string keys to hide.
    *
    * @return array
    *   The filtered renderable array.
    */
-  public function withoutFilter($element) {
+  public function withoutFilter($element, ...$args) {
     if ($element instanceof \ArrayAccess) {
       $filtered_element = clone $element;
     }
     else {
       $filtered_element = $element;
     }
-    $args = func_get_args();
-    unset($args[0]);
     // Since the remaining arguments can be a mix of arrays and strings, we use
     // some native PHP iterator classes to allow us to recursively iterate over
     // everything in a single pass.

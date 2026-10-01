@@ -2,21 +2,20 @@
 
 namespace Drupal\datetime_range\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem;
 
 /**
  * Plugin implementation of the 'daterange_datelist' widget.
- *
- * @FieldWidget(
- *   id = "daterange_datelist",
- *   label = @Translation("Select list"),
- *   field_types = {
- *     "daterange"
- *   }
- * )
  */
+#[FieldWidget(
+  id: 'daterange_datelist',
+  label: new TranslatableMarkup('Select list'),
+  field_types: ['daterange'],
+)]
 class DateRangeDatelistWidget extends DateRangeWidgetBase {
 
   /**
@@ -100,7 +99,11 @@ class DateRangeDatelistWidget extends DateRangeWidgetBase {
       '#type' => 'select',
       '#title' => $this->t('Date part order'),
       '#default_value' => $this->getSetting('date_order'),
-      '#options' => ['MDY' => $this->t('Month/Day/Year'), 'DMY' => $this->t('Day/Month/Year'), 'YMD' => $this->t('Year/Month/Day')],
+      '#options' => [
+        'MDY' => $this->t('Month/Day/Year'),
+        'DMY' => $this->t('Day/Month/Year'),
+        'YMD' => $this->t('Year/Month/Day'),
+      ],
     ];
 
     if ($this->getFieldSetting('datetime_type') == DateRangeItem::DATETIME_TYPE_DATETIME) {

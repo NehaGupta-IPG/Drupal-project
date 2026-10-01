@@ -1,17 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\cron_queue_test\Plugin\QueueWorker;
 
+use Drupal\Core\Queue\Attribute\QueueWorker;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\Core\Queue\SuspendQueueException;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * @QueueWorker(
- *   id = \Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestSuspendQueue::PLUGIN_ID,
- *   title = @Translation("Suspend queue test"),
- *   cron = {"time" = 60}
- * )
+ * A queue worker for testing suspending queue run.
  */
+#[QueueWorker(
+  id: self::PLUGIN_ID,
+  title: new TranslatableMarkup('Suspend queue test'),
+  cron: ['time' => 60]
+)]
 class CronQueueTestSuspendQueue extends QueueWorkerBase {
 
   /**
@@ -22,7 +27,7 @@ class CronQueueTestSuspendQueue extends QueueWorkerBase {
   /**
    * {@inheritdoc}
    */
-  public function processItem($data) {
+  public function processItem($data): void {
     if ($data === 'suspend') {
       throw new SuspendQueueException('The queue is broken.');
     }

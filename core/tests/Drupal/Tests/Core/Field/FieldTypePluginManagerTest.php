@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Field;
 
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
@@ -11,18 +13,19 @@ use Drupal\Core\Field\FieldTypePluginManager;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\Core\Field\FieldTypePluginManager
- * @group Field
+ * Tests Drupal\Core\Field\FieldTypePluginManager.
  */
+#[CoversClass(FieldTypePluginManager::class)]
+#[Group('Field')]
 class FieldTypePluginManagerTest extends UnitTestCase {
 
   /**
    * The field type plugin manager.
-   *
-   * @var \Drupal\Core\Field\FieldTypePluginManager
    */
   protected FieldTypePluginManager $fieldTypeManager;
 
@@ -70,19 +73,18 @@ class FieldTypePluginManagerTest extends UnitTestCase {
 
     $this->discovery = $this->prophesize(DiscoveryInterface::class);
     $property = new \ReflectionProperty(FieldTypePluginManager::class, 'discovery');
-    $property->setAccessible(TRUE);
     $property->setValue($this->fieldTypeManager, $this->discovery->reveal());
   }
 
   /**
-   * @covers ::getGroupedDefinitions
+   * Tests get grouped definitions.
    */
-  public function testGetGroupedDefinitions() {
+  public function testGetGroupedDefinitions(): void {
     $this->discovery->getDefinitions()->willReturn([
-      'telephone' => [
+      'field_test' => [
         'category' => 'general',
-        'label' => 'Telephone',
-        'id' => 'telephone',
+        'label' => 'field_test',
+        'id' => 'field_test',
       ],
       'string' => [
         'category' => 'text',
@@ -128,9 +130,9 @@ class FieldTypePluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getGroupedDefinitions
+   * Tests get grouped definitions invalid.
    */
-  public function testGetGroupedDefinitionsInvalid() {
+  public function testGetGroupedDefinitionsInvalid(): void {
     $this->discovery->getDefinitions()->willReturn([
       'string' => [
         'category' => 'text',
@@ -147,17 +149,14 @@ class FieldTypePluginManagerTest extends UnitTestCase {
     ]);
 
     $zend_assertions_default = ini_get('zend.assertions');
-    $assert_active_default = assert_options(ASSERT_ACTIVE);
 
     // Test behavior when assertions are not enabled.
     ini_set('zend.assertions', 0);
-    assert_options(ASSERT_ACTIVE, 0);
     $grouped_definitions = $this->fieldTypeManager->getGroupedDefinitions();
     $this->assertEquals(['General'], array_keys($grouped_definitions));
 
     // Test behavior when assertions are enabled.
     ini_set('zend.assertions', 1);
-    assert_options(ASSERT_ACTIVE, 1);
     $this->expectException(\AssertionError::class);
     try {
       $this->fieldTypeManager->getGroupedDefinitions();
@@ -165,16 +164,15 @@ class FieldTypePluginManagerTest extends UnitTestCase {
     catch (\Exception $e) {
       // Reset the original assert values.
       ini_set('zend.assertions', $zend_assertions_default);
-      assert_options(ASSERT_ACTIVE, $assert_active_default);
 
       throw $e;
     }
   }
 
   /**
-   * @covers ::getGroupedDefinitions
+   * Tests get grouped definitions empty.
    */
-  public function testGetGroupedDefinitionsEmpty() {
+  public function testGetGroupedDefinitionsEmpty(): void {
     $this->fieldTypeCategoryManager->getDefinitions()->willReturn([]);
     $this->assertEquals([], $this->fieldTypeManager->getGroupedDefinitions([]));
   }

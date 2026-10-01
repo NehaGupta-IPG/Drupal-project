@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Traits\Core;
 
 /**
@@ -38,7 +40,7 @@ trait GeneratePermutationsTrait {
    *   contains the full list of parameters that have been passed, but with a
    *   single value only.
    */
-  public static function generatePermutations(array $parameters) {
+  public static function generatePermutations(array $parameters): array {
     $all_permutations = [[]];
     foreach ($parameters as $parameter => $values) {
       $new_permutations = [];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Traits\Core;
 
 /**
@@ -10,7 +12,7 @@ trait CronRunTrait {
   /**
    * Runs cron on the test site.
    */
-  protected function cronRun() {
+  protected function cronRun(): void {
     $this->drupalGet('cron/' . \Drupal::state()->get('system.cron_key'));
   }
 

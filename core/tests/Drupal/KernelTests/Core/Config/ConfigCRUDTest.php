@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Component\Utility\Crypt;
@@ -9,34 +11,28 @@ use Drupal\Core\Config\ConfigValueException;
 use Drupal\Core\Config\DatabaseStorage;
 use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests CRUD operations on configuration objects.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigCRUDTest extends KernelTestBase {
 
   /**
    * Exempt from strict schema checking.
    *
    * @see \Drupal\Core\Config\Development\ConfigSchemaChecker
-   *
-   * @var bool
    */
-  protected $strictConfigSchema = FALSE;
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  protected static $modules = ['system'];
+  protected bool $strictConfigSchema = FALSE;
 
   /**
    * Tests CRUD operations.
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $event_dispatcher = $this->container->get('event_dispatcher');
     $typed_config_manager = $this->container->get('config.typed');
 
@@ -171,7 +167,7 @@ class ConfigCRUDTest extends KernelTestBase {
     $new_config = $this->config($new_name);
     $expected_values = [
       'value' => 'herp',
-      '404' => 'derp',
+      '404' => 'foo',
     ];
     $new_config->merge($expected_values);
     $new_config->save();
@@ -188,7 +184,7 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests the validation of configuration object names.
    */
-  public function testNameValidation() {
+  public function testNameValidation(): void {
     // Verify that an object name without namespace causes an exception.
     $name = 'no_namespace';
     try {
@@ -200,7 +196,7 @@ class ConfigCRUDTest extends KernelTestBase {
     }
 
     // Verify that a name longer than the maximum length causes an exception.
-    $name = 'config_test.herman_melville.moby_dick_or_the_whale.harper_1851.now_small_fowls_flew_screaming_over_the_yet_yawning_gulf_a_sullen_white_surf_beat_against_its_steep_sides_then_all_collapsed_and_the_great_shroud_of_the_sea_rolled_on_as_it_rolled_five_thousand_years_ago';
+    $name = 'config_test.herman_melville.dick_or_the_whale.harper_1851.now_small_fowls_flew_screaming_over_the_yet_yawning_gulf_a_sullen_white_surf_beat_against_its_steep_sides_then_all_collapsed_and_the_great_shroud_of_the_sea_rolled_on_as_it_rolled_five_thousand_years_ago';
     try {
       $this->config($name)->save();
       $this->fail('Expected ConfigNameException was thrown for a name longer than Config::MAX_NAME_LENGTH.');
@@ -217,7 +213,7 @@ class ConfigCRUDTest extends KernelTestBase {
         $config = $this->config($name);
         $config->save();
       }
-      catch (ConfigNameException $e) {
+      catch (ConfigNameException) {
         unset($test_characters[$i]);
       }
     }
@@ -229,7 +225,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $config = $this->config($name);
       $config->save();
     }
-    catch (ConfigNameException $e) {
+    catch (ConfigNameException) {
       $this->fail('ConfigNameException was not thrown for a valid object name.');
     }
 
@@ -238,7 +234,7 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests the validation of configuration object values.
    */
-  public function testValueValidation() {
+  public function testValueValidation(): void {
     // Verify that setData() will catch dotted keys.
     try {
       $this->config('namespace.object')->setData(['key.value' => 12])->save();
@@ -261,7 +257,7 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests data type handling.
    */
-  public function testDataTypes() {
+  public function testDataTypes(): void {
     \Drupal::service('module_installer')->install(['config_test']);
     $storage = new DatabaseStorage($this->container->get('database'), 'config');
     $name = 'config_test.types';
@@ -279,11 +275,24 @@ class ConfigCRUDTest extends KernelTestBase {
       // Symfony 5.1's YAML parser issues a deprecation when reading octal with
       // a leading zero, to comply with YAML 1.2. However PECL YAML is still
       // YAML 1.1 compliant.
-      // @todo: revisit parsing of octal once PECL YAML supports YAML 1.2.
-      // See https://www.drupal.org/project/drupal/issues/3205480
-      // 'octal' => 0775,
+      // @todo Revisit parsing of octal once PECL YAML supports YAML 1.2.
+      //   https://www.drupal.org/project/drupal/issues/3205480
+      //   'octal' => 0775,
       'string' => 'string',
       'string_int' => '1',
+      'nullable_array' => NULL,
+      'nullable_boolean' => NULL,
+      'nullable_exp' => NULL,
+      'nullable_float' => NULL,
+      'nullable_float_as_integer' => NULL,
+      'nullable_hex' => NULL,
+      'nullable_int' => NULL,
+      'nullable_octal' => NULL,
+      'nullable_string' => NULL,
+      'nullable_string_int' => NULL,
+      'mapping_with_only_required_keys' => [],
+      'mapping_with_some_required_keys' => [],
+      'mapping_with_only_optional_keys' => [],
     ];
     $data = ['_core' => ['default_config_hash' => Crypt::hashBase64(serialize($data))]] + $data;
     $this->assertSame($data, $config->get());
@@ -302,21 +311,13 @@ class ConfigCRUDTest extends KernelTestBase {
     $this->assertSame($data, $config->get());
     $this->assertSame($data, $storage->read($name));
 
-    // Test that schema type enforcement can be overridden by trusting the data.
-    $this->assertSame(99, $config->get('int'));
-    $config->set('int', '99')->save(TRUE);
-    $this->assertSame('99', $config->get('int'));
-    // Test that re-saving without testing the data enforces the schema type.
-    $config->save();
-    $this->assertSame($data, $config->get());
-
     // Test that setting an unsupported type for a config object with a schema
     // fails.
     try {
       $config->set('stream', fopen(__FILE__, 'r'))->save();
       $this->fail('No Exception thrown upon saving invalid data type.');
     }
-    catch (UnsupportedDataTypeConfigException $e) {
+    catch (UnsupportedDataTypeConfigException) {
       // Expected exception; just continue testing.
     }
 
@@ -331,9 +332,49 @@ class ConfigCRUDTest extends KernelTestBase {
       $config->set('stream', fopen(__FILE__, 'r'))->save();
       $this->fail('No Exception thrown upon saving invalid data type.');
     }
-    catch (UnsupportedDataTypeConfigException $e) {
+    catch (UnsupportedDataTypeConfigException) {
       // Expected exception; just continue testing.
     }
+  }
+
+  /**
+   * Tests deprecation of trusted data.
+   *
+   * @legacy-covers \Drupal\Core\Config\Config::save()
+   */
+  #[IgnoreDeprecations]
+  public function testTrustedDataDeprecation(): void {
+    $this->expectUserDeprecationMessage('Calling Drupal\\Core\\Config\\Config::save() with the $has_trusted_data argument is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3348180');
+    \Drupal::service('module_installer')->install(['config_test']);
+    $typed_config_manager = \Drupal::service('config.typed');
+
+    $name = 'config_test.types';
+    $config = $this->config($name);
+    $this->assertTrue($typed_config_manager->hasConfigSchema($name));
+
+    // Test that schema type enforcement can be overridden by trusting the data.
+    $this->assertSame(99, $config->get('int'));
+    $config->set('int', '99')->save(TRUE);
+    $this->assertSame('99', $config->get('int'));
+    // Test that re-saving without testing the data enforces the schema type.
+    $config->save();
+    $this->assertSame(99, $config->get('int'));
+
+    // Test that setting an unsupported type for a config object with a schema
+    // fails.
+    $this->expectException(UnsupportedDataTypeConfigException::class);
+    $config->set('stream', fopen(__FILE__, 'r'))->save(TRUE);
+
+    // Test that setting an unsupported type for a config object with no schema
+    // also fails.
+    $config_name = 'config_test.no_schema';
+    $config = $this->config($config_name);
+    $this->assertFalse($typed_config_manager->hasConfigSchema($config_name));
+
+    // Verify that an exception is thrown when saving unsupported data types.
+    $this->expectException(UnsupportedDataTypeConfigException::class);
+    $config->set('stream', fopen(__FILE__, 'r'))->save(TRUE);
+
   }
 
 }

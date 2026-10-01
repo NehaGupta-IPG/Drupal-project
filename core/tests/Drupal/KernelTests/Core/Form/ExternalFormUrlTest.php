@@ -1,18 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Form;
 
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Ensures that form actions can't be tricked into sending to external URLs.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class ExternalFormUrlTest extends KernelTestBase implements FormInterface {
 
   /**
@@ -23,14 +29,14 @@ class ExternalFormUrlTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'external_form_url_test';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['something'] = [
       '#type' => 'textfield',
       '#title' => 'What do you think?',
@@ -41,12 +47,12 @@ class ExternalFormUrlTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
+  public function validateForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
+  public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * {@inheritdoc}
@@ -66,7 +72,7 @@ class ExternalFormUrlTest extends KernelTestBase implements FormInterface {
   /**
    * Tests form behavior.
    */
-  public function testActionUrlBehavior() {
+  public function testActionUrlBehavior(): void {
     // Create a new request which has a request uri with multiple leading
     // slashes and make it the master request.
     $request_stack = \Drupal::service('request_stack');
@@ -76,13 +82,14 @@ class ExternalFormUrlTest extends KernelTestBase implements FormInterface {
     $request_stack->pop();
     $request_stack->pop();
     $request = Request::create($original_request->getSchemeAndHttpHost() . '//example.org');
+    $request->setSession(new Session(new MockArraySessionStorage()));
     $request_stack->push($request);
 
     $form = \Drupal::formBuilder()->getForm($this);
     $markup = \Drupal::service('renderer')->renderRoot($form);
 
     $this->setRawContent($markup);
-    $elements = $this->xpath('//form/@action');
+    $elements = $this->getSimpleXmlElementsByXpath('//form/@action');
     $action = (string) $elements[0];
     $this->assertEquals($original_request->getSchemeAndHttpHost() . '//example.org', $action);
 
@@ -91,13 +98,14 @@ class ExternalFormUrlTest extends KernelTestBase implements FormInterface {
     $request_stack = \Drupal::service('request_stack');
     $original_request = $request_stack->pop();
     $request = Request::create($original_request->getSchemeAndHttpHost() . '/example.org');
+    $request->setSession(new Session(new MockArraySessionStorage()));
     $request_stack->push($request);
 
     $form = \Drupal::formBuilder()->getForm($this);
     $markup = \Drupal::service('renderer')->renderRoot($form);
 
     $this->setRawContent($markup);
-    $elements = $this->xpath('//form/@action');
+    $elements = $this->getSimpleXmlElementsByXpath('//form/@action');
     $action = (string) $elements[0];
     $this->assertEquals('/example.org', $action);
   }

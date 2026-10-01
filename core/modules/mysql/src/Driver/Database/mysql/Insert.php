@@ -12,13 +12,6 @@ class Insert extends QueryInsert {
   /**
    * {@inheritdoc}
    */
-  public function __construct(Connection $connection, string $table, array $options = []) {
-    // @todo Remove the __construct in Drupal 11.
-    // @see https://www.drupal.org/project/drupal/issues/3256524
-    parent::__construct($connection, $table, $options);
-    unset($this->queryOptions['return']);
-  }
-
   public function execute() {
     if (!$this->preExecute()) {
       return NULL;
@@ -42,18 +35,18 @@ class Insert extends QueryInsert {
     $stmt = $this->connection->prepareStatement((string) $this, $this->queryOptions);
     try {
       $stmt->execute($values, $this->queryOptions);
-      $last_insert_id = $this->connection->lastInsertId();
+      // Re-initialize the values array so that we can re-use this query.
+      $this->insertValues = [];
+      return $this->connection->lastInsertId();
     }
     catch (\Exception $e) {
       $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $values, $this->queryOptions);
     }
-
-    // Re-initialize the values array so that we can re-use this query.
-    $this->insertValues = [];
-
-    return $last_insert_id;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function __toString() {
     // Create a sanitized comment string to prepend to the query.
     $comments = $this->connection->makeComment($this->comments);

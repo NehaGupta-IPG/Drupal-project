@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Views;
 
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\user\Entity\User;
 use Drupal\Tests\views\Kernel\Handler\FieldFieldAccessTestBase;
+use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests base field access in Views for the user entity.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserViewsFieldAccessTest extends FieldFieldAccessTestBase {
 
   /**
@@ -27,7 +31,10 @@ class UserViewsFieldAccessTest extends FieldFieldAccessTestBase {
     $this->installEntitySchema('user');
   }
 
-  public function testUserFields() {
+  /**
+   * Tests the user fields.
+   */
+  public function testUserFields(): void {
     ConfigurableLanguage::createFromLangcode('es')->save();
     ConfigurableLanguage::createFromLangcode('fr')->save();
 
@@ -55,7 +62,7 @@ class UserViewsFieldAccessTest extends FieldFieldAccessTestBase {
     $this->assertFieldAccess('user', 'timezone', 'ut1');
     $this->assertFieldAccess('user', 'status', 'On');
     // $this->assertFieldAccess('user', 'created', \Drupal::service('date.formatter')->format(123456));
-    // $this->assertFieldAccess('user', 'changed', \Drupal::service('date.formatter')->format(REQUEST_TIME));
+    // $this->assertFieldAccess('user', 'changed', \Drupal::service('date.formatter')->format(\Drupal::time()->getRequestTime()));
   }
 
 }
