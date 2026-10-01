@@ -14,7 +14,7 @@ use PhpTuf\ComposerStager\API\Exception\ExceptionInterface;
  *
  * @property \Drupal\Core\StringTranslation\TranslatableMarkup[] $messages
  * @property int $severity
- *   The severity of the result as an int. Deprecated in drupal:11.5.0 and is
+ *   The severity of the result as an int. Deprecated in drupal:12.1.0 and is
  *   removed from drupal:13.0.0. Use
  *   \Drupal\package_manager\ValidationResult::$severityEnum instead. See
  *   https://www.drupal.org/node/3618729.
@@ -49,7 +49,7 @@ final class ValidationResult {
     bool $assert_translatable,
   ) {
     if (is_int($severity)) {
-      @trigger_error('Calling ' . __METHOD__ . '() with $severity as an int is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass a \Drupal\Core\Extension\Requirement\RequirementSeverity instead. See https://www.drupal.org/node/3618729', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with $severity as an int is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Pass a \Drupal\Core\Extension\Requirement\RequirementSeverity instead. See https://www.drupal.org/node/3618729', E_USER_DEPRECATED);
       $severity = RequirementSeverity::from($severity);
     }
     $this->severityEnum = $severity;
@@ -84,7 +84,7 @@ final class ValidationResult {
    *   The severity of the result.
    */
   private function getDeprecatedSeverity(): int {
-    @trigger_error('\Drupal\package_manager\ValidationResult::$severity is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\package_manager\ValidationResult::$severityEnum instead. See https://www.drupal.org/node/3618729', E_USER_DEPRECATED);
+    @trigger_error('\Drupal\package_manager\ValidationResult::$severity is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal\package_manager\ValidationResult::$severityEnum instead. See https://www.drupal.org/node/3618729', E_USER_DEPRECATED);
     return $this->severityEnum->value;
   }
 
