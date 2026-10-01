@@ -7,6 +7,7 @@ namespace Drupal\Tests\inline_form_errors\Kernel;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('InlineFormErrors')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class FormElementInlineErrorTest extends KernelTestBase {
 
   /**

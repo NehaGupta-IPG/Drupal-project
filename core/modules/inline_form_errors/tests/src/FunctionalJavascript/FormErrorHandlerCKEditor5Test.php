@@ -13,6 +13,7 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('ckeditor5')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class FormErrorHandlerCKEditor5Test extends WebDriverTestBase {
 
   /**
