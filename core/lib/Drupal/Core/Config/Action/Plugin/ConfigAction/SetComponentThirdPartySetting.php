@@ -37,14 +37,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @code
  * config:
  *   actions:
- *     # Sets a third-party setting on the `user_picture` component, on
- *     # behalf of the System module.
- *     core.entity_view_display.user.user.default:
+ *     # Sets a third-party setting on the `title` component for all bundles, on
+ *     # behalf of the 'my_module'.
+ *     core.entity_view_display.node.*.default:
  *       setComponentThirdPartySetting:
- *         component: user_picture
- *         provider: system
+ *         component: title
+ *         provider: my_module
  *         settings:
- *           example_flag: true
+ *           example_flag: node.%bundle.title.flag
  *
  *     # It is possible to set third-party settings on multiple components.
  *     core.entity_view_display.user.user.compact:
@@ -114,8 +114,8 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
    *   The display entity.
    */
   private function applySingle(array $value, EntityDisplayInterface $entity): void {
-    if (empty($value['component']) || empty($value['provider'])) {
-      throw new ConfigActionException("The setComponentThirdPartySetting action requires an array with 'component' and 'provider'.");
+    if (empty($value['component']) || empty($value['provider']) || empty($value['settings'])) {
+      throw new ConfigActionException("The setComponentThirdPartySetting action requires an array with 'component', 'provider' and 'settings'.");
     }
     $provider = $value['provider'];
 
@@ -124,7 +124,7 @@ final class SetComponentThirdPartySetting implements ConfigActionPluginInterface
     if ($component === NULL) {
       throw new ConfigActionException(sprintf("Component %s does not exist or is hidden.", $value['component']));
     }
-    $component['third_party_settings'][$provider] = ConfigActionManager::replacePlaceholders($value['settings'] ?? [], [
+    $component['third_party_settings'][$provider] = ConfigActionManager::replacePlaceholders($value['settings'], [
       '%bundle' => $entity->getTargetBundle(),
       '%entity_type' => $entity->getTargetEntityTypeId(),
       '%display_mode' => $entity->getMode(),
