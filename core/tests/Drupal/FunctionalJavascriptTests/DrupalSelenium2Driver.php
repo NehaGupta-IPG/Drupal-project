@@ -161,30 +161,6 @@ JS,
   /**
    * {@inheritdoc}
    */
-  public function check(string $xpath): void {
-    parent::check($xpath);
-    $this->waitForRenderedFrame();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function uncheck(string $xpath): void {
-    parent::uncheck($xpath);
-    $this->waitForRenderedFrame();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function selectOption(string $xpath, string $value, bool $multiple = FALSE): void {
-    parent::selectOption($xpath, $value, $multiple);
-    $this->waitForRenderedFrame();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function click(string $xpath): void {
     /** @var \Exception $not_clickable_exception */
     $not_clickable_exception = NULL;
