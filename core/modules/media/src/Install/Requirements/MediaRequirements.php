@@ -22,7 +22,7 @@ class MediaRequirements implements InstallRequirementsInterface {
    *   The module's requirements.
    *
    * @see \Drupal\Core\Extension\InstallRequirementsInterface::getRequirements()
-    */
+   */
   public static function getRequirements(): array {
     $requirements = [];
     $destination = 'public://media-icons/generic';
@@ -37,9 +37,12 @@ class MediaRequirements implements InstallRequirementsInterface {
         $error = t('The directory %directory is not writable.', ['%directory' => $destination]);
       }
       $description = t('An automated attempt to create this directory failed, possibly due to a permissions problem. To proceed with the installation, either create the directory and modify its permissions manually or ensure that the installer has the permissions to create it automatically. For more information, see INSTALL.txt or the <a href=":handbook_url">online handbook</a>.', [':handbook_url' => 'https://www.drupal.org/server-permissions']);
-      $description = $error . ' ' . $description;
-      $requirements['media']['description'] = $description;
-      $requirements['media']['severity'] = RequirementSeverity::Error;
+      $requirement['description'] = t('%error %description', [
+        '%error' => $error,
+        '%description' => $description,
+      ]);
+      $requirement['severity'] = RequirementSeverity::Error;
+      $requirements['media'] = $requirement;
     }
     return $requirements;
   }
