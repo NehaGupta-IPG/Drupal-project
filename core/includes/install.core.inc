@@ -888,17 +888,6 @@ function install_tasks($install_state): array {
     'install_finished' => [],
   ];
 
-  // Allow the installation profile to modify the full list of tasks.
-  if (!empty($install_state['parameters']['profile'])) {
-    $profile = $install_state['parameters']['profile'];
-    if ($install_state['profiles'][$profile]->load()) {
-      $function = $install_state['parameters']['profile'] . '_install_tasks_alter';
-      if (function_exists($function)) {
-        $function($tasks, $install_state);
-      }
-    }
-  }
-
   // Fill in default parameters for each task before returning the list.
   foreach ($tasks as $task_name => &$task) {
     $task += [
@@ -1537,7 +1526,6 @@ function _install_get_version_info($version) {
 function install_load_profile(&$install_state): void {
   $profile = $install_state['parameters']['profile'];
   if ($profile !== FALSE) {
-    $install_state['profiles'][$profile]->load();
     $install_state['profile_info'] = install_profile_info($profile, $install_state['parameters']['langcode'] ?? 'en');
   }
 
