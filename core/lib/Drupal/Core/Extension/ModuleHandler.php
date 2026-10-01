@@ -18,15 +18,6 @@ use Drupal\Core\Utility\CallableResolver;
 class ModuleHandler implements ModuleHandlerInterface {
 
   /**
-   * List of loaded files.
-   *
-   * @var array<string, true>
-   *   An associative array whose keys are file paths of loaded files, relative
-   *   to the application's root directory.
-   */
-  protected $loadedFiles;
-
-  /**
    * Installed modules, as extension objects keyed by module name.
    *
    * @var array<string, \Drupal\Core\Extension\Extension>
@@ -34,19 +25,11 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected $moduleList;
 
   /**
-   * Boolean indicating whether modules have been loaded.
-   *
-   * @var bool
-   */
-  protected $loaded = FALSE;
-
-  /**
    * Lists of callbacks which implement an alter hook, keyed by hook name(s).
    *
    * @var array<string, list<callable>>
    */
   protected array $alterHookListeners = [];
-
 
   /**
    * A list of module include file keys.
@@ -118,49 +101,6 @@ class ModuleHandler implements ModuleHandlerInterface {
       $this->moduleList[$name] = new Extension($this->root, $module['type'], $module['pathname'], $module['filename']);
     }
 
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function load($name) {
-    if (isset($this->loadedFiles[$name])) {
-      return TRUE;
-    }
-
-    if (isset($this->moduleList[$name])) {
-      $this->moduleList[$name]->load();
-      $this->loadedFiles[$name] = TRUE;
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function loadAll() {
-    if (!$this->loaded) {
-      foreach ($this->moduleList as $name => $module) {
-        $this->load($name);
-      }
-      $this->loaded = TRUE;
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function reload() {
-    $this->loaded = FALSE;
-    $this->loadAll();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isLoaded() {
-    return $this->loaded;
   }
 
   /**
