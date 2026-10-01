@@ -12,7 +12,6 @@ use Drupal\hook_collector_depends_test\Hook\DependsOnModuleClassHooks;
 use Drupal\hook_collector_depends_test\Hook\DependsOnModuleMethodHooks;
 use Drupal\hook_collector_depends_test\Hook\DependsOnModuleMultipleHooks;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\module_handler_test_all1\Hook\ModuleHandlerTestAll1Hooks;
 use Drupal\user_hooks_test\Hook\UserHooksTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
