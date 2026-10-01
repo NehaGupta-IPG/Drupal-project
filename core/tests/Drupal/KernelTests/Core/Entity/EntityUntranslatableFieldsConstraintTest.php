@@ -35,11 +35,11 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
   ];
 
   /**
-   * The entity storage class for the entity type used in tests.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $storage;
+  protected $entityTypeManager;
 
   /**
    * A user account used to create entities.
@@ -54,8 +54,7 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema(self::ENTITY_TYPE);
-    $this->storage = $this->container->get('entity_type.manager')
-      ->getStorage(self::ENTITY_TYPE);
+    $this->entityTypeManager = $this->container->get('entity_type.manager');
     ConfigurableLanguage::createFromLangcode(self::LANGCODE)->save();
     $this->state->set('entity_test.translation', 1);
     $this->state->set('entity_test.untranslatable_fields.default_translation_affected', 0);
@@ -68,8 +67,9 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
    */
   #[DataProvider('accessValues')]
   public function testEntityUntranslatableFieldsConstraint(bool $access): void {
+    $storage = $this->entityTypeManager->getStorage(self::ENTITY_TYPE);
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $this->storage->create([
+    $entity = $storage->create([
       'name' => $this->randomString(),
       'user_id' => $this->user->id(),
       'langcode' => LanguageInterface::LANGCODE_DEFAULT,
@@ -89,7 +89,7 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
       'default_value' => [['value' => TRUE]],
     ])->save();
     // Necessary for picking up the new field.
-    $entity = $this->storage->loadUnchanged($entity->id());
+    $entity = $storage->loadUnchanged($entity->id());
     $entity = $entity->addTranslation(self::LANGCODE);
     $entity->isDefaultRevision(FALSE);
     /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $display */
