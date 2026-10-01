@@ -367,7 +367,7 @@
 .details.error {
   position: relative;
   border-color: var(--input--error-color);
-  border-left: none;
+  border-inline-start: none;
 
   /* Remove left border for open details summary. */
   &[open] > .details__summary::after {
