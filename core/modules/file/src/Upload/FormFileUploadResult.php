@@ -62,6 +62,26 @@ final class FormFileUploadResult {
   }
 
   /**
+   * Gets the detailed error messages, keyed by delta.
+   *
+   * Only deltas whose error has detail messages are included. Callers that
+   * display errors should show these with the matching message from
+   * ::getErrors(), for example as an item list.
+   *
+   * @return array<int, array<string|\Stringable>>
+   *   The detail messages, keyed by delta.
+   */
+  public function getErrorDetails(): array {
+    $details = [];
+    foreach ($this->results as $delta => $result) {
+      if ($result->getError() !== NULL && $result->getErrorDetails()) {
+        $details[$delta] = $result->getErrorDetails();
+      }
+    }
+    return $details;
+  }
+
+  /**
    * Returns whether any of the uploads failed with a reported error.
    *
    * @return bool

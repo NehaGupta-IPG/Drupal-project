@@ -6,6 +6,7 @@ namespace Drupal\file\Upload;
 
 use Drupal\file\FileInterface;
 use Drupal\Core\File\FileExists;
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\UploadedFilesExtractor;
 use Drupal\Core\Form\FormStateInterface;
@@ -80,7 +81,11 @@ class ManagedFileElementHelper {
     $result = $this->formFileUploader->saveFormUploadedFiles($uploadName, $uploadValidators, $uploadLocation, $fileExists);
 
     if ($result !== NULL && $result->hasErrors()) {
-      $errors = array_values($result->getErrors());
+      $errorDetails = $result->getErrorDetails();
+      $errors = [];
+      foreach ($result->getErrors() as $delta => $error) {
+        $errors[] = isset($errorDetails[$delta]) ? $this->renderErrorWithDetails($error, $errorDetails[$delta]) : $error;
+      }
 
       if (count($errors) > 1) {
         // Render multiple errors into a single message.
@@ -108,6 +113,30 @@ class ManagedFileElementHelper {
     }
     $files = $result->getFiles();
     return isset($delta) ? $result->getFile($delta) : $files;
+  }
+
+  /**
+   * Renders an error message followed by a list of detail messages.
+   *
+   * @param string|\Drupal\Component\Render\MarkupInterface $error
+   *   The error message.
+   * @param array<string|\Stringable> $details
+   *   The detail messages.
+   *
+   * @return \Drupal\Component\Render\MarkupInterface
+   *   The rendered error.
+   */
+  protected function renderErrorWithDetails(string|MarkupInterface $error, array $details): MarkupInterface {
+    $renderArray = [
+      'error' => [
+        '#markup' => $error,
+      ],
+      'item_list' => [
+        '#theme' => 'item_list',
+        '#items' => $details,
+      ],
+    ];
+    return $this->renderer->renderInIsolation($renderArray);
   }
 
   /**

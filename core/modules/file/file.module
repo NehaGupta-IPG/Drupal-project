@@ -107,7 +107,20 @@ function file_save_upload($form_field_name, $validators = [], $destination = FAL
   }
   if ($result->hasErrors()) {
     $messenger = \Drupal::messenger();
-    foreach ($result->getErrors() as $error) {
+    $errorDetails = $result->getErrorDetails();
+    foreach ($result->getErrors() as $delta => $error) {
+      if (isset($errorDetails[$delta])) {
+        $message = [
+          'error' => [
+            '#markup' => $error,
+          ],
+          'item_list' => [
+            '#theme' => 'item_list',
+            '#items' => $errorDetails[$delta],
+          ],
+        ];
+        $error = \Drupal::service('renderer')->renderInIsolation($message);
+      }
       $messenger->addError($error);
     }
   }

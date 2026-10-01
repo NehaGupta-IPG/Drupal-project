@@ -80,7 +80,20 @@ class FileTestForm extends FormBase {
 
     $result = \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles('file_test_upload', $validators, $destination, static::fileExistsFromName($form_state->getValue('file_test_replace')));
     if ($result !== NULL && $result->hasErrors()) {
-      foreach ($result->getErrors() as $error) {
+      $errorDetails = $result->getErrorDetails();
+      foreach ($result->getErrors() as $delta => $error) {
+        if (isset($errorDetails[$delta])) {
+          $message = [
+            'error' => [
+              '#markup' => $error,
+            ],
+            'item_list' => [
+              '#theme' => 'item_list',
+              '#items' => $errorDetails[$delta],
+            ],
+          ];
+          $error = \Drupal::service('renderer')->renderInIsolation($message);
+        }
         \Drupal::messenger()->addError($error);
       }
     }

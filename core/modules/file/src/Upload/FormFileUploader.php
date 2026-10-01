@@ -12,7 +12,6 @@ use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\UploadedFilesExtractor;
 use Drupal\Core\Lock\LockAcquiringException;
-use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
@@ -50,8 +49,8 @@ class FormFileUploader {
    * permanent.
    *
    * This method does not report errors to the user. It is the caller's
-   * responsibility to inspect FormFileUploadResult::getErrors() and display
-   * them appropriately.
+   * responsibility to inspect FormFileUploadResult::getErrors() and
+   * FormFileUploadResult::getErrorDetails() and display them appropriately.
    *
    * @param string $formFieldName
    *   A string that is the associative array key of the upload form element in
@@ -103,14 +102,12 @@ class FormFileUploader {
         if ($result->hasViolations()) {
           $violationMessages = [];
           foreach ($result->getViolations() as $violation) {
-            $violationMessages[] = (string) $violation->getMessage();
+            $violationMessages[] = $violation->getMessage();
           }
-          // Violation messages are TranslatableMarkup (see DrupalTranslator),
-          // already escaped, so combine as markup to avoid double-escaping.
-          $results[$i] = UploadedFileResult::failure($this->t('The specified file %name could not be uploaded: @errors', [
-            '%name' => $uploadedFile->getClientOriginalName(),
-            '@errors' => Markup::create(implode(' ', $violationMessages)),
-          ]));
+          $results[$i] = UploadedFileResult::failure(
+            $this->t('The specified file %name could not be uploaded.', ['%name' => $uploadedFile->getClientOriginalName()]),
+            $violationMessages,
+          );
           continue;
         }
         if ($result->hasErrors()) {
