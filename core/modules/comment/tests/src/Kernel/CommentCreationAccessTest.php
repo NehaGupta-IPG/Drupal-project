@@ -69,25 +69,47 @@ class CommentCreationAccessTest extends KernelTestBase {
 
     // Create a testing host entity.
     $entity = EntityTest::create();
+    $field = $entity->get('comment');
+
+    $field->access('create');
+    $this->assertEquals([
+      'commented_entity' => 'entity_test:',
+      'field' => 'comment',
+    ], $state->get('comment_test.create_access.context'));
+    $this->assertFalse($state->get('comment_test.create_access.cid'));
     $entity->save();
 
-    $comment = $this->createComment([
+    $unsaved_comment = $this->createComment([
       'entity_type' => $entity->getEntityTypeId(),
       'entity_id' => $entity->id(),
-    ]);
+    ], FALSE);
 
     $field = $entity->get('comment');
     $this->assertInstanceOf(CommentFieldItemList::class, $field);
 
     // Check that the comment create access handler receives the commented
     // entity as context when called from the comment entity ::access() method.
-    $comment->access('create');
+    $unsaved_comment->access('create');
     $this->assertEquals([
       'commented_entity' => 'entity_test:1',
       'field' => 'comment',
     ], $state->get('comment_test.create_access.context'));
     $this->assertSame('create:comment:entity_test:1:comment:', $state->get('comment_test.create_access.cid'));
 
+    $unsaved_comment->access('reply');
+    $this->assertEquals([
+      'commented_entity' => 'entity_test:1',
+      'field' => 'comment',
+      'parent' => 'comment:',
+    ], $state->get('comment_test.create_access.context'));
+    // Access result of a new comment is not cached.
+    $this->assertFalse($state->get('comment_test.create_access.cid'));
+
+    // Create access result should be cached in case of a saved comment.
+    $comment = $this->createComment([
+      'entity_type' => $entity->getEntityTypeId(),
+      'entity_id' => $entity->id(),
+    ]);
     $comment->access('reply');
     $this->assertEquals([
       'commented_entity' => 'entity_test:1',

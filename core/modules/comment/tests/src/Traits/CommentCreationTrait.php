@@ -42,11 +42,13 @@ trait CommentCreationTrait {
    *
    * @param array $values
    *   A list of values to be set on entity.
+   * @param bool $save
+   *   Whether the comment must be saved.
    *
    * @return \Drupal\comment\CommentInterface
    *   The comment entity.
    */
-  protected function createComment(array $values = []): CommentInterface {
+  protected function createComment(array $values = [], bool $save = TRUE): CommentInterface {
     /** @var \Drupal\comment\CommentStorageInterface $comment_storage */
     $comment_storage = \Drupal::entityTypeManager()->getStorage('comment');
 
@@ -73,7 +75,9 @@ trait CommentCreationTrait {
     ];
     /** @var \Drupal\comment\CommentInterface $comment */
     $comment = $comment_storage->create($values);
-    $comment->save();
+    if ($save) {
+      $comment->save();
+    }
 
     return $comment;
   }
