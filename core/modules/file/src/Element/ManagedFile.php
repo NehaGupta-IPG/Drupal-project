@@ -106,7 +106,7 @@ class ManagedFile extends FormElementBase {
               TrustedCallbackInterface::class,
               Variable::callableToString($callback)
             );
-            StaticTrustedCallbackHelper::callback($callback, [&$element, $input, $form_state], $message);
+            StaticTrustedCallbackHelper::callback($callback, [&$element, $input, $form_state], $message, TrustedCallbackInterface::TRIGGER_SILENCED_DEPRECATION);
           }
         }
 
