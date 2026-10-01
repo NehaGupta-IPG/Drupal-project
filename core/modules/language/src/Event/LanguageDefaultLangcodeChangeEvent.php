@@ -29,7 +29,7 @@ final class LanguageDefaultLangcodeChangeEvent extends Event {
   public function __construct(
     public readonly string $oldLangcode,
     public readonly string $newLangcode,
-    private readonly BatchBuilder $batch,
+    public readonly BatchBuilder $batch,
   ) {}
 
   /**
@@ -50,16 +50,6 @@ final class LanguageDefaultLangcodeChangeEvent extends Event {
    */
   public function addOperation(callable|string $callback, array $arguments = []): void {
     $this->batch->addOperation($callback, $arguments);
-  }
-
-  /**
-   * Gets the batch builder object.
-   *
-   * @return \Drupal\Core\Batch\BatchBuilder
-   *   The batch builder object.
-   */
-  public function getBatch(): BatchBuilder {
-    return $this->batch;
   }
 
 }

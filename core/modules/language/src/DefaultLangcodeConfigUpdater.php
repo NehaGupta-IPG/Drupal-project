@@ -45,7 +45,7 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
     $event = new LanguageDefaultLangcodeChangeEvent($old_langcode, $new_langcode, $batch);
     $this->eventDispatcher->dispatch($event);
 
-    return $event->getBatch();
+    return $event->batch;
   }
 
   /**
@@ -76,6 +76,8 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
       }
       $typed_config = $this->typedConfigManager->createFromNameAndData($name, $data);
       if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
+        // The configuration schema does not have a langcode, so it is not
+        // translatable.
         continue;
       }
       if ($data['langcode'] === $old_langcode) {
@@ -113,7 +115,7 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
         // The override may not have existed at all, or it may only have
         // translated some of the translatable keys. Record the translatable
         // keys not covered by the override separately, so a subscriber
-        // reconciling actual translation content (for example, the Locale
+        // reconciling actual translation content (for example, the locale
         // module) knows which keys are still in the original language and which
         // have been translated.
         $untranslated_keys = static::extractUntranslatedKeys($translatable_data, $override_data);

@@ -234,6 +234,8 @@ class Config extends StorableConfigBase {
       }
       if ($this->typedConfigManager->hasConfigSchema($this->name)) {
         if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+          // Ensure that the schema wrapper has the latest data.
+          $this->schemaWrapper = NULL;
           $is_translatable = FALSE;
           $this->castValue(NULL, $this->data, $is_translatable);
           $this->reconcileLangcodeWithTranslatability($is_translatable, $this->getSchemaWrapper());
@@ -277,20 +279,18 @@ class Config extends StorableConfigBase {
    */
   protected function reconcileLangcodeWithTranslatability(bool $is_translatable, Element $typed_config): void {
     if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
+      // The configuration schema does not have a langcode, so it is not
+      // translatable. There is no langcode to reconcile.
       return;
     }
     if (!$is_translatable) {
-      if (array_key_exists('langcode', $this->data)) {
-        unset($this->data['langcode']);
-      }
+      unset($this->data['langcode']);
       return;
     }
     if (array_key_exists('langcode', $this->data)) {
       return;
     }
-    $event = new ConfigLangcodeResolveEvent();
-    $this->eventDispatcher->dispatch($event);
-    $this->data['langcode'] = $event->getLangcode();
+    $this->data['langcode'] = $this->eventDispatcher->dispatch(new ConfigLangcodeResolveEvent())->getLangcode();
     // castValue() already sorted $this->data into schema order before
     // langcode existed as a key, so it landed here at the end instead. Left
     // alone, the next unrelated save would silently re-sort it into its

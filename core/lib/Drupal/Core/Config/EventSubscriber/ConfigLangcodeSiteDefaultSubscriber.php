@@ -30,17 +30,7 @@ class ConfigLangcodeSiteDefaultSubscriber implements EventSubscriberInterface {
    * Resolves langcode to the site default.
    */
   public function onResolveLangcode(ConfigLangcodeResolveEvent $event): void {
-    $event->setLangcode($this->getSiteDefaultLangcode());
-  }
-
-  /**
-   * Gets the site's default language.
-   *
-   * @return string
-   *   The langcode.
-   */
-  protected function getSiteDefaultLangcode(): string {
-    return $this->configFactory->get('system.site')->get('default_langcode') ?? 'en';
+    $event->setLangcode($this->configFactory->get('system.site')->get('default_langcode') ?? 'en');
   }
 
   /**

@@ -25,20 +25,18 @@ interface DefaultLangcodeConfigUpdaterInterface {
   public function buildBatch(string $old_langcode, string $new_langcode): BatchBuilder;
 
   /**
-   * Batch operation: updates configuration following the previous default.
+   * Batch operation: updates configuration to match the new default langcode.
    *
    * Only configuration whose langcode currently matches the previous
-   * default is touched - anything explicitly set to some other langcode is
-   * left alone, the same way an ordinary save would leave it alone.
+   * default is touched. Anything explicitly set to some other langcode is left
+   * alone.
    *
-   * Before updating, whatever the configuration's current content
-   * actually is gets saved as an override for the langcode it is about to
-   * stop being - otherwise it would simply be gone the moment locale module
-   * applies the new default's own translation over the top. This is a plain
-   * snapshot of the current values, not a translation.
+   * Before updating the current default configuration, the existing translated
+   * strings are saved as an override for the old langcode. This preserves the
+   * existing translations.
    *
    * A configuration override already existing for the new default langcode
-   * is absorbed into the configuration being updated, then removed: the new
+   * is absorbed into the configuration being updated, then removed. The new
    * default language can no longer have an override of its own once the active
    * configuration itself becomes its canonical copy.
    *
