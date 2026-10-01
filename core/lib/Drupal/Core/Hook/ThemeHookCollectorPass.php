@@ -10,7 +10,6 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
-use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Hook\Attribute\ReorderHook;
 use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -223,7 +222,6 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
    */
   protected function collectThemeHookImplementations($dir, $theme, $currentThemePreg, $allThemesPreg, bool $shouldSkipProceduralScan): void {
     $hookFileCache = FileCacheFactory::get('theme_hook_implementations');
-    $proceduralHookFileCache = FileCacheFactory::get('theme_procedural_hook_implementations:' . $allThemesPreg);
 
     foreach ($this->getHookFileIterator($dir, ["$theme.theme"]) as $fileinfo) {
       assert($fileinfo instanceof \SplFileInfo);
@@ -270,35 +268,6 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
               throw new \LogicException("The #[ReorderHook] attribute is not allowed in themes. Found in $class.");
             }
           }
-        }
-      }
-      elseif (!$shouldSkipProceduralScan) {
-        $implementations = $proceduralHookFileCache->get($filename);
-        if ($implementations === NULL) {
-          $finder = MockFileFinder::create($filename);
-          $parser = new StaticReflectionParser('', $finder);
-          $implementations = [
-            'hooks' => [],
-          ];
-          foreach ($parser->getMethodAttributes() as $function => $attributes) {
-            if (StaticReflectionParser::hasAttribute($attributes, ExtensionFileIsConverted::class)) {
-              $implementations['@skip_theme_file_deprecation'] = TRUE;
-            }
-            if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
-              break;
-            }
-            if ((preg_match($currentThemePreg, $function, $matches) || preg_match($allThemesPreg, $function, $matches))) {
-              assert($function === $matches['theme'] . '_' . $matches['hook']);
-              $implementations['hooks'][] = ['theme' => $matches['theme'], 'hook' => $matches['hook']];
-            }
-          }
-          $proceduralHookFileCache->set($filename, $implementations);
-        }
-        if (isset($implementations['@skip_theme_file_deprecation'])) {
-          unset($this->deprecatedThemeFiles[pathinfo($filename, PATHINFO_FILENAME)]);
-        }
-        foreach ($implementations['hooks'] as $implementation) {
-          $this->proceduralImplementations[$implementation['hook']][] = $implementation['theme'];
         }
       }
     }

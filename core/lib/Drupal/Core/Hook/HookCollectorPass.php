@@ -12,7 +12,6 @@ use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\HookDependsOnModule;
-use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ReorderHook;
 use Drupal\Core\Hook\OrderOperation\OrderOperation;
@@ -327,12 +326,6 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
    */
   protected function collectModuleHookImplementations($dir, $module, $current_module_preg, $all_modules_preg, bool $skip_procedural): void {
     $hook_file_cache = FileCacheFactory::get('hook_implementations');
-    // List of modules must be included in the cache key to ensure rediscovery
-    // takes place when a new module is installed. Some modules define hooks
-    // on behalf of other modules and those hooks need to be found.
-    // Hash to prevent massive key sizes.
-    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . hash('xxh3', $all_modules_preg));
-
     $procedural_files = array_map(fn (string $extension): string => "$module.$extension", $this->proceduralFileExtensions);
     foreach ($this->getHookFileIterator($dir, $procedural_files) as $fileinfo) {
       assert($fileinfo instanceof \SplFileInfo);
@@ -417,49 +410,6 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
               $this->removeHookIdentifiers[$attribute->hook][] = $identifier;
             }
           }
-        }
-      }
-      elseif (!$skip_procedural) {
-        $implementations = $procedural_hook_file_cache->get($filename);
-        if ($implementations === NULL) {
-          $finder = MockFileFinder::create($filename);
-          $parser = new StaticReflectionParser('', $finder);
-          $implementations = [];
-          foreach ($parser->getMethodAttributes() as $function => $attributes) {
-            if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
-              break;
-            }
-
-            if ((preg_match($current_module_preg, $function, $matches) || preg_match($all_modules_preg, $function, $matches))) {
-              // Skip hooks that are not supported by the new hook system, they
-              // do not need to be added to the BC layer. Note that is different
-              // from static::checkForProceduralOnlyHooks(). hook_requirements
-              // is allowed and only update hooks are considered as dynamic
-              // exclusion, since post updates are not expected to be parsed.
-              // Also, update hooks are checked as ends with, since the regular
-              // expression sometimes attributes them to the wrong module,
-              // resulting in a prefix.
-              $staticDenyHooks = [
-                'install',
-                'install_tasks',
-                'install_tasks_alter',
-                'schema',
-                'uninstall',
-                'update_last_removed',
-                'update_dependencies',
-              ];
-              if (in_array($matches['hook'], $staticDenyHooks) || preg_match('/update_\d+$/', $function)) {
-                continue;
-              }
-
-              assert($function === $matches['module'] . '_' . $matches['hook']);
-              $implementations[] = ['module' => $matches['module'], 'hook' => $matches['hook']];
-            }
-          }
-          $procedural_hook_file_cache->set($filename, $implementations);
-        }
-        foreach ($implementations as $implementation) {
-          $this->addProceduralImplementation($implementation['hook'], $implementation['module']);
         }
       }
     }
