@@ -10,6 +10,8 @@ use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\path_alias\AliasManagerInterface;
+use Drupal\system\Path\PathPatternsMap;
+use Drupal\system\Path\PathVisibilityMatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -67,13 +69,19 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
    *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
+   * @param \Drupal\system\Path\PathVisibilityMatcher|null $visibilityMatcher
+   *   The page patterns matcher.
    */
-  public function __construct(AliasManagerInterface $alias_manager, PathMatcherInterface $path_matcher, RequestStack $request_stack, CurrentPathStack $current_path, array $configuration, $plugin_id, array $plugin_definition) {
+  public function __construct(AliasManagerInterface $alias_manager, PathMatcherInterface $path_matcher, RequestStack $request_stack, CurrentPathStack $current_path, array $configuration, $plugin_id, array $plugin_definition, protected ?PathVisibilityMatcher $visibilityMatcher = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->aliasManager = $alias_manager;
     $this->pathMatcher = $path_matcher;
     $this->requestStack = $request_stack;
     $this->currentPath = $current_path;
+    if ($this->visibilityMatcher === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $visibilityMatcher argument is deprecated in drupal:11.5.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3589822', E_USER_DEPRECATED);
+      $this->visibilityMatcher = \Drupal::service(PathVisibilityMatcher::class);
+    }
   }
 
   /**
@@ -87,7 +95,9 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
       $container->get('path.current'),
       $configuration,
       $plugin_id,
-      $plugin_definition);
+      $plugin_definition,
+      $container->get(PathVisibilityMatcher::class),
+    );
   }
 
   /**
@@ -159,15 +169,7 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
     if (!$pages) {
       return TRUE;
     }
-
-    $request = $this->requestStack->getCurrentRequest();
-    // Compare the lowercase path alias (if any) and internal path.
-    $path = $this->currentPath->getPath($request);
-    // Do not trim a trailing slash if that is the complete path.
-    $path = $path === '/' ? $path : rtrim($path, '/');
-    $path_alias = mb_strtolower($this->aliasManager->getAliasByPath($path));
-
-    return $this->pathMatcher->matchPath($path_alias, $pages) || (($path != $path_alias) && $this->pathMatcher->matchPath($path, $pages));
+    return $this->visibilityMatcher->matches($pages);
   }
 
   /**
@@ -175,7 +177,12 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
    */
   public function getCacheContexts() {
     $contexts = parent::getCacheContexts();
-    $contexts[] = 'url.path';
+    // Vary by the result of ::evaluate() rather than by path. Without page
+    // patterns, ::evaluate() does not look at the path at all.
+    $pages = mb_strtolower($this->configuration['pages']);
+    if ($pages) {
+      $contexts[] = 'url.path.matches:' . PathPatternsMap::hash($pages);
+    }
     return $contexts;
   }
 

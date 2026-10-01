@@ -11,6 +11,7 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationContentEntity;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\node\NodeInterface;
+use Drupal\system\Path\PathPatternsMap;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\user\Entity\Role;
@@ -125,7 +126,7 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
       'timezone',
       // The placed block is only visible on certain URLs through a visibility
       // condition.
-      'url.path',
+      'url.path.matches:' . PathPatternsMap::hash('/node/' . $node_2->id()),
       'url.query_args:' . MainContentViewSubscriber::WRAPPER_FORMAT,
       // rel=canonical links and friends have absolute URLs as their values.
       'url.site',

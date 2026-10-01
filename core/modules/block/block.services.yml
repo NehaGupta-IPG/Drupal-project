@@ -15,3 +15,6 @@ services:
     class: Drupal\block\BlockRepository
   Drupal\block\BlockRepositoryInterface: '@block.repository'
   Drupal\block\BlockConfigUpdater: ~
+  Drupal\block\BlockPathPatternsProvider:
+    tags:
+      - { name: path_patterns_provider }

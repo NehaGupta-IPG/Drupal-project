@@ -5,6 +5,17 @@ services:
   _defaults:
     autoconfigure: true
     autowire: true
+  cache_context.url.path.matches:
+    class: Drupal\system\Cache\Context\PathMatchesCacheContext
+    tags:
+      - { name: cache.context }
+  system.path_patterns_map:
+    class: Drupal\system\Path\PathPatternsMap
+    tags:
+      - { name: service_collector, tag: path_patterns_provider, call: addProvider }
+      - { name: cache_tags_invalidator }
+  Drupal\system\Path\PathPatternsMap: '@system.path_patterns_map'
+  Drupal\system\Path\PathVisibilityMatcher: ~
   access_check.cron:
     class: Drupal\system\Access\CronAccessCheck
     tags:
