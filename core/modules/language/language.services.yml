@@ -19,6 +19,7 @@ services:
   language.default_langcode_config_updater:
     class: Drupal\language\DefaultLangcodeConfigUpdater
   Drupal\language\DefaultLangcodeConfigUpdater: '@language.default_langcode_config_updater'
+  Drupal\language\DefaultLangcodeConfigUpdaterInterface: '@language.default_langcode_config_updater'
   language.config_factory_override:
     class: Drupal\language\Config\LanguageConfigFactoryOverride
     arguments: ['@config.storage', '@event_dispatcher', '@config.typed', '@language.default', '%language.default_values%', '%language.translate_english%']
