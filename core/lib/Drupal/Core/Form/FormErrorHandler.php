@@ -70,13 +70,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  protected function displayErrorMessagesNew(array $form, FormStateInterface $form_state) {
-    // Skip generating inline form errors when opted out.
-    if (!Settings::get('enable_inline_error_handling', FALSE)) {
-      $this->displayErrorMessages($form, $form_state);
-      return;
-    }
-
+  protected function displayErrorMessagesNew(array $form, FormStateInterface $form_state): void {
     $error_links = [];
     $errors = $form_state->getErrors();
     // Loop through all form errors and check if we need to display a link.

@@ -25,7 +25,7 @@ class FormErrorHandler extends CoreFormErrorHandler {
    *
    * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  protected RendererInterface $renderer;
 
   /**
    * The messenger.
