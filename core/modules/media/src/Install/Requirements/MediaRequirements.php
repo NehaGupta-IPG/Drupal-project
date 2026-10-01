@@ -10,12 +10,19 @@ use Drupal\Core\File\FileSystemInterface;
 
 /**
  * Install time requirements for the media module.
+ *
+ * @phpstan-import-type RequirementInfo from \Drupal\Core\Extension\InstallRequirementsInterface
  */
 class MediaRequirements implements InstallRequirementsInterface {
 
   /**
-   * {@inheritdoc}
-   */
+   * Check installation requirements.
+   *
+   * @return array{'media'?: RequirementInfo}
+   *   The module's requirements.
+   *
+   * @see \Drupal\Core\Extension\InstallRequirementsInterface::getRequirements()
+    */
   public static function getRequirements(): array {
     $requirements = [];
     $destination = 'public://media-icons/generic';

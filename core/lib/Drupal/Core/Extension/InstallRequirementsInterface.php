@@ -1,18 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Extension;
+
+// phpcs:ignore SlevomatCodingStandard.Namespaces.UnusedUses.UnusedUse
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
+// phpcs:ignore SlevomatCodingStandard.Namespaces.UnusedUses.UnusedUse
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides method for checking requirements during install time.
  *
  * @phpstan-type RequirementInfo array{
- *   'title'?: \Drupal\Core\StringTranslation\TranslatableMarkup,
- *   'value'?: \Drupal\Core\StringTranslation\TranslatableMarkup
- *      | array<string, mixed>
- *      | string,
- *   'description'?: \Drupal\Core\StringTranslation\TranslatableMarkup
- *      | array<string, mixed>,
- *   'severity'?: \Drupal\Core\Extension\Requirement\RequirementSeverity,
+ *   'title'?: TranslatableMarkup,
+ *   'value'?: TranslatableMarkup|array<string,mixed>|string,
+ *   'description'?: TranslatableMarkup|array<string,mixed>,
+ *   'severity'?: RequirementSeverity,
  * }
  */
 interface InstallRequirementsInterface {
@@ -39,7 +43,7 @@ interface InstallRequirementsInterface {
    * During installation, if you need to load a class from your module,
    * you'll need to include the class file directly.
    *
-   * @return array<string, RequirementInfo>
+   * @return array<string,RequirementInfo>
    *   An associative array where the keys are arbitrary but must be unique (it
    *   is suggested to use the module short name as a prefix) and the values
    *   are themselves associative arrays with the following elements:
