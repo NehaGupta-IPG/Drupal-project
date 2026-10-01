@@ -133,6 +133,8 @@ class DbLogTest extends BrowserTestBase {
     $this->test403LogEventPage();
     $this->testMessageParsing();
     $this->testOverviewLinks();
+    $this->testAccessDblogReportsPermission();
+    $this->testAccessSiteReportsPermission();
   }
 
   /**

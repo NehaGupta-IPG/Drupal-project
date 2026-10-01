@@ -16,7 +16,6 @@ use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\user\Entity\Role;
 use Drupal\views\Entity\View;
-use Drupal\views\ViewExecutable;
 
 /**
  * Implements hook_schema().
@@ -127,7 +126,7 @@ function dblog_update_112001(&$sandbox): void {
   // Iterate over all installed roles.
   foreach ($roles as $role) {
     if ($role->hasPermission('access site reports')) {
-      // Add the access dblog reports permission.
+      // Add the 'access dblog reports' permission.
       $role->grantPermission('access dblog reports');
 
       // Save the role.
@@ -140,29 +139,32 @@ function dblog_update_112001(&$sandbox): void {
  * Update permission on the Watchdog view (if it uses the default).
  */
 function dblog_update_112002(&$sandbox): void {
-  // Load the Watchdog view.
-  $watchdog_view = View::load('watchdog')->getExecutable();
+  if (\Drupal::service('module_handler')->moduleExists('views')) {
+    // Load the Watchdog view.
+    $watchdog_view = \Drupal::entityTypeManager()->getStorage('view')->load('watchdog');
 
-  if ($watchdog_view instanceof ViewExecutable) {
-    // Get the permission used on the default display.
-    $current_perm = $watchdog_view
-      ->getDisplay('default')
-      ->getOption('access')['options']['perm'];
-
-    if ($current_perm == 'access site reports') {
-      // Set the permission on the default display to 'access dblog reports' if
-      // the permission is currently the old default ('access site reports').
-      $watchdog_view
+    if ($watchdog_view instanceof View) {
+      // Get the permission used on the default display.
+      $current_permission = $watchdog_view
         ->getDisplay('default')
-        ->setOption('access', [
-          'type' => 'perm',
-          'options' => [
-            'perm' => 'access dblog reports',
-          ],
-        ]);
+        ->getOption('access')['options']['perm'];
 
-      // Save the view.
-      $watchdog_view->save();
+      if ($current_permission === 'access site reports') {
+        // Set the permission on the default display to 'access dblog reports'
+        // if the permission is currently the old default ('access site
+        // reports').
+        $watchdog_view
+          ->getDisplay('default')
+          ->setOption('access', [
+            'type' => 'perm',
+            'options' => [
+              'perm' => 'access dblog reports',
+            ],
+          ]);
+
+        // Save the view.
+        $watchdog_view->save();
+      }
     }
   }
 }
