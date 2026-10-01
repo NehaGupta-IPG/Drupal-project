@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\HookCollectorPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;

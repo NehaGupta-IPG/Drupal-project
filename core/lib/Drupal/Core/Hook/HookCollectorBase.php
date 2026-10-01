@@ -25,14 +25,13 @@ abstract class HookCollectorBase {
    */
   protected function getHookFileIterator(string $dir): \Generator {
     $hook_directory = "$dir/src/Hook";
-    if (!is_dir($hook_directory)) {
-      return;
-    }
-    $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS;
-    $iterator = new \RecursiveDirectoryIterator($hook_directory, $flags);
-    $iterator = new \RecursiveCallbackFilterIterator($iterator, static fn (\SplFileInfo $fileinfo): bool => $fileinfo->isDir() || $fileinfo->getExtension() === 'php');
-    foreach (new \RecursiveIteratorIterator($iterator) as $fileinfo) {
-      yield $fileinfo;
+    if (is_dir($hook_directory)) {
+      $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS;
+      $iterator = new \RecursiveDirectoryIterator($hook_directory, $flags);
+      $iterator = new \RecursiveCallbackFilterIterator($iterator, static fn (\SplFileInfo $fileinfo): bool => $fileinfo->isDir() || $fileinfo->getExtension() === 'php');
+      foreach (new \RecursiveIteratorIterator($iterator) as $fileinfo) {
+        yield $fileinfo;
+      }
     }
   }
 
