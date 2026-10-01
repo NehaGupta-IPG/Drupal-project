@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Hook;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Hook\HookCollectorBase;
 use Drupal\Core\Hook\HookCollectorPass;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Tests Drupal\Core\Hook\HookCollectorPass.

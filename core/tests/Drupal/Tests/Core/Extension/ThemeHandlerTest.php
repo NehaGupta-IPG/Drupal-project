@@ -69,7 +69,7 @@ class ThemeHandlerTest extends UnitTestCase {
    * Tests empty libraries in theme.info.yml file.
    */
   public function testThemeLibrariesEmpty(): void {
-    $theme = new Theme($this->root, 'core/modules/system/tests/themes/test_theme_libraries_empty', [], 'test_theme_libraries_empty.info.yml');
+    $theme = new Theme($this->root, 'core/modules/system/tests/themes/test_theme_libraries_empty', []);
     try {
       $this->themeHandler->addTheme($theme);
       $this->assertTrue(TRUE, 'Empty libraries key in theme.info.yml does not cause PHP warning');

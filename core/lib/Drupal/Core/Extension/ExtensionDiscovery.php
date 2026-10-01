@@ -473,7 +473,6 @@ class ExtensionDiscovery {
         continue;
       }
 
-      $name = $fileinfo->getBasename('.info.yml');
       $pathname = $dir_prefix . $fileinfo->getSubPathname();
       $extension = new Extension($this->root, $type, $pathname);
 

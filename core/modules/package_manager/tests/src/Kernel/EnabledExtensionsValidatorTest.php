@@ -127,7 +127,7 @@ class EnabledExtensionsValidatorTest extends PackageManagerKernelTestBase {
       if ($extension->getType() === 'theme') {
         /** @var \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler */
         $theme_handler = $this->container->get('theme_handler');
-        $theme = new Theme($project_root, $extension->getPathname(), ['base theme' => FALSE], $extension->getExtensionFilename());
+        $theme = new Theme($project_root, $extension->getPathname(), ['base theme' => FALSE]);
         $theme_handler->addTheme($theme);
         $this->assertArrayHasKey($extension_name, $theme_handler->listInfo());
       }
