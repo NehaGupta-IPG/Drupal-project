@@ -5,7 +5,7 @@ namespace Drupal\language\EventSubscriber;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
-use Drupal\language\DefaultLangcodeConfigUpdater;
+use Drupal\language\DefaultLangcodeConfigUpdaterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -28,12 +28,12 @@ class DefaultConfigLangcodeSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a new class object.
    *
-   * @param \Drupal\language\DefaultLangcodeConfigUpdater $defaultLangcodeConfigUpdater
+   * @param \Drupal\language\DefaultLangcodeConfigUpdaterInterface $defaultLangcodeConfigUpdater
    *   The default langcode configuration updater.
    * @param \Drupal\Core\Config\ConfigInstallerInterface $configInstaller
    *   The config installer, used to check whether configuration is syncing.
    */
-  public function __construct(protected readonly DefaultLangcodeConfigUpdater $defaultLangcodeConfigUpdater, protected readonly ConfigInstallerInterface $configInstaller) {
+  public function __construct(protected readonly DefaultLangcodeConfigUpdaterInterface $defaultLangcodeConfigUpdater, protected readonly ConfigInstallerInterface $configInstaller) {
   }
 
   /**

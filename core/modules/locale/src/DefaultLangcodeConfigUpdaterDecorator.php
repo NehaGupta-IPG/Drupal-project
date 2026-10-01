@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\locale;
 
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\language\DefaultLangcodeConfigUpdater;
+use Drupal\language\DefaultLangcodeConfigUpdaterInterface;
 
 /**
  * Keeps DefaultLangcodeConfigUpdater's own saves out of locale storage.
@@ -20,10 +20,10 @@ use Drupal\language\DefaultLangcodeConfigUpdater;
  *
  * @see \Drupal\locale\LocaleConfigSubscriber
  */
-final class DefaultLangcodeConfigUpdaterDecorator extends DefaultLangcodeConfigUpdater {
+final class DefaultLangcodeConfigUpdaterDecorator implements DefaultLangcodeConfigUpdaterInterface {
 
   public function __construct(
-    protected readonly DefaultLangcodeConfigUpdater $inner,
+    protected readonly DefaultLangcodeConfigUpdaterInterface $inner,
     protected readonly LocaleConfigManager $localeConfigManager,
   ) {}
 
