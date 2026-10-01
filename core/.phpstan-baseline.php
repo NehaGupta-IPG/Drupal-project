@@ -6404,19 +6404,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleHandler.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Extension\\\\ModuleHandler\\:\\:loadAll\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleHandler.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Extension\\\\ModuleHandler\\:\\:loadAllIncludes\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleHandler.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Extension\\\\ModuleHandler\\:\\:reload\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleHandler.php',
@@ -6452,19 +6440,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleHandlerInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Extension\\\\ModuleHandlerInterface\\:\\:loadAll\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleHandlerInterface.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Extension\\\\ModuleHandlerInterface\\:\\:loadAllIncludes\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleHandlerInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Extension\\\\ModuleHandlerInterface\\:\\:reload\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleHandlerInterface.php',
