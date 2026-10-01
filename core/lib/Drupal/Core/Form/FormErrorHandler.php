@@ -31,7 +31,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
     if ($form_state->getErrors()) {
       if (Settings::get('enable_inline_error_handling', FALSE)) {
         // Display error messages for each element.
-        $this->displayErrorMessagesNew($form, $form_state);
+        $this->displayErrorMessagesInline($form, $form_state);
       }
       else {
         // Display error messages for each element.
@@ -70,7 +70,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  protected function displayErrorMessagesNew(array $form, FormStateInterface $form_state): void {
+  protected function displayErrorMessagesInline(array $form, FormStateInterface $form_state): void {
     $error_links = [];
     $errors = $form_state->getErrors();
     // Loop through all form errors and check if we need to display a link.
