@@ -58,7 +58,7 @@ class LocaleConfigBatch {
         ->setErrorMessage($this->t('Error updating configuration translations'));
 
       if ($update_default_config_langcodes && $this->languageManager->getDefaultLanguage()->getId() !== 'en') {
-        @trigger_error('Calling ' . __METHOD__ . '() with $update_default_config_langcodes set to TRUE is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
+        @trigger_error('Calling ' . __METHOD__ . '() with $update_default_config_langcodes set to TRUE is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
       }
 
       // Chunking the array of names into batches of 20 for better performance.
@@ -94,7 +94,7 @@ class LocaleConfigBatch {
    * @see https://www.drupal.org/node/3623413
    */
   public function batchUpdateDefaultConfigLangcodes(array|\ArrayAccess &$context): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
     $this->localeConfigManager->updateDefaultConfigLangcodes();
     $context['finished'] = 1;
     $context['message'] = $this->t('Updated default configuration to %langcode', ['%langcode' => $this->languageManager->getDefaultLanguage()->getId()]);
