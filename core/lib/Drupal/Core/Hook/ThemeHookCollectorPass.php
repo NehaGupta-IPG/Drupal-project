@@ -39,13 +39,6 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
   protected array $oopImplementations = [];
 
   /**
-   * Procedural implementation extension names by hook name.
-   *
-   * @var array<string, list<string>>
-   */
-  protected array $proceduralImplementations = [];
-
-  /**
    * Preprocess suggestions discovered in extensions.
    *
    * These are stored to prevent adding preprocess suggestions to the invoke map
@@ -227,11 +220,6 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
    */
   protected function getFilteredImplementations(): array {
     $implementationsByHook = [];
-    foreach ($this->proceduralImplementations as $hook => $proceduralThemes) {
-      foreach ($proceduralThemes as $theme) {
-        $implementationsByHook[$hook][$theme . '_' . $hook] = $theme;
-      }
-    }
     foreach ($this->oopImplementations as $hook => $oopImplementations) {
       if (!isset($implementationsByHook[$hook])) {
         $implementationsByHook[$hook] = $oopImplementations;

@@ -45,13 +45,6 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
   protected array $oopImplementations = [];
 
   /**
-   * Procedural implementation module names by hook name.
-   *
-   * @var array<string, list<string>>
-   */
-  protected array $proceduralImplementations = [];
-
-  /**
    * Order operations grouped by hook name and weight.
    *
    * Operations with higher weight are applied last, which means they can
@@ -141,11 +134,6 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
    */
   protected function getFilteredImplementations(): array {
     $implementationsByHook = [];
-    foreach ($this->proceduralImplementations as $hook => $procedural_modules) {
-      foreach ($procedural_modules as $module) {
-        $implementationsByHook[$hook][$module . '_' . $hook] = $module;
-      }
-    }
     foreach ($this->oopImplementations as $hook => $oopImplementations) {
       if (!isset($implementationsByHook[$hook])) {
         $implementationsByHook[$hook] = $oopImplementations;
@@ -340,7 +328,6 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
           }
           foreach ($methodAttributes as $attribute) {
             if ($attribute instanceof Hook) {
-              self::checkForProceduralOnlyHooks($attribute, $class);
               $this->oopImplementations[$attribute->hook][$class . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
               if ($attribute->order !== NULL) {
                 // Use a lower weight for order operations that are declared
@@ -385,47 +372,6 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
     }
 
     return FALSE;
-  }
-
-  /**
-   * Adds a procedural hook implementation.
-   *
-   * @param string $hook
-   *   The name of the hook.
-   * @param string $module
-   *   The module implementing the hook, or on behalf of which the hook is
-   *   implemented.
-   */
-  protected function addProceduralImplementation(string $hook, string $module): void {
-    $function = $module . '_' . $hook;
-
-    $this->proceduralImplementations[$hook][] = $module;
-  }
-
-  /**
-   * Checks for hooks which can't be supported in classes.
-   *
-   * @param \Drupal\Core\Hook\Attribute\Hook $hookAttribute
-   *   The hook to check.
-   * @param class-string $class
-   *   The class the hook is implemented on.
-   */
-  public static function checkForProceduralOnlyHooks(Hook $hookAttribute, string $class): void {
-    $staticDenyHooks = [
-      'install',
-      'install_tasks',
-      'install_tasks_alter',
-      'removed_post_updates',
-      'requirements',
-      'schema',
-      'uninstall',
-      'update_dependencies',
-      'update_last_removed',
-    ];
-
-    if (in_array($hookAttribute->hook, $staticDenyHooks) || preg_match('/^(post_update_|update_\d+$)/', $hookAttribute->hook)) {
-      throw new \LogicException("The hook $hookAttribute->hook on class $class does not support attributes and must remain procedural.");
-    }
   }
 
 }
