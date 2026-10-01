@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Core\Recipe;
 
+use Drupal\Component\Serialization\Yaml;
 use Drupal\config_enum_test\EnumValue;
 use Drupal\Core\Config\Checkpoint\Checkpoint;
 use Drupal\Core\Recipe\Command\RecipeCommand;
@@ -11,6 +12,7 @@ use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests recipe command.
@@ -186,6 +188,50 @@ class RecipeCommandTest extends BrowserTestBase {
     $process = $this->applyRecipe('core/tests/fixtures/recipes/broken_enum_action_test', 1);
     $output = trim(preg_replace('/\s+/', ' ', $process->getErrorOutput()));
     $this->assertStringContainsString('The enum "Drupal\config_enum_test\DoesNotExistEnumValue" is not defined', $output);
+  }
+
+  /**
+   * Tests applying a recipe that requires an extension added after caching.
+   *
+   * This simulates running `composer require` for a recipe and its
+   * dependencies, then applying the recipe without clearing caches.
+   *
+   * @param string $type
+   *   The extension type, either 'module' or 'theme'.
+   * @param array<string, string> $info
+   *   Additional info.yml keys for the extension.
+   *
+   * @see https://www.drupal.org/node/3501858
+   */
+  #[TestWith(['module', []])]
+  #[TestWith(['theme', ['base theme' => 'stark']])]
+  public function testApplyRecipeWithNewlyAddedExtension(string $type, array $info): void {
+    // Ensure the extension lists are in the persistent cache, as they would
+    // be on any site that has been used before new code was added.
+    \Drupal::service('extension.list.module')->getList();
+    \Drupal::service('extension.list.theme')->getList();
+
+    // Add a new extension to the file system, as `composer require` would.
+    $name = 'recipe_new_' . $type;
+    $extension_dir = $this->siteDirectory . '/' . $type . 's/' . $name;
+    mkdir($extension_dir, recursive: TRUE);
+    file_put_contents($extension_dir . '/' . $name . '.info.yml', Yaml::encode([
+      'name' => 'Recipe new ' . $type,
+      'type' => $type,
+      'core_version_requirement' => '*',
+      'package' => 'Testing',
+    ] + $info));
+
+    // Write the recipe directly, since creating a Recipe object in the test
+    // runner would validate it here instead of in the recipe command.
+    $recipe_dir = $this->siteDirectory . '/recipes/install_new_' . $type;
+    mkdir($recipe_dir, recursive: TRUE);
+    file_put_contents($recipe_dir . '/recipe.yml', Yaml::encode([
+      'name' => 'Install newly added ' . $type,
+      'install' => [$name],
+    ]));
+    $this->applyRecipe($recipe_dir);
+    $this->assertArrayHasKey($name, $this->config('core.extension')->get($type));
   }
 
   /**
