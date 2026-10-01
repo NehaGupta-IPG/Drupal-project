@@ -192,6 +192,13 @@ class DbDumpCommand extends DbCommandBase {
       if (!is_string($type)) {
         $column_args['type'] = $type;
       }
+      else {
+        $column_args['dbSpecificExtra'] = [
+          'mysql' => [
+            'mysql_type' => $type,
+          ],
+        ];
+      }
       if ($type !== ColumnType::Serial) {
         $column_args['notNull'] = $row['Null'] === 'NO';
       }
@@ -271,21 +278,73 @@ class DbDumpCommand extends DbCommandBase {
         $column_args['binary'] = TRUE;
       }
 
-      $column = Column::create(
-        name: $column_args['name'],
-        type: $column_args['type'] ?? NULL,
-        description: $column_args['description'] ?? NULL,
-        serialize: $column_args['serialize'] ?? NULL,
-        size: $column_args['size'] ?? NULL,
-        notNull: $column_args['notNull'] ?? NULL,
-        default: $column_args['default'] ?? NULL,
-        length: $column_args['length'] ?? NULL,
-        unsigned: $column_args['unsigned'] ?? NULL,
-        precision: $column_args['precision'] ?? NULL,
-        scale: $column_args['scale'] ?? NULL,
-        binary: $column_args['binary'] ?? NULL,
-        dbSpecificExtra: $column_args['dbSpecificExtra'] ?? NULL,
-      );
+      $column = match ($column_args['type'] ?? NULL) {
+        ColumnType::Char, ColumnType::Varchar, ColumnType::VarcharAscii => Column::{lcfirst($column_args['type']->name)}(
+          name: $column_args['name'],
+          description: $column_args['description'] ?? NULL,
+          size: $column_args['size'] ?? NULL,
+          notNull: $column_args['notNull'] ?? NULL,
+          default: $column_args['default'] ?? NULL,
+          length: $column_args['length'] ?? NULL,
+          binary: $column_args['binary'] ?? NULL,
+        ),
+        ColumnType::Text => Column::{lcfirst($column_args['type']->name)}(
+          name: $column_args['name'],
+          description: $column_args['description'] ?? NULL,
+          serialize: $column_args['serialize'] ?? NULL,
+          size: $column_args['size'] ?? NULL,
+          notNull: $column_args['notNull'] ?? NULL,
+          default: $column_args['default'] ?? NULL,
+          length: $column_args['length'] ?? NULL,
+          binary: $column_args['binary'] ?? NULL,
+        ),
+        ColumnType::Int, ColumnType::Float => Column::{lcfirst($column_args['type']->name)}(
+          name: $column_args['name'],
+          description: $column_args['description'] ?? NULL,
+          size: $column_args['size'] ?? NULL,
+          notNull: $column_args['notNull'] ?? NULL,
+          default: $column_args['default'] ?? NULL,
+          unsigned: $column_args['unsigned'] ?? NULL,
+        ),
+        ColumnType::Serial => Column::{lcfirst($column_args['type']->name)}(
+          name: $column_args['name'],
+          description: $column_args['description'] ?? NULL,
+          size: $column_args['size'] ?? NULL,
+        ),
+        ColumnType::Numeric => Column::{lcfirst($column_args['type']->name)}(
+          name: $column_args['name'],
+          description: $column_args['description'] ?? NULL,
+          size: $column_args['size'] ?? NULL,
+          notNull: $column_args['notNull'] ?? NULL,
+          default: $column_args['default'] ?? NULL,
+          unsigned: $column_args['unsigned'] ?? NULL,
+          precision: $column_args['precision'] ?? NULL,
+          scale: $column_args['scale'] ?? NULL,
+        ),
+        ColumnType::Blob => Column::{lcfirst($column_args['type']->name)}(
+          name: $column_args['name'],
+          description: $column_args['description'] ?? NULL,
+          serialize: $column_args['serialize'] ?? NULL,
+          size: $column_args['size'] ?? NULL,
+          notNull: $column_args['notNull'] ?? NULL,
+          default: $column_args['default'] ?? NULL,
+        ),
+        default => Column::create(
+          name: $column_args['name'],
+          type: $column_args['type'] ?? NULL,
+          description: $column_args['description'] ?? NULL,
+          serialize: $column_args['serialize'] ?? NULL,
+          size: $column_args['size'] ?? NULL,
+          notNull: $column_args['notNull'] ?? NULL,
+          default: $column_args['default'] ?? NULL,
+          length: $column_args['length'] ?? NULL,
+          unsigned: $column_args['unsigned'] ?? NULL,
+          precision: $column_args['precision'] ?? NULL,
+          scale: $column_args['scale'] ?? NULL,
+          binary: $column_args['binary'] ?? NULL,
+          dbSpecificExtra: $column_args['dbSpecificExtra'] ?? NULL,
+        ),
+      };
 
       $columns[] = $column;
     }
