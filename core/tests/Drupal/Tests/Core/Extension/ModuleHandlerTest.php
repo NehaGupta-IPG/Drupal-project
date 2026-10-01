@@ -50,11 +50,9 @@ class ModuleHandlerTest extends UnitTestCase {
     $modules['module_handler_test'] = 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test';
     $moduleList = [];
     foreach ($modules as $module => $path) {
-      $filename = "$module.module";
       $moduleList[$module] = [
         'type' => 'module',
         'pathname' => "$path/$module.info.yml",
-        'filename' => file_exists("$this->root/$path/$filename") ? $filename : NULL,
       ];
     }
     $keyvalue = new KeyValueMemoryFactory();
@@ -73,7 +71,7 @@ class ModuleHandlerTest extends UnitTestCase {
    */
   public function testGetModuleList(): void {
     $this->assertEquals($this->getModuleHandler()->getModuleList(), [
-      'module_handler_test' => new Extension($this->root, 'module', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test/module_handler_test.info.yml', 'module_handler_test.module'),
+      'module_handler_test' => new Extension($this->root, 'module', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test/module_handler_test.info.yml'),
     ]);
   }
 
@@ -81,7 +79,7 @@ class ModuleHandlerTest extends UnitTestCase {
    * Confirm we get back a module from the module list.
    */
   public function testGetModuleWithExistingModule(): void {
-    $this->assertEquals($this->getModuleHandler()->getModule('module_handler_test'), new Extension($this->root, 'module', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test/module_handler_test.info.yml', 'module_handler_test.module'));
+    $this->assertEquals($this->getModuleHandler()->getModule('module_handler_test'), new Extension($this->root, 'module', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test/module_handler_test.info.yml'));
   }
 
   /**

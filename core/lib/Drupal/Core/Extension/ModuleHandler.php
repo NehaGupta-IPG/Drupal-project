@@ -98,7 +98,7 @@ class ModuleHandler implements ModuleHandlerInterface {
   ) {
     $this->moduleList = [];
     foreach ($module_list as $name => $module) {
-      $this->moduleList[$name] = new Extension($this->root, $module['type'], $module['pathname'], $module['filename']);
+      $this->moduleList[$name] = new Extension($this->root, $module['type'], $module['pathname']);
     }
 
   }

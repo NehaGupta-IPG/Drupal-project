@@ -305,8 +305,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
         $module_path = \Drupal::service('extension.list.module')
           ->getPath($name);
         $pathname = "$module_path/$name.info.yml";
-        $filename = file_exists($module_path . "/$name.module") ? "$name.module" : NULL;
-        $module_filenames[$name] = new Extension($this->root, 'module', $pathname, $filename);
+        $module_filenames[$name] = new Extension($this->root, 'module', $pathname);
       }
     }
 
