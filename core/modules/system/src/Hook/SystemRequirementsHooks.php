@@ -210,7 +210,7 @@ class SystemRequirementsHooks {
     ];
 
     // If running Apache, verify that mod_rewrite is enabled
-    if (function_exists('appache_get_modules')) {
+    if (function_exists('apache_get_modules')) {
       if (!in_array('mod_rewrite', apache_get_modules())) {
         $requirements['mod_rewrite_image'] = [
           'title' => $this->t('Apache mod_rewrite'),
