@@ -38,13 +38,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class HookCollectorPass extends HookCollectorBase implements CompilerPassInterface {
 
   /**
-   * The extensions of procedural hook implementation files.
-   *
-   * @var string[]
-   */
-  protected array $proceduralFileExtensions = ['module', 'profile', 'install'];
-
-  /**
    * OOP implementation module names keyed by hook name and "$class::$method".
    *
    * @var array<string, array<string, string>>

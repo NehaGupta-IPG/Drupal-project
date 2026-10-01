@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook;
 
-use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
-use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ReorderHook;
-use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -59,15 +56,6 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
   protected array $preprocessForSuggestions;
 
   /**
-   * Deprecated .theme files.
-   *
-   * These are stored to allow emitting deprecation messages.
-   *
-   * @var array<string, true>
-   */
-  protected array $deprecatedThemeFiles = [];
-
-  /**
    * Constructor.
    *
    * @param list<string> $themes
@@ -104,10 +92,6 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
       'theme_hook_list' => $this->sortByTheme($implementationsByHook),
       'theme_preprocess_for_suggestions' => $this->preprocessForSuggestions ?? [],
     ]);
-
-    foreach ($this->deprecatedThemeFiles as $deprecatedThemeFile => $v) {
-      @trigger_error('Using ' . $deprecatedThemeFile . '.theme is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222', E_USER_DEPRECATED);
-    }
   }
 
   /**
