@@ -26,22 +26,6 @@ final class ValidationResult {
    */
   public readonly RequirementSeverity $severityEnum;
 
-  /**
-   * Creates a ValidationResult object.
-   *
-   * @param \Drupal\Core\Extension\Requirement\RequirementSeverity|int $severity
-   *   The severity of the result.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[]|string[] $messages
-   *   The result messages.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $summary
-   *   A succinct summary of the result.
-   * @param bool $assert_translatable
-   *   Whether to assert the messages are translatable. Internal use only.
-   *
-   * @throws \InvalidArgumentException
-   *   Thrown if $messages is empty, or if it has 2 or more items but $summary
-   *   is NULL.
-   */
   private function __construct(
     RequirementSeverity|int $severity,
     private readonly array $messages,
