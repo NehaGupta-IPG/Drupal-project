@@ -213,10 +213,9 @@ class Config extends StorableConfigBase {
       if ($this->typedConfigManager->hasConfigSchema($this->name)) {
         // Ensure that the schema wrapper has the latest data.
         $this->schemaWrapper = NULL;
-        $is_translatable = FALSE;
-        $this->data = $this->castValue(NULL, $this->data, $is_translatable);
+        $this->data = $this->castValue(NULL, $this->data);
         if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
-          $this->reconcileLangcodeWithTranslatability($is_translatable, $this->getSchemaWrapper());
+          $this->reconcileLangcodeWithTranslatability($this->getSchemaWrapper());
         }
         // Reclaim the memory used by the schema wrapper.
         $this->schemaWrapper = NULL;
@@ -232,16 +231,12 @@ class Config extends StorableConfigBase {
       foreach ($this->data as $key => $value) {
         $this->validateValue($key, $value);
       }
-      if ($this->typedConfigManager->hasConfigSchema($this->name)) {
-        if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
-          // Ensure that the schema wrapper has the latest data.
-          $this->schemaWrapper = NULL;
-          $is_translatable = FALSE;
-          $this->castValue(NULL, $this->data, $is_translatable);
-          $this->reconcileLangcodeWithTranslatability($is_translatable, $this->getSchemaWrapper());
-          // Reclaim the memory used by the schema wrapper.
-          $this->schemaWrapper = NULL;
-        }
+      if ($this->typedConfigManager->hasConfigSchema($this->name) && $this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+        // Ensure that the schema wrapper has the latest data.
+        $this->schemaWrapper = NULL;
+        $this->reconcileLangcodeWithTranslatability($this->getSchemaWrapper());
+        // Reclaim the memory used by the schema wrapper.
+        $this->schemaWrapper = NULL;
       }
     }
 
@@ -271,19 +266,24 @@ class Config extends StorableConfigBase {
    *
    * This never overwrites an existing langcode.
    *
-   * @param bool $is_translatable
-   *   Whether the configuration currently has any translatable value, as
-   *   computed by \Drupal\Core\Config\StorableConfigBase::castValue().
    * @param \Drupal\Core\Config\Schema\Element $typed_config
    *   The typed configuration wrapper for this configuration object.
    */
-  protected function reconcileLangcodeWithTranslatability(bool $is_translatable, Element $typed_config): void {
+  protected function reconcileLangcodeWithTranslatability(Element $typed_config): void {
     if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
       // The configuration schema does not have a langcode, so it is not
       // translatable. There is no langcode to reconcile.
       return;
     }
-    if (!$is_translatable) {
+    // This potentially loops through the config array again like call to
+    // StorableConfigBase::castValue() but this is mitigated by the fact that
+    // this only occurs for simple configuration as configuration entities have
+    // the translatable flag set on the top level mapping. Additionally, once
+    // \Drupal\Core\Config\Schema\ArrayElement::hasTranslatableElements() has
+    // found a translatable key it returns early.
+    // @todo consider if could somehow prepopulate the top level flag for simple
+    //   configuration when the config has no dynamic parts.
+    if (!$typed_config->hasTranslatableElements()) {
       unset($this->data['langcode']);
       return;
     }
