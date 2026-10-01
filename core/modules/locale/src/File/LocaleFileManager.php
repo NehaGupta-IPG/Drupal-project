@@ -197,10 +197,11 @@ class LocaleFileManager {
    */
   public function downloadTranslationSource(LocaleFile $source_file, string $directory = 'translations://'): LocaleFile|false {
     try {
-      // Ensure the destination exists. saveData() only calls prepareDirectory()
-      // without CREATE_DIRECTORY, so a missing translations:// path fails with
-      // DirectoryNotReadyException (common after locale.settings:translation.path
-      // was deprecated in favor of $settings['locale_translation_path']).
+      // Ensure the destination exists. saveData() only calls
+      // prepareDirectory() without CREATE_DIRECTORY, so a missing
+      // translations:// path fails with DirectoryNotReadyException
+      // (common after locale.settings:translation.path was deprecated
+      // in favor of $settings['locale_translation_path']).
       $this->fileSystem->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
       $data = (string) $this->httpClient->request('GET', $source_file->uri)->getBody();
       $filename = basename($source_file->uri);
