@@ -1216,7 +1216,7 @@
     // Hide the button and its description.
     this.$button.hide();
     this.$parent.find('.exposed-description, .grouped-description').hide();
-    this.$input = this.$parent.find('[type=checkbox], [type=radio]');
+
     this.$input.on('click', this.clickHandler.bind(this));
   };
 
