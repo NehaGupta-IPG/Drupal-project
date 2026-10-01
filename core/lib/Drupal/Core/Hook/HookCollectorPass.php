@@ -13,7 +13,6 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\HookDependsOnModule;
 use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
-use Drupal\Core\Hook\Attribute\LegacyRequirementsHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ReorderHook;
 use Drupal\Core\Hook\OrderOperation\OrderOperation;
@@ -431,8 +430,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
               break;
             }
 
-            $legacy_attributes = [LegacyRequirementsHook::class];
-            if (!static::hasAnyAttribute($attributes, $legacy_attributes) && (preg_match($current_module_preg, $function, $matches) || preg_match($all_modules_preg, $function, $matches))) {
+            if ((preg_match($current_module_preg, $function, $matches) || preg_match($all_modules_preg, $function, $matches))) {
               // Skip hooks that are not supported by the new hook system, they
               // do not need to be added to the BC layer. Note that is different
               // from static::checkForProceduralOnlyHooks(). hook_requirements
@@ -502,10 +500,6 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
   protected function addProceduralImplementation(string $hook, string $module): void {
     $function = $module . '_' . $hook;
 
-    if (in_array($hook, ['requirements', 'requirements_alter'])) {
-      $message = "$function without a #[LegacyRequirementsHook] attribute is deprecated in drupal:11.3.0 and removed in drupal:13.0.0. See https://www.drupal.org/node/3549685";
-      @trigger_error($message, E_USER_DEPRECATED);
-    }
     $this->proceduralImplementations[$hook][] = $module;
   }
 
