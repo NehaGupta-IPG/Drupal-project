@@ -1,0 +1,8 @@
+name: 'Newsroom'
+type: module
+description: 'Example module: an article bundle class hidden behind a domain-specific interface.'
+package: Example
+version: VERSION
+hidden: true
+dependencies:
+  - drupal:node
