@@ -145,7 +145,7 @@ final class EntityMethod implements ConfigActionPluginInterface, ContainerFactor
     }
     // If an instance of the entity (either itself, or a clone) was returned
     // by the method, return that.
-    return is_a($result, get_class($entity)) ? $result : $entity;
+    return $result instanceof $entity ? $result : $entity;
   }
 
 }
