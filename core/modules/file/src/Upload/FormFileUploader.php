@@ -66,8 +66,7 @@ class FormFileUploader {
    *   should only be allowed for trusted users, if at all.)
    * @param string $destination
    *   (optional) A string containing the URI that the file should be copied
-   *   to. This must be a stream wrapper URI. If this value is omitted or set
-   *   to FALSE, Drupal's temporary files scheme will be used ("temporary://").
+   *   to. This must be a stream wrapper URI. temporary:// is the default.
    * @param \Drupal\Core\File\FileExists $fileExists
    *   (optional) The replace behavior when the destination file already
    *   exists.

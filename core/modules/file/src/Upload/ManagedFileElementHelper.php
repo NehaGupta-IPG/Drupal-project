@@ -69,9 +69,13 @@ class ManagedFileElementHelper {
     ?int $delta = NULL,
     FileExists $fileExists = FileExists::Rename,
   ): array|FileInterface|null|false {
-    $uploadLocation = $element['#upload_location'] ?? FALSE;
+    $uploadLocation = $element['#upload_location'] ?? 'temporary://';
     $uploadName = implode('_', $element['#parents']);
     $uploadValidators = $element['#upload_validators'] ?? [];
+
+    if ($uploadLocation === FALSE) {
+      $uploadLocation = 'temporary://';
+    }
 
     $result = $this->formFileUploader->saveFormUploadedFiles($uploadName, $uploadValidators, $uploadLocation, $fileExists);
 
