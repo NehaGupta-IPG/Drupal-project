@@ -114,6 +114,15 @@ class DatabaseStorageExpirableTest extends StorageTestBase {
     // Verify that the other collection is still not affected.
     $this->assertNull($stores[1]->get($key));
 
+    // An item that has expired counts as not existing, so it is replaced.
+    $expired = $this->randomMachineName();
+    $stores[0]->setWithExpire($expired, $this->objects[0], -604800);
+    $this->assertTrue($stores[0]->setWithExpireIfNotExists($expired, $this->objects[1], rand(500, 100000)));
+    $this->assertEquals($this->objects[1], $stores[0]->get($expired));
+    // While the item is live it is left alone.
+    $this->assertFalse($stores[0]->setWithExpireIfNotExists($expired, $this->objects[2], rand(500, 100000)));
+    $this->assertEquals($this->objects[1], $stores[0]->get($expired));
+
   }
 
   /**

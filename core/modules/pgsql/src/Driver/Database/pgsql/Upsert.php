@@ -74,6 +74,9 @@ class Upsert extends QueryUpsert {
         $stmt->getClientStatement()->bindValue($argument, $value);
       }
     }
+    foreach ($this->updateCondition?->arguments ?? [] as $argument => $value) {
+      $stmt->getClientStatement()->bindValue($argument, $value);
+    }
 
     $options = $this->queryOptions;
     if (!empty($table_information->sequences)) {
@@ -150,6 +153,9 @@ class Upsert extends QueryUpsert {
 
     if (!empty($update)) {
       $query .= 'UPDATE SET ' . implode(', ', $update);
+      if ($this->updateCondition) {
+        $query .= ' WHERE ' . $this->updateCondition->expression;
+      }
     }
     else {
       $query .= 'NOTHING';

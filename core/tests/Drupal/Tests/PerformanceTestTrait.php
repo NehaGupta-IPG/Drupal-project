@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Serialization\Yaml;
@@ -221,9 +222,16 @@ trait PerformanceTestTrait {
    */
   protected static function logQuery(PerformanceData $performance_data, string $query, array $args): void {
     // Make queries with random variables invariable.
-    if (str_starts_with($query, 'INSERT INTO "semaphore"')) {
+    // Taking a lock is an upsert, which MySQL compiles to an insert that
+    // ignores the duplicate key, and MariaDB to a single statement that
+    // reports what it wrote.
+    if (str_starts_with($query, 'INSERT INTO "semaphore"')
+      || str_starts_with($query, 'INSERT IGNORE INTO "semaphore"')) {
       $args[':db_insert_placeholder_1'] = 'LOCK_ID';
       $args[':db_insert_placeholder_2'] = 'EXPIRE';
+      $args[':db_upsert_written_0'] = 'LOCK_ID';
+      $args[':db_upsert_written_1'] = 'EXPIRE';
+      $args[':now'] = 'NOW';
     }
     elseif (str_starts_with($query, 'DELETE FROM "semaphore"')) {
       $args[':db_condition_placeholder_1'] = 'LOCK_ID';
@@ -864,6 +872,13 @@ trait PerformanceTestTrait {
   /**
    * Returns the filename for a given performance test assertions file.
    *
+   * Databases that share a driver do not always compile a query the same way,
+   * so a database variant can carry expectations of its own in a file named
+   * "NAME.VARIANT.EXTENSION". That file is used when it exists, and the shared
+   * "NAME.EXTENSION" file is used when it does not. To add a variant file,
+   * create it empty and run the test on that database with PERF_TEST_UPDATE
+   * set, the same way the shared file is created.
+   *
    * @param string $name
    *   The base name of the file.
    * @param string $extension
@@ -882,7 +897,31 @@ trait PerformanceTestTrait {
       \Drupal::service(FileSystemInterface::class)->prepareDirectory($dir, FileSystemInterface::CREATE_DIRECTORY);
     }
 
+    $variant = $this->getExpectationsVariant();
+    if ($variant !== '' && file_exists($dir . '/' . $name . '.' . $variant . '.' . $extension)) {
+      return $dir . '/' . $name . '.' . $variant . '.' . $extension;
+    }
+
     return $dir . '/' . $name . '.' . $extension;
+  }
+
+  /**
+   * Returns the database variant that can carry its own expectations.
+   *
+   * MariaDB and MySQL share the mysql driver, but do not support the same
+   * clauses, so the driver does not always compile a query the same way for
+   * both.
+   *
+   * @return string
+   *   The variant name, or an empty string when the database has no variant.
+   */
+  protected function getExpectationsVariant(): string {
+    $connection = Database::getConnection();
+    if (method_exists($connection, 'isMariaDb') && $connection->isMariaDb()) {
+      return 'mariadb';
+    }
+
+    return '';
   }
 
 }

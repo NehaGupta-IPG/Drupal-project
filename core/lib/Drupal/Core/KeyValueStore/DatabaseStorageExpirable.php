@@ -175,11 +175,23 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    *   TRUE if the data was set, or FALSE if it already existed.
    */
   protected function doSetWithExpireIfNotExists($key, $value, $expire) {
-    if (!$this->has($key)) {
-      $this->setWithExpire($key, $value, $expire);
-      return TRUE;
-    }
-    return FALSE;
+    $now = $this->time->getRequestTime();
+
+    // One conditional upsert stores the value while no item exists, and while
+    // the item that does exist has expired, which counts as not existing. An
+    // item that is still live is left alone, and no row is reported as
+    // affected. Looking the item up first would leave a window in which two
+    // requests both find it absent and both store their own value.
+    return (bool) $this->connection->upsert($this->table)
+      ->key(['collection', 'name'])
+      ->fields([
+        'collection' => $this->collection,
+        'name' => $key,
+        'value' => $this->serializer->encode($value),
+        'expire' => $now + $expire,
+      ])
+      ->updateCondition('{' . $this->connection->escapeTable($this->table) . '}.[expire] <= :now', [':now' => $now])
+      ->execute();
   }
 
   /**
