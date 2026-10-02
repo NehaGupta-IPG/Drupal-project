@@ -227,7 +227,8 @@ class Config extends StorableConfigBase {
       }
     }
     else {
-      // Deprecated path.
+      // This path is deprecated as it is only called if $has_trusted_data is
+      // TRUE. The deprecation is trigger above.
       foreach ($this->data as $key => $value) {
         $this->validateValue($key, $value);
       }
