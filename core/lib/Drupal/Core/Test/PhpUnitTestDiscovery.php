@@ -123,7 +123,7 @@ class PhpUnitTestDiscovery {
       $container = \Drupal::getContainer();
       $containerObjectId = spl_object_id($container);
     }
-    $phpUnitTestSuite = (new TestSuiteBuilder())->build($phpUnitConfiguration);
+    $phpUnitTestSuite = (new TestSuiteBuilder(EventFacade::emitter()))->build($phpUnitConfiguration);
     if (isset($containerObjectId) && $containerObjectId !== spl_object_id(\Drupal::getContainer())) {
       $this->addWarning(
         ">>> The service container was changed during the test discovery <<<\n" .

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "56c6c635ee363ea5e5a29b7cf7a82c76",
+    "content-hash": "a010da3140f61c058d8ff230b65bb5dc",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -8145,12 +8145,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "0a5b0915a1c797dfe70bbcbfe8aa594a34916067"
+                "reference": "1804d0a9b1799a749c94131ace9d598e92601613"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/0a5b0915a1c797dfe70bbcbfe8aa594a34916067",
-                "reference": "0a5b0915a1c797dfe70bbcbfe8aa594a34916067",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/1804d0a9b1799a749c94131ace9d598e92601613",
+                "reference": "1804d0a9b1799a749c94131ace9d598e92601613",
                 "shasum": ""
             },
             "require": {
@@ -8230,7 +8230,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-10-01T20:22:44+00:00"
+            "time": "2026-10-02T04:41:03+00:00"
         },
         {
             "name": "ramsey/collection",
