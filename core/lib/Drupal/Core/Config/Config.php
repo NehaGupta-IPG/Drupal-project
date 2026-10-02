@@ -297,6 +297,9 @@ class Config extends StorableConfigBase {
       return;
     }
     $this->data['langcode'] = $this->eventDispatcher->dispatch(new ConfigLangcodeResolveEvent())->getLangcode();
+    // The underlying data has changed, so the schema wrapper needs to be
+    // updated.
+    $this->schemaWrapper = NULL;
   }
 
   /**
