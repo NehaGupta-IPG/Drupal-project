@@ -6,6 +6,7 @@ namespace Drupal\locale;
 
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Site\Settings;
+use Drupal\language\DefaultLangcodeConfigUpdater;
 use Drupal\language\DefaultLangcodeConfigUpdaterInterface;
 
 /**
@@ -33,7 +34,7 @@ final class DefaultLangcodeConfigUpdaterDecorator implements DefaultLangcodeConf
    */
   public function buildBatch(string $old_langcode, string $new_langcode): BatchBuilder {
     return $this->inner->buildBatch($old_langcode, $new_langcode)->addOperation(
-      'language.default_langcode_config_updater:translateUpdatedConfigOperation',
+      DefaultLangcodeConfigUpdater::class . ':translateUpdatedConfigOperation',
       [$new_langcode]
     );
   }
