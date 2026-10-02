@@ -8,6 +8,7 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -212,19 +213,95 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests if exposed filter progress type is visible as configured.
+   * Tests which progress type the exposed form and the view refresh use.
    *
-   * The closest data-progress-type to the submit button decides, not the first
-   * one found in the view.
+   * @param array $types
+   *   The data-progress-type attributes to put on the page, keyed by where they
+   *   go: 'button' (the submit button), 'form' (the form element) or
+   *   'before_form' (an element before the form, inside the view).
+   * @param string $filter_type
+   *   The progress type expected when the exposed form is submitted.
+   * @param string $refresh_type
+   *   The progress type expected when the view is refreshed.
    */
-  public function testExposedFiltersProgressType(): void {
+  #[DataProvider('providerExposedFiltersProgressType')]
+  public function testExposedFiltersProgressType(array $types, string $filter_type, string $refresh_type): void {
+    \Drupal::state()->set('views_test_config.progress_type', $types);
     $this->drupalGet('list_view');
-    $assert = $this->assertSession();
-    $this->submitForm(['title' => 'Basic'], 'Apply');
-    $assert->elementExists('css', '.ajax-progress-throbber');
-    $assert->elementNotExists('css', '.ajax-progress-bar');
-    $assert->elementNotExists('css', '.ajax-progress-fullscreen');
-    $assert->assertWaitOnAjaxRequest();
+    $this->recordProgressTypes();
+    $this->submitForm(['title' => 'Page One'], 'Apply');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->pageTextContains('Page One');
+    $this->assertSession()->pageTextNotContains('Page Two');
+    $this->assertSame([$filter_type], $this->getProgressTypes());
+
+    $this->recordProgressTypes();
+    $this->getSession()->executeScript("jQuery('.js-view-dom-id-' + Object.values(drupalSettings.views.ajaxViews)[0].view_dom_id).trigger('RefreshView');");
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSame([$refresh_type], $this->getProgressTypes());
+  }
+
+  /**
+   * Provides attributes and expected progress types for the exposed form.
+   */
+  public static function providerExposedFiltersProgressType(): array {
+    return [
+      'nothing set' => [[], 'fullscreen', 'fullscreen'],
+      'on the submit button' => [['button' => 'throbber', 'before_form' => 'none'], 'throbber', 'none'],
+      'on the form' => [['form' => 'throbber', 'before_form' => 'none'], 'throbber', 'none'],
+      'elsewhere in the view' => [['before_form' => 'throbber'], 'throbber', 'throbber'],
+    ];
+  }
+
+  /**
+   * Tests that the pager and the exposed form can use different progress types.
+   */
+  public function testPagerProgressType(): void {
+    for ($i = 1; $i <= 10; $i++) {
+      $this->createNode(['title' => 'Page ' . ($i + 2)]);
+    }
+    \Drupal::state()->set('views_test_config.progress_type', [
+      'button' => 'throbber',
+      'pager' => 'none',
+    ]);
+    $this->drupalGet('list_view');
+    $this->recordProgressTypes();
+    $this->assertSession()->elementExists('css', '.js-pager__items a[rel="next"]')->click();
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->elementExists('css', '.js-pager__items a[rel="prev"]');
+    $this->assertSame(['none'], $this->getProgressTypes());
+
+    $this->recordProgressTypes();
+    $this->submitForm(['title' => 'Page One'], 'Apply');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->pageTextContains('Page One');
+    $this->assertSame(['throbber'], $this->getProgressTypes());
+  }
+
+  /**
+   * Records the progress type of each AJAX request sent from now on.
+   */
+  protected function recordProgressTypes(): void {
+    $this->getSession()->executeScript(<<<JS
+      window.viewsTestProgressTypes = [];
+      if (!Drupal.Ajax.prototype.viewsTestBeforeSend) {
+        Drupal.Ajax.prototype.viewsTestBeforeSend = Drupal.Ajax.prototype.beforeSend;
+        Drupal.Ajax.prototype.beforeSend = function (xmlhttprequest, options) {
+          window.viewsTestProgressTypes.push(this.progress.type);
+          return this.viewsTestBeforeSend(xmlhttprequest, options);
+        };
+      }
+      JS);
+  }
+
+  /**
+   * Gets the progress types recorded by recordProgressTypes().
+   *
+   * @return string[]
+   *   The progress types, in the order the requests were sent.
+   */
+  protected function getProgressTypes(): array {
+    return $this->getSession()->evaluateScript('window.viewsTestProgressTypes');
   }
 
   /**

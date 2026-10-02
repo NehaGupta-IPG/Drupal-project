@@ -100,15 +100,40 @@ class ViewsTestConfigHooks {
   }
 
   /**
-   * Implements hook_form_BASE_FORM_ID_alter().
+   * Implements hook_form_FORM_ID_alter() for views_exposed_form.
+   *
+   * Puts the data-progress-type attributes named in the
+   * views_test_config.progress_type state on the exposed form of list_view.
    */
-  #[Hook('form_alter')]
-  public function formAlter(&$form, FormStateInterface $form_state, $form_id): void {
-    if ($form['#id'] == 'views-exposed-form-list-view-page-1') {
-      $form['actions']['submit']['#attributes']['data-progress-type'][] = 'throbber';
-      // An element before the form, outside the submit button's ancestors,
-      // must not decide the progress type of the form.
-      $form['#prefix'] = '<span data-progress-type="bar"></span>';
+  #[Hook('form_views_exposed_form_alter')]
+  public function formViewsExposedFormAlter(array &$form, FormStateInterface $form_state): void {
+    if ($form['#id'] !== 'views-exposed-form-list-view-page-1') {
+      return;
+    }
+    $types = \Drupal::state()->get('views_test_config.progress_type', []);
+    if (isset($types['button'])) {
+      $form['actions']['submit']['#attributes']['data-progress-type'] = $types['button'];
+    }
+    if (isset($types['form'])) {
+      $form['#attributes']['data-progress-type'] = $types['form'];
+    }
+    if (isset($types['before_form'])) {
+      $form['#prefix'] = '<span data-progress-type="' . $types['before_form'] . '"></span>';
+    }
+  }
+
+  /**
+   * Implements hook_preprocess_HOOK() for views_view.
+   *
+   * Wraps the pager of list_view in an element with the data-progress-type
+   * named in the views_test_config.progress_type state.
+   */
+  #[Hook('preprocess_views_view')]
+  public function preprocessViewsView(array &$variables): void {
+    $types = \Drupal::state()->get('views_test_config.progress_type', []);
+    if ($variables['view']->id() === 'list_view' && isset($types['pager']) && !empty($variables['pager'])) {
+      $variables['pager']['#prefix'] = '<div data-progress-type="' . $types['pager'] . '">';
+      $variables['pager']['#suffix'] = '</div>';
     }
   }
 
