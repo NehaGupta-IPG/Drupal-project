@@ -316,7 +316,7 @@ YAML
     $this->assertStringContainsString('Theme generated successfully to themes/generated_from_another_theme', trim($process->getOutput()), $process->getErrorOutput());
     $this->assertSame(0, $exit_code);
 
-    // Confirm new .theme file.
+    // Confirm new ThemeHooks file.
     $dot_theme_file = $this->getWorkspaceDirectory() . '/themes/generated_from_another_theme/src/Hook/GeneratedFromAnotherThemeHooks.php';
     $this->assertStringContainsString('public function preprocessImageWidget(array &$variables): void {', file_get_contents($dot_theme_file));
     $this->deleteGeneratedTheme('generated_from_another_theme');
@@ -533,12 +533,12 @@ SH;
       '--name="Test custom starterkit theme"',
       '--description="Custom theme generated from a starterkit theme"',
       '--starterkit',
-      'olivero',
+      'stark',
     ];
     $process = new Process($install_command);
     $process->setTimeout(60);
     $result = $process->run();
-    $this->assertStringContainsString('Theme source theme olivero is not a valid starter kit.', trim($process->getErrorOutput()));
+    $this->assertStringContainsString('Theme source theme stark is not a valid starter kit.', trim($process->getErrorOutput()));
     $this->assertSame(1, $result);
   }
 

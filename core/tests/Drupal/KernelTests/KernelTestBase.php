@@ -12,6 +12,8 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\Development\ConfigSchemaChecker;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
+use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DrupalKernel;
@@ -674,7 +676,8 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
 
     // Clean up statics, container, and settings.
     if (function_exists('drupal_static_reset')) {
-      drupal_static_reset();
+      // @phpstan-ignore function.deprecated
+      drupal_static_reset('clear_all_skip_deprecation');
     }
     \Drupal::unsetContainer();
     $this->container = NULL;
@@ -746,6 +749,16 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $schema = $this->container->get('database')->schema();
     $tables = (array) $tables;
     foreach ($tables as $table) {
+      if ($specification instanceof Schema) {
+        try {
+          $table_definition = $specification->getTableDefinition($table);
+          $schema->createTableFromDefinition($specification->type, $specification->name, $table_definition);
+          continue;
+        }
+        catch (SchemaDefinitionException) {
+          throw new \LogicException("$module module does not define a schema for table '$table'.");
+        }
+      }
       if (empty($specification[$table])) {
         throw new \LogicException("$module module does not define a schema for table '$table'.");
       }
