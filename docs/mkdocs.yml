@@ -1,8 +1,10 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 site_name: Drupal Core
 docs_dir: src
-site_url: 'https://project.pages.drupalcode.org/drupal/'
-repo_url: 'https://git.drupalcode.org/project/drupal'
+site_url: https://project.pages.drupalcode.org/drupal/
+repo_url: https://git.drupalcode.org/project/drupal
+repo_name: Drupal Core
+edit_uri: /-/edit/main/docs/src
 theme:
   name: material
   logo: icon-w-drupal.png
