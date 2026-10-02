@@ -83,6 +83,8 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
       if ($data['langcode'] === $old_langcode) {
         $translatable_data = static::extractTranslatableData($typed_config);
         if ($translatable_data !== []) {
+          // Preserve the translations for the old langcode in a new config
+          // override.
           $this->getRawLanguageConfigOverride($old_override_storage, $name)
             ->setData($translatable_data)
             ->save();
@@ -92,24 +94,18 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
         $had_override = !$override->isNew();
         $override_data = $had_override ? $override->get() : [];
         if ($had_override) {
-          // The override predates the new default and holds deliberately
-          // authored values for it - more authoritative than whatever the
-          // updated configuration currently says. Merge it in before the active
-          // configuration is saved, so a subscriber reacting to the override's
-          // removal below sees the merged content already in place, not the
-          // pre-merge values it is replacing.
+          // Merge the override data into the default configuration to ensure
+          // the default configuration has the correct translations.
           $config->setData(NestedArray::mergeDeepArray([$data, $override_data], TRUE));
         }
         $config->set('langcode', $new_langcode)->save();
         if ($had_override) {
-          // The new default language can no longer have an override of its
-          // own: the active configuration just saved above is now its
-          // canonical copy.
+          // Remove the override for the new default language. Its values have
+          // been merged into the default collection configuration.
           $override->delete();
         }
         // Record which names were actually updated to the new default, so
-        // other batch operations (for example locale module translating
-        // them) know what to act on.
+        // other batch operations know what to act on.
         $context['results']['updated_names'][] = $name;
 
         // The override may not have existed at all, or it may only have
@@ -133,10 +129,10 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
    * Gets a language override.
    *
    * This method does not use LanguageConfigFactoryOverride::getStorage()
-   * because it skips loading overrides when English is the default language and
-   * the passed in langcode is English. That assumption breaks exactly here:
-   * switching back to English is when an 'en' override left by an earlier
-   * switch away from it needs to be found.
+   * because that method skips loading overrides when English is the default
+   * language and the passed in langcode is English. That assumption breaks
+   * here: switching to English needs to be able to access existing 'en'
+   * overrides.
    *
    * @param StorageInterface $storage
    *   The config storage in the language's collection.
@@ -159,21 +155,17 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
   /**
    * Extracts the translatable portion of a config object's current data.
    *
-   * Mirrors the shape a language config override normally has - a nested
-   * array containing only the values under keys the schema marks
-   * translatable - built from this element's actual current values rather
-   * than from locale module's stored translations, since this is a
-   * snapshot of what the configuration currently says, not a translation of
-   * it.
+   * Mirrors the shape a language config override normally has, a nested
+   * array containing only the values under keys the schema marks translatable,
+   * built from this element's actual current values.
    *
    * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $element
-   *   The typed config element to walk - always a Mapping in practice,
-   *   since that is all callers ever have on hand.
+   *   The typed config element to walk.
    *
    * @return array
    *   A nested array matching the structure under $element, containing
    *   only the values under keys the schema marks translatable. Empty if
-   *   there is nothing translatable here at all.
+   *   there is nothing translatable.
    */
   protected static function extractTranslatableData(TraversableTypedDataInterface $element): array {
     $translatable = [];
@@ -187,18 +179,18 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
   }
 
   /**
-   * Extracts the translatable value of a single typed config element.
+   * Extracts the translatable value of a typed config element.
    *
    * @param \Drupal\Core\TypedData\TypedDataInterface $element
    *   The typed config element.
    *
-   * @return array|string
-   *   Recurses via self::extractTranslatableData() for a traversable
-   *   structure, so this is a nested array in that case; the element's raw
-   *   value directly if it is itself a translatable leaf; or an empty array
-   *   if there is nothing translatable here at all.
+   * @return array|string|bool|int|float
+   *   If the element is traversable, recurses via
+   *   self::extractTranslatableData() and returns a nested array. If the
+   *   element is not traversable but is translatable, the element's value is
+   *   returned. An empty array is returned if the value is not translatable.
    */
-  private static function extractTranslatableValue(TypedDataInterface $element): array|string {
+  private static function extractTranslatableValue(TypedDataInterface $element): array|string|bool|int|float {
     if ($element instanceof TraversableTypedDataInterface) {
       return static::extractTranslatableData($element);
     }

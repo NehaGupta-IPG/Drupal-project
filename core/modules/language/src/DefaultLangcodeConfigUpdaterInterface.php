@@ -7,7 +7,7 @@ namespace Drupal\language;
 use Drupal\Core\Batch\BatchBuilder;
 
 /**
- * Reconciles configuration langcode with a new default language.
+ * Updates configuration when the default language changes.
  */
 interface DefaultLangcodeConfigUpdaterInterface {
 
@@ -36,14 +36,13 @@ interface DefaultLangcodeConfigUpdaterInterface {
    * existing translations.
    *
    * A configuration override already existing for the new default langcode
-   * is absorbed into the configuration being updated, then removed. The new
-   * default language can no longer have an override of its own once the active
-   * configuration itself becomes its canonical copy.
+   * is merged into the configuration being updated, then removed. The new
+   * default language can no longer have an override of its own.
    *
    * Before the first batch step reads the full configuration list, modules
-   * can remove names from it via
-   * hook_language_update_config_langcode_list_alter(), so that configuration
-   * keeps its current langcode regardless of the new default.
+   * can remove names from the list via
+   * hook_language_update_config_langcode_list_alter(). This allows
+   * configuration to keep its current langcode regardless of the new default.
    *
    * @param string $old_langcode
    *   The previous default langcode.
