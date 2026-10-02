@@ -29,3 +29,7 @@ theme:
         icon: material/brightness-4
         name: Switch to system preference
   features: []
+plugins:
+  - search
+  - privacy:
+      enabled: !ENV [CI, false]
