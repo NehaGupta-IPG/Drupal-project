@@ -64,6 +64,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
       'administer site configuration',
       'access site in maintenance mode',
       'access site reports',
+      'access dblog reports',
     ]);
     $this->drupalLogin($this->adminUser);
   }
