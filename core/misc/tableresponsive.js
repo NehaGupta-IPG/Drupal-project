@@ -110,7 +110,7 @@
             window.getComputedStyle(element).getPropertyValue('display') ===
               'none'
           );
-       }).length;
+        }).length;
         // If the table has hidden columns, associate an action link with the
         // table to show the columns.
         if (hiddenLength > 0) {
