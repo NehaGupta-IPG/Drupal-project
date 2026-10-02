@@ -33,7 +33,7 @@ class SchemaInspector {
   public static function getTablesSpecification(ModuleHandlerInterface $handler, string $module): Schema|array {
     if ($handler->loadInclude($module, 'install')) {
       $schema = [];
-      $function = $module . '_' . 'schema';
+      $function = "{$module}_schema";
       if (function_exists($function)) {
         $schema = $function();
       }
