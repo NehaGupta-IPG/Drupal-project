@@ -29,7 +29,7 @@ class DefaultConfigLangcodeSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Triggers the reconciliation of configuration langcode with a new default.
+   * Triggers the reconciliation of configuration langcodes with a new default.
    *
    * This event subscriber assumes that the new default langcode and old default
    * langcode are valid langcodes. If the source of truth for the default
@@ -41,10 +41,9 @@ class DefaultConfigLangcodeSubscriber implements EventSubscriberInterface {
    */
   public function onConfigSave(ConfigCrudEvent $event): void {
     if ($this->configInstaller->isSyncing()) {
-      // An import's source storage is a complete, self-consistent snapshot: it
+      // An import's source storage is a complete, self-consistent snapshot. It
       // is responsible for providing correct langcodes for anything it changes
-      // itself, the same reasoning that keeps ConfigInstaller and
-      // Config::save() from touching langcode mid-sync.
+      // itself.
       return;
     }
     $saved_config = $event->getConfig();

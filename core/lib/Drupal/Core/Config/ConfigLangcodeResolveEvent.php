@@ -9,17 +9,16 @@ use Drupal\Component\EventDispatcher\Event;
 /**
  * Event fired to determine the default langcode for new configuration.
  *
- * Dispatched whenever configuration would otherwise be saved with no
- * meaningful langcode of its own.
+ * Dispatched whenever translatable configuration has no langcode set and during
+ * extension install when a configuration's langcode is missing or 'en'.
  *
- * self::setLangcode() stops propagation as soon as a subscriber answers, so
- * a higher-priority, more specific policy takes precedence over a later, more
- * general one simply by running first. It is up to the subscriber to ensure the
- * langcode is valid for the site.
+ * Calling self::setLangcode() stops propagation because only one answer is
+ * possible. Event priority determines which subscriber is called first. It is
+ * up to the subscriber to ensure the langcode is valid for the site.
  *
  * If a subscriber is added by a contributed or custom module, the
  * DefaultConfigLangcodeSubscriber event must be changed to account for the new
- * source of truth.
+ * source of truth for configuration's default langcode.
  *
  * Drupal core always registers a subscriber for the site's default language, so
  * self::getLangcode() is guaranteed a value by the time dispatch() returns.

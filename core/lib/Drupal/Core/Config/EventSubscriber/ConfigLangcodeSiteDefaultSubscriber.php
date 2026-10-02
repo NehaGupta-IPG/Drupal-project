@@ -10,15 +10,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Resolves configuration langcode to the site's default language.
- *
- * The site's default language (system.site:default_langcode) is the single
- * source of truth for what langcode configuration with none of its own
- * should get - unless something more specific already decided, such as a
- * module with its own default-langcode policy. Registered at the lowest
- * priority, so this only ever runs at all once nothing more specific has:
- * \Drupal\Core\Config\ConfigLangcodeResolveEvent::setLangcode() stops
- * propagation as soon as an earlier subscriber resolves, meaning this one is
- * simply never called.
  */
 class ConfigLangcodeSiteDefaultSubscriber implements EventSubscriberInterface {
 
@@ -38,6 +29,8 @@ class ConfigLangcodeSiteDefaultSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     return [
+      // Registered with a low priority to allow other subscribers to answer
+      // first.
       ConfigLangcodeResolveEvent::class => ['onResolveLangcode', -10000],
     ];
   }
