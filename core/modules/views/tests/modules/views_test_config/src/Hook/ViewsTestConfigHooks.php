@@ -103,9 +103,12 @@ class ViewsTestConfigHooks {
    * Implements hook_form_BASE_FORM_ID_alter().
    */
   #[Hook('form_alter')]
-  public function formAlter(&$form, FormStateInterface $form_state, $form_id) {
+  public function formAlter(&$form, FormStateInterface $form_state, $form_id): void {
     if ($form['#id'] == 'views-exposed-form-list-view-page-1') {
       $form['actions']['submit']['#attributes']['data-progress-type'][] = 'throbber';
+      // An element before the form, outside the submit button's ancestors,
+      // must not decide the progress type of the form.
+      $form['#prefix'] = '<span data-progress-type="bar"></span>';
     }
   }
 

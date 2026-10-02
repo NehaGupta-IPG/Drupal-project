@@ -114,11 +114,7 @@
       setClick: true,
       event: 'click',
       selector,
-      progress: {
-        type:
-          this.$view.find('[data-progress-type]').attr('data-progress-type') ||
-          'fullscreen',
-      },
+      progress: { type: 'fullscreen' },
     };
 
     this.settings = settings;
@@ -148,6 +144,7 @@
       base: this.selector,
       httpMethod: 'GET',
       element: this.$view.get(0),
+      progress: { type: this.getProgressType(this.$view.get(0)) },
     });
     this.refreshViewAjax = Drupal.ajax(selfSettings);
   };
@@ -169,6 +166,7 @@
         const selfSettings = $.extend({}, that.element_settings, {
           base: $(this).attr('id'),
           element: this,
+          progress: { type: that.getProgressType(this) },
         });
         that.exposedFormAjax[index] = Drupal.ajax(selfSettings);
       });
@@ -222,8 +220,29 @@
       base: false,
       element: link,
       httpMethod: 'GET',
+      progress: { type: this.getProgressType(link) },
     });
     this.pagerAjax = Drupal.ajax(selfSettings);
+  };
+
+  /**
+   * Gets the type of progress indicator for the element triggering a request.
+   *
+   * The closest data-progress-type attribute decides, starting at the element
+   * itself and going up through its ancestors, so the filters and the pager of
+   * one view can show different indicators.
+   *
+   * @param {HTMLElement} element
+   *   The element that triggers the request.
+   *
+   * @return {string}
+   *   The progress type, 'fullscreen' if no element sets one.
+   */
+  Drupal.views.ajaxView.prototype.getProgressType = function (element) {
+    return (
+      $(element).closest('[data-progress-type]').attr('data-progress-type') ||
+      this.element_settings.progress.type
+    );
   };
 
   /**

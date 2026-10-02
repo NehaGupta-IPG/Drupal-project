@@ -213,12 +213,17 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
 
   /**
    * Tests if exposed filter progress type is visible as configured.
+   *
+   * The closest data-progress-type to the submit button decides, not the first
+   * one found in the view.
    */
-  public function testExposedFiltersProgressType() {
+  public function testExposedFiltersProgressType(): void {
     $this->drupalGet('list_view');
     $assert = $this->assertSession();
     $this->submitForm(['title' => 'Basic'], 'Apply');
     $assert->elementExists('css', '.ajax-progress-throbber');
+    $assert->elementNotExists('css', '.ajax-progress-bar');
+    $assert->elementNotExists('css', '.ajax-progress-fullscreen');
     $assert->assertWaitOnAjaxRequest();
   }
 
