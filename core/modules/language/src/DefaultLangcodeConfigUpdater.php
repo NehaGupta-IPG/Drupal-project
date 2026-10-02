@@ -16,7 +16,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\language\Config\LanguageConfigOverride;
-use Drupal\language\Event\LanguageDefaultLangcodeChangeEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -42,10 +41,7 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
       ->setTitle(new TranslatableMarkup('Updating configuration for the new default language'))
       ->addOperation(static::class . ':reconcileConfigLangcodeOperation', [$old_langcode, $new_langcode]);
 
-    $event = new LanguageDefaultLangcodeChangeEvent($old_langcode, $new_langcode, $batch);
-    $this->eventDispatcher->dispatch($event);
-
-    return $event->batch;
+    return $batch;
   }
 
   /**
