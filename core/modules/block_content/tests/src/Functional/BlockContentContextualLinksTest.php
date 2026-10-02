@@ -41,7 +41,7 @@ class BlockContentContextualLinksTest extends BlockContentTestBase {
     $this->drupalLogin($user);
 
     $this->drupalGet('<front>');
-    $this->assertSession()->elementAttributeContains('css', 'div[data-contextual-id]', 'data-contextual-id', 'block:block=' . $block->id() . ':langcode=en|block_content:block_content=' . $block_content->id() . ':');
+    $this->assertSession()->elementAttributeContains('css', 'div[data-contextual-id]', 'data-contextual-id', 'block:block=' . $block->id() . ':langcode=en&admin_langcode=en|block_content:block_content=' . $block_content->id() . ':');
   }
 
 }

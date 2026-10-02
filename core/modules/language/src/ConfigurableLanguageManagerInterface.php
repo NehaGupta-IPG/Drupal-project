@@ -103,4 +103,17 @@ interface ConfigurableLanguageManagerInterface extends LanguageManagerInterface 
    */
   public function getNegotiatedLanguageMethod($type = LanguageInterface::TYPE_INTERFACE);
 
+  /**
+   * Gets the langcode the current user administers the site in.
+   *
+   * The langcode is provided by the enabled interface language negotiation
+   * methods implementing \Drupal\language\AdminLanguageNegotiationInterface,
+   * asked in order of the method priority.
+   *
+   * @return string
+   *   The administration langcode, or an empty string when no enabled
+   *   negotiation method provides one for the current user.
+   */
+  public function getAdminLangcode(): string;
+
 }

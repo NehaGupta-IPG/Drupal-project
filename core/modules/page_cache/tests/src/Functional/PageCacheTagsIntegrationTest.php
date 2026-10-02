@@ -129,6 +129,7 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
       'url.query_args:' . MainContentViewSubscriber::WRAPPER_FORMAT,
       // rel=canonical links and friends have absolute URLs as their values.
       'url.site',
+      'user.admin_language',
       // These two cache contexts are added by BigPipe.
       'cookies:big_pipe_nojs',
       'session.exists',

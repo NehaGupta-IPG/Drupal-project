@@ -444,4 +444,12 @@ class LanguageManager implements LanguageManagerInterface {
     return $filtered_languages;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function setCurrentLanguage(
+    LanguageInterface $language,
+    ?string $type = LanguageInterface::TYPE_INTERFACE,
+  ): void {}
+
 }

@@ -361,7 +361,7 @@ class DisplayBlockTest extends ViewTestBase {
       'http_response',
       'rendered',
     ]));
-    $this->assertCacheContexts(['url.query_args:_wrapper_format']);
+    $this->assertCacheContexts(['url.query_args:_wrapper_format', 'user.admin_language']);
 
     // Hide the header on empty results.
     $display = &$view->getDisplay('block_1');
@@ -406,7 +406,7 @@ class DisplayBlockTest extends ViewTestBase {
       'http_response',
       'rendered',
     ]));
-    $this->assertCacheContexts(['url.query_args:_wrapper_format']);
+    $this->assertCacheContexts(['url.query_args:_wrapper_format', 'user.admin_language']);
   }
 
   /**
@@ -422,9 +422,9 @@ class DisplayBlockTest extends ViewTestBase {
     $cached_block = $this->drupalPlaceBlock('views_block:test_view_block-block_1');
     $this->drupalGet('test-page');
 
-    $id = 'block:block=' . $block->id() . ':langcode=en|entity.view.edit_form:view=test_view_block:location=block&name=test_view_block&display_id=block_1&langcode=en';
+    $id = 'block:block=' . $block->id() . ':langcode=en&admin_langcode=en|entity.view.edit_form:view=test_view_block:location=block&name=test_view_block&display_id=block_1&langcode=en&admin_langcode=en';
     $id_token = Crypt::hmacBase64($id, Settings::getHashSalt() . $this->container->get('private_key')->get());
-    $cached_id = 'block:block=' . $cached_block->id() . ':langcode=en|entity.view.edit_form:view=test_view_block:location=block&name=test_view_block&display_id=block_1&langcode=en';
+    $cached_id = 'block:block=' . $cached_block->id() . ':langcode=en&admin_langcode=en|entity.view.edit_form:view=test_view_block:location=block&name=test_view_block&display_id=block_1&langcode=en&admin_langcode=en';
     $cached_id_token = Crypt::hmacBase64($cached_id, Settings::getHashSalt() . $this->container->get('private_key')->get());
     // @see \Drupal\contextual\Tests\ContextualDynamicContextTest:assertContextualLinkPlaceHolder()
     // Check existence of the contextual link placeholders.

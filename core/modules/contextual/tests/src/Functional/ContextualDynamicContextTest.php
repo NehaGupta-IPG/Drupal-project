@@ -103,10 +103,10 @@ class ContextualDynamicContextTest extends BrowserTestBase {
     // Now, on the front page, all article nodes should have contextual links
     // placeholders, as should the view that contains them.
     $ids = [
-      'node:node=' . $node1->id() . ':changed=' . $node1->getChangedTime() . '&langcode=en',
-      'node:node=' . $node2->id() . ':changed=' . $node2->getChangedTime() . '&langcode=en',
-      'node:node=' . $node3->id() . ':changed=' . $node3->getChangedTime() . '&langcode=en',
-      'entity.view.edit_form:view=frontpage:location=page&name=frontpage&display_id=page_1&langcode=en',
+      'node:node=' . $node1->id() . ':changed=' . $node1->getChangedTime() . '&langcode=en&admin_langcode=en',
+      'node:node=' . $node2->id() . ':changed=' . $node2->getChangedTime() . '&langcode=en&admin_langcode=en',
+      'node:node=' . $node3->id() . ':changed=' . $node3->getChangedTime() . '&langcode=en&admin_langcode=en',
+      'entity.view.edit_form:view=frontpage:location=page&name=frontpage&display_id=page_1&langcode=en&admin_langcode=en',
     ];
 
     // Editor user: can access contextual links and can edit articles.
@@ -130,7 +130,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
       'title' => $this->randomString(),
       'promote' => TRUE,
     ])->save();
-    $id = 'node:node=' . $node3->id() . ':changed=' . $node3->getChangedTime() . '&langcode=it';
+    $id = 'node:node=' . $node3->id() . ':changed=' . $node3->getChangedTime() . '&langcode=it&admin_langcode=en';
     $this->drupalGet('node', ['language' => ConfigurableLanguage::createFromLangcode('it')]);
     $this->assertContextualLinkPlaceHolder($id);
 
@@ -184,7 +184,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
 
     // Now, on the front page, all article nodes should have contextual links
     // placeholders, as should the view that contains them.
-    $id = 'node:node=' . $node1->id() . ':changed=' . $node1->getChangedTime() . '&langcode=en';
+    $id = 'node:node=' . $node1->id() . ':changed=' . $node1->getChangedTime() . '&langcode=en&admin_langcode=en';
 
     // Editor user: can access contextual links and can edit articles.
     $this->drupalGet('node');
