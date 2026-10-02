@@ -13924,12 +13924,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/src/EventSubscriber/FileEventSubscriber.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#4 \\$field_type of function file_get_file_references expects string, null given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/src/FileAccessControlHandler.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\file\\\\FileInterface\\:\\:setFileUri\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
