@@ -17,7 +17,7 @@ class DeprecatedController {
    */
   public function deprecatedMethod() {
     return [
-      '#markup' => $this->deprecationTest(),
+      '#markup' => static::testDeprecation(),
     ];
   }
 
@@ -32,9 +32,9 @@ class DeprecatedController {
    *
    * @see https://www.drupal.org/project/drupal/issues/2870194
    */
-  public function deprecationTest() {
+  public static function testDeprecation() {
     // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-    @trigger_error('This is the deprecation message for deprecation_test_function().', E_USER_DEPRECATED);
+    @trigger_error('This is the deprecation message for testDeprecation().', E_USER_DEPRECATED);
     return 'known_return_value';
   }
 
