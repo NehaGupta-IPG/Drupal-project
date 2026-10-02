@@ -213,10 +213,10 @@ class Config extends StorableConfigBase {
       if ($this->typedConfigManager->hasConfigSchema($this->name)) {
         // Ensure that the schema wrapper has the latest data.
         $this->schemaWrapper = NULL;
-        $this->data = $this->castValue(NULL, $this->data);
         if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
           $this->reconcileLangcodeWithTranslatability($this->getSchemaWrapper());
         }
+        $this->data = $this->castValue(NULL, $this->data);
         // Reclaim the memory used by the schema wrapper.
         $this->schemaWrapper = NULL;
       }
@@ -259,12 +259,12 @@ class Config extends StorableConfigBase {
    * Keeps langcode in step with whether the configuration is translatable.
    *
    * Configuration can become translatable, or stop being translatable, as a
-   * side effect of an ordinary data change - for example a plugin being
-   * swapped for one that does, or does not, have a translatable value. This
-   * adds a langcode when translatability just switched on and none is
-   * present yet, and removes it when translatability just switched off.
+   * side effect of an ordinary data change. For example, a plugin being swapped
+   * for one that does, or does not, have a translatable value. This adds a
+   * langcode when configuration becomes translatable and none is present yet,
+   * and removes it when configuration becomes untranslatable.
    *
-   * This never overwrites an existing langcode.
+   * This method never overwrites an existing langcode.
    *
    * @param \Drupal\Core\Config\Schema\Element $typed_config
    *   The typed configuration wrapper for this configuration object.
@@ -279,8 +279,8 @@ class Config extends StorableConfigBase {
     $required_langcode = $typed_config->getDataDefinition()['mapping']['langcode']['requiredKey'] ?? FALSE;
     // This potentially loops through the config array again like call to
     // StorableConfigBase::castValue() but this is mitigated by the fact that
-    // this only occurs for simple configuration as configuration entities have
-    // a required langcode. Additionally, once
+    // this only occurs for simple configuration. Configuration entities have a
+    // required langcode. Additionally, once
     // \Drupal\Core\Config\Schema\ArrayElement::hasTranslatableElements() has
     // found a translatable key it returns early.
     // @todo consider if could somehow prepopulate the set the langcode
@@ -296,17 +296,6 @@ class Config extends StorableConfigBase {
       return;
     }
     $this->data['langcode'] = $this->eventDispatcher->dispatch(new ConfigLangcodeResolveEvent())->getLangcode();
-    // castValue() already sorted $this->data into schema order before
-    // langcode existed as a key, so it landed here at the end instead. Left
-    // alone, the next unrelated save would silently re-sort it into its
-    // schema position, changing the stored key order for no logical reason -
-    // a spurious diff for anyone who exported in between. Sort it into place
-    // now instead, the same way castValue() would have.
-    $mapping = $typed_config->getDataDefinition()['mapping'];
-    if (is_array($mapping)) {
-      $mapping = array_intersect_key($mapping, $this->data);
-      $this->data = array_replace($mapping, $this->data);
-    }
   }
 
   /**
