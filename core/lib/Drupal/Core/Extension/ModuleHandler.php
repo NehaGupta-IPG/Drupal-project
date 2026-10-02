@@ -252,30 +252,6 @@ class ModuleHandler implements ModuleHandlerInterface {
       }
       return reset($listeners)(... $args);
     }
-
-    return $this->legacyInvoke($module, $hook, $args);
-  }
-
-  /**
-   * Calls a function called $module . '_' . $hook if one exists.
-   *
-   * @param string $module
-   *   The name of the module (without the .module extension).
-   * @param string $hook
-   *   The name of the hook to invoke.
-   * @param array $args
-   *   Arguments to pass to the hook implementation.
-   *
-   * @return mixed
-   *   The return value of the hook implementation.
-   */
-  protected function legacyInvoke($module, $hook, array $args = []) {
-    $function = $module . '_' . $hook;
-    if (function_exists($function)) {
-      return $function(...$args);
-    }
-
-    return NULL;
   }
 
   /**
