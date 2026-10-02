@@ -114,7 +114,11 @@
       setClick: true,
       event: 'click',
       selector,
-      progress: { type: 'fullscreen' },
+      progress: {
+        type:
+          this.$view.find('[data-progress-type]').attr('data-progress-type') ||
+          'fullscreen',
+      },
     };
 
     this.settings = settings;
@@ -230,13 +234,14 @@
    *
    * The closest data-progress-type attribute decides, starting at the element
    * itself and going up through its ancestors, so the filters and the pager of
-   * one view can show different indicators.
+   * one view can show different indicators. When there is none, the type is the
+   * one set for the view as a whole.
    *
    * @param {HTMLElement} element
    *   The element that triggers the request.
    *
    * @return {string}
-   *   The progress type, 'fullscreen' if no element sets one.
+   *   The progress type.
    */
   Drupal.views.ajaxView.prototype.getProgressType = function (element) {
     return (
