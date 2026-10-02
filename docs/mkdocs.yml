@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
-site_name: Drupal core documentation
+site_name: Drupal Core
 docs_dir: src
 site_url: 'https://project.pages.drupalcode.org/drupal/'
 repo_url: 'https://git.drupalcode.org/project/drupal'
@@ -33,3 +33,5 @@ plugins:
   - search
   - privacy:
       enabled: !ENV [CI, false]
+nav:
+  - API Documentation: https://api.drupal.org/api/drupal/main
