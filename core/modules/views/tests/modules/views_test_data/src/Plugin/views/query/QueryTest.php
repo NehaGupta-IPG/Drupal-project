@@ -7,8 +7,8 @@ namespace Drupal\views_test_data\Plugin\views\query;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsQuery;
+use Drupal\views\Plugin\views\query\HandlerQueryInterface;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
-use Drupal\views\Plugin\views\join\JoinPluginBase;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 
@@ -20,7 +20,7 @@ use Drupal\views\ViewExecutable;
   title: new TranslatableMarkup('Query test'),
   help: new TranslatableMarkup('Defines a query test plugin.')
 )]
-class QueryTest extends QueryPluginBase {
+class QueryTest extends QueryPluginBase implements HandlerQueryInterface {
 
   /**
    * The conditions to apply to the query.
@@ -108,13 +108,6 @@ class QueryTest extends QueryPluginBase {
    */
   public function addOrderBy($table, $field = NULL, $order = 'ASC', $alias = '', $params = []): void {
     $this->orderBy = ['field' => $field, 'order' => $order];
-  }
-
-  /**
-   * Ensures a table exists in the queue.
-   */
-  public function ensureTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL): void {
-    // There is no concept of joins.
   }
 
   /**

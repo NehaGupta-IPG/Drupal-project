@@ -40,7 +40,7 @@ trait TaxonomyIndexDepthQueryTrait {
    *   The terms ID(s) to do a depth search for.
    */
   protected function addSubQueryJoin($tids): void {
-    $connection = $this->query->getConnection();
+    $connection = $this->sqlQuery()->getConnection();
     $operator = is_array($tids) ? 'IN' : '=';
     // Create the depth 0 subquery.
     $subquery = $connection->select('taxonomy_index', 'tn');
@@ -86,7 +86,7 @@ trait TaxonomyIndexDepthQueryTrait {
     $join = \Drupal::service('plugin.manager.views.join')->createInstance('standard', $definition);
 
     // There is no $base as we are joining to a query.
-    $this->query->addRelationship('taxonomy_index_depth', $join, NULL, $this->relationship);
+    $this->sqlQuery()->addRelationship('taxonomy_index_depth', $join, NULL, $this->relationship);
   }
 
 }

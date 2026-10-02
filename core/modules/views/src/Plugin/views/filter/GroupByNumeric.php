@@ -32,11 +32,11 @@ class GroupByNumeric extends NumericFilter {
     $placeholder_min = $this->placeholder();
     $placeholder_max = $this->placeholder();
     if ($this->operator == 'between') {
-      $this->query->addHavingExpression($this->options['group'], "$field >= $placeholder_min", [$placeholder_min => $this->value['min']]);
-      $this->query->addHavingExpression($this->options['group'], "$field <= $placeholder_max", [$placeholder_max => $this->value['max']]);
+      $this->sqlQuery()->addHavingExpression($this->options['group'], "$field >= $placeholder_min", [$placeholder_min => $this->value['min']]);
+      $this->sqlQuery()->addHavingExpression($this->options['group'], "$field <= $placeholder_max", [$placeholder_max => $this->value['max']]);
     }
     else {
-      $this->query->addHavingExpression($this->options['group'], "$field < $placeholder_min OR $field > $placeholder_max", [
+      $this->sqlQuery()->addHavingExpression($this->options['group'], "$field < $placeholder_min OR $field > $placeholder_max", [
         $placeholder_min => $this->value['min'],
         $placeholder_max => $this->value['max'],
       ]);
@@ -48,7 +48,7 @@ class GroupByNumeric extends NumericFilter {
    */
   protected function opSimple($field) {
     $placeholder = $this->placeholder();
-    $this->query->addHavingExpression($this->options['group'], "$field $this->operator $placeholder", [$placeholder => $this->value['value']]);
+    $this->sqlQuery()->addHavingExpression($this->options['group'], "$field $this->operator $placeholder", [$placeholder => $this->value['value']]);
   }
 
   /**
@@ -62,7 +62,7 @@ class GroupByNumeric extends NumericFilter {
       $operator = "IS NOT NULL";
     }
 
-    $this->query->addHavingExpression($this->options['group'], "$field $operator");
+    $this->sqlQuery()->addHavingExpression($this->options['group'], "$field $operator");
   }
 
   /**

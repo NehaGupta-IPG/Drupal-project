@@ -82,17 +82,15 @@ class LatestRevision extends FilterPluginBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function query() {
-    /** @var \Drupal\views\Plugin\views\query\Sql $query */
-    $query = $this->query;
     $query_base_table = $this->relationship ?: $this->view->storage->get('base_table');
 
     $entity_type = $this->entityTypeManager->getDefinition($this->getEntityType());
     $keys = $entity_type->getKeys();
 
-    $subquery = $query->getConnection()->select($query_base_table, 'base_table');
+    $subquery = $this->sqlQuery()->getConnection()->select($query_base_table, 'base_table');
     $subquery->addExpression("MAX(base_table.{$keys['revision']})", $keys['revision']);
     $subquery->groupBy("base_table.{$keys['id']}");
-    $query->addWhere($this->options['group'], "$query_base_table.{$keys['revision']}", $subquery, 'IN');
+    $this->handlerQuery()->addWhere($this->options['group'], "$query_base_table.{$keys['revision']}", $subquery, 'IN');
   }
 
 }

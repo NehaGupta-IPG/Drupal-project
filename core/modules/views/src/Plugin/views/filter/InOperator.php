@@ -435,7 +435,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
 
     // We use array_values() because the checkboxes keep keys and that can cause
     // array addition problems.
-    $this->query->addWhere($this->options['group'], "$this->tableAlias.$this->realField", array_values($this->value), $this->operator);
+    $this->handlerQuery()->addWhere($this->options['group'], "$this->tableAlias.$this->realField", array_values($this->value), $this->operator);
   }
 
   /**
@@ -450,7 +450,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
       $operator = "IS NOT NULL";
     }
 
-    $this->query->addWhere($this->options['group'], "$this->tableAlias.$this->realField", NULL, $operator);
+    $this->handlerQuery()->addWhere($this->options['group'], "$this->tableAlias.$this->realField", NULL, $operator);
   }
 
   /**

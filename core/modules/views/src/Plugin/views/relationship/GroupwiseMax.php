@@ -388,7 +388,7 @@ class GroupwiseMax extends RelationshipPluginBase {
     // Use a short alias for this:
     $alias = $def['table'] . '_' . $this->table;
 
-    $this->alias = $this->query->addRelationship($alias, $join, $this->definition['base'], $this->relationship);
+    $this->alias = $this->sqlQuery()->addRelationship($alias, $join, $this->definition['base'], $this->relationship);
   }
 
 }

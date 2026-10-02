@@ -30,7 +30,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
   title: new TranslatableMarkup('SQL Query'),
   help: new TranslatableMarkup('Query will be generated and run using the Drupal database API.')
 )]
-class Sql extends QueryPluginBase {
+class Sql extends QueryPluginBase implements SqlQueryInterface {
 
   /**
    * A list of tables in the order they should be added, keyed by alias.

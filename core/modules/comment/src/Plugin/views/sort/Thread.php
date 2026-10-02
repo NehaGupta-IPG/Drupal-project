@@ -22,12 +22,12 @@ class Thread extends SortPluginBase {
     // See \Drupal\comment\CommentStorage::loadThread() for an explanation of
     // the thinking behind this sort.
     if ($this->options['order'] == 'DESC') {
-      $this->query->addOrderBy($this->tableAlias, $this->realField, $this->options['order']);
+      $this->handlerQuery()->addOrderBy($this->tableAlias, $this->realField, $this->options['order']);
     }
     else {
       $alias = $this->tableAlias . '_' . $this->realField . 'asc';
       // @todo is this secure?
-      $this->query->addOrderBy(NULL, "SUBSTRING({$this->tableAlias}.{$this->realField}, 1, (LENGTH({$this->tableAlias}.{$this->realField}) - 1))", $this->options['order'], $alias);
+      $this->handlerQuery()->addOrderBy(NULL, "SUBSTRING({$this->tableAlias}.{$this->realField}, 1, (LENGTH({$this->tableAlias}.{$this->realField}) - 1))", $this->options['order'], $alias);
     }
   }
 

@@ -39,18 +39,18 @@ class Access extends FilterPluginBase {
     $account = $this->view->getUser();
     if (!$account->hasPermission('bypass node access') && $this->moduleHandler->hasImplementations('node_grants')) {
       $table = $this->ensureMyTable();
-      $grants = $this->query->getConnection()->condition('OR');
+      $grants = $this->sqlQuery()->getConnection()->condition('OR');
       foreach (\Drupal::service(NodeGrantsHelper::class)->nodeAccessGrants('view', $account) as $realm => $gids) {
         foreach ($gids as $gid) {
-          $grants->condition(($this->query->getConnection()->condition('AND'))
+          $grants->condition(($this->sqlQuery()->getConnection()->condition('AND'))
             ->condition($table . '.gid', $gid)
             ->condition($table . '.realm', $realm)
           );
         }
       }
 
-      $this->query->addWhere('AND', $grants);
-      $this->query->addWhere('AND', $table . '.grant_view', 1, '>=');
+      $this->handlerQuery()->addWhere('AND', $grants);
+      $this->handlerQuery()->addWhere('AND', $table . '.grant_view', 1, '>=');
     }
   }
 

@@ -14,7 +14,7 @@ trait ModerationStateJoinViewsHandlerTrait {
    */
   public function ensureMyTable() {
     if (!isset($this->tableAlias)) {
-      $table_alias = $this->query->ensureTable($this->table, $this->relationship);
+      $table_alias = $this->sqlQuery()->ensureTable($this->table, $this->relationship);
 
       // Join the moderation states of the content via the
       // ContentModerationState field revision table, joining either the entity
@@ -46,7 +46,7 @@ trait ModerationStateJoinViewsHandlerTrait {
         ];
       }
       $join = \Drupal::service('plugin.manager.views.join')->createInstance('standard', $configuration);
-      $this->tableAlias = $this->query->addRelationship('content_moderation_state', $join, 'content_moderation_state_field_revision');
+      $this->tableAlias = $this->sqlQuery()->addRelationship('content_moderation_state', $join, 'content_moderation_state_field_revision');
     }
 
     return $this->tableAlias;

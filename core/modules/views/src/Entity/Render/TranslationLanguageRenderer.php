@@ -30,10 +30,9 @@ class TranslationLanguageRenderer extends EntityTranslationRendererBase {
     }
     $langcode_table = $this->getLangcodeTable($query, $relationship);
     if ($langcode_table) {
-      /** @var \Drupal\views\Plugin\views\query\Sql $query */
-      $table_alias = $query->ensureTable($langcode_table, $relationship);
+      $table_alias = $query->getSqlQuery()->ensureTable($langcode_table, $relationship);
       $langcode_key = $this->entityType->getKey('langcode');
-      $this->langcodeAlias = $query->addField($table_alias, $langcode_key);
+      $this->langcodeAlias = $query->getHandlerQuery()->addField($table_alias, $langcode_key);
     }
   }
 

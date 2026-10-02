@@ -41,11 +41,11 @@ class StatisticsLastCommentName extends SortPluginBase {
     // @todo this might be safer if we had an ensure_relationship rather than
     //   guessing the table alias. Though if we did that we'd be guessing the
     //   relationship name so that doesn't matter that much.
-    $this->user_table = $this->query->ensureTable('ces_users', $this->relationship, $join);
-    $this->user_field = $this->query->addField($this->user_table, 'name');
+    $this->user_table = $this->sqlQuery()->ensureTable('ces_users', $this->relationship, $join);
+    $this->user_field = $this->handlerQuery()->addField($this->user_table, 'name');
 
     // Add the field.
-    $this->query->addOrderBy(NULL, "LOWER(COALESCE($this->user_table.name, $this->tableAlias.$this->field))", $this->options['order'], $this->tableAlias . '_' . $this->field);
+    $this->handlerQuery()->addOrderBy(NULL, "LOWER(COALESCE($this->user_table.name, $this->tableAlias.$this->field))", $this->options['order'], $this->tableAlias . '_' . $this->field);
   }
 
 }

@@ -175,7 +175,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     $this->ensureMyTable();
     // Add the field.
     $params = $this->options['group_type'] != 'group' ? ['function' => $this->options['group_type']] : [];
-    $this->field_alias = $this->query->addField($this->tableAlias, $this->realField, NULL, $params);
+    $this->field_alias = $this->handlerQuery()->addField($this->tableAlias, $this->realField, NULL, $params);
 
     $this->addAdditionalFields();
   }
@@ -210,7 +210,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       foreach ($fields as $identifier => $info) {
         if (is_array($info)) {
           if (isset($info['table'])) {
-            $table_alias = $this->query->ensureTable($info['table'], $this->relationship);
+            $table_alias = $this->sqlQuery()->ensureTable($info['table'], $this->relationship);
           }
           else {
             $table_alias = $this->tableAlias;
@@ -234,10 +234,10 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
           }
 
           $params += $group_params;
-          $this->aliases[$identifier] = $this->query->addField($table_alias, $info['field'], NULL, $params);
+          $this->aliases[$identifier] = $this->handlerQuery()->addField($table_alias, $info['field'], NULL, $params);
         }
         else {
-          $this->aliases[$info] = $this->query->addField($this->tableAlias, $info, NULL, $group_params);
+          $this->aliases[$info] = $this->handlerQuery()->addField($this->tableAlias, $info, NULL, $group_params);
         }
       }
     }
@@ -251,7 +251,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       // Since fields should always have themselves already added, just
       // add a sort on the field.
       $params = $this->options['group_type'] != 'group' ? ['function' => $this->options['group_type']] : [];
-      $this->query->addOrderBy(NULL, NULL, $order, $this->field_alias, $params);
+      $this->handlerQuery()->addOrderBy(NULL, NULL, $order, $this->field_alias, $params);
     }
   }
 

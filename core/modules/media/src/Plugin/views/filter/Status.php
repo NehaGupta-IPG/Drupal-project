@@ -40,7 +40,7 @@ class Status extends FilterPluginBase {
     if ($this->moduleHandler->moduleExists('content_moderation')) {
       $snippet .= ' OR ***VIEW_ANY_UNPUBLISHED_NODES*** = 1';
     }
-    $this->query->addWhereExpression($this->options['group'], $snippet);
+    $this->sqlQuery()->addWhereExpression($this->options['group'], $snippet);
   }
 
   /**

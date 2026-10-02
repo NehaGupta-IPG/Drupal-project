@@ -38,7 +38,7 @@ abstract class SortPluginBase extends HandlerBase implements CacheableDependency
   public function query() {
     $this->ensureMyTable();
     // Add the field.
-    $this->query->addOrderBy($this->tableAlias, $this->realField, $this->options['order']);
+    $this->handlerQuery()->addOrderBy($this->tableAlias, $this->realField, $this->options['order']);
   }
 
   /**

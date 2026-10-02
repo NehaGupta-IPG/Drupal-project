@@ -152,10 +152,10 @@ abstract class RowPluginBase extends PluginBase {
     if (isset($this->base_table)) {
       if (isset($this->options['relationship']) && isset($this->view->relationship[$this->options['relationship']])) {
         $relationship = $this->view->relationship[$this->options['relationship']];
-        $this->field_alias = $this->view->query->addField($relationship->alias, $this->base_field);
+        $this->field_alias = $this->view->query->getHandlerQuery()->addField($relationship->alias, $this->base_field);
       }
       else {
-        $this->field_alias = $this->view->query->addField($this->base_table, $this->base_field);
+        $this->field_alias = $this->view->query->getHandlerQuery()->addField($this->base_table, $this->base_field);
       }
     }
   }

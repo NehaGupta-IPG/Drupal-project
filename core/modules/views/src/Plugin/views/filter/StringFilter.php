@@ -361,7 +361,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
    * Adds a where clause for the operation, 'equals'.
    */
   public function opEqual($field) {
-    $this->query->addWhere($this->options['group'], $field, $this->connection->escapeLike($this->value), $this->operator());
+    $this->handlerQuery()->addWhere($this->options['group'], $field, $this->connection->escapeLike($this->value), $this->operator());
   }
 
   /**
@@ -369,14 +369,14 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
    */
   protected function opContains($field) {
     $operator = $this->getConditionOperator('LIKE');
-    $this->query->addWhere($this->options['group'], $field, '%' . $this->connection->escapeLike($this->value) . '%', $operator);
+    $this->handlerQuery()->addWhere($this->options['group'], $field, '%' . $this->connection->escapeLike($this->value) . '%', $operator);
   }
 
   /**
    * Adds a where clause for the operation, 'contains'.
    */
   protected function opContainsWord($field) {
-    $where = $this->operator == 'word' ? $this->query->getConnection()->condition('OR') : $this->query->getConnection()->condition('AND');
+    $where = $this->operator == 'word' ? $this->sqlQuery()->getConnection()->condition('OR') : $this->sqlQuery()->getConnection()->condition('AND');
 
     // Don't filter on empty strings.
     if (empty($this->value)) {
@@ -405,7 +405,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
 
     // Previously this was a call_user_func_array but that's unnecessary
     // as views will unpack an array that is a single arg.
-    $this->query->addWhere($this->options['group'], $where);
+    $this->handlerQuery()->addWhere($this->options['group'], $where);
   }
 
   /**
@@ -413,7 +413,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
    */
   protected function opStartsWith($field) {
     $operator = $this->getConditionOperator('LIKE');
-    $this->query->addWhere($this->options['group'], $field, $this->connection->escapeLike($this->value) . '%', $operator);
+    $this->handlerQuery()->addWhere($this->options['group'], $field, $this->connection->escapeLike($this->value) . '%', $operator);
   }
 
   /**
@@ -421,7 +421,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
    */
   protected function opNotStartsWith($field) {
     $operator = $this->getConditionOperator('NOT LIKE');
-    $this->query->addWhere($this->options['group'], $field, $this->connection->escapeLike($this->value) . '%', $operator);
+    $this->handlerQuery()->addWhere($this->options['group'], $field, $this->connection->escapeLike($this->value) . '%', $operator);
   }
 
   /**
@@ -429,7 +429,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
    */
   protected function opEndsWith($field) {
     $operator = $this->getConditionOperator('LIKE');
-    $this->query->addWhere($this->options['group'], $field, '%' . $this->connection->escapeLike($this->value), $operator);
+    $this->handlerQuery()->addWhere($this->options['group'], $field, '%' . $this->connection->escapeLike($this->value), $operator);
   }
 
   /**
@@ -437,7 +437,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
    */
   protected function opNotEndsWith($field) {
     $operator = $this->getConditionOperator('NOT LIKE');
-    $this->query->addWhere($this->options['group'], $field, '%' . $this->connection->escapeLike($this->value), $operator);
+    $this->handlerQuery()->addWhere($this->options['group'], $field, '%' . $this->connection->escapeLike($this->value), $operator);
   }
 
   /**
@@ -445,7 +445,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
    */
   protected function opNotLike($field) {
     $operator = $this->getConditionOperator('NOT LIKE');
-    $this->query->addWhere($this->options['group'], $field, '%' . $this->connection->escapeLike($this->value) . '%', $operator);
+    $this->handlerQuery()->addWhere($this->options['group'], $field, '%' . $this->connection->escapeLike($this->value) . '%', $operator);
   }
 
   /**
@@ -455,7 +455,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
     $placeholder = $this->placeholder();
     // Type cast the argument to an integer because the SQLite database driver
     // has to do some specific alterations to the query base on that data type.
-    $this->query->addWhereExpression($this->options['group'], "LENGTH($field) < $placeholder", [$placeholder => (int) $this->value]);
+    $this->sqlQuery()->addWhereExpression($this->options['group'], "LENGTH($field) < $placeholder", [$placeholder => (int) $this->value]);
   }
 
   /**
@@ -465,7 +465,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
     $placeholder = $this->placeholder();
     // Type cast the argument to an integer because the SQLite database driver
     // has to do some specific alterations to the query base on that data type.
-    $this->query->addWhereExpression($this->options['group'], "LENGTH($field) > $placeholder", [$placeholder => (int) $this->value]);
+    $this->sqlQuery()->addWhereExpression($this->options['group'], "LENGTH($field) > $placeholder", [$placeholder => (int) $this->value]);
   }
 
   /**
@@ -475,7 +475,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
    *   The expression pointing to the queries field, for example "foo.bar".
    */
   protected function opRegex($field) {
-    $this->query->addWhere($this->options['group'], $field, $this->value, 'REGEXP');
+    $this->handlerQuery()->addWhere($this->options['group'], $field, $this->value, 'REGEXP');
   }
 
   /**
@@ -485,7 +485,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
    *   The expression pointing to the queries field, for example "foo.bar".
    */
   protected function opNotRegex($field) {
-    $this->query->addWhere($this->options['group'], $field, $this->value, 'NOT REGEXP');
+    $this->handlerQuery()->addWhere($this->options['group'], $field, $this->value, 'NOT REGEXP');
   }
 
   /**
@@ -499,7 +499,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
       $operator = "IS NOT NULL";
     }
 
-    $this->query->addWhere($this->options['group'], $field, NULL, $operator);
+    $this->handlerQuery()->addWhere($this->options['group'], $field, NULL, $operator);
   }
 
 }

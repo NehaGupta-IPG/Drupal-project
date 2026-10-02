@@ -156,7 +156,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
     // This is safe because we are manually scrubbing the values.
     $operator = strtoupper($this->operator);
     $field = $this->query->getDateFormat($this->query->getDateField($field, TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
-    $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
+    $this->sqlQuery()->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
   }
 
   /**
@@ -172,7 +172,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
 
     // This is safe because we are manually scrubbing the value.
     $field = $this->query->getDateFormat($this->query->getDateField($field, TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
-    $this->query->addWhereExpression($this->options['group'], "$field $this->operator $value");
+    $this->sqlQuery()->addWhereExpression($this->options['group'], "$field $this->operator $value");
   }
 
   /**

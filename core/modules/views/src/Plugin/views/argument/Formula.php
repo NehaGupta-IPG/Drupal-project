@@ -55,8 +55,8 @@ class Formula extends ArgumentPluginBase {
     $formula = $this->getFormula();
 
     // Add the field.
-    $this->base_alias = $this->name_alias = $this->query->addField(NULL, $formula, $this->field);
-    $this->query->setCountField(NULL, $formula, $this->field);
+    $this->base_alias = $this->name_alias = $this->handlerQuery()->addField(NULL, $formula, $this->field);
+    $this->sqlQuery()->setCountField(NULL, $formula, $this->field);
 
     return $this->summaryBasics(FALSE);
   }
@@ -72,7 +72,7 @@ class Formula extends ArgumentPluginBase {
     $placeholders = [
       $placeholder => $this->argument,
     ];
-    $this->query->addWhere(0, $formula, $placeholders, 'formula');
+    $this->handlerQuery()->addWhere(0, $formula, $placeholders, 'formula');
   }
 
 }

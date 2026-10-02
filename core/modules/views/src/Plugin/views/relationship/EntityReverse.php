@@ -77,7 +77,7 @@ class EntityReverse extends RelationshipPluginBase {
 
     $first_join = $this->joinManager->createInstance('standard', $first);
 
-    $this->first_alias = $this->query->addTable($this->definition['field table'], $this->relationship, $first_join);
+    $this->first_alias = $this->sqlQuery()->addTable($this->definition['field table'], $this->relationship, $first_join);
 
     // Second, relate the field table to the entity specified using
     // the entity id on the field table and the entity's id field.
@@ -99,7 +99,7 @@ class EntityReverse extends RelationshipPluginBase {
     // Use a short alias for this:
     $alias = $this->definition['field_name'] . '_' . $this->table;
 
-    $this->alias = $this->query->addRelationship($alias, $second_join, $this->definition['base'], $this->relationship);
+    $this->alias = $this->sqlQuery()->addRelationship($alias, $second_join, $this->definition['base'], $this->relationship);
   }
 
 }

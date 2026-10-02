@@ -341,10 +341,10 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       $this->aliases[$column] = $this->tableAlias . '.' . $column;
       // If the query uses DISTINCT we need to add the column too.
       if (!empty($this->view->getQuery()->options['distinct'])) {
-        $this->query->addField($this->tableAlias, $column);
+        $this->handlerQuery()->addField($this->tableAlias, $column);
       }
     }
-    $this->query->addOrderBy(NULL, NULL, $order, $this->aliases[$column]);
+    $this->handlerQuery()->addOrderBy(NULL, NULL, $order, $this->aliases[$column]);
   }
 
   /**

@@ -926,7 +926,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
 
     // Clear out the normal primary field and whatever else may have
     // been added and let the summary do the work.
-    $this->query->clearFields();
+    $this->sqlQuery()->clearFields();
     $this->summaryQuery();
 
     $by = $this->options['summary']['number_of_records'] ? 'num_records' : NULL;
@@ -950,7 +950,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
   protected function summaryQuery() {
     $this->ensureMyTable();
     // Add the field.
-    $this->base_alias = $this->query->addField($this->tableAlias, $this->realField);
+    $this->base_alias = $this->handlerQuery()->addField($this->tableAlias, $this->realField);
 
     $this->summaryNameField();
     $this->summaryBasics();
@@ -973,11 +973,11 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
         if ($j) {
           $join = clone $j;
           $join->leftTable = $this->tableAlias;
-          $this->name_table_alias = $this->query->addTable($this->name_table, $this->relationship, $join);
+          $this->name_table_alias = $this->sqlQuery()->addTable($this->name_table, $this->relationship, $join);
         }
       }
       else {
-        $this->name_table_alias = $this->query->ensureTable($this->name_table, $this->relationship);
+        $this->name_table_alias = $this->sqlQuery()->ensureTable($this->name_table, $this->relationship);
       }
     }
     else {
@@ -985,7 +985,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
     }
 
     if (isset($this->name_field)) {
-      $this->name_alias = $this->query->addField($this->name_table_alias, $this->name_field);
+      $this->name_alias = $this->handlerQuery()->addField($this->name_table_alias, $this->name_field);
     }
     else {
       $this->name_alias = $this->base_alias;
@@ -1002,17 +1002,17 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
     // Add the number of nodes counter.
     $distinct = ($this->view->display_handler->getOption('distinct') && empty($this->query->no_distinct));
 
-    $count_alias = $this->query->addField($this->view->storage->get('base_table'),
+    $count_alias = $this->handlerQuery()->addField($this->view->storage->get('base_table'),
       $this->view->storage->get('base_field'),
       'num_records',
       [
         'count' => TRUE,
         'distinct' => $distinct,
       ]);
-    $this->query->addGroupBy($this->name_alias);
+    $this->sqlQuery()->addGroupBy($this->name_alias);
 
     if ($count_field) {
-      $this->query->setCountField($this->tableAlias, $this->realField);
+      $this->sqlQuery()->setCountField($this->tableAlias, $this->realField);
     }
 
     $this->count_alias = $count_alias;
@@ -1030,7 +1030,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    *   Defaults to NULL.
    */
   public function summarySort($order, $by = NULL) {
-    $this->query->addOrderBy(NULL, NULL, $order, (!empty($by) ? $by : $this->name_alias));
+    $this->handlerQuery()->addOrderBy(NULL, NULL, $order, (!empty($by) ? $by : $this->name_alias));
   }
 
   /**
@@ -1067,7 +1067,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    */
   public function query($group_by = FALSE) {
     $this->ensureMyTable();
-    $this->query->addWhere(0, "$this->tableAlias.$this->realField", $this->argument);
+    $this->handlerQuery()->addWhere(0, "$this->tableAlias.$this->realField", $this->argument);
   }
 
   /**

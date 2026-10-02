@@ -13,6 +13,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\views\Plugin\views\query\HandlerQueryInterface;
+use Drupal\views\Plugin\views\query\SqlQueryInterface;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
@@ -585,7 +587,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    *   A placeholder which contains the table and the fieldname.
    */
   protected function placeholder() {
-    return $this->query->placeholder($this->table . '_' . $this->field);
+    return $this->sqlQuery()->placeholder($this->table . '_' . $this->field);
   }
 
   /**
@@ -618,11 +620,31 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
   }
 
   /**
+   * Returns common handler query operations.
+   */
+  protected function handlerQuery(): HandlerQueryInterface {
+    return $this->query->getHandlerQuery();
+  }
+
+  /**
+   * Returns SQL-specific handler query operations.
+   */
+  protected function sqlQuery(): SqlQueryInterface {
+    return $this->query->getSqlQuery();
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function ensureMyTable() {
     if (!isset($this->tableAlias)) {
-      $this->tableAlias = $this->query->ensureTable($this->table, $this->relationship);
+      if ($this->query instanceof SqlQueryInterface || method_exists($this->query, 'ensureTable')) {
+        $this->tableAlias = $this->sqlQuery()->ensureTable($this->table, $this->relationship);
+      }
+      else {
+        // Query plugins without table semantics do not need a table alias.
+        $this->tableAlias = '';
+      }
     }
     return $this->tableAlias;
   }
