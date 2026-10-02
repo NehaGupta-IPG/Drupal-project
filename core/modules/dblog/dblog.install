@@ -16,6 +16,7 @@ use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\user\Entity\Role;
 use Drupal\views\Entity\View;
+use Drupal\views\ViewExecutable;
 
 /**
  * Implements hook_schema().
@@ -141,12 +142,13 @@ function dblog_update_112001(&$sandbox): void {
 function dblog_update_112002(&$sandbox): void {
   if (\Drupal::service('module_handler')->moduleExists('views')) {
     // Load the Watchdog view.
-    $watchdog_view = \Drupal::entityTypeManager()->getStorage('view')->load('watchdog');
+    $watchdog_view = View::load('watchdog')->getExecutable();
 
-    if ($watchdog_view instanceof View) {
+    if ($watchdog_view instanceof ViewExecutable) {
       // Get the permission used on the default display.
+      $watchdog_view->setDisplay('default');
       $current_permission = $watchdog_view
-        ->getDisplay('default')
+        ->display_handler
         ->getOption('access')['options']['perm'];
 
       if ($current_permission === 'access site reports') {

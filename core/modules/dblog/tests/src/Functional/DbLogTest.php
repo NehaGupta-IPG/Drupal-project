@@ -87,7 +87,6 @@ class DbLogTest extends BrowserTestBase {
     ]);
     $this->userWithSiteReportsPermissions = $this->drupalCreateUser([
       'access administration pages',
-      'access dblog reports',
       'access site reports',
     ]);
     $this->userWithDblogReportsPermissions = $this->drupalCreateUser([
@@ -95,7 +94,7 @@ class DbLogTest extends BrowserTestBase {
       'access dblog reports',
       'access site reports',
     ]);
-    $this->webUser = $this->drupalCreateUser([]);
+    $this->webUser = $this->drupalCreateUser();
   }
 
   /**
@@ -228,8 +227,9 @@ class DbLogTest extends BrowserTestBase {
 
     $this->drupalLogin($this->userWithSiteReportsPermissions);
 
-    // Check if the Reports menu item exists.
-    $assert_session->elementExists('xpath', "//a[@id='toolbar-link-system-admin_reports'][@href='/admin/reports']");
+    // Check if the user can access the Reports page.
+    $this->drupalGet('/admin/reports');
+    $assert_session->statusCodeEquals(200);
 
     // Make sure the user can't reach the Recent log messages page.
     $this->drupalGet('/admin/reports/dblog');
