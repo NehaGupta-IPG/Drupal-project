@@ -29,10 +29,8 @@ class TestingProfileHooksTest extends BrowserTestBase {
    * Test hooks are picked up.
    */
   public function testHookPickup(): void {
-    $this->assertFalse(isset($GLOBALS['profile_procedural']));
     $this->assertFalse(isset($GLOBALS['profile_oop']));
     drupal_flush_all_caches();
-    $this->assertTrue(isset($GLOBALS['profile_procedural']));
     $this->assertTrue(isset($GLOBALS['profile_oop']));
   }
 

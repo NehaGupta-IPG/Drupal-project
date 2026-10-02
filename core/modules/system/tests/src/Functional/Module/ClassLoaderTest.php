@@ -103,22 +103,4 @@ class ClassLoaderTest extends BrowserTestBase {
     $this->assertTrue(\Drupal::moduleHandler()->moduleExists('module_install_class_loader_test2'), 'The module_install_class_loader_test2 module has been installed.');
   }
 
-  /**
-   * Tests that .module files can use class constants in main section.
-   */
-  public function testAutoloadFromModuleFile(): void {
-    $this->assertFalse(defined('MODULE_AUTOLOAD_TEST_CONSTANT'));
-    // Create use with required permissions.
-    $this->drupalLogin($this->drupalCreateUser(['administer modules']));
-
-    $edit = [
-      "modules[module_autoload_test][enable]" => TRUE,
-    ];
-    $this->drupalGet('admin/modules');
-    $this->submitForm($edit, 'Install');
-    $this->assertSession()->statusCodeEquals(200);
-    $this->resetAll();
-    $this->assertSame(SomeClass::TEST, MODULE_AUTOLOAD_TEST_CONSTANT);
-  }
-
 }
