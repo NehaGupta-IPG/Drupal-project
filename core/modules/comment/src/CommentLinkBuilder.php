@@ -73,7 +73,8 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
         continue;
       }
       $links = [];
-      $commenting_status = CommentingStatus::tryFrom((int) $entity->get($field_name)->status);
+      $field = $entity->get($field_name);
+      $commenting_status = CommentingStatus::tryFrom((int) $field->status);
       if ($commenting_status != CommentingStatus::Hidden) {
         // Entity has commenting status open or closed.
         $field_definition = $entity->getFieldDefinition($field_name);
@@ -81,20 +82,18 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
           // Teaser view: display the number of comments that have been posted,
           // or a link to add new comments if the user has permission, the
           // entity is open to new comments, and there currently are none.
-          if ($this->currentUser->hasPermission('access comments')) {
-            if (!empty($entity->get($field_name)->comment_count)) {
-              $links['comment-comments'] = [
-                'title' => $this->formatPlural($entity->get($field_name)->comment_count, '1 comment', '@count comments'),
-                'attributes' => ['title' => $this->t('Jump to the first comment.')],
-                'fragment' => 'comments',
-                'url' => $entity->toUrl(),
-              ];
-            }
+          if ($field->comment_count > 0 && $field->access('view comment list', $this->currentUser)) {
+            $links['comment-comments'] = [
+              'title' => $this->formatPlural($field->comment_count, '1 comment', '@count comments'),
+              'attributes' => ['title' => $this->t('Jump to the first comment.')],
+              'fragment' => 'comments',
+              'url' => $entity->toUrl(),
+            ];
           }
           // Provide a link to new comment form.
           if ($commenting_status == CommentingStatus::Open) {
             $comment_form_location = FormLocation::tryFrom((int) $field_definition->getSetting('form_location'));
-            if ($this->currentUser->hasPermission('post comments')) {
+            if ($field->access('create', $this->currentUser)) {
               $links['comment-add'] = [
                 'title' => $this->t('Add new comment'),
                 'language' => $entity->language(),
@@ -125,10 +124,12 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
           // comments.
           if ($commenting_status == CommentingStatus::Open) {
             $comment_form_location = FormLocation::tryFrom((int) $field_definition->getSetting('form_location'));
-            if ($this->currentUser->hasPermission('post comments')) {
+            if ($field->access('create', $this->currentUser)) {
               // Show the "post comment" link if the form is on another page, or
               // if there are existing comments that the link will skip past.
-              if ($comment_form_location == FormLocation::SeparatePage || (!empty($entity->get($field_name)->comment_count) && $this->currentUser->hasPermission('access comments'))) {
+              $separate_form_location = $comment_form_location === FormLocation::SeparatePage;
+              $existing_comments = $field->comment_count > 0 && $field->access('view comment list', $this->currentUser);
+              if ($separate_form_location || $existing_comments) {
                 $links['comment-add'] = [
                   'title' => $this->t('Add new comment'),
                   'attributes' => ['title' => $this->t('Share your thoughts and opinions.')],

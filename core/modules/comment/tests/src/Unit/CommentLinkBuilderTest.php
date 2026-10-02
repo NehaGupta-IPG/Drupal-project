@@ -9,6 +9,7 @@ use Drupal\comment\CommentLinkBuilder;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\FormLocation;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
@@ -171,7 +172,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
       'is_anonymous' => [FALSE, TRUE],
       'comment_count' => [0, 1],
       'has_access_comments' => [0, 1],
-      'has_post_comments'   => [0, 1],
+      'has_post_comments' => [0, 1],
       'form_location' => FormLocation::cases(),
       'comments' => CommentingStatus::cases(),
       'view_mode' => [
@@ -258,11 +259,24 @@ class CommentLinkBuilderTest extends UnitTestCase {
     if (empty($this->timestamp)) {
       $this->timestamp = time();
     }
-    $field_item = (object) [
-      'status' => $comment_status->value,
-      'comment_count' => $comment_count,
-      'last_comment_timestamp' => $this->timestamp,
-    ];
+    $field_item = $this->createStub(FieldItemListInterface::class);
+    $field_item
+      ->method('__get')
+      ->willReturnMap([
+        ['status', $comment_status->value],
+        ['comment_count', $comment_count],
+        ['last_comment_timestamp', $this->timestamp],
+      ]);
+    $field_item
+      ->method('access')
+      ->willReturnCallback(function ($operation, $account) {
+        return match ($operation) {
+          'view comment list' => $account->hasPermission('access comments'),
+          'view' => $account->hasPermission('access comments') || $account->hasPermission('post comments'),
+          'create' => $account->hasPermission('post comments'),
+          default => FALSE,
+        };
+      });
     $node
       ->method('get')
       ->willReturn($field_item);

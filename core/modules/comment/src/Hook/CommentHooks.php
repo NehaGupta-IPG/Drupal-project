@@ -357,12 +357,14 @@ class CommentHooks {
       }
       // Do not make a string if comments are hidden.
       $status = CommentingStatus::tryFrom((int) $node->get($field_name)->status);
-      if (\Drupal::currentUser()->hasPermission('access comments') && $status != CommentingStatus::Hidden) {
+      if ($status != CommentingStatus::Hidden) {
         if ($status == CommentingStatus::Open) {
           // At least one comment field is open.
           $open = TRUE;
         }
-        $comments += $node->get($field_name)->comment_count;
+        if ($node->get($field_name)->access('view comment list')) {
+          $comments += $node->get($field_name)->comment_count;
+        }
       }
     }
     // Do not make a string if there are no comment fields, or no comments exist

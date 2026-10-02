@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\comment_test\Hook;
 
+use Drupal\comment_test\CommentTestAccessControlHandler;
 use Drupal\Core\Url;
 use Drupal\comment\CommentInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -25,6 +26,8 @@ class CommentTestHooks {
       $translation['comment_test'] = TRUE;
       $entity_types['comment']->set('translation', $translation);
     }
+
+    $entity_types['comment']->setHandlerClass('access', CommentTestAccessControlHandler::class);
   }
 
   /**

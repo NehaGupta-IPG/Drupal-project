@@ -2,6 +2,7 @@
 
 namespace Drupal\comment;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -112,8 +113,16 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
       'comment_type' => $comment_type_id,
       'pid' => NULL,
     ];
-    $comment = $this->entityTypeManager->getStorage('comment')->create($values);
-    return $this->entityFormBuilder->getForm($comment);
+    $host = $this->entityTypeManager->getStorage($commented_entity_type_id)->load($commented_entity_id);
+    $access = $host->get($field_name)->access('create', $this->currentUser, TRUE);
+    $form = $access->isAllowed() ? $this->entityFormBuilder->getForm($this->entityTypeManager->getStorage('comment')->create($values)) : [];
+
+    // Merge access cacheable metadata into the form render array.
+    CacheableMetadata::createFromRenderArray($form)
+      ->merge(CacheableMetadata::createFromObject($access))
+      ->applyTo($form);
+
+    return $form;
   }
 
   /**
@@ -190,9 +199,8 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
         ];
       }
       $field_definition = $commented_entity->getFieldDefinition($entity->getFieldName());
-      if ($entity->isPublished()
-        && $entity->access('create')
-        && $field_definition->getSetting('default_mode') === CommentManagerInterface::COMMENT_MODE_THREADED) {
+      $is_threaded = $field_definition->getSetting('default_mode') === CommentManagerInterface::COMMENT_MODE_THREADED;
+      if ($is_threaded && $entity->access('reply')) {
         $links['comment-reply'] = [
           'title' => $this->t('Reply'),
           'url' => Url::fromRoute('comment.reply', [
