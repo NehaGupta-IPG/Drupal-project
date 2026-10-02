@@ -37,4 +37,5 @@ class DeprecatedController {
     @trigger_error('This is the deprecation message for deprecation_test_function().', E_USER_DEPRECATED);
     return 'known_return_value';
   }
+
 }
