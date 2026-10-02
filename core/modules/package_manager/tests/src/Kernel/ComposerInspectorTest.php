@@ -502,8 +502,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
    *   The Composer configuration to set.
    * @param array|bool $expected_value
    *   The expected return value from getAllowPluginsConfig().
-   *
-   * @legacy-covers ::getAllowPluginsConfig
    */
   #[DataProvider('providerAllowedPlugins')]
   public function testAllowedPlugins(array $config, bool|array $expected_value): void {

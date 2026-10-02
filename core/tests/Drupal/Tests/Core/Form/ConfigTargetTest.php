@@ -67,8 +67,6 @@ class ConfigTargetTest extends UnitTestCase {
 
   /**
    * Tests form cacheable.
-   *
-   * @legacy-covers \Drupal\Core\Form\ConfigFormBase::storeConfigKeyToFormElementMap
    */
   #[DataProvider('providerTestFormCacheable')]
   public function testFormCacheable(bool $expected, ?callable $fromConfig, ?callable $toConfig): void {
@@ -123,9 +121,6 @@ class ConfigTargetTest extends UnitTestCase {
 
   /**
    * Tests from form string.
-   *
-   * @legacy-covers ::fromForm
-   * @legacy-covers ::fromString
    */
   public function testFromFormString(): void {
     $form = [
@@ -148,8 +143,6 @@ class ConfigTargetTest extends UnitTestCase {
 
   /**
    * Tests from form config target.
-   *
-   * @legacy-covers ::fromForm
    */
   public function testFromFormConfigTarget(): void {
     $form = [
@@ -171,8 +164,6 @@ class ConfigTargetTest extends UnitTestCase {
 
   /**
    * Tests from form exception.
-   *
-   * @legacy-covers ::fromForm
    */
   #[DataProvider('providerTestFromFormException')]
   public function testFromFormException(array $form, array $array_parents, string $exception_message): void {

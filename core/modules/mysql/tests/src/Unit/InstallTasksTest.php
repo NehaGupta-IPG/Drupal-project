@@ -98,9 +98,6 @@ class InstallTasksTest extends UnitTestCase {
 
   /**
    * Tests name and minimum version.
-   *
-   * @legacy-covers ::minimumVersion
-   * @legacy-covers ::name
    */
   #[DataProvider('providerNameAndMinimumVersion')]
   public function testNameAndMinimumVersion(bool $is_mariadb, string $expected_name, string $expected_minimum_version): void {
@@ -142,8 +139,6 @@ class InstallTasksTest extends UnitTestCase {
 
   /**
    * Tests name with no connection.
-   *
-   * @legacy-covers ::name
    */
   public function testNameWithNoConnection(): void {
     $tasks = $this->createTasksNoConnection();

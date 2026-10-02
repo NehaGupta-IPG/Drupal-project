@@ -261,8 +261,6 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate property.
-   *
-   * @legacy-covers ::validateProperty
    */
   public function testValidateProperty(): void {
     $typed_data = $this->buildExampleTypedDataWithProperties();
@@ -281,8 +279,6 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate property value with invalid objects.
-   *
-   * @legacy-covers ::validatePropertyValue
    */
   #[DataProvider('providerTestValidatePropertyWithInvalidObjects')]
   public function testValidatePropertyValueWithInvalidObjects(object $object): void {
@@ -292,8 +288,6 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate property value.
-   *
-   * @legacy-covers ::validatePropertyValue
    */
   public function testValidatePropertyValue(): void {
     $typed_data = $this->buildExampleTypedDataWithProperties(['subkey1' => 'subvalue11', 'subkey2' => 'subvalue22']);
