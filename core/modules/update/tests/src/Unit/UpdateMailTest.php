@@ -58,7 +58,6 @@ class UpdateMailTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    include_once __DIR__ . '/../../../update.module';
 
     // Initialize the container.
     $this->container = new ContainerBuilder();
