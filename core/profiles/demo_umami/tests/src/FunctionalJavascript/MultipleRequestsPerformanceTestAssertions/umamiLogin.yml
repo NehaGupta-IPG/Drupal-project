@@ -1,8 +1,8 @@
 QueryCount: 15
-CacheGetCount: 97
+CacheGetCount: 98
 CacheGetCountByBin:
   config: 28
-  bootstrap: 17
+  bootstrap: 18
   discovery: 32
   data: 5
   entity: 4

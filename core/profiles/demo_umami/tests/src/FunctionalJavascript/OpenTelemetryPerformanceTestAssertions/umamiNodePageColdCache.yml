@@ -1,9 +1,9 @@
-QueryCount: 194
-CacheGetCount: 221
+QueryCount: 196
+CacheGetCount: 223
 CacheGetCountByBin:
   page: 1
-  config: 53
-  bootstrap: 15
+  config: 54
+  bootstrap: 16
   discovery: 82
   data: 8
   entity: 23
@@ -13,10 +13,10 @@ CacheGetCountByBin:
   render: 16
   menu: 3
   file_parsing: 2
-CacheSetCount: 229
+CacheSetCount: 231
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
-CacheTagLookupQueryCount: 25
+CacheTagLookupQueryCount: 24
 CacheTagGroupedLookups:
   -
     - entity_types
@@ -74,10 +74,9 @@ CacheTagGroupedLookups:
     - 'block_content:1'
     - 'block_content:2'
     - 'config:configurable_language_list'
+    - 'config:system.site'
   -
     - 'config:system.menu.footer'
-  -
-    - 'config:system.site'
   -
     - 'node:1:revisions'
   -
