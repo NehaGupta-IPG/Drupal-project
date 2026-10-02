@@ -99,9 +99,9 @@ variables:
 #############
 stages:
   - 🪄 Lint
+  - 📚 Documentation
   - ⚡️ Tests
   - 🗜️ Additional tests
-  - 📚 Documentation
 
 #############
 # Defaults  #
