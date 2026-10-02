@@ -74,8 +74,6 @@ class EntityWithoutBaseTableTest extends KernelTestBase {
 
   /**
    * Tests that the entity without a data table doesn't emit deprecation notice.
-   *
-   * @legacy-covers ::defaultFieldImplementation
    */
   public function testEntityWithoutDataTable(): void {
     $entity_type = $this->container->get('entity_type.manager')->getDefinition('entity_test_label');

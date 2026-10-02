@@ -29,8 +29,6 @@ class DriverModuleMissingDependenciesTest extends UnitTestCase {
 
   /**
    * Tests determine drivers autoloading failing on missing dependency.
-   *
-   * @legacy-covers ::get
    */
   public function testDetermineDriversAutoloadingFailingOnMissingDependency(): void {
     $root = realpath(dirname(__FILE__) . '/fixtures');

@@ -56,8 +56,6 @@ class ContentEntityStorageBaseTest extends KernelTestBase {
 
   /**
    * Tests re create.
-   *
-   * @legacy-covers ::create
    */
   public function testReCreate(): void {
     $storage = $this->container->get('entity_type.manager')->getStorage('entity_test');

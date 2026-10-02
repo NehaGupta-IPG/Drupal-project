@@ -258,8 +258,6 @@ class DrupalKernelTest extends KernelTestBase {
    *
    * @param bool $value
    *   The value to set class_loader_auto_detect to.
-   *
-   * @legacy-covers ::boot
    */
   #[DataProvider('providerClassLoaderAutoDetect')]
   #[PreserveGlobalState(FALSE)]

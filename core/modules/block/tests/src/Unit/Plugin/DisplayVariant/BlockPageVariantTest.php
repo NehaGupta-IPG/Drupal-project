@@ -264,8 +264,6 @@ class BlockPageVariantTest extends UnitTestCase {
 
   /**
    * Tests that cache metadata in the plugin are present in the build.
-   *
-   * @legacy-covers ::build
    */
   public function testCacheMetadataFromPlugin(): void {
     $display_variant = $this->setUpDisplayVariant();

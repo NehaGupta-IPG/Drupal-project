@@ -84,9 +84,6 @@ class ViewsModerationStateFilterTest extends ViewTestBase {
 
   /**
    * Tests the dependency handling of the moderation state filter.
-   *
-   * @legacy-covers ::calculateDependencies
-   * @legacy-covers ::onDependencyRemoval
    */
   public function testModerationStateFilterDependencyHandling(): void {
     // First, check that the view doesn't have any config dependency when there

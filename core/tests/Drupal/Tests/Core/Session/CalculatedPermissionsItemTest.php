@@ -19,12 +19,6 @@ class CalculatedPermissionsItemTest extends UnitTestCase {
 
   /**
    * Tests that the object values were set in the constructor.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getIdentifier
-   * @legacy-covers ::getScope
-   * @legacy-covers ::getPermissions
-   * @legacy-covers ::isAdmin
    */
   public function testConstructor(): void {
     $scope = 'some_scope';

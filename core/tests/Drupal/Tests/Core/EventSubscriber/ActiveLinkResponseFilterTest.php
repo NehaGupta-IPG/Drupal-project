@@ -843,8 +843,6 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
 
   /**
    * Tests ActiveLinkResponseFilter only affects HTML responses.
-   *
-   * @legacy-covers ::onResponse
    */
   public function testOnlyHtml(): void {
     $session = new AnonymousUserSession();
@@ -882,8 +880,6 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
 
   /**
    * Tests certain response types ignored by the ActiveLinkResponseFilter.
-   *
-   * @legacy-covers ::onResponse
    */
   public function testSkipCertainResponseTypes(): void {
     $session = new AnonymousUserSession();

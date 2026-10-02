@@ -26,7 +26,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Yaml\Yaml;
 
 // cspell:ignore onhover baguette
-
 /**
  * Tests Validators.
  */
@@ -86,10 +85,6 @@ class ValidatorsTest extends KernelTestBase {
    * @param array $expected_violations
    *   All expected violations for the given CKEditor 5 settings, with property
    *   path as keys and message as values.
-   *
-   * @legacy-covers \Drupal\ckeditor5\Plugin\Validation\Constraint\CKEditor5ElementConstraintValidator
-   * @legacy-covers \Drupal\ckeditor5\Plugin\Validation\Constraint\StyleSensibleElementConstraintValidator
-   * @legacy-covers \Drupal\ckeditor5\Plugin\Validation\Constraint\UniqueLabelInListConstraintValidator
    */
   #[DataProvider('provider')]
   public function test(array $ckeditor5_settings, array $expected_violations): void {
@@ -678,8 +673,6 @@ class ValidatorsTest extends KernelTestBase {
    *   The paired text format's filters and filter settings.
    * @param array $expected_violations
    *   All expected violations for the pair.
-   *
-   * @legacy-covers \Drupal\ckeditor5\Plugin\Validation\Constraint\SourceEditingPreventSelfXssConstraintValidator
    */
   #[DataProvider('providerPair')]
   public function testPair(array $ckeditor5_settings, array $editor_image_upload_settings, array $filters, array $expected_violations): void {
@@ -1610,8 +1603,6 @@ class ValidatorsTest extends KernelTestBase {
 
   /**
    * Tests that validation works with >1 enabled HTML restrictor filters.
-   *
-   * @legacy-covers \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator::checkHtmlRestrictionsMatch
    */
   public function testMultipleHtmlRestrictingFilters(): void {
     $this->container->get('module_installer')->install(['filter_test']);

@@ -47,8 +47,6 @@ class AnnounceFetcherUnitTest extends UnitTestCase {
 
   /**
    * Test the ValidateUrl() method.
-   *
-   * @legacy-covers \Drupal\announcements_feed\AnnounceFetcher::validateUrl
    */
   #[DataProvider('urlProvider')]
   public function testValidateUrl(string $url, bool $isValid): void {

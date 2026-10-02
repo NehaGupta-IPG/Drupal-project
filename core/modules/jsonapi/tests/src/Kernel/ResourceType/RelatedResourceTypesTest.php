@@ -137,8 +137,6 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
 
   /**
    * Tests get relatable resource types provider.
-   *
-   * @legacy-covers ::getRelatableResourceTypes
    */
   #[DataProvider('getRelatableResourceTypesProvider')]
   public static function getRelatableResourceTypesProvider(): array {
@@ -184,9 +182,6 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
    *
    *
    * @link https://www.drupal.org/project/drupal/issues/2996114
-   * @legacy-covers \Drupal\jsonapi\ResourceType\ResourceTypeRepository::all
-   * @legacy-covers \Drupal\jsonapi\ResourceType\ResourceTypeRepository::calculateRelatableResourceTypes
-   * @legacy-covers \Drupal\jsonapi\ResourceType\ResourceTypeRepository::getRelatableResourceTypesFromFieldDefinition
    */
   public function testGetRelatableResourceTypesFromFieldDefinition(): void {
     $field_config_storage = $this->container->get('entity_type.manager')->getStorage('field_config');

@@ -21,8 +21,6 @@ class PercentagesTest extends UnitTestCase {
 
   /**
    * Tests percentages.
-   *
-   * @legacy-covers ::format
    */
   #[DataProvider('providerTestPercentages')]
   public function testPercentages(int $total, int|float $current, string $expected_result): void {

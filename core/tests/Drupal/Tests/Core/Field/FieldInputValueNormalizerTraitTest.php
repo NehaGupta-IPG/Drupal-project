@@ -21,8 +21,6 @@ class FieldInputValueNormalizerTraitTest extends UnitTestCase {
 
   /**
    * Tests key value by delta.
-   *
-   * @legacy-covers ::normalizeValue
    */
   #[DataProvider('keyValueByDeltaTestCases')]
   public function testKeyValueByDelta(int|string|array|null $input_value, array $expected_value, $main_property_name = 'value'): void {
@@ -90,8 +88,6 @@ class FieldInputValueNormalizerTraitTest extends UnitTestCase {
 
   /**
    * Tests scalar with no main property.
-   *
-   * @legacy-covers ::normalizeValue
    */
   public function testScalarWithNoMainProperty(): void {
     $this->expectException(\InvalidArgumentException::class);
@@ -102,8 +98,6 @@ class FieldInputValueNormalizerTraitTest extends UnitTestCase {
 
   /**
    * Tests key value by delta undefined variables.
-   *
-   * @legacy-covers ::normalizeValue
    */
   public function testKeyValueByDeltaUndefinedVariables(): void {
     $this->assertEquals([], $this->normalizeValue($undefined_variable, 'value'));

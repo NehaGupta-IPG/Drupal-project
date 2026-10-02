@@ -638,11 +638,6 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    *   The initial primary key of the test table.
    * @param array $renamed_primary_key
    *   The primary key of the test table after renaming the test field.
-   *
-   * @legacy-covers ::addField
-   * @legacy-covers ::changeField
-   * @legacy-covers ::dropField
-   * @legacy-covers ::findPrimaryKeyColumns
    */
   #[DataProvider('providerTestSchemaCreateTablePrimaryKey')]
   public function testSchemaChangePrimaryKey(array $initial_primary_key, array $renamed_primary_key): void {

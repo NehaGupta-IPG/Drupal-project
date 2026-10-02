@@ -24,9 +24,6 @@ class AccountProxyTest extends UnitTestCase {
 
   /**
    * Tests id.
-   *
-   * @legacy-covers ::id
-   * @legacy-covers ::setInitialAccountId
    */
   public function testId(): void {
     $dispatcher = $this->prophesize(EventDispatcherInterface::class);

@@ -226,11 +226,6 @@ class EntityRevisionsTest extends BrowserTestBase {
 
   /**
    * Tests manual revert of the revision ID value.
-   *
-   * @legacy-covers \Drupal\Core\Entity\ContentEntityBase::getRevisionId
-   * @legacy-covers \Drupal\Core\Entity\ContentEntityBase::getLoadedRevisionId
-   * @legacy-covers \Drupal\Core\Entity\ContentEntityBase::setNewRevision
-   * @legacy-covers \Drupal\Core\Entity\ContentEntityBase::isNewRevision
    */
   public function testNewRevisionRevert(): void {
     $entity = EntityTestMulRev::create(['name' => 'EntityLoadedRevisionTest']);

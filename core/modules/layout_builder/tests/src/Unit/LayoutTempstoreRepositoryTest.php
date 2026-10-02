@@ -21,9 +21,6 @@ class LayoutTempstoreRepositoryTest extends UnitTestCase {
 
   /**
    * Tests get empty tempstore.
-   *
-   * @legacy-covers ::get
-   * @legacy-covers ::has
    */
   public function testGetEmptyTempstore(): void {
     $section_storage = $this->prophesize(SectionStorageInterface::class);
@@ -46,9 +43,6 @@ class LayoutTempstoreRepositoryTest extends UnitTestCase {
 
   /**
    * Tests get loaded tempstore.
-   *
-   * @legacy-covers ::get
-   * @legacy-covers ::has
    */
   public function testGetLoadedTempstore(): void {
     $section_storage = $this->prophesize(SectionStorageInterface::class);

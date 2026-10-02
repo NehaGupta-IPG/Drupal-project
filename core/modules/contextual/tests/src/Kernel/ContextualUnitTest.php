@@ -114,8 +114,6 @@ class ContextualUnitTest extends KernelTestBase {
    *   The serialized representation of the passed links.
    * @param string $theme
    *   The name of the theme the placeholder should pass to the controller.
-   *
-   * @legacy-covers \Drupal\contextual\ContextualLinksSerializer::linksToId()
    */
   #[DataProvider('contextualLinksDataProvider')]
   public function testContextualLinksToId(array $links, string $id, string $theme): void {
@@ -131,8 +129,6 @@ class ContextualUnitTest extends KernelTestBase {
    *   The serialized representation of the passed links.
    * @param string $theme
    *   The name of the theme the placeholder should pass to the controller.
-   *
-   * @legacy-covers \Drupal\contextual\ContextualLinksSerializer::idToLinks()
    */
   #[DataProvider('contextualLinksDataProvider')]
   public function testContextualIdToLinks(array $links, string $id, string $theme): void {
@@ -148,8 +144,6 @@ class ContextualUnitTest extends KernelTestBase {
    *   The serialized representation of the passed links.
    * @param string $theme
    *   The name of the theme the placeholder should pass to the controller.
-   *
-   * @legacy-covers \Drupal\contextual\Element\ContextualLinksPlaceholder::preRenderPlaceholder
    */
   #[DataProvider('contextualLinksDataProvider')]
   public function testThemePlaceholder(array $links, string $id, string $theme): void {

@@ -37,8 +37,6 @@ class FiberPlaceholderTest extends UnitTestCase {
 
   /**
    * Tests long placeholder fiber suspending loop.
-   *
-   * @legacy-covers \Drupal\big_pipe\Render\BigPipe::sendPlaceholders
    */
   public function testLongPlaceholderFiberSuspendingLoop(): void {
     $request_stack = $this->prophesize(RequestStack::class);

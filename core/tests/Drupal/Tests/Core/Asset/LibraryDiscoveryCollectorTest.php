@@ -176,8 +176,6 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
 
   /**
    * Tests library with an extend.
-   *
-   * @legacy-covers ::applyLibrariesExtend
    */
   public function testLibrariesExtend(): void {
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
@@ -219,8 +217,6 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
 
   /**
    * Tests a deprecated library with an extend.
-   *
-   * @legacy-covers ::applyLibrariesExtend
    */
   #[IgnoreDeprecations]
   public function testLibrariesExtendDeprecated(): void {

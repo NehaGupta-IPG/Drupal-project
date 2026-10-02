@@ -40,8 +40,6 @@ class MoveTest extends FileManagedUnitTestBase {
 
   /**
    * Move a normal file.
-   *
-   * @legacy-covers ::move
    */
   public function testNormal(): void {
     $contents = $this->randomMachineName(10);
@@ -72,8 +70,6 @@ class MoveTest extends FileManagedUnitTestBase {
 
   /**
    * Tests renaming when moving onto a file that already exists.
-   *
-   * @legacy-covers ::move
    */
   public function testExistingRename(): void {
     // Setup a file to overwrite.
@@ -109,8 +105,6 @@ class MoveTest extends FileManagedUnitTestBase {
 
   /**
    * Tests replacement when moving onto a file that already exists.
-   *
-   * @legacy-covers ::move
    */
   public function testExistingReplace(): void {
     // Setup a file to overwrite.
@@ -143,8 +137,6 @@ class MoveTest extends FileManagedUnitTestBase {
 
   /**
    * Tests replacement when moving onto itself.
-   *
-   * @legacy-covers ::move
    */
   public function testExistingReplaceSelf(): void {
     // Setup a file to overwrite.
@@ -172,8 +164,6 @@ class MoveTest extends FileManagedUnitTestBase {
 
   /**
    * Tests that moving onto an existing file fails when instructed to do so.
-   *
-   * @legacy-covers ::move
    */
   public function testExistingError(): void {
     $contents = $this->randomMachineName(10);
@@ -206,8 +196,6 @@ class MoveTest extends FileManagedUnitTestBase {
 
   /**
    * Tests for an invalid stream wrapper.
-   *
-   * @legacy-covers ::move
    */
   public function testInvalidStreamWrapper(): void {
     $this->expectException(InvalidStreamWrapperException::class);
@@ -218,8 +206,6 @@ class MoveTest extends FileManagedUnitTestBase {
 
   /**
    * Tests for entity storage exception.
-   *
-   * @legacy-covers ::move
    */
   public function testEntityStorageException(): void {
     /** @var \Drupal\Core\Entity\EntityTypeManager $entityTypeManager */

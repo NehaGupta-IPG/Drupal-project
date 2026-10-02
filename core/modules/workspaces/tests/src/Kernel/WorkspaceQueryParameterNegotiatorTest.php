@@ -55,8 +55,6 @@ class WorkspaceQueryParameterNegotiatorTest extends KernelTestBase {
 
   /**
    * Tests workspace query parameter.
-   *
-   * @legacy-covers ::getActiveWorkspaceId
    */
   #[DataProvider('providerTestWorkspaceQueryParameter')]
   public function testWorkspaceQueryParameter(?string $workspace, ?string $token, ?string $negotiated_workspace, bool $has_active_workspace): void {

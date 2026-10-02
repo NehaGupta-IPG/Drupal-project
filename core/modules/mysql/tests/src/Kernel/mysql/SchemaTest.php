@@ -8,8 +8,8 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException;
 use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
-use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
@@ -220,8 +220,6 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**
    * Tests introspect index schema.
-   *
-   * @legacy-covers \Drupal\mysql\Driver\Database\mysql\Schema::introspectIndexSchema
    */
   public function testIntrospectIndexSchema(): void {
     $table_specification = [

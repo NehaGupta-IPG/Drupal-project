@@ -19,8 +19,8 @@ use PHPUnit\Framework\TestCase;
 class RegexDirectoryIteratorTest extends TestCase {
 
   /**
-   * @legacy-covers ::accept
-   */
+ * Tests regex directory iterator.
+ */
   #[DataProvider('providerTestRegexDirectoryIterator')]
   public function testRegexDirectoryIterator(array $directory, string $regex, array $expected): void {
     vfsStream::setup('root', NULL, $directory);

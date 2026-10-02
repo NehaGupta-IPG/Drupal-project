@@ -44,9 +44,6 @@ class LazyRouteCollectionTest extends UnitTestCase {
 
   /**
    * Tests get iterator.
-   *
-   * @legacy-covers ::getIterator
-   * @legacy-covers ::all
    */
   public function testGetIterator(): void {
     $this->routeProvider->expects($this->exactly(2))

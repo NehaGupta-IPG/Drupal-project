@@ -40,8 +40,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests config.
-   *
-   * @legacy-covers ::getConfig
    */
   public function testConfig(): void {
     $dir = $this->container->get(PathLocator::class)
@@ -83,8 +81,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests config undefined key.
-   *
-   * @legacy-covers ::getConfig
    */
   public function testConfigUndefinedKey(): void {
     $project_root = $this->container->get(PathLocator::class)
@@ -164,8 +160,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests composer unavailable.
-   *
-   * @legacy-covers ::validate
    */
   public function testComposerUnavailable(): void {
     $precondition = $this->prophesize(ComposerIsAvailableInterface::class);
@@ -203,8 +197,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
    * @param string $filename
    *   The filename to delete, which should cause validate() to raise an
    *   error.
-   *
-   * @legacy-covers ::validate
    */
   #[TestWith(["composer.json"])]
   #[TestWith(["composer.lock"])]
@@ -235,8 +227,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
    *   The error message that should be generated for the reported version of
    *   Composer. If not passed, will default to the message format defined in
    *   ::validate().
-   *
-   * @legacy-covers ::validate
    */
   #[TestWith(["2.2.12", "<default>"])]
   #[TestWith(["2.2.13", "<default>"])]
@@ -322,8 +312,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests composer validate is called.
-   *
-   * @legacy-covers ::validate
    */
   public function testComposerValidateIsCalled(): void {
     $project_root = $this->container->get(PathLocator::class)
@@ -354,8 +342,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests root package info.
-   *
-   * @legacy-covers ::getRootPackageInfo
    */
   public function testRootPackageInfo(): void {
     $project_root = $this->container->get(PathLocator::class)
@@ -378,8 +364,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
    * @param string|null $exception_message
    *   The expected exception message, or NULL if no exception should be thrown.
    *   The token <PROJECT_ROOT> will be replaced with the project root.
-   *
-   * @legacy-covers ::getInstalledPackagesList
    */
   #[TestWith([TRUE, NULL, NULL])]
   #[TestWith([

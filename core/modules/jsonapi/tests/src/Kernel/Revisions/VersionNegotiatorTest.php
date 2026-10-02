@@ -126,8 +126,6 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
 
   /**
    * Tests old revision.
-   *
-   * @legacy-covers \Drupal\jsonapi\Revisions\VersionById::getRevision
    */
   public function testOldRevision(): void {
     $revision = $this->versionNegotiator->getRevision($this->node, 'id:' . $this->nodePreviousRevisionId);
@@ -137,8 +135,6 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
 
   /**
    * Tests invalid revision id.
-   *
-   * @legacy-covers \Drupal\jsonapi\Revisions\VersionById::getRevision
    */
   public function testInvalidRevisionId(): void {
     $this->expectException(CacheableNotFoundHttpException::class);
@@ -148,8 +144,6 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
 
   /**
    * Tests latest version.
-   *
-   * @legacy-covers \Drupal\jsonapi\Revisions\VersionByRel::getRevision
    */
   public function testLatestVersion(): void {
     $revision = $this->versionNegotiator->getRevision($this->node, 'rel:' . VersionByRel::LATEST_VERSION);
@@ -159,8 +153,6 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
 
   /**
    * Tests current version.
-   *
-   * @legacy-covers \Drupal\jsonapi\Revisions\VersionByRel::getRevision
    */
   public function testCurrentVersion(): void {
     $revision = $this->versionNegotiator->getRevision($this->node, 'rel:' . VersionByRel::WORKING_COPY);
@@ -171,8 +163,6 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
 
   /**
    * Tests invalid revision rel.
-   *
-   * @legacy-covers \Drupal\jsonapi\Revisions\VersionByRel::getRevision
    */
   public function testInvalidRevisionRel(): void {
     $this->expectException(CacheableBadRequestHttpException::class);

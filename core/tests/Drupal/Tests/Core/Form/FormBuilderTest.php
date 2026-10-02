@@ -620,8 +620,6 @@ class FormBuilderTest extends FormTestBase {
 
   /**
    * Tests exceeded file size.
-   *
-   * @legacy-covers ::buildForm
    */
   public function testExceededFileSize(): void {
     $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE]);
@@ -657,8 +655,6 @@ class FormBuilderTest extends FormTestBase {
 
   /**
    * Tests post ajax request.
-   *
-   * @legacy-covers ::buildForm
    */
   public function testPostAjaxRequest(): void {
     $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE], ['form_id' => 'different_form_id']);
@@ -683,8 +679,6 @@ class FormBuilderTest extends FormTestBase {
 
   /**
    * Tests get ajax request.
-   *
-   * @legacy-covers ::buildForm
    */
   public function testGetAjaxRequest(): void {
     $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE]);
@@ -710,8 +704,6 @@ class FormBuilderTest extends FormTestBase {
 
   /**
    * Tests child access inheritance.
-   *
-   * @legacy-covers ::buildForm
    */
   #[DataProvider('providerTestChildAccessInheritance')]
   public function testChildAccessInheritance(array $element, $access_checks): void {
@@ -911,8 +903,6 @@ class FormBuilderTest extends FormTestBase {
 
   /**
    * Tests invalid token.
-   *
-   * @legacy-covers ::doBuildForm
    */
   #[DataProvider('providerTestInvalidToken')]
   public function testInvalidToken($expected, $valid_token, $user_is_authenticated): void {
@@ -975,8 +965,6 @@ class FormBuilderTest extends FormTestBase {
 
   /**
    * Tests form token cacheability.
-   *
-   * @legacy-covers ::prepareForm
    */
   #[DataProvider('providerTestFormTokenCacheability')]
   public function testFormTokenCacheability(bool|string|null $token, bool $is_authenticated, string $method, bool $opted_in_for_cache): void {

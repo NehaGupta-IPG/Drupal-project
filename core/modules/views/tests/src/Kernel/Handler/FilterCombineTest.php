@@ -351,8 +351,6 @@ class FilterCombineTest extends ViewsKernelTestBase {
 
   /**
    * Tests the Combine field filter using the 'equal' operator.
-   *
-   * @legacy-covers ::opEqual
    */
   public function testFilterCombineEqual(): void {
     $view = Views::getView('test_view');
@@ -399,8 +397,6 @@ class FilterCombineTest extends ViewsKernelTestBase {
 
   /**
    * Tests the Combine field filter using the 'not equal' operator.
-   *
-   * @legacy-covers ::opEqual
    */
   public function testFilterCombineNotEqual(): void {
     $view = Views::getView('test_view');

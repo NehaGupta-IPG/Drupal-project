@@ -339,8 +339,6 @@ class ConfigCRUDTest extends KernelTestBase {
 
   /**
    * Tests deprecation of trusted data.
-   *
-   * @legacy-covers \Drupal\Core\Config\Config::save()
    */
   #[IgnoreDeprecations]
   public function testTrustedDataDeprecation(): void {

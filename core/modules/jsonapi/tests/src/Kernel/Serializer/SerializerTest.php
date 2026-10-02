@@ -104,8 +104,6 @@ class SerializerTest extends JsonapiKernelTestBase {
 
   /**
    * Tests fallback normalizer.
-   *
-   * @legacy-covers \Drupal\jsonapi\Serializer\Serializer::normalize
    */
   public function testFallbackNormalizer(): void {
     $context = [

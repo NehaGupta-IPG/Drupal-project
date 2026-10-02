@@ -92,8 +92,6 @@ class FieldResolverTest extends JsonapiKernelTestBase {
 
   /**
    * Tests resolve internal include path.
-   *
-   * @legacy-covers ::resolveInternalEntityQueryPath
    */
   #[DataProvider('resolveInternalIncludePathProvider')]
   public function testResolveInternalIncludePath(array $expect, string $external_path, $entity_type_id = 'entity_test_with_bundle', $bundle = 'bundle1'): void {

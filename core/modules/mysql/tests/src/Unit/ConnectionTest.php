@@ -37,9 +37,6 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests version and is maria db.
-   *
-   * @legacy-covers ::version
-   * @legacy-covers ::isMariaDb
    */
   #[DataProvider('providerVersionAndIsMariaDb')]
   public function testVersionAndIsMariaDb(bool $expected_is_mariadb, string $server_version, string $expected_version): void {

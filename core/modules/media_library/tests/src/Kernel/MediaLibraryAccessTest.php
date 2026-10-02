@@ -140,8 +140,6 @@ class MediaLibraryAccessTest extends KernelTestBase {
    *   Whether to test with media_embed filter enabled on the text format.
    * @param bool $can_use_format
    *   Whether the logged in user is allowed to use the text format.
-   *
-   * @legacy-covers \Drupal\media_library\MediaLibraryEditorOpener::checkAccess
    */
   #[DataProvider('editorOpenerAccessProvider')]
   public function testEditorOpenerAccess(bool $media_embed_enabled, bool $can_use_format): void {

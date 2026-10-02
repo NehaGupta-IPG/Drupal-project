@@ -51,9 +51,6 @@ class ChainEntityResolverTest extends UnitTestCase {
 
   /**
    * Tests the resolve method with no matching resolvers.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::resolve
    */
   public function testResolverWithNoneResolved(): void {
     $resolvers = [
@@ -68,9 +65,6 @@ class ChainEntityResolverTest extends UnitTestCase {
 
   /**
    * Tests the resolve method with no matching resolvers, using addResolver.
-   *
-   * @legacy-covers ::addResolver
-   * @legacy-covers ::resolve
    */
   public function testResolverWithNoneResolvedUsingAddResolver(): void {
     $resolver = new ChainEntityResolver();
@@ -82,9 +76,6 @@ class ChainEntityResolverTest extends UnitTestCase {
 
   /**
    * Tests the resolve method with a matching resolver first.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::resolve
    */
   public function testResolverWithFirstResolved(): void {
     $resolvers = [
@@ -99,9 +90,6 @@ class ChainEntityResolverTest extends UnitTestCase {
 
   /**
    * Tests the resolve method with a matching resolver last.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::resolve
    */
   public function testResolverWithLastResolved(): void {
     $resolvers = [
@@ -116,9 +104,6 @@ class ChainEntityResolverTest extends UnitTestCase {
 
   /**
    * Tests the resolve method where one resolver returns 0.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::resolve
    */
   public function testResolverWithResolvedToZero(): void {
     $resolvers = [

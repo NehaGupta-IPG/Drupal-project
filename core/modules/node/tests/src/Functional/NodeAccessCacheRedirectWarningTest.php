@@ -37,8 +37,6 @@ class NodeAccessCacheRedirectWarningTest extends NodeTestBase {
 
   /**
    * Ensures that node access checks don't cause cache redirect warnings.
-   *
-   * @legacy-covers \Drupal\node\NodeAccessControlHandler
    */
   public function testNodeAccessCacheRedirectWarning(): void {
     $this->drupalPlaceBlock('local_tasks_block');

@@ -240,8 +240,6 @@ class KernelTestBaseTest extends KernelTestBase {
 
   /**
    * Tests that a usable session is on the request.
-   *
-   * @legacy-covers ::bootKernel
    */
   public function testSessionOnRequest(): void {
     /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
@@ -329,8 +327,6 @@ class KernelTestBaseTest extends KernelTestBase {
 
   /**
    * Tests database driver module enabled.
-   *
-   * @legacy-covers ::bootEnvironment
    */
   public function testDatabaseDriverModuleEnabled(): void {
     $module = Database::getConnection()->getProvider();

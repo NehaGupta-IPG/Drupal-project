@@ -47,8 +47,6 @@ class LinkUriTest extends KernelTestBase {
    *   The value to pass to LinkUri::transform().
    * @param string $expected
    *   The expected return value of LinkUri::transform().
-   *
-   * @legacy-covers ::transform
    */
   #[DataProvider('providerTestRouted')]
   public function testRouted($value, $expected): void {
@@ -143,8 +141,6 @@ class LinkUriTest extends KernelTestBase {
    *   The value to pass to LinkUri::transform().
    * @param string $expected
    *   The expected return value of LinkUri::transform().
-   *
-   * @legacy-covers ::transform
    */
   #[DataProvider('providerTestDisablingRouteValidation')]
   public function testDisablingRouteValidation($value, $expected): void {

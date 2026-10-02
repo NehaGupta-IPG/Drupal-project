@@ -42,9 +42,6 @@ class ExtensionSerializationTest extends UnitTestCase {
    * object data, test that the Extension object's root property is set to the
    * container's app.root and not the DRUPAL_ROOT constant if the service
    * container app.root is available.
-   *
-   * @legacy-covers ::__sleep
-   * @legacy-covers ::__wakeup
    */
   public function testServiceAppRouteUsage(): void {
     $container = new ContainerBuilder();
@@ -67,9 +64,6 @@ class ExtensionSerializationTest extends UnitTestCase {
 
   /**
    * Tests dynamically assigned public properties kept when serialized.
-   *
-   * @legacy-covers ::__sleep
-   * @legacy-covers ::__wakeup
    */
   public function testPublicProperties(): void {
     $container = new ContainerBuilder();

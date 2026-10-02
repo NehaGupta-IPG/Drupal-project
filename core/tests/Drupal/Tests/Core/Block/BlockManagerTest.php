@@ -87,8 +87,6 @@ class BlockManagerTest extends UnitTestCase {
 
   /**
    * Tests definitions.
-   *
-   * @legacy-covers ::getDefinitions
    */
   public function testDefinitions(): void {
     $definitions = $this->blockManager->getDefinitions();
@@ -97,8 +95,6 @@ class BlockManagerTest extends UnitTestCase {
 
   /**
    * Tests sorted definitions.
-   *
-   * @legacy-covers ::getSortedDefinitions
    */
   public function testSortedDefinitions(): void {
     $definitions = $this->blockManager->getSortedDefinitions();
@@ -107,8 +103,6 @@ class BlockManagerTest extends UnitTestCase {
 
   /**
    * Tests grouped definitions.
-   *
-   * @legacy-covers ::getGroupedDefinitions
    */
   public function testGroupedDefinitions(): void {
     $definitions = $this->blockManager->getGroupedDefinitions();

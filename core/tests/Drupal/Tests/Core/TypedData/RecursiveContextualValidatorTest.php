@@ -110,8 +110,6 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
 
   /**
    * Tests basic validate without constraints.
-   *
-   * @legacy-covers ::validate
    */
   public function testBasicValidateWithoutConstraints(): void {
     $typed_data = $this->typedDataManager->create(DataDefinition::create('string'));
@@ -121,8 +119,6 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
 
   /**
    * Tests basic validate with constraint.
-   *
-   * @legacy-covers ::validate
    */
   public function testBasicValidateWithConstraint(): void {
     $typed_data = $this->typedDataManager->create(
@@ -143,8 +139,6 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
 
   /**
    * Tests basic validate with multiple constraints.
-   *
-   * @legacy-covers ::validate
    */
   public function testBasicValidateWithMultipleConstraints(): void {
     $options = [
@@ -163,8 +157,6 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
 
   /**
    * Tests properties validate with multiple levels.
-   *
-   * @legacy-covers ::validate
    */
   public function testPropertiesValidateWithMultipleLevels(): void {
 

@@ -186,9 +186,6 @@ class BubbleableMetadataTest extends UnitTestCase {
    * @see testMergeAttachmentsHtmlHeadMerging()
    * @see testMergeAttachmentsHtmlHeadLinkMerging()
    * @see testMergeAttachmentsHttpHeaderMerging()
-   *
-   * @legacy-covers ::addAttachments
-   * @legacy-covers ::setAttachments
    */
   #[DataProvider('providerTestAddAttachments')]
   public function testAddAttachments(BubbleableMetadata $initial, array $attachments, BubbleableMetadata $expected): void {

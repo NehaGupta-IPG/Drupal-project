@@ -22,8 +22,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class UnsupportedRouteAttributePropertiesTest extends UnitTestCase {
 
   /**
-   * @legacy-covers ::createRouteCollection
-   */
+ * Tests exception.
+ */
   #[DataProvider('providerTestException')]
   public function testException(string $class, string $message, bool $isForm = FALSE): void {
     $discovery = new AttributeRouteDiscovery(new \ArrayIterator());

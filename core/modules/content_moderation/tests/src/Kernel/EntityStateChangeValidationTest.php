@@ -63,8 +63,6 @@ class EntityStateChangeValidationTest extends KernelTestBase {
 
   /**
    * Tests valid transitions.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidTransition(): void {
 
@@ -94,8 +92,6 @@ class EntityStateChangeValidationTest extends KernelTestBase {
 
   /**
    * Tests invalid transitions.
-   *
-   * @legacy-covers ::validate
    */
   public function testInvalidTransition(): void {
     $this->setCurrentUser($this->adminUser);

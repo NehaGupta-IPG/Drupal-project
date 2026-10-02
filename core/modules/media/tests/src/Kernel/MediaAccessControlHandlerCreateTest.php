@@ -35,8 +35,6 @@ class MediaAccessControlHandlerCreateTest extends MediaKernelTestBase {
    *   Expected cache contexts.
    * @param string[] $expected_cache_tags
    *   Expected cache tags.
-   *
-   * @legacy-covers ::checkCreateAccess
    */
   #[DataProvider('providerCreateAccess')]
   public function testCreateAccess(array $permissions, AccessResultInterface $expected_result, array $expected_cache_contexts, array $expected_cache_tags): void {

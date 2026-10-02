@@ -55,8 +55,6 @@ class ContextDefinitionTest extends KernelTestBase {
 
   /**
    * Tests entity context definition assert.
-   *
-   * @legacy-covers ::__construct
    */
   public function testEntityContextDefinitionAssert(): void {
     $this->expectException(\AssertionError::class);

@@ -17,8 +17,7 @@ use PHPUnit\Framework\TestCase;
 class MockFileFinderTest extends TestCase {
 
   /**
-   * @legacy-covers ::create
-   * @legacy-covers ::findFile
+   * Tests find file.
    */
   public function testFindFile(): void {
     $tmp = MockFileFinder::create('test_filename.txt');

@@ -141,9 +141,6 @@ class NestedArrayTest extends TestCase {
 
   /**
    * Tests NestedArray::mergeDeepArray().
-   *
-   * @legacy-covers ::mergeDeep
-   * @legacy-covers ::mergeDeepArray
    */
   public function testMergeDeepArray(): void {
     $link_options_1 = [
@@ -169,8 +166,6 @@ class NestedArrayTest extends TestCase {
 
   /**
    * Tests that arrays with implicit keys are appended, not merged.
-   *
-   * @legacy-covers ::mergeDeepArray
    */
   public function testMergeImplicitKeys(): void {
     $a = [
@@ -190,8 +185,6 @@ class NestedArrayTest extends TestCase {
 
   /**
    * Tests that even with explicit keys, values are appended, not merged.
-   *
-   * @legacy-covers ::mergeDeepArray
    */
   public function testMergeExplicitKeys(): void {
     $a = [
@@ -226,8 +219,6 @@ class NestedArrayTest extends TestCase {
    * Even if the initial ordering would place the data from the second array
    * before those in the first one, they are still appended, and the keys on
    * the first array are deleted and regenerated.
-   *
-   * @legacy-covers ::mergeDeepArray
    */
   public function testMergeOutOfSequenceKeys(): void {
     $a = [

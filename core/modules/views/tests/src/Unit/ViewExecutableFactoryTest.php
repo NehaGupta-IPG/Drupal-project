@@ -114,8 +114,6 @@ class ViewExecutableFactoryTest extends UnitTestCase {
 
   /**
    * Tests the get method when current request is null.
-   *
-   * @legacy-covers ::get
    */
   public function testGetNoRequest(): void {
     $executable = $this->viewExecutableFactory->get($this->view);

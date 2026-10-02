@@ -133,8 +133,6 @@ class ModerationInformationTest extends UnitTestCase {
 
   /**
    * Tests should moderate entities.
-   *
-   * @legacy-covers ::shouldModerateEntitiesOfBundle
    */
   #[DataProvider('providerWorkflow')]
   public function testShouldModerateEntities(?string $workflow, bool $expected): void {

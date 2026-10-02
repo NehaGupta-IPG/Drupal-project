@@ -20,8 +20,6 @@ class PathChangedHelperTest extends UnitTestCase {
 
   /**
    * Tests that the constructor validates its arguments.
-   *
-   * @legacy-covers ::__construct
    */
   public function testPathChangedHelperException(): void {
     $route_match = $this->prophesize(RouteMatchInterface::class);

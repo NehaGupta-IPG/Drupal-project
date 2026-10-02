@@ -36,10 +36,6 @@ class RendererRecursionTest extends RendererTestBase {
 
   /**
    * Tests that renderRoot() may not be called recursively.
-   *
-   * @legacy-covers ::renderRoot
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   public function testRenderRecursionWithNestedRenderRoot(): void {
     [$parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
@@ -68,10 +64,6 @@ class RendererRecursionTest extends RendererTestBase {
    *
    * Including from inside of another ::renderRoot() call. Bubbling must be
    * performed.
-   *
-   * @legacy-covers ::renderRoot
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   public function testRenderRecursionWithNestedRender(): void {
     [$parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
@@ -101,9 +93,6 @@ class RendererRecursionTest extends RendererTestBase {
 
   /**
    * Tests that renderRoot() can be called from anywhere including recursively.
-   *
-   * @legacy-covers ::renderRoot
-   * @legacy-covers ::renderInIsolation
    */
   public function testRenderRecursionWithNestedRenderInIsolation(): void {
     [$parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();

@@ -20,8 +20,6 @@ class MemoryBackendTest extends UnitTestCase {
 
   /**
    * Tests that expired cache items are removed from memory.
-   *
-   * @legacy-covers ::garbageCollection
    */
   public function testGarbageCollection(): void {
     $time = $this->createStub(TimeInterface::class);

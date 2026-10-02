@@ -43,8 +43,6 @@ class EntityFormDisplayTest extends KernelTestBase {
 
   /**
    * Tests entity get from display.
-   *
-   * @legacy-covers \Drupal\Core\Entity\EntityDisplayRepository::getFormDisplay
    */
   public function testEntityGetFromDisplay(): void {
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */

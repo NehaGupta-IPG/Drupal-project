@@ -21,8 +21,6 @@ class MediaEmbedFilterConfigurationUiAddTest extends MediaEmbedFilterTestBase {
 
   /**
    * Tests validation when adding.
-   *
-   * @legacy-covers \Drupal\media\Hook\MediaHooks::formFilterFormatAddFormAlter
    */
   #[DataProvider('providerTestValidations')]
   public function testValidationWhenAdding($filter_html_status, $filter_align_status, $filter_caption_status, $filter_html_image_secure_status, $media_embed, $allowed_html, $expected_error_message): void {

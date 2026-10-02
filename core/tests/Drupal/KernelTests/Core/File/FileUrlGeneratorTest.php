@@ -69,8 +69,6 @@ class FileUrlGeneratorTest extends FileTestBase {
 
   /**
    * Tests the rewriting of shipped file URLs by hook_file_url_alter().
-   *
-   * @legacy-covers ::generateAbsoluteString
    */
   public function testShippedFileURL(): void {
     // Test generating a URL to a shipped file (i.e. a file that is part of
@@ -118,8 +116,6 @@ class FileUrlGeneratorTest extends FileTestBase {
 
   /**
    * Tests the rewriting of public managed file URLs by hook_file_url_alter().
-   *
-   * @legacy-covers ::generateAbsoluteString
    */
   public function testPublicManagedFileURL(): void {
     // Test generating a URL to a managed file.
@@ -148,8 +144,6 @@ class FileUrlGeneratorTest extends FileTestBase {
 
   /**
    * Tests generate absolute string with relative URL.
-   *
-   * @legacy-covers ::generateAbsoluteString
    */
   public function testRelativeFileURL(): void {
     // Disable file_test.module's hook_file_url_alter() implementation.

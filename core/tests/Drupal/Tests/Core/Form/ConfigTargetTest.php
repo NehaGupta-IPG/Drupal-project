@@ -29,8 +29,6 @@ class ConfigTargetTest extends UnitTestCase {
 
   /**
    * Tests duplicate targets not allowed.
-   *
-   * @legacy-covers \Drupal\Core\Form\ConfigFormBase::storeConfigKeyToFormElementMap
    */
   public function testDuplicateTargetsNotAllowed(): void {
     $form = [

@@ -54,8 +54,6 @@ class ConfigEntityTypeTest extends UnitTestCase {
    *
    * Tests that we get an exception when the length of the config prefix that is
    * returned by getConfigPrefix() exceeds the maximum defined prefix length.
-   *
-   * @legacy-covers ::getConfigPrefix
    */
   public function testConfigPrefixLengthExceeds(): void {
     // A provider length of 24 and config_prefix length of 59 (+1 for the .)
@@ -75,8 +73,6 @@ class ConfigEntityTypeTest extends UnitTestCase {
    *
    * Tests that a valid config prefix returned by getConfigPrefix()
    * does not throw an exception and is formatted as expected.
-   *
-   * @legacy-covers ::getConfigPrefix
    */
   public function testConfigPrefixLengthValid(): void {
     // A provider length of 24 and config_prefix length of 58 (+1 for the .)
@@ -92,8 +88,6 @@ class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
    * Tests construct.
-   *
-   * @legacy-covers ::__construct
    */
   public function testConstruct(): void {
     $config_entity = new ConfigEntityType([
@@ -104,8 +98,6 @@ class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
    * Tests construct bad storage.
-   *
-   * @legacy-covers ::__construct
    */
   public function testConstructBadStorage(): void {
     $this->expectException(ConfigEntityStorageClassException::class);
@@ -208,8 +200,6 @@ class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get ConfigEntityType::hasIntegerId() method.
-   *
-   * @legacy-covers ::hasIntegerId
    */
   public function testHasIntegerId(): void {
     $config_entity_type = new ConfigEntityType([

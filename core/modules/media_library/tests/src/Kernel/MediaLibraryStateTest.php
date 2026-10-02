@@ -364,8 +364,6 @@ class MediaLibraryStateTest extends KernelTestBase {
 
   /**
    * Tests opener parameters.
-   *
-   * @legacy-covers ::getOpenerParameters
    */
   public function testOpenerParameters(): void {
     $state = MediaLibraryState::create('test', ['file'], 'file', -1, [

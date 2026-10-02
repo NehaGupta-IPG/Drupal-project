@@ -107,8 +107,6 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Tests reload method.
-   *
-   * @legacy-covers ::reload
    */
   public function testModuleReloading(): void {
     $module_handler = $this->getMockBuilder(ModuleHandler::class)

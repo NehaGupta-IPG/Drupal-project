@@ -107,8 +107,6 @@ class OEmbedSourceTest extends MediaKernelTestBase {
    *   the values are arrays of strings.
    * @param string $expected_extension
    *   The extension that the downloaded thumbnail should have.
-   *
-   * @legacy-covers ::getLocalThumbnailUri
    */
   #[DataProvider('providerThumbnailUri')]
   public function testThumbnailUri(string $remote_thumbnail_url, array $thumbnail_headers, string $expected_extension): void {

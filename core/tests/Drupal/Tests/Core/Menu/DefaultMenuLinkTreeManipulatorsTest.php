@@ -218,9 +218,6 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
 
   /**
    * Tests the checkAccess() tree manipulator.
-   *
-   * @legacy-covers ::checkAccess
-   * @legacy-covers ::menuLinkCheckAccess
    */
   public function testCheckAccess(): void {
     $this->setUpMockAccessManager();
@@ -300,9 +297,6 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
 
   /**
    * Tests checkAccess() tree manipulator.
-   *
-   * @legacy-covers ::checkAccess
-   * @legacy-covers ::menuLinkCheckAccess
    */
   public function testCheckAccessTreeManipulator(): void {
     $this->setUpMockAccessManager();
@@ -341,10 +335,6 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
 
   /**
    * Tests the optimized node access checking.
-   *
-   * @legacy-covers ::checkNodeAccess
-   * @legacy-covers ::collectNodeLinks
-   * @legacy-covers ::checkAccess
    */
   public function testCheckNodeAccess(): void {
     $this->setUpMockAccessManager();

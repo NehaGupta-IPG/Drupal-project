@@ -129,8 +129,6 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
 
   /**
    * Ensures that a naming conflict in mapping causes an exception to be thrown.
-   *
-   * @legacy-covers ::getFields
    */
   #[DataProvider('getFieldsProvider')]
   public function testMappingNameConflictCheck(array $field_name_list): void {

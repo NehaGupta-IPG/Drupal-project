@@ -121,7 +121,7 @@ class ContextTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getContextValue
+   * Tests default value.
    */
   public function testDefaultValue(): void {
     $mock_definition = $this->createMock('Drupal\Component\Plugin\Context\ContextDefinitionInterface');

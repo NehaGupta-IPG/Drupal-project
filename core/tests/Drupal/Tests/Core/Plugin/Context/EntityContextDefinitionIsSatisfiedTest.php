@@ -106,11 +106,6 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
 
   /**
    * Tests is satisfied by.
-   *
-   * @legacy-covers ::isSatisfiedBy
-   * @legacy-covers ::dataTypeMatches
-   * @legacy-covers ::getSampleValues
-   * @legacy-covers ::getConstraintObjects
    */
   #[DataProvider('providerTestIsSatisfiedBy')]
   public function testIsSatisfiedBy(bool $expected, ContextDefinition $requirement, ContextDefinition $definition, $value = NULL): void {
@@ -191,11 +186,6 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
 
   /**
    * Tests is satisfied by generate bundled entity.
-   *
-   * @legacy-covers ::isSatisfiedBy
-   * @legacy-covers ::dataTypeMatches
-   * @legacy-covers ::getSampleValues
-   * @legacy-covers ::getConstraintObjects
    */
   #[DataProvider('providerTestIsSatisfiedByGenerateBundledEntity')]
   public function testIsSatisfiedByGenerateBundledEntity(bool $expected, array $requirement_bundles, array $candidate_bundles, ?array $bundles_to_instantiate = NULL): void {
@@ -289,11 +279,6 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
 
   /**
    * Tests is satisfied by pass bundled entity.
-   *
-   * @legacy-covers ::isSatisfiedBy
-   * @legacy-covers ::dataTypeMatches
-   * @legacy-covers ::getSampleValues
-   * @legacy-covers ::getConstraintObjects
    */
   #[DataProvider('providerTestIsSatisfiedByPassBundledEntity')]
   public function testIsSatisfiedByPassBundledEntity(bool $expected, $requirement_constraint): void {

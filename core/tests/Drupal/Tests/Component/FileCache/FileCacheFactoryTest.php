@@ -158,8 +158,7 @@ class FileCacheFactoryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getConfiguration
-   * @legacy-covers ::setConfiguration
+   * Tests get set configuration.
    */
   public function testGetSetConfiguration(): void {
     $configuration = FileCacheFactory::getConfiguration();
@@ -170,8 +169,7 @@ class FileCacheFactoryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getPrefix
-   * @legacy-covers ::setPrefix
+   * Tests get set prefix.
    */
   public function testGetSetPrefix(): void {
     // Random generator.

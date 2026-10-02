@@ -566,8 +566,6 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests namespace default.
-   *
-   * @legacy-covers ::__construct
    */
   public function testNamespaceDefault(): void {
     $connection = new StubConnection($this->createStub(\PDO::class), []);
@@ -630,10 +628,6 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests that the proper caller is retrieved from the backtrace.
-   *
-   * @legacy-covers ::findCallerFromDebugBacktrace
-   * @legacy-covers ::removeDatabaseEntriesFromDebugBacktrace
-   * @legacy-covers ::getDebugBacktrace
    */
   public function testFindCallerFromDebugBacktrace(): void {
     Database::addConnectionInfo('default', 'default', [
@@ -663,9 +657,6 @@ class ConnectionTest extends UnitTestCase {
    *   A test debug_backtrace stack.
    * @param array $expected_entry
    *   The expected stack entry.
-   *
-   * @legacy-covers ::findCallerFromDebugBacktrace
-   * @legacy-covers ::removeDatabaseEntriesFromDebugBacktrace
    */
   #[DataProvider('providerMockedBacktrace')]
   public function testFindCallerFromDebugBacktraceWithMockedBacktrace(string $driver_namespace, array $stack, array $expected_entry): void {

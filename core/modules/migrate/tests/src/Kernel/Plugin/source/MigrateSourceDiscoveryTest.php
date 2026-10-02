@@ -27,8 +27,6 @@ class MigrateSourceDiscoveryTest extends KernelTestBase {
 
   /**
    * Tests get definitions.
-   *
-   * @legacy-covers \Drupal\migrate\Plugin\MigrateSourcePluginManager::getDefinitions
    */
   public function testGetDefinitions(): void {
     // First, check the expected plugins are provided by migrate only.
@@ -64,8 +62,6 @@ class MigrateSourceDiscoveryTest extends KernelTestBase {
 
   /**
    * Tests annotation get definitions backwards compatibility.
-   *
-   * @legacy-covers \Drupal\migrate\Plugin\MigrateSourcePluginManager::getDefinitions
    */
   public function testAnnotationGetDefinitionsBackwardsCompatibility(): void {
     // First, test attribute-only discovery.

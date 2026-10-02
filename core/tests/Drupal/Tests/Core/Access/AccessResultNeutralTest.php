@@ -18,9 +18,6 @@ class AccessResultNeutralTest extends UnitTestCase {
 
   /**
    * Tests the construction of an AccessResultForbidden object.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getReason
    */
   public function testConstruction(): void {
     $a = new AccessResultNeutral();

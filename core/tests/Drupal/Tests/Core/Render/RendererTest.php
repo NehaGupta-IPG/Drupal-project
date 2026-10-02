@@ -25,7 +25,6 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 // cspell:ignore fooalert
-
 /**
  * Tests Drupal\Core\Render\Renderer.
  */
@@ -53,9 +52,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests render basic.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   #[DataProvider('providerTestRenderBasic')]
   public function testRenderBasic(string|array|null $build, $expected, ?callable $setup_code = NULL): void {
@@ -509,9 +505,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests render sorting.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   public function testRenderSorting(): void {
     $first = $this->randomMachineName();
@@ -546,9 +539,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests render sorting with set hash sorted.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   public function testRenderSortingWithSetHashSorted(): void {
     $first = $this->randomMachineName();
@@ -573,9 +563,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests that element defaults are added.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   public function testElementDefaultsAdded(): void {
     $build = ['#type' => 'details'];
@@ -607,9 +594,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests render with preset access.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   #[DataProvider('providerAccessValues')]
   public function testRenderWithPresetAccess(bool|AccessResultForbidden|AccessResultAllowed $access): void {
@@ -622,9 +606,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests render with access callback callable.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   #[DataProvider('providerAccessValues')]
   public function testRenderWithAccessCallbackCallable(bool|AccessResultForbidden|AccessResultAllowed $access): void {
@@ -639,9 +620,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Ensures that the #access property wins over the callable.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   #[DataProvider('providerAccessValues')]
   public function testRenderWithAccessPropertyAndCallback(bool|AccessResultForbidden|AccessResultAllowed $access): void {
@@ -657,9 +635,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests render with access controller resolved.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   #[DataProvider('providerAccessValues')]
   public function testRenderWithAccessControllerResolved(bool|AccessResultForbidden|AccessResultAllowed $access): void {
@@ -691,9 +666,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests render access cacheability dependency inheritance.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   public function testRenderAccessCacheabilityDependencyInheritance(): void {
     $build = [
@@ -711,9 +683,6 @@ class RendererTest extends RendererTestBase {
    * Tests that a first render returns the rendered output and a second doesn't
    * because of the #printed property. Also tests that correct metadata has been
    * set for re-rendering.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   #[DataProvider('providerRenderTwice')]
   public function testRenderTwice(array $build): void {
@@ -819,9 +788,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests render without theme arguments.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   public function testRenderWithoutThemeArguments(): void {
     $this->setUpMockThemeManager();
@@ -840,9 +806,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests render with theme arguments.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
    */
   public function testRenderWithThemeArguments(): void {
     $this->setUpMockThemeManager();
@@ -898,11 +861,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests render cache.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
-   * @legacy-covers \Drupal\Core\Render\RenderCache::get
-   * @legacy-covers \Drupal\Core\Render\RenderCache::set
    */
   #[DataProvider('providerRenderCache')]
   public function testRenderCache(?AccessResultForbidden $child_access, array $expected_tags): void {
@@ -949,11 +907,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests render cache max age.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
-   * @legacy-covers \Drupal\Core\Render\RenderCache::get
-   * @legacy-covers \Drupal\Core\Render\RenderCache::set
    */
   #[DataProvider('providerTestRenderCacheMaxAge')]
   public function testRenderCacheMaxAge(int $max_age, bool $is_render_cached, ?int $render_cache_item_expire): void {
@@ -992,12 +945,6 @@ class RendererTest extends RendererTestBase {
    *
    * @param array $expected_results
    *   An associative array of expected results keyed by property name.
-   *
-   * @legacy-covers ::render
-   * @legacy-covers ::doRender
-   * @legacy-covers \Drupal\Core\Render\RenderCache::get
-   * @legacy-covers \Drupal\Core\Render\RenderCache::set
-   * @legacy-covers \Drupal\Core\Render\RenderCache::getCacheableRenderArray
    */
   #[DataProvider('providerTestRenderCacheProperties')]
   public function testRenderCacheProperties(array $expected_results): void {

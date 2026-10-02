@@ -375,9 +375,6 @@ class DefaultPluginManagerTest extends UnitTestCase {
 
   /**
    * Tests provider exists.
-   *
-   * @legacy-covers ::findDefinitions
-   * @legacy-covers ::extractProviderFromDefinition
    */
   public function testProviderExists(): void {
     $definitions = [];

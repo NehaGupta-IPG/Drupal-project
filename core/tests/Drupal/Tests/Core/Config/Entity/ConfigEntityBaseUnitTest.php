@@ -211,9 +211,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests calculate dependencies.
-   *
-   * @legacy-covers ::calculateDependencies
-   * @legacy-covers ::getDependencies
    */
   public function testCalculateDependencies(): void {
     // Calculating dependencies will reset the dependencies array.
@@ -361,9 +358,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests calculate dependencies with plugin collections.
-   *
-   * @legacy-covers ::getDependencies
-   * @legacy-covers ::calculateDependencies
    */
   #[DataProvider('providerCalculateDependenciesWithPluginCollections')]
   public function testCalculateDependenciesWithPluginCollections(array $definition, array $expected_dependencies): void {
@@ -594,10 +588,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests calculate dependencies with third party settings.
-   *
-   * @legacy-covers ::calculateDependencies
-   * @legacy-covers ::getDependencies
-   * @legacy-covers ::onDependencyRemoval
    */
   public function testCalculateDependenciesWithThirdPartySettings(): void {
     $this->entity = new StubConfigEntity([], $this->entityTypeId);
@@ -615,8 +605,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests sleep with plugin collections.
-   *
-   * @legacy-covers ::__sleep
    */
   public function testSleepWithPluginCollections(): void {
     $instance_id = 'the_instance_id';
@@ -662,9 +650,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests get original id.
-   *
-   * @legacy-covers ::setOriginalId
-   * @legacy-covers ::getOriginalId
    */
   public function testGetOriginalId(): void {
     $new_id = $this->randomMachineName();
@@ -696,9 +681,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests get.
-   *
-   * @legacy-covers ::set
-   * @legacy-covers ::get
    */
   public function testGet(): void {
     $name = 'id';
@@ -710,9 +692,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests set status.
-   *
-   * @legacy-covers ::setStatus
-   * @legacy-covers ::status
    */
   public function testSetStatus(): void {
     $this->assertTrue($this->entity->status());
@@ -744,9 +723,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests is syncing.
-   *
-   * @legacy-covers ::setSyncing
-   * @legacy-covers ::isSyncing
    */
   public function testIsSyncing(): void {
     $this->assertFalse($this->entity->isSyncing());
@@ -879,12 +855,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests third party settings.
-   *
-   * @legacy-covers ::getThirdPartySetting
-   * @legacy-covers ::setThirdPartySetting
-   * @legacy-covers ::getThirdPartySettings
-   * @legacy-covers ::unsetThirdPartySetting
-   * @legacy-covers ::getThirdPartyProviders
    */
   public function testThirdPartySettings(): void {
     $key = 'test';

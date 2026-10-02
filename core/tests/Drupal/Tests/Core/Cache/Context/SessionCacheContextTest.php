@@ -56,8 +56,6 @@ class SessionCacheContextTest extends UnitTestCase {
 
   /**
    * Tests same context for same session.
-   *
-   * @legacy-covers ::getContext
    */
   public function testSameContextForSameSession(): void {
     $this->request->setSession($this->session);
@@ -77,8 +75,6 @@ class SessionCacheContextTest extends UnitTestCase {
 
   /**
    * Tests different context for different session.
-   *
-   * @legacy-covers ::getContext
    */
   public function testDifferentContextForDifferentSession(): void {
     $this->request->setSession($this->session);

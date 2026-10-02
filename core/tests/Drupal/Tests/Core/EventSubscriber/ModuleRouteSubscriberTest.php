@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\EventSubscriber;
 
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\EventSubscriber\ModuleRouteSubscriber;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\RouteBuildEvent;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -54,8 +54,6 @@ class ModuleRouteSubscriberTest extends UnitTestCase {
    *   An array of requirements to use for the route.
    * @param bool $removed
    *   Whether or not the route is expected to be removed from the collection.
-   *
-   * @legacy-covers ::onAlterRoutes
    */
   #[DataProvider('providerTestRemoveRoute')]
   public function testRemoveRoute(string $route_name, array $requirements, bool $removed): void {

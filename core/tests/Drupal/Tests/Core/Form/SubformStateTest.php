@@ -67,9 +67,6 @@ class SubformStateTest extends UnitTestCase {
    *   The parents.
    * @param string $expected
    *   The expected state values.
-   *
-   * @legacy-covers ::getValues
-   * @legacy-covers ::getParents
    */
   #[DataProvider('providerGetValues')]
   public function testGetValues(array $parents, $expected): void {
@@ -107,9 +104,6 @@ class SubformStateTest extends UnitTestCase {
    *   The parents.
    * @param string $expected
    *   The expected state values.
-   *
-   * @legacy-covers ::getValues
-   * @legacy-covers ::getParents
    */
   #[DataProvider('providerGetValuesBroken')]
   public function testGetValuesBroken(array $parents, $expected): void {
@@ -317,8 +311,6 @@ class SubformStateTest extends UnitTestCase {
 
   /**
    * Tests form object.
-   *
-   * @legacy-covers ::getFormObject
    */
   public function testFormObject(): void {
     $parent_form_state = $this->prophesize(FormStateInterface::class);

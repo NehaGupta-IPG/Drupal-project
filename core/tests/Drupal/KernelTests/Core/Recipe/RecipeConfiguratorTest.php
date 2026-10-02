@@ -23,8 +23,6 @@ class RecipeConfiguratorTest extends KernelTestBase {
 
   /**
    * Tests the listing all the extensions installed by a recipe.
-   *
-   * @legacy-covers ::listAllExtensions
    */
   public function testRecipeConfigurator(): void {
     $recipe_configurator = new RecipeConfigurator(
@@ -62,8 +60,6 @@ class RecipeConfiguratorTest extends KernelTestBase {
 
   /**
    * Tests that RecipeConfigurator can load recipes.
-   *
-   * @legacy-covers ::getIncludedRecipe
    */
   #[TestWith(["install_two_modules", "Install two modules"])]
   #[TestWith(["recipe_include", "Recipe include"])]
@@ -74,8 +70,6 @@ class RecipeConfiguratorTest extends KernelTestBase {
 
   /**
    * Tests exception thrown when RecipeConfigurator cannot find a recipe.
-   *
-   * @legacy-covers ::getIncludedRecipe
    */
   #[TestWith(["no_recipe"])]
   #[TestWith(["does_not_exist"])]

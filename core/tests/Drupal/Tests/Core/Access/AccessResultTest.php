@@ -51,8 +51,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests the construction of an AccessResult object.
-   *
-   * @legacy-covers ::neutral
    */
   public function testConstruction(): void {
     $verify = function (AccessResult $access): void {
@@ -75,11 +73,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests access allowed.
-   *
-   * @legacy-covers ::allowed
-   * @legacy-covers ::isAllowed
-   * @legacy-covers ::isForbidden
-   * @legacy-covers ::isNeutral
    */
   public function testAccessAllowed(): void {
     $verify = function (AccessResult $access): void {
@@ -96,11 +89,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests access forbidden.
-   *
-   * @legacy-covers ::forbidden
-   * @legacy-covers ::isAllowed
-   * @legacy-covers ::isForbidden
-   * @legacy-covers ::isNeutral
    */
   public function testAccessForbidden(): void {
     $verify = function (AccessResult $access): void {
@@ -117,8 +105,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests access forbidden reason.
-   *
-   * @legacy-covers ::forbidden
    */
   public function testAccessForbiddenReason(): void {
     $verify = function (AccessResult $access, $reason): void {
@@ -139,8 +125,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests access neutral reason.
-   *
-   * @legacy-covers ::neutral
    */
   public function testAccessNeutralReason(): void {
     $verify = function (AccessResult $access, $reason): void {
@@ -164,11 +148,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests access conditionally allowed.
-   *
-   * @legacy-covers ::allowedIf
-   * @legacy-covers ::isAllowed
-   * @legacy-covers ::isForbidden
-   * @legacy-covers ::isNeutral
    */
   public function testAccessConditionallyAllowed(): void {
     $verify = function (AccessResult $access, $allowed): void {
@@ -186,11 +165,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests access conditionally forbidden.
-   *
-   * @legacy-covers ::forbiddenIf
-   * @legacy-covers ::isAllowed
-   * @legacy-covers ::isForbidden
-   * @legacy-covers ::isNeutral
    */
   public function testAccessConditionallyForbidden(): void {
     $verify = function (AccessResult $access, $forbidden): void {
@@ -416,9 +390,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests cache max age.
-   *
-   * @legacy-covers ::setCacheMaxAge
-   * @legacy-covers ::getCacheMaxAge
    */
   public function testCacheMaxAge(): void {
     $this->assertSame(Cache::PERMANENT, AccessResult::neutral()->getCacheMaxAge());
@@ -427,13 +398,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests cache contexts.
-   *
-   * @legacy-covers ::addCacheContexts
-   * @legacy-covers ::resetCacheContexts
-   * @legacy-covers ::getCacheContexts
-   * @legacy-covers ::cachePerPermissions
-   * @legacy-covers ::cachePerUser
-   * @legacy-covers ::allowedIfHasPermission
    */
   public function testCacheContexts(): void {
     $verify = function (AccessResult $access, array $contexts): void {
@@ -508,11 +472,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests cache tags.
-   *
-   * @legacy-covers ::addCacheTags
-   * @legacy-covers ::addCacheableDependency
-   * @legacy-covers ::getCacheTags
-   * @legacy-covers ::resetCacheTags
    */
   public function testCacheTags(): void {
     $verify = function (AccessResult $access, array $tags, array $contexts = [], $max_age = Cache::PERMANENT): void {
@@ -884,10 +843,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests and or cacheability propagation.
-   *
-   * @legacy-covers ::andIf
-   * @legacy-covers ::orIf
-   * @legacy-covers ::inheritCacheability
    */
   #[DataProvider('andOrCacheabilityPropagationProvider')]
   public function testAndOrCacheabilityPropagation(AccessResultInterface $first, string $op, AccessResultInterface $second, bool $implements_cacheable_dependency_interface, ?bool $is_cacheable): void {

@@ -162,10 +162,6 @@ class OverridesSectionStorageTest extends UnitTestCase {
 
   /**
    * Tests build routes.
-   *
-   * @legacy-covers ::buildRoutes
-   * @legacy-covers ::getEntityTypes
-   * @legacy-covers \Drupal\layout_builder\Routing\LayoutBuilderRoutesTrait::buildLayoutRoutes
    */
   public function testBuildRoutes(): void {
     $entity_types = [];

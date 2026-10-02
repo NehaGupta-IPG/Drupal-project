@@ -89,8 +89,6 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
 
   /**
    * Tests that a new token seed is generated upon first use.
-   *
-   * @legacy-covers ::get
    */
   public function testGenerateSeedOnGet(): void {
     $key = Crypt::randomBytesBase64();
@@ -170,8 +168,6 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
    *   The token to be validated.
    * @param mixed $value
    *   An additional value to base the token on.
-   *
-   * @legacy-covers ::validate
    */
   #[DataProvider('providerTestInvalidParameterTypes')]
   public function testInvalidParameterTypes(int|string|array|null $token, \stdClass|array $value): void {

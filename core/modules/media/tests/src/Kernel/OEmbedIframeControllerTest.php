@@ -54,8 +54,6 @@ class OEmbedIframeControllerTest extends MediaKernelTestBase {
    *
    * @param string $hash
    *   The 'hash' query string parameter.
-   *
-   * @legacy-covers ::render
    */
   #[DataProvider('providerBadHashParameter')]
   public function testBadHashParameter(string $hash): void {
@@ -79,8 +77,6 @@ class OEmbedIframeControllerTest extends MediaKernelTestBase {
    * Tests that resources can be used in media_oembed_iframe preprocess.
    *
    * @see media_test_oembed_preprocess_media_oembed_iframe()
-   *
-   * @legacy-covers ::render
    */
   public function testResourcePassedToPreprocess(): void {
     $hash = $this->container->get('media.oembed.iframe_url_helper')

@@ -55,8 +55,6 @@ class PsrResponseSubscriberTest extends UnitTestCase {
 
   /**
    * Tests altering and finished event.
-   *
-   * @legacy-covers ::onKernelView
    */
   public function testConvertsControllerResult(): void {
     $body = $this->createStub(StreamInterface::class);
@@ -71,8 +69,6 @@ class PsrResponseSubscriberTest extends UnitTestCase {
 
   /**
    * Tests that a seekable body results in a non-streamed response.
-   *
-   * @legacy-covers ::onKernelView
    */
   public function testConvertsSeekableBodyWithoutStreaming(): void {
     $body = $this->createStub(StreamInterface::class);
@@ -94,8 +90,6 @@ class PsrResponseSubscriberTest extends UnitTestCase {
 
   /**
    * Tests that a non-seekable body results in a streamed response.
-   *
-   * @legacy-covers ::onKernelView
    */
   public function testConvertsNonSeekableBodyWithStreaming(): void {
     $body = $this->createStub(StreamInterface::class);
@@ -117,8 +111,6 @@ class PsrResponseSubscriberTest extends UnitTestCase {
 
   /**
    * Tests altering and finished event.
-   *
-   * @legacy-covers ::onKernelView
    */
   public function testDoesNotConvertControllerResult(): void {
     $event = $this->createEvent([]);

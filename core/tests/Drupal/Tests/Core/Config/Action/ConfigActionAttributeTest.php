@@ -19,8 +19,6 @@ class ConfigActionAttributeTest extends UnitTestCase {
 
   /**
    * Tests no label no deriver.
-   *
-   * @legacy-covers ::__construct
    */
   public function testNoLabelNoDeriver(): void {
     $this->expectException(InvalidPluginDefinitionException::class);

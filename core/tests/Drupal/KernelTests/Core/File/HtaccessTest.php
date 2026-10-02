@@ -44,8 +44,6 @@ class HtaccessTest extends KernelTestBase {
 
   /**
    * Tests htaccess save.
-   *
-   * @legacy-covers ::write
    */
   public function testHtaccessSave(): void {
     // Prepare test directories.
@@ -94,8 +92,6 @@ class HtaccessTest extends KernelTestBase {
 
   /**
    * Tests htaccess save disabled.
-   *
-   * @legacy-covers ::write
    */
   public function testHtaccessSaveDisabled(): void {
     $this->setSetting('auto_create_htaccess', FALSE);

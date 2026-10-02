@@ -21,8 +21,6 @@ class FileNameLengthConstraintValidatorTest extends FileValidatorTestBase {
 
   /**
    * This will ensure the filename length is valid.
-   *
-   * @legacy-covers ::validate
    */
   public function testFileValidateNameLength(): void {
     // Create a new file entity.

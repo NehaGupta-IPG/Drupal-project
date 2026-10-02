@@ -81,8 +81,6 @@ class RevisionVersionHistoryTest extends KernelTestBase {
 
   /**
    * Test current revision is indicated.
-   *
-   * @legacy-covers \Drupal\Core\Entity\Controller\VersionHistoryController::revisionOverview
    */
   public function testCurrentRevision(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
@@ -110,8 +108,6 @@ class RevisionVersionHistoryTest extends KernelTestBase {
 
   /**
    * Test description with entity implementing revision log.
-   *
-   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionRevLog(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
@@ -129,8 +125,6 @@ class RevisionVersionHistoryTest extends KernelTestBase {
 
   /**
    * Test description with entity implementing revision log, with empty values.
-   *
-   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionRevLogNullValues(): void {
     $this->installConfig(['user']);
@@ -149,8 +143,6 @@ class RevisionVersionHistoryTest extends KernelTestBase {
 
   /**
    * Test description with entity, without revision log, no label access.
-   *
-   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionNoRevLogNoLabelAccess(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
@@ -165,8 +157,6 @@ class RevisionVersionHistoryTest extends KernelTestBase {
 
   /**
    * Test description with entity, without revision log, with label access.
-   *
-   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionNoRevLogWithLabelAccess(): void {
     // Permission grants 'view label' access.
@@ -184,8 +174,6 @@ class RevisionVersionHistoryTest extends KernelTestBase {
 
   /**
    * Test revision link, without access to revision page.
-   *
-   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionLinkNoAccess(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
@@ -203,8 +191,6 @@ class RevisionVersionHistoryTest extends KernelTestBase {
    *
    * Test two revisions. Usually the latest revision only checks canonical
    * route access, whereas all others will check individual revision access.
-   *
-   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionLinkWithAccess(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
@@ -232,8 +218,6 @@ class RevisionVersionHistoryTest extends KernelTestBase {
 
   /**
    * Test revision log message if supported, and HTML tags are stripped.
-   *
-   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionRevisionLogMessage(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
@@ -249,8 +233,6 @@ class RevisionVersionHistoryTest extends KernelTestBase {
 
   /**
    * Test revert operation.
-   *
-   * @legacy-covers ::buildRevertRevisionLink
    */
   public function testOperationRevertRevision(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
@@ -289,8 +271,6 @@ class RevisionVersionHistoryTest extends KernelTestBase {
 
   /**
    * Test delete operation.
-   *
-   * @legacy-covers ::buildDeleteRevisionLink
    */
   public function testOperationDeleteRevision(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */

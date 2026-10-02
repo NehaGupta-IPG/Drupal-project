@@ -125,7 +125,7 @@ class EntityLinksTest extends KernelTestBase {
   }
 
   /**
-   * @legacy-covers ::process
+   * Tests .
    */
   public function test(): void {
     $expected_aliases = [
@@ -193,8 +193,7 @@ class EntityLinksTest extends KernelTestBase {
   }
 
   /**
-   * @legacy-covers ::getUrl
-   * @legacy-covers \Drupal\file\Entity\FileLinkTarget
+   * Tests file entity.
    */
   public function testFileEntity(): void {
     $file = File::create([
@@ -218,8 +217,7 @@ class EntityLinksTest extends KernelTestBase {
   }
 
   /**
-   * @legacy-covers ::getUrl
-   * @legacy-covers \Drupal\media\Entity\MediaLinkTarget
+   * Tests media entity.
    *
    * @param bool $standalone_url_setting
    *   Whether the standalone_url setting is off (Drupal's default) or on.
@@ -302,8 +300,7 @@ class EntityLinksTest extends KernelTestBase {
   }
 
   /**
-   * @legacy-covers ::getUrl
-   * @legacy-covers \Drupal\menu_link_content\Entity\MenuLinkContentLinkTarget
+   * Tests menu link content entity.
    */
   public function testMenuLinkContentEntity(): void {
     $link = 'https://nl.wikipedia.org/wiki/Llama';

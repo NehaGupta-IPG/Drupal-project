@@ -21,8 +21,6 @@ class AuthenticationProviderPassTest extends UnitTestCase {
 
   /**
    * Tests encoders.
-   *
-   * @legacy-covers ::process
    */
   public function testEncoders(): void {
     $container = new ContainerBuilder();

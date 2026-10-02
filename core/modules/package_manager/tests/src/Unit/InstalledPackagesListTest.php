@@ -20,11 +20,6 @@ class InstalledPackagesListTest extends UnitTestCase {
 
   /**
    * Tests immutability.
-   *
-   * @legacy-covers ::offsetSet
-   * @legacy-covers ::offsetUnset
-   * @legacy-covers ::append
-   * @legacy-covers ::exchangeArray
    */
   #[TestWith(["offsetSet", ["new", "thing"]])]
   #[TestWith(["offsetUnset", ["existing"]])]
@@ -39,9 +34,6 @@ class InstalledPackagesListTest extends UnitTestCase {
 
   /**
    * Tests package comparison.
-   *
-   * @legacy-covers ::getPackagesNotIn
-   * @legacy-covers ::getPackagesWithDifferentVersionsIn
    */
   public function testPackageComparison(): void {
     $active = new InstalledPackagesList([
@@ -97,8 +89,6 @@ class InstalledPackagesListTest extends UnitTestCase {
 
   /**
    * Tests core packages.
-   *
-   * @legacy-covers ::getCorePackages
    */
   public function testCorePackages(): void {
     $data = [

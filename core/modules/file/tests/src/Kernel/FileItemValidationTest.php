@@ -61,9 +61,6 @@ class FileItemValidationTest extends KernelTestBase {
 
   /**
    * Tests file validation constraint.
-   *
-   * @legacy-covers \Drupal\file\Plugin\Validation\Constraint\FileValidationConstraint
-   * @legacy-covers \Drupal\file\Plugin\Validation\Constraint\FileValidationConstraintValidator
    */
   #[DataProvider('getFileTypes')]
   public function testFileValidationConstraint(string $file_type): void {

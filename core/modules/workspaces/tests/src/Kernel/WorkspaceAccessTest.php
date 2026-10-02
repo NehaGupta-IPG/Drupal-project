@@ -129,8 +129,6 @@ class WorkspaceAccessTest extends KernelTestBase {
 
   /**
    * Tests workspace selection.
-   *
-   * @legacy-covers \Drupal\workspaces\Plugin\EntityReferenceSelection\WorkspaceSelection::getReferenceableEntities
    */
   public function testWorkspaceSelection(): void {
     $own_permission_user = $this->createUser(['view own workspace']);
@@ -242,8 +240,6 @@ class WorkspaceAccessTest extends KernelTestBase {
 
   /**
    * Tests workspace switcher block.
-   *
-   * @legacy-covers \Drupal\workspaces\Plugin\Block\WorkspaceSwitcherBlock::blockAccess
    */
   public function testWorkspaceSwitcherBlock(): void {
     $own_permission_user = $this->createUser(['view own workspace']);
@@ -266,8 +262,6 @@ class WorkspaceAccessTest extends KernelTestBase {
 
   /**
    * Tests that workspaces with non-default providers are not referenceable.
-   *
-   * @legacy-covers \Drupal\workspaces\Plugin\EntityReferenceSelection\WorkspaceSelection::getReferenceableEntities
    */
   public function testWorkspaceSelectionFiltersByProvider(): void {
     $admin_permission_user = $this->createUser(['administer workspaces']);

@@ -22,8 +22,6 @@ class InlineBlockEntityOperationsTest extends UnitTestCase {
 
   /**
    * Tests calling handlePreSave() with an entity that is syncing.
-   *
-   * @legacy-covers ::handlePreSave
    */
   public function testPreSaveWithSyncingEntity(): void {
     $entity = $this->prophesize(SynchronizableInterface::class);

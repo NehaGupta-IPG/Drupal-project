@@ -65,8 +65,6 @@ class CreateSampleEntityTest extends KernelTestBase {
 
   /**
    * Tests sample value content entity creation of all types.
-   *
-   * @legacy-covers ::createWithSampleValues
    */
   public function testSampleValueContentEntity(): void {
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type_id => $definition) {

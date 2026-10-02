@@ -68,12 +68,6 @@ class WorkspaceMergerTest extends KernelTestBase {
 
   /**
    * Tests workspace merging.
-   *
-   * @legacy-covers ::merge
-   * @legacy-covers ::getNumberOfChangesOnSource
-   * @legacy-covers ::getNumberOfChangesOnTarget
-   * @legacy-covers ::getDifferringRevisionIdsOnSource
-   * @legacy-covers ::getDifferringRevisionIdsOnTarget
    */
   public function testWorkspaceMerger(): void {
     $this->initializeWorkspacesModule();

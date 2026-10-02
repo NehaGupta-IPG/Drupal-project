@@ -49,7 +49,7 @@ class AttributeRouteDiscoveryTest extends UnitTestCase {
   }
 
   /**
-   * @legacy-covers ::onRouteBuild
+   * Tests on route build with array namespace directories.
    */
   public function testOnRouteBuildWithArrayNamespaceDirectories(): void {
     $event = new RouteBuildEvent(new RouteCollection());
@@ -69,7 +69,7 @@ class AttributeRouteDiscoveryTest extends UnitTestCase {
   }
 
   /**
-   * @legacy-covers ::onRouteBuild
+   * Tests on route build.
    */
   public function testOnRouteBuild(): void {
     $this->assertNotEmpty($this->routeCollection);
@@ -165,9 +165,6 @@ EOF
 
   /**
    * Tests all supported route properties.
-   *
-   * @legacy-covers ::onRouteBuild
-   * @legacy-covers ::addRoute
    */
   #[IgnoreDeprecations]
   public function testAllRouteProperties(): void {

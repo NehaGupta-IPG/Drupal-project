@@ -48,8 +48,6 @@ class BlockContentPermissionsTest extends KernelTestBase {
 
   /**
    * Tests dynamic permissions.
-   *
-   * @legacy-covers ::blockTypePermissions
    */
   public function testDynamicPermissions(): void {
     $permissions = $this->permissionHandler->getPermissions();

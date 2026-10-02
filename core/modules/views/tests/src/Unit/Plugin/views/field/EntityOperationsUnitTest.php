@@ -57,8 +57,6 @@ class EntityOperationsUnitTest extends UnitTestCase {
 
   /**
    * {@inheritdoc}
-   *
-   * @legacy-covers ::__construct
    */
   protected function setUp(): void {
     parent::setUp();

@@ -627,9 +627,6 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
 
   /**
    * Tests no http fallback.
-   *
-   * @legacy-covers ::doRequest
-   * @legacy-covers ::getSecurityAdvisories
    */
   public function testNoHttpFallback(): void {
     $this->setTestFeedResponses([

@@ -23,9 +23,6 @@ class PluginWithFormsTraitTest extends UnitTestCase {
 
   /**
    * Tests get form class.
-   *
-   * @legacy-covers ::getFormClass
-   * @legacy-covers ::hasFormClass
    */
   #[DataProvider('providerGetFormClass')]
   public function testGetFormClass(PluginWithFormsInterface $block_plugin, string $operation, ?string $expected_class): void {

@@ -30,8 +30,6 @@ class LoggerAwarePassTest extends KernelTestBase {
 
   /**
    * Tests that the logger aware compiler pass works.
-   *
-   * @legacy-covers ::process
    */
   public function testLoggerAwarePass(): void {
     $container = $this->container;
@@ -44,8 +42,6 @@ class LoggerAwarePassTest extends KernelTestBase {
 
   /**
    * Tests that existing loggers are not overwritten.
-   *
-   * @legacy-covers ::process
    */
   public function testExistingLogger(): void {
     $container = $this->container;

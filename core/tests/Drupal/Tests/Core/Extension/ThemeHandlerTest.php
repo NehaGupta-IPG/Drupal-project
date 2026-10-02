@@ -81,8 +81,6 @@ class ThemeHandlerTest extends UnitTestCase {
 
   /**
    * Test that a missing theme doesn't break ThemeHandler::listInfo().
-   *
-   * @legacy-covers ::listInfo
    */
   public function testMissingTheme(): void {
     $themes = $this->themeHandler->listInfo();

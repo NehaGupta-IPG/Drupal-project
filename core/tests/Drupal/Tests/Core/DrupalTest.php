@@ -38,8 +38,6 @@ class DrupalTest extends UnitTestCase {
 
   /**
    * Tests the get/setContainer() method.
-   *
-   * @legacy-covers ::getContainer
    */
   public function testSetContainer(): void {
     \Drupal::setContainer($this->container);

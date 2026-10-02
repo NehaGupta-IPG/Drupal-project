@@ -136,8 +136,6 @@ class FieldTest extends UnitTestCase {
 
   /**
    * Tests construct.
-   *
-   * @legacy-covers ::__construct
    */
   public function testConstruct(): void {
     $definition = [

@@ -25,8 +25,6 @@ class RelationshipNodeTermDataTest extends TaxonomyTestBase {
 
   /**
    * Tests relations limited by vocabulary.
-   *
-   * @legacy-covers \Drupal\taxonomy\Plugin\views\relationship\NodeTermData::calculateDependencies
    */
   public function testViewsHandlerRelationshipNodeTermData(): void {
     $view = Views::getView('test_taxonomy_node_term_data');

@@ -57,8 +57,6 @@ class RecipeTest extends KernelTestBase {
 
   /**
    * Tests creating a pre-existing configuration with a different configuration.
-   *
-   * @legacy-covers ::createFromDirectory
    */
   public function testPreExistingDifferentConfiguration(): void {
     // Install the node module, its dependencies and configuration.
@@ -77,8 +75,6 @@ class RecipeTest extends KernelTestBase {
 
   /**
    * Tests creating an existing configuration with the same configuration.
-   *
-   * @legacy-covers ::createFromDirectory
    */
   public function testPreExistingMatchingConfiguration(): void {
     // Install the node module, its dependencies and configuration.
@@ -126,8 +122,6 @@ class RecipeTest extends KernelTestBase {
 
   /**
    * Tests getting extra extension-specific info from a recipe.
-   *
-   * @legacy-covers ::getExtra
    */
   public function testExtra(): void {
     $recipe = $this->createRecipe([

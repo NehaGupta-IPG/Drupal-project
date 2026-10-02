@@ -83,9 +83,6 @@ class BytesTest extends TestCase {
    * @param bool $expected_result
    *   The expected return value from
    *   \Drupal\Component\Utility\Bytes::validate().
-   *
-   * @legacy-covers ::validate
-   * @legacy-covers ::validateConstraint
    */
   #[DataProvider('providerTestValidate')]
   public function testValidate(string|int|float $string, bool $expected_result): void {

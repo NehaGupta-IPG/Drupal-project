@@ -19,8 +19,6 @@ class InlineBlockUsageTest extends UnitTestCase {
 
   /**
    * Tests calling deleteUsage() with empty array.
-   *
-   * @legacy-covers ::deleteUsage
    */
   public function testEmptyDeleteUsageCall(): void {
     $connection = $this->createMock(Connection::class);

@@ -28,8 +28,6 @@ class AccessGroupAndTest extends UnitTestCase {
 
   /**
    * Tests groups.
-   *
-   * @legacy-covers \Drupal\Core\Access\AccessGroupAnd
    */
   public function testGroups(): void {
     $allowedAccessible = $this->createAccessibleDouble(AccessResult::allowed());

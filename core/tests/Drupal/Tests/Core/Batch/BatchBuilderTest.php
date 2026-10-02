@@ -19,8 +19,6 @@ class BatchBuilderTest extends UnitTestCase {
 
   /**
    * Tests the default values.
-   *
-   * @legacy-covers ::toArray
    */
   public function testDefaultValues(): void {
     $batch = (new BatchBuilder())->toArray();
@@ -156,8 +154,6 @@ class BatchBuilderTest extends UnitTestCase {
 
   /**
    * Tests setting and adding libraries.
-   *
-   * @legacy-covers ::setLibraries
    */
   public function testAddingLibraries(): void {
     $batch = (new BatchBuilder())
@@ -201,8 +197,6 @@ class BatchBuilderTest extends UnitTestCase {
 
   /**
    * Tests queue class exists.
-   *
-   * @legacy-covers ::setQueue
    */
   public function testQueueExists(): void {
     $batch_builder = (new BatchBuilder());
@@ -213,8 +207,6 @@ class BatchBuilderTest extends UnitTestCase {
 
   /**
    * Tests queue class implements \Drupal\Core\Queue\QueueInterface.
-   *
-   * @legacy-covers ::setQueue
    */
   public function testQueueImplements(): void {
     $batch_builder = (new BatchBuilder());
@@ -269,9 +261,6 @@ class BatchBuilderTest extends UnitTestCase {
 
   /**
    * Tests registering IDs of built batches.
-   *
-   * @legacy-covers ::isSetIdRegistered
-   * @legacy-covers ::registerSetId
    */
   public function testRegisterIds(): void {
     $setId = $this->randomMachineName();

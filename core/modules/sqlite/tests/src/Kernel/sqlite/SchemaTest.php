@@ -17,7 +17,6 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore xinfo
-
 /**
  * Tests schema API for the SQLite driver.
  */
@@ -83,8 +82,6 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**
    * Tests introspect index schema.
-   *
-   * @legacy-covers \Drupal\sqlite\Driver\Database\sqlite\Schema::introspectIndexSchema
    */
   public function testIntrospectIndexSchema(): void {
     $table_specification = [
