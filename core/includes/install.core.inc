@@ -1743,8 +1743,6 @@ function install_install_profile(&$install_state): void {
  *   An array of information about the current installation state.
  */
 function install_download_additional_translations_operations(&$install_state): void {
-  \Drupal::moduleHandler()->loadInclude('locale', 'bulk.inc');
-
   $langcode = $install_state['parameters']['langcode'];
   if (!($language = ConfigurableLanguage::load($langcode))) {
     // Create the language if not already shipped with a profile.
@@ -1808,10 +1806,6 @@ function install_import_translations(&$install_state) {
  *   An array of batch definitions.
  */
 function install_finish_translations(&$install_state): array {
-  \Drupal::moduleHandler()->loadInclude('locale', 'fetch.inc');
-  \Drupal::moduleHandler()->loadInclude('locale', 'compare.inc');
-  \Drupal::moduleHandler()->loadInclude('locale', 'bulk.inc');
-
   // Build a fresh list of installed projects. When more projects than core are
   // installed, their translations will be downloaded (if required) and imported
   // using a batch.

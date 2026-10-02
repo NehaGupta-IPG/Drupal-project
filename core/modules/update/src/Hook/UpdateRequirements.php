@@ -53,7 +53,6 @@ class UpdateRequirements {
   public function runtime(): array {
     $requirements = [];
     if ($available = $this->updateManager->getAvailable(FALSE)) {
-      $this->moduleHandler->loadInclude('update', 'inc', 'update.compare');
       $data = $this->updateManager->calculateProjectData($available);
       // First, populate the requirements for core:
       $requirements['update_core'] = $this->requirementCheck($data['drupal'], 'core');
