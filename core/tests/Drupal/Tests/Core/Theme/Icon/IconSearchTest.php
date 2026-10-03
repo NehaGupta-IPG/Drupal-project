@@ -75,6 +75,18 @@ class IconSearchTest extends UnitTestCase {
   }
 
   /**
+   * Tests search trims the query before checking its length.
+   */
+  #[AllowMockObjectsWithoutExpectations]
+  public function testSearchWithShortQueryAfterTrim(): void {
+    $this->iconPackManager->expects($this->never())
+      ->method('getIcons');
+
+    $this->assertSame([], $this->iconSearch->search(' '));
+    $this->assertSame([], $this->iconSearch->search(' a '));
+  }
+
+  /**
    * Tests search returns matching icon IDs.
    */
   public function testSearchReturnsResults(): void {
@@ -546,6 +558,186 @@ class IconSearchTest extends UnitTestCase {
         $many,
         'home',
         ['core:home'],
+      ],
+    ];
+  }
+
+  /**
+   * Tests the complete search result, with and without an icon pack limit.
+   *
+   * @param string $query
+   *   The search query.
+   * @param string[] $allowed_icon_pack
+   *   Icon pack ids to limit the search to.
+   * @param string[] $icons
+   *   Full icon ids, in pack declaration order.
+   * @param string[] $expected
+   *   The complete expected result, in order.
+   */
+  #[DataProvider('providerSearchMatches')]
+  public function testSearchMatches(string $query, array $allowed_icon_pack, array $icons, array $expected): void {
+    // Limit the icons to the allowed packs, as the icon pack manager does.
+    $available = array_filter($icons, static fn (string $id): bool => !$allowed_icon_pack || in_array(strstr($id, ':', TRUE), $allowed_icon_pack, TRUE));
+
+    $this->iconPackManager->expects($this->once())
+      ->method('getIcons')
+      ->with($allowed_icon_pack)
+      ->willReturn(array_fill_keys($available, []));
+
+    $this->cache->expects($this->once())
+      ->method('get')
+      ->willReturn(FALSE);
+
+    $this->assertSame($expected, $this->iconSearch->search($query, $allowed_icon_pack));
+  }
+
+  /**
+   * Provides id and word queries for ::testSearchMatches.
+   *
+   * @return array
+   *   Sets of query, allowed icon packs, full icon ids and expected result.
+   */
+  public static function providerSearchMatches(): array {
+    $exact = ['bar:_match_', 'baz:quux', 'foo:_match_'];
+    $exact_multiple = [
+      'foo:_match_',
+      'bar:_match_',
+      'bar:bar',
+      'baz:_match_',
+      'baz:baz',
+      'quux:_match_',
+    ];
+    $words = ['foo:_partial_barista_', 'qux:quux', 'baz: some foolish', 'baz:baz'];
+    $words_pack = [
+      '_match_pack_:_partial_barista_',
+      'qux:quux',
+      '_match_pack_: some foolish',
+      'baz:baz',
+    ];
+
+    return [
+      'punctuation only' => [
+        '?!%$*+',
+        [],
+        ['foo:bar', 'baz:quux'],
+        [],
+      ],
+      'exact full id' => [
+        '_pack_match_:_match_',
+        [],
+        ['foo:bar', '_pack_match_:_match_', 'baz:quux'],
+        ['_pack_match_:_match_'],
+      ],
+      'exact full id, pack not allowed' => [
+        '_match_:_match_',
+        ['other'],
+        ['foo:bar', '_match_:_match_', 'baz:quux'],
+        [],
+      ],
+      'exact full id, pack allowed' => [
+        '_match_pack_:_match_',
+        ['_match_pack_'],
+        ['foo:bar', '_match_pack_:_match_', 'baz:quux'],
+        ['_match_pack_:_match_'],
+      ],
+      'exact icon id' => [
+        '_match_',
+        [],
+        $exact,
+        ['bar:_match_', 'foo:_match_'],
+      ],
+      'exact icon id, pack not allowed' => [
+        '_match_',
+        ['other'],
+        $exact,
+        [],
+      ],
+      'exact icon id, pack allowed' => [
+        '_match_',
+        ['_match_pack_'],
+        ['bar:_match_', 'baz:quux', '_match_pack_:_match_'],
+        ['_match_pack_:_match_'],
+      ],
+      'exact icon id in several packs' => [
+        '_match_',
+        [],
+        $exact_multiple,
+        ['foo:_match_', 'bar:_match_', 'baz:_match_', 'quux:_match_'],
+      ],
+      'exact icon id in several packs, pack not allowed' => [
+        '_match_',
+        ['other'],
+        $exact_multiple,
+        [],
+      ],
+      'exact icon id in several packs, packs allowed' => [
+        '_match_',
+        ['_match_pack_', '_match_pack_2_'],
+        [
+          'bar:_match_',
+          'bar:bar',
+          '_match_pack_:_match_',
+          'baz:_match_',
+          'baz:baz',
+          '_match_pack_2_:_match_',
+        ],
+        ['_match_pack_:_match_', '_match_pack_2_:_match_'],
+      ],
+      'name prefix before substring' => [
+        'fo',
+        [],
+        [
+          'bar:foo',
+          'bar:bar',
+          'baz: this is foo',
+          'baz:baz',
+          'quux:bar',
+          'quux:foo or what? ',
+          'qux:bar',
+        ],
+        ['bar:foo', 'quux:foo or what? ', 'baz: this is foo'],
+      ],
+      'partial words in order' => [
+        'part bar',
+        [],
+        $words,
+        ['foo:_partial_barista_'],
+      ],
+      'partial words in order, pack not allowed' => [
+        'part bar',
+        ['other'],
+        $words,
+        [],
+      ],
+      'partial words in order, pack allowed' => [
+        'part bar',
+        ['_match_pack_'],
+        ['_match_pack_:_partial_barista_', 'qux:quux', 'baz:quux', 'baz:baz'],
+        ['_match_pack_:_partial_barista_'],
+      ],
+      'every query word must match' => [
+        'foo bar',
+        [],
+        $words,
+        ['foo:_partial_barista_'],
+      ],
+      'every query word must match, pack allowed' => [
+        'foo bar',
+        ['foo'],
+        $words,
+        ['foo:_partial_barista_'],
+      ],
+      'partial words in order, one of two allowed packs has icons' => [
+        'part bar',
+        ['_match_pack_', '_other_match_pack'],
+        $words_pack,
+        ['_match_pack_:_partial_barista_'],
+      ],
+      'query punctuation is matched literally' => [
+        '!foo? !ùµ$::!bar.çà',
+        [],
+        $words,
+        [],
       ],
     ];
   }
