@@ -79,7 +79,9 @@ variables:
   _TARGET_PHP: "${PRIMARY_PHP}"
   # The web server variant of the PHP image: "apache" or "unit" (FreeUnit).
   _TARGET_SERVER: "unit"
-  _TARGET_IMAGE_TAG: "dev"
+  # Pinned by digest: runners reuse a cached ":dev", so the tag alone gave a
+  # mix of image builds within one pipeline.
+  _TARGET_IMAGE_TAG: "dev@sha256:e0854f27ec7bee4f7514095f28c2bac3ecd89968659a38509f499f69747a3212"
   _TARGET_DB: "mysql-8.4"
   _TARGET_DB_DRIVER: "mysql"
   _TARGET_DB_DRIVER_MODULE: "mysql"

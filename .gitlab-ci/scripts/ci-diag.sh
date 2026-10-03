@@ -81,7 +81,8 @@ case "$1" in
     echo "cpu.stat: $(tr '\n' ' ' < /sys/fs/cgroup/cpu.stat 2>/dev/null)"
     echo "cpu.pressure: $(tr '\n' ' ' < /sys/fs/cgroup/cpu.pressure 2>/dev/null)"
     echo "memory.peak_mb=$(( $(cat /sys/fs/cgroup/memory.peak 2>/dev/null || echo 0) / 1048576 )) memory.pressure: $(tr '\n' ' ' < /sys/fs/cgroup/memory.pressure 2>/dev/null)"
-    [ -d /tmp/opcache-cli ] && echo "cli opcache file_cache: files=$(find /tmp/opcache-cli -type f | wc -l) size=$(du -sh /tmp/opcache-cli | cut -f1)"
+    fc=$(php -r 'echo ini_get("opcache.file_cache");')
+    [ -n "$fc" ] && [ -d "$fc" ] && echo "cli opcache file_cache: dir=$fc files=$(find "$fc" -type f | wc -l) size=$(du -sh "$fc" | cut -f1) owners=$(find "$fc" -mindepth 1 -maxdepth 1 -printf '%u ' 2>/dev/null)"
     section "web server cpu by process (incl. reaped children)"
     server_cpu
     if [ -S /var/run/control.unit.sock ]; then
