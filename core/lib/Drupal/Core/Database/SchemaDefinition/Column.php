@@ -81,7 +81,7 @@ final class Column implements SchemaDefinitionInterface {
     public readonly ?ColumnType $type = NULL,
     public readonly ?string $description = NULL,
     public readonly ?bool $serialize = NULL,
-    public readonly ?ColumnSize $size = NULL,
+    public readonly ?ColumnSize $size = ColumnSize::Normal,
     public readonly ?bool $notNull = NULL,
     public readonly StringValue|IntValue|FloatValue|NullValue|null $default = NULL,
     public readonly ?int $length = NULL,

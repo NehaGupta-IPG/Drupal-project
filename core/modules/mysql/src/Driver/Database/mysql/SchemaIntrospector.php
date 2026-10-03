@@ -110,10 +110,18 @@ class SchemaIntrospector {
    *   A table definition.
    */
   protected function getTableSchema(string $table): Table {
+    $tableStatus = $this->connection->query("SHOW TABLE STATUS WHERE [Name] = '" . $this->connection->getPrefix() . "{$table}'")->fetchAssoc();
+    $description = $tableStatus['Comment'] ?? NULL;
+
     $query = $this->connection->query("SHOW FULL COLUMNS FROM {" . $table . "}");
     $columns = [];
     while (($row = $query->fetchAssoc()) !== FALSE) {
       $column_args = ['name' => $row['Field']];
+
+      if (!empty($row['Comment'])) {
+        $column_args['description'] = $row['Comment'];
+      }
+
       // Parse out the field type and meta information.
       preg_match('@([a-z]+)(?:\((\d+)(?:,(\d+))?\))?\s*(unsigned)?@', $row['Type'], $matches);
       $type = $this->fieldTypeMap($matches[1]);
@@ -283,6 +291,7 @@ class SchemaIntrospector {
 
     $table_args = [
       'name' => $table,
+      'description' => $description,
       'columns' => $columns,
       'dbSpecificExtra' => [
         'mysql' => [

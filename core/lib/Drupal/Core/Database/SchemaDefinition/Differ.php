@@ -73,7 +73,7 @@ class Differ {
     }
 
     // Different types, or one value is no longer an object/array.
-    if (get_debug_type($old) !== get_debug_type($new) || $old !== $new) {
+    if (get_debug_type($old) !== get_debug_type($new) || $old != $new) {
       $diff[$path] = ['type' => 'changed', 'old' => $old, 'new' => $new];
     }
 
