@@ -25,6 +25,11 @@ def conf(base, docroot='/var/www/html', access_log=True):
     m += [
         # RewriteRule "/\.|^\.(?!well-known/)" - [F]
         {'match': {'uri': [r'~^%s/(\.(?!well-known/)|.*/\.)' % R]}, 'action': {'return': 403}},
+        # <FilesMatch> applies to the file Apache serves: a path with no file
+        # behind it is rewritten to index.php first, so Drupal answers. No
+        # system/ directory exists in the docroot, so private file paths such
+        # as /system/files/module/system/system.info.yml always reach Drupal.
+        {'match': {'uri': B + '/system/files/*'}, 'action': {'pass': 'routes/front'}},
         # <FilesMatch>: protect files and directories from prying eyes.
         {'match': {'uri': files_match}, 'action': {'return': 403}},
         # Directories carrying their own "Require all denied" .htaccess.

@@ -47,6 +47,14 @@
       },
       {
         "match": {
+          "uri": "/subdirectory/system/files/*"
+        },
+        "action": {
+          "pass": "routes/front"
+        }
+      },
+      {
+        "match": {
           "uri": "~(^|/)([^/]*\\.(engine|inc|install|make|module|profile|po|sh|[^/]*sql|theme|twig|tpl(\\.php)?|xtmpl|yml)(~|\\.sw[op]|\\.bak|\\.orig|\\.save)?|\\.(?!well-known)[^/]*|Entries[^/]*|Repository|Root|Tag|Template|composer\\.(json|lock)|web\\.config|yarn\\.lock|package(-lock)?\\.json|#[^/]*#|[^/]*\\.php(~|\\.sw[op]|\\.bak|\\.orig|\\.save))$"
         },
         "action": {
