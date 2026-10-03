@@ -69,6 +69,7 @@ case "$1" in
     echo "kernel=$(uname -r) loadavg=$(cut -d' ' -f1-3 /proc/loadavg)"
     echo "KUBERNETES_CPU_REQUEST=$KUBERNETES_CPU_REQUEST CONCURRENCY=$CONCURRENCY server=$(command -v unitd >/dev/null && unitd --version 2>&1 | head -1 || apache2 -v 2>/dev/null | head -1)"
     php -v | head -1
+    echo "cli: $(php -r 'echo php_ini_loaded_file(), " opcache.enable_cli=", ini_get("opcache.enable_cli"), " opcache.file_cache=", ini_get("opcache.file_cache");')"
     cat /sys/fs/cgroup/cpu.stat 2>/dev/null | tr '\n' ' '; echo
     section "server php (start)"
     probe
@@ -79,6 +80,7 @@ case "$1" in
     echo "cpu.stat: $(tr '\n' ' ' < /sys/fs/cgroup/cpu.stat 2>/dev/null)"
     echo "cpu.pressure: $(tr '\n' ' ' < /sys/fs/cgroup/cpu.pressure 2>/dev/null)"
     echo "memory.peak_mb=$(( $(cat /sys/fs/cgroup/memory.peak 2>/dev/null || echo 0) / 1048576 )) memory.pressure: $(tr '\n' ' ' < /sys/fs/cgroup/memory.pressure 2>/dev/null)"
+    [ -d /tmp/opcache-cli ] && echo "cli opcache file_cache: files=$(find /tmp/opcache-cli -type f | wc -l) size=$(du -sh /tmp/opcache-cli | cut -f1)"
     section "web server cpu by process (incl. reaped children)"
     server_cpu
     if [ -S /var/run/control.unit.sock ]; then
