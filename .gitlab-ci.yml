@@ -78,8 +78,8 @@ variables:
   PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
   _TARGET_PHP: "${PRIMARY_PHP}"
   # The web server variant of the PHP image: "apache" or "unit" (FreeUnit).
-  _TARGET_SERVER: "apache"
-  _TARGET_IMAGE_TAG: "production"
+  _TARGET_SERVER: "unit"
+  _TARGET_IMAGE_TAG: "dev"
   _TARGET_DB: "mysql-8.4"
   _TARGET_DB_DRIVER: "mysql"
   _TARGET_DB_DRIVER_MODULE: "mysql"
@@ -958,6 +958,9 @@ default:
     # that we allow here.
     exit_codes: 100
   variables:
+    # FreeUnit images exist only for the primary PHP version.
+    _TARGET_SERVER: "apache"
+    _TARGET_IMAGE_TAG: "production"
     KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: 24
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
@@ -1000,6 +1003,9 @@ default:
     # that we allow here.
     exit_codes: 100
   variables:
+    # FreeUnit images exist only for the primary PHP version.
+    _TARGET_SERVER: "apache"
+    _TARGET_IMAGE_TAG: "production"
     KUBERNETES_CPU_REQUEST: "2"
     _ARTIFACTS_DIR: "test-artifacts/phpunit"
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
