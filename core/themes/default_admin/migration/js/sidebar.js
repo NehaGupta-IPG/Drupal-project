@@ -43,10 +43,16 @@
             }
           });
 
-          // Resize observer.
+          // Resize observer. Only a change of width can cross a breakpoint: a
+          // change of height, as when the page content grows, must not
+          // collapse the sidebar.
+          let lastWidth;
           const resizeHandler = new ResizeObserver((entries) => {
             for (let entry of entries) {
-              Drupal.debounce(this.handleResize(entry.contentRect), 150);
+              if (entry.contentRect.width !== lastWidth) {
+                lastWidth = entry.contentRect.width;
+                Drupal.debounce(this.handleResize(entry.contentRect), 150);
+              }
             }
           });
           resizeHandler.observe(document.querySelector('html'));
@@ -63,6 +69,16 @@
             e.preventDefault();
             this.removeInlineStyles();
             this.toggleSidebar();
+          }),
+      );
+
+      // Error message open
+      once('adminSidebarOpen', '[data-admin-sidebar-open]', context).forEach(
+        (el) =>
+          el.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.removeInlineStyles();
+            this.showSidebarAtField(el.dataset.adminSidebarOpen);
           }),
       );
 
@@ -140,6 +156,35 @@
 
       // Expose to localStorage.
       localStorage.setItem(chooseStorage, 'false');
+    },
+
+    showSidebarAtField: (id) => {
+      Drupal.adminSidebar.showSidebar();
+
+      // Find the field with the error.
+      const target = document.getElementById(id);
+      const field =
+        target && !target.matches('input, select, textarea')
+          ? target.querySelector('input, select, textarea')
+          : target || resizable.querySelector('.error');
+      if (!field) {
+        return;
+      }
+
+      // Open the details elements around the field.
+      let details = field.closest('details:not([open])');
+      while (details) {
+        details.open = true;
+        details = details.parentElement.closest('details:not([open])');
+      }
+
+      // The sidebar stays hidden until its transition starts.
+      field.focus();
+      if (document.activeElement !== field) {
+        resizable.addEventListener('transitionend', () => field.focus(), {
+          once: true,
+        });
+      }
     },
 
     handleResize: (windowSize = window) => {
