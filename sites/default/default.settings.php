@@ -198,8 +198,38 @@ $databases = [];
  *     'password' => 'sql_password',
  *     'host' => 'localhost',
  *     'prefix' => '',
+ *     'sslmode' => '',
+ *     'sslcert' => '',
+ *     'sslkey' => '',
+ *     'sslrootcert' => '',
  *   ];
  * @endcode
+ *
+ *  For SSL enabled PostgreSQL servers, the following settings can be used to
+ *  configure the connection:
+ *  - 'sslmode'     - Options: see below.
+ *  - 'sslcert'     - Path to the client certificate that PHP presents to the
+ *                    server. Optional, but required if the PostgreSQL server
+ *                    requires it.
+ *  - 'sslkey'      - Path to the private key for the certificate in `sslcert`.
+ *                    Optional, but required if the PostgreSQL server requires
+ *                    it.
+ *  - 'sslrootcert' - Path to the trusted CA certificate(s) used to check the
+ *                    server's certificate. Required for 'verify-ca' and
+ *                    'verify-full' sslmode options.
+ *
+ *  The sslmode options:
+ *  - 'disable'     - Never use SSL (default).
+ *  - 'allow'       - Try an unencrypted connection first; use SSL only if that
+ *                    fails.
+ *  - 'prefer'      - Try an encrypted connection first; fall back to
+ *                    unencrypted if that fails.
+ *  - 'require'     - Always use SSL; but normally does not verify the server
+ *                    certificate.
+ *  - 'verify-ca'   - Always use SSL and verify the server certificate is issued
+ *                    by a trusted CA.
+ *  - 'verify-full' - Always use SSL and verify the server certificate is issued
+ *                    by a trusted CA and matches the host name.
  *
  * Sample Database configuration format for SQLite (sqlite):
  * @code
