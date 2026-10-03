@@ -22,7 +22,7 @@ use PHPUnit\Framework\Attributes\Group;
  * Tests Schema differ.
  */
 #[Group('Database')]
-#[CoversClass(Differ::class)]
+#[CoversClass(SchemaDefinitionDiffer::class)]
 class SchemaDefinitionDifferTest extends UnitTestCase {
 
   /**
@@ -110,9 +110,9 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
   /**
    * Returns a compact diff between two SchemaDefinitionInterface objects.
    *
-   * @param SchemaDefinitionInterface $old
+   * @param SchemaDefinitionInterface $a
    *   A SchemaDefinitionInterface object to compare.
-   * @param SchemaDefinitionInterface $new
+   * @param SchemaDefinitionInterface $b
    *   A SchemaDefinitionInterface object to compare.
    *
    * @return array<string,string>
@@ -123,4 +123,5 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
     $diff = SchemaDefinitionDiffer::diff($a, $b);
     return array_map(fn ($value): string => $value['type']->name, $diff);
   }
+
 }
