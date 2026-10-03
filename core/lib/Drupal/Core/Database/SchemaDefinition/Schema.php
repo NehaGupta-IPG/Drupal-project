@@ -46,6 +46,13 @@ final class Schema implements SchemaDefinitionInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function normalizationProperty(): ?string {
+    return NULL;
+  }
+
+  /**
    * Returns the names of the tables.
    *
    * @return list<string>

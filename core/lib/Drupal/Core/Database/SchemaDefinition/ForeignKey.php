@@ -62,6 +62,13 @@ final class ForeignKey extends KeyBase {
   /**
    * {@inheritdoc}
    */
+  public static function normalizationProperty(): ?string {
+    return 'name';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function toArray(): array {
     $match = [];
     for ($i = 0; $i < count($this->columns); $i++) {

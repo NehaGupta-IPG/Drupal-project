@@ -112,6 +112,13 @@ final class Table implements SchemaDefinitionInterface {
   /**
    * {@inheritdoc}
    */
+  public static function normalizationProperty(): ?string {
+    return 'name';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function toArray(): array {
     $spec = [];
     if ($this->description !== NULL) {

@@ -26,4 +26,11 @@ final class UniqueKey extends KeyBase {
     parent::__construct($columns, FALSE);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function normalizationProperty(): ?string {
+    return 'name';
+  }
+
 }

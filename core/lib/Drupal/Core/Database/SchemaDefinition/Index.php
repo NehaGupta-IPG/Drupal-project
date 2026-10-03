@@ -26,4 +26,11 @@ final class Index extends KeyBase {
     parent::__construct($columns, TRUE);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function normalizationProperty(): ?string {
+    return 'name';
+  }
+
 }
