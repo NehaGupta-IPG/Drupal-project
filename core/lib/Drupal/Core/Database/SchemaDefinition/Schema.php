@@ -48,10 +48,8 @@ final class Schema implements SchemaDefinitionInterface {
   /**
    * {@inheritdoc}
    */
-  public function arrayPropertyNormalizationKeys(): array {
-    return [
-      'tables' => 'name',
-    ];
+  public static function normalizationProperty(): ?string {
+    return NULL;
   }
 
   /**

@@ -112,13 +112,8 @@ final class Table implements SchemaDefinitionInterface {
   /**
    * {@inheritdoc}
    */
-  public function arrayPropertyNormalizationKeys(): array {
-    return [
-      'columns' => 'name',
-      'uniqueKeys' => 'name',
-      'indexes' => 'name',
-      'foreignKeys' => 'name',
-    ];
+  public static function normalizationProperty(): ?string {
+    return 'name';
   }
 
   /**

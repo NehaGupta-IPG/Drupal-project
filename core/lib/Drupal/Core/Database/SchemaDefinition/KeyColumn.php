@@ -26,8 +26,8 @@ final class KeyColumn implements SchemaDefinitionInterface {
   /**
    * {@inheritdoc}
    */
-  public function arrayPropertyNormalizationKeys(): array {
-    return [];
+  public static function normalizationProperty(): ?string {
+    return 'name';
   }
 
   /**

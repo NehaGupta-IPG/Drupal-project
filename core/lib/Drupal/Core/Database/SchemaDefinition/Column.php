@@ -12,6 +12,16 @@ use Drupal\Core\Database\Exception\SchemaDefinitionException;
 final class Column implements SchemaDefinitionInterface {
 
   /**
+   * The column data size.
+   *
+   * This is a hint about the largest value the column will store. See
+   * ColumnSize for allowed values.
+   *
+   * @see \Drupal\Core\Database\SchemaDefinition\ColumnSize
+   */
+  public readonly ColumnSize $size;
+
+  /**
    * Constructor.
    *
    * @param string $name
@@ -81,7 +91,7 @@ final class Column implements SchemaDefinitionInterface {
     public readonly ?ColumnType $type = NULL,
     public readonly ?string $description = NULL,
     public readonly ?bool $serialize = NULL,
-    public readonly ?ColumnSize $size = ColumnSize::Normal,
+    ?ColumnSize $size = ColumnSize::Normal,
     public readonly ?bool $notNull = NULL,
     public readonly StringValue|IntValue|FloatValue|NullValue|null $default = NULL,
     public readonly ?int $length = NULL,
@@ -93,6 +103,7 @@ final class Column implements SchemaDefinitionInterface {
     public readonly ?GeneratedColumnExpression $generatedExpression = NULL,
     public readonly ?array $dbSpecificExtra = NULL,
   ) {
+    $this->size = $size ?? ColumnSize::Normal;
   }
 
   /**
@@ -225,8 +236,8 @@ final class Column implements SchemaDefinitionInterface {
   /**
    * {@inheritdoc}
    */
-  public function arrayPropertyNormalizationKeys(): array {
-    return [];
+  public static function normalizationProperty(): ?string {
+    return 'name';
   }
 
   /**

@@ -12,21 +12,23 @@ class Differ {
   /**
    * Computes the diff.
    */
-  public static function diff(mixed $old, mixed $new, string $path = ''): array {
+  public static function diff(SchemaDefinitionInterface $old, SchemaDefinitionInterface $new): array {
+    if (get_class($old) !== get_class($new)) {
+      throw new \InvalidArgumentException('Schema diff can only be computed between same type of SchemaDefinition objects');
+    }
+    return static::computeDiff($old, $new);
+  }
+
+  /**
+   * Computes the diff.
+   */
+  protected static function computeDiff(mixed $old, mixed $new, ?string $path = NULL): array {
     $diff = [];
 
     // SchemaDefinitionInterface objects: compare their properties.
     if ($old instanceof SchemaDefinitionInterface && $new instanceof SchemaDefinitionInterface) {
-      // When comparing simple arrays of SchemaDefinitionInterface objects,
-      // normalize them to associative arrays when the sequence of values in the
-      // simple array is not relevant.
-      $arrayPropertyNormalizationKeys = $old->arrayPropertyNormalizationKeys();
-
       $old = get_object_vars($old);
       $new = get_object_vars($new);
-    }
-    else {
-      $arrayPropertyNormalizationKeys = [];
     }
 
     // Compare array keys recursively.
@@ -34,11 +36,22 @@ class Differ {
       $allKeys = array_unique(array_merge(array_keys($old), array_keys($new)));
 
       foreach ($allKeys as $key) {
-        $pathFragmentA = $old[$key] ?? $new[$key];
-        $pathFragmentB = $pathFragmentA instanceof SchemaDefinitionInterface && property_exists($pathFragmentA, 'name') && is_int($key) ? $pathFragmentA->name : NULL;
-        $pathFragmentC = $pathFragmentB !== NULL ? '[' . (string) $key . ']' . $pathFragmentB : (string) $key;
+        $pathFragmentElement = $old[$key] ?? $new[$key];
+        if ($pathFragmentElement instanceof SchemaDefinitionInterface) {
+          $pathFragmentClass = get_class($pathFragmentElement);
+          $pathFragmentNormalizationProperty = $pathFragmentClass::normalizationProperty();
+          if ($pathFragmentNormalizationProperty) {
+            $pathFragmentValue = "[" . $pathFragmentElement->{$pathFragmentNormalizationProperty} . "]";
+          }
+          else {
+            $pathFragmentValue = '';
+          }
+        }
+        else {
+          $pathFragmentValue = ($path === NULL ? '' : '.') . $key;
+        }
 
-        $currentPath = $path === '' ? $pathFragmentC : $path . '.' . $pathFragmentC;
+        $currentPath = $path === NULL ? $pathFragmentValue : $path . $pathFragmentValue;
 
         $existsOld = array_key_exists($key, $old);
         $existsNew = array_key_exists($key, $new);
@@ -66,7 +79,7 @@ class Differ {
           $new[$key] = $tmp;
         }
 
-        $diff = array_merge($diff, static::diff($old[$key], $new[$key], $currentPath));
+        $diff = array_merge($diff, static::computeDiff($old[$key], $new[$key], $currentPath));
       }
 
       return $diff;

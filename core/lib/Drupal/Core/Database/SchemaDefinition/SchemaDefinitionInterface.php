@@ -20,7 +20,7 @@ interface SchemaDefinitionInterface {
    * @return array<string,string>
    *   The legacy array-based specification.
    */
-  public function arrayPropertyNormalizationKeys(): array;
+  public static function normalizationProperty(): ?string;
 
   /**
    * Converts the object to legacy array-based specifications.

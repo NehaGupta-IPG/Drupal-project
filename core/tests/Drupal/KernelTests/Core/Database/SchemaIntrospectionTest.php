@@ -142,8 +142,6 @@ class SchemaIntrospectionTest extends DatabaseTestBase {
 
     $introspectedSchema = $this->connection->schema()->introspect(['/^test_introspection$/']);
 
-    dump(Differ::diff($testSchemaDefinition, $introspectedSchema));
-
     $this->assertEquals([], Differ::diff($testSchemaDefinition, $introspectedSchema));
   }
 

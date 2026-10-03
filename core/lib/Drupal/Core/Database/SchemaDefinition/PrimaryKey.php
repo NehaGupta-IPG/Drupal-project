@@ -21,4 +21,11 @@ final class PrimaryKey extends KeyBase {
     parent::__construct($columns, FALSE);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function normalizationProperty(): ?string {
+    return NULL;
+  }
+
 }
