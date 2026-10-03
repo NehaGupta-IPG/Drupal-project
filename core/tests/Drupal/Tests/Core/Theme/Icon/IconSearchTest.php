@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Theme\Icon;
 
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Theme\Icon\IconSearch;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 use Drupal\Tests\UnitTestCase;
@@ -28,13 +27,6 @@ class IconSearchTest extends UnitTestCase {
   protected $iconPackManager;
 
   /**
-   * The cache backend mock.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $cache;
-
-  /**
    * The icon search service.
    *
    * @var \Drupal\Core\Theme\Icon\IconSearchInterface
@@ -48,12 +40,8 @@ class IconSearchTest extends UnitTestCase {
     parent::setUp();
 
     $this->iconPackManager = $this->createMock(IconPackManagerInterface::class);
-    $this->cache = $this->createMock(CacheBackendInterface::class);
 
-    $this->iconSearch = new IconSearch(
-      $this->iconPackManager,
-      $this->cache,
-    );
+    $this->iconSearch = new IconSearch($this->iconPackManager);
   }
 
   /**
@@ -77,7 +65,6 @@ class IconSearchTest extends UnitTestCase {
   /**
    * Tests search trims the query before checking its length.
    */
-  #[AllowMockObjectsWithoutExpectations]
   public function testSearchWithShortQueryAfterTrim(): void {
     $this->iconPackManager->expects($this->never())
       ->method('getIcons');
@@ -102,19 +89,6 @@ class IconSearchTest extends UnitTestCase {
       ->with([])
       ->willReturn($icons);
 
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->willReturn(FALSE);
-
-    $this->cache->expects($this->once())
-      ->method('set')
-      ->with(
-        $this->isString(),
-        $this->isArray(),
-        CacheBackendInterface::CACHE_PERMANENT,
-        ['icon_pack_plugin']
-      );
-
     $result = $this->iconSearch->search('add');
 
     // 'core:add' matches exactly, 'core:add-new' has 'add' as a whole word.
@@ -129,13 +103,6 @@ class IconSearchTest extends UnitTestCase {
       ->method('getIcons')
       ->with(['core'])
       ->willReturn(['core:add' => ['source' => 'add.svg']]);
-
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->willReturn(FALSE);
-
-    $this->cache->expects($this->once())
-      ->method('set');
 
     $result = $this->iconSearch->search('add', ['core']);
 
@@ -155,13 +122,6 @@ class IconSearchTest extends UnitTestCase {
     $this->iconPackManager->expects($this->once())
       ->method('getIcons')
       ->willReturn($icons);
-
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->willReturn(FALSE);
-
-    $this->cache->expects($this->once())
-      ->method('set');
 
     $result = $this->iconSearch->search('icon', [], 10);
 
@@ -183,13 +143,6 @@ class IconSearchTest extends UnitTestCase {
       ->method('getIcons')
       ->willReturn($icons);
 
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->willReturn(FALSE);
-
-    $this->cache->expects($this->once())
-      ->method('set');
-
     $result = $this->iconSearch->search('home');
 
     // The icon part of 'core:home' equals the query, so it comes first. The
@@ -200,30 +153,6 @@ class IconSearchTest extends UnitTestCase {
       'other:my-home',
       'pack:has-home-icon',
     ], $result);
-  }
-
-  /**
-   * Tests search returns cached results without querying icon packs.
-   */
-  public function testSearchUsesCachedResults(): void {
-    $cachedResults = [
-      ['value' => 'core:add', 'label' => 'core:add'],
-    ];
-
-    $cacheObject = (object) ['data' => $cachedResults];
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->willReturn($cacheObject);
-
-    $this->iconPackManager->expects($this->never())
-      ->method('getIcons');
-
-    $this->cache->expects($this->never())
-      ->method('set');
-
-    $result = $this->iconSearch->search('add');
-
-    $this->assertEquals($cachedResults, $result);
   }
 
   /**
@@ -238,13 +167,6 @@ class IconSearchTest extends UnitTestCase {
     $this->iconPackManager->expects($this->once())
       ->method('getIcons')
       ->willReturn($icons);
-
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->willReturn(FALSE);
-
-    $this->cache->expects($this->once())
-      ->method('set');
 
     $result = $this->iconSearch->search('add');
 
@@ -263,13 +185,6 @@ class IconSearchTest extends UnitTestCase {
     $this->iconPackManager->expects($this->once())
       ->method('getIcons')
       ->willReturn($icons);
-
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->willReturn(FALSE);
-
-    $this->cache->expects($this->once())
-      ->method('set');
 
     $result = $this->iconSearch->search('user profile');
 
@@ -290,13 +205,6 @@ class IconSearchTest extends UnitTestCase {
       ->method('getIcons')
       ->willReturn($icons);
 
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->willReturn(FALSE);
-
-    $this->cache->expects($this->once())
-      ->method('set');
-
     $result = $this->iconSearch->search('icon', [], 500);
 
     $this->assertCount(300, $result);
@@ -305,7 +213,6 @@ class IconSearchTest extends UnitTestCase {
   /**
    * Tests search treats query length as characters, not bytes.
    */
-  #[AllowMockObjectsWithoutExpectations]
   public function testSearchWithSingleMultibyteCharacter(): void {
     $this->iconPackManager->expects($this->never())
       ->method('getIcons');
@@ -322,121 +229,20 @@ class IconSearchTest extends UnitTestCase {
       ->method('getIcons')
       ->willReturn(['core:你好' => ['source' => 'ni-hao.svg']]);
 
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->willReturn(FALSE);
-
     $result = $this->iconSearch->search('你好');
 
     $this->assertSame(['core:你好'], $result);
   }
 
   /**
-   * Tests an empty search result is not written to the cache.
-   */
-  public function testSearchDoesNotCacheEmptyResults(): void {
-    $this->iconPackManager->expects($this->once())
-      ->method('getIcons')
-      ->willReturn(['core:add' => ['source' => 'add.svg']]);
-
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->willReturn(FALSE);
-
-    $this->cache->expects($this->never())
-      ->method('set');
-
-    $this->assertSame([], $this->iconSearch->search('zzz'));
-  }
-
-  /**
-   * Tests the cache id is a hash of the search parameters.
-   */
-  public function testSearchCacheIdIsHashed(): void {
-    $cid = NULL;
-
-    $this->iconPackManager->expects($this->once())
-      ->method('getIcons')
-      ->willReturn(['core:add' => ['source' => 'add.svg']]);
-
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->with($this->callback(function ($value) use (&$cid) {
-        $cid = $value;
-        return TRUE;
-      }))
-      ->willReturn(FALSE);
-
-    $this->cache->expects($this->once())
-      ->method('set');
-
-    $this->iconSearch->search('add', ['core'], 10);
-
-    $this->assertMatchesRegularExpression('/^icon_search:[A-Za-z0-9_-]{43}$/', $cid);
-  }
-
-  /**
    * Tests search returns nothing for a non-positive max result.
    */
-  #[AllowMockObjectsWithoutExpectations]
   public function testSearchWithNonPositiveMaxResult(): void {
     $this->iconPackManager->expects($this->never())
       ->method('getIcons');
 
     $this->assertSame([], $this->iconSearch->search('add', [], 0));
     $this->assertSame([], $this->iconSearch->search('add', [], -1));
-  }
-
-  /**
-   * Tests the cache id ignores the max result and the pack order.
-   */
-  public function testSearchCacheIdIgnoresMaxResultAndPackOrder(): void {
-    $cids = [];
-
-    $this->iconPackManager->expects($this->exactly(2))
-      ->method('getIcons')
-      ->willReturn(['core:add' => ['source' => 'add.svg']]);
-
-    $this->cache->expects($this->exactly(2))
-      ->method('get')
-      ->with($this->callback(function ($value) use (&$cids) {
-        $cids[] = $value;
-        return TRUE;
-      }))
-      ->willReturn(FALSE);
-
-    $this->cache->expects($this->exactly(2))
-      ->method('set');
-
-    $this->iconSearch->search('add', ['other', 'core'], 10);
-    $this->iconSearch->search('add', ['core', 'other'], 20);
-
-    $this->assertCount(2, $cids);
-    $this->assertSame($cids[0], $cids[1]);
-  }
-
-  /**
-   * Tests the full ranked list is cached and sliced on read.
-   */
-  public function testSearchSlicesCachedResults(): void {
-    $this->iconPackManager->expects($this->once())
-      ->method('getIcons')
-      ->willReturn([
-        'core:add' => ['source' => 'add.svg'],
-        'core:add-new' => ['source' => 'add-new.svg'],
-        'core:add-old' => ['source' => 'add-old.svg'],
-      ]);
-
-    $this->cache->expects($this->exactly(2))
-      ->method('get')
-      ->willReturnOnConsecutiveCalls(FALSE, (object) ['data' => ['core:add', 'core:add-new', 'core:add-old']]);
-
-    $this->cache->expects($this->once())
-      ->method('set')
-      ->with($this->isString(), ['core:add', 'core:add-new', 'core:add-old']);
-
-    $this->assertSame(['core:add', 'core:add-new'], $this->iconSearch->search('add', [], 2));
-    $this->assertSame(['core:add'], $this->iconSearch->search('add', [], 1));
   }
 
   /**
@@ -455,10 +261,6 @@ class IconSearchTest extends UnitTestCase {
     $this->iconPackManager->expects($this->once())
       ->method('getIcons')
       ->willReturn($icons);
-
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->willReturn(FALSE);
 
     $result = $this->iconSearch->search($query);
 
@@ -583,10 +385,6 @@ class IconSearchTest extends UnitTestCase {
       ->method('getIcons')
       ->with($allowed_icon_pack)
       ->willReturn(array_fill_keys($available, []));
-
-    $this->cache->expects($this->once())
-      ->method('get')
-      ->willReturn(FALSE);
 
     $this->assertSame($expected, $this->iconSearch->search($query, $allowed_icon_pack));
   }

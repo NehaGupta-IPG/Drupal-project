@@ -2102,19 +2102,9 @@ services:
   Drupal\Core\Theme\DesignToken\DesignTokenValuePluginManagerInterface: '@plugin.manager.design_token_value'
   Drupal\Core\Extension\ThemeSettingsProvider:
     autowire: true
-  cache.icon:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory: ['@cache_factory', 'get']
-    arguments: [icon]
   icon.search:
     class: Drupal\Core\Theme\Icon\IconSearch
-    arguments:
-      [
-        '@plugin.manager.icon_pack',
-        '@cache.icon',
-      ]
+    arguments: ['@plugin.manager.icon_pack']
   Drupal\Core\Theme\Icon\IconSearch: '@icon.search'
   Drupal\Core\Theme\Icon\IconSearchInterface: '@icon.search'
   Drupal\Core\Extension\ModuleWeight:

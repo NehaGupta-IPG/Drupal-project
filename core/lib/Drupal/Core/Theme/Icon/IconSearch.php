@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Theme\Icon;
 
-use Drupal\Component\Utility\Crypt;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 
 /**
@@ -22,6 +20,10 @@ use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
  *
  * Within a bucket the order the icon packs declare their icons is kept.
  *
+ * Results are not cached here: every distinct query would add a cache entry,
+ * and the route exposing the search accepts anonymous requests. The icon
+ * definitions are cached by the icon pack manager.
+ *
  * @internal
  *   This API is experimental.
  */
@@ -37,12 +39,9 @@ class IconSearch implements IconSearchInterface {
    *
    * @param \Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface $pluginManagerIconPack
    *   The icon pack manager service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
    */
   public function __construct(
     private readonly IconPackManagerInterface $pluginManagerIconPack,
-    private readonly CacheBackendInterface $cache,
   ) {}
 
   /**
@@ -60,26 +59,7 @@ class IconSearch implements IconSearchInterface {
       return [];
     }
 
-    // The full ranked list is cached and sliced on read, so the cache id only
-    // depends on the query and the pack set. Hashing keeps user input out of
-    // the id and its length within what every cache backend accepts.
-    sort($allowed_icon_pack);
-    $cache_key = 'icon_search:' . Crypt::hashBase64($query . '|' . implode('+', $allowed_icon_pack));
-
-    // Try to get cached results.
-    if ($cached = $this->cache->get($cache_key)) {
-      return array_slice($cached->data, 0, $max_result);
-    }
-
-    // Perform the search and cache permanently, tagged so results are
-    // invalidated when icon packs change.
-    $results = $this->doSearch($query, $allowed_icon_pack);
-    if ($results === []) {
-      return [];
-    }
-    $this->cache->set($cache_key, $results, CacheBackendInterface::CACHE_PERMANENT, ['icon_pack_plugin']);
-
-    return array_slice($results, 0, $max_result);
+    return array_slice($this->doSearch($query, $allowed_icon_pack), 0, $max_result);
   }
 
   /**

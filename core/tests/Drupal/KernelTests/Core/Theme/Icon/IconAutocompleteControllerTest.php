@@ -69,8 +69,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
    */
   private function rebuildControllerWithMock(IconPackManagerInterface $icon_pack_manager): void {
     $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
-    $cache = $this->container->get('cache.default');
-    $this->container->set('icon.search', new IconSearch($icon_pack_manager, $cache));
+    $this->container->set('icon.search', new IconSearch($icon_pack_manager));
     // Use a concrete implementation instead of a PHPUnit mock to avoid notices
     // from mocking methods that take by-reference parameters.
     $renderer = new class() implements RendererInterface {
