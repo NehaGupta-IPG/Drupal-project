@@ -10,6 +10,8 @@ use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore sslmode sslcert sslkey sslrootcert
+
 /**
  * Tests the PostgreSQL SSL connection options.
  *

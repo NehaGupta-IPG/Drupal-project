@@ -9,6 +9,8 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore sslmode sslcert sslkey sslrootcert
+
 /**
  * Tests the SSL options of Drupal\pgsql\Driver\Database\pgsql\Connection.
  */
