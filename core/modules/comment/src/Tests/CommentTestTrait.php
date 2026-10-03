@@ -116,7 +116,10 @@ trait CommentTestTrait {
           'label' => 'above',
           'type' => 'comment_default',
           'weight' => 20,
-          'settings' => ['view_mode' => $comment_view_mode],
+          'settings' => [
+            'view_mode' => $comment_view_mode,
+            'use_entity_access_control' => TRUE,
+          ],
         ])
         ->save();
       foreach ($entity_display_repository->getViewModes($entity_type) as $id => $view_mode) {

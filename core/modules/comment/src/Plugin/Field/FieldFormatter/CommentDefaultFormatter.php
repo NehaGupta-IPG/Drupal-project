@@ -9,6 +9,7 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -37,6 +38,7 @@ class CommentDefaultFormatter extends FormatterBase {
     return [
       'view_mode' => 'default',
       'pager_id' => 0,
+      'use_entity_access_control' => TRUE,
     ] + parent::defaultSettings();
   }
 
@@ -138,6 +140,12 @@ class CommentDefaultFormatter extends FormatterBase {
       !in_array($this->viewMode, ['search_result', 'search_index'])) {
       $comment_settings = $this->getFieldSettings();
 
+      $use_entity_access_control = $this->getSetting('use_entity_access_control') ?? FALSE;
+      if (!$use_entity_access_control) {
+        // @phpstan-ignore method.deprecated
+        return $this->getDeprecatedPermissionBasedAccessElements($entity, $field_name, $status, $comment_settings);
+      }
+
       // Only attempt to render comments if the entity has visible comments.
       // Unpublished comments are not included in
       // $entity->get($field_name)->comment_count, but unpublished comments
@@ -150,24 +158,7 @@ class CommentDefaultFormatter extends FormatterBase {
         $output['comments'] = [];
 
         if ($items->comment_count || $comment_admin) {
-          $mode = $comment_settings['default_mode'];
-          $comments_per_page = $comment_settings['per_page'];
-          $comments = $this->storage->loadThread($entity, $field_name, $mode, $comments_per_page, $this->getSetting('pager_id'));
-
-          if ($comments) {
-            $build = $this->viewBuilder->viewMultiple($comments, $this->getSetting('view_mode'));
-            $build['pager']['#type'] = 'pager';
-            // CommentController::commentPermalink() calculates the page number
-            // where a specific comment appears and does a subrequest pointing
-            // to that page, we need to pass that subrequest route to our pager
-            // to keep the pager working.
-            $build['pager']['#route_name'] = $this->routeMatch->getRouteName();
-            $build['pager']['#route_parameters'] = $this->routeMatch->getRawParameters()->all();
-            if ($this->getSetting('pager_id')) {
-              $build['pager']['#element'] = $this->getSetting('pager_id');
-            }
-            $output['comments'] += $build;
-          }
+          $this->buildCommentList($output, $entity, $field_name);
         }
       }
 
@@ -225,6 +216,16 @@ class CommentDefaultFormatter extends FormatterBase {
       '#default_value' => $this->getSetting('pager_id'),
       '#description' => $this->t("Unless you're experiencing problems with pagers related to this field, you should leave this at 0. If using multiple pagers on one page you may need to set this number to a higher value so as not to conflict within the ?page= array. Large values will add a lot of commas to your URLs, so avoid if possible."),
     ];
+    $element['use_entity_access_control'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('How to check the user access'),
+      '#options' => [
+        TRUE => $this->t('Use entity access control'),
+        FALSE => $this->t('Use permission-based access control (deprecated)'),
+      ],
+      '#description' => $this->t('Permission-based access control is deprecated and will be removed in Drupal 13.0.0.'),
+      '#default_value' => $this->getSetting('use_entity_access_control') ?? FALSE,
+    ];
     return $element;
   }
 
@@ -267,6 +268,92 @@ class CommentDefaultFormatter extends FormatterBase {
    */
   protected function getViewModes() {
     return $this->entityDisplayRepository->getViewModeOptionsByBundle('comment', $this->getFieldSetting('comment_type'));
+  }
+
+  /**
+   * Builds the list of comments.
+   *
+   * @param array $output
+   *   The output array to which the comments will be added.
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The entity for which the comments are being built.
+   * @param string $field_name
+   *   The name of the field for which the comments are being built.
+   */
+  protected function buildCommentList(array &$output, FieldableEntityInterface $entity, string $field_name): void {
+    $mode = $this->getFieldSetting('default_mode');
+    $comments_per_page = $this->getFieldSetting('per_page');
+    $comments = $this->storage->loadThread($entity, $field_name, $mode, $comments_per_page, $this->getSetting('pager_id'));
+
+    if ($comments) {
+      $build = $this->viewBuilder->viewMultiple($comments, $this->getSetting('view_mode'));
+      $build['pager']['#type'] = 'pager';
+      // CommentController::commentPermalink() calculates the page number
+      // where a specific comment appears and does a subrequest pointing
+      // to that page, we need to pass that subrequest route to our pager
+      // to keep the pager working.
+      $build['pager']['#route_name'] = $this->routeMatch->getRouteName();
+      $build['pager']['#route_parameters'] = $this->routeMatch->getRawParameters()->all();
+      if ($this->getSetting('pager_id')) {
+        $build['pager']['#element'] = $this->getSetting('pager_id');
+      }
+      $output['comments'] += $build;
+    }
+  }
+
+  /**
+   * Returns the elements by using the deprecated permission-based access.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Only entity
+   *   access control will be available and the field--comment.html.twig
+   *   template overrides should be adapted.
+   *
+   * @see https://www.drupal.org/node/3180183
+   */
+  protected function getDeprecatedPermissionBasedAccessElements(FieldableEntityInterface $entity, string $field_name, CommentingStatus $status, array $comment_settings): array {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Only entity access control will be available and the field--comment.html.twig template overrides should be adapted. See https://www.drupal.org/node/3180183', E_USER_DEPRECATED);
+
+    $elements = [];
+    $output = [];
+
+    $elements['#cache']['contexts'][] = 'user.permissions';
+    if ($this->currentUser->hasPermission('access comments') || $this->currentUser->hasPermission('administer comments')) {
+      $output['comments'] = [];
+      if ($entity->get($field_name)->comment_count || $this->currentUser->hasPermission('administer comments')) {
+        $this->buildCommentList($output, $entity, $field_name);
+      }
+    }
+
+    // Append comment form if the comments are open and the form is set to
+    // display below the entity. Do not show the form for the print view mode.
+    $form_location = FormLocation::tryFrom($comment_settings['form_location']);
+    if ($status == CommentingStatus::Open && $form_location == FormLocation::Below && $this->viewMode != 'print') {
+      // Only show the add comment form if the user has permission.
+      $elements['#cache']['contexts'][] = 'user.roles';
+      if ($this->currentUser->hasPermission('post comments')) {
+        $output['comment_form'] = [
+          '#lazy_builder' => [
+            'comment.lazy_builders:renderForm',
+            [
+              $entity->getEntityTypeId(),
+              $entity->id(),
+              $field_name,
+              $this->getFieldSetting('comment_type'),
+            ],
+          ],
+          '#create_placeholder' => TRUE,
+        ];
+      }
+    }
+
+    $elements[] = $output + [
+      '#comment_type' => $this->getFieldSetting('comment_type'),
+      '#comment_display_mode' => $this->getFieldSetting('default_mode'),
+      'comments' => [],
+      'comment_form' => [],
+    ];
+
+    return $elements;
   }
 
 }

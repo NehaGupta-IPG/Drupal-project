@@ -19,6 +19,9 @@ field.formatter.settings.comment_default:
     pager_id:
       type: integer
       label: 'Pager ID'
+    use_entity_access_control:
+      type: boolean
+      label: 'Use entity access control'
 
 field.widget.settings.comment_default:
   type: mapping
