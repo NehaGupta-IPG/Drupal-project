@@ -103,7 +103,7 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
    *   The comment type ID.
    *
    * @return array
-   *   A renderable array containing the comment form.
+   *   A themed comment form or an empty array if the user cannot post comments.
    */
   public function renderForm($commented_entity_type_id, $commented_entity_id, $field_name, $comment_type_id) {
     $values = [
@@ -115,14 +115,21 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
     ];
     $host = $this->entityTypeManager->getStorage($commented_entity_type_id)->load($commented_entity_id);
     $access = $host->get($field_name)->access('create', $this->currentUser, TRUE);
-    $form = $access->isAllowed() ? $this->entityFormBuilder->getForm($this->entityTypeManager->getStorage('comment')->create($values)) : [];
+    $build = [];
+    if ($access->isAllowed()) {
+      $build = [
+        '#theme' => 'comment_form_wrapper',
+        '#title' => $this->t('Add new comment'),
+        '#form' => $this->entityFormBuilder->getForm($this->entityTypeManager->getStorage('comment')->create($values)),
+      ];
+    }
 
-    // Merge access cacheable metadata into the form render array.
-    CacheableMetadata::createFromRenderArray($form)
+    // Merge access cacheable metadata into the render array.
+    CacheableMetadata::createFromRenderArray($build)
       ->merge(CacheableMetadata::createFromObject($access))
-      ->applyTo($form);
+      ->applyTo($build);
 
-    return $form;
+    return $build;
   }
 
   /**
