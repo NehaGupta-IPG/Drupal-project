@@ -1,0 +1,26 @@
+parameters:
+  container_env_test: '%env(CONTAINER_ENV_TEST)%'
+  container_env_test_with_default: '%env(default:container_env_test_with_default__default:CONTAINER_ENV_TEST_WITH_DEFAULT)%'
+  container_env_test_with_default__default: 'some-test'
+  container_env_test_with_default2: '%env(default:container_env_test_with_default__default:CONTAINER_ENV_TEST_WITH_DEFAULT2)%'
+  container_env_test_with_default__default2: 'some-test2'
+
+  container_env_test_string: '%env(string:CONTAINER_ENV_TEST_STRING)%'
+  container_env_test_integer: '%env(int:CONTAINER_ENV_TEST_INTEGER)%'
+  container_env_test_boolean: '%env(bool:CONTAINER_ENV_TEST_BOOLEAN)%'
+
+  env(CONTAINER_ENV_TEST_SECRET): 'some_secret'
+  container_env_test_secret: '%env(string:CONTAINER_ENV_TEST_SECRET)%'
+
+  env(CONTAINER_ENV_TEST_HOST): '10.0.0.1'
+  container_env_test_host: '%env(CONTAINER_ENV_TEST_HOST)%'
+  env(CONTAINER_ENV_TEST_HOST_PATH): 'http://%container_env_test_host%/project'
+  container_env_test_host_path: '%env(resolve:CONTAINER_ENV_TEST_HOST_PATH)%'
+
+  container_env_test_array: ['one', 'two', 'three']
+
+  container_env_test_url_pattern: 'https://symfony.com/?foo=%%s&amp;bar=%%d'
+services:
+  Drupal\container_env_test\TestService:
+    arguments:
+      - '%container_env_test%'

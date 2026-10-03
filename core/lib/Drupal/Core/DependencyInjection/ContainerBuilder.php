@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
 use Symfony\Component\DependencyInjection\Container as SymfonyContainer;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
@@ -66,10 +67,63 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
    * {@inheritdoc}
    */
   public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value): void {
-    if (strtolower($name) !== $name) {
+    if (strtolower($name) !== $name && strpos($name, 'env(') !== 0) {
       throw new \InvalidArgumentException("Parameter names must be lowercase: $name");
     }
+
     parent::setParameter($name, $value);
+  }
+
+  /**
+   * Replaces the parameter bag, e.g. to swap in resolved env values.
+   *
+   * This is needed because compile() replaces the parameter bag with a
+   * FrozenParameterBag, preventing further modifications.
+   */
+  public function drupalResolveEnvParameters(): void {
+    // When not dumping (e.g. KernelTestBase), resolve env placeholders
+    // eagerly in the ContainerBuilder's parameter bag since it won't go
+    // through our custom Container which handles runtime resolution.
+    //
+    // First, convert internal env placeholders back to %env(FOO)%
+    // format in all parameter values, then replace the parameter bag
+    // so that Symfony's EnvVarProcessor (used by the resolve: prefix)
+    // sees %env(FOO)% patterns instead of internal placeholder strings.
+    $params = $this->parameterBag->all();
+    $withEnvFormat = $this->resolveEnvPlaceholders($params);
+    if ($withEnvFormat !== $params) {
+      $this->parameterBag = (new ParameterBag($withEnvFormat));
+      // Now resolve the %env(FOO)% strings to actual env var values.
+      // resolveEnvPlaceholders(value, TRUE) calls getEnv() which uses
+      // EnvVarProcessor to handle prefixes (int:, bool:, resolve:, etc).
+      foreach ($withEnvFormat as $key => $value) {
+        if (is_string($value) && str_contains($value, '%env(')) {
+          $withEnvFormat[$key] = $this->resolveEnvPlaceholders($params[$key], TRUE);
+        }
+      }
+      // @todo We need to freeze the parameter bag again.
+      $this->parameterBag = (new ParameterBag($withEnvFormat));
+
+      // Also resolve env placeholders in service definition arguments,
+      // since ResolveParameterPlaceHoldersPass already replaced %param%
+      // references with internal env placeholder strings during compile.
+      foreach ($this->getDefinitions() as $definition) {
+        $args = $definition->getArguments();
+        $changed = FALSE;
+        foreach ($args as $key => $arg) {
+          if (is_string($arg) && stripos($arg, 'env_') !== FALSE) {
+            $resolved = $this->resolveEnvPlaceholders($arg, TRUE);
+            if ($resolved !== $arg) {
+              $args[$key] = $resolved;
+              $changed = TRUE;
+            }
+          }
+        }
+        if ($changed) {
+          $definition->setArguments($args);
+        }
+      }
+    }
   }
 
   /**

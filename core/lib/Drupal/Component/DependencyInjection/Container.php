@@ -3,6 +3,7 @@
 namespace Drupal\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -98,6 +99,16 @@ class Container implements ContainerInterface, ResetInterface {
   protected $frozen = TRUE;
 
   /**
+   * Cache for resolved environment variables.
+   */
+  protected array $envCache = [];
+
+  /**
+   * EnvVarProcessor instance.
+   */
+  protected EnvVarProcessor $envVarProcessor;
+
+  /**
    * Constructs a new Container instance.
    *
    * @param array $container_definition
@@ -119,6 +130,7 @@ class Container implements ContainerInterface, ResetInterface {
     $this->parameters = $container_definition['parameters'] ?? [];
     $this->serviceDefinitions = $container_definition['services'] ?? [];
     $this->frozen = $container_definition['frozen'] ?? FALSE;
+    $this->envVarProcessor = new EnvVarProcessor($this);
   }
 
   /**
@@ -205,6 +217,8 @@ class Container implements ContainerInterface, ResetInterface {
    */
   public function reset(): void {
     $this->services = [];
+    $this->envCache = [];
+    $this->envVarProcessor->reset();
   }
 
   /**
@@ -327,7 +341,7 @@ class Container implements ContainerInterface, ResetInterface {
       throw new ParameterNotFoundException($name, NULL, NULL, NULL, $this->getParameterAlternatives($name));
     }
 
-    return $this->parameters[$name];
+    return $this->resolveEnvParameters($this->parameters[$name]);
   }
 
   /**
@@ -346,6 +360,67 @@ class Container implements ContainerInterface, ResetInterface {
     }
 
     $this->parameters[$name] = $value;
+  }
+
+  /**
+   * Resolves %env(...)% placeholders in a parameter value.
+   *
+   * @param mixed $value
+   *   The parameter value to resolve.
+   *
+   * @return mixed
+   *   The resolved value.
+   */
+  protected function resolveEnvParameters(mixed $value): mixed {
+    if (is_array($value)) {
+      $resolved = [];
+      foreach ($value as $k => $v) {
+        $resolved[$k] = $this->resolveEnvParameters($v);
+      }
+      return $resolved;
+    }
+    if (!is_string($value) || !str_contains($value, '%env(')) {
+      return $value;
+    }
+    // Full match: the entire value is a single %env(...)% reference.
+    // This preserves non-string types (int, bool) from env processors.
+    if (preg_match('/^%env\(([^)]+)\)%$/', $value, $matches)) {
+      return $this->getEnv($matches[1]);
+    }
+    // Partial match: env references embedded in a larger string.
+    return preg_replace_callback('/%env\(([^)]+)\)%/', function ($matches) {
+      return (string) $this->getEnv($matches[1]);
+    }, $value);
+  }
+
+  /**
+   * Resolves an environment variable using Symfony's EnvVarProcessor.
+   *
+   * This follows the same pattern as Symfony's Container::getEnv(), delegating
+   * all prefix handling (string:, int:, bool:, default:, resolve:, etc.) to
+   * the EnvVarProcessor.
+   *
+   * @param string $name
+   *   The env var specification (e.g., 'FOO', 'int:FOO',
+   *   'default:param:FOO').
+   *
+   * @return mixed
+   *   The resolved value.
+   */
+  protected function getEnv(string $name): mixed {
+    if (\array_key_exists($name, $this->envCache)) {
+      return $this->envCache[$name];
+    }
+
+    if (str_contains($name, ':')) {
+      [$prefix, $localName] = explode(':', $name, 2);
+    }
+    else {
+      $prefix = '';
+      $localName = $name;
+    }
+
+    return $this->envCache[$name] = $this->envVarProcessor->getEnv($prefix, $localName, $this->getEnv(...));
   }
 
   /**
@@ -384,6 +459,11 @@ class Container implements ContainerInterface, ResetInterface {
 
     // Process the arguments.
     foreach ($arguments as $key => $argument) {
+      // Resolve %env(...)% placeholders in plain string arguments.
+      if (is_string($argument) && str_contains($argument, '%env(')) {
+        $arguments[$key] = $this->resolveEnvParameters($argument);
+        continue;
+      }
       // For this machine-optimized format, only \stdClass arguments are
       // processed and resolved. All other values are kept as is.
       if ($argument instanceof \stdClass) {
@@ -402,8 +482,10 @@ class Container implements ContainerInterface, ResetInterface {
           $argument = $arguments[$key] = $this->parameters[$name];
 
           // In case there is not a machine readable value (e.g. a service)
-          // behind this resolved parameter, continue.
+          // behind this resolved parameter, resolve any %env()% placeholders
+          // and continue.
           if (!($argument instanceof \stdClass)) {
+            $arguments[$key] = $this->resolveEnvParameters($argument);
             continue;
           }
 

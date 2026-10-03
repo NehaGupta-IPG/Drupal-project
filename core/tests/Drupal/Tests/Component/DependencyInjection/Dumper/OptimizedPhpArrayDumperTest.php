@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophet;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -77,6 +78,9 @@ class OptimizedPhpArrayDumperTest extends TestCase {
     $this->containerBuilder->getParameterBag()->willReturn(new ParameterBag());
     $this->containerBuilder->getDefinitions()->willReturn([]);
     $this->containerBuilder->isCompiled()->willReturn(TRUE);
+    $this->containerBuilder->resolveEnvPlaceholders(Argument::cetera())->will(function ($args) {
+      return $args[0];
+    });
 
     $definition = [];
     $definition['aliases'] = [];

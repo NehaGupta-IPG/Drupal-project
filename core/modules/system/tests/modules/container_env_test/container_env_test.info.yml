@@ -1,0 +1,5 @@
+name: 'Container Environment variable test'
+type: module
+description: 'Support module for container environment variable testing.'
+package: Testing
+version: VERSION

@@ -28,7 +28,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\DrupalInstalled;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -1046,6 +1046,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $dumper = new $this->phpArrayDumperClass($container);
         $container_definition = $dumper->getArray();
       }
+      else {
+        $container->drupalResolveEnvParameters();
+      }
     }
 
     // The container was rebuilt successfully.
@@ -1622,7 +1625,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   The Drupal dependency injection container builder.
    */
   protected function getContainerBuilder() {
-    return new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
+    return new ContainerBuilder(new EnvPlaceholderParameterBag($this->getKernelParameters()));
   }
 
   /**

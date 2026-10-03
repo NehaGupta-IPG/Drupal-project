@@ -114,7 +114,14 @@ class OptimizedPhpArrayDumper extends Dumper {
 
     $parameters = $this->container->getParameterBag()->all();
     $is_compiled = $this->container->isCompiled();
-    return $this->prepareParameters($parameters, $is_compiled);
+    $parameters = $this->prepareParameters($parameters, $is_compiled);
+    // Convert internal env placeholder strings (e.g. env_834a...) back to the
+    // %env(FOO)% format so the cached container stores readable env references
+    // that can be resolved at runtime. This runs AFTER escaping because
+    // internal placeholders don't contain % and pass through escape()
+    // unchanged. The '%%env(%s)%%' format uses sprintf, where %% produces
+    // a literal %, resulting in %env(FOO)% in the output.
+    return $this->container->resolveEnvPlaceholders($parameters, '%%env(%s)%%') ?? $parameters;
   }
 
   /**
@@ -407,6 +414,12 @@ class OptimizedPhpArrayDumper extends Dumper {
     }
     elseif ($value instanceof Parameter) {
       return $this->getParameterCall((string) $value);
+    }
+    // Convert internal env placeholder strings to %env(FOO)% format before
+    // the %param% check, so they are stored as plain strings rather than
+    // being misinterpreted as parameter references.
+    elseif (is_string($value) && ($resolved = $this->container->resolveEnvPlaceholders($value, '%%env(%s)%%')) && $resolved !== $value) {
+      return $resolved;
     }
     elseif (is_string($value) && str_contains($value, '%')) {
       if (preg_match('/^%([^%]+)%$/', $value, $matches)) {
