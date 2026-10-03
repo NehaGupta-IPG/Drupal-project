@@ -293,8 +293,6 @@ default:
   <<: [ *with-composer, *test-setup ]
   parallel: 3
   variables:
-    # Bisecting: FunctionalJavascript image tests fail since ci-diag.sh.
-    CI_DIAG: "0"
     TESTSUITE: functional-javascript
     CONCURRENCY: "12"
     KUBERNETES_CPU_REQUEST: "14"
@@ -337,6 +335,14 @@ default:
   extends: '⚙️️ PHPUnit Kernel'
   variables:
     CLI_OPCACHE_FILE_CACHE: "1"
+
+# [DO NOT MERGE] The same FunctionalJavascript shards on Apache, to tell
+# FreeUnit-specific failures from flaky ones within one pipeline.
+'🖱️️️ PHPUnit Functional Javascript apache':
+  extends: '🖱️️️ PHPUnit Functional Javascript'
+  variables:
+    _TARGET_SERVER: "apache"
+    _TARGET_IMAGE_TAG: "production"
 
 '🦉️️️ Nightwatch':
   <<: [ *with-composer, *test-setup ]
