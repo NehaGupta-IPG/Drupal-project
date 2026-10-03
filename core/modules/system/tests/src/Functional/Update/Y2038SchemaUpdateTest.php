@@ -135,11 +135,6 @@ class Y2038SchemaUpdateTest extends UpdatePathTestBase {
    * Asserts the field storage specifications after the update.
    */
   public function assertAfterSpecifications($expected_values): void {
-    // Log in to access the log messages.
-    $this->adminUser = $this->drupalCreateUser([
-      'access site reports',
-    ]);
-    $this->drupalLogin($this->adminUser);
     $logs = Database::getConnection()->select('watchdog', 'w')
       ->fields('w', ['message'])
       ->condition('message', "% 2038 limitation.", "LIKE")
