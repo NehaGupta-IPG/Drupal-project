@@ -293,6 +293,8 @@ default:
   <<: [ *with-composer, *test-setup ]
   parallel: 3
   variables:
+    # Bisecting: FunctionalJavascript image tests fail since ci-diag.sh.
+    CI_DIAG: "0"
     TESTSUITE: functional-javascript
     CONCURRENCY: "12"
     KUBERNETES_CPU_REQUEST: "14"

@@ -4,6 +4,7 @@
 #   ci-diag.sh start   after the web server started (from server-setup.sh)
 #   ci-diag.sh end     from after_script
 set +e
+[ "${CI_DIAG:-1}" = "0" ] && exit 0
 cd "${CI_PROJECT_DIR:-.}" || exit 0
 LOG="./ci-diag-$(echo "${CI_JOB_NAME:-local}" | tr -c 'A-Za-z0-9_.-' '_' | sed 's/__*/_/g').log"
 PROBE=core/ci-diag-probe.php
