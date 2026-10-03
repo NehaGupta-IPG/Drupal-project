@@ -77,6 +77,13 @@ abstract class KeyBase implements SchemaDefinitionInterface {
   /**
    * {@inheritdoc}
    */
+  public function arrayPropertyNormalizationKeys(): array {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function toArray(): array {
     $spec = [];
     foreach ($this->columns as $keyColumn) {
