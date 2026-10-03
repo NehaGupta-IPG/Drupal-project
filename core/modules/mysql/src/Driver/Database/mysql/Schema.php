@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectExistsException;
@@ -609,6 +610,13 @@ class Schema extends DatabaseSchema {
 
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP INDEX [' . $name . ']');
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function introspect(array $includePatterns = ['/^.*$/'], array $excludePatterns = []): SchemaDefinition {
+    return new SchemaIntrospector($this->connection, $includePatterns, $excludePatterns)->execute();
   }
 
   /**

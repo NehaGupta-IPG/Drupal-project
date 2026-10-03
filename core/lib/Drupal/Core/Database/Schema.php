@@ -795,4 +795,25 @@ abstract class Schema implements PlaceholderInterface {
     }
   }
 
+  /**
+   * Introspects a Schema definition from the current database schema.
+   *
+   * @param array $includePatterns
+   *   (Optional) An array of database object name patterns to include. If not
+   *   specified, all objects in the current database schema of the connection
+   *   will be introspected.
+   * @param array $excludePatterns
+   *   (Optional) An array of database object name patterns to exclude
+   *   completely. If not specified, all objects will be introspected.
+   *
+   * @return \Drupal\Core\Database\SchemaDefinition\Schema
+   *   The abstract Schema definition.
+   *
+   * @throws \RuntimeException
+   *   If the driver does not implement this method.
+   */
+  public function introspect(array $includePatterns = ['/^.*$/'], array $excludePatterns = []): SchemaDefinition {
+    throw new \RuntimeException("The '{$this->connection->driver()}' database driver does not implement " . __METHOD__);
+  }
+
 }
