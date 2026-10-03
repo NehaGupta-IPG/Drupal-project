@@ -28,9 +28,9 @@ use Drupal\Core\TypedData\DataDefinition;
     "ComplexData" => [
       'properties' => [
         "value" => [
-            "Range" => [
-              "min" => "-9223372036854775807",
-              "max" => "9223372036854775807",
+          "Range" => [
+            "min" => "-9223372036854775807",
+            "max" => "9223372036854775807",
           ],
         ],
       ],
