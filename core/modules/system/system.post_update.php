@@ -6,7 +6,6 @@
  */
 
 use Drupal\Core\Datetime\Plugin\Field\FieldWidget\TimestampDatetimeWidget;
-use Drupal\Core\Field\FieldDefinitionInterface;
 
 /**
  * Implements hook_removed_post_updates().
@@ -109,8 +108,8 @@ function system_post_update_update_datetime_timestamp_field_widget_current_time(
 
     $bundles = array_keys(\Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type));
     foreach ($bundles as $bundle) {
-      // Build list of entity form display IDs,
-      // and then query to determine which ones are valid.
+      // Build list of entity form display IDs, and then query to determine
+      // which ones are valid.
       foreach ($entity_form_modes as $form_mode) {
         $candidate_ids[] = $entity_type . '.' . $bundle . '.' . $form_mode;
       }
@@ -119,8 +118,8 @@ function system_post_update_update_datetime_timestamp_field_widget_current_time(
         ->condition('status', TRUE)
         ->execute();
 
-      // Iterate through each valid form display ID
-      // and load any that we have not previously updated.
+      // Iterate through each valid form display ID and load any that we have
+      // not previously updated.
       foreach ($results as $candidate_id) {
         if (in_array($candidate_id, $updated_form_ids)) {
           continue;
@@ -128,19 +127,17 @@ function system_post_update_update_datetime_timestamp_field_widget_current_time(
         $form_display = $entity_form_display_storage->load($candidate_id);
         $changed = FALSE;
 
-        // Iterate through all widgets and update if we find a datetime timestamp.
+        // Iterate through all widgets and update if we find a datetime
+        // timestamp.
         $widgets = $form_display->get('content');
         foreach ($widgets as &$widget) {
-          if (
-            ($widget['type'] ?? '') === 'datetime_timestamp' &&
-            empty($widget['settings']['use_current_time'])
-          ) {
+          if (($widget['type'] ?? '') === 'datetime_timestamp' && empty($widget['settings']['use_current_time'])) {
             $widget['settings']['use_current_time'] = TimestampDatetimeWidget::TIMESTAMP_OPTION_ON_SUBMISSION;
             $changed = TRUE;
           }
         }
 
-        // Update form display if we have updated any datetime timestamp widgets.
+        // Update form display for widgets that have changed.
         if ($changed) {
           $form_display->set('content', $widgets);
           $form_display->save();
