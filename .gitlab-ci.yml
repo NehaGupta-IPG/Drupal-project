@@ -326,12 +326,12 @@ default:
 
 # [DO NOT MERGE] A/B arm in the same pipeline: the same shards with the CLI
 # opcache file cache, to measure it against the jobs above.
-'🌐️️ PHPUnit Functional [cli-fc]':
+'🌐️️ PHPUnit Functional cli-fc':
   extends: '🌐️️ PHPUnit Functional'
   variables:
     CLI_OPCACHE_FILE_CACHE: "1"
 
-'⚙️️ PHPUnit Kernel [cli-fc]':
+'⚙️️ PHPUnit Kernel cli-fc':
   extends: '⚙️️ PHPUnit Kernel'
   variables:
     CLI_OPCACHE_FILE_CACHE: "1"
