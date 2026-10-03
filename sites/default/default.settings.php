@@ -1,6 +1,7 @@
 <?php
 
 // phpcs:ignoreFile
+// cspell:disable
 
 /**
  * @file
