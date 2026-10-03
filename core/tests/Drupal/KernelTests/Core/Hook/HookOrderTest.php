@@ -102,15 +102,11 @@ class HookOrderTest extends KernelTestBase {
         CHooks::class . '::testHookFirst',
         // Moved to first using Order::First.
         AHooks::class . '::testHookFirst',
-        'aaa_hook_order_test_test_hook',
         AHooks::class . '::testHook',
-        'bbb_hook_order_test_test_hook',
         BHooks::class . '::testHook',
         // Moved to after BHooks using OrderAfter().
         AHooks::class . '::testHookAfterB',
-        'ccc_hook_order_test_test_hook',
         CHooks::class . '::testHook',
-        'ddd_hook_order_test_test_hook',
         DHooks::class . '::testHook',
         // Moved to first using Order::Last.
         AHooks::class . '::testHookLast',
@@ -200,34 +196,6 @@ class HookOrderTest extends KernelTestBase {
   }
 
   /**
-   * Tests hook order when each module has either OO or procedural listeners.
-   *
-   * This test uses the hook, 'sparse_test_hook'.
-   *
-   * This detects a possible mistake where we would first collect modules from
-   * all procedural and then from all OO implementations, without fixing the
-   * order.
-   *
-   * @see \Drupal\bbb_hook_order_test\Hook\BHooks::sparseTestHook()
-   * @see \Drupal\ddd_hook_order_test\Hook\DHooks::sparseTestHook()
-   * @see \aaa_hook_order_test_sparse_test_hook()
-   * @see \ccc_hook_order_test_sparse_test_hook()
-   */
-  public function testSparseHookOrder(): void {
-    $this->assertSameCallList(
-      [
-        // OO and procedural listeners are correctly intermixed by module
-        // order.
-        'aaa_hook_order_test_sparse_test_hook',
-        BHooks::class . '::sparseTestHook',
-        'ccc_hook_order_test_sparse_test_hook',
-        DHooks::class . '::sparseTestHook',
-      ],
-      \Drupal::moduleHandler()->invokeAll('sparse_test_hook'),
-    );
-  }
-
-  /**
    * Tests ordering of 'test_both_parameters_hook' with all parameters defined.
    *
    * This tests when both $modules and $classesAndMethods are passed as
@@ -258,36 +226,6 @@ class HookOrderTest extends KernelTestBase {
         AHooks::class . '::testBothParametersHook',
       ],
       \Drupal::moduleHandler()->invokeAll('test_both_parameters_hook'),
-    );
-  }
-
-  /**
-   * Test procedural hook ordering using, 'test_procedural_reorder'.
-   *
-   * The order of 'test_procedural_reorder', without modification would be as
-   * follows.
-   * - \Drupal\aaa_hook_order_test\Hook\AHooks::testProceduralReorder()
-   * - bbb_hook_order_test_test_procedural_reorder()
-   * - ccc_hook_order_test_test_procedural_reorder()
-   *
-   * That order is modified using the Remove and Reorder as follows and the
-   *  resulting order asserted in this test.
-   * - The Reorder attribute is used to move
-   *   - bbb_hook_order_test_test_procedural_reorder() to the first position.
-   * - The Remove attribute is used to remove
-   *   - ccc_hook_order_test_test_procedural_reorder()
-   *
-   * @see \bbb_hook_order_test_test_procedural_reorder()
-   * @see \ccc_hook_order_test_test_procedural_reorder()
-   * @see \Drupal\aaa_hook_order_test\Hook\AHooks::testProceduralReorder()
-   */
-  public function testHookReorderProcedural(): void {
-    $this->assertSameCallList(
-      [
-        'bbb_hook_order_test_test_procedural_reorder',
-        AHooks::class . '::testProceduralReorder',
-      ],
-      \Drupal::moduleHandler()->invokeAll('test_procedural_reorder'),
     );
   }
 

@@ -55,7 +55,7 @@ class ExtensionDiscoveryTest extends UnitTestCase {
 
     $this->assertEquals($files_by_type_and_name_expected, $files_by_type_and_name);
 
-    $extension_expected = new Extension($root, 'module', 'core/modules/system/system.info.yml', 'system.module');
+    $extension_expected = new Extension($root, 'module', 'core/modules/system/system.info.yml');
     $extension_expected->subpath = 'modules/system';
     $extension_expected->origin = 'core';
     $this->assertEquals($extension_expected, $extensions_by_type['module']['system'], 'system');

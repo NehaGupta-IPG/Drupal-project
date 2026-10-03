@@ -37,17 +37,6 @@ interface ThemeInitializationInterface {
   public function getActiveThemeByName($theme_name);
 
   /**
-   * Loads a theme, so it is ready to be used.
-   *
-   * Loading a theme includes loading and initializing the engine,
-   * each base theme and its engines.
-   *
-   * @param \Drupal\Core\Theme\ActiveTheme $active_theme
-   *   The theme to load.
-   */
-  public function loadActiveTheme(ActiveTheme $active_theme);
-
-  /**
    * Builds up the active theme object from extensions.
    *
    * @param \Drupal\Core\Extension\Extension $theme

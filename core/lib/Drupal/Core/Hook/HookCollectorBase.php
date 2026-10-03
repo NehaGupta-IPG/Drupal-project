@@ -19,29 +19,19 @@ abstract class HookCollectorBase {
    *
    * @param string $dir
    *   The extension directory.
-   * @param list<string> $procedural_files
-   *   The root-level procedural hook implementation files.
    *
    * @return \Generator<\SplFileInfo>
-   *   The procedural hook files and PHP files in src/Hook.
+   *   PHP files in src/Hook.
    */
-  protected function getHookFileIterator(string $dir, array $procedural_files): \Generator {
-    foreach ($procedural_files as $filename) {
-      $filename = "$dir/$filename";
-      if (is_file($filename)) {
-        yield new \SplFileInfo($filename);
-      }
-    }
-
+  protected function getHookFileIterator(string $dir): \Generator {
     $hook_directory = "$dir/src/Hook";
-    if (!is_dir($hook_directory)) {
-      return;
-    }
-    $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS;
-    $iterator = new \RecursiveDirectoryIterator($hook_directory, $flags);
-    $iterator = new \RecursiveCallbackFilterIterator($iterator, static fn (\SplFileInfo $fileinfo): bool => $fileinfo->isDir() || $fileinfo->getExtension() === 'php');
-    foreach (new \RecursiveIteratorIterator($iterator) as $fileinfo) {
-      yield $fileinfo;
+    if (is_dir($hook_directory)) {
+      $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS;
+      $iterator = new \RecursiveDirectoryIterator($hook_directory, $flags);
+      $iterator = new \RecursiveCallbackFilterIterator($iterator, static fn (\SplFileInfo $fileinfo): bool => $fileinfo->isDir() || $fileinfo->getExtension() === 'php');
+      foreach (new \RecursiveIteratorIterator($iterator) as $fileinfo) {
+        yield $fileinfo;
+      }
     }
   }
 

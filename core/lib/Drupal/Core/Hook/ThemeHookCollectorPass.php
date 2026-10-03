@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook;
 
-use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
-use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
-use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Hook\Attribute\ReorderHook;
-use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -44,13 +39,6 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
   protected array $oopImplementations = [];
 
   /**
-   * Procedural implementation extension names by hook name.
-   *
-   * @var array<string, list<string>>
-   */
-  protected array $proceduralImplementations = [];
-
-  /**
    * Preprocess suggestions discovered in extensions.
    *
    * These are stored to prevent adding preprocess suggestions to the invoke map
@@ -59,15 +47,6 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
    * @var array<string, true>
    */
   protected array $preprocessForSuggestions;
-
-  /**
-   * Deprecated .theme files.
-   *
-   * These are stored to allow emitting deprecation messages.
-   *
-   * @var array<string, true>
-   */
-  protected array $deprecatedThemeFiles = [];
 
   /**
    * Constructor.
@@ -106,10 +85,6 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
       'theme_hook_list' => $this->sortByTheme($implementationsByHook),
       'theme_preprocess_for_suggestions' => $this->preprocessForSuggestions ?? [],
     ]);
-
-    foreach ($this->deprecatedThemeFiles as $deprecatedThemeFile => $v) {
-      @trigger_error('Using ' . $deprecatedThemeFile . '.theme is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222', E_USER_DEPRECATED);
-    }
   }
 
   /**
@@ -171,40 +146,12 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
     $parameters = $container->getParameterBag()->all();
     $themeList = $parameters['container.themes'];
 
-    $skipProcedural = array_filter(
-      array_keys($themeList),
-      static fn(string $theme) => !empty($parameters["$theme.skip_procedural_hook_scan"]),
-    );
     $themes = array_keys($themeList);
-    $allThemesPreg = static::getThemeListPattern($themes);
     $collector = new static($themes);
     foreach ($themeList as $theme => $info) {
-      $shouldSkipProceduralScan = in_array($theme, $skipProcedural);
-      $currentThemePreg = static::getThemeListPattern([$theme]);
-      $collector->collectThemeHookImplementations(dirname($info['pathname']), $theme, $currentThemePreg, $allThemesPreg, $shouldSkipProceduralScan);
+      $collector->collectThemeHookImplementations(dirname($info['pathname']), $theme);
     }
     return $collector;
-  }
-
-  /**
-   * Get a pattern used to match hooks for the given theme list.
-   *
-   * The supplied theme list will be sorted by length in descending order so
-   * that longer names are matched first.
-   *
-   * @param list<string> $themeList
-   *   A list of theme names.
-   *
-   * @return string
-   *   The pattern used to match hooks for the given theme list.
-   */
-  protected static function getThemeListPattern(array $themeList): string {
-    usort($themeList, static fn($a, $b) => strlen($b) - strlen($a));
-    $themePattern = implode('|', array_map(
-      static fn($x) => preg_quote($x, '/'),
-      $themeList,
-    ));
-    return '/^(?<function>(?<theme>' . $themePattern . ')_(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
   }
 
   /**
@@ -214,26 +161,14 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
    *   The directory in which the theme resides.
    * @param string $theme
    *   The name of the theme.
-   * @param string $currentThemePreg
-   *   A regular expression matching only the theme being scanned.
-   * @param string $allThemesPreg
-   *   A regular expression matching every theme, longer theme names are
-   *   matched first.
-   * @param bool $shouldSkipProceduralScan
-   *   Skip the procedural check for the current theme.
    */
-  protected function collectThemeHookImplementations($dir, $theme, $currentThemePreg, $allThemesPreg, bool $shouldSkipProceduralScan): void {
+  protected function collectThemeHookImplementations($dir, $theme): void {
     $hookFileCache = FileCacheFactory::get('theme_hook_implementations');
-    $proceduralHookFileCache = FileCacheFactory::get('theme_procedural_hook_implementations:' . $allThemesPreg);
 
-    foreach ($this->getHookFileIterator($dir, ["$theme.theme"]) as $fileinfo) {
+    foreach ($this->getHookFileIterator($dir) as $fileinfo) {
       assert($fileinfo instanceof \SplFileInfo);
       $fileExtension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
-
-      if ($fileExtension === 'theme') {
-        $this->deprecatedThemeFiles[pathinfo($filename, PATHINFO_FILENAME)] = TRUE;
-      }
 
       if ($fileExtension === 'php') {
         $cached = $hookFileCache->get($filename);
@@ -273,35 +208,6 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
           }
         }
       }
-      elseif (!$shouldSkipProceduralScan) {
-        $implementations = $proceduralHookFileCache->get($filename);
-        if ($implementations === NULL) {
-          $finder = MockFileFinder::create($filename);
-          $parser = new StaticReflectionParser('', $finder);
-          $implementations = [
-            'hooks' => [],
-          ];
-          foreach ($parser->getMethodAttributes() as $function => $attributes) {
-            if (StaticReflectionParser::hasAttribute($attributes, ExtensionFileIsConverted::class)) {
-              $implementations['@skip_theme_file_deprecation'] = TRUE;
-            }
-            if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
-              break;
-            }
-            if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && (preg_match($currentThemePreg, $function, $matches) || preg_match($allThemesPreg, $function, $matches))) {
-              assert($function === $matches['theme'] . '_' . $matches['hook']);
-              $implementations['hooks'][] = ['theme' => $matches['theme'], 'hook' => $matches['hook']];
-            }
-          }
-          $proceduralHookFileCache->set($filename, $implementations);
-        }
-        if (isset($implementations['@skip_theme_file_deprecation'])) {
-          unset($this->deprecatedThemeFiles[pathinfo($filename, PATHINFO_FILENAME)]);
-        }
-        foreach ($implementations['hooks'] as $implementation) {
-          $this->proceduralImplementations[$implementation['hook']][] = $implementation['theme'];
-        }
-      }
     }
   }
 
@@ -314,11 +220,6 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
    */
   protected function getFilteredImplementations(): array {
     $implementationsByHook = [];
-    foreach ($this->proceduralImplementations as $hook => $proceduralThemes) {
-      foreach ($proceduralThemes as $theme) {
-        $implementationsByHook[$hook][$theme . '_' . $hook] = $theme;
-      }
-    }
     foreach ($this->oopImplementations as $hook => $oopImplementations) {
       if (!isset($implementationsByHook[$hook])) {
         $implementationsByHook[$hook] = $oopImplementations;

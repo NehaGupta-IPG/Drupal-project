@@ -4,17 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook;
 
-use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
-use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\OpCodeCache;
-use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\HookDependsOnModule;
-use Drupal\Core\Hook\Attribute\LegacyHook;
-use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
-use Drupal\Core\Hook\Attribute\LegacyRequirementsHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ReorderHook;
 use Drupal\Core\Hook\OrderOperation\OrderOperation;
@@ -44,25 +38,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class HookCollectorPass extends HookCollectorBase implements CompilerPassInterface {
 
   /**
-   * The extensions of procedural hook implementation files.
-   *
-   * @var string[]
-   */
-  protected array $proceduralFileExtensions = ['module', 'profile', 'install'];
-
-  /**
    * OOP implementation module names keyed by hook name and "$class::$method".
    *
    * @var array<string, array<string, string>>
    */
   protected array $oopImplementations = [];
-
-  /**
-   * Procedural implementation module names by hook name.
-   *
-   * @var array<string, list<string>>
-   */
-  protected array $proceduralImplementations = [];
 
   /**
    * Order operations grouped by hook name and weight.
@@ -154,11 +134,6 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
    */
   protected function getFilteredImplementations(): array {
     $implementationsByHook = [];
-    foreach ($this->proceduralImplementations as $hook => $procedural_modules) {
-      foreach ($procedural_modules as $module) {
-        $implementationsByHook[$hook][$module . '_' . $hook] = $module;
-      }
-    }
     foreach ($this->oopImplementations as $hook => $oopImplementations) {
       if (!isset($implementationsByHook[$hook])) {
         $implementationsByHook[$hook] = $oopImplementations;
@@ -274,42 +249,13 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
    */
   protected static function collectAllHookImplementations(ContainerBuilder $container): static {
     $module_list = $container->getParameter('container.modules');
-    $parameters = $container->getParameterBag()->all();
-    $skip_procedural_modules = array_filter(
-      array_keys($module_list),
-      static fn (string $module) => !empty($parameters["$module.skip_procedural_hook_scan"]),
-    );
 
     $modules = array_keys($module_list);
-    $all_modules_preg = static::getModuleListPattern($modules);
     $collector = new static($modules);
     foreach ($module_list as $module => $info) {
-      $skip_procedural = in_array($module, $skip_procedural_modules);
-      $current_module_preg = static::getModuleListPattern([$module]);
-      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $current_module_preg, $all_modules_preg, $skip_procedural);
+      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module);
     }
     return $collector;
-  }
-
-  /**
-   * Get a pattern used to match hooks for the given module list.
-   *
-   * The supplied module list will be sorted by length in descending order so
-   * that longer names are matched first.
-   *
-   * @param list<string> $module_list
-   *   A list of module names.
-   *
-   * @return string
-   *   The pattern used to match hooks for the given module list.
-   */
-  protected static function getModuleListPattern(array $module_list): string {
-    usort($module_list, static fn ($a, $b) => strlen($b) - strlen($a));
-    $module_pattern = implode('|', array_map(
-      static fn ($x) => preg_quote($x, '/'),
-      $module_list,
-    ));
-    return '/^(?<function>(?<module>' . $module_pattern . ')_(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
   }
 
   /**
@@ -319,24 +265,10 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
    *   The directory in which the module resides.
    * @param string $module
    *   The name of the module.
-   * @param string $current_module_preg
-   *   A regular expression matching only the module being scanned.
-   * @param string $all_modules_preg
-   *   A regular expression matching every module, longer module names are
-   *   matched first.
-   * @param bool $skip_procedural
-   *   Skip the procedural check for the current module.
    */
-  protected function collectModuleHookImplementations($dir, $module, $current_module_preg, $all_modules_preg, bool $skip_procedural): void {
+  protected function collectModuleHookImplementations($dir, $module): void {
     $hook_file_cache = FileCacheFactory::get('hook_implementations');
-    // List of modules must be included in the cache key to ensure rediscovery
-    // takes place when a new module is installed. Some modules define hooks
-    // on behalf of other modules and those hooks need to be found.
-    // Hash to prevent massive key sizes.
-    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . hash('xxh3', $all_modules_preg));
-
-    $procedural_files = array_map(fn (string $extension): string => "$module.$extension", $this->proceduralFileExtensions);
-    foreach ($this->getHookFileIterator($dir, $procedural_files) as $fileinfo) {
+    foreach ($this->getHookFileIterator($dir) as $fileinfo) {
       assert($fileinfo instanceof \SplFileInfo);
       $extension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
@@ -396,7 +328,6 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
           }
           foreach ($methodAttributes as $attribute) {
             if ($attribute instanceof Hook) {
-              self::checkForProceduralOnlyHooks($attribute, $class);
               $this->oopImplementations[$attribute->hook][$class . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
               if ($attribute->order !== NULL) {
                 // Use a lower weight for order operations that are declared
@@ -405,64 +336,16 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
               }
             }
             elseif ($attribute instanceof ReorderHook) {
-              $identifier = $attribute->class === ProceduralCall::class
-                ? $attribute->method
-                : $attribute->class . '::' . $attribute->method;
+              $identifier = $attribute->class . '::' . $attribute->method;
               // Use a higher weight for order operations that target other hook
               // listeners.
               $this->orderOperations[$attribute->hook][1][] = $attribute->order->getOperation($identifier);
             }
             elseif ($attribute instanceof RemoveHook) {
-              $identifier = $attribute->class === ProceduralCall::class
-                ? $attribute->method
-                : $attribute->class . '::' . $attribute->method;
+              $identifier = $attribute->class . '::' . $attribute->method;
               $this->removeHookIdentifiers[$attribute->hook][] = $identifier;
             }
           }
-        }
-      }
-      elseif (!$skip_procedural) {
-        $implementations = $procedural_hook_file_cache->get($filename);
-        if ($implementations === NULL) {
-          $finder = MockFileFinder::create($filename);
-          $parser = new StaticReflectionParser('', $finder);
-          $implementations = [];
-          foreach ($parser->getMethodAttributes() as $function => $attributes) {
-            if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
-              break;
-            }
-
-            $legacy_attributes = [LegacyHook::class, LegacyRequirementsHook::class];
-            if (!static::hasAnyAttribute($attributes, $legacy_attributes) && (preg_match($current_module_preg, $function, $matches) || preg_match($all_modules_preg, $function, $matches))) {
-              // Skip hooks that are not supported by the new hook system, they
-              // do not need to be added to the BC layer. Note that is different
-              // from static::checkForProceduralOnlyHooks(). hook_requirements
-              // is allowed and only update hooks are considered as dynamic
-              // exclusion, since post updates are not expected to be parsed.
-              // Also, update hooks are checked as ends with, since the regular
-              // expression sometimes attributes them to the wrong module,
-              // resulting in a prefix.
-              $staticDenyHooks = [
-                'install',
-                'install_tasks',
-                'install_tasks_alter',
-                'schema',
-                'uninstall',
-                'update_last_removed',
-                'update_dependencies',
-              ];
-              if (in_array($matches['hook'], $staticDenyHooks) || preg_match('/update_\d+$/', $function)) {
-                continue;
-              }
-
-              assert($function === $matches['module'] . '_' . $matches['hook']);
-              $implementations[] = ['module' => $matches['module'], 'hook' => $matches['hook']];
-            }
-          }
-          $procedural_hook_file_cache->set($filename, $implementations);
-        }
-        foreach ($implementations as $implementation) {
-          $this->addProceduralImplementation($implementation['hook'], $implementation['module']);
         }
       }
     }
@@ -489,51 +372,6 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
     }
 
     return FALSE;
-  }
-
-  /**
-   * Adds a procedural hook implementation.
-   *
-   * @param string $hook
-   *   The name of the hook.
-   * @param string $module
-   *   The module implementing the hook, or on behalf of which the hook is
-   *   implemented.
-   */
-  protected function addProceduralImplementation(string $hook, string $module): void {
-    $function = $module . '_' . $hook;
-
-    if (in_array($hook, ['requirements', 'requirements_alter'])) {
-      $message = "$function without a #[LegacyRequirementsHook] attribute is deprecated in drupal:11.3.0 and removed in drupal:13.0.0. See https://www.drupal.org/node/3549685";
-      @trigger_error($message, E_USER_DEPRECATED);
-    }
-    $this->proceduralImplementations[$hook][] = $module;
-  }
-
-  /**
-   * Checks for hooks which can't be supported in classes.
-   *
-   * @param \Drupal\Core\Hook\Attribute\Hook $hookAttribute
-   *   The hook to check.
-   * @param class-string $class
-   *   The class the hook is implemented on.
-   */
-  public static function checkForProceduralOnlyHooks(Hook $hookAttribute, string $class): void {
-    $staticDenyHooks = [
-      'install',
-      'install_tasks',
-      'install_tasks_alter',
-      'removed_post_updates',
-      'requirements',
-      'schema',
-      'uninstall',
-      'update_dependencies',
-      'update_last_removed',
-    ];
-
-    if (in_array($hookAttribute->hook, $staticDenyHooks) || preg_match('/^(post_update_|update_\d+$)/', $hookAttribute->hook)) {
-      throw new \LogicException("The hook $hookAttribute->hook on class $class does not support attributes and must remain procedural.");
-    }
   }
 
 }

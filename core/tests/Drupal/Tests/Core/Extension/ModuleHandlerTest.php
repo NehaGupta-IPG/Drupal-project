@@ -41,22 +41,18 @@ class ModuleHandlerTest extends UnitTestCase {
    *   Module paths by module name.
    * @param array<string, array<callable-string, string>> $implementations
    *   Module names by function name implementing hook_hook().
-   * @param bool $loadAll
-   *   TRUE to call ModuleHandler->loadAll() on the new module handler.
    *
    * @return \Drupal\Core\Extension\ModuleHandler
    *   The module handler to test.
    */
-  protected function getModuleHandler(array $modules = [], array $implementations = [], bool $loadAll = TRUE): ModuleHandler {
+  protected function getModuleHandler(array $modules = [], array $implementations = []): ModuleHandler {
     // This only works if there's a single $hook.
     $modules['module_handler_test'] = 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test';
     $moduleList = [];
     foreach ($modules as $module => $path) {
-      $filename = "$module.module";
       $moduleList[$module] = [
         'type' => 'module',
         'pathname' => "$path/$module.info.yml",
-        'filename' => file_exists("$this->root/$path/$filename") ? $filename : NULL,
       ];
     }
     $keyvalue = new KeyValueMemoryFactory();
@@ -67,85 +63,7 @@ class ModuleHandlerTest extends UnitTestCase {
       ->method('getCallableFromDefinition')
       ->willReturnCallback(fn ($definition) => $definition);
     $moduleHandler = new ModuleHandler($this->root, $moduleList, $keyvalue, $callableResolver, $cache);
-    if ($loadAll) {
-      $moduleHandler->loadAll();
-    }
     return $moduleHandler;
-  }
-
-  /**
-   * Tests loading a module.
-   */
-  public function testLoadModule(): void {
-    $moduleList = [
-      'module_handler_test_added' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_added',
-    ];
-    $module_handler = $this->getModuleHandler($moduleList);
-    $this->assertTrue($module_handler->load('module_handler_test'));
-    $this->assertTrue(function_exists('module_handler_test_hook'));
-
-    $this->assertTrue($module_handler->load('module_handler_test_added'));
-    $this->assertTrue(function_exists('module_handler_test_added_helper'), 'Function exists after being loaded.');
-    $this->assertTrue($module_handler->load('module_handler_test_added'));
-
-    $this->assertFalse($module_handler->load('module_handler_test_dne'), 'Non-existent modules returns false.');
-  }
-
-  /**
-   * Tests loading all modules.
-   */
-  public function testLoadAllModules(): void {
-    $moduleList = [
-      'module_handler_test_all1' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1',
-      'module_handler_test_all2' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2',
-    ];
-    $module_handler = $this->getModuleHandler($moduleList);
-    $module_handler->loadAll();
-    $this->assertTrue(function_exists('module_handler_test_all1_hook'), 'Function exists after being loaded.');
-    $this->assertTrue(function_exists('module_handler_test_all2_hook'), 'Function exists after being loaded.');
-  }
-
-  /**
-   * Tests reload method.
-   *
-   * @legacy-covers ::reload
-   */
-  public function testModuleReloading(): void {
-    $module_handler = $this->getMockBuilder(ModuleHandler::class)
-      ->setConstructorArgs([
-        $this->root,
-        [
-          'module_handler_test' => [
-            'type' => 'module',
-            'pathname' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test/module_handler_test.info.yml',
-            'filename' => 'module_handler_test.module',
-          ],
-        ],
-        new KeyValueMemoryFactory(),
-        $this->createStub(CallableResolver::class),
-        new NullBackend('bootstrap'),
-      ])
-      ->onlyMethods(['load'])
-      ->getMock();
-    $calls = [
-      'module_handler_test',
-    ];
-    $module_handler->expects($this->once())
-      ->method('load')
-      ->with($this->callback(function (string $module) use (&$calls): bool {
-        return $module === array_shift($calls);
-      }));
-    $module_handler->reload();
-  }
-
-  /**
-   * Tests isLoaded accessor.
-   */
-  public function testIsLoaded(): void {
-    $module_handler = $this->getModuleHandler(loadAll: FALSE);
-    $this->assertFalse($module_handler->isLoaded());
-    $module_handler->loadAll();
-    $this->assertTrue($module_handler->isLoaded());
   }
 
   /**
@@ -153,7 +71,7 @@ class ModuleHandlerTest extends UnitTestCase {
    */
   public function testGetModuleList(): void {
     $this->assertEquals($this->getModuleHandler()->getModuleList(), [
-      'module_handler_test' => new Extension($this->root, 'module', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test/module_handler_test.info.yml', 'module_handler_test.module'),
+      'module_handler_test' => new Extension($this->root, 'module', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test/module_handler_test.info.yml'),
     ]);
   }
 
@@ -161,7 +79,7 @@ class ModuleHandlerTest extends UnitTestCase {
    * Confirm we get back a module from the module list.
    */
   public function testGetModuleWithExistingModule(): void {
-    $this->assertEquals($this->getModuleHandler()->getModule('module_handler_test'), new Extension($this->root, 'module', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test/module_handler_test.info.yml', 'module_handler_test.module'));
+    $this->assertEquals($this->getModuleHandler()->getModule('module_handler_test'), new Extension($this->root, 'module', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test/module_handler_test.info.yml'));
   }
 
   /**
@@ -253,36 +171,6 @@ class ModuleHandlerTest extends UnitTestCase {
     $this->assertTrue(function_exists('module_handler_test_hook_include'));
     // Include doesn't exist.
     $this->assertFalse($module_handler->loadInclude('module_handler_test', 'install'));
-  }
-
-  /**
-   * Tests invoke methods when module is enabled.
-   */
-  public function testInvokeModuleEnabled(): void {
-    $module_handler = $this->getModuleHandler();
-    $module_handler->loadAll();
-    $this->assertTrue($module_handler->invoke('module_handler_test', 'hook', [TRUE]), 'Installed module runs hook.');
-    $this->assertFalse($module_handler->invoke('module_handler_test', 'hook', [FALSE]), 'Installed module runs hook.');
-    $this->assertNull($module_handler->invoke('module_handler_test_fake', 'hook', [FALSE]), 'Installed module runs hook.');
-  }
-
-  /**
-   * Tests invoke all.
-   */
-  public function testInvokeAll(): void {
-    $implementations = [
-      'hook' => [
-        'module_handler_test_hook' => 'module_handler_test',
-        'module_handler_test_all1_hook' => 'module_handler_test_all1',
-        'module_handler_test_all2_hook' => 'module_handler_test_all2',
-      ],
-    ];
-    $moduleList = [
-      'module_handler_test_all1' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1',
-      'module_handler_test_all2' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2',
-    ];
-    $module_handler = $this->getModuleHandler($moduleList, $implementations);
-    $this->assertEquals([TRUE, TRUE, TRUE], $module_handler->invokeAll('hook', [TRUE]));
   }
 
   /**

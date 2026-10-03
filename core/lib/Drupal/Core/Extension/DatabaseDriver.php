@@ -89,7 +89,7 @@ class DatabaseDriver extends Extension {
   /**
    * {@inheritdoc}
    */
-  public function load() {
+  public function load(): bool {
     if (!isset($this->classLoader)) {
       if (\Drupal::hasContainer() && \Drupal::hasService('class_loader')) {
         $this->classLoader = \Drupal::service('class_loader');
@@ -229,20 +229,6 @@ class DatabaseDriver extends Extension {
    * {@inheritdoc}
    */
   public function getFilename() {
-    throw new \LogicException(__METHOD__ . '() is not implemented');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getExtensionPathname() {
-    throw new \LogicException(__METHOD__ . '() is not implemented');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getExtensionFilename() {
     throw new \LogicException(__METHOD__ . '() is not implemented');
   }
 

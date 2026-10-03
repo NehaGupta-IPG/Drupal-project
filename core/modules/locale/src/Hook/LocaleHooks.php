@@ -123,7 +123,6 @@ class LocaleHooks {
     // Remove translations.
     \Drupal::service('locale.storage')->deleteTranslations(['language' => $language->id()]);
     // Remove interface translation files.
-    \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.bulk');
     \Drupal::service(LocaleFileManager::class)->deleteTranslationFiles([], [$language->id()]);
     // Remove translated configuration objects.
     \Drupal::service('locale.config_manager')->deleteLanguageTranslations($language->id());

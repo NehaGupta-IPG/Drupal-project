@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\HookCollectorPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -35,7 +34,6 @@ class KernelTestCompilerPass implements CompilerPassInterface {
       foreach ($method_reflection->getAttributes(Hook::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute_reflection) {
         $hook = $attribute_reflection->newInstance();
         assert($hook instanceof Hook);
-        HookCollectorPass::checkForProceduralOnlyHooks($hook, static::class);
         $map['hook_list'][$hook->hook][$this->definition->getClass() . ':' . $method_reflection->getName()] = 'core';
       }
     }

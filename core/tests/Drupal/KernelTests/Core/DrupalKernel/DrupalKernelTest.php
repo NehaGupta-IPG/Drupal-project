@@ -153,7 +153,6 @@ class DrupalKernelTest extends KernelTestBase {
       [
         'type' => 'module',
         'pathname' => $module_extension_list->getPathname('service_provider_test'),
-        'filename' => NULL,
       ],
       $modules['service_provider_test']
     );

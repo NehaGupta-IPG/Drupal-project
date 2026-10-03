@@ -851,7 +851,6 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     // Note that the kernel has rebuilt the container; this $module_handler is
     // no longer the $module_handler instance from above.
     $module_handler = $this->container->get('module_handler');
-    $module_handler->reload();
     foreach ($modules as $module) {
       if (!$module_handler->moduleExists($module)) {
         throw new \RuntimeException("$module module is not installed after installing it.");
@@ -896,7 +895,6 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     // Note that the kernel has rebuilt the container; this $module_handler is
     // no longer the $module_handler instance from above.
     $module_handler = $this->container->get('module_handler');
-    $module_handler->reload();
     foreach ($modules as $module) {
       if ($module_handler->moduleExists($module)) {
         throw new \RuntimeException("$module module is not uninstalled after uninstalling it.");

@@ -173,7 +173,6 @@ class TranslationStatusForm extends FormBase {
     // \Drupal\locale\LocaleProjectRepository::buildProjects() is an
     // expensive way to get a module name. Explore optimizing this process.
     // @see https://www.drupal.org/node/3589049
-    $this->moduleHandler->loadInclude('locale', 'compare.inc');
     $project_data = \Drupal::service(LocaleProjectRepository::class)->buildProjects();
 
     foreach ($status as $project) {
@@ -245,9 +244,6 @@ class TranslationStatusForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->moduleHandler->loadInclude('locale', 'fetch.inc');
-    $this->moduleHandler->loadInclude('locale', 'bulk.inc');
-
     $langcodes = array_filter($form_state->getValue('langcodes'));
     $projects = array_filter($form_state->getValue('projects_update'));
 

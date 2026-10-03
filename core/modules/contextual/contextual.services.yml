@@ -1,5 +1,3 @@
-parameters:
-  contextual.skip_procedural_hook_scan: true
 services:
   _defaults:
     autowire: true

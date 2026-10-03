@@ -12,38 +12,6 @@ namespace Drupal\Core\Extension;
 interface ModuleHandlerInterface {
 
   /**
-   * Includes a module's .module file.
-   *
-   * This prevents including a module more than once.
-   *
-   * @param string $name
-   *   The name of the module to load.
-   *
-   * @return bool
-   *   TRUE if the item is loaded or has already been loaded.
-   */
-  public function load($name);
-
-  /**
-   * Loads all enabled modules.
-   */
-  public function loadAll();
-
-  /**
-   * Returns whether all modules have been loaded.
-   *
-   * @return bool
-   *   A Boolean indicating whether all modules have been loaded. This means all
-   *   modules; the load status of bootstrap modules cannot be checked.
-   */
-  public function isLoaded();
-
-  /**
-   * Reloads all enabled modules.
-   */
-  public function reload();
-
-  /**
    * Returns the list of currently active modules.
    *
    * @return array<string, \Drupal\Core\Extension\Extension>

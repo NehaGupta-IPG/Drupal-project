@@ -5,7 +5,6 @@ namespace Drupal\file;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -92,26 +91,6 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
 
     // No opinion.
     return AccessResult::neutral();
-  }
-
-  /**
-   * Wrapper for file_get_file_references().
-   *
-   * @param \Drupal\file\FileInterface $file
-   *   The file object for which to get references.
-   *
-   * @return array
-   *   A multidimensional array. The keys are field_name, entity_type,
-   *   entity_id and the value is an entity referencing this file.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
-   *   \Drupal::service(\Drupal\file\FileReferenceResolver::class) instead.
-   *
-   * @see https://www.drupal.org/node/3573884
-   */
-  protected function getFileReferences(FileInterface $file) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service(\Drupal\file\FileReferenceResolver::class) instead. See https://www.drupal.org/node/3573884', E_USER_DEPRECATED);
-    return file_get_file_references($file, NULL, EntityStorageInterface::FIELD_LOAD_REVISION, NULL);
   }
 
   /**

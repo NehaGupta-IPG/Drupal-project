@@ -7,7 +7,6 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
-use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\ImplementationList;
 use Drupal\Core\Hook\OrderOperation\OrderOperation;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
@@ -19,15 +18,6 @@ use Drupal\Core\Utility\CallableResolver;
 class ModuleHandler implements ModuleHandlerInterface {
 
   /**
-   * List of loaded files.
-   *
-   * @var array<string, true>
-   *   An associative array whose keys are file paths of loaded files, relative
-   *   to the application's root directory.
-   */
-  protected $loadedFiles;
-
-  /**
    * Installed modules, as extension objects keyed by module name.
    *
    * @var array<string, \Drupal\Core\Extension\Extension>
@@ -35,19 +25,11 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected $moduleList;
 
   /**
-   * Boolean indicating whether modules have been loaded.
-   *
-   * @var bool
-   */
-  protected $loaded = FALSE;
-
-  /**
    * Lists of callbacks which implement an alter hook, keyed by hook name(s).
    *
    * @var array<string, list<callable>>
    */
   protected array $alterHookListeners = [];
-
 
   /**
    * A list of module include file keys.
@@ -93,7 +75,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    *
    * @param string $root
    *   The app root.
-   * @param array<string, array{type: string, pathname: string, filename: string}> $module_list
+   * @param array<string, array{type: string, pathname: string}> $module_list
    *   An associative array whose keys are the names of installed modules and
    *   whose values are Extension class parameters. This is normally the
    *   %container.modules% parameter being set up by DrupalKernel.
@@ -116,52 +98,9 @@ class ModuleHandler implements ModuleHandlerInterface {
   ) {
     $this->moduleList = [];
     foreach ($module_list as $name => $module) {
-      $this->moduleList[$name] = new Extension($this->root, $module['type'], $module['pathname'], $module['filename']);
+      $this->moduleList[$name] = new Extension($this->root, $module['type'], $module['pathname']);
     }
 
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function load($name) {
-    if (isset($this->loadedFiles[$name])) {
-      return TRUE;
-    }
-
-    if (isset($this->moduleList[$name])) {
-      $this->moduleList[$name]->load();
-      $this->loadedFiles[$name] = TRUE;
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function loadAll() {
-    if (!$this->loaded) {
-      foreach ($this->moduleList as $name => $module) {
-        $this->load($name);
-      }
-      $this->loaded = TRUE;
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function reload() {
-    $this->loaded = FALSE;
-    $this->loadAll();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isLoaded() {
-    return $this->loaded;
   }
 
   /**
@@ -313,31 +252,6 @@ class ModuleHandler implements ModuleHandlerInterface {
       }
       return reset($listeners)(... $args);
     }
-
-    return $this->legacyInvoke($module, $hook, $args);
-  }
-
-  /**
-   * Calls a function called $module . '_' . $hook if one exists.
-   *
-   * @param string $module
-   *   The name of the module (without the .module extension).
-   * @param string $hook
-   *   The name of the hook to invoke.
-   * @param array $args
-   *   Arguments to pass to the hook implementation.
-   *
-   * @return mixed
-   *   The return value of the hook implementation.
-   */
-  protected function legacyInvoke($module, $hook, array $args = []) {
-    $this->load($module);
-    $function = $module . '_' . $hook;
-    if (function_exists($function) && !(new \ReflectionFunction($function))->getAttributes(LegacyHook::class)) {
-      return $function(... $args);
-    }
-
-    return NULL;
   }
 
   /**

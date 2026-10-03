@@ -473,16 +473,8 @@ class ExtensionDiscovery {
         continue;
       }
 
-      $name = $fileinfo->getBasename('.info.yml');
       $pathname = $dir_prefix . $fileinfo->getSubPathname();
-
-      // Determine whether the extension has a main extension file.
-      $filename = $name . '.' . $type;
-      if (!file_exists($this->root . '/' . dirname($pathname) . '/' . $filename)) {
-        $filename = NULL;
-      }
-
-      $extension = new Extension($this->root, $type, $pathname, $filename);
+      $extension = new Extension($this->root, $type, $pathname);
 
       // Track the originating directory for sorting purposes.
       $extension->subpath = $fileinfo->getSubPath();

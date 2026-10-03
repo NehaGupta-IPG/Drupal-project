@@ -12,7 +12,6 @@ use Drupal\views\Plugin\views\filter\Standard;
 use Drupal\views\Plugin\views\ViewsHandlerInterface;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -211,35 +210,6 @@ class ModuleTest extends ViewsKernelTestBase {
       $this->assertEquals($plugin_def['provider'], $plugin_details['provider'], 'The expected plugin provider was found.');
       $this->assertContains('test_view', $plugin_details['views'], 'The test_view View was found in the list of views using this plugin.');
     }
-  }
-
-  /**
-   * Tests views.module: views_embed_view().
-   */
-  #[IgnoreDeprecations]
-  public function testViewsEmbedView(): void {
-    /** @var \Drupal\Core\Render\RendererInterface $renderer */
-    $renderer = \Drupal::service('renderer');
-
-    $result = views_embed_view('test_argument');
-    $renderer->renderInIsolation($result);
-    $this->assertCount(5, $result['view_build']['#view']->result);
-
-    $result = views_embed_view('test_argument', 'default', 1);
-    $renderer->renderInIsolation($result);
-    $this->assertCount(1, $result['view_build']['#view']->result);
-
-    $result = views_embed_view('test_argument', 'default', '1,2');
-    $renderer->renderInIsolation($result);
-    $this->assertCount(2, $result['view_build']['#view']->result);
-
-    $result = views_embed_view('test_argument', 'default', '1,2', 'John');
-    $renderer->renderInIsolation($result);
-    $this->assertCount(1, $result['view_build']['#view']->result);
-
-    $result = views_embed_view('test_argument', 'default', '1,2', 'John,George');
-    $renderer->renderInIsolation($result);
-    $this->assertCount(2, $result['view_build']['#view']->result);
   }
 
   /**

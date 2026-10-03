@@ -32,7 +32,11 @@ class SchemaInspector {
    */
   public static function getTablesSpecification(ModuleHandlerInterface $handler, string $module): Schema|array {
     if ($handler->loadInclude($module, 'install')) {
-      $schema = $handler->invoke($module, 'schema') ?? [];
+      $schema = [];
+      $function = "{$module}_schema";
+      if (function_exists($function)) {
+        $schema = $function();
+      }
       // @todo Remove Schema check in drupal:13.0.0.
       if ($schema instanceof Schema) {
         assert($schema->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');

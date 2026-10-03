@@ -14,29 +14,6 @@ namespace Drupal\Core\Extension;
 class Extension {
 
   /**
-   * The type of the extension (e.g., 'module').
-   *
-   * @var string
-   */
-  protected $type;
-
-  /**
-   * The relative pathname of the extension.
-   *
-   * An example relative pathname is 'core/modules/node/node.info.yml'.
-   *
-   * @var string
-   */
-  protected $pathname;
-
-  /**
-   * The filename of the main extension file (e.g., 'node.module').
-   *
-   * @var string|null
-   */
-  protected $filename;
-
-  /**
    * An SplFileInfo instance for the extension's info file.
    *
    * Note that SplFileInfo is a PHP resource and resources cannot be serialized.
@@ -46,37 +23,19 @@ class Extension {
   protected $splFileInfo;
 
   /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * The extension info array.
    */
   public array $info;
 
-  /**
-   * Constructs a new Extension object.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $type
-   *   The type of the extension; e.g., 'module'.
-   * @param string $pathname
-   *   The relative path and filename of the extension's info file; e.g.,
-   *   'core/modules/node/node.info.yml'.
-   * @param string $filename
-   *   (optional) The filename of the main extension file; e.g., 'node.module'.
-   */
-  public function __construct($root, $type, $pathname, $filename = NULL) {
+  public function __construct(
+    protected string $root,
+    protected string $type,
+    protected string $pathname,
+  ) {
     // @see \Drupal\Core\Theme\ThemeInitialization::getActiveThemeByName()
     assert($pathname === 'core/core.info.yml' || ($pathname[0] !== '/' && file_exists($root . '/' . $pathname)), sprintf('The file specified by the given app root, relative path and file name (%s) do not exist.', $root . '/' . $pathname));
-    $this->root = $root;
     $this->type = $type;
     $this->pathname = $pathname;
-    $this->filename = $filename;
   }
 
   /**
@@ -127,42 +86,6 @@ class Extension {
    */
   public function getFilename() {
     return basename($this->pathname);
-  }
-
-  /**
-   * Returns the relative path of the main extension file, if any.
-   *
-   * @return string|null
-   *   The relative path for the main extension file, usually the *.module file.
-   */
-  public function getExtensionPathname() {
-    if ($this->filename) {
-      return $this->getPath() . '/' . $this->filename;
-    }
-  }
-
-  /**
-   * Returns the name of the main extension file, if any.
-   *
-   * @return string|null
-   *   The filename of the main extension file, usually the *.module file.
-   */
-  public function getExtensionFilename() {
-    return $this->filename;
-  }
-
-  /**
-   * Loads the main extension file, if any.
-   *
-   * @return bool
-   *   TRUE if this extension has a main extension file, FALSE otherwise.
-   */
-  public function load() {
-    if ($this->filename) {
-      include_once $this->root . '/' . $this->getPath() . '/' . $this->filename;
-      return TRUE;
-    }
-    return FALSE;
   }
 
   /**

@@ -908,10 +908,6 @@ class ConfigImporter {
       ->setSourceStorage($this->storageComparer->getSourceStorage());
     if ($type == 'module') {
       $this->callAndReInjectIfNeeded(fn () => $this->moduleInstaller->$op($names, FALSE));
-      // During a module install or uninstall the container is rebuilt and the
-      // module handler is called. This causes the container's instance of the
-      // module handler not to have loaded all the enabled modules.
-      $this->moduleHandler->loadAll();
     }
     if ($type == 'theme') {
       // Theme uninstalls possible remove default or admin themes therefore we

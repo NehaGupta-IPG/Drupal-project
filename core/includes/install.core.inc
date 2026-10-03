@@ -888,17 +888,6 @@ function install_tasks($install_state): array {
     'install_finished' => [],
   ];
 
-  // Allow the installation profile to modify the full list of tasks.
-  if (!empty($install_state['parameters']['profile'])) {
-    $profile = $install_state['parameters']['profile'];
-    if ($install_state['profiles'][$profile]->load()) {
-      $function = $install_state['parameters']['profile'] . '_install_tasks_alter';
-      if (function_exists($function)) {
-        $function($tasks, $install_state);
-      }
-    }
-  }
-
   // Fill in default parameters for each task before returning the list.
   foreach ($tasks as $task_name => &$task) {
     $task += [
@@ -1537,7 +1526,6 @@ function _install_get_version_info($version) {
 function install_load_profile(&$install_state): void {
   $profile = $install_state['parameters']['profile'];
   if ($profile !== FALSE) {
-    $install_state['profiles'][$profile]->load();
     $install_state['profile_info'] = install_profile_info($profile, $install_state['parameters']['langcode'] ?? 'en');
   }
 
@@ -1755,8 +1743,6 @@ function install_install_profile(&$install_state): void {
  *   An array of information about the current installation state.
  */
 function install_download_additional_translations_operations(&$install_state): void {
-  \Drupal::moduleHandler()->loadInclude('locale', 'bulk.inc');
-
   $langcode = $install_state['parameters']['langcode'];
   if (!($language = ConfigurableLanguage::load($langcode))) {
     // Create the language if not already shipped with a profile.
@@ -1820,10 +1806,6 @@ function install_import_translations(&$install_state) {
  *   An array of batch definitions.
  */
 function install_finish_translations(&$install_state): array {
-  \Drupal::moduleHandler()->loadInclude('locale', 'fetch.inc');
-  \Drupal::moduleHandler()->loadInclude('locale', 'compare.inc');
-  \Drupal::moduleHandler()->loadInclude('locale', 'bulk.inc');
-
   // Build a fresh list of installed projects. When more projects than core are
   // installed, their translations will be downloaded (if required) and imported
   // using a batch.

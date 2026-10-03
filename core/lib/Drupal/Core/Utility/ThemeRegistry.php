@@ -46,15 +46,13 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
    *   The lock backend.
    * @param array $tags
    *   (optional) The tags to specify for the cache item.
-   * @param bool $modules_loaded
-   *   Whether all modules have already been loaded.
    */
-  public function __construct($cid, CacheBackendInterface $cache, LockBackendInterface $lock, $tags = [], $modules_loaded = FALSE) {
+  public function __construct($cid, CacheBackendInterface $cache, LockBackendInterface $lock, $tags = []) {
     $this->cid = $cid;
     $this->cache = $cache;
     $this->lock = $lock;
     $this->tags = $tags;
-    $this->persistable = $modules_loaded && \Drupal::hasRequest() && \Drupal::request()->isMethod('GET');
+    $this->persistable = \Drupal::hasRequest() && \Drupal::request()->isMethod('GET');
 
     $this->lazyLoadCache();
 

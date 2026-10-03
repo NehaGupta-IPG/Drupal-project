@@ -305,8 +305,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
         $module_path = \Drupal::service('extension.list.module')
           ->getPath($name);
         $pathname = "$module_path/$name.info.yml";
-        $filename = file_exists($module_path . "/$name.module") ? "$name.module" : NULL;
-        $module_filenames[$name] = new Extension($this->root, 'module', $pathname, $filename);
+        $module_filenames[$name] = new Extension($this->root, 'module', $pathname);
       }
     }
 
@@ -336,10 +335,9 @@ class ModuleInstaller implements ModuleInstallerInterface {
     }
 
     foreach ($module_list as $module) {
-      // Load the module's .module and .install files. Do this for all modules
+      // Load the module's .install files. Do this for all modules
       // prior to calling hook_module_preinstall() in order to not pollute the
       // cache.
-      $this->moduleHandler->load($module);
       $this->moduleHandler->loadInclude($module, 'install');
     }
 

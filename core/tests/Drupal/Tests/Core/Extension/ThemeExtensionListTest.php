@@ -35,8 +35,8 @@ class ThemeExtensionListTest extends UnitTestCase {
     $extension_discovery
       ->scan('theme')
       ->willReturn([
-        'test_subtheme'  => new Extension($this->root, 'theme', 'core/modules/system/tests/themes/test_subtheme/test_subtheme.info.yml', 'test_subtheme.info.yml'),
-        'test_base_theme' => new Extension($this->root, 'theme', 'core/modules/system/tests/themes/test_base_theme/test_base_theme.info.yml', 'test_base_theme.info.yml'),
+        'test_subtheme'  => new Extension($this->root, 'theme', 'core/modules/system/tests/themes/test_subtheme/test_subtheme.info.yml'),
+        'test_base_theme' => new Extension($this->root, 'theme', 'core/modules/system/tests/themes/test_base_theme/test_base_theme.info.yml'),
       ]);
 
     // Verify that info parser is called with the specified paths.

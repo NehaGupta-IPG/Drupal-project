@@ -20,22 +20,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 class Theme extends Extension {
 
-  /**
-   * Constructs a new Theme object.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $pathname
-   *   The relative path and filename of the extension's info file; e.g.,
-   *   'core/themes/my_theme/my_theme.info.yml'.
-   * @param array $info
-   *   The info array parsed from the theme's .info.yml file.
-   * @param string|null $filename
-   *   (optional) The filename of the main extension file; e.g., my_theme.theme.
-   *   This is deprecated and will be removed in Drupal 13.0.0.
-   */
-  public function __construct(string $root, string $pathname, array $info, ?string $filename = NULL) {
-    parent::__construct($root, 'theme', $pathname, $filename);
+  public function __construct(string $root, string $pathname, array $info) {
+    parent::__construct($root, 'theme', $pathname);
     $this->info = $info;
   }
 

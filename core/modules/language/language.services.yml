@@ -1,5 +1,4 @@
 parameters:
-  language.skip_procedural_hook_scan: true
   language.translate_english: true
 
 services:
