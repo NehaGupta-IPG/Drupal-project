@@ -63,8 +63,8 @@ class Y2038SchemaUpdateTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles():void {
     $this->databaseDumpFiles = [
-      // Start with a filled standard install of Drupal 10.3.0.
-      DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
+      // Start with a filled standard install of Drupal 11.3.0.
+      DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-11.3.0.filled.standard.php.gz',
     ];
   }
 
