@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\navigation\Kernel;
 
+use Dom\HTMLDocument;
 use Drupal\Core\Render\MetadataBubblingUrlGenerator;
 use Drupal\Core\Routing\UrlGenerator;
 use Drupal\KernelTests\KernelTestBase;
@@ -153,6 +154,52 @@ class NavigationMenuMarkupTest extends KernelTestBase {
     foreach ($items_query as $query) {
       $element = $xpath->query($query);
       $this->assertEquals(1, $element->length, $query);
+    }
+  }
+
+  /**
+   * Tests that the accessible name of expandable buttons starts with the title.
+   *
+   * The visually hidden action text must follow the visible title, so that
+   * the accessible name starts with the visible label.
+   */
+  public function testExpandableButtonLabelInName(): void {
+    // Add two more levels so that "Third level link" has children and renders
+    // as a level 2 toggle button:
+    // - 1
+    // - 2
+    //   - 3
+    //     - 4
+    //       - 5
+    // phpcs:disable
+    $links = [
+      4 => MenuLinkMock::createMock(['id' => 'test.example4', 'route_name' => 'example3', 'title' => 'Third level link', 'parent' => 'test.example3', 'weight' => 3]),
+      5 => MenuLinkMock::createMock(['id' => 'test.example5', 'route_name' => 'example3', 'title' => 'Fourth level link', 'parent' => 'test.example4', 'weight' => 4]),
+    ];
+    // phpcs:enable
+    foreach ($links as $instance) {
+      $this->menuLinkManager->addDefinition($instance->getPluginId(), $instance->getPluginDefinition());
+    }
+
+    $block = $this->blockManager->createInstance('navigation_menu:' . $this->menu->id(), [
+      'region' => 'content',
+      'id' => 'machine_name',
+      'level' => 1,
+      'depth' => NavigationMenuBlock::NAVIGATION_MAX_DEPTH,
+    ]);
+
+    $block_build = $block->build();
+    $render = \Drupal::service('renderer')->renderRoot($block_build);
+    $dom = HTMLDocument::createFromString((string) $render);
+
+    $buttons = [
+      'Another title' => '.toolbar-block__list-item > button',
+      'Third level link' => '.toolbar-menu__item--level-2 > button',
+    ];
+    foreach ($buttons as $title => $selector) {
+      $button = $dom->querySelector($selector);
+      $this->assertNotNull($button, $selector);
+      $this->assertSame($title . ' Extend', trim(preg_replace('/\s+/', ' ', $button->textContent)), $selector);
     }
   }
 
