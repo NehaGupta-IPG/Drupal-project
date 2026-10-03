@@ -222,6 +222,7 @@ default:
     # Need to pass this along directly.
     - time sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --debug-discovery --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --all --ci-parallel-node-index $CI_NODE_INDEX --ci-parallel-node-total $CI_NODE_TOTAL
   after_script:
+    - $CI_PROJECT_DIR/.gitlab-ci/scripts/ci-diag.sh end
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
   artifacts:
     when: always
@@ -299,6 +300,7 @@ default:
     - <<: *with-database
     - <<: *with-selenium-chrome
   after_script:
+    - $CI_PROJECT_DIR/.gitlab-ci/scripts/ci-diag.sh end
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
     - cp /builds/chromedriver.log ./
 
@@ -352,6 +354,7 @@ default:
     - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - sudo -u www-data -E -H yarn run test:nightwatch --workers=3
   after_script:
+    - $CI_PROJECT_DIR/.gitlab-ci/scripts/ci-diag.sh end
     - cp /builds/chromedriver.log ./
   artifacts:
     when: always
