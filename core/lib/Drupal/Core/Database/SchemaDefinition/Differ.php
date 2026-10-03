@@ -44,7 +44,7 @@ class Differ {
             $pathFragmentValue = "[" . $pathFragmentElement->{$pathFragmentNormalizationProperty} . "]";
           }
           else {
-            $pathFragmentValue = '';
+            $pathFragmentValue = ($path === NULL ? '' : '.') . $key;
           }
         }
         else {
@@ -66,15 +66,18 @@ class Differ {
           continue;
         }
 
-        if (isset($arrayPropertyNormalizationKeys[$key])) {
+        $isSchemaDefinitionArray = is_array($old[$key]) ? ((array_first($old[$key]) ?? array_first($new[$key])) instanceof SchemaDefinitionInterface) : FALSE;
+        if ($isSchemaDefinitionArray) {
+          $schemaDefinitionClass = get_class(array_first($old[$key]) ?? array_first($new[$key]));
+          $schemaDefinitionNormalizationProperty = $schemaDefinitionClass::normalizationProperty();
           $tmp = [];
           foreach ($old[$key] ?? [] as $value) {
-            $tmp[$value->{$arrayPropertyNormalizationKeys[$key]}] = $value;
+            $tmp[$value->{$schemaDefinitionNormalizationProperty}] = $value;
           }
           $old[$key] = $tmp;
           $tmp = [];
           foreach ($new[$key] ?? [] as $value) {
-            $tmp[$value->{$arrayPropertyNormalizationKeys[$key]}] = $value;
+            $tmp[$value->{$schemaDefinitionNormalizationProperty}] = $value;
           }
           $new[$key] = $tmp;
         }

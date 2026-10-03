@@ -78,29 +78,29 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
 
     $this->assertEquals(
       [
-        "tables.foo.columns.id.type",
-        "tables.foo.columns.month.size",
-        "tables.foo.columns.month.default",
-        "tables.foo.columns.surname",
-        "tables.foo.primaryKey.columns.[1]month",
+        "tables[foo].columns[id].type",
+        "tables[foo].columns[month].size",
+        "tables[foo].columns[month].default",
+        "tables[foo].columns[surname]",
+        "tables[foo].primaryKey.columns[month]",
       ],
       array_keys(Differ::diff($schemaA, $schemaB))
     );
 
     $this->assertEquals(
       [
-        "columns.id.type",
-        "columns.month.size",
-        "columns.month.default",
-        "columns.surname",
-        "primaryKey.columns.[1]month",
+        "columns[id].type",
+        "columns[month].size",
+        "columns[month].default",
+        "columns[surname]",
+        "primaryKey.columns[month]",
       ],
       array_keys(Differ::diff($schemaA->getTableDefinition('foo'), $schemaB->getTableDefinition('foo'))),
     );
 
     $this->assertEquals(
       [
-        "columns.[1]month",
+        "columns[month]",
       ],
       array_keys(Differ::diff($schemaA->getTableDefinition('foo')->primaryKey, $schemaB->getTableDefinition('foo')->primaryKey)),
     );
