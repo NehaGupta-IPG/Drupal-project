@@ -161,7 +161,9 @@ final class Settings implements ContainerInjectionInterface {
    *   TRUE, if the user has overridden theme settings, FALSE otherwise.
    */
   public function userOverrideEnabled(?AccountInterface $account = NULL): bool {
-    $overrides = &drupal_static(__CLASS__ . '_' . __METHOD__, []);
+    $cid = __CLASS__ . '_' . __METHOD__;
+    $cached = \Drupal::cache('memory')->get($cid);
+    $overrides = $cached->data ?? [];
 
     if (!$account || !$this->userData) {
       $account = $this->currentUser;
@@ -170,6 +172,7 @@ final class Settings implements ContainerInjectionInterface {
     if (!isset($overrides[$account->id()])) {
       $overrides[$account->id()] = $this->allowUserOverrides()
         && $this->userData->get('default_admin', $account->id(), 'enable_user_settings');
+      \Drupal::cache('memory')->set($cid, $overrides);
     }
 
     return $overrides[$account->id()];
@@ -293,9 +296,9 @@ final class Settings implements ContainerInjectionInterface {
       '#title' => $this->t('Focus color'),
       '#default_value' => $account ? $this->get('preset_focus_color', $account) : $this->getDefault('preset_focus_color'),
       '#options' => [
-        'gin' => $this->t('Default Admin Focus color (Default)'),
+        'default' => $this->t('Default Admin Focus color (Default)'),
         'green' => $this->t('Green'),
-        'claro' => $this->t('Legacy green'),
+        'legacy_green' => $this->t('Legacy green'),
         'orange' => $this->t('Orange'),
         'dark' => $this->t('Neutral'),
         'accent' => $this->t('Same as Accent color'),
