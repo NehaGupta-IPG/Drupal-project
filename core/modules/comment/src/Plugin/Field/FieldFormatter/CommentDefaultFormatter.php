@@ -38,7 +38,7 @@ class CommentDefaultFormatter extends FormatterBase {
     return [
       'view_mode' => 'default',
       'pager_id' => 0,
-      'use_entity_access_control' => TRUE,
+      'use_entity_access_control' => FALSE,
     ] + parent::defaultSettings();
   }
 
@@ -140,8 +140,7 @@ class CommentDefaultFormatter extends FormatterBase {
       !in_array($this->viewMode, ['search_result', 'search_index'])) {
       $comment_settings = $this->getFieldSettings();
 
-      $use_entity_access_control = $this->getSetting('use_entity_access_control') ?? FALSE;
-      if (!$use_entity_access_control) {
+      if (!$this->getSetting('use_entity_access_control')) {
         // @phpstan-ignore method.deprecated
         return $this->getDeprecatedPermissionBasedAccessElements($entity, $field_name, $status, $comment_settings);
       }
@@ -220,11 +219,11 @@ class CommentDefaultFormatter extends FormatterBase {
       '#type' => 'radios',
       '#title' => $this->t('How to check the user access'),
       '#options' => [
-        TRUE => $this->t('Use entity access control'),
-        FALSE => $this->t('Use permission-based access control (deprecated)'),
+        1 => $this->t('Use entity access control'),
+        0 => $this->t('Use permission-based access control (deprecated)'),
       ],
       '#description' => $this->t('Permission-based access control is deprecated and will be removed in Drupal 13.0.0.'),
-      '#default_value' => $this->getSetting('use_entity_access_control') ?? FALSE,
+      '#default_value' => (int) $this->getSetting('use_entity_access_control'),
     ];
     return $element;
   }
@@ -305,13 +304,13 @@ class CommentDefaultFormatter extends FormatterBase {
    * Returns the elements by using the deprecated permission-based access.
    *
    * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Only entity
-   *   access control will be available and the field--comment.html.twig
+   *   access control will be available, and the field--comment.html.twig
    *   template overrides should be adapted.
    *
    * @see https://www.drupal.org/node/3180183
    */
   protected function getDeprecatedPermissionBasedAccessElements(FieldableEntityInterface $entity, string $field_name, CommentingStatus $status, array $comment_settings): array {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Only entity access control will be available and the field--comment.html.twig template overrides should be adapted. See https://www.drupal.org/node/3180183', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Only entity access control will be available, and the field--comment.html.twig template overrides should be adapted. See https://www.drupal.org/node/3180183', E_USER_DEPRECATED);
 
     $elements = [];
     $output = [];

@@ -19,9 +19,17 @@ field.formatter.settings.comment_default:
     pager_id:
       type: integer
       label: 'Pager ID'
+    # This setting is deprecated in drupal:11.5.0 and is removed from
+    # drupal:13.0.0. Only entity access control will be available, and the
+    # field--comment.html.twig template overrides should be adapted.
+    # @see https://www.drupal.org/node/3180183
     use_entity_access_control:
       type: boolean
       label: 'Use entity access control'
+      # Defaults to FALSE.
+      # @see \Drupal\comment\Plugin\Field\FieldFormatter\CommentDefaultFormatter::defaultSettings()
+      requiredKey: false
+      deprecated: "The 'use_entity_access_control' config schema is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Only entity access control will be available, and the field--comment.html.twig template overrides should be adapted. See https://www.drupal.org/node/3180183"
 
 field.widget.settings.comment_default:
   type: mapping

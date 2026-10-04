@@ -24,6 +24,8 @@
 %The "cache.backend.memory" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use cache.backend.memory.memory instead. See https://www.drupal.org/node/3546856%
 %The "cache.static" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use the cache.memory bin instead. See https://www.drupal.org/node/3546856%
 %Not returning a Schema object from .*_schema\(\) to (Drupal\\Core\\Extension\\ModuleInstaller::installSchema|Drupal\\Core\\Extension\\ModuleInstaller::uninstallSchema|Drupal\\TestTools\\Extension\\SchemaInspector::getTablesSpecification) is deprecated in drupal:12\.1\.0 and is removed in drupal:13\.0\.0\. See https://www.drupal.org/node/3557405%
+%The 'use_entity_access_control' config schema is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Only entity access control will be available, and the field--comment.html.twig template overrides should be adapted. See https://www.drupal.org/node/3180183%
+%The Drupal\\Tests\\comment\\Functional\\CommentNonNodeTest::setDeprecatedFormatterSetting\(\) method is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. No replacement is provided. See https://www.drupal.org/node/3180183%
 
 # Symfony 8.
 %Since symfony/dependency-injection 8\.1: Calling "Drupal\\workspaces\\Provider\\DefaultWorkspaceProvider::getId\(\)" to get the "" index is deprecated, use the #\[AsTaggedItem\] attribute instead\.%
