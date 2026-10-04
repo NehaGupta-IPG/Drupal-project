@@ -41,6 +41,8 @@ use PHPUnit\Framework\Attributes\Group;
 class AjaxCommandsTest extends UnitTestCase {
 
   /**
+   * Returns the data for testing the add css command.
+   *
    * @return array
    *   - Array of css elements
    *   - Expected value
@@ -131,6 +133,8 @@ class AjaxCommandsTest extends UnitTestCase {
   }
 
   /**
+   * Returns the data for testing the add module preload command.
+   *
    * @return array
    *   - Array of module preload attributes
    *   - Expected value

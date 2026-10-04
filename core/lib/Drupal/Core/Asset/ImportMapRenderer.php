@@ -61,6 +61,10 @@ class ImportMapRenderer implements AssetCollectionRendererInterface {
       'importmap' => [
         '#type' => 'html_tag',
         '#tag' => 'script',
+        // The JSON is safe as the #value of the script tag, which is XSS
+        // filtered: Json::encode() escapes all HTML special characters as
+        // \uXXXX sequences, so the filtering cannot alter the JSON, and the
+        // JSON cannot break out of the script tag.
         '#value' => Json::encode($map),
         '#attributes' => ['type' => 'importmap'],
       ],

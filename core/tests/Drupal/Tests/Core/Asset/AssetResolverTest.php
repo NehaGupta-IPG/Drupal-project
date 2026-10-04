@@ -303,6 +303,13 @@ class AssetResolverTest extends UnitTestCase {
     $this->assertCount($expected_css_cache_item_count, $this->cache->getAllCids());
   }
 
+  /**
+   * Returns the data for testing the CSS assets.
+   *
+   * @return array
+   *   - The attached assets.
+   *   - The expected number of cache items.
+   */
   public static function providerAttachedCssAssets(): array {
     return [
       'one js only library and one css only library' => [
@@ -337,6 +344,13 @@ class AssetResolverTest extends UnitTestCase {
     $this->assertCount($expected_multilingual_js_cache_item_count, $this->cache->getAllCids());
   }
 
+  /**
+   * Returns the data for testing the JavaScript assets.
+   *
+   * @return array
+   *   - The attached assets.
+   *   - The expected number of cache items.
+   */
   public static function providerAttachedJsAssets(): array {
     $time = time();
     return [
@@ -365,6 +379,13 @@ class AssetResolverTest extends UnitTestCase {
     $this->assertSame($expected, $fonts);
   }
 
+  /**
+   * Returns the data for testing the font assets.
+   *
+   * @return array
+   *   - The attached assets.
+   *   - The expected font assets.
+   */
   public static function providerAttachedFontAssets(): array {
     return [
       [
@@ -597,6 +618,13 @@ class AssetResolverTest extends UnitTestCase {
     $this->assertSame($expected, $this->assetResolver->getModulePreloads($assets));
   }
 
+  /**
+   * Returns the data for testing the module preloads.
+   *
+   * @return array
+   *   - The attached libraries.
+   *   - The expected module preloads.
+   */
   public static function providerGetModulePreloads(): array {
     return [
       'no libraries attached' => [[], []],
@@ -638,6 +666,9 @@ if (!defined('JS_DEFAULT')) {
  */
 class TestMemoryBackend extends MemoryBackend {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getAllCids(): array {
     return array_keys($this->cache);
   }

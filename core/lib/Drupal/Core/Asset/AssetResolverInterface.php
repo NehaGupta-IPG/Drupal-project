@@ -23,12 +23,8 @@ interface AssetResolverInterface {
    * Returns the CSS assets for the current response's libraries.
    *
    * It returns the CSS assets in order, according to the SMACSS categories
-   * specified in the assets' weights:
-   * - CSS_BASE
-   * - CSS_LAYOUT
-   * - CSS_COMPONENT
-   * - CSS_STATE
-   * - CSS_THEME
+   * specified in the assets' weights (CSS_BASE, CSS_LAYOUT, CSS_COMPONENT,
+   * CSS_STATE, CSS_THEME).
    *
    * This ensures proper cascading of styles so themes can easily override
    * module styles through CSS selectors.

@@ -58,7 +58,7 @@ class BigPipeImportMapTest extends BrowserTestBase {
   }
 
   /**
-   * Returns the expected module preloads of the importmap_test/consumer library.
+   * Returns the expected module preloads of the test consumer library.
    *
    * @return array
    *   The expected attributes of the module preload link elements.
@@ -83,7 +83,7 @@ class BigPipeImportMapTest extends BrowserTestBase {
   }
 
   /**
-   * Asserts that the response contains a single import map in the initial response.
+   * Asserts the initial response contains a single import map.
    *
    * The import map must be in the initial response, before the first BigPipe
    * chunk (when there is a BigPipe start signal).
@@ -129,7 +129,7 @@ class BigPipeImportMapTest extends BrowserTestBase {
   }
 
   /**
-   * Tests that a BigPipe no-JS placeholder replacement does not add an import map.
+   * Tests that a no-JS placeholder replacement adds no import map.
    *
    * The placeholder replacement is sent as an embedded HTML response. It does
    * not add module preloads either: the no-JS BigPipe placeholders are only

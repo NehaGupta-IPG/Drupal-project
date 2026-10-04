@@ -565,7 +565,6 @@ function hook_preprocess(&$variables, $hook): void {
   static $hooks;
 
   // Add contextual links to the variables, if the user has permission.
-
   if (!\Drupal::currentUser()->hasPermission('access contextual links')) {
     return;
   }

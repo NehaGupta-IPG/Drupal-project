@@ -236,10 +236,14 @@ class AssetResolver implements AssetResolverInterface {
   public function getImportMap(): array {
     $active_theme = $this->themeManager->getActiveTheme()->getName();
     // The import map is built from all known libraries: core, the enabled
-    // modules, and the active theme including its base themes. Module scripts
-    // attached later (e.g., in an Ajax response) may import any of these,
-    // and browsers without support for multiple import maps cannot update
-    // the map after the initial page load.
+    // modules, and the active theme including its base themes, not just the
+    // libraries attached to the current response. Module scripts can be
+    // attached at any time, e.g., in an Ajax, BigPipe or HTMX response, and
+    // it is not possible to know in advance which of those will import a
+    // module. Browsers only support a single import map per page (Firefox
+    // does not support multiple import maps), and the import map cannot be
+    // updated once it has been loaded, so the complete import map has to be
+    // emitted with the main HTML document.
     $extensions = ['core'];
     foreach (array_keys($this->moduleHandler->getModuleList()) as $module) {
       $extensions[] = $module;
