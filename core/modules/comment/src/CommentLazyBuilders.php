@@ -101,11 +101,17 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
    *   The comment field name.
    * @param string $comment_type_id
    *   The comment type ID.
+   * @param bool $use_entity_access_control
+   *   (deprecated) Whether to use entity access control or the deprecated
+   *   permission-based access control. The $use_entity_access_control parameter
+   *   is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0.
    *
    * @return array
    *   A themed comment form or an empty array if the user cannot post comments.
+   *
+   * @see https://www.drupal.org/node/3180183
    */
-  public function renderForm($commented_entity_type_id, $commented_entity_id, $field_name, $comment_type_id) {
+  public function renderForm($commented_entity_type_id, $commented_entity_id, $field_name, $comment_type_id, bool $use_entity_access_control = TRUE) {
     $values = [
       'entity_type' => $commented_entity_type_id,
       'entity_id' => $commented_entity_id,
@@ -113,6 +119,13 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
       'comment_type' => $comment_type_id,
       'pid' => NULL,
     ];
+
+    if (!$use_entity_access_control) {
+      @trigger_error('The $use_entity_access_control parameter is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3180183', E_USER_DEPRECATED);
+      $comment = $this->entityTypeManager->getStorage('comment')->create($values);
+      return $this->entityFormBuilder->getForm($comment);
+    }
+
     $host = $this->entityTypeManager->getStorage($commented_entity_type_id)->load($commented_entity_id);
     $access = $host->get($field_name)->access('create', $this->currentUser, TRUE);
     $build = [];

@@ -338,6 +338,7 @@ class CommentDefaultFormatter extends FormatterBase {
               $entity->id(),
               $field_name,
               $this->getFieldSetting('comment_type'),
+              FALSE,
             ],
           ],
           '#create_placeholder' => TRUE,
