@@ -27,7 +27,7 @@ final class KeyColumn implements SchemaDefinitionInterface {
    * {@inheritdoc}
    */
   public static function normalizationProperty(): ?string {
-    return 'name';
+    return NULL;
   }
 
   /**

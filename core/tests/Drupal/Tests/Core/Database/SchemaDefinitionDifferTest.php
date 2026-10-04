@@ -6,22 +6,25 @@ namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
-use Drupal\Core\Database\SchemaDefinition\Differ;
+use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionInterface;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\UniqueKey;
+use Drupal\Core\Database\Utility\SchemaDefinitionDiffer;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Tests VersionedSchema definition object validations.
+ * Tests Schema differ.
  */
 #[Group('Database')]
-#[CoversClass(Differ::class)]
+#[CoversClass(SchemaDefinitionDiffer::class)]
 class SchemaDefinitionDifferTest extends UnitTestCase {
 
   /**
@@ -44,6 +47,12 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
             ),
           ],
           primaryKey: new PrimaryKey(['id']),
+          uniqueKeys: [
+            new UniqueKey(name: 'bar', columns: ['id', 'month']),
+          ],
+          indexes: [
+            new Index(name: 'swap', columns: ['id', 'month']),
+          ],
         ),
       ],
     );
@@ -72,38 +81,66 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
             ),
           ],
           primaryKey: new PrimaryKey(['id', 'month']),
+          indexes: [
+            new Index(name: 'swap', columns: ['month', 'id', 'surname']),
+          ],
         ),
       ],
     );
 
     $this->assertEquals(
       [
-        "tables[foo].columns[id].type",
-        "tables[foo].columns[month].size",
-        "tables[foo].columns[month].default",
-        "tables[foo].columns[surname]",
-        "tables[foo].primaryKey.columns[month]",
+        "tables[foo].columns[id].type" => 'Changed',
+        "tables[foo].columns[month].size" => 'Unset',
+        "tables[foo].columns[month].default" => 'Set',
+        "tables[foo].columns[surname]" => 'Added',
+        "tables[foo].indexes[swap].columns[0].name" => 'Changed',
+        "tables[foo].indexes[swap].columns[1].name" => 'Changed',
+        "tables[foo].indexes[swap].columns[2]" => 'Added',
+        "tables[foo].primaryKey.columns[1]" => 'Added',
+        'tables[foo].uniqueKeys[bar]' => 'Removed',
       ],
-      array_keys(Differ::diff($schemaA, $schemaB))
+      $this->compactDiff($schemaA, $schemaB),
     );
 
     $this->assertEquals(
       [
-        "columns[id].type",
-        "columns[month].size",
-        "columns[month].default",
-        "columns[surname]",
-        "primaryKey.columns[month]",
+        "columns[id].type" => 'Changed',
+        "columns[month].size" => 'Unset',
+        "columns[month].default" => 'Set',
+        "columns[surname]" => 'Added',
+        "indexes[swap].columns[0].name" => 'Changed',
+        "indexes[swap].columns[1].name" => 'Changed',
+        "indexes[swap].columns[2]" => 'Added',
+        "primaryKey.columns[1]" => 'Added',
+        'uniqueKeys[bar]' => 'Removed',
       ],
-      array_keys(Differ::diff($schemaA->getTableDefinition('foo'), $schemaB->getTableDefinition('foo'))),
+      $this->compactDiff($schemaA->getTableDefinition('foo'), $schemaB->getTableDefinition('foo')),
     );
 
     $this->assertEquals(
       [
-        "columns[month]",
+        "columns[1]" => 'Added',
       ],
-      array_keys(Differ::diff($schemaA->getTableDefinition('foo')->primaryKey, $schemaB->getTableDefinition('foo')->primaryKey)),
+      $this->compactDiff($schemaA->getTableDefinition('foo')->primaryKey, $schemaB->getTableDefinition('foo')->primaryKey),
     );
+  }
+
+  /**
+   * Returns a compact diff between two SchemaDefinitionInterface objects.
+   *
+   * @param SchemaDefinitionInterface $a
+   *   A SchemaDefinitionInterface object to compare.
+   * @param SchemaDefinitionInterface $b
+   *   A SchemaDefinitionInterface object to compare.
+   *
+   * @return array<string,string>
+   *   The compacted diff entries, exposing path as key and the diff type as
+   *   value.
+   */
+  protected function compactDiff(SchemaDefinitionInterface $a, SchemaDefinitionInterface $b): array {
+    $diff = SchemaDefinitionDiffer::diff($a, $b);
+    return array_map(fn ($value): string => $value['type']->name, $diff);
   }
 
 }

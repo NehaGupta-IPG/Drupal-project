@@ -17,8 +17,8 @@ interface SchemaDefinitionInterface {
    * method returns the key to be used for each property to build an
    * associative array for comparison.
    *
-   * @return array<string,string>
-   *   The legacy array-based specification.
+   * @return ?string
+   *   The public property to be used for normalization.
    */
   public static function normalizationProperty(): ?string;
 
