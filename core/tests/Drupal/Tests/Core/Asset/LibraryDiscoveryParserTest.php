@@ -362,12 +362,8 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $css = $library['css'];
     $this->assertCount(10, $css);
 
-    // The following default weights are tested:
-    // - CSS_BASE: -200
-    // - CSS_LAYOUT: -100
-    // - CSS_COMPONENT: 0
-    // - CSS_STATE: 100
-    // - CSS_THEME: 200
+    // The following default weights are tested: CSS_BASE (-200),
+    // CSS_LAYOUT (-100), CSS_COMPONENT (0), CSS_STATE (100), CSS_THEME (200).
     $this->assertEquals(200, $css[0]['weight']);
     $this->assertEquals(200 + 29, $css[1]['weight']);
     $this->assertEquals(-200, $css[2]['weight']);
@@ -503,7 +499,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
    * @legacy-covers ::buildByExtension
    */
   public function testImportMapLibrariesDirectory(): void {
-    $this->setUpMockLibrariesDirectoryFileFinder();
+    $this->librariesDirectoryFileFinder = $this->createMock(LibrariesDirectoryFileFinder::class);
     $this->librariesDirectoryFileFinder->expects($this->once())
       ->method('find')
       ->with('llama/lib.mjs')
@@ -521,7 +517,8 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->with('module', 'importmap_module')
       ->willReturn($path);
 
-    $libraries = $this->libraryDiscoveryParser->buildByExtension('importmap_module');
+    $parser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+    $libraries = $parser->buildByExtension('importmap_module');
     $this->assertSame('libraries/llama/lib.mjs', $libraries['importmap']['importmap']['imports']['importmap-test-libraries']['data']);
   }
 
@@ -1325,10 +1322,27 @@ class TestLibraryDiscoveryParser extends LibraryDiscoveryParser {
    */
   protected array $validUris;
 
+  /**
+   * Determines if the supplied file is a valid URI.
+   *
+   * @param string $source
+   *   The file source to check.
+   *
+   * @return bool
+   *   TRUE if the file is a valid URI, according to the test data.
+   */
   protected function fileValidUri($source): bool {
     return $this->validUris[$source] ?? FALSE;
   }
 
+  /**
+   * Sets the validity of a URI in the test data.
+   *
+   * @param string $source
+   *   The file source.
+   * @param bool $valid
+   *   TRUE if the file is a valid URI.
+   */
   public function setFileValidUri(string $source, bool $valid): void {
     $this->validUris[$source] = $valid;
   }

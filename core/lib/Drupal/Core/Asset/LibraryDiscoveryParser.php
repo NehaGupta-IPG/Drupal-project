@@ -31,8 +31,21 @@ class LibraryDiscoveryParser {
     protected ExtensionPathResolver $extensionPathResolver,
     protected ComponentPluginManager $componentPluginManager,
     protected YamlCacheCollector $yamlCacheCollector,
+    ?LibraryImportMapProcessorInterface $importMapProcessor = NULL,
   ) {
+    if (!isset($importMapProcessor)) {
+      @trigger_error('Constructing LibraryDiscoveryParser without an import map processor is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+      $importMapProcessor = new LibraryImportMapProcessor($this->librariesDirectoryFileFinder, $this->streamWrapperManager);
+    }
+    $this->importMapProcessor = $importMapProcessor;
   }
+
+  /**
+   * The import map processor.
+   *
+   * @var \Drupal\Core\Asset\LibraryImportMapProcessorInterface
+   */
+  protected $importMapProcessor;
 
   /**
    * Parses and builds up all the libraries information of an extension.
@@ -107,7 +120,7 @@ class LibraryDiscoveryParser {
 
       // Validate the importmap definition, and resolve its paths.
       if (!empty($library['importmap'])) {
-        $library['importmap'] = $this->processImportMapDefinition($library['importmap'], $id, $extension, $path, $library['version'] ?? -1);
+        $library['importmap'] = $this->importMapProcessor->processImportMapDefinition($library['importmap'], $id, $extension, $path, $library['version'] ?? -1);
       }
 
       // Assign Drupal's license to libraries that don't have license info.
@@ -320,7 +333,10 @@ class LibraryDiscoveryParser {
    *   scripts attached later (e.g., in an Ajax response) can also resolve
    *   their imports. When a library with import map entries is attached to a
    *   page, its entries are preloaded with <link rel="modulepreload">
-   *   elements. Libraries that consume an import map entry should declare a
+   *   elements. All of its entries are preloaded, including entries that the
+   *   attached module scripts do not import, so a library should keep its
+   *   import map entries limited to the modules that its scripts import.
+   *   Libraries that consume an import map entry should declare a
    *   normal library dependency on the library that provides the entry. The
    *   importmap of a library may be overridden in the libraries-override of
    *   a theme: the override uses the same structure as the definition. The
@@ -745,188 +761,6 @@ class LibraryDiscoveryParser {
       return '/' . $theme_path . '/' . $overriding_asset;
     }
     return $overriding_asset;
-  }
-
-  /**
-   * Processes the importmap key of a library definition.
-   *
-   * Validates the definition against the import map authoring requirements of
-   * the HTML specification, and resolves all of its paths, mirroring the
-   * resolution of js and css asset sources.
-   *
-   * @param array $importmap
-   *   The importmap definition, as declared in the library definition. It may
-   *   contain the keys 'imports', 'scopes' and 'integrity'.
-   * @param string $id
-   *   The name of the library containing the definition.
-   * @param string $extension
-   *   The name of the extension providing the definition.
-   * @param string $path
-   *   The relative path to the extension providing the definition.
-   * @param int|string $version
-   *   The version of the library containing the definition, or -1 if the
-   *   library has no version.
-   *
-   * @return array
-   *   The processed importmap definition, with the keys 'imports', 'scopes'
-   *   and 'integrity'. Entries under 'imports' and 'scopes' are keyed by the
-   *   module specifier, and resolve to an array with the keys 'data' (the
-   *   resolved path or URL), 'external' (a boolean, TRUE for external URLs)
-   *   and 'version'. Entries under 'integrity' are keyed by the resolved path
-   *   or URL, and resolve to an array with the keys 'data', 'external',
-   *   'version' and 'integrity' (the integrity metadata string).
-   *
-   * @throws \UnexpectedValueException
-   *   Thrown when the importmap definition is invalid.
-   *
-   * @see https://html.spec.whatwg.org/multipage/webappapis.html#import-map
-   */
-  protected function processImportMapDefinition(array $importmap, string $id, string $extension, string $path, int|string $version): array {
-    foreach (['imports', 'scopes', 'integrity'] as $key) {
-      if (isset($importmap[$key]) && !is_array($importmap[$key])) {
-        throw new \UnexpectedValueException(sprintf("The '%s' key of the importmap definition of the library %s/%s must be an array.", $key, $extension, $id));
-      }
-    }
-    foreach (array_keys($importmap) as $key) {
-      if (!in_array($key, ['imports', 'scopes', 'integrity'], TRUE)) {
-        throw new \UnexpectedValueException(sprintf("Unknown key '%s' in the importmap definition of the library %s/%s. Only the keys 'imports', 'scopes' and 'integrity' are allowed.", $key, $extension, $id));
-      }
-    }
-    $processed = [
-      'imports' => [],
-      'scopes' => [],
-      'integrity' => [],
-    ];
-    if (isset($importmap['imports'])) {
-      $processed['imports'] = $this->processImportMapEntries($importmap['imports'], $id, $extension, $path, $version);
-    }
-    if (isset($importmap['scopes'])) {
-      foreach ($importmap['scopes'] as $scope => $entries) {
-        $scope = (string) $scope;
-        if ($scope === '') {
-          throw new \UnexpectedValueException(sprintf("The importmap definition of the library %s/%s contains an empty scope.", $extension, $id));
-        }
-        if (!is_array($entries)) {
-          throw new \UnexpectedValueException(sprintf("The entries of scope '%s' in the importmap definition of the library %s/%s must be an array.", $scope, $extension, $id));
-        }
-        // Resolve the scope path like the other entries, so that a scope can
-        // be relative to the registering extension, or an absolute path or
-        // URL.
-        [$resolved_scope] = $this->resolveImportMapSource($scope, $path, $id, $extension);
-        $processed['scopes'][$resolved_scope] = $this->processImportMapEntries($entries, $id, $extension, $path, $version);
-      }
-    }
-    if (isset($importmap['integrity'])) {
-      foreach ($importmap['integrity'] as $url => $integrity) {
-        if (!is_string($integrity) || $integrity === '') {
-          throw new \UnexpectedValueException(sprintf("The integrity metadata for '%s' in the importmap definition of the library %s/%s must be a non-empty string.", $url, $extension, $id));
-        }
-        [$data, $external] = $this->resolveImportMapSource((string) $url, $path, $id, $extension);
-        $processed['integrity'][$data] = [
-          'data' => $data,
-          'external' => $external,
-          'version' => $version,
-          'integrity' => $integrity,
-        ];
-      }
-    }
-    return $processed;
-  }
-
-  /**
-   * Processes the module specifier entries of an importmap definition.
-   *
-   * @param array $entries
-   *   The module specifier entries, keyed by the module specifier.
-   * @param string $id
-   *   The name of the library containing the definition.
-   * @param string $extension
-   *   The name of the extension providing the definition.
-   * @param string $path
-   *   The relative path to the extension providing the definition.
-   * @param int|string $version
-   *   The version of the library containing the definition, or -1 if the
-   *   library has no version.
-   *
-   * @return array
-   *   The processed entries, keyed by the module specifier, and resolving to
-   *   an array with the keys 'data', 'external' and 'version'.
-   *
-   * @throws \UnexpectedValueException
-   *   Thrown when the entries are invalid.
-   */
-  protected function processImportMapEntries(array $entries, string $id, string $extension, string $path, int|string $version): array {
-    $processed = [];
-    foreach ($entries as $specifier => $source) {
-      $specifier = (string) $specifier;
-      if ($specifier === '') {
-        throw new \UnexpectedValueException(sprintf("The importmap definition of the library %s/%s contains an empty module specifier.", $extension, $id));
-      }
-      if (!is_string($source) || $source === '') {
-        throw new \UnexpectedValueException(sprintf("The value of the module specifier '%s' in the importmap definition of the library %s/%s must be a non-empty string.", $specifier, $extension, $id));
-      }
-      if (str_ends_with($specifier, '/') && !str_ends_with($source, '/')) {
-        throw new \UnexpectedValueException(sprintf("The module specifier '%s' in the importmap definition of the library %s/%s ends with a slash, so its value must also end with a slash.", $specifier, $extension, $id));
-      }
-      [$data, $external] = $this->resolveImportMapSource($source, $path, $id, $extension);
-      $processed[$specifier] = [
-        'data' => $data,
-        'external' => $external,
-        'version' => $version,
-      ];
-    }
-    return $processed;
-  }
-
-  /**
-   * Resolves the source of an importmap entry to an asset path or URL.
-   *
-   * Mirrors the resolution of js and css asset sources: paths relative to the
-   * registering extension, absolute paths relative to the Drupal root, the
-   * libraries directories, stream wrapper URIs, and external URLs.
-   *
-   * @param string $source
-   *   The source as declared in the library definition.
-   * @param string $path
-   *   The relative path to the extension providing the definition.
-   * @param string $id
-   *   The name of the library containing the definition.
-   * @param string $extension
-   *   The name of the extension providing the definition.
-   *
-   * @return array
-   *   A two element array: the resolved path or URL, and a boolean which is
-   *   TRUE when the resolved value is an external URL.
-   */
-  protected function resolveImportMapSource(string $source, string $path, string $id, string $extension): array {
-    if ($source[0] === '/') {
-      // A protocol-free URI (e.g., //cdn.com/example.mjs) is external.
-      if (($source[1] ?? '') === '/') {
-        return [$source, TRUE];
-      }
-      // An absolute path maps to DRUPAL_ROOT / base_path().
-      $source = substr($source, 1);
-      // Non core provided libraries can be in multiple locations.
-      if (str_starts_with($source, 'libraries/')) {
-        $path_to_source = $this->librariesDirectoryFileFinder->find(substr($source, 10));
-        if ($path_to_source) {
-          return [$path_to_source, FALSE];
-        }
-      }
-      return [$source, FALSE];
-    }
-    // A stream wrapper URI (e.g., public://generated_js/example.mjs).
-    elseif ($this->streamWrapperManager->isValidUri($source)) {
-      return [$source, FALSE];
-    }
-    // A regular URI (e.g., https://example.com/example.mjs).
-    elseif ($this->isValidUri($source)) {
-      return [$source, TRUE];
-    }
-    // By default, file paths are relative to the registering extension.
-    else {
-      return [$path . '/' . $source, FALSE];
-    }
   }
 
   /**

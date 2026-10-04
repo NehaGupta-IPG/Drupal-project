@@ -1814,6 +1814,10 @@ services:
   asset.js.dumper:
     class: Drupal\Core\Asset\AssetDumper
     arguments: ['@file_system']
+  asset.library_import_map_processor:
+    class: Drupal\Core\Asset\LibraryImportMapProcessor
+    arguments: [ '@library.libraries_directory_file_finder', '@stream_wrapper_manager' ]
+  Drupal\Core\Asset\LibraryImportMapProcessorInterface: '@asset.library_import_map_processor'
   library.discovery:
     class: Drupal\Core\Asset\LibraryDiscoveryCollector
     arguments: ['@cache.discovery', '@lock', '@library.discovery.parser', '@theme.manager']
@@ -1822,7 +1826,7 @@ services:
   Drupal\Core\Asset\LibraryDiscoveryInterface: '@library.discovery'
   library.discovery.parser:
     class: Drupal\Core\Asset\LibraryDiscoveryParser
-    arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc', '@library.parsing_cache']
+    arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc', '@library.parsing_cache', '@asset.library_import_map_processor']
   Drupal\Core\Asset\LibraryDiscoveryParser: '@library.discovery.parser'
   library.parsing_cache:
     class: Drupal\Core\Utility\YamlCacheCollector
