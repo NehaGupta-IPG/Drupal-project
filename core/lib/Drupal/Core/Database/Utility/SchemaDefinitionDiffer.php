@@ -44,14 +44,16 @@ class SchemaDefinitionDiffer {
    *   A property to compare.
    * @param ?string $path
    *   The current diff path.
+   * @param bool $areArrayElements
+   *   TRUE when a $old and $new are arrays of SchemaDefinition elements.
    *
    * @return array<string,DiffEntry>
    *   A list of diff entries.
    */
-  protected static function computeDiff(mixed $old, mixed $new, ?string $path = NULL): array {
+  protected static function computeDiff(mixed $old, mixed $new, ?string $path = NULL, bool $areArrayElements = FALSE): array {
     $diff = [];
 
-    // SchemaDefinitionInterface objects: compare their properties.
+    // For SchemaDefinitionInterface objects, we compare their properties.
     if ($old instanceof SchemaDefinitionInterface && $new instanceof SchemaDefinitionInterface) {
       $old = get_object_vars($old);
       $new = get_object_vars($new);
@@ -62,23 +64,7 @@ class SchemaDefinitionDiffer {
       $allKeys = array_unique(array_merge(array_keys($old), array_keys($new)));
 
       foreach ($allKeys as $key) {
-        $pathFragmentElement = $old[$key] ?? $new[$key];
-        if ($pathFragmentElement instanceof SchemaDefinitionInterface) {
-          $pathFragmentClass = get_class($pathFragmentElement);
-          $pathFragmentNormalizationProperty = $pathFragmentClass::normalizationProperty();
-          if ($pathFragmentNormalizationProperty) {
-            /** @var string $normalizedKey */
-            $normalizedKey = $pathFragmentElement->{$pathFragmentNormalizationProperty};
-            $pathFragmentValue = "[" . $normalizedKey . "]";
-          }
-          else {
-            $pathFragmentValue = ($path === NULL ? '' : '.') . $key;
-          }
-        }
-        else {
-          $pathFragmentValue = ($path === NULL ? '' : '.') . $key;
-        }
-
+        $pathFragmentValue = $areArrayElements ? "[{$key}]" : (($path === NULL ? '' : '.') . $key);
         $currentPath = $path === NULL ? $pathFragmentValue : $path . $pathFragmentValue;
 
         $existsOld = array_key_exists($key, $old);
@@ -100,27 +86,28 @@ class SchemaDefinitionDiffer {
           continue;
         }
 
-        $oldFirstArrayKey = is_array($old[$key]) ? array_first($old[$key]) : NULL;
-        $newFirstArrayKey = is_array($new[$key]) ? array_first($new[$key]) : NULL;
+        $oldFirstArrayKey = is_array($old[$key] ?? NULL) ? array_first($old[$key]) : NULL;
+        $newFirstArrayKey = is_array($new[$key] ?? NULL) ? array_first($new[$key]) : NULL;
         $isSchemaDefinitionArray = ($oldFirstArrayKey ?? $newFirstArrayKey) instanceof SchemaDefinitionInterface;
         if ($isSchemaDefinitionArray) {
           $schemaDefinitionClass = get_class($oldFirstArrayKey ?? $newFirstArrayKey);
           $schemaDefinitionNormalizationProperty = $schemaDefinitionClass::normalizationProperty();
-          $tmp = [];
-          foreach ($old[$key] ?? [] as $value) {
-            /** @var string $normalizedKey */
-            $normalizedKey = $value->{$schemaDefinitionNormalizationProperty};
-            $tmp[$normalizedKey] = $value;
+          if (isset($schemaDefinitionNormalizationProperty)) {
+            $tmp = [];
+            foreach ($old[$key] ?? [] as $value) {
+              /** @var string $normalizedKey */
+              $normalizedKey = $value->{$schemaDefinitionNormalizationProperty};
+              $tmp[$normalizedKey] = $value;
+            }
+            $old[$key] = $tmp;
+            $tmp = [];
+            foreach ($new[$key] ?? [] as $value) {
+              /** @var string $normalizedKey */
+              $normalizedKey = $value->{$schemaDefinitionNormalizationProperty};
+              $tmp[$normalizedKey] = $value;
+            }
+            $new[$key] = $tmp;
           }
-          $old[$key] = $tmp;
-          $tmp = [];
-          assert(is_array($new[$key]));
-          foreach ($new[$key] as $value) {
-            /** @var string $normalizedKey */
-            $normalizedKey = $value->{$schemaDefinitionNormalizationProperty};
-            $tmp[$normalizedKey] = $value;
-          }
-          $new[$key] = $tmp;
         }
 
         /** @var scalar|array|SchemaDefinitionInterface $oldKey */
@@ -128,21 +115,37 @@ class SchemaDefinitionDiffer {
         /** @var scalar|array|SchemaDefinitionInterface $newKey */
         $newKey = $new[$key];
 
-        $diff = array_merge($diff, static::computeDiff($oldKey, $newKey, $currentPath));
+        $diff = array_merge($diff, static::computeDiff($oldKey, $newKey, $currentPath, $isSchemaDefinitionArray));
       }
 
       /** @var array<string,DiffEntry> $diff */
       return $diff;
     }
 
-    // Different types, or one value is no longer an object/array.
+    // Actual comparison.
     if ($old != $new) {
       assert(is_string($path), 'Invalid diff path.');
-      $diff[$path] = [
-        'type' => SchemaDefinitionDiffEntryType::Changed,
-        'old' => $old,
-        'new' => $new,
-      ];
+      if ($old !== NULL && $new !== NULL) {
+        $diff[$path] = [
+          'type' => SchemaDefinitionDiffEntryType::Changed,
+          'old' => $old,
+          'new' => $new,
+        ];
+      }
+      elseif ($old === NULL) {
+        $diff[$path] = [
+          'type' => SchemaDefinitionDiffEntryType::Set,
+          'old' => $old,
+          'new' => $new,
+        ];
+      }
+      else {
+        $diff[$path] = [
+          'type' => SchemaDefinitionDiffEntryType::Unset,
+          'old' => $old,
+          'new' => $new,
+        ];
+      }
     }
 
     return $diff;

@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
@@ -13,6 +14,7 @@ use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionInterface;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 use Drupal\Core\Database\Utility\SchemaDefinitionDiffer;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -45,6 +47,12 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
             ),
           ],
           primaryKey: new PrimaryKey(['id']),
+          uniqueKeys: [
+            new UniqueKey(name: 'bar', columns: ['id', 'month']),
+          ],
+          indexes: [
+            new Index(name: 'swap', columns: ['id', 'month']),
+          ],
         ),
       ],
     );
@@ -73,6 +81,9 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
             ),
           ],
           primaryKey: new PrimaryKey(['id', 'month']),
+          indexes: [
+            new Index(name: 'swap', columns: ['month', 'id', 'surname']),
+          ],
         ),
       ],
     );
@@ -80,10 +91,14 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
     $this->assertEquals(
       [
         "tables[foo].columns[id].type" => 'Changed',
-        "tables[foo].columns[month].size" => 'Changed',
-        "tables[foo].columns[month].default" => 'Changed',
+        "tables[foo].columns[month].size" => 'Unset',
+        "tables[foo].columns[month].default" => 'Set',
         "tables[foo].columns[surname]" => 'Added',
-        "tables[foo].primaryKey.columns[month]" => 'Added',
+        "tables[foo].indexes[swap].columns[0].name" => 'Changed',
+        "tables[foo].indexes[swap].columns[1].name" => 'Changed',
+        "tables[foo].indexes[swap].columns[2]" => 'Added',
+        "tables[foo].primaryKey.columns[1]" => 'Added',
+        'tables[foo].uniqueKeys[bar]' => 'Removed',
       ],
       $this->compactDiff($schemaA, $schemaB),
     );
@@ -91,17 +106,21 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
     $this->assertEquals(
       [
         "columns[id].type" => 'Changed',
-        "columns[month].size" => 'Changed',
-        "columns[month].default" => 'Changed',
+        "columns[month].size" => 'Unset',
+        "columns[month].default" => 'Set',
         "columns[surname]" => 'Added',
-        "primaryKey.columns[month]" => 'Added',
+        "indexes[swap].columns[0].name" => 'Changed',
+        "indexes[swap].columns[1].name" => 'Changed',
+        "indexes[swap].columns[2]" => 'Added',
+        "primaryKey.columns[1]" => 'Added',
+        'uniqueKeys[bar]' => 'Removed',
       ],
       $this->compactDiff($schemaA->getTableDefinition('foo'), $schemaB->getTableDefinition('foo')),
     );
 
     $this->assertEquals(
       [
-        "columns[month]" => 'Added',
+        "columns[1]" => 'Added',
       ],
       $this->compactDiff($schemaA->getTableDefinition('foo')->primaryKey, $schemaB->getTableDefinition('foo')->primaryKey),
     );
