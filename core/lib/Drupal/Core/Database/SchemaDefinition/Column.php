@@ -104,6 +104,7 @@ final class Column implements SchemaDefinitionInterface {
     public readonly ?array $dbSpecificExtra = NULL,
   ) {
     $this->size = $size ?? ColumnSize::Normal;
+    $this->validate();
   }
 
   /**
@@ -124,7 +125,7 @@ final class Column implements SchemaDefinitionInterface {
     ?bool $binary = NULL,
     ?array $dbSpecificExtra = NULL,
   ): self {
-    $instance = new self(
+    return new self(
       name: $name,
       type: $type,
       description: $description,
@@ -139,8 +140,6 @@ final class Column implements SchemaDefinitionInterface {
       binary: $binary,
       dbSpecificExtra: $dbSpecificExtra,
     );
-    $instance->validate();
-    return $instance;
   }
 
   /**
@@ -523,7 +522,7 @@ final class Column implements SchemaDefinitionInterface {
     ?bool $binary = NULL,
     ?array $dbSpecificExtra = NULL,
   ): self {
-    $column = new self(
+    return new self(
       type: $type,
       name: $name,
       description: $description,
@@ -537,8 +536,6 @@ final class Column implements SchemaDefinitionInterface {
       generatedExpression: $expression,
       dbSpecificExtra: $dbSpecificExtra,
     );
-    $column->validate();
-    return $column;
   }
 
 }

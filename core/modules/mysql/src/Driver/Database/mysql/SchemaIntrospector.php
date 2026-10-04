@@ -11,6 +11,7 @@ use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\FloatValue;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnExpression;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
@@ -125,10 +126,22 @@ class SchemaIntrospector {
       // Parse out the field type and meta information.
       preg_match('@([a-z]+)(?:\((\d+)(?:,(\d+))?\))?\s*(unsigned)?@', $row['Type'], $matches);
       $type = $this->fieldTypeMap($matches[1]);
+
       if ($row['Extra'] === 'auto_increment') {
         // If this is an auto increment, then the type is 'serial'.
         $type = ColumnType::Serial;
       }
+      elseif ($row['Extra'] === 'VIRTUAL GENERATED') {
+        $type = ColumnType::Generated;
+        $column_args['storage'] = GeneratedColumnStorage::Virtual;
+        $column_args['expression'] = new GeneratedColumnExpression('x2');
+      }
+      elseif ($row['Extra'] === 'STORED GENERATED') {
+        $type = ColumnType::Generated;
+        $column_args['storage'] = GeneratedColumnStorage::Stored;
+        $column_args['expression'] = new GeneratedColumnExpression('x2');
+      }
+
       if (!is_string($type)) {
         $column_args['type'] = $type;
       }
@@ -139,12 +152,15 @@ class SchemaIntrospector {
           ],
         ];
       }
+
       if ($type !== ColumnType::Serial) {
         $column_args['notNull'] = $row['Null'] === 'NO';
       }
+
       if ($size = $this->fieldSizeMap($matches[1])) {
         $column_args['size'] = $size;
       }
+
       if (isset($matches[2]) && $type === ColumnType::Numeric) {
         // Add precision and scale.
         $column_args['precision'] = (int) $matches[2];
@@ -268,6 +284,20 @@ class SchemaIntrospector {
           size: $column_args['size'] ?? NULL,
           notNull: $column_args['notNull'] ?? NULL,
           default: $column_args['default'] ?? NULL,
+        ),
+        ColumnType::Generated => Column::{lcfirst($column_args['type']->name)}(
+          name: $column_args['name'],
+          type: $column_args['type'],
+          storage: $column_args['storage'],
+          expression: $column_args['expression'],
+          description: $column_args['description'] ?? NULL,
+          size: $column_args['size'] ?? NULL,
+          length: $column_args['length'] ?? NULL,
+          unsigned: $column_args['unsigned'] ?? NULL,
+          precision: $column_args['precision'] ?? NULL,
+          scale: $column_args['scale'] ?? NULL,
+          binary: $column_args['binary'] ?? NULL,
+          dbSpecificExtra: $column_args['dbSpecificExtra'] ?? NULL,
         ),
         default => Column::create(
           name: $column_args['name'],

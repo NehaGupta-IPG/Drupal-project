@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
-use Drupal\Core\Database\SchemaDefinition\Differ;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnExpression;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
@@ -17,10 +16,12 @@ use Drupal\Core\Database\SchemaDefinition\KeyColumn;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionInterface;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
+use Drupal\Core\Database\Utility\SchemaDefinitionDiffer;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -65,6 +66,13 @@ class SchemaIntrospectionTest extends DatabaseTestBase {
           storage: GeneratedColumnStorage::Virtual,
           expression: new GeneratedColumnExpression('[age] * 2'),
           dbSpecificExtra: ['pgsql' => ['pgsql_type' => 'bigint']],
+        ),
+        Column::generated(
+          name: 'triple_age',
+          type: ColumnType::Int,
+          description: "The person's age X 3",
+          storage: GeneratedColumnStorage::Stored,
+          expression: new GeneratedColumnExpression('[age] * 3'),
         ),
         Column::varchar(
           name: 'job',
@@ -141,8 +149,25 @@ class SchemaIntrospectionTest extends DatabaseTestBase {
     $this->connection->schema()->createSchemaFromDefinition($testSchemaDefinition);
 
     $introspectedSchema = $this->connection->schema()->introspect(['/^test_introspection$/']);
+    dump(SchemaDefinitionDiffer::diff($testSchemaDefinition, $introspectedSchema));
+    $this->assertEquals([], $this->compactDiff($testSchemaDefinition, $introspectedSchema));
+  }
 
-    $this->assertEquals([], Differ::diff($testSchemaDefinition, $introspectedSchema));
+  /**
+   * Returns a compact diff between two SchemaDefinitionInterface objects.
+   *
+   * @param SchemaDefinitionInterface $a
+   *   A SchemaDefinitionInterface object to compare.
+   * @param SchemaDefinitionInterface $b
+   *   A SchemaDefinitionInterface object to compare.
+   *
+   * @return array<string,string>
+   *   The compacted diff entries, exposing path as key and the diff type as
+   *   value.
+   */
+  protected function compactDiff(SchemaDefinitionInterface $a, SchemaDefinitionInterface $b): array {
+    $diff = SchemaDefinitionDiffer::diff($a, $b);
+    return array_map(fn ($value): string => $value['type']->name, $diff);
   }
 
 }
