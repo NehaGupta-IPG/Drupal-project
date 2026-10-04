@@ -614,9 +614,12 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Gets the default value used for the created field.
+   *
+   * @return int
+   *   The current request time.
    */
-  public static function getRequestTime() {
+  public static function getRequestTime(): int {
     return \Drupal::time()->getRequestTime();
   }
 
