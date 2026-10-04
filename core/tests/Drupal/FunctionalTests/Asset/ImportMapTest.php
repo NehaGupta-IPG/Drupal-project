@@ -148,6 +148,28 @@ class ImportMapTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that the import map precedes head assets attached by modules.
+   *
+   * An import map must be processed by the browser before any module script
+   * or module preload, so the import map is added to the start of the head,
+   * before the head assets attached with #attached['html_head']. This pins
+   * the order in which the import map and the head assets are rendered:
+   * a module script or module preload in the head that came before the
+   * import map would not be resolved by it.
+   */
+  public function testImportMapPrecedesAttachedHeadAssets(): void {
+    $this->drupalGet('/importmap-test/head-assets');
+    $content = $this->getSession()->getPage()->getContent();
+    $importmap_start = strpos($content, '<script type="importmap">');
+    $this->assertNotFalse($importmap_start, 'The import map script is present in the head.');
+    $this->assertDoesNotMatchRegularExpression('/<script[^>]*type="module"[^>]*>|<link[^>]*rel="modulepreload"[^>]*>/', substr($content, 0, $importmap_start), 'No module scripts or module preloads come before the import map script.');
+    // The attached head assets are present, and come after the import map
+    // script.
+    $this->assertStringContainsString('<link rel="modulepreload" href="core/misc/ajax.js" />', substr($content, $importmap_start));
+    $this->assertStringContainsString('<script type="module" src="core/misc/ajax.js"></script>', substr($content, $importmap_start));
+  }
+
+  /**
    * Tests that an HTMX response adds module preloads, but not an import map.
    *
    * The consumer route has the '_htmx_route' option, so it returns an HTMX

@@ -22,6 +22,14 @@ importmap_test.scoped_consumer:
   requirements:
     _access: 'TRUE'
 
+importmap_test.head_assets:
+  path: '/importmap-test/head-assets'
+  defaults:
+    _controller: '\Drupal\importmap_test\Controller\ConsumerController::headAssetsPage'
+    _title: 'Import map head assets'
+  requirements:
+    _access: 'TRUE'
+
 importmap_test.htmx_trigger:
   path: '/importmap-test/htmx-trigger'
   defaults:

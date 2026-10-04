@@ -35,6 +35,37 @@ class ConsumerController extends ControllerBase implements TrustedCallbackInterf
   }
 
   /**
+   * Returns a page that attaches a module script and preload to the head.
+   *
+   * The head assets are attached with #attached['html_head'], so they are
+   * rendered in the head placeholder. The import map is added to the start of
+   * the head placeholder, so it must precede them, as required by the HTML
+   * specification: an import map must be processed by the browser before any
+   * module script or module preload.
+   */
+  public function headAssetsPage(): array {
+    $build['#attached']['html_head'] = [
+      [
+        [
+          '#type' => 'html_tag',
+          '#tag' => 'link',
+          '#attributes' => ['rel' => 'modulepreload', 'href' => 'core/misc/ajax.js'],
+        ],
+        'modulepreload',
+      ],
+      [
+        [
+          '#type' => 'html_tag',
+          '#tag' => 'script',
+          '#attributes' => ['type' => 'module', 'src' => 'core/misc/ajax.js'],
+        ],
+        'module-script',
+      ],
+    ];
+    return $build;
+  }
+
+  /**
    * Returns a page with a button that requests the HTMX consumer route.
    *
    * The button attaches the core/drupal.htmx library, which provides the
