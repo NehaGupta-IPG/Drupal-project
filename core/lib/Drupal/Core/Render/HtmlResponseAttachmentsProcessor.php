@@ -3,7 +3,6 @@
 namespace Drupal\Core\Render;
 
 // cspell:ignore turbolinks
-
 use Drupal\Core\Asset\AssetCollectionRendererInterface;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
@@ -41,6 +40,36 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    */
   protected $config;
 
+  /**
+   * Constructs a HtmlResponseAttachmentsProcessor instance.
+   *
+   * @param \Drupal\Core\Asset\AssetResolverInterface $assetResolver
+   *   The asset resolver.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
+   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $cssCollectionRenderer
+   *   The CSS collection renderer.
+   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $jsCollectionRenderer
+   *   The JS collection renderer.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager.
+   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
+   *   The file URL generator.
+   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface|null $importMapRenderer
+   *   The import map renderer. Omitted for backwards compatibility with
+   *   subclasses; the 'asset.importmap.renderer' service is used as a
+   *   fallback.
+   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface|null $modulePreloadRenderer
+   *   The module preload renderer. Omitted for backwards compatibility with
+   *   subclasses; the 'asset.modulepreload.renderer' service is used as a
+   *   fallback.
+   */
   public function __construct(
     protected AssetResolverInterface $assetResolver,
     ConfigFactoryInterface $config_factory,
@@ -51,10 +80,18 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     protected ModuleHandlerInterface $moduleHandler,
     protected LanguageManagerInterface $languageManager,
     protected FileUrlGeneratorInterface $fileUrlGenerator,
-    protected AssetCollectionRendererInterface $importMapRenderer,
-    protected AssetCollectionRendererInterface $modulePreloadRenderer,
+    protected AssetCollectionRendererInterface|null $importMapRenderer = NULL,
+    protected AssetCollectionRendererInterface|null $modulePreloadRenderer = NULL,
   ) {
     $this->config = $config_factory->get('system.performance');
+    if (!isset($importMapRenderer)) {
+      $this->importMapRenderer = \Drupal::service('asset.importmap.renderer');
+      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without an import map renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+    }
+    if (!isset($modulePreloadRenderer)) {
+      $this->modulePreloadRenderer = \Drupal::service('asset.modulepreload.renderer');
+      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without a module preload renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+    }
   }
 
   /**
