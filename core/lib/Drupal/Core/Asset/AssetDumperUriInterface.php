@@ -15,7 +15,8 @@ interface AssetDumperUriInterface extends AssetDumperInterface {
    * @param string $file_extension
    *   The file extension of this asset.
    * @param string $uri
-   *   The URI to dump to.
+   *   The URI to dump to. If a file already exists at this URI, it will not be
+   *   overwritten.
    *
    * @return string
    *   An URI to access the dumped asset.
