@@ -9,8 +9,16 @@ namespace Drupal\Core\Database\Utility;
  */
 enum SchemaDefinitionDiffEntryType {
 
-  case Added;
-  case Removed;
+  // The old property was NULL, the new one has a value assigned.
+  case Set;
+  // The old and the new property values are different.
   case Changed;
+  // The old property had a value, the new one is NULL.
+  case Unset;
+
+  // A key is added to an array property.
+  case Added;
+  // A key is removed from an array property.
+  case Removed;
 
 }
