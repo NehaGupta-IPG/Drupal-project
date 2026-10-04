@@ -641,7 +641,11 @@ class Ckeditor5Hooks {
       $theme = $this->configFactory->get('system.theme')->get('default');
     }
     if (isset($theme) && $theme_path = $this->themeExtensionList->getPath($theme)) {
-      $info = $this->themeExtensionList->getExtensionInfo($theme);
+      // The theme may exist on disk without being installed, for example in
+      // test contexts in which modules are installed but no theme is. Read
+      // the theme's .info.yml from the list of available themes rather than
+      // the installed themes, so the stylesheets can still be resolved.
+      $info = $this->themeExtensionList->getAllAvailableInfo()[$theme] ?? NULL;
       if (isset($info['ckeditor5-stylesheets']) && $info['ckeditor5-stylesheets'] !== FALSE) {
         $css = $info['ckeditor5-stylesheets'];
         foreach ($css as $key => $url) {

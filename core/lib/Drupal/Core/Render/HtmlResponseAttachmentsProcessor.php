@@ -41,13 +41,6 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    */
   protected $config;
 
-  /**
-   * A config object for the core extension configuration.
-   *
-   * @var \Drupal\Core\Config\Config
-   */
-  protected $coreExtension;
-
   public function __construct(
     protected AssetResolverInterface $assetResolver,
     ConfigFactoryInterface $config_factory,
@@ -62,7 +55,6 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     protected AssetCollectionRendererInterface $modulePreloadRenderer,
   ) {
     $this->config = $config_factory->get('system.performance');
-    $this->coreExtension = $config_factory->get('core.extension');
   }
 
   /**
@@ -201,12 +193,10 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
         // it scans the libraries of all enabled modules, which invokes
         // hook_library_info_alter(). Some implementations of that hook make
         // assumptions about the installed site that do not hold during
-        // installation, in maintenance mode, or in contexts where no theme is
-        // installed (such as kernel tests), because they read the .info.yml of
-        // the default theme, so the import map and the module preloads must
-        // not be built in those contexts.
+        // installation or in maintenance mode, so the import map must not be
+        // built in those contexts.
         $maintenance_mode = defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
-        if (!$maintenance_mode && !empty($this->coreExtension->get('theme'))) {
+        if (!$maintenance_mode) {
           $head_elements = $this->importMapRenderer->render($this->assetResolver->getImportMap())
             + $this->modulePreloadRenderer->render($this->assetResolver->getModulePreloads($assets));
           if ($head_elements) {
