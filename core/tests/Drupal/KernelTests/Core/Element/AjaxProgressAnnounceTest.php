@@ -6,12 +6,14 @@ namespace Drupal\KernelTests\Core\Element;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Core\Render\Element\RenderElementBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests AJAX progress screen reader announcement defaults.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class AjaxProgressAnnounceTest extends KernelTestBase {
 
   /**
