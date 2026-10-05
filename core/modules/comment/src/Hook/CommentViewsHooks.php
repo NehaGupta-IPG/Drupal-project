@@ -5,6 +5,7 @@ namespace Drupal\comment\Hook;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\field\FieldStorageConfigInterface;
 
 /**
  * Hook implementations for comment.
@@ -12,6 +13,27 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 class CommentViewsHooks {
 
   use StringTranslationTrait;
+
+  /**
+   * Implements hook_field_views_data().
+   *
+   * Filters on the status column of comment fields with the node_comment
+   * plugin, which offers the commenting status options.
+   */
+  #[Hook('field_views_data')]
+  public function fieldViewsData(FieldStorageConfigInterface $field_storage): array {
+    $data = \Drupal::service('views.field_data_provider')->defaultFieldImplementation($field_storage);
+    if ($field_storage->getType() !== 'comment') {
+      return $data;
+    }
+    $key = $field_storage->getName() . '_status';
+    foreach ($data as $table_name => $table_data) {
+      if (isset($table_data[$key]['filter'])) {
+        $data[$table_name][$key]['filter']['id'] = 'node_comment';
+      }
+    }
+    return $data;
+  }
 
   /**
    * Implements hook_views_data_alter().
