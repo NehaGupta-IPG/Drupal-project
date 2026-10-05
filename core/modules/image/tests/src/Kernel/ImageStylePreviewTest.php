@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\image\Kernel;
 
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\image\Hook\ImageThemeHooks;
 use Drupal\KernelTests\KernelTestBase;
@@ -74,7 +75,33 @@ class ImageStylePreviewTest extends KernelTestBase {
       $this->assertSame(160, $variables['preview'][$type]['width'], "The $type preview falls back to the sample width.");
       $this->assertSame(160, $variables['preview'][$type]['height'], "The $type preview falls back to the sample height.");
       $this->assertArrayHasKey('rendered', $variables[$type], "The $type preview is rendered.");
+      $this->assertStringContainsString('0 pixels wide', (string) $variables[$type]['rendered']['#alt'], "The $type alt text reports zero dimensions.");
     }
+  }
+
+  /**
+   * Tests that an unreadable derivative does not cause a division by zero.
+   */
+  public function testPreviewWithInvalidDerivative(): void {
+    $uri = 'public://sample.png';
+    $file_system = \Drupal::service('file_system');
+    $file_system->copy($this->root . '/core/modules/image/sample.png', $uri);
+    $this->config('image.settings')->set('preview_image', $uri)->save();
+
+    // The hook only creates the derivative when it does not exist yet, so a
+    // pre-existing non-image file is used as the derivative.
+    $derivative_uri = $this->style->buildUri($uri);
+    $directory = dirname($derivative_uri);
+    $file_system->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
+    file_put_contents($derivative_uri, 'not an image');
+
+    $variables = $this->preprocessPreview();
+
+    $this->assertSame(160, $variables['preview']['original']['width']);
+    $this->assertSame(120, (int) $variables['preview']['original']['height']);
+    $this->assertSame(160, $variables['preview']['derivative']['width']);
+    $this->assertSame(160, $variables['preview']['derivative']['height']);
+    $this->assertStringContainsString('0 pixels wide', (string) $variables['derivative']['rendered']['#alt']);
   }
 
   /**
