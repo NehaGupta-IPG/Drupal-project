@@ -3,7 +3,6 @@
 namespace Drupal\Core\Queue;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
@@ -51,23 +50,11 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function createItem($data) {
-    $try_again = FALSE;
-    try {
-      $id = $this->doCreateItem($data);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if (!$try_again = $this->ensureTableExists()) {
-        // If the exception happened for other reason than the missing table,
-        // propagate the exception.
-        throw $e;
-      }
-    }
-    // Now that the table has been created, try again if necessary.
-    if ($try_again) {
-      $id = $this->doCreateItem($data);
-    }
-    return $id;
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      fn() => $this->doCreateItem($data),
+    );
   }
 
   /**
@@ -100,76 +87,100 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function numberOfItems() {
-    try {
-      return (int) $this->connection->query('SELECT COUNT([item_id]) FROM {' . static::TABLE_NAME . '} WHERE [name] = :name', [':name' => $this->name])
-        ->fetchField();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      // If there is no table there cannot be any items.
-      return 0;
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      function () {
+        try {
+          return (int) $this->connection->query('SELECT COUNT([item_id]) FROM {' . static::TABLE_NAME . '} WHERE [name] = :name', [':name' => $this->name])
+            ->fetchField();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+          // If there is no table there cannot be any items.
+          return 0;
+        }
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function claimItem($lease_time = 30) {
-    // Claim an item by updating its expire fields. If claim is not successful
-    // another thread may have claimed the item in the meantime. Therefore loop
-    // until an item is successfully claimed or we are reasonably sure there
-    // are no unclaimed items left.
-    while (TRUE) {
-      try {
-        $item = $this->connection->queryRange('SELECT [data], [created], [item_id] FROM {' . static::TABLE_NAME . '} q WHERE [expire] = 0 AND [name] = :name ORDER BY [created], [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
-      }
-      catch (\Exception $e) {
-        $this->catchException($e);
-      }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      function () use ($lease_time) {
+        // Claim an item by updating its expire fields. If claim is not
+        // successful
+        // another thread may have claimed the item in the meantime. Therefore
+        // loop
+        // until an item is successfully claimed or we are reasonably sure there
+        // are no unclaimed items left.
+        while (TRUE) {
+          try {
+            $item = $this->connection->queryRange('SELECT [data], [created], [item_id] FROM {' . static::TABLE_NAME . '} q WHERE [expire] = 0 AND [name] = :name ORDER BY [created], [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
+          }
+          catch (\Exception $e) {
+            $this->catchException($e);
+          }
 
-      // If the table does not exist there are no items currently available to
-      // claim.
-      if (empty($item)) {
-        return FALSE;
-      }
+          // If the table does not exist there are no items currently available
+          // to
+          // claim.
+          if (empty($item)) {
+            return FALSE;
+          }
 
-      // Try to update the item. Only one thread can succeed in UPDATEing the
-      // same row. We cannot rely on \Drupal::time()->getRequestTime() because
-      // items might be claimed by a single consumer which runs longer than 1
-      // second. If we continue to use ::getRequestTime() instead of
-      // ::getCurrentTime(), we steal time from the lease, and will tend to
-      // reset items before the lease should really expire.
-      $update = $this->connection->update(static::TABLE_NAME)
-        ->fields([
-          'expire' => \Drupal::time()->getCurrentTime() + $lease_time,
-        ])
-        ->condition('item_id', $item->item_id)
-        ->condition('expire', 0);
-      // If there are affected rows, this update succeeded.
-      if ($update->execute()) {
-        $item->data = unserialize($item->data);
-        return $item;
-      }
-    }
+          // Try to update the item. Only one thread can succeed in UPDATEing
+          // the
+          // same row. We cannot rely on \Drupal::time()->getRequestTime()
+          // because
+          // items might be claimed by a single consumer which runs longer than
+          // 1
+          // second. If we continue to use ::getRequestTime() instead of
+          // ::getCurrentTime(), we steal time from the lease, and will tend to
+          // reset items before the lease should really expire.
+          $update = $this->connection->update(static::TABLE_NAME)
+            ->fields([
+              'expire' => \Drupal::time()->getCurrentTime() + $lease_time,
+            ])
+            ->condition('item_id', $item->item_id)
+            ->condition('expire', 0);
+          // If there are affected rows, this update succeeded.
+          if ($update->execute()) {
+            $item->data = unserialize($item->data);
+            return $item;
+          }
+        }
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function releaseItem($item) {
-    try {
-      $update = $this->connection->update(static::TABLE_NAME)
-        ->fields([
-          'expire' => 0,
-        ])
-        ->condition('item_id', $item->item_id);
-      return (bool) $update->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      // If the table doesn't exist we should consider the item released.
-      return TRUE;
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      function () use ($item) {
+        try {
+          $update = $this->connection->update(static::TABLE_NAME)
+            ->fields([
+              'expire' => 0,
+            ])
+            ->condition('item_id', $item->item_id);
+          return (bool) $update->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+          // If the table doesn't exist we should consider the item released.
+          return TRUE;
+        }
+      },
+    );
   }
 
   /**
@@ -180,37 +191,49 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
     if ($delay < 0) {
       throw new \InvalidArgumentException('$delay must be non-negative');
     }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      function () use ($item, $delay) {
 
-    try {
-      // Add the delay relative to the current time.
-      $expire = \Drupal::time()->getCurrentTime() + $delay;
-      // Update the expiry time of this item.
-      $update = $this->connection->update(static::TABLE_NAME)
-        ->fields([
-          'expire' => $expire,
-        ])
-        ->condition('item_id', $item->item_id);
-      return (bool) $update->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      // If the table doesn't exist we should consider the item nonexistent.
-      return TRUE;
-    }
+        try {
+          // Add the delay relative to the current time.
+          $expire = \Drupal::time()->getCurrentTime() + $delay;
+          // Update the expiry time of this item.
+          $update = $this->connection->update(static::TABLE_NAME)
+            ->fields([
+              'expire' => $expire,
+            ])
+            ->condition('item_id', $item->item_id);
+          return (bool) $update->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+          // If the table doesn't exist we should consider the item nonexistent.
+          return TRUE;
+        }
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteItem($item) {
-    try {
-      $this->connection->delete(static::TABLE_NAME)
-        ->condition('item_id', $item->item_id)
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      function () use ($item) {
+        try {
+          $this->connection->delete(static::TABLE_NAME)
+            ->condition('item_id', $item->item_id)
+            ->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+      },
+    );
   }
 
   /**
@@ -225,60 +248,52 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function deleteQueue() {
-    try {
-      $this->connection->delete(static::TABLE_NAME)
-        ->condition('name', $this->name)
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      function () {
+        try {
+          $this->connection->delete(static::TABLE_NAME)
+            ->condition('name', $this->name)
+            ->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function garbageCollection() {
-    try {
-      // Clean up the queue for failed batches.
-      $this->connection->delete(static::TABLE_NAME)
-        ->condition('created', \Drupal::time()->getRequestTime() - 864000, '<')
-        ->condition('name', 'drupal_batch:%', 'LIKE')
-        ->execute();
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      function () {
+        try {
+          // Clean up the queue for failed batches.
+          $this->connection->delete(static::TABLE_NAME)
+            ->condition('created', \Drupal::time()->getRequestTime() - 864000, '<')
+            ->condition('name', 'drupal_batch:%', 'LIKE')
+            ->execute();
 
-      // Reset expired items in the default queue implementation table. If
-      // that's not used, this will simply be a no-op.
-      $this->connection->update(static::TABLE_NAME)
-        ->fields([
-          'expire' => 0,
-        ])
-        ->condition('expire', 0, '<>')
-        ->condition('expire', \Drupal::time()->getRequestTime(), '<')
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
-  }
-
-  /**
-   * Check if the table exists and create it if not.
-   */
-  protected function ensureTableExists() {
-    try {
-      $database_schema = $this->connection->schema();
-      $schema_definition = $this->schemaDefinition();
-      $database_schema->createTable(static::TABLE_NAME, $schema_definition);
-    }
-    // If another process has already created the queue table, attempting to
-    // recreate it will throw an exception. In this case just catch the
-    // exception and do nothing.
-    catch (DatabaseException) {
-    }
-    catch (\Exception) {
-      return FALSE;
-    }
-    return TRUE;
+          // Reset expired items in the default queue implementation table. If
+          // that's not used, this will simply be a no-op.
+          $this->connection->update(static::TABLE_NAME)
+            ->fields([
+              'expire' => 0,
+            ])
+            ->condition('expire', 0, '<>')
+            ->condition('expire', \Drupal::time()->getRequestTime(), '<')
+            ->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+      },
+    );
   }
 
   /**

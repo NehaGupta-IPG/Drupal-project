@@ -8,7 +8,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
 
@@ -235,17 +234,11 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   failed.
    */
   protected function safeExecuteSelect(SelectInterface $query) {
-    try {
-      return $query->execute();
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if ($this->ensureTableExists()) {
-        return $query->execute();
-      }
-      // Some other failure that we can not recover from.
-      throw new PluginException($e->getMessage(), 0, $e);
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      fn() => $query->execute(),
+    );
   }
 
   /**
@@ -1181,27 +1174,6 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       }
     }
     return $tree;
-  }
-
-  /**
-   * Checks if the tree table exists and create it if not.
-   *
-   * @return bool
-   *   TRUE if the table was created, FALSE otherwise.
-   */
-  protected function ensureTableExists() {
-    try {
-      $this->connection->schema()->createTable($this->table, static::schemaDefinition());
-    }
-    catch (DatabaseException) {
-      // If another process has already created the config table, attempting to
-      // recreate it will throw an exception. In this case just catch the
-      // exception and do nothing.
-    }
-    catch (\Exception) {
-      return FALSE;
-    }
-    return TRUE;
   }
 
   /**

@@ -311,6 +311,13 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function supportsLazyTableCreation(): bool {
+    return FALSE;
+  }
+
+  /**
    * Overrides \Drupal\Core\Database\Connection::createDatabase().
    *
    * @param string $database

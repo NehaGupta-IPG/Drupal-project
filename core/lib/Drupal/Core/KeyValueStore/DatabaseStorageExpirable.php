@@ -42,79 +42,103 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function has($key) {
-    try {
-      return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key AND [expire] > :now', [
-        ':collection' => $this->collection,
-        ':key' => $key,
-        ':now' => $this->time->getRequestTime(),
-      ])->fetchField();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      return FALSE;
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      function () use ($key) {
+        try {
+          return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key AND [expire] > :now', [
+            ':collection' => $this->collection,
+            ':key' => $key,
+            ':now' => $this->time->getRequestTime(),
+          ])->fetchField();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+          return FALSE;
+        }
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function getMultiple(array $keys) {
-    try {
-      $values = $this->connection->query(
-        'SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [expire] > :now AND [name] IN ( :keys[] ) AND [collection] = :collection',
-        [
-          ':now' => $this->time->getRequestTime(),
-          ':keys[]' => $keys,
-          ':collection' => $this->collection,
-        ])->fetchAllKeyed();
-      return array_map([$this->serializer, 'decode'], $values);
-    }
-    catch (\Exception $e) {
-      // @todo Perhaps if the database is never going to be available,
-      // key/value requests should return FALSE in order to allow exception
-      // handling to occur but for now, keep it an array, always.
-      // https://www.drupal.org/node/2787737
-      $this->catchException($e);
-    }
-    return [];
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      function () use ($keys) {
+        try {
+          $values = $this->connection->query(
+            'SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [expire] > :now AND [name] IN ( :keys[] ) AND [collection] = :collection',
+            [
+              ':now' => $this->time->getRequestTime(),
+              ':keys[]' => $keys,
+              ':collection' => $this->collection,
+            ])->fetchAllKeyed();
+          return array_map([$this->serializer, 'decode'], $values);
+        }
+        catch (\Exception $e) {
+          // @todo Perhaps if the database is never going to be available,
+          // key/value requests should return FALSE in order to allow exception
+          // handling to occur but for now, keep it an array, always.
+          // https://www.drupal.org/node/2787737
+          $this->catchException($e);
+        }
+        return [];
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAll() {
-    try {
-      $values = $this->connection->query(
-        'SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [expire] > :now',
-        [
-          ':collection' => $this->collection,
-          ':now' => $this->time->getRequestTime(),
-        ])->fetchAllKeyed();
-      return array_map([$this->serializer, 'decode'], $values);
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
-    return [];
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      function () {
+        try {
+          $values = $this->connection->query(
+            'SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [expire] > :now',
+            [
+              ':collection' => $this->collection,
+              ':now' => $this->time->getRequestTime(),
+            ])->fetchAllKeyed();
+          return array_map([$this->serializer, 'decode'], $values);
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+        return [];
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAllKeys(): iterable {
-    try {
-      $values = $this->connection->query(
-        'SELECT [name] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [expire] > :now',
-        [
-          ':collection' => $this->collection,
-          ':now' => $this->time->getRequestTime(),
-        ])->fetchCol();
-      return $values;
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
-    return [];
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      function () {
+        try {
+          $values = $this->connection->query(
+            'SELECT [name] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [expire] > :now',
+            [
+              ':collection' => $this->collection,
+              ':now' => $this->time->getRequestTime(),
+            ])->fetchCol();
+          return $values;
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+        return [];
+      },
+    );
   }
 
   /**
@@ -145,18 +169,11 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function setWithExpire($key, $value, $expire) {
-    try {
-      $this->doSetWithExpire($key, $value, $expire);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, then try to create the table.
-      if ($this->ensureTableExists()) {
-        $this->doSetWithExpire($key, $value, $expire);
-      }
-      else {
-        throw $e;
-      }
-    }
+    $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      fn() => $this->doSetWithExpire($key, $value, $expire),
+    );
   }
 
   /**
@@ -186,18 +203,11 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function setWithExpireIfNotExists($key, $value, $expire) {
-    try {
-      return $this->doSetWithExpireIfNotExists($key, $value, $expire);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if ($this->ensureTableExists()) {
-        return $this->doSetWithExpireIfNotExists($key, $value, $expire);
-      }
-      else {
-        throw $e;
-      }
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      fn() => $this->doSetWithExpireIfNotExists($key, $value, $expire),
+    );
   }
 
   /**

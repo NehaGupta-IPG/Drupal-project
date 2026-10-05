@@ -5,7 +5,6 @@ namespace Drupal\Core\Batch;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\Index;
@@ -19,6 +18,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * Defines the storage handler class for batches.
  */
 class BatchStorage implements BatchStorageInterface {
+
 
   /**
    * The table name.
@@ -49,68 +49,93 @@ class BatchStorage implements BatchStorageInterface {
    * {@inheritdoc}
    */
   public function load($id) {
-    // Ensure that a session is started before using the CSRF token generator.
-    $this->session->start();
-    try {
-      $batch = $this->connection->select('batch', 'b')
-        ->fields('b', ['batch'])
-        ->condition('bid', $id)
-        ->condition('token', $this->csrfToken->get($id))
-        ->execute()
-        ->fetchField();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      $batch = FALSE;
-    }
-    if ($batch) {
-      return unserialize($batch);
-    }
-    return FALSE;
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition()),
+      function () use ($id) {
+        // Ensure that a session is started before using the CSRF token
+        // generator.
+        $this->session->start();
+        try {
+          $batch = $this->connection->select('batch', 'b')
+            ->fields('b', ['batch'])
+            ->condition('bid', $id)
+            ->condition('token', $this->csrfToken->get($id))
+            ->execute()
+            ->fetchField();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+          $batch = FALSE;
+        }
+        if ($batch) {
+          return unserialize($batch);
+        }
+        return FALSE;
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function delete($id) {
-    try {
-      $this->connection->delete('batch')
-        ->condition('bid', $id)
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition()),
+      function () use ($id) {
+        try {
+          $this->connection->delete('batch')
+            ->condition('bid', $id)
+            ->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function update(array $batch) {
-    try {
-      $this->connection->update('batch')
-        ->fields(['batch' => serialize($batch)])
-        ->condition('bid', $batch['id'])
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition()),
+      function () use ($batch) {
+        try {
+          $this->connection->update('batch')
+            ->fields(['batch' => serialize($batch)])
+            ->condition('bid', $batch['id'])
+            ->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function cleanup() {
-    try {
-      // Cleanup the batch table and the queue for failed batches.
-      $this->connection->delete('batch')
-        ->condition('timestamp', $this->time->getRequestTime() - 864000, '<')
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition()),
+      function () {
+        try {
+          // Cleanup the batch table and the queue for failed batches.
+          $this->connection->delete('batch')
+            ->condition('timestamp', $this->time->getRequestTime() - 864000, '<')
+            ->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+      },
+    );
   }
 
   /**
@@ -133,23 +158,11 @@ class BatchStorage implements BatchStorageInterface {
    * {@inheritdoc}
    */
   public function getId(): int {
-    $try_again = FALSE;
-    try {
-      // The batch table might not yet exist.
-      return $this->doInsertBatchRecord();
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if (!$try_again = $this->ensureTableExists()) {
-        // If the exception happened for other reason than the missing table,
-        // propagate the exception.
-        throw $e;
-      }
-    }
-    // Now that the table has been created, try again if necessary.
-    if ($try_again) {
-      return $this->doInsertBatchRecord();
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition()),
+      fn() => $this->doInsertBatchRecord(),
+    );
   }
 
   /**
@@ -166,24 +179,6 @@ class BatchStorage implements BatchStorageInterface {
         'batch' => NULL,
       ])
       ->execute();
-  }
-
-  /**
-   * Check if the table exists and create it if not.
-   */
-  protected function ensureTableExists() {
-    try {
-      $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition());
-    }
-    // If another process has already created the batch table, attempting to
-    // recreate it will throw an exception. In this case just catch the
-    // exception and do nothing.
-    catch (DatabaseException) {
-    }
-    catch (\Exception) {
-      return FALSE;
-    }
-    return TRUE;
   }
 
   /**

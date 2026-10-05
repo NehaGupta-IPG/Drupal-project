@@ -5,7 +5,6 @@ namespace Drupal\Core\Session;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
@@ -14,6 +13,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHand
  * Default session handler.
  */
 class SessionHandler extends AbstractSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface {
+
 
   use DependencySerializationTrait;
 
@@ -45,26 +45,32 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    * {@inheritdoc}
    */
   public function doRead(#[\SensitiveParameter] string $sessionId): string {
-    $data = '';
-    if (!empty($sessionId)) {
-      try {
-        // Read the session data from the database.
-        $query = $this->connection
-          ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => Crypt::hashBase64($sessionId)]);
-        $data = (string) $query->fetchField();
-      }
-      // Swallow the error if the table hasn't been created yet.
-      catch (\Exception) {
-      }
+    if (empty($sessionId)) {
+      return '';
     }
-    return $data;
+    return $this->connection->executeAndCreateTableIfNeeded(
+      'sessions',
+      fn() => $this->connection->schema()->createTable('sessions', $this->schemaDefinition()),
+      function () use ($sessionId) {
+        $data = '';
+        try {
+          // Read the session data from the database.
+          $query = $this->connection
+            ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => Crypt::hashBase64($sessionId)]);
+          $data = (string) $query->fetchField();
+        }
+        // Swallow the error if the table hasn't been created yet.
+        catch (\Exception) {
+        }
+        return $data;
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function doWrite(#[\SensitiveParameter] string $sessionId, string $data): bool {
-    $try_again = FALSE;
     $request = $this->requestStack->getCurrentRequest();
     $doWrite = fn() =>
       $this->connection->upsert('sessions')
@@ -77,22 +83,11 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
           'timestamp' => $this->time->getRequestTime(),
         ])
         ->execute();
-    try {
-      $doWrite();
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if (!$try_again = $this->ensureTableExists()) {
-        // If the exception happened for other reason than the missing
-        // table, propagate the exception.
-        throw $e;
-      }
-    }
-    // Now that the bin has been created, try again if necessary.
-    if ($try_again) {
-      $doWrite();
-    }
-
+    $this->connection->executeAndCreateTableIfNeeded(
+      'sessions',
+      fn() => $this->connection->schema()->createTable('sessions', $this->schemaDefinition()),
+      $doWrite,
+    );
     return TRUE;
   }
 
@@ -114,37 +109,51 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    * {@inheritdoc}
    */
   protected function doDestroy(#[\SensitiveParameter] string $sessionId): bool {
-    try {
-      // Delete session data.
-      $this->connection->delete('sessions')
-        ->condition('sid', Crypt::hashBase64($sessionId))
-        ->execute();
-    }
-    // Swallow the error if the table hasn't been created yet.
-    catch (\Exception) {
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      'sessions',
+      fn() => $this->connection->schema()->createTable('sessions', $this->schemaDefinition()),
+      function () use ($sessionId) {
+        try {
+          // Delete session data.
+          $this->connection->delete('sessions')
+            ->condition('sid', Crypt::hashBase64($sessionId))
+            ->execute();
+        }
+        // Swallow the error if the table hasn't been created yet.
+        catch (\Exception) {
+        }
 
-    return TRUE;
+        return TRUE;
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function gc(int $lifetime): int|false {
-    // Be sure to adjust 'php_value session.gc_maxlifetime' to a large enough
-    // value. For example, if you want user sessions to stay in your database
-    // for three weeks before deleting them, you need to set gc_maxlifetime
-    // to '1814400'. At that value, only after a user doesn't log in after
-    // three weeks (1814400 seconds) will their session be removed.
-    try {
-      return $this->connection->delete('sessions')
-        ->condition('timestamp', $this->time->getRequestTime() - $lifetime, '<')
-        ->execute();
-    }
-    // Swallow the error if the table hasn't been created yet.
-    catch (\Exception) {
-    }
-    return FALSE;
+    return $this->connection->executeAndCreateTableIfNeeded(
+      'sessions',
+      fn() => $this->connection->schema()->createTable('sessions', $this->schemaDefinition()),
+      function () use ($lifetime) {
+        // Be sure to adjust 'php_value session.gc_maxlifetime' to a large
+        // enough
+        // value. For example, if you want user sessions to stay in your
+        // database
+        // for three weeks before deleting them, you need to set gc_maxlifetime
+        // to '1814400'. At that value, only after a user doesn't log in after
+        // three weeks (1814400 seconds) will their session be removed.
+        try {
+          return $this->connection->delete('sessions')
+            ->condition('timestamp', $this->time->getRequestTime() - $lifetime, '<')
+            ->execute();
+        }
+        // Swallow the error if the table hasn't been created yet.
+        catch (\Exception) {
+        }
+        return FALSE;
+      },
+    );
   }
 
   /**
@@ -215,29 +224,6 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
     ];
 
     return $schema;
-  }
-
-  /**
-   * Check if the session table exists and create it if not.
-   *
-   * @return bool
-   *   TRUE if the table already exists or was created, FALSE if creation fails.
-   */
-  protected function ensureTableExists(): bool {
-    try {
-      $database_schema = $this->connection->schema();
-      $schema_definition = $this->schemaDefinition();
-      $database_schema->createTable('sessions', $schema_definition);
-    }
-    // If another process has already created the table, attempting to create
-    // it will throw an exception. In this case just catch the exception and do
-    // nothing.
-    catch (DatabaseException) {
-    }
-    catch (\Exception) {
-      return FALSE;
-    }
-    return TRUE;
   }
 
 }

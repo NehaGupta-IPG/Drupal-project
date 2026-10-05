@@ -3,7 +3,6 @@
 namespace Drupal\Core\Cache;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Query\UpsertUpdateExpression;
 
 /**
@@ -34,9 +33,11 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
    * {@inheritdoc}
    */
   protected function doInvalidateTags(array $tags) {
-    try {
-      foreach ($tags as $tag) {
-        $this->connection->upsert('cachetags')
+    foreach ($tags as $tag) {
+      $this->connection->executeAndCreateTableIfNeeded(
+        'cachetags',
+        fn() => $this->connection->schema()->createTable('cachetags', $this->schemaDefinition()),
+        fn() => $this->connection->upsert('cachetags')
           ->key(['tag'])
           ->fields([
             'tag',
@@ -46,16 +47,8 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
             'tag' => $tag,
             'invalidations' => 1,
           ])
-          ->execute();
-      }
-    }
-    catch (\Exception $e) {
-      // Create the cache table, which will be empty. This fixes cases during
-      // core install where cache tags are invalidated before the table is
-      // created.
-      if (!$this->ensureTableExists()) {
-        throw $e;
-      }
+          ->execute(),
+      );
     }
   }
 
@@ -63,53 +56,23 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
    * {@inheritdoc}
    */
   protected function getTagInvalidationCounts(array $tags) {
-    try {
-      return $this->connection->query('SELECT [tag], [invalidations] FROM {cachetags} WHERE [tag] IN ( :tags[] )', [':tags[]' => $tags])
-        ->fetchAllKeyed();
-    }
-    catch (\Exception $e) {
-      // If the table does not exist yet, create.
-      if (!$this->ensureTableExists()) {
-        throw $e;
-      }
-    }
-    return [];
+    return $this->connection->executeAndCreateTableIfNeeded(
+      'cachetags',
+      fn() => $this->connection->schema()->createTable('cachetags', $this->schemaDefinition()),
+      fn() => $this->connection->query('SELECT [tag], [invalidations] FROM {cachetags} WHERE [tag] IN ( :tags[] )', [':tags[]' => $tags])->fetchAllKeyed(),
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function purge(): void {
-    try {
-      $this->connection->truncate('cachetags')->execute();
-    }
-    catch (\Throwable $e) {
-      // If the table does not exist yet, there is nothing to purge.
-      if (!$this->ensureTableExists()) {
-        throw $e;
-      }
-    }
+    $this->connection->executeAndCreateTableIfNeeded(
+      'cachetags',
+      fn() => $this->connection->schema()->createTable('cachetags', $this->schemaDefinition()),
+      fn() => $this->connection->truncate('cachetags')->execute(),
+    );
     $this->reset();
-  }
-
-  /**
-   * Check if the cache tags table exists and create it if not.
-   */
-  protected function ensureTableExists() {
-    try {
-      $database_schema = $this->connection->schema();
-      $schema_definition = $this->schemaDefinition();
-      $database_schema->createTable('cachetags', $schema_definition);
-    }
-    // If another process has already created the cachetags table, attempting to
-    // recreate it will throw an exception. In this case just catch the
-    // exception and do nothing.
-    catch (DatabaseException) {
-    }
-    catch (\Exception) {
-      return FALSE;
-    }
-    return TRUE;
   }
 
   /**

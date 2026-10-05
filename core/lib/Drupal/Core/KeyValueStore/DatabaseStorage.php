@@ -62,81 +62,105 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function has($key) {
-    try {
-      return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key', [
-        ':collection' => $this->collection,
-        ':key' => $key,
-      ])->fetchField();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      return FALSE;
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      function () use ($key) {
+        try {
+          return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key', [
+            ':collection' => $this->collection,
+            ':key' => $key,
+          ])->fetchField();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+          return FALSE;
+        }
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function getMultiple(array $keys) {
-    $values = [];
-    try {
-      $result = $this->connection
-        ->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [
-          ':keys[]' => $keys,
-          ':collection' => $this->collection,
-        ])
-        ->fetchAllAssoc('name');
-      foreach ($keys as $key) {
-        if (isset($result[$key])) {
-          $values[$key] = $this->serializer->decode($result[$key]->value);
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      function () use ($keys) {
+        $values = [];
+        try {
+          $result = $this->connection
+            ->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [
+              ':keys[]' => $keys,
+              ':collection' => $this->collection,
+            ])
+            ->fetchAllAssoc('name');
+          foreach ($keys as $key) {
+            if (isset($result[$key])) {
+              $values[$key] = $this->serializer->decode($result[$key]->value);
+            }
+          }
         }
-      }
-    }
-    catch (\Exception) {
-      // @todo Perhaps if the database is never going to be available,
-      // key/value requests should return FALSE in order to allow exception
-      // handling to occur but for now, keep it an array, always.
-    }
-    return $values;
+        catch (\Exception) {
+          // @todo Perhaps if the database is never going to be available,
+          // key/value requests should return FALSE in order to allow exception
+          // handling to occur but for now, keep it an array, always.
+        }
+        return $values;
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAll() {
-    try {
-      $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection', [':collection' => $this->collection]);
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      $result = [];
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      function () {
+        try {
+          $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection', [':collection' => $this->collection]);
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+          $result = [];
+        }
 
-    $values = [];
-    foreach ($result as $item) {
-      if ($item) {
-        $values[$item->name] = $this->serializer->decode($item->value);
-      }
-    }
-    return $values;
+        $values = [];
+        foreach ($result as $item) {
+          if ($item) {
+            $values[$item->name] = $this->serializer->decode($item->value);
+          }
+        }
+        return $values;
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAllKeys(): iterable {
-    try {
-      $values = $this->connection->query(
-        'SELECT [name] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection',
-        [
-          ':collection' => $this->collection,
-        ])->fetchCol();
-      return $values;
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
-    return [];
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      function () {
+        try {
+          $values = $this->connection->query(
+            'SELECT [name] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection',
+            [
+              ':collection' => $this->collection,
+            ])->fetchCol();
+          return $values;
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+        return [];
+      },
+    );
   }
 
   /**
@@ -164,18 +188,11 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function set($key, $value) {
-    try {
-      $this->doSet($key, $value);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if ($this->ensureTableExists()) {
-        $this->doSet($key, $value);
-      }
-      else {
-        throw $e;
-      }
-    }
+    $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      fn() => $this->doSet($key, $value),
+    );
   }
 
   /**
@@ -218,18 +235,11 @@ class DatabaseStorage extends StorageBase {
     if (empty($data)) {
       return;
     }
-    try {
-      $this->doSetMultiple($data);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if ($this->ensureTableExists()) {
-        $this->doSetMultiple($data);
-      }
-      else {
-        throw $e;
-      }
-    }
+    $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      fn() => $this->doSetMultiple($data),
+    );
   }
 
   /**
@@ -262,87 +272,77 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function setIfNotExists($key, $value) {
-    try {
-      return $this->doSetIfNotExists($key, $value);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if ($this->ensureTableExists()) {
-        return $this->doSetIfNotExists($key, $value);
-      }
-      else {
-        throw $e;
-      }
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      fn() => $this->doSetIfNotExists($key, $value),
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function rename($key, $new_key) {
-    try {
-      $this->connection->update($this->table)
-        ->fields(['name' => $new_key])
-        ->condition('collection', $this->collection)
-        ->condition('name', $key)
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      function () use ($key, $new_key) {
+        try {
+          $this->connection->update($this->table)
+            ->fields(['name' => $new_key])
+            ->condition('collection', $this->collection)
+            ->condition('name', $key)
+            ->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteMultiple(array $keys) {
-    // Delete in chunks when a large array is passed.
-    while ($keys) {
-      try {
-        $this->connection->delete($this->table)
-          ->condition('name', array_splice($keys, 0, 1000), 'IN')
-          ->condition('collection', $this->collection)
-          ->execute();
-      }
-      catch (\Exception $e) {
-        $this->catchException($e);
-      }
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      function () use ($keys) {
+        // Delete in chunks when a large array is passed.
+        while ($keys) {
+          try {
+            $this->connection->delete($this->table)
+              ->condition('name', array_splice($keys, 0, 1000), 'IN')
+              ->condition('collection', $this->collection)
+              ->execute();
+          }
+          catch (\Exception $e) {
+            $this->catchException($e);
+          }
+        }
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteAll() {
-    try {
-      $this->connection->delete($this->table)
-        ->condition('collection', $this->collection)
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
-  }
-
-  /**
-   * Check if the table exists and create it if not.
-   *
-   * @return bool
-   *   TRUE if the table exists, FALSE if it does not exists.
-   */
-  protected function ensureTableExists() {
-    try {
-      $database_schema = $this->connection->schema();
-      $database_schema->createTable($this->table, $this->schemaDefinition());
-    }
-    // If the table already exists, then attempting to recreate it will throw an
-    // exception. In this case just catch the exception and do nothing.
-    catch (DatabaseException) {
-    }
-    catch (\Exception) {
-      return FALSE;
-    }
-    return TRUE;
+    return $this->connection->executeAndCreateTableIfNeeded(
+      $this->table,
+      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      function () {
+        try {
+          $this->connection->delete($this->table)
+            ->condition('collection', $this->collection)
+            ->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+      },
+    );
   }
 
   /**

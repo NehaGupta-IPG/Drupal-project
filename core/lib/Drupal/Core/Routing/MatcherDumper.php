@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Routing;
 
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
@@ -16,6 +15,7 @@ use Drupal\Core\Database\Connection;
  * @see \Drupal\Core\Routing\RouteProvider
  */
 class MatcherDumper implements MatcherDumperInterface {
+
 
   /**
    * The routes to be dumped.
@@ -94,15 +94,11 @@ class MatcherDumper implements MatcherDumperInterface {
       $transaction = $this->connection->startTransaction();
       // We don't use truncate, because it is not guaranteed to be transaction
       // safe.
-      try {
-        $this->connection->delete($this->tableName)
-          ->execute();
-      }
-      catch (\Exception $e) {
-        if (!$this->ensureTableExists()) {
-          throw $e;
-        }
-      }
+      $this->connection->executeAndCreateTableIfNeeded(
+        $this->tableName,
+        fn() => $this->connection->schema()->createTable($this->tableName, $this->schemaDefinition()),
+        fn() => $this->connection->delete($this->tableName)->execute(),
+      );
 
       // Split the routes into chunks to avoid big INSERT queries.
       $route_chunks = array_chunk($this->routes->all(), 50, TRUE);
@@ -188,27 +184,6 @@ class MatcherDumper implements MatcherDumperInterface {
    */
   public function getRoutes(): RouteCollection {
     return $this->routes;
-  }
-
-  /**
-   * Checks if the tree table exists and create it if not.
-   *
-   * @return bool
-   *   TRUE if the table was created, FALSE otherwise.
-   */
-  protected function ensureTableExists() {
-    try {
-      $this->connection->schema()->createTable($this->tableName, $this->schemaDefinition());
-    }
-    catch (DatabaseException) {
-      // If another process has already created the config table, attempting to
-      // recreate it will throw an exception. In this case just catch the
-      // exception and do nothing.
-    }
-    catch (\Exception) {
-      return FALSE;
-    }
-    return TRUE;
   }
 
   /**

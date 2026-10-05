@@ -12,6 +12,7 @@ use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\Truncate;
 use Drupal\Core\Database\Query\Update;
 use Drupal\Core\Database\Statement\FetchAs;
+use Drupal\Core\Database\Transaction\TransactionManagerBase;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 
@@ -26,6 +27,13 @@ use Drupal\Core\Pager\PagerManagerInterface;
  * @see http://php.net/manual/book.pdo.php
  */
 abstract class Connection {
+
+  /**
+   * The transaction and schema versions when each table was verified.
+   *
+   * @var array<string, array{int, int}>
+   */
+  private array $verifiedTables = [];
 
   /**
    * The database target this connection is for.
@@ -1232,6 +1240,147 @@ abstract class Connection {
    */
   public function supportsTransactionalDDL() {
     return $this->transactionalDDLSupport;
+  }
+
+  /**
+   * Executes an operation, creating its table if necessary.
+   *
+   * On drivers where a failed statement aborts a transaction, verifies the
+   * table first when a transaction is active. Otherwise, attempts the operation
+   * optimistically and retries once if a missing-table exception occurs and the
+   * specified table is missing. Other exceptions are propagated unchanged.
+   * Operations may handle a missing table themselves when an empty result or
+   * a no-op is appropriate, avoiding creation outside transactions.
+   *
+   * @param string $table
+   *   The unprefixed table name.
+   * @param callable $create_table
+   *   A callback that only creates the table and lets exceptions propagate.
+   * @param callable $operation
+   *   The operation. It may be called twice and must be safe to retry after a
+   *   missing-table failure. Start any transaction before calling this method,
+   *   not inside the callback, so verification precedes failing statements.
+   *
+   * @return mixed
+   *   The result of the operation.
+   */
+  public function executeAndCreateTableIfNeeded(string $table, callable $create_table, callable $operation): mixed {
+    if (!$this->supportsLazyTableCreation() && $this->inTransaction()) {
+      $manager = $this->transactionManager();
+      $schema = $this->schema();
+      // Replacement managers may not track table visibility. In that case,
+      // conservatively check on every call.
+      $version = $manager instanceof TransactionManagerBase ?
+        [$manager->getTransactionVersion(), $schema->getTableInformationVersion()] : NULL;
+      if ($version === NULL || ($this->verifiedTables[$table] ?? NULL) !== $version) {
+        if (!$schema->tableExists($table)) {
+          $this->createTableForOperation($table, $create_table);
+        }
+        // Keep the version from before creation: a rollback while recovering
+        // from a creation race must also invalidate this entry.
+        if ($version !== NULL) {
+          $this->verifiedTables[$table] = $version;
+        }
+      }
+      return $operation();
+    }
+
+    try {
+      return $operation();
+    }
+    catch (DatabaseException $e) {
+      if (!$this->isMissingTableException($e) || $this->schema()->tableExists($table)) {
+        throw $e;
+      }
+      $this->createTableForOperation($table, $create_table);
+    }
+    return $operation();
+  }
+
+  /**
+   * Determines whether an operation failed because a table was missing.
+   *
+   * @param \Throwable $exception
+   *   The operation exception.
+   *
+   * @return bool
+   *   TRUE for missing table errors, FALSE for unrelated database errors.
+   */
+  protected function isMissingTableException(\Throwable $exception): bool {
+    $previous = $exception->getPrevious();
+    if ($previous instanceof \PDOException) {
+      $state = $previous->errorInfo[0] ?? $previous->getCode();
+      if (in_array($state, ['42P01', '42S02'], TRUE)) {
+        return TRUE;
+      }
+      // SQLite uses HY000/1 for many errors, including missing tables.
+      return $state === 'HY000' && ($previous->errorInfo[1] ?? NULL) === 1 && str_contains($previous->getMessage(), 'no such table:');
+    }
+    return FALSE;
+  }
+
+  /**
+   * Creates a table, recovering only from a concurrent creation.
+   *
+   * @param string $table
+   *   The unprefixed table name.
+   * @param callable $create_table
+   *   A callback that creates the table.
+   */
+  private function createTableForOperation(string $table, callable $create_table): void {
+    // Only transaction-aborting drivers need a savepoint for a creation race.
+    $savepoint = !$this->supportsLazyTableCreation() && $this->inTransaction() ? $this->startTransaction() : NULL;
+    try {
+      $create_table();
+      $savepoint?->commitOrRelease();
+    }
+    catch (\Throwable $e) {
+      $savepoint?->rollBack();
+      if (!$e instanceof DatabaseException || !$this->schema()->tableExists($table) || !$this->isTableCreationRace($e)) {
+        throw $e;
+      }
+    }
+  }
+
+  /**
+   * Determines whether table creation failed because another creator won.
+   *
+   * @param \Throwable $exception
+   *   The table creation exception.
+   *
+   * @return bool
+   *   TRUE for duplicate table errors, FALSE for unrelated schema errors.
+   */
+  protected function isTableCreationRace(\Throwable $exception): bool {
+    if ($exception instanceof SchemaObjectExistsException) {
+      return TRUE;
+    }
+    $previous = $exception->getPrevious();
+    if ($previous instanceof \PDOException) {
+      $state = $previous->errorInfo[0] ?? $previous->getCode();
+      if (in_array($state, ['42P07', '42S01'], TRUE)) {
+        return TRUE;
+      }
+      // Concurrent PostgreSQL CREATE TABLE statements can also collide on
+      // the catalog's type-name constraint before the table is visible.
+      if ($state === '23505' && str_contains($previous->getMessage(), 'pg_type_typname_nsp_index')) {
+        return TRUE;
+      }
+      // SQLite reports both syntax and duplicate table errors as HY000/1.
+      return $state === 'HY000' && ($previous->errorInfo[1] ?? NULL) === 1 && str_contains($previous->getMessage(), 'already exists');
+    }
+    return FALSE;
+  }
+
+  /**
+   * Determines if this driver supports lazy table creation.
+   *
+   * @return bool
+   *   TRUE if this connection supports creating tables lazily, FALSE
+   *   otherwise.
+   */
+  public function supportsLazyTableCreation(): bool {
+    return TRUE;
   }
 
   /**

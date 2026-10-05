@@ -4,13 +4,13 @@ namespace Drupal\Core\Flood;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Defines the database flood backend. This is the default Drupal backend.
  */
 class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
+
 
   /**
    * The database table name.
@@ -42,19 +42,11 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
     if (!isset($identifier)) {
       $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
     }
-    $try_again = FALSE;
-    try {
-      $this->doInsert($name, $window, $identifier);
-    }
-    catch (\Exception $e) {
-      $try_again = $this->ensureTableExists();
-      if (!$try_again) {
-        throw $e;
-      }
-    }
-    if ($try_again) {
-      $this->doInsert($name, $window, $identifier);
-    }
+    $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      fn() => $this->doInsert($name, $window, $identifier),
+    );
   }
 
   /**
@@ -84,92 +76,88 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
    * {@inheritdoc}
    */
   public function clear($name, $identifier = NULL) {
-    if (!isset($identifier)) {
-      $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
-    }
-    try {
-      $this->connection->delete(static::TABLE_NAME)
-        ->condition('event', $name)
-        ->condition('identifier', $identifier)
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      function () use ($name, $identifier) {
+        if (!isset($identifier)) {
+          $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
+        }
+        try {
+          $this->connection->delete(static::TABLE_NAME)
+            ->condition('event', $name)
+            ->condition('identifier', $identifier)
+            ->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function clearByPrefix(string $name, string $prefix): void {
-    try {
-      $this->connection->delete(static::TABLE_NAME)
-        ->condition('event', $name)
-        ->condition('identifier', $prefix . '-%', 'LIKE')
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      function () use ($name, $prefix) {
+        try {
+          $this->connection->delete(static::TABLE_NAME)
+            ->condition('event', $name)
+            ->condition('identifier', $prefix . '-%', 'LIKE')
+            ->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function isAllowed($name, $threshold, $window = 3600, $identifier = NULL) {
-    if (!isset($identifier)) {
-      $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
-    }
-    try {
-      $number = $this->connection->select(static::TABLE_NAME, 'f')
-        ->condition('event', $name)
-        ->condition('identifier', $identifier)
-        ->condition('timestamp', $this->time->getRequestTime() - $window, '>')
-        ->countQuery()
-        ->execute()
-        ->fetchField();
-      return ($number < $threshold);
-    }
-    catch (\Exception $e) {
-      if (!$this->ensureTableExists()) {
-        throw $e;
-      }
-      return TRUE;
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      function () use ($name, $threshold, $window, $identifier) {
+        if (!isset($identifier)) {
+          $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
+        }
+        $number = $this->connection->select(static::TABLE_NAME, 'f')
+          ->condition('event', $name)
+          ->condition('identifier', $identifier)
+          ->condition('timestamp', $this->time->getRequestTime() - $window, '>')
+          ->countQuery()
+          ->execute()
+          ->fetchField();
+        return ($number < $threshold);
+      },
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function garbageCollection() {
-    try {
-      $this->connection->delete(static::TABLE_NAME)
-        ->condition('expiration', $this->time->getRequestTime(), '<')
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
-  }
-
-  /**
-   * Check if the flood table exists and create it if not.
-   */
-  protected function ensureTableExists() {
-    try {
-      $database_schema = $this->connection->schema();
-      $schema_definition = $this->schemaDefinition();
-      $database_schema->createTable(static::TABLE_NAME, $schema_definition);
-    }
-    // If another process has already created the table, attempting to create
-    // it will throw an exception. In this case just catch the exception and do
-    // nothing.
-    catch (DatabaseException) {
-    }
-    catch (\Exception) {
-      return FALSE;
-    }
-    return TRUE;
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      function () {
+        try {
+          $this->connection->delete(static::TABLE_NAME)
+            ->condition('expiration', $this->time->getRequestTime(), '<')
+            ->execute();
+        }
+        catch (\Exception $e) {
+          $this->catchException($e);
+        }
+      },
+    );
   }
 
   /**
