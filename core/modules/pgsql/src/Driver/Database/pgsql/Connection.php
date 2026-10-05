@@ -306,6 +306,31 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
+  protected function isMissingTableException(\Throwable $exception): bool {
+    $previous = $exception->getPrevious();
+    return $previous instanceof \PDOException
+      && ($previous->errorInfo[0] ?? $previous->getCode()) === '42P01';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function isTableCreationRace(\Throwable $exception): bool {
+    $previous = $exception->getPrevious();
+    if ($previous instanceof \PDOException) {
+      $state = $previous->errorInfo[0] ?? $previous->getCode();
+      // Concurrent CREATE TABLE statements can also collide on the catalog's
+      // type-name constraint before the table is visible.
+      if ($state === '42P07' || ($state === '23505' && str_contains($previous->getMessage(), 'pg_type_typname_nsp_index'))) {
+        return TRUE;
+      }
+    }
+    return parent::isTableCreationRace($exception);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function databaseType() {
     return 'pgsql';
   }

@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class BatchStorage implements BatchStorageInterface {
 
-
   /**
    * The table name.
    */
@@ -56,18 +55,12 @@ class BatchStorage implements BatchStorageInterface {
         // Ensure that a session is started before using the CSRF token
         // generator.
         $this->session->start();
-        try {
-          $batch = $this->connection->select('batch', 'b')
-            ->fields('b', ['batch'])
-            ->condition('bid', $id)
-            ->condition('token', $this->csrfToken->get($id))
-            ->execute()
-            ->fetchField();
-        }
-        catch (\Exception $e) {
-          $this->catchException($e);
-          $batch = FALSE;
-        }
+        $batch = $this->connection->select('batch', 'b')
+          ->fields('b', ['batch'])
+          ->condition('bid', $id)
+          ->condition('token', $this->csrfToken->get($id))
+          ->execute()
+          ->fetchField();
         if ($batch) {
           return unserialize($batch);
         }
@@ -84,14 +77,9 @@ class BatchStorage implements BatchStorageInterface {
       static::TABLE_NAME,
       $this->schemaDefinition(),
       function () use ($id) {
-        try {
-          $this->connection->delete('batch')
-            ->condition('bid', $id)
-            ->execute();
-        }
-        catch (\Exception $e) {
-          $this->catchException($e);
-        }
+        $this->connection->delete('batch')
+          ->condition('bid', $id)
+          ->execute();
       },
     );
   }
@@ -104,15 +92,10 @@ class BatchStorage implements BatchStorageInterface {
       static::TABLE_NAME,
       $this->schemaDefinition(),
       function () use ($batch) {
-        try {
-          $this->connection->update('batch')
-            ->fields(['batch' => serialize($batch)])
-            ->condition('bid', $batch['id'])
-            ->execute();
-        }
-        catch (\Exception $e) {
-          $this->catchException($e);
-        }
+        $this->connection->update('batch')
+          ->fields(['batch' => serialize($batch)])
+          ->condition('bid', $batch['id'])
+          ->execute();
       },
     );
   }
@@ -125,15 +108,10 @@ class BatchStorage implements BatchStorageInterface {
       static::TABLE_NAME,
       $this->schemaDefinition(),
       function () {
-        try {
-          // Cleanup the batch table and the queue for failed batches.
-          $this->connection->delete('batch')
-            ->condition('timestamp', $this->time->getRequestTime() - 864000, '<')
-            ->execute();
-        }
-        catch (\Exception $e) {
-          $this->catchException($e);
-        }
+        // Cleanup the batch table and the queue for failed batches.
+        $this->connection->delete('batch')
+          ->condition('timestamp', $this->time->getRequestTime() - 864000, '<')
+          ->execute();
       },
     );
   }
@@ -192,8 +170,13 @@ class BatchStorage implements BatchStorageInterface {
    *   The exception.
    *
    * @throws \Exception
+   *
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
+   *   Connection::executeAndCreateTableIfNeeded() instead.
+   * @see https://www.drupal.org/node/3626977
    */
   protected function catchException(\Exception $e) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/3626977', E_USER_DEPRECATED);
     if ($this->connection->schema()->tableExists(static::TABLE_NAME)) {
       throw $e;
     }

@@ -52,17 +52,10 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
       'sessions',
       $this->schemaDefinition(),
       function () use ($sessionId) {
-        $data = '';
-        try {
-          // Read the session data from the database.
-          $query = $this->connection
-            ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => Crypt::hashBase64($sessionId)]);
-          $data = (string) $query->fetchField();
-        }
-        // Swallow the error if the table hasn't been created yet.
-        catch (\Exception) {
-        }
-        return $data;
+        // Read the session data from the database.
+        $query = $this->connection
+          ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => Crypt::hashBase64($sessionId)]);
+        return (string) $query->fetchField();
       },
     );
   }
@@ -113,15 +106,10 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
       'sessions',
       $this->schemaDefinition(),
       function () use ($sessionId) {
-        try {
-          // Delete session data.
-          $this->connection->delete('sessions')
-            ->condition('sid', Crypt::hashBase64($sessionId))
-            ->execute();
-        }
-        // Swallow the error if the table hasn't been created yet.
-        catch (\Exception) {
-        }
+        // Delete session data.
+        $this->connection->delete('sessions')
+          ->condition('sid', Crypt::hashBase64($sessionId))
+          ->execute();
 
         return TRUE;
       },
@@ -136,22 +124,14 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
       'sessions',
       $this->schemaDefinition(),
       function () use ($lifetime) {
-        // Be sure to adjust 'php_value session.gc_maxlifetime' to a large
-        // enough
-        // value. For example, if you want user sessions to stay in your
-        // database
+        // Adjust 'php_value session.gc_maxlifetime' to a large enough value.
+        // For example, if you want user sessions to stay in your database
         // for three weeks before deleting them, you need to set gc_maxlifetime
         // to '1814400'. At that value, only after a user doesn't log in after
         // three weeks (1814400 seconds) will their session be removed.
-        try {
-          return $this->connection->delete('sessions')
-            ->condition('timestamp', $this->time->getRequestTime() - $lifetime, '<')
-            ->execute();
-        }
-        // Swallow the error if the table hasn't been created yet.
-        catch (\Exception) {
-        }
-        return FALSE;
+        return $this->connection->delete('sessions')
+          ->condition('timestamp', $this->time->getRequestTime() - $lifetime, '<')
+          ->execute();
       },
     );
   }

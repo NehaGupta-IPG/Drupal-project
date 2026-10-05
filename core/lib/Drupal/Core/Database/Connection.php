@@ -1314,11 +1314,7 @@ abstract class Connection {
     $previous = $exception->getPrevious();
     if ($previous instanceof \PDOException) {
       $state = $previous->errorInfo[0] ?? $previous->getCode();
-      if (in_array($state, ['42P01', '42S02'], TRUE)) {
-        return TRUE;
-      }
-      // SQLite uses HY000/1 for many errors, including missing tables.
-      return $state === 'HY000' && ($previous->errorInfo[1] ?? NULL) === 1 && str_contains($previous->getMessage(), 'no such table:');
+      return $state === '42S02';
     }
     return FALSE;
   }
@@ -1370,16 +1366,7 @@ abstract class Connection {
     $previous = $exception->getPrevious();
     if ($previous instanceof \PDOException) {
       $state = $previous->errorInfo[0] ?? $previous->getCode();
-      if (in_array($state, ['42P07', '42S01'], TRUE)) {
-        return TRUE;
-      }
-      // Concurrent PostgreSQL CREATE TABLE statements can also collide on
-      // the catalog's type-name constraint before the table is visible.
-      if ($state === '23505' && str_contains($previous->getMessage(), 'pg_type_typname_nsp_index')) {
-        return TRUE;
-      }
-      // SQLite reports both syntax and duplicate table errors as HY000/1.
-      return $state === 'HY000' && ($previous->errorInfo[1] ?? NULL) === 1 && str_contains($previous->getMessage(), 'already exists');
+      return $state === '42S01';
     }
     return FALSE;
   }

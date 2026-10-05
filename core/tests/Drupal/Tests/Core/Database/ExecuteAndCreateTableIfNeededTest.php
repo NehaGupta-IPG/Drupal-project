@@ -12,6 +12,8 @@ use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\pgsql\Driver\Database\pgsql\Connection as PgsqlConnection;
+use Drupal\sqlite\Driver\Database\sqlite\Connection as SqliteConnection;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,6 +26,32 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[CoversClass(Connection::class)]
 #[Group('Database')]
 class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
+
+  /**
+   * Tests that driver-specific errors are recognized only by that driver.
+   */
+  #[TestWith([StubConnection::class, '42S02', 1146, 'Missing table', TRUE, FALSE])]
+  #[TestWith([StubConnection::class, '42S01', 1050, 'Table exists', FALSE, TRUE])]
+  #[TestWith([StubConnection::class, 'HY000', 1, 'no such table: lazy', FALSE, FALSE])]
+  #[TestWith([StubConnection::class, '42P01', 7, 'Missing table', FALSE, FALSE])]
+  #[TestWith([StubConnection::class, '23505', 7, 'pg_type_typname_nsp_index', FALSE, FALSE])]
+  #[TestWith([PgsqlConnection::class, '42P01', 7, 'Missing table', TRUE, FALSE])]
+  #[TestWith([PgsqlConnection::class, '42P07', 7, 'Table exists', FALSE, TRUE])]
+  #[TestWith([PgsqlConnection::class, '23505', 7, 'pg_type_typname_nsp_index', FALSE, TRUE])]
+  #[TestWith([PgsqlConnection::class, '23505', 7, 'other_constraint', FALSE, FALSE])]
+  #[TestWith([PgsqlConnection::class, '42501', 7, 'Permission denied', FALSE, FALSE])]
+  #[TestWith([SqliteConnection::class, 'HY000', 1, 'no such table: lazy', TRUE, FALSE])]
+  #[TestWith([SqliteConnection::class, 'HY000', 1, 'table lazy already exists', FALSE, TRUE])]
+  #[TestWith([SqliteConnection::class, 'HY000', 1, 'syntax error', FALSE, FALSE])]
+  #[TestWith([SqliteConnection::class, 'HY000', 8, 'attempt to write a readonly database', FALSE, FALSE])]
+  public function testDriverErrors(string $class, string $state, int $code, string $message, bool $missing, bool $race): void {
+    $connection = (new \ReflectionClass($class))->newInstanceWithoutConstructor();
+    $previous = new \PDOException($message);
+    $previous->errorInfo = [$state, $code, $message];
+    $exception = new DatabaseExceptionWrapper($message, 0, $previous);
+    $this->assertSame($missing, (new \ReflectionMethod($connection, 'isMissingTableException'))->invoke($connection, $exception));
+    $this->assertSame($race, (new \ReflectionMethod($connection, 'isTableCreationRace'))->invoke($connection, $exception));
+  }
 
   /**
    * Tests that a missing table is created and the operation retried once.

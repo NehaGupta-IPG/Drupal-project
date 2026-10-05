@@ -83,15 +83,10 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
         if (!isset($identifier)) {
           $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
         }
-        try {
-          $this->connection->delete(static::TABLE_NAME)
-            ->condition('event', $name)
-            ->condition('identifier', $identifier)
-            ->execute();
-        }
-        catch (\Exception $e) {
-          $this->catchException($e);
-        }
+        $this->connection->delete(static::TABLE_NAME)
+          ->condition('event', $name)
+          ->condition('identifier', $identifier)
+          ->execute();
       },
     );
   }
@@ -104,15 +99,10 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
       static::TABLE_NAME,
       $this->schemaDefinition(),
       function () use ($name, $prefix) {
-        try {
-          $this->connection->delete(static::TABLE_NAME)
-            ->condition('event', $name)
-            ->condition('identifier', $prefix . '-%', 'LIKE')
-            ->execute();
-        }
-        catch (\Exception $e) {
-          $this->catchException($e);
-        }
+        $this->connection->delete(static::TABLE_NAME)
+          ->condition('event', $name)
+          ->condition('identifier', $prefix . '-%', 'LIKE')
+          ->execute();
       },
     );
   }
@@ -148,14 +138,9 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
       static::TABLE_NAME,
       $this->schemaDefinition(),
       function () {
-        try {
-          $this->connection->delete(static::TABLE_NAME)
-            ->condition('expiration', $this->time->getRequestTime(), '<')
-            ->execute();
-        }
-        catch (\Exception $e) {
-          $this->catchException($e);
-        }
+        $this->connection->delete(static::TABLE_NAME)
+          ->condition('expiration', $this->time->getRequestTime(), '<')
+          ->execute();
       },
     );
   }
@@ -171,8 +156,13 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
    *   The exception.
    *
    * @throws \Exception
+   *
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
+   *   Connection::executeAndCreateTableIfNeeded() instead.
+   * @see https://www.drupal.org/node/3626977
    */
   protected function catchException(\Exception $e) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/3626977', E_USER_DEPRECATED);
     if ($this->connection->schema()->tableExists(static::TABLE_NAME)) {
       throw $e;
     }
