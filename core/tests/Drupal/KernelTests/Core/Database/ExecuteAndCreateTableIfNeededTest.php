@@ -6,7 +6,6 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
@@ -39,13 +38,7 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
     ]);
     $result = $this->connection->executeAndCreateTableIfNeeded($table, $definition, function () use ($table, &$attempts): string {
       $attempts++;
-      // Bypass query() so a PostgreSQL failure really aborts the transaction.
-      try {
-        $this->connection->getClientConnection()->exec('INSERT INTO ' . $this->connection->getFullQualifiedTableName($table) . ' (id) VALUES (1)');
-      }
-      catch (\PDOException $e) {
-        throw new DatabaseExceptionWrapper($e->getMessage(), 0, $e);
-      }
+      $this->connection->query('INSERT INTO {' . $table . '} ([id]) VALUES (1)');
       return 'inserted';
     });
     $this->assertSame('inserted', $result);
@@ -91,12 +84,9 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
     ];
     $schema->expects($this->once())->method('createTable')->with($table, $definition)->willReturnCallback(function () use ($table, $other, $definition): void {
       $other->schema()->createTable($table, $definition);
-      try {
-        $this->connection->getClientConnection()->exec('CREATE TABLE ' . $this->connection->getFullQualifiedTableName($table) . ' (id int NOT NULL)');
-      }
-      catch (\PDOException $e) {
-        throw new DatabaseExceptionWrapper($e->getMessage(), 0, $e);
-      }
+      // Skip the existence check in Schema::createTable(), so the statement
+      // fails like it does when the race is lost.
+      $this->connection->query('CREATE TABLE {' . $table . '} ([id] int NOT NULL)');
     });
     $property = new \ReflectionProperty($this->connection, 'schema');
     $property->setValue($this->connection, $schema);

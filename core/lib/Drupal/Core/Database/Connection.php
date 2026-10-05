@@ -1264,22 +1264,26 @@ abstract class Connection {
       return $operation();
     }
     catch (DatabaseException $e) {
-      if (!$this->isMissingTableException($e) || $this->schema()->tableExists($table)) {
+      if (!$this->isMissingTableException($e)) {
         throw $e;
       }
     }
-    try {
-      if ($table_schema instanceof SchemaDefinition) {
-        $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table));
+    // Another process may have created the table after the operation failed,
+    // in which case only the retry is needed.
+    if (!$this->schema()->tableExists($table)) {
+      try {
+        if ($table_schema instanceof SchemaDefinition) {
+          $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table));
+        }
+        else {
+          $this->schema()->createTable($table, $table_schema);
+        }
       }
-      else {
-        $this->schema()->createTable($table, $table_schema);
-      }
-    }
-    catch (DatabaseException $e) {
-      // Recover only if another process created the table concurrently.
-      if (!$this->schema()->tableExists($table) || !$this->isTableCreationRace($e)) {
-        throw $e;
+      catch (DatabaseException $e) {
+        // Recover only if another process created the table concurrently.
+        if (!$this->schema()->tableExists($table) || !$this->isTableCreationRace($e)) {
+          throw $e;
+        }
       }
     }
     return $operation();

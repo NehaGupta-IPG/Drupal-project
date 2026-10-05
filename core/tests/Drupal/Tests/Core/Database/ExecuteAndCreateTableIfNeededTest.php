@@ -11,6 +11,7 @@ use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\mysqli\Driver\Database\mysqli\Connection as MysqliConnection;
 use Drupal\pgsql\Driver\Database\pgsql\Connection as PgsqlConnection;
 use Drupal\sqlite\Driver\Database\sqlite\Connection as SqliteConnection;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
@@ -35,6 +36,7 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
   #[TestWith([StubConnection::class, '42S01', 1050, 'Table exists', FALSE, TRUE])]
   #[TestWith([PgsqlConnection::class, '42P01', 7, 'Missing table', TRUE, FALSE])]
   #[TestWith([PgsqlConnection::class, '42P07', 7, 'Table exists', FALSE, TRUE])]
+  #[TestWith([PgsqlConnection::class, '42710', 7, 'Type exists', FALSE, TRUE])]
   #[TestWith([PgsqlConnection::class, '23505', 7, 'pg_type_typname_nsp_index', FALSE, TRUE])]
   #[TestWith([PgsqlConnection::class, '23505', 7, 'other_constraint', FALSE, FALSE])]
   #[TestWith([PgsqlConnection::class, '42501', 7, 'Permission denied', FALSE, FALSE])]
@@ -49,6 +51,44 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
     $exception = new DatabaseExceptionWrapper($message, 0, $previous);
     $this->assertSame($missing, (new \ReflectionMethod($connection, 'isMissingTableException'))->invoke($connection, $exception));
     $this->assertSame($race, (new \ReflectionMethod($connection, 'isTableCreationRace'))->invoke($connection, $exception));
+  }
+
+  /**
+   * Tests that mysqli errors are recognized.
+   */
+  #[TestWith(['42S02', 1146, TRUE, FALSE])]
+  #[TestWith(['42S01', 1050, FALSE, TRUE])]
+  #[TestWith(['42000', 1142, FALSE, FALSE])]
+  public function testMysqliErrors(string $state, int $code, bool $missing, bool $race): void {
+    $connection = (new \ReflectionClass(MysqliConnection::class))->newInstanceWithoutConstructor();
+    $previous = new \mysqli_sql_exception('Error', $code);
+    (new \ReflectionProperty($previous, 'sqlstate'))->setValue($previous, $state);
+    $exception = new DatabaseExceptionWrapper('Error', 0, $previous);
+    $this->assertSame($missing, (new \ReflectionMethod($connection, 'isMissingTableException'))->invoke($connection, $exception));
+    $this->assertSame($race, (new \ReflectionMethod($connection, 'isTableCreationRace'))->invoke($connection, $exception));
+  }
+
+  /**
+   * Tests a retry without creation when another process created the table.
+   */
+  public function testTableCreatedAfterFailure(): void {
+    $connection = $this->getMockBuilder(StubConnection::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods(['schema'])
+      ->getMock();
+    $schema = $this->createMock(Schema::class);
+    $schema->expects($this->once())->method('tableExists')->with('lazy')->willReturn(TRUE);
+    $schema->expects($this->never())->method('createTable');
+    $connection->expects($this->once())->method('schema')->willReturn($schema);
+    $attempts = 0;
+    $result = $connection->executeAndCreateTableIfNeeded('lazy', [], function () use (&$attempts): string {
+      if (++$attempts === 1) {
+        throw $this->missingTableException();
+      }
+      return 'result';
+    });
+    $this->assertSame('result', $result);
+    $this->assertSame(2, $attempts);
   }
 
   /**

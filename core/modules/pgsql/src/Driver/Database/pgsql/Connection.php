@@ -355,10 +355,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     $previous = $exception->getPrevious();
     if ($previous instanceof \PDOException) {
       $state = $previous->errorInfo[0] ?? $previous->getCode();
-      // Concurrent CREATE TABLE statements can also collide on the catalog's
-      // type-name constraint before the table is visible.
+      // Concurrent CREATE TABLE statements can also collide on the table's
+      // row type, either as a duplicate object or on the catalog's type-name
+      // constraint, before the table is visible.
       // cspell:ignore typname
-      if ($state === '42P07' || ($state === '23505' && str_contains($previous->getMessage(), 'pg_type_typname_nsp_index'))) {
+      if ($state === '42P07' || $state === '42710' || ($state === '23505' && str_contains($previous->getMessage(), 'pg_type_typname_nsp_index'))) {
         return TRUE;
       }
     }
