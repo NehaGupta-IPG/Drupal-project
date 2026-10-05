@@ -210,8 +210,8 @@ class ImageThemeHooks {
     $original_image = $this->imageFactory->get($original_path);
     $variables['original'] = [
       'url' => $this->fileUrlGenerator->generateString($original_path),
-      'width' => $original_image->getWidth(),
-      'height' => $original_image->getHeight(),
+      'width' => (int) $original_image->getWidth(),
+      'height' => (int) $original_image->getHeight(),
     ];
     if (empty($variables['original']['width']) || empty($variables['original']['height'])) {
       $variables['preview']['original']['width'] = $sample_width;
@@ -242,8 +242,8 @@ class ImageThemeHooks {
 
     $variables['derivative'] = [
       'url' => $this->fileUrlGenerator->generateString($preview_file),
-      'width' => $preview_image->getWidth(),
-      'height' => $preview_image->getHeight(),
+      'width' => (int) $preview_image->getWidth(),
+      'height' => (int) $preview_image->getHeight(),
     ];
     if (empty($variables['derivative']['width']) || empty($variables['derivative']['height'])) {
       $variables['preview']['derivative']['width'] = $sample_width;
