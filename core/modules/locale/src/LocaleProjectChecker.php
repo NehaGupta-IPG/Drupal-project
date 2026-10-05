@@ -6,6 +6,7 @@ namespace Drupal\locale;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Session\AccountProxyInterface;
@@ -13,6 +14,8 @@ use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
+use Drupal\locale\Model\SourceType;
+use Drupal\locale\Model\TranslationUpdateMode;
 
 /**
  * Provide Locale Project Checker helper methods.
@@ -31,6 +34,8 @@ class LocaleProjectChecker {
     protected readonly ModuleHandlerInterface $moduleHandler,
     protected readonly TranslationInterface $translationManager,
     protected readonly AccountProxyInterface $currentUser,
+    protected readonly ConfigFactoryInterface $configFactory,
+    protected readonly LocaleLanguages $localeLanguages,
   ) {}
 
   /**
@@ -42,7 +47,7 @@ class LocaleProjectChecker {
    *   Array of language codes. Defaults to all translatable languages.
    */
   public function checkProjects(array $projects, array $langcodes = []): void {
-    if (locale_translation_use_remote_source()) {
+    if ($this->configFactory->get('locale.settings')->get('translation.use_source') == TranslationUpdateMode::RemoteAndLocal->value) {
       // Retrieve the status of both remote and local translation sources by
       // using a batch process.
       $this->triggerBatch($projects, $langcodes);
@@ -50,7 +55,7 @@ class LocaleProjectChecker {
     else {
       // Retrieve and save the status of local translations only.
       $this->checkLocalProjects($projects, $langcodes);
-      $this->state->set('locale.translation_last_checked', $this->time->getRequestTime());
+      $this->localeSource->updateLastChecked();
     }
   }
 
@@ -74,17 +79,18 @@ class LocaleProjectChecker {
    *   Array of language codes. Defaults to all translatable languages.
    */
   public function checkLocalProjects(array $projects, array $langcodes = []): void {
-    $projects = $this->localeProjectRepository->getMultiple($projects);
-    $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
+    $langcodes = $langcodes ?: array_keys($this->localeLanguages->getTranslatableLanguages());
 
     // For each project and each language we check if a local po file is
     // available. When found the source object is updated with the appropriate
     // type and timestamp of the po file.
-    foreach ($projects as $name => $project) {
+    foreach ($projects as $project) {
       foreach ($langcodes as $langcode) {
-        $source = $this->localeSource->sourceBuild($project, $langcode);
+        $source = $this->localeSource->loadSource($project, $langcode);
         $file = $this->localeSource->sourceCheckFile($source);
-        locale_translation_status_save($name, $langcode, LOCALE_TRANSLATION_LOCAL, $file);
+        if ($file) {
+          $this->localeSource->saveSource($project, $langcode, SourceType::Local->value, $file);
+        }
       }
     }
   }
@@ -94,9 +100,8 @@ class LocaleProjectChecker {
    *
    * The batch process fetches the state of both local and (if configured)
    * remote translation files. The data of the most recent translation is
-   * stored per project and per language. This data is stored in a state
-   * variable 'locale.translation_status'. The timestamp it was last updated is
-   * stored in the state variable 'locale.translation_last_checked'.
+   * stored per project and per language. The data for this is maintained
+   * by \Drupal\locale\LocaleSource.
    *
    * @param array $projects
    *   Array of project names for which to check the state of translation files.
@@ -105,7 +110,7 @@ class LocaleProjectChecker {
    *   Array of language codes. Defaults to all translatable languages.
    */
   public function triggerBatch(array $projects, array $langcodes = []): void {
-    $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
+    $langcodes = $langcodes ?: array_keys($this->localeLanguages->getTranslatableLanguages());
     $options = LocaleDefaultOptions::updateOptions();
 
     $operations = $this->localeFetch->getStatusOperations($projects, $langcodes, $options);
@@ -153,7 +158,7 @@ class LocaleProjectChecker {
       if (!isset($results['failed_files']) && !isset($results['files'])) {
         $this->messenger->addStatus($this->t('Nothing to check.'));
       }
-      $this->state->set('locale.translation_last_checked', $this->time->getRequestTime());
+      $this->localeSource->updateLastChecked();
     }
     else {
       $this->messenger->addError($this->t('An error occurred trying to check available interface translation updates.'));

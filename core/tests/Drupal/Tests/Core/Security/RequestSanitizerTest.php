@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Security;
 
+// cspell:ignore errfile errline
+
 use Drupal\Core\Security\RequestSanitizer;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -37,7 +39,11 @@ class RequestSanitizerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->errors = [];
-    set_error_handler([$this, "errorHandler"]);
+    // Catches and logs errors to $this->errors.
+    set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline): bool {
+      $this->errors[] = compact('errno', 'errstr');
+      return TRUE;
+    });
   }
 
   /**
@@ -278,8 +284,8 @@ class RequestSanitizerTest extends UnitTestCase {
 
     $request = RequestSanitizer::sanitize($request, [], TRUE);
 
-    $this->assertSame($destination, $request->query->get('destination', NULL));
-    $this->assertNull($request->request->get('destination', NULL));
+    $this->assertSame($destination, $request->query->get('destination'));
+    $this->assertNull($request->request->get('destination'));
     $this->assertSame($destination, $_GET['destination']);
     $this->assertSame($destination, $_REQUEST['destination']);
     $this->assertArrayNotHasKey('destination', $_POST);
@@ -299,8 +305,8 @@ class RequestSanitizerTest extends UnitTestCase {
 
     $request = RequestSanitizer::sanitize($request, [], TRUE);
 
-    $this->assertNull($request->request->get('destination', NULL));
-    $this->assertNull($request->query->get('destination', NULL));
+    $this->assertNull($request->request->get('destination'));
+    $this->assertNull($request->query->get('destination'));
     $this->assertArrayNotHasKey('destination', $_POST);
     $this->assertArrayNotHasKey('destination', $_REQUEST);
     $this->assertArrayNotHasKey('destination', $_GET);
@@ -344,8 +350,8 @@ class RequestSanitizerTest extends UnitTestCase {
 
     $request = RequestSanitizer::sanitize($request, [], TRUE);
 
-    $this->assertSame($destination, $request->request->get('destination', NULL));
-    $this->assertNull($request->query->get('destination', NULL));
+    $this->assertSame($destination, $request->request->get('destination'));
+    $this->assertNull($request->query->get('destination'));
     $this->assertSame($destination, $_POST['destination']);
     $this->assertSame($destination, $_REQUEST['destination']);
     $this->assertArrayNotHasKey('destination', $_GET);
@@ -365,8 +371,8 @@ class RequestSanitizerTest extends UnitTestCase {
 
     $request = RequestSanitizer::sanitize($request, [], TRUE);
 
-    $this->assertNull($request->request->get('destination', NULL));
-    $this->assertNull($request->query->get('destination', NULL));
+    $this->assertNull($request->request->get('destination'));
+    $this->assertNull($request->query->get('destination'));
     $this->assertArrayNotHasKey('destination', $_POST);
     $this->assertArrayNotHasKey('destination', $_REQUEST);
     $this->assertArrayNotHasKey('destination', $_GET);
@@ -424,18 +430,6 @@ class RequestSanitizerTest extends UnitTestCase {
     // External URL is not allowed.
     $data[] = ['http://example.com'];
     return $data;
-  }
-
-  /**
-   * Catches and logs errors to $this->errors.
-   *
-   * @param int $errno
-   *   The severity level of the error.
-   * @param string $errstr
-   *   The error message.
-   */
-  public function errorHandler($errno, $errstr): void {
-    $this->errors[] = compact('errno', 'errstr');
   }
 
   /**
