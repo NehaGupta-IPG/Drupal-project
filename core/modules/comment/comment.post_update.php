@@ -27,7 +27,9 @@ function comment_post_update_views_status_filter(array &$sandbox): ?Translatable
   if (!\Drupal::moduleHandler()->moduleExists('views')) {
     return NULL;
   }
-  $updater = \Drupal::classResolver(CommentViewsConfigUpdater::class);
+  /** @var \Drupal\comment\CommentViewsConfigUpdater $updater */
+  $updater = \Drupal::service(CommentViewsConfigUpdater::class);
+  $updater->setDeprecationsEnabled(FALSE);
   $sandbox['comment_skipped_filters'] ??= [];
   $message = \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($updater, &$sandbox): bool {
     $skipped = [];

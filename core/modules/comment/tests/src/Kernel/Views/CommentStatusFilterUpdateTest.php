@@ -14,12 +14,14 @@ use Drupal\views\Entity\View;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the update path for numeric filters on comment field status columns.
  *
  * @see comment_post_update_views_status_filter()
+ * @see \Drupal\comment\Hook\CommentViewsHooks::viewPresave()
  */
 #[Group('comment')]
 #[RunTestsInSeparateProcesses]
@@ -117,7 +119,7 @@ class CommentStatusFilterUpdateTest extends KernelTestBase {
   }
 
   /**
-   * Creates a view with the given filters per display.
+   * Builds an unsaved view with the given filters per display.
    *
    * @param string $id
    *   The view ID.
@@ -125,7 +127,7 @@ class CommentStatusFilterUpdateTest extends KernelTestBase {
    *   Filters keyed by display ID. The default display is always created; an
    *   "embed" display is created with overridden filters when given.
    */
-  protected function createView(string $id, array $filters): void {
+  protected function buildView(string $id, array $filters): View {
     $display = [
       'default' => [
         'id' => 'default',
@@ -160,13 +162,32 @@ class CommentStatusFilterUpdateTest extends KernelTestBase {
         ],
       ];
     }
-    View::create([
+    return View::create([
       'id' => $id,
       'label' => $id,
       'base_table' => 'node_field_data',
       'base_field' => 'nid',
       'display' => $display,
-    ])->save();
+    ]);
+  }
+
+  /**
+   * Stores a view with the given filters as it was saved before the update.
+   *
+   * The configuration is written directly, so that hook_view_presave() does
+   * not convert the filters.
+   *
+   * @param string $id
+   *   The view ID.
+   * @param array $filters
+   *   Filters keyed by display ID.
+   *
+   * @see self::buildView()
+   */
+  protected function createView(string $id, array $filters): void {
+    $this->config('views.view.' . $id)
+      ->setData($this->buildView($id, $filters)->toArray())
+      ->save();
   }
 
   /**
@@ -382,6 +403,91 @@ class CommentStatusFilterUpdateTest extends KernelTestBase {
       $this->assertSame($saved[$filter_id], $this->getFilter('legacy', $filter_id));
     }
     $this->assertSame('node_comment', $this->getFilter('legacy', 'converted')['plugin_id']);
+  }
+
+  /**
+   * Tests that saving a view converts numeric comment status filters.
+   */
+  #[IgnoreDeprecations]
+  public function testPresaveConversion(): void {
+    $this->expectUserDeprecationMessage('The update to convert numeric filters on comment field status columns for view "legacy" is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/project/drupal/issues/3031364');
+    $nid = [
+      'id' => 'nid',
+      'table' => 'node_field_data',
+      'field' => 'nid',
+      'plugin_id' => 'numeric',
+      'operator' => '>',
+      'value' => ['min' => '', 'max' => '', 'value' => '0'],
+    ];
+    $timestamp = [
+      'id' => 'comment_last_comment_timestamp',
+      'table' => 'node__comment',
+      'field' => 'comment_last_comment_timestamp',
+      'plugin_id' => 'numeric',
+      'operator' => '>=',
+      'value' => ['min' => '', 'max' => '', 'value' => '0'],
+    ];
+    $this->buildView('legacy', [
+      'default' => [
+        'nid' => $nid,
+        'comment_status' => $this->legacyFilter('comment', 'between', ['min' => '1', 'max' => '2']),
+        'comment_other_status' => $this->legacyFilter('comment_other', '!=', ['value' => '0']),
+      ],
+      'embed' => [
+        'comment_last_comment_timestamp' => $timestamp,
+        'comment_status' => $this->legacyFilter('comment', '=', ['value' => '0']),
+      ],
+    ])->save();
+
+    $filter = $this->getFilter('legacy', 'comment_status');
+    $this->assertSame('node_comment', $filter['plugin_id']);
+    $this->assertSame('in', $filter['operator']);
+    $this->assertSame([2 => '2', 1 => '1'], $filter['value']);
+    $filter = $this->getFilter('legacy', 'comment_other_status');
+    $this->assertSame('node_comment', $filter['plugin_id']);
+    $this->assertSame('not in', $filter['operator']);
+    $this->assertSame([0 => '0'], $filter['value']);
+    $filter = $this->getFilter('legacy', 'comment_status', 'embed');
+    $this->assertSame('node_comment', $filter['plugin_id']);
+    $this->assertSame('in', $filter['operator']);
+    $this->assertSame([0 => '0'], $filter['value']);
+    $this->assertSame($nid, $this->getFilter('legacy', 'nid'));
+    $this->assertSame($timestamp, $this->getFilter('legacy', 'comment_last_comment_timestamp', 'embed'));
+
+    $this->assertSame(['closed-open'], $this->executeView('legacy'));
+    $this->assertSame(['hidden-closed'], $this->executeView('legacy', 'embed'));
+  }
+
+  /**
+   * Tests that saving a view leaves other filters unchanged.
+   */
+  public function testPresaveUnchanged(): void {
+    $converted = $this->legacyFilter('comment', '=');
+    unset($converted['expose']['min_placeholder'], $converted['expose']['max_placeholder'], $converted['expose']['placeholder'], $converted['expose']['min_label'], $converted['expose']['max_label']);
+    $converted['expose']['reduce'] = FALSE;
+    $converted['plugin_id'] = 'node_comment';
+    $converted['operator'] = 'in';
+    $converted['value'] = [2 => '2'];
+    $filters = [
+      'nid' => [
+        'id' => 'nid',
+        'table' => 'node_field_data',
+        'field' => 'nid',
+        'plugin_id' => 'numeric',
+        'operator' => '>',
+        'value' => ['min' => '', 'max' => '', 'value' => '0'],
+      ],
+      'comment_status' => $converted,
+      'comment_other_status' => $this->legacyFilter('comment_other', 'regular_expression', [
+        'min' => '',
+        'max' => '',
+        'value' => '^0$',
+      ]),
+    ];
+    $this->buildView('legacy', ['default' => $filters])->save();
+
+    $this->assertSame($filters, View::load('legacy')->getDisplay('default')['display_options']['filters']);
+    $this->assertSame(['open-hidden'], $this->executeView('legacy'));
   }
 
 }

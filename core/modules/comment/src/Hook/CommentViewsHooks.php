@@ -2,10 +2,12 @@
 
 namespace Drupal\comment\Hook;
 
+use Drupal\comment\CommentViewsConfigUpdater;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldStorageConfigInterface;
+use Drupal\views\ViewEntityInterface;
 
 /**
  * Hook implementations for comment.
@@ -13,6 +15,23 @@ use Drupal\field\FieldStorageConfigInterface;
 class CommentViewsHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    protected readonly CommentViewsConfigUpdater $commentViewsConfigUpdater,
+  ) {
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_presave() for views.
+   *
+   * Converts numeric filters on comment field status columns in view
+   * configuration that was not updated by
+   * comment_post_update_views_status_filter().
+   */
+  #[Hook('view_presave')]
+  public function viewPresave(ViewEntityInterface $view): void {
+    $this->commentViewsConfigUpdater->processStatusFilters($view);
+  }
 
   /**
    * Implements hook_field_views_data().

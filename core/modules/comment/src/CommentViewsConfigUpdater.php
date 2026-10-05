@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\comment;
 
-use Drupal\Core\DependencyInjection\AutowireTrait;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\views\ViewEntityInterface;
@@ -15,18 +13,38 @@ use Drupal\views\ViewEntityInterface;
  *
  * @internal
  */
-class CommentViewsConfigUpdater implements ContainerInjectionInterface {
-
-  use AutowireTrait;
+class CommentViewsConfigUpdater {
 
   /**
-   * The status columns of comment fields, keyed by table and column name.
+   * Flag determining whether deprecations should be triggered.
    */
-  protected array $statusColumns;
+  protected bool $deprecationsEnabled = TRUE;
+
+  /**
+   * Stores which deprecations were triggered, keyed by view ID.
+   */
+  protected array $triggeredDeprecations = [];
 
   public function __construct(
     protected readonly EntityTypeManagerInterface $entityTypeManager,
   ) {
+  }
+
+  /**
+   * Sets the deprecations enabling status.
+   *
+   * @param bool $enabled
+   *   Whether deprecations should be enabled.
+   */
+  public function setDeprecationsEnabled(bool $enabled): void {
+    $this->deprecationsEnabled = $enabled;
+  }
+
+  /**
+   * Whether deprecations are enabled.
+   */
+  public function areDeprecationsEnabled(): bool {
+    return $this->deprecationsEnabled;
   }
 
   /**
@@ -37,7 +55,8 @@ class CommentViewsConfigUpdater implements ContainerInjectionInterface {
    * "not in" operator and the commenting statuses that match the numeric
    * condition. The "empty" and "not empty" operators are kept. A filter is
    * left unchanged when no statuses match or when its operator, such as
-   * "regular_expression", has no equivalent.
+   * "regular_expression", has no equivalent. A deprecation is triggered when
+   * a filter is converted and deprecations are enabled.
    *
    * @param \Drupal\views\ViewEntityInterface $view
    *   The view to update.
@@ -48,12 +67,16 @@ class CommentViewsConfigUpdater implements ContainerInjectionInterface {
    *   Whether the view was updated.
    */
   public function processStatusFilters(ViewEntityInterface $view, array &$skipped = []): bool {
-    $columns = $this->getStatusColumns();
     $changed = FALSE;
     $displays = $view->get('display');
     foreach ($displays as $display_id => $display) {
       foreach ($display['display_options']['filters'] ?? [] as $filter_id => $filter) {
-        if (($filter['plugin_id'] ?? NULL) !== 'numeric' || !isset($columns[$filter['table'] ?? ''][$filter['field'] ?? ''])) {
+        if (($filter['plugin_id'] ?? NULL) !== 'numeric') {
+          continue;
+        }
+        // Only look up the comment fields when a view has a numeric filter.
+        $columns ??= $this->getStatusColumns();
+        if (!isset($columns[$filter['table'] ?? ''][$filter['field'] ?? ''])) {
           continue;
         }
         $filter = $this->convertFilter($filter);
@@ -68,6 +91,13 @@ class CommentViewsConfigUpdater implements ContainerInjectionInterface {
     if ($changed) {
       $view->set('display', $displays);
     }
+
+    $deprecations_triggered = &$this->triggeredDeprecations[$view->id()];
+    if ($this->areDeprecationsEnabled() && $changed && !$deprecations_triggered) {
+      $deprecations_triggered = TRUE;
+      @trigger_error(sprintf('The update to convert numeric filters on comment field status columns for view "%s" is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/project/drupal/issues/3031364', $view->id()), E_USER_DEPRECATED);
+    }
+
     return $changed;
   }
 
@@ -78,25 +108,26 @@ class CommentViewsConfigUpdater implements ContainerInjectionInterface {
    *   An array keyed by table name, then by column name.
    */
   protected function getStatusColumns(): array {
-    if (!isset($this->statusColumns)) {
-      $this->statusColumns = [];
-      /** @var \Drupal\field\FieldStorageConfigInterface[] $field_storages */
-      $field_storages = $this->entityTypeManager->getStorage('field_storage_config')->loadByProperties(['type' => 'comment']);
-      foreach ($field_storages as $field_storage) {
-        $entity_type_id = $field_storage->getTargetEntityTypeId();
-        $storage = $this->entityTypeManager->getStorage($entity_type_id);
-        if (!$storage instanceof SqlEntityStorageInterface) {
-          continue;
-        }
-        $table_mapping = $storage->getTableMapping();
-        $column = $table_mapping->getFieldColumnName($field_storage, 'status');
-        $this->statusColumns[$table_mapping->getDedicatedDataTableName($field_storage)][$column] = TRUE;
-        if ($this->entityTypeManager->getDefinition($entity_type_id)->isRevisionable()) {
-          $this->statusColumns[$table_mapping->getDedicatedRevisionTableName($field_storage)][$column] = TRUE;
-        }
+    $columns = [];
+    if (!$this->entityTypeManager->hasDefinition('field_storage_config')) {
+      return $columns;
+    }
+    /** @var \Drupal\field\FieldStorageConfigInterface[] $field_storages */
+    $field_storages = $this->entityTypeManager->getStorage('field_storage_config')->loadByProperties(['type' => 'comment']);
+    foreach ($field_storages as $field_storage) {
+      $entity_type_id = $field_storage->getTargetEntityTypeId();
+      $storage = $this->entityTypeManager->getStorage($entity_type_id);
+      if (!$storage instanceof SqlEntityStorageInterface) {
+        continue;
+      }
+      $table_mapping = $storage->getTableMapping();
+      $column = $table_mapping->getFieldColumnName($field_storage, 'status');
+      $columns[$table_mapping->getDedicatedDataTableName($field_storage)][$column] = TRUE;
+      if ($this->entityTypeManager->getDefinition($entity_type_id)->isRevisionable()) {
+        $columns[$table_mapping->getDedicatedRevisionTableName($field_storage)][$column] = TRUE;
       }
     }
-    return $this->statusColumns;
+    return $columns;
   }
 
   /**
