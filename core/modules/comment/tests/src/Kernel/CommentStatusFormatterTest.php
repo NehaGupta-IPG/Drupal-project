@@ -6,6 +6,8 @@ namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\CommentingStatus;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\StringTranslation\Translator\StaticTranslation;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -69,6 +71,24 @@ class CommentStatusFormatterTest extends KernelTestBase {
     $node->get('comment')->status = $status;
     $build = $node->get('comment')->view(['type' => 'comment_status']);
     $this->assertSame($expected, trim((string) $this->container->get('renderer')->renderRoot($build[0])));
+  }
+
+  /**
+   * Tests that the formatter translates the status label.
+   */
+  public function testStatusLabelTranslated(): void {
+    $translation = $this->container->get('string_translation');
+    $translation->addTranslator(new StaticTranslation([
+      'fr' => ['' => ['Closed' => 'Fermé']],
+    ]));
+    $translation->setDefaultLangcode('fr');
+
+    $node = Node::create(['type' => 'page', 'title' => 'Test']);
+    $node->get('comment')->status = CommentingStatus::Closed->value;
+    $build = $node->get('comment')->view(['type' => 'comment_status']);
+    $this->assertInstanceOf(TranslatableMarkup::class, $build[0]['#plain_text']);
+    $this->assertSame('Closed', $build[0]['#plain_text']->getUntranslatedString());
+    $this->assertSame('Fermé', trim((string) $this->container->get('renderer')->renderRoot($build[0])));
   }
 
   /**

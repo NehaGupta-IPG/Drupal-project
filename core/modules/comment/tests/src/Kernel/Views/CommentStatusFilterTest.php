@@ -8,6 +8,7 @@ use Drupal\comment\CommentingStatus;
 use Drupal\comment\Plugin\views\field\CommentStatus;
 use Drupal\comment\Plugin\views\filter\NodeComment;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Core\StringTranslation\Translator\StaticTranslation;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
@@ -155,6 +156,25 @@ class CommentStatusFilterTest extends KernelTestBase {
   }
 
   /**
+   * Tests that the comment status filter offers the status options.
+   */
+  public function testCommentStatusFilterOptions(): void {
+    $view = NULL;
+    $this->executeFilteredView('comment', [CommentingStatus::Open->value], $view);
+    $options = $view->filter['comment_status']->getValueOptions();
+    $this->assertSame([
+      CommentingStatus::Open->value,
+      CommentingStatus::Closed->value,
+      CommentingStatus::Hidden->value,
+    ], array_keys($options));
+    $this->assertSame([
+      CommentingStatus::Open->value => 'Open',
+      CommentingStatus::Closed->value => 'Closed',
+      CommentingStatus::Hidden->value => 'Hidden',
+    ], array_map('strval', $options));
+  }
+
+  /**
    * Tests that the comment status field displays the status labels.
    */
   public function testCommentStatusField(): void {
@@ -175,6 +195,28 @@ class CommentStatusFilterTest extends KernelTestBase {
       }
       $this->assertSame($labels, $actual, $field_name);
     }
+  }
+
+  /**
+   * Tests that the comment status field translates the status labels.
+   */
+  public function testCommentStatusFieldTranslated(): void {
+    $translation = $this->container->get('string_translation');
+    $translation->addTranslator(new StaticTranslation([
+      'fr' => ['' => ['Open' => 'Ouvert', 'Closed' => 'Fermé', 'Hidden' => 'Masqué']],
+    ]));
+    $translation->setDefaultLangcode('fr');
+
+    $this->createNodeWithStatuses('open-hidden', CommentingStatus::Open, CommentingStatus::Hidden);
+    $this->createNodeWithStatuses('closed-open', CommentingStatus::Closed, CommentingStatus::Open);
+    $this->createNodeWithStatuses('hidden-closed', CommentingStatus::Hidden, CommentingStatus::Closed);
+
+    $view = $this->executeStatusFieldView('comment');
+    $actual = [];
+    foreach ($view->result as $row) {
+      $actual[$row->_entity->label()] = (string) $view->field['comment_status']->advancedRender($row);
+    }
+    $this->assertSame(['open-hidden' => 'Ouvert', 'closed-open' => 'Fermé', 'hidden-closed' => 'Masqué'], $actual);
   }
 
   /**
