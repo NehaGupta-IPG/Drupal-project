@@ -37,12 +37,14 @@ class TransactionTest extends DriverSpecificTransactionTestBase {
     catch (\PDOException $e) {
       $this->assertSame('23505', $e->getCode());
     }
-    $this->assertSame($version + 1, $manager->getTransactionVersion());
+    finally {
+      // Clean up the stack so the Transaction object can be destructed.
+      $version_after_commit = $manager->getTransactionVersion();
+      $manager->voidClientTransaction();
+      unset($transaction);
+    }
+    $this->assertSame($version + 1, $version_after_commit);
     $this->assertSame(0, (int) $this->connection->query('SELECT COUNT(*) FROM {test_deferred}')->fetchField());
-
-    // Clean up the stack so the Transaction object can be destructed.
-    $manager->voidClientTransaction();
-    unset($transaction);
   }
 
 }

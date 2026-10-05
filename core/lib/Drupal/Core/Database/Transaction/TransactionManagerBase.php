@@ -491,7 +491,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         // Rollback the client transaction to the savepoint when the Drupal
         // transaction is not a root one. Then, release the savepoint too. The
         // client connection remains active.
-        $this->transactionVersion++;
         $this->rollbackClientSavepoint($name);
         $this->releaseClientSavepoint($name);
         // The Transaction object remains open, and when it will get destructed
