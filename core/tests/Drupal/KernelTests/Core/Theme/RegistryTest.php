@@ -256,4 +256,27 @@ class RegistryTest extends KernelTestBase {
     $this->assertEquals($expected, array_values($registry['theme_test_registered_by_module']['preprocess functions']));
   }
 
+  /**
+   * Tests that resetting the registry clears the fallback 'core' theme cache.
+   */
+  public function testResetFallbackCoreTheme(): void {
+    // No theme installed, so initialization falls back to 'core' pseudo-theme.
+    $this->assertSame('core', \Drupal::theme()->getActiveTheme()->getName());
+
+    // Build the registry and the runtime registry. Make sure they are cached.
+    $registry = \Drupal::service(Registry::class);
+    $registry->get();
+    $registry->getRuntime()->get('theme_test_template_test');
+    $registry->destruct();
+
+    $this->assertNotFalse(\Drupal::cache()->get('theme_registry:core'));
+    $this->assertNotFalse(\Drupal::cache('bootstrap')->get('theme_registry:runtime:core'));
+
+    $registry->reset();
+
+    // Check that the fallback 'core' theme cache is cleared.
+    $this->assertFalse(\Drupal::cache()->get('theme_registry:core'));
+    $this->assertFalse(\Drupal::cache('bootstrap')->get('theme_registry:runtime:core'));
+  }
+
 }
