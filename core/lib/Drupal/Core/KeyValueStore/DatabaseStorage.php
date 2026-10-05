@@ -64,7 +64,7 @@ class DatabaseStorage extends StorageBase {
   public function has($key) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($key) {
         try {
           return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key', [
@@ -86,7 +86,7 @@ class DatabaseStorage extends StorageBase {
   public function getMultiple(array $keys) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($keys) {
         $values = [];
         try {
@@ -118,7 +118,7 @@ class DatabaseStorage extends StorageBase {
   public function getAll() {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () {
         try {
           $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection', [':collection' => $this->collection]);
@@ -145,7 +145,7 @@ class DatabaseStorage extends StorageBase {
   public function getAllKeys(): iterable {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () {
         try {
           $values = $this->connection->query(
@@ -190,7 +190,7 @@ class DatabaseStorage extends StorageBase {
   public function set($key, $value) {
     $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->doSet($key, $value),
     );
   }
@@ -237,7 +237,7 @@ class DatabaseStorage extends StorageBase {
     }
     $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->doSetMultiple($data),
     );
   }
@@ -274,7 +274,7 @@ class DatabaseStorage extends StorageBase {
   public function setIfNotExists($key, $value) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->doSetIfNotExists($key, $value),
     );
   }
@@ -285,7 +285,7 @@ class DatabaseStorage extends StorageBase {
   public function rename($key, $new_key) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($key, $new_key) {
         try {
           $this->connection->update($this->table)
@@ -307,7 +307,7 @@ class DatabaseStorage extends StorageBase {
   public function deleteMultiple(array $keys) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($keys) {
         // Delete in chunks when a large array is passed.
         while ($keys) {
@@ -331,7 +331,7 @@ class DatabaseStorage extends StorageBase {
   public function deleteAll() {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () {
         try {
           $this->connection->delete($this->table)

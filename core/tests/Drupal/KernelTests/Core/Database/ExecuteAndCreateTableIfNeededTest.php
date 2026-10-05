@@ -8,6 +8,11 @@ use Drupal\Core\Config\DatabaseStorage as ConfigDatabaseStorage;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -28,15 +33,12 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
   public function testExecution(bool $in_transaction): void {
     $transaction = $in_transaction ? $this->connection->startTransaction() : NULL;
     $attempts = 0;
-    $created = 0;
     $table = 'lazy_execution_test';
-    $result = $this->connection->executeAndCreateTableIfNeeded($table, function () use ($table, &$created): void {
-      $created++;
-      $this->connection->schema()->createTable($table, [
-        'fields' => ['id' => ['type' => 'int', 'not null' => TRUE]],
-        'primary key' => ['id'],
-      ]);
-    }, function () use ($table, &$attempts): string {
+    $definition = new Schema(SchemaDefinitionType::Storage, 'lazy_execution', [
+      new Table($table, [Column::int('id', notNull: TRUE)], primaryKey: new PrimaryKey(['id'])),
+      new Table('lazy_unrelated', [Column::int('id')]),
+    ]);
+    $result = $this->connection->executeAndCreateTableIfNeeded($table, $definition, function () use ($table, &$attempts): string {
       $attempts++;
       // Bypass query() so a PostgreSQL failure really aborts the transaction.
       try {
@@ -48,7 +50,7 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
       return 'inserted';
     });
     $this->assertSame('inserted', $result);
-    $this->assertSame(1, $created);
+    $this->assertFalse($this->connection->schema()->tableExists('lazy_unrelated'));
     $this->assertSame($in_transaction && !$this->connection->supportsLazyTableCreation() ? 1 : 2, $attempts);
     $transaction?->commitOrRelease();
     $this->assertSame('1', (string) $this->connection->select($table)->countQuery()->execute()->fetchField());
@@ -69,23 +71,34 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
     $info = Database::getConnectionInfo()['default'];
     Database::addConnectionInfo('lazy_race', 'default', $info);
     $other = Database::getConnection('default', 'lazy_race');
+    $original_schema = $this->connection->schema();
+    $schema = $this->getMockBuilder($original_schema::class)
+      ->setConstructorArgs([$this->connection])
+      ->onlyMethods(['createTable'])
+      ->getMock();
+    $definition = [
+      'fields' => ['id' => ['type' => 'int', 'not null' => TRUE]],
+      'primary key' => ['id'],
+    ];
+    $schema->expects($this->once())->method('createTable')->with($table, $definition)->willReturnCallback(function () use ($table, $other, $definition): void {
+      $other->schema()->createTable($table, $definition);
+      try {
+        $this->connection->getClientConnection()->exec('CREATE TABLE ' . $this->connection->getFullQualifiedTableName($table) . ' (id int NOT NULL)');
+      }
+      catch (\PDOException $e) {
+        throw new DatabaseExceptionWrapper($e->getMessage(), 0, $e);
+      }
+    });
+    $property = new \ReflectionProperty($this->connection, 'schema');
+    $property->setValue($this->connection, $schema);
     try {
-      $result = $this->connection->executeAndCreateTableIfNeeded($table, function () use ($table, $other): void {
-        $other->schema()->createTable($table, [
-          'fields' => ['id' => ['type' => 'int', 'not null' => TRUE]],
-          'primary key' => ['id'],
-        ]);
-        try {
-          $this->connection->getClientConnection()->exec('CREATE TABLE ' . $this->connection->getFullQualifiedTableName($table) . ' (id int NOT NULL)');
-        }
-        catch (\PDOException $e) {
-          throw new DatabaseExceptionWrapper($e->getMessage(), 0, $e);
-        }
-      }, fn() => $this->connection->insert($table)->fields(['id' => 1])->execute());
+      $result = $this->connection->executeAndCreateTableIfNeeded($table, $definition,
+        fn() => $this->connection->insert($table)->fields(['id' => 1])->execute());
       $this->assertNotFalse($result);
       $this->assertSame('1', (string) $this->connection->select($table)->countQuery()->execute()->fetchField());
     }
     finally {
+      $property->setValue($this->connection, $original_schema);
       Database::removeConnection('lazy_race');
     }
   }

@@ -6,11 +6,17 @@ namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Core\Database\Schema;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests execution with lazy table creation.
@@ -22,7 +28,9 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
   /**
    * Tests that a missing table is created and the operation retried once.
    */
-  public function testRetry(): void {
+  #[TestWith([FALSE])]
+  #[TestWith([TRUE])]
+  public function testRetry(bool $use_object): void {
     $connection = $this->getMockBuilder(StubConnection::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['schema', 'supportsLazyTableCreation'])
@@ -31,19 +39,38 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
     $schema = $this->createMock(Schema::class);
     $schema->expects($this->once())->method('tableExists')->with('lazy')->willReturn(FALSE);
     $connection->expects($this->atLeastOnce())->method('schema')->willReturn($schema);
-    $created = 0;
+    $table = new Table('lazy', [Column::int('id')]);
+    $definition = $use_object ? new SchemaDefinition(SchemaDefinitionType::Storage, 'lazy', [$table]) : $table->toArray();
+    $schema->expects($this->once())->method('createTable')->with('lazy', $table->toArray());
     $attempts = 0;
-    $result = $connection->executeAndCreateTableIfNeeded('lazy', function () use (&$created): void {
-      $created++;
-    }, function () use (&$attempts): string {
+    $result = $connection->executeAndCreateTableIfNeeded('lazy', $definition, function () use (&$attempts): string {
       if (++$attempts === 1) {
         throw $this->missingTableException();
       }
       return 'result';
     });
     $this->assertSame('result', $result);
-    $this->assertSame(1, $created);
     $this->assertSame(2, $attempts);
+  }
+
+  /**
+   * Tests that a schema cannot create a different table than the one requested.
+   */
+  public function testMissingTableDefinition(): void {
+    $connection = $this->getMockBuilder(StubConnection::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods(['schema'])
+      ->getMock();
+    $schema = $this->createMock(Schema::class);
+    $schema->method('tableExists')->with('lazy')->willReturn(FALSE);
+    $schema->expects($this->never())->method('createTable');
+    $connection->expects($this->atLeastOnce())->method('schema')->willReturn($schema);
+    $definition = new SchemaDefinition(SchemaDefinitionType::Storage, 'other', [
+      new Table('other', [Column::int('id')]),
+    ]);
+    $this->expectException(SchemaDefinitionException::class);
+    $connection->executeAndCreateTableIfNeeded('lazy', $definition,
+      fn() => throw $this->missingTableException());
   }
 
   /**
@@ -56,9 +83,7 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
       ->getMock();
     $connection->expects($this->never())->method('schema');
     $result = new \stdClass();
-    $this->assertSame($result, $connection->executeAndCreateTableIfNeeded('lazy', function (): void {
-      $this->fail('Creation is not needed.');
-    }, static fn() => $result));
+    $this->assertSame($result, $connection->executeAndCreateTableIfNeeded('lazy', [], static fn() => $result));
   }
 
   /**
@@ -72,9 +97,7 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
     $connection->expects($this->never())->method('schema');
     $exception = new DatabaseExceptionWrapper('Permission denied');
     try {
-      $connection->executeAndCreateTableIfNeeded('lazy', function (): void {
-        $this->fail('Creation is not needed.');
-      }, static fn() => throw $exception);
+      $connection->executeAndCreateTableIfNeeded('lazy', [], static fn() => throw $exception);
       $this->fail('The exception must propagate.');
     }
     catch (DatabaseExceptionWrapper $caught) {
@@ -92,9 +115,7 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
       ->getMock();
     $connection->expects($this->never())->method('schema');
     $this->expectException(\LogicException::class);
-    $connection->executeAndCreateTableIfNeeded('lazy', function (): void {
-      $this->fail('Creation is not needed.');
-    }, static fn() => throw new \LogicException('Application failure'));
+    $connection->executeAndCreateTableIfNeeded('lazy', [], static fn() => throw new \LogicException('Application failure'));
   }
 
   /**
@@ -107,14 +128,12 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
       ->getMock();
     $schema = $this->createMock(Schema::class);
     $schema->expects($this->once())->method('tableExists')->willReturn(FALSE);
-    $connection->expects($this->once())->method('schema')->willReturn($schema);
+    $schema->expects($this->once())->method('createTable')->with('lazy', []);
+    $connection->expects($this->exactly(2))->method('schema')->willReturn($schema);
     $attempts = 0;
-    $created = 0;
     $exception = $this->missingTableException();
     try {
-      $connection->executeAndCreateTableIfNeeded('lazy', function () use (&$created): void {
-        $created++;
-      }, function () use (&$attempts, $exception): void {
+      $connection->executeAndCreateTableIfNeeded('lazy', [], function () use (&$attempts, $exception): void {
         $attempts++;
         throw $exception;
       });
@@ -123,7 +142,6 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
     catch (DatabaseExceptionWrapper $caught) {
       $this->assertSame($exception, $caught);
       $this->assertSame(2, $attempts);
-      $this->assertSame(1, $created);
     }
   }
 
@@ -137,10 +155,11 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
       ->getMock();
     $schema = $this->createMock(Schema::class);
     $schema->expects($this->exactly(2))->method('tableExists')->willReturn(FALSE);
-    $connection->expects($this->exactly(2))->method('schema')->willReturn($schema);
+    $connection->expects($this->exactly(3))->method('schema')->willReturn($schema);
     $exception = new DatabaseExceptionWrapper('Creation denied');
+    $schema->expects($this->once())->method('createTable')->with('lazy', [])->willThrowException($exception);
     try {
-      $connection->executeAndCreateTableIfNeeded('lazy', static fn() => throw $exception,
+      $connection->executeAndCreateTableIfNeeded('lazy', [],
         fn() => throw $this->missingTableException());
       $this->fail('Creation must fail.');
     }
@@ -161,8 +180,9 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
     $schema->expects($this->exactly(2))->method('tableExists')->willReturnOnConsecutiveCalls(FALSE, TRUE);
     $connection->expects($this->atLeastOnce())->method('schema')->willReturn($schema);
     $exception = new DatabaseExceptionWrapper('Permission denied while creating an index');
+    $schema->expects($this->once())->method('createTable')->with('lazy', [])->willThrowException($exception);
     try {
-      $connection->executeAndCreateTableIfNeeded('lazy', static fn() => throw $exception,
+      $connection->executeAndCreateTableIfNeeded('lazy', [],
         fn() => throw $this->missingTableException());
       $this->fail('An unrelated creation error must propagate.');
     }
@@ -182,9 +202,7 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
     $connection->expects($this->never())->method('schema');
     $exception = new DatabaseExceptionWrapper('Permission denied');
     $this->expectExceptionObject($exception);
-    $connection->executeAndCreateTableIfNeeded('lazy', function (): void {
-      $this->fail('An unrelated error must not trigger creation.');
-    }, static fn() => throw $exception);
+    $connection->executeAndCreateTableIfNeeded('lazy', [], static fn() => throw $exception);
   }
 
   /**

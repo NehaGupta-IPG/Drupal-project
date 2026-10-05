@@ -65,7 +65,7 @@ class DatabaseStorage implements StorageInterface {
   public function exists($name) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($name) {
         try {
           return (bool) $this->connection->queryRange('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', 0, 1, [
@@ -91,7 +91,7 @@ class DatabaseStorage implements StorageInterface {
   public function read($name) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($name) {
         $data = FALSE;
         try {
@@ -124,7 +124,7 @@ class DatabaseStorage implements StorageInterface {
     }
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($names) {
         $list = [];
         try {
@@ -157,7 +157,7 @@ class DatabaseStorage implements StorageInterface {
     $data = $this->encode($data);
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->doWrite($name, $data),
     );
   }
@@ -267,7 +267,7 @@ class DatabaseStorage implements StorageInterface {
   public function listAll($prefix = '') {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($prefix) {
         try {
           $query = $this->connection->select($this->table);
@@ -295,7 +295,7 @@ class DatabaseStorage implements StorageInterface {
   public function deleteAll($prefix = '') {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($prefix) {
         try {
           return (bool) $this->connection->delete($this->table, $this->options)
@@ -340,7 +340,7 @@ class DatabaseStorage implements StorageInterface {
   public function getAllCollectionNames() {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () {
         try {
           return $this->connection->query('SELECT DISTINCT [collection] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] <> :collection ORDER by [collection]', [

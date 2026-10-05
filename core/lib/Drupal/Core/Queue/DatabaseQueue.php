@@ -52,7 +52,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
   public function createItem($data) {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->doCreateItem($data),
     );
   }
@@ -89,7 +89,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
   public function numberOfItems() {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () {
         try {
           return (int) $this->connection->query('SELECT COUNT([item_id]) FROM {' . static::TABLE_NAME . '} WHERE [name] = :name', [':name' => $this->name])
@@ -110,7 +110,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
   public function claimItem($lease_time = 30) {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($lease_time) {
         // Claim an item by updating its expire fields. If claim is not
         // successful
@@ -164,7 +164,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
   public function releaseItem($item) {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($item) {
         try {
           $update = $this->connection->update(static::TABLE_NAME)
@@ -193,7 +193,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
     }
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($item, $delay) {
 
         try {
@@ -222,7 +222,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
   public function deleteItem($item) {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($item) {
         try {
           $this->connection->delete(static::TABLE_NAME)
@@ -250,7 +250,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
   public function deleteQueue() {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () {
         try {
           $this->connection->delete(static::TABLE_NAME)
@@ -270,7 +270,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
   public function garbageCollection() {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () {
         try {
           // Clean up the queue for failed batches.

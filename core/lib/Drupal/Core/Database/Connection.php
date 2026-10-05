@@ -11,6 +11,7 @@ use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\Truncate;
 use Drupal\Core\Database\Query\Update;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerBase;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
@@ -1254,8 +1255,11 @@ abstract class Connection {
    *
    * @param string $table
    *   The unprefixed table name.
-   * @param callable $create_table
-   *   A callback that only creates the table and lets exceptions propagate.
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema|array $table_schema
+   *   A schema definition containing the named table. Only that table is
+   *   created.
+   *   A legacy table definition array, as accepted by Schema::createTable(), is
+   *   also supported.
    * @param callable $operation
    *   The operation. It may be called twice and must be safe to retry after a
    *   missing-table failure. Start any transaction before calling this method,
@@ -1264,7 +1268,7 @@ abstract class Connection {
    * @return mixed
    *   The result of the operation.
    */
-  public function executeAndCreateTableIfNeeded(string $table, callable $create_table, callable $operation): mixed {
+  public function executeAndCreateTableIfNeeded(string $table, SchemaDefinition|array $table_schema, callable $operation): mixed {
     if (!$this->supportsLazyTableCreation() && $this->inTransaction()) {
       $manager = $this->transactionManager();
       $schema = $this->schema();
@@ -1274,7 +1278,7 @@ abstract class Connection {
         [$manager->getTransactionVersion(), $schema->getTableInformationVersion()] : NULL;
       if ($version === NULL || ($this->verifiedTables[$table] ?? NULL) !== $version) {
         if (!$schema->tableExists($table)) {
-          $this->createTableForOperation($table, $create_table);
+          $this->createTableForOperation($table, $table_schema);
         }
         // Keep the version from before creation: a rollback while recovering
         // from a creation race must also invalidate this entry.
@@ -1292,7 +1296,7 @@ abstract class Connection {
       if (!$this->isMissingTableException($e) || $this->schema()->tableExists($table)) {
         throw $e;
       }
-      $this->createTableForOperation($table, $create_table);
+      $this->createTableForOperation($table, $table_schema);
     }
     return $operation();
   }
@@ -1324,14 +1328,22 @@ abstract class Connection {
    *
    * @param string $table
    *   The unprefixed table name.
-   * @param callable $create_table
-   *   A callback that creates the table.
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema|array $table_schema
+   *   A schema definition containing the named table. Only that table is
+   *   created.
+   *   A legacy table definition array, as accepted by Schema::createTable(), is
+   *   also supported.
    */
-  private function createTableForOperation(string $table, callable $create_table): void {
+  private function createTableForOperation(string $table, SchemaDefinition|array $table_schema): void {
     // Only transaction-aborting drivers need a savepoint for a creation race.
     $savepoint = !$this->supportsLazyTableCreation() && $this->inTransaction() ? $this->startTransaction() : NULL;
     try {
-      $create_table();
+      if ($table_schema instanceof SchemaDefinition) {
+        $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table));
+      }
+      else {
+        $this->schema()->createTable($table, $table_schema);
+      }
       $savepoint?->commitOrRelease();
     }
     catch (\Throwable $e) {

@@ -44,7 +44,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
     }
     $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->doInsert($name, $window, $identifier),
     );
   }
@@ -78,7 +78,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
   public function clear($name, $identifier = NULL) {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($name, $identifier) {
         if (!isset($identifier)) {
           $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
@@ -102,7 +102,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
   public function clearByPrefix(string $name, string $prefix): void {
     $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($name, $prefix) {
         try {
           $this->connection->delete(static::TABLE_NAME)
@@ -123,7 +123,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
   public function isAllowed($name, $threshold, $window = 3600, $identifier = NULL) {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($name, $threshold, $window, $identifier) {
         if (!isset($identifier)) {
           $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
@@ -146,7 +146,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
   public function garbageCollection() {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () {
         try {
           $this->connection->delete(static::TABLE_NAME)

@@ -51,7 +51,7 @@ class BatchStorage implements BatchStorageInterface {
   public function load($id) {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($id) {
         // Ensure that a session is started before using the CSRF token
         // generator.
@@ -82,7 +82,7 @@ class BatchStorage implements BatchStorageInterface {
   public function delete($id) {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($id) {
         try {
           $this->connection->delete('batch')
@@ -102,7 +102,7 @@ class BatchStorage implements BatchStorageInterface {
   public function update(array $batch) {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($batch) {
         try {
           $this->connection->update('batch')
@@ -123,7 +123,7 @@ class BatchStorage implements BatchStorageInterface {
   public function cleanup() {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () {
         try {
           // Cleanup the batch table and the queue for failed batches.
@@ -160,7 +160,7 @@ class BatchStorage implements BatchStorageInterface {
   public function getId(): int {
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->doInsertBatchRecord(),
     );
   }

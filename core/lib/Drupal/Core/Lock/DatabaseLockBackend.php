@@ -45,7 +45,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
   public function acquire($name, $timeout = 30.0) {
     return $this->database->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->database->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($name, $timeout) {
         $name = $this->normalizeName($name);
 
@@ -112,7 +112,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
   public function lockMayBeAvailable($name) {
     return $this->database->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->database->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($name) {
         $name = $this->normalizeName($name);
 
@@ -150,7 +150,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
   public function release($name) {
     return $this->database->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
-      fn() => $this->database->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($name) {
         $name = $this->normalizeName($name);
 

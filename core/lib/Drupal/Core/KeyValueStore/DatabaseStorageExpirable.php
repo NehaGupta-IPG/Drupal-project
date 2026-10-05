@@ -44,7 +44,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
   public function has($key) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($key) {
         try {
           return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key AND [expire] > :now', [
@@ -67,7 +67,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
   public function getMultiple(array $keys) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($keys) {
         try {
           $values = $this->connection->query(
@@ -97,7 +97,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
   public function getAll() {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () {
         try {
           $values = $this->connection->query(
@@ -122,7 +122,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
   public function getAllKeys(): iterable {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () {
         try {
           $values = $this->connection->query(
@@ -171,7 +171,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
   public function setWithExpire($key, $value, $expire) {
     $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->doSetWithExpire($key, $value, $expire),
     );
   }
@@ -205,7 +205,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
   public function setWithExpireIfNotExists($key, $value, $expire) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->doSetWithExpireIfNotExists($key, $value, $expire),
     );
   }

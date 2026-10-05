@@ -36,7 +36,7 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
     foreach ($tags as $tag) {
       $this->connection->executeAndCreateTableIfNeeded(
         'cachetags',
-        fn() => $this->connection->schema()->createTable('cachetags', $this->schemaDefinition()),
+        $this->schemaDefinition(),
         fn() => $this->connection->upsert('cachetags')
           ->key(['tag'])
           ->fields([
@@ -58,7 +58,7 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
   protected function getTagInvalidationCounts(array $tags) {
     return $this->connection->executeAndCreateTableIfNeeded(
       'cachetags',
-      fn() => $this->connection->schema()->createTable('cachetags', $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->connection->query('SELECT [tag], [invalidations] FROM {cachetags} WHERE [tag] IN ( :tags[] )', [':tags[]' => $tags])->fetchAllKeyed(),
     );
   }
@@ -69,7 +69,7 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
   public function purge(): void {
     $this->connection->executeAndCreateTableIfNeeded(
       'cachetags',
-      fn() => $this->connection->schema()->createTable('cachetags', $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->connection->truncate('cachetags')->execute(),
     );
     $this->reset();

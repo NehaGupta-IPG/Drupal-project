@@ -117,7 +117,7 @@ class DatabaseBackend implements CacheBackendInterface {
   public function getMultiple(&$cids, $allow_invalid = FALSE) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->bin,
-      fn() => $this->connection->schema()->createTable($this->bin, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use (&$cids, $allow_invalid) {
         $cid_mapping = [];
         foreach ($cids as $cid) {
@@ -225,7 +225,7 @@ class DatabaseBackend implements CacheBackendInterface {
   public function setMultiple(array $items) {
     $this->connection->executeAndCreateTableIfNeeded(
       $this->bin,
-      fn() => $this->connection->schema()->createTable($this->bin, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->doSetMultiple($items),
     );
   }
@@ -318,7 +318,7 @@ class DatabaseBackend implements CacheBackendInterface {
     foreach (array_chunk($cids, 1000) as $cids_chunk) {
       $this->connection->executeAndCreateTableIfNeeded(
         $this->bin,
-        fn() => $this->connection->schema()->createTable($this->bin, $this->schemaDefinition()),
+        $this->schemaDefinition(),
         fn() => $this->connection->delete($this->bin)
           ->condition('cid', $cids_chunk, 'IN')
           ->execute(),
@@ -332,7 +332,7 @@ class DatabaseBackend implements CacheBackendInterface {
   public function deleteAll() {
     $this->connection->executeAndCreateTableIfNeeded(
       $this->bin,
-      fn() => $this->connection->schema()->createTable($this->bin, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $this->connection->truncate($this->bin)->execute(),
     );
   }
@@ -350,7 +350,7 @@ class DatabaseBackend implements CacheBackendInterface {
   public function invalidateMultiple(array $cids) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->bin,
-      fn() => $this->connection->schema()->createTable($this->bin, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($cids) {
         $cids = array_values(array_map([$this, 'normalizeCid'], $cids));
         try {
@@ -376,7 +376,7 @@ class DatabaseBackend implements CacheBackendInterface {
   public function garbageCollection() {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->bin,
-      fn() => $this->connection->schema()->createTable($this->bin, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () {
         try {
           // Bounded size cache bin, using FIFO.

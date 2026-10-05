@@ -50,7 +50,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
     }
     return $this->connection->executeAndCreateTableIfNeeded(
       'sessions',
-      fn() => $this->connection->schema()->createTable('sessions', $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($sessionId) {
         $data = '';
         try {
@@ -85,7 +85,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
         ->execute();
     $this->connection->executeAndCreateTableIfNeeded(
       'sessions',
-      fn() => $this->connection->schema()->createTable('sessions', $this->schemaDefinition()),
+      $this->schemaDefinition(),
       $doWrite,
     );
     return TRUE;
@@ -111,7 +111,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
   protected function doDestroy(#[\SensitiveParameter] string $sessionId): bool {
     return $this->connection->executeAndCreateTableIfNeeded(
       'sessions',
-      fn() => $this->connection->schema()->createTable('sessions', $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($sessionId) {
         try {
           // Delete session data.
@@ -134,7 +134,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
   public function gc(int $lifetime): int|false {
     return $this->connection->executeAndCreateTableIfNeeded(
       'sessions',
-      fn() => $this->connection->schema()->createTable('sessions', $this->schemaDefinition()),
+      $this->schemaDefinition(),
       function () use ($lifetime) {
         // Be sure to adjust 'php_value session.gc_maxlifetime' to a large
         // enough

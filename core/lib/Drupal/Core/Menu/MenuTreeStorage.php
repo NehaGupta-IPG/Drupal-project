@@ -236,7 +236,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   protected function safeExecuteSelect(SelectInterface $query) {
     return $this->connection->executeAndCreateTableIfNeeded(
       $this->table,
-      fn() => $this->connection->schema()->createTable($this->table, $this->schemaDefinition()),
+      $this->schemaDefinition(),
       fn() => $query->execute(),
     );
   }

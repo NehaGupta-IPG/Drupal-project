@@ -31,14 +31,11 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
   /**
    * Returns an object that delegates table verification to the connection.
    *
-   * @param \Closure|null $beforeCreate
-   *   (optional) A callback that runs before the table is created.
-   *
    * @return object
    *   An object exposing the verification operation.
    */
-  protected function createVerifier(?\Closure $beforeCreate = NULL): object {
-    return new class ($this->connection, $beforeCreate) {
+  protected function createVerifier(): object {
+    return new class ($this->connection) {
 
       /**
        * Executes a no-op after transaction-safe table creation.
@@ -46,14 +43,13 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
       public function verifyTableInTransaction(string $table): void {
         $this->connection->executeAndCreateTableIfNeeded(
           $table,
-          fn() => $this->createVerifiedTable($table),
+          $this->schemaDefinition(),
           static fn() => NULL,
         );
       }
 
       public function __construct(
         protected Connection $connection,
-        protected ?\Closure $beforeCreate,
       ) {}
 
       /**
@@ -66,16 +62,6 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
           ],
           'primary key' => ['id'],
         ];
-      }
-
-      /**
-       * Creates the table through the test callback.
-       */
-      protected function createVerifiedTable(string $table): void {
-        if ($this->beforeCreate) {
-          ($this->beforeCreate)($table);
-        }
-        $this->connection->schema()->createTable($table, $this->schemaDefinition());
       }
 
     };
@@ -205,7 +191,7 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
     Database::addConnectionInfo('table_verify_race', 'default', Database::getConnectionInfo()['default']);
     $other = Database::getConnection('default', 'table_verify_race');
 
-    $verifier = $this->createVerifier(function (string $table) use ($other): void {
+    $this->mockTableCreation(function (string $table) use ($other): void {
       $other->schema()->createTable($table, [
         'fields' => [
           'id' => ['type' => 'int', 'not null' => TRUE],
@@ -225,7 +211,7 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
     });
 
     $transaction = $this->connection->startTransaction();
-    $verifier->verifyTableInTransaction(static::TABLE);
+    $this->createVerifier()->verifyTableInTransaction(static::TABLE);
     $this->assertTrue($this->connection->inTransaction());
     $this->connection->insert(static::TABLE)->fields(['id' => 1])->execute();
     $transaction->commitOrRelease();
@@ -254,15 +240,16 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
   public function testCreationFailurePreservesTransaction(): void {
     $transaction = $this->connection->startTransaction();
     $error = new DatabaseExceptionWrapper('Creation failed');
+    $this->mockTableCreation(function () use ($error): void {
+      try {
+        $this->connection->getClientConnection()->exec('CREATE TABLE ' . $this->connection->getFullQualifiedTableName(static::TABLE) . ' (id nonexistent_data_type)');
+      }
+      catch (\PDOException) {
+        throw $error;
+      }
+    });
     try {
-      $this->connection->executeAndCreateTableIfNeeded(static::TABLE, function () use ($error): void {
-        try {
-          $this->connection->getClientConnection()->exec('CREATE TABLE ' . $this->connection->getFullQualifiedTableName(static::TABLE) . ' (id nonexistent_data_type)');
-        }
-        catch (\PDOException) {
-          throw $error;
-        }
-      }, function (): void {
+      $this->connection->executeAndCreateTableIfNeeded(static::TABLE, $this->createVerifier()->schemaDefinition(), function (): void {
         $this->fail('The operation must not run after a creation failure.');
       });
       $this->fail('The creation error must propagate.');
@@ -273,6 +260,20 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
     $this->assertSame('1', (string) $this->connection->getClientConnection()->query('SELECT 1')->fetchColumn());
     $this->assertFalse($this->connection->schema()->tableExists(static::TABLE));
     $transaction->commitOrRelease();
+  }
+
+  /**
+   * Injects a schema creation failure without replacing real transaction logic.
+   */
+  private function mockTableCreation(\Closure $create_table): void {
+    $schema = $this->getMockBuilder($this->connection->schema()::class)
+      ->setConstructorArgs([$this->connection])
+      ->onlyMethods(['createTable'])
+      ->getMock();
+    $schema->expects($this->once())->method('createTable')
+      ->with(static::TABLE, $this->createVerifier()->schemaDefinition())
+      ->willReturnCallback($create_table);
+    (new \ReflectionProperty($this->connection, 'schema'))->setValue($this->connection, $schema);
   }
 
 }

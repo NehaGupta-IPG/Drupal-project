@@ -96,7 +96,7 @@ class MatcherDumper implements MatcherDumperInterface {
       // safe.
       $this->connection->executeAndCreateTableIfNeeded(
         $this->tableName,
-        fn() => $this->connection->schema()->createTable($this->tableName, $this->schemaDefinition()),
+        $this->schemaDefinition(),
         fn() => $this->connection->delete($this->tableName)->execute(),
       );
 
