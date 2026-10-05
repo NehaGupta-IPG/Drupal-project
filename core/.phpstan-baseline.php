@@ -3446,42 +3446,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Database/Connection.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:addConnectionInfo\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:closeConnection\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:ignoreTarget\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:openConnection\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:parseConnectionInfo\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:setMultipleConnectionInfo\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Install\\\\Tasks\\:\\:checkEngineVersion\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -27590,10 +27554,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/default_format_test/src/DefaultFormatTestController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to deprecated function deprecation_test_function\\(\\)\\:
+	'message' => '#^Call to deprecated method testDeprecation\\(\\) of class Drupal\\\\deprecation_test\\\\DeprecatedController\\:
 in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
-  the deprecation message for deprecated_test_function\\(\\)\\.$#',
-	'identifier' => 'function.deprecated',
+  the deprecation message for testDeprecation\\(\\)\\.$#',
+	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/deprecation_test/src/DeprecatedController.php',
 ];
