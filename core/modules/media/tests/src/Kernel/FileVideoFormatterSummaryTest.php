@@ -119,7 +119,7 @@ class FileVideoFormatterSummaryTest extends MediaKernelTestBase {
           'Multiple file display: Multiple HTML tags',
           'Muted: <em class="placeholder">no</em>',
           'Plays Inline: <em class="placeholder">no</em>',
-          'Width: <em class="placeholder">unset</em> pixels',
+          'Width: <em class="placeholder">unset</em>',
           'Height: <em class="placeholder">unset</em>',
         ],
       ],
