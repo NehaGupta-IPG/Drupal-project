@@ -116,6 +116,9 @@ class CommentViewsConfigUpdater {
     $field_storages = $this->entityTypeManager->getStorage('field_storage_config')->loadByProperties(['type' => 'comment']);
     foreach ($field_storages as $field_storage) {
       $entity_type_id = $field_storage->getTargetEntityTypeId();
+      if (!$this->entityTypeManager->hasDefinition($entity_type_id)) {
+        continue;
+      }
       $storage = $this->entityTypeManager->getStorage($entity_type_id);
       if (!$storage instanceof SqlEntityStorageInterface) {
         continue;

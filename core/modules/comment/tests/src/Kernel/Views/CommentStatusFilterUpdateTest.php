@@ -490,4 +490,30 @@ class CommentStatusFilterUpdateTest extends KernelTestBase {
     $this->assertSame(['open-hidden'], $this->executeView('legacy'));
   }
 
+  /**
+   * Tests comment field storages of an entity type that is not defined.
+   */
+  public function testUndefinedEntityType(): void {
+    $data = $this->config('field.storage.node.comment')->get();
+    $data['id'] = 'undefined_type.comment';
+    $data['entity_type'] = 'undefined_type';
+    // Write the storage directly, as it cannot be saved through the API.
+    $this->container->get('config.storage')->write('field.storage.undefined_type.comment', $data);
+
+    $nid = [
+      'id' => 'nid',
+      'table' => 'node_field_data',
+      'field' => 'nid',
+      'plugin_id' => 'numeric',
+      'operator' => '>',
+      'value' => ['min' => '', 'max' => '', 'value' => '0'],
+    ];
+    $this->buildView('unrelated', ['default' => ['nid' => $nid]])->save();
+    $this->assertSame($nid, $this->getFilter('unrelated', 'nid'));
+
+    $this->createView('legacy', ['default' => ['comment_status' => $this->legacyFilter('comment', '=', ['value' => '2'])]]);
+    $this->assertNull($this->runUpdate());
+    $this->assertSame('node_comment', $this->getFilter('legacy', 'comment_status')['plugin_id']);
+  }
+
 }
