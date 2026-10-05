@@ -53,6 +53,13 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
           indexes: [
             new Index(name: 'swap', columns: ['id', 'month']),
           ],
+          dbSpecificExtra: [
+            'mysql' => [
+              'mysql_engine' => 'InnoDB',
+              'mysql_character_set' => 'utf8mb4',
+            ],
+            'zoo' => ['lion', 'giraffe'],
+          ],
         ),
       ],
     );
@@ -83,6 +90,14 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
           primaryKey: new PrimaryKey(['id', 'month']),
           indexes: [
             new Index(name: 'swap', columns: ['month', 'id', 'surname']),
+          ],
+          dbSpecificExtra: [
+            'mysql' => [
+              'mysql_engine' => 'InnoDB',
+              'char_collation' => 'Ansi',
+              'mysql_character_set' => 'utf8mb4',
+            ],
+            'zoo' => ['lion', 'turtle', 'giraffe'],
           ],
         ),
       ],

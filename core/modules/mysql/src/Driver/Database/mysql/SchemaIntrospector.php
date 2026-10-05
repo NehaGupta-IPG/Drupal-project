@@ -114,32 +114,36 @@ class SchemaIntrospector {
     $tableStatus = $this->connection->query("SHOW TABLE STATUS WHERE [Name] = '" . $this->connection->getPrefix() . "{$table}'")->fetchAssoc();
     $description = $tableStatus['Comment'] ?? NULL;
 
-    $query = $this->connection->query("SHOW FULL COLUMNS FROM {" . $table . "}");
+    $query = $this->connection->query('SELECT * FROM [information_schema].[columns] WHERE [table_schema] = :schema AND [table_name] = :table', [
+      ':schema' => $this->connection->getConnectionOptions()['database'],
+      ':table' => $this->connection->getPrefix() . "{$table}",
+    ]);
     $columns = [];
     while (($row = $query->fetchAssoc()) !== FALSE) {
-      $column_args = ['name' => $row['Field']];
+dump($row);
+      $column_args = ['name' => $row['COLUMN_NAME']];
 
-      if (!empty($row['Comment'])) {
-        $column_args['description'] = $row['Comment'];
+      if (!empty($row['COLUMN_COMMENT'])) {
+        $column_args['description'] = $row['COLUMN_COMMENT'];
       }
 
       // Parse out the field type and meta information.
-      preg_match('@([a-z]+)(?:\((\d+)(?:,(\d+))?\))?\s*(unsigned)?@', $row['Type'], $matches);
+      preg_match('@([a-z]+)(?:\((\d+)(?:,(\d+))?\))?\s*(unsigned)?@', $row['COLUMN_TYPE'], $matches);
       $type = $this->fieldTypeMap($matches[1]);
 
-      if ($row['Extra'] === 'auto_increment') {
+      if ($row['EXTRA'] === 'auto_increment') {
         // If this is an auto increment, then the type is 'serial'.
         $type = ColumnType::Serial;
       }
-      elseif ($row['Extra'] === 'VIRTUAL GENERATED') {
+      elseif ($row['EXTRA'] === 'VIRTUAL GENERATED') {
         $type = ColumnType::Generated;
         $column_args['storage'] = GeneratedColumnStorage::Virtual;
-        $column_args['expression'] = new GeneratedColumnExpression('x2');
+        $column_args['expression'] = new GeneratedColumnExpression($row['GENERATION_EXPRESSION']);
       }
-      elseif ($row['Extra'] === 'STORED GENERATED') {
+      elseif ($row['EXTRA'] === 'STORED GENERATED') {
         $type = ColumnType::Generated;
         $column_args['storage'] = GeneratedColumnStorage::Stored;
-        $column_args['expression'] = new GeneratedColumnExpression('x2');
+        $column_args['expression'] = new GeneratedColumnExpression($row['GENERATION_EXPRESSION']);
       }
 
       if (!is_string($type)) {
@@ -154,7 +158,7 @@ class SchemaIntrospector {
       }
 
       if ($type !== ColumnType::Serial) {
-        $column_args['notNull'] = $row['Null'] === 'NO';
+        $column_args['notNull'] = $row['IS_NULLABLE'] === 'NO';
       }
 
       if ($size = $this->fieldSizeMap($matches[1])) {
@@ -200,8 +204,8 @@ class SchemaIntrospector {
         $column_args['length'] = (int) ($matches[2] ?? 100);
       }
 
-      if (isset($row['Default'])) {
-        $default = $row['Default'];
+      if (isset($row['COLUMN_DEFAULT'])) {
+        $default = $row['COLUMN_DEFAULT'];
         if ($default === 'NULL') {
           $column_args['default'] = new NullValue();
         }
@@ -219,18 +223,18 @@ class SchemaIntrospector {
       }
 
       // Check for the 'varchar_ascii' type that should be 'binary'.
-      if (isset($row['Collation']) && $row['Collation'] == 'ascii_bin') {
+      if (isset($row['COLLATION_NAME']) && $row['COLLATION_NAME'] == 'ascii_bin') {
         $column_args['type'] = ColumnType::VarcharAscii;
         $column_args['binary'] = TRUE;
       }
 
       // Check for the non-binary 'varchar_ascii'.
-      if (isset($row['Collation']) && $row['Collation'] == 'ascii_general_ci') {
+      if (isset($row['COLLATION_NAME']) && $row['COLLATION_NAME'] == 'ascii_general_ci') {
         $column_args['type'] = ColumnType::VarcharAscii;
       }
 
       // Check for the 'utf8_bin' collation.
-      if (isset($row['Collation']) && $row['Collation'] == 'utf8_bin') {
+      if (isset($row['COLLATION_NAME']) && $row['COLLATION_NAME'] == 'utf8_bin') {
         $column_args['binary'] = TRUE;
       }
 
