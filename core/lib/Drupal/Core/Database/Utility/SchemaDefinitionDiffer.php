@@ -11,8 +11,8 @@ use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionInterface;
  *
  * @phpstan-type DiffEntry array{
  *   'type': SchemaDefinitionDiffEntryType,
- *   'old'?: scalar|array|SchemaDefinitionInterface,
- *   'new'?: scalar|array|SchemaDefinitionInterface,
+ *   'old'?: scalar|array|SchemaDefinitionInterface|null,
+ *   'new'?: scalar|array|SchemaDefinitionInterface|null,
  * }
  */
 class SchemaDefinitionDiffer {
@@ -129,6 +129,8 @@ class SchemaDefinitionDiffer {
     }
 
     // Actual comparison.
+    /** @var scalar|SchemaDefinitionInterface|null $old */
+    /** @var scalar|SchemaDefinitionInterface|null $new */
     if ($old != $new) {
       assert(is_string($path), 'Invalid diff path.');
       if ($old !== NULL && $new !== NULL) {
