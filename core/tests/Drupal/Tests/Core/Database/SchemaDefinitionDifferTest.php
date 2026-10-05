@@ -10,7 +10,6 @@ use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
-use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionInterface;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
@@ -118,7 +117,7 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
         'tables[foo].uniqueKeys[bar]' => 'Removed',
         'tables[foo].dbSpecificExtra[mysql][ziggy]' => 'Added',
         'tables[foo].dbSpecificExtra[zoo][1]' => 'Changed',
-        'tables[foo].dbSpecificExtra[zoo][2]' => 'Added'
+        'tables[foo].dbSpecificExtra[zoo][2]' => 'Added',
       ],
       $this->compactDiff(SchemaDefinitionDiffer::diff($schemaA, $schemaB)),
     );
@@ -136,7 +135,7 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
         'uniqueKeys[bar]' => 'Removed',
         'dbSpecificExtra[mysql][ziggy]' => 'Added',
         'dbSpecificExtra[zoo][1]' => 'Changed',
-        'dbSpecificExtra[zoo][2]' => 'Added'
+        'dbSpecificExtra[zoo][2]' => 'Added',
       ],
       $this->compactDiff(SchemaDefinitionDiffer::diff($schemaA->getTableDefinition('foo'), $schemaB->getTableDefinition('foo'))),
     );
@@ -152,7 +151,7 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
   /**
    * Returns a compact diff between two SchemaDefinitionInterface objects.
    *
-   * @param array<string,DiffEntry>
+   * @param array<string,DiffEntry> $diff
    *   A SchemaDefinitionInterface diff.
    *
    * @return array<string,string>
