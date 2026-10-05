@@ -51,9 +51,19 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
     });
     $this->assertSame('inserted', $result);
     $this->assertFalse($this->connection->schema()->tableExists('lazy_unrelated'));
-    $this->assertSame($in_transaction && !$this->connection->supportsLazyTableCreation() ? 1 : 2, $attempts);
+    $this->assertSame($in_transaction && $this->checksTableFirstInTransaction() ? 1 : 2, $attempts);
     $transaction?->commitOrRelease();
     $this->assertSame('1', (string) $this->connection->select($table)->countQuery()->execute()->fetchField());
+  }
+
+  /**
+   * Determines whether the driver checks for the table before the operation.
+   *
+   * Drivers where a failed statement aborts a transaction override
+   * Connection::executeAndCreateTableIfNeeded() to check first.
+   */
+  protected function checksTableFirstInTransaction(): bool {
+    return (new \ReflectionMethod($this->connection, 'executeAndCreateTableIfNeeded'))->getDeclaringClass()->getName() !== Connection::class;
   }
 
   /**
@@ -112,7 +122,7 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
     $storage = new ConfigDatabaseStorage($this->connection, $table);
     $transaction = $in_transaction ? $this->connection->startTransaction() : NULL;
     $this->assertFalse($storage->read('missing'));
-    $this->assertSame($in_transaction && !$this->connection->supportsLazyTableCreation(), $this->connection->schema()->tableExists($table));
+    $this->assertSame($in_transaction && $this->checksTableFirstInTransaction(), $this->connection->schema()->tableExists($table));
     $transaction?->commitOrRelease();
   }
 

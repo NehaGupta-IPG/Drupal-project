@@ -15,8 +15,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests connection-scoped lazy table creation on PostgreSQL.
  *
- * PostgreSQL does not support lazy table creation: a failed statement aborts
- * the enclosing transaction.
+ * On PostgreSQL, a failed statement aborts the enclosing transaction, so the
+ * table is checked before the operation inside a transaction.
  */
 #[CoversClass(Connection::class)]
 #[Group('Database')]
@@ -68,13 +68,6 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
   }
 
   /**
-   * Tests that the driver requires table verification.
-   */
-  public function testLazyTableCreationNotSupported(): void {
-    $this->assertFalse($this->connection->supportsLazyTableCreation());
-  }
-
-  /**
    * Tests that a missing table is created inside a transaction.
    */
   public function testMissingTableCreatedInTransaction(): void {
@@ -100,9 +93,9 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
   }
 
   /**
-   * Tests that a root transaction rollback invalidates verification.
+   * Tests that a table is created again after a root transaction rollback.
    */
-  public function testRootRollbackInvalidatesVerification(): void {
+  public function testRootRollbackRecreatesTable(): void {
     $schema = $this->connection->schema();
     $verifier = $this->createVerifier();
 
@@ -123,9 +116,9 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
   }
 
   /**
-   * Tests that a savepoint rollback invalidates verification.
+   * Tests that a table is created again after a savepoint rollback.
    */
-  public function testSavepointRollbackInvalidatesVerification(): void {
+  public function testSavepointRollbackRecreatesTable(): void {
     $schema = $this->connection->schema();
     $verifier = $this->createVerifier();
 
@@ -145,28 +138,9 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
   }
 
   /**
-   * Tests that a released savepoint keeps the verification.
+   * Tests that a table is created again after it is dropped.
    */
-  public function testSavepointReleaseKeepsVerification(): void {
-    $verifier = $this->createVerifier();
-    $transaction = $this->connection->startTransaction();
-    $savepoint = $this->connection->startTransaction();
-    $verifier->verifyTableInTransaction(static::TABLE);
-    $savepoint->commitOrRelease();
-    unset($savepoint);
-
-    // Drop the table behind the back of the schema object, so a new
-    // verification would create it again.
-    $this->connection->query('DROP TABLE {' . static::TABLE . '}');
-    $verifier->verifyTableInTransaction(static::TABLE);
-    $this->assertFalse($this->connection->schema()->tableExists(static::TABLE));
-    $transaction->rollBack();
-  }
-
-  /**
-   * Tests that dropping the table invalidates verification.
-   */
-  public function testDropTableInvalidatesVerification(): void {
+  public function testDropTableRecreatesTable(): void {
     $schema = $this->connection->schema();
     $verifier = $this->createVerifier();
 
@@ -218,20 +192,6 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
 
     $this->assertSame(1, (int) $this->connection->select(static::TABLE)->countQuery()->execute()->fetchField());
     Database::removeConnection('table_verify_race');
-  }
-
-  /**
-   * Tests that services sharing a connection also share verification.
-   */
-  public function testSharedVerification(): void {
-    $transaction = $this->connection->startTransaction();
-    $this->createVerifier()->verifyTableInTransaction(static::TABLE);
-    $this->connection->query('DROP TABLE {' . static::TABLE . '}');
-    // A second service must reuse the connection's verification rather than
-    // consulting the schema again. Raw DDL intentionally bypasses invalidation.
-    $this->createVerifier()->verifyTableInTransaction(static::TABLE);
-    $this->assertFalse($this->connection->schema()->tableExists(static::TABLE));
-    $transaction->rollBack();
   }
 
   /**

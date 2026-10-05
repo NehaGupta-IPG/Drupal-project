@@ -413,10 +413,6 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function removeBin() {
-    if (!$this->connection->supportsLazyTableCreation() && $this->connection->inTransaction() && !$this->connection->schema()->tableExists($this->bin)) {
-      // Nothing to drop, and a failing drop would abort the transaction.
-      return;
-    }
     try {
       $this->connection->schema()->dropTable($this->bin);
     }

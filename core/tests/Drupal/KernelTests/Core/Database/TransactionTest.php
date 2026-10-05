@@ -108,15 +108,6 @@ class TransactionTest extends DatabaseTestBase {
   }
 
   /**
-   * Returns the transaction version of the transaction manager.
-   */
-  protected function getTransactionVersion(): int {
-    $manager = $this->connection->transactionManager();
-    $this->assertInstanceOf(TransactionManagerBase::class, $manager);
-    return $manager->getTransactionVersion();
-  }
-
-  /**
    * Encapsulates a transaction's "inner layer" with an "outer layer".
    *
    * This "outer layer" transaction starts and then encapsulates the "inner
@@ -194,12 +185,10 @@ class TransactionTest extends DatabaseTestBase {
    */
   public function testRollbackRoot(): void {
     $transaction = $this->createRootTransaction();
-    $version = $this->getTransactionVersion();
 
     // Rollback. Since we are at the root, the transaction is closed.
     // Corresponds to 'ROLLBACK' on the database.
     $transaction->rollBack();
-    $this->assertSame($version + 1, $this->getTransactionVersion());
     $this->assertRowAbsent('David');
     $this->assertFalse($this->connection->inTransaction());
     $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
@@ -211,12 +200,10 @@ class TransactionTest extends DatabaseTestBase {
   public function testRollbackRootAfterSavepointRollback(): void {
     $transaction = $this->createRootTransaction();
     $savepoint = $this->createFirstSavepointTransaction();
-    $version = $this->getTransactionVersion();
 
     // Rollback savepoint. It should get released too. Corresponds to 'ROLLBACK
     // TO savepoint_1' plus 'RELEASE savepoint_1' on the database.
     $savepoint->rollBack();
-    $this->assertSame($version + 1, $this->getTransactionVersion());
     $this->assertRowPresent('David');
     $this->assertRowAbsent('Roger');
     $this->assertTrue($this->connection->inTransaction());
@@ -224,7 +211,6 @@ class TransactionTest extends DatabaseTestBase {
 
     // Try to rollback root. No savepoint is active, this should succeed.
     $transaction->rollBack();
-    $this->assertSame($version + 2, $this->getTransactionVersion());
     $this->assertRowAbsent('David');
     $this->assertRowAbsent('Roger');
     $this->assertFalse($this->connection->inTransaction());
@@ -238,18 +224,11 @@ class TransactionTest extends DatabaseTestBase {
     $transaction = $this->createRootTransaction();
     // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $savepoint = $this->createFirstSavepointTransaction();
-    $version = $this->getTransactionVersion();
 
     // Try to rollback root. Since a savepoint is active, this should fail.
-    try {
-      $transaction->rollBack();
-      $this->fail('Expected TransactionOutOfOrderException was not thrown');
-    }
-    catch (TransactionOutOfOrderException $e) {
-      $this->assertMatchesRegularExpression("/^Error attempting rollback of .*\\\\drupal_transaction\\. Active stack: .*\\\\drupal_transaction > .*\\\\savepoint_1/", $e->getMessage());
-    }
-    // The failed rollback does not change the transaction version.
-    $this->assertSame($version, $this->getTransactionVersion());
+    $this->expectException(TransactionOutOfOrderException::class);
+    $this->expectExceptionMessageMatches("/^Error attempting rollback of .*\\\\drupal_transaction\\. Active stack: .*\\\\drupal_transaction > .*\\\\savepoint_1/");
+    $transaction->rollBack();
   }
 
   /**
@@ -258,12 +237,10 @@ class TransactionTest extends DatabaseTestBase {
   public function testRollbackSavepoint(): void {
     $transaction = $this->createRootTransaction();
     $savepoint = $this->createFirstSavepointTransaction();
-    $version = $this->getTransactionVersion();
 
     // Rollback savepoint. It should get released too. Corresponds to 'ROLLBACK
     // TO savepoint_1' plus 'RELEASE savepoint_1' on the database.
     $savepoint->rollBack();
-    $this->assertSame($version + 1, $this->getTransactionVersion());
     $this->assertRowPresent('David');
     $this->assertRowAbsent('Roger');
     $this->assertTrue($this->connection->inTransaction());
@@ -274,7 +251,6 @@ class TransactionTest extends DatabaseTestBase {
 
     // Commit root.
     $transaction->commitOrRelease();
-    $this->assertSame($version + 2, $this->getTransactionVersion());
     $this->assertRowPresent('David');
     $this->assertRowAbsent('Roger');
     $this->assertRowPresent('Syd');
@@ -978,7 +954,6 @@ class TransactionTest extends DatabaseTestBase {
     // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $savepoint4 = $this->connection->startTransaction();
     $this->assertSame(5, $this->connection->transactionManager()->stackDepth());
-    $version = $this->getTransactionVersion();
 
     $this->insertRow('row');
 
@@ -989,15 +964,11 @@ class TransactionTest extends DatabaseTestBase {
     // the savepoints created later have been dropped by the database already.
     $this->assertSame(2, $this->connection->transactionManager()->stackDepth());
     $this->assertRowPresent('row');
-    // Releasing savepoints does not change the transaction version.
-    $this->assertSame($version, $this->getTransactionVersion());
 
     // Commit the remaining Transaction objects. The client transaction is
     // eventually committed.
     $savepoint1->commitOrRelease();
-    $this->assertSame($version, $this->getTransactionVersion());
     $transaction->commitOrRelease();
-    $this->assertSame($version + 1, $this->getTransactionVersion());
     $this->assertFalse($this->connection->inTransaction());
     $this->assertRowPresent('row');
   }
@@ -1014,13 +985,11 @@ class TransactionTest extends DatabaseTestBase {
     // on the database.
     $savepoint2 = $this->connection->startTransaction();
     $this->assertSame(3, $this->connection->transactionManager()->stackDepth());
-    $version = $this->getTransactionVersion();
 
     $this->insertRow('row');
 
-    // Commit the root transaction. The transaction version changes once.
+    // Commit the root transaction.
     $transaction->commitOrRelease();
-    $this->assertSame($version + 1, $this->getTransactionVersion());
     // Since we have committed the outer (root) Transaction object, the inner
     // (savepoint) ones have been dropped by the database already, and we are
     // no longer in an active transaction state.
@@ -1031,7 +1000,6 @@ class TransactionTest extends DatabaseTestBase {
     // at this point since the root transaction was fully committed already; we
     // do not raise any error in this case.
     $savepoint2->commitOrRelease();
-    $this->assertSame($version + 1, $this->getTransactionVersion());
   }
 
   /**
@@ -1367,9 +1335,7 @@ class TransactionTest extends DatabaseTestBase {
   public function testDeprecationOfImplicitCommit(): void {
     $this->expectUserDeprecationMessage('Database commit by letting a Transaction object go out of scope is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Commit explicitly via Transaction::commitOrRelease() instead. See https://www.drupal.org/node/3524461');
     $transaction = $this->createRootTransaction();
-    $version = $this->getTransactionVersion();
     unset($transaction);
-    $this->assertSame($version + 1, $this->getTransactionVersion());
     $this->assertRowPresent('David');
   }
 

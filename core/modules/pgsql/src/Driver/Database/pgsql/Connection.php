@@ -5,8 +5,10 @@ namespace Drupal\pgsql\Driver\Database\pgsql;
 use Drupal\Core\Database\Connection as DatabaseConnection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseAccessDeniedException;
+use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
@@ -305,6 +307,40 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
   /**
    * {@inheritdoc}
+   *
+   * A failed statement aborts the enclosing transaction. Inside a transaction,
+   * check for the table before the operation instead of recovering from the
+   * failure, and create it in a savepoint, so that losing a creation race does
+   * not abort the enclosing transaction.
+   */
+  public function executeAndCreateTableIfNeeded(string $table, SchemaDefinition|array $table_schema, callable $operation): mixed {
+    if (!$this->inTransaction()) {
+      return parent::executeAndCreateTableIfNeeded($table, $table_schema, $operation);
+    }
+    if (!$this->schema()->tableExists($table)) {
+      $savepoint = $this->startTransaction();
+      try {
+        if ($table_schema instanceof SchemaDefinition) {
+          $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table));
+        }
+        else {
+          $this->schema()->createTable($table, $table_schema);
+        }
+        $savepoint->commitOrRelease();
+      }
+      catch (\Throwable $e) {
+        $savepoint->rollBack();
+        // Recover only if another process created the table concurrently.
+        if (!$e instanceof DatabaseException || !$this->schema()->tableExists($table) || !$this->isTableCreationRace($e)) {
+          throw $e;
+        }
+      }
+    }
+    return $operation();
+  }
+
+  /**
+   * {@inheritdoc}
    */
   protected function isMissingTableException(\Throwable $exception): bool {
     $previous = $exception->getPrevious();
@@ -333,13 +369,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function databaseType() {
     return 'pgsql';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function supportsLazyTableCreation(): bool {
-    return FALSE;
   }
 
   /**

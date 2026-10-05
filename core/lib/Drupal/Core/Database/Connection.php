@@ -13,7 +13,6 @@ use Drupal\Core\Database\Query\Truncate;
 use Drupal\Core\Database\Query\Update;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\Statement\FetchAs;
-use Drupal\Core\Database\Transaction\TransactionManagerBase;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 
@@ -28,13 +27,6 @@ use Drupal\Core\Pager\PagerManagerInterface;
  * @see http://php.net/manual/book.pdo.php
  */
 abstract class Connection {
-
-  /**
-   * The transaction and schema versions when each table was verified.
-   *
-   * @var array<string, array{int, int}>
-   */
-  private array $verifiedTables = [];
 
   /**
    * The database target this connection is for.
@@ -1246,12 +1238,11 @@ abstract class Connection {
   /**
    * Executes an operation, creating its table if necessary.
    *
-   * On drivers where a failed statement aborts a transaction, verifies the
-   * table first when a transaction is active. Otherwise, attempts the operation
-   * optimistically and retries once if a missing-table exception occurs and the
-   * specified table is missing. Other exceptions are propagated unchanged.
-   * Operations may handle a missing table themselves when an empty result or
-   * a no-op is appropriate, avoiding creation outside transactions.
+   * Attempts the operation optimistically and retries it once if it fails
+   * because the specified table is missing. Other exceptions are propagated
+   * unchanged. Drivers where a failed statement aborts a transaction override
+   * this method to check for the table first. Operations may handle a missing
+   * table themselves when an empty result or a no-op is appropriate.
    *
    * @param string $table
    *   The unprefixed table name.
@@ -1263,32 +1254,12 @@ abstract class Connection {
    * @param callable $operation
    *   The operation. It may be called twice and must be safe to retry after a
    *   missing-table failure. Start any transaction before calling this method,
-   *   not inside the callback, so verification precedes failing statements.
+   *   not inside the callback, so drivers can check for the table first.
    *
    * @return mixed
    *   The result of the operation.
    */
   public function executeAndCreateTableIfNeeded(string $table, SchemaDefinition|array $table_schema, callable $operation): mixed {
-    if (!$this->supportsLazyTableCreation() && $this->inTransaction()) {
-      $manager = $this->transactionManager();
-      $schema = $this->schema();
-      // Replacement managers may not track table visibility. In that case,
-      // conservatively check on every call.
-      $version = $manager instanceof TransactionManagerBase ?
-        [$manager->getTransactionVersion(), $schema->getTableInformationVersion()] : NULL;
-      if ($version === NULL || ($this->verifiedTables[$table] ?? NULL) !== $version) {
-        if (!$schema->tableExists($table)) {
-          $this->createTableForOperation($table, $table_schema);
-        }
-        // Keep the version from before creation: a rollback while recovering
-        // from a creation race must also invalidate this entry.
-        if ($version !== NULL) {
-          $this->verifiedTables[$table] = $version;
-        }
-      }
-      return $operation();
-    }
-
     try {
       return $operation();
     }
@@ -1296,7 +1267,20 @@ abstract class Connection {
       if (!$this->isMissingTableException($e) || $this->schema()->tableExists($table)) {
         throw $e;
       }
-      $this->createTableForOperation($table, $table_schema);
+    }
+    try {
+      if ($table_schema instanceof SchemaDefinition) {
+        $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table));
+      }
+      else {
+        $this->schema()->createTable($table, $table_schema);
+      }
+    }
+    catch (DatabaseException $e) {
+      // Recover only if another process created the table concurrently.
+      if (!$this->schema()->tableExists($table) || !$this->isTableCreationRace($e)) {
+        throw $e;
+      }
     }
     return $operation();
   }
@@ -1320,37 +1304,6 @@ abstract class Connection {
   }
 
   /**
-   * Creates a table, recovering only from a concurrent creation.
-   *
-   * @param string $table
-   *   The unprefixed table name.
-   * @param \Drupal\Core\Database\SchemaDefinition\Schema|array $table_schema
-   *   A schema definition containing the named table. Only that table is
-   *   created.
-   *   A legacy table definition array, as accepted by Schema::createTable(), is
-   *   also supported.
-   */
-  private function createTableForOperation(string $table, SchemaDefinition|array $table_schema): void {
-    // Only transaction-aborting drivers need a savepoint for a creation race.
-    $savepoint = !$this->supportsLazyTableCreation() && $this->inTransaction() ? $this->startTransaction() : NULL;
-    try {
-      if ($table_schema instanceof SchemaDefinition) {
-        $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table));
-      }
-      else {
-        $this->schema()->createTable($table, $table_schema);
-      }
-      $savepoint?->commitOrRelease();
-    }
-    catch (\Throwable $e) {
-      $savepoint?->rollBack();
-      if (!$e instanceof DatabaseException || !$this->schema()->tableExists($table) || !$this->isTableCreationRace($e)) {
-        throw $e;
-      }
-    }
-  }
-
-  /**
    * Determines whether table creation failed because another creator won.
    *
    * @param \Throwable $exception
@@ -1369,17 +1322,6 @@ abstract class Connection {
       return $state === '42S01';
     }
     return FALSE;
-  }
-
-  /**
-   * Determines if this driver supports lazy table creation.
-   *
-   * @return bool
-   *   TRUE if this connection supports creating tables lazily, FALSE
-   *   otherwise.
-   */
-  public function supportsLazyTableCreation(): bool {
-    return TRUE;
   }
 
   /**

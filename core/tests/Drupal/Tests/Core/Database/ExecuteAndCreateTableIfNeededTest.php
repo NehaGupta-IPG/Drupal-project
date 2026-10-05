@@ -61,9 +61,8 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
   public function testRetry(bool $use_object): void {
     $connection = $this->getMockBuilder(StubConnection::class)
       ->disableOriginalConstructor()
-      ->onlyMethods(['schema', 'supportsLazyTableCreation'])
+      ->onlyMethods(['schema'])
       ->getMock();
-    $connection->method('supportsLazyTableCreation')->willReturn(TRUE);
     $schema = $this->createMock(Schema::class);
     $schema->expects($this->once())->method('tableExists')->with('lazy')->willReturn(FALSE);
     $connection->expects($this->atLeastOnce())->method('schema')->willReturn($schema);
