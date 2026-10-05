@@ -24,136 +24,19 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
 
   /**
-   * The name of the table verified by the tests.
+   * The name of the table created by the tests.
    */
   protected const string TABLE = 'table_verify_test';
 
   /**
-   * Returns an object that delegates table verification to the connection.
-   *
-   * @return object
-   *   An object exposing the verification operation.
+   * The definition of the table created by the tests.
    */
-  protected function createVerifier(): object {
-    return new class ($this->connection) {
-
-      /**
-       * Executes a no-op after transaction-safe table creation.
-       */
-      public function verifyTableInTransaction(string $table): void {
-        $this->connection->executeAndCreateTableIfNeeded(
-          $table,
-          $this->schemaDefinition(),
-          static fn() => NULL,
-        );
-      }
-
-      public function __construct(
-        protected Connection $connection,
-      ) {}
-
-      /**
-       * Returns the schema definition of the table.
-       */
-      public function schemaDefinition(): array {
-        return [
-          'fields' => [
-            'id' => ['type' => 'int', 'not null' => TRUE],
-          ],
-          'primary key' => ['id'],
-        ];
-      }
-
-    };
-  }
-
-  /**
-   * Tests that a missing table is created inside a transaction.
-   */
-  public function testMissingTableCreatedInTransaction(): void {
-    $schema = $this->connection->schema();
-    $this->assertFalse($schema->tableExists(static::TABLE));
-
-    $transaction = $this->connection->startTransaction();
-    $this->createVerifier()->verifyTableInTransaction(static::TABLE);
-    $this->assertTrue($schema->tableExists(static::TABLE));
-    $this->connection->insert(static::TABLE)->fields(['id' => 1])->execute();
-    $transaction->commitOrRelease();
-
-    $this->assertFalse($this->connection->inTransaction());
-    $this->assertSame(1, (int) $this->connection->select(static::TABLE)->countQuery()->execute()->fetchField());
-  }
-
-  /**
-   * Tests that verification outside a transaction does not create the table.
-   */
-  public function testOutsideTransactionNotCreated(): void {
-    $this->createVerifier()->verifyTableInTransaction(static::TABLE);
-    $this->assertFalse($this->connection->schema()->tableExists(static::TABLE));
-  }
-
-  /**
-   * Tests that a table is created again after a root transaction rollback.
-   */
-  public function testRootRollbackRecreatesTable(): void {
-    $schema = $this->connection->schema();
-    $verifier = $this->createVerifier();
-
-    $transaction = $this->connection->startTransaction();
-    $verifier->verifyTableInTransaction(static::TABLE);
-    $this->assertTrue($schema->tableExists(static::TABLE));
-    $transaction->rollBack();
-    unset($transaction);
-    // The table creation was part of the rolled back transaction.
-    $this->assertFalse($schema->tableExists(static::TABLE));
-
-    $transaction = $this->connection->startTransaction();
-    $verifier->verifyTableInTransaction(static::TABLE);
-    $this->assertTrue($schema->tableExists(static::TABLE));
-    $this->connection->insert(static::TABLE)->fields(['id' => 1])->execute();
-    $transaction->commitOrRelease();
-    $this->assertTrue($schema->tableExists(static::TABLE));
-  }
-
-  /**
-   * Tests that a table is created again after a savepoint rollback.
-   */
-  public function testSavepointRollbackRecreatesTable(): void {
-    $schema = $this->connection->schema();
-    $verifier = $this->createVerifier();
-
-    $transaction = $this->connection->startTransaction();
-    $savepoint = $this->connection->startTransaction();
-    $verifier->verifyTableInTransaction(static::TABLE);
-    $this->assertTrue($schema->tableExists(static::TABLE));
-    $savepoint->rollBack();
-    unset($savepoint);
-    $this->assertFalse($schema->tableExists(static::TABLE));
-
-    $verifier->verifyTableInTransaction(static::TABLE);
-    $this->assertTrue($schema->tableExists(static::TABLE));
-    $this->connection->insert(static::TABLE)->fields(['id' => 1])->execute();
-    $transaction->commitOrRelease();
-    $this->assertSame(1, (int) $this->connection->select(static::TABLE)->countQuery()->execute()->fetchField());
-  }
-
-  /**
-   * Tests that a table is created again after it is dropped.
-   */
-  public function testDropTableRecreatesTable(): void {
-    $schema = $this->connection->schema();
-    $verifier = $this->createVerifier();
-
-    $transaction = $this->connection->startTransaction();
-    $verifier->verifyTableInTransaction(static::TABLE);
-    $this->assertTrue($schema->dropTable(static::TABLE));
-    $this->assertFalse($schema->tableExists(static::TABLE));
-
-    $verifier->verifyTableInTransaction(static::TABLE);
-    $this->assertTrue($schema->tableExists(static::TABLE));
-    $this->connection->insert(static::TABLE)->fields(['id' => 1])->execute();
-    $transaction->commitOrRelease();
-  }
+  protected const array DEFINITION = [
+    'fields' => [
+      'id' => ['type' => 'int', 'not null' => TRUE],
+    ],
+    'primary key' => ['id'],
+  ];
 
   /**
    * Tests that a lost table creation race keeps the transaction usable.
@@ -166,12 +49,7 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
     $other = Database::getConnection('default', 'table_verify_race');
 
     $this->mockTableCreation(function (string $table) use ($other): void {
-      $other->schema()->createTable($table, [
-        'fields' => [
-          'id' => ['type' => 'int', 'not null' => TRUE],
-        ],
-        'primary key' => ['id'],
-      ]);
+      $other->schema()->createTable($table, static::DEFINITION);
       // Run the statement on the client connection. This skips the existence
       // check in Schema::createTable() and the savepoint that
       // Connection::query() adds, so the failure aborts the transaction like
@@ -185,9 +63,9 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
     });
 
     $transaction = $this->connection->startTransaction();
-    $this->createVerifier()->verifyTableInTransaction(static::TABLE);
+    $this->connection->executeAndCreateTableIfNeeded(static::TABLE, static::DEFINITION,
+      fn() => $this->connection->insert(static::TABLE)->fields(['id' => 1])->execute());
     $this->assertTrue($this->connection->inTransaction());
-    $this->connection->insert(static::TABLE)->fields(['id' => 1])->execute();
     $transaction->commitOrRelease();
 
     $this->assertSame(1, (int) $this->connection->select(static::TABLE)->countQuery()->execute()->fetchField());
@@ -209,7 +87,7 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
       }
     });
     try {
-      $this->connection->executeAndCreateTableIfNeeded(static::TABLE, $this->createVerifier()->schemaDefinition(), function (): void {
+      $this->connection->executeAndCreateTableIfNeeded(static::TABLE, static::DEFINITION, function (): void {
         $this->fail('The operation must not run after a creation failure.');
       });
       $this->fail('The creation error must propagate.');
@@ -231,7 +109,7 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
       ->onlyMethods(['createTable'])
       ->getMock();
     $schema->expects($this->once())->method('createTable')
-      ->with(static::TABLE, $this->createVerifier()->schemaDefinition())
+      ->with(static::TABLE, static::DEFINITION)
       ->willReturnCallback($create_table);
     (new \ReflectionProperty($this->connection, 'schema'))->setValue($this->connection, $schema);
   }

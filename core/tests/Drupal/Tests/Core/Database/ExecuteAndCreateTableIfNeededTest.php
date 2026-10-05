@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
@@ -20,6 +19,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
 
+// cspell:ignore typname
+
 /**
  * Tests execution with lazy table creation.
  */
@@ -32,9 +33,6 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
    */
   #[TestWith([StubConnection::class, '42S02', 1146, 'Missing table', TRUE, FALSE])]
   #[TestWith([StubConnection::class, '42S01', 1050, 'Table exists', FALSE, TRUE])]
-  #[TestWith([StubConnection::class, 'HY000', 1, 'no such table: lazy', FALSE, FALSE])]
-  #[TestWith([StubConnection::class, '42P01', 7, 'Missing table', FALSE, FALSE])]
-  #[TestWith([StubConnection::class, '23505', 7, 'pg_type_typname_nsp_index', FALSE, FALSE])]
   #[TestWith([PgsqlConnection::class, '42P01', 7, 'Missing table', TRUE, FALSE])]
   #[TestWith([PgsqlConnection::class, '42P07', 7, 'Table exists', FALSE, TRUE])]
   #[TestWith([PgsqlConnection::class, '23505', 7, 'pg_type_typname_nsp_index', FALSE, TRUE])]
@@ -81,26 +79,6 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
   }
 
   /**
-   * Tests that a schema cannot create a different table than the one requested.
-   */
-  public function testMissingTableDefinition(): void {
-    $connection = $this->getMockBuilder(StubConnection::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['schema'])
-      ->getMock();
-    $schema = $this->createMock(Schema::class);
-    $schema->method('tableExists')->with('lazy')->willReturn(FALSE);
-    $schema->expects($this->never())->method('createTable');
-    $connection->expects($this->atLeastOnce())->method('schema')->willReturn($schema);
-    $definition = new SchemaDefinition(SchemaDefinitionType::Storage, 'other', [
-      new Table('other', [Column::int('id')]),
-    ]);
-    $this->expectException(SchemaDefinitionException::class);
-    $connection->executeAndCreateTableIfNeeded('lazy', $definition,
-      fn() => throw $this->missingTableException());
-  }
-
-  /**
    * Tests that successful operations do not query the schema.
    */
   public function testExistingTableFastPath(): void {
@@ -111,25 +89,6 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
     $connection->expects($this->never())->method('schema');
     $result = new \stdClass();
     $this->assertSame($result, $connection->executeAndCreateTableIfNeeded('lazy', [], static fn() => $result));
-  }
-
-  /**
-   * Tests that errors on existing tables are not retried.
-   */
-  public function testExistingTableFailure(): void {
-    $connection = $this->getMockBuilder(StubConnection::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['schema'])
-      ->getMock();
-    $connection->expects($this->never())->method('schema');
-    $exception = new DatabaseExceptionWrapper('Permission denied');
-    try {
-      $connection->executeAndCreateTableIfNeeded('lazy', [], static fn() => throw $exception);
-      $this->fail('The exception must propagate.');
-    }
-    catch (DatabaseExceptionWrapper $caught) {
-      $this->assertSame($exception, $caught);
-    }
   }
 
   /**

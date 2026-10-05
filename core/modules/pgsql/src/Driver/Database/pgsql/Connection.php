@@ -357,6 +357,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       $state = $previous->errorInfo[0] ?? $previous->getCode();
       // Concurrent CREATE TABLE statements can also collide on the catalog's
       // type-name constraint before the table is visible.
+      // cspell:ignore typname
       if ($state === '42P07' || ($state === '23505' && str_contains($previous->getMessage(), 'pg_type_typname_nsp_index'))) {
         return TRUE;
       }
