@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHand
  */
 class SessionHandler extends AbstractSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface {
 
-
   use DependencySerializationTrait;
 
   /**
@@ -45,19 +44,19 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    * {@inheritdoc}
    */
   public function doRead(#[\SensitiveParameter] string $sessionId): string {
-    if (empty($sessionId)) {
-      return '';
-    }
-    return $this->connection->executeAndCreateTableIfNeeded(
-      'sessions',
-      $this->schemaDefinition(),
-      function () use ($sessionId) {
+    $data = '';
+    if (!empty($sessionId)) {
+      try {
         // Read the session data from the database.
         $query = $this->connection
           ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => Crypt::hashBase64($sessionId)]);
-        return (string) $query->fetchField();
-      },
-    );
+        $data = (string) $query->fetchField();
+      }
+      // Swallow the error if the table hasn't been created yet.
+      catch (\Exception) {
+      }
+    }
+    return $data;
   }
 
   /**
@@ -102,38 +101,37 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    * {@inheritdoc}
    */
   protected function doDestroy(#[\SensitiveParameter] string $sessionId): bool {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      'sessions',
-      $this->schemaDefinition(),
-      function () use ($sessionId) {
-        // Delete session data.
-        $this->connection->delete('sessions')
-          ->condition('sid', Crypt::hashBase64($sessionId))
-          ->execute();
+    try {
+      // Delete session data.
+      $this->connection->delete('sessions')
+        ->condition('sid', Crypt::hashBase64($sessionId))
+        ->execute();
+    }
+    // Swallow the error if the table hasn't been created yet.
+    catch (\Exception) {
+    }
 
-        return TRUE;
-      },
-    );
+    return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function gc(int $lifetime): int|false {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      'sessions',
-      $this->schemaDefinition(),
-      function () use ($lifetime) {
-        // Adjust 'php_value session.gc_maxlifetime' to a large enough value.
-        // For example, if you want user sessions to stay in your database
-        // for three weeks before deleting them, you need to set gc_maxlifetime
-        // to '1814400'. At that value, only after a user doesn't log in after
-        // three weeks (1814400 seconds) will their session be removed.
-        return $this->connection->delete('sessions')
-          ->condition('timestamp', $this->time->getRequestTime() - $lifetime, '<')
-          ->execute();
-      },
-    );
+    // Be sure to adjust 'php_value session.gc_maxlifetime' to a large enough
+    // value. For example, if you want user sessions to stay in your database
+    // for three weeks before deleting them, you need to set gc_maxlifetime
+    // to '1814400'. At that value, only after a user doesn't log in after
+    // three weeks (1814400 seconds) will their session be removed.
+    try {
+      return $this->connection->delete('sessions')
+        ->condition('timestamp', $this->time->getRequestTime() - $lifetime, '<')
+        ->execute();
+    }
+    // Swallow the error if the table hasn't been created yet.
+    catch (\Exception) {
+    }
+    return FALSE;
   }
 
   /**

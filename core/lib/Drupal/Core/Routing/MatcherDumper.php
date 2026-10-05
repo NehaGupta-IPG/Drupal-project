@@ -16,7 +16,6 @@ use Drupal\Core\Database\Connection;
  */
 class MatcherDumper implements MatcherDumperInterface {
 
-
   /**
    * The routes to be dumped.
    *

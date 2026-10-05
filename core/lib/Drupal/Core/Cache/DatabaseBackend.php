@@ -18,7 +18,6 @@ use Drupal\Core\Database\Connection;
  */
 class DatabaseBackend implements CacheBackendInterface {
 
-
   /**
    * The default maximum number of rows that this cache bin table can store.
    *
@@ -115,53 +114,47 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function getMultiple(&$cids, $allow_invalid = FALSE) {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->bin,
-      $this->schemaDefinition(),
-      function () use (&$cids, $allow_invalid) {
-        $cid_mapping = [];
-        foreach ($cids as $cid) {
-          $cid_mapping[$this->normalizeCid($cid)] = $cid;
+    $cid_mapping = [];
+    foreach ($cids as $cid) {
+      $cid_mapping[$this->normalizeCid($cid)] = $cid;
+    }
+    // When serving cached pages, the overhead of using ::select() was found
+    // to add around 30% overhead to the request. Since $this->bin is a
+    // variable, this means the call to ::query() here uses a concatenated
+    // string. This is highly discouraged under any other circumstances, and
+    // is used here only due to the performance overhead we would incur
+    // otherwise. When serving an uncached page, the overhead of using
+    // ::select() is a much smaller proportion of the request.
+    $result = [];
+    try {
+      $result = $this->connection->query('SELECT [cid], [data], [created], [expire], [serialized], [tags], [checksum] FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE [cid] IN ( :cids[] ) ORDER BY [cid]', [':cids[]' => array_keys($cid_mapping)])->fetchAll();
+    }
+    catch (\Exception) {
+      // Nothing to do.
+    }
+    // Before checking the validity of each item individually, register the
+    // cache tags for all returned cache items for preloading, this allows the
+    // cache tag service to optimize cache tag lookups.
+    if ($this->checksumProvider instanceof CacheTagsChecksumPreloadInterface) {
+      $tags_for_preload = [];
+      foreach ($result as $item) {
+        if ($item->tags) {
+          $tags_for_preload[] = explode(' ', $item->tags);
         }
-        // When serving cached pages, the overhead of using ::select() was found
-        // to add around 30% overhead to the request. Since $this->bin is a
-        // variable, this means the call to ::query() here uses a concatenated
-        // string. This is highly discouraged under any other circumstances, and
-        // is used here only due to the performance overhead we would incur
-        // otherwise. When serving an uncached page, the overhead of using
-        // ::select() is a much smaller proportion of the request.
-        $result = [];
-        try {
-          $result = $this->connection->query('SELECT [cid], [data], [created], [expire], [serialized], [tags], [checksum] FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE [cid] IN ( :cids[] ) ORDER BY [cid]', [':cids[]' => array_keys($cid_mapping)])->fetchAll();
-        }
-        catch (\Exception) {
-          // Nothing to do.
-        }
-        // Before checking the validity of each item individually, register the
-        // cache tags for all returned cache items for preloading, allowing the
-        // cache tag service to optimize cache tag lookups.
-        if ($this->checksumProvider instanceof CacheTagsChecksumPreloadInterface) {
-          $tags_for_preload = [];
-          foreach ($result as $item) {
-            if ($item->tags) {
-              $tags_for_preload[] = explode(' ', $item->tags);
-            }
-          }
-          $this->checksumProvider->registerCacheTagsForPreload(array_merge(...$tags_for_preload));
-        }
-        $cache = [];
-        foreach ($result as $item) {
-          // Map the cache ID back to the original.
-          $item->cid = $cid_mapping[$item->cid];
-          $item = $this->prepareItem($item, $allow_invalid);
-          if ($item) {
-            $cache[$item->cid] = $item;
-          }
-        }
-        $cids = array_diff($cids, array_keys($cache));
-        return $cache;
-      },
-    );
+      }
+      $this->checksumProvider->registerCacheTagsForPreload(array_merge(...$tags_for_preload));
+    }
+    $cache = [];
+    foreach ($result as $item) {
+      // Map the cache ID back to the original.
+      $item->cid = $cid_mapping[$item->cid];
+      $item = $this->prepareItem($item, $allow_invalid);
+      if ($item) {
+        $cache[$item->cid] = $item;
+      }
+    }
+    $cids = array_diff($cids, array_keys($cache));
+    return $cache;
   }
 
   /**
@@ -348,65 +341,53 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function invalidateMultiple(array $cids) {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->bin,
-      $this->schemaDefinition(),
-      function () use ($cids) {
-        $cids = array_values(array_map([$this, 'normalizeCid'], $cids));
-        try {
-          // Update in chunks when a large array is passed.
-          $requestTime = $this->time->getRequestTime();
-          foreach (array_chunk($cids, 1000) as $cids_chunk) {
-            $this->connection->update($this->bin)
-              ->fields(['expire' => $requestTime - 1])
-              ->condition('cid', $cids_chunk, 'IN')
-              ->execute();
-          }
-        }
-        catch (\Exception $e) {
-          $this->catchException($e);
-        }
-      },
-    );
+    $cids = array_values(array_map([$this, 'normalizeCid'], $cids));
+    try {
+      // Update in chunks when a large array is passed.
+      $requestTime = $this->time->getRequestTime();
+      foreach (array_chunk($cids, 1000) as $cids_chunk) {
+        $this->connection->update($this->bin)
+          ->fields(['expire' => $requestTime - 1])
+          ->condition('cid', $cids_chunk, 'IN')
+          ->execute();
+      }
+    }
+    catch (\Exception $e) {
+      $this->catchException($e);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function garbageCollection() {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->bin,
-      $this->schemaDefinition(),
-      function () {
-        try {
-          // Bounded size cache bin, using FIFO.
-          if ($this->maxRows !== static::MAXIMUM_NONE) {
-            $first_invalid_create_time = $this->connection->select($this->bin)
-              ->fields($this->bin, ['created'])
-              ->orderBy("{$this->bin}.created", 'DESC')
-              ->range($this->maxRows, 1)
-              ->execute()
-              ->fetchField();
+    try {
+      // Bounded size cache bin, using FIFO.
+      if ($this->maxRows !== static::MAXIMUM_NONE) {
+        $first_invalid_create_time = $this->connection->select($this->bin)
+          ->fields($this->bin, ['created'])
+          ->orderBy("{$this->bin}.created", 'DESC')
+          ->range($this->maxRows, 1)
+          ->execute()
+          ->fetchField();
 
-            if ($first_invalid_create_time) {
-              $this->connection->delete($this->bin)
-                ->condition('created', $first_invalid_create_time, '<=')
-                ->execute();
-            }
-          }
-
+        if ($first_invalid_create_time) {
           $this->connection->delete($this->bin)
-            ->condition('expire', Cache::PERMANENT, '<>')
-            ->condition('expire', $this->time->getRequestTime(), '<')
+            ->condition('created', $first_invalid_create_time, '<=')
             ->execute();
         }
-        catch (\Exception) {
-          // If the table does not exist, it surely does not have garbage in it.
-          // If the table exists, the next garbage collection will clean up.
-          // There is nothing to do.
-        }
-      },
-    );
+      }
+
+      $this->connection->delete($this->bin)
+        ->condition('expire', Cache::PERMANENT, '<>')
+        ->condition('expire', $this->time->getRequestTime(), '<')
+        ->execute();
+    }
+    catch (\Exception) {
+      // If the table does not exist, it surely does not have garbage in it.
+      // If the table exists, the next garbage collection will clean up.
+      // There is nothing to do.
+    }
   }
 
   /**

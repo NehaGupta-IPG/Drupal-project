@@ -13,7 +13,6 @@ use Drupal\Core\Database\IntegrityConstraintViolationException;
  */
 class DatabaseLockBackend extends LockBackendAbstract {
 
-
   /**
    * The database table name.
    */
@@ -43,129 +42,110 @@ class DatabaseLockBackend extends LockBackendAbstract {
    * {@inheritdoc}
    */
   public function acquire($name, $timeout = 30.0) {
-    return $this->database->executeAndCreateTableIfNeeded(
-      static::TABLE_NAME,
-      $this->schemaDefinition(),
-      function () use ($name, $timeout) {
-        $name = $this->normalizeName($name);
+    $name = $this->normalizeName($name);
 
-        // Insure that the timeout is at least 1 ms.
-        $timeout = max($timeout, 0.001);
-        $expire = microtime(TRUE) + $timeout;
-        if (isset($this->locks[$name])) {
-          // Try to extend the expiration of a lock we already acquired.
-          $success = (bool) $this->database->update('semaphore')
-            ->fields(['expire' => $expire])
-            ->condition('name', $name)
-            ->condition('value', $this->getLockId())
-            ->execute();
-          if (!$success) {
-            // The lock was broken.
-            unset($this->locks[$name]);
-          }
-          return $success;
-        }
-        else {
-          // Optimistically try to acquire the lock, then retry once if it
-          // fails.
-          // The first time through the loop cannot be a retry.
+    // Insure that the timeout is at least 1 ms.
+    $timeout = max($timeout, 0.001);
+    $expire = microtime(TRUE) + $timeout;
+    if (isset($this->locks[$name])) {
+      // Try to extend the expiration of a lock we already acquired.
+      $success = (bool) $this->database->update('semaphore')
+        ->fields(['expire' => $expire])
+        ->condition('name', $name)
+        ->condition('value', $this->getLockId())
+        ->execute();
+      if (!$success) {
+        // The lock was broken.
+        unset($this->locks[$name]);
+      }
+      return $success;
+    }
+    else {
+      // Optimistically try to acquire the lock, then retry once if it fails.
+      // The first time through the loop cannot be a retry.
+      $retry = FALSE;
+      // We always want to do this code at least once.
+      do {
+        try {
+          $this->database->executeAndCreateTableIfNeeded(
+            static::TABLE_NAME,
+            $this->schemaDefinition(),
+            fn() => $this->database->insert('semaphore')
+              ->fields([
+                'name' => $name,
+                'value' => $this->getLockId(),
+                'expire' => $expire,
+              ])
+              ->execute(),
+          );
+          // We track all acquired locks in the global variable.
+          $this->locks[$name] = TRUE;
+          // We never need to try again.
           $retry = FALSE;
-          // We always want to do this code at least once.
-          do {
-            try {
-              $this->database->insert('semaphore')
-                ->fields([
-                  'name' => $name,
-                  'value' => $this->getLockId(),
-                  'expire' => $expire,
-                ])
-                ->execute();
-              // We track all acquired locks in the global variable.
-              $this->locks[$name] = TRUE;
-              // We never need to try again.
-              $retry = FALSE;
-            }
-            catch (IntegrityConstraintViolationException) {
-              // Suppress the error. If this is our first pass through the loop,
-              // then $retry is FALSE. In this case, the insert failed because
-              // some
-              // other request acquired the lock but did not release it. We
-              // decide
-              // whether to retry by checking lockMayBeAvailable(). This will
-              // clear
-              // the offending row from the database table in case it has
-              // expired.
-              $retry = $retry ? FALSE : $this->lockMayBeAvailable($name);
-            }
-            // We only retry in case the first attempt failed, but we then broke
-            // an expired lock.
-          } while ($retry);
         }
-        return isset($this->locks[$name]);
-      },
-    );
+        catch (IntegrityConstraintViolationException) {
+          // Suppress the error. If this is our first pass through the loop,
+          // then $retry is FALSE. In this case, the insert failed because some
+          // other request acquired the lock but did not release it. We decide
+          // whether to retry by checking lockMayBeAvailable(). This will clear
+          // the offending row from the database table in case it has expired.
+          $retry = $retry ? FALSE : $this->lockMayBeAvailable($name);
+        }
+        // We only retry in case the first attempt failed, but we then broke
+        // an expired lock.
+      } while ($retry);
+    }
+    return isset($this->locks[$name]);
   }
 
   /**
    * {@inheritdoc}
    */
   public function lockMayBeAvailable($name) {
-    return $this->database->executeAndCreateTableIfNeeded(
-      static::TABLE_NAME,
-      $this->schemaDefinition(),
-      function () use ($name) {
-        $name = $this->normalizeName($name);
+    $name = $this->normalizeName($name);
 
-        try {
-          $lock = $this->database->query('SELECT [expire], [value] FROM {semaphore} WHERE [name] = :name', [':name' => $name])->fetchAssoc();
-        }
-        catch (\Exception $e) {
-          $this->catchException($e);
-          // If the table does not exist yet then the lock may be available.
-          $lock = FALSE;
-        }
-        if (!$lock) {
-          return TRUE;
-        }
-        $expire = (float) $lock['expire'];
-        $now = microtime(TRUE);
-        if ($now > $expire) {
-          // We check two conditions to prevent a race condition where another
-          // request acquired the lock and set a new expire time. We add a small
-          // number to $expire to avoid errors with float to string conversion.
-          return (bool) $this->database->delete('semaphore')
-            ->condition('name', $name)
-            ->condition('value', $lock['value'])
-            ->condition('expire', 0.0001 + $expire, '<=')
-            ->execute();
-        }
-        return FALSE;
-      },
-    );
+    try {
+      $lock = $this->database->query('SELECT [expire], [value] FROM {semaphore} WHERE [name] = :name', [':name' => $name])->fetchAssoc();
+    }
+    catch (\Exception $e) {
+      $this->catchException($e);
+      // If the table does not exist yet then the lock may be available.
+      $lock = FALSE;
+    }
+    if (!$lock) {
+      return TRUE;
+    }
+    $expire = (float) $lock['expire'];
+    $now = microtime(TRUE);
+    if ($now > $expire) {
+      // We check two conditions to prevent a race condition where another
+      // request acquired the lock and set a new expire time. We add a small
+      // number to $expire to avoid errors with float to string conversion.
+      return (bool) $this->database->delete('semaphore')
+        ->condition('name', $name)
+        ->condition('value', $lock['value'])
+        ->condition('expire', 0.0001 + $expire, '<=')
+        ->execute();
+    }
+    return FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function release($name) {
-    return $this->database->executeAndCreateTableIfNeeded(
-      static::TABLE_NAME,
-      $this->schemaDefinition(),
-      function () use ($name) {
-        $name = $this->normalizeName($name);
+    $name = $this->normalizeName($name);
 
-        unset($this->locks[$name]);
-        try {
-          $this->database->delete('semaphore')
-            ->condition('name', $name)
-            ->condition('value', $this->getLockId())
-            ->execute();
-        }
-        catch (\Exception $e) {
-          $this->catchException($e);
-        }
-      },
-    );
+    unset($this->locks[$name]);
+    try {
+      $this->database->delete('semaphore')
+        ->condition('name', $name)
+        ->condition('value', $this->getLockId())
+        ->execute();
+    }
+    catch (\Exception $e) {
+      $this->catchException($e);
+    }
   }
 
   /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
-use Drupal\Core\Config\DatabaseStorage as ConfigDatabaseStorage;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
@@ -111,31 +110,6 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
       $property->setValue($this->connection, $original_schema);
       Database::removeConnection('lazy_race');
     }
-  }
-
-  /**
-   * Tests the empty-result contract without unnecessary creation on safe reads.
-   */
-  #[DataProvider('transactionProvider')]
-  public function testMissingTableRead(bool $in_transaction): void {
-    $table = 'lazy_read_test';
-    $storage = new ConfigDatabaseStorage($this->connection, $table);
-    $transaction = $in_transaction ? $this->connection->startTransaction() : NULL;
-    $this->assertFalse($storage->read('missing'));
-    $this->assertSame($in_transaction && $this->checksTableFirstInTransaction(), $this->connection->schema()->tableExists($table));
-    $transaction?->commitOrRelease();
-  }
-
-  /**
-   * Tests that empty requests never create a table, even in a transaction.
-   */
-  public function testEmptyRead(): void {
-    $table = 'lazy_empty_read_test';
-    $storage = new ConfigDatabaseStorage($this->connection, $table);
-    $transaction = $this->connection->startTransaction();
-    $this->assertSame([], $storage->readMultiple([]));
-    $this->assertFalse($this->connection->schema()->tableExists($table));
-    $transaction->commitOrRelease();
   }
 
 }

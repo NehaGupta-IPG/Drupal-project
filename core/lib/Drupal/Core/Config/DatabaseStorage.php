@@ -63,56 +63,44 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function exists($name) {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      function () use ($name) {
-        try {
-          return (bool) $this->connection->queryRange('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', 0, 1, [
-            ':collection' => $this->collection,
-            ':name' => $name,
-          ], $this->options)->fetchField();
-        }
-        catch (\Exception $e) {
-          if ($this->connection->schema()->tableExists($this->table)) {
-            throw $e;
-          }
-          // If we attempt a read without actually having the table available,
-          // return false so the caller can handle it.
-          return FALSE;
-        }
-      },
-    );
+    try {
+      return (bool) $this->connection->queryRange('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', 0, 1, [
+        ':collection' => $this->collection,
+        ':name' => $name,
+      ], $this->options)->fetchField();
+    }
+    catch (\Exception $e) {
+      if ($this->connection->schema()->tableExists($this->table)) {
+        throw $e;
+      }
+      // If we attempt a read without actually having the table available,
+      // return false so the caller can handle it.
+      return FALSE;
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function read($name) {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      function () use ($name) {
-        $data = FALSE;
-        try {
-          $raw = $this->connection->query('SELECT [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', [
-            ':collection' => $this->collection,
-            ':name' => $name,
-          ], $this->options)->fetchField();
-          if ($raw !== FALSE) {
-            $data = $this->decode($raw);
-          }
-        }
-        catch (\Exception $e) {
-          if ($this->connection->schema()->tableExists($this->table)) {
-            throw $e;
-          }
-          // If we attempt a read without actually having the table available,
-          // return false so the caller can handle it.
-        }
-        return $data;
-      },
-    );
+    $data = FALSE;
+    try {
+      $raw = $this->connection->query('SELECT [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', [
+        ':collection' => $this->collection,
+        ':name' => $name,
+      ], $this->options)->fetchField();
+      if ($raw !== FALSE) {
+        $data = $this->decode($raw);
+      }
+    }
+    catch (\Exception $e) {
+      if ($this->connection->schema()->tableExists($this->table)) {
+        throw $e;
+      }
+      // If we attempt a read without actually having the table available,
+      // return false so the caller can handle it.
+    }
+    return $data;
   }
 
   /**
@@ -122,32 +110,27 @@ class DatabaseStorage implements StorageInterface {
     if (empty($names)) {
       return [];
     }
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      function () use ($names) {
-        $list = [];
-        try {
-          $list = $this->connection
-            ->query('SELECT [name], [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] IN ( :names[] )', [
-              ':collection' => $this->collection,
-              ':names[]' => $names,
-            ], $this->options)
-            ->fetchAllKeyed();
-          foreach ($list as &$data) {
-            $data = $this->decode($data);
-          }
-        }
-        catch (\Exception $e) {
-          if ($this->connection->schema()->tableExists($this->table)) {
-            throw $e;
-          }
-          // If we attempt a read without actually having the table available,
-          // return an empty array so the caller can handle it.
-        }
-        return $list;
-      },
-    );
+
+    $list = [];
+    try {
+      $list = $this->connection
+        ->query('SELECT [name], [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] IN ( :names[] )', [
+          ':collection' => $this->collection,
+          ':names[]' => $names,
+        ], $this->options)
+        ->fetchAllKeyed();
+      foreach ($list as &$data) {
+        $data = $this->decode($data);
+      }
+    }
+    catch (\Exception $e) {
+      if ($this->connection->schema()->tableExists($this->table)) {
+        throw $e;
+      }
+      // If we attempt a read without actually having the table available,
+      // return an empty array so the caller can handle it.
+    }
+    return $list;
   }
 
   /**
@@ -265,54 +248,42 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function listAll($prefix = '') {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      function () use ($prefix) {
-        try {
-          $query = $this->connection->select($this->table);
-          $query->fields($this->table, ['name']);
-          $query->condition('collection', $this->collection, '=');
-          $query->condition('name', $prefix . '%', 'LIKE');
-          $query->orderBy('collection')->orderBy('name');
-          return $query->execute()->fetchCol();
-        }
-        catch (\Exception $e) {
-          if ($this->connection->schema()->tableExists($this->table)) {
-            throw $e;
-          }
-          // If we attempt a read without actually having the table available,
-          // return an empty array so the caller can handle it.
-          return [];
-        }
-      },
-    );
+    try {
+      $query = $this->connection->select($this->table);
+      $query->fields($this->table, ['name']);
+      $query->condition('collection', $this->collection, '=');
+      $query->condition('name', $prefix . '%', 'LIKE');
+      $query->orderBy('collection')->orderBy('name');
+      return $query->execute()->fetchCol();
+    }
+    catch (\Exception $e) {
+      if ($this->connection->schema()->tableExists($this->table)) {
+        throw $e;
+      }
+      // If we attempt a read without actually having the table available,
+      // return an empty array so the caller can handle it.
+      return [];
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteAll($prefix = '') {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      function () use ($prefix) {
-        try {
-          return (bool) $this->connection->delete($this->table, $this->options)
-            ->condition('name', $prefix . '%', 'LIKE')
-            ->condition('collection', $this->collection)
-            ->execute();
-        }
-        catch (\Exception $e) {
-          if ($this->connection->schema()->tableExists($this->table)) {
-            throw $e;
-          }
-          // If we attempt a delete without actually having the table available,
-          // return false so the caller can handle it.
-          return FALSE;
-        }
-      },
-    );
+    try {
+      return (bool) $this->connection->delete($this->table, $this->options)
+        ->condition('name', $prefix . '%', 'LIKE')
+        ->condition('collection', $this->collection)
+        ->execute();
+    }
+    catch (\Exception $e) {
+      if ($this->connection->schema()->tableExists($this->table)) {
+        throw $e;
+      }
+      // If we attempt a delete without actually having the table available,
+      // return false so the caller can handle it.
+      return FALSE;
+    }
   }
 
   /**
@@ -338,25 +309,19 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function getAllCollectionNames() {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      function () {
-        try {
-          return $this->connection->query('SELECT DISTINCT [collection] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] <> :collection ORDER by [collection]', [
-            ':collection' => StorageInterface::DEFAULT_COLLECTION,
-          ])->fetchCol();
-        }
-        catch (\Exception $e) {
-          if ($this->connection->schema()->tableExists($this->table)) {
-            throw $e;
-          }
-          // If we attempt a read without actually having the table available,
-          // return an empty array so the caller can handle it.
-          return [];
-        }
-      },
-    );
+    try {
+      return $this->connection->query('SELECT DISTINCT [collection] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] <> :collection ORDER by [collection]', [
+        ':collection' => StorageInterface::DEFAULT_COLLECTION,
+      ])->fetchCol();
+    }
+    catch (\Exception $e) {
+      if ($this->connection->schema()->tableExists($this->table)) {
+        throw $e;
+      }
+      // If we attempt a read without actually having the table available,
+      // return an empty array so the caller can handle it.
+      return [];
+    }
   }
 
 }
