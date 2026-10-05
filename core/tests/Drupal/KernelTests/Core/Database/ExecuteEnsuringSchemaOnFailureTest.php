@@ -17,6 +17,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
 
+  /**
+   * Tests a valid callback when the schema already exists.
+   */
   public function testValidCallbackOnExistingSchema(): void {
     // Create the tables before executing the test.
     $this->connection->schema()->createTable('fixture_header', $this->validMultiTableFixtureSchema()['fixture_header']);
@@ -41,6 +44,9 @@ class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
     $this->assertEquals(1, $this->connection->select('fixture_detail', 'h')->countQuery()->execute()->fetchField());
   }
 
+  /**
+   * Tests a valid callback on a missing schema, retried after creation.
+   */
   public function testValidCallbackOnMissingMultiTableSchemaAndRetry(): void {
     $execution = $this->connection->executeEnsuringSchemaOnFailure(
       execute: function (): int {
@@ -62,6 +68,9 @@ class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
     $this->assertEquals(1, $this->connection->select('fixture_detail', 'h')->countQuery()->execute()->fetchField());
   }
 
+  /**
+   * Tests a valid callback on a missing schema, not retried.
+   */
   public function testValidCallbackOnMissingMultiTableSchemaNoRetry(): void {
     $execution = $this->connection->executeEnsuringSchemaOnFailure(
       execute: function (): int {
@@ -85,6 +94,9 @@ class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
     $execution->getResult();
   }
 
+  /**
+   * Tests a broken callback when the schema already exists.
+   */
   public function testBrokenCallbackOnExistingSchema(): void {
     $this->connection->schema()->createTable('fixture_header', $this->validMultiTableFixtureSchema()['fixture_header']);
     $this->connection->schema()->createTable('fixture_detail', $this->validMultiTableFixtureSchema()['fixture_detail']);
@@ -102,12 +114,15 @@ class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
     );
   }
 
+  /**
+   * Tests a broken callback on a missing schema, retried after creation.
+   */
   public function testBrokenCallbackOnMissingMultiTableSchemaAndRetry(): void {
     $this->assertFalse($this->connection->schema()->tableExists('fixture_header'));
     $this->assertFalse($this->connection->schema()->tableExists('fixture_detail'));
 
     try {
-      $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      $this->connection->executeEnsuringSchemaOnFailure(
         execute: function (): int {
           return $this->connection->query('bananas')->execute()->fetchField();
         },
@@ -125,6 +140,9 @@ class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
     $this->assertTrue($this->connection->schema()->tableExists('fixture_detail'));
   }
 
+  /**
+   * Tests a broken callback on a missing schema, not retried.
+   */
   public function testBrokenCallbackOnMissingMultiTableSchemaNoRetry(): void {
     $this->assertFalse($this->connection->schema()->tableExists('fixture_header'));
     $this->assertFalse($this->connection->schema()->tableExists('fixture_detail'));
@@ -151,6 +169,9 @@ class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
     $execution->getResult();
   }
 
+  /**
+   * Tests a callback fetching a missing field from an existing schema.
+   */
   public function testCallbackFetchingMissingFieldOnExistingSchema(): void {
     // Create the tables before executing the test.
     $this->connection->schema()->createTable('fixture_header', $this->validMultiTableFixtureSchema()['fixture_header']);
@@ -161,7 +182,7 @@ class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
     // ::executeEnsuringSchemaOnFailure().
     $this->expectException(DatabaseExceptionWrapper::class);
 
-    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+    $this->connection->executeEnsuringSchemaOnFailure(
       execute: function (): int {
         $query = $this->connection->select('fixture_header', 'h');
         $query->fields('h', ['qux']);
@@ -171,6 +192,9 @@ class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
     );
   }
 
+  /**
+   * Tests a valid callback with a successful schema callback.
+   */
   public function testValidCallbackOnSuccessfulSchemaCallback(): void {
     $execution = $this->connection->executeEnsuringSchemaOnFailure(
       execute: function (): int {
@@ -196,6 +220,9 @@ class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
     $this->assertEquals(1, $this->connection->select('fixture_detail', 'h')->countQuery()->execute()->fetchField());
   }
 
+  /**
+   * Tests a valid callback with a failing schema callback.
+   */
   public function testValidCallbackOnBrokenSchemaCallback(): void {
     // The initial callback execution failed, and the schema creation was
     // unsuccessful too. We expect an exception reporting the failed schema
@@ -215,6 +242,12 @@ class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
     );
   }
 
+  /**
+   * Returns the schema definition of the fixture tables.
+   *
+   * @return array<string,array<string,mixed>>
+   *   The schema definition, keyed by table name.
+   */
   protected function validMultiTableFixtureSchema(): array {
     return [
       'fixture_header' => [
@@ -258,6 +291,12 @@ class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
     ];
   }
 
+  /**
+   * Inserts rows into the fixture tables.
+   *
+   * @return int
+   *   The ID of the inserted fixture header row.
+   */
   protected function insertIntoFixtureTables(): int {
     $hid = (int) $this->connection->insert('fixture_header')
       ->fields([

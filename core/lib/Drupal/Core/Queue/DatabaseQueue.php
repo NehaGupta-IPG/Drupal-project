@@ -57,9 +57,9 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
           ->fields([
             'name' => $this->name,
             'data' => serialize($data),
-            // We cannot rely on \Drupal::time()->getRequestTime() because many
-            // items might be created by a single request which takes longer than
-            // 1 second.
+            // We cannot rely on \Drupal::time()->getRequestTime() because
+            // many items might be created by a single request which takes
+            // longer than 1 second.
             'created' => \Drupal::time()->getCurrentTime(),
           ]);
         // Return the new serial ID, or FALSE on failure.

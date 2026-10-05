@@ -83,11 +83,12 @@ class DatabaseLockBackend extends LockBackendAbstract {
               $retry = FALSE;
             }
             catch (IntegrityConstraintViolationException) {
-              // Suppress the error. If this is our first pass through the loop,
-              // then $retry is FALSE. In this case, the insert failed because some
-              // other request acquired the lock but did not release it. We decide
-              // whether to retry by checking lockMayBeAvailable(). This will clear
-              // the offending row from the database table in case it has expired.
+              // Suppress the error. If this is our first pass through the
+              // loop, then $retry is FALSE. In this case, the insert failed
+              // because some other request acquired the lock but did not
+              // release it. We decide whether to retry by checking
+              // lockMayBeAvailable(). This will clear the offending row from
+              // the database table in case it has expired.
               $retry = $retry ? FALSE : $this->lockMayBeAvailable($name);
             }
           },

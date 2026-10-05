@@ -12,6 +12,12 @@ use Drupal\Core\Database\StatementInterface;
  *
  * Note that query builders use PHP's magic __toString() method to compile the
  * query object into a prepared statement.
+ *
+ * Every concrete query builder implements an execute() method that runs the
+ * query against the database. Its return type differs per query type, so it
+ * is not declared as an abstract method here.
+ *
+ * @method mixed execute()
  */
 abstract class Query implements PlaceholderInterface {
 
