@@ -61,7 +61,7 @@ class ElementsDetailsTest extends KernelTestBase implements FormInterface {
     $this->render($form);
 
     // Verify that summary element contains a "(required)" text.
-    $elements = $this->xpath('//details[@id="edit-details-required"]//summary[contains(@class,"js-form-required")]//span[@aria-hidden="true" and @class="hidden" and @data-drupal-required and contains(text(), " (required)")]');
+    $elements = $this->getSimpleXmlElementsByXpath('//details[@id="edit-details-required"]//summary[contains(@class,"js-form-required")]//span[@aria-hidden="true" and @class="hidden" and @data-drupal-required and contains(text(), " (required)")]');
     $this->assertCount(1, $elements);
   }
 
