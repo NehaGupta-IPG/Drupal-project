@@ -309,6 +309,10 @@ class DatabaseBackend implements CacheBackendInterface {
    */
   public function deleteMultiple(array $cids) {
     $cids = array_values(array_map([$this, 'normalizeCid'], $cids));
+    // Delete in chunks when a large array is passed. Create the cache table
+    // if needed, which will be empty. This fixes cases during core install
+    // where a cache table is cleared before it is set with {cache_render} and
+    // {cache_data}.
     foreach (array_chunk($cids, 1000) as $cids_chunk) {
       $this->connection->executeAndCreateTableIfNeeded(
         $this->bin,
@@ -324,6 +328,9 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function deleteAll() {
+    // Create the cache table if needed, which will be empty. This fixes cases
+    // during core install where a cache table is cleared before it is set
+    // with {cache_render} and {cache_data}.
     $this->connection->executeAndCreateTableIfNeeded(
       $this->bin,
       $this->schemaDefinition(),

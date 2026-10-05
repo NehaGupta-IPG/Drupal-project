@@ -18,13 +18,6 @@ readonly class UserSessionRepository implements UserSessionRepositoryInterface {
    * {@inheritdoc}
    */
   public function deleteAll(int $uid): void {
-    // On some drivers, a failed delete query below aborts the enclosing
-    // transaction. When the table does not exist there are no sessions to
-    // delete. Deleting the sessions of a user inside a transaction is rare
-    // enough that the extra lookup does not matter.
-    if ($this->connection->inTransaction() && !$this->connection->schema()->tableExists('sessions')) {
-      return;
-    }
     try {
       // Delete session data.
       $this->connection->delete('sessions')

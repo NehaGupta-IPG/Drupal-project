@@ -109,13 +109,13 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
    * {@inheritdoc}
    */
   public function isAllowed($name, $threshold, $window = 3600, $identifier = NULL) {
+    if (!isset($identifier)) {
+      $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
+    }
     return $this->connection->executeAndCreateTableIfNeeded(
       static::TABLE_NAME,
       $this->schemaDefinition(),
       function () use ($name, $threshold, $window, $identifier) {
-        if (!isset($identifier)) {
-          $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
-        }
         $number = $this->connection->select(static::TABLE_NAME, 'f')
           ->condition('event', $name)
           ->condition('identifier', $identifier)

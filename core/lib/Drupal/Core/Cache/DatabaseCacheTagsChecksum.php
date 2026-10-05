@@ -34,6 +34,8 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
    * {@inheritdoc}
    */
   protected function doInvalidateTags(array $tags) {
+    // Create the cache tags table if needed. This fixes cases during core
+    // install where cache tags are invalidated before the table is created.
     foreach ($tags as $tag) {
       $this->connection->executeAndCreateTableIfNeeded(
         'cachetags',
