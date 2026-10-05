@@ -123,6 +123,13 @@ class ViewsViewsHooks {
         'id' => 'display_link',
       ],
     ];
+    $data['views']['link'] = [
+      'title' => $this->t('Link'),
+      'help' => $this->t('Displays a link to an internal or external URL, for example to create content when the view is empty.'),
+      'area' => [
+        'id' => 'link',
+      ],
+    ];
     // Registers an entity area handler per entity type.
     foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type_id => $entity_type) {
       // Excludes entity types, which cannot be rendered.
