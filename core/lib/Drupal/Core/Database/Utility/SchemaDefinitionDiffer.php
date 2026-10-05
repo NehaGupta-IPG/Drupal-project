@@ -90,40 +90,37 @@ class SchemaDefinitionDiffer {
         $newFirstArrayKey = is_array($new[$key] ?? NULL) ? array_first($new[$key]) : NULL;
         $isSchemaDefinitionArray = ($oldFirstArrayKey ?? $newFirstArrayKey) instanceof SchemaDefinitionInterface;
         if ($isSchemaDefinitionArray) {
+          $oldKeyAsArray = $old[$key] ?? [];
+          $newKeyAsArray = $new[$key] ?? [];
+          assert(is_iterable($newKeyAsArray));
           $schemaDefinitionClass = get_class($oldFirstArrayKey ?? $newFirstArrayKey);
           $schemaDefinitionNormalizationProperty = $schemaDefinitionClass::normalizationProperty();
           if (isset($schemaDefinitionNormalizationProperty)) {
-            $oldKeyAsArray = $old[$key] ?? [];
-            $newKeyAsArray = $new[$key] ?? [];
-            assert(is_iterable($newKeyAsArray));
-            $tmp = [];
+            $oldKey = [];
             foreach ($oldKeyAsArray as $value) {
               /** @var string $normalizedKey */
               $normalizedKey = $value->{$schemaDefinitionNormalizationProperty};
-              $tmp[$normalizedKey] = $value;
+              $oldKey[$normalizedKey] = $value;
             }
-            $old[$key] = $tmp;
-            $tmp = [];
+            $newKey = [];
             foreach ($newKeyAsArray as $value) {
               /** @var string $normalizedKey */
               $normalizedKey = $value->{$schemaDefinitionNormalizationProperty};
-              $tmp[$normalizedKey] = $value;
+              $newKey[$normalizedKey] = $value;
             }
-            $new[$key] = $tmp;
           }
-          /** @var scalar|array|SchemaDefinitionInterface $oldKey */
-          $oldKey = $old[$key];
-          /** @var scalar|array|SchemaDefinitionInterface $newKey */
-          $newKey = $new[$key];
+          else {
+            $oldKey = $old[$key];
+            $newKey = $new[$key];
+          }
         }
         else {
-          /** @var scalar|array|SchemaDefinitionInterface $oldKey */
           $oldKey = $old[$key];
-          /** @var scalar|array|SchemaDefinitionInterface $newKey */
           $newKey = $new[$key];
         }
 
-
+        /** @var scalar|array|SchemaDefinitionInterface $oldKey */
+        /** @var scalar|array|SchemaDefinitionInterface $newKey */
         $diff = array_merge($diff, static::computeDiff($oldKey, $newKey, $currentPath, is_array($oldKey) && is_array($newKey)));
       }
 
