@@ -58,8 +58,8 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
         'name' => 'Stark',
         'dependencies' => [],
       ],
-      'claro' => [
-        'name' => 'Claro',
+      'default_admin' => [
+        'name' => 'Admin',
         'dependencies' => [],
       ],
     ]);
@@ -83,8 +83,8 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
         'name' => 'Stark',
         'dependencies' => [],
       ],
-      'claro' => [
-        'name' => 'Claro',
+      'default_admin' => [
+        'name' => 'Admin',
         'dependencies' => [],
       ],
       $theme => [
@@ -124,8 +124,8 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
         'name' => 'Stark',
         'dependencies' => [],
       ],
-      'claro' => [
-        'name' => 'Claro',
+      'default_admin' => [
+        'name' => 'Default Admin',
         'dependencies' => [],
       ],
       $theme1 => [
@@ -170,8 +170,8 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
         'name' => 'Stark',
         'dependencies' => [],
       ],
-      'claro' => [
-        'name' => 'Claro',
+      'default_admin' => [
+        'name' => 'Default Admin',
         'dependencies' => [],
       ],
       'one_theme' => [
