@@ -65,8 +65,10 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    */
   public function doWrite(#[\SensitiveParameter] string $sessionId, string $data): bool {
     $request = $this->requestStack->getCurrentRequest();
-    $doWrite = fn() =>
-      $this->connection->upsert('sessions')
+    $this->connection->executeAndCreateTableIfNeeded(
+      'sessions',
+      $this->schemaDefinition(),
+      fn() => $this->connection->upsert('sessions')
         ->key('sid')
         ->fields([
           'sid' => Crypt::hashBase64($sessionId),
@@ -75,11 +77,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
           'session' => $data,
           'timestamp' => $this->time->getRequestTime(),
         ])
-        ->execute();
-    $this->connection->executeAndCreateTableIfNeeded(
-      'sessions',
-      $this->schemaDefinition(),
-      $doWrite,
+        ->execute(),
     );
     return TRUE;
   }
