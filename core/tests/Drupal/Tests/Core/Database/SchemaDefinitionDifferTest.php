@@ -22,7 +22,7 @@ use PHPUnit\Framework\Attributes\Group;
 /**
  * Tests Schema differ.
  *
- * @phpstan-type-import DiffEntry from \Drupal\Core\Database\Utility\SchemaDefinitionDiffer
+ * @phpstan-import-type DiffEntry from \Drupal\Core\Database\Utility\SchemaDefinitionDiffer
  */
 #[Group('Database')]
 #[CoversClass(SchemaDefinitionDiffer::class)]
