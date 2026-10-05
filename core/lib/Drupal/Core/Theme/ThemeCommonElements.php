@@ -248,6 +248,9 @@ class ThemeCommonElements {
         'render element' => 'element',
         'initial preprocess' => FormPreprocess::class . ':preprocessFormElementLabel',
       ],
+      'form_element_title_required' => [
+        'render element' => 'element',
+      ],
       'vertical_tabs' => [
         'render element' => 'element',
         'initial preprocess' => FormPreprocess::class . ':preprocessVerticalTabs',

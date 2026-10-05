@@ -4,7 +4,6 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -240,16 +239,22 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
    *   The modified element with all group members.
    */
   public static function preRenderRequiredElementTitle($element): array {
-    // Add "(required)" to '#title' of required elements.
+    // Add " (required)" to '#title' of required elements.
     // Drupal currently allows empty '#title' values to hide labels.
     // We don't want to blindly add text to these.
-    // We don't add "(required)" with HTML to 'title' attributes.
+    // We also don't add " (required)" with HTML to 'title' attributes.
     // Only checkboxes and radios support 'attribute' for '#title_display',
     // and CompositeFormElementTrait::preRenderCompositeFormElement()
-    // adds "(Required)" to 'title' attributes for these cases.
+    // adds "(Required)" to the 'title' attributes for these cases.
     // @todo Adjust condition after https://www.drupal.org/i/933004.
     if (!empty($element['#required']) && !empty($element['#title']) && $element['#title_display'] !== 'attribute') {
-      $element['#title'] = new TranslatableMarkup('@title <span aria-hidden="true" class="hidden" data-drupal-required> (required)</span>', ['@title' => $element['#title']]);
+      $required_text = [
+        '#title' => $element['#title'],
+        '#theme' => [
+          'form_element_title_required',
+        ],
+      ];
+      $element['#title'] = \Drupal::service('renderer')->render($required_text);
     }
 
     return $element;
