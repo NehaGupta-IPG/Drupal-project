@@ -2311,19 +2311,6 @@ function hook_mail_backend_info_alter(&$info) {
 }
 
 /**
- * Alter the default country list.
- *
- * @param string[][] $countries
- *   The associative array of countries keyed by two-letter country code.
- *
- * @see \Drupal\Core\Locale\CountryManager::getList()
- */
-function hook_countries_alter(&$countries) {
-  // Elbonia is now independent, so add it to the country list.
-  $countries['EB'] = 'Elbonia';
-}
-
-/**
  * Alter display variant plugin definitions.
  *
  * @param array $definitions

@@ -64,7 +64,44 @@ use Drupal\Core\Language\LanguageInterface;
  *   Drupal.org, see
  *   @link interface_translation_properties Interface translation properties topic @endlink
  *   for information on how to make sure your UI text is translatable.
+ */
+
+/**
+ * @section localization Localization
  *
+ * Drupal core uses the Common Locale Data Repository (CLDR) country list. The
+ * list is modified to remove some locales that are not countries and limits the
+ * list to locales that have a 2 digit country code.
+ *
+ * Sites can alter the list with hook_countries_alter
+ *
+ * The modifications are done by the update-countries.sh script.
+ * @}
+ */
+
+/**
+ * @addtogroup hooks
+ * @{
+ */
+
+/**
+ * Alter the default country list.
+ *
+ * @param string[][] $countries
+ *   The associative array of countries keyed by two-letter country code.
+ *
+ * @see \Drupal\Core\Locale\CountryManager::getList()
+ */
+function hook_countries_alter(&$countries) {
+  // Elbonia is now independent, so add it to the country list.
+  $countries['EB'] = 'Elbonia';
+}
+
+/**
+ * @} End of "addtogroup hooks".
+ */
+
+/**
  * @section translation Translation
  * Once your data and user interface are internationalized, the following Core
  * modules are used to translate it into different languages (machine names of
