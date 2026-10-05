@@ -34,7 +34,7 @@ class Link extends TokenizeAreaPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     $form['path'] = [
       '#type' => 'textfield',
       '#title' => $this->t('URL'),
@@ -67,7 +67,7 @@ class Link extends TokenizeAreaPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function validateOptionsForm(&$form, FormStateInterface $form_state) {
+  public function validateOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::validateOptionsForm($form, $form_state);
 
     $path = trim($form_state->getValue(['options', 'path']));
