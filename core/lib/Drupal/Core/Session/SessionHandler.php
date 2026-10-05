@@ -5,6 +5,7 @@ namespace Drupal\Core\Session;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
@@ -202,6 +203,36 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
     ];
 
     return $schema;
+  }
+
+  /**
+   * Check if the session table exists and create it if not.
+   *
+   * @return bool
+   *   TRUE if the table already exists or was created, FALSE if creation fails.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/9999999
+   */
+  protected function ensureTableExists(): bool {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+    try {
+      $database_schema = $this->connection->schema();
+      $schema_definition = $this->schemaDefinition();
+      $database_schema->createTable('sessions', $schema_definition);
+    }
+    // If another process has already created the table, attempting to create
+    // it will throw an exception. In this case just catch the exception and do
+    // nothing.
+    catch (DatabaseException) {
+    }
+    catch (\Exception) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
 }

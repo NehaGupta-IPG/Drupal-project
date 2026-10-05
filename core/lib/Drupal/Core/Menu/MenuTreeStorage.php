@@ -8,6 +8,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
 
@@ -1174,6 +1175,34 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       }
     }
     return $tree;
+  }
+
+  /**
+   * Checks if the tree table exists and create it if not.
+   *
+   * @return bool
+   *   TRUE if the table was created, FALSE otherwise.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/9999999
+   */
+  protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+    try {
+      $this->connection->schema()->createTable($this->table, static::schemaDefinition());
+    }
+    catch (DatabaseException) {
+      // If another process has already created the config table, attempting to
+      // recreate it will throw an exception. In this case just catch the
+      // exception and do nothing.
+    }
+    catch (\Exception) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
   /**

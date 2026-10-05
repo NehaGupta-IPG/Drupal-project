@@ -304,6 +304,34 @@ class DatabaseStorage extends StorageBase {
   }
 
   /**
+   * Check if the table exists and create it if not.
+   *
+   * @return bool
+   *   TRUE if the table exists, FALSE if it does not exists.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/9999999
+   */
+  protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+    try {
+      $database_schema = $this->connection->schema();
+      $database_schema->createTable($this->table, $this->schemaDefinition());
+    }
+    // If the table already exists, then attempting to recreate it will throw an
+    // exception. In this case just catch the exception and do nothing.
+    catch (DatabaseException) {
+    }
+    catch (\Exception) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
    * Act on an exception when the table might not have been created.
    *
    * If the table does not yet exist, that's fine, but if the table exists and
