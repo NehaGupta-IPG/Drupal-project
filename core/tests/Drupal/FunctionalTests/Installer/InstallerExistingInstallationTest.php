@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests the installer with an existing Drupal installation.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerExistingInstallationTest extends InstallerTestBase {
 
   /**
@@ -31,7 +34,6 @@ class InstallerExistingInstallationTest extends InstallerTestBase {
     unlink($this->siteDirectory . '/settings.php');
     $this->visitInstaller();
     $this->setUpLanguage();
-    $this->setUpProfile();
     $this->setUpRequirementsProblem();
     $this->setUpSettings();
     $this->assertSession()->pageTextContains('Drupal already installed');

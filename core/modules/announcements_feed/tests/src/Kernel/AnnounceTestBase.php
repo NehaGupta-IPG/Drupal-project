@@ -6,15 +6,15 @@ namespace Drupal\Tests\announcements_feed\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 
 /**
  * Base class for Announce Kernel tests.
  */
-class AnnounceTestBase extends KernelTestBase {
+abstract class AnnounceTestBase extends KernelTestBase {
 
   /**
    * {@inheritdoc}
@@ -27,8 +27,6 @@ class AnnounceTestBase extends KernelTestBase {
 
   /**
    * History of requests/responses.
-   *
-   * @var array
    */
   protected array $history = [];
 

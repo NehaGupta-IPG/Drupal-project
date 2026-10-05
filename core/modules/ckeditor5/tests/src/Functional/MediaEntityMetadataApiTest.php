@@ -17,16 +17,19 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\ckeditor5\Traits\SynchronizeCsrfTokenSeedTrait;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
-use Drupal\user\RoleInterface;
 use Drupal\user\Entity\User;
+use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Tests the media entity metadata API.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class MediaEntityMetadataApiTest extends BrowserTestBase {
 
   use TestFileCreationTrait;
@@ -73,8 +76,6 @@ class MediaEntityMetadataApiTest extends BrowserTestBase {
 
   /**
    * The admin user.
-   *
-   * @var \Drupal\user\Entity\User
    */
   protected User $adminUser;
 
@@ -167,7 +168,7 @@ class MediaEntityMetadataApiTest extends BrowserTestBase {
     ])->save();
 
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair($this->editor, $filtered_html_format))
@@ -263,12 +264,11 @@ class MediaEntityMetadataApiTest extends BrowserTestBase {
     $this->drupalGet($path, ['query' => ['uuid' => 'ðŸ¦™', 'token' => $token]]);
     $this->assertSession()->statusCodeEquals(400);
 
-    // Ensure that users that don't have access to the filter format receive
-    // either 404 or 403.
+    // Ensure that users without access to the filter format receive 403.
     $this->drupalLogout();
     $token = $this->container->get('csrf_token')->get(ltrim($path, '/'));
     $this->drupalGet($path, ['token' => $token]);
-    $this->assertSession()->statusCodeEquals(400);
+    $this->assertSession()->statusCodeEquals(403);
 
     $this->drupalGet($path, ['query' => ['uuid' => $uuid, 'token' => $token]]);
     $this->assertSession()->statusCodeEquals(403);

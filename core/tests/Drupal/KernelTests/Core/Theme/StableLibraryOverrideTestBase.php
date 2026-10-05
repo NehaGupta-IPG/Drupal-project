@@ -9,8 +9,6 @@ use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Tests the behavior of a theme when base_theme info key is missing.
- *
- * @group Theme
  */
 abstract class StableLibraryOverrideTestBase extends KernelTestBase {
 
@@ -54,7 +52,7 @@ abstract class StableLibraryOverrideTestBase extends KernelTestBase {
    */
   protected function enableVisibleAndStableCoreModules(): void {
     $all_modules = $this->container->get('extension.list.module')->getList();
-    $all_modules = array_filter($all_modules, function ($module) {
+    $all_modules = array_filter($all_modules, function ($module): bool {
       // Filter contrib, hidden, experimental, deprecated, and already enabled
       // modules, and modules in the Testing package.
       if ($module->origin !== 'core'
@@ -62,7 +60,8 @@ abstract class StableLibraryOverrideTestBase extends KernelTestBase {
         || $module->status == TRUE
         || $module->info['package'] == 'Testing'
         || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::EXPERIMENTAL
-        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::OBSOLETE) {
         return FALSE;
       }
       return TRUE;

@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\FunctionalJavascript\Plugin\views\Handler;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the add filter handler UI.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FilterTest extends WebDriverTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'views', 'views_ui', 'user'];
+  protected static $modules = ['body_field', 'node', 'views', 'views_ui', 'user'];
 
   /**
    * The account.
@@ -104,10 +107,9 @@ class FilterTest extends WebDriverTestBase {
    *   The filtered elements.
    */
   protected function filterVisibleElements($elements): array {
-    $elements = array_filter($elements, function ($element) {
+    return array_filter($elements, function (NodeElement $element) {
       return $element->isVisible();
     });
-    return $elements;
   }
 
   /**
@@ -126,7 +128,7 @@ class FilterTest extends WebDriverTestBase {
   protected function waitForVisibleElementCount($count, $locator, $timeout = 10000): bool {
     $page = $this->getSession()->getPage();
 
-    return $page->waitFor($timeout / 1000, function () use ($count, $page, $locator) {
+    return $page->waitFor($timeout / 1000, function () use ($count, $page, $locator): bool {
       $elements = $page->findAll('css', $locator);
       $visible_elements = $this->filterVisibleElements($elements);
       if (count($visible_elements) === $count) {
@@ -148,7 +150,7 @@ class FilterTest extends WebDriverTestBase {
   protected function waitForOnlyContentRows($timeout = 10000): bool {
     $page = $this->getSession()->getPage();
 
-    return $page->waitFor($timeout / 1000, function () use ($page) {
+    return $page->waitFor($timeout / 1000, function () use ($page): bool {
       $handler_rows = $page->findAll('css', 'tr.filterable-option');
       $handler_rows = $this->filterVisibleElements($handler_rows);
 

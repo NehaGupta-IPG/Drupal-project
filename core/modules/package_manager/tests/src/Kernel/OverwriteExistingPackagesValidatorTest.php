@@ -4,23 +4,34 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Kernel;
 
+use Drupal\Core\Recipe\Recipe;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\package_manager\ComposerInspector;
 use Drupal\package_manager\Event\PostCreateEvent;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\OverwriteExistingPackagesValidator;
 use Drupal\package_manager\Validator\SupportedReleaseValidator;
 use Drupal\Tests\package_manager\Traits\ComposerInstallersTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\package_manager\Validator\OverwriteExistingPackagesValidator
- * @group package_manager
+ * Tests Overwrite Existing Packages Validator.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[Group('#slow')]
+#[CoversClass(OverwriteExistingPackagesValidator::class)]
+#[RunTestsInSeparateProcesses]
 class OverwriteExistingPackagesValidatorTest extends PackageManagerKernelTestBase {
 
   use ComposerInstallersTrait;
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -131,29 +142,57 @@ class OverwriteExistingPackagesValidatorTest extends PackageManagerKernelTestBas
       TRUE
     );
     $inspector = $this->container->get(ComposerInspector::class);
-    $listener = function (PostCreateEvent $event) use ($inspector) {
-      $list = $inspector->getInstalledPackagesList($event->stage->getStageDirectory());
+    $listener = function (PostCreateEvent $event) use ($inspector): void {
+      $list = $inspector->getInstalledPackagesList($event->sandboxManager->getSandboxDirectory());
       $this->assertArrayHasKey('drupal/sub-module', $list->getArrayCopy());
       $this->assertArrayHasKey('drupal/other_module_1', $list->getArrayCopy());
       // Confirm that metapackage will have a NULL install path.
       $this->assertNull($list['drupal/sub-module']->path);
       // Confirm another package has specified install path.
-      $this->assertSame($list['drupal/other_module_1']->path, $event->stage->getStageDirectory() . '/modules/module_1');
+      $this->assertSame($list['drupal/other_module_1']->path, $event->sandboxManager->getSandboxDirectory() . '/modules/module_1');
     };
     $this->addEventTestListener($listener, PostCreateEvent::class);
 
     $expected_results = [
       ValidationResult::createError([
-        t('The new package drupal/module_4 will be installed in the directory /modules/module_6, which already exists but is not managed by Composer.'),
+        $this->t('The new package drupal/module_4 will be installed in the directory /modules/module_6, which already exists but is not managed by Composer.'),
       ]),
       ValidationResult::createError([
-        t('The new package drupal/other_module_1 will be installed in the directory /modules/module_1, which already exists but is not managed by Composer.'),
+        $this->t('The new package drupal/other_module_1 will be installed in the directory /modules/module_1, which already exists but is not managed by Composer.'),
       ]),
       ValidationResult::createError([
-        t('The new package drupal/other_module_2 will be installed in the directory /modules/module_2, which already exists but is not managed by Composer.'),
+        $this->t('The new package drupal/other_module_2 will be installed in the directory /modules/module_2, which already exists but is not managed by Composer.'),
       ]),
     ];
     $this->assertResults($expected_results, PreApplyEvent::class);
+  }
+
+  /**
+   * Tests that things in the `recipes` directory can be overwritten.
+   */
+  public function testRecipeOverwriteIsAllowed(): void {
+    (new ActiveFixtureManipulator())
+      ->addProjectAtPath('recipes/test_recipe', file_name: 'recipe.yml')
+      ->commitChanges();
+    $stage_manipulator = $this->getStageFixtureManipulator();
+
+    // This should not raise an error because, even though it's going to
+    // overwrite an existing directory, it's at a path which specifically allows
+    // that.
+    $stage_manipulator->addPackage(
+      [
+        'name' => 'drupal/test_recipe',
+        'version' => '1.0.0',
+        'type' => Recipe::COMPOSER_PROJECT_TYPE,
+      ],
+      FALSE,
+      TRUE
+    );
+    $installer_paths = [
+      'recipes/test_recipe' => ['drupal/test_recipe'],
+    ];
+    $this->setInstallerPaths($installer_paths, $this->container->get(PathLocator::class)->getProjectRoot());
+    $this->assertResults([], PreApplyEvent::class);
   }
 
 }

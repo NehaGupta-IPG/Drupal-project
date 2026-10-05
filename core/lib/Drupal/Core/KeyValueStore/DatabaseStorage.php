@@ -83,7 +83,12 @@ class DatabaseStorage extends StorageBase {
   public function getMultiple(array $keys) {
     $values = [];
     try {
-      $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [':keys[]' => $keys, ':collection' => $this->collection])->fetchAllAssoc('name');
+      $result = $this->connection
+        ->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [name] IN ( :keys[] ) AND [collection] = :collection', [
+          ':keys[]' => $keys,
+          ':collection' => $this->collection,
+        ])
+        ->fetchAllAssoc('name');
       foreach ($keys as $key) {
         if (isset($result[$key])) {
           $values[$key] = $this->serializer->decode($result[$key]->value);
@@ -122,6 +127,25 @@ class DatabaseStorage extends StorageBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getAllKeys(): iterable {
+    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function (): array {
+        return $this->connection->query(
+          'SELECT [name] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection',
+          [
+            ':collection' => $this->collection,
+          ])->fetchCol();
+      },
+      schema: [
+        $this->table => static::schemaDefinition(),
+      ],
+    );
+    return $execution->isSuccessful() ? $execution->getResult() : [];
+  }
+
+  /**
    * Saves a value for a given key.
    *
    * This will be called by set() within a try block.
@@ -139,12 +163,13 @@ class DatabaseStorage extends StorageBase {
    */
   protected function doSet($key, $value) {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
-    $this->connection->merge($this->table)
-      ->keys([
-        'name' => $key,
+    $this->connection->upsert($this->table)
+      ->key(['collection', 'name'])
+      ->fields([
         'collection' => $this->collection,
+        'name' => $key,
+        'value' => $this->serializer->encode($value),
       ])
-      ->fields(['value' => $this->serializer->encode($value)])
       ->execute();
   }
 
@@ -154,13 +179,65 @@ class DatabaseStorage extends StorageBase {
   public function set($key, $value) {
     $this->connection->executeEnsuringSchemaOnFailure(
       execute: function () use ($key, $value): void {
-        $this->connection->merge($this->table)
-          ->keys([
-            'name' => $key,
+        $this->connection->upsert($this->table)
+          ->key(['collection', 'name'])
+          ->fields([
             'collection' => $this->collection,
+            'name' => $key,
+            'value' => $this->serializer->encode($value),
           ])
-          ->fields(['value' => $this->serializer->encode($value)])
           ->execute();
+      },
+      schema: [
+        $this->table => static::schemaDefinition(),
+      ],
+      retryAfterSchemaEnsured: TRUE,
+    );
+  }
+
+  /**
+   * Saves key/value pairs.
+   *
+   * This will be called by ::setMultiple() with schema enforcement.
+   *
+   * @param array $data
+   *   An associative array of key/value pairs.
+   */
+  protected function doSetMultiple(array $data): void {
+    $query = $this->connection->upsert($this->table)
+      ->key(['collection', 'name']);
+
+    $fieldsSet = FALSE;
+    foreach ($data as $key => $value) {
+      if (!$fieldsSet) {
+        $query->fields([
+          'collection' => $this->collection,
+          'name' => $key,
+          'value' => $this->serializer->encode($value),
+        ]);
+        $fieldsSet = TRUE;
+        continue;
+      }
+      $query->values([
+        'collection' => $this->collection,
+        'name' => $key,
+        'value' => $this->serializer->encode($value),
+      ]);
+    }
+
+    $query->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMultiple(array $data): void {
+    if (empty($data)) {
+      return;
+    }
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($data): void {
+        $this->doSetMultiple($data);
       },
       schema: [
         $this->table => static::schemaDefinition(),
@@ -188,7 +265,7 @@ class DatabaseStorage extends StorageBase {
    *
    * @see https://www.drupal.org/node/3489185
    */
-  public function doSetIfNotExists($key, $value) {
+  protected function doSetIfNotExists($key, $value) {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     $result = $this->connection->merge($this->table)
       ->insertFields([

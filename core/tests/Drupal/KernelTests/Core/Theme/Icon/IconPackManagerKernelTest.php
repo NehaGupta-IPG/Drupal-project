@@ -4,22 +4,26 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Theme\Icon;
 
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\Core\Form\FormState;
 use Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException;
 use Drupal\Core\Theme\Icon\IconDefinitionInterface;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManager;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
+use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\Theme\Icon\Plugin\IconPackManager
+ * Tests values are from test module icon_test.
  *
- * Tests values are from test module icon_test. Any change of the definition
- * will impact the tests.
+ * Any change of the definition will impact the tests.
  *
  * @see core/modules/system/tests/modules/icon_test/icon_test.icons.yml
- *
- * @group icon
  */
+#[CoversClass(IconPackManager::class)]
+#[Group('icon')]
+#[RunTestsInSeparateProcesses]
 class IconPackManagerKernelTest extends KernelTestBase {
 
   /**
@@ -33,21 +37,16 @@ class IconPackManagerKernelTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'icon_test',
   ];
 
   /**
    * The IconPackManager instance.
-   *
-   * @var \Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface
    */
   private IconPackManagerInterface $pluginManagerIconPack;
 
   /**
    * The App root instance.
-   *
-   * @var string
    */
   private string $appRoot;
 
@@ -169,9 +168,7 @@ class IconPackManagerKernelTest extends KernelTestBase {
    * Test the IconPackManager::getExtractorPluginForms method.
    */
   public function testGetExtractorPluginForms(): void {
-    $form_state = $this->getMockBuilder('Drupal\Core\Form\FormState')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $form_state = $this->createStub(FormState::class);
     $form = [];
 
     $this->pluginManagerIconPack->getExtractorPluginForms($form, $form_state);
@@ -221,9 +218,7 @@ class IconPackManagerKernelTest extends KernelTestBase {
    * Test the IconPackManager::getExtractorPluginForms method.
    */
   public function testGetExtractorPluginFormsWithAllowed(): void {
-    $form_state = $this->getMockBuilder('Drupal\Core\Form\FormState')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $form_state = $this->createStub(FormState::class);
     $form = [];
 
     $allowed_icon_pack['test_svg'] = '';
@@ -365,7 +360,7 @@ class IconPackManagerKernelTest extends KernelTestBase {
   public function testProcessDefinitionExceptionName(): void {
     $definition = ['provider' => 'foo'];
     $this->expectException(IconPackConfigErrorException::class);
-    $this->expectExceptionMessage('Invalid icon pack id in: foo, name: $ Not valid !* must contain only lowercase letters, numbers, and underscores.');
+    $this->expectExceptionMessageIs('Invalid icon pack id in: foo, name: $ Not valid !* must contain only lowercase letters, numbers, and underscores.');
     $this->pluginManagerIconPack->processDefinition($definition, '$ Not valid !*');
   }
 
@@ -379,7 +374,7 @@ class IconPackManagerKernelTest extends KernelTestBase {
     ];
     $this->pluginManagerIconPack->setValidator();
     $this->expectException(IconPackConfigErrorException::class);
-    $this->expectExceptionMessage('icon_test:foo Error in definition `foo`:[extractor] The property extractor is required, [template] The property template is required');
+    $this->expectExceptionMessageIs('icon_test:foo Error in definition `foo`:[extractor] The property extractor is required, [template] The property template is required');
     $this->pluginManagerIconPack->processDefinition($definition, 'foo');
   }
 

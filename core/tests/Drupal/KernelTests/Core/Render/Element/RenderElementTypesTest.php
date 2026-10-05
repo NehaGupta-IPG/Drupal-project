@@ -7,12 +7,14 @@ namespace Drupal\KernelTests\Core\Render\Element;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the rendered markup of core render element types.
- *
- * @group Common
  */
+#[Group('Common')]
+#[RunTestsInSeparateProcesses]
 class RenderElementTypesTest extends KernelTestBase {
 
   /**
@@ -201,7 +203,7 @@ class RenderElementTypesTest extends KernelTestBase {
         'value' => [
           '#type' => 'system_compact_link',
         ],
-        'expected' => '//div[@class="compact-link"]/a[contains(@href, "admin/compact/on?") and text()="Hide descriptions"]',
+        'expected' => '//div[@class="compact-link"]/a[contains(@href, "#") and @data-admin-compact-toggle and text()="Hide descriptions"]',
       ],
       [
         'name' => "#type 'system_compact_link' when adding extra attributes",
@@ -211,30 +213,111 @@ class RenderElementTypesTest extends KernelTestBase {
             'class' => ['kittens-rule'],
           ],
         ],
-        'expected' => '//div[@class="compact-link"]/a[contains(@href, "admin/compact/on?") and @class="kittens-rule" and text()="Hide descriptions"]',
+        'expected' => '//div[@class="compact-link"]/a[contains(@href, "#") and @data-admin-compact-toggle and @class="kittens-rule" and text()="Hide descriptions"]',
       ],
     ];
 
     foreach ($elements as $element) {
+      $markup = (string) \Drupal::service('renderer')->renderRoot($element['value']);
+      $xpath = new \DOMXPath(Html::load($markup));
+      $result = $xpath->query($element['expected']);
+      $this->assertGreaterThan(0, $result->length, '"' . $element['name'] . '" is rendered correctly.');
+    }
+  }
+
+  /**
+   * Tests system #type 'link'.
+   */
+  public function testLink(): void {
+    $elements = [
+      [
+        'name' => "#type 'link' simple anchor tag",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org'),
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in ['#attributes']",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org'),
+          '#attributes' => [
+            'class' => ['attributes-class'],
+          ],
+          '#options' => [],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and @class="attributes-class" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in ['#options']['attributes']",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org'),
+          '#attributes' => [],
+          '#options' => [
+            'attributes' => [
+              'class' => ['options-attributes-class'],
+            ],
+          ],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and @class="options-attributes-class" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in both ['#attributes'] and ['#options']['attributes']",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org'),
+          '#attributes' => [
+            'class' => ['attributes-class'],
+          ],
+          '#options' => [
+            'attributes' => [
+              'class' => ['options-attributes-class'],
+            ],
+          ],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and @class="options-attributes-class attributes-class" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in both ['#attributes'] and ['#options']['attributes'] as strings",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org'),
+          '#attributes' => [
+            'class' => 'attributes-class',
+          ],
+          '#options' => [
+            'attributes' => [
+              'class' => 'options-attributes-class',
+            ],
+          ],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and contains(@class,"options-attributes-class") and contains(@class,"attributes-class") and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in Url object ['#options']['attributes'] which are ignored",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org')->setOption('attributes', ['class' => 'url-options-attributes-class']),
+          '#attributes' => [],
+          '#options' => [],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and not(@class) and text()="title"]',
+      ],
+    ];
+    foreach ($elements as $element) {
       $xml = new \SimpleXMLElement((string) \Drupal::service('renderer')->renderRoot($element['value']));
       $result = $xml->xpath($element['expected']);
-      $this->assertNotEmpty($result, '"' . $element['name'] . '" is rendered correctly.');
+      $this->assertNotEmpty($result, '"' . $element['name'] . '" input rendered correctly.');
     }
-
-    // Set admin compact mode on for additional tests.
-    \Drupal::request()->cookies->set('Drupal_visitor_admin_compact_mode', TRUE);
-
-    $element = [
-      'name' => "#type 'system_compact_link' when admin compact mode is on",
-      'value' => [
-        '#type' => 'system_compact_link',
-      ],
-      'expected' => '//div[@class="compact-link"]/a[contains(@href, "admin/compact?") and text()="Show descriptions"]',
-    ];
-
-    $xml = new \SimpleXMLElement((string) \Drupal::service('renderer')->renderRoot($element['value']));
-    $result = $xml->xpath($element['expected']);
-    $this->assertNotEmpty($result, '"' . $element['name'] . '" is rendered correctly.');
   }
 
 }

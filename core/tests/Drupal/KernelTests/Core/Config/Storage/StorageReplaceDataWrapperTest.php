@@ -6,12 +6,15 @@ namespace Drupal\KernelTests\Core\Config\Storage;
 
 use Drupal\config\StorageReplaceDataWrapper;
 use Drupal\Core\Config\StorageInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests StorageReplaceDataWrapper operations.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class StorageReplaceDataWrapperTest extends ConfigStorageTestBase {
 
   /**
@@ -25,7 +28,7 @@ class StorageReplaceDataWrapperTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function read($name) {
+  protected function read($name): array|object {
     return $this->storage->read($name);
   }
 
@@ -62,10 +65,9 @@ class StorageReplaceDataWrapperTest extends ConfigStorageTestBase {
    *
    * @param string $collection
    *   The collection name.
-   *
-   * @dataProvider providerCollections
    */
-  public function testCreateCollection($collection): void {
+  #[DataProvider('providerCollections')]
+  public function testCreateCollection(string $collection): void {
     $initial_collection_name = $this->storage->getCollectionName();
 
     // Create new storage with given collection and check it is set correctly.
@@ -82,7 +84,7 @@ class StorageReplaceDataWrapperTest extends ConfigStorageTestBase {
    * @return array
    *   Returns an array of collection names.
    */
-  public static function providerCollections() {
+  public static function providerCollections(): array {
     return [
       [StorageInterface::DEFAULT_COLLECTION],
       ['foo.bar'],

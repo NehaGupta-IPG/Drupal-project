@@ -50,7 +50,8 @@ class Layout extends Plugin {
    * @param string $theme_hook
    *   (optional) The template hook to render the layout.
    * @param string|null $path
-   *   (optional) Path (relative to the module or theme) to resources like icon or template.
+   *   (optional) Path (relative to the module or theme) to resources like icon
+   *   or template.
    * @param string|null $library
    *   (optional) The asset library.
    * @param string|null $icon
@@ -99,6 +100,9 @@ class Layout extends Plugin {
     // @see \Drupal\Core\Layout\LayoutDefinition::$additional
     // @see \Drupal\Core\Layout\LayoutDefinition::get()
     $this->additional = $additional;
+    if ($this->label === NULL && $this->deriver === NULL) {
+      throw new \InvalidArgumentException(sprintf('The "%s" layout plugin must have at least one of the label or deriver properties.', $this->id));
+    }
   }
 
   /**

@@ -7,12 +7,14 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Exception\SchemaCreationFailureException;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Connection::executeEnsuringSchemaOnFailure().
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class ExecuteEnsuringSchemaOnFailureTest extends DatabaseTestBase {
 
   public function testValidCallbackOnExistingSchema(): void {

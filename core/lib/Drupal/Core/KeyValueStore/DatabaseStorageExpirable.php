@@ -101,6 +101,26 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getAllKeys(): iterable {
+    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function (): array {
+        return $this->connection->query(
+          'SELECT [name] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [expire] > :now',
+          [
+            ':collection' => $this->collection,
+            ':now' => $this->time->getRequestTime(),
+          ])->fetchCol();
+      },
+      schema: [
+        $this->table => static::schemaDefinition(),
+      ],
+    );
+    return $execution->isSuccessful() ? $execution->getResult() : [];
+  }
+
+  /**
    * Saves a value for a given key with a time to live.
    *
    * This will be called by setWithExpire() within a try block.
@@ -120,12 +140,11 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    */
   protected function doSetWithExpire($key, $value, $expire) {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
-    $this->connection->merge($this->table)
-      ->keys([
-        'name' => $key,
-        'collection' => $this->collection,
-      ])
+    $this->connection->upsert($this->table)
+      ->key(['collection', 'name'])
       ->fields([
+        'collection' => $this->collection,
+        'name' => $key,
         'value' => $this->serializer->encode($value),
         'expire' => $this->time->getRequestTime() + $expire,
       ])
@@ -138,12 +157,11 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
   public function setWithExpire($key, $value, $expire) {
     $this->connection->executeEnsuringSchemaOnFailure(
       execute: function () use ($key, $value, $expire): void {
-        $this->connection->merge($this->table)
-          ->keys([
-            'name' => $key,
-            'collection' => $this->collection,
-          ])
+        $this->connection->upsert($this->table)
+          ->key(['collection', 'name'])
           ->fields([
+            'collection' => $this->collection,
+            'name' => $key,
             'value' => $this->serializer->encode($value),
             'expire' => $this->time->getRequestTime() + $expire,
           ])
@@ -204,13 +222,6 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
     foreach ($data as $key => $value) {
       $this->setWithExpire($key, $value, $expire);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function deleteMultiple(array $keys) {
-    parent::deleteMultiple($keys);
   }
 
   /**

@@ -4,6 +4,7 @@ namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\StatementInterface;
 
 /**
@@ -72,7 +73,7 @@ abstract class Query implements PlaceholderInterface {
    *   Array of query options.
    */
   public function __construct(Connection $connection, $options) {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = bin2hex(random_bytes(12));
 
     $this->connection = $connection;
     $this->connectionKey = $this->connection->getKey();
@@ -101,25 +102,18 @@ abstract class Query implements PlaceholderInterface {
    * Implements the magic __clone function.
    */
   public function __clone() {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = bin2hex(random_bytes(12));
   }
-
-  /**
-   * Runs the query against the database.
-   *
-   * @return \Drupal\Core\Database\StatementInterface|string|null
-   *   A prepared statement, a string or NULL if the query is not valid.
-   */
-  abstract protected function execute();
 
   /**
    * Runs the query, enforcing a database schema creation on failure.
    *
-   * @param array<string,array<string,mixed>>|\Closure $schema
-   *   A database schema specification, with table name as key and schema
-   *   array as value, or a callback to be executed. The callback must return
-   *   TRUE if the database was changed, FALSE if it was executed but did not
-   *   change the database, or throw an exception.
+   * @param array<string,array<string,mixed>>|\Drupal\Core\Database\SchemaDefinition\Schema|\Closure $schema
+   *   A database schema specification, either as an array with table name
+   *   as key and schema array as value, or as a schema definition object; or
+   *   a callback to be executed. The callback must return TRUE if the
+   *   database was changed, FALSE if it was executed but did not change the
+   *   database, or throw an exception.
    * @param bool $retryAfterSchemaEnsured
    *   (Optional) If TRUE, the callback is executed again after the first
    *   execution failed, and the schema enforcement was successful. Defaults to
@@ -133,7 +127,7 @@ abstract class Query implements PlaceholderInterface {
    *   database schema.
    */
   public function executeEnsuringSchemaOnFailure(
-    array|\Closure $schema,
+    array|SchemaDefinition|\Closure $schema,
     bool $retryAfterSchemaEnsured = FALSE,
   ): StatementInterface|string|NULL {
     $execution = $this->connection->executeEnsuringSchemaOnFailure(
@@ -189,7 +183,7 @@ abstract class Query implements PlaceholderInterface {
    * The comment string will be sanitized to remove * / and other characters
    * that may terminate the string early so as to avoid SQL injection attacks.
    *
-   * @param $comment
+   * @param string $comment
    *   The comment string to be inserted into the query.
    *
    * @return $this

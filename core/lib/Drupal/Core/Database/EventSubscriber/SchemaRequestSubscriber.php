@@ -6,6 +6,7 @@ namespace Drupal\Core\Database\EventSubscriber;
 
 use Drupal\Core\Database\Event\ExecuteMethodEnsuringSchemaEvent;
 use Drupal\Core\Database\Exception\SchemaCreationFailureException;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\Core\Database\DatabaseException;
 
@@ -66,10 +67,16 @@ class SchemaRequestSubscriber implements EventSubscriberInterface {
    */
   private function processSchema(ExecuteMethodEnsuringSchemaEvent $event): bool {
     $schemaChanged = FALSE;
-    // Either process the schema definition array, or execute the schema
-    // callback.
-    if (is_array($event->schema)) {
-      foreach ($event->schema as $name => $definition) {
+    // Either process the schema definition, or execute the schema callback.
+    if (is_array($event->schema) || $event->schema instanceof SchemaDefinition) {
+      $tables = $event->schema;
+      if ($tables instanceof SchemaDefinition) {
+        $tables = [];
+        foreach ($event->schema->tables as $table) {
+          $tables[$table->name] = $table->toArray();
+        }
+      }
+      foreach ($tables as $name => $definition) {
         if ($event->connection->schema()->tableExists($name)) {
           continue;
         }

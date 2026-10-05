@@ -33,7 +33,6 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
   public static function getConnection(): Connection {
     // Check whether there is a test runner connection.
     // @see run-tests.sh
-    // @todo Convert Simpletest UI runner to create + use this connection, too.
     try {
       $connection = Database::getConnection('default', 'test-runner');
     }
@@ -105,7 +104,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
     $count = $this->connection->delete('simpletest_test_id')
       ->condition('test_id', $test_run->id())
       ->execute();
-    unset($transaction);
+    $transaction->commitOrRelease();
     return $count;
   }
 
@@ -180,7 +179,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
       ->delete('simpletest')
       ->executeEnsuringSchemaOnFailure($this->testingResultsSchema());
     $count = $this->connection->delete('simpletest_test_id')->execute();
-    unset($transaction);
+    $transaction->commitOrRelease();
     return $count;
   }
 
@@ -217,7 +216,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
           'length' => 9,
           'not null' => TRUE,
           'default' => '',
-          'description' => 'Message status. Core understands pass, fail, exception.',
+          'description' => 'Message status.',
         ],
         'message' => [
           'type' => 'text',
@@ -250,6 +249,18 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
           'not null' => TRUE,
           'default' => '',
           'description' => 'Name of the file where the function is called.',
+        ],
+        'time' => [
+          'type' => 'float',
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'Time elapsed for the execution of the test.',
+        ],
+        'exit_code' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'The exit code of the test executed.',
         ],
       ],
       'primary key' => ['message_id'],

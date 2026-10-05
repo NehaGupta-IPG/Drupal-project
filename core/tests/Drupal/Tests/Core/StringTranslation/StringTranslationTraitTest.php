@@ -7,14 +7,15 @@ namespace Drupal\Tests\Core\StringTranslation;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Tests\UnitTestCase;
-use Prophecy\Argument;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\StringTranslation\StringTranslationTrait
- * @group StringTranslation
+ * Tests Drupal\Core\StringTranslation\StringTranslationTrait.
  */
+#[CoversClass(StringTranslationTrait::class)]
+#[Group('StringTranslation')]
 class StringTranslationTraitTest extends UnitTestCase {
 
   /**
@@ -28,13 +29,7 @@ class StringTranslationTraitTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Prepare a mock translation service to pass to the trait.
-    $translation = $this->prophesize(TranslationInterface::class);
-    $translation->translate(Argument::cetera())->shouldNotBeCalled();
-    $translation->formatPlural(Argument::cetera())->shouldNotBeCalled();
-    $translation->translateString(Argument::cetera())->will(function ($args) {
-      return $args[0]->getUntranslatedString();
-    });
+    $translation = $this->getStringTranslationStub();
 
     // Set up the object under test.
     $this->testObject = new class() {
@@ -42,11 +37,13 @@ class StringTranslationTraitTest extends UnitTestCase {
       use StringTranslationTrait;
 
     };
-    $this->testObject->setStringTranslation($translation->reveal());
+    $this->testObject->setStringTranslation($translation);
   }
 
   /**
-   * @covers ::t
+   * Tests t().
+   *
+   * @legacy-covers ::t
    */
   public function testT(): void {
     $invokableT = new \ReflectionMethod($this->testObject, 't');
@@ -56,7 +53,9 @@ class StringTranslationTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::formatPlural
+   * Tests formatPlural().
+   *
+   * @legacy-covers ::formatPlural
    */
   public function testFormatPlural(): void {
     $invokableFormatPlural = new \ReflectionMethod($this->testObject, 'formatPlural');

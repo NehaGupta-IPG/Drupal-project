@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_ui\Kernel;
 
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\system\Entity\Menu;
 use Drupal\block\Entity\Block;
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\menu_ui\Hook\MenuUiHooks;
+use Drupal\system\Entity\Menu;
 use Drupal\system\MenuInterface;
 use Drupal\Tests\user\Traits\UserCreationTrait;
-use Drupal\menu_ui\Hook\MenuUiHooks;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests SystemMenuBlock.
- *
- * @group menu_ui
  */
+#[Group('menu_ui')]
+#[RunTestsInSeparateProcesses]
 class MenuBlockTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -32,8 +34,6 @@ class MenuBlockTest extends KernelTestBase {
 
   /**
    * The menu for testing.
-   *
-   * @var \Drupal\system\MenuInterface
    */
   protected MenuInterface $menu;
 
@@ -71,7 +71,7 @@ class MenuBlockTest extends KernelTestBase {
     ]);
 
     // Test when user does have "administer menu" permission.
-    $menuUiEntityOperation = new MenuUiHooks();
+    $menuUiEntityOperation = \Drupal::service(MenuUiHooks::class);
     $this->assertEquals([
       'menu-edit' => [
         'title' => 'Edit menu',

@@ -12,12 +12,14 @@ use Drupal\media_library\MediaLibraryState;
 use Drupal\media_library_form_overwrite_test\Form\TestAddForm;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the media library add form.
- *
- * @group media_library
  */
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class MediaLibraryAddFormTest extends KernelTestBase {
 
   use MediaTypeCreationTrait;
@@ -124,7 +126,7 @@ class MediaLibraryAddFormTest extends KernelTestBase {
   public function testFormStateValidation(): void {
     $form_state = new FormState();
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('The media library state is not present in the form state.');
+    $this->expectExceptionMessageIs('The media library state is not present in the form state.');
     \Drupal::formBuilder()->buildForm(FileUploadForm::class, $form_state);
   }
 
@@ -136,7 +138,7 @@ class MediaLibraryAddFormTest extends KernelTestBase {
     $form_state = new FormState();
     $form_state->set('media_library_state', $state);
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage("The 'header_image' media type does not exist.");
+    $this->expectExceptionMessageIs("The 'header_image' media type does not exist.");
     \Drupal::formBuilder()->buildForm(FileUploadForm::class, $form_state);
   }
 

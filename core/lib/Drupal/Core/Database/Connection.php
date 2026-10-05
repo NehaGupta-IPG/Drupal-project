@@ -9,11 +9,12 @@ use Drupal\Core\Database\EventSubscriber\SchemaRequestSubscriber;
 use Drupal\Core\Database\Exception\EventException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
-use Drupal\Core\Database\Query\Insert;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\Truncate;
 use Drupal\Core\Database\Query\Update;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 
@@ -205,7 +206,7 @@ abstract class Connection {
    * @return object
    *   A client connection object.
    */
-  abstract public static function open(array &$connection_options = []);
+  abstract public static function open(#[\SensitiveParameter] array &$connection_options = []);
 
   /**
    * Ensures that the client connection can be garbage collected.
@@ -224,8 +225,15 @@ abstract class Connection {
    *   This method exists only to work around a bug caused by Drupal incorrectly
    *   relying on object destruction order to commit transactions. Xdebug 3.3.0
    *   changes the order of object destruction when the develop mode is enabled.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3524461
    */
   public function commitAll() {
+    // Only soft deprecation (no @trigger_error) to avoid thousands of
+    // occurrences per test run. PHPStan reports usage errors anyway.
     $manager = $this->transactionManager();
     if ($manager->inTransaction() && method_exists($manager, 'commitAll')) {
       $this->transactionManager()->commitAll();
@@ -252,11 +260,10 @@ abstract class Connection {
    * A given query can be customized with a number of option flags in an
    * associative array:
    * - fetch: This element controls how rows from a result set will be
-   *   returned. Legal values include \PDO::FETCH_ASSOC, \PDO::FETCH_BOTH,
-   *   \PDO::FETCH_OBJ, \PDO::FETCH_NUM, or a string representing the name of a
-   *   class. If a string is specified, each record will be fetched into a new
-   *   object of that class. The behavior of all other values is defined by PDO.
-   *   See http://php.net/manual/pdostatement.fetch.php
+   *   returned. Legal values include one of the enumeration cases of FetchAs or
+   *   a string representing the name of a class. If a string is specified, each
+   *   record will be fetched into a new object of that class. The behavior of
+   *   all other values is described in the FetchAs enum.
    * - allow_delimiter_in_query: By default, queries which have the ; delimiter
    *   any place in them will cause an exception. This reduces the chance of SQL
    *   injection attacks that terminate the original query and add one or more
@@ -279,7 +286,7 @@ abstract class Connection {
    */
   protected function defaultOptions() {
     return [
-      'fetch' => \PDO::FETCH_OBJ,
+      'fetch' => FetchAs::Object,
       'allow_delimiter_in_query' => FALSE,
       'allow_square_brackets' => FALSE,
       'pdo' => [],
@@ -327,7 +334,8 @@ abstract class Connection {
   /**
    * Returns the prefix of the tables.
    *
-   * @return string $prefix
+   * @return string
+   *   The table prefix.
    */
   public function getPrefix(): string {
     return $this->prefix;
@@ -397,6 +405,7 @@ abstract class Connection {
    *   The name of the table in question.
    *
    * @return string
+   *   The fully qualified table name.
    */
   public function getFullQualifiedTableName($table) {
     $options = $this->getConnectionOptions();
@@ -432,16 +441,20 @@ abstract class Connection {
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
     assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to prepareStatement() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     try {
-      $query = $this->preprocessStatement($query, $options);
-      $statement = new $this->statementWrapperClass($this, $this->connection, $query, $options['pdo'] ?? [], $allow_row_count);
+      return new $this->statementWrapperClass(
+        $this,
+        $this->connection,
+        $this->preprocessStatement($query, $options),
+        $options['pdo'] ?? [],
+        $allow_row_count,
+      );
     }
     catch (\Exception $e) {
       $this->exceptionHandler()->handleStatementException($e, $query, $options);
     }
-
-    return $statement;
   }
 
   /**
@@ -502,6 +515,9 @@ abstract class Connection {
    *   (optional) The target this connection is for.
    */
   public function setTarget($target = NULL) {
+    if (!is_string($target)) {
+      @trigger_error('Passing a non-string value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+    }
     if (!isset($this->target)) {
       $this->target = $target;
     }
@@ -524,6 +540,9 @@ abstract class Connection {
    *   The key this connection is for.
    */
   public function setKey($key) {
+    if (!is_string($key)) {
+      @trigger_error('Passing a non-string value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+    }
     if (!isset($this->key)) {
       $this->key = $key;
     }
@@ -650,6 +669,7 @@ abstract class Connection {
     assert(is_string($query), 'The \'$query\' argument to ' . __METHOD__ . '() must be a string');
     assert(!isset($options['return']), 'Passing "return" option to query() has no effect. See https://www.drupal.org/node/3185520');
     assert(!isset($options['target']), 'Passing "target" option to query() has no effect. See https://www.drupal.org/node/2993033');
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to query() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     // Use default values if not already set.
     $options += $this->defaultOptions();
@@ -657,13 +677,12 @@ abstract class Connection {
     $this->expandArguments($query, $args);
     $statement = $this->prepareStatement($query, $options);
     try {
-      $result = $statement->execute($args, $options);
+      $statement->execute($args, $options);
+      return $statement;
     }
     catch (\Exception $e) {
       $this->exceptionHandler()->handleExecutionException($e, $statement, $args, $options);
-      $result = FALSE;
     }
-    return $result ? $statement : NULL;
   }
 
   /**
@@ -742,7 +761,7 @@ abstract class Connection {
    *   The name of the class that should be used for this driver.
    */
   public function getDriverClass($class) {
-    match($class) {
+    match ($class) {
       'Install\\Tasks',
       'ExceptionHandler',
       'Select',
@@ -783,7 +802,7 @@ abstract class Connection {
    *   for query_alter hook implementations.
    * @param string $alias
    *   (optional) The alias of the base table of this query.
-   * @param $options
+   * @param array $options
    *   An array of options on the query.
    *
    * @return \Drupal\Core\Database\Query\SelectInterface
@@ -814,9 +833,7 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Query\Insert
    * @see \Drupal\Core\Database\Connection::defaultOptions()
    */
-  public function insert($table, array $options = []) {
-    return new Insert($this, $table, $options);
-  }
+  abstract public function insert($table, array $options = []);
 
   /**
    * Returns the ID of the last inserted row or sequence value.
@@ -1106,6 +1123,7 @@ abstract class Connection {
    * \Drupal\Core\Database\Transaction\TransactionManagerBase, and instantiate
    * it here.
    *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return \Drupal\Core\Database\Transaction\TransactionManagerInterface
    *   The transaction manager.
    *
@@ -1187,6 +1205,7 @@ abstract class Connection {
    * override this method.
    *
    * @return string
+   *   The version of the database server.
    */
   public function version() {
     return $this->connection->getAttribute(\PDO::ATTR_SERVER_VERSION);
@@ -1199,6 +1218,7 @@ abstract class Connection {
    * override this method.
    *
    * @return string
+   *   The version of the database client.
    */
   public function clientVersion() {
     return $this->connection->getAttribute(\PDO::ATTR_CLIENT_VERSION);
@@ -1221,6 +1241,7 @@ abstract class Connection {
    * Returns the name of the database engine accessed by this driver.
    *
    * @return string
+   *   The database engine name.
    */
   abstract public function databaseType();
 
@@ -1247,11 +1268,46 @@ abstract class Connection {
    *   The condition operator, such as "IN", "BETWEEN", etc. Case-sensitive.
    *
    * @return array|null
-   *   The extra handling directives for the specified operator, or NULL.
+   *   The extra handling directives for the specified operator, or NULL. The
+   *   directives are an array with any of the following keys:
+   *   - operator: The replacement operator.
+   *   - field_suffix: SQL to append to the field, such as a type cast.
+   *   - prefix: SQL to add before the value.
+   *   - postfix: SQL to add after the value.
+   *   - delimiter: The delimiter to implode multiple values with.
+   *   - use_value: Whether to compile the value part. Defaults to TRUE.
    *
    * @see \Drupal\Core\Database\Query\Condition::compile()
    */
   abstract public function mapConditionOperator($operator);
+
+  /**
+   * Gets the field suffix for the specified condition operator.
+   *
+   * Only needed when a condition is built as an SQL snippet, for example
+   * with where(). Conditions added with condition() get the suffix added
+   * when the condition is compiled.
+   *
+   * For example, on PostgreSQL the LIKE operator needs a '::text' type-cast
+   * on the field:
+   * @code
+   * $suffix = $connection->getConditionFieldSuffix('LIKE');
+   * $query->where("[title]$suffix LIKE :pattern", [
+   *   ':pattern' => '%foo%',
+   * ]);
+   * @endcode
+   *
+   * @param string $operator
+   *   The condition operator, such as "LIKE", "REGEXP", etc. Case-sensitive.
+   *
+   * @return string
+   *   The SQL the database driver needs appended to the field for this
+   *   operator, for example a type-cast, or an empty string.
+   */
+  public function getConditionFieldSuffix(string $operator): string {
+    $mapping = $this->mapConditionOperator($operator);
+    return $mapping['field_suffix'] ?? '';
+  }
 
   /**
    * Quotes a string for use in a query.
@@ -1262,7 +1318,7 @@ abstract class Connection {
    *   (optional) Provides a data type hint for drivers that have alternate
    *   quoting styles. Defaults to \PDO::PARAM_STR.
    *
-   * @return string|bool
+   * @return string|false
    *   A quoted string that is theoretically safe to pass into an SQL statement.
    *   Returns FALSE if the driver does not support quoting in this way.
    *
@@ -1276,7 +1332,7 @@ abstract class Connection {
    * Extracts the SQLSTATE error from a PDOException.
    *
    * @param \Exception $e
-   *   The exception
+   *   The exception.
    *
    * @return string
    *   The five character error code.
@@ -1304,9 +1360,6 @@ abstract class Connection {
    *
    * @param string $url
    *   The URL.
-   * @param string $root
-   *   The root directory of the Drupal installation. Some database drivers,
-   *   like for example SQLite, need this information.
    *
    * @return array
    *   The connection options.
@@ -1321,7 +1374,7 @@ abstract class Connection {
    *
    * @see \Drupal\Core\Database\Database::convertDbUrlToConnectionInfo()
    */
-  public static function createConnectionOptionsFromUrl($url, $root) {
+  public static function createConnectionOptionsFromUrl($url) {
     $url_components = parse_url($url);
     if (!isset($url_components['scheme'], $url_components['host'], $url_components['path'])) {
       throw new \InvalidArgumentException("The database connection URL '$url' is invalid. The minimum requirement is: 'driver://host/database'");
@@ -1431,7 +1484,7 @@ abstract class Connection {
     // The namespace for Drupal modules is Drupal\MODULE_NAME, and the module
     // name must be all lowercase. Second-level namespaces containing uppercase
     // letters (e.g., "Core", "Component", "Driver") are not modules.
-    // @see \Drupal\Core\DrupalKernel::getModuleNamespacesPsr4()
+    // @see \Drupal\Core\DrupalKernel::getExtensionNamespacesPsr4()
     // @see https://www.drupal.org/docs/8/creating-custom-modules/naming-and-placing-your-drupal-8-module#s-name-your-module
     return ($first === 'Drupal' && strtolower($second) === $second) ? $second : 'core';
   }
@@ -1622,11 +1675,12 @@ abstract class Connection {
    *
    * @param \Closure $execute
    *   The callback to be executed.
-   * @param array<string,array<string,mixed>>|\Closure $schema
-   *   A database schema specification, with table name as key and schema
-   *   array as value, or a callback to be executed. The callback must return
-   *   TRUE if the database was changed, FALSE if it was executed but did not
-   *   change the database, or throw an exception.
+   * @param array<string,array<string,mixed>>|\Drupal\Core\Database\SchemaDefinition\Schema|\Closure $schema
+   *   A database schema specification, either as an array with table name
+   *   as key and schema array as value, or as a schema definition object; or
+   *   a callback to be executed. The callback must return TRUE if the
+   *   database was changed, FALSE if it was executed but did not change the
+   *   database, or throw an exception.
    * @param bool $retryAfterSchemaEnsured
    *   (Optional) If TRUE, the callback is executed again after the first
    *   execution failed, and the schema enforcement was successful. Defaults to
@@ -1641,7 +1695,7 @@ abstract class Connection {
    */
   public function executeEnsuringSchemaOnFailure(
     \Closure $execute,
-    array|\Closure $schema,
+    array|SchemaDefinition|\Closure $schema,
     bool $retryAfterSchemaEnsured = FALSE,
   ): ExecuteMethodEnsuringSchemaEvent {
 
@@ -1649,22 +1703,20 @@ abstract class Connection {
 
     // When rebuilding the container, or very early during a test, there's a
     // stage when the event_dispatcher service has not been activated yet. In
-    // that case, execute the closure, and set its returned value; if the
-    // callback throws an exception, it will just propagate to the caller.
+    // that case, process the event directly with the default subscriber.
     if (!\Drupal::hasService('event_dispatcher')) {
-      $event->setResult($execute());
-      $event->setCallbackExecutionState(TRUE);
-      return $event;
+      (new SchemaRequestSubscriber())->onExecuteMethodEnsuringSchema($event);
     }
+    else {
+      $dispatcher = \Drupal::service('event_dispatcher');
 
-    $dispatcher = \Drupal::service('event_dispatcher');
+      // @todo Temporary, Drush does not add the subscriber on cache rebuild.
+      if (!$dispatcher->hasListeners(ExecuteMethodEnsuringSchemaEvent::class)) {
+        $dispatcher->addSubscriber(new SchemaRequestSubscriber());
+      }
 
-    // @todo Temporary, Drush does not add the subscriber on cache rebuild.
-    if (!$dispatcher->hasListeners(ExecuteMethodEnsuringSchemaEvent::class)) {
-      $dispatcher->addSubscriber(new SchemaRequestSubscriber());
+      $dispatcher->dispatch($event);
     }
-
-    $dispatcher->dispatch($event);
 
     if (!$event->isSuccessful()) {
       // Callback calls were not successful and schema creation failed, throw

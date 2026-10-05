@@ -23,8 +23,9 @@ trait InfoWriterTrait {
    *   The info array.
    *
    * @return void
+   *   No return value.
    */
-  private function writeInfoFile(string $file_path, array $info): void {
+  protected function writeInfoFile(string $file_path, array $info): void {
     $mtime = file_exists($file_path) ? filemtime($file_path) : FALSE;
 
     file_put_contents($file_path, Yaml::encode($info));

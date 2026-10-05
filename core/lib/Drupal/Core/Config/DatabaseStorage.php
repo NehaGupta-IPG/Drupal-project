@@ -87,7 +87,10 @@ class DatabaseStorage implements StorageInterface {
       $execution = $this->connection->executeEnsuringSchemaOnFailure(
         execute: function () use ($name): array|FALSE {
           $data = FALSE;
-          $raw = $this->connection->query('SELECT [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', [':collection' => $this->collection, ':name' => $name], $this->options)->fetchField();
+          $raw = $this->connection->query('SELECT [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', [
+            ':collection' => $this->collection,
+            ':name' => $name,
+          ], $this->options)->fetchField();
           if ($raw !== FALSE) {
             $data = $this->decode($raw);
           }
@@ -115,7 +118,10 @@ class DatabaseStorage implements StorageInterface {
     $execution = $this->connection->executeEnsuringSchemaOnFailure(
       execute: function () use ($names): array {
         $list = $this->connection
-          ->query('SELECT [name], [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] IN ( :names[] )', [':collection' => $this->collection, ':names[]' => $names], $this->options)
+          ->query('SELECT [name], [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] IN ( :names[] )', [
+            ':collection' => $this->collection,
+            ':names[]' => $names,
+          ], $this->options)
           ->fetchAllKeyed();
 
         foreach ($list as &$data) {
@@ -141,9 +147,13 @@ class DatabaseStorage implements StorageInterface {
     try {
       $execution = $this->connection->executeEnsuringSchemaOnFailure(
         execute: function () use ($name, $data): bool {
-          return (bool) $this->connection->merge($this->table, $this->options)
-            ->keys(['collection', 'name'], [$this->collection, $name])
-            ->fields(['data' => $data])
+          return (bool) $this->connection->upsert($this->table, $this->options)
+            ->key(['collection', 'name'])
+            ->fields([
+              'collection' => $this->collection,
+              'name' => $name,
+              'data' => $data,
+            ])
             ->execute();
         },
         schema: [
@@ -173,6 +183,7 @@ class DatabaseStorage implements StorageInterface {
    *   The config data, already dumped to a string.
    *
    * @return bool
+   *   TRUE when the write was successful, FALSE otherwise.
    *
    * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
    * \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
@@ -182,9 +193,13 @@ class DatabaseStorage implements StorageInterface {
    */
   protected function doWrite($name, $data) {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
-    return (bool) $this->connection->merge($this->table, $this->options)
-      ->keys(['collection', 'name'], [$this->collection, $name])
-      ->fields(['data' => $data])
+    return (bool) $this->connection->upsert($this->table, $this->options)
+      ->key(['collection', 'name'])
+      ->fields([
+        'collection' => $this->collection,
+        'name' => $name,
+        'data' => $data,
+      ])
       ->execute();
   }
 
@@ -290,14 +305,10 @@ class DatabaseStorage implements StorageInterface {
   }
 
   /**
-   * Implements Drupal\Core\Config\StorageInterface::decode().
-   *
-   * @throws \ErrorException
-   *   The unserialize() call will trigger E_NOTICE if the string cannot
-   *   be unserialized.
+   * {@inheritdoc}
    */
   public function decode($raw) {
-    $data = @unserialize($raw);
+    $data = @unserialize($raw, ['allowed_classes' => FALSE]);
     return is_array($data) ? $data : FALSE;
   }
 

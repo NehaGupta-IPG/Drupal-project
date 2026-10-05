@@ -7,12 +7,15 @@ namespace Drupal\Tests\system\FunctionalJavascript;
 use Drupal\file\Entity\File;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that theme form settings works correctly.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class ThemeSettingsFormTest extends WebDriverTestBase {
 
   use TestFileCreationTrait;
@@ -21,6 +24,11 @@ class ThemeSettingsFormTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected static $modules = ['file'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile = 'testing_locale';
 
   /**
    * {@inheritdoc}
@@ -39,11 +47,9 @@ class ThemeSettingsFormTest extends WebDriverTestBase {
 
   /**
    * Tests that submission handler works correctly.
-   *
-   * @dataProvider providerTestFormSettingsSubmissionHandler
    */
-  public function testFormSettingsSubmissionHandler($theme): void {
-
+  #[DataProvider('providerTestFormSettingsSubmissionHandler')]
+  public function testFormSettingsSubmissionHandler(string $theme): void {
     \Drupal::service('theme_installer')->install([$theme]);
 
     $page = $this->getSession()->getPage();
@@ -75,7 +81,7 @@ class ThemeSettingsFormTest extends WebDriverTestBase {
   /**
    * Provides test data for ::testFormSettingsSubmissionHandler().
    */
-  public static function providerTestFormSettingsSubmissionHandler() {
+  public static function providerTestFormSettingsSubmissionHandler(): array {
     return [
       'test theme.theme' => ['test_theme_theme'],
       'test theme-settings.php' => ['test_theme_settings'],

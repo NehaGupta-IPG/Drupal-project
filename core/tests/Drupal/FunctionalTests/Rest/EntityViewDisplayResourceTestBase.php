@@ -8,6 +8,9 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 
+/**
+ * Resource test base for the entity_view_display entity.
+ */
 abstract class EntityViewDisplayResourceTestBase extends ConfigEntityResourceTestBase {
 
   /**
@@ -33,7 +36,7 @@ abstract class EntityViewDisplayResourceTestBase extends ConfigEntityResourceTes
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer node display']);
   }
 

@@ -2,9 +2,11 @@
 
 namespace Drupal\workspaces;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -17,8 +19,16 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class WorkspaceOperationFactory {
 
-  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected Connection $database, protected WorkspaceManagerInterface $workspaceManager, protected WorkspaceAssociationInterface $workspaceAssociation, protected EventDispatcherInterface $eventDispatcher, protected LoggerInterface $logger) {
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected Connection $database,
+    protected WorkspaceManagerInterface $workspaceManager,
+    protected WorkspaceTrackerInterface $workspaceTracker,
+    protected EventDispatcherInterface $eventDispatcher,
+    #[Autowire(service: 'logger.channel.workspaces')]
+    protected LoggerInterface $logger,
+    protected TimeInterface $time,
+  ) {}
 
   /**
    * Gets the workspace publisher.
@@ -30,7 +40,7 @@ class WorkspaceOperationFactory {
    *   A workspace publisher object.
    */
   public function getPublisher(WorkspaceInterface $source) {
-    return new WorkspacePublisher($this->entityTypeManager, $this->database, $this->workspaceManager, $this->workspaceAssociation, $this->eventDispatcher, $source, $this->logger);
+    return new WorkspacePublisher($this->entityTypeManager, $this->database, $this->workspaceManager, $this->workspaceTracker, $this->eventDispatcher, $source, $this->logger, $this->time);
   }
 
   /**
@@ -45,7 +55,7 @@ class WorkspaceOperationFactory {
    *   A workspace merger object.
    */
   public function getMerger(WorkspaceInterface $source, WorkspaceInterface $target) {
-    return new WorkspaceMerger($this->entityTypeManager, $this->database, $this->workspaceAssociation, $source, $target, $this->logger);
+    return new WorkspaceMerger($this->entityTypeManager, $this->database, $this->workspaceTracker, $source, $target, $this->logger);
   }
 
 }

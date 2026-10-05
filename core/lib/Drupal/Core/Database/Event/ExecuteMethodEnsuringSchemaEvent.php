@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Database\Event;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaException;
 
 /**
@@ -39,11 +40,12 @@ final class ExecuteMethodEnsuringSchemaEvent extends DatabaseEvent {
    *   The database connection.
    * @param \Closure $execute
    *   The callback to be executed.
-   * @param array<string,array<string,mixed>>|\Closure $schema
-   *   A database schema specification, with table name as key and schema
-   *   array as value, or a callback to be executed. The callback must return
-   *   TRUE if the database was changed, FALSE if it was executed but did not
-   *   change the database, or throw an exception.
+   * @param array<string,array<string,mixed>>|\Drupal\Core\Database\SchemaDefinition\Schema|\Closure $schema
+   *   A database schema specification, either as an array with table name
+   *   as key and schema array as value, or as a schema definition object; or
+   *   a callback to be executed. The callback must return TRUE if the
+   *   database was changed, FALSE if it was executed but did not change the
+   *   database, or throw an exception.
    * @param bool $retryAfterSchemaEnsured
    *   (Optional) If TRUE, the callback is executed again after the first
    *   execution failed, and the schema enforcement was successful. Defaults to
@@ -52,7 +54,7 @@ final class ExecuteMethodEnsuringSchemaEvent extends DatabaseEvent {
   public function __construct(
     public readonly Connection $connection,
     public readonly \Closure $execute,
-    public readonly array|\Closure $schema,
+    public readonly array|SchemaDefinition|\Closure $schema,
     public readonly bool $retryAfterSchemaEnsured = FALSE,
   ) {
     parent::__construct();
