@@ -39,6 +39,17 @@
           }
 
           setTimeout(function () {
+            // A dialog opened on top of this one owns the focus, and must not
+            // lose it when behaviors are re-attached in the dialog underneath.
+            // Focus residing in a different dialog is the signal for that, which
+            // is more reliable than inspecting DOM order or stacking: it holds
+            // for any number of dialogs and ignores ones already closed.
+            // @see https://www.drupal.org/node/3422758
+            const focusedDialog =
+              document.activeElement?.closest('.ui-dialog-content');
+            if (focusedDialog && focusedDialog !== dialog) {
+              return;
+            }
             // Account for pre-existing focus handling that may have already moved
             // the focus inside the dialog.
             if (!dialog.contains(document.activeElement)) {
