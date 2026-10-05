@@ -235,11 +235,21 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   failed.
    */
   protected function safeExecuteSelect(SelectInterface $query) {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      fn() => $query->execute(),
-    );
+    try {
+      return $this->connection->executeAndCreateTableIfNeeded(
+        $this->table,
+        $this->schemaDefinition(),
+        fn() => $query->execute(),
+      );
+    }
+    catch (DatabaseException $e) {
+      // Database errors propagate unchanged.
+      throw $e;
+    }
+    catch (\Exception $e) {
+      // Some other failure that we can not recover from.
+      throw new PluginException($e->getMessage(), 0, $e);
+    }
   }
 
   /**

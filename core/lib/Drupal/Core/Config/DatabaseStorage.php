@@ -139,11 +139,21 @@ class DatabaseStorage implements StorageInterface {
    */
   public function write($name, array $data) {
     $data = $this->encode($data);
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      fn() => $this->doWrite($name, $data),
-    );
+    try {
+      return $this->connection->executeAndCreateTableIfNeeded(
+        $this->table,
+        $this->schemaDefinition(),
+        fn() => $this->doWrite($name, $data),
+      );
+    }
+    catch (DatabaseException $e) {
+      // Database errors propagate unchanged.
+      throw $e;
+    }
+    catch (\Exception $e) {
+      // Some other failure that we can not recover from.
+      throw new StorageException($e->getMessage(), 0, $e);
+    }
   }
 
   /**
