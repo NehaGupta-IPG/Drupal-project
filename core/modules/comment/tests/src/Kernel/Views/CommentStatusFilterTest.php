@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Kernel\Views;
 
 use Drupal\comment\CommentingStatus;
+use Drupal\comment\Plugin\views\field\CommentStatus;
 use Drupal\comment\Plugin\views\filter\NodeComment;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -151,6 +152,90 @@ class CommentStatusFilterTest extends KernelTestBase {
     $this->assertSame(['hidden-closed'], $result);
     $this->assertInstanceOf(NodeComment::class, $view->filter['comment_other_status']);
     $this->assertStatusCondition($view, 'node__comment_other.comment_other_status');
+  }
+
+  /**
+   * Tests that the comment status field displays the status labels.
+   */
+  public function testCommentStatusField(): void {
+    $this->createNodeWithStatuses('open-hidden', CommentingStatus::Open, CommentingStatus::Hidden);
+    $this->createNodeWithStatuses('closed-open', CommentingStatus::Closed, CommentingStatus::Open);
+    $this->createNodeWithStatuses('hidden-closed', CommentingStatus::Hidden, CommentingStatus::Closed);
+
+    $expected = [
+      'comment' => ['open-hidden' => 'Open', 'closed-open' => 'Closed', 'hidden-closed' => 'Hidden'],
+      'comment_other' => ['open-hidden' => 'Hidden', 'closed-open' => 'Open', 'hidden-closed' => 'Closed'],
+    ];
+    foreach ($expected as $field_name => $labels) {
+      $view = $this->executeStatusFieldView($field_name);
+      $this->assertInstanceOf(CommentStatus::class, $view->field[$field_name . '_status']);
+      $actual = [];
+      foreach ($view->result as $row) {
+        $actual[$row->_entity->label()] = (string) $view->field[$field_name . '_status']->advancedRender($row);
+      }
+      $this->assertSame($labels, $actual, $field_name);
+    }
+  }
+
+  /**
+   * Tests that an unexpected stored status value renders without error.
+   */
+  public function testCommentStatusFieldUnexpectedValue(): void {
+    $node = Node::create([
+      'type' => 'page',
+      'title' => 'odd',
+      'comment' => ['status' => 7],
+    ]);
+    $node->save();
+    $view = $this->executeStatusFieldView('comment');
+    $this->assertCount(1, $view->result);
+    $output = (string) $view->field['comment_status']->advancedRender($view->result[0]);
+    $this->assertSame('7', $output);
+  }
+
+  /**
+   * Builds and executes a view displaying a comment field's status.
+   */
+  protected function executeStatusFieldView(string $field_name): ViewExecutable {
+    $view_entity = View::create([
+      'id' => 'test_comment_status_field_' . $field_name,
+      'label' => 'Test',
+      'base_table' => 'node_field_data',
+      'base_field' => 'nid',
+      'display' => [
+        'default' => [
+          'id' => 'default',
+          'display_plugin' => 'default',
+          'position' => 0,
+          'display_options' => [
+            'fields' => [
+              'title' => [
+                'id' => 'title',
+                'table' => 'node_field_data',
+                'field' => 'title',
+                'entity_type' => 'node',
+                'entity_field' => 'title',
+                'plugin_id' => 'field',
+              ],
+              $field_name . '_status' => [
+                'id' => $field_name . '_status',
+                'table' => 'node__' . $field_name,
+                'field' => $field_name . '_status',
+                'plugin_id' => 'comment_status',
+              ],
+            ],
+            'pager' => ['type' => 'none'],
+            'style' => ['type' => 'default'],
+            'row' => ['type' => 'fields'],
+          ],
+        ],
+      ],
+    ]);
+    $view_entity->save();
+    $view = Views::getView($view_entity->id());
+    $view->setDisplay('default');
+    $view->execute();
+    return $view;
   }
 
   /**

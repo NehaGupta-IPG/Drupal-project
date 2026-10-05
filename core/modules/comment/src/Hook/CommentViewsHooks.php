@@ -18,7 +18,8 @@ class CommentViewsHooks {
    * Implements hook_field_views_data().
    *
    * Filters on the status column of comment fields with the node_comment
-   * plugin, which offers the commenting status options.
+   * plugin, which offers the commenting status options, and displays it with
+   * the comment_status plugin, which renders the status label.
    */
   #[Hook('field_views_data')]
   public function fieldViewsData(FieldStorageConfigInterface $field_storage): array {
@@ -30,6 +31,7 @@ class CommentViewsHooks {
     foreach ($data as $table_name => $table_data) {
       if (isset($table_data[$key]['filter'])) {
         $data[$table_name][$key]['filter']['id'] = 'node_comment';
+        $data[$table_name][$key]['field']['id'] = 'comment_status';
       }
     }
     return $data;
