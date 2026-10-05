@@ -109,6 +109,8 @@ class CommentPermissionBasedDeprecationTest extends KernelTestBase {
 
     // Force the theme registry to rebuild and use the legacy template.
     $this->container->get('theme.registry')->reset();
+    // The previous line does not clear the cache of the 'core' pseudo-theme.
+    // @see https://www.drupal.org/project/drupal/issues/3628524
     $this->container->get('cache.default')->delete('theme_registry:core');
 
     // Prevent the HTML IDs from getting a suffix on the second rendering as we
