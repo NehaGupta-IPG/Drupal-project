@@ -93,29 +93,38 @@ class SchemaDefinitionDiffer {
           $schemaDefinitionClass = get_class($oldFirstArrayKey ?? $newFirstArrayKey);
           $schemaDefinitionNormalizationProperty = $schemaDefinitionClass::normalizationProperty();
           if (isset($schemaDefinitionNormalizationProperty)) {
+            $oldKeyAsArray = $old[$key] ?? [];
+            $newKeyAsArray = $new[$key] ?? [];
+            assert(is_iterable($newKeyAsArray));
             $tmp = [];
-            foreach ($old[$key] ?? [] as $value) {
+            foreach ($oldKeyAsArray as $value) {
               /** @var string $normalizedKey */
               $normalizedKey = $value->{$schemaDefinitionNormalizationProperty};
               $tmp[$normalizedKey] = $value;
             }
             $old[$key] = $tmp;
             $tmp = [];
-            foreach ($new[$key] ?? [] as $value) {
+            foreach ($newKeyAsArray as $value) {
               /** @var string $normalizedKey */
               $normalizedKey = $value->{$schemaDefinitionNormalizationProperty};
               $tmp[$normalizedKey] = $value;
             }
             $new[$key] = $tmp;
           }
+          /** @var scalar|array|SchemaDefinitionInterface $oldKey */
+          $oldKey = $old[$key];
+          /** @var scalar|array|SchemaDefinitionInterface $newKey */
+          $newKey = $new[$key];
+        }
+        else {
+          /** @var scalar|array|SchemaDefinitionInterface $oldKey */
+          $oldKey = $old[$key];
+          /** @var scalar|array|SchemaDefinitionInterface $newKey */
+          $newKey = $new[$key];
         }
 
-        /** @var scalar|array|SchemaDefinitionInterface $oldKey */
-        $oldKey = $old[$key];
-        /** @var scalar|array|SchemaDefinitionInterface $newKey */
-        $newKey = $new[$key];
 
-        $diff = array_merge($diff, static::computeDiff($oldKey, $newKey, $currentPath, $isSchemaDefinitionArray));
+        $diff = array_merge($diff, static::computeDiff($oldKey, $newKey, $currentPath, is_array($oldKey) && is_array($newKey)));
       }
 
       /** @var array<string,DiffEntry> $diff */

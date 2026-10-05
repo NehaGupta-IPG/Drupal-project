@@ -22,6 +22,8 @@ use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Schema differ.
+ *
+ * @phpstan-type-import DiffEntry from \Drupal\Core\Database\Utility\SchemaDefinitionDiffer
  */
 #[Group('Database')]
 #[CoversClass(SchemaDefinitionDiffer::class)]
@@ -52,6 +54,13 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
           ],
           indexes: [
             new Index(name: 'swap', columns: ['id', 'month']),
+          ],
+          dbSpecificExtra: [
+            'mysql' => [
+              'mysql_engine' => 'InnoDB',
+              'mysql_character_set' => 'utf8mb4',
+            ],
+            'zoo' => ['lion', 'giraffe'],
           ],
         ),
       ],
@@ -84,6 +93,14 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
           indexes: [
             new Index(name: 'swap', columns: ['month', 'id', 'surname']),
           ],
+          dbSpecificExtra: [
+            'mysql' => [
+              'mysql_engine' => 'InnoDB',
+              'ziggy' => 'stardust',
+              'mysql_character_set' => 'utf8mb4',
+            ],
+            'zoo' => ['lion', 'turtle', 'giraffe'],
+          ],
         ),
       ],
     );
@@ -99,8 +116,11 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
         "tables[foo].indexes[swap].columns[2]" => 'Added',
         "tables[foo].primaryKey.columns[1]" => 'Added',
         'tables[foo].uniqueKeys[bar]' => 'Removed',
+        'tables[foo].dbSpecificExtra[mysql][ziggy]' => 'Added',
+        'tables[foo].dbSpecificExtra[zoo][1]' => 'Changed',
+        'tables[foo].dbSpecificExtra[zoo][2]' => 'Added'
       ],
-      $this->compactDiff($schemaA, $schemaB),
+      $this->compactDiff(SchemaDefinitionDiffer::diff($schemaA, $schemaB)),
     );
 
     $this->assertEquals(
@@ -114,32 +134,32 @@ class SchemaDefinitionDifferTest extends UnitTestCase {
         "indexes[swap].columns[2]" => 'Added',
         "primaryKey.columns[1]" => 'Added',
         'uniqueKeys[bar]' => 'Removed',
+        'dbSpecificExtra[mysql][ziggy]' => 'Added',
+        'dbSpecificExtra[zoo][1]' => 'Changed',
+        'dbSpecificExtra[zoo][2]' => 'Added'
       ],
-      $this->compactDiff($schemaA->getTableDefinition('foo'), $schemaB->getTableDefinition('foo')),
+      $this->compactDiff(SchemaDefinitionDiffer::diff($schemaA->getTableDefinition('foo'), $schemaB->getTableDefinition('foo'))),
     );
 
     $this->assertEquals(
       [
         "columns[1]" => 'Added',
       ],
-      $this->compactDiff($schemaA->getTableDefinition('foo')->primaryKey, $schemaB->getTableDefinition('foo')->primaryKey),
+      $this->compactDiff(SchemaDefinitionDiffer::diff($schemaA->getTableDefinition('foo')->primaryKey, $schemaB->getTableDefinition('foo')->primaryKey)),
     );
   }
 
   /**
    * Returns a compact diff between two SchemaDefinitionInterface objects.
    *
-   * @param SchemaDefinitionInterface $a
-   *   A SchemaDefinitionInterface object to compare.
-   * @param SchemaDefinitionInterface $b
-   *   A SchemaDefinitionInterface object to compare.
+   * @param array<string,DiffEntry>
+   *   A SchemaDefinitionInterface diff.
    *
    * @return array<string,string>
    *   The compacted diff entries, exposing path as key and the diff type as
    *   value.
    */
-  protected function compactDiff(SchemaDefinitionInterface $a, SchemaDefinitionInterface $b): array {
-    $diff = SchemaDefinitionDiffer::diff($a, $b);
+  protected function compactDiff(array $diff): array {
     return array_map(fn ($value): string => $value['type']->name, $diff);
   }
 

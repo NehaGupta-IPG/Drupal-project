@@ -36,7 +36,7 @@ final class Table implements SchemaDefinitionInterface {
    *   (Optional) An array of foreign keys for the table. This argument is for
    *   documentation purposes only; foreign keys are not created in the
    *   database, nor are they enforced by Drupal.
-   * @param array<string,array<string,mixed>>|null $dbSpecificExtra
+   * @param array<string,array<string|int,mixed>>|null $dbSpecificExtra
    *   (Optional) If you need to define a table requiring information not
    *   included elsewhere, you can specify it for each database backend.
    *   Specify this as an associative array having the database type ('mysql',
