@@ -94,7 +94,7 @@ variables:
   YARN_ENABLE_GLOBAL_CACHE: false
   YARN_ENABLE_MIRROR: false
   # [DO NOT MERGE] Bench matrix: "pilot" or "main" (ab-* jobs).
-  AB_RUN: "main"
+  AB_RUN: "q3"
 
 #############
 # Stages    #
@@ -1130,6 +1130,12 @@ default:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $AB_RUN == "main"
 
+# Q3 rerun: main run 991786 applied no patch in slots 1-2 (git apply inside the
+# checkout), so the lever jobs run again on their own.
+.ab-q3: &ab-q3
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($AB_RUN == "main" || $AB_RUN == "q3")
+
 .ab-kernel-vars: &ab-kernel-vars
   TESTSUITE: kernel
   CONCURRENCY: "24"
@@ -1265,7 +1271,7 @@ default:
 
 # Q3, file cache on (warm) in every pass.
 'ab-B Kernel':
-  <<: [ *ab-main, *ab-job ]
+  <<: [ *ab-q3, *ab-job ]
   parallel: 4
   variables:
     <<: *ab-kernel-vars
@@ -1274,7 +1280,7 @@ default:
     AB_SHARDS: "1 2 3 4"
 
 'ab-AB Functional':
-  <<: [ *ab-main, *ab-job ]
+  <<: [ *ab-q3, *ab-job ]
   parallel: 4
   variables:
     <<: *ab-functional-vars
@@ -1285,7 +1291,7 @@ default:
 # D: correctness and CPU of the split only; its shard effect is a scheduling
 # question answered by simulation from the measured class times.
 'ab-D package_manager':
-  <<: [ *ab-main, *ab-job ]
+  <<: [ *ab-q3, *ab-job ]
   variables:
     <<: *ab-kernel-vars
     AB_KIND: patch

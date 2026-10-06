@@ -112,6 +112,16 @@ EOF
   log "slots ready: $(for s in $(seq 0 $((N - 1))); do printf 'slot%s=%s ' "$s" "$(stat -f -c %T "$(slot_dir "$s")")"; done)"
 }
 
+# git in a slot. The copies live inside the job's checkout, and git run from a
+# subdirectory of a repository silently skips patch paths outside that
+# directory (main run 991786 applied no patch in slots 1-2). Stop repository
+# discovery at the slot, so git apply treats it as a plain directory.
+slot_git() {
+  local d=$1
+  shift
+  if [ "$d" = "$CI_PROJECT_DIR" ]; then (cd "$d" && git "$@"); else (cd "$d" && GIT_CEILING_DIRECTORIES="$(dirname "$d")" git "$@"); fi
+}
+
 # Puts arm $2 into slot $1; sets ARM_ENV[$1] and IDENT[$1].
 declare -A ARM_ENV IDENT
 set_slot_arm() {
@@ -133,13 +143,22 @@ set_slot_arm() {
       cur=$(cat "$d/.ab-patch")
       if [ "$cur" != "$arm" ]; then
         if [ -n "$cur" ] && [ "$cur" != base ]; then
-          (cd "$d" && git apply -R "$CI_PROJECT_DIR/.gitlab-ci/ab/$cur.patch") || { log "FATAL: revert $cur in slot $s"; exit 1; }
+          slot_git "$d" apply -R "$CI_PROJECT_DIR/.gitlab-ci/ab/$cur.patch" || { log "FATAL: revert $cur in slot $s"; exit 1; }
         fi
         if [ "$arm" != base ]; then
-          (cd "$d" && git apply "$CI_PROJECT_DIR/.gitlab-ci/ab/$arm.patch") || { log "FATAL: apply $arm in slot $s"; exit 1; }
+          slot_git "$d" apply "$CI_PROJECT_DIR/.gitlab-ci/ab/$arm.patch" || { log "FATAL: apply $arm in slot $s"; exit 1; }
         fi
         echo "$arm" > "$d/.ab-patch"
       fi
+      # Prove it: the arm's patch must be applied, and every other patch not.
+      for p in "${ARMS[@]}"; do
+        [ "$p" = base ] && continue
+        if [ "$p" = "$arm" ]; then
+          slot_git "$d" apply --check -R "$CI_PROJECT_DIR/.gitlab-ci/ab/$p.patch" 2>/dev/null || { log "FATAL: $p is not applied in slot $s"; exit 1; }
+        else
+          slot_git "$d" apply --check "$CI_PROJECT_DIR/.gitlab-ci/ab/$p.patch" 2>/dev/null || { log "FATAL: $p is applied in slot $s (arm $arm)"; exit 1; }
+        fi
+      done
       # Q3 measures the levers on top of a warm file cache, one per slot.
       mkdir -p "/tmp/ab-ini-slot$s" "/tmp/opcache-cli-slot$s"
       echo "opcache.file_cache=/tmp/opcache-cli-slot$s" > "/tmp/ab-ini-slot$s/fc.ini"
