@@ -9,7 +9,6 @@ use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\Access\AccessInterface;
-use Drupal\Core\Routing\Exception\CacheableResourceNotFoundException;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\views\Plugin\views\argument\ArgumentPluginBase;
 use Drupal\views\ViewExecutableFactory;
@@ -19,8 +18,8 @@ use Symfony\Component\Routing\Route;
 /**
  * Checks access to view routes based on argument configuration.
  *
- * This is primarily used to avoid displaying links to views that will either
- * return a 403 or 404 response.
+ * This is primarily used to avoid displaying links to views that will return a
+ * 403 response.
  */
 class ArgumentAccessCheck implements AccessInterface {
 
@@ -30,30 +29,32 @@ class ArgumentAccessCheck implements AccessInterface {
   ) {}
 
   /**
-   * Checks whether a NULL argument will return a 403 or 404 response.
+   * Checks whether a NULL argument will return a 403 response.
    *
    * @param array $options
    *   The argument handler options.
    *
    * @return bool
-   *   Whether a NULL argument will return a 403 or 404 response.
+   *   Whether a NULL argument will return a 403 response.
    */
   public static function requiresValue(array $options): bool {
-    return in_array($options['default_action'] ?? 'default', ['not found', 'access denied'], TRUE);
+    return ($options['default_action'] ?? '') === 'access denied';
   }
 
   /**
-   * Checks whether an invalid argument will return a 403 or 404 response.
+   * Checks whether an invalid argument will return a 403 response.
    *
    * @param array $options
    *   The argument handler options.
    *
    * @return bool
-   *   Whether an invalid argument will return a 403 or 404 response.
+   *   Whether an invalid argument will return a 403 response.
    */
   public static function requiresValidation(array $options): bool {
-    return ($options['validate']['type'] ?? 'none') !== 'none'
-      && in_array($options['validate']['fail'] ?? 'not found', ['not found', 'access denied'], TRUE);
+    if (!isset($options['validate']['type']) || $options['validate']['type'] === 'none') {
+      return FALSE;
+    }
+    return ($options['validate']['fail'] ?? '') === 'access denied';
   }
 
   /**
@@ -105,11 +106,7 @@ class ArgumentAccessCheck implements AccessInterface {
 
       $parameter_name = $argument_map[$argument_id];
       $argument_value = $route_match->getRawParameter($parameter_name) ?: $route_match->getParameter($parameter_name);
-
       if ($requires_value && $argument_value === NULL) {
-        if ($argument_options['default_action'] === 'not found') {
-          throw new CacheableResourceNotFoundException($cacheability);
-        }
         return AccessResult::forbidden()->addCacheableDependency($cacheability);
       }
 
@@ -119,9 +116,6 @@ class ArgumentAccessCheck implements AccessInterface {
       }
 
       if ($requires_validation && !$argument->getPlugin('argument_validator')->validateArgument($argument_value, $cacheability)) {
-        if ($argument_options['validate']['fail'] === 'not found') {
-          throw new CacheableResourceNotFoundException($cacheability);
-        }
         return AccessResult::forbidden()->addCacheableDependency($cacheability);
       }
     }

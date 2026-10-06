@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Core\Menu\MenuTreeParameters;
-use Drupal\Core\Routing\Exception\CacheableResourceNotFoundException;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -58,10 +57,9 @@ class ArgumentAccessCheckTest extends ViewsKernelTestBase {
     $route_name = 'view.test_argument_validator_node.page_2';
     $this->assertFalse($access_manager->checkNamedRoute($route_name, [], $test_user));
 
-    // A 404 achieved via an exception.
-    $this->expectException(CacheableResourceNotFoundException::class);
+    // A 404 is returned by the controller, not the access check.
     $route_name = 'view.test_argument_validator_node.page_1';
-    $access_manager->checkNamedRoute($route_name, [], $test_user);
+    $this->assertTrue($access_manager->checkNamedRoute($route_name, [], $test_user));
   }
 
   /**
@@ -82,10 +80,9 @@ class ArgumentAccessCheckTest extends ViewsKernelTestBase {
     $route_name = 'view.test_argument_validator_node.page_4';
     $this->assertFalse($access_manager->checkNamedRoute($route_name, ['node' => $node_page->id()], $test_user));
 
-    // A 404 achieved via an exception.
-    $this->expectException(CacheableResourceNotFoundException::class);
+    // A 404 is returned by the controller, not the access check.
     $route_name = 'view.test_argument_validator_node.page_3';
-    $access_manager->checkNamedRoute($route_name, ['node' => $node_page->id()], $test_user);
+    $this->assertTrue($access_manager->checkNamedRoute($route_name, ['node' => $node_page->id()], $test_user));
   }
 
   /**
@@ -99,8 +96,13 @@ class ArgumentAccessCheckTest extends ViewsKernelTestBase {
     $node_article = $this->createNode(['type' => 'article']);
     foreach ([$node_page, $node_article] as $node) {
       MenuLinkContent::create([
-        'title' => $node->bundle() . ' link',
+        'title' => $node->bundle() . ' link 404',
         'link' => ['uri' => 'route:view.test_argument_validator_node.page_3;node=' . $node->id()],
+        'menu_name' => 'main',
+      ])->save();
+      MenuLinkContent::create([
+        'title' => $node->bundle() . ' link 403',
+        'link' => ['uri' => 'route:view.test_argument_validator_node.page_4;node=' . $node->id()],
         'menu_name' => 'main',
       ])->save();
     }
@@ -114,8 +116,13 @@ class ArgumentAccessCheckTest extends ViewsKernelTestBase {
     $build = $menu_tree->build($tree);
     $output = (string) $this->render($build);
 
-    $this->assertStringContainsString('article link', $output);
-    $this->assertStringNotContainsString('page link', $output);
+    // Menu links are properly hidden when the view is configured to 403.
+    $this->assertStringContainsString('article link 403', $output);
+    $this->assertStringNotContainsString('page link 403', $output);
+
+    // Menu links show when the view is configured to 404.
+    $this->assertStringContainsString('article link 404', $output);
+    $this->assertStringContainsString('page link 404', $output);
   }
 
 }

@@ -191,8 +191,9 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     }
     $access_plugin->alterRouteDefinition($route);
 
-    // If a NULL or invalid argument could lead to a 403 or 404 response, we
-    // need to make sure the route checks the argument and does the same.
+    // If a NULL or invalid argument could lead to a 403 response, we need to
+    // make sure the route checks the argument and does the same. We do not
+    // check for 404 responses as access checks are not fit for that.
     $arguments_to_check = [];
     foreach ((array) $this->getOption('arguments') as $name => $argument) {
       if (ArgumentAccessCheck::requiresValue($argument) || ArgumentAccessCheck::requiresValidation($argument)) {
