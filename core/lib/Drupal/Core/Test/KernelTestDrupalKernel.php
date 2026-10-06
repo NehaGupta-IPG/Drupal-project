@@ -8,17 +8,10 @@ use Drupal\Core\DrupalKernel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * The DrupalKernel class is the core of Drupal itself.
+ * Sublass of DrupalKernel for kernel testing.
  *
- * This class is responsible for building the Dependency Injection Container and
- * also deals with the registration of service providers. It allows registered
- * service providers to add their services to the container. Core provides the
- * CoreServiceProvider, which, in addition to registering any core services that
- * cannot be registered in the core.services.yml file, adds any compiler passes
- * needed by core, e.g. for processing tagged services. Each module can add its
- * own service provider, i.e. a class implementing
- * Drupal\Core\DependencyInjection\ServiceProvider, to register services to the
- * container, or modify existing services.
+ * This class extends the DrupalKernel to allow re-use of the dependency
+ * injection container between kernel test methods.
  */
 class KernelTestDrupalKernel extends DrupalKernel {
 
