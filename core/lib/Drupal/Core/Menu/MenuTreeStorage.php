@@ -126,7 +126,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       }
       $this->routeProvider = \Drupal::service('router.route_provider');
       @trigger_error(
-        'Calling ' . __METHOD__ . '() without the $route_provider argument is deprecated in drupal:11.5.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3364323',
+        'Calling ' . __METHOD__ . '() without the $route_provider argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3364323',
         E_USER_DEPRECATED
       );
     }
