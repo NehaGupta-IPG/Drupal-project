@@ -35,20 +35,6 @@ class AjaxTestForm extends FormBase {
       '#markup' => '<p>' . $this->t("Ajax Form contents description.") . '</p>',
     ];
 
-    $form['select'] = [
-      '#type' => 'select',
-      '#title' => 'AJAX Select field',
-      '#options' => [
-        'one' => 'One',
-        'two' => 'Two',
-      ],
-      '#id' => 'select-announcement',
-      '#ajax' => [
-        'callback' => '::selectAnnouncementCallback',
-        'event' => 'change',
-      ],
-    ];
-
     $form['actions'] = [
       '#type' => 'actions',
     ];
@@ -75,6 +61,16 @@ class AjaxTestForm extends FormBase {
         'event' => 'click',
       ],
     ];
+    $form['actions']['test_progress'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Test progress'),
+      // No regular submit-handler. This form only works via JavaScript.
+      '#submit' => [],
+      '#ajax' => [
+        'callback' => '::delayedHelloWorld',
+        'event' => 'click',
+      ],
+    ];
     return $form;
   }
 
@@ -96,9 +92,7 @@ class AjaxTestForm extends FormBase {
   }
 
   /**
-   * The select announcement callback.
-   *
-   * This callback a five second delay to emulate a slow AJAX call.
+   * An AJAX callback that prints "Hello World!" as a message with a delay.
    *
    * @param array $form
    *   The form array to remove elements from.
@@ -108,7 +102,7 @@ class AjaxTestForm extends FormBase {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   An AJAX response.
    */
-  public function selectAnnouncementCallback(array $form, FormStateInterface $form_state) {
+  public function delayedHelloWorld(array $form, FormStateInterface $form_state) {
     sleep(5);
     return $this->helloWorld($form, $form_state);
   }
