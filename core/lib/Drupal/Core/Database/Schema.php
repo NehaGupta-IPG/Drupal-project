@@ -51,7 +51,7 @@ abstract class Schema implements PlaceholderInterface {
   /**
    * The map of database objects in the schema.
    *
-   * @array<\Drupal\Core\Database\SchemaDefinition\SchemaObject,array<string,1>>
+   * @var array{'Table'?,array<string,1>}
    */
   protected $objects;
 
