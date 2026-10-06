@@ -165,14 +165,15 @@ class FieldConfigEditForm extends EntityForm {
         'class' => ['js-hide'],
       ],
       '#value' => $this->t('Update settings'),
-      '#process' => ['::processFieldStorageSubmit'],
+      '#process' => [[static::class, 'processFieldStorageSubmit']],
       '#limit_validation_errors' => [$form['field_storage']['subform']['#parents']],
-      '#submit' => ['::fieldStorageSubmit'],
+      '#submit' => [[$this, 'fieldStorageSubmit']],
     ];
     $field_storage_form = $this->entityTypeManager->getFormObject('field_storage_config', $this->operation);
     $field_storage_form->setEntity($field_storage);
     $subform_state = SubformState::createForSubform($form['field_storage']['subform'], $form, $form_state, $field_storage_form);
     $form['field_storage']['subform'] = $field_storage_form->buildForm($form['field_storage']['subform'], $subform_state, $this->entity);
+    $form['field_storage']['subform']['#form_object'] = $field_storage_form;
 
     $target_entity_storage = $this->entityTypeManager->getStorage($this->entity->getTargetEntityTypeId());
     if (!$target_entity_storage instanceof ContentEntityStorageInterface) {
@@ -287,21 +288,6 @@ class FieldConfigEditForm extends EntityForm {
       unset($user_input['settings']);
       $form_state->setUserInput($user_input);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function afterBuild(array $element, FormStateInterface $form_state) {
-    // Delegate ::afterBuild to the subform.
-    // @todo remove after https://www.drupal.org/i/3385205 has been addressed.
-    if (isset($element['field_storage_submit'])) {
-      $field_storage_form = $this->entityTypeManager->getFormObject('field_storage_config', $this->operation);
-      $field_storage_form->setEntity($this->entity->getFieldStorageDefinition());
-      return $field_storage_form->afterBuild($element, SubformState::createForSubform($element, $form_state->getCompleteForm(), $form_state));
-    }
-
-    return parent::afterBuild($element, $form_state);
   }
 
   /**

@@ -622,7 +622,8 @@ interface FormStateInterface {
    * Converts support notations for a form callback to a valid callable.
    *
    * Specifically, supports methods on the form/callback object as strings when
-   * they start with ::, for example "::submitForm()".
+   * they start with ::, for example "::submitForm()". Within an element with
+   * #form_object, they resolve against that form object.
    *
    * @param string|array $callback
    *   The callback.
@@ -634,6 +635,9 @@ interface FormStateInterface {
 
   /**
    * Returns the form object that is responsible for building this form.
+   *
+   * Callbacks within an element with #form_object get that form object. The
+   * 'callback_object' build info always holds the top-level form object.
    *
    * @return \Drupal\Core\Form\FormInterface
    *   The form object.

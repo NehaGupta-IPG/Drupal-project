@@ -40,10 +40,12 @@ class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
     // or may not be a button) that triggered the Ajax request to determine what
     // needs to be rendered.
     $callback = NULL;
+    $callback_form_state = $form_state;
     if (($triggering_element = $form_state->getTriggeringElement()) && isset($triggering_element['#ajax']['callback'])) {
       $callback = $triggering_element['#ajax']['callback'];
+      $callback_form_state = FormObjectScopedFormState::createForElement($triggering_element, $form_state);
     }
-    $callback = $form_state->prepareCallback($callback);
+    $callback = $callback_form_state->prepareCallback($callback);
     if (empty($callback)) {
       throw new HttpException(500, 'The specified #ajax callback is empty or not callable.');
     }
@@ -53,7 +55,7 @@ class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
     catch (\InvalidArgumentException $e) {
       throw new HttpException(500, 'The specified #ajax callback is empty or not callable.', $e);
     }
-    $result = call_user_func_array($callback, [&$form, &$form_state, $request]);
+    $result = call_user_func_array($callback, [&$form, &$callback_form_state, $request]);
 
     // If the callback is an #ajax callback, the result is a render array, and
     // we need to turn it into an AJAX response, so that we can add any commands

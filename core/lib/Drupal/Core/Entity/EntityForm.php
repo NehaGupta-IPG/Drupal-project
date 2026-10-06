@@ -6,6 +6,8 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\SubformState;
+use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Utility\CallableResolver;
@@ -169,6 +171,10 @@ class EntityForm extends FormBase implements EntityFormInterface {
     // Rebuild the entity if #after_build is being called as part of a form
     // rebuild, i.e. if we are processing input.
     if ($form_state->isProcessingInput()) {
+      // Values of a form embedded with #form_object are relative to its root.
+      if (($element['#form_object'] ?? NULL) === $this && !$form_state instanceof SubformStateInterface) {
+        $form_state = SubformState::createForSubform($element, $form_state->getCompleteForm(), $form_state);
+      }
       $this->entity = $this->buildEntity($element, $form_state);
     }
 

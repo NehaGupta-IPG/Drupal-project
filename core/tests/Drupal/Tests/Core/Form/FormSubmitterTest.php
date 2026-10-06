@@ -284,6 +284,46 @@ class FormSubmitterTest extends UnitTestCase {
   }
 
   /**
+   * Tests submit handlers of a button with #form_object.
+   */
+  #[DataProvider('providerTestExecuteSubmitHandlersFormObject')]
+  public function testExecuteSubmitHandlersFormObject(bool $button_handlers): void {
+    $this->callableResolver->method('getCallableFromDefinition')->willReturnArgument(0);
+    $form_submitter = $this->getFormSubmitter();
+
+    $form_object = $this->prophesize(MockFormBase::class);
+    $subform_object = $this->prophesize(MockFormBase::class);
+    $expected_form_object = $button_handlers ? $subform_object : $form_object;
+    $other_form_object = $button_handlers ? $form_object : $subform_object;
+    $expected_form_object
+      ->simple_string_submit(Argument::type('array'), Argument::that(fn (FormStateInterface $form_state): bool => $form_state->getFormObject() === $expected_form_object->reveal()))
+      ->shouldBeCalledOnce();
+    $other_form_object
+      ->simple_string_submit(Argument::cetera())
+      ->shouldNotBeCalled();
+
+    $form = ['#submit' => ['::simple_string_submit']];
+    $form_state = (new FormState())->setFormObject($form_object->reveal());
+    $triggering_element = ['#form_object' => $subform_object->reveal()];
+    if ($button_handlers) {
+      $triggering_element['#submit'] = ['::simple_string_submit'];
+      $form_state->setSubmitHandlers($triggering_element['#submit']);
+    }
+    $form_state->setTriggeringElement($triggering_element);
+    $form_submitter->executeSubmitHandlers($form, $form_state);
+  }
+
+  /**
+   * Provides test data for testExecuteSubmitHandlersFormObject().
+   */
+  public static function providerTestExecuteSubmitHandlersFormObject(): array {
+    return [
+      'button handlers' => [TRUE],
+      'form handlers' => [FALSE],
+    ];
+  }
+
+  /**
    * @return \Drupal\Core\Form\FormSubmitterInterface
    *   A mocked instance of FormSubmitter.
    */

@@ -53,7 +53,8 @@ class SubformState extends FormStateDecoratorBase implements SubformStateInterfa
    * @param \Drupal\Core\Form\FormStateInterface $parent_form_state
    *   The parent form state.
    * @param \Drupal\Core\Form\FormInterface|null $subform_form_object
-   *   The subform form object when it's not the same as the parent form.
+   *   The subform form object when it's not the same as the parent form. Form
+   *   API element callbacks only see it when the subform sets #form_object.
    *
    * @return static
    */
@@ -165,6 +166,17 @@ class SubformState extends FormStateDecoratorBase implements SubformStateInterfa
     }
 
     return parent::getFormObject();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareCallback($callback) {
+    if ($this->subformFormObject !== NULL && is_string($callback) && str_starts_with($callback, '::')) {
+      return [$this->subformFormObject, substr($callback, 2)];
+    }
+
+    return parent::prepareCallback($callback);
   }
 
 }
