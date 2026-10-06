@@ -68,7 +68,7 @@ class DeprecatedAssetsTest extends KernelTestBase {
         'core',
         'js-cookie',
         'asset library is deprecated in Drupal 10.1.0 and will be removed in Drupal 11.0.0. There is no replacement. See https://www.drupal.org/node/3322720',
-        'a7e012e283433678627bc03f520f4042',
+        '559a9b6b6d894b9058121219e3d88607',
       ],
     ];
   }
