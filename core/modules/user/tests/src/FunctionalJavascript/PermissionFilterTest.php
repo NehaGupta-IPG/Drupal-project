@@ -83,6 +83,60 @@ class PermissionFilterTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests filtering the permissions to only show restricted permissions.
+   */
+  public function testRestrictedPermissionFilter(): void {
+    $this->drupalGet('admin/people/permissions');
+    $assertSession = $this->assertSession();
+    $session = $this->getSession();
+    $page = $session->getPage();
+
+    $filter = $page->findField('edit-text');
+    $restricted = $page->findField('Only show restricted permissions');
+
+    // Get all permission rows, for assertions later.
+    $permission_rows = $page->findAll('css', 'tbody tr td .permission');
+    $restricted_rows = $page->findAll('css', 'tbody tr.permission-restricted td .permission');
+    self::assertNotEmpty($restricted_rows);
+    self::assertGreaterThan(count($restricted_rows), count($permission_rows));
+    $assertSession->elementExists('css', 'tr.permission-restricted[data-drupal-selector="edit-permissions-administer-permissions"]');
+    $assertSession->elementNotExists('css', 'tr.permission-restricted[data-drupal-selector="edit-permissions-access-user-profiles"]');
+
+    // Only restricted permissions are shown when the checkbox is checked.
+    $restricted->check();
+    $this->assertTrue($session->wait(1000, "jQuery('tr[data-drupal-selector=\"edit-permissions-access-user-profiles\"]:visible').length == 0"));
+    $visible_rows = $this->filterVisibleElements($permission_rows);
+    self::assertCount(count($restricted_rows), $visible_rows);
+    self::assertCount(count($restricted_rows), $this->filterVisibleElements($restricted_rows));
+    $expected_message = count($visible_rows) . ' permissions are available in the modified list.';
+    $this->assertNotEmpty($assertSession->waitForElement('css', "#drupal-live-announce:contains('$expected_message')"));
+
+    // The text filter is combined with the restricted filter.
+    $filter->setValue('Administer site configuration');
+    $this->assertTrue($session->wait(1000, "jQuery('tr[data-drupal-selector=\"edit-permissions-administer-permissions\"]:visible').length == 0"));
+    $visible_rows = $this->filterVisibleElements($permission_rows);
+    self::assertCount(1, $visible_rows);
+    $this->assertNotEmpty($assertSession->waitForElement('css', "#drupal-live-announce:contains('1 permission is available in the modified list.')"));
+
+    // Text matches without the restricted flag are not shown.
+    $filter->setValue('View user');
+    $this->assertTrue($session->wait(1000, "jQuery('tr[data-drupal-selector=\"edit-permissions-administer-site-configuration\"]:visible').length == 0"));
+    self::assertCount(0, $this->filterVisibleElements($permission_rows));
+
+    // Unchecking the checkbox shows the unrestricted text matches again.
+    $restricted->uncheck();
+    $this->assertTrue($session->wait(1000, "jQuery('tr[data-drupal-selector=\"edit-permissions-view-user-email-addresses\"]:visible').length == 1"));
+    self::assertNotEmpty($this->filterVisibleElements($permission_rows));
+
+    // Clearing the text filter shows all permissions.
+    $filter->setValue('');
+    // Wait until no rows are hidden; the filter is debounced and may run on a
+    // partially cleared value first.
+    $this->assertTrue($session->wait(5000, "jQuery('#permissions tbody tr:hidden').length == 0"));
+    self::assertCount(count($permission_rows), $this->filterVisibleElements($permission_rows));
+  }
+
+  /**
    * Removes any non-visible elements from the passed array.
    *
    * @param \Behat\Mink\Element\NodeElement[] $elements

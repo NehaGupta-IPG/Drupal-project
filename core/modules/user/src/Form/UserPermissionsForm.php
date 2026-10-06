@@ -159,6 +159,15 @@ class UserPermissionsForm extends FormBase {
       ],
     ];
 
+    $form['filters']['restricted'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Only show restricted permissions'),
+      '#attributes' => [
+        'class' => ['table-filter-restricted'],
+        'data-table' => '#permissions',
+      ],
+    ];
+
     $form['permissions'] = [
       '#type' => 'table',
       '#empty' => $this->t('No permissions found.'),
@@ -200,6 +209,9 @@ class UserPermissionsForm extends FormBase {
             'title' => $perm_item['title'],
           ],
         ];
+        if ($perm_item['restrict access']) {
+          $form['permissions'][$perm]['#attributes']['class'][] = 'permission-restricted';
+        }
         $form['permissions'][$perm]['description']['#context']['description'] = $perm_item['description'];
         $form['permissions'][$perm]['description']['#context']['warning'] = $perm_item['warning'];
         foreach ($role_names as $rid => $name) {
