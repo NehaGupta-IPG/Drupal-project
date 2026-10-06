@@ -1095,8 +1095,9 @@ default:
 
 ###########################################################################
 # [DO NOT MERGE] Same-node A/B bench (#3627452 / #3628411).
-# Each job runs ONE shard several times, switching only the arm between
-# passes (.gitlab-ci/ab/ab.sh). AB_RUN selects the pilot or the main matrix.
+# Each job runs ALL arms of one shard concurrently, one codebase copy and
+# server port per arm, rotating arms over copies between rounds
+# (.gitlab-ci/ab/ab.sh). AB_RUN selects the pilot or the main matrix.
 # Job names carry no brackets: GitLab merges "[...]" names in test reports.
 ###########################################################################
 
@@ -1158,7 +1159,16 @@ default:
     - .gitlab-ci/ab/build-unit.sh n137 1.37.0 8ae237d5a32d77bb8a7426d844ce75aeb18583a4e47318f55e17839d865fad8c
     - .gitlab-ci/ab/ab.sh
 
-#### Pilot: noise floor (A1/A2), calibration against known fc ratios, harness shakedown.
+#### Pilot: A/A noise floor, calibration against known fc ratios, harness shakedown.
+
+'ab-AA Kernel pilot':
+  <<: [ *ab-pilot, *ab-job ]
+  variables:
+    <<: *ab-kernel-vars
+    AB_KIND: fc
+    AB_ARMS: "off off2"
+    AB_ROUNDS: "4"
+    AB_SHARDS: "3"
 
 'ab-fc Kernel pilot':
   <<: [ *ab-pilot, *ab-job ]
@@ -1166,7 +1176,7 @@ default:
     <<: *ab-kernel-vars
     AB_KIND: fc
     AB_ARMS: "off on"
-    AB_SEQS: "0110"
+    AB_ROUNDS: "4"
     AB_SHARDS: "2"
 
 'ab-fc Functional pilot':
@@ -1175,8 +1185,18 @@ default:
     <<: *ab-functional-vars
     AB_KIND: fc
     AB_ARMS: "off on"
-    AB_SEQS: "1001"
+    AB_ROUNDS: "4"
     AB_SHARDS: "3"
+
+# A/A control: two identical arms; the measured ratio is the design's noise.
+'ab-AA Functional pilot':
+  <<: [ *ab-pilot, *ab-job ]
+  variables:
+    <<: *ab-functional-vars
+    AB_KIND: fc
+    AB_ARMS: "off off2"
+    AB_ROUNDS: "4"
+    AB_SHARDS: "4"
 
 'ab-unit Functional pilot':
   <<: [ *ab-pilot, *ab-unit, *ab-job ]
@@ -1184,9 +1204,9 @@ default:
     <<: *ab-functional-vars
     AB_KIND: unit
     AB_ARMS: "ac n137"
-    AB_SEQS: "0110"
     AB_SHARDS: "1"
     AB_MICRO: "1"
+    AB_MICRO_ROUNDS: "8"
 
 #### Main matrix (AB_RUN: main). Sized after the pilot.
 
@@ -1197,7 +1217,6 @@ default:
     <<: *ab-kernel-vars
     AB_KIND: fc
     AB_ARMS: "off on"
-    AB_SEQS: "1001;0110;1001"
     AB_SHARDS: "1 3 4"
 
 'ab-fc Functional':
@@ -1207,7 +1226,6 @@ default:
     <<: *ab-functional-vars
     AB_KIND: fc
     AB_ARMS: "off on"
-    AB_SEQS: "0110;1001;0110"
     AB_SHARDS: "1 5 7"
 
 'ab-fc FunctionalJavascript':
@@ -1227,8 +1245,8 @@ default:
     CLI_OPCACHE_FILE_CACHE: "0"
     AB_KIND: fc
     AB_ARMS: "off on"
-    AB_SEQS: "0110;1001;0110"
     AB_SHARDS: "1 2 3"
+    AB_FILLER: "0"
 
 # Unit Core does not run server-setup.sh, so !17339 does not reach it; this
 # measures what extending it to Unit Core would give.
@@ -1244,7 +1262,6 @@ default:
     CLI_OPCACHE_FILE_CACHE: "0"
     AB_KIND: fc
     AB_ARMS: "off on"
-    AB_SEQS: "0110;1001"
 
 # Q3, file cache on (warm) in every pass.
 'ab-B Kernel':
@@ -1254,7 +1271,6 @@ default:
     <<: *ab-kernel-vars
     AB_KIND: patch
     AB_ARMS: "base B"
-    AB_SEQS: "0110;1001;0110;1001"
     AB_SHARDS: "1 2 3 4"
 
 'ab-AB Functional':
@@ -1264,7 +1280,6 @@ default:
     <<: *ab-functional-vars
     AB_KIND: patch
     AB_ARMS: "base A B"
-    AB_SEQS: "012210;120021;201102;021120"
     AB_SHARDS: "2 4 6 8"
 
 # D: correctness and CPU of the split only; its shard effect is a scheduling
@@ -1275,8 +1290,26 @@ default:
     <<: *ab-kernel-vars
     AB_KIND: patch
     AB_ARMS: "base D"
-    AB_SEQS: "0110"
     AB_TARGET: "--types kernel --module package_manager"
+
+# Co-load bias: does off/on move when the neighbour arm is the other arm?
+'ab-mix Kernel':
+  <<: [ *ab-main, *ab-job ]
+  parallel: 2
+  variables:
+    <<: *ab-kernel-vars
+    AB_KIND: fc
+    AB_ARMS: "off on on2"
+    AB_SHARDS: "2 2"
+
+'ab-mix2 Kernel':
+  <<: [ *ab-main, *ab-job ]
+  parallel: 2
+  variables:
+    <<: *ab-kernel-vars
+    AB_KIND: fc
+    AB_ARMS: "off off2 on"
+    AB_SHARDS: "2 2"
 
 'ab-unit Functional':
   <<: [ *ab-main, *ab-unit, *ab-job ]
@@ -1284,6 +1317,6 @@ default:
     <<: *ab-functional-vars
     AB_KIND: unit
     AB_ARMS: "ac n137"
-    AB_SEQS: "1001"
     AB_SHARDS: "5"
     AB_MICRO: "1"
+    AB_MICRO_ROUNDS: "8"
