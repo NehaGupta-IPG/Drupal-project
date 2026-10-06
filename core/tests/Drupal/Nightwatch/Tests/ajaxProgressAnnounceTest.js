@@ -10,7 +10,7 @@ module.exports = {
     browser
       .drupalRelativeURL('/ajax-test/dialog-form')
       .waitForElementVisible('body', 1000)
-      .click('select[id="select-announcement"] option[value="two"]')
+      .click('.form-actions .nightwatch-test-progress')
       .pause(1000);
 
     browser.expect

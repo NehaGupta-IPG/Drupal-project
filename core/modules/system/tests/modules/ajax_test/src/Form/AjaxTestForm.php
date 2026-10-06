@@ -70,6 +70,9 @@ class AjaxTestForm extends FormBase {
         'callback' => '::delayedHelloWorld',
         'event' => 'click',
       ],
+      '#attributes' => [
+        'class' => ['nightwatch-test-progress'],
+      ],
     ];
     return $form;
   }
