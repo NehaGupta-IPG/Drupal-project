@@ -317,6 +317,31 @@ class SessionTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that an invalid session cookie is deleted with a single header.
+   *
+   * @legacy-covers \Drupal\Core\Session\SessionManager::destroy
+   */
+  public function testInvalidSessionCookieOnEmptySession(): void {
+    $mink = $this->getSession();
+    $sessionCookieName = $this->getSessionName();
+
+    // Send a session ID that does not exist in the database to a page that
+    // does not store anything in the session.
+    $mink->setCookie($sessionCookieName, bin2hex($this->randomMachineName(13)));
+    $this->drupalGet('session-test/get');
+
+    // Strict mode makes PHP replace the invalid ID and queue a cookie for the
+    // new one. As the session is empty it is destroyed, so only the header
+    // deleting the session cookie may be sent.
+    $sessionCookies = array_values(array_filter(
+      array_change_key_case($mink->getResponseHeaders())['set-cookie'] ?? [],
+      fn (string $cookie): bool => str_starts_with($cookie, $sessionCookieName . '='),
+    ));
+    $this->assertCount(1, $sessionCookies);
+    $this->assertStringStartsWith($sessionCookieName . '=deleted;', $sessionCookies[0]);
+  }
+
+  /**
    * Tests that sessions are only saved when necessary.
    */
   public function testSessionWrite(): void {

@@ -234,14 +234,60 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     // convenience method here.
     session_destroy();
 
-    // Unset the session cookies.
     $session_name = $this->getName();
+
+    // PHP may already have queued a session cookie during this request, for
+    // example when strict mode replaced an invalid session ID with a new one.
+    // That cookie refers to the session that was just destroyed, remove it so
+    // the response does not contain conflicting Set-Cookie headers.
+    if (!headers_sent()) {
+      $this->removeSessionCookieHeaders($session_name);
+    }
+
+    // Unset the session cookies.
     $cookies = $this->requestStack->getCurrentRequest()->cookies;
     // setcookie() can only be called when headers are not yet sent.
     if ($cookies->has($session_name) && !headers_sent()) {
       $params = session_get_cookie_params();
       setcookie($session_name, '', $this->time->getRequestTime() - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
       $cookies->remove($session_name);
+    }
+  }
+
+  /**
+   * Removes queued Set-Cookie headers for the session cookie.
+   *
+   * Other Set-Cookie headers are preserved.
+   *
+   * @param string $session_name
+   *   The session cookie name.
+   *
+   * @see \Symfony\Component\HttpFoundation\Session\SessionUtils::popSessionCookie()
+   */
+  protected function removeSessionCookieHeaders(string $session_name): void {
+    $prefix = ' ' . urlencode($session_name) . '=';
+    $other_cookies = [];
+    $found = FALSE;
+
+    foreach (headers_list() as $header) {
+      if (stripos($header, 'Set-Cookie:') !== 0) {
+        continue;
+      }
+      if (strpos($header, $prefix, 11) === 11) {
+        $found = TRUE;
+      }
+      else {
+        $other_cookies[] = $header;
+      }
+    }
+
+    if (!$found) {
+      return;
+    }
+
+    header_remove('Set-Cookie');
+    foreach ($other_cookies as $header) {
+      header($header, FALSE);
     }
   }
 
