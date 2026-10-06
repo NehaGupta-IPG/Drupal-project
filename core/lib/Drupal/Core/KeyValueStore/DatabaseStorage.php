@@ -313,10 +313,10 @@ class DatabaseStorage extends StorageBase {
    *   \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded()
    *   instead.
    *
-   * @see https://www.drupal.org/node/9999999
+   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $database_schema = $this->connection->schema();
       $database_schema->createTable($this->table, $this->schemaDefinition());

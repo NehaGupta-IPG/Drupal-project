@@ -55,7 +55,7 @@ class LegacyLazyTableCreationTest extends DatabaseTestBase {
   #[TestWith([SessionHandler::class, 'ensureTableExists', 'sessions'])]
   public function testEnsureTableExists(string $class, string $method, string $table): void {
     $backend = $this->createBackend($class);
-    $this->expectUserDeprecationMessage($class . '::' . $method . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/9999999');
+    $this->expectUserDeprecationMessage($class . '::' . $method . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/3489185');
     (new \ReflectionMethod($backend, $method))->invoke($backend);
     $this->assertTrue($this->connection->schema()->tableExists($table));
   }
