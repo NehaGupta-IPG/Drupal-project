@@ -19,6 +19,8 @@ use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore Fermé Masqué Ouvert
+
 /**
  * Tests filtering a view on the status of a comment field.
  */
