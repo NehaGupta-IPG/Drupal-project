@@ -8,7 +8,7 @@ use Drupal\Core\DrupalKernel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Sublass of DrupalKernel for kernel testing.
+ * Subclass of DrupalKernel for kernel testing.
  *
  * This class extends the DrupalKernel to allow re-use of the dependency
  * injection container between kernel test methods.
