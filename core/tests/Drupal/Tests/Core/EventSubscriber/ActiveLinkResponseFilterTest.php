@@ -26,6 +26,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 // cspell:ignore svenska
+
 /**
  * Tests Drupal\Core\EventSubscriber\ActiveLinkResponseFilter.
  */
@@ -880,8 +881,6 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
 
   /**
    * Tests a response with a NULL Content-Type header is ignored.
-   *
-   * @legacy-covers ::onResponse
    */
   public function testOnResponseNullContentType(): void {
     $session = new AnonymousUserSession();
