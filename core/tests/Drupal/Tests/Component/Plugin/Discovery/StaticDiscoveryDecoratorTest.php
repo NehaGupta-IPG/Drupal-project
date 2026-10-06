@@ -185,8 +185,8 @@ class StaticDiscoveryDecoratorTest extends TestCase {
   }
 
   /**
- * Tests call.
- */
+   * Tests call.
+   */
   #[DataProvider('providerCall')]
   public function testCall(string $method, array $args): void {
     // Mock a decorated object.

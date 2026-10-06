@@ -125,7 +125,7 @@ class EntityLinksTest extends KernelTestBase {
   }
 
   /**
-   * Tests .
+   * Tests links to entity translations.
    */
   public function test(): void {
     $expected_aliases = [

@@ -55,8 +55,8 @@ class FormattableMarkupTest extends TestCase {
   }
 
   /**
- * Tests unexpected placeholder.
- */
+   * Tests unexpected placeholder.
+   */
   #[DataProvider('providerTestUnexpectedPlaceholder')]
   public function testUnexpectedPlaceholder(string $string, array $arguments, ?int $error_number, string $error_message): void {
     // We set a custom error handler that saves the last error.

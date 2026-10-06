@@ -137,8 +137,8 @@ class DrupalComponentTest extends TestCase {
   }
 
   /**
- * Tests assert no core usage.
- */
+   * Tests assert no core usage.
+   */
   #[DataProvider('providerAssertNoCoreUsage')]
   public function testAssertNoCoreUsage(bool $expected_pass, string $file_data): void {
     // Set up a virtual file to read.
