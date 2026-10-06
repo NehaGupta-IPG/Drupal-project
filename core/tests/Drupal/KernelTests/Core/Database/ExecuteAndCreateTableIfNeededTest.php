@@ -100,6 +100,11 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
   #[TestWith([FALSE])]
   #[TestWith([TRUE])]
   public function testCreateTableIfNotExistsRace(bool $in_transaction): void {
+    if ($in_transaction && $this->connection->driver() === 'sqlite') {
+      // SQLite starts transactions with BEGIN IMMEDIATE, so no other
+      // connection can create the table while the transaction is open.
+      $this->markTestSkipped('SQLite transactions hold the write lock, so a creation race cannot occur.');
+    }
     $table = 'lazy_create_race';
     $this->simulateCreationRace($table, function () use ($table, $in_transaction): void {
       $transaction = $in_transaction ? $this->connection->startTransaction() : NULL;
