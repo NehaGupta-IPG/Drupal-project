@@ -5,12 +5,15 @@ namespace Drupal\Core\Database;
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\Core\Database\Exception\EventException;
+use Drupal\Core\Database\Exception\SchemaTableDoesNotExistException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\Truncate;
 use Drupal\Core\Database\Query\Update;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
+use Drupal\Core\Database\SchemaDefinition\SchemaCollection as SchemaDefinitionCollection;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
@@ -1232,6 +1235,25 @@ abstract class Connection {
    */
   public function supportsTransactionalDDL() {
     return $this->transactionalDDLSupport;
+  }
+
+  /**
+   * Executes an operation, creating its schema if necessary.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema|\Drupal\Core\Database\SchemaDefinition\SchemaCollection $schema
+   *   A schema definition.
+   * @param callable $operation
+   *   The operation. It may be called twice and must be safe to retry after a
+   *   missing-table failure. Start any transaction before calling this method,
+   *   not inside the callback, so drivers can check for the database objects
+   *   first.
+   *
+   * @return mixed
+   *   The result of the operation.
+   */
+  public function executeWithCreateSchemaIfNeeded(SchemaDefinition|SchemaDefinitionCollection $schema, callable $operation): mixed {
+    $this->schema()->createSchemaFromDefinition($schema);
+    return $operation();
   }
 
   /**

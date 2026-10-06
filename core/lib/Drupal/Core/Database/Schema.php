@@ -2,9 +2,11 @@
 
 namespace Drupal\Core\Database;
 
+use Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\SchemaObject;
 use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
 
 /**
@@ -46,6 +48,13 @@ abstract class Schema implements PlaceholderInterface {
    */
   protected $uniqueIdentifier;
 
+  /**
+   * The map of database objects in the schema.
+   *
+   * @array<\Drupal\Core\Database\SchemaDefinition\SchemaObject,array<string,1>>
+   */
+  protected $objects;
+
   public function __construct($connection) {
     $this->uniqueIdentifier = bin2hex(random_bytes(12));
     $this->connection = $connection;
@@ -56,6 +65,49 @@ abstract class Schema implements PlaceholderInterface {
    */
   public function __clone() {
     $this->uniqueIdentifier = bin2hex(random_bytes(12));
+  }
+
+  /**
+   * Determines if a database object exists is the schema.
+   *
+   * @param string $name
+   *   The name of the object to find.
+   * @param ?SchemaObject $objectType
+   *   (Optional) The type of object to find, or NULL not to restrict.
+   *
+   * @return SchemaObject|false
+   *   The type of the object found, or FALSE if not found.
+   */
+  public function hasObject(string $name, ?SchemaObject $objectType = NULL): SchemaObject|false {
+    if ($objectType) {
+      $matchable[$objectType->name] = $this->objects[$objectType->name] ?? [];
+    }
+    else {
+      $matchable = $this->objects;
+    }
+    foreach ($matchable as $type => $list) {
+      if (isset($list[$name])) {
+        return $type;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Introspect the list of available database objects.
+   *
+   * The list is cached for the duration of the request. Schema operations
+   * adding/renaming/removing database objects adjust the list.
+   *
+   * @param bool $reload
+   *   If TRUE, reloads the objects from the database even if already cached.
+   */
+  public function fetchObjects(bool $reload = FALSE): void {
+    if ($this->objects && !$reload) {
+      return;
+    }
+    // Load tables.
+    $this->objects[SchemaObject::Table->name] = $this->findTables('%');
   }
 
   /**
@@ -643,7 +695,15 @@ abstract class Schema implements PlaceholderInterface {
    */
   final public function createSchemaFromDefinition(SchemaDefinition $schema): void {
     foreach ($schema->tables as $table) {
-      $this->createTableFromDefinition($schema->type, $schema->name, $table);
+      try {
+        if (!$this->hasObject($table->name, SchemaObject::Table)) {
+          $this->createTableFromDefinition($schema->type, $schema->name, $table);
+        }
+      }
+      catch (SchemaTableAlreadyExistsException) {
+        // If the table already exists, we are fine; reload database objects.
+        $this->fetchObjects(TRUE);
+      }
     }
   }
 
@@ -683,10 +743,14 @@ abstract class Schema implements PlaceholderInterface {
     if ($this->tableExists($name)) {
       throw new SchemaObjectExistsException("Table '$name' already exists.");
     }
+    $this->fetchObjects();
+
     $statements = $this->createTableSql($name, $table);
     foreach ($statements as $statement) {
       $this->executeDdlStatement($statement);
     }
+
+    $this->objects[SchemaObject::Table->name][$name] = 1;
   }
 
   /**

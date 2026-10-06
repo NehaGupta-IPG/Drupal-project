@@ -6,7 +6,9 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\ExceptionHandler as BaseExceptionHandler;
 use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
+use Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException;
 use Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException;
+use Drupal\Core\Database\Exception\SchemaTableDoesNotExistException;
 use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\StatementInterface;
@@ -88,7 +90,9 @@ class ExceptionHandler extends BaseExceptionHandler {
         4111 => throw new SchemaPrimaryKeyMustBeDroppedException($message, 0, $exception),
         default => throw new DatabaseExceptionWrapper($message, 0, $exception),
       },
-      '42000' =>  match ($errorCode) {
+      '42000', '42S01', '42S02' =>  match ($errorCode) {
+        1050 => throw new SchemaTableAlreadyExistException($message, $code, $exception),
+        1051, 1146 => throw new SchemaTableDoesNotExistException($message, $code, $exception),
         1071 => throw new SchemaTableKeyTooLargeException($message, $code, $exception),
         1074 => throw new SchemaTableColumnSizeTooLargeException($message, $code, $exception),
         default => throw new DatabaseExceptionWrapper($message, 0, $exception),

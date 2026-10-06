@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Batch;
 
+use Drupal\Core\Batch\BatchStorageInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -39,6 +40,13 @@ class BatchKernelTest extends KernelTestBase {
     // Set the value to FALSE.
     $this->assertEquals(FALSE, _batch_needs_update(FALSE));
     $this->assertEquals(FALSE, _batch_needs_update());
+  }
+
+  /**
+   * Tests getting a batch id from the service.
+   */
+  public function testGetBatchId(): void {
+    $this->assertEquals(1, \Drupal::service(BatchStorageInterface::class)->getId());
   }
 
 }

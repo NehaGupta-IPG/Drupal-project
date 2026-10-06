@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaDefinition\SchemaObject;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectExistsException;
@@ -395,9 +396,13 @@ class Schema extends DatabaseSchema {
     if ($this->tableExists($new_name)) {
       throw new SchemaObjectExistsException("Cannot rename '$table' to '$new_name': table '$new_name' already exists.");
     }
+    $this->fetchObjects();
 
     $info = $this->getPrefixInfo($new_name);
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} RENAME TO [' . $info['table'] . ']');
+
+    unset($this->objects[SchemaObject::Table->name][$table]);
+    $this->objects[SchemaObject::Table->name][$info['table']] = 1;
   }
 
   /**
@@ -407,8 +412,11 @@ class Schema extends DatabaseSchema {
     if (!$this->tableExists($table)) {
       return FALSE;
     }
+    $this->fetchObjects();
 
     $this->executeDdlStatement('DROP TABLE {' . $table . '}');
+
+    unset($this->objects[SchemaObject::Table->name][$table]);
     return TRUE;
   }
 
