@@ -1244,7 +1244,7 @@ abstract class Connection {
    * this method to check for the table first. Operations may handle a missing
    * table themselves when an empty result or a no-op is appropriate.
    *
-   * @param string $table
+   * @param string $table_name
    *   The unprefixed table name.
    * @param \Drupal\Core\Database\SchemaDefinition\Schema|array $table_schema
    *   A schema definition containing the named table. Only that table is
@@ -1259,7 +1259,7 @@ abstract class Connection {
    * @return mixed
    *   The result of the operation.
    */
-  public function executeAndCreateTableIfNeeded(string $table, SchemaDefinition|array $table_schema, callable $operation): mixed {
+  public function executeAndCreateTableIfNeeded(string $table_name, SchemaDefinition|array $table_schema, callable $operation): mixed {
     try {
       return $operation();
     }
@@ -1270,18 +1270,18 @@ abstract class Connection {
     }
     // Another process may have created the table after the operation failed,
     // in which case only the retry is needed.
-    if (!$this->schema()->tableExists($table)) {
+    if (!$this->schema()->tableExists($table_name)) {
       try {
         if ($table_schema instanceof SchemaDefinition) {
-          $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table));
+          $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table_name));
         }
         else {
-          $this->schema()->createTable($table, $table_schema);
+          $this->schema()->createTable($table_name, $table_schema);
         }
       }
       catch (DatabaseException $e) {
         // Recover only if another process created the table concurrently.
-        if (!$this->schema()->tableExists($table) || !$this->exceptionHandler()->isTableCreationRace($e)) {
+        if (!$this->schema()->tableExists($table_name) || !$this->exceptionHandler()->isTableCreationRace($e)) {
           throw $e;
         }
       }

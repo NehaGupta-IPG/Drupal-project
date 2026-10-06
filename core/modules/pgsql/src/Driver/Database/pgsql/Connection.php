@@ -312,25 +312,25 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * failure, and create it in a savepoint, so that losing a creation race does
    * not abort the enclosing transaction.
    */
-  public function executeAndCreateTableIfNeeded(string $table, SchemaDefinition|array $table_schema, callable $operation): mixed {
+  public function executeAndCreateTableIfNeeded(string $table_name, SchemaDefinition|array $table_schema, callable $operation): mixed {
     if (!$this->inTransaction()) {
-      return parent::executeAndCreateTableIfNeeded($table, $table_schema, $operation);
+      return parent::executeAndCreateTableIfNeeded($table_name, $table_schema, $operation);
     }
-    if (!$this->schema()->tableExists($table)) {
+    if (!$this->schema()->tableExists($table_name)) {
       $savepoint = $this->startTransaction();
       try {
         if ($table_schema instanceof SchemaDefinition) {
-          $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table));
+          $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table_name));
         }
         else {
-          $this->schema()->createTable($table, $table_schema);
+          $this->schema()->createTable($table_name, $table_schema);
         }
         $savepoint->commitOrRelease();
       }
       catch (\Throwable $e) {
         $savepoint->rollBack();
         // Recover only if another process created the table concurrently.
-        if (!$e instanceof DatabaseException || !$this->schema()->tableExists($table) || !$this->exceptionHandler()->isTableCreationRace($e)) {
+        if (!$e instanceof DatabaseException || !$this->schema()->tableExists($table_name) || !$this->exceptionHandler()->isTableCreationRace($e)) {
           throw $e;
         }
       }
