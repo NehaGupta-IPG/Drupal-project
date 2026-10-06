@@ -30,7 +30,10 @@ class FilterAutoP extends FilterBase {
     // avoid messing up code. We look for matched pairs and allow basic nesting.
     // For example,
     // "processed<pre>ignored<script>ignored</script>ignored</pre>processed".
-    $chunks = preg_split('@(<!--.*?-->|</?(?:pre|script|style|object|iframe|drupal-media|svg|!--)[^>]*>)@i', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+    // Complete <drupal-media> elements, including a link wrapping them, are
+    // captured as a single chunk so that the link is not split apart.
+    $media = '<drupal-media\b[^>]*>.*?</drupal-media>';
+    $chunks = preg_split('@(<!--.*?-->|<a\b[^>]*>\s*' . $media . '\s*</a>|' . $media . '|</?(?:pre|script|style|object|iframe|drupal-media|svg|!--)[^>]*>)@is', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
     // Note: PHP ensures the array consists of alternating delimiters and
     // literals and begins and ends with a literal (inserting NULL as required).
     $ignore = FALSE;
@@ -40,6 +43,11 @@ class FilterAutoP extends FilterBase {
       if ($i % 2) {
         if (str_starts_with($chunk, '<!--')) {
           // Nothing to do, this is a comment.
+          $output .= $chunk;
+          continue;
+        }
+        if (preg_match('@</drupal-media>(?:\s*</a>)?$@i', $chunk) && stripos($chunk, '<drupal-media') !== FALSE) {
+          // Nothing to do, this is a complete or linked media element.
           $output .= $chunk;
           continue;
         }
