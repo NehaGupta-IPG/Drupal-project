@@ -46,11 +46,12 @@ class BigPipeController {
       throw new AccessDeniedHttpException();
     }
 
-    if (!$request->query->has('destination')) {
+    $destination = $request->query->get('destination');
+    if (!$request->query->has('destination') || $destination === '') {
       throw new HttpException(400, 'The original location is missing.');
     }
 
-    $response = new LocalRedirectResponse($request->query->get('destination'));
+    $response = new LocalRedirectResponse($destination);
     // Set cookie without httpOnly, so that JavaScript can delete it.
     $response->headers->setCookie(new Cookie(BigPipeStrategy::NOJS_COOKIE, TRUE, 0, '/', NULL, FALSE, FALSE, FALSE, NULL));
     $response->addCacheableDependency((new CacheableMetadata())->addCacheContexts([
