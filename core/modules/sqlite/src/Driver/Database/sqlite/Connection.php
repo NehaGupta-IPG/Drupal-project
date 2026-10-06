@@ -6,7 +6,6 @@ use Drupal\Component\Utility\FilterArray;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Connection as DatabaseConnection;
 use Drupal\Core\Database\DatabaseNotFoundException;
-use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Statement\FetchAs;
@@ -380,31 +379,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function driver() {
     return 'sqlite';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function isMissingTableException(\Throwable $exception): bool {
-    $previous = $exception->getPrevious();
-    // SQLite uses HY000/1 for many errors, including missing tables.
-    return $previous instanceof \PDOException
-      && ($previous->errorInfo[0] ?? $previous->getCode()) === 'HY000'
-      && ($previous->errorInfo[1] ?? NULL) === 1
-      && str_contains($previous->getMessage(), 'no such table:');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function isTableCreationRace(\Throwable $exception): bool {
-    $previous = $exception->getPrevious();
-    // SQLite reports both syntax and duplicate table errors as HY000/1.
-    return parent::isTableCreationRace($exception)
-      || ($previous instanceof \PDOException
-        && ($previous->errorInfo[0] ?? $previous->getCode()) === 'HY000'
-        && ($previous->errorInfo[1] ?? NULL) === 1
-        && str_contains($previous->getMessage(), 'already exists'));
   }
 
   /**

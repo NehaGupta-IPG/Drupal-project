@@ -27,4 +27,21 @@ class ExceptionHandler extends BaseMySqlExceptionHandler {
     $this->rethrowNormalizedException($exception, $exception->getSqlState(), $exception->getCode(), $statement->getQueryString(), $arguments);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isMissingTableException(\Throwable $exception): bool {
+    $previous = $exception->getPrevious();
+    return $previous instanceof \mysqli_sql_exception && $previous->getSqlState() === '42S02';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isTableCreationRace(\Throwable $exception): bool {
+    $previous = $exception->getPrevious();
+    return parent::isTableCreationRace($exception)
+      || ($previous instanceof \mysqli_sql_exception && $previous->getSqlState() === '42S01');
+  }
+
 }
