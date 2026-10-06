@@ -9,7 +9,6 @@ use Drupal\Component\FileCache\ApcuFileCacheBackend;
 use Drupal\Component\FileCache\FileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\Json;
-use Drupal\Component\Serialization\PhpSerialize;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\Development\ConfigSchemaChecker;
@@ -465,14 +464,14 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     }
 
     // Bootstrap the kernel. Do not use createFromRequest() to retain Settings.
-    $kernel = new KernelTestDrupalKernel('testing', $this->classLoader, $this instanceof SharedEnvironmentTestInterface);
+    $kernel = new KernelTestDrupalKernel('testing', $this->classLoader, static::sharesEnvironment());
     $kernel->setSitePath($this->siteDirectory);
     // Boot a new one-time container from scratch. Set the module list upfront
     // to avoid a subsequent rebuild or setting the kernel into the
     // pre-installer mode.
     $extensions = $modules ? $this->getExtensionsForModules($modules) : [];
     $kernel->updateModules($extensions, $extensions);
-    if ($this instanceof SharedEnvironmentTestInterface) {
+    if (!static::sharesEnvironment()) {
       $kernel->setContainerNeedsRebuild(FALSE);
       $kernel->setOverrideUseCache(TRUE);
     }
