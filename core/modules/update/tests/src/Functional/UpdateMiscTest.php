@@ -50,7 +50,6 @@ class UpdateMiscTest extends UpdateTestBase {
       'administer site configuration',
     ]);
     $this->drupalLogin($admin_user);
-    $this->drupalGet('admin/reports/updates');
     $this->refreshUpdateStatus([], '503-error', TRUE);
     // Ensure that no "Warning: SimpleXMLElement..." parse errors are found.
     $this->assertSession()->pageTextNotContains('SimpleXMLElement');
