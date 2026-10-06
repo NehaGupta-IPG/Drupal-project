@@ -94,7 +94,7 @@ variables:
   YARN_ENABLE_GLOBAL_CACHE: false
   YARN_ENABLE_MIRROR: false
   # [DO NOT MERGE] Bench matrix: "pilot" or "main" (ab-* jobs).
-  AB_RUN: "pilot"
+  AB_RUN: "main"
 
 #############
 # Stages    #
@@ -1311,12 +1311,22 @@ default:
     AB_ARMS: "off off2 on"
     AB_SHARDS: "2 2"
 
-'ab-unit Functional':
+# Q1 parity is settled by the pilot (test CPU 1.000, app CPU 0.996); the
+# router costs more per request on 1.37.0. Bisect it on the microbenchmark only.
+'ab-unit micro bisect':
   <<: [ *ab-main, *ab-unit, *ab-job ]
+  script:
+    - apt-get update -qq && apt-get install -qy --no-install-recommends gcc make libc6-dev pkgconf libssl-dev zlib1g-dev libpcre2-dev wrk >/dev/null
+    - .gitlab-ci/ab/build-unit.sh ac ac2f2d294ecc970daa74b60b2540e9334c7f14e0 74a2a34688a09e5d7c88cf67863227e0ba921bd968ad0a047caacf353563e36f
+    - .gitlab-ci/ab/build-unit.sh m600 60033ee4f1e5abdc3c1d705c587982a6fffc7d2c 019f465930cb7d3a2468cb9a3998d69752d45f9731b3ddfb15008943004c6598
+    - .gitlab-ci/ab/build-unit.sh n137 1.37.0 8ae237d5a32d77bb8a7426d844ce75aeb18583a4e47318f55e17839d865fad8c
+    - .gitlab-ci/ab/ab.sh
+  parallel: 2
   variables:
     <<: *ab-functional-vars
+    AB_WARMUP: ""
     AB_KIND: unit
-    AB_ARMS: "ac n137"
-    AB_SHARDS: "5"
+    AB_ARMS: "ac m600 n137"
+    AB_ROUNDS: "0"
     AB_MICRO: "1"
-    AB_MICRO_ROUNDS: "8"
+    AB_MICRO_ROUNDS: "9"

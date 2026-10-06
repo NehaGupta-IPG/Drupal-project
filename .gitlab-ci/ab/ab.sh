@@ -88,8 +88,8 @@ setup_slots() {
       mkdir -p "$(docroot "$s")"
       ln -sfn "$d" "$(docroot "$s")/subdirectory"
     fi
-    mkdir -p "$d/sites/default/files" "$d/sites/simpletest"
-    chown -R www-data:www-data "$d/sites"
+    mkdir -p "$d/sites/default/files" "$d/sites/simpletest" "/tmp/ab-tmp-$s"
+    chown -R www-data:www-data "$d/sites" "/tmp/ab-tmp-$s"
     : > "$d/.ab-patch"
     if [ "$AB_KIND" != unit ] && [ "$s" != 0 ]; then
       cat > "/etc/apache2/sites-enabled/ab-slot$s.conf" <<EOF
@@ -208,7 +208,9 @@ fi
 run_tests() {
   local s=$1
   shift
-  cd "$(slot_dir "$s")" && sudo -u www-data -E -H env ${ARM_ENV[$s]} SIMPLETEST_BASE_URL="$(base_url "$s")" \
+  # run-tests.sh probes symlinks at a fixed $TMPDIR/test_symlink, so runs that
+  # start together collide; each slot gets its own TMPDIR.
+  cd "$(slot_dir "$s")" && sudo -u www-data -E -H env ${ARM_ENV[$s]} TMPDIR="/tmp/ab-tmp-$s" SIMPLETEST_BASE_URL="$(base_url "$s")" \
     php ./core/scripts/run-tests.sh --phpunit-configuration "$(slot_dir "$s")/core" --color --keep-results \
     --concurrency "$CONC" --repeat 1 --dburl "$SIMPLETEST_DB" --url "$(base_url "$s")" --verbose --non-html "$@"
 }
