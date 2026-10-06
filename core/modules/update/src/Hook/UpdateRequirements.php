@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\update\Hook;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -27,6 +28,7 @@ class UpdateRequirements {
   public function __construct(
     protected readonly ModuleHandlerInterface $moduleHandler,
     protected readonly UpdateManagerInterface $updateManager,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
   ) {}
 
   /**
@@ -91,7 +93,47 @@ class UpdateRequirements {
       $requirements['update_core']['reason'] = UpdateFetcherInterface::UNKNOWN;
       $requirements['update_core']['description'] = $this->noData();
     }
+    if ($permission_requirement = $this->permissionCheck()) {
+      $requirements['update_notifications_permission'] = $permission_requirement;
+    }
     return $requirements;
+  }
+
+  /**
+   * Checks that site administrators can view update notifications.
+   *
+   * @return array
+   *   A requirement array if there are roles with the "administer site
+   *   configuration" permission that do not have the "view update
+   *   notifications" permission, or an empty array otherwise.
+   */
+  protected function permissionCheck(): array {
+    $role_labels = [];
+    /** @var \Drupal\user\RoleInterface $role */
+    foreach ($this->entityTypeManager->getStorage('user_role')->loadMultiple() as $role) {
+      if ($role->hasPermission('administer site configuration') && !$role->hasPermission('view update notifications')) {
+        $role_labels[] = $role->label();
+      }
+    }
+    if (empty($role_labels)) {
+      return [];
+    }
+    return [
+      'title' => $this->t('Update notifications permission'),
+      'value' => $this->t('Not granted to all site administrators'),
+      'severity' => RequirementSeverity::Warning,
+      'description' => $this->formatPlural(
+        count($role_labels),
+        'The %roles role has the %admin permission but not the %view permission, so users with this role will not see notifications about available security and software updates. <a href=":url">Review permissions</a>.',
+        'The %roles roles have the %admin permission but not the %view permission, so users with these roles will not see notifications about available security and software updates. <a href=":url">Review permissions</a>.',
+        [
+          '%roles' => implode(', ', $role_labels),
+          '%admin' => $this->t('Administer site configuration'),
+          '%view' => $this->t('View software update notifications'),
+          ':url' => Url::fromRoute('user.admin_permissions.module', ['modules' => 'update'])->toString(),
+        ],
+      ),
+    ];
   }
 
   /**
