@@ -1,0 +1,13 @@
+{
+    "name": "package-test/not-an-extension",
+    "autoload": {
+        "psr-4": {
+            "NotAnExtension\\": "src"
+        }
+    },
+    "extra": {
+        "drupal": {
+            "note": "This package is also added to installed.json for composer."
+        }
+    }
+}

@@ -1,0 +1,8 @@
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+
+  ServicesPackage\TestService:
+    class: ServicesPackage\TestService
+    public: true

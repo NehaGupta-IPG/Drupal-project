@@ -1,0 +1,15 @@
+{
+    "name": "package-test/dr-command-package",
+    "autoload": {
+        "psr-4": {
+            "DrCommandPackage\\": "src"
+        }
+    },
+    "extra": {
+        "drupal": {
+            "providers": [
+                "DrCommandPackage\\PhpPackageTestServiceProvider"
+            ]
+        }
+    }
+}

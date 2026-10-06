@@ -1,0 +1,13 @@
+{
+    "name": "package-test/services-package",
+    "autoload": {
+        "psr-4": {
+            "ServicesPackage\\": "src"
+        }
+    },
+    "extra": {
+        "drupal": {
+            "container_yamls": "package-services.yml"
+        }
+    }
+}

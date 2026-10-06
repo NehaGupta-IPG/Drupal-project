@@ -3,6 +3,7 @@
 namespace Drupal\Core;
 
 use Composer\Autoload\ClassLoader;
+use Composer\InstalledVersions;
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
@@ -29,6 +30,7 @@ use Drupal\Core\Test\TestDatabase;
 use Drupal\DrupalInstalled;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -163,6 +165,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @var \Drupal\Core\Extension\Extension[]
    */
   protected $moduleData = [];
+
+  /**
+   * The list of php package extension metadata.
+   *
+   * @var array
+   */
+  protected $phpPackageExtensions = [];
 
   /**
    * Holds the list of enabled themes from core.extension config.
@@ -643,6 +652,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     ];
     $this->serviceYamls['app']['core'] = 'core/core.services.yml';
     $this->serviceProviderClasses['app']['core'] = 'Drupal\Core\CoreServiceProvider';
+
+    // Add service yamls and providers of php packages.
+    $packageDetails = $this->getPhpPackageExtensionsDetails();
+    $this->serviceYamls['app'] += $packageDetails['container_yamls'];
+    $this->serviceProviderClasses['app'] += $packageDetails['providers'];
 
     // Retrieve enabled modules and register their namespaces.
     if (!isset($this->moduleList) || !isset($this->themeList)) {
@@ -1515,6 +1529,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         }
       }
     }
+    $namespaces += $this->getPhpPackageExtensionsDetails()['namespaces'];
     $container->setParameter('container.namespaces', $namespaces);
 
     // Store the default language values on the container. This is so that the
@@ -1613,6 +1628,81 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         }
       }
     }
+  }
+
+  /**
+   * Get the details of the php package drupal extensions.
+   *
+   * @return array
+   *   The calculated or cached metadata for php package drupal extensions.
+   */
+  protected function getPhpPackageExtensionsDetails(): array {
+    if (!empty($this->phpPackageExtensions)) {
+      return $this->phpPackageExtensions;
+    }
+
+    // Instead of reading all the info from installed.json and composer.json
+    // we should compile this information into an autoloaded class with a
+    // composer event and offload all of this to build time.
+    // But for a first proof of concept this is nice because it can be patched
+    // in easily to try this on an existing test site.
+    $vendor_composer_path = dirname(new \ReflectionClass(InstalledVersions::class)->getFileName());
+    assert(is_file($vendor_composer_path . '/installed.json'));
+    $installed = json_decode(file_get_contents($vendor_composer_path . '/installed.json'), TRUE, flags: JSON_THROW_ON_ERROR);
+    $packages = array_filter($installed['packages'], fn($package) => isset($package['extra']['drupal']['container_yamls']) || isset($package['extra']['drupal']['providers']));
+
+    // Get the root composer.json info too.
+    ['install_path' => $project_root] = InstalledVersions::getRootPackage();
+    $project_root = realpath($project_root);
+    $file = $project_root . DIRECTORY_SEPARATOR . 'composer.json';
+    assert(is_file($file));
+    $data = (string) file_get_contents($file);
+    $data = json_decode($data, TRUE, flags: JSON_THROW_ON_ERROR);
+    $patterns = (array) ($data['extra']['drupal']['exclude-package'] ?? []);
+
+    $this->phpPackageExtensions = [
+      'container_yamls' => [],
+      'providers' => [],
+      'namespaces' => [],
+    ];
+    foreach ($packages as $package) {
+      if (in_array($package['name'], $patterns, TRUE)) {
+        // Allow packages to be skipped.
+        continue;
+      }
+      // The path to the package so that various files can be found.
+      $package_path = Path::canonicalize($vendor_composer_path . DIRECTORY_SEPARATOR . $package['install-path']) . DIRECTORY_SEPARATOR;
+
+      if (isset($package['extra']['drupal']['container_yamls'])) {
+        $files = (array) $package['extra']['drupal']['container_yamls'];
+        $this->phpPackageExtensions['container_yamls'] += array_map(fn($file) => $package_path . $file, $files);
+      }
+
+      if (isset($package['extra']['drupal']['providers'])) {
+        $this->phpPackageExtensions['providers'] += (array) $package['extra']['drupal']['providers'];
+      }
+
+      // We only support packages with psr-4 namespaces.
+      if (isset($package['autoload']['psr-4'])) {
+        foreach ($package['autoload']['psr-4'] as $namespace => $psr4s) {
+          // Most of the time this will be only one directory for the namespace.
+          // But composer allows an array and it seems that Drupal is fine with
+          // an array too.
+          $relative = [];
+          foreach ((array) $psr4s as $psr4) {
+            $relative[] = Path::makeRelative($package_path . $psr4, $this->root);
+          }
+          if (count($relative) == 1) {
+            $relative = current($relative);
+          }
+          // container.namespaces keys never have the trailing namespace
+          // separator, but composer.json's psr-4 keys always do.
+          $this->phpPackageExtensions['namespaces'][rtrim($namespace, '\\')] = $relative;
+        }
+      }
+    }
+
+    return $this->phpPackageExtensions;
   }
 
   /**

@@ -1,0 +1,8 @@
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+
+  Excluded\ExcludedService:
+    class: Excluded\ExcludedService
+    public: true
