@@ -1529,9 +1529,9 @@ class SystemRequirementsHooks {
       $requirements['preprocess_enabled'] = [
         'title' => $this->t('Bandwidth optimization'),
         'value' => $this->t('Enabled'),
-        'description' => $this->t('Aggregating CSS and JavaScript files reduces both the size and number of requests made to your website. See the @link settings page.', [
+        'description' => $this->t('Aggregating CSS and JavaScript files reduces both the size and number of requests made to your website. @link.', [
           '@link' => Link::createFromRoute(
-            'Performance',
+            'Change bandwidth settings',
             'system.performance_settings',
           )->toString(),
         ]),
