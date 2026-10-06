@@ -75,43 +75,4 @@ class ExceptionHandler {
     throw $exception;
   }
 
-  /**
-   * Determines whether an operation failed because a table was missing.
-   *
-   * @param \Throwable $exception
-   *   The operation exception.
-   *
-   * @return bool
-   *   TRUE for missing table errors, FALSE for unrelated database errors.
-   */
-  public function isMissingTableException(\Throwable $exception): bool {
-    $previous = $exception->getPrevious();
-    if ($previous instanceof \PDOException) {
-      $state = $previous->errorInfo[0] ?? $previous->getCode();
-      return $state === '42S02';
-    }
-    return FALSE;
-  }
-
-  /**
-   * Determines whether table creation failed because another creator won.
-   *
-   * @param \Throwable $exception
-   *   The table creation exception.
-   *
-   * @return bool
-   *   TRUE for duplicate table errors, FALSE for unrelated schema errors.
-   */
-  public function isTableCreationRace(\Throwable $exception): bool {
-    if ($exception instanceof SchemaObjectExistsException) {
-      return TRUE;
-    }
-    $previous = $exception->getPrevious();
-    if ($previous instanceof \PDOException) {
-      $state = $previous->errorInfo[0] ?? $previous->getCode();
-      return $state === '42S01';
-    }
-    return FALSE;
-  }
-
 }
