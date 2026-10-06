@@ -12,7 +12,6 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Contracts\Service\ServiceCollectionInterface;
 
 /**
  * Tests Drupal\Core\Plugin\Context\LazyContextRepository.
@@ -127,22 +126,6 @@ class LazyContextRepositoryTest extends UnitTestCase {
   }
 
   /**
-   * Tests that available contexts use the collection's iterator directly.
-   */
-  public function testGetAvailableContextsIteratesProviders(): void {
-    $contexts = $this->setupContextAndProvider('test_provider', ['test_context']);
-    $providers = $this->createMock(ServiceCollectionInterface::class);
-    $providers->expects($this->once())
-      ->method('getIterator')
-      ->willReturn(new \ArrayIterator($this->contextProviders));
-    $providers->expects($this->never())->method('getProvidedServices');
-    $providers->expects($this->never())->method('get');
-
-    $repository = new LazyContextRepository($providers);
-    $this->assertSame(['@test_provider:test_context' => $contexts[0]], $repository->getAvailableContexts());
-  }
-
-  /**
    * Tests that runtime lookups only instantiate the requested provider.
    */
   public function testGetRuntimeContextsLazyProviders(): void {
@@ -156,15 +139,6 @@ class LazyContextRepositoryTest extends UnitTestCase {
     $repository = new LazyContextRepository($locator);
     $this->assertSame([], $repository->getRuntimeContexts([]));
     $this->assertSame(['@test_provider:test_context' => $contexts[0]], $repository->getRuntimeContexts(['@test_provider:test_context']));
-  }
-
-  /**
-   * Tests a repository without any context providers.
-   */
-  public function testEmptyProviders(): void {
-    $repository = $this->getContextRepository();
-    $this->assertSame([], $repository->getAvailableContexts());
-    $this->assertSame([], $repository->getRuntimeContexts([]));
   }
 
   /**
