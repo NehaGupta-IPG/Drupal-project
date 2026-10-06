@@ -1270,23 +1270,43 @@ abstract class Connection {
     }
     // Another process may have created the table after the operation failed,
     // in which case only the retry is needed.
-    if (!$this->schema()->tableExists($table_name)) {
-      try {
-        if ($table_schema instanceof SchemaDefinition) {
-          $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table_name));
-        }
-        else {
-          $this->schema()->createTable($table_name, $table_schema);
-        }
+    $this->createTableIfNotExists($table_name, $table_schema);
+    return $operation();
+  }
+
+  /**
+   * Creates a table if it does not exist yet.
+   *
+   * Losing a creation race against another process is not an error. Prefer
+   * ::executeAndCreateTableIfNeeded() when the table is created for an
+   * operation, as that avoids checking for the table on every call.
+   *
+   * @param string $table_name
+   *   The unprefixed table name.
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema|array $table_schema
+   *   A schema definition containing the named table. Only that table is
+   *   created.
+   *   A legacy table definition array, as accepted by Schema::createTable(), is
+   *   also supported.
+   */
+  public function createTableIfNotExists(string $table_name, SchemaDefinition|array $table_schema): void {
+    if ($this->schema()->tableExists($table_name)) {
+      return;
+    }
+    try {
+      if ($table_schema instanceof SchemaDefinition) {
+        $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table_name));
       }
-      catch (DatabaseException $e) {
-        // Recover only if another process created the table concurrently.
-        if (!$this->schema()->tableExists($table_name) || !$this->exceptionHandler()->isTableCreationRace($e)) {
-          throw $e;
-        }
+      else {
+        $this->schema()->createTable($table_name, $table_schema);
       }
     }
-    return $operation();
+    catch (DatabaseException $e) {
+      // Recover only if another process created the table concurrently.
+      if (!$this->schema()->tableExists($table_name) || !$this->exceptionHandler()->isTableCreationRace($e)) {
+        throw $e;
+      }
+    }
   }
 
   /**
