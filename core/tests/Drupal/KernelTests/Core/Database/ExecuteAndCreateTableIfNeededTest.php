@@ -12,9 +12,9 @@ use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests table creation without the driver's query-level recovery savepoints.
@@ -27,7 +27,8 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
   /**
    * Tests lazy table creation inside and outside a transaction.
    */
-  #[DataProvider('transactionProvider')]
+  #[TestWith([FALSE])]
+  #[TestWith([TRUE])]
   public function testExecution(bool $in_transaction): void {
     $transaction = $in_transaction ? $this->connection->startTransaction() : NULL;
     $attempts = 0;
@@ -56,13 +57,6 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
    */
   protected function checksTableFirstInTransaction(): bool {
     return (new \ReflectionMethod($this->connection, 'executeAndCreateTableIfNeeded'))->getDeclaringClass()->getName() !== Connection::class;
-  }
-
-  /**
-   * Provides transaction contexts.
-   */
-  public static function transactionProvider(): array {
-    return [[FALSE], [TRUE]];
   }
 
   /**
