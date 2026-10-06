@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Routing\Exception\CacheableResourceNotFoundException;
+use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
@@ -24,7 +26,7 @@ class ArgumentAccessCheckTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'user', 'filter'];
+  protected static $modules = ['node', 'user', 'filter', 'link', 'menu_link_content'];
 
   /**
    * Views used by this test.
@@ -84,6 +86,36 @@ class ArgumentAccessCheckTest extends ViewsKernelTestBase {
     $this->expectException(CacheableResourceNotFoundException::class);
     $route_name = 'view.test_argument_validator_node.page_3';
     $access_manager->checkNamedRoute($route_name, ['node' => $node_page->id()], $test_user);
+  }
+
+  /**
+   * Tests that menu links to an argument failing validation are hidden.
+   */
+  public function testMenuLinkToFailedArgumentValidation(): void {
+    $this->installEntitySchema('menu_link_content');
+    $this->setUpCurrentUser([], ['access content']);
+
+    $node_page = $this->createNode(['type' => 'page']);
+    $node_article = $this->createNode(['type' => 'article']);
+    foreach ([$node_page, $node_article] as $node) {
+      MenuLinkContent::create([
+        'title' => $node->bundle() . ' link',
+        'link' => ['uri' => 'route:view.test_argument_validator_node.page_3;node=' . $node->id()],
+        'menu_name' => 'main',
+      ])->save();
+    }
+
+    // Same steps as \Drupal\system\Plugin\Block\SystemMenuBlock::build().
+    $menu_tree = \Drupal::menuTree();
+    $tree = $menu_tree->load('main', new MenuTreeParameters());
+    $tree = $menu_tree->transform($tree, [
+      ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+    ]);
+    $build = $menu_tree->build($tree);
+    $output = (string) $this->render($build);
+
+    $this->assertStringContainsString('article link', $output);
+    $this->assertStringNotContainsString('page link', $output);
   }
 
 }
