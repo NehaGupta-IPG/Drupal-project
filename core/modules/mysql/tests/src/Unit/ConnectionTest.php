@@ -122,4 +122,41 @@ class ConnectionTest extends UnitTestCase {
     ];
   }
 
+  /**
+   * Tests the transaction isolation variable name.
+   *
+   * @legacy-covers ::getTransactionIsolationVariableName
+   */
+  #[DataProvider('providerTransactionIsolationVariableName')]
+  public function testTransactionIsolationVariableName(string $server_version, string $expected): void {
+    $this->connection->expects($this->atLeastOnce())
+      ->method('getServerVersion')
+      ->willReturn($server_version);
+
+    $this->assertSame($expected, $this->connection->getTransactionIsolationVariableName());
+  }
+
+  /**
+   * Provides test data for testTransactionIsolationVariableName().
+   *
+   * @return array
+   *   An array of test data.
+   */
+  public static function providerTransactionIsolationVariableName(): array {
+    return [
+      // MariaDB before 11.1.1 only knows tx_isolation.
+      ['10.6.18-MariaDB', 'tx_isolation'],
+      ['5.5.5-10.11.8-MariaDB-0ubuntu0.24.04.1', 'tx_isolation'],
+      ['11.0.6-MariaDB', 'tx_isolation'],
+      ['11.1.0-MariaDB', 'tx_isolation'],
+      // MariaDB 11.1.1 and later use transaction_isolation.
+      ['11.1.1-MariaDB', 'transaction_isolation'],
+      ['5.5.5-11.4.2-MariaDB-ubu2404', 'transaction_isolation'],
+      ['12.3.1-MariaDB', 'transaction_isolation'],
+      // MySQL always uses transaction_isolation.
+      ['8.0.36', 'transaction_isolation'],
+      ['8.4.0-1.el9', 'transaction_isolation'],
+    ];
+  }
+
 }

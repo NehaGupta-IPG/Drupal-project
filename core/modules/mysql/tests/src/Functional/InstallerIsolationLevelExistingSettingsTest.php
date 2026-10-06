@@ -48,7 +48,7 @@ class InstallerIsolationLevelExistingSettingsTest extends InstallerExistingSetti
     unset($driver_test_connection['init_commands']);
 
     $connection = Database::getConnection('default', 'default');
-    $query = $connection->isMariaDb() ? 'SELECT @@SESSION.tx_isolation' : 'SELECT @@SESSION.transaction_isolation';
+    $query = 'SELECT @@SESSION.' . $connection->getTransactionIsolationVariableName();
     $original_transaction_level = $connection->query($query)->fetchField();
     Database::renameConnection('default', 'original_database_connection');
     Database::addConnectionInfo('default', 'default', $driver_test_connection);

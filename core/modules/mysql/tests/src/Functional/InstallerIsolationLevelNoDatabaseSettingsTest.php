@@ -58,7 +58,7 @@ class InstallerIsolationLevelNoDatabaseSettingsTest extends InstallerTestBase {
     Database::closeConnection('default', 'default');
     $connection = Database::getConnection('default', 'default');
 
-    $query = $connection->isMariaDb() ? 'SELECT @@SESSION.tx_isolation' : 'SELECT @@SESSION.transaction_isolation';
+    $query = 'SELECT @@SESSION.' . $connection->getTransactionIsolationVariableName();
 
     // Test that transaction level is READ-COMMITTED.
     $this->assertEquals('READ-COMMITTED', $connection->query($query)->fetchField());
