@@ -1,0 +1,241 @@
+diff --git a/core/lib/Drupal/Core/Test/FunctionalTestSetupTrait.php b/core/lib/Drupal/Core/Test/FunctionalTestSetupTrait.php
+index 84b6879e6d1..b0d5daa78c9 100644
+--- a/core/lib/Drupal/Core/Test/FunctionalTestSetupTrait.php
++++ b/core/lib/Drupal/Core/Test/FunctionalTestSetupTrait.php
+@@ -16,7 +16,6 @@
+ use Drupal\Core\Session\UserSession;
+ use Drupal\Core\Site\Settings;
+ use Drupal\Core\Site\SettingsEditor;
+-use Drupal\Core\StreamWrapper\StreamWrapperInterface;
+ use Drupal\Tests\SessionTestTrait;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+ use Symfony\Component\HttpFoundation\Request;
+@@ -685,19 +684,25 @@ protected function setupBaseUrl() {
+    * filesystem and configuration directories.
+    */
+   protected function prepareEnvironment() {
+-    // Bootstrap Drupal so we can use Drupal's built in functions.
+     $this->classLoader = require __DIR__ . '/../../../../../autoload.php';
+     $request = Request::createFromGlobals();
++    // Prepare the test runner's environment and settings. Its container is not
++    // needed: the test installs its own site.
+     $kernel = TestRunnerKernel::createFromRequest($request, $this->classLoader);
+-    $kernel->boot();
+-    $kernel->preHandle($request);
++    $kernel->prepareTestEnvironment($request);
+     $this->prepareDatabasePrefix();
+ 
+-    $this->originalSite = $kernel->findSitePath($request);
++    $this->originalSite = $kernel->getSitePath();
+ 
+     // Create test directory ahead of installation so fatal errors and debug
+     // information can be logged during installation process.
+-    \Drupal::service('file_system')->prepareDirectory($this->siteDirectory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
++    $directory = DRUPAL_ROOT . '/' . $this->siteDirectory;
++    if (!is_dir($directory) && !@mkdir($directory, 0775, TRUE) && !is_dir($directory)) {
++      throw new \RuntimeException('Unable to create directory: ' . $this->siteDirectory);
++    }
++    if (!is_writable($directory)) {
++      chmod($directory, 0775);
++    }
+ 
+     // Prepare filesystem directory paths.
+     $this->publicFilesDirectory = $this->siteDirectory . '/files';
+@@ -707,12 +712,6 @@ protected function prepareEnvironment() {
+     // Ensure the configImporter is refreshed for each test.
+     $this->configImporter = NULL;
+ 
+-    // Unregister all custom stream wrappers of the parent site.
+-    $wrappers = \Drupal::service('stream_wrapper_manager')->getWrappers(StreamWrapperInterface::ALL);
+-    foreach ($wrappers as $scheme => $info) {
+-      stream_wrapper_unregister($scheme);
+-    }
+-
+     // Reset statics.
+     // @phpstan-ignore function.deprecated
+     drupal_static_reset('clear_all_skip_deprecation');
+diff --git a/core/lib/Drupal/Core/Test/TestRunnerKernel.php b/core/lib/Drupal/Core/Test/TestRunnerKernel.php
+index 417b6658650..31f9e3c62f1 100644
+--- a/core/lib/Drupal/Core/Test/TestRunnerKernel.php
++++ b/core/lib/Drupal/Core/Test/TestRunnerKernel.php
+@@ -4,6 +4,7 @@
+ 
+ use Drupal\Core\DrupalKernel;
+ use Drupal\Core\Site\Settings;
++use Drupal\Core\StreamWrapper\PublicStream;
+ use Symfony\Component\HttpFoundation\Request;
+ 
+ /**
+@@ -34,26 +35,7 @@ public function __construct($environment, $class_loader, $allow_dumping = FALSE,
+    * {@inheritdoc}
+    */
+   public function boot() {
+-    // Ensure that required Settings exist.
+-    if (!Settings::getAll()) {
+-      new Settings([
+-        'hash_salt' => 'run-tests',
+-        'container_yamls' => [],
+-        // If there is no settings.php, then there is no parent site. In turn,
+-        // there is no public files directory; use a custom public files path.
+-        'file_public_path' => 'sites/default/files',
+-      ]);
+-    }
+-
+-    // Remove Drupal's error/exception handlers; they are designed for HTML
+-    // and there is no storage nor a (watchdog) logger here.
+-    if (get_error_handler() === '_drupal_error_handler') {
+-      restore_error_handler();
+-    }
+-    restore_exception_handler();
+-
+-    // In addition, ensure that PHP errors are not hidden away in logs.
+-    ini_set('display_errors', TRUE);
++    $this->prepareTestRunnerEnvironment();
+ 
+     // This container is never going to be dumped and therefore it needs a
+     // rebuild. Setting this flag avoids trying to load the container from
+@@ -81,6 +63,56 @@ public function boot() {
+     return $this;
+   }
+ 
++  /**
++   * Prepares the PHP environment for running tests, without a container.
++   *
++   * Functional tests install their own site, so the process that runs them
++   * only needs the environment of the test runner, not its container. Booting
++   * the kernel would compile a container that is thrown away.
++   *
++   * @param \Symfony\Component\HttpFoundation\Request $request
++   *   The current request.
++   *
++   * @internal
++   */
++  public function prepareTestEnvironment(Request $request): void {
++    $this->prepareTestRunnerEnvironment();
++    $this->loadLegacyIncludes();
++    $this->initializeRequestGlobals($request);
++
++    // Create the build/artifacts directory if necessary.
++    $directory = $this->root . '/' . PublicStream::basePath($this->sitePath) . '/simpletest';
++    if (!is_dir($directory) && !@mkdir($directory, 0777, TRUE) && !is_dir($directory)) {
++      throw new \RuntimeException('Unable to create directory: ' . $directory);
++    }
++  }
++
++  /**
++   * Ensures settings exist and removes Drupal's error handlers.
++   */
++  protected function prepareTestRunnerEnvironment(): void {
++    // Ensure that required Settings exist.
++    if (!Settings::getAll()) {
++      new Settings([
++        'hash_salt' => 'run-tests',
++        'container_yamls' => [],
++        // If there is no settings.php, then there is no parent site. In turn,
++        // there is no public files directory; use a custom public files path.
++        'file_public_path' => 'sites/default/files',
++      ]);
++    }
++
++    // Remove Drupal's error/exception handlers; they are designed for HTML
++    // and there is no storage nor a (watchdog) logger here.
++    if (get_error_handler() === '_drupal_error_handler') {
++      restore_error_handler();
++    }
++    restore_exception_handler();
++
++    // In addition, ensure that PHP errors are not hidden away in logs.
++    ini_set('display_errors', TRUE);
++  }
++
+   /**
+    * {@inheritdoc}
+    */
+diff --git a/core/modules/system/tests/src/Functional/Module/DependencyTest.php b/core/modules/system/tests/src/Functional/Module/DependencyTest.php
+index cd65ec90f6d..c9b13dbcc35 100644
+--- a/core/modules/system/tests/src/Functional/Module/DependencyTest.php
++++ b/core/modules/system/tests/src/Functional/Module/DependencyTest.php
+@@ -27,7 +27,7 @@ class DependencyTest extends ModuleTestBase {
+   protected function prepareEnvironment(): void {
+     parent::prepareEnvironment();
+     // Create a module for testing semver support.
+-    \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/../modules/system_core_semver_test', NULL, TRUE);
++    mkdir($this->publicFilesDirectory . '/../modules/system_core_semver_test', 0775, TRUE);
+     $contents = <<<INFO
+ name: 'System core ^8 version test'
+ type: module
+diff --git a/core/modules/system/tests/src/Functional/System/ThemeTest.php b/core/modules/system/tests/src/Functional/System/ThemeTest.php
+index c1559135086..0dc0e72b20f 100644
+--- a/core/modules/system/tests/src/Functional/System/ThemeTest.php
++++ b/core/modules/system/tests/src/Functional/System/ThemeTest.php
+@@ -71,7 +71,7 @@ protected function setUp(): void {
+   protected function prepareEnvironment(): void {
+     parent::prepareEnvironment();
+     // Create theme for testing semver.
+-    \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/../themes/test_core_semver', NULL, TRUE);
++    mkdir($this->publicFilesDirectory . '/../themes/test_core_semver', 0775, TRUE);
+     $contents = <<<INFO
+ name: 'Theme test with semver core version'
+ type: theme
+diff --git a/core/tests/Drupal/FunctionalTests/Installer/DrupalFlushAllCachesInInstallerTest.php b/core/tests/Drupal/FunctionalTests/Installer/DrupalFlushAllCachesInInstallerTest.php
+index 401521da25b..2e17e3a02a9 100644
+--- a/core/tests/Drupal/FunctionalTests/Installer/DrupalFlushAllCachesInInstallerTest.php
++++ b/core/tests/Drupal/FunctionalTests/Installer/DrupalFlushAllCachesInInstallerTest.php
+@@ -96,7 +96,7 @@ protected function installParameters(): array {
+     $parameters['parameters']['langcode'] = 'de';
+     // Create an empty po file so we don't attempt to download one from
+     // localize.drupal.org.
+-    \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/translations', NULL, TRUE);
++    mkdir($this->publicFilesDirectory . '/translations', 0775, TRUE);
+     $contents = <<<PO
+ msgid ""
+ msgstr ""
+diff --git a/core/tests/Drupal/FunctionalTests/Installer/InstallerConfigDirectoryTestBase.php b/core/tests/Drupal/FunctionalTests/Installer/InstallerConfigDirectoryTestBase.php
+index 02c3ce289d5..557f5aa4ca0 100644
+--- a/core/tests/Drupal/FunctionalTests/Installer/InstallerConfigDirectoryTestBase.php
++++ b/core/tests/Drupal/FunctionalTests/Installer/InstallerConfigDirectoryTestBase.php
+@@ -5,7 +5,9 @@
+ namespace Drupal\FunctionalTests\Installer;
+ 
+ use Drupal\Component\Serialization\Yaml;
++use Drupal\Core\Config\ConfigFactoryInterface;
+ use Drupal\Core\Database\Database;
++use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Extension\ModuleWeight;
+ 
+ /**
+@@ -115,7 +117,7 @@ protected function prepareEnvironment(): void {
+         foreach (array_keys($info['dependencies'] ?? []) as $dependency) {
+           $core_extension['module'][$dependency] = 0;
+         }
+-        $core_extension['module'] = \Drupal::service(ModuleWeight::class)->sort($core_extension['module']);
++        $core_extension['module'] = (new ModuleWeight($this->createStub(ModuleHandlerInterface::class), $this->createStub(ConfigFactoryInterface::class)))->sort($core_extension['module']);
+       }
+       if ($this->profile === FALSE && array_key_exists('profile', $core_extension)) {
+         // Remove the profile.
+diff --git a/core/tests/Drupal/FunctionalTests/Installer/InstallerExistingBrokenDatabaseSettingsTest.php b/core/tests/Drupal/FunctionalTests/Installer/InstallerExistingBrokenDatabaseSettingsTest.php
+index a0ad8bbe0f1..4f41b924824 100644
+--- a/core/tests/Drupal/FunctionalTests/Installer/InstallerExistingBrokenDatabaseSettingsTest.php
++++ b/core/tests/Drupal/FunctionalTests/Installer/InstallerExistingBrokenDatabaseSettingsTest.php
+@@ -39,7 +39,7 @@ protected function prepareEnvironment(): void {
+     $connection_info['default']['driver'] = 'DriverTestMysqlDeprecatedVersion';
+     $namespace = 'Drupal\\driver_test\\Driver\\Database\\DriverTestMysqlDeprecatedVersion';
+     $connection_info['default']['namespace'] = $namespace;
+-    $connection_info['default']['autoload'] = \Drupal::service('extension.list.database_driver')
++    $connection_info['default']['autoload'] = Database::getDriverList()
+       ->get($namespace)
+       ->getAutoloadInfo()['autoload'];
+ 
+diff --git a/core/tests/Drupal/Tests/Traits/Core/Locale/InstallerLanguageTrait.php b/core/tests/Drupal/Tests/Traits/Core/Locale/InstallerLanguageTrait.php
+index 2426d48f706..6a6cb6d7983 100644
+--- a/core/tests/Drupal/Tests/Traits/Core/Locale/InstallerLanguageTrait.php
++++ b/core/tests/Drupal/Tests/Traits/Core/Locale/InstallerLanguageTrait.php
+@@ -42,7 +42,7 @@ protected function installParameters(): array {
+     $parameters['parameters']['langcode'] = $this->getInstallLangcode();
+     // Create a po file so we don't attempt to download one from
+     // localize.drupal.org and to have a test translation that will not change.
+-    \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/translations', NULL, TRUE);
++    mkdir($this->publicFilesDirectory . '/translations', 0775, TRUE);
+     file_put_contents(
+       $this->publicFilesDirectory . '/translations/drupal-' . \Drupal::VERSION . '.' . $this->getInstallLangcode() . '.po',
+       $this->getTranslationFileContents()

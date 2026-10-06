@@ -120,8 +120,9 @@ class StyleSerializerEntityTest extends ViewTestBase {
     // propagation of cache max-age.
 
     // Test the http Content-type.
-    $headers = $this->getSession()->getResponseHeaders();
-    $this->assertSame(['application/json'], $headers['Content-Type']);
+    // Header names are case-insensitive: the display sets "Content-type", and
+    // only some web servers normalize the case.
+    $this->assertSame('application/json', $this->getSession()->getResponseHeader('Content-Type'));
 
     $expected = [];
     foreach ($view->result as $row) {
