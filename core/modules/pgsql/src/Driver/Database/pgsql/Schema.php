@@ -11,7 +11,7 @@ use Drupal\Core\Database\SchemaObjectExistsException;
 // cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
 // cSpell:ignore contype fillfactor indexname indexrelid indisprimary indkey
 // cSpell:ignore indrelid nextval nspname regclass relkind relname relnamespace
-// cSpell:ignore schemaname setval
+// cSpell:ignore schemaname setval viewname
 
 /**
  * @addtogroup schemaapi
@@ -545,6 +545,30 @@ EOD;
   /**
    * {@inheritdoc}
    */
+  public function dropView(string $name): bool {
+    $dropped = parent::dropView($name);
+    if ($dropped) {
+      // ::queryTableInformation() caches the column metadata of views too.
+      $this->resetTableInformation($name);
+    }
+    return $dropped;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function viewExists(string $name, bool $add_prefix = TRUE): bool {
+    $prefixInfo = $this->getPrefixInfo($name, $add_prefix);
+
+    return (bool) $this->connection->query("SELECT 1 FROM pg_views WHERE schemaname = :schema AND viewname = :view", [
+      ':schema' => $prefixInfo['schema'],
+      ':view' => $prefixInfo['table'],
+    ])->fetchField();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function findTables($table_expression) {
     $prefix = $this->connection->getPrefix();
     $prefix_length = strlen($prefix);
@@ -583,12 +607,46 @@ EOD;
   /**
    * {@inheritdoc}
    */
+  public function findViews(string $view_expression): array {
+    $prefix = $this->connection->getPrefix();
+    $prefix_length = strlen($prefix);
+    $views = [];
+
+    $results = $this->connection->query("SELECT viewname FROM pg_views WHERE schemaname = :schema", [':schema' => $this->defaultSchema]);
+    foreach ($results as $view) {
+      if ($prefix && substr($view->viewname, 0, $prefix_length) !== $prefix) {
+        // Views outside this connection's prefix are not managed by this
+        // Drupal installation, so exclude them.
+        continue;
+      }
+
+      // Remove the prefix from the returned views.
+      $unprefixed_view_name = substr($view->viewname, $prefix_length);
+
+      // Exclude a view whose full name is the prefix itself.
+      if (!empty($unprefixed_view_name)) {
+        $views[$unprefixed_view_name] = $unprefixed_view_name;
+      }
+    }
+
+    // Convert the SQL LIKE pattern to a regular expression, escaping literal
+    // characters and the regular expression delimiter.
+    $view_expression = str_replace(['%', '_'], ['.*?', '.'], preg_quote($view_expression, '/'));
+    return preg_grep('/^' . $view_expression . '$/i', $views);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function renameTable($table, $new_name) {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot rename '$table' to '$new_name': table '$table' doesn't exist.");
     }
     if ($this->tableExists($new_name)) {
       throw new SchemaObjectExistsException("Cannot rename '$table' to '$new_name': table '$new_name' already exists.");
+    }
+    if ($this->viewExists($new_name)) {
+      throw new SchemaObjectExistsException("Cannot rename '$table' to '$new_name': view '$new_name' already exists.");
     }
 
     // Get the schema and tablename for the old table.
@@ -619,10 +677,11 @@ EOD;
         preg_match('/^' . preg_quote($table_name, NULL) . '__(.*)__' . preg_quote($index_type, NULL) . '/', $index->indexname, $matches);
         $index_name = $matches[1];
       }
-      // The renaming of an index will fail when the there exists an table with
-      // the same name as the renamed index.
-      if (!$this->tableExists($this->ensureIdentifiersLength($new_name, $index_name, $index_type), FALSE)) {
-        $this->executeDdlStatement('ALTER INDEX "' . $this->defaultSchema . '"."' . $index->indexname . '" RENAME TO ' . $this->ensureIdentifiersLength($new_name, $index_name, $index_type));
+      // Tables, views and indexes share one namespace, so renaming the index
+      // fails when a table or view has the new index name.
+      $new_index_name = $this->ensureIdentifiersLength($new_name, $index_name, $index_type);
+      if (!$this->tableExists($new_index_name, FALSE) && !$this->viewExists($new_index_name, FALSE)) {
+        $this->executeDdlStatement('ALTER INDEX "' . $this->defaultSchema . '"."' . $index->indexname . '" RENAME TO ' . $new_index_name);
       }
     }
 

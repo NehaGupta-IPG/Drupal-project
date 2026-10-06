@@ -62,10 +62,10 @@ class EnvironmentCleaner implements EnvironmentCleanerInterface {
   public function cleanDatabase(): void {
     $count = $this->doCleanDatabase();
     if ($count > 0) {
-      $this->output->write('Leftover tables removed: ' . $count);
+      $this->output->write('Leftover tables and views removed: ' . $count);
     }
     else {
-      $this->output->write('No leftover tables to remove.');
+      $this->output->write('No leftover tables or views to remove.');
     }
   }
 
@@ -73,13 +73,18 @@ class EnvironmentCleaner implements EnvironmentCleanerInterface {
    * Performs the fixture database cleanup.
    *
    * @return int
-   *   The number of tables that were removed.
+   *   The number of tables and SQL views that were removed.
    */
   protected function doCleanDatabase(): int {
     /** @var \Drupal\Core\Database\Schema $schema */
     $schema = $this->testDatabase->schema();
-    $tables = $schema->findTables('test%');
     $count = 0;
+    // Drop views, including views built on other views, before their tables.
+    // Only drop views which begin with 'test' followed by digits.
+    $views = preg_grep('/^test\d+/', $schema->findViews('test%'));
+    $schema->dropViews($views);
+    $count += count($views);
+    $tables = $schema->findTables('test%');
     foreach ($tables as $table) {
       // Only drop tables which begin wih 'test' followed by digits, for
       // example, {test12345678node__body}.

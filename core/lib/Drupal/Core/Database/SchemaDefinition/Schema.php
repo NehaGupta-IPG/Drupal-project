@@ -21,11 +21,15 @@ final class Schema implements SchemaDefinitionInterface {
    *   The schema name.
    * @param list<Table> $tables
    *   A list of Table objects.
+   * @param list<View> $views
+   *   (optional) A list of View objects in creation order. Declare each view
+   *   before any views that depend on it.
    */
   public function __construct(
     public readonly SchemaDefinitionType $type,
     public readonly string $name,
     public readonly array $tables,
+    public readonly array $views = [],
   ) {
     $this->validate();
   }
@@ -42,6 +46,17 @@ final class Schema implements SchemaDefinitionInterface {
     $tableNames = $this->tableNames();
     if (count($tableNames) !== count(array_unique($tableNames))) {
       throw new SchemaDefinitionException("Duplicate tables for '{$this->name}' schema: " . implode(', ', $tableNames));
+    }
+    if ($this->views && !Inspector::assertAllObjects($this->views, View::class)) {
+      throw new SchemaDefinitionException("All members of the 'views' argument of a Schema must be View objects");
+    }
+    $viewNames = $this->viewNames();
+    if (count($viewNames) !== count(array_unique($viewNames))) {
+      throw new SchemaDefinitionException("Duplicate views for '{$this->name}' schema: " . implode(', ', $viewNames));
+    }
+    $collisions = array_intersect($viewNames, $tableNames);
+    if ($collisions) {
+      throw new SchemaDefinitionException("Views named like a table in '{$this->name}' schema: " . implode(', ', $collisions));
     }
   }
 
@@ -84,9 +99,48 @@ final class Schema implements SchemaDefinitionInterface {
   }
 
   /**
+   * Returns the names of the SQL views.
+   *
+   * @return list<string>
+   *   The names of the views.
+   */
+  public function viewNames(): array {
+    return array_map(
+      fn(View $view): string => $view->name,
+      $this->views,
+    );
+  }
+
+  /**
+   * Gets a SQL view definition.
+   *
+   * @param string $name
+   *   The view name.
+   *
+   * @return View
+   *   The view definition.
+   *
+   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
+   *   When the requested view is missing.
+   */
+  public function getViewDefinition(string $name): View {
+    $ret = array_find(
+      $this->views,
+      function (View $view) use ($name): bool {
+        return $view->name === $name;
+      },
+    );
+    if (!$ret) {
+      throw new SchemaDefinitionException("Schema {$this->name} does not define a view named {$name}");
+    }
+    return $ret;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function toArray(): array {
+    // The legacy array format cannot describe SQL views, so omit them.
     $spec = [];
     foreach ($this->tables as $table) {
       $spec[$table->name] = $table->toArray();

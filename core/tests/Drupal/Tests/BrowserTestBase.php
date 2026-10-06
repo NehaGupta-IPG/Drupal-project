@@ -364,15 +364,18 @@ abstract class BrowserTestBase extends DrupalTestCase {
    * Clean up the test environment.
    */
   protected function cleanupEnvironment() {
-    // Remove all prefixed tables.
+    // Remove all prefixed views and tables.
     $original_connection_info = Database::getConnectionInfo('simpletest_original_default');
     $original_prefix = $original_connection_info['default']['prefix'];
     $test_connection_info = Database::getConnectionInfo('default');
     $test_prefix = $test_connection_info['default']['prefix'];
     if ($original_prefix != $test_prefix) {
-      $tables = Database::getConnection()->schema()->findTables('%');
+      $schema = Database::getConnection()->schema();
+      // Drop views, including views built on other views, before their tables.
+      $schema->dropViews($schema->findViews('%'));
+      $tables = $schema->findTables('%');
       foreach ($tables as $table) {
-        if (Database::getConnection()->schema()->dropTable($table)) {
+        if ($schema->dropTable($table)) {
           unset($tables[$table]);
         }
       }

@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the sql_view_test module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\View;
+use Drupal\Core\Database\SchemaDefinition\ViewQuery;
+
+/**
+ * Implements hook_schema().
+ */
+function sql_view_test_schema(): Schema {
+  $table = new Table(
+    name: 'sql_view_test',
+    description: 'Table to test the behavior of SQL views during module installation.',
+    columns: [
+      Column::serial(
+        name: 'id',
+      ),
+      Column::varcharAscii(
+        name: 'name',
+        description: 'The name of the record.',
+        length: 255,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+    ],
+    primaryKey: new PrimaryKey(['id']),
+  );
+
+  $view = new View(
+    name: 'sql_view_test_view',
+    query: new ViewQuery('SELECT [id], UPPER([name]) AS [shout] FROM {sql_view_test}'),
+    description: 'View over the {sql_view_test} table.',
+  );
+
+  $dependent_view = new View(
+    name: 'sql_view_test_view2',
+    query: new ViewQuery('SELECT [id], [shout] FROM {sql_view_test_view}'),
+    description: 'View over the {sql_view_test_view} view.',
+  );
+
+  return new Schema(
+    type: SchemaDefinitionType::Module,
+    name: 'sql_view_test',
+    tables: [$table],
+    views: [$view, $dependent_view],
+  );
+}

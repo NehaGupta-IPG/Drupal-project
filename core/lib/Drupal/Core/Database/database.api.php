@@ -16,6 +16,8 @@ use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\View;
+use Drupal\Core\Database\SchemaDefinition\ViewQuery;
 
 /**
  * @defgroup database Database abstraction layer
@@ -492,6 +494,37 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  * }
  * @endcode
  *
+ * A schema can also declare SQL views. Create one directly with
+ * \Drupal\Core\Database\Schema::createView(), or add
+ * \Drupal\Core\Database\SchemaDefinition\View objects to the 'views'
+ * argument of the \Drupal\Core\Database\SchemaDefinition\Schema returned
+ * by hook_schema(). Tables are created first, then views in the order listed.
+ * Declare each view before any views that depend on it. A view cannot have the
+ * same name as a table in the same database schema.
+ *
+ * Write view queries with curly braces around table names and square brackets
+ * around identifiers. View definitions cannot contain bound parameters, so
+ * never include user input. Identifier and table-prefix replacement also
+ * affects literal square or curly brackets inside strings. Apart from that
+ * replacement the query runs as written, so use only SQL that every supported
+ * database engine accepts.
+ *
+ * The Schema API does not drop, update or recreate views when changing their
+ * tables. The module that declares a view must drop it before changing,
+ * renaming or dropping a table or column the view depends on, and create it
+ * again afterwards. When another module changes the table in an update
+ * function, use hook_update_dependencies() to drop the view before that update
+ * function and create it again after. Leaving a view in place can cause the
+ * operation to fail or leave the view unusable, depending on the operation and
+ * database.
+ *
+ * On SQLite, rebuilding a table drops the original table before renaming its
+ * replacement. If a view still depends on the original table, the rename
+ * fails. Unless an enclosing transaction is rolled back, the original table is
+ * gone and its data remains in the replacement table under a generated name.
+ * A view that depends on a missing table also prevents later table renames in
+ * that database until the view is dropped.
+ *
  * @see \Drupal\Core\Extension\ModuleInstaller::installSchema()
  * @see \Drupal\Core\Extension\ModuleInstaller::uninstallSchema()
  * @see \Drupal\TestTools\Extension\SchemaInspector::getTablesSpecification()
@@ -593,10 +626,10 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  * or more tables and their related keys and indexes. A schema is defined by
  * hook_schema() which must live in your module's .install file.
  *
- * The tables declared by this hook will be automatically created when the
- * module is installed, and removed when the module is uninstalled. This happens
- * before hook_install() is invoked, and after hook_uninstall() is invoked,
- * respectively.
+ * The tables and SQL views declared by this hook will be automatically created
+ * when the module is installed, and removed when the module is uninstalled.
+ * Creation happens before hook_install(). Removal happens after
+ * hook_uninstall().
  *
  * By declaring the tables used by your module via an implementation of
  * hook_schema(), these tables will be available on all supported database
@@ -670,10 +703,17 @@ function hook_schema(): Schema {
     ],
   );
 
+  $views[] = new View(
+    name: 'users_data_serialized',
+    query: new ViewQuery('SELECT [uid], [module], [name] FROM {users_data} WHERE [serialized] = 1'),
+    description: 'The serialized records of the {users_data} table.',
+  );
+
   return new Schema(
     type: SchemaDefinitionType::Module,
     name: 'hook',
     tables: $tables,
+    views: $views,
   );
 }
 

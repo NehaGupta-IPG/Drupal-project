@@ -1,0 +1,5 @@
+name: 'SQL view test'
+type: module
+description: 'Support module for SQL view tests, declaring a table and a view.'
+package: Testing
+version: VERSION

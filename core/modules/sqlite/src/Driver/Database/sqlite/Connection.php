@@ -47,7 +47,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   protected $attachedDatabases = [];
 
   /**
-   * Whether or not a table has been dropped this request.
+   * Whether a table or view has been dropped this request.
    *
    * The destructor will only try to get rid of unnecessary databases if there
    * is potential of them being empty.
@@ -159,7 +159,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * Destructor for the SQLite connection.
    *
-   * We prune empty databases on destruct, but only if tables have been
+   * We delete empty database files on destruct if tables or views were
    * dropped. This is especially needed when running the test suite, which
    * creates and destroy databases several times in a row.
    */
@@ -169,12 +169,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
         // Check if the database is now empty, ignore the internal SQLite
         // tables.
         try {
-          $count = $this->query('SELECT COUNT(*) FROM ' . $prefix . '.sqlite_master WHERE type = :type AND name NOT LIKE :pattern', [
-            ':type' => 'table',
+          $count = $this->query("SELECT COUNT(*) FROM " . $prefix . ".sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE :pattern", [
             ':pattern' => 'sqlite_%',
           ])->fetchField();
 
-          // We can prune the database file if it doesn't have any tables.
+          // Delete the database file if it has no tables or views.
           if ($count == 0 && $this->connectionOptions['database'] != ':memory:' && file_exists($this->connectionOptions['database'] . '-' . $prefix)) {
             // Detach the database.
             $this->query('DETACH DATABASE :schema', [':schema' => $prefix]);

@@ -395,6 +395,9 @@ class Schema extends DatabaseSchema {
     if ($this->tableExists($new_name)) {
       throw new SchemaObjectExistsException("Cannot rename '$table' to '$new_name': table '$new_name' already exists.");
     }
+    if ($this->viewExists($new_name)) {
+      throw new SchemaObjectExistsException("Cannot rename '$table' to '$new_name': view '$new_name' already exists.");
+    }
 
     $info = $this->getPrefixInfo($new_name);
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} RENAME TO [' . $info['table'] . ']');

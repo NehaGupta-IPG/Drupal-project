@@ -6,6 +6,7 @@ use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
+use Drupal\Core\Database\SchemaDefinition\View as ViewDefinition;
 
 /**
  * Provides a base implementation for Database Schema.
@@ -265,6 +266,51 @@ abstract class Schema implements PlaceholderInterface {
   }
 
   /**
+   * Finds SQL views whose names match a pattern.
+   *
+   * @param string $view_expression
+   *   A case-insensitive SQL LIKE pattern. '_' matches one character and '%'
+   *   matches any number of characters, including none.
+   *
+   * @return array
+   *   The matching view names without prefixes, as both keys and values, in no
+   *   particular order. Some databases refuse to drop a view while another
+   *   view depends on it. Pass the result to ::dropViews() to drop the views
+   *   regardless of their order.
+   */
+  public function findViews(string $view_expression): array {
+    $condition = $this->buildTableNameCondition('%', 'LIKE');
+    $condition->compile($this->connection, $this);
+
+    $prefix = $this->connection->getPrefix();
+    $prefix_length = strlen($prefix);
+    $views = [];
+    // Query information_schema.views directly because Select queries prefix
+    // table names.
+    $results = $this->connection->query("SELECT table_name AS table_name FROM information_schema.views WHERE " . (string) $condition, $condition->arguments());
+    foreach ($results as $view) {
+      if ($prefix && substr($view->table_name, 0, $prefix_length) !== $prefix) {
+        // Views outside this connection's prefix are not managed by this
+        // Drupal installation, so exclude them.
+        continue;
+      }
+
+      // Remove the prefix from the returned views.
+      $unprefixed_view_name = substr($view->table_name, $prefix_length);
+
+      // Exclude a view whose full name is the prefix itself.
+      if (!empty($unprefixed_view_name)) {
+        $views[$unprefixed_view_name] = $unprefixed_view_name;
+      }
+    }
+
+    // Convert the SQL LIKE pattern to a regular expression, escaping literal
+    // characters and the regular expression delimiter.
+    $view_expression = str_replace(['%', '_'], ['.*?', '.'], preg_quote($view_expression, '/'));
+    return preg_grep('/^' . $view_expression . '$/i', $views);
+  }
+
+  /**
    * Check if a column exists in the given table.
    *
    * @param string $table
@@ -311,7 +357,7 @@ abstract class Schema implements PlaceholderInterface {
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
-   *   If a table with the specified new name already exists.
+   *   If a table or SQL view with the specified new name already exists.
    */
   abstract public function renameTable($table, $new_name);
 
@@ -326,6 +372,111 @@ abstract class Schema implements PlaceholderInterface {
    *   by that name to begin with.
    */
   abstract public function dropTable($table);
+
+  /**
+   * Creates a SQL view.
+   *
+   * A view cannot have the same name as a table in the same database schema.
+   *
+   * @param string $name
+   *   The name of the view to create, without prefixing.
+   * @param string $query
+   *   The SELECT query defining the view, with curly braces surrounding the
+   *   table names and square brackets surrounding identifiers. The query
+   *   cannot contain bound parameters. Never include user input in it.
+   * @param bool $replace
+   *   (optional) If TRUE and a view with the same name exists, it is replaced.
+   *   Database support for replacing views differs, so this method drops the
+   *   old view before creating the new one. Replacement is not atomic: if
+   *   creation fails, the old view is not restored. Defaults to FALSE.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If a table with the specified name already exists, or if a view with the
+   *   specified name already exists and $replace is FALSE.
+   * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
+   *   When the query is invalid. SQLite allows references to missing tables
+   *   or columns at creation time and reports them when the view is used.
+   */
+  public function createView(string $name, string $query, bool $replace = FALSE): void {
+    if ($this->tableExists($name)) {
+      throw new SchemaObjectExistsException("View '$name' cannot be created as a table with the same name already exists.");
+    }
+    if ($this->viewExists($name)) {
+      if (!$replace) {
+        throw new SchemaObjectExistsException("View '$name' already exists.");
+      }
+      $this->dropView($name);
+    }
+    $this->executeDdlStatement('CREATE VIEW {' . $name . '} AS ' . $query);
+  }
+
+  /**
+   * Drops a SQL view.
+   *
+   * @param string $name
+   *   The name of the view to drop, without prefixing.
+   *
+   * @return bool
+   *   TRUE if the view was dropped, FALSE if it did not exist.
+   */
+  public function dropView(string $name): bool {
+    if (!$this->viewExists($name)) {
+      return FALSE;
+    }
+    $this->executeDdlStatement('DROP VIEW {' . $name . '}');
+    return TRUE;
+  }
+
+  /**
+   * Drops SQL views that may depend on each other.
+   *
+   * PostgreSQL refuses to drop a view that another view depends on. Views that
+   * fail to drop are retried until all are dropped or none can be dropped.
+   *
+   * @param string[] $views
+   *   The names of the views to drop, without prefixing. The order does not
+   *   matter.
+   *
+   * @throws \Drupal\Core\Database\DatabaseException
+   *   When none of the remaining views can be dropped.
+   */
+  public function dropViews(array $views): void {
+    while ($views) {
+      $remaining = [];
+      $exception = NULL;
+      foreach ($views as $view) {
+        try {
+          $this->dropView($view);
+        }
+        catch (DatabaseException $exception) {
+          $remaining[] = $view;
+        }
+      }
+      if (count($remaining) === count($views)) {
+        throw $exception;
+      }
+      $views = $remaining;
+    }
+  }
+
+  /**
+   * Checks if a SQL view exists.
+   *
+   * @param string $name
+   *   The name of the view, without prefixing.
+   * @param bool $add_prefix
+   *   Whether to add the connection's prefix to the view name.
+   *
+   * @return bool
+   *   TRUE if the given view exists, otherwise FALSE.
+   */
+  public function viewExists(string $name, bool $add_prefix = TRUE): bool {
+    $condition = $this->buildTableNameCondition($name, '=', $add_prefix);
+    $condition->compile($this->connection, $this);
+    // Query information_schema.views directly because Select queries prefix
+    // table names.
+    return (bool) $this->connection->query("SELECT 1 FROM information_schema.views WHERE " . (string) $condition, $condition->arguments())->fetchField();
+  }
 
   /**
    * Add a new field to a table.
@@ -631,19 +782,26 @@ abstract class Schema implements PlaceholderInterface {
   abstract public function changeField($table, $field, $field_new, $spec, $keys_new = []);
 
   /**
-   * Creates the tables in a schema definition.
+   * Creates the tables and SQL views in a schema definition.
+   *
+   * Tables are created first, then views in the order listed. Declare each view
+   * before any views that depend on it.
    *
    * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
    *   A Schema definition.
    *
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
-   *   If any of the specified tables already exists.
+   *   If any of the specified tables or views already exists.
    * @throws \BadMethodCallException
    *   When concrete driver class is missing implementations.
    */
   final public function createSchemaFromDefinition(SchemaDefinition $schema): void {
     foreach ($schema->tables as $table) {
       $this->createTableFromDefinition($schema->type, $schema->name, $table);
+    }
+    // Views are created after tables because they select from them.
+    foreach ($schema->views as $view) {
+      $this->createViewFromDefinition($schema->type, $schema->name, $view);
     }
   }
 
@@ -667,6 +825,23 @@ abstract class Schema implements PlaceholderInterface {
   }
 
   /**
+   * Creates a new SQL view from a view schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType $schemaDefinitionType
+   *   The type of Drupal feature providing the schema.
+   * @param string $schemaName
+   *   The schema name.
+   * @param \Drupal\Core\Database\SchemaDefinition\View $view
+   *   The view definition.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If a table or a view with the specified name already exists.
+   */
+  final public function createViewFromDefinition(SchemaDefinitionType $schemaDefinitionType, string $schemaName, ViewDefinition $view): void {
+    $this->createView($view->name, $view->query->expression);
+  }
+
+  /**
    * Create a new table from a Drupal array table definition.
    *
    * @param string $name
@@ -675,13 +850,16 @@ abstract class Schema implements PlaceholderInterface {
    *   A Schema API table definition array.
    *
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
-   *   If the specified table already exists.
+   *   If a table or SQL view with the specified name already exists.
    * @throws \BadMethodCallException
    *   When ::createTableSql() is not implemented in the concrete driver class.
    */
   public function createTable($name, $table) {
     if ($this->tableExists($name)) {
       throw new SchemaObjectExistsException("Table '$name' already exists.");
+    }
+    if ($this->viewExists($name)) {
+      throw new SchemaObjectExistsException("View '$name' already exists.");
     }
     $statements = $this->createTableSql($name, $table);
     foreach ($statements as $statement) {
