@@ -3,7 +3,7 @@
 namespace Drupal\Core\Plugin\Context;
 
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
-use Symfony\Contracts\Service\ServiceProviderInterface;
+use Symfony\Contracts\Service\ServiceCollectionInterface;
 
 /**
  * Provides a context repository which uses context provider services.
@@ -20,13 +20,13 @@ class LazyContextRepository implements ContextRepositoryInterface {
   /**
    * Constructs a LazyContextRepository object.
    *
-   * @param \Symfony\Contracts\Service\ServiceProviderInterface $container
+   * @param \Symfony\Contracts\Service\ServiceCollectionInterface $container
    *   A service locator containing the services tagged 'context_provider',
    *   keyed by service ID.
    */
   public function __construct(
     #[AutowireLocator('context_provider')]
-    protected ServiceProviderInterface $container,
+    protected ServiceCollectionInterface $container,
   ) {}
 
   /**
@@ -70,8 +70,8 @@ class LazyContextRepository implements ContextRepositoryInterface {
    */
   public function getAvailableContexts() {
     $contexts = [];
-    foreach (array_keys($this->container->getProvidedServices()) as $service_id) {
-      $contexts_by_service = $this->container->get($service_id)->getAvailableContexts();
+    foreach ($this->container as $service_id => $context_provider) {
+      $contexts_by_service = $context_provider->getAvailableContexts();
       foreach ($contexts_by_service as $unqualified_context_id => $context) {
         $context_id = '@' . $service_id . ':' . $unqualified_context_id;
         $contexts[$context_id] = $context;
