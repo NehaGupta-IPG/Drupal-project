@@ -27,9 +27,9 @@ final class NaturalSort {
    * extension is not available, or no language can be determined, this method
    * falls back to strnatcasecmp().
    *
-   * @param string $string1
+   * @param string|Drupal\Core\StringTranslation\TranslatableMarkup $string1
    *   The first string.
-   * @param string $string2
+   * @param string|Drupal\Core\StringTranslation\TranslatableMarkup $string2
    *   The second string.
    * @param string|null $langcode
    *   (optional) The language code to determine the collation rules. Defaults
