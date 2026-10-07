@@ -11,7 +11,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -95,15 +94,15 @@ class EntityTestHooks {
     }
     if ($entity_type->id() === 'entity_test_mul' && \Drupal::state()->get('entity_test.required_multi_default_field')) {
       $fields['required_multi_default_field'] = BaseFieldDefinition::create('string')->setLabel('Required field with default value')->setRequired(TRUE)->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)->setDefaultValue([
-            [
-              'value' => 'this is the first default field item',
-            ],
-            [
-              'value' => 'this is the second default value',
-            ],
-            [
-              'value' => 'you get the idea...',
-            ],
+        [
+          'value' => 'this is the first default field item',
+        ],
+        [
+          'value' => 'this is the second default value',
+        ],
+        [
+          'value' => 'you get the idea...',
+        ],
       ]);
     }
     if ($entity_type->id() == 'entity_test_mulrev' && \Drupal::state()->get('entity_test.field_test_item')) {
@@ -434,9 +433,7 @@ class EntityTestHooks {
     if (in_array($entity->getEntityTypeId(), $valid_entity_type_ids)) {
       if (\Drupal::service('router.route_provider')->getRouteByName("entity.{$entity->getEntityTypeId()}.test_operation")) {
         $operations['test_operation'] = [
-          'title' => new FormattableMarkup('Test Operation: @label', [
-            '@label' => $entity->label(),
-          ]),
+          'title' => "Test Operation: " . $entity->label(),
           'url' => Url::fromRoute("entity.{$entity->getEntityTypeId()}.test_operation", [
             $entity->getEntityTypeId() => $entity->id(),
           ]),

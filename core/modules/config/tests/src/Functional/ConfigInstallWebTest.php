@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
+use Drupal\config_enum_test\AnotherEnumValue;
+use Drupal\config_enum_test\EnumValue;
 use Drupal\config_test\Entity\ConfigTest;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\StorageInterface;
@@ -160,7 +162,6 @@ class ConfigInstallWebTest extends BrowserTestBase {
     // The user is shown a confirm form because the config_test module is a
     // dependency.
     // @see \Drupal\system\Form\ModulesListConfirmForm::submitForm()
-    $this->drupalGet('admin/modules');
     $this->submitForm(['modules[config_install_fail_test][enable]' => TRUE], 'Install');
     $this->submitForm([], 'Continue');
     // @todo improve error message as the config does not exist. But both modules
@@ -170,7 +171,6 @@ class ConfigInstallWebTest extends BrowserTestBase {
 
     // Install the config test module so that the configuration does actually
     // exist.
-    $this->drupalGet('admin/modules');
     $this->submitForm([
       'modules[config_test][enable]' => TRUE,
     ], 'Install');
@@ -195,7 +195,7 @@ class ConfigInstallWebTest extends BrowserTestBase {
     // the config_test.dynamic.dotted.default configuration and the translation
     // override created still exists.
     $this->drupalGet('admin/appearance');
-    $url = $this->xpath("//a[contains(@href,'config_clash_test_theme') and contains(@href,'/install?')]/@href")[0];
+    $url = $this->getNodeElementsByXpath("//a[contains(@href,'config_clash_test_theme') and contains(@href,'/install?')]/@href")[0];
     $this->drupalGet($this->getAbsoluteUrl($url->getText()));
     $this->assertSession()->responseContains('Unable to install config_clash_test_theme, <em class="placeholder">config_test.dynamic.dotted.default, language/fr/config_test.dynamic.dotted.default</em> already exist in active configuration.');
 
@@ -215,27 +215,31 @@ class ConfigInstallWebTest extends BrowserTestBase {
   }
 
   /**
+   * Tests various config install scenarios.
+   */
+  public function testConfigInstall(): void {
+    $this->doTestUnmetDependenciesInstall();
+    $this->doTestConfigModuleRequirements();
+    $this->doTestEnumsAndConstantsInModules();
+  }
+
+  /**
    * Tests unmet dependencies detection.
    */
-  public function testUnmetDependenciesInstall(): void {
+  protected function doTestUnmetDependenciesInstall(): void {
     $this->drupalLogin($this->adminUser);
     // We need to install separately since config_install_dependency_test does
     // not depend on config_test and order is important.
     $this->drupalGet('admin/modules');
     $this->submitForm(['modules[config_test][enable]' => TRUE], 'Install');
-    $this->drupalGet('admin/modules');
     $this->submitForm(['modules[config_install_dependency_test][enable]' => TRUE], 'Install');
     $this->assertSession()->responseContains('Unable to install <em class="placeholder">Config install dependency test</em> due to unmet dependencies: <em class="placeholder">config_test.dynamic.other_module_test_with_dependency (config_other_module_config_test, config_test.dynamic.dotted.english)</em>');
 
-    $this->drupalGet('admin/modules');
     $this->submitForm(['modules[config_test_language][enable]' => TRUE], 'Install');
-    $this->drupalGet('admin/modules');
     $this->submitForm(['modules[config_install_dependency_test][enable]' => TRUE], 'Install');
     $this->assertSession()->responseContains('Unable to install <em class="placeholder">Config install dependency test</em> due to unmet dependencies: <em class="placeholder">config_test.dynamic.other_module_test_with_dependency (config_other_module_config_test)</em>');
 
-    $this->drupalGet('admin/modules');
     $this->submitForm(['modules[config_other_module_config_test][enable]' => TRUE], 'Install');
-    $this->drupalGet('admin/modules');
     $this->submitForm(['modules[config_install_dependency_test][enable]' => TRUE], 'Install');
     $this->rebuildContainer();
     $this->assertInstanceOf(ConfigTest::class, \Drupal::entityTypeManager()->getStorage('config_test')->load('other_module_test_with_dependency'));
@@ -244,8 +248,7 @@ class ConfigInstallWebTest extends BrowserTestBase {
   /**
    * Tests config_requirements().
    */
-  public function testConfigModuleRequirements(): void {
-    $this->drupalLogin($this->adminUser);
+  protected function doTestConfigModuleRequirements(): void {
     $this->drupalGet('admin/modules');
     $this->submitForm(['modules[config][enable]' => TRUE], 'Install');
 
@@ -258,6 +261,35 @@ class ConfigInstallWebTest extends BrowserTestBase {
     }
     $this->drupalGet('/admin/reports/status');
     $this->assertSession()->pageTextContains("The directory $directory does not exist.");
+  }
+
+  /**
+   * Tests installing modules with enums and constants in config.
+   */
+  protected function doTestEnumsAndConstantsInModules(): void {
+    $this->drupalGet('admin/modules');
+
+    // Install modules using enums at the same time. This ensures that a module
+    // can use a enum from a dependency that is not yet installed.
+    $this->assertSession()->fieldExists('edit-modules-config-enum-test-enable')->check();
+    $this->assertSession()->fieldExists('edit-modules-config-enum-dependency-test-enable')->check();
+    $this->submitForm([], 'Install');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Configuration test for enums');
+    $this->assertSession()->pageTextContains('Configuration test for enum with dependency');
+
+    // Ensure the value returned from config is an enum.
+    $this->assertSame(AnotherEnumValue::Foo, $this->config('config_enum_dependency_test.settings')->get('status'));
+    $this->assertSame(EnumValue::Maybe, $this->config('config_enum_test.settings')->get('foo'));
+
+    // Enable a module which has a constant in configuration.
+    $this->assertSession()->fieldExists('edit-modules-config-constant-test-enable')->check();
+    $this->submitForm([], 'Install');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Module Configuration test for constants has been installed.');
+
+    // Ensure the value returned from config is the expected value.
+    $this->assertSame('foo', $this->config('config_constant_test.settings')->get('foo'));
   }
 
 }

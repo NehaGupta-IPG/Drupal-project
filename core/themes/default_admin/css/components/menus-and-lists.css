@@ -8,13 +8,13 @@
 /**
  * Menus and lists.
  *
- * These classes are used in claro-toolbar-menu and any list items.
+ * These classes are used in admin-toolbar-menu and any list items.
  */
 
 .item-list,
 .menu-item {
-  --item-list-spacing-l: var(--space-l);
-  --item-list-spacing-m: var(--space-m);
+  --item-list-spacing-l: var(--admin-space-l);
+  --item-list-spacing-m: var(--admin-space-m);
 }
 
 .item-list ul {

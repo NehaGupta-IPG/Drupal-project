@@ -4,17 +4,14 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
-
 /*
  * @file
  *
  * Styling for Media Library.
  */
-
 /*
  * The field widget shown on the entity create page.
  */
-
 .field--widget-media-library-widget {
   .media-library-item__preview {
     cursor: move;
@@ -34,14 +31,13 @@
  * Negative margins compensate for modal dialog padding and compensate for
  * positioning that would otherwise hide the active tab indicator on the start.
  */
-
 #media-library-wrapper {
   display: flex;
-  margin-inline: calc(-1 * var(--space-l));
+  margin-inline: calc(-1 * var(--admin-space-l));
 
   .messages-list,
   .messages {
-    margin-block: 0 var(--space-l);
+    margin-block: 0 var(--admin-space-l);
   }
 
   /* "Grid" and "Table" buttons. */
@@ -52,7 +48,7 @@
     white-space: nowrap;
     -webkit-text-decoration: none;
     text-decoration: none;
-    color: var(--gin-color-text);
+    color: var(--admin-color-text);
     background-image: none;
     font-size: 0.9375rem;
     line-height: 1rem;
@@ -63,17 +59,17 @@
       width: 1rem;
       height: 1rem;
       content: "";
-      background-color: var(--gin-color-text);
+      background-color: var(--admin-color-text);
       inset-block-start: 1px;
       inset-inline-start: 0;
     }
 
     &.is-active {
-      color: var(--gin-color-primary);
+      color: var(--admin-color-primary);
       font-weight: bold;
 
       &::before {
-        background-color: var(--gin-color-primary);
+        background-color: var(--admin-color-primary);
       }
     }
   }
@@ -90,7 +86,7 @@
 #media-library-content {
   width: 100%;
   padding: 1em;
-  border-color: var(--gin-border-color);
+  border-color: var(--admin-color-border);
   border-inline-start: 0 none;
   outline: none;
 
@@ -102,7 +98,6 @@
 }
 
 /* Generic media add form styles. */
-
 .media-library-add-form--without-input .form-item {
   margin-inline-end: 1rem;
 }
@@ -119,10 +114,9 @@
 }
 
 /* Form within media library that allows you to upload additional media. */
-
 .media-library-add-form {
   .messages-list:has(.messages) {
-    margin-block: var(--space-m);
+    margin-block: var(--admin-space-m);
   }
 
   .file-upload-help {
@@ -131,7 +125,6 @@
 }
 
 /* Style the media add oEmbed form. */
-
 .media-library-add-form--oembed {
   .media-library-add-form__input-wrapper {
     display: flex;
@@ -155,14 +148,14 @@
   flex-basis: 100%;
   box-sizing: border-box;
   width: 100%;
-  color: var(--gin-color-title);
-  border-block-end: 1px solid var(--gin-border-color-table-header);
+  color: var(--admin-color-text-loud);
+  border-block-end: 1px solid var(--admin-color-border-loud);
   border-radius: 0;
-  background: var(--gin-bg-layer);
+  background: var(--admin-color-bg-surface);
   margin-block: 0 0.625rem;
   margin-inline: 0 0.5rem;
-  padding-block: 0 var(--space-m);
-  padding-inline: var(--space-m);
+  padding-block: 0 var(--admin-space-m);
+  padding-inline: var(--admin-space-m);
 
   input {
     margin-inline-end: 0.625rem;
@@ -213,13 +206,13 @@
       white-space: nowrap;
 
       .button:not(:last-child) {
-        margin-inline-end: var(--space-xs);
+        margin-inline-end: var(--admin-space-xs);
       }
     }
 
     .media-library-selected-count {
       flex-grow: 1;
-      margin-block-end: var(--space-s);
+      margin-block-end: var(--admin-space-s);
 
       /* cspell:disable-next-line */
       @media (min-width: 36.75em) {
@@ -239,7 +232,6 @@
  * Selection widget area shown on the parent form after items are
  * inserted.
  */
-
 .media-library-selection {
   display: grid;
   gap: 0.625rem;
@@ -247,33 +239,31 @@
 }
 
 /* Media library widget styles. */
-
 .media-library-widget {
   position: relative;
 }
 
 fieldset.media-library-widget {
   .media-library-edit__link {
-    margin: var(--space-xs);
+    margin: var(--admin-space-xs);
   }
 }
 
 .media-library-widget__toggle-weight {
   position: absolute;
-  inset-block-start: var(--space-s);
-  inset-inline-end: var(--space-m);
+  inset-block-start: var(--admin-space-s);
+  inset-inline-end: var(--admin-space-m);
   -webkit-text-decoration: none;
   text-decoration: none;
 
   .fieldset.media-library-widget & {
-    padding: var(--space-xs);
-    font-size: var(--font-size-xxs);
+    padding: var(--admin-space-xs);
+    font-size: var(--admin-font-size-2xs);
     line-height: 1;
   }
 }
 
 /* The <li> that is shown after a media item has been uploaded */
-
 .media-library-add-form__media {
   position: relative;
   display: flex;
@@ -292,13 +282,12 @@ fieldset.media-library-widget {
  * Only renders after a file is uploaded via the add-form. Coverage matrix never
  * completed an upload.
  */
-
 .media-library-add-form__preview {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 13.75rem;
-  background: var(--gin-bg-app);
+  background: var(--admin-color-bg);
 }
 
 .media-library-add-form__fields {
@@ -317,18 +306,18 @@ fieldset.media-library-widget {
   inset-inline-end: 0;
 
   &.button--extrasmall {
-    margin: var(--space-xs) 0;
+    margin: var(--admin-space-xs) 0;
   }
 }
 
 .media-library-selected-count {
-  margin: 0 var(--space-l);
-  color: var(--gin-color-text-light);
+  margin: 0 var(--admin-space-l);
+  color: var(--admin-color-text-soft);
 }
 
 .media-library-widget-empty-text {
   margin-inline: 0;
-  color: var(--gin-color-text-light);
+  color: var(--admin-color-text-soft);
 }
 
 .media-library-open-button {
@@ -337,19 +326,19 @@ fieldset.media-library-widget {
 
 .media-library-view {
   display: grid;
-  gap: var(--space-l);
+  gap: var(--admin-space-l);
 
   .view-header {
     display: flex;
     flex-wrap: wrap;
     gap: 0.9375rem;
-    padding: var(--space-m);
+    padding: var(--admin-space-m);
     -webkit-text-decoration: none;
     text-decoration: none;
-    color: var(--gin-color-text);
-    border-radius: var(--gin-border-m);
-    background: var(--gin-bg-layer3);
-    box-shadow: var(--gin-shadow-l1);
+    color: var(--admin-color-text);
+    border-radius: var(--admin-radius-m);
+    background: var(--admin-color-bg-raised);
+    box-shadow: var(--admin-shadow-1);
   }
 
   .views-exposed-form {

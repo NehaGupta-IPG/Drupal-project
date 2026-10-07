@@ -34,7 +34,7 @@ class StandardRecipeTest extends StandardTest {
     $theme_installer = \Drupal::service('theme_installer');
     $theme_installer->install(['stark']);
     $this->config('system.theme')->set('admin', '')->set('default', 'stark')->save();
-    $theme_installer->uninstall(['claro', 'olivero']);
+    $theme_installer->uninstall(['default_admin']);
 
     // Determine which modules to uninstall.
     // If the database module has dependencies, they are expected too.
@@ -143,6 +143,8 @@ class StandardRecipeTest extends StandardTest {
       'system.action.taxonomy_term_publish_action',
       'core.entity_view_mode.taxonomy_term.full',
       'taxonomy.settings',
+      'block.block.default_admin_login',
+      'views.view.promoted_content',
       'views.view.taxonomy_term',
     ];
     // We expect core.extension to be different because standard is no longer
@@ -150,8 +152,6 @@ class StandardRecipeTest extends StandardTest {
     $expected_list['update'] = [
       'core.extension',
       'user.role.content_editor',
-      'views.view.archive',
-      'views.view.frontpage',
     ];
     $this->assertSame($expected_list, $comparer->getChangelist());
 
