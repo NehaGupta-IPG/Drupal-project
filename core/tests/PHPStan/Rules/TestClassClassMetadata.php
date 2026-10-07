@@ -8,9 +8,11 @@ namespace Drupal\PHPStan\Rules;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
 use PHPStan\Node\InClassNode;
+use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -101,6 +103,13 @@ final class TestClassClassMetadata implements Rule {
             ->build();
         }
       }
+      // The attribute is not inherited, so on a base class it does nothing.
+      if ($this->declaresShareEnvironment($class)) {
+        $fails[] = RuleErrorBuilder::message("Abstract test class {$class->getName()} must not add attribute " . ShareEnvironment::class . ". The attribute is not inherited, so each concrete test class declares it.")
+          ->identifier('abstractTestClass.metadataForbidden')
+          ->line($node->getStartLine())
+          ->build();
+      }
 
       $resolvedPhpDoc = $class->getResolvedPhpDoc();
       if ($resolvedPhpDoc) {
@@ -148,12 +157,19 @@ final class TestClassClassMetadata implements Rule {
             break;
         }
       }
+      $is_kernel_test = $class->isSubclassOfClass($this->reflectionProvider->getClass(KernelTestBase::class));
       $should_run_in_separate_process =
-        $class->isSubclassOfClass($this->reflectionProvider->getClass(BrowserTestBase::class)) ||
-        $class->isSubclassOfClass($this->reflectionProvider->getClass(KernelTestBase::class));
+        $is_kernel_test ||
+        $class->isSubclassOfClass($this->reflectionProvider->getClass(BrowserTestBase::class));
       if ($should_run_in_separate_process && !$has_run_in_separate_process_attribute) {
         $fails[] = RuleErrorBuilder::message("Test class {$class->getName()} must have attribute \PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses.")
           ->identifier('testClass.missingAttribute.RunTestsInSeparateProcesses')
+          ->line($node->getStartLine())
+          ->build();
+      }
+      if ($is_kernel_test && !$this->declaresShareEnvironment($class)) {
+        $fails[] = RuleErrorBuilder::message("Kernel test class {$class->getName()} must have attribute \\" . ShareEnvironment::class . ". Add #[ShareEnvironment], or #[ShareEnvironment(FALSE)] if the class cannot share its environment.")
+          ->identifier('testClass.missingAttribute.ShareEnvironment')
           ->line($node->getStartLine())
           ->build();
       }
@@ -167,6 +183,26 @@ final class TestClassClassMetadata implements Rule {
     }
 
     return $fails;
+  }
+
+  /**
+   * Checks if a class declares the ShareEnvironment attribute itself.
+   *
+   * @param \PHPStan\Reflection\ClassReflection $class
+   *   The class to check.
+   *
+   * @return bool
+   *   TRUE if the class declares the attribute, with or without arguments.
+   *
+   * @see \Drupal\TestTools\Attribute\ShareEnvironment::isEnabledFor()
+   */
+  private function declaresShareEnvironment(ClassReflection $class): bool {
+    // This does not use "ClassReflection::getAttributes()", which is what the
+    // other attribute checks loop over. PHPStan keeps an attribute that has
+    // arguments only when it can reflect the attribute class, and it does not
+    // autoload the test namespaces, so "#[ShareEnvironment(FALSE)]" is dropped
+    // from that list and only "#[ShareEnvironment]" is in it.
+    return $class->getNativeReflection()->getAttributes(ShareEnvironment::class) !== [];
   }
 
 }
