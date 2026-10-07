@@ -115,6 +115,6 @@ CacheTagGroupedLookups:
   -
     - 'config:user.role.anonymous'
 ScriptCount: 3
-ScriptBytes: 12098
+ScriptBytes: 12091
 StylesheetCount: 7
 StylesheetBytes: 34766
