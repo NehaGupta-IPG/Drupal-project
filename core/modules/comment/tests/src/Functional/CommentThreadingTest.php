@@ -6,6 +6,7 @@ namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentPreviewMode;
+use Drupal\field\Entity\FieldConfig;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -20,6 +21,58 @@ class CommentThreadingTest extends CommentTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * Tests disabling the reply depth limit stores the unlimited value.
+   */
+  public function testReplyDepthLimitSettingsForm(): void {
+    $field_settings_url = 'admin/structure/types/manage/article/fields/node.article.comment';
+
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet($field_settings_url);
+
+    // The default depth of -1 is treated as unlimited.
+    $this->assertSession()->checkboxNotChecked('Limit level of comment replies');
+
+    $this->submitForm([
+      'settings[thread_reply_depth_limit]' => '4',
+      'settings[limit_reply_depth]' => TRUE,
+    ], 'Save settings');
+
+    $this->assertEquals(
+      [
+        'default_mode' => 1,
+        'thread_reply_depth' => 4,
+        'per_page' => 50,
+        'anonymous' => 0,
+        'form_location' => TRUE,
+        'preview' => 1,
+        'comment_type' => 'comment',
+      ],
+      FieldConfig::load('node.article.comment')->getSettings(),
+    );
+
+    // Not using the limit sets thread_reply_depth to -1.
+    $this->drupalGet($field_settings_url);
+    $this->assertSession()->checkboxChecked('Limit level of comment replies');
+    $this->submitForm([
+      'settings[thread_reply_depth_limit]' => '4',
+      'settings[limit_reply_depth]' => FALSE,
+    ], 'Save settings');
+
+    $this->assertSame(
+      [
+        'default_mode' => 1,
+        'thread_reply_depth' => -1,
+        'per_page' => 50,
+        'anonymous' => 0,
+        'form_location' => TRUE,
+        'preview' => 1,
+        'comment_type' => 'comment',
+      ],
+      FieldConfig::load('node.article.comment')->getSettings(),
+    );
+  }
 
   /**
    * Check the reply link on unpublished comments.

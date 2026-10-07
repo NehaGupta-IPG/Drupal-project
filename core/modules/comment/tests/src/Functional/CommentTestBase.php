@@ -73,6 +73,7 @@ abstract class CommentTestBase extends BrowserTestBase {
       'administer comments',
       'administer comment types',
       'administer comment fields',
+      'administer node fields',
       'administer comment display',
       'skip comment approval',
       'post comments',

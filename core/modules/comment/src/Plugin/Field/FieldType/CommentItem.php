@@ -126,12 +126,30 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       '#default_value' => $settings['default_mode'],
       '#description' => $this->t('If the comments are displayed as a flat list or threaded.'),
     ];
-    $element['thread_reply_depth'] = [
+    $element['limit_reply_depth'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Limit level of comment replies'),
+      '#default_value' => $settings['thread_reply_depth'] !== -1,
+    ];
+    $element['thread_reply_depth_limit'] = [
       '#type' => 'number',
       '#title' => $this->t('Thread depth limit'),
+      // Use "3" if reply limit was enabled just now.
+      '#default_value' => $settings['thread_reply_depth'] > -1 ? $settings['thread_reply_depth'] : 3,
+      '#description' => $this->t('Define the maximum number of replies in a comment thread. Set 0 if no replies are allowed.'),
+      '#min' => 0,
+      '#states' => [
+        'visible' => [
+          ':input[name="settings[limit_reply_depth]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $element['thread_reply_depth'] = [
+      '#type' => 'value',
       '#default_value' => $settings['thread_reply_depth'],
-      '#description' => $this->t('Define the maximum number of replies in a comment thread.'),
-      '#min' => -1,
+      '#element_validate' => [
+        [static::class, 'massageThreadReplyDepth'],
+      ],
     ];
     $element['per_page'] = [
       '#type' => 'number',
@@ -160,8 +178,24 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       '#default_value' => $settings['preview'],
       '#options' => CommentPreviewMode::asOptions(),
     ];
-
     return $element;
+  }
+
+  /**
+   * Normalizes the reply depth limit setting.
+   *
+   * @param array $element
+   *   The form element of the thread_reply_depth value input.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of the (entire) configuration form.
+   */
+  public static function massageThreadReplyDepth(array $element, FormStateInterface $form_state): void {
+    $reply_depth_limited = $form_state->getValue(['settings', 'limit_reply_depth']);
+    $limit = $form_state->getValue(['settings', 'thread_reply_depth_limit']);
+    $form_state->setValueForElement(
+      $element,
+      $reply_depth_limited ? $limit : -1,
+    );
   }
 
   /**
