@@ -1924,15 +1924,16 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Get the container from cache if it's cacheable.
+   * Gets the cached container definition if the cache may be used.
    *
-   * @return ?array
-   *   An initialized container object or NULL.
+   * @return array|null
+   *   The cached container definition, or NULL if the cache must not be used
+   *   or holds no definition.
    */
   protected function getContainerFromCacheIfCacheable(): ?array {
     // If the module list hasn't already been set in updateModules and we are
     // not forcing a rebuild, then try and load the container from the cache.
-    if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
+    if (!$this->moduleList && !$this->containerNeedsRebuild) {
       return $this->getCachedContainerDefinition();
     }
     return NULL;

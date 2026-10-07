@@ -12,6 +12,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * This class extends the DrupalKernel to allow re-use of the dependency
  * injection container between kernel test methods.
+ *
+ * @internal only use in tests.
  */
 class KernelTestDrupalKernel extends DrupalKernel {
 
@@ -66,9 +68,9 @@ class KernelTestDrupalKernel extends DrupalKernel {
     if ($this->containerNeedsRebuild) {
       $this->cacheSuffix++;
     }
-    // Vary by whether cache usage is being overridden, so that when the
-    // container is rebuilt with the same key after an override, it does not
-    // invalidate the original cached container.
+    // Vary by the suffix, so that a container rebuilt during a test method is
+    // cached under its own key and does not overwrite the initial container
+    // that the other test methods of the class load.
     $key .= ':' . $this->cacheSuffix;
     return $key;
   }
@@ -77,17 +79,12 @@ class KernelTestDrupalKernel extends DrupalKernel {
    * {@inheritdoc}
    */
   protected function getContainerFromCacheIfCacheable(): ?array {
-    $container_definition = NULL;
-    // If the module list hasn't already been set in updateModules and we are
-    // not forcing a rebuild, then try and load the container from the cache.
-    if ((empty($this->moduleList) && !$this->containerNeedsRebuild) || $this->overrideUseCache) {
-      $container_definition = $this->getCachedContainerDefinition();
-    }
-    // Only override once.
     if ($this->overrideUseCache) {
+      // Only override once.
       $this->overrideUseCache = FALSE;
+      return $this->getCachedContainerDefinition();
     }
-    return $container_definition;
+    return parent::getContainerFromCacheIfCacheable();
   }
 
   /**

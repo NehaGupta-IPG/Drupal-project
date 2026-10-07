@@ -471,7 +471,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     // pre-installer mode.
     $extensions = $modules ? $this->getExtensionsForModules($modules) : [];
     $kernel->updateModules($extensions, $extensions);
-    if (!static::sharesEnvironment()) {
+    if (static::sharesEnvironment()) {
       $kernel->setContainerNeedsRebuild(FALSE);
       $kernel->setOverrideUseCache(TRUE);
     }
