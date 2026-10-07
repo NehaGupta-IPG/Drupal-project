@@ -2,7 +2,6 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException;
 use Drupal\Core\Database\Exception\SchemaTableDoesNotExistException;
@@ -34,11 +33,11 @@ class ExceptionHandler extends BaseExceptionHandler {
     }
 
     if (str_contains($exception->getMessage(), 'no such table:')) {
-        throw new SchemaTableDoesNotExistException($message, $code, $exception, $info);
+      throw new SchemaTableDoesNotExistException($message, $code, $exception, $info);
     }
 
     if (str_contains($exception->getMessage(), 'already exists')) {
-        throw new SchemaTableAlreadyExistsException($message, $code, $exception, $info);
+      throw new SchemaTableAlreadyExistsException($message, $code, $exception, $info);
     }
 
     throw new DatabaseExceptionWrapper($message, 0, $exception, $info);
