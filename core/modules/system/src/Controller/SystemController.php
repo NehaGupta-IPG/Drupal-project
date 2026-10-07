@@ -18,6 +18,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\ThemeAccessCheck;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\NaturalSort;
 use Drupal\system\SystemManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -413,7 +414,7 @@ class SystemController extends ControllerBase {
       if ($b->is_default) {
         return 1;
       }
-      return strcasecmp($a->info['name'], $b->info['name']);
+      return NaturalSort::strnatcasecmp($a->info['name'], $b->info['name']);
     };
 
     uasort($theme_groups['installed'], $sortThemes);

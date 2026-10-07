@@ -9,6 +9,7 @@ use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Utility\NaturalSort;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -97,7 +98,7 @@ class SystemManager {
     uasort($requirements, function ($a, $b) {
       if (!isset($a['weight'])) {
         if (!isset($b['weight'])) {
-          return strcasecmp($a['title'], $b['title']);
+          return NaturalSort::strnatcasecmp($a['title'], $b['title']);
         }
         return -$b['weight'];
       }
