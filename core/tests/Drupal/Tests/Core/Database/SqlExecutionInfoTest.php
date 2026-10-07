@@ -6,7 +6,7 @@ namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Database\SchemaObjectExistsException;
+use Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException;
 use Drupal\Core\Database\SqlExecutionInfo;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Tests\UnitTestCase;
@@ -141,7 +141,7 @@ class SqlExecutionInfoTest extends UnitTestCase {
       // Thrown by Drupal rather than by a driver.
       'database exception carrying nothing' => [
         FALSE,
-        new SchemaObjectExistsException('Table exists'),
+        new SchemaTableAlreadyExistsException('Table exists'),
       ],
       'no database exception in the chain' => [
         FALSE,
