@@ -1531,8 +1531,10 @@ class SystemRequirementsHooks {
         'value' => $this->t('Enabled'),
         'description' => $this->t('Aggregating CSS and JavaScript files reduces both the size and number of requests made to your website. @link.', [
           '@link' => Link::createFromRoute(
-            'Change bandwidth settings',
+            'Change bandwidth optimization',
             'system.performance_settings',
+            [],
+            ['fragment' => 'edit-bandwidth-optimization'],
           )->toString(),
         ]),
         'severity' => RequirementSeverity::Info,
