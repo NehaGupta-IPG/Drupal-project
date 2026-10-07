@@ -120,11 +120,9 @@ class LanguageListTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save configuration');
     $this->rebuildContainer();
 
-    // The edited label was made while $langcode was the site default, the
-    // same as authoring a translation into it - moving the default back to
-    // English absorbs the label English had at the time of the earlier
-    // switch, the same way it would for any other configuration, and the
-    // edited label survives as a language override instead.
+    // Swapping back 'en' will marge the 'en' translation override back into
+    // the default configuration and preserve the 'xx' translation as a language
+    // config override.
     $this->assertSession()->pageTextContains($original_name);
     $this->assertSession()->pageTextNotContains($name);
     /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */

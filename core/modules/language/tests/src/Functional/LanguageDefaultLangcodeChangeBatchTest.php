@@ -47,7 +47,7 @@ class LanguageDefaultLangcodeChangeBatchTest extends BrowserTestBase {
   }
 
   /**
-   * Tests a pre-existing override for the new default is absorbed on switch.
+   * Tests a pre-existing override for the new default is merged on switch.
    *
    * @see \Drupal\language\DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation()
    */
