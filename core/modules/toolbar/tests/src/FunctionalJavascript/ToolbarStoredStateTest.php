@@ -111,6 +111,46 @@ class ToolbarStoredStateTest extends WebDriverTestBase {
       $this->getSession()->evaluateScript("sessionStorage.getItem('Drupal.toolbar.toolbarState')")
     );
     $this->assertSame($expected, $toolbar_stored_state);
+
+    // Opening the user tray is required to reach its logout link. Logging out
+    // must not leave that tray persisted for the next authenticated session.
+    $page->clickLink('toolbar-item-user');
+    $this->assertNotEmpty(
+      $assert_session->waitForElementVisible('css', '#toolbar-item-user.is-active'),
+    );
+
+    $this->assertSame(
+      '"toolbar-item-user"',
+      $this->getSession()->evaluateScript(
+        "localStorage.getItem('Drupal.toolbar.activeTabID')",
+      ),
+    );
+
+    $toolbar_stored_state = JSON::decode(
+      $this->getSession()->evaluateScript(
+        "sessionStorage.getItem('Drupal.toolbar.toolbarState')",
+      ),
+    );
+    $this->assertTrue($toolbar_stored_state['hasActiveTab']);
+    $this->assertSame('toolbar-item-user', $toolbar_stored_state['activeTabId']);
+    $this->assertSame('toolbar-item-user-tray', $toolbar_stored_state['activeTray']);
+
+    $page->clickLink('Log out');
+
+    $this->assertNull(
+      $this->getSession()->evaluateScript(
+        "localStorage.getItem('Drupal.toolbar.activeTabID')",
+      ),
+    );
+
+    $toolbar_stored_state = JSON::decode(
+      $this->getSession()->evaluateScript(
+        "sessionStorage.getItem('Drupal.toolbar.toolbarState')",
+      ),
+    );
+    $this->assertFalse($toolbar_stored_state['hasActiveTab']);
+    $this->assertNull($toolbar_stored_state['activeTabId']);
+    $this->assertArrayNotHasKey('activeTray', $toolbar_stored_state);
   }
 
 }
