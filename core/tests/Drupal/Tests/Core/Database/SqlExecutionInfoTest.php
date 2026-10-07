@@ -132,7 +132,7 @@ class SqlExecutionInfoTest extends UnitTestCase {
         TRUE,
         new \RuntimeException('Outer', 0, new \LogicException('Middle', 0, $carrying)),
       ],
-      // Not every database exception extends DatabaseExceptionBase, so the
+      // Not every database exception extends DatabaseExceptionWrapper, so the
       // walk cannot stop at the first one it meets.
       'behind a database exception without the property' => [
         TRUE,
