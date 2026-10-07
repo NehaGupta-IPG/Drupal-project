@@ -2,7 +2,6 @@
 
 namespace Drupal\image\Form;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
