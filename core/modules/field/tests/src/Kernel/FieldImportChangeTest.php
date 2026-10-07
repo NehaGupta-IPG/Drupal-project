@@ -6,6 +6,7 @@ namespace Drupal\Tests\field\Kernel;
 
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('field')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FieldImportChangeTest extends FieldKernelTestBase {
 
   /**

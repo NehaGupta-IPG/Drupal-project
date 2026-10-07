@@ -7,6 +7,7 @@ namespace Drupal\Tests\help\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\HttpKernelUiHelperTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('help')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class NoHelpTest extends KernelTestBase {
 
   use HttpKernelUiHelperTrait;

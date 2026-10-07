@@ -9,6 +9,7 @@ use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -27,6 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 #[CoversClass(DrupalKernel::class)]
 #[Group('DrupalKernel')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DrupalKernelTest extends KernelTestBase {
 
   /**

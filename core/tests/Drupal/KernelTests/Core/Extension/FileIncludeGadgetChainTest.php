@@ -8,6 +8,7 @@ namespace Drupal\KernelTests\Core\Extension;
 
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('File')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FileIncludeGadgetChainTest extends KernelTestBase {
 
   /**

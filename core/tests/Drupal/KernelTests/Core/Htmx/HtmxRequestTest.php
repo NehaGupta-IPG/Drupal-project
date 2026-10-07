@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Htmx;
 use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 #[CoversClass(Htmx::class)]
 #[Group('Htmx')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class HtmxRequestTest extends KernelTestBase {
 
   /**
@@ -45,9 +47,16 @@ class HtmxRequestTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->installConfig(['system']);
     $this->httpKernel = $this->container->get('http_kernel');
     $this->url = Url::fromRoute('test_htmx.attachments.page');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installConfig(['system']);
   }
 
   /**

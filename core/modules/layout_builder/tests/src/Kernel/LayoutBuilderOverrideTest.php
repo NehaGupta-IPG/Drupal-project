@@ -7,6 +7,7 @@ namespace Drupal\Tests\layout_builder\Kernel;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\layout_builder_override\LayoutBuilderEntityViewDisplay as LayoutBuilderEntityViewDisplayOverride;
 use Drupal\layout_builder_override_dependency\LayoutBuilderEntityViewDisplay as LayoutBuilderEntityViewDisplayDependency;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('layout_builder')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LayoutBuilderOverrideTest extends LayoutBuilderCompatibilityTestBase {
 
   /**

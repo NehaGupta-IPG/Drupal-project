@@ -15,6 +15,7 @@ use Drupal\package_manager\Exception\SandboxException;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager\Validator\WritableFileSystemValidator;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PhpTuf\ComposerStager\API\Core\BeginnerInterface;
 use PhpTuf\ComposerStager\API\Core\CommitterInterface;
 use PhpTuf\ComposerStager\API\Core\StagerInterface;
@@ -32,6 +33,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('package_manager')]
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;

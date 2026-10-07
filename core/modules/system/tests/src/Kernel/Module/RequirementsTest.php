@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Kernel\Module;
 
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
  */
 #[Group('Module')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class RequirementsTest extends KernelTestBase {
 
   /**

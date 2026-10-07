@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\EventSubscriber;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('EventSubscriber')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class HttpResponseDebugCacheabilityHeadersTest extends KernelTestBase {
 
   /**

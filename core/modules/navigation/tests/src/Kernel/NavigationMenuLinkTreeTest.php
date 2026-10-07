@@ -7,6 +7,7 @@ namespace Drupal\Tests\navigation\Kernel;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\navigation\Menu\NavigationMenuLinkTree;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('navigation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class NavigationMenuLinkTreeTest extends KernelTestBase {
 
   /**
@@ -43,10 +45,16 @@ class NavigationMenuLinkTreeTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->linkTree = $this->container->get('navigation.menu_tree');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
     $this->installEntitySchema('menu_link_content');
-
-    $this->linkTree = $this->container->get('navigation.menu_tree');
   }
 
   /**

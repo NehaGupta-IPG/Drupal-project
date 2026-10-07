@@ -11,6 +11,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Controller\AssetControllerBase;
 use Drupal\system\Controller\CssAssetController;
 use Drupal\system\Controller\JsAssetController;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -23,6 +24,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 #[Group('asset')]
 #[RunTestsInSeparateProcesses]
 #[CoversMethod(AssetControllerBase::class, 'deliver')]
+#[ShareEnvironment]
 class AssetControllerTest extends KernelTestBase {
 
   /**

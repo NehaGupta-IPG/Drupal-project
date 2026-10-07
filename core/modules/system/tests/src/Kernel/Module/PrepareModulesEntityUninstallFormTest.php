@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Kernel\Module;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[Group('Module')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class PrepareModulesEntityUninstallFormTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -24,6 +26,14 @@ class PrepareModulesEntityUninstallFormTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = ['user', 'system'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('user');
+  }
 
   /**
    * Tests PrepareModulesEntityUninstallForm::formTitle.

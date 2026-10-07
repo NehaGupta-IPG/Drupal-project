@@ -13,6 +13,7 @@ use Drupal\Core\Theme\Entity\DesignToken;
 use Drupal\Core\Theme\Entity\DesignTokenInterface;
 use Drupal\Core\Theme\Plugin\DesignTokenValue\Dimension;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -27,6 +28,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(DesignToken::class)]
 #[Group('design_token')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DesignTokenConfigEntityKernelTest extends KernelTestBase {
 
   /**

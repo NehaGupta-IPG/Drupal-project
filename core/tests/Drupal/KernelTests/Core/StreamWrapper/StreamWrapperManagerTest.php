@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\StreamWrapper;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\stream_wrapper_service_test\StreamWrapper\ServiceDependencyStreamWrapper;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(StreamWrapperManager::class)]
 #[Group('File')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class StreamWrapperManagerTest extends KernelTestBase {
 
   /**

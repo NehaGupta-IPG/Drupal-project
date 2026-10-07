@@ -6,6 +6,7 @@ namespace Drupal\Tests\rest\Kernel\Views;
 
 use Drupal\rest\Plugin\views\display\RestExport;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Entity\View;
 use Drupal\views\Tests\ViewTestData;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(RestExport::class)]
 #[Group('rest')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class RestExportTest extends ViewsKernelTestBase {
 
   /**

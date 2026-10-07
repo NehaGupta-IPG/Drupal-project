@@ -10,6 +10,7 @@ use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\MockHandler;
@@ -29,6 +30,7 @@ use Psr\Log\LoggerInterface;
 #[CoversClass(SecurityAdvisoriesFetcher::class)]
 #[Group('system')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInterface {
 
   use RfcLoggerTrait;

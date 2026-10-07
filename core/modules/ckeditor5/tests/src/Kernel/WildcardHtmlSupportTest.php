@@ -9,6 +9,7 @@ use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -23,6 +24,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 #[Group('ckeditor5')]
 #[CoversMethod(CKEditor5PluginManager::class, 'getCKEditor5PluginConfig')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class WildcardHtmlSupportTest extends KernelTestBase {
 
   /**

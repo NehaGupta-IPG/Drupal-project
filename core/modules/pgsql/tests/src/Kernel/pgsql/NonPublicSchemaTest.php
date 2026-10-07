@@ -10,6 +10,7 @@ use Drupal\KernelTests\Core\Database\DatabaseTestSchemaDataTrait;
 use Drupal\KernelTests\Core\Database\DatabaseTestSchemaInstallTrait;
 use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(Schema::class)]
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
 
   use DatabaseTestSchemaDataTrait;

@@ -7,6 +7,7 @@ namespace Drupal\Tests\layout_discovery\Kernel;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_discovery\Hook\LayoutDiscoveryThemeHooks;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Layout')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LayoutTest extends KernelTestBase {
 
   /**

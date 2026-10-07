@@ -7,6 +7,7 @@ namespace Drupal\Tests\locale\Kernel;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\locale\LocaleXss;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('locale')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class LocaleStringIsSafeTest extends KernelTestBase {
 
   use StringTranslationTrait;

@@ -6,6 +6,7 @@ namespace Drupal\Tests\filter\Kernel;
 
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('filter')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FilterDefaultConfigTest extends KernelTestBase {
 
   /**
@@ -25,9 +27,8 @@ class FilterDefaultConfigTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     // Install filter_test module, which ships with custom default format.
     $this->installConfig(['user', 'filter_test']);
   }

@@ -9,6 +9,7 @@ use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Path')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class PathValidatorTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -34,7 +36,15 @@ class PathValidatorTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->setUpCurrentUser();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('entity_test');
+    $this->installEntitySchema('user');
   }
 
   /**

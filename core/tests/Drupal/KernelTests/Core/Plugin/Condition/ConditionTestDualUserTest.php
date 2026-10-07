@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Plugin\Condition;
 
 use Drupal\Core\Plugin\Context\EntityContext;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('condition_test')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ConditionTestDualUserTest extends KernelTestBase {
 
   /**
@@ -41,11 +43,16 @@ class ConditionTestDualUserTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->installEntitySchema('user');
-
     $this->anonymous = User::create(['uid' => 0]);
     $this->authenticated = User::create(['uid' => 1]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('user');
   }
 
   /**

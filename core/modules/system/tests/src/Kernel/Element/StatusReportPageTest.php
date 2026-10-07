@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Kernel\Element;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Element\StatusReportPage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ include_once \DRUPAL_ROOT . '/core/includes/install.inc';
  */
 #[Group('system')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class StatusReportPageTest extends KernelTestBase {
 
   /**

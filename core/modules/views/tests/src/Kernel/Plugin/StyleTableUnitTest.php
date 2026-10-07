@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class StyleTableUnitTest extends PluginKernelTestBase {
 
   /**

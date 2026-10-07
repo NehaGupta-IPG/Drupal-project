@@ -7,6 +7,7 @@ namespace Drupal\Tests\language\Kernel;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManager;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ConfigurableLanguageManager::class)]
 #[Group('language')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ConfigurableLanguageManagerTest extends LanguageTestBase {
 
   /**
@@ -43,11 +45,16 @@ class ConfigurableLanguageManagerTest extends LanguageTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->installEntitySchema('user');
-
     $this->languageNegotiator = $this->container->get('language_negotiator');
     $this->languageManager = $this->container->get('language_manager');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('user');
   }
 
   /**

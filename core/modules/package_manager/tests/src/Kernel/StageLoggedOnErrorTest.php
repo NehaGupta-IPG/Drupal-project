@@ -16,6 +16,7 @@ use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\PackageManagerUninstallValidator;
 use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager_test_validation\EventSubscriber\TestSubscriber;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -31,6 +32,7 @@ use Psr\Log\LogLevel;
 #[Group('package_manager')]
 #[CoversClass(PackageManagerUninstallValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class StageLoggedOnErrorTest extends PackageManagerKernelTestBase {
 
   /**

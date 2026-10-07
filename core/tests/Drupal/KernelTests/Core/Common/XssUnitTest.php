@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Common;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Common')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class XssUnitTest extends KernelTestBase {
 
   use StringTranslationTrait;
@@ -31,8 +33,8 @@ class XssUnitTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig(['system']);
   }
 

@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Component\Render;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Render')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FormattableMarkupKernelTest extends KernelTestBase {
 
   /**

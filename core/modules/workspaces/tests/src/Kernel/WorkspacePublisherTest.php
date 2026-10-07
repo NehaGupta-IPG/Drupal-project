@@ -17,6 +17,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\node\NodeInterface;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workspaces\Entity\Workspace;
 use Drupal\workspaces\WorkspaceOperationFactory;
 use Drupal\workspaces\WorkspacePublisher;
@@ -34,6 +35,7 @@ use Psr\Log\LoggerInterface;
 #[CoversClass(WorkspacePublisher::class)]
 #[Group('workspaces')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class WorkspacePublisherTest extends KernelTestBase {
 
   use NodeCreationTrait;

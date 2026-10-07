@@ -8,6 +8,7 @@ use Drupal\Core\Command\DbCommandBase;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 #[Group('console')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class DbCommandBaseTest extends KernelTestBase {
 
   /**

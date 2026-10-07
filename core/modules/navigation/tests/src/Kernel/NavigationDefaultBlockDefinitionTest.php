@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\navigation\Kernel;
 
 use Drupal\Core\Url;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Drupal\KernelTests\KernelTestBase;
@@ -15,6 +16,7 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
  */
 #[Group('navigation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class NavigationDefaultBlockDefinitionTest extends KernelTestBase {
 
   use UserCreationTrait;

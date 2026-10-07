@@ -13,6 +13,7 @@ use Drupal\filter\Plugin\DataType\FilterFormat as FilterFormatDataType;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\Tests\filter\Traits\ProcessedTextTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -22,6 +23,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 #[Group('filter')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FilterAPITest extends EntityKernelTestBase {
 
   use ProcessedTextTestTrait;

@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Kernel\Form;
 
 use Drupal\form_test\Form\FormTestLabelForm;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Form')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ElementsLabelsTest extends KernelTestBase {
 
   /**
@@ -24,8 +26,8 @@ class ElementsLabelsTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig(['filter', 'system']);
   }
 

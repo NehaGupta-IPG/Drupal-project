@@ -7,6 +7,7 @@ namespace Drupal\Tests\filter\Kernel;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('filter')]
 #[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class CheckMarkupDeprecationTest extends KernelTestBase {
 
   /**

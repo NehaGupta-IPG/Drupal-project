@@ -7,6 +7,7 @@ namespace Drupal\Tests\node\Kernel\Views;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('node')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FilterUidRevisionTest extends KernelTestBase {
 
   use NodeCreationTrait;
@@ -44,15 +46,21 @@ class FilterUidRevisionTest extends KernelTestBase {
   public static $testViews = ['test_filter_node_uid_revision'];
 
   /**
-   * Tests the node_uid_revision filter.
+   * {@inheritdoc}
    */
-  public function testFilter(): void {
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installSchema('node', ['node_access']);
     $this->installConfig(['filter']);
     ViewTestData::createTestViews(static::class, ['node_test_views']);
+  }
 
+  /**
+   * Tests the node_uid_revision filter.
+   */
+  public function testFilter(): void {
     $author = $this->createUser();
     $no_author = $this->createUser();
 

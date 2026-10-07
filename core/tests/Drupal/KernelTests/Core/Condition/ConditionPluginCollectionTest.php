@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Condition;
 
 use Drupal\Core\Condition\ConditionPluginCollection;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ConditionPluginCollection::class)]
 #[Group('Condition')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ConditionPluginCollectionTest extends KernelTestBase {
 
   /**

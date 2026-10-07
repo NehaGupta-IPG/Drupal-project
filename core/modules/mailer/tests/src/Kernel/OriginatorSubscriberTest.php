@@ -10,6 +10,7 @@ use Drupal\Core\State\StateInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -26,6 +27,7 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
 #[CoversClass(OriginatorSubscriber::class)]
 #[Group('mailer')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class OriginatorSubscriberTest extends KernelTestBase {
 
   /**

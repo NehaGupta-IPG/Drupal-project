@@ -11,6 +11,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('comment')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FilterAndArgumentUserUidTest extends KernelTestBase {
 
   use CommentTestTrait;
@@ -52,9 +54,10 @@ class FilterAndArgumentUserUidTest extends KernelTestBase {
   public static $testViews = ['test_comment_user_uid'];
 
   /**
-   * Tests the user posted or commented filter and argument handlers.
+   * {@inheritdoc}
    */
-  public function testHandlers(): void {
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installEntitySchema('comment');
@@ -73,6 +76,13 @@ class FilterAndArgumentUserUidTest extends KernelTestBase {
     ])->save();
     $this->addDefaultCommentField('node', 'page', 'comment');
 
+    ViewTestData::createTestViews(static::class, ['comment_test_views']);
+  }
+
+  /**
+   * Tests the user posted or commented filter and argument handlers.
+   */
+  public function testHandlers(): void {
     $account = $this->createUser();
     $other_account = $this->createUser();
 
@@ -106,8 +116,6 @@ class FilterAndArgumentUserUidTest extends KernelTestBase {
       'entity_type' => 'node',
       'field_name' => 'comment',
     ])->save();
-
-    ViewTestData::createTestViews(static::class, ['comment_test_views']);
 
     $expected_result = [
       [

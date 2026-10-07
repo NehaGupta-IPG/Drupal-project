@@ -15,6 +15,7 @@ use Drupal\Core\Serialization\Yaml;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -26,6 +27,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(RecipeRunner::class)]
 #[Group('Recipe')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class RecipeRunnerTest extends KernelTestBase {
 
   use RecipeTestTrait;

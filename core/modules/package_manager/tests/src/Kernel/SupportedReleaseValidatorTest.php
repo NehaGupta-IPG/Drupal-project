@@ -9,6 +9,7 @@ use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\SupportedReleaseValidator;
 use Drupal\Tests\package_manager\Traits\FixtureUtilityTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('#slow')]
 #[Group('package_manager')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class SupportedReleaseValidatorTest extends PackageManagerKernelTestBase {
 
   use FixtureUtilityTrait;

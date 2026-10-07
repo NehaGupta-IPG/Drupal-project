@@ -12,6 +12,7 @@ use Drupal\Core\Extension\ModuleInstaller;
 use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -26,6 +27,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 #[CoversClass(ModuleInstaller::class)]
 #[Group('Extension')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
 
   use RfcLoggerTrait;

@@ -6,6 +6,7 @@ namespace Drupal\KernelTests;
 
 use Drupal\Core\Url;
 use Drupal\Tests\HttpKernelUiHelperTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Group('Test')]
 #[Group('KernelTests')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class KernelTestHttpRequestTest extends KernelTestBase {
 
   /**

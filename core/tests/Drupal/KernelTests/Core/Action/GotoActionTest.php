@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Entity\Action;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 #[CoversClass(GotoAction::class)]
 #[Group('Action')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class GotoActionTest extends KernelTestBase {
 
   /**

@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\entity_test\Entity\EntityTestMulRevPub;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workspaces\Entity\Workspace;
 use Drupal\workspaces\Plugin\Validation\Constraint\EntityWorkspaceConflictConstraintValidator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(EntityWorkspaceConflictConstraintValidator::class)]
 #[Group('workspaces')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class EntityWorkspaceConflictConstraintValidatorTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -44,15 +46,20 @@ class EntityWorkspaceConflictConstraintValidatorTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
     $this->entityTypeManager = \Drupal::entityTypeManager();
+    $this->createUser();
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     $this->installEntitySchema('entity_test_mulrevpub');
     $this->installEntitySchema('workspace');
     $this->installEntitySchema('user');
-    $this->createUser();
   }
 
   /**

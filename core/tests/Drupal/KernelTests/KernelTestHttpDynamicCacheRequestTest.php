@@ -8,6 +8,7 @@ use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Tests\HttpKernelUiHelperTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\Traits\Core\Cache\PageCachePolicyTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[Group('Test')]
 #[Group('KernelTests')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class KernelTestHttpDynamicCacheRequestTest extends KernelTestBase implements ServiceModifierInterface {
 
   use PageCachePolicyTrait;
@@ -39,8 +41,9 @@ class KernelTestHttpDynamicCacheRequestTest extends KernelTestBase implements Se
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('user');
   }
 
   /**

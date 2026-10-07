@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\workflows\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workflows\Entity\Workflow;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('workflows')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class PredefinedWorkflowTypeTest extends KernelTestBase {
 
   /**

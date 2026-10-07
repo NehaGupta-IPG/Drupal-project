@@ -12,6 +12,7 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\LinkGenerator;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversMethod(UrlHelper::class, 'filterQueryParameters')]
 #[CoversMethod(LinkGenerator::class, 'generate')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class UrlTest extends KernelTestBase {
 
   /**

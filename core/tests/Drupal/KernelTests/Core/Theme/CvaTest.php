@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Theme;
 use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\TestWith;
  */
 #[Group('Theme')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 final class CvaTest extends KernelTestBase {
 
   /**

@@ -10,6 +10,7 @@ use Drupal\Core\TypedData\Plugin\DataType\BooleanData;
 use Drupal\Core\TypedData\Plugin\DataType\IntegerData;
 use Drupal\Core\TypedData\Plugin\DataType\StringData;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ConfigEntityAdapter::class)]
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ConfigEntityAdapterTest extends KernelTestBase {
 
   /**
@@ -41,8 +43,6 @@ class ConfigEntityAdapterTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->installConfig(static::$modules);
-
     // ConfigTest::create doesn't work with the following exception:
     // "Multiple entity types found for Drupal\config_test\Entity\ConfigTest".
     $this->entity = \Drupal::entityTypeManager()->getStorage('config_test')->create([
@@ -50,6 +50,14 @@ class ConfigEntityAdapterTest extends KernelTestBase {
       'label' => 'foobar',
       'weight' => 1,
     ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installConfig(static::$modules);
   }
 
   /**

@@ -8,6 +8,7 @@ use Drupal\Core\Mailer\TransportServiceFactory;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\mailer_transport_factory_kernel_test\Transport\CanaryTransport;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -24,6 +25,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 #[CoversClass(TransportServiceFactory::class)]
 #[Group('mailer')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class TransportTest extends KernelTestBase {
 
   /**
@@ -172,6 +174,19 @@ class TransportTest extends KernelTestBase {
 
     $actual = $this->container->get(TransportInterface::class);
     $this->assertInstanceOf(CanaryTransport::class, $actual);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function resetEnvironment(): void {
+    parent::resetEnvironment();
+
+    // The test class shares its environment, so the module list must be left
+    // as ::testThirdPartyFactory() found it.
+    if ($this->container->get('module_handler')->moduleExists('mailer_transport_factory_kernel_test')) {
+      $this->disableModules(['mailer_transport_factory_kernel_test']);
+    }
   }
 
 }

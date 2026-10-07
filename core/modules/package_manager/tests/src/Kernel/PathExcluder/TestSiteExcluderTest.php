@@ -7,6 +7,7 @@ namespace Drupal\Tests\package_manager\Kernel\PathExcluder;
 use Drupal\package_manager\PathExcluder\TestSiteExcluder;
 use Drupal\package_manager\PathLocator;
 use Drupal\Tests\package_manager\Kernel\PackageManagerKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('#slow')]
 #[CoversClass(TestSiteExcluder::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class TestSiteExcluderTest extends PackageManagerKernelTestBase {
 
   /**

@@ -7,6 +7,7 @@ namespace Drupal\Tests\user\Kernel\Views;
 use Drupal\Core\Form\FormState;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Plugin\views\argument\ArgumentPluginBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ArgumentValidateTest extends ViewsKernelTestBase {
 
   use UserCreationTrait;

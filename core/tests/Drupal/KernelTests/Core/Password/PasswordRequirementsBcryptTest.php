@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Password;
 
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\system\Hook\SystemRequirementsHooks;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Password')]
 #[RunTestsInSeparateProcesses]
 #[CoversMethod(SystemRequirementsHooks::class, 'checkPasswordHashing')]
+#[ShareEnvironment]
 class PasswordRequirementsBcryptTest extends PasswordTestBase {
 
   /**

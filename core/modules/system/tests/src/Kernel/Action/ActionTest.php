@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Kernel\Action;
 use Drupal\Core\Action\ActionInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Entity\Action;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Action')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ActionTest extends KernelTestBase {
 
   /**

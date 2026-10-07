@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\DrupalKernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('DrupalKernel')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ContentNegotiationTest extends KernelTestBase {
 
   /**
@@ -24,8 +26,8 @@ class ContentNegotiationTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig(['system']);
   }
 

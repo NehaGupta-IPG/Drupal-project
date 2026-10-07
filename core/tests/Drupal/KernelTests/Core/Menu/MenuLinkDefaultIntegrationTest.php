@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Menu;
 
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Menu')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class MenuLinkDefaultIntegrationTest extends KernelTestBase {
 
   /**

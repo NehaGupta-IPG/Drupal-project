@@ -13,6 +13,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -24,6 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 #[Group('Cache')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EndOfTransactionQueriesTest extends KernelTestBase {
 
   /**

@@ -12,6 +12,7 @@ use Drupal\path_alias\AliasManager;
 use Drupal\path_alias\AliasPrefixList;
 use Drupal\path_alias\AliasRepository;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(AliasRepository::class)]
 #[Group('path_alias')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class AliasTest extends KernelTestBase {
 
   use PathAliasTestTrait;

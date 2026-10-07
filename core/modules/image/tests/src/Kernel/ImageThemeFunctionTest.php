@@ -14,6 +14,7 @@ use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -22,6 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('image')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ImageThemeFunctionTest extends KernelTestBase {
 
   use TestFileCreationTrait {
@@ -58,7 +60,19 @@ class ImageThemeFunctionTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->imageFactory = $this->container->get('image.factory');
+    \Drupal::service('file_system')->copy($this->root . '/core/misc/druplicon.png', 'public://example.jpg');
+    $this->image = File::create([
+      'uri' => 'public://example.jpg',
+    ]);
+    $this->image->save();
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig('system');
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('file');
@@ -76,12 +90,6 @@ class ImageThemeFunctionTest extends KernelTestBase {
       'field_name' => 'image_test',
       'bundle' => 'entity_test',
     ])->save();
-    \Drupal::service('file_system')->copy($this->root . '/core/misc/druplicon.png', 'public://example.jpg');
-    $this->image = File::create([
-      'uri' => 'public://example.jpg',
-    ]);
-    $this->image->save();
-    $this->imageFactory = $this->container->get('image.factory');
   }
 
   /**

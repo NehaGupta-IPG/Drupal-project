@@ -9,6 +9,7 @@ use Drupal\Core\ImageToolkit\ImageToolkitInterface;
 use Drupal\image\ImageEffectManager;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Traits\Core\Image\ToolkitTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Image')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ToolkitTest extends KernelTestBase {
 
   use ToolkitTestTrait;

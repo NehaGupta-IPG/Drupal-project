@@ -9,6 +9,7 @@ use Drupal\Core\Cache\CacheTagsPurgeInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\Reference;
@@ -18,6 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 #[Group('Cache')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DatabaseBackendTagTest extends KernelTestBase {
 
   /**

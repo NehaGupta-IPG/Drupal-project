@@ -11,6 +11,7 @@ use Drupal\Core\Recipe\RecipeFileException;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\TestWith;
  */
 #[Group('Recipe')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ConfigActionValidationTest extends KernelTestBase {
 
   use RecipeTestTrait;

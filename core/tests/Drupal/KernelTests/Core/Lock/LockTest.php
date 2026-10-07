@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Lock;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Lock\DatabaseLockBackend;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Lock')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LockTest extends KernelTestBase {
 
   /**

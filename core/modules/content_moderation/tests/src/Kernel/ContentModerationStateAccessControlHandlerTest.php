@@ -7,6 +7,7 @@ namespace Drupal\Tests\content_moderation\Kernel;
 use Drupal\content_moderation\ContentModerationStateAccessControlHandler;
 use Drupal\content_moderation\Entity\ContentModerationState;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ContentModerationStateAccessControlHandler::class)]
 #[Group('content_moderation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ContentModerationStateAccessControlHandlerTest extends KernelTestBase {
 
   /**
@@ -40,9 +42,16 @@ class ContentModerationStateAccessControlHandlerTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->accessControlHandler = $this->container->get('entity_type.manager')->getAccessControlHandler('content_moderation_state');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('content_moderation_state');
     $this->installEntitySchema('user');
-    $this->accessControlHandler = $this->container->get('entity_type.manager')->getAccessControlHandler('content_moderation_state');
   }
 
   /**

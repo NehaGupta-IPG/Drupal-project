@@ -10,6 +10,7 @@ use Drupal\Core\Lock\DatabaseLockBackend;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\TempStore\SharedTempStoreFactory;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('TempStore')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class TempStoreDatabaseTest extends KernelTestBase {
 
   /**

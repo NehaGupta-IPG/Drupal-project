@@ -10,6 +10,7 @@ use Drupal\package_manager\PathExcluder\GitExcluder;
 use Drupal\package_manager\PathLocator;
 use Drupal\Tests\package_manager\Kernel\PackageManagerKernelTestBase;
 use Drupal\Tests\package_manager\Traits\ComposerInstallersTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PhpTuf\ComposerStager\API\Core\BeginnerInterface;
 use PhpTuf\ComposerStager\API\Core\CommitterInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -26,6 +27,7 @@ use Symfony\Component\Filesystem\Filesystem;
 #[Group('#slow')]
 #[CoversClass(GitExcluder::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class GitExcluderTest extends PackageManagerKernelTestBase {
 
   use ComposerInstallersTrait;

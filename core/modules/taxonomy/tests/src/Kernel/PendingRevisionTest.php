@@ -11,6 +11,7 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('taxonomy')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class PendingRevisionTest extends KernelTestBase {
 
   /**
@@ -37,14 +39,33 @@ class PendingRevisionTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig(['taxonomy']);
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installEntitySchema('taxonomy_term');
     $this->installSchema('node', 'node_access');
+
+    NodeType::create([
+      'type' => 'page',
+      'name' => 'Page',
+    ])->save();
+
+    FieldStorageConfig::create([
+      'entity_type' => 'node',
+      'field_name' => 'field_tags',
+      'type' => 'entity_reference',
+      'settings' => [
+        'target_type' => 'taxonomy_term',
+      ],
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'field_tags',
+      'entity_type' => 'node',
+      'bundle' => 'page',
+    ])->save();
   }
 
   /**
@@ -68,25 +89,6 @@ class PendingRevisionTest extends KernelTestBase {
     ]);
     $term2->save();
 
-    NodeType::create([
-      'type' => 'page',
-      'name' => 'Page',
-    ])->save();
-
-    FieldStorageConfig::create([
-      'entity_type' => 'node',
-      'field_name' => 'field_tags',
-      'type' => 'entity_reference',
-      'settings' => [
-        'target_type' => 'taxonomy_term',
-      ],
-    ])->save();
-
-    FieldConfig::create([
-      'field_name' => 'field_tags',
-      'entity_type' => 'node',
-      'bundle' => 'page',
-    ])->save();
     $node = Node::create([
       'type' => 'page',
       'title' => 'test_title',

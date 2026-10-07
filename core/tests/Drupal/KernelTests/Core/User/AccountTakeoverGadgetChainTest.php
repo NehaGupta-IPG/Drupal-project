@@ -8,6 +8,7 @@ namespace Drupal\KernelTests\Core\User;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class AccountTakeoverGadgetChainTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -34,8 +36,8 @@ class AccountTakeoverGadgetChainTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     // Views and some of its requirements need to be at least partially set up
     // in order for the payload to work.
     $this->installEntitySchema('node');

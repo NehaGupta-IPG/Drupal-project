@@ -8,6 +8,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Test\EnvironmentCleaner;
 use Drupal\Core\Test\TestRunResultsStorageInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,6 +21,7 @@ use Symfony\Component\Console\Output\NullOutput;
 #[CoversClass(EnvironmentCleaner::class)]
 #[Group('Test')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class EnvironmentCleanerTest extends KernelTestBase {
 
   /**

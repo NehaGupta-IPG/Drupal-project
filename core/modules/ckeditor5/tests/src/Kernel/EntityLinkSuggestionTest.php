@@ -11,6 +11,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use Drupal\editor\Entity\Editor;
 use Drupal\node\Entity\NodeType;
@@ -30,6 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 #[Group('ckeditor5')]
 #[CoversClass(EntityLinkSuggestionsController::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EntityLinkSuggestionTest extends KernelTestBase {
 
   use CKEditor5ValidationTestTrait;

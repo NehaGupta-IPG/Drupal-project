@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\OneTimeAuthentication;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
 #[CoversClass(OneTimeAuthentication::class)]
+#[ShareEnvironment]
 class OneTimeAuthenticationTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -29,11 +31,17 @@ class OneTimeAuthenticationTest extends KernelTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('user');
+  }
+
+  /**
    * Tests uniqueness of hashes when no password is set.
    */
   public function testUniqueHashNoPasswordValue(): void {
-    $this->installEntitySchema('user');
-
     $timestamp = \Drupal::time()->getRequestTime();
 
     $user_a = $this->createUser(

@@ -7,6 +7,7 @@ namespace Drupal\Tests\content_translation\Kernel;
 use Drupal\content_translation\ContentTranslationPermissions;
 use Drupal\entity_test\Entity\EntityTestMulBundle;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ContentTranslationPermissions::class)]
 #[Group('content_translation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ContentTranslationPermissionsTest extends KernelTestBase {
 
   /**

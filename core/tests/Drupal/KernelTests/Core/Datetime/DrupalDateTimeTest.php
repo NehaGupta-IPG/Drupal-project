@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Datetime;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Datetime')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class DrupalDateTimeTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -32,8 +34,8 @@ class DrupalDateTimeTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig(['system']);
     $this->installEntitySchema('user');
   }

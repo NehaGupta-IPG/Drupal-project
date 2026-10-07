@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Test;
 
 use Drupal\Core\Test\PhpUnitTestDiscovery;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Test')]
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class PhpUnitApiGetTestClassesTest extends KernelTestBase {
 
   /**

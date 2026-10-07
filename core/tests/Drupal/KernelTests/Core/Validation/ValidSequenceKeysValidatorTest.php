@@ -9,6 +9,7 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\ValidSequenceKeysConstraint;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\ValidSequenceKeysConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ValidSequenceKeysConstraint::class)]
 #[CoversClass(ValidSequenceKeysConstraintValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ValidSequenceKeysValidatorTest extends KernelTestBase {
 
   /**

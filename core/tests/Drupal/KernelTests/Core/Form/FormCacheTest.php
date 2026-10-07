@@ -10,6 +10,7 @@ use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversMethod(FormBuilder::class, 'getCache')]
 #[CoversMethod(FormBuilder::class, 'setCache')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FormCacheTest extends KernelTestBase {
 
   /**

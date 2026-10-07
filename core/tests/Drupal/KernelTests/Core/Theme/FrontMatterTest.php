@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Theme;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Component\FrontMatter\FrontMatterTest as ComponentFrontMatterTest;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use Twig\Loader\FilesystemLoader;
  */
 #[Group('Twig')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FrontMatterTest extends KernelTestBase {
 
   /**

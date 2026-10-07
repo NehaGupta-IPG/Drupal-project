@@ -7,6 +7,7 @@ namespace Drupal\Tests\block_content\Kernel;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('block_content')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class BlockContentRevisionsTest extends KernelTestBase {
 
   /**
@@ -28,8 +30,8 @@ class BlockContentRevisionsTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
     $this->installEntitySchema('block_content');
   }

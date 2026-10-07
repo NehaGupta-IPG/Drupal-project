@@ -7,6 +7,7 @@ namespace Drupal\Tests\taxonomy\Kernel;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('taxonomy_term')]
 #[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class TaxonomyTermPageVariableDeprecationTest extends TaxonomyTestBase {
 
   /**

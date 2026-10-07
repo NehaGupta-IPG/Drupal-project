@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Components;
 
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -12,6 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('sdc')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ComponentPluginManagerCachedDiscoveryTest extends ComponentKernelTestBase {
 
   /**

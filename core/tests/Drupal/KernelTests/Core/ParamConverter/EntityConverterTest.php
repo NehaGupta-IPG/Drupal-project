@@ -9,6 +9,7 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(EntityConverter::class)]
 #[Group('ParamConverter')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class EntityConverterTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -37,9 +39,16 @@ class EntityConverterTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
     $this->setUpCurrentUser();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('entity_test');
+    $this->installEntitySchema('user');
 
     // Create some testing bundles for 'entity_test' entity type.
     EntityTestHelper::createBundle('foo', 'Foo');

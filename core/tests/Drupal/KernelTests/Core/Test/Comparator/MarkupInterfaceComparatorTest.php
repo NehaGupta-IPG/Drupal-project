@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Test\Comparator;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -24,6 +25,7 @@ use SebastianBergmann\Comparator\Factory;
 #[CoversClass(MarkupInterfaceComparator::class)]
 #[Group('Test')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class MarkupInterfaceComparatorTest extends KernelTestBase {
 
   /**

@@ -7,6 +7,7 @@ namespace Drupal\Tests\syslog\Kernel;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\syslog\Logger\SysLog;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 #[CoversClass(SysLog::class)]
 #[Group('syslog')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class SyslogTest extends KernelTestBase {
 
   /**

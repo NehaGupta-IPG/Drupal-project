@@ -9,6 +9,7 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workflows\Entity\Workflow;
 use Drupal\workflows\WorkflowAccessControlHandler;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -23,6 +24,7 @@ use Prophecy\Prophet;
 #[CoversClass(WorkflowAccessControlHandler::class)]
 #[Group('workflows')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class WorkflowAccessControlHandlerTest extends KernelTestBase {
 
   use UserCreationTrait;

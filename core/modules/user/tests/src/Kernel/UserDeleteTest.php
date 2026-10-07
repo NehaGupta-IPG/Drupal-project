@@ -7,6 +7,7 @@ namespace Drupal\Tests\user\Kernel;
 use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class UserDeleteTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -29,12 +31,18 @@ class UserDeleteTest extends KernelTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installSchema('user', ['users_data']);
+    $this->installEntitySchema('user');
+  }
+
+  /**
    * Tests deleting multiple users.
    */
   public function testUserDeleteMultiple(): void {
-    $this->installSchema('user', ['users_data']);
-    $this->installEntitySchema('user');
-
     // Create a few users with permissions, so roles will be created.
     $user_a = $this->createUser(['access user profiles']);
     $user_b = $this->createUser(['access user profiles']);

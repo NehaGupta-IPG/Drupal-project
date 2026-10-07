@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\File;
 
 use Drupal\Core\File\FileSystem;
 use Drupal\file_test\FileTestHelper;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(FileSystem::class)]
 #[Group('File')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ScanDirectoryTest extends FileTestBase {
 
   /**

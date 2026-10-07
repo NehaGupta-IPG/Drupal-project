@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Plugin\Condition;
 use Drupal\Core\Condition\ConditionManager;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,6 +23,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 #[Group('Plugin')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ResponseStatusTest extends KernelTestBase {
 
   /**
@@ -44,14 +46,19 @@ class ResponseStatusTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->installConfig('system');
-
     $this->pluginManager = $this->container->get('plugin.manager.condition');
 
     // Set the test request stack in the container.
     $this->requestStack = new RequestStack();
     $this->container->set('request_stack', $this->requestStack);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installConfig('system');
   }
 
   /**

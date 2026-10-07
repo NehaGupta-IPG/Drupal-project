@@ -8,6 +8,7 @@ use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Url;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\media\Controller\MediaFilterController;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[CoversClass(MediaFilterController::class)]
 #[Group('media')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MediaFilterControllerTest extends MediaEmbedFilterTestBase {
 
   /**

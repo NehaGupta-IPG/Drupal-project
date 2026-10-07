@@ -14,6 +14,7 @@ use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\block_content\Entity\BlockContentType;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -26,6 +27,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[Group('Recipe')]
 #[CoversClass(ConfigConfigurator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ConfigConfiguratorTest extends KernelTestBase {
 
   use RecipeTestTrait;

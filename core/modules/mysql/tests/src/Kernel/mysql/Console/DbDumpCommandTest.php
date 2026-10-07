@@ -6,6 +6,7 @@ namespace Drupal\Tests\mysql\Kernel\mysql\Console;
 
 use Drupal\Core\Command\DbDumpCommand;
 use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -15,6 +16,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 #[Group('console')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DbDumpCommandTest extends DriverSpecificKernelTestBase {
 
   /**

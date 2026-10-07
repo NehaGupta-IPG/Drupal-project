@@ -10,6 +10,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\plugin_test\Plugin\MockBlockManager;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Plugin')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ContextPluginTest extends KernelTestBase {
 
   /**
@@ -30,14 +32,20 @@ class ContextPluginTest extends KernelTestBase {
   ];
 
   /**
-   * Tests basic context definition and value getters and setters.
+   * {@inheritdoc}
    */
-  public function testContext(): void {
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $type = NodeType::create(['type' => 'page', 'name' => 'Page']);
     $type->save();
+  }
 
+  /**
+   * Tests basic context definition and value getters and setters.
+   */
+  public function testContext(): void {
     $name = $this->randomMachineName();
     $manager = new MockBlockManager();
     $plugin = $manager->createInstance('user_name');

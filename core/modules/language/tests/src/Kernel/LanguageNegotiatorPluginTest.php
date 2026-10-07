@@ -8,6 +8,7 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Logger\LoggerChannelFactory;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\ErrorHandler\BufferingLogger;
@@ -17,12 +18,21 @@ use Symfony\Component\ErrorHandler\BufferingLogger;
  */
 #[Group('language')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class LanguageNegotiatorPluginTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = ['language', 'user'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('user');
+  }
 
   /**
    * Tests for PluginNotFoundException.
@@ -35,7 +45,6 @@ class LanguageNegotiatorPluginTest extends KernelTestBase {
       ->with('language')
       ->willReturn($logger);
     $this->container->set('logger.factory', $logger_factory);
-    $this->installEntitySchema('user');
 
     // Test unavailable plugin.
     $config = $this->config('language.types');

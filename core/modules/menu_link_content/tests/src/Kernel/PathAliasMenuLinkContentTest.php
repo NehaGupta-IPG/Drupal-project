@@ -9,6 +9,7 @@ use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('menu_link_content')]
 #[Group('path')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class PathAliasMenuLinkContentTest extends KernelTestBase {
 
   use PathAliasTestTrait;

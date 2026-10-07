@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class UserFieldsTest extends KernelTestBase {
 
   /**
@@ -26,13 +28,20 @@ class UserFieldsTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    \Drupal::theme()->setActiveTheme(\Drupal::service('theme.initialization')->initTheme('user_test_theme'));
+    // Clear the theme registry.
+    $this->container->set('theme.registry', NULL);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
 
     // Set up a test theme that prints the user's mail field.
     \Drupal::service('theme_installer')->install(['user_test_theme']);
-    \Drupal::theme()->setActiveTheme(\Drupal::service('theme.initialization')->initTheme('user_test_theme'));
-    // Clear the theme registry.
-    $this->container->set('theme.registry', NULL);
   }
 
   /**

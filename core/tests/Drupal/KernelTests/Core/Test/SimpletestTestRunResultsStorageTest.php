@@ -8,6 +8,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Test\SimpletestTestRunResultsStorage;
 use Drupal\Core\Test\TestRun;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(SimpletestTestRunResultsStorage::class)]
 #[Group('Test')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class SimpletestTestRunResultsStorageTest extends KernelTestBase {
 
   /**

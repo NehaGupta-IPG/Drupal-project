@@ -8,6 +8,7 @@ use Drupal\Core\Action\Plugin\Action\Derivative\EntityDeleteActionDeriver;
 use Drupal\entity_test\Entity\EntityTestMulRevPub;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Entity\Action;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Action')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DeleteActionTest extends KernelTestBase {
 
   /**

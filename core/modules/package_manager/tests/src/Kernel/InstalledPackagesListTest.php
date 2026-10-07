@@ -9,6 +9,7 @@ use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\package_manager\InstalledPackage;
 use Drupal\package_manager\InstalledPackagesList;
 use Drupal\package_manager\PathLocator;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(InstalledPackagesList::class)]
 #[Group('package_manager')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class InstalledPackagesListTest extends PackageManagerKernelTestBase {
 
   /**

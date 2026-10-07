@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\default_admin\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('default_admin')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FocusColorPresetUpdateTest extends KernelTestBase {
 
   /**

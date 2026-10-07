@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\serialization\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -14,6 +15,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 #[Group('serialization')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class SerializationTest extends KernelTestBase {
 
   /**

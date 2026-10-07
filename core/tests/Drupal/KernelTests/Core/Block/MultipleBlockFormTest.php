@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Block;
 
 use Drupal\block_test\PluginForm\EmptyBlockForm;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('block')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class MultipleBlockFormTest extends KernelTestBase {
 
   /**

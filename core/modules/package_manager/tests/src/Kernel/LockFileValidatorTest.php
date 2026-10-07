@@ -16,6 +16,7 @@ use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\LockFileValidator;
 use Drupal\package_manager_bypass\NoOpStager;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -30,6 +31,7 @@ use Prophecy\Argument;
 #[CoversClass(LockFileValidator::class)]
 #[Group('package_manager')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LockFileValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;

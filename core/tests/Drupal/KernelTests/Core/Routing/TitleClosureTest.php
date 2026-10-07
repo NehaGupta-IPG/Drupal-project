@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Routing;
 use Drupal\Core\Routing\Attribute\Route;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\router_test\Controller\TestAttributes;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -24,6 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 #[CoversClass(Route::class)]
 #[Group('Routing')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class TitleClosureTest extends KernelTestBase {
 
   /**

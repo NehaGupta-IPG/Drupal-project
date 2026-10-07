@@ -7,6 +7,7 @@ namespace Drupal\Tests\node\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('node')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class NodeTemplateSuggestionsTest extends KernelTestBase {
 
   use NodeCreationTrait;
@@ -29,11 +31,10 @@ class NodeTemplateSuggestionsTest extends KernelTestBase {
   ];
 
   /**
-   * Tests node template suggestions.
-   *
-   * @see \Drupal\node\Hook\NodeThemeHooks::themeSuggestionsNode
+   * {@inheritdoc}
    */
-  public function testNodeThemeHookSuggestions(): void {
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
 
@@ -43,7 +44,14 @@ class NodeTemplateSuggestionsTest extends KernelTestBase {
       'type' => 'page',
       'name' => 'Page',
     ])->save();
+  }
 
+  /**
+   * Tests node template suggestions.
+   *
+   * @see \Drupal\node\Hook\NodeThemeHooks::themeSuggestionsNode
+   */
+  public function testNodeThemeHookSuggestions(): void {
     // Create node to be rendered.
     $node = $this->createNode();
     $view_mode = 'full';

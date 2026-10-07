@@ -13,6 +13,7 @@ use Drupal\bbb_hook_order_test\Hook\BMissingTargetAlter;
 use Drupal\ccc_hook_order_test\Hook\CAlterHooks;
 use Drupal\ddd_hook_order_test\Hook\DAlterHooks;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -24,6 +25,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Hook')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class HookAlterOrderTest extends KernelTestBase {
 
   use HookOrderTestTrait;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Http;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[Group('Http')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class BinaryFileResponseTest extends KernelTestBase {
 
   /**

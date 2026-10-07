@@ -9,6 +9,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\KeyValueStore\DatabaseStorageExpirable;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Hook\SystemHooks;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('KeyValueStore')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class GarbageCollectionTest extends KernelTestBase {
 
   /**

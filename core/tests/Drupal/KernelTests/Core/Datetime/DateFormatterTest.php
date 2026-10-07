@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Datetime;
 use Drupal\Core\Datetime\DateFormatter;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(DateFormatter::class)]
 #[Group('Common')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DateFormatterTest extends KernelTestBase {
 
   /**

@@ -9,6 +9,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('responsive_image')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ResponsiveImageIntegrationTest extends KernelTestBase {
 
   /**

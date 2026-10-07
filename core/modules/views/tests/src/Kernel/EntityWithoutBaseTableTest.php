@@ -8,6 +8,7 @@ use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\FieldViewsDataProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -25,6 +26,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(FieldViewsDataProvider::class)]
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class EntityWithoutBaseTableTest extends KernelTestBase {
 
   /**
@@ -41,9 +43,8 @@ class EntityWithoutBaseTableTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     // This entity type doesn't have a data table.
     $this->installEntitySchema('entity_test_label');
 

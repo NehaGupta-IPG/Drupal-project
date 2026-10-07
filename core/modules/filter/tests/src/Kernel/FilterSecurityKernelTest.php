@@ -8,6 +8,7 @@ use Drupal\filter\Plugin\FilterInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\filter\Traits\ProcessedTextTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[RunTestsInSeparateProcesses]
 #[Group('filter')]
+#[ShareEnvironment]
 class FilterSecurityKernelTest extends KernelTestBase {
 
   use ProcessedTextTestTrait;
@@ -28,9 +30,8 @@ class FilterSecurityKernelTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     // Create a dedicated text format for this test.
     FilterFormat::create([
       'format' => 'kernel_filtered_html',

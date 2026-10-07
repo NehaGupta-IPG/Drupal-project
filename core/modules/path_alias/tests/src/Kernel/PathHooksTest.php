@@ -7,6 +7,7 @@ namespace Drupal\Tests\path_alias\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\path_alias\AliasManagerInterface;
 use Drupal\path_alias\Entity\PathAlias;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -18,6 +19,7 @@ use Prophecy\Argument;
 #[CoversClass(PathAlias::class)]
 #[Group('path_alias')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class PathHooksTest extends KernelTestBase {
 
   /**
@@ -28,9 +30,8 @@ class PathHooksTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('path_alias');
   }
 

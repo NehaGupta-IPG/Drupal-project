@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Kernel\Command;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Command\LoginCommand;
 use Drupal\user\OneTimeAuthentication;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -26,6 +27,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
 #[CoversClass(LoginCommand::class)]
+#[ShareEnvironment]
 class LoginCommandTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -38,8 +40,8 @@ class LoginCommandTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
   }
 

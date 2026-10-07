@@ -8,6 +8,7 @@ use Drupal\Core\DependencyInjection\Compiler\LoggerAwarePass;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\logger_aware_test\LoggerAwareStub;
 use Drupal\logger_aware_test\LoggerStub;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use Psr\Log\LoggerInterface;
 #[CoversClass(LoggerAwarePass::class)]
 #[Group('system')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class LoggerAwarePassTest extends KernelTestBase {
 
   /**

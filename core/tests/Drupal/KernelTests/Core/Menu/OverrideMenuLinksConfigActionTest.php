@@ -11,6 +11,7 @@ use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\Plugin\ConfigAction\OverrideMenuLinks;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Menu')]
 #[CoversClass(OverrideMenuLinks::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 final class OverrideMenuLinksConfigActionTest extends KernelTestBase {
 
   /**

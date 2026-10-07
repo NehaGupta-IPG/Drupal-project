@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Theme;
 use Drupal\Core\Extension\InfoParserException;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Theme')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class BaseThemeMissingTest extends KernelTestBase {
 
   /**

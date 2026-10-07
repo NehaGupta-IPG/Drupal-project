@@ -7,6 +7,7 @@ namespace Drupal\Tests\comment\Kernel;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 #[CoversClass(Comment::class)]
 #[Group('comment')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class CommentHostnameTest extends KernelTestBase {
 
   /**

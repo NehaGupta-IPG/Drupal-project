@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\drupal_system_listing_compatible_test\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('drupal_system_listing_compatible_test')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class SystemListingCrossProfileCompatibleTest extends KernelTestBase {
 
   /**

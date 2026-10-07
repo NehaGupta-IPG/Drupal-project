@@ -10,6 +10,7 @@ use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\layout_builder\Hook\LayoutBuilderHooks;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -24,6 +25,7 @@ use Symfony\Component\Routing\Route;
 #[Group('layout_builder')]
 #[CoversMethod(LayoutBuilderHooks::class, 'entityViewAlter')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class EntityViewAlterTest extends KernelTestBase {
 
   /**
@@ -40,8 +42,8 @@ class EntityViewAlterTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     EntityTestHelper::createBundle('bundle_with_extra_fields');
     $this->installEntitySchema('entity_test');
     $this->installConfig(['layout_builder_defaults_test']);

@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Kernel\Command;
 use Drupal\Core\Extension\Command\ExtensionListCommand;
 use Drupal\KernelTests\DrupalApplicationTesterTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -18,6 +19,7 @@ use Symfony\Component\Console\Command\Command;
 #[Group('Console')]
 #[RunTestsInSeparateProcesses]
 #[CoversClass(ExtensionListCommand::class)]
+#[ShareEnvironment]
 class ExtensionListCommandTest extends KernelTestBase {
 
   use DrupalApplicationTesterTrait;

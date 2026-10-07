@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Kernel\Validation;
 
 use Drupal\file_test\FileTestHelper;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FileValidatorTest extends FileValidatorTestBase {
 
   /**

@@ -7,6 +7,7 @@ namespace Drupal\Tests\path\Kernel;
 use Drupal\content_translation_test\Entity\EntityTestTranslatableUISkip;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('path')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class PathNoCanonicalLinkTest extends KernelTestBase {
 
   /**

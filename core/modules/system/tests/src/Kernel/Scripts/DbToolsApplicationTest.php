@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Kernel\Scripts;
 
 use Drupal\Core\Command\DbToolsApplication;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('console')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class DbToolsApplicationTest extends KernelTestBase {
 
   /**

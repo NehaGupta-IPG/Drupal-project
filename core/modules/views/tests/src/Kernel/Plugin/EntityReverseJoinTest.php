@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\join\JoinTest;
 use PHPUnit\Framework\Attributes\Group;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EntityReverseJoinTest extends RelationshipJoinTestBase {
 
   /**

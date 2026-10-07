@@ -14,6 +14,7 @@ use Drupal\media\OEmbed\Resource;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
 use Drupal\media\OEmbed\UrlResolverInterface;
 use Drupal\media\Plugin\media\Source\OEmbed;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -33,6 +34,7 @@ use Psr\Log\LoggerInterface;
 #[CoversClass(OEmbed::class)]
 #[Group('media')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class OEmbedSourceTest extends MediaKernelTestBase implements LoggerInterface {
 
   use RfcLoggerTrait;

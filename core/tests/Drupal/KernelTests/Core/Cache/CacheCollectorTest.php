@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Cache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Core\Cache\CacheCollectorHelper;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -18,6 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 #[Group('Cache')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class CacheCollectorTest extends KernelTestBase {
 
   /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\mysqli\Kernel\mysqli;
 
 use Drupal\KernelTests\Core\Database\DriverSpecificSyntaxTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class SyntaxTest extends DriverSpecificSyntaxTestBase {
 
   /**

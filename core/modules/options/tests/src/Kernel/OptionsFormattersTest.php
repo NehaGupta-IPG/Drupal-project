@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\options\Kernel;
 
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('options')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class OptionsFormattersTest extends OptionsFieldUnitTestBase {
 
   /**

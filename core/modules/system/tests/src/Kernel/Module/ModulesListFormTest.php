@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Kernel\Module;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Form\ModulesListForm;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Module')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ModulesListFormTest extends KernelTestBase {
 
   /**

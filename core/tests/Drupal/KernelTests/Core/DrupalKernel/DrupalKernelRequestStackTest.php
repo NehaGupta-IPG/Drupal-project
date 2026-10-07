@@ -8,6 +8,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -24,6 +25,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 #[CoversClass(DrupalKernel::class)]
 #[Group('DrupalKernel')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DrupalKernelRequestStackTest extends KernelTestBase implements EventSubscriberInterface {
 
   /**

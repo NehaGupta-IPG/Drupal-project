@@ -10,6 +10,7 @@ use Drupal\entity_test\Entity\EntityTestMul;
 use Drupal\entity_test\Entity\EntityTestMulBundle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,6 +23,7 @@ use Symfony\Component\Routing\Route;
 #[CoversClass(ContentTranslationController::class)]
 #[Group('content_translation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ContentTranslationConcurrencyTest extends KernelTestBase {
 
   /**
@@ -32,8 +34,8 @@ class ContentTranslationConcurrencyTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('entity_test_mul');
     $this->installEntitySchema('entity_test_mul_with_bundle');
     EntityTestMulBundle::create([

@@ -9,6 +9,7 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('content_moderation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class NodeAccessTest extends KernelTestBase {
 
   use NodeCreationTrait;
@@ -48,7 +50,14 @@ class NodeAccessTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->moderationInformation = \Drupal::service('content_moderation.moderation_information');
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('content_moderation_state');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
@@ -64,8 +73,6 @@ class NodeAccessTest extends KernelTestBase {
     $workflow = $this->createEditorialWorkflow();
     $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'page');
     $workflow->save();
-
-    $this->moderationInformation = \Drupal::service('content_moderation.moderation_information');
   }
 
   /**

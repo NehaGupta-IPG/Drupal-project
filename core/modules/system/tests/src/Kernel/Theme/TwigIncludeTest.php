@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Kernel\Theme;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Twig\Error\LoaderError;
@@ -15,6 +16,7 @@ use Twig\Error\LoaderError;
  */
 #[Group('Theme')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class TwigIncludeTest extends KernelTestBase {
   /**
    * The Twig configuration to set the container parameter to during rebuilds.

@@ -9,6 +9,7 @@ use Drupal\Core\Theme\Plugin\Validation\Constraint\CssSelectorConstraintValidato
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,6 +23,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 #[CoversClass(CssSelectorConstraint::class)]
 #[CoversClass(CssSelectorConstraintValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class CssSelectorConstraintValidatorTest extends KernelTestBase {
 
   /**

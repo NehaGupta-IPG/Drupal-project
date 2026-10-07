@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\automated_cron\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 #[Group('automated_cron')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class AutomatedCronTest extends KernelTestBase {
 
   /**

@@ -9,6 +9,7 @@ use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\file\ComputedFileUrl;
 use Drupal\file\FileInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ComputedFileUrl::class)]
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ComputedFileUrlTest extends KernelTestBase {
 
   /**

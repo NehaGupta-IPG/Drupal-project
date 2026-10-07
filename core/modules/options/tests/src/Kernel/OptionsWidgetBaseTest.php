@@ -6,6 +6,7 @@ namespace Drupal\Tests\options\Kernel;
 
 use Drupal\Core\Field\Plugin\Field\FieldWidget\OptionsWidgetBase;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(OptionsWidgetBase::class)]
 #[Group('options')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class OptionsWidgetBaseTest extends OptionsFieldUnitTestBase {
 
   /**

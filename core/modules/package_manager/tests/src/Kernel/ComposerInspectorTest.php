@@ -13,6 +13,7 @@ use Drupal\package_manager\InstalledPackage;
 use Drupal\package_manager\InstalledPackagesList;
 use Drupal\package_manager\PathLocator;
 use Drupal\Tests\package_manager\Traits\InstalledPackagesListTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PhpTuf\ComposerStager\API\Exception\PreconditionException;
 use PhpTuf\ComposerStager\API\Exception\RuntimeException;
 use PhpTuf\ComposerStager\API\Path\Factory\PathFactoryInterface;
@@ -34,6 +35,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 #[CoversClass(ComposerInspector::class)]
 #[Group('package_manager')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
   use InstalledPackagesListTrait;

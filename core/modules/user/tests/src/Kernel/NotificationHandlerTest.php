@@ -7,6 +7,7 @@ namespace Drupal\Tests\user\Kernel;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Hook\UserHooks;
 use Drupal\user\NotificationHandler;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -21,6 +22,7 @@ use Psr\Log\LoggerInterface;
 #[CoversClass(NotificationHandler::class)]
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class NotificationHandlerTest extends EntityKernelTestBase {
 
   use AssertMailTrait;

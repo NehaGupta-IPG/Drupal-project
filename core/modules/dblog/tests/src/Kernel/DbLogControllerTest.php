@@ -6,6 +6,7 @@ namespace Drupal\Tests\dblog\Kernel;
 
 use Drupal\dblog\Controller\DbLogController;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('dblog')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DbLogControllerTest extends KernelTestBase {
 
   /**

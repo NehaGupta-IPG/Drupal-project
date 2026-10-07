@@ -6,6 +6,7 @@ namespace Drupal\Tests\file\Kernel\Upload;
 
 use Drupal\file\Upload\InputStreamFileWriter;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(InputStreamFileWriter::class)]
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class StreamFileUploaderTest extends KernelTestBase {
 
   /**

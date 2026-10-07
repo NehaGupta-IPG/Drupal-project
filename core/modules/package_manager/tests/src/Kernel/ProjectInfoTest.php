@@ -6,6 +6,7 @@ namespace Drupal\Tests\package_manager\Kernel;
 
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\package_manager\ProjectInfo;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\update\UpdateManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ProjectInfo::class)]
 #[Group('auto_updates')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ProjectInfoTest extends PackageManagerKernelTestBase {
 
   /**

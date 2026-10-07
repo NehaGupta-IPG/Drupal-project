@@ -6,6 +6,7 @@ namespace Drupal\Tests\config_translation\Kernel;
 
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Routing\Route;
@@ -15,6 +16,7 @@ use Symfony\Component\Routing\Route;
  */
 #[Group('config_translation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ConfigMapperTest extends KernelTestBase {
 
   /**

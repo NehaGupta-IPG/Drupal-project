@@ -7,6 +7,7 @@ namespace Drupal\Tests\user\Kernel\Field;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('field')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class UserNameFormatterTest extends KernelTestBase {
 
   /**
@@ -43,13 +45,18 @@ class UserNameFormatterTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->installConfig(['field']);
-    $this->installEntitySchema('user');
-
     $this->entityType = 'user';
     $this->bundle = $this->entityType;
     $this->fieldName = 'name';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installConfig(['field']);
+    $this->installEntitySchema('user');
   }
 
   /**

@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Kernel\Views;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class HandlerArgumentUserUidTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -39,14 +41,20 @@ class HandlerArgumentUserUidTest extends KernelTestBase {
   public static $testViews = ['test_user_uid_argument'];
 
   /**
-   * Tests the generated title of a user: uid argument.
+   * {@inheritdoc}
    */
-  public function testArgumentTitle(): void {
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
     $this->installConfig(['user']);
     User::create(['uid' => 0, 'name' => ''])->save();
     ViewTestData::createTestViews(static::class, ['user_test_views']);
+  }
 
+  /**
+   * Tests the generated title of a user: uid argument.
+   */
+  public function testArgumentTitle(): void {
     $view = Views::getView('test_user_uid_argument');
 
     // Tests an invalid user uid.

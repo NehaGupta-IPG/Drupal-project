@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\workflows\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workflow_type_test\Plugin\WorkflowType\ComplexTestType;
 use Drupal\workflows\Entity\Workflow;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ComplexTestType::class)]
 #[Group('workflows')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ComplexWorkflowTypeTest extends KernelTestBase {
 
   /**

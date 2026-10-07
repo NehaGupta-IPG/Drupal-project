@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel;
 
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Hook\ViewsThemeHooks;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ViewsPreprocessTest extends ViewsKernelTestBase {
 
   /**

@@ -12,6 +12,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Entity\Menu;
 use Drupal\system\Tests\Routing\MockRouteProvider;
 use Drupal\Tests\Core\Menu\MenuLinkMock;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -33,6 +34,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 #[Group('Block')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class SystemMenuBlockTest extends KernelTestBase {
 
   /**

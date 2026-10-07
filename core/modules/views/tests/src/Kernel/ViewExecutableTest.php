@@ -8,6 +8,7 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Database\Database;
 use Drupal\node\Entity\NodeType;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use Drupal\views\DisplayPluginCollection;
 use Drupal\views\Entity\View;
@@ -34,6 +35,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ViewExecutableTest extends ViewsKernelTestBase {
 
   use CommentTestTrait;

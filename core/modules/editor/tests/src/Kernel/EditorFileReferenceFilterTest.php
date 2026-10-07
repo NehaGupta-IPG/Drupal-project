@@ -10,6 +10,7 @@ use Drupal\file\Entity\File;
 use Drupal\filter\FilterPluginCollection;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('editor')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EditorFileReferenceFilterTest extends KernelTestBase {
 
   use TestFileCreationTrait;

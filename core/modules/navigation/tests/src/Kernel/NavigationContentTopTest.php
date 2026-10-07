@@ -6,6 +6,7 @@ namespace Drupal\Tests\navigation\Kernel;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Url;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Drupal\KernelTests\KernelTestBase;
@@ -17,6 +18,7 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
  */
 #[Group('navigation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class NavigationContentTopTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -39,12 +41,18 @@ class NavigationContentTopTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->installConfig('navigation');
-    $this->installEntitySchema('user');
     $this->setCurrentUser($this->createUser([
       'access navigation',
     ]));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installConfig('navigation');
+    $this->installEntitySchema('user');
   }
 
   /**

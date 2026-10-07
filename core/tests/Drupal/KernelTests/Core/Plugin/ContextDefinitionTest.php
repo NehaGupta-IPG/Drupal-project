@@ -10,6 +10,7 @@ use Drupal\Core\Plugin\Context\EntityContext;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ContextDefinition::class)]
 #[Group('Plugin')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ContextDefinitionTest extends KernelTestBase {
 
   /**
@@ -28,11 +30,17 @@ class ContextDefinitionTest extends KernelTestBase {
   protected static $modules = ['entity_test', 'user'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('user');
+  }
+
+  /**
    * Tests is satisfied by.
    */
   public function testIsSatisfiedBy(): void {
-    $this->installEntitySchema('user');
-
     $value = EntityTest::create([]);
     // Assert that the entity has at least one violation.
     $this->assertNotEmpty($value->validate());

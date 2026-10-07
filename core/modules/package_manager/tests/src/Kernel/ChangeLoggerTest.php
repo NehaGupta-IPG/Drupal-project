@@ -8,6 +8,7 @@ use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\package_manager\EventSubscriber\ChangeLogger;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use Psr\Log\LogLevel;
 #[Group('#slow')]
 #[CoversClass(ChangeLogger::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ChangeLoggerTest extends PackageManagerKernelTestBase {
 
   /**

@@ -9,6 +9,7 @@ use Drupal\locale\File\LocaleFile;
 use Drupal\locale\LocaleFetch;
 use Drupal\locale\LocaleTranslationSource;
 use Drupal\locale\Model\SourceType;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('locale')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LocaleBatchTest extends KernelTestBase {
 
   /**

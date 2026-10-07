@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\File;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\File\FileUrlGenerator;
 use Drupal\file_test\FileTestCdn;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 #[CoversClass(FileUrlGenerator::class)]
 #[Group('File')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FileUrlGeneratorTest extends FileTestBase {
 
   /**

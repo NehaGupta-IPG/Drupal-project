@@ -10,6 +10,7 @@ use Drupal\comment\Entity\Comment;
 use Drupal\comment_base_field_test\Entity\CommentTestBaseField;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('comment')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class CommentBaseFieldTest extends KernelTestBase {
 
   /**
@@ -33,8 +35,8 @@ class CommentBaseFieldTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('comment_test_base_field');
     $this->installEntitySchema('comment');
     $this->installEntitySchema('user');

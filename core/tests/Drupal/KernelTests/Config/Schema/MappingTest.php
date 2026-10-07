@@ -12,6 +12,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\KernelTestBase;
 // cspell:ignore childkey
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -24,6 +25,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[CoversClass(Mapping::class)]
 #[Group('Config')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MappingTest extends KernelTestBase {
 
   /**

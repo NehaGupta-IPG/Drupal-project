@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Validation;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\StringEqualsConcatenatedValuesConstraint;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\StringEqualsConcatenatedValuesConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(StringEqualsConcatenatedValuesConstraint::class)]
 #[CoversClass(StringEqualsConcatenatedValuesConstraintValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class StringEqualsConcatenatedValuesConstraintValidatorTest extends KernelTestBase {
 
   /**

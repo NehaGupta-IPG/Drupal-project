@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Asset;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Common')]
 #[Group('Asset')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class AttachedAssetsTest extends KernelTestBase {
 
   /**

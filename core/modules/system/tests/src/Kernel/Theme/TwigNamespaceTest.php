@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Theme;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Twig\TemplateWrapper;
@@ -14,6 +15,7 @@ use Twig\TemplateWrapper;
  */
 #[Group('Theme')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class TwigNamespaceTest extends KernelTestBase {
 
   /**
@@ -36,8 +38,15 @@ class TwigNamespaceTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    \Drupal::service('theme_installer')->install(['test_theme', 'default_admin']);
     $this->twig = \Drupal::service('twig');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    \Drupal::service('theme_installer')->install(['test_theme', 'default_admin']);
   }
 
   /**

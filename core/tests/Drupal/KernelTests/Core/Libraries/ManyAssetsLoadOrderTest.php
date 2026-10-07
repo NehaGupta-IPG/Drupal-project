@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Libraries;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('libraries')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ManyAssetsLoadOrderTest extends KernelTestBase {
 
   /**

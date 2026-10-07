@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Routing;
 
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Url')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class UrlIntegrationTest extends KernelTestBase {
 
   /**

@@ -8,6 +8,7 @@ use Drupal\Core\Extension\Plugin\Validation\Constraint\ExtensionAvailableConstra
 use Drupal\Core\Extension\Plugin\Validation\Constraint\ExtensionAvailableConstraintValidator;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ExtensionAvailableConstraint::class)]
 #[CoversClass(ExtensionAvailableConstraintValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ExtensionAvailableConstraintValidatorTest extends KernelTestBase {
 
   /**

@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Routing;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 #[Group('ContentNegotiation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ContentNegotiationRoutingTest extends KernelTestBase {
 
   use PathAliasTestTrait;
@@ -28,9 +30,8 @@ class ContentNegotiationRoutingTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('path_alias');
   }
 
@@ -128,6 +129,19 @@ class ContentNegotiationRoutingTest extends KernelTestBase {
       $kernel = \Drupal::getContainer()->get('http_kernel');
       $response = $kernel->handle($request);
       $this->assertEquals(Response::HTTP_OK, $response->getStatusCode(), "Testing path:{$path} Accept:{$accept_header} Content-type:{$content_type}");
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function resetEnvironment(): void {
+    parent::resetEnvironment();
+
+    // The test class shares its environment, so the module list must be left
+    // as ::testFullNegotiation() found it.
+    if ($this->container->get('module_handler')->moduleExists('accept_header_routing_test')) {
+      $this->disableModules(['accept_header_routing_test']);
     }
   }
 

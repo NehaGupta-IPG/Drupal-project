@@ -8,6 +8,7 @@ use Drupal\config_translation\Form\ConfigTranslationAddForm;
 use Drupal\config_translation\Form\ConfigTranslationEditForm;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('config_translation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ConfigTranslationFormTest extends KernelTestBase {
 
   /**

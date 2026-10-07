@@ -8,6 +8,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[IgnoreDeprecations]
 #[CoversFunction('file_get_file_references')]
 #[CoversFunction('file_field_find_file_reference_column')]
+#[ShareEnvironment(FALSE)]
 class FileReferencesDeprecationTest extends FileManagedUnitTestBase {
 
   /**

@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Component;
 
 use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DomCrawler\Crawler;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[Group('sdc')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 final class ComponentRenderTest extends KernelTestBase {
 
   /**

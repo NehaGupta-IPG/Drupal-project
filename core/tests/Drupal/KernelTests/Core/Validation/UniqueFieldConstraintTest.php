@@ -9,6 +9,7 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldValueValidato
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestStringId;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(UniqueFieldValueValidator::class)]
 #[Group('Validation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class UniqueFieldConstraintTest extends KernelTestBase {
 
   /**

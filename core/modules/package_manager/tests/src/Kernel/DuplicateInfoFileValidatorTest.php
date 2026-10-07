@@ -8,6 +8,7 @@ use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\DuplicateInfoFileValidator;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -23,6 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
 #[Group('#slow')]
 #[CoversClass(DuplicateInfoFileValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DuplicateInfoFileValidatorTest extends PackageManagerKernelTestBase {
 
   /**

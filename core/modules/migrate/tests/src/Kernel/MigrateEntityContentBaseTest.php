@@ -16,6 +16,7 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Drupal\migrate_entity_test\Entity\StringIdEntityTest;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Drupal\Tests\migrate\StubTestTrait;
@@ -25,6 +26,7 @@ use Drupal\Tests\migrate\StubTestTrait;
  */
 #[Group('migrate')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MigrateEntityContentBaseTest extends KernelTestBase {
 
   use StubTestTrait;

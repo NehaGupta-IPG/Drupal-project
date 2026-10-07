@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel;
 
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Exception\ViewRenderElementException;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ViewElementTest extends ViewsKernelTestBase {
 
   /**

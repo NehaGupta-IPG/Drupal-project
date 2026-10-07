@@ -6,6 +6,7 @@ namespace Drupal\Tests\node\Kernel\Config;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('node')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class NodeImportChangeTest extends KernelTestBase {
 
   /**
@@ -28,11 +30,10 @@ class NodeImportChangeTest extends KernelTestBase {
   ];
 
   /**
-   * Set the default field storage backend for fields created during tests.
+   * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     // Set default storage backend.
     $this->installConfig(['system', 'field', 'node_test_config']);
   }

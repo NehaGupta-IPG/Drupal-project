@@ -8,6 +8,7 @@ use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -33,6 +34,7 @@ use Symfony\Component\Process\Process;
 #[PreserveGlobalState(FALSE)]
 #[CoversNothing]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class TestSiteApplicationTest extends KernelTestBase {
 
   /**

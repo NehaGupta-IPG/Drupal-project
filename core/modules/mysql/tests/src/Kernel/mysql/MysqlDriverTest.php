@@ -6,6 +6,7 @@ namespace Drupal\Tests\mysql\Kernel\mysql;
 
 use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
 use Drupal\mysql\Driver\Database\mysql\Connection;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class MysqlDriverTest extends DriverSpecificKernelTestBase {
 
   /**

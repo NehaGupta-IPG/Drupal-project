@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Asset;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Asset\AssetQueryString;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(AssetQueryString::class)]
 #[Group('Asset')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class AssetQueryStringTest extends KernelTestBase {
 
   /**
