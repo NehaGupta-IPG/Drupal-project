@@ -70,7 +70,7 @@ final class NaturalSort {
    * This method is a drop-in replacement for natcasesort() using
    * NaturalSort::strnatcasecmp().
    *
-   * @param string[]|Drupal\Core\StringTranslation\TranslatableMarkup $array
+   * @param string[]|Drupal\Core\StringTranslation\TranslatableMarkup[] $array
    *   The input array.
    * @param string|null $langcode
    *   (optional) The language code to determine the collation rules. Defaults
