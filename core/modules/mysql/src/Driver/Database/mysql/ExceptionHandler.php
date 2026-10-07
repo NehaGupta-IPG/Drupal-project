@@ -104,8 +104,8 @@ class ExceptionHandler extends BaseExceptionHandler {
         default => throw new DatabaseExceptionWrapper($message, 0, $exception, $info),
       },
       '42000', '42S01', '42S02' =>  match ($errorCode) {
-        1050 => throw new SchemaTableAlreadyExistsException($message, $code, $exception),
-        1051, 1146 => throw new SchemaTableDoesNotExistException($message, $code, $exception),
+        1050 => throw new SchemaTableAlreadyExistsException($message, $code, $exception, $info),
+        1051, 1146 => throw new SchemaTableDoesNotExistException($message, $code, $exception, $info),
         1071 => throw new SchemaTableKeyTooLargeException($message, $code, $exception, $info),
         1074 => throw new SchemaTableColumnSizeTooLargeException($message, $code, $exception, $info),
         default => throw new DatabaseExceptionWrapper($message, 0, $exception, $info),
