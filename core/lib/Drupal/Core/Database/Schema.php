@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Database;
 
+use Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException;
+use Drupal\Core\Database\Exception\SchemaTableDoesNotExistException;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
@@ -556,7 +558,7 @@ abstract class Schema implements PlaceholderInterface {
    */
   protected function introspectIndexSchema($table) {
     if (!$this->tableExists($table)) {
-      throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
+      throw new SchemaTableDoesNotExistException("The table $table doesn't exist.");
     }
     throw new \RuntimeException("The '{$this->connection->driver()}' database driver does not implement " . __METHOD__);
   }
@@ -681,7 +683,7 @@ abstract class Schema implements PlaceholderInterface {
    */
   public function createTable($name, $table) {
     if ($this->tableExists($name)) {
-      throw new SchemaObjectExistsException("Table '$name' already exists.");
+      throw new SchemaTableAlreadyExistsException("Table '$name' already exists.");
     }
     $statements = $this->createTableSql($name, $table);
     foreach ($statements as $statement) {
