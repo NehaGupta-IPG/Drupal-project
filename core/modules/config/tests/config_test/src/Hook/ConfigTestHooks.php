@@ -69,12 +69,11 @@ class ConfigTestHooks {
   }
 
   /**
-   * Implements hook_language_update_config_langcode_list_alter().
+   * Implements hook_language_preserve_config_langcode().
    */
-  #[Hook('language_update_config_langcode_list_alter')]
-  public function languageUpdateConfigLangcodeListAlter(array &$names): void {
-    $protected_names = \Drupal::keyValue(static::class)->get('config_test.langcode_update_protected_names', []);
-    $names = array_diff($names, $protected_names);
+  #[Hook('language_preserve_config_langcode')]
+  public function languagePreserveConfigLangcode(string $old_langcode, string $new_langcode): array {
+    return \Drupal::keyValue(static::class)->get('config_test.language_preserve_config_langcode', []);
   }
 
 }

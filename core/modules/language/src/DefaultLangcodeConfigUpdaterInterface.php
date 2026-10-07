@@ -40,9 +40,9 @@ interface DefaultLangcodeConfigUpdaterInterface {
    * default language can no longer have an override of its own.
    *
    * Before the first batch step reads the full configuration list, modules
-   * can remove names from the list via
-   * hook_language_update_config_langcode_list_alter(). This allows
-   * configuration to keep its current langcode regardless of the new default.
+   * can list configuration names to preserve via
+   * hook_language_preserve_config_langcode(). Listed configuration keeps its
+   * current langcode regardless of the new default.
    *
    * @param string $old_langcode
    *   The previous default langcode.
@@ -51,7 +51,7 @@ interface DefaultLangcodeConfigUpdaterInterface {
    * @param array|\ArrayAccess $context
    *   The batch context.
    *
-   * @see hook_language_update_config_langcode_list_alter()
+   * @see hook_language_preserve_config_langcode()
    */
   public function reconcileConfigLangcodeOperation(string $old_langcode, string $new_langcode, &$context): void;
 
