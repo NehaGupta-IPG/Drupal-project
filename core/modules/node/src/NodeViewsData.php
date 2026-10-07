@@ -98,7 +98,7 @@ class NodeViewsData extends EntityViewsData {
       $status_extra_help_text = $this->t('Filters out unpublished content if the current user cannot view it.');
     }
     else {
-      uasort($node_access_implementations, ['\Drupal\Core\Utility::strnatcasecmp']);
+      uasort($node_access_implementations, '\Drupal\Core\Utility::strnatcasecmp');
       $status_extra_help_text = new PluralTranslatableMarkup(
         $node_access_implementation_count,
         'This filter has no effect because the %module module controls access.',

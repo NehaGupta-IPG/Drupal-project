@@ -92,7 +92,7 @@ class NodeRequirements {
             }
           );
         }
-        uasort($node_access_implementations, ['\Drupal\Core\Utility::strnatcasecmp']);
+        uasort($node_access_implementations, '\Drupal\Core\Utility::strnatcasecmp');
         $views_ui_enabled = $this->moduleHandler->moduleExists('views_ui');
         $node_status_filter_problematic_views_list = [];
         foreach ($node_status_filter_problematic_views as $view_id => $displays) {

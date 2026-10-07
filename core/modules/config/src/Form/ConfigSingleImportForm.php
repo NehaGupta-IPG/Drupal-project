@@ -129,7 +129,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
       }
     }
     // Sort the entity types by label, then add the simple config to the top.
-    uasort($entity_types, ['\Drupal\Core\Utility::strnatcasecmp']);
+    uasort($entity_types, '\Drupal\Core\Utility::strnatcasecmp');
     $config_types = [
       'system.simple' => $this->t('Simple configuration'),
     ] + $entity_types;
