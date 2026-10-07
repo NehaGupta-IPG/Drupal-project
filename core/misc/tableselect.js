@@ -75,11 +75,13 @@
         const id = `tableselect-select-all-${Math.random()
           .toString(36)
           .slice(2, 10)}`;
+        const label = document.createElement('label');
+        label.className = 'tableselect__select-all-label';
+        label.htmlFor = id;
+        label.textContent = Drupal.t('Select all');
         $(this).prepend(
           $(Drupal.theme('checkbox')).attr({ id, title: strings.selectAll }),
-          $('<label class="tableselect__select-all-label"></label>')
-            .attr('for', id)
-            .text(Drupal.t('Select all')),
+          label,
         );
       })
       .on('click', (event) => {
