@@ -309,14 +309,14 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    *
    * A failed statement aborts the enclosing transaction. Inside a transaction,
-   * check for the table before the operation instead of recovering from the
+   * check for the tables before the operation instead of recovering from the
    * failure.
    */
-  public function executeAndCreateTableIfNeeded(string $table_name, SchemaDefinition|array $table_schema, callable $operation): mixed {
+  public function executeAndCreateSchemaIfNeeded(SchemaDefinition $schema, callable $operation): mixed {
     if (!$this->inTransaction()) {
-      return parent::executeAndCreateTableIfNeeded($table_name, $table_schema, $operation);
+      return parent::executeAndCreateSchemaIfNeeded($schema, $operation);
     }
-    $this->createTableIfNotExists($table_name, $table_schema);
+    $this->createSchemaIfNotExists($schema);
     return $operation();
   }
 
@@ -324,32 +324,29 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    *
    * A failed statement aborts the enclosing transaction. Inside a transaction,
-   * create the table in a savepoint, so that losing a creation race does not
+   * create each table in a savepoint, so that losing a creation race does not
    * abort the enclosing transaction.
    */
-  protected function createTableIfNotExists(string $table_name, SchemaDefinition|array $table_schema): void {
+  protected function createSchemaIfNotExists(SchemaDefinition $schema): void {
     if (!$this->inTransaction()) {
-      parent::createTableIfNotExists($table_name, $table_schema);
+      parent::createSchemaIfNotExists($schema);
       return;
     }
-    if ($this->schema()->tableExists($table_name)) {
-      return;
-    }
-    $savepoint = $this->startTransaction();
-    try {
-      if ($table_schema instanceof SchemaDefinition) {
-        $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table_name));
+    foreach ($schema->tables as $table) {
+      if ($this->schema()->tableExists($table->name)) {
+        continue;
       }
-      else {
-        $this->schema()->createTable($table_name, $table_schema);
+      $savepoint = $this->startTransaction();
+      try {
+        $this->schema()->createTableFromDefinition($schema->type, $schema->name, $table);
+        $savepoint->commitOrRelease();
       }
-      $savepoint->commitOrRelease();
-    }
-    catch (\Throwable $e) {
-      $savepoint->rollBack();
-      // Recover only if another process created the table concurrently.
-      if (!$e instanceof DatabaseException || !$this->schema()->tableExists($table_name) || !$this->isTableCreationRace($e)) {
-        throw $e;
+      catch (\Throwable $e) {
+        $savepoint->rollBack();
+        // Recover only if another process created the table concurrently.
+        if (!$e instanceof DatabaseException || !$this->schema()->tableExists($table->name) || !$this->isTableCreationRace($e)) {
+          throw $e;
+        }
       }
     }
   }

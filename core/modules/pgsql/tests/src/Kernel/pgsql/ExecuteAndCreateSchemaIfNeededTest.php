@@ -7,13 +7,18 @@ namespace Drupal\Tests\pgsql\Kernel\pgsql;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\KernelTests\Core\Database\DriverSpecificDatabaseTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests connection-scoped lazy table creation on PostgreSQL.
+ * Tests lazy schema creation on PostgreSQL.
  *
  * On PostgreSQL, a failed statement aborts the enclosing transaction, so the
  * table is checked before the operation inside a transaction.
@@ -21,7 +26,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(Connection::class)]
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
-class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
+class ExecuteAndCreateSchemaIfNeededTest extends DriverSpecificDatabaseTestBase {
 
   /**
    * The name of the table created by the tests.
@@ -29,14 +34,13 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
   protected const string TABLE = 'table_verify_test';
 
   /**
-   * The definition of the table created by the tests.
+   * Returns the schema definition of the table created by the tests.
    */
-  protected const array DEFINITION = [
-    'fields' => [
-      'id' => ['type' => 'int', 'not null' => TRUE],
-    ],
-    'primary key' => ['id'],
-  ];
+  protected function definition(): Schema {
+    return new Schema(SchemaDefinitionType::Storage, 'table_verify', [
+      new Table(static::TABLE, [Column::int('id', notNull: TRUE)], primaryKey: new PrimaryKey(['id'])),
+    ]);
+  }
 
   /**
    * Tests that a lost table creation race keeps the transaction usable.
@@ -49,7 +53,7 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
     $other = Database::getConnection('default', 'table_verify_race');
 
     $this->mockTableCreation(function (string $table) use ($other): void {
-      $other->schema()->createTable($table, static::DEFINITION);
+      $other->schema()->createSchemaFromDefinition($this->definition());
       // Run the statement on the client connection. This skips the existence
       // check in Schema::createTable() and the savepoint that
       // Connection::query() adds, so the failure aborts the transaction like
@@ -63,7 +67,7 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
     });
 
     $transaction = $this->connection->startTransaction();
-    $this->connection->executeAndCreateTableIfNeeded(static::TABLE, static::DEFINITION,
+    $this->connection->executeAndCreateSchemaIfNeeded($this->definition(),
       fn() => $this->connection->insert(static::TABLE)->fields(['id' => 1])->execute());
     $this->assertTrue($this->connection->inTransaction());
     $transaction->commitOrRelease();
@@ -87,7 +91,7 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
       }
     });
     try {
-      $this->connection->executeAndCreateTableIfNeeded(static::TABLE, static::DEFINITION, function (): void {
+      $this->connection->executeAndCreateSchemaIfNeeded($this->definition(), function (): void {
         $this->fail('The operation must not run after a creation failure.');
       });
       $this->fail('The creation error must propagate.');
@@ -109,7 +113,7 @@ class ExecuteAndCreateTableIfNeededTest extends DriverSpecificDatabaseTestBase {
       ->onlyMethods(['createTable'])
       ->getMock();
     $schema->expects($this->once())->method('createTable')
-      ->with(static::TABLE, static::DEFINITION)
+      ->with(static::TABLE, $this->definition()->getTableDefinition(static::TABLE)->toArray())
       ->willReturnCallback($create_table);
     (new \ReflectionProperty($this->connection, 'schema'))->setValue($this->connection, $schema);
   }
