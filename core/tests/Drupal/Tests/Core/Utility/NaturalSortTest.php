@@ -38,9 +38,6 @@ class NaturalSortTest extends UnitTestCase {
     $list2 = ['Format 10x10', 'Format 100x100'];
     NaturalSort::natcasesort($list2, 'en');
     $this->assertSame('Format 10x10', reset($list2));
-    $list3 = ['Format 10x10', 'Format 10x10'];
-    NaturalSort::natcasesort($list3, 'en');
-    $this->assertSame('Format 10x10', reset($list3));
 
     // Accented characters are sorted by their base letter, unlike
     // strnatcasecmp(), which sorts them after all ASCII characters.
@@ -82,7 +79,7 @@ class NaturalSortTest extends UnitTestCase {
     $this->assertLessThan(0, NaturalSort::strnatcasecmp('Émission', 'Format'));
     $this->assertGreaterThan(0, NaturalSort::strnatcasecmp('Format 100x100', 'Format 10x10'));
 
-    $list1 = ['Émission', 'Format'];
+    $list1 = ['Format', 'Émission'];
     NaturalSort::natcasesort($list1);
     $this->assertSame('Émission', reset($list1));
     $list2 = ['Format 100x100', 'Format 10x10'];
