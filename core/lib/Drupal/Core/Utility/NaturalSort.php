@@ -138,7 +138,7 @@ final class NaturalSort {
     $a_title = (is_array($a) && isset($a[$key])) ? $a[$key] : '';
     $b_title = (is_array($b) && isset($b[$key])) ? $b[$key] : '';
 
-    return self::strnatcasecmp($a_title, $b_title);
+    return self::strnatcasecmp((string) $a_title, (string) $b_title);
   }
 
 }
