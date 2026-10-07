@@ -85,7 +85,7 @@ final class NaturalSort {
     });
   }
 
- /**
+  /**
    * Sorts a structured array by 'title' key (no # prefix).
    *
    * Callback for uasort().
