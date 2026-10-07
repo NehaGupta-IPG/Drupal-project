@@ -27,9 +27,9 @@ final class NaturalSort {
    * extension is not available, or no language can be determined, this method
    * falls back to strnatcasecmp().
    *
-   * @param string|Drupal\Core\StringTranslation\TranslatableMarkup $string1
+   * @param string $string1
    *   The first string.
-   * @param string|Drupal\Core\StringTranslation\TranslatableMarkup $string2
+   * @param string $string2
    *   The second string.
    * @param string|null $langcode
    *   (optional) The language code to determine the collation rules. Defaults
@@ -81,7 +81,7 @@ final class NaturalSort {
    */
   public static function natcasesort(array &$array, ?string $langcode = NULL): true {
     return uasort($array, function ($a, $b) use ($langcode) {
-      return self::strnatcasecmp($a, $b, $langcode);
+      return self::strnatcasecmp((string) $a, (string) $b, $langcode);
     });
   }
 
