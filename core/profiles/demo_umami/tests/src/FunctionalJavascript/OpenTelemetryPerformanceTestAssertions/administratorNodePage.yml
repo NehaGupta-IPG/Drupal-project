@@ -93,6 +93,7 @@ CacheTagGroupedLookups:
   -
     - 'config:system.menu.navigation-user-links'
   -
+    - 'config:language.types'
     - 'config:user.role.authenticated'
     - 'config:user.role.test_admin'
     - 'user:11'
@@ -122,16 +123,6 @@ CacheTagGroupedLookups:
     - 'taxonomy_term:8'
     - 'taxonomy_term:9'
     - taxonomy_term_list
-  -
-    - 'config:navigation.block_layout'
-    - 'config:navigation.settings'
-    - 'config:node_type_list'
-  -
-    - 'config:system.menu.navigation-user-links'
-  -
-    - 'config:user.role.authenticated'
-    - 'config:user.role.test_admin'
-    - 'user:11'
   -
     - 'config:image.style.medium_8_7'
     - 'file:37'
