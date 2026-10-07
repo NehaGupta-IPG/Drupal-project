@@ -47,7 +47,7 @@ class SqlExecutionInfo {
    */
   public static function fromThrowable(\Throwable $throwable): ?SqlExecutionInfo {
     while ($throwable) {
-      if ($throwable instanceof DatabaseExceptionBase && $throwable->info !== NULL) {
+      if ($throwable instanceof DatabaseExceptionWrapper && $throwable->info !== NULL) {
         return $throwable->info;
       }
       $throwable = $throwable->getPrevious();
