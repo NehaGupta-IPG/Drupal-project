@@ -7,24 +7,27 @@
   --dropbutton-spacing-size: var(--admin-space-m);
   --dropbutton-font-size: var(--admin-font-size-m);
   --dropbutton-line-height: var(--admin-space-m);
-  --dropbutton-toggle-size: 48px;
   --dropbutton-border-size: 1px;
   --dropbutton-toggle-size-spacing: var(--dropbutton-border-size);
-  --dropbutton-border-radius-size: 2px;
+  --dropbutton-height: 64px;
+  --dropbutton-border-radius-size: 6px;
   --dropbutton-item-max-width: 12.5rem;
-  
+  --dropbutton-padding: 20px;
+
   .no-touchevents &.dropbutton--small {
     --dropbutton-spacing-size: 0.625rem;
     --dropbutton-font-size: var(--admin-font-size-xs);
     --dropbutton-line-height: 0.75rem;
-    --dropbutton-toggle-size: 32px;
+    --dropbutton-padding: 20px;
+    --dropbutton-height: 32px;
   }
 
   .no-touchevents &.dropbutton--extrasmall {
     --dropbutton-spacing-size: 0.375rem;
     --dropbutton-font-size: var(--admin-font-size-xs);
     --dropbutton-line-height: 0.75rem;
-    --dropbutton-toggle-size: 16px;
+    --dropbutton-padding: 0 12px;
+    --dropbutton-height: 24px;
   }
 }
 
@@ -59,8 +62,9 @@
   margin: 0;
   list-style: none;
   border: 2px solid var(--admin-color-primary);
-  border-radius: var(--admin-radius-m);
+  border-radius: var(--dropbutton-border-radius-size);
   box-shadow: 0 1px 2px var(--admin-color-primary-soft);
+  height: var(--dropbutton-height);
 
   .dark-mode & {
     box-shadow: 0 4px 18px var(--admin-shadow-color-button);
@@ -110,11 +114,12 @@
  */
 .dropbutton__toggle {
   position: relative;
-  width: var(--admin-space-2xl);
+  display: block;
+  aspect-ratio: 1;
   border: var(--dropbutton-border-size) solid transparent;
   border-inline-start: var(--dropbutton-border-size) solid var(--admin-color-primary);
-  border-start-end-radius: var(--button-border-radius-size);
-  border-end-end-radius: var(--button-border-radius-size);
+  border-start-end-radius: var(--dropbutton-border-radius-size);
+  border-end-end-radius: var(--dropbutton-border-radius-size);
   appearance: none;
   background: none;
 
@@ -127,7 +132,7 @@
     mask-image: var(--admin-icon-drop);
     mask-repeat: no-repeat;
     mask-position: center center;
-    mask-size: 12px 12px;
+    mask-size: 0.75rem 0.75rem;
   }
 
   .dropbutton-wrapper.open &::before {
@@ -144,14 +149,14 @@
   > * {
     display: block;
     margin: 0;
-    padding: 0 var(--admin-space-l);
+    padding: var(--dropbutton-padding);
     cursor: pointer;
     white-space: nowrap;
     text-decoration: none;
     color: var(--admin-color-primary);
     border-radius: var(--button-border-radius-size);
     background: none;
-    font-size: var(--admin-font-size-s);
+    font-size: var(--dropbutton-font-size);
     font-weight: var(--admin-font-weight-semibold);
     appearance: none;
 
