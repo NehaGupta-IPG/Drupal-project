@@ -40,7 +40,7 @@ class Transaction {
   /**
    * Prevent transactions from being unserialized.
    */
-  public function __wakeup(): void {
+  public function __unserialize(array $data): void {
     throw new \BadMethodCallException('Cannot unserialize ' . get_class($this));
   }
 

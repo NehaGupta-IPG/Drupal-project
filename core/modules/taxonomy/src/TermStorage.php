@@ -432,9 +432,8 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
-    /** @var string[] $vars */
-    $vars = parent::__sleep();
+  protected function doSerialize(): array {
+    $vars = parent::doSerialize();
     // Do not serialize static cache.
     unset($vars['ancestors'], $vars['treeChildren'], $vars['treeParents'], $vars['treeTerms'], $vars['trees'], $vars['vocabularyHierarchyType']);
     return $vars;
@@ -443,8 +442,8 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function __wakeup(): void {
-    parent::__wakeup();
+  protected function doUnserialize(array $data): void {
+    parent::doUnserialize($data);
     // Initialize static caches.
     $this->ancestors = [];
     $this->treeChildren = [];

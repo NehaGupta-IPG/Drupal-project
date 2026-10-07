@@ -521,7 +521,7 @@ abstract class BrowserTestBase extends DrupalTestCase {
    *
    * @see vendor/phpunit/phpunit/src/Util/PHP/Template/TestCaseMethod.tpl.dist
    */
-  public function __sleep(): array {
+  public function __serialize(): array {
     return [];
   }
 

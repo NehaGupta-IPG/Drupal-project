@@ -5,11 +5,16 @@ namespace Drupal\Core\DependencyInjection;
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Utility\DeprecatedSleepTrait;
+use Drupal\Core\Utility\DeprecatedWakeupTrait;
 
 /**
  * Provides dependency injection friendly methods for serialization.
  */
 trait DependencySerializationTrait {
+
+  use DeprecatedSleepTrait;
+  use DeprecatedWakeupTrait;
 
   /**
    * An array of service IDs keyed by property name used for serialization.
@@ -30,7 +35,7 @@ trait DependencySerializationTrait {
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     $vars = get_object_vars($this);
     try {
       $container = \Drupal::getContainer();
@@ -63,32 +68,39 @@ trait DependencySerializationTrait {
     catch (ContainerNotInitializedException) {
       // No container, no problem.
     }
-
-    return array_keys($vars);
+    $vars['_entityStorages'] = $this->_entityStorages;
+    $vars['_serviceIds'] = $this->_serviceIds;
+    return $vars;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __wakeup(): void {
-    // Avoid trying to wakeup if there's nothing to do.
-    if (empty($this->_serviceIds) && empty($this->_entityStorages)) {
+  protected function doUnserialize(array $data): void {
+    $service_ids = $data['_serviceIds'] ?? [];
+    unset($data['_serviceIds']);
+    $this->_serviceIds = [];
+    $entity_storages = $data['_entityStorages'] ?? [];
+    unset($data['_entityStorages']);
+    $this->_entityStorages = [];
+    $this->populateProperties($data);
+    // Avoid trying to repopulate from container if there's nothing to do.
+    if (empty($service_ids) && empty($entity_storages)) {
       return;
     }
+
     $container = \Drupal::getContainer();
-    foreach ($this->_serviceIds as $key => $service_id) {
+    foreach ($service_ids as $key => $service_id) {
       $this->$key = $container->get($service_id);
     }
-    $this->_serviceIds = [];
 
-    if ($this->_entityStorages) {
+    if ($entity_storages) {
       /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
       $entity_type_manager = $container->get('entity_type.manager');
-      foreach ($this->_entityStorages as $key => $entity_type_id) {
+      foreach ($entity_storages as $key => $entity_type_id) {
         $this->$key = $entity_type_manager->getStorage($entity_type_id);
       }
     }
-    $this->_entityStorages = [];
   }
 
 }

@@ -548,7 +548,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     // Get the values of instantiated field objects, only serialize the values.
     foreach ($this->fields as $name => $fields) {
       foreach ($fields as $langcode => $field) {
@@ -560,7 +560,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $this->languages = NULL;
     $this->clearTranslationCache();
 
-    return parent::__sleep();
+    return parent::doSerialize();
   }
 
   /**

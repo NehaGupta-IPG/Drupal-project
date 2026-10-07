@@ -750,19 +750,14 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   }
 
   /**
-   * Implements the magic __sleep() method.
-   *
-   * Using the Serialize interface and serialize() / unserialize() methods
-   * breaks entity forms in PHP 5.4.
-   *
-   * @todo Investigate in https://www.drupal.org/node/1977206.
+   * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     // Only serialize necessary properties, excluding those that can be
     // recalculated.
     $properties = get_object_vars($this);
     unset($properties['schema'], $properties['propertyDefinitions'], $properties['original']);
-    return array_keys($properties);
+    return $properties;
   }
 
   /**

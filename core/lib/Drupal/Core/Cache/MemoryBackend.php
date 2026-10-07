@@ -4,6 +4,7 @@ namespace Drupal\Core\Cache;
 
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Utility\DeprecatedSleepTrait;
 
 /**
  * Defines a memory cache implementation.
@@ -21,6 +22,8 @@ use Drupal\Component\Datetime\TimeInterface;
  * @ingroup cache
  */
 class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterface {
+
+  use DeprecatedSleepTrait;
 
   /**
    * Array to store cache objects.
@@ -203,10 +206,11 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   }
 
   /**
-   * Prevents data stored in memory backends from being serialized.
+   * {@inheritdoc}
    */
-  public function __sleep(): array {
-    return ['time'];
+  protected function doSerialize(): array {
+    // Prevents data stored in memory backends from being serialized.
+    return ['time' => $this->time];
   }
 
   /**

@@ -614,11 +614,11 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   }
 
   /**
-   * Tests sleep with plugin collections.
+   * Tests serialize with plugin collections.
    *
-   * @legacy-covers ::__sleep
+   * @legacy-covers ::__serialize
    */
-  public function testSleepWithPluginCollections(): void {
+  public function testSerializeWithPluginCollections(): void {
     $instance_id = 'the_instance_id';
     $instance = new TestConfigurablePlugin([], $instance_id, []);
 
@@ -650,9 +650,9 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $this->assertSame($expected_plugin_config, $entity->get('the_plugin_collection_config'));
 
     // Ensure the plugin collection and manager is not stored.
-    $vars = $entity->__sleep();
-    $this->assertNotContains('pluginCollection', $vars);
-    $this->assertNotContains('pluginManager', $vars);
+    $vars = $entity->__serialize();
+    $this->assertArrayNotHasKey('pluginCollection', $vars);
+    $this->assertArrayNotHasKey('pluginManager', $vars);
     $this->assertSame(['pluginManager' => 'plugin.manager.foo'], $entity->get('_serviceIds'));
 
     $expected_plugin_config = [$instance_id => ['id' => $instance_id, 'foo' => 'new_value']];

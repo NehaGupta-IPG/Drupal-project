@@ -458,7 +458,7 @@ class TestSandboxManager extends SandboxManagerBase {
   protected string $type = 'package_manager:test';
 
   /**
-   * Implements the magic __sleep() method.
+   * Implements the magic __serialize() method.
    *
    * TRICKY: without this, any failed ::assertStatusCheckResults()
    * will fail, because PHPUnit will want to serialize all arguments in the call
@@ -466,7 +466,7 @@ class TestSandboxManager extends SandboxManagerBase {
    *
    * @see https://www.drupal.org/node/3312619#comment-14801308
    */
-  public function __sleep(): array {
+  public function __serialize(): array {
     return [];
   }
 

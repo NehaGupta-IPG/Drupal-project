@@ -1176,13 +1176,13 @@ class ConfigImporter {
       if ($container_id !== spl_object_id(\Drupal::getContainer())) {
         // When rebuilding the container,
         // \Drupal\Core\DrupalKernel::initializeContainer() saves the hashes of
-        // the old container and passes them to the new one. So __sleep() will
-        // recognize the old services and then __wakeup() will restore them from
-        // the new container.
-        $this->__sleep();
-        $this->__wakeup();
-        $this->storageComparer->__sleep();
-        $this->storageComparer->__wakeup();
+        // the old container and passes them to the new one. So __serialize()
+        // will recognize the old services and then __unserialize() will restore
+        // them from the new container.
+        $data = $this->__serialize();
+        $this->__unserialize($data);
+        $comparer_data = $this->storageComparer->__serialize();
+        $this->storageComparer->__unserialize($comparer_data);
       }
     }
   }

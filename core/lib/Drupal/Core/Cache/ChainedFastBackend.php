@@ -144,7 +144,7 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
       // Items in the fast backend might be invalid based on their timestamp,
       // but we can't check the timestamp prior to getting the item, which
       // includes unserializing it. However, unserializing an invalid item can
-      // throw an exception. For example, a __wakeup() implementation that
+      // throw an exception. For example, an __unserialize() implementation that
       // receives object properties containing references to code or data that
       // no longer exists in the application's current state.
       //

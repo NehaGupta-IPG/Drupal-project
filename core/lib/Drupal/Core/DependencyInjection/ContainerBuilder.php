@@ -3,6 +3,7 @@
 namespace Drupal\Core\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Utility\DeprecatedSleepTrait;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
 use Symfony\Component\DependencyInjection\Container as SymfonyContainer;
@@ -17,6 +18,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  * @ingroup container
  */
 class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInterface {
+
+  use DeprecatedSleepTrait;
 
   /**
    * {@inheritdoc}
@@ -75,9 +78,9 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     assert(FALSE, 'The container was serialized.');
-    return array_keys(get_object_vars($this));
+    return get_object_vars($this);
   }
 
 }

@@ -468,21 +468,16 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   }
 
   /**
-   * Implements the magic __sleep() method.
-   *
-   * Using the Serialize interface and serialize() / unserialize() methods
-   * breaks entity forms in PHP 5.4.
-   *
-   * @todo Investigate in https://www.drupal.org/node/1977206.
+   * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     $properties = get_object_vars($this);
 
     // Only serialize necessary properties, excluding those that can be
     // recalculated.
     unset($properties['itemDefinition'], $properties['original']);
 
-    return array_keys($properties);
+    return $properties;
   }
 
   /**

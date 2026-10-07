@@ -7,6 +7,8 @@ use Drupal\Component\Utility\Tags;
 use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Utility\DeprecatedSleepTrait;
+use Drupal\Core\Utility\DeprecatedWakeupTrait;
 use Drupal\views\Plugin\views\display\DisplayRouterInterface;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\Plugin\ViewsPluginManager;
@@ -29,6 +31,8 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 #[\AllowDynamicProperties]
 class ViewExecutable {
 
+  use DeprecatedSleepTrait;
+  use DeprecatedWakeupTrait;
   use LoggerChannelTrait;
 
   /**
@@ -2526,12 +2530,9 @@ class ViewExecutable {
   }
 
   /**
-   * Magic method implementation to serialize the view executable.
-   *
-   * @return array
-   *   The names of all variables that should be serialized.
+   * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     // Limit to only the required data which is needed to properly restore the
     // state during unserialization.
     $this->serializationData = [
@@ -2545,13 +2546,14 @@ class ViewExecutable {
       'dom_id' => $this->dom_id,
       'executed' => $this->executed,
     ];
-    return ['serializationData'];
+    return ['serializationData' => $this->serializationData];
   }
 
   /**
-   * Magic method implementation to unserialize the view executable.
+   * {@inheritdoc}
    */
-  public function __wakeup(): void {
+  public function doUnserialize(array $data): void {
+    $this->populateProperties($data);
     $reflection = new \ReflectionClass($this);
     $defaults = $reflection->getDefaultProperties();
     foreach ($reflection->getProperties() as $property) {

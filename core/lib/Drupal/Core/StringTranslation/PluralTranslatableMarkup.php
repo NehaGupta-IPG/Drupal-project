@@ -107,8 +107,8 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
-    return array_merge(parent::__sleep(), ['count']);
+  protected function doSerialize(): array {
+    return parent::doSerialize() + ['count' => $this->count];
   }
 
 }

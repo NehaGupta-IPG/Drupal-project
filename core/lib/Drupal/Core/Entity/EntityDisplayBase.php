@@ -558,34 +558,27 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
-    // Only store the definition, not external objects or derived data.
-    $keys = array_keys($this->toArray());
+  protected function doSerialize(): array {
+    $vars = get_object_vars($this);
+    // Only store the definition, so get the exportable properties, then use
+    // those keys to filter out external objects or derived data.
+    $export_vars = $this->toArray();
+    $vars = array_intersect_key($vars, $export_vars);
     // In addition, we need to keep the entity type and the "is new" status.
-    $keys[] = 'entityTypeId';
-    $keys[] = 'enforceIsNew';
-    // Keep track of the serialized keys, to avoid calling toArray() again in
-    // __wakeup(). Because of the way __sleep() works, the data has to be
-    // present in the object to be included in the serialized values.
-    $keys[] = '_serializedKeys';
+    $vars['entityTypeId'] = $this->entityTypeId;
+    $vars['enforceIsNew'] = $this->enforceIsNew;
     // Keep track of the initialization status.
-    $keys[] = 'initialized';
-    $this->_serializedKeys = $keys;
-    return $keys;
+    $vars['initialized'] = $this->initialized;
+    return $vars;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __wakeup(): void {
-    // Determine what were the properties from toArray() that were saved in
-    // __sleep().
-    $keys = $this->_serializedKeys;
-    unset($this->_serializedKeys);
-    $values = array_intersect_key(get_object_vars($this), array_flip($keys));
+  protected function doUnserialize(array $data): void {
     // Run those values through the __construct(), as if they came from a
     // regular entity load.
-    $this->__construct($values, $this->entityTypeId);
+    $this->__construct($data, $data['entityTypeId']);
   }
 
   /**

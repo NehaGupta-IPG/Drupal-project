@@ -17,6 +17,8 @@ class StorageComparer implements StorageComparerInterface {
   use DependencySerializationTrait {
     __sleep as defaultSleep;
     __wakeup as defaultWakeup;
+    doSerialize as defaultDoSerialize;
+    doUnserialize as defaultDoUnserialize;
   }
 
   /**
@@ -510,15 +512,17 @@ class StorageComparer implements StorageComparerInterface {
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
-    return array_diff($this->defaultSleep(), ['targetStorages']);
+  protected function doSerialize(): array {
+    $vars = $this->defaultDoSerialize();
+    unset($vars['targetStorages']);
+    return $vars;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __wakeup(): void {
-    $this->defaultWakeup();
+  protected function doUnserialize(array $data): void {
+    $this->defaultDoUnserialize($data);
     $this->targetStorages = [];
     $this->targetCacheStorage->deleteAll();
   }

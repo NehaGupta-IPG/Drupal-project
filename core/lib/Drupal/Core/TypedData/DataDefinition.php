@@ -2,11 +2,14 @@
 
 namespace Drupal\Core\TypedData;
 
+use Drupal\Core\Utility\DeprecatedSleepTrait;
+
 /**
  * A typed data definition class for defining data based on defined data types.
  */
 class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
 
+  use DeprecatedSleepTrait;
   use TypedDataTrait;
 
   /**
@@ -370,11 +373,11 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     // Never serialize the typed data manager.
     $vars = get_object_vars($this);
     unset($vars['typedDataManager']);
-    return array_keys($vars);
+    return $vars;
   }
 
   /**

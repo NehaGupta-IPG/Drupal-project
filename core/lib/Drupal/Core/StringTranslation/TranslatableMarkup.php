@@ -3,6 +3,7 @@
 namespace Drupal\Core\StringTranslation;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Utility\DeprecatedSleepTrait;
 
 /**
  * Provides translatable markup class.
@@ -18,6 +19,8 @@ use Drupal\Component\Render\FormattableMarkup;
  * @see \Drupal\Core\Annotation\Translation
  */
 class TranslatableMarkup extends FormattableMarkup {
+
+  use DeprecatedSleepTrait;
 
   /**
    * The translated markup without placeholder replacements.
@@ -205,10 +208,15 @@ class TranslatableMarkup extends FormattableMarkup {
   }
 
   /**
-   * Magic __sleep() method to avoid serializing the string translator.
+   * {@inheritdoc}
    */
-  public function __sleep(): array {
-    return ['string', 'arguments', 'options'];
+  protected function doSerialize(): array {
+    // Avoid serializing the string translator.
+    return [
+      'string' => $this->string,
+      'arguments' => $this->arguments,
+      'options' => $this->options,
+    ];
   }
 
   /**

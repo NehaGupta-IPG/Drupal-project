@@ -472,8 +472,10 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
-    return array_diff(parent::__sleep(), ['database']);
+  protected function doSerialize(): array {
+    $vars = parent::doSerialize();
+    unset($vars['database']);
+    return $vars;
   }
 
 }

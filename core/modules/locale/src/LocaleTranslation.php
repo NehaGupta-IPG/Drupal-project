@@ -23,6 +23,7 @@ class LocaleTranslation implements TranslatorInterface, DestructableInterface {
 
   use DependencySerializationTrait {
     __sleep as traitSleep;
+    doSerialize as traitDoSerialize;
   }
 
   /**
@@ -111,10 +112,12 @@ class LocaleTranslation implements TranslatorInterface, DestructableInterface {
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     // ::$translations is an array of LocaleLookup objects, which have the
     // database service injected and therefore cannot be serialized safely.
-    return array_diff($this->traitSleep(), ['translations']);
+    $vars = $this->traitDoSerialize();
+    unset($vars['translations']);
+    return $vars;
   }
 
 }

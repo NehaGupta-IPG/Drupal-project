@@ -161,9 +161,9 @@ class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDa
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
+  protected function doSerialize(): array {
     $this->dataType = NULL;
-    return parent::__sleep();
+    return parent::doSerialize();
   }
 
 }
