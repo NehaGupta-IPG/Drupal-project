@@ -8,7 +8,6 @@ use Drupal\comment\CommentAccessControlHandler;
 use Drupal\comment\CommentInterface;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentViewBuilder;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Render\Element;
 use Drupal\entity_test\Entity\EntityTest;
@@ -114,83 +113,13 @@ class CommentThreadMaxDepthTest extends KernelTestBase {
   }
 
   /**
-   * Tests threaded comments with depth limitation when replying is allowed.
-   */
-  public function testMaxDepthReplyAllowed(): void {
-    FieldConfig::loadByName('entity_test', 'entity_test', 'comment')
-      ->setSetting('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT)
-      ->setSetting('thread_limit', [
-        'depth' => 3,
-        'mode' => CommentItemInterface::THREAD_DEPTH_REPLY_MODE_ALLOW,
-      ])->save();
-    $this->createTestComments();
-
-    // Reply to 'deepest' comment.
-    $reply = $this->createComment(['pid' => $this->comment[0][0][0]['entity']->id()]);
-    // Reply to reply.
-    $reply_to_reply = $this->createComment(['pid' => $reply->id()]);
-
-    // The view builder is responsible to compute the indent for each comment.
-    // @see \Drupal\comment\CommentViewBuilder::buildComponents()
-    $this->buildComments([
-      $this->comment[0]['entity'],
-      $this->comment[0][0]['entity'],
-      $this->comment[0][1]['entity'],
-      $this->comment[0][0][0]['entity'],
-      $reply,
-      $reply_to_reply,
-    ]);
-
-    // Checking indents of each comment. Note that the build item
-    // #comment_indent value is relative to the previous comment.
-    $this->assertCommentIsNotIndented($this->comment[0]['entity']);
-    $this->assertCommentIsIndented($this->comment[0][0]['entity']);
-    $this->assertCommentIsNotIndented($this->comment[0][1]['entity']);
-    $this->assertCommentIsIndented($this->comment[0][0][0]['entity']);
-    // Check that the reply to deepest comment shows both with the same indent.
-    $this->assertCommentIsNotIndented($reply);
-    // Check that the reply to reply has the same indent.
-    $this->assertCommentIsNotIndented($reply_to_reply);
-
-    // Change the reply mode in order to test that, when reply to the deepest
-    // comment is denied, the thread still shows with the limited depth.
-    FieldConfig::loadByName('entity_test', 'entity_test', 'comment')
-      ->setSetting('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT)
-      ->setSetting('thread_limit', [
-        'depth' => 3,
-        'mode' => CommentItemInterface::THREAD_DEPTH_REPLY_MODE_DENY,
-      ])->save();
-
-    // Rebuild comments.
-    $this->buildComments([
-      $this->comment[0]['entity'],
-      $this->comment[0][0]['entity'],
-      $this->comment[0][1]['entity'],
-      $this->comment[0][0][0]['entity'],
-      $reply,
-      $reply_to_reply,
-    ]);
-
-    // Checking that the indents are kept.
-    $this->assertCommentIsNotIndented($this->comment[0]['entity']);
-    $this->assertCommentIsIndented($this->comment[0][0]['entity']);
-    $this->assertCommentIsNotIndented($this->comment[0][1]['entity']);
-    $this->assertCommentIsIndented($this->comment[0][0][0]['entity']);
-    // Check that the reply to deepest comment shows both with the same indent.
-    $this->assertCommentIsNotIndented($reply);
-    // Check that the reply to reply has the same indent.
-    $this->assertCommentIsNotIndented($reply_to_reply);
-  }
-
-  /**
-   * Tests threaded comments with depth limitation when replying is denied.
+   * Tests that replies are denied when thread depth limit is reached.
    */
   public function testMaxDepthReplyDenied(): void {
     FieldConfig::loadByName('entity_test', 'entity_test', 'comment')
       ->setSetting('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT)
       ->setSetting('thread_limit', [
         'depth' => 3,
-        'mode' => CommentItemInterface::THREAD_DEPTH_REPLY_MODE_DENY,
       ])->save();
     $this->createTestComments();
 

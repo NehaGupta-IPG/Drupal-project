@@ -2,7 +2,6 @@
 
 namespace Drupal\comment;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Entity\EntityAccessControlHandler;
@@ -110,17 +109,13 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
 
     // Only check if the depth is limited.
     if ($field_settings && $field_settings['default_mode'] === CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT) {
-      $thread_limit_settings = $field_settings['thread_limit'];
       \assert($field_settings['thread_limit']['depth'] >= 2, 'Thread depth limit should be greater than or equal to 2.');
 
-      // Only check if the depth limitation is configured to deny replies.
-      if ($thread_limit_settings['mode'] === CommentItemInterface::THREAD_DEPTH_REPLY_MODE_DENY) {
-        // Prevent replying to the deepest comment.
-        $comment_indent = count(explode('.', $comment->getThread()));
-        $max_indent = $field_settings['thread_limit']['depth'];
-        if ($comment_indent >= $max_indent) {
-          return $access_result->andIf(AccessResult::forbidden('Thread limit hit'));
-        }
+      // Prevent replying to the deepest comment.
+      $comment_indent = count(explode('.', $comment->getThread()));
+      $max_indent = $field_settings['thread_limit']['depth'];
+      if ($comment_indent >= $max_indent) {
+        return $access_result->andIf(AccessResult::forbidden('Thread limit hit'));
       }
     }
 

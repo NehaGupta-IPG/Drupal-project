@@ -5,7 +5,6 @@
  * Post update functions for the comment module.
  */
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
 use Drupal\field\FieldConfigInterface;
 
@@ -27,7 +26,6 @@ function comment_post_update_add_thread_limit_field_setting(?array &$sandbox = N
     if ($field_config->getType() === 'comment') {
       $field_config->setSetting('thread_limit', [
         'depth' => 2,
-        'mode' => CommentItemInterface::THREAD_DEPTH_REPLY_MODE_ALLOW,
       ]);
       return TRUE;
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional\Update;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -40,7 +39,6 @@ class CommentUpdateTest extends UpdatePathTestBase {
 
     $config = $config_factory->get('field.field.node.article.comment');
     $this->assertSame(2, $config->get('settings.thread_limit.depth'));
-    $this->assertSame(CommentItemInterface::THREAD_DEPTH_REPLY_MODE_ALLOW, $config->get('settings.thread_limit.mode'));
   }
 
 }

@@ -50,7 +50,6 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       'default_mode' => CommentManagerInterface::COMMENT_MODE_THREADED,
       'thread_limit' => [
         'depth' => 2,
-        'mode' => CommentItemInterface::THREAD_DEPTH_REPLY_MODE_ALLOW,
       ],
       'per_page' => 50,
       'form_location' => FormLocation::Below->value,
@@ -149,21 +148,6 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       // The maximum thread deep cannot be less than 2 as it doesn't makes sense
       // to have threaded comments with only one level.
       '#min' => 2,
-    ];
-    $element['thread_limit']['mode'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Replying to deepest comment'),
-      '#default_value' => $settings['thread_limit']['mode'],
-      '#options' => [
-        CommentItemInterface::THREAD_DEPTH_REPLY_MODE_ALLOW => $this->t('Allowed'),
-        CommentItemInterface::THREAD_DEPTH_REPLY_MODE_DENY => $this->t('Denied'),
-      ],
-      CommentItemInterface::THREAD_DEPTH_REPLY_MODE_ALLOW => [
-        '#description' => $this->t('Users are able to reply to the deepest comment. The reply will be displayed on the same level as the comment that receives the reply.'),
-      ],
-      CommentItemInterface::THREAD_DEPTH_REPLY_MODE_DENY => [
-        '#description' => $this->t('Users cannot reply to the deepest comment.'),
-      ],
     ];
     $element['per_page'] = [
       '#type' => 'number',
