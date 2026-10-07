@@ -3,6 +3,7 @@
 namespace Drupal\image\Hook;
 
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldStorageConfigInterface;
@@ -27,6 +28,8 @@ class ImageHooks {
   public function __construct(
     #[AutowireServiceClosure(ImageDerivativeUtilities::class)]
     protected readonly \Closure $imageDerivativeUtilitiesClosure,
+    #[AutowireServiceClosure(ImageFactory::class)]
+    protected readonly \Closure $imageFactoryClosure,
   ) {}
 
   /**
@@ -308,15 +311,19 @@ class ImageHooks {
   /**
    * Implements hook_ENTITY_TYPE_prepare_form() for 'image_style'.
    *
-   * Help site builders to use modern image formats by enabling webp
-   * conversion by default.
+   * Help site builders to use modern image formats by adding a WebP
+   * conversion effect to new image styles by default, if the image toolkit
+   * supports WebP.
    *
    * Note that hook_ENTITY_TYPE_create() is intentionally not being used to
    * allow programmatic creation of image styles with other defaults.
    */
   #[Hook('image_style_prepare_form')]
-  public function imageStyleCreate(ImageStyleInterface $style, string $operation): void {
-    if ($operation === 'add' && $style->getEffects()->count() === 0) {
+  public function imageStylePrepareForm(ImageStyleInterface $style, string $operation): void {
+    if ($operation === 'add'
+      && $style->getEffects()->count() === 0
+      && in_array('webp', ($this->imageFactoryClosure)()->getSupportedExtensions(), TRUE)
+    ) {
       $style->addImageEffect([
         'id' => 'image_convert',
         'weight' => 0,

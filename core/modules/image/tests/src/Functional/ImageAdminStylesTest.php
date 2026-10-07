@@ -88,6 +88,10 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $style_label = $this->randomString();
     $style_path = $admin_path . '/manage/' . $style_name;
     $effect_edits = [
+      // The convert effect is added by default to new image styles.
+      'image_convert' => [
+        'extension' => 'webp',
+      ],
       'image_resize' => [
         'width' => 100,
         'height' => 101,
@@ -134,8 +138,9 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
 
     // Add effect form.
 
-    // Add each sample effect to the style.
-    foreach ($effect_edits as $effect => $edit) {
+    // Add each sample effect to the style, except for the convert effect which
+    // has been added by default.
+    foreach (array_slice($effect_edits, 1) as $effect => $edit) {
       $edit_data = [];
       foreach ($edit as $field => $value) {
         $edit_data['data[' . $field . ']'] = $value;
@@ -278,7 +283,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->submitForm($edit, 'Add effect');
     $entity_type_manager = $this->container->get('entity_type.manager');
     $style = $entity_type_manager->getStorage('image_style')->loadUnchanged($style_name);
-    $this->assertCount(6, $style->getEffects(), 'Rotate effect with transparent background was added.');
+    $this->assertCount(7, $style->getEffects(), 'Rotate effect with transparent background was added.');
 
     // Style deletion form.
 
@@ -385,8 +390,9 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->submitForm(['data[width]' => '300', 'data[height]' => '200'], 'Add effect');
     $this->assertSession()->pageTextContains('Scale and crop 300×200');
 
-    // There should normally be only one edit link on this page initially.
-    $this->clickLink('Edit');
+    // There should normally be two edit links on this page initially: one for
+    // the default convert effect and one for the scale and crop effect.
+    $this->clickLink('Edit', 1);
     $this->assertSession()->pageTextContains("Edit Scale and crop effect on style Test style effect edit");
     $this->submitForm(['data[width]' => '360', 'data[height]' => '240'], 'Update effect');
     $this->assertSession()->pageTextContains('Scale and crop 360×240');
@@ -400,8 +406,9 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->submitForm(['new' => 'image_scale'], 'Add');
     $this->submitForm(['data[width]' => '12', 'data[height]' => '19'], 'Add effect');
 
-    // Edit the scale effect that was just added.
-    $this->clickLink('Edit');
+    // Edit the scale effect that was just added, after the default convert
+    // effect.
+    $this->clickLink('Edit', 1);
     $this->assertSession()->pageTextContains("Edit Scale effect on style Test style scale edit scale");
     $this->submitForm(['data[width]' => '24', 'data[height]' => '19'], 'Update effect');
 

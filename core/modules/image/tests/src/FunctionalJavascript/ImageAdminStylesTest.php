@@ -55,8 +55,14 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     // Load the saved image style.
     $style = ImageStyle::load($style_name);
 
-    // Edit back the effects.
+    // Edit back the Ajax-enabled effects, skipping the convert effect that is
+    // added by default.
+    $ajax_effect_uuids = [];
     foreach ($style->getEffects() as $uuid => $effect) {
+      if ($effect->getPluginId() !== 'image_module_test_ajax') {
+        continue;
+      }
+      $ajax_effect_uuids[] = $uuid;
       $effect_path = $admin_path . '/manage/' . $style_name . '/effects/' . $uuid;
       $this->drupalGet($effect_path);
       $this->assertSession()->fieldValueEquals('data[test_parameter]', '100');
@@ -74,9 +80,10 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
       $this->assertSession()->fieldValueEquals('data[test_parameter]', '111');
     }
 
-    // Edit the 1st effect, multiple AJAX calls before updating.
-    $style = ImageStyle::load($style_name);
-    $uuid = array_values($style->getEffects()->getInstanceIds())[0];
+    $this->assertCount(2, $ajax_effect_uuids);
+
+    // Edit the 1st Ajax-enabled effect, multiple AJAX calls before updating.
+    $uuid = $ajax_effect_uuids[0];
     $this->drupalGet($admin_path . '/manage/' . $style_name . '/effects/' . $uuid);
     $this->assertSession()->fieldValueEquals('data[test_parameter]', '111');
     $field = $page->findField('data[test_parameter]');
