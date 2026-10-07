@@ -10,6 +10,7 @@ use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\Utility\NaturalSort;
 use Drupal\views\EntityViewsData;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -98,7 +99,7 @@ class NodeViewsData extends EntityViewsData {
       $status_extra_help_text = $this->t('Filters out unpublished content if the current user cannot view it.');
     }
     else {
-      uasort($node_access_implementations, '\Drupal\Core\Utility\NaturalSort::strnatcasecmp');
+      NaturalSort::natcasesort($node_access_implementations);
       $status_extra_help_text = new PluralTranslatableMarkup(
         $node_access_implementation_count,
         'This filter has no effect because the %module module controls access.',

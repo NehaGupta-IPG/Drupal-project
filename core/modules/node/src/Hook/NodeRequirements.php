@@ -14,6 +14,7 @@ use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\NaturalSort;
 
 /**
  * Requirements for the Node module.
@@ -92,7 +93,7 @@ class NodeRequirements {
             }
           );
         }
-        uasort($node_access_implementations, '\Drupal\Core\Utility\NaturalSort::strnatcasecmp');
+        NaturalSort::natcasesort($node_access_implementations);
         $views_ui_enabled = $this->moduleHandler->moduleExists('views_ui');
         $node_status_filter_problematic_views_list = [];
         foreach ($node_status_filter_problematic_views as $view_id => $displays) {

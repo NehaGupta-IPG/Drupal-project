@@ -17,6 +17,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\NaturalSort;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -129,7 +130,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
       }
     }
     // Sort the entity types by label, then add the simple config to the top.
-    uasort($entity_types, '\Drupal\Core\Utility\NaturalSort::strnatcasecmp');
+    NaturalSort::natcasesort($entity_types);
     $config_types = [
       'system.simple' => $this->t('Simple configuration'),
     ] + $entity_types;

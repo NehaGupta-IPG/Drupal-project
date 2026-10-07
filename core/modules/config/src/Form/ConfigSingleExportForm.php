@@ -12,6 +12,7 @@ use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\NaturalSort;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -85,7 +86,7 @@ class ConfigSingleExportForm extends FormBase {
       return $definition->getLabel();
     }, $this->definitions);
     // Sort the entity types by label, then add the simple config to the top.
-    uasort($entity_types, '\Drupal\Core\Utility\NaturalSort::strnatcasecmp');
+    NaturalSort::natcasesort($entity_types);
     $config_types = [
       'system.simple' => $this->t('Simple configuration'),
     ] + $entity_types;
