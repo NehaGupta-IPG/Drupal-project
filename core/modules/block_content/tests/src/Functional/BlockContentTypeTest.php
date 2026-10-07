@@ -150,6 +150,9 @@ class BlockContentTypeTest extends BlockContentTestBase {
 
     // Verify that title and body fields are displayed.
     $this->drupalGet('block/add/basic');
+    // The page title comes from a closure on the route attribute, which is
+    // passed the upcasted block type.
+    $this->assertSession()->titleEquals('Add basic content block | Drupal');
     $this->assertSession()->pageTextContains('Block description');
     $this->assertNotEmpty($this->cssSelect('#edit-body-0-value'), 'Body field was found.');
 
@@ -173,6 +176,8 @@ class BlockContentTypeTest extends BlockContentTestBase {
     $this->clickLink('Bar');
     // Verify that the original machine name was used in the URL.
     $this->assertSession()->addressEquals(Url::fromRoute('block_content.add_form', ['block_content_type' => 'basic']));
+    // The title closure runs on each request, so it picks up the new label.
+    $this->assertSession()->titleEquals('Add Bar content block | Drupal');
 
     // Remove the body field.
     $this->drupalGet('admin/structure/block-content/manage/basic/fields/block_content.basic.body/delete');
@@ -230,7 +235,7 @@ class BlockContentTypeTest extends BlockContentTestBase {
       ->getStorage('block_content');
 
     // Install all themes.
-    $themes = ['olivero', 'stark', 'claro'];
+    $themes = ['stark', 'default_admin'];
     \Drupal::service('theme_installer')->install($themes);
     $theme_settings = $this->config('system.theme');
     foreach ($themes as $default_theme) {
@@ -258,7 +263,7 @@ class BlockContentTypeTest extends BlockContentTestBase {
             'theme' => $theme,
           ]));
           $this->submitForm(['region' => 'content'], 'Save block');
-          $this->assertSession()->addressEquals(Url::fromRoute('block.admin_display_theme', ['theme' => $theme], ['query' => ['block-placement' => $theme . '-' . Html::getClass($edit['info[0][value]'])]]));
+          $this->assertSession()->addressEquals(Url::fromRoute('block.admin_display_theme', ['theme' => $theme], ['query' => ['block-placement' => Html::getClass($theme . '-' . $edit['info[0][value]'])]]));
         }
         else {
           $this->fail('Could not load created block.');

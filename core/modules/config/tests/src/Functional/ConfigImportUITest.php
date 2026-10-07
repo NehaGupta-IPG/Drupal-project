@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
+use Drupal\config_enum_test\EnumValue;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Extension\ModuleWeight;
-use Drupal\Core\Serialization\Yaml;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -95,18 +95,16 @@ class ConfigImportUITest extends BrowserTestBase {
     $core_extension['module']['automated_cron'] = 0;
     $core_extension['module']['config_install_schema_test'] = 0;
     $core_extension['module'] = \Drupal::service(ModuleWeight::class)->sort($core_extension['module']);
-    $core_extension['theme']['olivero'] = 0;
+    $core_extension['theme']['test_theme'] = 0;
     $sync->write('core.extension', $core_extension);
-    // Olivero ships with configuration.
-    $sync->write('olivero.settings', Yaml::decode(file_get_contents('core/themes/olivero/config/install/olivero.settings.yml')));
 
     // Use the install storage so that we can read configuration from modules
     // and themes that are not installed.
     $install_storage = new InstallStorage();
 
-    // Set the Olivero theme as default.
+    // Set the test theme as default.
     $system_theme = $this->config('system.theme')->get();
-    $system_theme['default'] = 'olivero';
+    $system_theme['default'] = 'test_theme';
     $sync->write('system.theme', $system_theme);
 
     // Read the automated_cron config from module default config folder.
@@ -162,7 +160,7 @@ class ConfigImportUITest extends BrowserTestBase {
     $this->assertTrue(\Drupal::moduleHandler()->moduleExists('automated_cron'), 'Automated Cron module installed during import.');
     $this->assertTrue(\Drupal::moduleHandler()->moduleExists('options'), 'Options module installed during import.');
     $this->assertTrue(\Drupal::moduleHandler()->moduleExists('text'), 'Text module installed during import.');
-    $this->assertTrue(\Drupal::service('theme_handler')->themeExists('olivero'), 'Olivero theme installed during import.');
+    $this->assertTrue(\Drupal::service('theme_handler')->themeExists('test_theme'), 'Test theme installed during import.');
 
     // Ensure installations and uninstallation occur as expected.
     $uninstalled = \Drupal::state()->get('ConfigImportUITest.core.extension.modules_uninstalled', []);
@@ -184,11 +182,10 @@ class ConfigImportUITest extends BrowserTestBase {
     unset($core_extension['module']['config_install_schema_test']);
     unset($core_extension['module']['options']);
     unset($core_extension['module']['text']);
-    unset($core_extension['theme']['olivero']);
+    unset($core_extension['theme']['test_theme']);
     $sync->write('core.extension', $core_extension);
     $sync->delete('automated_cron.settings');
     $sync->delete('text.settings');
-    $sync->delete('olivero.settings');
 
     $system_theme = $this->config('system.theme')->get();
     $system_theme = [
@@ -229,7 +226,7 @@ class ConfigImportUITest extends BrowserTestBase {
     $this->assertEmpty($installed, 'No modules installed during import');
 
     $theme_info = \Drupal::service('theme_handler')->listInfo();
-    $this->assertFalse(isset($theme_info['olivero']), 'Olivero theme uninstalled during import.');
+    $this->assertFalse(isset($theme_info['test_theme']), 'Test theme uninstalled during import.');
 
     // Verify that the automated_cron.settings configuration object was only
     // deleted once during the import process.
@@ -554,6 +551,39 @@ class ConfigImportUITest extends BrowserTestBase {
     $this->assertSession()->responseContains('_config_import_test_config_import_steps_alter batch error');
     $this->assertSession()->responseContains('_config_import_test_config_import_steps_alter ConfigImporter error');
     $this->assertSession()->responseContains('The configuration was imported with errors.');
+  }
+
+  /**
+   * Tests importing an enum.
+   */
+  public function testEnumViaConfigImporter(): void {
+    $config_name = 'config_enum_test.settings';
+    $assert_session = $this->assertSession();
+    $sync = \Drupal::service('config.storage.sync');
+    $config_data = $this->config($config_name)->get();
+    $config_data['foo'] = EnumValue::No;
+    $sync->write($config_name, $config_data);
+
+    $core_extension = $this->config('core.extension')->get();
+    $core_extension['module']['config_enum_test'] = 0;
+    $core_extension['module'] = \Drupal::service(ModuleWeight::class)->sort($core_extension['module']);
+    $sync->write('core.extension', $core_extension);
+
+    $this->drupalGet('admin/config/development/configuration/sync/diff/' . $config_name);
+    $assert_session->responseNotContains('&amp;nbsp;');
+    $assert_session->titleEquals("View changes of $config_name | Drupal");
+    $assert_session->elementsCount('xpath', '//table[contains(@class, "diff")]', 1);
+    $assert_session->pageTextContains("foo: !php/enum Drupal\config_enum_test\EnumValue::No");
+
+    $this->drupalGet('admin/config/development/configuration');
+    $assert_session->responseContains('<td>config_enum_test.settings');
+    $assert_session->pageTextNotContains('The staged configuration is identical to the active configuration.');
+    $this->submitForm([], 'Import all');
+    $assert_session->responseNotContains('<td>config_enum_test.settings');
+    $assert_session->pageTextContains('The staged configuration is identical to the active configuration.');
+
+    // Ensure the value returned from config is an enum.
+    $this->assertSame(EnumValue::No, $this->config('config_enum_test.settings')->get('foo'));
   }
 
 }

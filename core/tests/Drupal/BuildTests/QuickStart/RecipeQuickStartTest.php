@@ -32,15 +32,11 @@ class RecipeQuickStartTest extends BuildTestBase {
 
   /**
    * The PHP executable path.
-   *
-   * @var string
    */
   protected string $php;
 
   /**
    * A test database object.
-   *
-   * @var \Drupal\Core\Test\TestDatabase
    */
   protected TestDatabase $testDb;
 
@@ -126,8 +122,6 @@ class RecipeQuickStartTest extends BuildTestBase {
     $response = $guzzle->get('http://127.0.0.1:' . $port, ['cookies' => $cookieJar]);
     $content = (string) $response->getBody();
     $this->assertStringContainsString('Test site ' . $this->testDb->getDatabasePrefix(), $content);
-    // Test content from frontpage.
-    $this->assertMatchesRegularExpression('/Powered by\s+Drupal/', strip_tags($content));
 
     // Stop the web server.
     $process->stop();

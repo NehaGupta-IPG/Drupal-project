@@ -16,6 +16,7 @@ use Drupal\Core\Plugin\RemovableDependentPluginInterface;
 use Drupal\Core\Plugin\PluginDependencyTrait;
 use Drupal\Core\Plugin\RemovableDependentPluginReturn;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Utility\NaturalSort;
 
 /**
  * Defines a base configuration entity class.
@@ -248,7 +249,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     if ($a_weight == $b_weight) {
       $a_label = $a->label() ?? '';
       $b_label = $b->label() ?? '';
-      return strnatcasecmp($a_label, $b_label);
+      return NaturalSort::strnatcasecmp($a_label, $b_label);
     }
     return $a_weight <=> $b_weight;
   }
@@ -644,6 +645,41 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     // @phpstan-ignore-next-line
     $this->trustedData = FALSE;
     return $return;
+  }
+
+  /**
+   * Loads one entity in their original form without overrides.
+   *
+   * @param string $id
+   *   The ID of the entity to load.
+   *
+   * @return static|null
+   *   An entity object. NULL if no matching entity is found.
+   */
+  public static function loadOverrideFree(string $id): ConfigEntityInterface|null {
+    $entity_type_repository = \Drupal::service('entity_type.repository');
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $storage = $entity_type_manager->getStorage($entity_type_repository->getEntityTypeFromClass(static::class));
+    assert($storage instanceof ConfigEntityStorageInterface);
+    return $storage->loadOverrideFree($id);
+  }
+
+  /**
+   * Loads one or more entities in their original form without overrides.
+   *
+   * @param string[]|null $ids
+   *   An array of entity IDs, or NULL to load all entities.
+   *
+   * @return static[]
+   *   An array of entity objects indexed by their IDs. Returns an empty array
+   *   if no matching entities are found.
+   */
+  public static function loadMultipleOverrideFree(?array $ids = NULL): array {
+    $entity_type_repository = \Drupal::service('entity_type.repository');
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $storage = $entity_type_manager->getStorage($entity_type_repository->getEntityTypeFromClass(static::class));
+    assert($storage instanceof ConfigEntityStorageInterface);
+    return $storage->loadMultipleOverrideFree($ids);
   }
 
 }

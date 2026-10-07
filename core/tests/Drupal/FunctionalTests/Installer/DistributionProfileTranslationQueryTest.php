@@ -37,7 +37,7 @@ class DistributionProfileTranslationQueryTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $profile = NULL;
+  protected $profile;
 
   /**
    * {@inheritdoc}
@@ -52,7 +52,7 @@ class DistributionProfileTranslationQueryTest extends InstallerTestBase {
         'name' => 'My Distribution',
         'langcode' => $this->langcode,
         'install' => [
-          'theme' => 'claro',
+          'theme' => 'default_admin',
         ],
       ],
     ];

@@ -1,6 +1,6 @@
 /**
  * @file
- * Claro styles for jQuery UI.
+ * Default Admin styles for jQuery UI.
  * Overrides /core/assets/vendor/jquery.ui/themes/base/theme.css.
  */
 
@@ -716,7 +716,7 @@
 }
 .ui-progressbar .ui-progressbar-value {
   height: 1.5em;
-  background: var(--admin-color-primary) url(../../../../misc/progress.gif);
+  background: var(--admin-color-primary);
 }
 
 /**
