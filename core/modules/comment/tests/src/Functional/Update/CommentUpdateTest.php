@@ -25,20 +25,20 @@ class CommentUpdateTest extends UpdatePathTestBase {
   }
 
   /**
-   * Tests comment_post_update_add_thread_limit_field_setting().
+   * Verifies tgat thread reply depth default value is added to comment fields.
    *
-   * @see comment_post_update_add_thread_limit_field_setting()
+   * @see comment_post_update_thread_reply_depth()
    */
-  public function testCommentPostUpdateAddThreadLimit(): void {
+  public function testCommentPostUpdateThreadReplyDepth(): void {
     $config_factory = \Drupal::configFactory();
 
     $config = $config_factory->get('field.field.node.article.comment');
-    $this->assertArrayNotHasKey('thread_limit', $config->get('settings'));
+    $this->assertArrayNotHasKey('thread_reply_depth', $config->get('settings'));
 
     $this->runUpdates();
 
     $config = $config_factory->get('field.field.node.article.comment');
-    $this->assertSame(2, $config->get('settings.thread_limit.depth'));
+    $this->assertSame(-1, $config->get('settings.thread_reply_depth'));
   }
 
 }

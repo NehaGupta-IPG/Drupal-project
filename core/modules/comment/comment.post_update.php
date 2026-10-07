@@ -19,16 +19,18 @@ function comment_removed_post_updates(): array {
 }
 
 /**
- * Set the default value of 'thread_limit' setting for all comment fields.
+ * Set default value for thread reply depth.
  */
-function comment_post_update_add_thread_limit_field_setting(?array &$sandbox = NULL): void {
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'field_config', function (FieldConfigInterface $field_config): bool {
-    if ($field_config->getType() === 'comment') {
-      $field_config->setSetting('thread_limit', [
-        'depth' => 2,
-      ]);
-      return TRUE;
-    }
-    return FALSE;
-  });
+function comment_post_update_thread_reply_depth(?array &$sandbox = NULL): void {
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update(
+    $sandbox,
+    'field_config',
+    function (FieldConfigInterface $field_config): bool {
+      if ($field_config->getType() === 'comment') {
+        $field_config->setSetting('thread_reply_depth', -1);
+        return TRUE;
+      }
+      return FALSE;
+    },
+  );
 }

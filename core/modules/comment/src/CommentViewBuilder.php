@@ -127,8 +127,8 @@ class CommentViewBuilder extends EntityViewBuilder {
         ->getFieldDefinition($entity->getFieldName())
         ?->getSettings();
       if (isset($field_settings['default_mode']) && $field_settings['default_mode'] === CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT) {
-        \assert($field_settings['thread_limit']['depth'] >= 2, 'Thread depth limit should be greater than or equal to 2.');
-        $max_indent = $field_settings['thread_limit']['depth'] - 1;
+        \assert($field_settings['thread_reply_depth'] >= 1, 'Thread reply depth should be greater than or equal to 1.');
+        $max_indent = $field_settings['thread_reply_depth'];
       }
     }
 

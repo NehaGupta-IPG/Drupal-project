@@ -79,13 +79,12 @@ field.field_settings.comment:
     default_mode:
       type: integer
       label: 'Threading'
-    thread_limit:
-      type: mapping
-      label: 'Thread limiting'
-      mapping:
-        depth:
-          type: integer
-          label: 'Thread depth'
+    thread_reply_depth:
+      type: integer
+      label: 'Thread reply depth'
+      constraint:
+        Range:
+          min: -1
     per_page:
       type: integer
       label: 'Comments per page'

@@ -48,9 +48,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
   public static function defaultFieldSettings() {
     return [
       'default_mode' => CommentManagerInterface::COMMENT_MODE_THREADED,
-      'thread_limit' => [
-        'depth' => 2,
-      ],
+      'thread_reply_depth' => -1,
       'per_page' => 50,
       'form_location' => FormLocation::Below->value,
       'anonymous' => AnonymousContact::Forbidden->value,
@@ -129,9 +127,12 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       '#default_value' => $settings['default_mode'],
       '#description' => $this->t('If the comments are displayed as a flat list or threaded.'),
     ];
-    $element['thread_limit'] = [
-      '#type' => 'fieldset',
-      '#title' => $this->t('Limited depth settings'),
+    $element['thread_reply_depth'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Thread depth limit'),
+      '#default_value' => $settings['thread_reply_depth'],
+      '#description' => $this->t('Define the maximum number of replies in a comment thread.'),
+      '#min' => -1,
       '#states' => [
         'visible' => [
           ':input[name="settings[default_mode]"]' => [
@@ -139,15 +140,6 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
           ],
         ],
       ],
-    ];
-    $element['thread_limit']['depth'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Thread depth limit'),
-      '#default_value' => $settings['thread_limit']['depth'],
-      '#description' => $this->t('Define comment thread depth.'),
-      // The maximum thread deep cannot be less than 2 as it doesn't makes sense
-      // to have threaded comments with only one level.
-      '#min' => 2,
     ];
     $element['per_page'] = [
       '#type' => 'number',
