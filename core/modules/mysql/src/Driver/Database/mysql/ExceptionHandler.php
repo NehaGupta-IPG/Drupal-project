@@ -22,6 +22,16 @@ class ExceptionHandler extends BaseExceptionHandler {
   /**
    * {@inheritdoc}
    */
+  public function handleStatementException(\Exception $exception, string $sql, array $options = []): never {
+    if (!$exception instanceof \PDOException) {
+      throw $exception;
+    }
+    $this->rethrowNormalizedException($exception, $exception->getCode(), $exception->errorInfo[1] ?? NULL, $sql, [], $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function handleExecutionException(\Exception $exception, StatementInterface $statement, array $arguments = [], array $options = []): never {
     if (!$exception instanceof \PDOException) {
       throw $exception;
