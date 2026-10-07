@@ -145,11 +145,18 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function setWithExpire($key, $value, $expire) {
-    $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      fn() => $this->doSetWithExpire($key, $value, $expire),
-    );
+    try {
+      $this->doSetWithExpire($key, $value, $expire);
+    }
+    catch (\Exception $e) {
+      // If there was an exception, then try to create the table.
+      if ($this->ensureTableExists()) {
+        $this->doSetWithExpire($key, $value, $expire);
+      }
+      else {
+        throw $e;
+      }
+    }
   }
 
   /**
@@ -179,11 +186,18 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function setWithExpireIfNotExists($key, $value, $expire) {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      fn() => $this->doSetWithExpireIfNotExists($key, $value, $expire),
-    );
+    try {
+      return $this->doSetWithExpireIfNotExists($key, $value, $expire);
+    }
+    catch (\Exception $e) {
+      // If there was an exception, try to create the table.
+      if ($this->ensureTableExists()) {
+        return $this->doSetWithExpireIfNotExists($key, $value, $expire);
+      }
+      else {
+        throw $e;
+      }
+    }
   }
 
   /**

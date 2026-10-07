@@ -51,11 +51,23 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function createItem($data) {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      static::TABLE_NAME,
-      $this->schemaDefinition(),
-      fn() => $this->doCreateItem($data),
-    );
+    $try_again = FALSE;
+    try {
+      $id = $this->doCreateItem($data);
+    }
+    catch (\Exception $e) {
+      // If there was an exception, try to create the table.
+      if (!$try_again = $this->ensureTableExists()) {
+        // If the exception happened for other reason than the missing table,
+        // propagate the exception.
+        throw $e;
+      }
+    }
+    // Now that the table has been created, try again if necessary.
+    if ($try_again) {
+      $id = $this->doCreateItem($data);
+    }
+    return $id;
   }
 
   /**
@@ -251,15 +263,8 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
 
   /**
    * Check if the table exists and create it if not.
-   *
-   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
-   *   \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded()
-   *   instead.
-   *
-   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $database_schema = $this->connection->schema();
       $schema_definition = $this->schemaDefinition();

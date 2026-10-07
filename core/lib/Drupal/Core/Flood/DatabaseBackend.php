@@ -42,11 +42,19 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
     if (!isset($identifier)) {
       $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
     }
-    $this->connection->executeAndCreateTableIfNeeded(
-      static::TABLE_NAME,
-      $this->schemaDefinition(),
-      fn() => $this->doInsert($name, $window, $identifier),
-    );
+    $try_again = FALSE;
+    try {
+      $this->doInsert($name, $window, $identifier);
+    }
+    catch (\Exception $e) {
+      $try_again = $this->ensureTableExists();
+      if (!$try_again) {
+        throw $e;
+      }
+    }
+    if ($try_again) {
+      $this->doInsert($name, $window, $identifier);
+    }
   }
 
   /**
@@ -112,20 +120,22 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
     if (!isset($identifier)) {
       $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
     }
-    return $this->connection->executeAndCreateTableIfNeeded(
-      static::TABLE_NAME,
-      $this->schemaDefinition(),
-      function () use ($name, $threshold, $window, $identifier) {
-        $number = $this->connection->select(static::TABLE_NAME, 'f')
-          ->condition('event', $name)
-          ->condition('identifier', $identifier)
-          ->condition('timestamp', $this->time->getRequestTime() - $window, '>')
-          ->countQuery()
-          ->execute()
-          ->fetchField();
-        return ($number < $threshold);
-      },
-    );
+    try {
+      $number = $this->connection->select(static::TABLE_NAME, 'f')
+        ->condition('event', $name)
+        ->condition('identifier', $identifier)
+        ->condition('timestamp', $this->time->getRequestTime() - $window, '>')
+        ->countQuery()
+        ->execute()
+        ->fetchField();
+      return ($number < $threshold);
+    }
+    catch (\Exception $e) {
+      if (!$this->ensureTableExists()) {
+        throw $e;
+      }
+      return TRUE;
+    }
   }
 
   /**
@@ -144,15 +154,8 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
 
   /**
    * Check if the flood table exists and create it if not.
-   *
-   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
-   *   \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded()
-   *   instead.
-   *
-   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $database_schema = $this->connection->schema();
       $schema_definition = $this->schemaDefinition();

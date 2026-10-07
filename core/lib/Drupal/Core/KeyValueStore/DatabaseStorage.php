@@ -164,11 +164,18 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function set($key, $value) {
-    $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      fn() => $this->doSet($key, $value),
-    );
+    try {
+      $this->doSet($key, $value);
+    }
+    catch (\Exception $e) {
+      // If there was an exception, try to create the table.
+      if ($this->ensureTableExists()) {
+        $this->doSet($key, $value);
+      }
+      else {
+        throw $e;
+      }
+    }
   }
 
   /**
@@ -211,11 +218,18 @@ class DatabaseStorage extends StorageBase {
     if (empty($data)) {
       return;
     }
-    $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      fn() => $this->doSetMultiple($data),
-    );
+    try {
+      $this->doSetMultiple($data);
+    }
+    catch (\Exception $e) {
+      // If there was an exception, try to create the table.
+      if ($this->ensureTableExists()) {
+        $this->doSetMultiple($data);
+      }
+      else {
+        throw $e;
+      }
+    }
   }
 
   /**
@@ -248,11 +262,18 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function setIfNotExists($key, $value) {
-    return $this->connection->executeAndCreateTableIfNeeded(
-      $this->table,
-      $this->schemaDefinition(),
-      fn() => $this->doSetIfNotExists($key, $value),
-    );
+    try {
+      return $this->doSetIfNotExists($key, $value);
+    }
+    catch (\Exception $e) {
+      // If there was an exception, try to create the table.
+      if ($this->ensureTableExists()) {
+        return $this->doSetIfNotExists($key, $value);
+      }
+      else {
+        throw $e;
+      }
+    }
   }
 
   /**
@@ -308,15 +329,8 @@ class DatabaseStorage extends StorageBase {
    *
    * @return bool
    *   TRUE if the table exists, FALSE if it does not exists.
-   *
-   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
-   *   \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded()
-   *   instead.
-   *
-   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $database_schema = $this->connection->schema();
       $database_schema->createTable($this->table, $this->schemaDefinition());

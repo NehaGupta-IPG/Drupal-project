@@ -182,20 +182,4 @@ class MatcherDumperTest extends KernelTestBase {
     $this->assertEquals($expected, $this->state->get('routing.menu_masks.test_routes'));
   }
 
-  /**
-   * Tests creating a missing table after the dumper starts its transaction.
-   */
-  public function testDumpCreatesTable(): void {
-    $connection = Database::getConnection();
-    $dumper = new MatcherDumper($connection, $this->state, $this->logger, 'lazy_routes');
-    $collection = new RouteCollection();
-    $collection->add('lazy_route', new Route('/lazy'));
-    $dumper->addRoutes($collection);
-    $this->assertFalse($connection->schema()->tableExists('lazy_routes'));
-    $this->assertSame('', $dumper->dump());
-    $this->assertFalse($connection->inTransaction());
-    $this->assertSame('lazy_route', $connection->select('lazy_routes')->fields('lazy_routes', ['name'])->execute()->fetchField());
-    $this->assertFalse($this->logger->hasErrorRecords());
-  }
-
 }
