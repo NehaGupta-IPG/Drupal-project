@@ -162,6 +162,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
             // reference like &$task_info causes bugs.
             $definitions[$plugin_id]['base_route'] = $definitions[$task_info['parent_id']]['base_route'];
           }
+          \assert(isset($task_info['route_name']), \sprintf('Local task "%s" is missing a route name', $plugin_id));
           if ($route_name == $task_info['route_name']) {
             if (!empty($task_info['base_route'])) {
               $base_routes[$task_info['base_route']] = $task_info['base_route'];
@@ -180,6 +181,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
           // Find all the plugins with the same root and that are at the top
           // level or that have a visible parent.
           foreach ($definitions as $plugin_id => $task_info) {
+            \assert(isset($task_info['base_route']), \sprintf('Local task "%s" is missing a base route', $plugin_id));
             if (!empty($base_routes[$task_info['base_route']]) && (empty($task_info['parent_id']) || !empty($parents[$task_info['parent_id']]))) {
               // Concat '> ' with root ID for the parent of top-level tabs.
               $parent = empty($task_info['parent_id']) ? '> ' . $task_info['base_route'] : $task_info['parent_id'];
