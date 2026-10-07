@@ -307,25 +307,20 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
   /**
    * {@inheritdoc}
-   *
-   * A failed statement aborts the enclosing transaction. Inside a transaction,
-   * check for the tables before the operation instead of recovering from the
-   * failure.
    */
   public function executeWithSchema(SchemaDefinition $schema, callable $operation): mixed {
     if (!$this->inTransaction()) {
       return parent::executeWithSchema($schema, $operation);
     }
+    // A failed statement aborts the enclosing transaction. Inside a
+    // transaction, check for the tables before the operation instead of
+    // recovering from the failure.
     $this->createSchemaIfNotExists($schema);
     return $operation();
   }
 
   /**
    * {@inheritdoc}
-   *
-   * A failed statement aborts the enclosing transaction. Inside a transaction,
-   * create each table in a savepoint, so that losing a creation race does not
-   * abort the enclosing transaction.
    */
   protected function createSchemaIfNotExists(SchemaDefinition $schema): void {
     if (!$this->inTransaction()) {
@@ -336,6 +331,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       if ($this->schema()->tableExists($table->name)) {
         continue;
       }
+      // A failed statement aborts the enclosing transaction. Create each table
+      // in a savepoint, so that losing a creation race does not abort the
+      // enclosing transaction.
       $savepoint = $this->startTransaction();
       try {
         $this->schema()->createTableFromDefinition($schema->type, $schema->name, $table);
