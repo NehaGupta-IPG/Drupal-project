@@ -14,6 +14,7 @@ use Drupal\Core\Plugin\Discovery\YamlDiscoveryDecorator;
 use Drupal\Core\Layout\Attribute\Layout;
 use Drupal\Core\Plugin\FilteredPluginManagerTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Utility\NaturalSort;
 use Drupal\layout_discovery\Hook\LayoutDiscoveryThemeHooks;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -190,7 +191,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     $categories = array_unique(array_values(array_map(function (LayoutDefinition $definition) {
       return $definition->getCategory();
     }, $this->getDefinitions())));
-    natcasesort($categories);
+    NaturalSort::natcasesort($categories);
     return $categories;
   }
 

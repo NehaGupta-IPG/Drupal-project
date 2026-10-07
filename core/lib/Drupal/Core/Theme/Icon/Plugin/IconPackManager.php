@@ -18,6 +18,7 @@ use Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException;
 use Drupal\Core\Theme\Icon\IconCollector;
 use Drupal\Core\Theme\Icon\IconDefinitionInterface;
 use Drupal\Core\Theme\Icon\IconExtractorPluginManager;
+use Drupal\Core\Utility\NaturalSort;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
 
@@ -344,7 +345,7 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
       $options[$definition['id']] = sprintf('%s (%u)', $label, count($definition['icons']));
     }
 
-    natsort($options);
+    NaturalSort::natcasesort($options);
     return $options;
   }
 

@@ -20,6 +20,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Utility\NaturalSort;
 use Drupal\user\EntityOwnerInterface;
 
 /**
@@ -160,7 +161,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       foreach ($bundles as $bundle_name => $bundle_info) {
         $bundle_options[$bundle_name] = $bundle_info['label'];
       }
-      natsort($bundle_options);
+      NaturalSort::natcasesort($bundle_options);
       $selected_bundles = array_intersect_key(
         $bundle_options,
         array_filter((array) $configuration['target_bundles'])

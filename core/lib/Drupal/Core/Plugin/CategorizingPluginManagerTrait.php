@@ -5,6 +5,7 @@ namespace Drupal\Core\Plugin;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Utility\NaturalSort;
 
 /**
  * Provides a trait for the CategorizingPluginManagerInterface.
@@ -80,7 +81,7 @@ trait CategorizingPluginManagerTrait {
     $categories = array_unique(array_values(array_map(function ($definition) {
       return $definition['category'];
     }, $this->getDefinitions())));
-    natcasesort($categories);
+    NaturalSort::natcasesort($categories);
     return $categories;
   }
 
