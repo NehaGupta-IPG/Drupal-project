@@ -389,10 +389,10 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
    * Tests a partial translation falls back to source per key, not per object.
    *
    * The override for the new default only covers one of several translatable
-   * keys, so DefaultLangcodeConfigUpdater absorbs that one key but leaves the
-   * others holding the previous default's content. Locale module must fall
-   * back to the English source for exactly those keys, without disturbing
-   * the one key that genuinely was translated.
+   * keys, so DefaultLangcodeConfigUpdater merges that one key but leaves the
+   * others holding the previous default's content. Locale module must fall back
+   * to the English source for exactly those keys, without disturbing the one
+   * key that genuinely was translated.
    *
    * @see \Drupal\language\DefaultLangcodeConfigUpdater::extractTranslatableData()
    */
@@ -435,7 +435,7 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
 
     $config = $this->config($config_name);
     $this->assertSame('es', $config->get('langcode'));
-    // The one key that was translated is absorbed as-is.
+    // The one key that was translated is merged as-is.
     $this->assertSame('Una cadena', $config->get('test_multiple.string'));
     // Every other translatable key falls back to the English source, not the
     // French text the previous default left behind.
