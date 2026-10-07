@@ -123,15 +123,14 @@ class CommentViewBuilder extends EntityViewBuilder {
     $max_indent = NULL;
     // The maximum indent can only be determined for non-orphan comments.
     if ($commented_entity) {
-      $field_settings = $commented_entity
+      $reply_depth_limit = $commented_entity
         ->getFieldDefinition($entity->getFieldName())
-        ?->getSettings();
-      if (isset($field_settings['default_mode']) && $field_settings['default_mode'] === CommentManagerInterface::COMMENT_MODE_THREADED &&
-        $field_settings['thread_reply_depth'] > -1
-      ) {
-        $max_indent = $field_settings['thread_reply_depth'];
+        ?->getSettings()['thread_reply_depth'] ?? NULL;
+      if (is_int($reply_depth_limit) && $reply_depth_limit > -1) {
+        $max_indent = $reply_depth_limit;
       }
     }
+    $reply_depth_limited = is_int($max_indent);
 
     parent::buildComponents($build, $entities, $displays, $view_mode);
 
@@ -141,7 +140,7 @@ class CommentViewBuilder extends EntityViewBuilder {
     foreach ($entities as $id => $entity) {
       if ($build[$id]['#comment_threaded']) {
         $comment_indent = count(explode('.', (string) $entity->getThread())) - 1;
-        if ($comment_indent > $current_indent && ($max_indent === NULL || $comment_indent <= $max_indent)) {
+        if ($comment_indent > $current_indent && (!$reply_depth_limited || $comment_indent <= $max_indent)) {
           // Set 1 to indent this comment from the previous one (its parent).
           // Set only one extra level of indenting even if the difference in
           // depth is higher.
@@ -154,7 +153,7 @@ class CommentViewBuilder extends EntityViewBuilder {
           $build[$id]['#comment_indent'] = $comment_indent - $current_indent;
           $current_indent = $comment_indent;
           // Adjust indentation relative to the defined thread depth.
-          if ($max_indent !== NULL && ($comment_indent > $max_indent)) {
+          if ($reply_depth_limited && ($comment_indent > $max_indent)) {
             $indent_adjustment = $comment_indent - $max_indent;
             $build[$id]['#comment_indent'] -= $indent_adjustment;
             $current_indent -= $indent_adjustment;

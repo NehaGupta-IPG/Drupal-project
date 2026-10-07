@@ -132,13 +132,6 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       '#default_value' => $settings['thread_reply_depth'],
       '#description' => $this->t('Define the maximum number of replies in a comment thread.'),
       '#min' => -1,
-      '#states' => [
-        'visible' => [
-          ':input[name="settings[default_mode]"]' => [
-            'value' => CommentManagerInterface::COMMENT_MODE_THREADED,
-          ],
-        ],
-      ],
     ];
     $element['per_page'] = [
       '#type' => 'number',

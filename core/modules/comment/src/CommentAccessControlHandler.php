@@ -100,27 +100,21 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
       return $access_result;
     }
 
-    // Forbid if this reply, to a threaded comment, is about to exceed the
-    // maximum thread depth.
+    // Forbid if this reply is about to exceed the maximum thread depth.
     $field_definition = $commented_entity->getFieldDefinition($comment->getFieldName());
     \assert($field_definition instanceof FieldDefinitionInterface);
     $access_result->addCacheableDependency($field_definition->getConfig($commented_entity->bundle()));
-    $field_settings = $field_definition->getSettings();
+    $reply_depth = $field_definition->getSettings()['thread_reply_depth'] ?? NULL;
+    \assert(is_int($reply_depth));
+    \assert($reply_depth >= -1, 'Thread reply depth should be greater than or equal to -1.');
 
-    // Only check if the depth is limited.
-    if (
-      $field_settings &&
-      $field_settings['default_mode'] === CommentManagerInterface::COMMENT_MODE_THREADED &&
-      $field_settings['thread_reply_depth'] > -1
-    ) {
-      \assert($field_settings['thread_reply_depth'] >= -1, 'Thread reply depth should be greater than or equal to -1.');
-
-      // Prevent replying to the deepest comment.
+    // Display mode is really only about how comments and their replies are
+    // displayed. So, we check thread depth regardless which display mode is
+    // set. Depth -1 means reply depth is unlimited.
+    if ($reply_depth > -1) {
+      // Prevent replying to comments on the deepest level.
       $comment_indent = count(explode('.', $comment->getThread()));
-      $max_indent = $field_settings['thread_reply_depth'] + 1;
-      if ($comment_indent >= $max_indent) {
-        return $access_result->andIf(AccessResult::forbidden('Thread limit hit'));
-      }
+      $access_result = $access_result->andIf(AccessResult::forbiddenIf($comment_indent > $reply_depth, 'Thread limit hit'));
     }
 
     return $access_result;
