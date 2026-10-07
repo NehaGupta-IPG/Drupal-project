@@ -121,8 +121,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       '#title' => $this->t('Threading mode'),
       '#options' => [
         CommentManagerInterface::COMMENT_MODE_FLAT => $this->t('Flat list'),
-        CommentManagerInterface::COMMENT_MODE_THREADED => $this->t('Threaded (no depth limit)'),
-        CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT => $this->t('Threaded (limited depth)'),
+        CommentManagerInterface::COMMENT_MODE_THREADED => $this->t('Threaded'),
       ],
       '#default_value' => $settings['default_mode'],
       '#description' => $this->t('If the comments are displayed as a flat list or threaded.'),
@@ -136,7 +135,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       '#states' => [
         'visible' => [
           ':input[name="settings[default_mode]"]' => [
-            'value' => CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT,
+            'value' => CommentManagerInterface::COMMENT_MODE_THREADED,
           ],
         ],
       ],

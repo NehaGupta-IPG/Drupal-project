@@ -117,7 +117,7 @@ class CommentThreadMaxDepthTest extends KernelTestBase {
    */
   public function testMaxDepthReplyDenied(): void {
     FieldConfig::loadByName('entity_test', 'entity_test', 'comment')
-      ->setSetting('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT)
+      ->setSetting('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED)
       ->setSetting('thread_reply_depth', 2)
       ->save();
     $this->createTestComments();

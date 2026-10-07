@@ -108,8 +108,12 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
     $field_settings = $field_definition->getSettings();
 
     // Only check if the depth is limited.
-    if ($field_settings && $field_settings['default_mode'] === CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT) {
-      \assert($field_settings['thread_reply_depth'] >= 1, 'Thread reply depth should be greater than or equal to 1.');
+    if (
+      $field_settings &&
+      $field_settings['default_mode'] === CommentManagerInterface::COMMENT_MODE_THREADED &&
+      $field_settings['thread_reply_depth'] > -1
+    ) {
+      \assert($field_settings['thread_reply_depth'] >= -1, 'Thread reply depth should be greater than or equal to -1.');
 
       // Prevent replying to the deepest comment.
       $comment_indent = count(explode('.', $comment->getThread()));

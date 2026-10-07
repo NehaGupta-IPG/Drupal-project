@@ -15,14 +15,9 @@ interface CommentManagerInterface {
   const COMMENT_MODE_FLAT = 0;
 
   /**
-   * Comments are displayed as a threaded list - expanded, no depth limitation.
+   * Comments are displayed as a threaded list - expanded.
    */
   const COMMENT_MODE_THREADED = 1;
-
-  /**
-   * Comments are displayed as a threaded list - expanded, depth is limited.
-   */
-  const COMMENT_MODE_THREADED_DEPTH_LIMIT = 2;
 
   /**
    * Utility function to return an array of comment fields.

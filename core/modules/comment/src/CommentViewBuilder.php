@@ -126,8 +126,9 @@ class CommentViewBuilder extends EntityViewBuilder {
       $field_settings = $commented_entity
         ->getFieldDefinition($entity->getFieldName())
         ?->getSettings();
-      if (isset($field_settings['default_mode']) && $field_settings['default_mode'] === CommentManagerInterface::COMMENT_MODE_THREADED_DEPTH_LIMIT) {
-        \assert($field_settings['thread_reply_depth'] >= 1, 'Thread reply depth should be greater than or equal to 1.');
+      if (isset($field_settings['default_mode']) && $field_settings['default_mode'] === CommentManagerInterface::COMMENT_MODE_THREADED &&
+        $field_settings['thread_reply_depth'] > -1
+      ) {
         $max_indent = $field_settings['thread_reply_depth'];
       }
     }
@@ -140,7 +141,7 @@ class CommentViewBuilder extends EntityViewBuilder {
     foreach ($entities as $id => $entity) {
       if ($build[$id]['#comment_threaded']) {
         $comment_indent = count(explode('.', (string) $entity->getThread())) - 1;
-        if ($comment_indent > $current_indent && (!$max_indent || $comment_indent <= $max_indent)) {
+        if ($comment_indent > $current_indent && ($max_indent === NULL || $comment_indent <= $max_indent)) {
           // Set 1 to indent this comment from the previous one (its parent).
           // Set only one extra level of indenting even if the difference in
           // depth is higher.
@@ -153,7 +154,7 @@ class CommentViewBuilder extends EntityViewBuilder {
           $build[$id]['#comment_indent'] = $comment_indent - $current_indent;
           $current_indent = $comment_indent;
           // Adjust indentation relative to the defined thread depth.
-          if ($max_indent && ($comment_indent > $max_indent)) {
+          if ($max_indent !== NULL && ($comment_indent > $max_indent)) {
             $indent_adjustment = $comment_indent - $max_indent;
             $build[$id]['#comment_indent'] -= $indent_adjustment;
             $current_indent -= $indent_adjustment;
