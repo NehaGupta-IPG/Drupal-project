@@ -12,7 +12,7 @@ import {
   SwitchButtonView,
   View,
   ViewCollection,
-  createLabeledInputText,
+  createLabeledTextarea,
   submitHandler,
   FocusTracker,
   KeystrokeHandler,
@@ -236,6 +236,10 @@ export default class ImageAlternativeTextFormView extends View {
   /**
    * Creates an input with a label.
    *
+   * The field is a textarea rather than a single-line input so that long
+   * alternative text wraps and the field grows vertically instead of
+   * scrolling horizontally out of view.
+   *
    * @returns {module:ui/labeledfield/labeledfieldview~LabeledFieldView}
    *   Labeled field view instance.
    *
@@ -244,13 +248,15 @@ export default class ImageAlternativeTextFormView extends View {
   _createLabeledInputView() {
     const labeledInput = new LabeledFieldView(
       this.locale,
-      createLabeledInputText,
+      createLabeledTextarea,
     );
 
     labeledInput
       .bind('class')
       .to(this.decorativeToggle, 'isOn', (value) => (value ? 'ck-hidden' : ''));
     labeledInput.label = Drupal.t('Alternative text');
+    labeledInput.fieldView.minRows = 1;
+    labeledInput.fieldView.maxRows = 6;
 
     return labeledInput;
   }

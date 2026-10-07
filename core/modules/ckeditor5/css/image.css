@@ -18,6 +18,9 @@
 .ck.ck-responsive-form .ck.ck-text-alternative-form__decorative-toggle .ck-switchbutton {
   width: 100%;
 }
+.ck.ck-text-alternative-form .ck-labeled-field-view__input-wrapper .ck-textarea {
+  width: 100% !important;
+}
 
 .ck .image,
 .ck .image-inline {

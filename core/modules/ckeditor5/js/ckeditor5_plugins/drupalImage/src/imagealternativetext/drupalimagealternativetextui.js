@@ -212,6 +212,12 @@ export default class DrupalImageAlternativeTextUi extends Plugin {
       repositionContextualBalloon(editor);
     });
 
+    // Reposition the toolbar when the alternative text field grows or
+    // shrinks as the user types, since that also changes the form size.
+    this.listenTo(this._form.labeledInput.fieldView, 'update', () => {
+      repositionContextualBalloon(editor);
+    });
+
     // Close the form on Esc key press.
     this._form.keystrokes.set('Esc', (data, cancel) => {
       this._hideForm(true);

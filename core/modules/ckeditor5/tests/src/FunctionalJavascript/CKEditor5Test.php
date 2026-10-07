@@ -508,7 +508,7 @@ JS;
     // Add alt text to the image.
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.image.ck-widget > img'));
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-balloon-panel .ck-text-alternative-form'));
-    $alt_override_input = $page->find('css', '.ck-balloon-panel .ck-text-alternative-form input[type=text]');
+    $alt_override_input = $page->find('css', '.ck-balloon-panel .ck-text-alternative-form textarea');
     $alt_override_input->setValue('There is now alt text');
     $this->getBalloonButton('Save')->click();
     $page->pressButton('Save');

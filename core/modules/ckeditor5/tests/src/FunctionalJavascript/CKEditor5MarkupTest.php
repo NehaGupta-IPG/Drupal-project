@@ -92,7 +92,7 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
     $assert_session->waitForElementVisible('css', '.ck-widget.image');
 
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-balloon-panel .ck-text-alternative-form'));
-    $alt_override_input = $page->find('css', '.ck-balloon-panel .ck-text-alternative-form input[type=text]');
+    $alt_override_input = $page->find('css', '.ck-balloon-panel .ck-text-alternative-form textarea');
     $this->assertSame('', $alt_override_input->getValue());
     $alt_override_input->setValue('</em> Kittens & llamas are cute');
     $this->getBalloonButton('Save')->click();
