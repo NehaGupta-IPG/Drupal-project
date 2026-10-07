@@ -174,6 +174,16 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    */
   protected const array INFRASTRUCTURE_TABLES = [
     'cache_container',
+    'cache_file_parsing',
+    'cachetags',
+    'config_export',
+    'config_import',
+    'config_snapshot',
+    'key_value_expire',
+    'menu_tree',
+    'queue',
+    'router',
+    'semaphore',
   ];
 
   /**
