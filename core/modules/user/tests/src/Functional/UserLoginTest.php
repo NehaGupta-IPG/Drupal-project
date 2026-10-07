@@ -157,30 +157,35 @@ class UserLoginTest extends BrowserTestBase {
       ->set('use_username', TRUE)
       ->save();
 
-    // Create a user so we can sanity check flood control is not active for an existing user.
+    // Create an existing user and an unsaved user with an unknown username.
     $user1 = $this->drupalCreateUser([]);
-    $non_existent_user2 = clone $user1;
-    $non_existent_user2->setUsername('user2');
+    $unknown_user = User::create(['name' => $this->randomMachineName()]);
+    $unknown_user->passRaw = $this->randomString();
 
-    // Try 3 failed logins for user 1, they will not trigger flood control.
+    // Try 3 failed logins for the unknown user, they will not trigger flood
+    // control.
     for ($i = 0; $i < 3; $i++) {
-      $this->assertFailedLogin($non_existent_user2);
+      $this->assertFailedLogin($unknown_user);
     }
 
-    // Try one successful attempt for user 1, it should not trigger any
-    // flood control.
+    // A successful login for user 1 should not trigger any flood control.
     $this->drupalLogin($user1);
     $this->drupalLogout();
 
-    // Try one more attempt for the non existing user 1, it should be blocked.
-    $this->assertFailedLogin($non_existent_user2, 'user');
+    // One more attempt for the unknown user should be blocked.
+    $this->assertFailedLogin($unknown_user, 'user');
 
-    // Create user 2.
-    $user2 = $this->drupalCreateUser([], 'user2');
+    // Create a user with the previously unknown username.
+    $user2 = $this->drupalCreateUser([], $unknown_user->getAccountName());
 
+    // Add Created field to the user profile display so that there is something
+    // to check page contents against.
+    EntityViewDisplay::collectRenderDisplay($user2, 'default')
+      ->setComponent('created', ['type' => 'timestamp'])
+      ->save();
     // Try to log in as user 2, as it now exists, it should be successful.
     $this->drupalLogin($user2);
-    $this->assertSession()->responseContains('Member for');
+    $this->assertSession()->responseContains('Created');
   }
 
   /**
