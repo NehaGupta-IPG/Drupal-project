@@ -1,0 +1,8 @@
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+
+  ServicesSecond\SecondTestService:
+    class: ServicesSecond\SecondTestService
+    public: true

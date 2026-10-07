@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DrCommandPackage;
+namespace ServicesPackage;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
@@ -10,15 +10,15 @@ use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 /**
  * Service provider contributed by a non-module Composer package.
  *
- * @see \Drupal\KernelTests\Core\DrupalKernel\PhpPackageExtensionsDetailsTest
+ * @see \Drupal\KernelTests\Core\DrupalKernel\PhpPackageExtensionsTest
  */
-class PhpPackageTestServiceProvider implements ServiceProviderInterface {
+class Provider implements ServiceProviderInterface {
 
   /**
    * {@inheritdoc}
    */
   public function register(ContainerBuilder $container) {
-    $container->setParameter('dr_command_package_test.service_provider_registered', TRUE);
+    $container->setParameter('services_package_test.service_provider_registered', TRUE);
   }
 
 }

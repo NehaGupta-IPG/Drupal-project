@@ -7,9 +7,7 @@
     },
     "extra": {
         "drupal": {
-            "providers": [
-                "DrCommandPackage\\PhpPackageTestServiceProvider"
-            ]
+            "providers": []
         }
     }
 }
