@@ -19,13 +19,15 @@
   --dropbutton-height: 4rem;
   --dropbutton-border-radius-size: 0.375rem;
   --dropbutton-item-max-width: 12.5rem;
-  --dropbutton-padding: 1.25rem;
+  --dropbutton-padding-block: 1.25rem;
+  --dropbutton-padding-inline: 1.25rem;
 
   .no-touchevents &.dropbutton--small {
     --dropbutton-spacing-size: 0.625rem;
     --dropbutton-font-size: var(--admin-font-size-xs);
     --dropbutton-line-height: 0.75rem;
-    --dropbutton-padding: 1.25rem;
+    --dropbutton-padding-block: 1.25rem;
+    --dropbutton-padding-inline: 1.25rem;
     --dropbutton-height: 2rem;
   }
 
@@ -33,7 +35,8 @@
     --dropbutton-spacing-size: 0.375rem;
     --dropbutton-font-size: var(--admin-font-size-xs);
     --dropbutton-line-height: 0.75rem;
-    --dropbutton-padding: 0 0.75rem;
+    --dropbutton-padding-block: 0.3125rem;
+    --dropbutton-padding-inline: 0.75rem;
     --dropbutton-height: 1.5rem;
   }
 }
@@ -93,13 +96,15 @@
  */
 
 .dropbutton__items {
+  --dropdown-padding: 0.25rem;
+
   position: fixed;
   z-index: 1; /* Appear above other dropbuttons. */
   min-width: anchor-size(width);
   width: max-content;
   visibility: hidden;
   margin: 0;
-  padding: 0.5em;
+  padding: var(--dropdown-padding);
   list-style: none;
   border-radius: var(--admin-radius-l);
   background: var(--admin-color-bg-raised);
@@ -111,6 +116,12 @@
     position-area: bottom span-x-end;
     position-try-fallbacks: flip-block;
     visibility: visible;
+  }
+
+  a {
+    display: block;
+    padding-block: var(--dropbutton-padding-block);
+    padding-inline: calc(var(--dropbutton-padding-inline) - var(--dropdown-padding));
   }
 }
 
@@ -166,7 +177,8 @@
     align-items: center;
     height: 100%;
     margin: 0;
-    padding: var(--dropbutton-padding);
+    padding-block: var(--dropbutton-padding-block);
+    padding-inline: var(--dropbutton-padding-inline);
     cursor: pointer;
     white-space: nowrap;
     -webkit-text-decoration: none;
