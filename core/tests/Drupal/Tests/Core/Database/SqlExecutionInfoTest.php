@@ -6,6 +6,8 @@ namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\ExceptionHandler;
+use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException;
 use Drupal\Core\Database\SqlExecutionInfo;
 use Drupal\Core\Entity\EntityStorageException;
@@ -20,6 +22,74 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(SqlExecutionInfo::class)]
 #[Group('Database')]
 class SqlExecutionInfoTest extends UnitTestCase {
+
+  /**
+   * Tests mixed arguments while handling an actual native query failure.
+   */
+  #[DataProvider('providerMixedArguments')]
+  public function testMixedArgumentsRetainNativeException(string $kind, string $diagnostic): void {
+    if (!in_array('sqlite', \PDO::getAvailableDrivers(), TRUE)) {
+      $this->markTestSkipped('The PDO SQLite driver is unavailable.');
+    }
+    $stream = fopen('php://memory', 'r+');
+    $closed = fopen('php://memory', 'r+');
+    fclose($closed);
+    $object = new class {
+
+      /**
+       * Throws if error formatting invokes this method.
+       */
+      public function __toString(): string {
+        throw new \LogicException('Must not stringify objects.');
+      }
+
+    };
+    $recursive = [];
+    $recursive[] = &$recursive;
+    $arguments = [
+      match ($kind) {
+        'stream' => $stream,
+        'closed' => $closed,
+        'object' => $object,
+        'recursive' => $recursive,
+      },
+    ];
+    $statement = $this->createStub(StatementInterface::class);
+    $statement->method('getQueryString')->willReturn('SELECT * FROM missing');
+    $pdo = new \PDO('sqlite::memory:');
+    try {
+      $pdo->query('SELECT * FROM missing');
+      $this->fail('The native query must fail.');
+    }
+    catch (\PDOException $native) {
+      try {
+        (new ExceptionHandler())->handleExecutionException($native, $statement, $arguments);
+      }
+      catch (DatabaseExceptionWrapper $actual) {
+        $this->assertSame($native, $actual->getPrevious());
+        $this->assertSame($arguments, $actual->info->placeholders);
+        $this->assertStringContainsString($diagnostic, $actual->getMessage());
+        $this->assertStringNotContainsString("\n", $actual->getMessage());
+        $this->assertLessThan(1000, strlen($actual->getMessage()));
+        $this->assertSame($native->getMessage(), $actual->info->stripFromMessage($actual->getMessage()));
+      }
+    }
+    finally {
+      fclose($stream);
+    }
+  }
+
+  /**
+   * Provides mixed argument types.
+   */
+  public static function providerMixedArguments(): array {
+    return [
+      ['stream', 'resource (stream)'],
+      ['closed', 'resource (closed)'],
+      ['object', 'object'],
+      ['recursive', '...'],
+    ];
+  }
 
   /**
    * Tests the compact representation used in exception messages.
@@ -89,7 +159,7 @@ class SqlExecutionInfoTest extends UnitTestCase {
 
     $this->assertStringStartsWith($message . ': ', $appended);
     $this->assertStringNotContainsString("\n", $appended);
-    // The options are only exposed by the verbose dump.
+    // Options remain available through the structured information.
     $this->assertStringNotContainsString('assoc', $appended);
     $this->assertSame($message, $info->stripFromMessage($appended));
   }

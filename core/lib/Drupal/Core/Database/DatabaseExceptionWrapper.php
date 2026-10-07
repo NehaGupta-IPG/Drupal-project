@@ -5,8 +5,10 @@ namespace Drupal\Core\Database;
 /**
  * Wrapper base class for exceptions that provide additional debug information.
  *
- * This class will always wrap a client connection exception, for example
- * \PDOException or \mysqli_sql_exception.
+ * Driver handlers wrap client exceptions, such as \PDOException or
+ * \mysqli_sql_exception, and attach SQL execution information. Exceptions
+ * raised by Drupal schema guards may have no previous throwable or information.
+ * Consumers can use SqlExecutionInfo::fromThrowable() and must handle NULL.
  */
 class DatabaseExceptionWrapper extends \RuntimeException implements DatabaseException {
 
