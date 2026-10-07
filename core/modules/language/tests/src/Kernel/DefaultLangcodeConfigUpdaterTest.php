@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Kernel;
 
+use Drupal\config_test\Hook\ConfigTestHooks;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\DefaultLangcodeConfigUpdater;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -115,7 +116,7 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
       ->set('optional_translatable_value', 'Hello')
       ->save();
 
-    \Drupal::state()->set('config_test.langcode_update_protected_names', ['config_test.langcode_test']);
+    \Drupal::keyValue(ConfigTestHooks::class)->set('config_test.langcode_update_protected_names', ['config_test.langcode_test']);
 
     $context = $this->reconcile('en', 'fr');
 
@@ -125,7 +126,7 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
     $this->assertNotContains('config_test.langcode_test', $context['results']['updated_names'] ?? []);
 
     // Remove the protection and re-run.
-    \Drupal::state()->set('config_test.langcode_update_protected_names', []);
+    \Drupal::keyValue(ConfigTestHooks::class)->delete('config_test.langcode_update_protected_names');
     $context = $this->reconcile('en', 'fr');
     $this->assertSame('fr', $this->config('config_test.langcode_test')->get('langcode'));
     $this->assertContains('config_test.langcode_test', $context['results']['updated_names'] ?? []);
