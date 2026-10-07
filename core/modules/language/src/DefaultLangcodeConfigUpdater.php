@@ -49,9 +49,8 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
    */
   public function reconcileConfigLangcodeOperation(string $old_langcode, string $new_langcode, &$context): void {
     if (!isset($context['sandbox']['names'])) {
-      $names = $this->configFactory->listAll();
-      $this->moduleHandler->alter('language_update_config_langcode_list', $names, $old_langcode, $new_langcode);
-      $context['sandbox']['names'] = $names;
+      $preserved = $this->moduleHandler->invokeAll('language_preserve_config_langcode', [$old_langcode, $new_langcode]);
+      $context['sandbox']['names'] = array_values(array_diff($this->configFactory->listAll(), $preserved));
       $context['sandbox']['max'] = count($context['sandbox']['names']);
     }
 
