@@ -85,6 +85,7 @@
 .dropbutton__items {
   position: fixed;
   z-index: 1; /* Appear above other dropbuttons. */
+  min-width: anchor-size(width);
   width: max-content;
   visibility: hidden;
   margin: 0;
@@ -93,6 +94,7 @@
   border-radius: var(--admin-radius-l);
   background: var(--admin-color-bg-raised);
   box-shadow: var(--admin-shadow-2);
+  font-size: var(--dropbutton-font-size);
 
   .dropbutton-wrapper.open & {
     position-anchor: --my-anchor;
@@ -147,7 +149,9 @@
  */
 .dropbutton > .dropbutton__item:first-of-type {
   > * {
-    display: block;
+    display: flex;
+    align-items: center;
+    height: 100%;
     margin: 0;
     padding: var(--dropbutton-padding);
     cursor: pointer;
