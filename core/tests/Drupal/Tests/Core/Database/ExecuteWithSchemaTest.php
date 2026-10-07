@@ -30,7 +30,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 #[CoversClass(Connection::class)]
 #[Group('Database')]
 #[AllowMockObjectsWithoutExpectations]
-class ExecuteAndCreateSchemaIfNeededTest extends UnitTestCase {
+class ExecuteWithSchemaTest extends UnitTestCase {
 
   /**
    * Tests that driver-specific errors are recognized only by that driver.
@@ -79,7 +79,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends UnitTestCase {
     $schema->expects($this->once())->method('tableExists')->with('lazy')->willReturn(FALSE);
     $schema->expects($this->once())->method('createTable')->with('lazy', $this->table()->toArray());
     $attempts = 0;
-    $result = $this->createConnection($schema)->executeAndCreateSchemaIfNeeded($this->definition(), function () use (&$attempts): string {
+    $result = $this->createConnection($schema)->executeWithSchema($this->definition(), function () use (&$attempts): string {
       if (++$attempts === 1) {
         throw $this->missingTableException();
       }
@@ -97,7 +97,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends UnitTestCase {
     $schema->expects($this->once())->method('tableExists')->with('lazy')->willReturn(TRUE);
     $schema->expects($this->never())->method('createTable');
     $attempts = 0;
-    $result = $this->createConnection($schema)->executeAndCreateSchemaIfNeeded($this->definition(), function () use (&$attempts): string {
+    $result = $this->createConnection($schema)->executeWithSchema($this->definition(), function () use (&$attempts): string {
       if (++$attempts === 1) {
         throw $this->missingTableException();
       }
@@ -117,7 +117,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends UnitTestCase {
     $previous->errorInfo = ['42S01', 1050, 'Table already exists'];
     $schema->expects($this->once())->method('createTable')->willThrowException(new DatabaseExceptionWrapper($previous->getMessage(), 0, $previous));
     $attempts = 0;
-    $result = $this->createConnection($schema)->executeAndCreateSchemaIfNeeded($this->definition(), function () use (&$attempts): string {
+    $result = $this->createConnection($schema)->executeWithSchema($this->definition(), function () use (&$attempts): string {
       if (++$attempts === 1) {
         throw $this->missingTableException();
       }
@@ -133,7 +133,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends UnitTestCase {
     $schema = $this->createMock(Schema::class);
     $schema->expects($this->never())->method('tableExists');
     $result = new \stdClass();
-    $this->assertSame($result, $this->createConnection($schema)->executeAndCreateSchemaIfNeeded($this->definition(), static fn() => $result));
+    $this->assertSame($result, $this->createConnection($schema)->executeWithSchema($this->definition(), static fn() => $result));
   }
 
   /**
@@ -146,7 +146,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends UnitTestCase {
     $attempts = 0;
     $exception = $this->missingTableException();
     try {
-      $this->createConnection($schema)->executeAndCreateSchemaIfNeeded($this->definition(), function () use (&$attempts, $exception): void {
+      $this->createConnection($schema)->executeWithSchema($this->definition(), function () use (&$attempts, $exception): void {
         $attempts++;
         throw $exception;
       });
@@ -167,7 +167,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends UnitTestCase {
     $exception = new DatabaseExceptionWrapper('Creation denied');
     $schema->expects($this->once())->method('createTable')->willThrowException($exception);
     $this->expectExceptionObject($exception);
-    $this->createConnection($schema)->executeAndCreateSchemaIfNeeded($this->definition(), fn() => throw $this->missingTableException());
+    $this->createConnection($schema)->executeWithSchema($this->definition(), fn() => throw $this->missingTableException());
   }
 
   /**
@@ -179,7 +179,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends UnitTestCase {
     $exception = new DatabaseExceptionWrapper('Permission denied while creating an index');
     $schema->expects($this->once())->method('createTable')->willThrowException($exception);
     $this->expectExceptionObject($exception);
-    $this->createConnection($schema)->executeAndCreateSchemaIfNeeded($this->definition(), fn() => throw $this->missingTableException());
+    $this->createConnection($schema)->executeWithSchema($this->definition(), fn() => throw $this->missingTableException());
   }
 
   /**
@@ -190,7 +190,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends UnitTestCase {
     $schema->expects($this->never())->method('tableExists');
     $exception = new DatabaseExceptionWrapper('Permission denied');
     $this->expectExceptionObject($exception);
-    $this->createConnection($schema)->executeAndCreateSchemaIfNeeded($this->definition(), static fn() => throw $exception);
+    $this->createConnection($schema)->executeWithSchema($this->definition(), static fn() => throw $exception);
   }
 
   /**

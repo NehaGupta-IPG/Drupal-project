@@ -26,7 +26,7 @@ class LegacyLazyTableCreationTest extends DatabaseTestBase {
    */
   public function testBatchStorageEnsureTableExists(): void {
     $storage = new BatchStorage($this->connection, $this->createStub(SessionInterface::class), $this->createStub(CsrfTokenGenerator::class), $this->createStub(TimeInterface::class));
-    $this->expectUserDeprecationMessage(BatchStorage::class . '::ensureTableExists() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Database\Connection::executeAndCreateSchemaIfNeeded() instead. See https://www.drupal.org/node/3489185');
+    $this->expectUserDeprecationMessage(BatchStorage::class . '::ensureTableExists() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Database\Connection::executeWithSchema() instead. See https://www.drupal.org/node/3489185');
     (new \ReflectionMethod($storage, 'ensureTableExists'))->invoke($storage);
     $this->assertTrue($this->connection->schema()->tableExists('batch'));
   }

@@ -133,7 +133,7 @@ class BatchStorage implements BatchStorageInterface {
    * {@inheritdoc}
    */
   public function getId(): int {
-    return $this->connection->executeAndCreateSchemaIfNeeded(
+    return $this->connection->executeWithSchema(
       $this->schemaDefinition(),
       fn() => $this->doInsertBatchRecord(),
     );
@@ -159,13 +159,12 @@ class BatchStorage implements BatchStorageInterface {
    * Check if the table exists and create it if not.
    *
    * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
-   *   \Drupal\Core\Database\Connection::executeAndCreateSchemaIfNeeded()
-   *   instead.
+   *   \Drupal\Core\Database\Connection::executeWithSchema() instead.
    *
    * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateSchemaIfNeeded() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeWithSchema() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition());
     }

@@ -22,7 +22,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[CoversClass(Connection::class)]
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
-class ExecuteAndCreateSchemaIfNeededTest extends DatabaseTestBase {
+class ExecuteWithSchemaTest extends DatabaseTestBase {
 
   /**
    * Tests lazy schema creation inside and outside a transaction.
@@ -36,7 +36,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends DatabaseTestBase {
       new Table('lazy_execution_test', [Column::int('id', notNull: TRUE)], primaryKey: new PrimaryKey(['id'])),
       new Table('lazy_execution_other', [Column::int('id')]),
     ]);
-    $result = $this->connection->executeAndCreateSchemaIfNeeded($definition, function () use (&$attempts): string {
+    $result = $this->connection->executeWithSchema($definition, function () use (&$attempts): string {
       $attempts++;
       $this->connection->query('INSERT INTO {lazy_execution_test} ([id]) VALUES (1)');
       return 'inserted';
@@ -45,7 +45,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends DatabaseTestBase {
     $this->assertTrue($this->connection->schema()->tableExists('lazy_execution_other'));
     // Drivers where a failed statement aborts a transaction check for the
     // tables first.
-    $checks_first = (new \ReflectionMethod($this->connection, 'executeAndCreateSchemaIfNeeded'))->getDeclaringClass()->getName() !== Connection::class;
+    $checks_first = (new \ReflectionMethod($this->connection, 'executeWithSchema'))->getDeclaringClass()->getName() !== Connection::class;
     $this->assertSame($in_transaction && $checks_first ? 1 : 2, $attempts);
     $transaction?->commitOrRelease();
     $this->assertSame('1', (string) $this->connection->select('lazy_execution_test')->countQuery()->execute()->fetchField());
@@ -73,7 +73,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends DatabaseTestBase {
     $property->setValue($this->connection, $schema);
     try {
       $definition = new Schema(SchemaDefinitionType::Storage, 'lazy_race', [$table]);
-      $result = $this->connection->executeAndCreateSchemaIfNeeded($definition,
+      $result = $this->connection->executeWithSchema($definition,
         fn() => $this->connection->insert($table->name)->fields(['id' => 1])->execute());
       $this->assertNotFalse($result);
       $this->assertSame('1', (string) $this->connection->select($table->name)->countQuery()->execute()->fetchField());

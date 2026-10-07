@@ -312,9 +312,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * check for the tables before the operation instead of recovering from the
    * failure.
    */
-  public function executeAndCreateSchemaIfNeeded(SchemaDefinition $schema, callable $operation): mixed {
+  public function executeWithSchema(SchemaDefinition $schema, callable $operation): mixed {
     if (!$this->inTransaction()) {
-      return parent::executeAndCreateSchemaIfNeeded($schema, $operation);
+      return parent::executeWithSchema($schema, $operation);
     }
     $this->createSchemaIfNotExists($schema);
     return $operation();

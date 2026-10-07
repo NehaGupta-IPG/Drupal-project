@@ -26,7 +26,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(Connection::class)]
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
-class ExecuteAndCreateSchemaIfNeededTest extends DriverSpecificDatabaseTestBase {
+class ExecuteWithSchemaTest extends DriverSpecificDatabaseTestBase {
 
   /**
    * The name of the table created by the tests.
@@ -67,7 +67,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends DriverSpecificDatabaseTestBase 
     });
 
     $transaction = $this->connection->startTransaction();
-    $this->connection->executeAndCreateSchemaIfNeeded($this->definition(),
+    $this->connection->executeWithSchema($this->definition(),
       fn() => $this->connection->insert(static::TABLE)->fields(['id' => 1])->execute());
     $this->assertTrue($this->connection->inTransaction());
     $transaction->commitOrRelease();
@@ -91,7 +91,7 @@ class ExecuteAndCreateSchemaIfNeededTest extends DriverSpecificDatabaseTestBase 
       }
     });
     try {
-      $this->connection->executeAndCreateSchemaIfNeeded($this->definition(), function (): void {
+      $this->connection->executeWithSchema($this->definition(), function (): void {
         $this->fail('The operation must not run after a creation failure.');
       });
       $this->fail('The creation error must propagate.');

@@ -1254,7 +1254,7 @@ abstract class Connection {
    * @return mixed
    *   The result of the operation.
    */
-  public function executeAndCreateSchemaIfNeeded(SchemaDefinition $schema, callable $operation): mixed {
+  public function executeWithSchema(SchemaDefinition $schema, callable $operation): mixed {
     try {
       return $operation();
     }
