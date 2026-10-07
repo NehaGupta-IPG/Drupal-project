@@ -327,7 +327,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * create the table in a savepoint, so that losing a creation race does not
    * abort the enclosing transaction.
    */
-  public function createTableIfNotExists(string $table_name, SchemaDefinition|array $table_schema): void {
+  protected function createTableIfNotExists(string $table_name, SchemaDefinition|array $table_schema): void {
     if (!$this->inTransaction()) {
       parent::createTableIfNotExists($table_name, $table_schema);
       return;

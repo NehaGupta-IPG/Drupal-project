@@ -60,28 +60,6 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests table creation without an operation.
-   */
-  #[TestWith([FALSE])]
-  #[TestWith([TRUE])]
-  public function testCreateTableIfNotExists(bool $in_transaction): void {
-    $transaction = $in_transaction ? $this->connection->startTransaction() : NULL;
-    $table = 'lazy_create_test';
-    $definition = new Schema(SchemaDefinitionType::Storage, 'lazy_create', [
-      new Table($table, [Column::int('id', notNull: TRUE)], primaryKey: new PrimaryKey(['id'])),
-      new Table('lazy_unrelated', [Column::int('id')]),
-    ]);
-    $this->connection->createTableIfNotExists($table, $definition);
-    $this->assertTrue($this->connection->schema()->tableExists($table));
-    $this->assertFalse($this->connection->schema()->tableExists('lazy_unrelated'));
-    // A second call for an existing table is a no-op.
-    $this->connection->createTableIfNotExists($table, $definition);
-    $this->connection->insert($table)->fields(['id' => 1])->execute();
-    $transaction?->commitOrRelease();
-    $this->assertSame('1', (string) $this->connection->select($table)->countQuery()->execute()->fetchField());
-  }
-
-  /**
    * Tests recovery when another connection creates the table first.
    */
   public function testCreationRace(): void {
@@ -90,27 +68,6 @@ class ExecuteAndCreateTableIfNeededTest extends DatabaseTestBase {
       $result = $this->connection->executeAndCreateTableIfNeeded($table, $this->raceTableDefinition(),
         fn() => $this->connection->insert($table)->fields(['id' => 1])->execute());
       $this->assertNotFalse($result);
-      $this->assertSame('1', (string) $this->connection->select($table)->countQuery()->execute()->fetchField());
-    });
-  }
-
-  /**
-   * Tests that losing a creation race does not break an enclosing transaction.
-   */
-  #[TestWith([FALSE])]
-  #[TestWith([TRUE])]
-  public function testCreateTableIfNotExistsRace(bool $in_transaction): void {
-    if ($in_transaction && $this->connection->driver() === 'sqlite') {
-      // SQLite starts transactions with BEGIN IMMEDIATE, so no other
-      // connection can create the table while the transaction is open.
-      $this->markTestSkipped('SQLite transactions hold the write lock, so a creation race cannot occur.');
-    }
-    $table = 'lazy_create_race';
-    $this->simulateCreationRace($table, function () use ($table, $in_transaction): void {
-      $transaction = $in_transaction ? $this->connection->startTransaction() : NULL;
-      $this->connection->createTableIfNotExists($table, $this->raceTableDefinition());
-      $this->connection->insert($table)->fields(['id' => 1])->execute();
-      $transaction?->commitOrRelease();
       $this->assertSame('1', (string) $this->connection->select($table)->countQuery()->execute()->fetchField());
     });
   }

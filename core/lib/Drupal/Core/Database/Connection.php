@@ -1277,9 +1277,7 @@ abstract class Connection {
   /**
    * Creates a table if it does not exist yet.
    *
-   * Losing a creation race against another process is not an error. Prefer
-   * ::executeAndCreateTableIfNeeded() when the table is created for an
-   * operation, as that avoids checking for the table on every call.
+   * Losing a creation race against another process is not an error.
    *
    * @param string $table_name
    *   The unprefixed table name.
@@ -1289,7 +1287,7 @@ abstract class Connection {
    *   A legacy table definition array, as accepted by Schema::createTable(), is
    *   also supported.
    */
-  public function createTableIfNotExists(string $table_name, SchemaDefinition|array $table_schema): void {
+  protected function createTableIfNotExists(string $table_name, SchemaDefinition|array $table_schema): void {
     if ($this->schema()->tableExists($table_name)) {
       return;
     }

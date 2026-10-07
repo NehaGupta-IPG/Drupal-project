@@ -232,57 +232,6 @@ class ExecuteAndCreateTableIfNeededTest extends UnitTestCase {
   }
 
   /**
-   * Tests that an existing table is not created again.
-   */
-  public function testCreateTableIfNotExistsExisting(): void {
-    $connection = $this->getMockBuilder(StubConnection::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['schema'])
-      ->getMock();
-    $schema = $this->createMock(Schema::class);
-    $schema->expects($this->once())->method('tableExists')->with('lazy')->willReturn(TRUE);
-    $schema->expects($this->never())->method('createTable');
-    $connection->expects($this->once())->method('schema')->willReturn($schema);
-    $connection->createTableIfNotExists('lazy', []);
-  }
-
-  /**
-   * Tests that a missing table is created.
-   */
-  #[TestWith([FALSE])]
-  #[TestWith([TRUE])]
-  public function testCreateTableIfNotExistsMissing(bool $use_object): void {
-    $connection = $this->getMockBuilder(StubConnection::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['schema'])
-      ->getMock();
-    $schema = $this->createMock(Schema::class);
-    $schema->expects($this->once())->method('tableExists')->with('lazy')->willReturn(FALSE);
-    $connection->expects($this->atLeastOnce())->method('schema')->willReturn($schema);
-    $table = new Table('lazy', [Column::int('id')]);
-    $definition = $use_object ? new SchemaDefinition(SchemaDefinitionType::Storage, 'lazy', [$table]) : $table->toArray();
-    $schema->expects($this->once())->method('createTable')->with('lazy', $table->toArray());
-    $connection->createTableIfNotExists('lazy', $definition);
-  }
-
-  /**
-   * Tests that losing a creation race is not an error.
-   */
-  public function testCreateTableIfNotExistsRace(): void {
-    $connection = $this->getMockBuilder(StubConnection::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['schema'])
-      ->getMock();
-    $schema = $this->createMock(Schema::class);
-    $schema->expects($this->exactly(2))->method('tableExists')->with('lazy')->willReturnOnConsecutiveCalls(FALSE, TRUE);
-    $connection->expects($this->exactly(3))->method('schema')->willReturn($schema);
-    $previous = new \PDOException('Table already exists');
-    $previous->errorInfo = ['42S01', 1050, 'Table already exists'];
-    $schema->expects($this->once())->method('createTable')->with('lazy', [])->willThrowException(new DatabaseExceptionWrapper($previous->getMessage(), 0, $previous));
-    $connection->createTableIfNotExists('lazy', []);
-  }
-
-  /**
    * Returns a missing-table exception from a PDO-based driver.
    */
   private function missingTableException(): DatabaseExceptionWrapper {
