@@ -186,16 +186,13 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
   }
 
   /**
-   * Tests absorbing a pre-existing override creates no locale row.
+   * Tests merging a pre-existing override creates no locale row.
    *
-   * The override here is written directly to storage - the way a config
-   * import would arrive, or an override that predates this site ever
-   * having locale module enabled - so it never went through locale's own
-   * onOverrideChange() and has no corresponding row in locale storage at
-   * all. Absorbing it into the active configuration is
-   * \Drupal\language\DefaultLangcodeConfigUpdater moving existing content
-   * from one place to another, not a fresh act of translation - it must not
-   * fabricate a locale row for content locale never had a hand in.
+   * The override is written directly to storage so it never goes through
+   * locale's own onOverrideChange() and has no corresponding row in locale
+   * storage at all. Merging overrides into the active configuration is not a
+   * fresh translation and must not fabricate a locale row for content locale
+   * never had a hand in.
    */
   public function testDefaultLanguageChangeAbsorbingOverrideDoesNotCreateTranslation(): void {
     ConfigurableLanguage::createFromLangcode('fr')->save();
@@ -317,8 +314,8 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
 
     // Back on English, the active configuration must show the original
     // English text again - not the French text the first switch left
-    // behind - because the override that first switch created absorbs back
-    // into the active configuration on the way past.
+    // behind - because the override that first switch created is merged back
+    // into the active configuration.
     $this->assertSame('en', $this->config('locale_test.translation')->get('langcode'));
     $this->assertSame('English test', $this->config('locale_test.translation')->get('test'));
 
@@ -340,7 +337,7 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
    *
    * Neither language here is English, and the new default has no
    * translation at all - so DefaultLangcodeConfigUpdater finds no override
-   * to absorb, and the active configuration is left holding the previous
+   * to merge, and the active configuration is left holding the previous
    * default's content, mislabelled with the new default's langcode. Locale
    * module must correct that back to the English source rather than leaving
    * it mislabelled.

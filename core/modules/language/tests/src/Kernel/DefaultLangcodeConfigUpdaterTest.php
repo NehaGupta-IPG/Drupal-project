@@ -132,7 +132,7 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
   }
 
   /**
-   * Tests an existing override for the new default is absorbed and removed.
+   * Tests an existing override for the new default is merged and removed.
    */
   public function testExistingOverrideForNewDefaultIsAbsorbed(): void {
     $this->config('config_test.langcode_test')
