@@ -73,7 +73,7 @@ class ConfigTestHooks {
    */
   #[Hook('language_update_config_langcode_list_alter')]
   public function languageUpdateConfigLangcodeListAlter(array &$names): void {
-    $protected_names = \Drupal::state()->get('config_test.langcode_update_protected_names', []);
+    $protected_names = \Drupal::keyValue(static::class)->get('config_test.langcode_update_protected_names', []);
     $names = array_diff($names, $protected_names);
   }
 
