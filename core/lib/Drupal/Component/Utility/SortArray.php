@@ -2,6 +2,8 @@
 
 namespace Drupal\Component\Utility;
 
+use Drupal\Core\Utility\NaturalSort;
+
 /**
  * Provides generic array sorting helper methods.
  *
@@ -102,7 +104,7 @@ class SortArray {
     $a_title = (is_array($a) && isset($a[$key])) ? $a[$key] : '';
     $b_title = (is_array($b) && isset($b[$key])) ? $b[$key] : '';
 
-    return strnatcasecmp($a_title, $b_title);
+    return NaturalSort::strnatcasecmp($a_title, $b_title);
   }
 
   /**

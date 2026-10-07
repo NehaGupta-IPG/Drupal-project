@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Utility\NaturalSort;
 use Drupal\Tests\views_ui\Traits\FilterEntityReferenceTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -58,7 +59,7 @@ class FilterEntityReferenceWebTest extends UITestBase {
     $options = $this->getUiOptions();
     // Should be sorted by title ASC.
     uasort($this->targetEntities, function (EntityInterface $a, EntityInterface $b): int {
-      return strnatcasecmp($a->getTitle(), $b->getTitle());
+      return NaturalSort::strnatcasecmp($a->getTitle(), $b->getTitle());
     });
     $i = 0;
     foreach ($this->targetEntities as $entity) {

@@ -7,6 +7,7 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\LazyPluginCollection;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Utility\NaturalSort;
 
 /**
  * Provides a default plugin collection for a plugin type.
@@ -95,7 +96,7 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
    * Provides uasort() callback to sort plugins.
    */
   public function sortHelper($aID, $bID) {
-    return strnatcasecmp($this->getPluginId($aID), $this->getPluginId($bID));
+    return NaturalSort::strnatcasecmp($this->getPluginId($aID), $this->getPluginId($bID));
   }
 
   /**

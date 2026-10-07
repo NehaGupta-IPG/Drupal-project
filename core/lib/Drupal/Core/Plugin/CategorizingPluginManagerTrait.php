@@ -93,9 +93,9 @@ trait CategorizingPluginManagerTrait {
     $definitions = $definitions ?? $this->getDefinitions();
     uasort($definitions, function ($a, $b) use ($label_key) {
       if ((string) $a['category'] != (string) $b['category']) {
-        return strnatcasecmp($a['category'], $b['category']);
+        return NaturalSort::strnatcasecmp($a['category'], $b['category']);
       }
-      return strnatcasecmp($a[$label_key], $b[$label_key]);
+      return NaturalSort::strnatcasecmp($a[$label_key], $b[$label_key]);
     });
     return $definitions;
   }

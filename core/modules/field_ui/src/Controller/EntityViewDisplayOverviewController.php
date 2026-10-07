@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\NaturalSort;
 use Drupal\field_ui\FieldUI;
 
 /**
@@ -65,7 +66,7 @@ class EntityViewDisplayOverviewController extends ControllerBase {
 
     // Sort view modes by label for consistent ordering.
     uasort($view_modes, function ($a, $b) {
-      return strnatcasecmp((string) $a['label'], (string) $b['label']);
+      return NaturalSort::strnatcasecmp((string) $a['label'], (string) $b['label']);
     });
 
     // Get all entity view displays for this bundle.

@@ -5,6 +5,7 @@ namespace Drupal\config_translation\Controller;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
+use Drupal\Core\Utility\NaturalSort;
 
 /**
  * Defines the configuration translation list builder for entities.
@@ -122,7 +123,7 @@ class ConfigTranslationEntityListBuilder extends ConfigEntityListBuilder impleme
       return $this->sortRowsMultiple($a, $b, $keys);
     }
 
-    return strnatcasecmp($a_value, $b_value);
+    return NaturalSort::strnatcasecmp($a_value, $b_value);
   }
 
   /**

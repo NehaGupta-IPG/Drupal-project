@@ -15,6 +15,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\StringTranslation\TranslationManager;
+use Drupal\Core\Utility\NaturalSort;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -137,7 +138,7 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
         if ($a_label === $b_label) {
           return $a->getPluginId() <=> $b->getPluginId();
         }
-        return strnatcasecmp($a_label, $b_label);
+        return NaturalSort::strnatcasecmp($a_label, $b_label);
       });
     }
     return $this->topLevelPlugins;
