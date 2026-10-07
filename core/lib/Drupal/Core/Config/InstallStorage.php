@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config;
 
+use Drupal\Core\Cache\CacheCollectorInterface;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\Extension;
 
@@ -49,9 +50,13 @@ class InstallStorage extends FileStorage {
    * @param string $collection
    *   (optional) The collection to store configuration in. Defaults to the
    *   default collection.
+   * @param ?Drupal\Core\Cache\CacheCollectorInterface $yamlCacheCollector
+   *   The YAML cache collector. If not passed, a YAMl cache collector with
+   *   a memory backend will be used.
    */
-  public function __construct($directory = self::CONFIG_INSTALL_DIRECTORY, $collection = StorageInterface::DEFAULT_COLLECTION) {
-    parent::__construct($directory, $collection);
+  public function __construct($directory = self::CONFIG_INSTALL_DIRECTORY, $collection = StorageInterface::DEFAULT_COLLECTION, ?CacheCollectorInterface $yamlCacheCollector = NULL) {
+
+    parent::__construct($directory, $collection, $yamlCacheCollector);
   }
 
   /**
