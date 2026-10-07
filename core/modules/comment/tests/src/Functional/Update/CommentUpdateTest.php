@@ -25,7 +25,7 @@ class CommentUpdateTest extends UpdatePathTestBase {
   }
 
   /**
-   * Verifies tgat thread reply depth default value is added to comment fields.
+   * Verifies that thread reply depth default value is added to comment fields.
    *
    * @see comment_post_update_thread_reply_depth()
    */
