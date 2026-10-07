@@ -82,7 +82,7 @@ variables:
   # Pinned by digest: runners reuse a cached ":dev", so the tag alone gave a
   # mix of image builds within one pipeline. CI pulls from registry.gitlab.com,
   # whose digest differs from Docker Hub's for the same build.
-  _TARGET_IMAGE_TAG: "dev@sha256:531645e528e67787c8423cf7c3e1a5ea7657190b2bb03d493017c635f903c907"
+  _TARGET_IMAGE_TAG: "dev@sha256:a0f8bf9873f35d7213676244c634d588e41d603bfd7ff802d69b0da4c329387a"
   _TARGET_DB: "mysql-8.4"
   _TARGET_DB_DRIVER: "mysql"
   _TARGET_DB_DRIVER_MODULE: "mysql"
