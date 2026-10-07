@@ -183,6 +183,51 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
    * {@inheritdoc}
    */
   public function buildUri($uri) {
+    [$scheme, $source_scheme, $path] = $this->getDerivativeLocation($uri);
+
+    // If this image style changes the extension, the derivative gets the new
+    // extension only and the original extension is stored as a directory in
+    // front of the source scheme, e.g. styles/large/png/public/image.webp. That
+    // directory can't collide with a source path, so image.png and image.jpg
+    // get different derivatives and the source can always be recovered.
+    $original_extension = pathinfo($path, PATHINFO_EXTENSION);
+    $extension = $this->getDerivativeExtension($original_extension);
+    if ($original_extension !== '' && $original_extension !== $extension) {
+      $path = substr($path, 0, -strlen($original_extension)) . $extension;
+      return "$scheme://styles/{$this->id()}/$original_extension/$source_scheme/$path";
+    }
+    return "$scheme://styles/{$this->id()}/$source_scheme/{$this->addExtension($path)}";
+  }
+
+  /**
+   * Returns the derivative URI used before the extension directory existed.
+   *
+   * Image styles that change the extension used to append the new extension
+   * to the source path, e.g. styles/large/public/image.png.webp.
+   *
+   * @param string $uri
+   *   The URI of the source image.
+   *
+   * @return string|null
+   *   The legacy derivative URI, or NULL if it is the same as the current one.
+   */
+  protected function buildLegacyUri(string $uri): ?string {
+    [$scheme, $source_scheme, $path] = $this->getDerivativeLocation($uri);
+    $legacy_uri = "$scheme://styles/{$this->id()}/$source_scheme/{$this->addExtension($path)}";
+    return $legacy_uri !== $this->buildUri($uri) ? $legacy_uri : NULL;
+  }
+
+  /**
+   * Computes where the derivatives of an image are stored.
+   *
+   * @param string $uri
+   *   The URI or path of the source image.
+   *
+   * @return string[]
+   *   An array containing the derivative scheme, the source scheme and the
+   *   path of the source image relative to the source scheme.
+   */
+  private function getDerivativeLocation(string $uri): array {
     $source_scheme = $scheme = StreamWrapperManager::getScheme($uri);
     $default_scheme = $this->fileDefaultScheme();
 
@@ -207,7 +252,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
       $path = $uri;
       $source_scheme = $scheme = $default_scheme;
     }
-    return "$scheme://styles/{$this->id()}/$source_scheme/{$this->addExtension($path)}";
+    return [$scheme, $source_scheme, $path];
   }
 
   /**
@@ -281,13 +326,16 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     if (isset($path)) {
-      $derivative_uri = $this->buildUri($path);
-      if (file_exists($derivative_uri)) {
-        try {
-          $file_system->delete($derivative_uri);
-        }
-        catch (FileException) {
-          // Ignore failed deletes.
+      // Also flush a derivative that still uses the legacy URI.
+      $derivative_uris = array_filter([$this->buildUri($path), $this->buildLegacyUri($path)]);
+      foreach ($derivative_uris as $derivative_uri) {
+        if (file_exists($derivative_uri)) {
+          try {
+            $file_system->delete($derivative_uri);
+          }
+          catch (FileException) {
+            // Ignore failed deletes.
+          }
         }
       }
     }
@@ -494,25 +542,27 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
   }
 
   /**
-   * Replaces the extension on a path when a derivative uses a different format.
+   * Adds an extension to a path.
    *
    * If this image style changes the extension of the derivative, this method
-   * replaces the original extension in the given path with the new one,
-   * producing clean single-extension filenames (e.g. image.webp, not
-   * image.png.webp).
+   * adds the new extension to the given path. This was used to build the
+   * derivative URI before the extension directory was introduced, and is still
+   * used to compute the derivative token.
    *
    * @param string $path
-   *   The path whose extension should be replaced.
+   *   The path to add the extension to.
    *
    * @return string
    *   The given path if this image style doesn't change its extension, or the
-   *   path with the replaced extension if it does.
+   *   path with the added extension if it does.
+   *
+   * @see \Drupal\image\Entity\ImageStyle::buildUri()
    */
   protected function addExtension($path) {
     $original_extension = pathinfo($path, PATHINFO_EXTENSION);
     $extension = $this->getDerivativeExtension($original_extension);
     if ($original_extension !== $extension) {
-      $path = substr($path, 0, -(strlen($original_extension) + 1)) . '.' . $extension;
+      $path .= '.' . $extension;
     }
     return $path;
   }

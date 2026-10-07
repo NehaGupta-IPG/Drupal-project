@@ -133,9 +133,15 @@ class ImageStyleTest extends UnitTestCase {
       ->willReturn('png');
 
     $image_style = $this->getImageStyleMock($image_effect_id, $image_effect);
-    $image_style->expects($this->once())
+    $image_style->expects($this->atLeastOnce())
       ->method('fileDefaultScheme');
-    $this->assertEquals($image_style->buildUri('public://test.jpeg'), 'public://styles/' . $image_style->id() . '/public/test.png');
+    // The original extension is a directory in front of the source scheme, so
+    // images that only differ in their extension get different derivatives.
+    $this->assertEquals('public://styles/' . $image_style->id() . '/jpeg/public/test.png', $image_style->buildUri('public://test.jpeg'));
+    $this->assertEquals('public://styles/' . $image_style->id() . '/gif/public/test.png', $image_style->buildUri('public://test.gif'));
+    $this->assertEquals('public://styles/' . $image_style->id() . '/jpeg/public/jpeg/test.png', $image_style->buildUri('public://jpeg/test.jpeg'));
+    // An image that already has the derivative extension is not converted.
+    $this->assertEquals('public://styles/' . $image_style->id() . '/public/jpeg/test.png', $image_style->buildUri('public://jpeg/test.png'));
 
     // Image style that doesn't change the extension.
     $image_effect_id = $this->randomMachineName();
@@ -175,9 +181,11 @@ class ImageStyleTest extends UnitTestCase {
       ->method('getHashSalt')
       ->willReturn($hash_salt);
 
-    // Assert the extension has been replaced in the URI before creating the token.
-    $this->assertEquals($image_style->getPathToken('public://test.png'), $image_style->getPathToken('public://test.jpeg'));
-    $this->assertEquals(substr(Crypt::hmacBase64($image_style->id() . ':public://test.png', $private_key . $hash_salt), 0, 8), $image_style->getPathToken('public://test.jpeg'));
+    // Assert the extension has been added to the URI before creating the token.
+    $this->assertEquals($image_style->getPathToken('public://test.jpeg.png'), $image_style->getPathToken('public://test.jpeg'));
+    $this->assertEquals(substr(Crypt::hmacBase64($image_style->id() . ':public://test.jpeg.png', $private_key . $hash_salt), 0, 8), $image_style->getPathToken('public://test.jpeg'));
+    // Images that only differ in their extension get different tokens.
+    $this->assertNotEquals($image_style->getPathToken('public://test.gif'), $image_style->getPathToken('public://test.jpeg'));
     $this->assertNotEquals(substr(Crypt::hmacBase64($image_style->id() . ':public://test.jpeg', $private_key . $hash_salt), 0, 8), $image_style->getPathToken('public://test.jpeg'));
 
     // Image style that doesn't change the extension.
@@ -224,7 +232,11 @@ class ImageStyleTest extends UnitTestCase {
     $image_effect_id = $this->randomMachineName();
     $image_effect = $this->createStub(ImageEffectBase::class);
 
-    $image_style = $this->getImageStyleMock($image_effect_id, $image_effect, ['buildUri', 'getCacheTagsToInvalidate']);
+    $image_style = $this->getImageStyleMock($image_effect_id, $image_effect, [
+      'buildUri',
+      'buildLegacyUri',
+      'getCacheTagsToInvalidate',
+    ]);
     $image_style->expects($this->atLeastOnce())
       ->method('buildUri')
       ->willReturn('test.jpg');

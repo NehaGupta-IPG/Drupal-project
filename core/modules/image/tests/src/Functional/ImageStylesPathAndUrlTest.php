@@ -136,7 +136,91 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
         'extension' => 'jpeg',
       ],
     ]);
+    $this->style->save();
     $this->doImageStyleUrlAndPathTests('private');
+  }
+
+  /**
+   * Tests converted derivatives of images that only differ in the extension.
+   */
+  public function testConvertedImagesWithSameName(): void {
+    $this->addConvertEffect('gif');
+    $png_uri = $this->copyTestImage('png', 'public://collision/foo.png');
+    $jpg_uri = $this->copyTestImage('jpg', 'public://collision/foo.jpg');
+
+    $png_derivative_uri = $this->style->buildUri($png_uri);
+    $jpg_derivative_uri = $this->style->buildUri($jpg_uri);
+    $this->assertSame('public://styles/style_foo/png/public/collision/foo.gif', $png_derivative_uri);
+    $this->assertSame('public://styles/style_foo/jpg/public/collision/foo.gif', $jpg_derivative_uri);
+
+    // Each derivative is generated from its own source image.
+    $this->drupalGet($this->style->buildUrl($png_uri));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->drupalGet($this->style->buildUrl($jpg_uri));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertFileExists($png_derivative_uri);
+    $this->assertFileExists($jpg_derivative_uri);
+    $this->assertNotSame(md5_file($png_derivative_uri), md5_file($jpg_derivative_uri));
+
+    // Derivative URLs with the legacy double extension still work.
+    $legacy_derivative_uri = 'public://styles/style_foo/public/collision/foo.png.gif';
+    $legacy_url = \Drupal::service('file_url_generator')->generateAbsoluteString($legacy_derivative_uri);
+    $this->drupalGet($legacy_url, ['query' => [ImageStyleInterface::TOKEN => $this->style->getPathToken($png_uri)]]);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertFileExists($legacy_derivative_uri);
+  }
+
+  /**
+   * Tests access to converted private images that only differ in extension.
+   */
+  public function testConvertedPrivateImagesWithSameName(): void {
+    $this->addConvertEffect('gif');
+    $png_uri = $this->copyTestImage('png', 'private://collision/foo.png');
+    $jpg_uri = $this->copyTestImage('jpg', 'private://collision/foo.jpg');
+
+    // Only grant access to the JPEG source image.
+    \Drupal::keyValue('image')->set('test_file_download', $jpg_uri);
+
+    $this->drupalGet($this->style->buildUrl($jpg_uri));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->drupalGet($this->style->buildUrl($png_uri));
+    $this->assertSession()->statusCodeEquals(403);
+    $this->assertFileDoesNotExist($this->style->buildUri($png_uri));
+  }
+
+  /**
+   * Adds a convert effect to the test image style.
+   *
+   * @param string $extension
+   *   The extension to convert to.
+   */
+  protected function addConvertEffect(string $extension): void {
+    $this->style->addImageEffect([
+      'id' => 'image_convert',
+      'weight' => 1,
+      'data' => [
+        'extension' => $extension,
+      ],
+    ]);
+    $this->style->save();
+  }
+
+  /**
+   * Copies a test image fixture to the given URI.
+   *
+   * @param string $extension
+   *   The extension of the test image fixture.
+   * @param string $uri
+   *   The destination URI.
+   *
+   * @return string
+   *   The destination URI.
+   */
+  protected function copyTestImage(string $extension, string $uri): string {
+    $file_system = \Drupal::service('file_system');
+    $directory = $file_system->dirname($uri);
+    $file_system->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
+    return $file_system->copy("core/tests/fixtures/files/image-test.$extension", $uri, FileExists::Replace);
   }
 
   /**
@@ -324,7 +408,9 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
     // Check that a security token is still required when generating a second
     // image derivative using the first one as a source.
     $nested_url = $this->style->buildUrl($generated_uri, $clean_url);
-    $matches_expected_url_format = (bool) preg_match('/styles\/' . $this->style->id() . '\/' . $scheme . '\/styles\/' . $this->style->id() . '\/' . $scheme . '/', $nested_url);
+    // If the image style changed the extension of the source, the original
+    // extension is in front of the scheme of the nested derivative.
+    $matches_expected_url_format = (bool) preg_match('/styles\/' . $this->style->id() . '\/' . $scheme . '\/styles\/' . $this->style->id() . '\/([a-z0-9]+\/)?' . $scheme . '/', $nested_url);
     $this->assertTrue($matches_expected_url_format, "URL for a derivative of an image style matches expected format.");
     $nested_url_with_wrong_token = str_replace(ImageStyleInterface::TOKEN . '=', 'wrong_parameter=', $nested_url);
     $this->drupalGet($nested_url_with_wrong_token);

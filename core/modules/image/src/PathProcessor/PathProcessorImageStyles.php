@@ -20,6 +20,10 @@ use Symfony\Component\HttpFoundation\Request;
  * - private image styles: In contrast to public image styles, private
  *   derivatives are already using system/files/styles. Similar to public image
  *   styles, it also converts the file path to a query parameter.
+ *
+ * If the image style changes the extension, the original extension of the
+ * source image is the path segment in front of the scheme. It is converted to
+ * the 'source_extension' query parameter.
  */
 class PathProcessorImageStyles implements InboundPathProcessorInterface {
 
@@ -64,6 +68,19 @@ class PathProcessorImageStyles implements InboundPathProcessorInterface {
     // Get the image style, scheme and path.
     if (substr_count($rest, '/') >= 2) {
       [$image_style, $scheme, $file] = explode('/', $rest, 3);
+
+      // Derivatives of an image style that changes the extension have the
+      // original extension in front of the scheme, for example
+      // styles/large/png/public/image.webp.
+      $request->query->remove('source_extension');
+      if (!$this->streamWrapperManager->isValidScheme($scheme) && preg_match('/^[a-z0-9]+$/i', $scheme) && str_contains($file, '/')) {
+        [$source_scheme, $source_file] = explode('/', $file, 2);
+        if ($this->streamWrapperManager->isValidScheme($source_scheme)) {
+          $request->query->set('source_extension', $scheme);
+          $scheme = $source_scheme;
+          $file = $source_file;
+        }
+      }
 
       // Set the file as query parameter.
       $request->query->set('file', $file);

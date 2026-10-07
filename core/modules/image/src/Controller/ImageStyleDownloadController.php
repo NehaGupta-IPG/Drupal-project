@@ -104,6 +104,15 @@ class ImageStyleDownloadController extends FileDownloadController {
    */
   public function deliver(Request $request, $scheme, ImageStyleInterface $image_style, string $required_derivative_scheme) {
     $target = $request->query->get('file');
+    // If the image style changed the extension, the original extension is
+    // passed separately. Restore it to get the path of the source image.
+    $source_extension = $request->query->get('source_extension');
+    if ($source_extension !== NULL) {
+      $target = static::getPathWithSourceExtension((string) $target, (string) $source_extension);
+      if ($target === NULL) {
+        throw new NotFoundHttpException();
+      }
+    }
     $image_uri = $scheme . '://' . $target;
     $image_uri = $this->streamWrapperManager->normalizeUri($image_uri);
     $sample_image_uri = $scheme . '://' . $this->config('image.settings')->get('preview_image');
@@ -167,35 +176,19 @@ class ImageStyleDownloadController extends FileDownloadController {
 
     $headers = [];
 
-    // Don't try to generate the image if the source is missing.
+    // Don't try to generate file if source is missing.
     if ($image_uri !== $sample_image_uri && !$this->sourceImageExists($image_uri, $token_is_valid)) {
-      $source_found = FALSE;
-      // Legacy: handle old double-extension derivative filenames (e.g.
-      // image.png.webp) generated before addExtension() replaced extensions
-      // instead of appending them.
+      // Derivatives created before the extension directory was introduced
+      // have the converted extension added to the original file, resulting in
+      // filenames like image.png.jpeg. So to find the actual source image, we
+      // remove the extension and check if that image exists.
       $converted_image_uri = static::getUriWithoutConvertedExtension($image_uri);
       if ($converted_image_uri !== $image_uri &&
-        $this->sourceImageExists($converted_image_uri, $token_is_valid)) {
+          $this->sourceImageExists($converted_image_uri, $token_is_valid)) {
+        // The converted file does exist, use it as the source.
         $image_uri = $converted_image_uri;
-        $source_found = TRUE;
       }
-      if (!$source_found) {
-        // Current: derivative uses a single replaced extension (e.g.
-        // image.webp). Try swapping the extension with known source formats.
-        $derivative_extension = pathinfo(StreamWrapperManager::getTarget($image_uri), PATHINFO_EXTENSION);
-        if ($derivative_extension) {
-          $base_uri = substr($image_uri, 0, -(strlen($derivative_extension) + 1));
-          foreach (['jpeg', 'jpg', 'png', 'gif', 'webp', 'tiff', 'bmp'] as $ext) {
-            $candidate_uri = $base_uri . '.' . $ext;
-            if ($candidate_uri !== $image_uri && $this->sourceImageExists($candidate_uri, $token_is_valid)) {
-              $image_uri = $candidate_uri;
-              $source_found = TRUE;
-              break;
-            }
-          }
-        }
-      }
-      if (!$source_found) {
+      else {
         $this->logger->notice('Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.', [
           '%source_image_path' => $image_uri,
           '%derivative_path' => $derivative_uri,
@@ -299,18 +292,40 @@ class ImageStyleDownloadController extends FileDownloadController {
   }
 
   /**
-   * Gets the file URI without a legacy double extension from style conversion.
+   * Replaces the extension of a derivative path with the source extension.
    *
-   * Handles old-style derivative filenames (e.g. image.png.webp) that were
-   * generated before addExtension() was changed to replace extensions rather
-   * than append them.
+   * @param string $path
+   *   The path of the derivative relative to the source scheme, for example
+   *   2026-10/image.webp.
+   * @param string $source_extension
+   *   The extension of the source image, for example png.
+   *
+   * @return string|null
+   *   The path of the source image, for example 2026-10/image.png, or NULL if
+   *   the arguments are not valid.
+   */
+  public static function getPathWithSourceExtension(string $path, string $source_extension): ?string {
+    $extension = pathinfo($path, PATHINFO_EXTENSION);
+    if ($extension === '' || !preg_match('/^[a-z0-9]+$/i', $source_extension)) {
+      return NULL;
+    }
+    return substr($path, 0, -strlen($extension)) . $source_extension;
+  }
+
+  /**
+   * Get the file URI without the extension from any conversion image style.
+   *
+   * Derivatives created before the extension directory was introduced have
+   * the converted extension added to the original file, resulting in
+   * filenames like image.png.jpeg.
    *
    * @param string $uri
    *   The file URI.
    *
    * @return string
-   *   The URI with the appended conversion extension stripped, or the original
-   *   URI if it does not have a double extension.
+   *   The file URI without the extension from any conversion image style.
+   *
+   * @see \Drupal\image\Entity\ImageStyle::buildUri()
    */
   public static function getUriWithoutConvertedExtension(string $uri): string {
     $original_uri = $uri;

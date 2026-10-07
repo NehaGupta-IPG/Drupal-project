@@ -96,35 +96,36 @@ class ImageHooks {
     // Private file access for image style derivatives.
     if (str_starts_with($path, 'styles/')) {
       $args = explode('/', $path);
+      // If the image style changed the extension, the original extension is in
+      // front of the scheme, for example styles/large/png/private/image.webp.
+      $source_extension = NULL;
+      $stream_wrapper_manager = \Drupal::service('stream_wrapper_manager');
+      if (isset($args[3]) && !$stream_wrapper_manager->isValidScheme($args[2]) && $stream_wrapper_manager->isValidScheme($args[3])) {
+        [$source_extension] = array_splice($args, 2, 1);
+      }
       // Discard "styles", style name, and scheme from the path.
       $args = array_slice($args, 3);
       // Then the remaining parts are the path to the image.
-      $original_uri = StreamWrapperManager::getScheme($uri) . '://' . implode('/', $args);
+      $original_path = implode('/', $args);
+      if ($source_extension !== NULL) {
+        $original_path = ImageStyleDownloadController::getPathWithSourceExtension($original_path, $source_extension);
+        if ($original_path === NULL) {
+          return -1;
+        }
+      }
+      $original_uri = StreamWrapperManager::getScheme($uri) . '://' . $original_path;
       // Check that the file exists and is an image.
       $image = \Drupal::service('image.factory')->get($uri);
       if ($image->isValid()) {
-        // If the image style changed the extension, recover the source URI.
-        if (!file_exists($original_uri)) {
-          // Legacy: handle old double-extension filenames
-          // (e.g. image.png.webp).
+        // Derivatives created before the extension directory was introduced
+        // have the converted extension added to the original file, resulting
+        // in filenames like image.png.jpeg. So to find the actual source image,
+        // we remove the extension and check if that image exists.
+        if ($source_extension === NULL && !file_exists($original_uri)) {
           $converted_original_uri = ImageStyleDownloadController::getUriWithoutConvertedExtension($original_uri);
           if ($converted_original_uri !== $original_uri && file_exists($converted_original_uri)) {
+            // The converted file does exist, use it as the source.
             $original_uri = $converted_original_uri;
-          }
-          else {
-            // Current: single replaced extension (e.g. image.webp). Try known
-            // source image extensions.
-            $derivative_extension = pathinfo(StreamWrapperManager::getTarget($original_uri), PATHINFO_EXTENSION);
-            if ($derivative_extension) {
-              $base_uri = substr($original_uri, 0, -(strlen($derivative_extension) + 1));
-              foreach (['jpeg', 'jpg', 'png', 'gif', 'webp', 'tiff', 'bmp'] as $ext) {
-                $candidate_uri = $base_uri . '.' . $ext;
-                if ($candidate_uri !== $original_uri && file_exists($candidate_uri)) {
-                  $original_uri = $candidate_uri;
-                  break;
-                }
-              }
-            }
           }
         }
         // Check the permissions of the original to grant access to this image.
