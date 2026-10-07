@@ -702,11 +702,13 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
       ->register('lock', 'Drupal\Core\Lock\NullLockBackend');
 
     // Explicitly configure all cache bins to use the memory backend.
-    foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
-      $definition = $container->getDefinition($id);
-      $tags = $definition->getTags();
-      $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
-      $definition->setTags($tags);
+    if (!static::sharesEnvironment()) {
+      foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
+        $definition = $container->getDefinition($id);
+        $tags = $definition->getTags();
+        $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
+        $definition->setTags($tags);
+      }
     }
 
     // Disable the super user access policy so that we are sure our tests check
