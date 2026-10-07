@@ -27,6 +27,14 @@ class ImageStylePrepareFormTest extends KernelTestBase {
   protected static $modules = ['system', 'image', 'image_test'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->installConfig(['system']);
+  }
+
+  /**
    * Tests that the add form adds a WebP convert effect to new image styles.
    */
   public function testAddForm(): void {
