@@ -27,7 +27,6 @@ CacheTagGroupedLookups:
     - 'config:user.role.anonymous'
     - 'config:views.view.recipe_collections'
     - 'config:views.view.related_recipes'
-    - 'config:views.view.taxonomy_term'
     - 'config:workflows.workflow.editorial'
     - 'file:37'
     - http_response
@@ -68,6 +67,6 @@ CacheTagGroupedLookups:
     - taxonomy_term_list
     - 'user:6'
 ScriptCount: 3
-ScriptBytes: 12091
+ScriptBytes: 12098
 StylesheetCount: 7
 StylesheetBytes: 34483

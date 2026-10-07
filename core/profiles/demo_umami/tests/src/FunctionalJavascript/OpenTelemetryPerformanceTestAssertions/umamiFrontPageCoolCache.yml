@@ -78,7 +78,6 @@ CacheTagGroupedLookups:
     - 'media:19'
     - 'config:system.menu.main'
     - 'config:views.view.recipe_collections'
-    - 'config:views.view.taxonomy_term'
     - 'taxonomy_term:1'
     - 'taxonomy_term:10'
     - 'taxonomy_term:11'
@@ -116,6 +115,6 @@ CacheTagGroupedLookups:
   -
     - 'config:user.role.anonymous'
 ScriptCount: 3
-ScriptBytes: 12091
+ScriptBytes: 12098
 StylesheetCount: 7
 StylesheetBytes: 34766

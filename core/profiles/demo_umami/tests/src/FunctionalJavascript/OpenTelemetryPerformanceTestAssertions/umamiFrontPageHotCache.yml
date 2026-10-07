@@ -39,7 +39,6 @@ CacheTagGroupedLookups:
     - 'config:views.view.frontpage'
     - 'config:views.view.promoted_items'
     - 'config:views.view.recipe_collections'
-    - 'config:views.view.taxonomy_term'
     - 'file:37'
     - http_response
     - local_task
@@ -78,6 +77,6 @@ CacheTagGroupedLookups:
     - taxonomy_term_list
     - 'user:6'
 ScriptCount: 3
-ScriptBytes: 12091
+ScriptBytes: 12098
 StylesheetCount: 7
 StylesheetBytes: 34766

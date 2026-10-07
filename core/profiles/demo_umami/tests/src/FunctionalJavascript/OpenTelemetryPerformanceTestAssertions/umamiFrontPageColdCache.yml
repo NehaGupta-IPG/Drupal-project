@@ -1,10 +1,10 @@
 QueryCount: 178
-CacheGetCount: 226
+CacheGetCount: 225
 CacheGetCountByBin:
   page: 1
   config: 55
   bootstrap: 15
-  discovery: 84
+  discovery: 83
   data: 10
   dynamic_page_cache: 1
   render: 23
@@ -13,10 +13,10 @@ CacheGetCountByBin:
   routes: 10
   menu: 3
   file_parsing: 2
-CacheSetCount: 241
+CacheSetCount: 240
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
-CacheTagLookupQueryCount: 26
+CacheTagLookupQueryCount: 25
 CacheTagGroupedLookups:
   -
     - entity_types
@@ -121,10 +121,8 @@ CacheTagGroupedLookups:
     - 'config:image.style.square_small'
     - 'config:responsive_image.styles.square'
   -
-    - 'config:views.view.taxonomy_term'
-  -
     - 'config:user.role.anonymous'
 ScriptCount: 3
-ScriptBytes: 12091
+ScriptBytes: 12098
 StylesheetCount: 7
 StylesheetBytes: 34766
