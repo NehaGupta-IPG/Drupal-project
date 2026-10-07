@@ -2,7 +2,6 @@
 
 namespace Drupal\help\Controller;
 
-use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
 use Drupal\help\HelpTopicPluginManagerInterface;
@@ -69,7 +68,7 @@ class HelpTopicPluginController extends ControllerBase {
     }
 
     if (count($links)) {
-      uasort($links, [SortArray::class, 'sortByTitleElement']);
+      uasort($links, '\Drupal\Core\Utility\NaturalSort::sortByTitleElement');
       $build['#related'] = [
         '#theme' => 'links__related',
         '#heading' => [

@@ -85,4 +85,60 @@ final class NaturalSort {
     });
   }
 
+ /**
+   * Sorts a structured array by 'title' key (no # prefix).
+   *
+   * Callback for uasort().
+   *
+   * @param array $a
+   *   First item for comparison. The compared items should be associative
+   *   arrays that optionally include a 'title' key.
+   * @param array $b
+   *   Second item for comparison.
+   *
+   * @return int
+   *   The comparison result for uasort().
+   */
+  public static function sortByTitleElement($a, $b) {
+    return static::sortByKeyString($a, $b, 'title');
+  }
+
+  /**
+   * Sorts a structured array by '#title' property.
+   *
+   * Callback for uasort().
+   *
+   * @param array $a
+   *   First item for comparison. The compared items should be associative
+   *   arrays that optionally include a '#title' key.
+   * @param array $b
+   *   Second item for comparison.
+   *
+   * @return int
+   *   The comparison result for uasort().
+   */
+  public static function sortByTitleProperty($a, $b) {
+    return static::sortByKeyString($a, $b, '#title');
+  }
+
+  /**
+   * Sorts a string array item by an arbitrary key.
+   *
+   * @param array $a
+   *   First item for comparison.
+   * @param array $b
+   *   Second item for comparison.
+   * @param string $key
+   *   The key to use in the comparison.
+   *
+   * @return int
+   *   The comparison result for uasort().
+   */
+  public static function sortByKeyString($a, $b, $key) {
+    $a_title = (is_array($a) && isset($a[$key])) ? $a[$key] : '';
+    $b_title = (is_array($b) && isset($b[$key])) ? $b[$key] : '';
+
+    return self::strnatcasecmp($a_title, $b_title);
+  }
+
 }
