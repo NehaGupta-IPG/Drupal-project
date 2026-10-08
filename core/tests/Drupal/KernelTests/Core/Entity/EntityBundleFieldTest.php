@@ -6,6 +6,8 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Field\FieldPurger;
 use Drupal\entity_test\EntityTestHelper;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -36,6 +38,41 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     $this->installSchema('user', ['users_data']);
     $this->installEntitySchema('entity_test_update');
     $this->database = $this->container->get('database');
+  }
+
+  /**
+   * Tests that both warmed field maps reflect configurable field CRUD.
+   */
+  public function testConfigurableFieldMapInvalidation(): void {
+    FieldStorageConfig::create([
+      'entity_type' => 'entity_test',
+      'field_name' => 'field_map_test',
+      'type' => 'string',
+    ])->save();
+
+    // Warm both maps after storage creation, which also clears field caches.
+    $manager = $this->container->get('entity_field.manager');
+    $obsolete = $this->container->get('keyvalue')->get('entity.definitions.bundle_field_map');
+    $this->assertSame([], $obsolete->getAll());
+    $this->assertArrayNotHasKey('field_map_test', $manager->getFieldMap()['entity_test']);
+    $this->assertArrayNotHasKey('field_map_test', $manager->getFieldMapByFieldType('string')['entity_test']);
+    $field = FieldConfig::create([
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'field_name' => 'field_map_test',
+    ]);
+    $field->save();
+
+    $expected = ['type' => 'string', 'bundles' => ['entity_test' => 'entity_test']];
+    $this->assertSame($expected, $manager->getFieldMap()['entity_test']['field_map_test']);
+    $this->assertSame($expected, $manager->getFieldMapByFieldType('string')['entity_test']['field_map_test']);
+    $this->assertSame([], $obsolete->getAll());
+
+    $field->delete();
+
+    $this->assertArrayNotHasKey('field_map_test', $manager->getFieldMap()['entity_test']);
+    $this->assertArrayNotHasKey('field_map_test', $manager->getFieldMapByFieldType('string')['entity_test']);
+    $this->assertSame([], $obsolete->getAll());
   }
 
   /**
