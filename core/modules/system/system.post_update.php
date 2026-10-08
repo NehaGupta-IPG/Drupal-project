@@ -5,6 +5,10 @@
  * Post update functions for System.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Field\Plugin\Field\FieldFormatter\StringFormatter;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -90,4 +94,21 @@ function system_post_update_clear_admin_compact_mode_config(): void {
   $config = \Drupal::configFactory()->getEditable('system.site');
   $config->clear('admin_compact_mode');
   $config->save();
+}
+
+/**
+ * Add the tag setting to string and inherited field formatters.
+ */
+function system_post_update_string_formatter_tag(array &$sandbox): void {
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'entity_view_display', function (EntityViewDisplayInterface $display): bool {
+    $changed = FALSE;
+    foreach ($display->getComponents() as $name => $component) {
+      if ($display->getRenderer($name) instanceof StringFormatter && !array_key_exists('tag', $component['settings'])) {
+        $component['settings']['tag'] = '';
+        $display->setComponent($name, $component);
+        $changed = TRUE;
+      }
+    }
+    return $changed;
+  });
 }
