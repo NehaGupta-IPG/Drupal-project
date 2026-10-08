@@ -72,11 +72,11 @@ class ExceptionHandler extends BaseExceptionHandler {
     }
 
     match ($sqlState) {
-      'HY000' =>  match ($errorCode) {
+      'HY000' => match ($errorCode) {
         4111 => throw new SchemaPrimaryKeyMustBeDroppedException($message, 0, $exception, $info),
         default => throw new DatabaseExceptionWrapper($message, 0, $exception, $info),
       },
-      '42000', '42S01', '42S02' =>  match ($errorCode) {
+      '42000', '42S01', '42S02' => match ($errorCode) {
         1050 => throw new SchemaTableAlreadyExistsException($message, $code, $exception, $info),
         1051, 1146 => throw new SchemaTableDoesNotExistException($message, $code, $exception, $info),
         1071 => throw new SchemaTableKeyTooLargeException($message, $code, $exception, $info),
