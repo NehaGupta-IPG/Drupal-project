@@ -13,6 +13,7 @@ use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Url;
 use Drupal\workflows\WorkflowInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -108,7 +109,8 @@ class ContentModerationConfigureEntityTypesForm extends FormBase {
     }
 
     $options = $defaults = [];
-    foreach ($this->bundleInfo->getBundleInfo($this->entityType->id()) as $bundle_id => $bundle) {
+    $bundles = $this->bundleInfo->getBundleInfo($this->entityType->id());
+    foreach ($bundles as $bundle_id => $bundle) {
       // Check if moderation is enabled for this bundle on any workflow.
       $moderation_enabled = $this->moderationInformation->shouldModerateEntitiesOfBundle($this->entityType, $bundle_id);
       // Check if moderation is enabled for this bundle on this workflow.
@@ -128,10 +130,13 @@ class ContentModerationConfigureEntityTypesForm extends FormBase {
       }
     }
 
+    $bundle_entity_type_id = $this->entityType->getBundleEntityType();
+    $bundle_entity_type = $bundle_entity_type_id ? $this->entityTypeManager->getDefinition($bundle_entity_type_id) : NULL;
+
     if (!empty($options)) {
       $bundles_header = $this->t('All @entity_type types', ['@entity_type' => $this->entityType->getLabel()]);
-      if ($bundle_entity_type_id = $this->entityType->getBundleEntityType()) {
-        $bundles_header = $this->t('All @entity_type_plural_label', ['@entity_type_plural_label' => $this->entityTypeManager->getDefinition($bundle_entity_type_id)->getPluralLabel()]);
+      if ($bundle_entity_type) {
+        $bundles_header = $this->t('All @entity_type_plural_label', ['@entity_type_plural_label' => $bundle_entity_type->getPluralLabel()]);
       }
       $form['bundles'] = [
         '#type' => 'tableselect',
@@ -142,6 +147,44 @@ class ContentModerationConfigureEntityTypesForm extends FormBase {
         '#default_value' => $defaults,
         '#attributes' => ['class' => ['no-highlight']],
       ];
+    }
+    else {
+      // There are no bundles to select from: explain why the dialog is blank
+      // and, where possible, link to the form for adding one.
+      $label = $bundle_entity_type ? mb_strtolower($bundle_entity_type->getPluralLabel()) : mb_strtolower($this->entityType->getLabel());
+
+      // Bundles may exist while all of them are moderated by other workflows.
+      $message = $bundles
+        ? $this->t('All @label are already moderated by other workflows.', ['@label' => $label])
+        : $this->t('No @label available.', ['@label' => $label]);
+
+      // node_type is the only bundle entity type content moderation deals
+      // with that has no 'add-form' link template of its own.
+      // @see \Drupal\node\Entity\NodeType
+      $add_form_route_name = match ($bundle_entity_type?->id()) {
+        NULL => NULL,
+        'node_type' => 'node.type_add',
+        default => $bundle_entity_type->hasLinkTemplate('add-form') ? "entity.{$bundle_entity_type->id()}.add_form" : NULL,
+      };
+
+      if ($add_form_route_name) {
+        $add_form_url = Url::fromRoute($add_form_route_name);
+        // The current user may not have permission to create a bundle, in
+        // which case linking to the add form would only lead to an access
+        // denied page.
+        $message = $add_form_url->access()
+          ? $this->t('@message <a href=":link">Add @singular_label</a>.', [
+            '@message' => $message,
+            ':link' => $add_form_url->toString(),
+            '@singular_label' => mb_strtolower($bundle_entity_type->getSingularLabel()),
+          ])
+          : $this->t('@message Someone with permission to create @label will need to do so before you can use this option.', [
+            '@message' => $message,
+            '@label' => $label,
+          ]);
+      }
+
+      $form['bundles'] = ['#markup' => $message];
     }
 
     // Get unsupported features for this entity type.

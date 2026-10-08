@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class ContentModerationWorkflowTypeTest extends BrowserTestBase {
 
+  use ContentModerationTestTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -22,6 +25,7 @@ class ContentModerationWorkflowTypeTest extends BrowserTestBase {
     'content_moderation',
     'node',
     'entity_test',
+    'taxonomy',
   ];
 
   /**
@@ -110,6 +114,58 @@ class ContentModerationWorkflowTypeTest extends BrowserTestBase {
     // Ensure warning message are displayed for unsupported features.
     $this->drupalGet('admin/config/workflow/workflows/manage/test/type/entity_test_rev');
     $this->assertSession()->pageTextContains('Test entity - revisions entities do not support publishing statuses. For example, even after transitioning from a published workflow state to an unpublished workflow state they will still be visible to site visitors.');
+  }
+
+  /**
+   * Tests the message shown when there are no bundles to select.
+   */
+  public function testNoBundlesMessage(): void {
+    $this->drupalGet('admin/config/workflow/workflows/add');
+    $this->submitForm([
+      'label' => 'Test',
+      'id' => 'test',
+      'workflow_type' => 'content_moderation',
+    ], 'Save');
+
+    $session = $this->assertSession();
+
+    // A user who cannot create content types sees no link to the add form.
+    $this->drupalGet('admin/config/workflow/workflows/manage/test/type/node');
+    $session->pageTextContains('No content types available. Someone with permission to create content types will need to do so before you can use this option.');
+    $session->linkNotExists('Add content type');
+
+    // A user who can create content types is linked to the add form. The node
+    // type has no 'add-form' link template, so this uses a dedicated route.
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer workflows',
+      'administer content types',
+      'administer taxonomy',
+    ]));
+    $this->drupalGet('admin/config/workflow/workflows/manage/test/type/node');
+    $session->pageTextContains('No content types available. Add content type.');
+    $session->linkByHrefExists('/admin/structure/types/add');
+
+    // Bundle entity types with an 'add-form' link template use it.
+    $this->drupalGet('admin/config/workflow/workflows/manage/test/type/taxonomy_term');
+    $session->pageTextContains('No vocabularies available. Add vocabulary.');
+    $session->linkByHrefExists('/admin/structure/taxonomy/add');
+
+    // Entity types without a bundle entity type fall back to the entity type
+    // label and never link anywhere.
+    \Drupal::state()->set('entity_test_rev.bundles', []);
+    \Drupal::service('entity_type.bundle.info')->clearCachedBundles();
+    $this->drupalGet('admin/config/workflow/workflows/manage/test/type/entity_test_rev');
+    $session->pageTextContains('No test entity - revisions available.');
+    $session->elementNotExists('css', '#edit-bundles');
+
+    // When every bundle is moderated by another workflow, the message says so
+    // instead of claiming there are none.
+    $this->createContentType(['type' => 'article']);
+    $workflow = $this->createEditorialWorkflow();
+    $this->addEntityTypeAndBundleToWorkflow($workflow, 'node', 'article');
+    $this->drupalGet('admin/config/workflow/workflows/manage/test/type/node');
+    $session->pageTextContains('All content types are already moderated by other workflows. Add content type.');
+    $session->pageTextNotContains('No content types available.');
   }
 
 }
