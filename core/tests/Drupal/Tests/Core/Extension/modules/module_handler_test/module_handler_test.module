@@ -7,9 +7,6 @@
 
 declare(strict_types=1);
 
-use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
-
-#[ExtensionFileIsConverted]
 function module_handler_test_hook($arg): mixed {
   return $arg;
 }
