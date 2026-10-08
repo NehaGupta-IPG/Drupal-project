@@ -6,21 +6,20 @@ namespace Drupal\Tests\sqlite\Kernel\sqlite;
 
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException;
-use Drupal\Core\Database\Exception\SchemaTableDoesNotExistException;
 use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests normalization of real SQLite table errors.
+ * Tests the classification of SQLite specific table errors.
  */
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
 class TableExceptionHandlerTest extends DriverSpecificKernelTestBase {
 
   /**
-   * Tests table errors without classifying duplicate indexes or triggers.
+   * Tests SQLite messages that need specific handling.
    */
   #[DataProvider('errorProvider')]
   public function testNativeErrors(string $sql, string $expected, string $expected_message): void {
@@ -47,9 +46,8 @@ class TableExceptionHandlerTest extends DriverSpecificKernelTestBase {
    */
   public static function errorProvider(): array {
     return [
-      ['SELECT * FROM {normalization_missing}', SchemaTableDoesNotExistException::class, 'no such table'],
-      ['DROP TABLE {normalization_missing}', SchemaTableDoesNotExistException::class, 'no such table'],
-      ['CREATE TABLE {normalization_test} (id INTEGER)', SchemaTableAlreadyExistsException::class, 'already exists'],
+      // SQLite reports this message instead of "table ... already exists". The
+      // target is unqualified because SQLite table prefixes are schema names.
       [
         'ALTER TABLE {normalization_test} RENAME TO normalization_target',
         SchemaTableAlreadyExistsException::class,
