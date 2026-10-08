@@ -80,4 +80,23 @@ class AreaResultTest extends ViewsKernelTestBase {
     $this->assertNoRaw('<header>');
   }
 
+  /**
+   * Tests altering the replacement tokens of the result area handler.
+   *
+   * @see \Drupal\views_test_data\Hook\ViewsTestDataViewsExecutionHooks::viewsAreaResultReplacementsAlter()
+   */
+  public function testResultReplacementsAlter(): void {
+    $view = Views::getView('test_area_result');
+    $view->setDisplay('default');
+    $header = $view->displayHandlers->get('default')->getOption('header');
+    $header['result']['content'] = 'total: @total | custom: @test_token';
+    $view->displayHandlers->get('default')->overrideOption('header', $header);
+
+    $this->executeView($view);
+    $output = $view->render();
+    $output = \Drupal::service('renderer')->renderRoot($output);
+    $this->setRawContent($output);
+    $this->assertText('total: altered 5 | custom: test value for result');
+  }
+
 }

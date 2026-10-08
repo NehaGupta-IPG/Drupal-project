@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\views_test_data\Hook;
 
+use Drupal\views\Plugin\views\area\Result;
 use Drupal\views\Plugin\views\cache\CachePluginBase;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\views\ViewExecutable;
@@ -143,6 +144,17 @@ class ViewsTestDataViewsExecutionHooks {
   #[Hook('views_query_alter')]
   public function viewsQueryAlter(ViewExecutable $view): void {
     \Drupal::state()->set('views_hook_test_views_query_alter', TRUE);
+  }
+
+  /**
+   * Implements hook_views_area_result_replacements_alter().
+   */
+  #[Hook('views_area_result_replacements_alter')]
+  public function viewsAreaResultReplacementsAlter(array &$replacements, ViewExecutable $view, Result $handler): void {
+    if ($view->storage->id() === 'test_area_result' && str_contains($handler->options['content'], '@test_token')) {
+      $replacements['@test_token'] = 'test value for ' . $handler->options['id'];
+      $replacements['@total'] = 'altered ' . $replacements['@total'];
+    }
   }
 
 }

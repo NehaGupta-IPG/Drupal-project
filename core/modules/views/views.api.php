@@ -13,6 +13,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\views\Plugin\views\cache\CachePluginBase;
 use Drupal\views\Plugin\views\PluginBase;
+use Drupal\views\Plugin\views\area\Result;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\ViewExecutable;
 
@@ -896,6 +897,34 @@ function hook_views_post_render(ViewExecutable $view, array &$output, CachePlugi
     $cache->options['results_lifespan'] = 0;
     $cache->options['output_lifespan'] = 0;
   }
+}
+
+/**
+ * Alter the replacement tokens of the "Global: Result summary" area handler.
+ *
+ * Modules may add new tokens or change the values of the existing ones (such
+ * as @start, @end and @total) before they are replaced in the configured
+ * result summary text.
+ *
+ * The replacement values are inserted into the output without escaping. The
+ * output is then filtered with \Drupal\Component\Utility\Xss::filterAdmin().
+ * Implementations are responsible for escaping any user-provided values, for
+ * example with \Drupal\Component\Utility\Html::escape().
+ *
+ * @param array $replacements
+ *   An associative array of replacement values, keyed by the token, including
+ *   the leading "@" character. For example: ['@total' => '42'].
+ * @param \Drupal\views\ViewExecutable $view
+ *   The view object being rendered.
+ * @param \Drupal\views\Plugin\views\area\Result $handler
+ *   The result summary area handler.
+ *
+ * @see \Drupal\views\Plugin\views\area\Result::render()
+ */
+function hook_views_area_result_replacements_alter(array &$replacements, ViewExecutable $view, Result $handler): void {
+  // Add a token containing the number of rows not yet displayed.
+  $remaining = max(0, (int) $replacements['@total'] - (int) $replacements['@end']);
+  $replacements['@remaining'] = (string) $remaining;
 }
 
 /**
