@@ -87,7 +87,7 @@ class HookOrderTest extends KernelTestBase {
    *
    * @see \Drupal\aaa_hook_order_test\Hook\AHooks()
    * @see \Drupal\bbb_hook_order_test\Hook\BHooks()
-   * @see \Drupal\ccccore/tests/Drupal/KernelTests/Core/Hook/HookCollectorPassTest.php_hook_order_test\Hook\CHooks()
+   * @see \Drupal\ccc_hook_order_test\Hook\CHooks()
    * @see \Drupal\ddd_hook_order_test\Hook\DHooks()
    * @see \aaa_hook_order_test_test_hook()
    * @see \bbb_hook_order_test_test_hook()
