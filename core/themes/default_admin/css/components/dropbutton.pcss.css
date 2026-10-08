@@ -9,19 +9,20 @@
   --dropbutton-line-height: var(--admin-space-m);
   --dropbutton-border-size: 1px;
   --dropbutton-toggle-size-spacing: var(--dropbutton-border-size);
-  --dropbutton-height: 64px;
-  --dropbutton-border-radius-size: 6px;
+  --dropbutton-height: 46px;
+  --dropbutton-border-radius-size: var(--admin-radius-m);
   --dropbutton-item-max-width: 12.5rem;
-  --dropbutton-padding-block: 20px;
-  --dropbutton-padding-inline: 20px;
+  --dropbutton-padding-block: 10px;
+  --dropbutton-padding-inline: 23px;
 
   .no-touchevents &.dropbutton--small {
     --dropbutton-spacing-size: 0.625rem;
     --dropbutton-font-size: var(--admin-font-size-xs);
     --dropbutton-line-height: 0.75rem;
-    --dropbutton-padding-block: 20px;
+    --dropbutton-padding-block: 9px;
     --dropbutton-padding-inline: 20px;
-    --dropbutton-height: 32px;
+    --dropbutton-height: 34px;
+    --dropbutton-border-radius-size: 6px;
   }
 
   .no-touchevents &.dropbutton--extrasmall {
@@ -31,6 +32,7 @@
     --dropbutton-padding-block: 5px;
     --dropbutton-padding-inline: 12px;
     --dropbutton-height: 24px;
+    --dropbutton-border-radius-size: 6px;
   }
 }
 
@@ -108,11 +110,14 @@
     visibility: visible;
   }
 
-  a {
+  :is(a, .button) {
     display: block;
     padding-block: var(--dropbutton-padding-block);
     padding-inline: calc(var(--dropbutton-padding-inline) - var(--dropdown-padding));
     border-radius: var(--dropbutton-border-radius-size);
+    text-decoration: none;
+    transition: var(--admin-transition);
+    -webkit-font-smoothing: antialiased;
 
     &:hover {
       background-color: var(--admin-color-primary-hover);
@@ -145,17 +150,36 @@
   aspect-ratio: 1;
   border: var(--dropbutton-border-size) solid transparent;
   border-inline-start: var(--dropbutton-border-size) solid var(--admin-color-primary);
-  border-start-end-radius: var(--dropbutton-border-radius-size);
-  border-end-end-radius: var(--dropbutton-border-radius-size);
+  border-start-end-radius: calc(var(--dropbutton-border-radius-size) - 2px);
+  border-end-end-radius: calc(var(--dropbutton-border-radius-size) - 2px);
   appearance: none;
   background: none;
+  cursor: pointer;
+  color: var(--admin-color-primary);
+
+  &:hover {
+    background-color: var(--admin-color-primary-hover);
+  }
+
+  &:active {
+    background-color: var(--admin-color-primary-active);
+  }
+
+  &:focus {
+    outline-offset: 0px;
+  }
+
+  &:hover,
+  &:active {
+    color: var(--admin-color-text-on-primary);
+  }
 
   &::before {
     position: absolute;
     inset: 0;
     margin: auto;
     content: "";
-    background-color: var(--admin-color-primary);
+    background-color: currentColor;
     mask-image: var(--admin-icon-drop);
     mask-repeat: no-repeat;
     mask-position: center center;
@@ -184,11 +208,14 @@
     white-space: nowrap;
     text-decoration: none;
     color: var(--admin-color-primary);
+    border: 0;
     border-radius: var(--button-border-radius-size);
     background: none;
     font-size: var(--dropbutton-font-size);
     font-weight: var(--admin-font-weight-semibold);
     appearance: none;
+    transition: all var(--admin-transition);
+    -webkit-font-smoothing: antialiased;
 
     &:hover {
       background-color: var(--admin-color-primary-hover);
