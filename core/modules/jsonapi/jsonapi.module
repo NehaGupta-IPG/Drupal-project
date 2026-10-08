@@ -88,7 +88,7 @@ const JSONAPI_FILTER_AMONG_ENABLED = 'filter_among_enabled';
 const JSONAPI_FILTER_AMONG_OWN = 'filter_among_own';
 
 /**
- * Need to suppress the deprecation.
+ * The attribute to skip the deprecation message must be set on a function.
  */
 #[ExtensionFileIsConverted]
 function _jsonapi_suppress_deprecation(): void {}

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Used to test bare container calls in .module files.
+ * Used to test bare container calls in .module files during hook collection.
  */
 
 declare(strict_types=1);
@@ -12,7 +12,7 @@ use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
 \Drupal::getContainer()->getParameter('site.path');
 
 /**
- * Suppress deprecations.
+ * The attribute to skip the deprecation message must be set on a function.
  */
 #[ExtensionFileIsConverted]
 function _container_initialize_suppress_deprecation(): void {}
