@@ -28,34 +28,6 @@ class SqlExecutionInfo {
   }
 
   /**
-   * Finds the SQL execution information in a chain of throwables.
-   *
-   * A database exception is often wrapped by the layer that ran the query,
-   * most visibly by \Drupal\Core\Entity\EntityStorageException, which is how
-   * most real query failures surface. A wrapper is not a database exception
-   * itself, so the information has to be looked for along the chain of
-   * previous throwables as well.
-   *
-   * @param \Throwable $throwable
-   *   The throwable to inspect.
-   *
-   * @return \Drupal\Core\Database\SqlExecutionInfo|null
-   *   The information carried by the first throwable in the chain that carries
-   *   any, or NULL if none of them does. Not every class implementing
-   *   \Drupal\Core\Database\DatabaseException carries the information, so a
-   *   database exception in the chain is not enough for this to return one.
-   */
-  public static function fromThrowable(\Throwable $throwable): ?SqlExecutionInfo {
-    while ($throwable) {
-      if ($throwable instanceof DatabaseExceptionWrapper && $throwable->info !== NULL) {
-        return $throwable->info;
-      }
-      $throwable = $throwable->getPrevious();
-    }
-    return NULL;
-  }
-
-  /**
    * Returns a compact single line representation of the SQL execution.
    *
    * This is meant for the exception message, which ends up in logs, in
@@ -86,24 +58,6 @@ class SqlExecutionInfo {
    */
   public function appendToMessage(string $message): string {
     return $message . ': ' . $this->toCompactString();
-  }
-
-  /**
-   * Removes the compact representation from an exception message.
-   *
-   * Consumers rendering the structured information use this to avoid
-   * repeating the statement that ::appendToMessage() added to the message.
-   *
-   * @param string $message
-   *   The exception message.
-   *
-   * @return string
-   *   The message without the suffix added by ::appendToMessage(). Messages
-   *   that do not carry the suffix are returned unchanged.
-   */
-  public function stripFromMessage(string $message): string {
-    $suffix = ': ' . $this->toCompactString();
-    return str_ends_with($message, $suffix) ? substr($message, 0, -strlen($suffix)) : $message;
   }
 
   /**

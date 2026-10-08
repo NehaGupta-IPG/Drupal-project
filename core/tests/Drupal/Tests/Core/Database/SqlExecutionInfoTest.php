@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Database;
 
-use Drupal\Core\Database\ConnectionNotDefinedException;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException;
 use Drupal\Core\Database\SqlExecutionInfo;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -76,63 +72,12 @@ class SqlExecutionInfoTest extends UnitTestCase {
   }
 
   /**
-   * Tests appending to and stripping from an exception message.
+   * Tests appending to an exception message.
    */
-  public function testAppendToAndStripFromMessage(): void {
+  public function testAppendToMessage(): void {
     $info = new SqlExecutionInfo('SELECT 1', [':a' => 'b'], ['fetch' => 'assoc']);
-    $appended = $info->appendToMessage('Failed');
     // The options are not included in the message.
-    $this->assertSame("Failed: SELECT 1; [:a='b']", $appended);
-    $this->assertSame('Failed', $info->stripFromMessage($appended));
-
-    // Messages without this suffix are returned unchanged.
-    $this->assertSame('Failed', $info->stripFromMessage('Failed'));
-    $other = (new SqlExecutionInfo('SELECT 2'))->appendToMessage('Failed');
-    $this->assertSame($other, $info->stripFromMessage($other));
-  }
-
-  /**
-   * Tests finding the execution information in a chain of throwables.
-   */
-  #[DataProvider('providerFromThrowable')]
-  public function testFromThrowable(?string $expected, \Throwable $throwable): void {
-    $this->assertSame($expected, SqlExecutionInfo::fromThrowable($throwable)?->sqlString);
-  }
-
-  /**
-   * Provides test cases for ::testFromThrowable().
-   */
-  public static function providerFromThrowable(): array {
-    $carrying = new DatabaseExceptionWrapper('Failed', 0, NULL, new SqlExecutionInfo('SELECT 1'));
-
-    return [
-      'carried directly' => ['SELECT 1', $carrying],
-      // This is how most query failures surface.
-      'wrapped by the entity storage' => [
-        'SELECT 1',
-        new EntityStorageException('Failed', 0, $carrying),
-      ],
-      // Not every database exception extends DatabaseExceptionWrapper, so the
-      // walk cannot stop at the first one it meets.
-      'behind a database exception without the property' => [
-        'SELECT 1',
-        new ConnectionNotDefinedException('Not defined', 0, $carrying),
-      ],
-      // The outermost statement is the one the caller ran.
-      'outermost of two' => [
-        'SELECT 2',
-        new DatabaseExceptionWrapper('Outer', 0, $carrying, new SqlExecutionInfo('SELECT 2')),
-      ],
-      // Thrown by Drupal rather than by a driver.
-      'database exception carrying nothing' => [
-        NULL,
-        new SchemaTableAlreadyExistsException('Table exists'),
-      ],
-      'no database exception in the chain' => [
-        NULL,
-        new \RuntimeException('Outer', 0, new \LogicException('Inner')),
-      ],
-    ];
+    $this->assertSame("Failed: SELECT 1; [:a='b']", $info->appendToMessage('Failed'));
   }
 
 }
