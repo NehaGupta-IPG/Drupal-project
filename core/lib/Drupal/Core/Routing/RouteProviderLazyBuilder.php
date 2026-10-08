@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Routing;
 
+use Drupal\Core\Installer\InstallerKernel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -44,6 +45,21 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   protected $rebuilding = FALSE;
 
   /**
+   * Static flag to track if router was rebuilt during site installation.
+   *
+   * This static flag persists across container rebuilds during installation,
+   * preventing redundant route rebuilds. It is only used when
+   * InstallerKernel::installationAttempted() returns TRUE; outside of
+   * installation (e.g., config import), this flag is ignored to ensure
+   * new modules get their routes rebuilt.
+   *
+   * @var bool
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3492438
+   */
+  protected static $installerRebuilt = FALSE;
+
+  /**
    * RouteProviderLazyBuilder constructor.
    *
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
@@ -57,13 +73,26 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   }
 
   /**
-   * Gets the real route provider service and rebuilds the router id necessary.
+   * Gets the real route provider service and rebuilds the router if necessary.
+   *
+   * During site installation, a static flag is used to prevent redundant
+   * route rebuilds across container rebuilds. Outside of installation, routes
+   * are always rebuilt when needed to ensure new modules have their routes
+   * available.
    *
    * @return \Drupal\Core\Routing\RouteProviderInterface
    *   The route provider service.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3492438
    */
   protected function getRouteProvider() {
-    if (!$this->rebuilt && !$this->rebuilding) {
+    // Only use the static rebuilt flag during site installation.
+    // Outside of installation, routes must rebuild for new modules.
+    $skipRebuild = $this->rebuilding;
+    if (InstallerKernel::installationAttempted()) {
+      $skipRebuild = $skipRebuild || static::$installerRebuilt;
+    }
+    if (!$skipRebuild) {
       $this->routeBuilder->rebuild();
     }
     return $this->routeProvider;
@@ -130,6 +159,21 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   }
 
   /**
+   * Sets the rebuilt flag.
+   *
+   * Used by ModuleInstaller::updateKernel() to preserve rebuilt state
+   * across container rebuilds during module installation.
+   *
+   * @param bool $rebuilt
+   *   The rebuilt state to set.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3492438
+   */
+  public function setRebuilt(bool $rebuilt): void {
+    $this->rebuilt = $rebuilt;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
@@ -151,6 +195,9 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   public function routerRebuildFinished() {
     $this->rebuilding = FALSE;
     $this->rebuilt = TRUE;
+    if (InstallerKernel::installationAttempted()) {
+      static::$installerRebuilt = TRUE;
+    }
   }
 
   /**
