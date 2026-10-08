@@ -284,6 +284,7 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
           foreach ($parser->getMethodAttributes() as $function => $attributes) {
             if (StaticReflectionParser::hasAttribute($attributes, ExtensionFileIsConverted::class)) {
               $implementations['@skip_theme_file_deprecation'] = TRUE;
+              break;
             }
             if ($shouldSkipProceduralScan || StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
               break;
