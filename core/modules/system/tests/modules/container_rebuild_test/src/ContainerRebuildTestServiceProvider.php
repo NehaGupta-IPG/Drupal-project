@@ -16,8 +16,9 @@ class ContainerRebuildTestServiceProvider implements ServiceModifierInterface {
    * {@inheritdoc}
    */
   public function alter(ContainerBuilder $container): void {
-    $count = $container->get('state')->get('container_rebuild_test.count', 0);
-    $container->get('state')->set('container_rebuild_test.count', ++$count);
+    $key_value = $container->get('keyvalue')->get('state');
+    $count = $key_value->get('container_rebuild_test.count', 0);
+    $key_value->set('container_rebuild_test.count', ++$count);
   }
 
 }
