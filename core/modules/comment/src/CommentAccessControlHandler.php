@@ -111,7 +111,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
     // Display mode is really only about how comments and their replies are
     // displayed. So, we check thread depth regardless which display mode is
     // set. Depth -1 means reply depth is unlimited.
-    if ($reply_depth > -1) {
+    if ($reply_depth !== CommentManagerInterface::REPLY_DEPTH_UNLIMITED) {
       // Prevent replying to comments on the deepest level.
       $comment_indent = count(explode('.', $comment->getThread()));
       $access_result = $access_result->andIf(AccessResult::forbiddenIf($comment_indent > $reply_depth, 'Thread limit hit'));

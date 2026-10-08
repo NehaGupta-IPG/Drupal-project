@@ -126,7 +126,7 @@ class CommentViewBuilder extends EntityViewBuilder {
       $reply_depth_limit = $commented_entity
         ->getFieldDefinition($entity->getFieldName())
         ?->getSettings()['thread_reply_depth'] ?? NULL;
-      if (is_int($reply_depth_limit) && $reply_depth_limit > -1) {
+      if (is_int($reply_depth_limit) && $reply_depth_limit !== CommentManagerInterface::REPLY_DEPTH_UNLIMITED) {
         $max_indent = $reply_depth_limit;
       }
     }

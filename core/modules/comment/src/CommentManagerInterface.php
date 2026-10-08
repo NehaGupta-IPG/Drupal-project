@@ -20,6 +20,11 @@ interface CommentManagerInterface {
   const COMMENT_MODE_THREADED = 1;
 
   /**
+   * Replies to comments are not limited based on their level.
+   */
+  const REPLY_DEPTH_UNLIMITED = -1;
+
+  /**
    * Utility function to return an array of comment fields.
    *
    * @param string $entity_type_id
