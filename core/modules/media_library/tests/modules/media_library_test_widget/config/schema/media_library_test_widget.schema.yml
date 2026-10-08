@@ -8,3 +8,6 @@ field.widget.settings.media_library_inception_widget:
       sequence:
         type: string
         label: 'Media type ID'
+    add_button_text:
+      type: string
+      label: 'Add button text'

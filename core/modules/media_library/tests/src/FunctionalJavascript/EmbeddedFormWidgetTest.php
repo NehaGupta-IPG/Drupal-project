@@ -76,6 +76,7 @@ class EmbeddedFormWidgetTest extends WebDriverTestBase {
         'region' => 'content',
         'settings' => [
           'media_types' => ['type_three'],
+          'add_button_text' => 'Add media',
         ],
       ])
       ->save();
@@ -108,6 +109,7 @@ class EmbeddedFormWidgetTest extends WebDriverTestBase {
         'region' => 'content',
         'settings' => [
           'media_types' => ['type_three'],
+          'add_button_text' => 'Add media',
         ],
       ])
       ->save();

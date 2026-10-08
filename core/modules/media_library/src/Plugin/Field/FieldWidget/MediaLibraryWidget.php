@@ -121,6 +121,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
   public static function defaultSettings() {
     return [
       'media_types' => [],
+      'add_button_text' => t('Add media'),
     ] + parent::defaultSettings();
   }
 
@@ -175,6 +176,13 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $elements = [];
+    $elements['add_button_text'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Add button text'),
+      '#required' => TRUE,
+      '#default_value' => $this->getSetting('add_button_text'),
+    ];
+
     $media_type_ids = $this->getAllowedMediaTypeIdsSorted();
 
     if (count($media_type_ids) <= 1) {
@@ -269,6 +277,9 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       }
       $summary[] = $this->t('Tab order: @order', ['@order' => implode(', ', $media_type_labels)]);
     }
+    $summary[] = $this->t('Add button text: @text', [
+      '@text' => $this->getSetting('add_button_text'),
+    ]);
     return $summary;
   }
 
@@ -511,7 +522,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // Add a button that will load the Media library in a modal using AJAX.
     $element['open_button'] = [
       '#type' => 'button',
-      '#value' => $this->t('Add media'),
+      '#value' => $this->getSetting('add_button_text'),
       '#name' => $field_name . '-media-library-open-button' . $id_suffix,
       '#attributes' => [
         'class' => [
