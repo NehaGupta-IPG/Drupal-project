@@ -34,6 +34,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -181,7 +182,8 @@ class EntityFieldManagerTest extends UnitTestCase {
   /**
    * Tests constructor dependencies and the original signature deprecation.
    */
-  #[DataProvider('constructorProvider')]
+  #[TestWith([FALSE], 'current')]
+  #[TestWith([TRUE], 'original')]
   #[IgnoreDeprecations]
   public function testConstructor(bool $legacy): void {
     if ($legacy) {
@@ -206,13 +208,6 @@ class EntityFieldManagerTest extends UnitTestCase {
     foreach ($dependencies as $property => $dependency) {
       $this->assertSame($dependency, (new \ReflectionProperty($manager, $property))->getValue($manager));
     }
-  }
-
-  /**
-   * Provides current and original constructor signatures.
-   */
-  public static function constructorProvider(): array {
-    return ['current' => [FALSE], 'original' => [TRUE]];
   }
 
   /**
