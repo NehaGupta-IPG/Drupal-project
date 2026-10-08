@@ -18,7 +18,6 @@ use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
  *
  * @see \Drupal\aaa_hook_order_test\Hook\AHooks::testHookAfterB()
  */
-#[ExtensionFileIsConverted]
 function bbb_hook_order_test_test_hook(): string {
   return __FUNCTION__;
 }

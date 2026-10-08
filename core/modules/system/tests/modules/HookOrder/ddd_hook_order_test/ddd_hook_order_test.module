@@ -14,7 +14,6 @@ use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
  *
  * This implementation has no ordering modifications.
  */
-#[ExtensionFileIsConverted]
 function ddd_hook_order_test_test_hook(): string {
   return __FUNCTION__;
 }
