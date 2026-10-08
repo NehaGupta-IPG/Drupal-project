@@ -54,8 +54,6 @@ class HookCollectorPassTest extends BrowserTestBase {
     // Confirm that the file still has a bare container call.
     $bare_container = "declare(strict_types=1);
 
-use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
-
 \Drupal::getContainer()->getParameter('site.path');
 ";
     $file_content = file_get_contents($config_module_file);

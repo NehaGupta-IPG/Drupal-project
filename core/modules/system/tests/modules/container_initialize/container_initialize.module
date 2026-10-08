@@ -7,12 +7,4 @@
 
 declare(strict_types=1);
 
-use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
-
 \Drupal::getContainer()->getParameter('site.path');
-
-/**
- * The attribute to skip the deprecation message must be set on a function.
- */
-#[ExtensionFileIsConverted]
-function _container_initialize_suppress_deprecation(): void {}
