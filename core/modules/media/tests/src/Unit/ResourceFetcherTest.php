@@ -6,6 +6,8 @@ namespace Drupal\Tests\media\Unit;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\NullBackend;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\media\OEmbed\ProviderRepositoryInterface;
 use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcher;
@@ -17,6 +19,7 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests Drupal\media\OEmbed\ResourceFetcher.
@@ -50,10 +53,38 @@ class ResourceFetcherTest extends UnitTestCase {
       $client->reveal(),
       $this->createStub(ProviderRepositoryInterface::class),
       new NullBackend('default'),
+      $this->createStub(ModuleHandlerInterface::class),
       $non_default_timeout,
-      $this->createMock('\Drupal\Core\Extension\ModuleHandlerInterface'),
     );
     $fetcher->fetchResource($url);
+  }
+
+  /**
+   * Tests the deprecated constructor signatures without a module handler.
+   */
+  #[IgnoreDeprecations]
+  public function testLegacyConstructor(): void {
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
+    $container = new ContainerBuilder();
+    $container->set('module_handler', $module_handler);
+    \Drupal::setContainer($container);
+
+    $client = $this->createStub(Client::class);
+    $providers = $this->createStub(ProviderRepositoryInterface::class);
+    $timeout = new \ReflectionProperty(ResourceFetcher::class, 'timeout');
+    $handler = new \ReflectionProperty(ResourceFetcher::class, 'moduleHandler');
+
+    $this->expectUserDeprecationMessage('Calling Drupal\media\OEmbed\ResourceFetcher::__construct() without the $moduleHandler argument is deprecated in drupal:12.1.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3042423');
+
+    // Omitting the module handler entirely.
+    $fetcher = new ResourceFetcher($client, $providers, new NullBackend('default'));
+    $this->assertSame($module_handler, $handler->getValue($fetcher));
+    $this->assertSame(5, $timeout->getValue($fetcher));
+
+    // Passing the timeout in the position of the module handler.
+    $fetcher = new ResourceFetcher($client, $providers, new NullBackend('default'), 10);
+    $this->assertSame($module_handler, $handler->getValue($fetcher));
+    $this->assertSame(10, $timeout->getValue($fetcher));
   }
 
   /**
@@ -92,7 +123,7 @@ class ResourceFetcherTest extends UnitTestCase {
       $client,
       $providers,
       new NullBackend('default'),
-      moduleHandler: $this->createMock('\Drupal\Core\Extension\ModuleHandlerInterface'),
+      $this->createStub(ModuleHandlerInterface::class),
     );
     /** @var \Drupal\media\OEmbed\Resource $resource */
     $resource = $fetcher->fetchResource('valid');
