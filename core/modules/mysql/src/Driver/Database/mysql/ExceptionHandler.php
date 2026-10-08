@@ -12,7 +12,6 @@ use Drupal\Core\Database\Exception\SchemaTableDoesNotExistException;
 use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\SqlExecutionInfo;
-use Drupal\Core\Database\StatementInterface;
 
 /**
  * MySql database exception handler class.
@@ -21,49 +20,13 @@ class ExceptionHandler extends BaseExceptionHandler {
 
   /**
    * {@inheritdoc}
-   */
-  public function handleStatementException(\Exception $exception, string $sql, array $options = []): never {
-    if (!$exception instanceof \PDOException) {
-      throw $exception;
-    }
-    $this->rethrowNormalizedException($exception, $exception->getCode(), $exception->errorInfo[1] ?? NULL, $sql, [], $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function handleExecutionException(\Exception $exception, StatementInterface $statement, array $arguments = [], array $options = []): never {
-    if (!$exception instanceof \PDOException) {
-      throw $exception;
-    }
-    $this->rethrowNormalizedException($exception, $exception->getCode(), $exception->errorInfo[1] ?? NULL, $statement->getQueryString(), $arguments, $options);
-  }
-
-  /**
-   * Rethrows exceptions thrown during execution of statement objects.
-   *
-   * Wrap the exception in another exception, because PHP does not allow
-   * overriding Exception::getMessage(). Its message is the extra database
-   * debug information.
-   *
-   * @param \Exception $exception
-   *   The exception to be handled.
-   * @param int|string $sqlState
-   *   MySql SQLState error condition.
-   * @param int|null $errorCode
-   *   MySql error code.
-   * @param string $queryString
-   *   The SQL statement string.
-   * @param array $arguments
-   *   An array of arguments for the prepared statement.
-   * @param array $options
-   *   An associative array of options to control how the database operation is
-   *   run.
    *
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
    * @throws \Drupal\Core\Database\IntegrityConstraintViolationException
    * @throws \Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException
    * @throws \Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableDoesNotExistException
    * @throws \Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException
    */
   protected function rethrowNormalizedException(
@@ -72,7 +35,7 @@ class ExceptionHandler extends BaseExceptionHandler {
     ?int $errorCode,
     string $queryString,
     array $arguments,
-    array $options,
+    array $options = [],
   ): never {
 
     // SQLState could be 'HY000' which cannot be used as a $code argument for
