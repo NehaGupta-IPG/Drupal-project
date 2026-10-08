@@ -28,34 +28,6 @@ class SqlExecutionInfo {
   }
 
   /**
-   * Finds the SQL execution information in a chain of throwables.
-   *
-   * A database exception is often wrapped by the layer that ran the query,
-   * most visibly by \Drupal\Core\Entity\EntityStorageException, which is how
-   * most real query failures surface. A wrapper is not a database exception
-   * itself, so the information has to be looked for along the chain of
-   * previous throwables as well.
-   *
-   * @param \Throwable $throwable
-   *   The throwable to inspect.
-   *
-   * @return \Drupal\Core\Database\SqlExecutionInfo|null
-   *   The information carried by the first throwable in the chain that carries
-   *   any, or NULL if none of them does. Not every class implementing
-   *   \Drupal\Core\Database\DatabaseException carries the information, so a
-   *   database exception in the chain is not enough for this to return one.
-   */
-  public static function fromThrowable(\Throwable $throwable): ?SqlExecutionInfo {
-    while ($throwable) {
-      if ($throwable instanceof DatabaseExceptionWrapper && $throwable->info !== NULL) {
-        return $throwable->info;
-      }
-      $throwable = $throwable->getPrevious();
-    }
-    return NULL;
-  }
-
-  /**
    * Returns a compact single line representation of the SQL execution.
    *
    * This is meant for the exception message, which ends up in logs, in
@@ -89,57 +61,22 @@ class SqlExecutionInfo {
   }
 
   /**
-   * Removes the compact representation from an exception message.
-   *
-   * Consumers rendering the structured information use this to avoid
-   * repeating the statement that ::appendToMessage() added to the message.
-   *
-   * @param string $message
-   *   The exception message.
-   *
-   * @return string
-   *   The message without the suffix added by ::appendToMessage(). Messages
-   *   that do not carry the suffix are returned unchanged.
-   */
-  public function stripFromMessage(string $message): string {
-    $suffix = ': ' . $this->toCompactString();
-    return str_ends_with($message, $suffix) ? substr($message, 0, -strlen($suffix)) : $message;
-  }
-
-  /**
    * Formats a single placeholder value for ::toCompactString().
    *
    * @param mixed $value
    *   The placeholder value.
-   * @param int $depth
-   *   The current array nesting depth.
    *
    * @return string
-   *   The value as a single line string.
+   *   The value as a single line string. Values that are not scalars are
+   *   represented by their type only.
    */
-  private static function formatValue(mixed $value, int $depth = 0): string {
-    if (is_array($value)) {
-      // Bound nesting and array size, including self-referencing arrays.
-      if ($depth >= 3) {
-        return '[...]';
-      }
-      $values = [];
-      foreach (array_slice($value, 0, 20) as $item) {
-        $values[] = self::formatValue($item, $depth + 1);
-      }
-      if (count($value) > 20) {
-        $values[] = '...';
-      }
-      return '[' . implode(', ', $values) . ']';
-    }
+  private static function formatValue(mixed $value): string {
     return match (TRUE) {
       $value === NULL => 'NULL',
       is_bool($value) => $value ? 'TRUE' : 'FALSE',
-      is_resource($value) => 'resource (' . get_resource_type($value) . ')',
-      gettype($value) === 'resource (closed)' => 'resource (closed)',
-      is_object($value) => 'object (' . get_debug_type($value) . ')',
       is_string($value) => "'" . strtr($value, ["\n" => '\n', "\r" => '\r']) . "'",
-      default => (string) $value,
+      is_int($value) || is_float($value) => (string) $value,
+      default => get_debug_type($value),
     };
   }
 
