@@ -224,7 +224,7 @@ class ModulesListForm extends FormBase {
     }
 
     // Lastly, sort all packages by title.
-    NaturalSort::sortByTitleProperty($form['modules']);
+    NaturalSort::sortByKeyString($form['modules'], '#title');
 
     $form['#attached']['library'][] = 'core/drupal.tableresponsive';
     $form['#attached']['library'][] = 'system/drupal.system.modules';

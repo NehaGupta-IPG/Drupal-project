@@ -86,38 +86,6 @@ final class NaturalSort {
   }
 
   /**
-   * Sorts a structured array by 'title' key (no # prefix).
-   *
-   * @param array $array
-   *   The input array.
-   * @param string|null $langcode
-   *   (optional) The language code to determine the collation rules. Defaults
-   *   to the current language if the language manager service is available.
-   *
-   * @return int
-   *   The comparison result for uasort().
-   */
-  public static function sortByTitleElement(array &$array, ?string $langcode = NULL) {
-    return static::sortByKeyString($array, 'title', $langcode);
-  }
-
-  /**
-   * Sorts a structured array by '#title' property.
-   *
-   * @param array $array
-   *   The input array.
-   * @param string|null $langcode
-   *   (optional) The language code to determine the collation rules. Defaults
-   *   to the current language if the language manager service is available.
-   *
-   * @return int
-   *   The comparison result for uasort().
-   */
-  public static function sortByTitleProperty(array &$array, ?string $langcode = NULL): true {
-    return static::sortByKeyString($array, '#title', $langcode);
-  }
-
-  /**
    * Sorts a string array item by an arbitrary key.
    *
    * @param array $array
