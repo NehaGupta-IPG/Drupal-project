@@ -69,7 +69,7 @@ class HelpTopicPluginController extends ControllerBase {
     }
 
     if (count($links)) {
-      uasort($links, [NaturalSort::class, 'sortByTitleElement']);
+      NaturalSort::sortByTitleElement($links);
       $build['#related'] = [
         '#theme' => 'links__related',
         '#heading' => [

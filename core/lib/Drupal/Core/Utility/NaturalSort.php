@@ -88,57 +88,55 @@ final class NaturalSort {
   /**
    * Sorts a structured array by 'title' key (no # prefix).
    *
-   * Callback for uasort().
-   *
-   * @param array $a
-   *   First item for comparison. The compared items should be associative
-   *   arrays that optionally include a 'title' key.
-   * @param array $b
-   *   Second item for comparison.
+   * @param string[]|Drupal\Core\StringTranslation\TranslatableMarkup[] $array
+   *   The input array.
+   * @param string|null $langcode
+   *   (optional) The language code to determine the collation rules. Defaults
+   *   to the current language if the language manager service is available.
    *
    * @return int
    *   The comparison result for uasort().
    */
-  public static function sortByTitleElement($a, $b) {
-    return static::sortByKeyString($a, $b, 'title');
+  public static function sortByTitleElement(array &$array, ?string $langcode = NULL) {
+    return static::sortByKeyString($array, 'title', $langcode);
   }
 
   /**
    * Sorts a structured array by '#title' property.
    *
-   * Callback for uasort().
-   *
-   * @param array $a
-   *   First item for comparison. The compared items should be associative
-   *   arrays that optionally include a '#title' key.
-   * @param array $b
-   *   Second item for comparison.
+   * @param string[]|Drupal\Core\StringTranslation\TranslatableMarkup[] $array
+   *   The input array.
+   * @param string|null $langcode
+   *   (optional) The language code to determine the collation rules. Defaults
+   *   to the current language if the language manager service is available.
    *
    * @return int
    *   The comparison result for uasort().
    */
-  public static function sortByTitleProperty($a, $b) {
-    return static::sortByKeyString($a, $b, '#title');
+  public static function sortByTitleProperty(array &$array, ?string $langcode = NULL): true {
+    return static::sortByKeyString($array, '#title', $langcode);
   }
 
   /**
    * Sorts a string array item by an arbitrary key.
    *
-   * @param array $a
-   *   First item for comparison.
-   * @param array $b
-   *   Second item for comparison.
+   * @param string[]|Drupal\Core\StringTranslation\TranslatableMarkup[] $array
+   *   The input array.
    * @param string $key
    *   The key to use in the comparison.
+   * @param string|null $langcode
+   *   (optional) The language code to determine the collation rules. Defaults
+   *   to the current language if the language manager service is available.
    *
-   * @return int
-   *   The comparison result for uasort().
+   * @return true
+   *   Always returns true.
    */
-  public static function sortByKeyString($a, $b, $key) {
-    $a_title = (is_array($a) && isset($a[$key])) ? $a[$key] : '';
-    $b_title = (is_array($b) && isset($b[$key])) ? $b[$key] : '';
-
-    return self::strnatcasecmp((string) $a_title, (string) $b_title);
+  public static function sortByKeyString(array &$array, string $key, ?string $langcode = NULL): true {
+    return uasort($array, function ($a, $b) use ($langcode, $key) {
+      $a_title = (is_array($a) && isset($a[$key])) ? $a[$key] : '';
+      $b_title = (is_array($b) && isset($b[$key])) ? $b[$key] : '';
+      return self::strnatcasecmp((string) $a_title, (string) $b_title, $langcode);
+    });
   }
 
 }
