@@ -8,6 +8,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Test\PhpUnitTestRunner;
 use Drupal\Core\Test\SimpletestTestRunResultsStorage;
 use Drupal\Core\Test\TestRun;
+use Drupal\Core\Test\TestRunResultsStorageInterface;
 use Drupal\Core\Test\TestStatus;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -88,6 +89,51 @@ class PhpUnitTestRunnerTest extends UnitTestCase {
       'exit_code' => 3,
     ];
     $this->assertEquals($fail_row, $row);
+  }
+
+  /**
+   * Tests that only an existing file is accepted as a test file.
+   */
+  #[DataProvider('providerStartPhpUnitOnSingleTestFileRejectsNonFiles')]
+  public function testStartPhpUnitOnSingleTestFileRejectsNonFiles(string $testFileName): void {
+    $runner = new PhpUnitTestRunner($this->root, sys_get_temp_dir());
+
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage("'{$testFileName}' is not a file containing tests.");
+    $runner->startPhpUnitOnSingleTestFile($this->testRun(), $testFileName, FALSE, FALSE);
+  }
+
+  /**
+   * Provides test cases for ::testStartPhpUnitOnSingleTestFileRejectsNonFiles().
+   */
+  public static function providerStartPhpUnitOnSingleTestFileRejectsNonFiles(): array {
+    return [
+      // A directory would run every test file below it under one test run id.
+      'directory' => [sys_get_temp_dir()],
+      // What \ReflectionClass::getFileName() returning FALSE used to become.
+      'empty string' => [''],
+      'missing file' => [sys_get_temp_dir() . '/no-such-file.php'],
+    ];
+  }
+
+  /**
+   * Tests that a class without a file is rejected.
+   *
+   * \ReflectionClass::getFileName() returns FALSE for an internal class.
+   */
+  public function testStartPhpUnitOnSingleTestClassRejectsInternalClass(): void {
+    $runner = new PhpUnitTestRunner($this->root, sys_get_temp_dir());
+
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage("Test class 'ArrayObject' is not defined in a file.");
+    $runner->startPhpUnitOnSingleTestClass($this->testRun(), \ArrayObject::class, FALSE, FALSE);
+  }
+
+  /**
+   * Returns a test run that stores nothing.
+   */
+  protected function testRun(): TestRun {
+    return TestRun::createNew($this->createStub(TestRunResultsStorageInterface::class));
   }
 
   /**

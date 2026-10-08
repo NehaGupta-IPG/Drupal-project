@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Utility;
 
+use Drupal\Core\Database\ConnectionNotDefinedException;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Utility\Error;
+use Drupal\Tests\Core\Utility\Stub\StubDriverStatement;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -16,6 +19,46 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(Error::class)]
 #[Group('Utility')]
 class ErrorTest extends UnitTestCase {
+
+  /**
+   * The global database registry, as found before the test ran.
+   */
+  protected array $connectionInfo;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    // Error::decodeException() reads the driver namespace from the global
+    // database registry. Start from an empty registry, so that the tests below
+    // do not depend on what an earlier test class left in it:
+    // Database::addConnectionInfo() keeps the information already registered
+    // for a key instead of overwriting it.
+    $this->connectionInfo = Database::getAllConnectionInfo();
+    $this->removeAllConnectionInfo();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function tearDown(): void {
+    // Put back what was found, rather than leaving the registry emptied for
+    // whichever test class runs next.
+    $this->removeAllConnectionInfo();
+    Database::setMultipleConnectionInfo($this->connectionInfo);
+    parent::tearDown();
+  }
+
+  /**
+   * Empties the global database registry.
+   */
+  private function removeAllConnectionInfo(): void {
+    foreach (array_keys(Database::getAllConnectionInfo()) as $key) {
+      Database::removeConnection($key);
+    }
+  }
 
   /**
    * Tests the getLastCaller() method.
@@ -112,6 +155,55 @@ class ErrorTest extends UnitTestCase {
     $data[] = [$second_item_args, "test_function() (Line: 10)\ntest_function_2('string', 10, Object) (Line: 10)\n"];
 
     return $data;
+  }
+
+  /**
+   * Tests that decodeException() does not need connection info to be defined.
+   *
+   * ConnectionNotDefinedException and DriverNotSpecifiedException implement
+   * DatabaseException, but are thrown precisely when the connection info is
+   * absent, so the driver namespace cannot be determined. The backtrace is
+   * then left untouched instead of failing inside the error handler.
+   */
+  public function testDecodeExceptionWithoutConnectionInfo(): void {
+    $exception = new ConnectionNotDefinedException('The specified database connection is not defined: default');
+    $decoded = Error::decodeException($exception);
+
+    $this->assertSame(ConnectionNotDefinedException::class, $decoded['%type']);
+    $this->assertSame('The specified database connection is not defined: default', $decoded['@message']);
+    $this->assertSame(__FILE__, $decoded['%file']);
+  }
+
+  /**
+   * Tests that decodeException() trims the backtrace of client exceptions.
+   *
+   * Client exceptions such as \PDOException do not implement Drupal's
+   * DatabaseException interface, but can still escape the database layer, for
+   * example from the statement fetch methods.
+   */
+  public function testDecodeExceptionWithClientException(): void {
+    Database::addConnectionInfo('default', 'default', [
+      'driver' => 'test',
+      'namespace' => 'Drupal\\Tests\\Core\\Utility\\Stub',
+      'autoload' => 'core/tests/Drupal/Tests/Core/Utility/Stub/',
+      'database' => 'test',
+    ]);
+
+    try {
+      $line = __LINE__ + 1;
+      (new StubDriverStatement())->execute();
+      $this->fail('No client exception was thrown.');
+    }
+    catch (\PDOException $exception) {
+      $decoded = Error::decodeException($exception);
+    }
+
+    // The entries of the stub driver are removed, so that the caller is the
+    // line in this test calling into the driver, and not the line throwing
+    // the exception inside it.
+    $this->assertSame(\PDOException::class, $decoded['%type']);
+    $this->assertSame(__FILE__, $decoded['%file']);
+    $this->assertSame($line, $decoded['%line']);
   }
 
   /**

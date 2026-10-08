@@ -770,7 +770,7 @@ abstract class Connection {
       'Truncate',
       'Schema',
       'Condition',
-      'Transaction' => throw new InvalidQueryException('Calling ' . __METHOD__ . '() for \'' . $class . '\' is not supported. Use standard autoloading in the methods that return database operations. See https://www.drupal.org/node/3217534'),
+      'Transaction' => throw new \InvalidArgumentException('Calling ' . __METHOD__ . '() for \'' . $class . '\' is not supported. Use standard autoloading in the methods that return database operations. See https://www.drupal.org/node/3217534'),
       default => NULL,
     };
     if (empty($this->driverClasses[$class])) {
@@ -1644,6 +1644,12 @@ abstract class Connection {
       if (str_starts_with($class, __NAMESPACE__) || str_starts_with($class, $driver_namespace)) {
         break;
       }
+    }
+
+    // No call to the database layer was found in the backtrace. Return it
+    // unchanged; slicing on the negative $n would keep the last entry only.
+    if ($n < 0) {
+      return array_values($backtrace);
     }
 
     return array_values(array_slice($backtrace, $n));

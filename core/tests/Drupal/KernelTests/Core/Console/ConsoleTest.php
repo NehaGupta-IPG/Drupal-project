@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Console;
 
 use Drupal\autowire_test\TestInjection;
+use Drupal\console_test\Command\ConsoleDatabaseExceptionCommand;
+use Drupal\console_test\Command\ConsoleDatabaseExceptionConsoleMarkupCommand;
+use Drupal\console_test\Command\ConsoleDatabaseExceptionNoInfoCommand;
+use Drupal\console_test\Command\ConsoleDatabaseExceptionWrappedCommand;
 use Drupal\console_test\Command\ConsoleExampleCommand;
 use Drupal\console_test\Command\ConsoleExampleConfigureCommand;
 use Drupal\console_test\Command\ConsoleExamplePrivateCommand;
+use Drupal\Core\Command\DrupalApplication;
 use Drupal\Core\DependencyInjection\Compiler\ConsoleCompilerPass;
 use Drupal\KernelTests\DrupalApplicationTesterTrait;
 use Drupal\KernelTests\KernelTestBase;
@@ -16,6 +21,9 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LazyCommand;
+use Symfony\Component\Console\Output\OutputInterface;
+
+// cspell:ignore nosuchcolor
 
 /**
  * Tests integration with Symfony Console.
@@ -24,6 +32,11 @@ use Symfony\Component\Console\Command\LazyCommand;
 #[RunTestsInSeparateProcesses]
 #[CoversClass(ConsoleCompilerPass::class)]
 #[CoversClass(ConsoleExampleCommand::class)]
+#[CoversClass(ConsoleDatabaseExceptionCommand::class)]
+#[CoversClass(ConsoleDatabaseExceptionConsoleMarkupCommand::class)]
+#[CoversClass(ConsoleDatabaseExceptionNoInfoCommand::class)]
+#[CoversClass(ConsoleDatabaseExceptionWrappedCommand::class)]
+#[CoversClass(DrupalApplication::class)]
 class ConsoleTest extends KernelTestBase {
   use DrupalApplicationTesterTrait;
 
@@ -115,6 +128,122 @@ class ConsoleTest extends KernelTestBase {
     $code = $tester->run(['command' => 'example:sub:command'], ['capture_stderr_separately' => TRUE]);
     $this->assertEquals(Command::SUCCESS, $code, $tester->getErrorOutput());
     $this->assertStringContainsString('[OK] Done', $tester->getDisplay());
+  }
+
+  /**
+   * Tests that a database exception is rendered with its statement dump.
+   *
+   * @see \Drupal\Core\Command\DrupalApplication::doRenderThrowable()
+   */
+  public function testDatabaseExceptionRendering(): void {
+    $tester = $this->applicationTester();
+    $code = $tester->run(['command' => 'example:database-exception']);
+    $display = $tester->getDisplay();
+
+    $this->assertEquals(Command::FAILURE, $code, $display);
+    $this->assertStringContainsString("Unknown column 'palm_height'", $display);
+    // The statement, its placeholders and its options are dumped below the
+    // rendered exception.
+    $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*FROM.*bananas_are_awesome.*WHERE.*palm_height/s', $display);
+    $this->assertMatchesRegularExpression('/Placeholders.*:db_condition_placeholder_0.*180/s', $display);
+    $this->assertMatchesRegularExpression('/Options.*allow_delimiter_in_query.*false/s', $display);
+    // The compact statement that the message carries for logs is taken off
+    // the rendered exception, since the dump repeats it in full.
+    $this->assertStringNotContainsString(':db_condition_placeholder_0=180', $display);
+  }
+
+  /**
+   * Tests that the dump is written without going through the formatter.
+   *
+   * Placeholder values are user input. The console output formatter would eat
+   * a registered tag such as <error>, and throw on a color that does not
+   * exist, from inside the exception renderer itself.
+   *
+   * @see \Drupal\Core\Command\DrupalApplication::doRenderThrowable()
+   */
+  public function testDatabaseExceptionConsoleMarkupRendering(): void {
+    $tester = $this->applicationTester();
+    $code = $tester->run(['command' => 'example:database-exception-console-markup'], ['decorated' => FALSE]);
+    $display = $tester->getDisplay();
+
+    $this->assertEquals(Command::FAILURE, $code, $display);
+    // The renderer did not fail on the unknown color.
+    $this->assertStringNotContainsString('nosuchcolor" color', $display);
+    // The values are dumped as they were bound.
+    $this->assertMatchesRegularExpression('/Placeholders.*<error>eaten\?<\/error> <fg=nosuchcolor>invalid<\/>/s', $display);
+  }
+
+  /**
+   * Tests that the dump is not dropped at quiet verbosity.
+   *
+   * The parent renders the exception at VERBOSITY_QUIET, so the dump that
+   * belongs to it has to be written at that verbosity too.
+   *
+   * @see \Drupal\Core\Command\DrupalApplication::doRenderThrowable()
+   */
+  public function testDatabaseExceptionRenderingAtQuietVerbosity(): void {
+    $tester = $this->applicationTester();
+    $code = $tester->run(
+      ['command' => 'example:database-exception'],
+      ['verbosity' => OutputInterface::VERBOSITY_QUIET],
+    );
+    $display = $tester->getDisplay();
+
+    $this->assertEquals(Command::FAILURE, $code, $display);
+    $this->assertStringContainsString("Unknown column 'palm_height'", $display);
+    $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*bananas_are_awesome/s', $display);
+  }
+
+  /**
+   * Tests rendering an exception that wraps a database exception.
+   *
+   * The wrapper is not a database exception, so the statement is only found by
+   * walking the chain of previous throwables.
+   *
+   * @see \Drupal\Core\Command\DrupalApplication::doRenderThrowable()
+   */
+  public function testDatabaseExceptionWrappedRendering(): void {
+    $tester = $this->applicationTester();
+    $code = $tester->run(['command' => 'example:database-exception-wrapped']);
+    $display = $tester->getDisplay();
+
+    $this->assertEquals(Command::FAILURE, $code, $display);
+    $this->assertStringContainsString("Unknown column 'palm_height'", $display);
+    $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*bananas_are_awesome/s', $display);
+    $this->assertMatchesRegularExpression('/Placeholders.*:db_condition_placeholder_0.*180/s', $display);
+    // The wrapper copied the message, so the compact statement it carries is
+    // taken off the rendered exception, since the dump repeats it in full.
+    $this->assertStringNotContainsString(':db_condition_placeholder_0=180', $display);
+
+    // The renderer only names the class at higher verbosity. It is the wrapper
+    // that is reported, and the dump belongs to the exception behind it.
+    $tester = $this->applicationTester();
+    $tester->run(
+      ['command' => 'example:database-exception-wrapped'],
+      ['verbosity' => OutputInterface::VERBOSITY_VERBOSE],
+    );
+    $this->assertStringContainsString('EntityStorageException', $tester->getDisplay());
+  }
+
+  /**
+   * Tests rendering a database exception that carries no statement information.
+   *
+   * Database exceptions thrown by Drupal rather than by a driver carry no
+   * \Drupal\Core\Database\SqlExecutionInfo, and must still be rendered.
+   *
+   * @see \Drupal\Core\Command\DrupalApplication::doRenderThrowable()
+   */
+  public function testDatabaseExceptionWithoutInfoRendering(): void {
+    $tester = $this->applicationTester();
+    $code = $tester->run(['command' => 'example:database-exception-no-info']);
+    $display = $tester->getDisplay();
+
+    $this->assertEquals(Command::FAILURE, $code, $display);
+    // The exception itself is reported, and not an error from the renderer.
+    $this->assertStringContainsString("Table 'bananas_are_awesome' already exists.", $display);
+    $this->assertStringNotContainsString('TypeError', $display);
+    // With no information to dump, nothing is added below the exception.
+    $this->assertStringNotContainsString('SQL statement', $display);
   }
 
 }

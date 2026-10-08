@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
+use Drupal\Core\Database\SqlExecutionInfo;
+use Drupal\Core\Database\Utility\SqlDumper;
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\Extension\DeprecationBridge\Configuration as DeprecationHandlerConfiguration;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\BeforeClass;
+use PHPUnit\TextUI\Configuration\Registry as ConfigurationRegistry;
 use Symfony\Component\VarDumper\VarDumper;
 
 /**
@@ -78,6 +81,75 @@ trait DrupalTestCaseTrait {
    */
   protected function expectExceptionMessageIsOrContains(string $message): void {
     $this->expectExceptionMessage($message);
+  }
+
+  /**
+   * Implements PHPUnit hook to alter a throwable before reporting.
+   *
+   * Database exceptions may carry the information of the executed statement,
+   * that can be exported to a more readable dump.
+   *
+   * @param \Throwable $t
+   *   The throwable to be transformed.
+   *
+   * @return \Throwable
+   *   A transformed throwable.
+   */
+  protected function transformException(\Throwable $t): \Throwable {
+    $info = SqlExecutionInfo::fromThrowable($t);
+    if ($info === NULL) {
+      return $t;
+    }
+    // PHPUnit reports the failure on a terminal, and colors it only when the
+    // test run asked for them.
+    $infoDump = (new SqlDumper())->export($info, self::testRunnerUsesColors(), FALSE);
+    if ($infoDump === '') {
+      return $t;
+    }
+
+    // The dump is appended to the message of the throwable itself, instead of
+    // returning a new one. A new throwable would carry this method's own
+    // ::getFile(), ::getLine() and ::getTrace(), so PHPUnit would report the
+    // failure as happening here instead of in the code that executed the
+    // statement.
+    //
+    // The message carries the same statement in compact form, which the dump
+    // renders in full right below it. PHPUnit reports the chain of previous
+    // throwables below the failure too, and a wrapper normally copied the
+    // message of the exception it wraps, so the suffix is taken off wherever
+    // it occurs. Reflection is used rather than a closure bound to the
+    // throwable, because a throwable in the chain can be an internal class -
+    // the innermost one usually is a \PDOException - and a closure cannot be
+    // bound to the scope of an internal class.
+    for ($throwable = $t; $throwable !== NULL; $throwable = $throwable->getPrevious()) {
+      $message = $info->stripFromMessage($throwable->getMessage());
+      if ($throwable === $t) {
+        $message .= "\n" . $infoDump;
+      }
+      (new \ReflectionProperty($throwable, 'message'))->setValue($throwable, $message);
+    }
+    return $t;
+  }
+
+  /**
+   * Determines whether the test runner is printing colored output.
+   *
+   * @return bool
+   *   TRUE if colors are enabled for the current test run, FALSE otherwise.
+   */
+  private static function testRunnerUsesColors(): bool {
+    // This is the resolved value of the --colors option, and it is restored in
+    // the child processes of tests running in process isolation too. Without
+    // it the dump would default to colored output, and the ANSI sequences would
+    // end up in the JUnit log, and therefore in run-tests.sh output. PHPUnit
+    // marks the registry as internal, so a failure to read it must not be
+    // fatal: the dump is only a debugging aid.
+    try {
+      return ConfigurationRegistry::get()->colors();
+    }
+    catch (\Throwable) {
+      return FALSE;
+    }
   }
 
 }

@@ -6,7 +6,7 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\DatabaseException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -50,13 +50,17 @@ class Error {
     // Add the line throwing the exception to the backtrace.
     array_unshift($backtrace, ['line' => $exception->getLine(), 'file' => $exception->getFile()]);
 
-    // For PDOException errors, we try to return the initial caller,
-    // skipping internal functions of the database layer.
-    if ($exception instanceof \PDOException || $exception instanceof DatabaseExceptionWrapper) {
-      $driver_namespace = Database::getConnectionInfo()['default']['namespace'];
-      $backtrace = Connection::removeDatabaseEntriesFromDebugBacktrace($backtrace, $driver_namespace);
-      if (isset($exception->query_string, $exception->args)) {
-        $message .= ": " . $exception->query_string . "; " . print_r($exception->args, TRUE);
+    // For database exceptions, we try to return the initial caller, skipping
+    // internal functions of the database layer. Client exceptions such as
+    // \PDOException do not implement DatabaseException, but can still escape
+    // the database layer, so they are trimmed as well. The driver namespace is
+    // unknown when no connection info is registered, which is precisely the
+    // case for exceptions such as ConnectionNotDefinedException; the backtrace
+    // is then left untouched rather than failing inside the error handler.
+    if ($exception instanceof DatabaseException || $exception instanceof \PDOException) {
+      $driver_namespace = Database::getConnectionInfo()['default']['namespace'] ?? NULL;
+      if ($driver_namespace !== NULL) {
+        $backtrace = Connection::removeDatabaseEntriesFromDebugBacktrace($backtrace, $driver_namespace);
       }
     }
 

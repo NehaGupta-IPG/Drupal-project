@@ -17,6 +17,11 @@ class Update extends QueryUpdate {
     $max_placeholder = 0;
     $blobs = [];
     $blob_count = 0;
+    // The values are bound on the client statement, which does not report them
+    // back once execution fails. They are collected here so that the exception
+    // handler can carry them, like the drivers that pass an argument array to
+    // \Drupal\Core\Database\StatementInterface::execute() do.
+    $placeholders = [];
 
     // Because we filter $fields the same way here and in __toString(), the
     // placeholders will all match up properly.
@@ -35,6 +40,7 @@ class Update extends QueryUpdate {
           // which is a fairly safe assumption to make since in most cases
           // it would be an invalid query anyway.
           $stmt->getClientStatement()->bindParam($placeholder, $data['arguments'][$placeholder]);
+          $placeholders[$placeholder] = $argument;
         }
       }
       if ($data['expression'] instanceof SelectInterface) {
@@ -42,6 +48,7 @@ class Update extends QueryUpdate {
         $select_query_arguments = $data['expression']->arguments();
         foreach ($select_query_arguments as $placeholder => $argument) {
           $stmt->getClientStatement()->bindParam($placeholder, $select_query_arguments[$placeholder]);
+          $placeholders[$placeholder] = $argument;
         }
       }
       unset($fields[$field]);
@@ -49,6 +56,7 @@ class Update extends QueryUpdate {
 
     foreach ($fields as $field => $value) {
       $placeholder = ':db_update_placeholder_' . ($max_placeholder++);
+      $placeholders[$placeholder] = $value;
 
       if (isset($table_information->blob_fields[$field]) && $value !== NULL) {
         $blobs[$blob_count] = fopen('php://memory', 'a');
@@ -68,6 +76,7 @@ class Update extends QueryUpdate {
       $arguments = $this->condition->arguments();
       foreach ($arguments as $placeholder => $value) {
         $stmt->getClientStatement()->bindParam($placeholder, $arguments[$placeholder]);
+        $placeholders[$placeholder] = $value;
       }
     }
 
@@ -85,7 +94,7 @@ class Update extends QueryUpdate {
       if (isset($savepoint)) {
         $savepoint->rollback();
       }
-      $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, [], $this->queryOptions);
+      $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $placeholders, $this->queryOptions);
     }
   }
 

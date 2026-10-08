@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Core\Command;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\Database\SqlExecutionInfo;
+use Drupal\Core\Database\Utility\SqlDumper;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\Console\Application;
@@ -15,8 +17,11 @@ use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+
+// cspell:ignore cloneable
 
 /**
  * Customize the Symfony Application for Drupal.
@@ -156,6 +161,56 @@ class DrupalApplication extends Application {
         $this->addCommand($container->get($id));
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doRenderThrowable(\Throwable $t, OutputInterface $output): void {
+    // Database exceptions may carry the information of the executed statement,
+    // that can be exported to a more readable dump. The exception may also be
+    // wrapped by the layer that ran the query, so the whole chain is searched.
+    // A console application writes to a terminal, and gets colors only when
+    // the output reports itself as decorated: --no-ansi and a redirected
+    // stream must stay free of escape sequences.
+    $info = SqlExecutionInfo::fromThrowable($t);
+    $dump = $info !== NULL ?
+      (new SqlDumper())->export($info, $output->isDecorated(), FALSE) :
+      '';
+
+    if ($dump === '') {
+      parent::doRenderThrowable($t, $output);
+      return;
+    }
+
+    // The message carries the same statement in compact form, which the dump
+    // renders in full right below it. The parent renders every throwable in
+    // the chain, and a wrapper normally copied the message of the exception it
+    // wraps, so the suffix is taken off wherever it occurs. Throwables are not
+    // cloneable and their message cannot be overridden, so this lasts for the
+    // duration of the parent call only: callers may still log or rethrow the
+    // throwable afterwards.
+    $originalMessages = [];
+    for ($throwable = $t; $throwable !== NULL; $throwable = $throwable->getPrevious()) {
+      $messageProperty = new \ReflectionProperty($throwable, 'message');
+      $originalMessages[] = [$messageProperty, $throwable, $throwable->getMessage()];
+      $messageProperty->setValue($throwable, $info->stripFromMessage($throwable->getMessage()));
+    }
+    try {
+      parent::doRenderThrowable($t, $output);
+    }
+    finally {
+      foreach ($originalMessages as [$messageProperty, $throwable, $message]) {
+        $messageProperty->setValue($throwable, $message);
+      }
+    }
+
+    // The dump contains placeholder values, which may look like console
+    // markup. OUTPUT_RAW keeps the formatter away from them: it would eat
+    // registered tags such as <error>, and throw on an unknown color, from
+    // inside the exception renderer. The parent writes the exception at
+    // VERBOSITY_QUIET, so the dump uses it too and is not dropped by -q.
+    $output->writeln($dump, OutputInterface::OUTPUT_RAW | OutputInterface::VERBOSITY_QUIET);
   }
 
 }

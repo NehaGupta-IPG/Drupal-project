@@ -81,6 +81,9 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    *
    * @return \Symfony\Component\Process\Process
    *   The spawned process object.
+   *
+   * @throws \InvalidArgumentException
+   *   If the class is not defined in a file.
    */
   public function startPhpUnitOnSingleTestClass(
     TestRun $test_run,
@@ -88,7 +91,47 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     bool $colors,
     bool $suppressDeprecations,
   ): Process {
-    $command = $this->prepareCommand($test_run, $test_class, $colors, $suppressDeprecations);
+    $testFileName = (new \ReflectionClass($test_class))->getFileName();
+    // An internal class has no file. Without this check the FALSE would reach
+    // ::startPhpUnitOnSingleTestFile() as an empty string.
+    if ($testFileName === FALSE) {
+      throw new \InvalidArgumentException("Test class '{$test_class}' is not defined in a file.");
+    }
+    return $this->startPhpUnitOnSingleTestFile($test_run, $testFileName, $colors, $suppressDeprecations);
+  }
+
+  /**
+   * Starts asynchronous execution of a PHPUnit process.
+   *
+   * This method executes the tests for a single test file.
+   *
+   * @param \Drupal\Core\Test\TestRun $test_run
+   *   The test run object.
+   * @param string $testFileName
+   *   The test file name.
+   * @param bool $colors
+   *   Whether to use colors in output.
+   * @param bool $suppressDeprecations
+   *   If TRUE, disables the deprecation reporting.
+   *
+   * @return \Symfony\Component\Process\Process
+   *   The spawned process object.
+   *
+   * @throws \InvalidArgumentException
+   *   If the argument is not the name of an existing file.
+   */
+  public function startPhpUnitOnSingleTestFile(
+    TestRun $test_run,
+    string $testFileName,
+    bool $colors,
+    bool $suppressDeprecations,
+  ): Process {
+    // PHPUnit accepts a directory as well, but it would then run every test
+    // it contains, and report all of them under this single test run id.
+    if (!is_file($testFileName)) {
+      throw new \InvalidArgumentException("'{$testFileName}' is not a file containing tests.");
+    }
+    $command = $this->prepareCommand($test_run, $testFileName, $colors, $suppressDeprecations);
     $test_run->start(microtime(TRUE));
     $process = new Process($command['cli_command'], $command['work_dir'], $command['environment_vars']);
     $process->setTimeout(NULL);
@@ -223,8 +266,8 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    *
    * @param \Drupal\Core\Test\TestRun $test_run
    *   The test run object.
-   * @param class-string $test_class_name
-   *   A fully qualified test class name.
+   * @param string $testFileName
+   *   The test file name.
    * @param bool $colors
    *   Whether to use colors in output.
    * @param bool $suppressDeprecations
@@ -235,7 +278,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    */
   protected function prepareCommand(
     TestRun $test_run,
-    string $test_class_name,
+    string $testFileName,
     bool $colors = FALSE,
     bool $suppressDeprecations = FALSE,
   ): array {
@@ -275,9 +318,10 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       '--log-junit',
       $log_junit_file_path,
     ];
-    if ($colors) {
-      $command[] = '--colors=always';
-    }
+    // Colors have to be explicitly disabled: core/phpunit.xml.dist enables
+    // them, so without this the subprocess would emit ANSI sequences that end
+    // up in the JUnit log that run-tests.sh parses.
+    $command[] = $colors ? '--colors=always' : '--colors=never';
 
     if (!$suppressDeprecations) {
       // If the deprecation handler bridge is active, we need to fail when there
@@ -290,9 +334,8 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       }
     }
 
-    // Add to the command the file containing the test class to be run.
-    $reflectedClass = new \ReflectionClass($test_class_name);
-    $command[] = $reflectedClass->getFileName();
+    // Add the file containing the test class to be run.
+    $command[] = $testFileName;
 
     return [
       'cli_command' => $command,

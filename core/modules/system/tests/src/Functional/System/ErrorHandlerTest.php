@@ -112,7 +112,7 @@ class ErrorHandlerTest extends BrowserTestBase {
     $message = \Drupal::database()->prepareStatement((string) $select, [])->getQueryString();
     $message = str_replace(["\r", "\n"], ' ', $message);
     $error_pdo_exception = [
-      '%type' => 'DatabaseExceptionWrapper',
+      '%type' => 'SchemaTableDoesNotExistException',
       '@message' => $message,
       '%function' => 'Drupal\error_test\Controller\ErrorTestController->triggerPDOException()',
       '%line' => 64,
@@ -127,15 +127,51 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(500);
     // We cannot use assertSession()->responseContains() since the exact error reported
     // varies from database to database. Check that the SQL string is displayed.
-    $this->assertSession()->pageTextContains($error_pdo_exception['%type']);
-    // Assert statement improved since static queries adds table alias in the
-    // error message.
-    $this->assertSession()->pageTextContains($error_pdo_exception['@message']);
+    $this->assertSession()->pageTextContains($error_pdo_type);
+    // The dump prints the statement over several lines, and the table name
+    // carries the test database prefix, so the whole statement is compared
+    // against the page text, which Mink returns with whitespace collapsed.
+    $this->assertSession()->pageTextContains($error_pdo_statement);
+    // The dump reports the statement, its placeholders and its options, each
+    // under its own heading. How the values themselves are rendered belongs to
+    // the var dumper and is not asserted.
+    $this->assertSession()->responseMatches('/SQL statement.*SELECT.*FROM.*bananas_are_awesome.*WHERE.*palm_height.*\>.*:db_condition_placeholder_0/s');
+    $this->assertSession()->responseMatches('/Placeholders.*:db_condition_placeholder_0.*180/s');
+    $this->assertSession()->responseMatches('/Options.*allow_delimiter_in_query/s');
+    // The compact statement that the message carries for logs is taken off
+    // the reported message, since the dump repeats it in full.
+    $this->assertSession()->responseNotContains(':db_condition_placeholder_0=180');
+
     $error_details = 'in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;triggerPDOException()</em> (line';
     $this->assertSession()->responseContains($error_details);
+
+    // A driver message can repeat values from the failing statement, and those
+    // values are user input. Neither the message nor the placeholder values
+    // are trusted markup, so both have to be escaped, while the dump around
+    // them is rendered as markup.
+    $xss_payload = "<script>alert('xss')</script>";
+    $this->drupalGet('error-test/trigger-escaped-database-exception');
+    $this->assertSession()->statusCodeEquals(500);
+    $this->assertSession()->responseNotContains($xss_payload);
+    $this->assertSession()->responseContains('&lt;script&gt;');
+    // The message is still reported, as text.
+    $this->assertSession()->pageTextContains($xss_payload);
+    $this->assertSession()->responseMatches('/SQL statement.*INSERT.*INTO.*error_test/s');
+
+    // A database exception thrown by Drupal instead of by a driver carries no
+    // statement to dump. It still has to be reported, with no dump and no
+    // dangling placeholder below it.
+    $this->drupalGet('error-test/trigger-database-exception-without-info');
+    $this->assertSession()->statusCodeEquals(500);
+    $this->assertSession()->pageTextContains('SchemaObjectExistsException');
+    $this->assertSession()->pageTextContains('already exists');
+    $this->assertSession()->responseContains('in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;triggerDatabaseExceptionWithoutInfo()</em> (line');
+    $this->assertSession()->responseNotContains('SQL statement');
+    $this->assertSession()->responseNotContains('@sql_dump');
+
     $this->drupalGet('error-test/trigger-renderer-exception');
     $this->assertSession()->statusCodeEquals(500);
-    $this->assertSession()->responseContains($error_renderer_exception);
+    $this->assertSession()->responseMatches($error_renderer_exception);
 
     // Disable error reporting, ensure that 5xx responses are not cached.
     $this->config('system.logging')

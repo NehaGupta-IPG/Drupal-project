@@ -12,9 +12,11 @@ use Drupal\Core\Test\SimpletestTestRunResultsStorage;
 use Drupal\Core\Test\TestRun;
 use Drupal\Core\Test\TestRunResultsStorageInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\TestRunner\MemoryTestRunResultsStorage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\Process\Process;
 
 /**
  * Tests Drupal\Core\Test\TestRun.
@@ -298,6 +300,112 @@ class TestRunTest extends KernelTestBase {
       'message' => 'Major Tom',
       'message_group' => 'other',
     ];
+  }
+
+  /**
+   * Tests SQL exception dumps the execution information in PHPUnit.
+   */
+  public function testSqlStatementExceptionDump(): void {
+    $process = $this->runTestFixture('SqlExceptionDumpTest.php');
+    $output = $process->getOutput();
+    $message = $output . $process->getErrorOutput();
+    $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*FROM.*bananas_are_awesome.*WHERE.*palm_height.*\>.*:db_condition_placeholder_0/s', $output, $message);
+    $this->assertMatchesRegularExpression('/Placeholders.*:db_condition_placeholder_0.*180/s', $output, $message);
+    $this->assertMatchesRegularExpression('/Options.*allow_delimiter_in_query.*false/s', $output, $message);
+    // The fixture is expected to error, so the process must not report success.
+    $this->assertNotSame(0, $process->getExitCode(), $message);
+  }
+
+  /**
+   * Tests reporting a SQL exception that carries no execution information.
+   *
+   * Database exceptions raised by Drupal instead of by a database driver carry
+   * no \Drupal\Core\Database\SqlExecutionInfo, and must still be reported.
+   *
+   * @see \Drupal\Tests\DrupalTestCaseTrait::transformException()
+   */
+  public function testSqlStatementExceptionDumpWithoutInfo(): void {
+    $process = $this->runTestFixture('SqlExceptionNoInfoDumpTest.php');
+    $output = $process->getOutput();
+    $message = $output . $process->getErrorOutput();
+    // The exception itself is reported, and not an error from the reporting.
+    $this->assertStringContainsString("Table 'bananas_are_awesome' already exists.", $output, $message);
+    $this->assertStringNotContainsString('TypeError', $output, $message);
+    // With no information to dump, nothing is added to the exception message.
+    $this->assertStringNotContainsString('SQL statement', $output, $message);
+    // A failure while reporting the exception can make PHPUnit report the
+    // failing test as successful, so check the process failed.
+    $this->assertNotSame(0, $process->getExitCode(), $message);
+  }
+
+  /**
+   * Tests reporting a SQL exception wrapped by another exception.
+   *
+   * The wrapper is not a database exception, so its statement is only found by
+   * walking the chain of previous throwables.
+   *
+   * @see \Drupal\Tests\DrupalTestCaseTrait::transformException()
+   */
+  public function testSqlStatementExceptionDumpWhenWrapped(): void {
+    $process = $this->runTestFixture('SqlExceptionWrappedDumpTest.php');
+    $output = $process->getOutput();
+    $message = $output . $process->getErrorOutput();
+    $this->assertStringContainsString('EntityStorageException', $output, $message);
+    $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*FROM.*bananas_are_awesome.*WHERE.*palm_height/s', $output, $message);
+    $this->assertMatchesRegularExpression('/Placeholders.*:db_condition_placeholder_0.*180/s', $output, $message);
+    // The wrapper copied the message, and PHPUnit reports the wrapped
+    // exception below the failure as well, so the compact statement must not
+    // be repeated anywhere: the dump renders it in full.
+    $this->assertStringNotContainsString(':db_condition_placeholder_0=180', $output, $message);
+    $this->assertNotSame(0, $process->getExitCode(), $message);
+  }
+
+  /**
+   * Tests that dumping the execution information keeps the failure location.
+   *
+   * The dump is appended to the message of the throwable that PHPUnit reports,
+   * so the reported file, line and stack trace remain those of the code that
+   * executed the statement.
+   *
+   * @see \Drupal\Tests\DrupalTestCaseTrait::transformException()
+   */
+  public function testSqlStatementExceptionDumpKeepsFailureLocation(): void {
+    $process = $this->runTestFixture('SqlExceptionDumpTest.php');
+    $output = $process->getOutput();
+    $message = $output . $process->getErrorOutput();
+
+    // The primary report is what precedes the chain of previous exceptions.
+    $primaryReport = explode("\nCaused by\n", $output)[0];
+    $this->assertStringContainsString('SqlExceptionDumpTest.php:18', $primaryReport, $message);
+    $this->assertStringNotContainsString('DrupalTestCaseTrait.php', $primaryReport, $message);
+
+    // The fixture runs without colors, so the dump must not be colored either.
+    // The same string is written to the JUnit log that run-tests.sh parses.
+    $this->assertStringNotContainsString("\e[", $output, $message);
+  }
+
+  /**
+   * Runs a test fixture file in a PHPUnit subprocess.
+   *
+   * @param string $fixture
+   *   The file name of a test fixture in core/tests/fixtures/TestTools.
+   *
+   * @return \Symfony\Component\Process\Process
+   *   The terminated PHPUnit process.
+   */
+  protected function runTestFixture(string $fixture): Process {
+    $runner = PhpUnitTestRunner::create(\Drupal::getContainer())
+      ->setConfigurationFilePath($this->root . '/core');
+    $process = $runner->startPhpUnitOnSingleTestFile(
+      TestRun::createNew(new MemoryTestRunResultsStorage()),
+      $this->root . '/core/tests/fixtures/TestTools/' . $fixture,
+      colors: FALSE,
+      suppressDeprecations: FALSE,
+    );
+    $process->wait();
+    // No output at all means the fixture was never run.
+    $this->assertNotSame('', $process->getOutput(), $process->getErrorOutput());
+    return $process;
   }
 
 }

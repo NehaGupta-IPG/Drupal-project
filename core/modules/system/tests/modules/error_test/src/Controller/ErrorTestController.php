@@ -6,6 +6,8 @@ namespace Drupal\error_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\SqlExecutionInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -91,7 +93,53 @@ class ErrorTestController extends ControllerBase {
     define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     $this->database->select('bananas_are_awesome', 'b')
       ->fields('b')
+      ->condition('palm_height', 180, '>')
       ->execute();
+  }
+
+  /**
+   * Trigger a database exception carrying markup in the message and the values.
+   *
+   * The exception is built here instead of being provoked with a real failing
+   * query, because the drivers do not agree on what a message contains. MySQL
+   * reports "Duplicate entry '<value>' for key ..." for a unique violation,
+   * while SQLite reports only the table and column names. The escaping this
+   * covers happens when the error page is built, so the message is crafted.
+   *
+   * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
+   */
+  public function triggerEscapedDatabaseException(): void {
+    define('SIMPLETEST_COLLECT_ERRORS', FALSE);
+    $payload = "<script>alert('xss')</script>";
+    $info = new SqlExecutionInfo(
+      'INSERT INTO {error_test} (name) VALUES (:db_insert_placeholder_0)',
+      [':db_insert_placeholder_0' => $payload],
+    );
+    throw new DatabaseExceptionWrapper(
+      $info->appendToMessage("SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '$payload' for key 'PRIMARY'"),
+      0,
+      NULL,
+      $info,
+    );
+  }
+
+  /**
+   * Trigger a database exception that carries no statement information.
+   *
+   * Most of the database exceptions core throws itself, rather than raising
+   * from a driver, carry no \Drupal\Core\Database\SqlExecutionInfo. The error
+   * page has to report them all the same, with nothing dumped below them.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   */
+  public function triggerDatabaseExceptionWithoutInfo(): void {
+    define('SIMPLETEST_COLLECT_ERRORS', FALSE);
+    // The schema handler refuses this before it builds any statement.
+    $this->database->schema()->createTable('users', [
+      'fields' => [
+        'uid' => ['type' => 'int', 'not null' => TRUE],
+      ],
+    ]);
   }
 
   /**
