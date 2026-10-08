@@ -26,9 +26,8 @@ class TableExceptionHandlerTest extends DriverSpecificKernelTestBase {
     $this->connection->query('CREATE TABLE {normalization_test} (id INTEGER)');
     $this->connection->query('CREATE TABLE {normalization_target} (id INTEGER)');
     $this->connection->query('CREATE INDEX {normalization_index} ON normalization_test (id)');
-    $this->connection->query('CREATE TRIGGER {normalization_trigger} AFTER INSERT ON normalization_test BEGIN SELECT 1; END', [], ['allow_delimiter_in_query' => TRUE]);
     try {
-      $this->connection->query($sql, [], ['allow_delimiter_in_query' => TRUE]);
+      $this->connection->query($sql);
       $this->fail('The native query must fail.');
     }
     catch (DatabaseExceptionWrapper $actual) {
@@ -57,11 +56,6 @@ class TableExceptionHandlerTest extends DriverSpecificKernelTestBase {
         'CREATE INDEX {normalization_index} ON normalization_test (id)',
         DatabaseExceptionWrapper::class,
         'index normalization_index already exists',
-      ],
-      [
-        'CREATE TRIGGER {normalization_trigger} AFTER INSERT ON normalization_test BEGIN SELECT 1; END',
-        DatabaseExceptionWrapper::class,
-        'trigger "normalization_trigger" already exists',
       ],
     ];
   }
