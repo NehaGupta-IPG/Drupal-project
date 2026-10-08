@@ -11,10 +11,14 @@ use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\StreamWrapper\StreamWrapperInterface;
+use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\file\Element\ManagedFile;
 use Drupal\file\Entity\File;
+use Drupal\file\FileInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -188,8 +192,9 @@ class FileWidget extends WidgetBase {
       // The field settings include defaults for the field type. However, this
       // widget is a base class for other widgets (e.g., ImageWidget) that may
       // act on field types without these expected settings.
-      $field_settings = $this->getFieldSettings() + ['display_field' => NULL];
+      $field_settings = $this->getFieldSettings() + ['display_field' => NULL, 'uri_scheme_field' => NULL];
       $elements['#display_field'] = (bool) $field_settings['display_field'];
+      $elements['#uri_scheme_field'] = (bool) $field_settings['uri_scheme_field'];
 
       // Add some properties that will eventually be added to the file upload
       // field. These are added here so that they may be referenced easily
@@ -219,6 +224,7 @@ class FileWidget extends WidgetBase {
       'display_default' => NULL,
       'display_field' => NULL,
       'description_field' => NULL,
+      'uri_scheme_field' => NULL,
     ];
 
     $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
@@ -245,6 +251,8 @@ class FileWidget extends WidgetBase {
       '#entity_type' => $items->getEntity()->getEntityTypeId(),
       '#display_field' => (bool) $field_settings['display_field'],
       '#display_default' => $field_settings['display_default'],
+      '#uri_scheme_field' => (bool) $field_settings['uri_scheme_field'],
+      '#uri_scheme_default' => $field_settings['uri_scheme'] ?? NULL,
       '#description_field' => $field_settings['description_field'],
       '#cardinality' => $cardinality,
     ];
@@ -413,6 +421,25 @@ class FileWidget extends WidgetBase {
       $element['display'] = [
         '#type' => 'hidden',
         '#value' => '1',
+      ];
+    }
+
+    // Add the uri scheme field if enabled.
+    if (!empty($element['#uri_scheme_field'])) {
+      $stream_wrapper_manager = \Drupal::service(StreamWrapperManagerInterface::class);
+      $scheme_options = $stream_wrapper_manager->getNames(StreamWrapperInterface::WRITE_VISIBLE);
+      if (isset($item['target_id'])) {
+        $file = \Drupal::service(EntityTypeManagerInterface::class)->getStorage('file')->load($item['target_id']);
+        if ($file instanceof FileInterface) {
+          $current_uri_scheme = $stream_wrapper_manager::getScheme($file->getFileUri());
+        }
+      }
+      $element['uri_scheme'] = [
+        '#type' => 'radios',
+        '#title' => new TranslatableMarkup('Upload destination'),
+        '#options' => $scheme_options,
+        '#default_value' => $current_uri_scheme ?? $element['#uri_scheme_default'],
+        '#required' => TRUE,
       ];
     }
 

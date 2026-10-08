@@ -60,6 +60,9 @@ field.storage_settings.file:
     uri_scheme:
       type: string
       label: 'Upload destination'
+    uri_scheme_field:
+      type: boolean
+      label: 'Enable "file system used for upload" field'
 
 field.value.file:
   type: mapping

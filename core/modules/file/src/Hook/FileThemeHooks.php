@@ -225,6 +225,12 @@ class FileThemeHooks {
     // Build up a table of applicable fields.
     $headers = [];
     $headers[] = $this->t('File information');
+    if (!empty($element['#uri_scheme_field'])) {
+      $headers[] = [
+        'data' => $this->t('Location'),
+        'class' => ['radio'],
+      ];
+    }
     if ($element['#display_field']) {
       $headers[] = [
         'data' => $this->t('Display'),
@@ -266,8 +272,11 @@ class FileThemeHooks {
         }
       }
 
-      // Delay rendering of the "Display" option and the weight selector, so
-      // that each can be rendered later in its own column.
+      // Delay rendering of the "Display" and "Location" option and the weight
+      // selector, so that each can be rendered later in its own column.
+      if (!empty($element['#uri_scheme_field'])) {
+        $widget['uri_scheme']['#printed'] = TRUE;
+      }
       if ($element['#display_field']) {
         $widget['display']['#printed'] = TRUE;
       }
@@ -281,6 +290,14 @@ class FileThemeHooks {
       $row[] = $this->renderer->render($widget);
 
       // Arrange the row with the rest of the rendered columns.
+      if (!empty($element['#uri_scheme_field'])) {
+        unset($widget['uri_scheme']['#title']);
+        $widget['uri_scheme']['#printed'] = FALSE;
+        $row[] = [
+          'data' => $widget['uri_scheme'],
+          'class' => ['radio'],
+        ];
+      }
       if ($element['#display_field']) {
         unset($widget['display']['#title']);
         $row[] = [

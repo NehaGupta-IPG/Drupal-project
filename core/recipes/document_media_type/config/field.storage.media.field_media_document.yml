@@ -16,6 +16,7 @@ settings:
   display_field: false
   display_default: false
   uri_scheme: public
+  uri_scheme_field: false
 module: file
 locked: false
 cardinality: 1
