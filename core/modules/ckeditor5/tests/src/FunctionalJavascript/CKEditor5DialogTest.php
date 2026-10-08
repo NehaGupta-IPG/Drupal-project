@@ -37,6 +37,77 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
    * Tests if CKEditor 5 tooltips can be interacted with in dialogs.
    */
   public function testCKEditor5FocusInTooltipsInDialog(): void {
+    $this->createLinkTextFormat();
+
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+
+    $this->drupalGet('/ckeditor5_test/dialog');
+    $page->clickLink('Add Node');
+    $assert_session->waitForElementVisible('css', '[role="dialog"]');
+    $assert_session->assertWaitOnAjaxRequest();
+
+    $content_area = $assert_session->waitForElementVisible('css', '.ck-editor__editable');
+    // Focus the editable area first.
+    $content_area->click();
+    // Then press the button to add a link.
+    $this->pressEditorButton('Link');
+
+    $link_url = '/ckeditor5_test/dialog';
+    $input = $assert_session->waitForElementVisible('css', '.ck-balloon-panel input.ck-input-text');
+    // Make sure the input field can have focus and we can type into it.
+    $input->setValue($link_url);
+    // Save the new link.
+    $page->find('xpath', "//button[span[text()='Insert']]")->click();
+    // Make sure something was added to the text.
+    $this->assertNotEmpty($content_area->getText());
+  }
+
+  /**
+   * Tests balloons in a dialog opened after an editor exists on the page.
+   *
+   * CKEditor 5 appends a single shared body wrapper to the page when the first
+   * editor is created. If that happens before a jQuery UI dialog is opened,
+   * the wrapper is placed before the dialog in the DOM.
+   */
+  public function testBalloonVisibleInDialogOpenedAfterEditor(): void {
+    $this->createLinkTextFormat();
+
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+
+    $this->drupalGet('/ckeditor5_test/dialog_with_editor');
+    $this->waitForEditor();
+    $page->clickLink('Add Node');
+    $dialog = $assert_session->waitForElementVisible('css', '.ui-dialog');
+    $assert_session->assertWaitOnAjaxRequest();
+
+    // Confirm the body wrapper was created before the dialog.
+    $this->assertTrue($this->getSession()->evaluateScript(<<<JS
+      document.querySelector('.ck-body-wrapper ~ .ui-dialog') !== null
+    JS));
+
+    $content_area = $assert_session->waitForElementVisible('css', '.ui-dialog .ck-editor__editable');
+    $content_area->click();
+    $dialog->find('xpath', "//button[span[text()='Link']]")->click();
+    $assert_session->waitForElementVisible('css', '.ck-balloon-panel_visible input.ck-input-text');
+
+    // Make sure the balloon is the topmost element at its own center point,
+    // and is not covered by the dialog.
+    $this->assertTrue($this->getSession()->evaluateScript(<<<JS
+      (function () {
+        const balloon = document.querySelector('.ck-balloon-panel_visible:not(.ck-tooltip)');
+        const rect = balloon.getBoundingClientRect();
+        const element = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        return balloon.contains(element);
+      })()
+    JS));
+  }
+
+  /**
+   * Creates a text format with CKEditor 5 and the link button.
+   */
+  protected function createLinkTextFormat(): void {
     FilterFormat::create([
       'format' => 'test_format',
       'name' => 'CKEditor 5 with link',
@@ -64,29 +135,6 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
         FilterFormat::load('test_format')
       ))
     ));
-
-    $page = $this->getSession()->getPage();
-    $assert_session = $this->assertSession();
-
-    $this->drupalGet('/ckeditor5_test/dialog');
-    $page->clickLink('Add Node');
-    $assert_session->waitForElementVisible('css', '[role="dialog"]');
-    $assert_session->assertWaitOnAjaxRequest();
-
-    $content_area = $assert_session->waitForElementVisible('css', '.ck-editor__editable');
-    // Focus the editable area first.
-    $content_area->click();
-    // Then press the button to add a link.
-    $this->pressEditorButton('Link');
-
-    $link_url = '/ckeditor5_test/dialog';
-    $input = $assert_session->waitForElementVisible('css', '.ck-balloon-panel input.ck-input-text');
-    // Make sure the input field can have focus and we can type into it.
-    $input->setValue($link_url);
-    // Save the new link.
-    $page->find('xpath', "//button[span[text()='Insert']]")->click();
-    // Make sure something was added to the text.
-    $this->assertNotEmpty($content_area->getText());
   }
 
   /**
