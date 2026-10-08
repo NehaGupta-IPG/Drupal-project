@@ -464,10 +464,10 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
             // attribute so we can auto suppress the deprecation.
             $legacy_attributes = [LegacyHook::class, LegacyRequirementsHook::class];
 
-            if (!static::hasAnyAttribute($attributes, $legacy_attributes)) {
-              $hasNonLegacyTaggedFunction = TRUE;
+            if (static::hasAnyAttribute($attributes, $legacy_attributes)) {
               continue;
             }
+            $hasNonLegacyTaggedFunction = TRUE;
             if ((preg_match($current_module_preg, $function, $matches) || preg_match($all_modules_preg, $function, $matches))) {
               // Skip hooks that are not supported by the new hook system, they
               // do not need to be added to the BC layer. Note that is different
@@ -493,10 +493,9 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
               assert($function === $matches['module'] . '_' . $matches['hook']);
               $implementations['hooks'][] = ['module' => $matches['module'], 'hook' => $matches['hook']];
             }
-
-            if (!$hasNonLegacyTaggedFunction) {
-              $implementations['@skip_extension_file_deprecation'] = TRUE;
-            }
+          }
+          if (!$hasNonLegacyTaggedFunction) {
+            $implementations['@skip_extension_file_deprecation'] = TRUE;
           }
           $procedural_hook_file_cache->set($filename, $implementations);
         }
