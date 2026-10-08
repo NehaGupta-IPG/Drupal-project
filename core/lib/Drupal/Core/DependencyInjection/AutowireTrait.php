@@ -6,13 +6,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a trait for automatically wiring dependencies from the container.
- *
- * This trait uses reflection and may cause performance issues with classes
- * that will be instantiated multiple times.
  */
 trait AutowireTrait {
-
-  use AutowiredInstanceTrait;
 
   /**
    * Instantiates a new instance of the implementing class using autowiring.
@@ -23,7 +18,7 @@ trait AutowireTrait {
    * @return static
    */
   public static function create(ContainerInterface $container) {
-    return static::createInstanceAutowired($container);
+    return AutowireFactory::createInstanceAutowired($container, static::class);
   }
 
 }
