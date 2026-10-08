@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\Exception\SchemaTableDoesNotExistException;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -30,6 +31,7 @@ class DatabaseExceptionWrapperTest extends KernelTestBase {
       $this->fail('Query should have failed.');
     }
     catch (DatabaseExceptionWrapper $e) {
+      $this->assertInstanceOf(SchemaTableDoesNotExistException::class, $e);
       $this->assertMatchesRegularExpression('/SELECT \* FROM ".*does_not_exist" WHERE "not_a_column" = :not_a_value/', $e->info->sqlString);
       $this->assertSame([':not_a_value' => 'not a value'], $e->info->placeholders);
       // The message keeps the statement in compact form, so that it still
