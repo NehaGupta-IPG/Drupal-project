@@ -402,7 +402,11 @@ class ContentTranslationHooks {
     if ($manager->isEnabled($entity_type_id, $entity->bundle())) {
       /** @var \Drupal\content_translation\ContentTranslationHandlerInterface $handler */
       $handler = \Drupal::entityTypeManager()->getHandler($entity->getEntityTypeId(), 'translation');
-      foreach ($entity->getTranslationLanguages() as $langcode => $language) {
+      // Only check translations that are still candidates, in priority order.
+      foreach (array_keys($candidates) as $langcode) {
+        if (!$entity->hasTranslation($langcode)) {
+          continue;
+        }
         $metadata = $manager->getTranslationMetadata($entity->getTranslation($langcode));
         if (!$metadata->isPublished()) {
           $access = $handler->getTranslationAccess($entity, 'update');
@@ -415,8 +419,13 @@ class ContentTranslationHooks {
             $entity->addCacheableDependency($access);
             if (!$access->isAllowed()) {
               unset($candidates[$langcode]);
+              continue;
             }
           }
+        }
+        // This candidate will be used, the ones after it are irrelevant.
+        if (!empty($context['first_candidate_only'])) {
+          break;
         }
       }
     }

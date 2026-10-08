@@ -103,7 +103,12 @@ class EntityRepository implements EntityRepositoryInterface {
       // negotiation, unless the current translation is already the desired one.
       if ($entity->language()->getId() != $langcode) {
         $context['data'] = $entity;
-        $context += ['operation' => 'entity_view', 'langcode' => $langcode];
+        // Only the first candidate with a translation is used below.
+        $context += [
+          'operation' => 'entity_view',
+          'langcode' => $langcode,
+          'first_candidate_only' => TRUE,
+        ];
         $candidates = $this->languageManager->getFallbackCandidates($context);
 
         // Ensure the default language has the proper language code.
