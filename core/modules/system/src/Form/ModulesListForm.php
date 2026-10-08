@@ -21,6 +21,7 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\NaturalSort;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\Utility\Xss;
 
@@ -223,7 +224,7 @@ class ModulesListForm extends FormBase {
     }
 
     // Lastly, sort all packages by title.
-    uasort($form['modules'], '\Drupal\Core\Utility\NaturalSort::sortByTitleProperty');
+    uasort($form['modules'], [NaturalSort::class, 'sortByTitleProperty']);
 
     $form['#attached']['library'][] = 'core/drupal.tableresponsive';
     $form['#attached']['library'][] = 'system/drupal.system.modules';
