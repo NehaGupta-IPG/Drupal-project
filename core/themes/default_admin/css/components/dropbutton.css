@@ -160,6 +160,7 @@
 .dropbutton__toggle {
   position: relative;
   display: block;
+  height: 100%; /* Necessary for Safari (tested 26.2). */
   aspect-ratio: 1;
   border: var(--dropbutton-border-size) solid transparent;
   border-inline-start: var(--dropbutton-border-size) solid var(--admin-color-primary);
@@ -179,7 +180,7 @@
   }
 
   &:focus {
-    outline-offset: 0px;
+    outline-offset: 1px;
   }
 
   &:hover,
@@ -224,13 +225,18 @@
     text-decoration: none;
     color: var(--admin-color-primary) !important; /* Override button.css admin specificity. */
     border: 0;
-    border-radius: var(--button-border-radius-size);
+    border-start-start-radius: calc(var(--dropbutton-border-radius-size) - 2px);
+    border-end-start-radius: calc(var(--dropbutton-border-radius-size) - 2px);
     background: none;
     font-size: var(--dropbutton-font-size);
     font-weight: var(--admin-font-weight-semibold);
     appearance: none;
     transition: all var(--admin-transition);
     -webkit-font-smoothing: antialiased;
+
+    &:focus {
+      outline-offset: 1px;
+    }
 
     &:hover {
       background-color: var(--admin-color-primary-hover);
@@ -243,6 +249,10 @@
     &:hover,
     &:active {
       color: var(--admin-color-text-on-primary) !important; /* Override button.css admin specificity. */
+    }
+
+    .dropbutton-single & {
+      border-radius: calc(var(--dropbutton-border-radius-size) - 2px);
     }
   }
 }
