@@ -43,6 +43,7 @@ use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleFetch;
 use Drupal\locale\LocaleConfigBatch;
 use Drupal\locale\LocaleProjectRepository;
+use Drupal\locale\Model\TranslationUpdateMode;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
@@ -1411,8 +1412,10 @@ function install_download_translation(&$install_state) {
   }
 
   $profile = $install_state['parameters']['profile'] ?? NULL;
-  $profile_path = $install_state['profiles'][$profile]?->getPath();
-  $profile_version = $install_state['profiles'][$profile]?->info['version'] ?? NULL;
+  // Installing from existing configuration may have no profile at all.
+  $profile_extension = $profile ? $install_state['profiles'][$profile] ?? NULL : NULL;
+  $profile_path = $profile_extension?->getPath();
+  $profile_version = $profile_extension?->info['version'] ?? NULL;
   // If we're using a custom profile and we know its version, try to download
   // that translation too. If we can't, proceed without it.
   if (isset($profile, $profile_path, $profile_version) && !str_starts_with($profile_path, 'core/')) {
@@ -2018,7 +2021,7 @@ function install_check_translations($langcode, $server_pattern, string $project 
 
   // The locale module is not installed yet when the installer downloads the
   // translation for its own language, so there is no configuration to honor.
-  if (\Drupal::moduleHandler()->moduleExists('locale') && !locale_translation_use_remote_source()) {
+  if (\Drupal::moduleHandler()->moduleExists('locale') && \Drupal::config('locale.settings')->get('translation.use_source') !== TranslationUpdateMode::RemoteAndLocal->value) {
     return $requirements;
   }
 

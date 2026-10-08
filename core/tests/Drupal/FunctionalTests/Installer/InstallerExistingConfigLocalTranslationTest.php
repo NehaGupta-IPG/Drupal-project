@@ -35,7 +35,8 @@ class InstallerExistingConfigLocalTranslationTest extends InstallerConfigDirecto
 
     // The fixture already sets translation.use_source to 'local'. Install in
     // Spanish so that the installer looks for a translation at all.
-    $site_config = $this->siteDirectory . '/profiles/' . $this->profile . '/config/sync/system.site.yml';
+    $sync_directory = $this->existingSyncDirectory ? $this->siteDirectory . '/config/sync' : $this->siteDirectory . '/profiles/' . $this->profile . '/config/sync';
+    $site_config = $sync_directory . '/system.site.yml';
     $site = Yaml::decode(file_get_contents($site_config));
     $site['langcode'] = 'es';
     $site['default_langcode'] = 'es';
