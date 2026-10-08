@@ -15,6 +15,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests Drupal\Core\Database\SqlExecutionInfo.
@@ -26,7 +27,10 @@ class SqlExecutionInfoTest extends UnitTestCase {
   /**
    * Tests mixed arguments while handling an actual native query failure.
    */
-  #[DataProvider('providerMixedArguments')]
+  #[TestWith(['stream', 'resource (stream)'])]
+  #[TestWith(['closed', 'resource (closed)'])]
+  #[TestWith(['object', 'object'])]
+  #[TestWith(['recursive', '...'])]
   public function testMixedArgumentsRetainNativeException(string $kind, string $diagnostic): void {
     if (!in_array('sqlite', \PDO::getAvailableDrivers(), TRUE)) {
       $this->markTestSkipped('The PDO SQLite driver is unavailable.');
@@ -77,18 +81,6 @@ class SqlExecutionInfoTest extends UnitTestCase {
     finally {
       fclose($stream);
     }
-  }
-
-  /**
-   * Provides mixed argument types.
-   */
-  public static function providerMixedArguments(): array {
-    return [
-      ['stream', 'resource (stream)'],
-      ['closed', 'resource (closed)'],
-      ['object', 'object'],
-      ['recursive', '...'],
-    ];
   }
 
   /**

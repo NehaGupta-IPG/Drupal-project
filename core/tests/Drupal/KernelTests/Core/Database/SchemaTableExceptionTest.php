@@ -9,7 +9,6 @@ use Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException;
 use Drupal\Core\Database\Exception\SchemaTableDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectExistsException;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -24,7 +23,9 @@ class SchemaTableExceptionTest extends DatabaseTestBase {
   /**
    * Tests the dedicated subclasses and backward compatible parent catches.
    */
-  #[DataProvider('tableErrorProvider')]
+  #[TestWith(['renameTable', 'normalization_missing', SchemaTableDoesNotExistException::class])]
+  #[TestWith(['renameTable', 'test', SchemaTableAlreadyExistsException::class])]
+  #[TestWith(['introspectIndexSchema', 'normalization_missing', SchemaTableDoesNotExistException::class])]
   public function testTableErrors(string $method, string $table, string $expected): void {
     $schema = $this->connection->schema();
     try {
@@ -41,17 +42,6 @@ class SchemaTableExceptionTest extends DatabaseTestBase {
       $this->assertInstanceOf($expected === SchemaTableAlreadyExistsException::class ? SchemaObjectExistsException::class : SchemaObjectDoesNotExistException::class, $actual);
       $this->assertStringContainsString($table, $actual->getMessage());
     }
-  }
-
-  /**
-   * Provides schema table errors shared by the database drivers.
-   */
-  public static function tableErrorProvider(): array {
-    return [
-      ['renameTable', 'normalization_missing', SchemaTableDoesNotExistException::class],
-      ['renameTable', 'test', SchemaTableAlreadyExistsException::class],
-      ['introspectIndexSchema', 'normalization_missing', SchemaTableDoesNotExistException::class],
-    ];
   }
 
   /**
