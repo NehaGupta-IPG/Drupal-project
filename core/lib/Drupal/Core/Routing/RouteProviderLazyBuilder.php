@@ -2,13 +2,18 @@
 
 namespace Drupal\Core\Routing;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * A Route Provider front-end for all Drupal-stored routes.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. The
+ *   'router.route_provider' service now rebuilds routes on demand itself; use
+ *   \Drupal\Core\Routing\RouteProvider::markStale() instead.
+ *
+ * @see https://www.drupal.org/node/9999999
  */
-class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, EventSubscriberInterface {
+class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface {
 
   /**
    * The route provider service.
@@ -52,6 +57,8 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
    *   The route building service.
    */
   public function __construct(RouteProviderInterface $route_provider, RouteBuilderInterface $route_builder) {
+    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. The router.route_provider service now rebuilds routes on demand itself. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
     $this->routeProvider = $route_provider;
     $this->routeBuilder = $route_builder;
   }
@@ -127,30 +134,6 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
    */
   public function hasRebuilt() {
     return $this->rebuilt;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getSubscribedEvents(): array {
-    $events[RoutingEvents::DYNAMIC][] = ['routerRebuilding', 3000];
-    $events[RoutingEvents::FINISHED][] = ['routerRebuildFinished', -3000];
-    return $events;
-  }
-
-  /**
-   * Sets the router rebuilding flag to TRUE.
-   */
-  public function routerRebuilding() {
-    $this->rebuilding = TRUE;
-  }
-
-  /**
-   * Sets the router rebuilding flag to FALSE.
-   */
-  public function routerRebuildFinished() {
-    $this->rebuilding = FALSE;
-    $this->rebuilt = TRUE;
   }
 
   /**

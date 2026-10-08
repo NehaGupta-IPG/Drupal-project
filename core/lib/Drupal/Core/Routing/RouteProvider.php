@@ -38,8 +38,42 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    */
   protected $extraCacheKeyParts = [];
 
-  public function __construct(protected Connection $connection, protected StateInterface $state, protected CurrentPathStack $currentPath, protected CacheBackendInterface $cache, protected InboundPathProcessorInterface $pathProcessor, protected CacheTagsInvalidatorInterface $cacheTagInvalidator, protected CacheBackendInterface $fastCache, protected string $tableName = 'router', protected ?LanguageManagerInterface $languageManager = NULL) {
+  /**
+   * Whether the routing table has been rebuilt since the last markStale().
+   *
+   * Defaults to TRUE: a freshly-built container is assumed to be in sync with
+   * the installed module list until ModuleInstaller tells us otherwise.
+   */
+  protected bool $rebuilt = TRUE;
+
+  /**
+   * Whether a rebuild is currently in progress.
+   *
+   * Used to prevent recursive router rebuilds during module installation,
+   * which can occur when route information is required by alter hooks that
+   * are triggered during a rebuild (for example,
+   * hook_menu_links_discovered_alter()).
+   */
+  protected bool $rebuilding = FALSE;
+
+  public function __construct(
+    protected Connection $connection,
+    protected StateInterface $state,
+    protected CurrentPathStack $currentPath,
+    protected CacheBackendInterface $cache,
+    protected InboundPathProcessorInterface $pathProcessor,
+    protected CacheTagsInvalidatorInterface $cacheTagInvalidator,
+    protected CacheBackendInterface $fastCache,
+    protected string $tableName = 'router',
+    protected ?LanguageManagerInterface $languageManager = NULL,
+    protected ?RouteBuilderInterface $routeBuilder = NULL,
+  ) {
     $this->languageManager ??= \Drupal::languageManager();
+    if ($this->routeBuilder === NULL) {
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+      @trigger_error('Calling ' . __METHOD__ . ' without the $route_builder argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+      $this->routeBuilder = \Drupal::service('router.builder');
+    }
   }
 
   /**
@@ -69,6 +103,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    *   by route name for routes with the same fit.
    */
   public function getRouteCollectionForRequest(Request $request) {
+    $this->rebuildIfStale();
     // Cache both the system path as well as route parameters and matching
     // routes.
     $cid = $this->getRouteCollectionCacheId($request);
@@ -136,6 +171,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     if (empty($names)) {
       throw new \InvalidArgumentException('You must specify the route names to load');
     }
+    $this->rebuildIfStale();
 
     $routes_to_load = array_diff($names, array_keys($this->routes));
     if ($routes_to_load) {
@@ -267,6 +303,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    *   and then in ascending order by route name for routes with the same fit.
    */
   protected function getRoutesByPath($path) {
+    $this->rebuildIfStale();
     // Split the path up on the slashes, ignoring multiple slashes in a row
     // or leading or trailing slashes. Convert to lower case here so we can
     // have a case-insensitive match from the incoming path to the lower case
@@ -322,6 +359,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * {@inheritdoc}
    */
   public function getAllRoutes() {
+    $this->rebuildIfStale();
     $select = $this->connection->select($this->tableName, 'router')
       ->fields('router', ['name', 'route'])
       ->isNull('alias');
@@ -348,8 +386,56 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
+    $events[RoutingEvents::DYNAMIC][] = ['onRouterRebuilding', 3000];
+    $events[RoutingEvents::FINISHED][] = ['onRouterRebuildFinished', -3000];
     $events[RoutingEvents::FINISHED][] = ['reset'];
     return $events;
+  }
+
+  /**
+   * Marks the routing table as stale so the next lookup triggers a rebuild.
+   */
+  public function markStale(): void {
+    $this->rebuilt = FALSE;
+  }
+
+  /**
+   * Returns TRUE if the routing table has been rebuilt since markStale().
+   */
+  public function hasRebuilt(): bool {
+    return $this->rebuilt;
+  }
+
+  /**
+   * Records that a router rebuild has started.
+   *
+   * @internal
+   */
+  public function onRouterRebuilding(): void {
+    $this->rebuilding = TRUE;
+  }
+
+  /**
+   * Records that a router rebuild has finished.
+   *
+   * @internal
+   */
+  public function onRouterRebuildFinished(): void {
+    $this->rebuilding = FALSE;
+    $this->rebuilt = TRUE;
+  }
+
+  /**
+   * Rebuilds the routing table on demand if marked stale.
+   *
+   * Entry points that read routes call this first so that callers that query
+   * routes mid-install (for example from an install hook) see the routes for
+   * the updated module list.
+   */
+  protected function rebuildIfStale(): void {
+    if (!$this->rebuilt && !$this->rebuilding) {
+      $this->routeBuilder->rebuild();
+    }
   }
 
   /**
@@ -451,6 +537,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * {@inheritdoc}
    */
   public function getRouteAliases(string $route_name): iterable {
+    $this->rebuildIfStale();
     $alias_route_names = $this->connection->select($this->tableName, 'router')
       ->fields('router', ['name'])
       ->condition('alias', $route_name)

@@ -2,13 +2,21 @@
 
 namespace Drupal\Core\Installer;
 
-use Drupal\Core\Routing\RouteProviderLazyBuilder;
+use Drupal\Core\Routing\RouteProvider;
 use Symfony\Component\Routing\Route;
 
 /**
  * A Route Provider front-end for use during the installer.
  */
-class InstallerRouteProviderLazyBuilder extends RouteProviderLazyBuilder {
+class InstallerRouteProviderLazyBuilder extends RouteProvider {
+
+  /**
+   * {@inheritdoc}
+   *
+   * The installer cannot rely on the routing table being populated, so the
+   * first lookup must trigger a rebuild.
+   */
+  protected bool $rebuilt = FALSE;
 
   /**
    * {@inheritdoc}

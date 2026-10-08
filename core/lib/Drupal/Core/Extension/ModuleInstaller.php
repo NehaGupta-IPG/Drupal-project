@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\Exception\ObsoleteExtensionException;
 use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Routing\RouteProvider;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent;
 use Drupal\Core\Update\UpdateHookRegistry;
@@ -236,24 +237,15 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $installed_modules = $extension_config->get('module') ?: [];
     }
     if (!InstallerKernel::installationAttempted()) {
-      // If the container was rebuilt during hook_install() it might not have
-      // the 'router.route_provider.old' service.
-      if (\Drupal::hasService('router.route_provider.old')) {
-        \Drupal::getContainer()->set('router.route_provider', \Drupal::service('router.route_provider.old'));
-      }
-      if (!\Drupal::service('router.route_provider.lazy_builder')->hasRebuilt()) {
-        // Rebuild routes after installing module. This is done here on top of
-        // \Drupal\Core\Routing\RouteBuilder::destruct to not run into errors on
-        // fastCGI which executes ::destruct() after the module installation
-        // page was sent already.
+      // Rebuild routes after installing modules unless the route provider
+      // already rebuilt during install. This is done here on top of
+      // \Drupal\Core\Routing\RouteBuilder::destruct to not run into errors on
+      // fastCGI which executes ::destruct() after the module installation page
+      // was sent already.
+      $route_provider = \Drupal::service('router.route_provider');
+      $already_rebuilt = $route_provider instanceof RouteProvider && $route_provider->hasRebuilt();
+      if (!$already_rebuilt) {
         \Drupal::service('router.builder')->rebuild();
-      }
-      else {
-        // Rebuild the router immediately if it is marked as needing a rebuild.
-        // @todo Work this through a bit more. This fixes
-        //   \Drupal\Tests\standard\Functional\StandardTest::testStandard()
-        //   after separately out the optional configuration install.
-        \Drupal::service('router.builder')->rebuildIfNeeded();
       }
     }
 
@@ -321,19 +313,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
 
     // Update the kernel to include it.
     $this->updateKernel($module_filenames);
-
-    if (!InstallerKernel::installationAttempted()) {
-      // Replace the route provider service with a version that will rebuild
-      // if routes are used during installation. This ensures that a module's
-      // routes are available during installation. This has to occur before
-      // any services that depend on it are instantiated otherwise those
-      // services will have the old route provider injected. Note that, since
-      // the container is rebuilt by updating the kernel, the route provider
-      // service is the regular one even though we are in a loop and might
-      // have replaced it before.
-      \Drupal::getContainer()->set('router.route_provider.old', \Drupal::service('router.route_provider'));
-      \Drupal::getContainer()->set('router.route_provider', \Drupal::service('router.route_provider.lazy_builder'));
-    }
 
     foreach ($module_list as $module) {
       // Load the module's .module and .install files. Do this for all modules
@@ -594,10 +573,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
       // Remove all configuration belonging to the module.
       \Drupal::service('config.manager')->uninstall('module', $module);
 
-      // In order to make uninstalling transactional if anything uses routes.
-      \Drupal::getContainer()->set('router.route_provider.old', \Drupal::service('router.route_provider'));
-      \Drupal::getContainer()->set('router.route_provider', \Drupal::service('router.route_provider.lazy_builder'));
-
       // Notify interested components that this module's entity types are being
       // deleted. For example, a SQL-based storage handler can use this as an
       // opportunity to drop the corresponding database tables.
@@ -758,6 +733,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $this->moduleHandler = $container->get('module_handler');
     $this->connection = $container->get('database');
     $this->updateRegistry = $container->get('update.update_hook_registry');
+
+    // Mark the routing table as stale so that any future route lookup
+    // rebuilds against the updated module list.
+    $route_provider = $container->get('router.route_provider');
+    if ($route_provider instanceof RouteProvider) {
+      $route_provider->markStale();
+    }
   }
 
   /**
