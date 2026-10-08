@@ -35,11 +35,11 @@ class DatabaseUpdate {
   ) {
     if (!$this->postUpdateRegistry instanceof UpdateRegistry) {
       $this->postUpdateRegistry = \Drupal::service(UpdateRegistry::class);
-      @trigger_error('Calling ' . __METHOD__ . '() without the $postUpdateRegistry argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3625487');
+      @trigger_error('Calling ' . __METHOD__ . '() without the $postUpdateRegistry argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3625487', E_USER_DEPRECATED);
     }
     if (!$this->moduleExtensionList instanceof ModuleExtensionList) {
       $this->moduleExtensionList = \Drupal::service(ModuleExtensionList::class);
-      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleExtensionList argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3625487');
+      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleExtensionList argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3625487', E_USER_DEPRECATED);
     }
   }
 
