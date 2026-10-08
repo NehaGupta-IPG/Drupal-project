@@ -7,8 +7,6 @@
 
 declare(strict_types=1);
 
-use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
-
 /**
  * Implements hook_test_hook().
  *
