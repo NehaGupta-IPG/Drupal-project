@@ -7,13 +7,6 @@
 
 declare(strict_types=1);
 
-use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
 use Drupal\module_autoload_test\SomeClass;
 
 define('MODULE_AUTOLOAD_TEST_CONSTANT', SomeClass::TEST);
-
-/**
- * The attribute to skip the deprecation message must be set on a function.
- */
-#[ExtensionFileIsConverted]
-function _module_autoload_test_suppress_deprecation(): void {}
