@@ -145,9 +145,7 @@ class ImageStyleEditForm extends ImageStyleFormBase {
     // Build the new image effect addition form and add it to the effect list.
     $new_effect_options = [];
     $effects = $this->imageEffectManager->getDefinitions();
-    uasort($effects, function ($a, $b) {
-      return NaturalSort::strnatcasecmp($a['label'], $b['label']);
-    });
+    NaturalSort::sortByKeyString($effects, 'label');
     foreach ($effects as $effect => $definition) {
       $new_effect_options[$effect] = $definition['label'];
     }
