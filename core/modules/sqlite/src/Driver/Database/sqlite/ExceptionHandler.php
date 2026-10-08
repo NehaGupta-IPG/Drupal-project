@@ -43,7 +43,7 @@ class ExceptionHandler extends BaseExceptionHandler {
       if (str_starts_with($detail, 'no such table: ')) {
         throw new SchemaTableDoesNotExistException($message, $code, $exception, $info);
       }
-      if (preg_match('/^table .+ already exists$/D', $detail) || str_starts_with($detail, 'there is already another table or index with this name: ')) {
+      if (preg_match('/^table .+ already exists$/D', $detail)) {
         throw new SchemaTableAlreadyExistsException($message, $code, $exception, $info);
       }
     }
