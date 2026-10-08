@@ -91,3 +91,10 @@ function system_post_update_clear_admin_compact_mode_config(): void {
   $config->clear('admin_compact_mode');
   $config->save();
 }
+
+/**
+ * Remove the obsolete bundle field map collection.
+ */
+function system_post_update_remove_bundle_field_map(): void {
+  \Drupal::keyValue('entity.definitions.bundle_field_map')->deleteAll();
+}
