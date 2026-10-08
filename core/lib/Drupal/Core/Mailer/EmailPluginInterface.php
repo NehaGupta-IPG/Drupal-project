@@ -168,6 +168,13 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
   public function subject(\Stringable|string $subject): static;
 
   /**
+   * Gets the email subject.
+   *
+   * @return \Stringable|string
+   */
+  public function getSubject(): \Stringable|string|null;
+
+  /**
    * Sets the To recipients.
    *
    * @param \Symfony\Component\Mime\Address|string ...$addresses
@@ -176,6 +183,13 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
    * @return static
    */
   public function to(Address|string ...$addresses): static;
+
+  /**
+   * Gets the email To recipients.
+   *
+   * @return array|null
+   */
+  public function getTo(): ?array;
 
   /**
    * Sets the Cc recipients.

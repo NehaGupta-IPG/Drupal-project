@@ -252,10 +252,26 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
   /**
    * {@inheritdoc}
    */
+  public function getSubject(): \Stringable|string|null {
+    return $this->getHeader('Subject');
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
   public function to(Address|string ...$addresses): static {
     $this->setHeader('To', $addresses);
     return $this;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTo(): ?array {
+    return $this->getHeader('To');
+  }
+
 
   /**
    * {@inheritdoc}
