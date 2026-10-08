@@ -7,6 +7,9 @@ namespace Drupal\Tests\field\Kernel\KernelString;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\Plugin\Field\FieldFormatter\StringFormatter;
+use Drupal\Core\Form\FormState;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestLabel;
 use Drupal\entity_test\Entity\EntityTestRev;
@@ -87,6 +90,7 @@ class StringFormatterTest extends KernelTestBase {
       'field_name' => $this->fieldName,
       'entity_type' => $this->entityType,
       'type' => 'string',
+      'cardinality' => -1,
     ]);
     $field_storage->save();
 
@@ -153,7 +157,6 @@ class StringFormatterTest extends KernelTestBase {
       'type' => 'string',
       'settings' => [
         'link_to_entity' => TRUE,
-        'tag' => 'h5',
       ],
     ]);
     $this->display->save();
@@ -161,9 +164,6 @@ class StringFormatterTest extends KernelTestBase {
     $this->renderEntityFields($entity, $this->display);
     $this->assertLink($value, 0);
     $this->assertLinkByHref($entity->toUrl()->toString());
-
-    // Verify string formatter output with specified h5 tag.
-    $this->assertRaw('<h5><a href="' . $entity->toUrl()->toString() . '" hreflang="en">' . $value . '</a></h5>');
 
     // $entity->toUrl('revision') falls back to the canonical URL if this is no
     // revision.
@@ -200,6 +200,134 @@ class StringFormatterTest extends KernelTestBase {
     $this->renderEntityFields($entity_new_revision, $this->display);
     $this->assertLink($value, 0);
     $this->assertLinkByHref($entity->toUrl('canonical')->toString());
+  }
+
+  /**
+   * Tests the default settings and the tag selector.
+   */
+  public function testTagSettings(): void {
+    $this->assertSame('', StringFormatter::defaultSettings()['tag']);
+    $formatter = $this->display->getRenderer($this->fieldName);
+    $form = $formatter->settingsForm([], new FormState());
+    $this->assertSame('Display as', (string) $form['tag']['#title']);
+    $this->assertInstanceOf(TranslatableMarkup::class, $form['tag']['#options']['']);
+    $this->assertSame('- None -', (string) $form['tag']['#options']['']);
+    $this->assertSame(['', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'], array_keys($form['tag']['#options']));
+    $this->assertSame([], $formatter->settingsSummary());
+    $formatter->setSetting('tag', 'h2');
+    $this->assertSame('Displayed as h2', (string) $formatter->settingsSummary()[0]);
+  }
+
+  /**
+   * Tests escaping and wrapping each value, with and without a link.
+   */
+  #[TestWith([''])]
+  #[TestWith(['span'])]
+  #[TestWith(['div'])]
+  #[TestWith(['h1'])]
+  #[TestWith(['h2'])]
+  #[TestWith(['h3'])]
+  #[TestWith(['h4'])]
+  #[TestWith(['h5'])]
+  #[TestWith(['h6'])]
+  public function testTags(string $tag): void {
+    $values = ['<strong>First & "value"</strong>', "Second <script>alert('test')</script>\nline"];
+    $entity = EntityTestRev::create([
+      'name' => 'Tagged values',
+      $this->fieldName => $values,
+    ]);
+    $entity->save();
+    foreach ([FALSE, TRUE] as $linked) {
+      $this->display->setComponent($this->fieldName, [
+        'type' => 'string',
+        'settings' => ['tag' => $tag, 'link_to_entity' => $linked],
+      ]);
+      $formatter = $this->display->getRenderer($this->fieldName);
+      $elements = $formatter->viewElements($entity->{$this->fieldName}, 'en');
+      foreach ($values as $delta => $value) {
+        $element = $elements[$delta];
+        $output = (string) $this->container->get('renderer')->renderInIsolation($element);
+        $expected = nl2br(Html::escape($value));
+        if ($linked) {
+          $expected = '<a href="' . $entity->toUrl()->toString() . '" hreflang="en">' . $expected . '</a>';
+        }
+        if ($tag !== '') {
+          $expected = "<$tag>$expected</$tag>";
+        }
+        $this->assertSame($expected, $output);
+      }
+      $settings = $formatter->getSettings();
+      $typed_config = $this->container->get('config.typed')->createFromNameAndData('field.formatter.settings.string', $settings);
+      $this->assertCount(0, $typed_config->validate());
+    }
+    foreach (['p', 'script', '<h1>'] as $invalid_tag) {
+      $settings['tag'] = $invalid_tag;
+      $typed_config = $this->container->get('config.typed')->createFromNameAndData('field.formatter.settings.string', $settings);
+      $this->assertGreaterThan(0, $typed_config->validate()->count());
+    }
+  }
+
+  /**
+   * Tests wrapping the inherited language formatter's plain text output.
+   */
+  public function testLanguageTag(): void {
+    $field_name = 'field_language';
+    $storage = FieldStorageConfig::create([
+      'entity_type' => $this->entityType,
+      'field_name' => $field_name,
+      'type' => 'language',
+    ]);
+    $storage->save();
+    FieldConfig::create([
+      'field_storage' => $storage,
+      'bundle' => $this->bundle,
+    ])->save();
+    // Reload the display so its cached field definitions include the new field.
+    $this->display = $this->entityTypeManager->getStorage('entity_view_display')->loadUnchanged($this->display->id());
+    $entity = EntityTestRev::create([$field_name => 'en']);
+    $this->display->setComponent($field_name, ['type' => 'language']);
+    $formatter = $this->display->getRenderer($field_name);
+    $this->assertSame('', $formatter->getSetting('tag'));
+    $elements = $formatter->viewElements($entity->{$field_name}, 'en');
+    $this->assertSame('English', (string) $this->container->get('renderer')->renderInIsolation($elements[0]));
+    $formatter->setSetting('tag', 'span');
+    $elements = $formatter->viewElements($entity->{$field_name}, 'en');
+    $this->assertSame('<span>English</span>', (string) $this->container->get('renderer')->renderInIsolation($elements[0]));
+    $typed_config = $this->container->get('config.typed')->createFromNameAndData('field.formatter.settings.language', $formatter->getSettings());
+    $this->assertCount(0, $typed_config->validate());
+  }
+
+  /**
+   * Tests that wrapping preserves link access cacheability and denied output.
+   */
+  public function testTagLinkAccess(): void {
+    $entity = EntityTestRev::create([
+      'name' => 'Access test',
+      $this->fieldName => '<strong>Value</strong>',
+    ]);
+    $entity->save();
+    foreach (['canonical', 'edit-form'] as $link_rel) {
+      $this->display->setComponent($this->fieldName, [
+        'type' => 'string',
+        'settings' => ['link_to_entity' => TRUE, 'link_rel' => $link_rel],
+      ]);
+      $formatter = $this->display->getRenderer($this->fieldName);
+      $plain = $formatter->viewElements($entity->{$this->fieldName}, 'en');
+      $formatter->setSetting('tag', 'div');
+      $wrapped = $formatter->viewElements($entity->{$this->fieldName}, 'en');
+      $this->assertSame($plain['#cache'], $wrapped['#cache']);
+      $this->assertSame('link', $wrapped[0]['#type']);
+      $this->assertSame($entity->toUrl($link_rel)->toString(), $wrapped[0]['#url']->toString());
+    }
+
+    // A user without edit permission gets wrapped text instead of a link.
+    $this->setUpCurrentUser(permissions: ['view test entity']);
+    $access = $entity->toUrl('edit-form')->access(return_as_object: TRUE);
+    $this->assertFalse($access->isAllowed());
+    $elements = $formatter->viewElements($entity->{$this->fieldName}, 'en');
+    $this->assertSame('inline_template', $elements[0]['#type']);
+    $this->assertSame($access->getCacheContexts(), $elements['#cache']['contexts']);
+    $this->assertSame('<div>&lt;strong&gt;Value&lt;/strong&gt;</div>', (string) $this->container->get('renderer')->renderInIsolation($elements[0]));
   }
 
   /**

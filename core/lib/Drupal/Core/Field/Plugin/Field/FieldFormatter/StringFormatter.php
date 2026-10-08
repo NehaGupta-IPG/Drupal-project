@@ -67,7 +67,7 @@ class StringFormatter extends FormatterBase {
 
     $options['link_to_entity'] = FALSE;
     $options['link_rel'] = 'canonical';
-    $options['tag'] = NULL;
+    $options['tag'] = '';
     return $options;
   }
 
@@ -112,7 +112,7 @@ class StringFormatter extends FormatterBase {
     }
 
     $heading_options = [
-      '' => '- None -',
+      '' => $this->t('- None -'),
       'span' => 'span',
       'div' => 'div',
     ];
@@ -157,7 +157,7 @@ class StringFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
-    $tag = NULL;
+    $tag = $this->getSetting('tag');
     $entity = $items->getEntity();
     $entity_type = $entity->getEntityType();
 
@@ -169,10 +169,6 @@ class StringFormatter extends FormatterBase {
         ->addCacheableDependency($access)
         ->applyTo($elements);
       $render_as_link = $access->isAllowed();
-    }
-
-    if ($this->getSetting('tag')) {
-      $tag = $this->getSetting('tag');
     }
 
     foreach ($items as $delta => $item) {
