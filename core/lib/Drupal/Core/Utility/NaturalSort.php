@@ -88,7 +88,7 @@ final class NaturalSort {
   /**
    * Sorts a structured array by 'title' key (no # prefix).
    *
-   * @param string[]|Drupal\Core\StringTranslation\TranslatableMarkup[] $array
+   * @param array $array
    *   The input array.
    * @param string|null $langcode
    *   (optional) The language code to determine the collation rules. Defaults
@@ -104,7 +104,7 @@ final class NaturalSort {
   /**
    * Sorts a structured array by '#title' property.
    *
-   * @param string[]|Drupal\Core\StringTranslation\TranslatableMarkup[] $array
+   * @param array $array
    *   The input array.
    * @param string|null $langcode
    *   (optional) The language code to determine the collation rules. Defaults
@@ -120,7 +120,7 @@ final class NaturalSort {
   /**
    * Sorts a string array item by an arbitrary key.
    *
-   * @param string[]|Drupal\Core\StringTranslation\TranslatableMarkup[] $array
+   * @param array $array
    *   The input array.
    * @param string $key
    *   The key to use in the comparison.
