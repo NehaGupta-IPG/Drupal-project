@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit\Plugin\area;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
@@ -54,6 +56,10 @@ class ResultTest extends UnitTestCase {
     $route_provider = $this->prophesize(RouteProviderInterface::class)->reveal();
     $display_plugin_manager = $this->prophesize(ViewsPluginManager::class)->reveal();
     $this->view = new ViewExecutable($storage->reveal(), $user, $views_data, $route_provider, $display_plugin_manager);
+
+    $container = new ContainerBuilder();
+    $container->set('module_handler', $this->prophesize(ModuleHandlerInterface::class)->reveal());
+    \Drupal::setContainer($container);
 
     $this->resultHandler = new Result([], 'result', []);
     $this->resultHandler->view = $this->view;
