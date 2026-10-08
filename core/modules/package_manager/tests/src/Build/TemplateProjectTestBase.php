@@ -15,6 +15,7 @@ use Drupal\sqlite\Driver\Database\sqlite\Install\Tasks;
 use Drupal\Tests\package_manager\Traits\AssertPreconditionsTrait;
 use Drupal\Tests\package_manager\Traits\FixtureUtilityTrait;
 use Drupal\Tests\RandomGeneratorTrait;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -261,7 +262,9 @@ END;
   protected function createTestProject(string $template): void {
     // Create a copy of core (including its Composer plugins, templates, and
     // metapackages) which we can modify.
-    $this->copyCodebase();
+    $finder = $this->getCodebaseFinder();
+    $finder->exclude('core/tests');
+    $this->copyCodebase($finder->getIterator());
 
     $workspace_dir = $this->getWorkspaceDirectory();
     $project_dir = $workspace_dir . '/project';
@@ -331,6 +334,14 @@ END;
     // Install Drupal.
     $this->installQuickStart('minimal');
     $this->formLogin($this->adminUsername, $this->adminPassword);
+
+    // Core's .gitattributes excludes test code from the drupal/core package.
+    // The test project therefore has no Package Manager test modules, so copy
+    // them in from the code base running the test.
+    (new Filesystem())->mirror(
+      dirname(__DIR__, 2) . '/modules',
+      $this->getWebRoot() . '/modules',
+    );
 
     // When checking for updates, we need to be able to make sub-requests, but
     // the built-in PHP server is single-threaded. Therefore, open a second
@@ -430,12 +441,12 @@ END;
       $name = $package_info['name'];
 
       $requirements = $package_info['require'] ?? [];
-      // These polyfills are dependencies of some packages, but for reasons we
-      // don't understand, they are not installed in code bases built on PHP
-      // versions that are newer than the ones being polyfilled, which means we
+      // These polyfills are dependencies of some packages, but because they
+      // appear in the "replace" section of our composer.json file, we
       // won't be able to build our test project because these polyfills aren't
       // available in the local code base. Since we're guaranteed to be on PHP
-      // 8.5 or later, no package should need to polyfill older versions.
+      // 8.5 or later, no package should need to polyfill older versions. This
+      // list should be kept in sync with the replace section of composer.json.
       unset(
         $requirements['symfony/polyfill-php72'],
         $requirements['symfony/polyfill-php73'],

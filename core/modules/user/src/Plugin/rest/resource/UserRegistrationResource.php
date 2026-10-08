@@ -12,6 +12,7 @@ use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\Plugin\rest\resource\EntityResourceAccessTrait;
 use Drupal\rest\Plugin\rest\resource\EntityResourceValidationTrait;
 use Drupal\user\Entity\User;
+use Drupal\user\NotificationHandler;
 use Drupal\user\UserInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -35,26 +36,6 @@ class UserRegistrationResource extends ResourceBase {
   use EntityResourceValidationTrait;
   use EntityResourceAccessTrait;
 
-  /**
-   * Constructs a new UserRegistrationResource instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param array $serializer_formats
-   *   The available serialization formats.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\Core\Config\ImmutableConfig $userSettings
-   *   A user settings config instance.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user.
-   * @param \Drupal\Core\Password\PasswordGeneratorInterface $passwordGenerator
-   *   The password generator.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,
@@ -64,6 +45,7 @@ class UserRegistrationResource extends ResourceBase {
     protected ImmutableConfig $userSettings,
     protected AccountInterface $currentUser,
     protected PasswordGeneratorInterface $passwordGenerator,
+    protected NotificationHandler $notificationHandler,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
   }
@@ -80,7 +62,8 @@ class UserRegistrationResource extends ResourceBase {
       $container->get('logger.factory')->get('rest'),
       $container->get('config.factory')->get('user.settings'),
       $container->get('current_user'),
-      $container->get('password_generator')
+      $container->get('password_generator'),
+      $container->get(NotificationHandler::class),
     );
   }
 
@@ -180,11 +163,11 @@ class UserRegistrationResource extends ResourceBase {
     // No email verification is required. Activating the user.
     if ($approval_settings == UserInterface::REGISTER_VISITORS) {
       // No administrator approval required.
-      _user_mail_notify('register_no_approval_required', $account);
+      $this->notificationHandler->sendRegisterNoApprovalRequired($account);
     }
     // Administrator approval required.
     elseif ($approval_settings == UserInterface::REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL) {
-      _user_mail_notify('register_pending_approval', $account);
+      $this->notificationHandler->sendRegisterPendingApproval($account);
     }
   }
 
