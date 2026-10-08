@@ -77,3 +77,15 @@ function views_post_update_filter_min_max_labels(?array &$sandbox = NULL): void 
     return $view_config_updater->needsMinMaxLabelUpdate($view);
   });
 }
+
+/**
+ * Add the 'end_date_inclusive' option to date filters.
+ */
+function views_post_update_date_filter_end_date_inclusive(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsDateFilterEndDateInclusiveUpdate($view);
+  });
+}

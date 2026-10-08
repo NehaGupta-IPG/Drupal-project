@@ -150,7 +150,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
     // dates are stored in UTC.
     $a = new DateTimePlus($min, new \DateTimeZone($timezone));
     $a = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($a->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
-    $b = new DateTimePlus($this->value['max'], new \DateTimeZone($timezone));
+    $b = new DateTimePlus($this->getRangeMaxValue(), new \DateTimeZone($timezone));
     $b = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($b->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
 
     // This is safe because we are manually scrubbing the values.

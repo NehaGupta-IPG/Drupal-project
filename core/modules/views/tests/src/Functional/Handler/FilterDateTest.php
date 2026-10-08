@@ -168,6 +168,46 @@ class FilterDateTest extends ViewTestBase {
     $this->assertIdenticalResultset($view, $expected_result, $this->map);
     $view->destroy();
 
+    // Test between with a max date without a time. By default, the range
+    // stops at the start of the end date.
+    $view->initHandlers();
+    $view->filter['created']->operator = 'between';
+    $view->filter['created']->value['min'] = $this->dateFormatter->format(150000, 'custom', 'Y-m-d H:i:s');
+    $view->filter['created']->value['max'] = $this->dateFormatter->format(200000, 'custom', 'Y-m-d');
+    $view->executeDisplay('default');
+    $this->assertIdenticalResultset($view, [], $this->map);
+    $view->destroy();
+
+    // Test between with a max date without a time, including the whole end
+    // date.
+    $view->initHandlers();
+    $view->filter['created']->operator = 'between';
+    $view->filter['created']->options['end_date_inclusive'] = TRUE;
+    $view->filter['created']->value['min'] = $this->dateFormatter->format(150000, 'custom', 'Y-m-d H:i:s');
+    $view->filter['created']->value['max'] = $this->dateFormatter->format(200000, 'custom', 'Y-m-d');
+    $view->executeDisplay('default');
+    $expected_result = [
+      ['nid' => $this->nodes[1]->id()],
+    ];
+    $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
+    // Test not between with a max date without a time, including the whole
+    // end date.
+    $view->initHandlers();
+    $view->filter['created']->operator = 'not between';
+    $view->filter['created']->options['end_date_inclusive'] = TRUE;
+    $view->filter['created']->value['min'] = $this->dateFormatter->format(150000, 'custom', 'Y-m-d H:i:s');
+    $view->filter['created']->value['max'] = $this->dateFormatter->format(200000, 'custom', 'Y-m-d');
+    $view->executeDisplay('default');
+    $expected_result = [
+      ['nid' => $this->nodes[0]->id()],
+      ['nid' => $this->nodes[2]->id()],
+      ['nid' => $this->nodes[3]->id()],
+    ];
+    $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
     // Test not between with min and max.
     $view->initHandlers();
     $view->filter['created']->operator = 'not between';
@@ -212,6 +252,29 @@ class FilterDateTest extends ViewTestBase {
     $edit['options[value][value]'] = $this->randomString() . '-------';
     $this->submitForm($edit, 'Apply');
     $this->assertSession()->pageTextContains('Invalid date format.');
+  }
+
+  /**
+   * Tests the option to include the whole end date in the UI.
+   */
+  public function testEndDateInclusiveUi(): void {
+    $this->drupalLogin($this->drupalCreateUser(['administer views']));
+
+    $this->drupalGet('admin/structure/views/nojs/handler/test_filter_date_between/default/filter/created');
+    $this->assertSession()->checkboxNotChecked('options[end_date_inclusive]');
+    $this->submitForm([
+      'options[operator]' => 'between',
+      'options[value][min]' => '1970-01-01',
+      'options[value][max]' => '1970-01-02',
+      'options[end_date_inclusive]' => TRUE,
+    ], 'Apply');
+    $this->submitForm([], 'Save');
+
+    $this->drupalGet('admin/structure/views/nojs/handler/test_filter_date_between/default/filter/created');
+    $this->assertSession()->checkboxChecked('options[end_date_inclusive]');
+    $view = $this->config('views.view.test_filter_date_between')->get('display.default.display_options.filters.created');
+    $this->assertTrue($view['end_date_inclusive']);
+    $this->assertConfigSchemaByName('views.view.test_filter_date_between');
   }
 
   /**

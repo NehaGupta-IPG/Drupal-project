@@ -149,6 +149,32 @@ class FilterDateTimeTest extends DateTimeHandlerTestBase {
     $this->assertIdenticalResultset($view, $expected_result, $this->map);
     $view->destroy();
 
+    // Test between with a max date without a time. By default, the range
+    // stops at the start of the end date.
+    $view->initHandlers();
+    $view->filter[$field]->operator = 'between';
+    $view->filter[$field]->value['min'] = '2001-01-01';
+    $view->filter[$field]->value['max'] = '2001-10-10';
+    $view->setDisplay('default');
+    $this->executeView($view);
+    $this->assertIdenticalResultset($view, [], $this->map);
+    $view->destroy();
+
+    // Test between with a max date without a time, including the whole end
+    // date.
+    $view->initHandlers();
+    $view->filter[$field]->operator = 'between';
+    $view->filter[$field]->options['end_date_inclusive'] = TRUE;
+    $view->filter[$field]->value['min'] = '2001-01-01';
+    $view->filter[$field]->value['max'] = '2001-10-10';
+    $view->setDisplay('default');
+    $this->executeView($view);
+    $expected_result = [
+      ['nid' => $this->nodes[1]->id()],
+    ];
+    $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
     // Test not between with min and max.
     $view->initHandlers();
     $view->filter[$field]->operator = 'not between';

@@ -24,8 +24,34 @@ class Date extends NumericFilter {
 
     $options['expose']['contains']['min_label'] = ['default' => $this->t('Start date')];
     $options['expose']['contains']['max_label'] = ['default' => $this->t('End date')];
+    $options['end_date_inclusive'] = ['default' => FALSE];
 
     return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::buildOptionsForm($form, $form_state);
+
+    $states = [];
+    foreach ($this->operatorValues(2) as $operator) {
+      $states[] = [':input[name="options[operator]"]' => ['value' => $operator]];
+    }
+    $form['end_date_inclusive'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Include the whole end date'),
+      '#description' => $this->t('When the end date of a range is a date without a time, such as 2026-10-06, include the whole of that day (up to 23:59:59) instead of stopping at its start (00:00:00).'),
+      '#default_value' => !empty($this->options['end_date_inclusive']),
+      '#states' => [
+        'visible' => $states,
+      ],
+    ];
+    // Grouped filters may use a range operator in any of their items.
+    if ($this->isAGroup()) {
+      unset($form['end_date_inclusive']['#states']);
+    }
   }
 
   /**
@@ -218,7 +244,7 @@ class Date extends NumericFilter {
    */
   protected function opBetween($field) {
     $a = intval(strtotime($this->value['min'], 0));
-    $b = intval(strtotime($this->value['max'], 0));
+    $b = intval(strtotime($this->getRangeMaxValue(), 0));
 
     if ($this->value['type'] == 'offset') {
       // Keep sign.
@@ -231,6 +257,22 @@ class Date extends NumericFilter {
     // offset.
     $operator = strtoupper($this->operator);
     $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
+  }
+
+  /**
+   * Gets the maximum value of a range, extended to the end of the day.
+   *
+   * @return string
+   *   The 'max' value. When the 'end_date_inclusive' option is enabled and the
+   *   value is a date without a time, the time 23:59:59 is appended so that
+   *   the whole end date is included in the range.
+   */
+  protected function getRangeMaxValue(): string {
+    $max = trim((string) ($this->value['max'] ?? ''));
+    if (!empty($this->options['end_date_inclusive']) && ($this->value['type'] ?? 'date') !== 'offset' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $max)) {
+      return $max . ' 23:59:59';
+    }
+    return $max;
   }
 
   /**
