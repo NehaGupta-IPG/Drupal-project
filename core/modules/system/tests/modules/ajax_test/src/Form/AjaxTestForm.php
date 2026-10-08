@@ -61,19 +61,6 @@ class AjaxTestForm extends FormBase {
         'event' => 'click',
       ],
     ];
-    $form['actions']['test_progress'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Test progress'),
-      // No regular submit-handler. This form only works via JavaScript.
-      '#submit' => [],
-      '#ajax' => [
-        'callback' => '::delayedHelloWorld',
-        'event' => 'click',
-      ],
-      '#attributes' => [
-        'class' => ['nightwatch-test-progress'],
-      ],
-    ];
     return $form;
   }
 
@@ -92,22 +79,6 @@ class AjaxTestForm extends FormBase {
     $response = new AjaxResponse();
     $response->addCommand(new MessageCommand('Hello world!'));
     return $response;
-  }
-
-  /**
-   * An AJAX callback that prints "Hello World!" as a message with a delay.
-   *
-   * @param array $form
-   *   The form array to remove elements from.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @return \Drupal\Core\Ajax\AjaxResponse
-   *   An AJAX response.
-   */
-  public function delayedHelloWorld(array $form, FormStateInterface $form_state) {
-    sleep(5);
-    return $this->helloWorld($form, $form_state);
   }
 
   /**

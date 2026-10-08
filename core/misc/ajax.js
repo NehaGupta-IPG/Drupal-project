@@ -365,7 +365,16 @@
    *   Type of progress element, core provides `'bar'`, `'throbber'` and
    *   `'fullscreen'`.
    * @prop {string} [progress.message=Drupal.t('Processing...')]
-   *   Custom message to be used with the bar indicator.
+   *   Custom message to be used with the progress indicator, and announced to
+   *   assistive technology.
+   * @prop {boolean} [progress.announce=true]
+   *   Whether to announce the progress message to assistive technology.
+   * @prop {number} [progress.announceDelay=1000]
+   *   Number of milliseconds to wait before announcing the progress message.
+   *   Requests that complete within this delay are not announced.
+   * @prop {number} [progress.announceInterval=2000]
+   *   Number of milliseconds between repeated announcements while the request
+   *   is in progress.
    * @prop {object} [submit]
    *   Extra data to be sent with the Ajax request.
    * @prop {boolean} [submit.js=true]
@@ -607,6 +616,8 @@
       },
       error(xmlhttprequest, status, error) {
         ajax.ajaxing = false;
+        // Requests that time out or are aborted do not reach ajax.error().
+        ajax.clearProgressAnnouncement();
       },
       complete(xmlhttprequest, status) {
         if (status === 'error' || status === 'parsererror') {
@@ -922,46 +933,7 @@
       typeof this[progressIndicatorMethod] === 'function'
     ) {
       this[progressIndicatorMethod].call(this);
-
-      // To avoid very fast AJAX operations from being announced, wait for the
-      // duration of the announceDelay property (1 second by default) before
-      // announcing progress to screen readers.
-      const delay = this.progress.announceDelay || 1000;
-      setTimeout(() => {
-        // Note that the disabling of $(this.element) is a pre-existing
-        // implementation used to prevent interaction while the request is in
-        // progress. It is being leveraged here as a way to confirm the AJAX
-        // operation completed as nothing else is available in scope to do so.
-        const shouldAnnounce = this.progress.hasOwnProperty('announce')
-          ? this.progress.announce
-          : true;
-        if ($(this.element).prop('disabled') && shouldAnnounce) {
-          let count = 1;
-          const toForceRepeat = '\u00A0';
-          let message = Drupal.t('Busy');
-          if (typeof this.progress.message === 'string') {
-            message = this.progress.message;
-          } else if (typeof this.progress.announceMessage === 'string') {
-            message = this.progress.announceMessage;
-          }
-
-          Drupal.announce(message, 'assertive');
-          // The progress message will be re-announced at a set interval until
-          // the AJAX operation is completed. Defaults to twice the value of the
-          // initial delay.
-          const rep = setInterval(() => {
-            if ($(this.element).prop('disabled')) {
-              Drupal.announce(
-                message + toForceRepeat.repeat(count % 2),
-                'assertive',
-              );
-              count += 1;
-            } else {
-              clearInterval(rep);
-            }
-          }, delay * 2);
-        }
-      }, delay);
+      this.announceProgress();
     }
   };
 
@@ -1066,6 +1038,49 @@
   };
 
   /**
+   * Announces the progress message to assistive technology.
+   *
+   * The message is only announced when the request takes longer than
+   * `progress.announceDelay`, and is then repeated every
+   * `progress.announceInterval` milliseconds until the request completes, so
+   * that an operation in progress can be distinguished from one that stalled.
+   */
+  Drupal.Ajax.prototype.announceProgress = function () {
+    this.clearProgressAnnouncement();
+    if (this.progress.announce === false) {
+      return;
+    }
+    // Instances created with custom progress settings, such as links with the
+    // 'use-ajax' class, may not have a message.
+    const message =
+      typeof this.progress.message === 'string' && this.progress.message
+        ? this.progress.message
+        : Drupal.t('Processing...');
+    let count = 0;
+    const announce = () => {
+      // Screen readers do not repeat a live region whose content did not
+      // change, so alternate a trailing non-breaking space.
+      Drupal.announce(message + '\u00A0'.repeat(count % 2));
+      count += 1;
+    };
+    this.progressAnnounceTimeout = setTimeout(() => {
+      announce();
+      this.progressAnnounceInterval = setInterval(
+        announce,
+        this.progress.announceInterval || 2000,
+      );
+    }, this.progress.announceDelay || 1000);
+  };
+
+  /**
+   * Stops announcing the progress message to assistive technology.
+   */
+  Drupal.Ajax.prototype.clearProgressAnnouncement = function () {
+    clearTimeout(this.progressAnnounceTimeout);
+    clearInterval(this.progressAnnounceInterval);
+  };
+
+  /**
    * Helper method to make sure commands are executed in sequence.
    *
    * @param {Array.<Drupal.AjaxCommands~commandDefinition>} response
@@ -1114,6 +1129,7 @@
     if (this.progress.object) {
       this.progress.object.stopMonitoring();
     }
+    this.clearProgressAnnouncement();
     $(this.element).prop('disabled', false);
 
     // Save element's ancestors tree so if the element is removed from the dom
@@ -1251,6 +1267,7 @@
     if (this.progress.object) {
       this.progress.object.stopMonitoring();
     }
+    this.clearProgressAnnouncement();
     // Undo hide.
     $(this.wrapper).show();
     // Re-enable the element.

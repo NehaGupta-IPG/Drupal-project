@@ -173,7 +173,7 @@ class DialogTest extends WebDriverTestBase {
     // dialog buttonpane as buttons. The originals should have their styles set
     // to display: none.
     $hidden_buttons = $this->getSession()->getPage()->findAll('css', '.ajax-test-form .button');
-    $this->assertCount(4, $hidden_buttons);
+    $this->assertCount(3, $hidden_buttons);
     $hidden_button_text = [];
     foreach ($hidden_buttons as $button) {
       $styles = $button->getAttribute('style');
@@ -184,7 +184,7 @@ class DialogTest extends WebDriverTestBase {
     // The copied buttons should have the same text as the submit inputs they
     // were copied from.
     $moved_to_buttonpane_buttons = $this->getSession()->getPage()->findAll('css', '.ui-dialog-buttonpane button');
-    $this->assertCount(4, $moved_to_buttonpane_buttons);
+    $this->assertCount(3, $moved_to_buttonpane_buttons);
     foreach ($moved_to_buttonpane_buttons as $key => $button) {
       $this->assertEquals($hidden_button_text[$key], $button->getText());
     }
@@ -198,12 +198,6 @@ class DialogTest extends WebDriverTestBase {
     $this->assertSession()->assertWaitOnAjaxRequest();
     $has_focus_text = $this->getSession()->evaluateScript('document.activeElement.textContent');
     $this->assertEquals('Do it', $has_focus_text);
-    $this->assertSession()->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Test progress');
-    $this->assertSession()->assertWaitOnAjaxRequest();
-    $has_focus_text = $this->getSession()->evaluateScript('document.activeElement.textContent');
-    $this->assertEquals('Do it', $has_focus_text);
-    $has_announce_text = $this->getSession()->evaluateScript('document.getElementById("drupal-live-announce").textContent');
-    $this->assertEquals("Processing...\u{00A0}", $has_announce_text);
 
     // Reset: close the form.
     $form_dialog->findButton('Close')->press();

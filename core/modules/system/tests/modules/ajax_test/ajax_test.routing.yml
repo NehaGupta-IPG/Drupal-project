@@ -182,3 +182,11 @@ ajax_test.property_link:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::propertyLink'
   requirements:
     _access: 'TRUE'
+
+ajax_test.progress_announce_form:
+  path: '/ajax-test/progress-announce-form'
+  defaults:
+    _title: 'AJAX progress announcement'
+    _form: '\Drupal\ajax_test\Form\AjaxTestProgressAnnounceForm'
+  requirements:
+    _access: 'TRUE'
