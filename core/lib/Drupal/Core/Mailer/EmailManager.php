@@ -43,22 +43,9 @@ class EmailManager extends DefaultPluginManager {
    * {@inheritdoc}
    */
   protected $defaults = [
-    // The email id. Set by the plugin system based on the top-level YAML key.
-    'id' => '',
-    // The email label.
     'label' => '',
-    // The email description.
     'description' => '',
-    // Default plugin class.
     'class' => EmailPluginDefault::class,
-    // Template for the HTML version of the email body.
-    'html_body_template' => NULL,
-    // Template for the text version of the email body.
-    'text_body_template' => NULL,
-    // Default subject for the email.
-    'default_subject' => NULL,
-    // Default recipients for the email.
-    'default_recipients' => NULL,
   ];
 
   /**
