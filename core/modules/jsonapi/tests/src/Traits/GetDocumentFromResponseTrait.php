@@ -39,16 +39,9 @@ trait GetDocumentFromResponseTrait {
     catch (InvalidDataTypeException) {
       if ($validate) {
         $this->fail('Response did not contain a well-formatted JSON string');
-    try {
-      $document = Json::decode((string) $response->getBody());
-    }
-    catch (InvalidDataTypeException) {
-      if ($validate) {
-        $this->fail('Response did not contain a well-formatted JSON string');
       }
       // Tests calling getDocumentFormResponse() anticipate NULL on error.
       return NULL;
-    }
     }
 
     if (isset($document['data']) && isset($document['errors'])) {
