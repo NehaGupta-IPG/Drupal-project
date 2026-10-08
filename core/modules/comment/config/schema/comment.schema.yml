@@ -82,9 +82,10 @@ field.field_settings.comment:
     thread_reply_depth:
       type: integer
       label: 'Thread reply depth'
+      nullable: true
       constraint:
         Range:
-          min: -1
+          min: 0
     per_page:
       type: integer
       label: 'Comments per page'

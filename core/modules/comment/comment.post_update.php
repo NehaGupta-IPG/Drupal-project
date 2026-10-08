@@ -27,7 +27,7 @@ function comment_post_update_thread_reply_depth(?array &$sandbox = NULL): void {
     'field_config',
     function (FieldConfigInterface $field_config): bool {
       if ($field_config->getType() === 'comment') {
-        $field_config->setSetting('thread_reply_depth', -1);
+        $field_config->setSetting('thread_reply_depth', NULL);
         return TRUE;
       }
       return FALSE;

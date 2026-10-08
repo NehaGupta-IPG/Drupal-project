@@ -48,7 +48,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
   public static function defaultFieldSettings() {
     return [
       'default_mode' => CommentManagerInterface::COMMENT_MODE_THREADED,
-      'thread_reply_depth' => CommentManagerInterface::REPLY_DEPTH_UNLIMITED,
+      'thread_reply_depth' => NULL,
       'per_page' => 50,
       'form_location' => FormLocation::Below->value,
       'anonymous' => AnonymousContact::Forbidden->value,
@@ -129,13 +129,13 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
     $element['limit_reply_depth'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Limit level of comment replies'),
-      '#default_value' => $settings['thread_reply_depth'] !== CommentManagerInterface::REPLY_DEPTH_UNLIMITED,
+      '#default_value' => $settings['thread_reply_depth'] !== NULL,
     ];
     $element['thread_reply_depth_limit'] = [
       '#type' => 'number',
       '#title' => $this->t('Thread depth limit'),
       // Use "3" if reply limit was enabled just now.
-      '#default_value' => $settings['thread_reply_depth'] === CommentManagerInterface::REPLY_DEPTH_UNLIMITED ? 3 : $settings['thread_reply_depth'],
+      '#default_value' => $settings['thread_reply_depth'] ?? 3,
       '#description' => $this->t('Define the maximum number of replies in a comment thread. Set 0 if no replies are allowed.'),
       '#min' => 0,
       '#states' => [
@@ -194,7 +194,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
     $limit = $form_state->getValue(['settings', 'thread_reply_depth_limit']);
     $form_state->setValueForElement(
       $element,
-      $reply_depth_limited ? $limit : CommentManagerInterface::REPLY_DEPTH_UNLIMITED,
+      $reply_depth_limited ? $limit : NULL,
     );
   }
 

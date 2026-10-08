@@ -123,10 +123,8 @@ class CommentViewBuilder extends EntityViewBuilder {
     $max_indent = NULL;
     // The maximum indent can only be determined for non-orphan comments.
     if ($commented_entity) {
-      $reply_depth_limit = $commented_entity
-        ->getFieldDefinition($entity->getFieldName())
-        ?->getSettings()['thread_reply_depth'] ?? NULL;
-      if (is_int($reply_depth_limit) && $reply_depth_limit !== CommentManagerInterface::REPLY_DEPTH_UNLIMITED) {
+      $reply_depth_limit = $commented_entity->getFieldDefinition($entity->getFieldName())?->getSetting('thread_reply_depth');
+      if (is_int($reply_depth_limit)) {
         $max_indent = $reply_depth_limit;
       }
     }

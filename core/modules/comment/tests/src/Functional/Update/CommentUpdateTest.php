@@ -38,7 +38,7 @@ class CommentUpdateTest extends UpdatePathTestBase {
     $this->runUpdates();
 
     $config = $config_factory->get('field.field.node.article.comment');
-    $this->assertSame(-1, $config->get('settings.thread_reply_depth'));
+    $this->assertNull($config->get('settings.thread_reply_depth'));
   }
 
 }

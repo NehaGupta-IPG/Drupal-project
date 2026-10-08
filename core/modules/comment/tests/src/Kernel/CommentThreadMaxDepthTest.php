@@ -78,7 +78,7 @@ class CommentThreadMaxDepthTest extends KernelTestBase {
    */
   public function testNoMaxDepth(): void {
     // Check that we're using unlimited comment threading.
-    $this->assertSame(-1, FieldConfig::loadByName('entity_test', 'entity_test', 'comment')->getSetting('thread_reply_depth'));
+    $this->assertNull(FieldConfig::loadByName('entity_test', 'entity_test', 'comment')->getSetting('thread_reply_depth'));
 
     $this->createTestComments();
 

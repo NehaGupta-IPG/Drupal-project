@@ -31,7 +31,7 @@ class CommentThreadingTest extends CommentTestBase {
     $this->drupalLogin($this->adminUser);
     $this->drupalGet($field_settings_url);
 
-    // The default depth of -1 is treated as unlimited.
+    // The default NULL depth is treated as unlimited.
     $this->assertSession()->checkboxNotChecked('Limit level of comment replies');
 
     $this->submitForm([
@@ -52,7 +52,7 @@ class CommentThreadingTest extends CommentTestBase {
       FieldConfig::load('node.article.comment')->getSettings(),
     );
 
-    // Not using the limit sets thread_reply_depth to -1.
+    // Not using the limit sets thread_reply_depth to NULL.
     $this->drupalGet($field_settings_url);
     $this->assertSession()->checkboxChecked('Limit level of comment replies');
     $this->submitForm([
@@ -63,7 +63,7 @@ class CommentThreadingTest extends CommentTestBase {
     $this->assertSame(
       [
         'default_mode' => 1,
-        'thread_reply_depth' => -1,
+        'thread_reply_depth' => NULL,
         'per_page' => 50,
         'anonymous' => 0,
         'form_location' => TRUE,
