@@ -32,7 +32,7 @@ class Json implements SerializationInterface {
   public static function decode($string) {
     try {
       // Decode with error throwing enabled.
-      return json_decode($string, TRUE, 512, JSON_THROW_ON_ERROR);
+      return json_decode($string, TRUE, flags: JSON_THROW_ON_ERROR);
     }
     catch (\JsonException $e) {
       throw new InvalidDataTypeException('JSON decoding failed: ' . $e->getMessage(), 0, $e);
