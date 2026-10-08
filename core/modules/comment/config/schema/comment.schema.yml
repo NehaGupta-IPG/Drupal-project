@@ -84,8 +84,7 @@ field.field_settings.comment:
       label: 'Thread reply depth'
       nullable: true
       constraint:
-        Range:
-          min: 0
+        PositiveOrZero: ~
     per_page:
       type: integer
       label: 'Comments per page'
