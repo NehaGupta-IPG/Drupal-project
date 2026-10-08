@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Hook;
 
+use Drupal\aaa_hook_order_test\Hook\ABetweenHooks;
 use Drupal\aaa_hook_order_test\Hook\AHooks;
 use Drupal\aaa_hook_order_test\Hook\AMissingTargetHooks;
+use Drupal\bbb_hook_order_test\Hook\BBetweenHooks;
 use Drupal\bbb_hook_order_test\Hook\BHooks;
 use Drupal\bbb_hook_order_test\Hook\BMissingTargetHooks;
 use Drupal\ccc_hook_order_test\Hook\CHooks;
@@ -116,6 +118,39 @@ class HookOrderTest extends KernelTestBase {
         AHooks::class . '::testHookLast',
       ],
       \Drupal::moduleHandler()->invokeAll('test_hook'),
+    );
+  }
+
+  /**
+   * Tests hook ordering between hook implementations.
+   *
+   * The order of 'test_between_hook', without modification would be as
+   *   - \Drupal\aaa_hook_order_test\Hook\ABetweenHooks::testBetweenHookOneA()
+   *   - \Drupal\aaa_hook_order_test\Hook\ABetweenHooks::testBetweenHookTwoA()
+   *   - \Drupal\bbb_hook_order_test\Hook\BBetweenHooks::testBetweenHookOneB()
+   *   - \Drupal\bbb_hook_order_test\Hook\BBetweenHooks::testBetweenHookTwoB()
+   *
+   * That order is modified in the hook implementation as follows, and the
+   * resulting order asserted in this test.
+   *  - The OrderAfter attribute is used to move
+   *    - BBetweenHooks::testBetweenHookOneB() to after
+   *      ABetweenHooks::testBetweenHookOneA().
+   *  - The OrderBefore attribute is used to move
+   *    - BBetweenHooks::testBetweenHookTwoB() to before
+   *      ABetweenHooks::testBetweenHookTwoA().
+   *
+   * @see \Drupal\aaa_hook_order_test\Hook\ABetweenHooks()
+   * @see \Drupal\bbb_hook_order_test\Hook\BBetweenHooks()
+   */
+  public function testHookBetweenOrder(): void {
+    $this->assertSameCallList(
+      [
+        ABetweenHooks::class . '::testBetweenHookOneA',
+        BBetweenHooks::class . '::testBetweenHookOneB',
+        BBetweenHooks::class . '::testBetweenHookTwoB',
+        ABetweenHooks::class . '::testBetweenHookTwoA',
+      ],
+      \Drupal::moduleHandler()->invokeAll('test_between_hook'),
     );
   }
 
