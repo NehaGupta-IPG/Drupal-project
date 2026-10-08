@@ -17,18 +17,27 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 class ResourceFetcher implements ResourceFetcherInterface {
 
+  /**
+   * The module handler.
+   */
+  protected ModuleHandlerInterface $moduleHandler;
+
   public function __construct(
     protected ClientInterface $httpClient,
     protected ProviderRepositoryInterface $providers,
     #[Autowire(service: 'cache.default')]
     protected CacheBackendInterface $cacheBackend,
+    ModuleHandlerInterface|int|null $moduleHandler = NULL,
     protected int $timeout = 5,
-    protected ?ModuleHandlerInterface $moduleHandler = NULL,
   ) {
-    if ($this->moduleHandler === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleHandler argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3042423', E_USER_DEPRECATED);
-      $this->moduleHandler = \Drupal::moduleHandler();
+    if (!$moduleHandler instanceof ModuleHandlerInterface) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleHandler argument is deprecated in drupal:12.1.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3042423', E_USER_DEPRECATED);
+      if (is_int($moduleHandler)) {
+        $this->timeout = $moduleHandler;
+      }
+      $moduleHandler = \Drupal::moduleHandler();
     }
+    $this->moduleHandler = $moduleHandler;
   }
 
   /**
