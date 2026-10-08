@@ -94,7 +94,6 @@
   z-index: 1; /* Appear above other dropbuttons. */
   min-width: anchor-size(width);
   width: max-content;
-  visibility: hidden;
   margin: 0;
   padding: var(--dropdown-padding);
   list-style: none;
@@ -102,12 +101,13 @@
   background: var(--admin-color-bg-raised);
   box-shadow: var(--admin-shadow-2);
   font-size: var(--dropbutton-font-size);
+  display: none;
 
   .dropbutton-wrapper.open & {
     position-anchor: --my-anchor;
     position-area: bottom span-x-end;
     position-try-fallbacks: flip-block;
-    visibility: visible;
+    display: block;
   }
 
   :is(a, .button) {
@@ -216,7 +216,7 @@
     font-size: var(--dropbutton-font-size);
     font-weight: var(--admin-font-weight-semibold);
     appearance: none;
-    transition: all var(--admin-transition);
+    transition: color var(--admin-transition);
     -webkit-font-smoothing: antialiased;
 
     &:focus {
