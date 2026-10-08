@@ -28,7 +28,7 @@ class NormalizerBaseTest extends UnitTestCase {
    *   (optional) The supported interface or class to set on the normalizer.
    */
   #[DataProvider('providerTestSupportsNormalization')]
-  public function testSupportsNormalization($expected_return, $data, $supported_types = NULL): void {
+  public function testSupportsNormalization(bool $expected_return, \stdClass|\RecursiveArrayIterator|array $data, ?string $supported_types = NULL): void {
     $normalizer_base = new TestNormalizerBase();
 
     if (isset($supported_types)) {
@@ -44,7 +44,7 @@ class NormalizerBaseTest extends UnitTestCase {
    * @return array
    *   An array of provider data for testSupportsNormalization.
    */
-  public static function providerTestSupportsNormalization() {
+  public static function providerTestSupportsNormalization(): array {
     return [
       // Something that is not an object should return FALSE immediately.
       [FALSE, []],
@@ -93,9 +93,19 @@ class TestNormalizerBase extends NormalizerBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Normalizes data into a set of arrays/scalars.
+   *
+   * @param object $object
+   *   Data to normalize.
+   * @param string|null $format
+   *   Format the normalization result will be encoded as.
+   * @param array<string, mixed> $context
+   *   Context options for the normalizer.
+   *
+   * @return null
+   *   The normalized data.
    */
-  public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
+  public function normalize($object, $format = NULL, array $context = []): NULL {
     return NULL;
   }
 

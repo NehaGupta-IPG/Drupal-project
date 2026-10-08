@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Unit\Plugin\DisplayVariant;
 
+use Drupal\block\BlockRepositoryInterface;
 use Drupal\block\Plugin\DisplayVariant\BlockPageVariant;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Block\MainContentBlockPluginInterface;
@@ -12,12 +13,14 @@ use Drupal\Core\Block\TitleBlockPluginInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
+use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Render\PageDisplayVariantSelectionEvent;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\block\Plugin\DisplayVariant\BlockPageVariant.
@@ -28,24 +31,13 @@ class BlockPageVariantTest extends UnitTestCase {
 
   /**
    * The block repository.
-   *
-   * @var \Drupal\block\BlockRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $blockRepository;
+  protected BlockRepositoryInterface&MockObject $blockRepository;
 
   /**
    * The block view builder.
-   *
-   * @var \Drupal\Core\Entity\EntityViewBuilderInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $blockViewBuilder;
-
-  /**
-   * The plugin context handler.
-   *
-   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $contextHandler;
+  protected EntityViewBuilderInterface&MockObject $blockViewBuilder;
 
   /**
    * Sets up a display variant plugin for testing.
@@ -58,7 +50,7 @@ class BlockPageVariantTest extends UnitTestCase {
    * @return \Drupal\block\Plugin\DisplayVariant\BlockPageVariant
    *   A test display variant plugin.
    */
-  public function setUpDisplayVariant($configuration = [], $definition = []) {
+  public function setUpDisplayVariant($configuration = [], $definition = []): BlockPageVariant {
 
     $container = new Container();
     $cache_context_manager = $this->createStub(CacheContextsManager::class);
@@ -77,7 +69,7 @@ class BlockPageVariantTest extends UnitTestCase {
   /**
    * Provides data to testBuild().
    */
-  public static function providerBuild() {
+  public static function providerBuild(): array {
     $blocks_config = [
       'block1' => [
         // region, is main content block, is messages block, is title block.
@@ -209,7 +201,7 @@ class BlockPageVariantTest extends UnitTestCase {
    * Tests the building of a full page variant.
    */
   #[DataProvider('providerBuild')]
-  public function testBuild(array $blocks_config, $visible_block_count, array $expected_render_array): void {
+  public function testBuild(array $blocks_config, int $visible_block_count, array $expected_render_array): void {
     $display_variant = $this->setUpDisplayVariant();
     $display_variant->setMainContent(['#markup' => 'Hello kittens!']);
 
@@ -230,7 +222,7 @@ class BlockPageVariantTest extends UnitTestCase {
       ->willReturn([]);
     $this->blockRepository->expects($this->once())
       ->method('getVisibleBlocksPerRegion')
-      ->willReturnCallback(function (&$cacheable_metadata) use ($blocks) {
+      ->willReturnCallback(function (array &$cacheable_metadata) use ($blocks): array {
         $cacheable_metadata['top'] = (new CacheableMetadata())->addCacheTags(['route']);
         return $blocks;
       });

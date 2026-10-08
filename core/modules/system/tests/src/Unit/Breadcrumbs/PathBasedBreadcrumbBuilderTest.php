@@ -21,7 +21,6 @@ use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
-use Drupal\Core\Utility\LinkGeneratorInterface;
 use Drupal\system\PathBasedBreadcrumbBuilder;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -322,7 +321,7 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
    * @legacy-covers ::getRequestForPath
    */
   #[DataProvider('providerTestBuildWithException')]
-  public function testBuildWithException($exception_class, $exception_argument): void {
+  public function testBuildWithException(string $exception_class, string|array $exception_argument): void {
     $this->context
       ->method('getPathInfo')
       ->willReturn('/example/bar');
@@ -349,7 +348,7 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
    *
    * @see \Drupal\Tests\system\Unit\Breadcrumbs\PathBasedBreadcrumbBuilderTest::testBuildWithException()
    */
-  public static function providerTestBuildWithException() {
+  public static function providerTestBuildWithException(): array {
     return [
       ['Drupal\Core\ParamConverter\ParamNotConvertedException', ''],
       ['Symfony\Component\Routing\Exception\MethodNotAllowedException', []],
@@ -475,23 +474,11 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
 class TestPathBasedBreadcrumbBuilder extends PathBasedBreadcrumbBuilder {
 
   /**
-   * The test link generator.
-   */
-  protected LinkGeneratorInterface $linkGenerator;
-
-  /**
    * {@inheritdoc}
    */
-  public function setStringTranslation(TranslationInterface $string_translation) {
+  public function setStringTranslation(TranslationInterface $string_translation): static {
     $this->stringTranslation = $string_translation;
     return $this;
-  }
-
-  /**
-   * Sets the link generator.
-   */
-  public function setLinkGenerator(LinkGeneratorInterface $link_generator): void {
-    $this->linkGenerator = $link_generator;
   }
 
 }

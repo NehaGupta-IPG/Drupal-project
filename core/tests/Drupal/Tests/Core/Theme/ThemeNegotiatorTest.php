@@ -7,10 +7,12 @@ namespace Drupal\Tests\Core\Theme;
 use Drupal\Core\DependencyInjection\ClassResolver;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Routing\RouteMatch;
+use Drupal\Core\Theme\ThemeAccessCheck;
 use Drupal\Core\Theme\ThemeNegotiator;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -22,10 +24,8 @@ class ThemeNegotiatorTest extends UnitTestCase {
 
   /**
    * The mocked theme access checker.
-   *
-   * @var \Drupal\Core\Theme\ThemeAccessCheck|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $themeAccessCheck;
+  protected ThemeAccessCheck&MockObject $themeAccessCheck;
 
   /**
    * The container builder.
@@ -225,8 +225,7 @@ class ThemeNegotiatorTest extends UnitTestCase {
    */
   protected function createThemeNegotiator(array $negotiators): ThemeNegotiator {
     $resolver = new ClassResolver($this->container);
-    $theme_negotiator = new ThemeNegotiator($this->themeAccessCheck, $resolver, $negotiators);
-    return $theme_negotiator;
+    return new ThemeNegotiator($this->themeAccessCheck, $resolver, $negotiators);
   }
 
 }

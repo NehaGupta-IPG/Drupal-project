@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 
@@ -37,11 +38,9 @@ class EntityResolverManagerTest extends UnitTestCase {
   protected $entityResolverManager;
 
   /**
-   * The mocked entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\Stub
+   * The entity type manager.
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&Stub $entityTypeManager;
 
   /**
    * The mocked class resolver.
@@ -52,10 +51,8 @@ class EntityResolverManagerTest extends UnitTestCase {
 
   /**
    * The mocked dependency injection container.
-   *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $container;
+  protected ContainerInterface&Stub $container;
 
   /**
    * {@inheritdoc}
@@ -521,16 +518,16 @@ class EntityResolverManagerTest extends UnitTestCase {
  */
 class BasicControllerClass {
 
-  public function exampleControllerMethod() {
+  public function exampleControllerMethod(): void {
   }
 
-  public function exampleControllerMethodWithArgument($argument) {
+  public function exampleControllerMethodWithArgument($argument): void {
   }
 
-  public function exampleControllerWithEntityNoUpcasting($entity_test) {
+  public function exampleControllerWithEntityNoUpcasting($entity_test): void {
   }
 
-  public function exampleControllerWithEntityUpcasting(EntityInterface $entity_test) {
+  public function exampleControllerWithEntityUpcasting(EntityInterface $entity_test): void {
   }
 
   public function exampleControllerWithEntityUnionType(EntityTest|EntityTestRev $entity_test): void {
@@ -569,7 +566,7 @@ class BasicForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
   }
 
 }
@@ -596,7 +593,7 @@ class BasicFormNoUpcasting extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
   }
 
 }
@@ -623,13 +620,13 @@ class BasicFormNoContainerInjectionInterface implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
   }
 
 }

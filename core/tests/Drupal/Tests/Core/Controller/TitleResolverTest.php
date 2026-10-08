@@ -6,12 +6,14 @@ namespace Drupal\Tests\Core\Controller;
 
 use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\Controller\TitleResolver;
+use Drupal\Core\Routing\Attribute\Route as RouteAttribute;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
@@ -25,25 +27,19 @@ use Symfony\Component\Routing\Route;
 class TitleResolverTest extends UnitTestCase {
 
   /**
-   * The mocked controller resolver.
-   *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface|\PHPUnit\Framework\MockObject\Stub
+   * The controller resolver stub.
    */
-  protected $controllerResolver;
+  protected ControllerResolverInterface&Stub $controllerResolver;
 
   /**
-   * The mocked translation manager.
-   *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\Stub
+   * The translation manager stub.
    */
-  protected $translationManager;
+  protected TranslationInterface&Stub $translationManager;
 
   /**
-   * The mocked argument resolver.
-   *
-   * @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface|\PHPUnit\Framework\MockObject\Stub
+   * The argument resolver stub.
    */
-  protected $argumentResolver;
+  protected ArgumentResolverInterface&Stub $argumentResolver;
 
   /**
    * The actual tested title resolver.
@@ -285,6 +281,30 @@ class TitleResolverTest extends UnitTestCase {
     ];
   }
 
+  /**
+   * Tests a title closure declared on the route attribute.
+   *
+   * @see \Drupal\Core\Controller\TitleResolver::getTitle()
+   */
+  public function testTitleClosure(): void {
+    $request = new Request();
+    $route = new Route('/test-route', [
+      '_title' => 'static title',
+      '_title_closure' => [TitleClosureCallback::class, 'example', 0],
+    ]);
+
+    // The closure defined in the Route attribute is resolved and called with
+    // the arguments provided by the argument resolver.
+    $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
+    $argumentResolver->expects($this->once())
+      ->method('getArguments')
+      ->with($request, $this->isInstanceOf(\Closure::class))
+      ->willReturn(['value']);
+    $this->titleResolver = new TitleResolver($this->controllerResolver, $this->translationManager, $argumentResolver);
+
+    $this->assertEquals(new TranslatableMarkup('Title for @value', ['@value' => 'value']), $this->titleResolver->getTitle($request, $route));
+  }
+
 }
 
 /**
@@ -303,6 +323,30 @@ class TitleCallback {
    */
   public function example(\Stringable|string|array|NULL $value): \Stringable|string|array|NULL {
     return $value;
+  }
+
+}
+
+/**
+ * Provides an example title closure for the testTitleClosure method above.
+ */
+class TitleClosureCallback {
+
+  /**
+   * A controller with a title closure on its route attribute.
+   *
+   * @return array
+   *   A render array.
+   */
+  #[RouteAttribute(
+    path: '/test-route/{value}',
+    name: 'title_resolver_test.closure',
+    title: static function (string $value) {
+      return new TranslatableMarkup('Title for @value', ['@value' => $value]);
+    },
+  )]
+  public function example(string $value): array {
+    return [];
   }
 
 }

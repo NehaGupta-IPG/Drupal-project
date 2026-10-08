@@ -8,12 +8,15 @@ use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\locale\LocaleLookup;
+use Drupal\locale\StringStorageInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -26,17 +29,13 @@ class LocaleLookupTest extends UnitTestCase {
 
   /**
    * A mocked storage to use when instantiating LocaleTranslation objects.
-   *
-   * @var \Drupal\locale\StringStorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $storage;
+  protected StringStorageInterface&MockObject $storage;
 
   /**
    * A mocked lock object.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $lock;
+  protected LockBackendInterface&MockObject $lock;
 
   /**
    * A mocked user object built from AccountInterface.
@@ -140,7 +139,7 @@ class LocaleLookupTest extends UnitTestCase {
    * Note that context is irrelevant here. It is not used but it is required.
    */
   #[DataProvider('resolveCacheMissWithFallbackProvider')]
-  public function testResolveCacheMissWithFallback($langcode, $string, $context, $expected): void {
+  public function testResolveCacheMissWithFallback(string $langcode, string $string, string $context, string $expected): void {
     // These are fake words!
     // cSpell:disable
     $translations = [
@@ -165,7 +164,7 @@ class LocaleLookupTest extends UnitTestCase {
     // cSpell:enable
     $this->storage->expects($this->atLeastOnce())
       ->method('findTranslation')
-      ->willReturnCallback(function ($argument) use ($translations) {
+      ->willReturnCallback(function (array $argument) use ($translations) {
         if (isset($translations[$argument['language']][$argument['source']])) {
           return (object) ['translation' => $translations[$argument['language']][$argument['source']]];
         }
@@ -175,7 +174,7 @@ class LocaleLookupTest extends UnitTestCase {
 
     $this->languageManager
       ->method('getFallbackCandidates')
-      ->willReturnCallback(function (array $context = []) {
+      ->willReturnCallback(function (array $context = []): array {
         switch ($context['langcode']) {
           case 'pl':
             return ['cs', 'en'];
@@ -200,7 +199,7 @@ class LocaleLookupTest extends UnitTestCase {
   /**
    * Provides test data for testResolveCacheMissWithFallback().
    */
-  public static function resolveCacheMissWithFallbackProvider() {
+  public static function resolveCacheMissWithFallbackProvider(): array {
     // cSpell:disable
     return [
       ['cs', 'test', 'irrelevant', 'test v české'],
@@ -311,10 +310,10 @@ class LocaleLookupTest extends UnitTestCase {
    * @legacy-covers ::resolveCacheMiss
    */
   #[DataProvider('providerFixOldPluralTranslationProvider')]
-  public function testFixOldPluralStyleTranslations($translations, $langcode, $string, $is_fix): void {
+  public function testFixOldPluralStyleTranslations(array $translations, string $langcode, string $string, bool $is_fix): void {
     $this->storage->expects($this->atLeastOnce())
       ->method('findTranslation')
-      ->willReturnCallback(function ($argument) use ($translations) {
+      ->willReturnCallback(function (array $argument) use ($translations) {
         if (isset($translations[$argument['language']][$argument['source']])) {
           return (object) ['translation' => $translations[$argument['language']][$argument['source']]];
         }
@@ -346,7 +345,7 @@ class LocaleLookupTest extends UnitTestCase {
   /**
    * Provides test data for testResolveCacheMissWithFallback().
    */
-  public static function providerFixOldPluralTranslationProvider() {
+  public static function providerFixOldPluralTranslationProvider(): array {
     $translations = [
       'by' => [
         'word1' => '@count[2] word-by',
@@ -369,7 +368,7 @@ class LocaleLookupTest extends UnitTestCase {
    * Tests get cid.
    */
   #[DataProvider('getCidProvider')]
-  public function testGetCid(array $roles, $expected): void {
+  public function testGetCid(array $roles, string $expected): void {
     $this->storage->expects($this->never())
       ->method('findTranslation');
 
@@ -403,7 +402,7 @@ class LocaleLookupTest extends UnitTestCase {
   /**
    * Provides test data for testGetCid().
    */
-  public static function getCidProvider() {
+  public static function getCidProvider(): array {
     return [
       [
         ['a'], 'locale:en:irrelevant:a',

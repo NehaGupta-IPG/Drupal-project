@@ -17,6 +17,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests entity access control handler custom internal cache ID.
@@ -27,31 +28,23 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
 
   /**
    * A mock entity type.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
    */
-  protected EntityTypeInterface $entityType;
+  protected EntityTypeInterface&Stub $entityType;
 
   /**
    * A mock account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
    */
-  protected AccountInterface $account;
+  protected AccountInterface&Stub $account;
 
   /**
    * A language code.
-   *
-   * @var string
    */
   protected string $langcode;
 
   /**
    * A mock module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected ModuleHandlerInterface $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
    * {@inheritdoc}

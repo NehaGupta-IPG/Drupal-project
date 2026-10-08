@@ -49,6 +49,7 @@ class ViewsViewsHooks {
       'help' => $this->t('Displays the actual position of the view result'),
       'field' => [
         'id' => 'counter',
+        'click sortable' => FALSE,
       ],
     ];
     $data['views']['area'] = [
@@ -255,11 +256,11 @@ class ViewsViewsHooks {
           'field table' => $table_mapping->getDedicatedDataTableName($field_storage),
           'field field' => $field_name . '_target_id',
           'join_extra' => [
-                  [
-                    'field' => 'deleted',
-                    'value' => 0,
-                    'numeric' => TRUE,
-                  ],
+            [
+              'field' => 'deleted',
+              'value' => 0,
+              'numeric' => TRUE,
+            ],
           ],
         ];
       }

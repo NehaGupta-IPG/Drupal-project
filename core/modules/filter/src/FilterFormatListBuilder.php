@@ -38,19 +38,7 @@ class FilterFormatListBuilder extends DraggableListBuilder {
    */
   protected $messenger;
 
-  /**
-   * Constructs a new FilterFormatListBuilder.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ConfigFactoryInterface $config_factory, MessengerInterface $messenger) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ConfigFactoryInterface $config_factory, MessengerInterface $messenger, protected FilterFormatRepositoryInterface $formatRepository) {
     parent::__construct($entity_type, $storage);
 
     $this->configFactory = $config_factory;
@@ -65,7 +53,8 @@ class FilterFormatListBuilder extends DraggableListBuilder {
       $entity_type,
       $container->get('entity_type.manager')->getStorage($entity_type->id()),
       $container->get('config.factory'),
-      $container->get('messenger')
+      $container->get('messenger'),
+      $container->get(FilterFormatRepositoryInterface::class)
     );
   }
 
@@ -111,7 +100,7 @@ class FilterFormatListBuilder extends DraggableListBuilder {
     else {
       $row['roles'] = [
         '#theme' => 'item_list',
-        '#items' => filter_get_roles_by_format($entity),
+        '#items' => $entity->getRoles(),
         '#empty' => $this->t('No roles may use this format'),
         '#context' => ['list_style' => 'comma-list'],
       ];
@@ -129,9 +118,7 @@ class FilterFormatListBuilder extends DraggableListBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
-    $args = func_get_args();
-    $cacheability = $args[1] ?? new CacheableMetadata();
+  protected function getDefaultOperations(EntityInterface $entity, CacheableMetadata $cacheability) {
     $operations = parent::getDefaultOperations($entity, $cacheability);
 
     if (isset($operations['edit'])) {
@@ -170,8 +157,6 @@ class FilterFormatListBuilder extends DraggableListBuilder {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
-
-    filter_formats_reset();
     $this->messenger->addStatus($this->t('The text format ordering has been saved.'));
   }
 

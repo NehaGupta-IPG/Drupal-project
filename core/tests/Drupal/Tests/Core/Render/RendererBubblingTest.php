@@ -140,7 +140,7 @@ class RendererBubblingTest extends RendererTestBase {
    * ::testBubblingWithPrerender() already tests the common case.
    */
   #[DataProvider('providerTestContextBubblingEdgeCases')]
-  public function testContextBubblingEdgeCases(array $element, array $expected_top_level_contexts, $expected_cache_item): void {
+  public function testContextBubblingEdgeCases(array $element, array $expected_top_level_contexts, array $expected_cache_item): void {
     $this->setUpRequest();
     $this->setUpMemoryCache();
     $this->cacheContextsManager
@@ -547,7 +547,7 @@ class RendererBubblingTest extends RendererTestBase {
       '#pre_render' => [__NAMESPACE__ . '\\BubblingTest::bubblingCacheOverwritePrerender'],
     ];
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Cache keys may not be changed after initial setup. Use the contexts property instead to bubble additional metadata.');
+    $this->expectExceptionMessageIs('Cache keys may not be changed after initial setup. Use the contexts property instead to bubble additional metadata.');
     $this->renderer->renderRoot($data);
   }
 
@@ -563,8 +563,8 @@ class BubblingTest implements TrustedCallbackInterface {
    *
    * This function is assigned as an #pre_render callback.
    */
-  public static function bubblingPreRender($elements) {
-    $elements += [
+  public static function bubblingPreRender(array $elements): array {
+    return $elements + [
       'child_cache_context' => [
         '#cache' => [
           'contexts' => ['child.cache_context'],
@@ -596,7 +596,6 @@ class BubblingTest implements TrustedCallbackInterface {
         '#pre_render' => [__CLASS__ . '::bubblingNestedPreRenderCached'],
       ],
     ];
-    return $elements;
   }
 
   /**
@@ -615,7 +614,7 @@ class BubblingTest implements TrustedCallbackInterface {
    *
    * This function is assigned as an #pre_render callback in.
    */
-  public static function bubblingNestedPreRenderCached($elements) {
+  public static function bubblingNestedPreRenderCached(array $elements): array {
     \Drupal::state()->set('bubbling_nested_pre_render_cached', TRUE);
     return $elements;
   }

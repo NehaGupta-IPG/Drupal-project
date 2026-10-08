@@ -28,29 +28,23 @@ class FormValidatorTest extends UnitTestCase {
 
   /**
    * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
    */
-  protected $logger;
+  protected LoggerInterface&Stub $logger;
 
   /**
    * The CSRF token generator to validate the form token.
-   *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
    */
-  protected $csrfToken;
+  protected CsrfTokenGenerator&Stub $csrfToken;
 
   /**
    * The form error handler.
-   *
-   * @var \Drupal\Core\Form\FormErrorHandlerInterface
    */
-  protected $formErrorHandler;
+  protected FormErrorHandlerInterface&Stub $formErrorHandler;
 
   /**
    * The callable resolver.
    */
-  protected CallableResolver | Stub $callableResolver;
+  protected CallableResolver&Stub $callableResolver;
 
   /**
    * {@inheritdoc}
@@ -569,16 +563,16 @@ interface FormValidatorTestMockInterface {
   /**
    * Function used in the mocking process of this test.
    */
-  public function validate_handler();
+  public function validate_handler(): void;
 
   /**
    * Function used in the mocking process of this test.
    */
-  public function hash_validate();
+  public function hash_validate(): void;
 
   /**
    * Function used in the mocking process of this test.
    */
-  public function element_validate();
+  public function element_validate(): void;
 
 }

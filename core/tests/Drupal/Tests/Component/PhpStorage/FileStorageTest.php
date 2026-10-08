@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+// cspell:ignore errfile errline
+
 namespace Drupal\Tests\Component\PhpStorage;
 
 use Drupal\Component\PhpStorage\FileStorage;
@@ -98,8 +100,9 @@ class FileStorageTest extends PhpStorageTestBase {
 
     // PHPUnit cannot expect warnings, so we have to catch them ourselves.
     $messages = [];
-    set_error_handler(function (int $errno, string $errstr) use (&$messages): void {
+    set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) use (&$messages): bool {
       $messages[] = [$errno, $errstr];
+      return TRUE;
     });
 
     $storage->save('subdirectory/foo.php', $code);
@@ -109,7 +112,7 @@ class FileStorageTest extends PhpStorageTestBase {
     $this->assertSame(E_USER_WARNING, $messages[0][0]);
     $this->assertSame('mkdir(): Permission Denied', $messages[0][1]);
     $this->assertSame(E_WARNING, $messages[1][0]);
-    $this->assertStringStartsWith('file_put_contents(vfs://permissionDenied/test/subdirectory/foo.php)', $messages[1][1]);
+    $this->assertMatchesRegularExpression('/file_put_contents(.*): Failed to open stream: ".*vfsStreamWrapper::stream_open" call failed/', $messages[1][1]);
   }
 
 }
