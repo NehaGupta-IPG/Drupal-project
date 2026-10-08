@@ -583,7 +583,7 @@ class DatabaseUpdate {
    *
    * @param array $updateFunctions
    *   An organized array of update functions, in the format returned by
-   *   ::updateGetFunctionList().
+   *   ::getUpdateFunctionList().
    *
    * @return array
    *   A multidimensional array representing the dependency graph, suitable for
@@ -714,7 +714,7 @@ class DatabaseUpdate {
    *   The number of the update within that module.
    * @param array $updateFunctions
    *   An organized array of update functions, in the format returned by
-   *   ::updateGetFunctionList(). This should represent all module updates that
+   *   ::getUpdateFunctionList(). This should represent all module updates that
    *   are requested to run at the time this function is called.
    *
    * @return bool
