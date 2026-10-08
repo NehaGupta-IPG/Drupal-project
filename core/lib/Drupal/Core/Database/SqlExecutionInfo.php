@@ -10,8 +10,8 @@ class SqlExecutionInfo {
   /**
    * Constructor.
    *
-   * @param string $sqlString
-   *   The SQL statement string.
+   * @param string $sqlQuery
+   *   The SQL query string.
    * @param array<int|string,mixed> $placeholders
    *   (optional) The placeholder values, keyed by placeholder name for a
    *   string containing named placeholders, 0-indexed for a string containing
@@ -21,7 +21,7 @@ class SqlExecutionInfo {
    *   run.
    */
   public function __construct(
-    public readonly string $sqlString,
+    public readonly string $sqlQuery,
     public readonly array $placeholders = [],
     public readonly array $options = [],
   ) {
@@ -32,19 +32,19 @@ class SqlExecutionInfo {
    *
    * This is meant for the exception message, which ends up in logs, in
    * error_log() output and in CLI applications rendering the throwable
-   * themselves. Runs of whitespace in the statement are collapsed and the
+   * themselves. Runs of whitespace in the query are collapsed and the
    * placeholder values are escaped, so that the result stays on one line.
    * The options are not included; consumers can read them from this object.
    *
    * @return string
-   *   The SQL statement followed by its placeholder values.
+   *   The SQL query followed by its placeholder values.
    */
   public function toCompactString(): string {
     $placeholders = [];
     foreach ($this->placeholders as $key => $value) {
       $placeholders[] = $key . '=' . self::formatValue($value);
     }
-    return preg_replace('/\s+/', ' ', trim($this->sqlString)) . '; [' . implode(', ', $placeholders) . ']';
+    return preg_replace('/\s+/', ' ', trim($this->sqlQuery)) . '; [' . implode(', ', $placeholders) . ']';
   }
 
   /**
