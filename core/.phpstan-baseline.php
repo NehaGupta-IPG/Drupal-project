@@ -34720,7 +34720,7 @@ $ignoreErrors[] = [
 in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
   ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
-	'count' => 1,
+	'count' => 2,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
 ];
 $ignoreErrors[] = [
