@@ -4,16 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\DrupalKernel;
 
-use Composer\InstalledVersions;
+use Drupal\PackageExtensionData;
+use Composer\Installer\InstallationManager;
+use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\Loader\JsonLoader;
+use Composer\Repository\InstalledArrayRepository;
+use Drupal\language\LanguageNegotiationMethodManager;
+use Prophecy\Argument;
 use DrCommandPackage\Command\PhpPackageTestCommand;
+use Drupal\Composer\Plugin\Scaffold\GeneratePackageExtensionData;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DrupalKernel;
-use Drupal\Core\Extension\PhpPackageExtensions;
 use Drupal\KernelTests\DrupalApplicationTesterTrait;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\serialization\Serializer\Serializer;
 use Excluded\ExcludedService;
 use NotAnExtension\NoService;
+use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -41,44 +47,56 @@ class PhpPackageExtensionsTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @phpstan-ignore phpunit.callParent
    */
   protected function setUp(): void {
-    parent::setUp();
+    // We do not call parent::setup because we want to do things after the setup
+    // but before the kernel is booted.
+    chdir($this->root);
+    $this->initFileCache();
+    $this->bootEnvironment();
 
     // Find and collect the test packages.
     $packages = [];
-    $vendor_composer_dir = dirname((new \ReflectionClass(InstalledVersions::class))->getFileName());
     $fixture_path = Path::canonicalize(dirname(__DIR__, 4) . '/fixtures/PhpPackageTestExtensions');
     $composerFiles = Finder::create()->files()->name('composer.json')->in($fixture_path)->depth(1);
+    $loader = new JsonLoader(new ArrayLoader());
+    $paths = [];
     foreach ($composerFiles as $file) {
-      $package = json_decode($file->getContents(), TRUE, flags: JSON_THROW_ON_ERROR);
-      // Composer adds info about where the package was installed to.
-      $package['install-path'] = Path::makeRelative($file->getPath(), $vendor_composer_dir);
+      $package = $loader->load($file->getContents());
       $packages[] = $package;
-      foreach ($package['autoload']['psr-4'] ?? [] as $prefix => $path) {
+      // Keep track of where it is located.
+      $paths[$package->getName()] = $file->getPath();
+      foreach ($package->getAutoload()['psr-4'] ?? [] as $prefix => $path) {
         // We also register the package in tha class loader.
         $this->classLoader->addPsr4($prefix, $file->getPath() . '/' . $path);
       }
     }
 
-    // Swap out the php package extensions in the kernel with the extra
-    // packages and rebuild the container. This affects all kernels in the same
-    // process. In particular this also means that the kernel in the dr command
-    // tester gets built with the same php package extensions.
-    (function () use ($packages) {
-      // @phpstan-ignore staticProperty.notFound
-      static::$phpPackageExtensions = (function () use ($packages) {
-        return new PhpPackageExtensions(
-          array_merge($this->installedPackages, $packages),
-          array_merge($this->excludedPackages, ['package-test/excluded-package']),
-          $this->vendorComposerDir,
-          $this->appRoot,
-        );
-        // @phpstan-ignore staticProperty.notFound
-      })->call(static::$phpPackageExtensions);
-    })->call(\Drupal::service('kernel'));
+    $root_package = new ArrayLoader()->load([
+      'name' => 'root',
+      'version' => '1.0.0',
+      'extra' => ['drupal' => ['exclude-package' => ['package-test/excluded-package']]],
+    ]);
 
-    $this->rebuildContainer();
+    $installationManager = $this->prophesize(InstallationManager::class);
+    $installationManager->getInstallPath(Argument::any())
+      ->will(function (array $args) use ($paths) {
+        [$package] = $args;
+        return $paths[$package->getName()];
+      });
+
+    $this->vfsRoot->addChild(vfsStream::newDirectory('vendor'));
+    $classPath = vfsStream::url('root/vendor/PackageExtensionData.php');
+    file_put_contents($classPath, GeneratePackageExtensionData::getCode($root_package, new InstalledArrayRepository($packages), $installationManager->reveal(), $this->root));
+
+    $this->classLoader->addClassMap([
+      PackageExtensionData::class => $classPath,
+    ]);
+
+    // Now boot the kernel with the class set up.
+    $this->bootKernel();
   }
 
   /**
@@ -88,7 +106,8 @@ class PhpPackageExtensionsTest extends KernelTestBase {
     // The package's PSR-4 namespace was merged into container.namespaces.
     $namespaces = $this->container->getParameter('container.namespaces');
     self::assertArrayHasKey('DrCommandPackage', $namespaces);
-    self::assertArrayHasKey('ServicesPackage', $namespaces);
+    self::assertArrayHasKey('ServicesSecond', $namespaces);
+    self::assertArrayNotHasKey('ServicesPackage', $namespaces);
     self::assertArrayNotHasKey('NotAnExtension', $namespaces);
     self::assertArrayNotHasKey('Excluded', $namespaces);
     // All classes are autoloaded.
@@ -121,14 +140,15 @@ class PhpPackageExtensionsTest extends KernelTestBase {
     $service = $this->container->get(TestService::class);
     $dependencies = $service->getConfiguredDependencies();
     self::assertInstanceOf(ConfigFactoryInterface::class, $dependencies['config.factory']);
-    self::assertNull($dependencies['serializer']);
+    self::assertNull($dependencies['language']);
+    self::assertNull($dependencies['help']);
     self::assertCount(1, $this->container->get(SecondTestService::class)->getConfiguredDependencies());
 
     // When the module is installed the service is set up with it.
-    $this->enableModules(['serialization']);
+    $this->enableModules(['language']);
     $dependencies = $this->container->get(TestService::class)->getConfiguredDependencies();
     self::assertInstanceOf(ConfigFactoryInterface::class, $dependencies['config.factory']);
-    self::assertInstanceOf(Serializer::class, $dependencies['serializer']);
+    self::assertInstanceOf(LanguageNegotiationMethodManager::class, $dependencies['language']);
     self::assertCount(2, $this->container->get(SecondTestService::class)->getConfiguredDependencies());
   }
 

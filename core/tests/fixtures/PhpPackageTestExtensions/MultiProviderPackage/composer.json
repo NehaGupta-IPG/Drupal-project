@@ -1,0 +1,19 @@
+{
+    "name": "package-test/multi-provider-package",
+    "version": "1.0.0",
+    "autoload": {
+        "psr-4": {
+            "MultiProviderPackage\\": "src"
+        }
+    },
+    "extra": {
+        "drupal": {
+            "extension": {
+                "providers": [
+                    "MultiProviderPackage\\ProviderOne",
+                    "MultiProviderPackage\\ProviderTwo"
+                ]
+            }
+        }
+    }
+}

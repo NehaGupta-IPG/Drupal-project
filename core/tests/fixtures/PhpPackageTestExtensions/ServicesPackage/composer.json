@@ -1,5 +1,6 @@
 {
     "name": "package-test/services-package",
+    "version": "1.0.0",
     "autoload": {
         "psr-4": {
             "ServicesPackage\\": "src"
@@ -7,8 +8,11 @@
     },
     "extra": {
         "drupal": {
-            "container_yamls": "package-services.yml",
-            "providers": "ServicesPackage\\Provider"
+            "extension": {
+                "auto-discover": false,
+                "services_yaml": "package-services.yml",
+                "providers": "ServicesPackage\\Provider"
+            }
         }
     }
 }

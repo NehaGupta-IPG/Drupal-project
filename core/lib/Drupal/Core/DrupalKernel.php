@@ -2,8 +2,8 @@
 
 namespace Drupal\Core;
 
+use Drupal\PackageExtensionData;
 use Composer\Autoload\ClassLoader;
-use Composer\InstalledVersions;
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
@@ -19,7 +19,6 @@ use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\YamlFileLoader;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
-use Drupal\Core\Extension\PhpPackageExtensions;
 use Drupal\Core\File\MimeType\MimeTypeGuesser;
 use Drupal\Core\Http\TrustedHostsRequestFactory;
 use Drupal\Core\Installer\InstallerKernel;
@@ -165,17 +164,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @var \Drupal\Core\Extension\Extension[]
    */
   protected $moduleData = [];
-
-  /**
-   * The php package extension metadata.
-   *
-   * This property is static so that it is shared across all kernels in the
-   * same process. Php package metadata only changes when composer changes
-   * packages or in tests.
-   *
-   * @var \Drupal\Core\Extension\PhpPackageExtensions|null
-   */
-  protected static ?PhpPackageExtensions $phpPackageExtensions = NULL;
 
   /**
    * Holds the list of enabled themes from core.extension config.
@@ -658,9 +646,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->serviceProviderClasses['app']['core'] = 'Drupal\Core\CoreServiceProvider';
 
     // Add service yamls and providers of php packages.
-    $packageExtensions = $this->getPhpPackageExtensions();
-    $this->serviceYamls['app'] += $packageExtensions->getContainerYamls();
-    $this->serviceProviderClasses['app'] += $packageExtensions->getProviders();
+    if (class_exists('Drupal\PackageExtensionData')) {
+      $this->serviceYamls['app'] += PackageExtensionData::getServicesYamls();
+      $this->serviceProviderClasses['app'] += PackageExtensionData::getProviders();
+    }
 
     // Retrieve enabled modules and register their namespaces.
     if (!isset($this->moduleList) || !isset($this->themeList)) {
@@ -1533,7 +1522,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         }
       }
     }
-    $namespaces += $this->getPhpPackageExtensions()->getNamespaces();
+    if (class_exists('Drupal\PackageExtensionData')) {
+      $namespaces += PackageExtensionData::getNamespaces();
+    }
     $container->setParameter('container.namespaces', $namespaces);
 
     // Store the default language values on the container. This is so that the
@@ -1632,23 +1623,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         }
       }
     }
-  }
-
-  /**
-   * Gets the php package drupal extensions.
-   *
-   * @return \Drupal\Core\Extension\PhpPackageExtensions
-   *   The calculated or cached metadata for php package drupal extensions.
-   */
-  protected function getPhpPackageExtensions(): PhpPackageExtensions {
-    if (!isset(static::$phpPackageExtensions)) {
-      $vendor_composer_path = dirname((new \ReflectionClass(InstalledVersions::class))->getFileName());
-      ['install_path' => $project_root] = InstalledVersions::getRootPackage();
-      $project_root = realpath($project_root);
-      static::$phpPackageExtensions = PhpPackageExtensions::fromFilePaths($vendor_composer_path, $project_root, $this->root);
-    }
-
-    return static::$phpPackageExtensions;
   }
 
   /**

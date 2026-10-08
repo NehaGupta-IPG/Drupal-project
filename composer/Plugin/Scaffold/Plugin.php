@@ -17,6 +17,7 @@ use Composer\Script\ScriptEvents;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Util\Filesystem;
 use Drupal\Composer\Plugin\Scaffold\CommandProvider as ScaffoldCommandProvider;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Composer plugin for handling drupal scaffold.
@@ -251,6 +252,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
     // Create the Drupal\DrupalInstalled class.
     file_put_contents($vendor_path . '/drupal/DrupalInstalled.php', DrupalInstalledTemplate::getCode($package, $repository));
     $autoload['classmap'][] = $vendor_dir . '/drupal/DrupalInstalled.php';
+
+    $web_root = new ManageOptions($event->getComposer())->getOptions()->getLocation('web-root');
+    $app_root = Path::canonicalize(Path::makeAbsolute($web_root, getcwd()));
+    file_put_contents($vendor_path . '/drupal/PackageExtensionData.php', GeneratePackageExtensionData::getCode($package, $repository, $event->getComposer()->getInstallationManager(), $app_root));
+    $autoload['classmap'][] = $vendor_dir . '/drupal/PackageExtensionData.php';
 
     $package->setAutoload($autoload);
   }

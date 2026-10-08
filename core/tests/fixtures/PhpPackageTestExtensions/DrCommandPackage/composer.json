@@ -1,5 +1,6 @@
 {
     "name": "package-test/dr-command-package",
+    "version": "1.0.0",
     "autoload": {
         "psr-4": {
             "DrCommandPackage\\": "src"
@@ -7,7 +8,7 @@
     },
     "extra": {
         "drupal": {
-            "providers": []
+            "extension": {}
         }
     }
 }

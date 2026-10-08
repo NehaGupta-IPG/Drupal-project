@@ -3,7 +3,8 @@
 namespace ServicesPackage;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\serialization\Serializer\JsonSchemaProviderSerializerInterface;
+use Drupal\help\HelpTopicPluginManagerInterface;
+use Drupal\language\LanguageNegotiationMethodManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -16,13 +17,16 @@ class TestService {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory is a core service.
-   * @param \Drupal\serialization\Serializer\JsonSchemaProviderSerializerInterface|null $serializer
-   *   The serialization module may not be installed.
+   * @param HelpTopicPluginManagerInterface $helpTopicManager
+   *   The help topic plugin manager can be auto wired, but may not exist.
+   * @param \Drupal\language\LanguageNegotiationMethodManager|null $languageNegotiationMethodManager
+   *   The language module may not be installed.
    */
   public function __construct(
     protected readonly ConfigFactoryInterface $configFactory,
-    #[Autowire('@serializer')]
-    protected ?JsonSchemaProviderSerializerInterface $serializer = NULL,
+    protected ?HelpTopicPluginManagerInterface $helpTopicManager = NULL,
+    #[Autowire('@plugin.manager.language_negotiation_method')]
+    protected ?LanguageNegotiationMethodManager $languageNegotiationMethodManager = NULL,
   ) {}
 
   /**
@@ -34,7 +38,8 @@ class TestService {
   public function getConfiguredDependencies(): array {
     return [
       'config.factory' => $this->configFactory,
-      'serializer' => $this->serializer,
+      'help' => $this->helpTopicManager,
+      'language' => $this->languageNegotiationMethodManager,
     ];
   }
 

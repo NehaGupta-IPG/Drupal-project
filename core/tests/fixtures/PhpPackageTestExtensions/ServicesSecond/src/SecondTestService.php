@@ -13,7 +13,7 @@ class SecondTestService {
    * The constructor.
    *
    * @param \ServicesPackage\TestService $testService
-   *   Packages can also depend on other packages.
+   *   Packages services can also depend on other packages.
    */
   public function __construct(
     protected readonly TestService $testService,
