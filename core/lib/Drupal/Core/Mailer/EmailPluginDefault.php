@@ -242,7 +242,6 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return $this->getHeader('Subject');
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -257,7 +256,6 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
   public function getTo(): ?array {
     return $this->getHeader('To');
   }
-
 
   /**
    * {@inheritdoc}

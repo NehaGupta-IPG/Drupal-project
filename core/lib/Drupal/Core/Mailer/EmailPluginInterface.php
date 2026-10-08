@@ -160,7 +160,8 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
   /**
    * Gets the email subject.
    *
-   * @return \Stringable|string
+   * @return \Stringable|string|null
+   *   The email subject
    */
   public function getSubject(): \Stringable|string|null;
 
@@ -178,6 +179,7 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
    * Gets the email To recipients.
    *
    * @return array|null
+   *   The email To recipients
    */
   public function getTo(): ?array;
 
