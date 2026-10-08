@@ -36,14 +36,10 @@ class MinimalTestEmail extends EmailPluginDefault {
    */
   public function textBody(): \Stringable {
     $id = $this->getPluginId();
-    $module = $this->getModule();
-    $key = $this->getKey();
     $langcode = $this->getLangcode();
-    return new FormattableMarkup('@method(id: @id, module: @module, key: @key, langcode: @langcode)', [
+    return new FormattableMarkup('@method(id: @id, langcode: @langcode)', [
       '@method' => __METHOD__,
       '@id' => $id,
-      '@module' => $module,
-      '@key' => $key,
       '@langcode' => $langcode,
     ]);
   }

@@ -63,20 +63,6 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function getModule(): string {
-    return (string) $this->pluginDefinition['module'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getKey(): string {
-    return (string) $this->pluginDefinition['key'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getLangcode(): ?string {
     return $this->environment['langcode'] ?? NULL;
   }

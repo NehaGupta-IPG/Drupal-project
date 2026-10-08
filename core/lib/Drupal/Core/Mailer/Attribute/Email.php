@@ -25,13 +25,6 @@ class Email extends Plugin {
    *   (optional) The human-readable name of the email.
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
    *   (optional) A short description of the email.
-   * @param string|null $module
-   *   (optional) The email sending module. Defaults to the module the email is
-   *   declared in. This can be set in the case when a module declares an email
-   *   on behalf of another one.
-   * @param string|null $key
-   *   (optional) The email key used to identify different emails sent from a
-   *   module.
    * @param class-string $class
    *   (optional) The email plugin class.
    * @param string|null $html_body_template
@@ -49,8 +42,6 @@ class Email extends Plugin {
     public readonly string $id,
     public readonly ?TranslatableMarkup $label = NULL,
     public readonly ?TranslatableMarkup $description = NULL,
-    public readonly ?string $module = '',
-    public readonly ?string $key = '',
     protected string $class = EmailPluginDefault::class,
     public readonly ?string $html_body_template = NULL,
     public readonly ?string $text_body_template = NULL,

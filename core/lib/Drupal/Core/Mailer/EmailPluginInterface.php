@@ -25,16 +25,6 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
   public function getDescription(): string;
 
   /**
-   * Returns the plugin module.
-   */
-  public function getModule(): string;
-
-  /**
-   * Returns the plugin key.
-   */
-  public function getKey(): string;
-
-  /**
    * Returns the email HTML body.
    */
   public function htmlBody(): RenderableInterface|array|null;

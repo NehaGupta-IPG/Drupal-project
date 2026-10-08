@@ -49,10 +49,6 @@ class EmailManager extends DefaultPluginManager {
     'label' => '',
     // The email description.
     'description' => '',
-    // The email sending module.
-    'module' => '',
-    // The email key used to identify different emails sent from a module.
-    'key' => '',
     // Default plugin class.
     'class' => EmailPluginDefault::class,
     // Template for the HTML version of the email body.
@@ -97,23 +93,6 @@ class EmailManager extends DefaultPluginManager {
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
     }
     return $this->discovery;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function processDefinition(&$definition, $plugin_id): void {
-    parent::processDefinition($definition, $plugin_id);
-
-    if (empty($definition['module'])) {
-      $definition['module'] = $definition['provider'];
-    }
-
-    if (empty($definition['key'])) {
-      $definition['key'] = str_contains($definition['id'], '.')
-        ? substr($definition['id'], strpos($definition['id'], '.') + 1)
-        : $definition['id'];
-    }
   }
 
   /**
