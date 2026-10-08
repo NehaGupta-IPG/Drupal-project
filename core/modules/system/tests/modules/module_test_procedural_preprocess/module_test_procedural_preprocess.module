@@ -7,9 +7,6 @@
 
 declare(strict_types=1);
 
-use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
-
-#[ExtensionFileIsConverted]
 function module_test_procedural_preprocess_preprocess($arg): mixed {
   return $arg;
 }
