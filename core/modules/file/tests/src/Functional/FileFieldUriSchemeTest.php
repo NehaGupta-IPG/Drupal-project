@@ -58,8 +58,19 @@ class FileFieldUriSchemeTest extends FileFieldTestBase {
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->assertSession()->fieldValueEquals("{$field_name}[0][uri_scheme]", 'private');
 
-    // Move the file to public storage.
+    // The file is not moved when the form does not save the entity.
     $private_uri = $file->getFileUri();
+    $this->submitForm([
+      'title[0][value]' => '',
+      "{$field_name}[0][uri_scheme]" => 'public',
+    ], 'Save');
+    $this->assertSession()->statusMessageContains('Title field is required.', 'error');
+    $file = File::load($file->id());
+    $this->assertSame($private_uri, $file->getFileUri());
+    $this->assertFileExists($private_uri);
+
+    // Move the file to public storage.
+    $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm(["{$field_name}[0][uri_scheme]" => 'public'], 'Save');
     $file = File::load($file->id());
     $this->assertStringStartsWith('public://', $file->getFileUri());

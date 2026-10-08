@@ -7,8 +7,6 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
-use Drupal\Core\File\Exception\FileException;
-use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
@@ -18,7 +16,6 @@ use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
-use Drupal\file\FileRepositoryInterface;
 use Drupal\file\Upload\ManagedFileElementHelper;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -156,33 +153,6 @@ class ManagedFile extends FormElementBase {
           }
           if ($force_default) {
             $fids = [];
-          }
-        }
-
-        // Move the file to another URI scheme if a change is detected. The
-        // scheme can only be chosen per file, so this requires exactly one.
-        if ($uri_scheme !== NULL && count($fids) === 1 && ($file = File::load(reset($fids)))) {
-          $stream_wrapper_manager = \Drupal::service(StreamWrapperManagerInterface::class);
-          $current_uri = $file->getFileUri();
-          $current_uri_scheme = $stream_wrapper_manager::getScheme($current_uri);
-          if ($uri_scheme !== $current_uri_scheme && file_exists($current_uri)) {
-            $destination = $uri_scheme . '://' . $stream_wrapper_manager::getTarget($current_uri);
-            $file_system = \Drupal::service(FileSystemInterface::class);
-            $directory = $file_system->dirname($destination);
-            if ($file_system->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY)) {
-              try {
-                \Drupal::service(FileRepositoryInterface::class)->move($file, $destination);
-              }
-              catch (FileException $e) {
-                // Keep the file in its current location.
-                \Drupal::logger('file')->error('The file %file could not be moved to %destination: @message', [
-                  '%file' => $current_uri,
-                  '%destination' => $destination,
-                  '@message' => $e->getMessage(),
-                ]);
-                \Drupal::messenger()->addError(t('The file %filename could not be moved to the selected location.', ['%filename' => $file->getFilename()]));
-              }
-            }
           }
         }
       }
