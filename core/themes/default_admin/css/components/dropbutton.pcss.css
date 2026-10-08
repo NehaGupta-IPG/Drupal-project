@@ -85,7 +85,7 @@
 }
 
 /**
- * Nested <UL> that contains the dropdown.
+ * Nested <UL> that is the dropdown.
  */
 .dropbutton__items {
   --dropdown-padding: 4px;
@@ -197,7 +197,7 @@
  * Duplicates base button styles.
  */
 .dropbutton > .dropbutton__item:first-of-type {
-  > * {
+  > *:not(.secondary-action) {
     display: flex;
     align-items: center;
     height: 100%;
@@ -207,7 +207,7 @@
     cursor: pointer;
     white-space: nowrap;
     text-decoration: none;
-    color: var(--admin-color-primary);
+    color: var(--admin-color-primary) !important; /* Override button.css admin specificity. */;
     border: 0;
     border-radius: var(--button-border-radius-size);
     background: none;
@@ -227,7 +227,7 @@
 
     &:hover,
     &:active {
-      color: var(--admin-color-text-on-primary);
+      color: var(--admin-color-text-on-primary) !important; /* Override button.css admin specificity. */;
     }
   }
 }
