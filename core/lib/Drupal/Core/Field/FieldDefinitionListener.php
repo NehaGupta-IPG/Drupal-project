@@ -23,6 +23,11 @@ class FieldDefinitionListener implements FieldDefinitionListenerInterface {
    * The key-value factory.
    *
    * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0.
+   *   There is no replacement.
+   *
+   * @see https://www.drupal.org/node/3612113
    */
   protected $keyValueFactory;
 
@@ -37,6 +42,11 @@ class FieldDefinitionListener implements FieldDefinitionListenerInterface {
    * The entity field manager.
    *
    * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0.
+   *   There is no replacement.
+   *
+   * @see https://www.drupal.org/node/3612113
    */
   protected $entityFieldManager;
 
@@ -45,20 +55,24 @@ class FieldDefinitionListener implements FieldDefinitionListenerInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\Cache\CacheBackendInterface|\Drupal\Core\KeyValueStore\KeyValueFactoryInterface $cache_backend
+   * @param \Drupal\Core\Cache\CacheBackendInterface|\Drupal\Core\Entity\EntityFieldManagerInterface $cache_backend
    *   The cache backend.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, CacheBackendInterface|KeyValueFactoryInterface $cache_backend) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface|EntityFieldManagerInterface $cache_backend) {
     $this->entityTypeManager = $entity_type_manager;
-    $this->entityFieldManager = $entity_field_manager;
-    $this->cacheBackend = $cache_backend;
-    if ($cache_backend instanceof KeyValueFactoryInterface) {
-      $this->keyValueFactory = $cache_backend;
-      $this->cacheBackend = func_get_arg(3);
-      @trigger_error('Calling ' . __METHOD__ . '() with the $key_value_factory argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3612113', E_USER_DEPRECATED);
+    if ($cache_backend instanceof EntityFieldManagerInterface) {
+      // @phpstan-ignore property.deprecated (Preserve the property for subclasses using the old constructor.)
+      $this->entityFieldManager = $cache_backend;
+      $cache_backend = func_get_arg(2);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $entity_field_manager argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3612113', E_USER_DEPRECATED);
     }
+    if ($cache_backend instanceof KeyValueFactoryInterface) {
+      // @phpstan-ignore property.deprecated (Preserve the property for subclasses using the old constructor.)
+      $this->keyValueFactory = $cache_backend;
+      $cache_backend = func_get_arg(3);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $key_value_factory argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3612113', E_USER_DEPRECATED);
+    }
+    $this->cacheBackend = $cache_backend;
   }
 
   /**

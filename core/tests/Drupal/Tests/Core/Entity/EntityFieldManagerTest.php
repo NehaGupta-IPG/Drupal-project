@@ -24,6 +24,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\BooleanItem;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -32,6 +33,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -174,6 +176,43 @@ class EntityFieldManagerTest extends UnitTestCase {
     $this->entityLastInstalledSchemaRepository = $this->prophesize(EntityLastInstalledSchemaRepositoryInterface::class);
 
     $this->entityFieldManager = new TestEntityFieldManager($this->entityTypeManager->reveal(), $this->entityTypeBundleInfo->reveal(), $this->entityDisplayRepository->reveal(), $this->typedDataManager->reveal(), $this->languageManager->reveal(), $this->moduleHandler->reveal(), $this->cacheBackend->reveal(), $this->entityLastInstalledSchemaRepository->reveal());
+  }
+
+  /**
+   * Tests constructor dependencies and the original signature deprecation.
+   */
+  #[DataProvider('constructorProvider')]
+  #[IgnoreDeprecations]
+  public function testConstructor(bool $legacy): void {
+    if ($legacy) {
+      $this->expectUserDeprecationMessage('Calling Drupal\\Core\\Entity\\EntityFieldManager::__construct() with the $key_value_factory argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3612113');
+    }
+    $key_value = $this->createStub(KeyValueFactoryInterface::class);
+    $dependencies = [
+      'entityTypeManager' => $this->entityTypeManager->reveal(),
+      'entityTypeBundleInfo' => $this->entityTypeBundleInfo->reveal(),
+      'entityDisplayRepository' => $this->entityDisplayRepository->reveal(),
+      'typedDataManager' => $this->typedDataManager->reveal(),
+      'languageManager' => $this->languageManager->reveal(),
+      'keyValueFactory' => $key_value,
+      'moduleHandler' => $this->moduleHandler->reveal(),
+      'cacheBackend' => $this->cacheBackend->reveal(),
+      'entityLastInstalledSchemaRepository' => $this->entityLastInstalledSchemaRepository->reveal(),
+    ];
+    if (!$legacy) {
+      unset($dependencies['keyValueFactory']);
+    }
+    $manager = new EntityFieldManager(...array_values($dependencies));
+    foreach ($dependencies as $property => $dependency) {
+      $this->assertSame($dependency, (new \ReflectionProperty($manager, $property))->getValue($manager));
+    }
+  }
+
+  /**
+   * Provides current and original constructor signatures.
+   */
+  public static function constructorProvider(): array {
+    return ['current' => [FALSE], 'original' => [TRUE]];
   }
 
   /**

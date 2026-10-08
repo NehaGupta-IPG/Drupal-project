@@ -12,9 +12,12 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldDefinitionListener;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 
 /**
@@ -62,7 +65,56 @@ class FieldDefinitionListenerTest extends UnitTestCase {
     $this->entityFieldManager = $this->prophesize(EntityFieldManagerInterface::class);
     $this->cacheBackend = $this->prophesize(CacheBackendInterface::class);
 
-    $this->fieldDefinitionListener = new FieldDefinitionListener($this->entityTypeManager->reveal(), $this->entityFieldManager->reveal(), $this->cacheBackend->reveal());
+    $this->fieldDefinitionListener = new FieldDefinitionListener($this->entityTypeManager->reveal(), $this->cacheBackend->reveal());
+  }
+
+  /**
+   * Tests supported constructor signatures and their dependencies.
+   */
+  #[DataProvider('constructorProvider')]
+  #[IgnoreDeprecations]
+  public function testConstructor(int $argument_count): void {
+    $manager = $this->entityTypeManager->reveal();
+    $field_manager = $this->entityFieldManager->reveal();
+    $cache = $this->cacheBackend->reveal();
+    $key_value = $this->createStub(KeyValueFactoryInterface::class);
+    $arguments = [$manager, $cache];
+    if ($argument_count > 2) {
+      $this->expectUserDeprecationMessage('Calling Drupal\\Core\\Field\\FieldDefinitionListener::__construct() with the $entity_field_manager argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3612113');
+      $arguments = [$manager, $field_manager, $cache];
+    }
+    if ($argument_count === 4) {
+      $this->expectUserDeprecationMessage('Calling Drupal\\Core\\Field\\FieldDefinitionListener::__construct() with the $key_value_factory argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3612113');
+      $arguments = [$manager, $field_manager, $key_value, $cache];
+    }
+    $listener = new FieldDefinitionListener(...$arguments);
+    $this->assertSame($manager, (new \ReflectionProperty($listener, 'entityTypeManager'))->getValue($listener));
+    $this->assertSame($cache, (new \ReflectionProperty($listener, 'cacheBackend'))->getValue($listener));
+    if ($argument_count > 2) {
+      $this->assertSame($field_manager, (new \ReflectionProperty($listener, 'entityFieldManager'))->getValue($listener));
+    }
+    if ($argument_count === 4) {
+      $this->assertSame($key_value, (new \ReflectionProperty($listener, 'keyValueFactory'))->getValue($listener));
+    }
+
+    $definition = $this->prophesize(FieldDefinitionInterface::class);
+    $definition->getTargetEntityTypeId()->willReturn('test_entity_type');
+    $storage = $this->prophesize(DynamicallyFieldableEntityStorageInterface::class);
+    $storage->onFieldDefinitionCreate($definition->reveal())->shouldBeCalledOnce();
+    $storage->onFieldDefinitionUpdate($definition->reveal(), $definition->reveal())->shouldBeCalledOnce();
+    $storage->onFieldDefinitionDelete($definition->reveal())->shouldBeCalledOnce();
+    $this->entityTypeManager->getStorage('test_entity_type')->willReturn($storage->reveal());
+    $this->cacheBackend->delete('entity_field_map')->shouldBeCalledTimes(2);
+    $listener->onFieldDefinitionCreate($definition->reveal());
+    $listener->onFieldDefinitionUpdate($definition->reveal(), $definition->reveal());
+    $listener->onFieldDefinitionDelete($definition->reveal());
+  }
+
+  /**
+   * Provides supported constructor argument counts.
+   */
+  public static function constructorProvider(): array {
+    return ['current' => [2], 'intermediate' => [3], 'original' => [4]];
   }
 
   /**

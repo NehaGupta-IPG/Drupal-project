@@ -115,6 +115,11 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
    * The key-value factory.
    *
    * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0.
+   *   There is no replacement.
+   *
+   * @see https://www.drupal.org/node/3612113
    */
   protected $keyValueFactory;
 
@@ -183,11 +188,12 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
     $this->cacheBackend = $cache_backend;
     $this->entityLastInstalledSchemaRepository = $entity_last_installed_schema_repository;
     if ($module_handler instanceof KeyValueFactoryInterface) {
+      // @phpstan-ignore property.deprecated (Preserve the property for subclasses using the old constructor.)
       $this->keyValueFactory = $module_handler;
       $this->moduleHandler = $cache_backend;
       $this->cacheBackend = $entity_last_installed_schema_repository;
       $this->entityLastInstalledSchemaRepository = func_get_arg(8);
-      @trigger_error('Calling ' . __METHOD__ . '() with the $key_value_factory argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3612113', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $key_value_factory argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3612113', E_USER_DEPRECATED);
     }
   }
 
