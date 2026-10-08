@@ -108,21 +108,17 @@ class ErrorHandlerTest extends BrowserTestBase {
   public function testExceptionHandler(): void {
     \Drupal::service('module_installer')->install(['page_cache']);
     $error_exception = '<em class="placeholder">Exception</em>: Drupal &amp; awesome in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;triggerException()</em> (line';
-    // The statement the failing controller runs. It has to stay in step with
-    // \Drupal\error_test\Controller\ErrorTestController::triggerPDOException():
-    // a narrower query here would still be found in the dump as a prefix of
-    // the real one, and the assertion below would pass without covering the
-    // condition.
-    $select = \Drupal::database()->select('bananas_are_awesome', 'b')
-      ->fields('b')
-      ->condition('palm_height', 180, '>');
-    $error_pdo_statement = \Drupal::database()->prepareStatement((string) $select, [])->getQueryString();
-    $error_pdo_statement = str_replace(["\r", "\n"], ' ', $error_pdo_statement);
-    $error_pdo_type = 'DatabaseExceptionWrapper';
-    // The line the closure is declared on moves whenever the controller above
-    // it changes, so it is matched instead of hardcoded.
-    $error_renderer_exception_prefix = '<em class="placeholder">Exception</em>: This is an exception that occurs during rendering in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():';
-    $error_renderer_exception = '#' . preg_quote($error_renderer_exception_prefix, '#') . '\d+\}\(\)</em> \(line#';
+    $select = \Drupal::database()->select('bananas_are_awesome', 'b')->fields('b');
+    $message = \Drupal::database()->prepareStatement((string) $select, [])->getQueryString();
+    $message = str_replace(["\r", "\n"], ' ', $message);
+    $error_pdo_exception = [
+      '%type' => 'SchemaTableDoesNotExistException',
+      '@message' => $message,
+      '%function' => 'Drupal\error_test\Controller\ErrorTestController->triggerPDOException()',
+      '%line' => 64,
+      '%file' => $this->getModulePath('error_test') . '/error_test.module',
+    ];
+    $error_renderer_exception = '<em class="placeholder">Exception</em>: This is an exception that occurs during rendering in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():104}()</em> (line';
     $this->drupalGet('error-test/trigger-exception');
     $this->assertSession()->statusCodeEquals(500);
     $this->assertSession()->responseContains($error_exception);

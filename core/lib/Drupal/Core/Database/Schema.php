@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Database;
 
+use Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException;
+use Drupal\Core\Database\Exception\SchemaTableDoesNotExistException;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
@@ -308,9 +310,9 @@ abstract class Schema implements PlaceholderInterface {
    * @param string $new_name
    *   The new name for the table.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableDoesNotExistException
    *   If the specified table doesn't exist.
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException
    *   If a table with the specified new name already exists.
    */
   abstract public function renameTable($table, $new_name);
@@ -549,14 +551,14 @@ abstract class Schema implements PlaceholderInterface {
    *   A schema array with the following keys: 'primary key', 'unique keys' and
    *   'indexes', and values as arrays of database columns.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableDoesNotExistException
    *   If the specified table doesn't exist.
    * @throws \RuntimeException
    *   If the driver does not implement this method.
    */
   protected function introspectIndexSchema($table) {
     if (!$this->tableExists($table)) {
-      throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
+      throw new SchemaTableDoesNotExistException("The table $table doesn't exist.");
     }
     throw new \RuntimeException("The '{$this->connection->driver()}' database driver does not implement " . __METHOD__);
   }
@@ -636,7 +638,7 @@ abstract class Schema implements PlaceholderInterface {
    * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
    *   A Schema definition.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException
    *   If any of the specified tables already exists.
    * @throws \BadMethodCallException
    *   When concrete driver class is missing implementations.
@@ -657,7 +659,7 @@ abstract class Schema implements PlaceholderInterface {
    * @param \Drupal\Core\Database\SchemaDefinition\Table $table
    *   The table definition.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException
    *   If the specified table already exists.
    * @throws \BadMethodCallException
    *   When concrete driver class is missing implementations.
@@ -674,14 +676,14 @@ abstract class Schema implements PlaceholderInterface {
    * @param array $table
    *   A Schema API table definition array.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException
    *   If the specified table already exists.
    * @throws \BadMethodCallException
    *   When ::createTableSql() is not implemented in the concrete driver class.
    */
   public function createTable($name, $table) {
     if ($this->tableExists($name)) {
-      throw new SchemaObjectExistsException("Table '$name' already exists.");
+      throw new SchemaTableAlreadyExistsException("Table '$name' already exists.");
     }
     $statements = $this->createTableSql($name, $table);
     foreach ($statements as $statement) {
