@@ -132,7 +132,7 @@ class LazyContextRepositoryTest extends UnitTestCase {
     $contexts = $this->setupContextAndProvider('test_provider', ['test_context']);
     $locator = new ServiceLocator([
       'unused_provider' => function (): ContextProviderInterface {
-        $this->fail('Unrequested context providers must not be instantiated.');
+        $this->fail('This context provider must not be instantiated.');
       },
       'test_provider' => fn() => $this->contextProviders['test_provider'],
     ]);
