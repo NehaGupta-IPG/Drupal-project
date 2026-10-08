@@ -18,6 +18,8 @@ use Drupal\Core\Plugin\Factory\ContainerFactory;
 use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Utility\Error;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -59,6 +61,8 @@ class EmailManager extends DefaultPluginManager {
     protected MailerInterface $mailer,
     #[Autowire(service: 'cache.discovery')]
     CacheBackendInterface $cache_backend,
+    #[Autowire(service: 'logger.channel.mail')]
+    protected LoggerInterface $logger,
   ) {
     parent::__construct('Plugin/Email', $namespaces, $module_handler, EmailPluginInterface::class, EmailAttribute::class);
     $this->factory = new ContainerFactory($this, EmailPluginInterface::class);
@@ -172,8 +176,9 @@ class EmailManager extends DefaultPluginManager {
       $this->mailer->send($symfony_email);
     }
     catch (\Exception $e) {
-      // Log the exception or handle it as needed.
-      \Drupal::logger('email')->error('Failed to send email: @message', ['@message' => $e->getMessage()]);
+      Error::logException($this->logger, $e, 'Failed to send email: @message', [
+        '@message' => $e->getMessage(),
+      ]);
       return FALSE;
     }
     return TRUE;
