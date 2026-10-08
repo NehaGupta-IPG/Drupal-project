@@ -71,6 +71,10 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
    * the wrapper is placed before the dialog in the DOM.
    */
   public function testBalloonVisibleInDialogOpenedAfterEditor(): void {
+    // Stark does not raise the z-index of jQuery UI dialogs above CKEditor 5
+    // balloons, so use a theme that does.
+    \Drupal::service('theme_installer')->install(['default_admin']);
+    $this->config('system.theme')->set('default', 'default_admin')->save();
     $this->createLinkTextFormat();
 
     $page = $this->getSession()->getPage();
@@ -92,14 +96,15 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
     $dialog->find('xpath', "//button[span[text()='Link']]")->click();
     $assert_session->waitForElementVisible('css', '.ck-balloon-panel_visible input.ck-input-text');
 
-    // Make sure the balloon is the topmost element at its own center point,
-    // and is not covered by the dialog.
-    $this->assertTrue($this->getSession()->evaluateScript(<<<JS
+    // Make sure the link balloon is the topmost element at its own center
+    // point, and is not covered by the dialog. Other visible balloons, such as
+    // the "Powered by" balloon, may be positioned off-screen.
+    $this->assertSame('balloon', $this->getSession()->evaluateScript(<<<JS
       (function () {
-        const balloon = document.querySelector('.ck-balloon-panel_visible:not(.ck-tooltip)');
+        const balloon = document.querySelector('.ck-balloon-panel_visible input.ck-input-text').closest('.ck-balloon-panel');
         const rect = balloon.getBoundingClientRect();
         const element = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
-        return balloon.contains(element);
+        return balloon.contains(element) ? 'balloon' : (element ? element.className : 'none');
       })()
     JS));
   }
