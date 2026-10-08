@@ -12,7 +12,7 @@ class SqlExecutionInfo {
    *
    * @param string $sqlString
    *   The SQL statement string.
-   * @param list<array|int|float|string|bool|null>|array<string,array|int|float|string|bool|null> $placeholders
+   * @param array<int|string,mixed> $placeholders
    *   (optional) The placeholder values, keyed by placeholder name for a
    *   string containing named placeholders, 0-indexed for a string containing
    *   positional placeholders.
@@ -62,13 +62,10 @@ class SqlExecutionInfo {
    * error_log() output and in CLI applications rendering the throwable
    * themselves. Runs of whitespace in the statement are collapsed and the
    * placeholder values are escaped, so that the result stays on one line.
-   * The options are not included: they are internal to the database API and
-   * are only exposed by the verbose dump.
+   * The options are not included; consumers can read them from this object.
    *
    * @return string
    *   The SQL statement followed by its placeholder values.
-   *
-   * @see \Drupal\Core\Database\Utility\SqlDumper::export()
    */
   public function toCompactString(): string {
     $placeholders = [];
@@ -94,7 +91,7 @@ class SqlExecutionInfo {
   /**
    * Removes the compact representation from an exception message.
    *
-   * Consumers rendering the full dump of this object use this to avoid
+   * Consumers rendering the structured information use this to avoid
    * repeating the statement that ::appendToMessage() added to the message.
    *
    * @param string $message
@@ -112,17 +109,35 @@ class SqlExecutionInfo {
   /**
    * Formats a single placeholder value for ::toCompactString().
    *
-   * @param array|int|float|string|bool|null $value
+   * @param mixed $value
    *   The placeholder value.
+   * @param int $depth
+   *   The current array nesting depth.
    *
    * @return string
    *   The value as a single line string.
    */
-  private static function formatValue(array|int|float|string|bool|null $value): string {
+  private static function formatValue(mixed $value, int $depth = 0): string {
+    if (is_array($value)) {
+      // Bound nesting and array size, including self-referencing arrays.
+      if ($depth >= 3) {
+        return '[...]';
+      }
+      $values = [];
+      foreach (array_slice($value, 0, 20) as $item) {
+        $values[] = self::formatValue($item, $depth + 1);
+      }
+      if (count($value) > 20) {
+        $values[] = '...';
+      }
+      return '[' . implode(', ', $values) . ']';
+    }
     return match (TRUE) {
       $value === NULL => 'NULL',
       is_bool($value) => $value ? 'TRUE' : 'FALSE',
-      is_array($value) => '[' . implode(', ', array_map(self::formatValue(...), $value)) . ']',
+      is_resource($value) => 'resource (' . get_resource_type($value) . ')',
+      gettype($value) === 'resource (closed)' => 'resource (closed)',
+      is_object($value) => 'object (' . get_debug_type($value) . ')',
       is_string($value) => "'" . strtr($value, ["\n" => '\n', "\r" => '\r']) . "'",
       default => (string) $value,
     };
