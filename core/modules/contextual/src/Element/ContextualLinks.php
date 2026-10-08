@@ -54,6 +54,22 @@ class ContextualLinks extends RenderElementBase {
    *       ],
    *     ]]
    *   @endcode
+   *   The 'contextual' group name is reserved for literal links. Its
+   *   'route_parameters' value is an array of links, each an array with
+   *   'title', 'path' and (optionally) 'options' keys:
+   *   @code
+   *     ['#contextual_links' => [
+   *       'contextual' => [
+   *         'route_parameters' => [
+   *           'some_unique_link_key' => [
+   *             'title' => 'Edit',
+   *             'path' => '/node/1/edit',
+   *             'options' => ['query' => ['destination' => '/some-view']],
+   *           ],
+   *         ],
+   *       ],
+   *     ]]
+   *   @endcode
    *
    * @return array
    *   A renderable array representing contextual links.
@@ -63,6 +79,11 @@ class ContextualLinks extends RenderElementBase {
     $items = [];
 
     $contextual_links_manager = static::contextualLinkManager();
+
+    // The 'contextual' group is reserved for literal links, an array with keys
+    // title, path and options.
+    $literal_links = $element['#contextual_links']['contextual']['route_parameters'] ?? [];
+    unset($element['#contextual_links']['contextual']);
 
     foreach ($element['#contextual_links'] as $group => $args) {
       $args += [
@@ -77,6 +98,23 @@ class ContextualLinks extends RenderElementBase {
     // Transform contextual links into parameters suitable for links.html.twig.
     $links = [];
     $use_ajax = FALSE;
+    foreach ($literal_links as $class => $literal_link) {
+      if (!isset($literal_link['title']) || !isset($literal_link['path'])) {
+        continue;
+      }
+      try {
+        $url = Url::fromUserInput($literal_link['path'], $literal_link['options'] ?? []);
+      }
+      catch (\InvalidArgumentException) {
+        // Skip links whose path is not a valid user-input path.
+        continue;
+      }
+      $class = Html::getClass($class);
+      $links[$class] = [
+        'title' => $literal_link['title'],
+        'url' => $url,
+      ];
+    }
     foreach ($items as $class => $item) {
       // Check whether any of the contextual links have the use-ajax class.
       $use_ajax = $use_ajax || in_array('use-ajax', $item['localized_options']['class'] ?? [], TRUE);

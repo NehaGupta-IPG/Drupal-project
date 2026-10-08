@@ -19,8 +19,12 @@ class ContextualViewsHooks {
   public function viewsDataAlter(&$data): void {
     $data['views']['contextual_links'] = [
       'title' => $this->t('Contextual Links'),
-      'help' => $this->t('Display fields in a contextual links menu.'),
       'field' => [
+        'help' => $this->t('Display fields in a contextual links menu.'),
+        'id' => 'contextual_links',
+      ],
+      'area' => [
+        'help' => $this->t('Display links in a contextual links menu.'),
         'id' => 'contextual_links',
       ],
     ];
