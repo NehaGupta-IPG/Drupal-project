@@ -111,35 +111,18 @@ class SqlExecutionInfo {
    *
    * @param mixed $value
    *   The placeholder value.
-   * @param int $depth
-   *   The current array nesting depth.
    *
    * @return string
-   *   The value as a single line string.
+   *   The value as a single line string. Values that are not scalars are
+   *   represented by their type only.
    */
-  private static function formatValue(mixed $value, int $depth = 0): string {
-    if (is_array($value)) {
-      // Bound nesting and array size, including self-referencing arrays.
-      if ($depth >= 3) {
-        return '[...]';
-      }
-      $values = [];
-      foreach (array_slice($value, 0, 20) as $item) {
-        $values[] = self::formatValue($item, $depth + 1);
-      }
-      if (count($value) > 20) {
-        $values[] = '...';
-      }
-      return '[' . implode(', ', $values) . ']';
-    }
+  private static function formatValue(mixed $value): string {
     return match (TRUE) {
       $value === NULL => 'NULL',
       is_bool($value) => $value ? 'TRUE' : 'FALSE',
-      is_resource($value) => 'resource (' . get_resource_type($value) . ')',
-      gettype($value) === 'resource (closed)' => 'resource (closed)',
-      is_object($value) => 'object (' . get_debug_type($value) . ')',
       is_string($value) => "'" . strtr($value, ["\n" => '\n', "\r" => '\r']) . "'",
-      default => (string) $value,
+      is_int($value) || is_float($value) => (string) $value,
+      default => get_debug_type($value),
     };
   }
 

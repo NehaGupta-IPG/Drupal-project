@@ -22,26 +22,6 @@ use PHPUnit\Framework\Attributes\Group;
 class SqlExecutionInfoTest extends UnitTestCase {
 
   /**
-   * Tests the compact representation of values that are not scalars.
-   */
-  public function testToCompactStringWithNonScalarValues(): void {
-    $stream = fopen('php://memory', 'r');
-    $closed = fopen('php://memory', 'r');
-    fclose($closed);
-    $recursive = [];
-    $recursive[] = &$recursive;
-    $info = new SqlExecutionInfo('SELECT 1', [
-      ':stream' => $stream,
-      ':closed' => $closed,
-      ':object' => new \stdClass(),
-      ':recursive' => $recursive,
-      ':long' => range(1, 21),
-    ]);
-    $this->assertSame("SELECT 1; [:stream=resource (stream), :closed=resource (closed), :object=object (stdClass), :recursive=[[[[...]]]], :long=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...]]", $info->toCompactString());
-    fclose($stream);
-  }
-
-  /**
    * Tests the compact representation used in exception messages.
    */
   #[DataProvider('providerToCompactString')]
@@ -70,7 +50,7 @@ class SqlExecutionInfoTest extends UnitTestCase {
         ['a', 'b'],
       ],
       'value types' => [
-        "SELECT 1; [:a=NULL, :b=TRUE, :c=FALSE, :d=1.5, :e='', :f=['x', 2]]",
+        "SELECT 1; [:a=NULL, :b=TRUE, :c=FALSE, :d=1.5, :e='', :f=array, :g=stdClass]",
         'SELECT 1',
         [
           ':a' => NULL,
@@ -79,6 +59,7 @@ class SqlExecutionInfoTest extends UnitTestCase {
           ':d' => 1.5,
           ':e' => '',
           ':f' => ['x', 2],
+          ':g' => new \stdClass(),
         ],
       ],
       'multiline statement is collapsed' => [
