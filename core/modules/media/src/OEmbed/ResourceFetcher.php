@@ -22,14 +22,13 @@ class ResourceFetcher implements ResourceFetcherInterface {
     protected ProviderRepositoryInterface $providers,
     #[Autowire(service: 'cache.default')]
     protected CacheBackendInterface $cacheBackend,
-    protected ?ModuleHandlerInterface $moduleHandler,
     protected int $timeout = 5,
+    protected ?ModuleHandlerInterface $moduleHandler = NULL,
   ) {
-    if (empty($moduleHandler)) {
-      $moduleHandler = \Drupal::moduleHandler();
-      @trigger_error('Passing NULL as the $module_handler parameter to ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3042423', E_USER_DEPRECATED);
+    if ($this->moduleHandler === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleHandler argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3042423', E_USER_DEPRECATED);
+      $this->moduleHandler = \Drupal::moduleHandler();
     }
-    $this->moduleHandler = $moduleHandler;
   }
 
   /**

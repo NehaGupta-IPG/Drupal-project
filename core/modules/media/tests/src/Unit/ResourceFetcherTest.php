@@ -50,8 +50,8 @@ class ResourceFetcherTest extends UnitTestCase {
       $client->reveal(),
       $this->createStub(ProviderRepositoryInterface::class),
       new NullBackend('default'),
+      $non_default_timeout,
       $this->createMock('\Drupal\Core\Extension\ModuleHandlerInterface'),
-      $non_default_timeout
     );
     $fetcher->fetchResource($url);
   }
@@ -92,7 +92,7 @@ class ResourceFetcherTest extends UnitTestCase {
       $client,
       $providers,
       new NullBackend('default'),
-      $this->createMock('\Drupal\Core\Extension\ModuleHandlerInterface')
+      moduleHandler: $this->createMock('\Drupal\Core\Extension\ModuleHandlerInterface'),
     );
     /** @var \Drupal\media\OEmbed\Resource $resource */
     $resource = $fetcher->fetchResource('valid');
