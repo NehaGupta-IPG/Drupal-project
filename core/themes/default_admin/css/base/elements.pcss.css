@@ -29,8 +29,7 @@ body {
 }
 
 :any-link,
-.link,
-button.link {
+.link {
   word-wrap: break-word;
   color: var(--admin-color-link);
   overflow-wrap: break-word;

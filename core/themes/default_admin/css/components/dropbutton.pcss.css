@@ -112,6 +112,20 @@
     display: block;
     padding-block: var(--dropbutton-padding-block);
     padding-inline: calc(var(--dropbutton-padding-inline) - var(--dropdown-padding));
+    border-radius: var(--dropbutton-border-radius-size);
+
+    &:hover {
+      background-color: var(--admin-color-primary-hover);
+    }
+
+    &:active {
+      background-color: var(--admin-color-primary-active);
+    }
+
+    &:hover,
+    &:active {
+      color: var(--admin-color-text-on-primary);
+    }
   }
 }
 
