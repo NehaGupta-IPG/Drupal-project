@@ -95,7 +95,7 @@ class EmailHooksTest extends KernelTestBase {
     $this->assertCount(1, $sentEmails);
 
     $sentEmail = $sentEmails[0];
-    $this->assertSame('Drupal\mailer_email_test\Plugin\Email\MinimalTestEmail::textBody(id: mailer_email_test.minimal, module: mailer_email_test, key: minimal, langcode: fr)', $sentEmail->getTextBody());
+    $this->assertSame('Drupal\mailer_email_test\Plugin\Email\MinimalTestEmail::textBody(id: mailer_email_test.minimal, langcode: fr)', $sentEmail->getTextBody());
     $this->assertSame('Minimal Test Email (mailer_email_test.minimal)', $sentEmail->getSubject());
   }
 
