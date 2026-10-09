@@ -64,12 +64,16 @@ class ModerationStateUserTest extends ModerationStateTestBase {
       'moderation_state' => 'published',
       'uid' => $user1->id(),
     ]);
+    $originalRevisionId = $node->getRevisionId();
 
     $node->addTranslation('es', [
       'title' => 'First version of the content es.',
       'moderation_state' => 'published',
       'uid' => $user2->id(),
-    ])->save();
+    ])
+      ->setRevisionUserId($user2->id())
+      ->save();
+    $translationRevisionId = $node->getRevisionId();
 
     // Add a forward draft revision in the original language.
     $node = $node->getTranslation('en');
@@ -79,6 +83,7 @@ class ModerationStateUserTest extends ModerationStateTestBase {
       ->set('title', 'Second version of the content en.')
       ->setRevisionUserId($user1->id());
     $node->save();
+    $draftRevisionId = $node->getRevisionId();
 
     // Check that the revisions have been created correctly.
     $this->assertUserNodeCount($user1->id(), 1, 'en', 'node_field_data');
@@ -103,6 +108,15 @@ class ModerationStateUserTest extends ModerationStateTestBase {
     $this->assertUserNodeCount($user1->id(), 0, 'en', 'node_field_revision');
     $this->assertUserNodeCount(0, 3, 'en', 'node_field_revision');
     $this->assertUserNodeCount($user2->id(), 2, 'es', 'node_field_revision');
+
+    // Only the revisions made by the first user are reassigned to the anonymous
+    // user. The revision made by the second user keeps its revision author,
+    // even though the node is owned by the first user.
+    $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
+    $nodeStorage->resetCache();
+    $this->assertEquals(0, $nodeStorage->loadRevision($originalRevisionId)->getRevisionUserId());
+    $this->assertEquals($user2->id(), $nodeStorage->loadRevision($translationRevisionId)->getRevisionUserId());
+    $this->assertEquals(0, $nodeStorage->loadRevision($draftRevisionId)->getRevisionUserId());
 
     // Check content as an anonymous user.
     $this->drupalLogout();
