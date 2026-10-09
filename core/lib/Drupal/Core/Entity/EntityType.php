@@ -721,6 +721,16 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * {@inheritdoc}
    */
+  public function removeLinkTemplate($key) {
+    if ($this->hasLinkTemplate($key)) {
+      unset($this->links[$key]);
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getBundleEntityType() {
     return $this->bundle_entity_type;
   }
