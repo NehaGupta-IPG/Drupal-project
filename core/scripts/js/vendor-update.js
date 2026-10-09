@@ -8,7 +8,7 @@
  */
 
 const path = require('node:path');
-const { copyFile, writeFile, readFile, chmod, mkdir } = require('node:fs').promises;
+const { copyFile, writeFile, readFile, readdir, chmod, mkdir } = require('node:fs').promises;
 const ckeditor5Files = require('./assets/ckeditor5Files');
 const jQueryUIProcess = require('./assets/process/jqueryui');
 const mapProcess = require('./assets/process/map');
@@ -233,6 +233,23 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
       updateLibraryVersion(libraryName, packageInfo);
     } catch (e) {
       // The package.json file doesn't exist, so nothing to do.
+    }
+
+    // Copy the license files from the package root, so each library is
+    // distributed together with its license.
+    // cspell:ignore licence
+    const licenseFiles = (await readdir(`${packageFolder}/${sourceFolder}`))
+      .filter((filename) => /^(licence|license|copying)/i.test(filename));
+    if (!licenseFiles.length) {
+      throw new Error(`No license file found in ${sourceFolder}`);
+    }
+    await mkdir(`${assetsFolder}/${destFolder}`, { recursive: true });
+    for (const filename of licenseFiles) {
+      console.log(`Copy ${sourceFolder}/${filename} to ${destFolder}/${filename}`);
+      await copyFile(
+        `${packageFolder}/${sourceFolder}/${filename}`,
+        `${assetsFolder}/${destFolder}/${filename}`,
+      );
     }
 
     for (const file of files.map(normalizeFile)) {
