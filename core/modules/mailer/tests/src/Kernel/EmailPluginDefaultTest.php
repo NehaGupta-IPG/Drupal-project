@@ -50,7 +50,7 @@ class EmailPluginDefaultTest extends KernelTestBase {
    * Test default plugin with html body only.
    */
   public function testHtmlBody(): void {
-    $emailManager = \Drupal::service('plugin.manager.email');
+    $emailManager = \Drupal::service(EmailManager::class);
     assert($emailManager instanceof EmailManager);
 
     $email = $emailManager->createInstance('mailer_email_test.with_html_body');
@@ -80,7 +80,7 @@ class EmailPluginDefaultTest extends KernelTestBase {
    * Test default plugin with text body only.
    */
   public function testTextBody(): void {
-    $emailManager = \Drupal::service('plugin.manager.email');
+    $emailManager = \Drupal::service(EmailManager::class);
     assert($emailManager instanceof EmailManager);
 
     $email = $emailManager->createInstance('mailer_email_test.with_text_body');
@@ -111,7 +111,7 @@ class EmailPluginDefaultTest extends KernelTestBase {
    * Test default plugin with both bodies.
    */
   public function testBothBodies(): void {
-    $emailManager = \Drupal::service('plugin.manager.email');
+    $emailManager = \Drupal::service(EmailManager::class);
     assert($emailManager instanceof EmailManager);
 
     $email = $emailManager->createInstance('mailer_email_test.with_both_body');
@@ -148,7 +148,7 @@ class EmailPluginDefaultTest extends KernelTestBase {
    * Test default plugin with headers from YAML declaration.
    */
   public function testDefaultHeadersFromYamlDeclaration(): void {
-    $emailManager = \Drupal::service('plugin.manager.email');
+    $emailManager = \Drupal::service(EmailManager::class);
     assert($emailManager instanceof EmailManager);
 
     $email = $emailManager->createInstance('mailer_email_test.with_default_headers');
@@ -182,7 +182,7 @@ class EmailPluginDefaultTest extends KernelTestBase {
    * Test default plugin with headers from YAML declaration overridden.
    */
   public function testDefaultHeadersFromYamlOverridden(): void {
-    $emailManager = \Drupal::service('plugin.manager.email');
+    $emailManager = \Drupal::service(EmailManager::class);
     assert($emailManager instanceof EmailManager);
 
     $email = $emailManager->createInstance('mailer_email_test.with_default_headers');

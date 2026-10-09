@@ -51,7 +51,7 @@ class EmailHooksTest extends KernelTestBase {
    * Tests hook_email_pre_build_alter_alter().
    */
   public function testEmailPreBuildAlter(): void {
-    $emailManager = \Drupal::service('plugin.manager.email');
+    $emailManager = \Drupal::service(EmailManager::class);
     assert($emailManager instanceof EmailManager);
 
     \Drupal::state()->set('email_pre_build_alter.set_params', [
@@ -81,7 +81,7 @@ class EmailHooksTest extends KernelTestBase {
    * Tests hook_email_pre_build_alter_alter().
    */
   public function testLangcodeAlter(): void {
-    $emailManager = \Drupal::service('plugin.manager.email');
+    $emailManager = \Drupal::service(EmailManager::class);
     assert($emailManager instanceof EmailManager);
 
     \Drupal::state()->set('email_pre_build_alter.set_langcode', 'fr');
@@ -103,7 +103,7 @@ class EmailHooksTest extends KernelTestBase {
    * Tests hook_email_pre_render_alter_alter().
    */
   public function testPreRenderAlter(): void {
-    $emailManager = \Drupal::service('plugin.manager.email');
+    $emailManager = \Drupal::service(EmailManager::class);
     assert($emailManager instanceof EmailManager);
 
     \Drupal::state()->set('email_pre_render_alter.set_elements', [
@@ -132,7 +132,7 @@ class EmailHooksTest extends KernelTestBase {
    * Tests hook_email_pre_send_alter().
    */
   public function testEmailPreSendAlter(): void {
-    $emailManager = \Drupal::service('plugin.manager.email');
+    $emailManager = \Drupal::service(EmailManager::class);
     assert($emailManager instanceof EmailManager);
 
     \Drupal::state()->set('email_pre_send_alter.set_tags', ['mailer.test']);
@@ -160,7 +160,7 @@ class EmailHooksTest extends KernelTestBase {
    * Tests hook_email_alter().
    */
   public function testEmailBuildAlterMetadata(): void {
-    $emailManager = \Drupal::service('plugin.manager.email');
+    $emailManager = \Drupal::service(EmailManager::class);
     assert($emailManager instanceof EmailManager);
 
     \Drupal::state()->set('email_pre_render_alter.set_elements', [
