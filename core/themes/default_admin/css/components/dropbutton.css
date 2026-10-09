@@ -109,7 +109,7 @@
   overflow: auto;
   width: max-content;
   min-width: anchor-size(width);
-  max-height: 70dvh;
+  max-height: 40dvh;
   margin: 0;
   padding: var(--dropdown-padding);
   list-style: none;
