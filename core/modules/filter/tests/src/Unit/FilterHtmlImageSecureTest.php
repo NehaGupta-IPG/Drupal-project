@@ -121,7 +121,7 @@ final class FilterHtmlImageSecureTest extends UnitTestCase {
    * Tests isSecurePrivateImage() strips the query string before resolving.
    */
   public function testIsSecurePrivateImageStripsQueryString(): void {
-    $image = $this->createMock(ImageInterface::class);
+    $image = $this->createStub(ImageInterface::class);
     $image->method('getFileSize')->willReturn(12345);
 
     $image_factory = $this->createMock(ImageFactory::class);
@@ -139,7 +139,7 @@ final class FilterHtmlImageSecureTest extends UnitTestCase {
    * Tests isSecurePrivateImage() rawurldecodes the path before resolving.
    */
   public function testIsSecurePrivateImageDecodesPath(): void {
-    $image = $this->createMock(ImageInterface::class);
+    $image = $this->createStub(ImageInterface::class);
     $image->method('getFileSize')->willReturn(12345);
 
     $image_factory = $this->createMock(ImageFactory::class);
@@ -162,7 +162,7 @@ final class FilterHtmlImageSecureTest extends UnitTestCase {
    */
   #[DataProvider('providerIsSecurePrivateImageInvalid')]
   public function testIsSecurePrivateImageInvalid(?int $file_size): void {
-    $image = $this->createMock(ImageInterface::class);
+    $image = $this->createStub(ImageInterface::class);
     $image->method('getFileSize')->willReturn($file_size);
 
     $image_factory = $this->createMock(ImageFactory::class);
@@ -222,10 +222,10 @@ final class FilterHtmlImageSecureTest extends UnitTestCase {
       [],
       'filter_html_image_secure',
       ['provider' => 'test'],
-      $this->createMock(FileUrlGeneratorInterface::class),
-      $this->createMock(ModuleHandlerInterface::class),
+      $this->createStub(FileUrlGeneratorInterface::class),
+      $this->createStub(ModuleHandlerInterface::class),
+      $image_factory ?? $this->createStub(ImageFactory::class),
       '/app/root',
-      $image_factory ?? $this->createMock(ImageFactory::class),
     );
   }
 

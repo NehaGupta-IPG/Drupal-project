@@ -133,12 +133,11 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
    *   Whether private image is secure.
    */
   protected function isSecurePrivateImage(string $src, string $private_path, int $private_path_length): bool {
-    $private_image_path = mb_substr($src, $private_path_length);
+    // Query strings and fragments are URL components, not part of the filename
+    // passed to the image factory. Decode only after extracting the URL path.
+    $private_image_path = mb_substr(parse_url($src, PHP_URL_PATH), $private_path_length);
     $private_image_path = 'private://' . $private_image_path;
     $private_image_path = rawurldecode($private_image_path);
-
-    // Remove any query string before checking the file on disk.
-    $private_image_path = explode('?', $private_image_path, 2)[0];
 
     $image_object = $this->imageFactory->get($private_image_path);
     if ($image_object->getFileSize()) {

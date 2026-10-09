@@ -7,6 +7,8 @@ namespace Drupal\Tests\filter\Functional;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\image\Entity\ImageStyle;
+use Drupal\image\ImageStyleInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -25,7 +27,7 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['filter', 'node', 'comment'];
+  protected static $modules = ['filter', 'node', 'comment', 'image'];
 
   /**
    * {@inheritdoc}
@@ -111,6 +113,21 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
     $private_uri = str_replace('public://', 'private://', $test_images[0]->uri);
     \Drupal::service('file_system')->copy($test_images[0]->uri, $private_uri);
 
+    // Create private images whose filenames contain URL-sensitive characters.
+    $private_filenames = [$test_image, 'private+image.png', 'private?#image.png'];
+    foreach (array_slice($private_filenames, 1) as $private_filename) {
+      \Drupal::service('file_system')->copy($test_images[0]->uri, 'private://' . $private_filename);
+    }
+
+    // Create an actual derivative and use core's generated destination token.
+    $image_style = ImageStyle::load('thumbnail');
+    $derivative_uri = $image_style->buildUri($private_uri);
+    $this->assertTrue($image_style->createDerivative($private_uri, $derivative_uri));
+    $derivative_url = $image_style->buildUrl($private_uri);
+    parse_str(parse_url($derivative_url, PHP_URL_QUERY), $derivative_query);
+    $this->assertSame($image_style->getPathToken($private_uri), $derivative_query[ImageStyleInterface::TOKEN]);
+    $relative_derivative_url = \Drupal::service('file_url_generator')->transformRelative($derivative_url);
+
     // Create a list of test image sources.
     // The keys become the value of the IMG 'src' attribute, the values are the
     // expected filter conversions.
@@ -132,9 +149,9 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
       $https_base_url . '/' . $public_files_path . '/' . $special_image => $files_path . '/' . $special_image,
       $http_base_url . '/' . $private_files_path . '/' . $test_image => base_path() . $private_files_path . '/' . $test_image,
       $https_base_url . '/' . $private_files_path . '/' . $test_image => base_path() . $private_files_path . '/' . $test_image,
-      // Test a private image whose URL contains a query string: the query
-      // string must be stripped before resolving the file on disk.
-      $http_base_url . '/' . $private_files_path . '/' . $test_image . '?itok=abc123' => base_path() . $private_files_path . '/' . $test_image . '?itok=abc123',
+      // Test an existing private derivative with a valid destination token.
+      $derivative_url => $relative_derivative_url,
+      $derivative_url . '#fragment' => $relative_derivative_url . '#fragment',
       $files_path . '/example.png' => $red_x_image,
       // Test a private path referencing a file that does not exist: it must be
       // replaced with the placeholder image.
@@ -146,6 +163,24 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
       // Test a url containing a query string.
       $http_base_url . '/' . $druplicon . '?query=string' => base_path() . $druplicon . '?query=string',
     ];
+    // Query strings and fragments must remain in rendered URLs, but must not
+    // become part of the private filesystem path used to validate the image.
+    foreach ($private_filenames as $private_filename) {
+      $private_paths = [rawurlencode($private_filename)];
+      if (!str_contains($private_filename, '?')) {
+        $private_paths[] = $private_filename;
+      }
+      foreach (array_unique($private_paths) as $private_filename_path) {
+        $private_image_url = base_path() . $private_files_path . '/' . $private_filename_path;
+        foreach (['', '?query=string', '#fragment', '?query=string#fragment'] as $suffix) {
+          $images[$private_image_url . $suffix] = $private_image_url . $suffix;
+          $images[$https_base_url . '/' . $private_files_path . '/' . $private_filename_path . $suffix] = $private_image_url . $suffix;
+        }
+      }
+    }
+    $images[$http_base_url . '/' . $private_files_path . '/does-not-exist.png?query=string#fragment'] = $red_x_image;
+    $images['https://example.com/' . $private_files_path . '/' . $test_image . '?query=string#fragment'] = $red_x_image;
+
     $comment = [];
     foreach ($images as $image => $converted) {
       // Output the image source as plain text for debugging.
@@ -171,7 +206,7 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
           $this->assertEquals('16', $element->getAttribute('width'));
         }
         else {
-          $this->assertEquals($converted, $element->getAttribute('src'));
+          $this->assertEquals($converted, $element->getAttribute('src'), $image);
         }
       }
       $this->assertTrue($found, "$image was found.");
