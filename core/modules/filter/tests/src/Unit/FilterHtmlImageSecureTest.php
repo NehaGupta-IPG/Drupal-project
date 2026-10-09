@@ -136,12 +136,13 @@ final class FilterHtmlImageSecureTest extends UnitTestCase {
   }
 
   /**
-   * Tests isSecurePrivateImage() rawurldecodes the path before resolving.
+   * Tests decoding a URL-encoded private image path before resolving.
    */
   public function testIsSecurePrivateImageDecodesPath(): void {
     $image = $this->createStub(ImageInterface::class);
     $image->method('getFileSize')->willReturn(12345);
 
+    // cspell:ignore tést fïle
     $image_factory = $this->createMock(ImageFactory::class);
     $image_factory->expects($this->once())
       ->method('get')
