@@ -19,8 +19,8 @@ use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Utility\Error;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
@@ -57,12 +57,19 @@ class EmailManager extends DefaultPluginManager {
     #[Autowire(service: 'container.namespaces')]
     \Traversable $namespaces,
     ModuleHandlerInterface $module_handler,
-    protected RendererInterface $renderer,
-    protected MailerInterface $mailer,
     #[Autowire(service: 'cache.discovery')]
     CacheBackendInterface $cache_backend,
-    #[Autowire(service: 'logger.channel.mail')]
-    protected LoggerInterface $logger,
+    protected RendererInterface $renderer,
+    /**
+     * @var \Closure(): \Symfony\Component\Mailer\MailerInterface
+     */
+    #[AutowireServiceClosure(MailerInterface::class)]
+    protected readonly \Closure $mailer,
+    /**
+     * @var \Closure(): \Psr\Log\LoggerInterface
+     */
+    #[AutowireServiceClosure('logger.channel.mail')]
+    protected readonly \Closure $logger,
   ) {
     parent::__construct('Plugin/Email', $namespaces, $module_handler, EmailPluginInterface::class, EmailAttribute::class);
     $this->factory = new ContainerFactory($this, EmailPluginInterface::class);
@@ -173,10 +180,10 @@ class EmailManager extends DefaultPluginManager {
     }
 
     try {
-      $this->mailer->send($symfony_email);
+      ($this->mailer)()->send($symfony_email);
     }
     catch (\Exception $e) {
-      Error::logException($this->logger, $e, 'Failed to send email: @message', [
+      Error::logException(($this->logger)(), $e, 'Failed to send email: @message', [
         '@message' => $e->getMessage(),
       ]);
       return FALSE;
