@@ -95,8 +95,10 @@ class BootstrapClassmapTest extends BrowserTestBase {
     foreach ($core_composer['autoload']['classmap'] as $file) {
       $classmap[] = $this->relativePath(realpath($this->root . '/core/' . $file), $vendor_dir);
     }
-    foreach (array_merge(...array_values(Plugin::BOOTSTRAP_CLASSMAP)) as $file) {
-      $classmap[] = $this->relativePath(realpath($vendor_dir . '/' . $file), $vendor_dir);
+    foreach (Plugin::BOOTSTRAP_CLASSMAP as $package_name => $files) {
+      foreach ($files as $file) {
+        $classmap[] = $this->relativePath(realpath($vendor_dir . '/' . $package_name . '/' . $file), $vendor_dir);
+      }
     }
     // The scaffold plugin generates this file and always adds it.
     $classmap[] = 'vendor/drupal/DrupalInstalled.php';

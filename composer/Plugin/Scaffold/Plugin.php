@@ -30,60 +30,60 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
    *
    * These files are used before the class loader can use APCu, so adding them
    * to the classmap avoids a filesystem lookup for each one. File paths are
-   * relative to the vendor directory.
+   * relative to the package directory.
    *
    * @see \Drupal\Core\DrupalKernel::boot()
    * @see \Drupal\FunctionalTests\Bootstrap\BootstrapClassmapTest
    */
   const BOOTSTRAP_CLASSMAP = [
     'psr/container' => [
-      'psr/container/src/ContainerExceptionInterface.php',
-      'psr/container/src/ContainerInterface.php',
-      'psr/container/src/NotFoundExceptionInterface.php',
+      'src/ContainerExceptionInterface.php',
+      'src/ContainerInterface.php',
+      'src/NotFoundExceptionInterface.php',
     ],
     'symfony/dependency-injection' => [
-      'symfony/dependency-injection/Argument/RewindableGenerator.php',
-      'symfony/dependency-injection/ContainerInterface.php',
-      'symfony/dependency-injection/ServiceLocator.php',
+      'Argument/RewindableGenerator.php',
+      'ContainerInterface.php',
+      'ServiceLocator.php',
     ],
     'symfony/http-foundation' => [
-      'symfony/http-foundation/AcceptHeader.php',
-      'symfony/http-foundation/AcceptHeaderItem.php',
-      'symfony/http-foundation/FileBag.php',
-      'symfony/http-foundation/HeaderBag.php',
-      'symfony/http-foundation/HeaderUtils.php',
-      'symfony/http-foundation/InputBag.php',
-      'symfony/http-foundation/ParameterBag.php',
-      'symfony/http-foundation/Request.php',
-      'symfony/http-foundation/RequestStack.php',
-      'symfony/http-foundation/ServerBag.php',
+      'AcceptHeader.php',
+      'AcceptHeaderItem.php',
+      'FileBag.php',
+      'HeaderBag.php',
+      'HeaderUtils.php',
+      'InputBag.php',
+      'ParameterBag.php',
+      'Request.php',
+      'RequestStack.php',
+      'ServerBag.php',
     ],
     'symfony/http-kernel' => [
-      'symfony/http-kernel/HttpKernelInterface.php',
-      'symfony/http-kernel/TerminableInterface.php',
+      'HttpKernelInterface.php',
+      'TerminableInterface.php',
     ],
     'symfony/mime' => [
-      'symfony/mime/FileBinaryMimeTypeGuesser.php',
-      'symfony/mime/FileinfoMimeTypeGuesser.php',
-      'symfony/mime/MimeTypeGuesserInterface.php',
-      'symfony/mime/MimeTypes.php',
-      'symfony/mime/MimeTypesInterface.php',
+      'FileBinaryMimeTypeGuesser.php',
+      'FileinfoMimeTypeGuesser.php',
+      'MimeTypeGuesserInterface.php',
+      'MimeTypes.php',
+      'MimeTypesInterface.php',
     ],
     'symfony/runtime' => [
-      'symfony/runtime/GenericRuntime.php',
-      'symfony/runtime/Internal/MissingDotenv.php',
-      'symfony/runtime/Resolver/ClosureResolver.php',
-      'symfony/runtime/ResolverInterface.php',
-      'symfony/runtime/Runner/Symfony/HttpKernelRunner.php',
-      'symfony/runtime/RunnerInterface.php',
-      'symfony/runtime/RuntimeInterface.php',
-      'symfony/runtime/SymfonyRuntime.php',
+      'GenericRuntime.php',
+      'Internal/MissingDotenv.php',
+      'Resolver/ClosureResolver.php',
+      'ResolverInterface.php',
+      'Runner/Symfony/HttpKernelRunner.php',
+      'RunnerInterface.php',
+      'RuntimeInterface.php',
+      'SymfonyRuntime.php',
     ],
     'symfony/service-contracts' => [
-      'symfony/service-contracts/ResetInterface.php',
-      'symfony/service-contracts/ServiceCollectionInterface.php',
-      'symfony/service-contracts/ServiceLocatorTrait.php',
-      'symfony/service-contracts/ServiceProviderInterface.php',
+      'ResetInterface.php',
+      'ServiceCollectionInterface.php',
+      'ServiceLocatorTrait.php',
+      'ServiceProviderInterface.php',
     ],
   ];
 
@@ -281,7 +281,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
     foreach (static::BOOTSTRAP_CLASSMAP as $package_name => $files) {
       if ($repository->findPackage($package_name, $constraint)) {
         foreach ($files as $file) {
-          $autoload['classmap'][] = $vendor_dir . '/' . $file;
+          $autoload['classmap'][] = $vendor_dir . '/' . $package_name . '/' . $file;
         }
       }
     }
