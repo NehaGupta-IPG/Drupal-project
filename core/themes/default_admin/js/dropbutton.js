@@ -1,6 +1,9 @@
 ((Drupal, once) => {
   /**
-   * Normalizes the markup of the dropbutton. Some dropbuttons do not have the nested list heirarchy that indicates a dropdown. An example is the "View <DISPLAY>" dropbutton within Views UI. This fixes this.
+   * Normalizes the markup of the dropbutton. Some dropbuttons do not have the
+   * nested list heirarchy that indicates a dropdown. An example is the "View
+   * <DISPLAY>" dropbutton within Views UI.
+   *
    * @param {HTMLElement} el - The dropbutton wrapper element.
    */
   function init(el) {
