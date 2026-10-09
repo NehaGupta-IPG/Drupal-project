@@ -127,7 +127,7 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function preBuild(): static {
+  public function preBuild(): void {
     if ($this->getHeader('Subject') === NULL && $default_subject = $this->getDefaultSubject()) {
       $this->subject($default_subject);
     }
@@ -141,7 +141,6 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     if (!empty($default_recipients['bcc']) && $this->getHeader('Bcc') === NULL) {
       $this->bcc(...$default_recipients['bcc']);
     }
-    return $this;
   }
 
   /**

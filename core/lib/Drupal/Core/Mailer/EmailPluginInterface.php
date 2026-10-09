@@ -37,7 +37,7 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
   /**
    * Performs pre-build operations.
    */
-  public function preBuild(): static;
+  public function preBuild(): void;
 
   /**
    * Returns all email headers.
