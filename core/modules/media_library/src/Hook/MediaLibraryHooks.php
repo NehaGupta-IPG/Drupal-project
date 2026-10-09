@@ -2,11 +2,13 @@
 
 namespace Drupal\media_library\Hook;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\InvokeCommand;
+use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -251,9 +253,11 @@ class MediaLibraryHooks {
 
     try {
       $state = MediaLibraryState::fromRequest($request);
-    } catch (BadRequestHttpException $e) {
+    }
+    catch (BadRequestHttpException $e) {
       return;
-    } catch (\InvalidArgumentException $e) {
+    }
+    catch (\InvalidArgumentException $e) {
       return;
     }
     if ($state->getOpenerId() !== 'media_library.opener.field_widget') {
@@ -268,12 +272,24 @@ class MediaLibraryHooks {
     foreach (Element::children($form['actions']) as $key) {
       if ($key === 'submit') {
         // Add an AJAX submit handler to the 'Save' button.
-        $form['actions'][$key]['#submit'][] = [$this, 'mediaEditFormAjaxCallback'];
-        $form['actions'][$key]['#attributes']['class'][] = 'use-ajax-submit';
+        $form['actions'][$key]['#ajax'] = [
+          'callback' => [$this, 'mediaEditFormAjaxCallback'],
+        ];
 
         // Prevent the form that opened the modal dialog to refocus to the
         // 'Save' button at the bottom of the form.
         $form['actions'][$key]['#attributes']['data-disable-refocus'] = 'true';
+
+        // The data-drupal-selector needs to be the same between the various
+        // AJAX requests. A bug in \Drupal\Core\Form\FormBuilder prevents that
+        // from happening unless $form['#id'] is also the same. Normally, #id
+        // is set to a unique HTML ID via Html::getUniqueId(), but here we
+        // bypass that in order to work around the data-drupal-selector bug.
+        // This is okay so long as we assume that this form only ever occurs
+        // once on a page.
+        // @todo: Remove once https://www.drupal.org/node/2897377 is fixed.
+        $form['#id'] = Html::getId($form_state->getBuildInfo()['form_id']);
+
       }
       else {
         // We just want to allow the save action for now. Just hide other
@@ -372,30 +388,44 @@ class MediaLibraryHooks {
    *
    * @internal
    */
-  public function mediaEditFormAjaxCallback(array &$form, FormStateInterface $form_state): void {
+  public function mediaEditFormAjaxCallback(array &$form, FormStateInterface $form_state): AjaxResponse {
+    $response = new AjaxResponse();
+
+    if ($form_state->hasAnyErrors()) {
+      $form['status_messages'] = [
+        '#type' => 'status_messages',
+        '#weight' => -1000,
+      ];
+      $response->addCommand(new ReplaceCommand('[data-drupal-selector="' . $form['#attributes']['data-drupal-selector'] . '"]', $form));
+
+      return $response;
+    }
+
     $request = $this->requestStack->getCurrentRequest();
 
     try {
       $state = MediaLibraryState::fromRequest($request);
-    } catch (BadRequestHttpException $e) {
-      return;
-    } catch (\InvalidArgumentException $e) {
-      return;
+    }
+    catch (BadRequestHttpException $e) {
+      return $response;
+    }
+    catch (\InvalidArgumentException $e) {
+      return $response;
     }
 
     $opener_parameters = $state->getOpenerParameters();
     if (empty($opener_parameters['field_widget_id'])) {
-      return;
+      return $response;
     }
 
     // Trigger the field widget to update itself and close the dialog.
-    $response = new AjaxResponse();
     $response->addCommand(new InvokeCommand("[data-media-library-widget-update=\"{$opener_parameters['field_widget_id']}\"]", 'trigger', ['mousedown']));
     $response->addCommand(new CloseModalDialogCommand());
-    $form_state->setResponse($response);
 
     // Remove status messages when editing medias.
     $this->messenger->deleteByType(MessengerInterface::TYPE_STATUS);
+
+    return $response;
   }
 
 }
