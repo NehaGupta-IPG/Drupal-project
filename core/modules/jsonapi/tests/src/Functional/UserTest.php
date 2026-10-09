@@ -461,12 +461,12 @@ class UserTest extends ResourceTestBase {
   }
 
   /**
-   * Tests GETting 'roles' relationship only if allowed.
+   * Tests that users can only see their own roles if they have permission.
    */
   public function testGetRolesRelationshipOnlyIfAllowed(): void {
-
+    $this->setUpAuthorization('GET');
     $collection_url = Url::fromRoute('jsonapi.user--user.collection', [], ['query' => ['sort' => 'drupal_internal__uid']]);
-    $user_url = Url::fromRoute(sprintf('jsonapi.user--user.individual'), ['entity' => $this->account->uuid()]);
+    $user_url = Url::fromRoute('jsonapi.user--user.individual', ['entity' => $this->account->uuid()]);
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
@@ -497,7 +497,12 @@ class UserTest extends ResourceTestBase {
     $this->assertSame($this->account->uuid(), $doc['data']['2']['id']);
     $this->assertArrayHasKey('relationships', $doc['data'][2]);
     $this->assertArrayHasKey('roles', $doc['data'][2]['relationships'] ?? [], "Own user--user.collection resource's 'roles' relationship is visible.");
-
+    // The roles of other users stay hidden.
+    $other_users = array_filter($doc['data'], fn (array $resource) => $resource['id'] !== $this->account->uuid());
+    $this->assertNotEmpty($other_users);
+    foreach ($other_users as $resource) {
+      $this->assertArrayNotHasKey('roles', $resource['relationships'] ?? [], "Other user--user.collection resource's 'roles' relationship is not visible.");
+    }
   }
 
   /**

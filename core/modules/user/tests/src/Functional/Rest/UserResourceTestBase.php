@@ -253,6 +253,34 @@ abstract class UserResourceTestBase extends EntityResourceTestBase {
 
     // Verify that we can log in with the new username.
     $this->assertRpcLogin('Cooler Llama', $new_password);
+
+    // Update username in $this->account, prepare for future requests.
+    $this->account->setUsername('Cooler Llama');
+    $this->initAuthentication();
+    $request_options = [
+      RequestOptions::HEADERS => ['Content-Type' => static::$mimeType],
+    ];
+    $request_options = array_merge_recursive($request_options, $this->getAuthenticationRequestOptions('PATCH'));
+    $get_request_options = $this->getAuthenticationRequestOptions('GET');
+
+    // Test case 4: viewing and changing roles.
+    $normalization = $original_normalization;
+    $normalization['roles'] = [['target_id' => $this->drupalCreateRole([])]];
+    $request_options[RequestOptions::BODY] = $this->serializer->encode($normalization, static::$format);
+
+    // Roles are hidden and cannot be changed without required permission.
+    $response = $this->request('GET', $url, $get_request_options);
+    $this->assertArrayNotHasKey('roles', $this->serializer->decode((string) $response->getBody(), static::$format));
+    $response = $this->request('PATCH', $url, $request_options);
+    $this->assertResourceErrorResponse(403, "Access denied on updating field 'roles'.", $response);
+
+    $this->grantPermissionsToTestedRole(['view own roles']);
+
+    // Roles are visible but still cannot be changed.
+    $response = $this->request('GET', $url, $get_request_options);
+    $this->assertArrayHasKey('roles', $this->serializer->decode((string) $response->getBody(), static::$format));
+    $response = $this->request('PATCH', $url, $request_options);
+    $this->assertResourceErrorResponse(403, "Access denied on updating field 'roles'.", $response);
   }
 
   /**
