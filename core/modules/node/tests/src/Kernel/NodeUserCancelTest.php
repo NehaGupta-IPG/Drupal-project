@@ -7,6 +7,7 @@ namespace Drupal\Tests\node\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use Drupal\user\AccountCancellation;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -70,7 +71,7 @@ class NodeUserCancelTest extends KernelTestBase {
 
     $this->assertNotEquals($firstRevisionId, $secondRevisionId);
 
-    \user_cancel([], $user1->id(), 'user_cancel_reassign');
+    \Drupal::service(AccountCancellation::class)->cancel([], (int) $user1->id(), 'user_cancel_reassign');
 
     // Test default revision.
     // Reload node.
