@@ -45,8 +45,8 @@
 
 .dropbutton-wrapper {
   display: inline-flex;
-  border-radius: var(--button-border-radius-size);
   box-sizing: border-box;
+  border-radius: var(--button-border-radius-size);
 
   * {
     box-sizing: border-box;
@@ -70,15 +70,15 @@
  */
 
 .dropbutton {
-  anchor-name: --my-anchor;
-  anchor-scope: all;
   display: flex;
+  height: var(--dropbutton-height);
   margin: 0;
   list-style: none;
   border: 2px solid var(--admin-color-primary);
   border-radius: var(--dropbutton-border-radius-size);
   box-shadow: 0 1px 2px var(--admin-color-primary-soft);
-  height: var(--dropbutton-height);
+  anchor-name: --my-anchor;
+  anchor-scope: all;
 
   .dark-mode & {
     box-shadow: 0 4px 18px var(--admin-shadow-color-button);
@@ -102,8 +102,9 @@
 
   position: fixed;
   z-index: 1; /* Appear above other dropbuttons. */
-  min-width: anchor-size(width);
+  display: none;
   width: max-content;
+  min-width: anchor-size(width);
   margin: 0;
   padding: var(--dropdown-padding);
   list-style: none;
@@ -111,7 +112,6 @@
   background: var(--admin-color-bg-raised);
   box-shadow: var(--admin-shadow-2);
   font-size: var(--dropbutton-font-size);
-  display: none;
 
   .dropbutton-wrapper.open & {
     position-anchor: --my-anchor;
@@ -123,18 +123,18 @@
   /* Some dropdown item actions can be <input> elements. This can be seen on the "View <display>" dropbutton within Views UI. */
   :is(a, input) {
     display: block;
-    padding-block: var(--dropbutton-padding-block);
-    padding-inline: calc(var(--dropbutton-padding-inline) - var(--dropdown-padding));
-    border-radius: var(--dropbutton-border-radius-size);
+    width: 100%;
+    transition: var(--admin-transition);
+    text-align: start;
     -webkit-text-decoration: none;
     text-decoration: none;
-    transition: var(--admin-transition);
     color: var(--admin-color-link);
-    -webkit-font-smoothing: antialiased;
     border: none;
+    border-radius: var(--dropbutton-border-radius-size);
     background: none;
-    width: 100%;
-    text-align: start;
+    padding-block: var(--dropbutton-padding-block);
+    padding-inline: calc(var(--dropbutton-padding-inline) - var(--dropdown-padding));
+    -webkit-font-smoothing: antialiased;
 
     &:hover {
       background-color: var(--admin-color-primary-hover);
@@ -167,15 +167,15 @@
   position: relative;
   display: block;
   height: 100%; /* Necessary for Safari (tested 26.2). */
-  aspect-ratio: 1;
+  cursor: pointer;
+  color: var(--admin-color-primary);
   border: var(--dropbutton-border-size) solid transparent;
   border-inline-start: var(--dropbutton-border-size) solid var(--admin-color-primary);
+  background: none;
+  aspect-ratio: 1;
   border-start-end-radius: calc(var(--dropbutton-border-radius-size) - 2px);
   border-end-end-radius: calc(var(--dropbutton-border-radius-size) - 2px);
   appearance: none;
-  background: none;
-  cursor: pointer;
-  color: var(--admin-color-primary);
 
   &:hover {
     background-color: var(--admin-color-primary-hover);
@@ -223,21 +223,21 @@
     align-items: center;
     height: 100%;
     margin: 0;
-    padding-block: var(--dropbutton-padding-block);
-    padding-inline: var(--dropbutton-padding-inline);
     cursor: pointer;
+    transition: color var(--admin-transition);
     white-space: nowrap;
     -webkit-text-decoration: none;
     text-decoration: none;
     color: var(--admin-color-primary) !important; /* Override button.css admin specificity. */
     border: 0;
-    border-start-start-radius: calc(var(--dropbutton-border-radius-size) - 2px);
-    border-end-start-radius: calc(var(--dropbutton-border-radius-size) - 2px);
     background: none;
     font-size: var(--dropbutton-font-size);
     font-weight: var(--admin-font-weight-semibold);
+    padding-block: var(--dropbutton-padding-block);
+    padding-inline: var(--dropbutton-padding-inline);
+    border-start-start-radius: calc(var(--dropbutton-border-radius-size) - 2px);
+    border-end-start-radius: calc(var(--dropbutton-border-radius-size) - 2px);
     appearance: none;
-    transition: color var(--admin-transition);
     -webkit-font-smoothing: antialiased;
 
     &:focus {
