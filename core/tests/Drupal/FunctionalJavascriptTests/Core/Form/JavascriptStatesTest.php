@@ -636,7 +636,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->drupalGet('ajax_forms_test_states_form');
     $page = $this->getSession()->getPage();
 
-    // Make sure that before ajax request behaviour is as expected.
+    // Make sure that behavior before the AJAX request is as expected.
     $page->selectFieldOption('num', 'Second');
     $page->selectFieldOption('color', 'Green');
     // Field that is dependent on the above selections of radios is visible.
