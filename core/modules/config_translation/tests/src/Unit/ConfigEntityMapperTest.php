@@ -53,7 +53,7 @@ class ConfigEntityMapperTest extends UnitTestCase {
 
     $this->routeProvider = $this->createMock(RouteProviderInterface::class);
 
-    $this->routeProvider
+    $this->routeProvider->expects($this->once())
       ->method('getRouteByName')
       ->with('entity.configurable_language.edit_form')
       ->willReturn(new Route('/admin/config/regional/language/edit/{configurable_language}'));
