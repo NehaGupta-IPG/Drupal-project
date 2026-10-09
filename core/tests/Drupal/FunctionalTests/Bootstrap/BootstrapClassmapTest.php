@@ -50,6 +50,14 @@ class BootstrapClassmapTest extends BrowserTestBase {
   public function testBootstrapClassmap(): void {
     $vendor_dir = dirname((new \ReflectionClass(ClassLoader::class))->getFileName(), 2);
 
+    // Production sites should set trusted host patterns, which loads an extra
+    // class during bootstrap.
+    $settings['settings']['trusted_host_patterns'] = (object) [
+      'value' => ['^' . preg_quote(parse_url($this->baseUrl, PHP_URL_HOST)) . '$'],
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+
     // Each test run uses its own front controller, so parallel runs do not
     // delete each other's file.
     $front_controller = 'bootstrap_classmap_' . $this->databasePrefix . '.php';

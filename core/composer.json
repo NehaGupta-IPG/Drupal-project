@@ -131,6 +131,7 @@
             "lib/Drupal/Core/DrupalKernel.php",
             "lib/Drupal/Core/DrupalKernelInterface.php",
             "lib/Drupal/Core/File/MimeType/MimeTypeGuesser.php",
+            "lib/Drupal/Core/Http/TrustedHostsRequestFactory.php",
             "lib/Drupal/Core/Installer/InstallerRedirectTrait.php",
             "lib/Drupal/Core/Runtime/DrupalRuntime.php",
             "lib/Drupal/Core/Site/Settings.php",

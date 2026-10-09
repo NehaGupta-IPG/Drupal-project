@@ -368,7 +368,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "d50761e1e0d5972fa9bd6c3aa07b590d1660e464"
+                "reference": "30c910fd77ebc12530fc614dbf7b451d7c90b9eb"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -532,6 +532,7 @@
                     "lib/Drupal/Core/DrupalKernel.php",
                     "lib/Drupal/Core/DrupalKernelInterface.php",
                     "lib/Drupal/Core/File/MimeType/MimeTypeGuesser.php",
+                    "lib/Drupal/Core/Http/TrustedHostsRequestFactory.php",
                     "lib/Drupal/Core/Installer/InstallerRedirectTrait.php",
                     "lib/Drupal/Core/Runtime/DrupalRuntime.php",
                     "lib/Drupal/Core/Site/Settings.php",
