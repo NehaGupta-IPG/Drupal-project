@@ -59,7 +59,7 @@ class EmailManager extends DefaultPluginManager {
     ModuleHandlerInterface $module_handler,
     #[Autowire(service: 'cache.discovery')]
     CacheBackendInterface $cache_backend,
-    protected RendererInterface $renderer,
+    protected readonly RendererInterface $renderer,
     /**
      * @var \Closure(): \Symfony\Component\Mailer\MailerInterface
      */
