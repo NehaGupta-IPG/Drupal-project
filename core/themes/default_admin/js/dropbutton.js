@@ -4,17 +4,30 @@
    * @param {HTMLElement} el - The dropbutton wrapper element.
    */
   function init(el) {
-    if (el.querySelectorAll('.dropbutton--multiple > .secondary-action:not(:has(ul.dropbutton__items))').length) {
-      const dropdownItems = el.querySelectorAll('.dropbutton-toggle ~ li.dropbutton__item');
+    if (
+      el.querySelectorAll(
+        '.dropbutton--multiple > .secondary-action:not(:has(ul.dropbutton__items))',
+      ).length
+    ) {
+      const dropdownItems = el.querySelectorAll(
+        '.dropbutton-toggle ~ li.dropbutton__item',
+      );
       const toggleButtonItem = el.querySelector('li.dropbutton-toggle');
 
       const dropdownEl = document.createElement('li');
-      dropdownEl.classList.add('dropbutton__item', 'dropbutton-action', 'secondary-action');
+      dropdownEl.classList.add(
+        'dropbutton__item',
+        'dropbutton-action',
+        'secondary-action',
+      );
       dropdownEl.innerHTML = `<ul class="dropbutton__items"></ul>`;
       const dropdown = dropdownEl.querySelector('ul.dropbutton__items');
 
-      dropdownItems.forEach(el => {
-        el.querySelector('.button, .button--primary')?.classList.remove('button', 'button--primary');
+      dropdownItems.forEach((el) => {
+        el.querySelector('.button, .button--primary')?.classList.remove(
+          'button',
+          'button--primary',
+        );
         dropdown.append(el);
       });
 
@@ -32,7 +45,11 @@
    */
   Drupal.behaviors.dropbuttonNormalize = {
     attach(context) {
-      once('admin-dropbutton-normalize', '.dropbutton-wrapper', context).forEach(init);
+      once(
+        'admin-dropbutton-normalize',
+        '.dropbutton-wrapper',
+        context,
+      ).forEach(init);
     },
   };
 
