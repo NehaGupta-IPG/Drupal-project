@@ -164,7 +164,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testDuplicateColumnInTable(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Duplicate columns for \'test\' table: id, id');
+    $this->expectExceptionMessageIs('Duplicate columns for \'test\' table: id, id');
     $table = new Table(
       name: 'test',
       columns: [
@@ -280,7 +280,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidSerialForGeneratedExpression(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set \'generatedExpression\' for serial column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set \'generatedExpression\' for serial column \'id\'');
     new Table(
       name: 'test',
       columns: [
@@ -300,7 +300,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidPrimaryKeyForGeneratedColumn(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage("The primary key of the 'test' Table cannot include generated columns");
+    $this->expectExceptionMessageIs("The primary key of the 'test' Table cannot include generated columns");
     new Table(
       name: 'test',
       columns: [
