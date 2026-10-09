@@ -252,7 +252,6 @@
     margin: 0;
     cursor: pointer;
     transition: color var(--admin-transition);
-    white-space: nowrap;
     text-decoration: none;
     color: var(--admin-color-primary) !important; /* Override button.css admin specificity. */
     border: 0;
