@@ -167,7 +167,11 @@ class EmailManager extends DefaultPluginManager {
    * @param \Drupal\Core\Mailer\EmailPluginInterface $email
    *   The email plugin instance defining the email to be sent.
    *
-   * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+   * @return bool
+   *   TRUE if the email was passed to the mail transport subsystem and queued
+   *   for delivery. Also TRUE if sending was blocked by an
+   *   hook_email_pre_send_alter implementation. FALSE if an exception occured
+   *   when attempting to send the email.
    */
   public function send(EmailPluginInterface $email): bool {
     $symfony_email = $this->build($email);
