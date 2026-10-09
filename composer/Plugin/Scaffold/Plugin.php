@@ -36,25 +36,54 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
    * @see \Drupal\FunctionalTests\Bootstrap\BootstrapClassmapTest
    */
   const BOOTSTRAP_CLASSMAP = [
+    'psr/container' => [
+      'psr/container/src/ContainerExceptionInterface.php',
+      'psr/container/src/ContainerInterface.php',
+      'psr/container/src/NotFoundExceptionInterface.php',
+    ],
+    'symfony/dependency-injection' => [
+      'symfony/dependency-injection/Argument/RewindableGenerator.php',
+      'symfony/dependency-injection/ContainerInterface.php',
+      'symfony/dependency-injection/ServiceLocator.php',
+    ],
     'symfony/http-foundation' => [
-      'symfony/http-foundation/Request.php',
-      'symfony/http-foundation/RequestStack.php',
-      'symfony/http-foundation/ParameterBag.php',
+      'symfony/http-foundation/AcceptHeader.php',
+      'symfony/http-foundation/AcceptHeaderItem.php',
       'symfony/http-foundation/FileBag.php',
-      'symfony/http-foundation/ServerBag.php',
       'symfony/http-foundation/HeaderBag.php',
       'symfony/http-foundation/HeaderUtils.php',
+      'symfony/http-foundation/InputBag.php',
+      'symfony/http-foundation/ParameterBag.php',
+      'symfony/http-foundation/Request.php',
+      'symfony/http-foundation/RequestStack.php',
+      'symfony/http-foundation/ServerBag.php',
     ],
     'symfony/http-kernel' => [
-      'symfony/http-kernel/HttpKernel.php',
       'symfony/http-kernel/HttpKernelInterface.php',
       'symfony/http-kernel/TerminableInterface.php',
     ],
-    'symfony/dependency-injection' => [
-      'symfony/dependency-injection/ContainerInterface.php',
+    'symfony/mime' => [
+      'symfony/mime/FileBinaryMimeTypeGuesser.php',
+      'symfony/mime/FileinfoMimeTypeGuesser.php',
+      'symfony/mime/MimeTypeGuesserInterface.php',
+      'symfony/mime/MimeTypes.php',
+      'symfony/mime/MimeTypesInterface.php',
     ],
-    'psr/container' => [
-      'psr/container/src/ContainerInterface.php',
+    'symfony/runtime' => [
+      'symfony/runtime/GenericRuntime.php',
+      'symfony/runtime/Internal/MissingDotenv.php',
+      'symfony/runtime/Resolver/ClosureResolver.php',
+      'symfony/runtime/ResolverInterface.php',
+      'symfony/runtime/Runner/Symfony/HttpKernelRunner.php',
+      'symfony/runtime/RunnerInterface.php',
+      'symfony/runtime/RuntimeInterface.php',
+      'symfony/runtime/SymfonyRuntime.php',
+    ],
+    'symfony/service-contracts' => [
+      'symfony/service-contracts/ResetInterface.php',
+      'symfony/service-contracts/ServiceCollectionInterface.php',
+      'symfony/service-contracts/ServiceLocatorTrait.php',
+      'symfony/service-contracts/ServiceProviderInterface.php',
     ],
   ];
 
