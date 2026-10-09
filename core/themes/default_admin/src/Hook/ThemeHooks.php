@@ -116,18 +116,6 @@ class ThemeHooks implements TrustedCallbackInterface {
         '#noscript' => TRUE,
         '#attributes' => [
           'rel' => 'stylesheet',
-          'href' => $theme_path . '/css/components/dropbutton-noscript.css?' . $query_string,
-        ],
-      ],
-      'dropbutton_noscript',
-    ];
-
-    $page['#attached']['html_head'][] = [
-      [
-        '#tag' => 'link',
-        '#noscript' => TRUE,
-        '#attributes' => [
-          'rel' => 'stylesheet',
           'href' => $theme_path . '/css/components/views-ui-noscript.css?' . $query_string,
         ],
       ],
