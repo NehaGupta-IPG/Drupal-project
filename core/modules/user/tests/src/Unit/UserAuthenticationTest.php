@@ -157,7 +157,7 @@ class UserAuthenticationTest extends UnitTestCase {
       ->with(['name' => $this->username])
       ->willReturn([$this->createStub(User::class)]);
 
-    $this->passwordService
+    $this->passwordService->expects($this->once())
       ->method('check')
       ->with('0', 0)
       ->willReturn(TRUE);
