@@ -109,9 +109,9 @@ class ModerationStateUserTest extends ModerationStateTestBase {
     $this->assertUserNodeCount(0, 3, 'en', 'node_field_revision');
     $this->assertUserNodeCount($user2->id(), 2, 'es', 'node_field_revision');
 
-    // Only the revisions made by the first user are reassigned to the anonymous
-    // user. The revision made by the second user keeps its revision author,
-    // even though the node is owned by the first user.
+    // Check that only the revisions made by the first user are reassigned to
+    // the anonymous user. The revision made by the second user keeps its
+    // revision author, even though the first user owns the node.
     $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
     $nodeStorage->resetCache();
     $this->assertEquals(0, $nodeStorage->loadRevision($originalRevisionId)->getRevisionUserId());
