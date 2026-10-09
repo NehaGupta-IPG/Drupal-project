@@ -27,7 +27,7 @@ class ProviderRepositoryTest extends MediaKernelTestBase {
    *   The expected JSON content of the provider database.
    */
   #[DataProvider('providerEmptyProviderList')]
-  public function testEmptyProviderList($content): void {
+  public function testEmptyProviderList(string $content): void {
     $response = $this->prophesize('\GuzzleHttp\Psr7\Response');
     $response->getBody()->willReturn(Utils::streamFor($content));
 
@@ -36,7 +36,7 @@ class ProviderRepositoryTest extends MediaKernelTestBase {
     $this->container->set('http_client', $client);
 
     $this->expectException(ProviderException::class);
-    $this->expectExceptionMessage('Remote oEmbed providers database returned invalid or empty list.');
+    $this->expectExceptionMessageIs('Remote oEmbed providers database returned invalid or empty list.');
     $this->container->get('media.oembed.provider_repository')->getAll();
   }
 
@@ -48,7 +48,7 @@ class ProviderRepositoryTest extends MediaKernelTestBase {
    * @return array
    *   An array of test cases.
    */
-  public static function providerEmptyProviderList() {
+  public static function providerEmptyProviderList(): array {
     return [
       'empty array' => ['[]'],
       'empty string' => [''],
@@ -64,13 +64,13 @@ class ProviderRepositoryTest extends MediaKernelTestBase {
    *   The expected exception message.
    */
   #[DataProvider('providerNonExistingProviderDatabase')]
-  public function testNonExistingProviderDatabase($providers_url, $exception_message): void {
+  public function testNonExistingProviderDatabase(string $providers_url, string $exception_message): void {
     $this->config('media.settings')
       ->set('oembed_providers_url', $providers_url)
       ->save();
 
     $this->expectException(ProviderException::class);
-    $this->expectExceptionMessage($exception_message);
+    $this->expectExceptionMessageIs($exception_message);
     $this->container->get('media.oembed.provider_repository')->getAll();
   }
 
@@ -82,7 +82,7 @@ class ProviderRepositoryTest extends MediaKernelTestBase {
    * @return array
    *   An array of test cases.
    */
-  public static function providerNonExistingProviderDatabase() {
+  public static function providerNonExistingProviderDatabase(): array {
     return [
       [
         'http://oembed1.com/providers.json',

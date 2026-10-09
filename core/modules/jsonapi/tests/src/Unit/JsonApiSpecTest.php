@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore kitt
+
 /**
  * Tests Drupal\jsonapi\JsonApiSpec.
  *
@@ -30,8 +31,11 @@ class JsonApiSpecTest extends UnitTestCase {
 
   /**
    * Data provider for testIsValidMemberName.
+   *
+   * @return mixed[]
+   *   The data.
    */
-  public static function providerTestIsValidMemberName() {
+  public static function providerTestIsValidMemberName(): array {
     // Copied from https://jsonapi.org/format/upcoming/#document-member-names.
     $data = [];
     $data['alphanumeric-lowercase'] = ['12kittens', TRUE];
@@ -112,7 +116,7 @@ class JsonApiSpecTest extends UnitTestCase {
   /**
    * Data provider for testIsValidCustomQueryParameter.
    */
-  public static function providerTestIsValidCustomQueryParameter() {
+  public static function providerTestIsValidCustomQueryParameter(): array {
     $data = static::providerTestIsValidMemberName();
 
     // All valid member names are also valid custom query parameters, except for

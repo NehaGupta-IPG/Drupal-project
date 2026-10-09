@@ -217,7 +217,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
    * @param string $format
    *   The new request format.
    */
-  protected function addRequestWithFormat($format): void {
+  protected function addRequestWithFormat(?string $format): void {
     $request = \Drupal::request();
     $request = clone $request;
     $request->setRequestFormat($format);
@@ -535,7 +535,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     ]);
     $view->save();
     $this->executeView($view);
-    foreach (Json::decode($this->drupalGet('test/serialize/field', ['query' => ['_format' => 'json']])) as $index => $values) {
+    foreach (Json::decode($this->drupalGet('test/serialize/field', ['query' => ['_format' => 'json']])) as $values) {
       $this->assertTrue(!isset($values['created']), 'Excluded value not found.');
     }
     // Test that the excluded field is not shown in the row options.

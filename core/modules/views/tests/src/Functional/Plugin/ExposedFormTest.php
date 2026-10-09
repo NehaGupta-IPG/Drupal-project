@@ -259,7 +259,7 @@ class ExposedFormTest extends ViewTestBase {
    * Tests the exposed block functionality.
    */
   #[DataProvider('providerTestExposedBlock')]
-  public function testExposedBlock($display): void {
+  public function testExposedBlock(string $display): void {
     $view = Views::getView('test_exposed_block');
     $view->setDisplay($display);
     $block = $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_block-' . $display);
@@ -334,7 +334,7 @@ class ExposedFormTest extends ViewTestBase {
    * @return array
    *   Array of display names to test.
    */
-  public static function providerTestExposedBlock() {
+  public static function providerTestExposedBlock(): array {
     return [
       'page_display' => ['page_1'],
       'block_display' => ['block_1'],
@@ -416,6 +416,18 @@ class ExposedFormTest extends ViewTestBase {
     ];
 
     $this->drupalGet('test_exposed_form_sort_items_per_page');
+    $this->assertCacheContexts($contexts);
+    $this->assertIds(range(1, 10, 1));
+
+    // Test that malformed sort_by is not causing PHP errors.
+    $this->drupalGet('test_exposed_form_sort_items_per_page', [
+      'query' => [
+        // Sort by must be a string, not an array.
+        'sort_by' => [
+          'aaa' => 'bbb',
+        ],
+      ],
+    ]);
     $this->assertCacheContexts($contexts);
     $this->assertIds(range(1, 10, 1));
 
