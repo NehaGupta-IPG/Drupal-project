@@ -153,7 +153,7 @@ class RecipeFinderTest extends KernelTestBase {
   public function testInvalidRecipesThrow(): void {
     $finder = new Finder($this->root . '/core/tests/fixtures/recipes');
     // This is a parse error, so we don't care about the exception type.
-    $this->expectExceptionMessageIs('foo: !php/enum Drupal\config_enum_test\DoesNotExistEnumValue::No');
+    $this->expectExceptionMessageIs('The enum "Drupal\config_enum_test\DoesNotExistEnumValue" is not defined at line 9 (near "foo: !php/enum Drupal\config_enum_test\DoesNotExistEnumValue::No").');
     iterator_to_array($finder);
   }
 
