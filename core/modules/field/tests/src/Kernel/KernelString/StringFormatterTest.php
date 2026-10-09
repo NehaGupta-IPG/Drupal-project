@@ -9,7 +9,6 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\StringFormatter;
 use Drupal\Core\Form\FormState;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestLabel;
 use Drupal\entity_test\Entity\EntityTestRev;
@@ -210,10 +209,9 @@ class StringFormatterTest extends KernelTestBase {
     $formatter = $this->display->getRenderer($this->fieldName);
     $form = $formatter->settingsForm([], new FormState());
     $this->assertSame('Display as', (string) $form['tag']['#title']);
-    $this->assertInstanceOf(TranslatableMarkup::class, $form['tag']['#options']['']);
-    $this->assertSame('- None -', (string) $form['tag']['#options']['']);
-    $this->assertSame(['', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'], array_keys($form['tag']['#options']));
-    $this->assertSame([], $formatter->settingsSummary());
+    $this->assertSame('', $form['tag']['#empty_value']);
+    $this->assertSame(['span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'], array_keys($form['tag']['#options']));
+    $this->assertSame('Displayed as plain text', (string) $formatter->settingsSummary()[0]);
     $formatter->setSetting('tag', 'h2');
     $this->assertSame('Displayed as h2', (string) $formatter->settingsSummary()[0]);
   }

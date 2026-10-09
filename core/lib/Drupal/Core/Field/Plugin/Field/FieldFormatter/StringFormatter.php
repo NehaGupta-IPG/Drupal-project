@@ -111,19 +111,19 @@ class StringFormatter extends FormatterBase {
       }
     }
 
-    $heading_options = [
-      '' => $this->t('- None -'),
+    $tag_options = [
       'span' => 'span',
       'div' => 'div',
     ];
     foreach (range(1, 6) as $level) {
-      $heading_options['h' . $level] = 'H' . $level;
+      $tag_options['h' . $level] = 'H' . $level;
     }
 
     $form['tag'] = [
       '#title' => $this->t('Display as'),
       '#type' => 'select',
-      '#options' => $heading_options,
+      '#options' => $tag_options,
+      '#empty_value' => '',
       '#default_value' => $this->getSetting('tag'),
     ];
 
@@ -146,9 +146,8 @@ class StringFormatter extends FormatterBase {
         default => $this->t('Linked to @link_template', ['@link_template' => $link_rel]),
       };
     }
-    if ($this->getSetting('tag')) {
-      $summary[] = $this->t('Displayed as @tag', ['@tag' => $this->getSetting('tag')]);
-    }
+    $tag = $this->getSetting('tag');
+    $summary[] = $tag ? $this->t('Displayed as @tag', ['@tag' => $tag]) : $this->t('Displayed as plain text');
     return $summary;
   }
 
