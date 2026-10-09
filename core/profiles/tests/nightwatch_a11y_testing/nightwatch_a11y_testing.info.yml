@@ -12,5 +12,5 @@ install:
   - taxonomy
   - nightwatch_theme_install_utility
 themes:
-  - claro
-  - olivero
+  - default_admin
+  - stark
