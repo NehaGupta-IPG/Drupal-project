@@ -89,11 +89,11 @@ class WorkspaceFormPersistenceTest extends KernelTestBase {
 
     // Submit the second form and check the workspace in which it was submitted.
     $this->formBuilder->submitForm($form_arg, $form_state_2);
-    $this->assertSame('cheese', $this->keyValue->get('ws_test')->get('form_test_active_workspace'));
+    $this->assertSame('cheese', $this->container->get('keyvalue')->get('ws_test')->get('form_test_active_workspace'));
 
     // Submit the first form and check the workspace in which it was submitted.
     $this->formBuilder->submitForm($form_arg, $form_state_1);
-    $this->assertSame('ham', $this->keyValue->get('ws_test')->get('form_test_active_workspace'));
+    $this->assertSame('ham', $this->container->get('keyvalue')->get('ws_test')->get('form_test_active_workspace'));
 
     // Reset the workspace manager service to simulate a new request and check
     // that the second workspace is still active.
@@ -117,7 +117,7 @@ class WorkspaceFormPersistenceTest extends KernelTestBase {
 
     // Check that the AJAX callback is executed in the initial workspace of its
     // parent form.
-    $this->assertSame('ham', $this->keyValue->get('ws_test')->get('ajax_test_active_workspace'));
+    $this->assertSame('ham', $this->container->get('keyvalue')->get('ws_test')->get('ajax_test_active_workspace'));
 
     // Reset the workspace manager service again and check that the AJAX request
     // didn't change the persisted workspace.
