@@ -170,7 +170,7 @@ class EmailManager extends DefaultPluginManager {
    * @return bool
    *   TRUE if the email was passed to the mail transport subsystem and queued
    *   for delivery. Also TRUE if sending was blocked by an
-   *   hook_email_pre_send_alter implementation. FALSE if an exception occured
+   *   hook_email_pre_send_alter implementation. FALSE if an exception occurred
    *   when attempting to send the email.
    */
   public function send(EmailPluginInterface $email): bool {
