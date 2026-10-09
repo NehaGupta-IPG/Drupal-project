@@ -1,0 +1,14 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 5a7c9ef3-4d0b-4b6e-9a51-6c1f6a0e4b21
+  bundle: page
+  default_langcode: fr
+default:
+  title:
+    -
+      value: 'Home'
+  path:
+    -
+      alias: /home
+      langcode: fr

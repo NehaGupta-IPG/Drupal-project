@@ -243,7 +243,9 @@ final class Importer implements LoggerAwareInterface {
       $values[$entity_type->getKey('bundle')] = $data['_meta']['bundle'];
     }
 
+    $original_langcode = NULL;
     if (!empty($data['_meta']['default_langcode'])) {
+      $original_langcode = $data['_meta']['default_langcode'];
       $data = $this->verifyNormalizedLanguage($data);
       $values[$entity_type->getKey('langcode')] = $data['_meta']['default_langcode'];
     }
@@ -252,6 +254,9 @@ final class Importer implements LoggerAwareInterface {
     $entity = $this->entityTypeManager->getStorage($entity_type->id())->create($values);
     foreach ($data['default'] as $field_name => $values) {
       $this->setFieldValues($entity, $field_name, $values);
+    }
+    if ($original_langcode !== NULL && $original_langcode !== $data['_meta']['default_langcode']) {
+      $this->updatePathAliasLanguage($entity, $original_langcode, $data['_meta']['default_langcode']);
     }
 
     foreach ($data['translations'] ?? [] as $langcode => $translation_data) {
@@ -367,6 +372,33 @@ final class Importer implements LoggerAwareInterface {
       return $entity;
     }
     return NULL;
+  }
+
+  /**
+   * Moves path aliases to the language the entity is imported in.
+   *
+   * Exported path field items have an explicit language. If the importer
+   * changes the language of the entity, aliases in the original language
+   * would never match. Move them to the new language.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   *   The unsaved entity.
+   * @param string $original_langcode
+   *   The default language of the normalized entity.
+   * @param string $langcode
+   *   The language the entity is imported in.
+   */
+  private function updatePathAliasLanguage(ContentEntityInterface $entity, string $original_langcode, string $langcode): void {
+    foreach ($entity->getFieldDefinitions() as $field_name => $field_definition) {
+      if ($field_definition->getType() !== 'path') {
+        continue;
+      }
+      foreach ($entity->get($field_name) as $item) {
+        if ($item->get('langcode')->getValue() === $original_langcode) {
+          $item->get('langcode')->setValue($langcode);
+        }
+      }
+    }
   }
 
   /**

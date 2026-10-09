@@ -1,0 +1,14 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: 8d2f4b1e-0c3a-4f7e-b9d6-2e5a1c7f3b90
+  bundle: page
+  default_langcode: fr
+default:
+  title:
+    -
+      value: 'About'
+  path:
+    -
+      alias: /about
+      langcode: und
