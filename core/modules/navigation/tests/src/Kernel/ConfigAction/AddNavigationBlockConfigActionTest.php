@@ -49,16 +49,16 @@ class AddNavigationBlockConfigActionTest extends KernelTestBase {
    */
   #[TestWith([0, 0])]
   #[TestWith([1, 1])]
-  #[TestWith([3, 3])]
-  #[TestWith([7, 3])]
-  public function testAddBlockToNavigation($delta, $computed_delta): void {
+  #[TestWith([2, 2])]
+  #[TestWith([6, 2])]
+  public function testAddBlockToNavigation($delta, int $computed_delta): void {
     // Load the navigation section storage.
     $navigation_storage = \Drupal::service('plugin.manager.layout_builder.section_storage')->load('navigation', [
       'navigation' => new Context(new ContextDefinition('string'), 'navigation'),
     ]);
     $section = $navigation_storage->getSection(0);
     $components = $section->getComponentsByRegion('content');
-    $this->assertCount(3, $components);
+    $this->assertCount(2, $components);
     $data = [
       'delta' => $delta,
       'configuration' => [
@@ -82,7 +82,7 @@ class AddNavigationBlockConfigActionTest extends KernelTestBase {
     ]);
     $section = $navigation_storage->getSection(0);
     $components = $section->getComponentsByRegion('content');
-    $this->assertCount(4, $components);
+    $this->assertCount(3, $components);
     $component = array_values($components)[$computed_delta];
     $this->assertSame('content', $component->getRegion());
     $this->assertEquals($data['configuration'], $component->get('configuration'));
@@ -93,7 +93,7 @@ class AddNavigationBlockConfigActionTest extends KernelTestBase {
    */
   public function testActionOnlySupportsNavigationConfig(): void {
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage('addNavigationBlock can only be executed for the navigation.block_layout config.');
+    $this->expectExceptionMessageIs('addNavigationBlock can only be executed for the navigation.block_layout config.');
     // Try to apply the Config Action against an unexpected config entity.
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');

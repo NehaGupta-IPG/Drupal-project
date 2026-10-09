@@ -4,6 +4,7 @@ namespace Drupal\views\Plugin\views\exposed_form;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\views\Attribute\ViewsExposedForm;
 
 /**
@@ -17,6 +18,11 @@ use Drupal\views\Attribute\ViewsExposedForm;
   help: new TranslatableMarkup('An exposed form that only renders a view if the form contains user input.')
 )]
 class InputRequired extends ExposedFormPluginBase {
+
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected FilterFormatRepositoryInterface $formatRepository) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+  }
 
   /**
    * {@inheritdoc}
@@ -40,7 +46,7 @@ class InputRequired extends ExposedFormPluginBase {
       '#title' => $this->t('Text on demand'),
       '#description' => $this->t('Text to display instead of results until the user selects and applies an exposed filter.'),
       '#default_value' => $this->options['text_input_required'],
-      '#format' => $this->options['text_input_required_format'] ?? filter_default_format(),
+      '#format' => $this->options['text_input_required_format'] ?? $this->formatRepository->getDefaultFormat()->id(),
       '#editor' => FALSE,
     ];
   }

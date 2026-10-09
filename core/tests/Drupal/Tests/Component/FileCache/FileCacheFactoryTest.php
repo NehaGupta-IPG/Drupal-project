@@ -64,6 +64,7 @@ class FileCacheFactoryTest extends TestCase {
    * Tests get no prefix.
    */
   public function testGetNoPrefix(): void {
+    // @phpstan-ignore argument.type
     FileCacheFactory::setPrefix(NULL);
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('Required prefix configuration is missing');
@@ -91,7 +92,7 @@ class FileCacheFactoryTest extends TestCase {
    * Tests get configuration overrides.
    */
   #[DataProvider('configurationDataProvider')]
-  public function testGetConfigurationOverrides($configuration, $arguments, $class): void {
+  public function testGetConfigurationOverrides($configuration, $arguments, string $class): void {
     FileCacheFactory::setConfiguration($configuration);
 
     $file_cache = FileCacheFactory::get('test_foo_settings', $arguments);

@@ -4,7 +4,6 @@ namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraints\Count;
 
 /**
@@ -19,7 +18,6 @@ use Symfony\Component\Validator\Constraints\Count;
 )]
 class CountConstraint extends Count {
 
-  #[HasNamedArguments]
   public function __construct(
     int|array|null $exactly = NULL,
     ?int $min = NULL,
@@ -31,9 +29,8 @@ class CountConstraint extends Count {
     ?string $divisibleByMessage = NULL,
     ?array $groups = NULL,
     mixed $payload = NULL,
-    ?array $options = NULL,
   ) {
-    parent::__construct($exactly, $min, $max, $divisibleBy, $exactMessage, $minMessage, $maxMessage, $divisibleByMessage, $groups, $payload, $options);
+    parent::__construct($exactly, $min, $max, $divisibleBy, $exactMessage, $minMessage, $maxMessage, $divisibleByMessage, $groups, $payload);
   }
 
   /**

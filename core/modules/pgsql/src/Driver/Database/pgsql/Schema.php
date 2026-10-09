@@ -2,9 +2,10 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
-use Drupal\Core\Database\SchemaObjectExistsException;
-use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaObjectDoesNotExistException;
+use Drupal\Core\Database\SchemaObjectExistsException;
 
 // cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
 // cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
@@ -147,7 +148,10 @@ class Schema extends DatabaseSchema {
         'blob_fields' => [],
         'sequences' => [],
       ];
-      $this->connection->addSavepoint();
+
+      if ($this->connection->inTransaction()) {
+        $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
+      }
 
       try {
         // The bytea columns and sequences for a table can be found in
@@ -164,17 +168,21 @@ WHERE pg_attribute.attnum > 0
 AND NOT pg_attribute.attisdropped
 AND pg_attribute.attrelid = :key::regclass
 AND (format_type(pg_attribute.atttypid, pg_attribute.atttypmod) = 'bytea'
-OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid) LIKE 'nextval%')
+OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid)::text LIKE 'nextval%')
 EOD;
         $result = $this->connection->query($sql, [
           ':key' => $quoted_key,
         ]);
       }
       catch (\Exception $e) {
-        $this->connection->rollbackSavepoint();
+        if (isset($savepoint)) {
+          $savepoint->rollback();
+        }
         throw $e;
       }
-      $this->connection->releaseSavepoint();
+      if (isset($savepoint)) {
+        $savepoint->commitOrRelease();
+      }
 
       // If the table information does not yet exist in the PostgreSQL
       // metadata, then return the default table information here, so that it
@@ -260,7 +268,9 @@ EOD;
     $schema = $prefixInfo['schema'];
     $table_name = $prefixInfo['table'];
 
-    $this->connection->addSavepoint();
+    if ($this->connection->inTransaction()) {
+      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
+    }
 
     try {
       $checks = $this->connection->query("SELECT conname FROM pg_class cl INNER JOIN pg_constraint co ON co.conrelid = cl.oid INNER JOIN pg_attribute attr ON attr.attrelid = cl.oid AND attr.attnum = ANY (co.conkey) INNER JOIN pg_namespace ns ON cl.relnamespace = ns.oid WHERE co.contype = :constraint_type AND ns.nspname = :schema AND cl.relname = :table AND attr.attname = :column", [
@@ -271,11 +281,15 @@ EOD;
       ]);
     }
     catch (\Exception $e) {
-      $this->connection->rollbackSavepoint();
+      if (isset($savepoint)) {
+        $savepoint->rollback();
+      }
       throw $e;
     }
 
-    $this->connection->releaseSavepoint();
+    if (isset($savepoint)) {
+      $savepoint->commitOrRelease();
+    }
 
     $field_information = $checks->fetchCol();
 
@@ -357,6 +371,14 @@ EOD;
     }
     elseif (isset($spec['precision']) && isset($spec['scale'])) {
       $sql .= '(' . $spec['precision'] . ', ' . $spec['scale'] . ')';
+    }
+
+    if (isset($spec['generated'])) {
+      $sql .= ' GENERATED ALWAYS AS (' . $spec['generated']->generatedExpression->expression . ') ';
+      $sql .= match ($spec['generated']->generatedStorage) {
+        GeneratedColumnStorage::Virtual => 'VIRTUAL',
+        GeneratedColumnStorage::Stored => 'STORED',
+      };
     }
 
     if (!empty($spec['unsigned'])) {
@@ -930,7 +952,7 @@ EOD;
     // Type 'serial' is known to PostgreSQL, but only during table creation,
     // not when altering. Because of that, we create it here as an 'int'. After
     // we create it we manually re-apply the sequence.
-    $field_def = match($spec['pgsql_type']) {
+    $field_def = match ($spec['pgsql_type']) {
       'serial' => 'int',
       'bigserial' => 'bigint',
       default => $spec['pgsql_type'],

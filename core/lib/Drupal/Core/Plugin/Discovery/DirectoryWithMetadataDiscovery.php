@@ -14,6 +14,14 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
   use DeprecatedServicePropertyTrait;
 
   /**
+   * Allowed characters of plugin ID.
+   *
+   * This discovery has the particularity of searching for plugin IDs in
+   * filenames.
+   */
+  const PLUGIN_ID_REGEX = '([a-z0-9._-])+';
+
+  /**
    * The deprecated properties.
    *
    * @see https://www.drupal.org/node/3530869
@@ -32,14 +40,13 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
    * @param string $file_cache_key_suffix
    *   The file cache key suffix. This should be unique for each type of
    *   discovery.
-   * @param \Drupal\Core\File\FileSystemInterface|null $fileSystem
-   *   The file system service.
+   * @param string $file_name_suffix
+   *   The file name suffix that identifies a plugin metadata file, without the
+   *   leading dot or trailing .yml extension. For example, passing 'component'
+   *   will match files of the form 'my-plugin.component.yml'.
    */
-  public function __construct(array $directories, string $file_cache_key_suffix, ?FileSystemInterface $fileSystem = NULL) {
+  public function __construct(array $directories, string $file_cache_key_suffix, protected string $file_name_suffix) {
     parent::__construct($directories, $file_cache_key_suffix);
-    if ($fileSystem) {
-      @trigger_error(sprintf('Passing the $fileSystem parameter to %s() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. The class no longer uses the file system service. See https://www.drupal.org/node/3530869', __METHOD__), E_USER_DEPRECATED);
-    }
   }
 
   /**
@@ -52,7 +59,7 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
    * @param string $directory
    *   The directory to scan.
    *
-   * @return \RecursiveIteratorIterator
+   * @return \RecursiveIteratorIterator<\SplFileInfo>
    *   A \RecursiveIteratorIterator object or array where the values are
    *   \SplFileInfo objects.
    */
@@ -62,8 +69,8 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
       | \FilesystemIterator::CURRENT_AS_FILEINFO
       | \FilesystemIterator::SKIP_DOTS;
     $directory_iterator = new \RecursiveDirectoryIterator($directory, $flags);
-    // Detect "my_component.component.yml".
-    $regex = '/^([a-z0-9_-])+\.component\.yml$/i';
+    // Detect files of the form "my_plugin.{$file_name_suffix}.yml".
+    $regex = '/^' . static::PLUGIN_ID_REGEX . '\.' . preg_quote($this->file_name_suffix, '/') . '\.yml$/i';
     $filter = new RegexRecursiveFilterIterator($directory_iterator, $regex);
     return new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::LEAVES_ONLY, $flags);
   }
@@ -73,14 +80,14 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
    *
    * The IDs can collide in two different scenarios:
    *
-   * 1. Because one component is overriding another one via "weight".
-   * 2. Because the same component exists in different themes.
+   * 1. Because one plugin is overriding another one via "weight".
+   * 2. Because the same plugin exists in different themes.
    */
   protected function getIdentifier($file, array $data): string {
-    $id = basename($file, '.component.yml');
+    $id = basename($file, '.' . $this->file_name_suffix . '.yml');
     $provider_paths = array_flip($this->directories);
     $provider = $this->findProvider($file, $provider_paths);
-    // We use the provider to dedupe components because it does not make sense
+    // We use the provider to dedupe plugins because it does not make sense
     // for a single provider to fork itself.
     return sprintf('%s:%s', $provider, $id);
   }

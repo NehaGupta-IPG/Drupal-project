@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional\Rest;
 
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Cache\Cache;
 use Drupal\entity_test\Entity\EntityTest;
@@ -14,7 +14,6 @@ use Drupal\entity_test\EntityTestHelper;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
 use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
-use PHPUnit\Framework\Attributes\Before;
 
 /**
  * Resource test base for the comment entity.
@@ -56,14 +55,14 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
   protected $entity;
 
   /**
-   * Marks some tests as skipped because XML cannot be deserialized.
+   * {@inheritdoc}
    */
-  #[Before]
-  public function commentResourceTestBaseSkipTests(): void {
+  protected function setUp(): void {
     if (static::$format === 'xml'
       && in_array($this->name(), ['testPostDxWithoutCriticalBaseFields', 'testPostSkipCommentApproval'], TRUE)) {
       $this->markTestSkipped('Deserialization of the XML format is not supported.');
     }
+    parent::setUp();
   }
 
   /**
@@ -113,7 +112,7 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
     $commented_entity = EntityTest::create([
       'name' => 'Camelids',
       'type' => 'bar',
-      'comment' => CommentItemInterface::OPEN,
+      'comment' => CommentingStatus::Open->value,
     ]);
     $commented_entity->save();
 

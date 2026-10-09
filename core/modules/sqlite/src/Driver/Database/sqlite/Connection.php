@@ -9,6 +9,7 @@ use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 
 /**
@@ -20,11 +21,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * Error code for "Unable to open database file" error.
    */
   const DATABASE_NOT_FOUND = 14;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $statementWrapperClass = NULL;
 
   /**
    * A map of condition operators to SQLite operators.
@@ -95,7 +91,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(#[\SensitiveParameter] array &$connection_options = []) {
     // Allow PDO options to be overridden.
     $connection_options += [
       'pdo' => [],
@@ -367,7 +363,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function queryTemporary($query, array $args = [], array $options = []) {
-    $tablename = 'db_temporary_' . uniqid();
+    $tablename = 'db_temporary_' . bin2hex(random_bytes(12));
 
     $this->query('CREATE TEMPORARY TABLE ' . $tablename . ' AS ' . $query, $args, $options);
 
@@ -421,18 +417,20 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
     assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
-    if (isset($options['fetch']) && is_int($options['fetch'])) {
-      @trigger_error("Passing the 'fetch' key as an integer to \$options in prepareStatement() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
-    }
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to query() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     try {
-      $query = $this->preprocessStatement($query, $options);
-      $statement = new Statement($this->connection, $this, $query, $options['pdo'] ?? [], $allow_row_count);
+      return new Statement(
+        $this->connection,
+        $this,
+        $this->preprocessStatement($query, $options),
+        $options['pdo'] ?? [],
+        $allow_row_count,
+      );
     }
     catch (\Exception $e) {
       $this->exceptionHandler()->handleStatementException($e, $query, $options);
     }
-    return $statement;
   }
 
   /**
@@ -448,11 +446,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function createConnectionOptionsFromUrl($url, $root) {
-    if ($root !== NULL) {
-      @trigger_error("Passing the \$root value to " . __METHOD__ . "() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
-    }
-    $database = parent::createConnectionOptionsFromUrl($url, NULL);
+  public static function createConnectionOptionsFromUrl($url) {
+    $database = parent::createConnectionOptionsFromUrl($url);
 
     // A SQLite database path with two leading slashes indicates a system path.
     // Otherwise the path is relative to the Drupal root.

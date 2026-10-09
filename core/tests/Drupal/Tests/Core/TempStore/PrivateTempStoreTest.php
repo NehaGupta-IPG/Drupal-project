@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\TempStore;
 
+use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
+use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\TempStore\Lock;
 use Drupal\Core\TempStore\PrivateTempStore;
 use Drupal\Core\TempStore\TempStoreException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -21,18 +26,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class PrivateTempStoreTest extends UnitTestCase {
 
   /**
-   * The mock key value expirable backend.
-   *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The mocked key value expirable backend.
    */
-  protected $keyValue;
+  protected KeyValueStoreExpirableInterface&MockObject $keyValue;
 
   /**
-   * The mock lock backend.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The lock backend.
    */
-  protected $lock;
+  protected LockBackendInterface&Stub $lock;
 
   /**
    * The temp store.
@@ -43,10 +44,8 @@ class PrivateTempStoreTest extends UnitTestCase {
 
   /**
    * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $currentUser;
+  protected AccountProxyInterface&Stub $currentUser;
 
   /**
    * The request stack.
@@ -76,9 +75,9 @@ class PrivateTempStoreTest extends UnitTestCase {
     parent::setUp();
 
     $this->keyValue = $this->createMock('Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface');
-    $this->lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
-    $this->currentUser = $this->createMock('Drupal\Core\Session\AccountProxyInterface');
-    $this->currentUser->expects($this->any())
+    $this->lock = $this->createStub(LockBackendInterface::class);
+    $this->currentUser = $this->createStub(AccountProxyInterface::class);
+    $this->currentUser
       ->method('id')
       ->willReturn(1);
 
@@ -97,6 +96,15 @@ class PrivateTempStoreTest extends UnitTestCase {
     // Clone the object but change the owner.
     $this->otherObject = clone $this->ownObject;
     $this->otherObject->owner = 2;
+  }
+
+  /**
+   * Reinitializes the lock backend as a mock object.
+   */
+  protected function setUpMockLock(): void {
+    $this->lock = $this->createMock(LockBackendInterface::class);
+    $reflection = new \ReflectionProperty($this->tempStore, 'lockBackend');
+    $reflection->setValue($this->tempStore, $this->lock);
   }
 
   /**
@@ -124,6 +132,8 @@ class PrivateTempStoreTest extends UnitTestCase {
    * Tests the set() method with no lock available.
    */
   public function testSetWithNoLockAvailable(): void {
+    $this->setUpMockLock();
+
     $this->lock->expects($this->exactly(2))
       ->method('acquire')
       ->with('1:test')
@@ -143,6 +153,8 @@ class PrivateTempStoreTest extends UnitTestCase {
    * Tests a successful set() call.
    */
   public function testSet(): void {
+    $this->setUpMockLock();
+
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('1:test')
@@ -183,6 +195,8 @@ class PrivateTempStoreTest extends UnitTestCase {
    * Tests the locking in the delete() method.
    */
   public function testDeleteLocking(): void {
+    $this->setUpMockLock();
+
     $this->keyValue->expects($this->once())
       ->method('get')
       ->with('1:test')
@@ -208,6 +222,8 @@ class PrivateTempStoreTest extends UnitTestCase {
    * Tests the delete() method with no lock available.
    */
   public function testDeleteWithNoLockAvailable(): void {
+    $this->setUpMockLock();
+
     $this->keyValue->expects($this->once())
       ->method('get')
       ->with('1:test')
@@ -231,6 +247,8 @@ class PrivateTempStoreTest extends UnitTestCase {
    * Tests the delete() method.
    */
   public function testDelete(): void {
+    $this->setUpMockLock();
+
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('1:test_2')

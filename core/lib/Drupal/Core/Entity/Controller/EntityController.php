@@ -93,18 +93,14 @@ class EntityController implements ContainerInjectionInterface {
    *
    * @param string $entity_type_id
    *   The entity type ID.
-   * @param \Symfony\Component\HttpFoundation\Request|null $request
+   * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request object.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse|array
    *   If there's only one available bundle, a redirect response.
    *   Otherwise, a render array with the add links for each bundle.
    */
-  public function addPage($entity_type_id, ?Request $request = NULL) {
-    if ($request === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $request parameter is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3467748', E_USER_DEPRECATED);
-      $request = \Drupal::requestStack()->getCurrentRequest();
-    }
+  public function addPage($entity_type_id, Request $request) {
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
     $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
     $bundle_key = $entity_type->getKey('bundle');
@@ -236,9 +232,15 @@ class EntityController implements ContainerInjectionInterface {
    *   The title for the entity edit page, if an entity was found.
    */
   public function editTitle(RouteMatchInterface $route_match, ?EntityInterface $_entity = NULL) {
-    if ($entity = $this->doGetEntity($route_match, $_entity)) {
-      return $this->t('Edit %label', ['%label' => $entity->label()]);
+    $entity = $this->doGetEntity($route_match, $_entity);
+    if ($entity === NULL) {
+      return NULL;
     }
+    $label = $entity->label();
+    if ($label === NULL) {
+      return $this->t('Edit');
+    }
+    return $this->t('Edit %label', ['%label' => $label]);
   }
 
   /**
@@ -255,7 +257,14 @@ class EntityController implements ContainerInjectionInterface {
    */
   public function deleteTitle(RouteMatchInterface $route_match, ?EntityInterface $_entity = NULL) {
     $entity = $this->doGetEntity($route_match, $_entity);
-    return $entity ? $this->t('Delete %label', ['%label' => $entity->label()]) : '';
+    if ($entity === NULL) {
+      return '';
+    }
+    $label = $entity->label();
+    if ($label === NULL) {
+      return $this->t('Delete');
+    }
+    return $this->t('Delete %label', ['%label' => $label]);
   }
 
   /**

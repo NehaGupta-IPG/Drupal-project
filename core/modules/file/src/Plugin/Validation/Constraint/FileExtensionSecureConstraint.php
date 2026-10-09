@@ -6,7 +6,6 @@ namespace Drupal\file\Plugin\Validation\Constraint;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
@@ -19,14 +18,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class FileExtensionSecureConstraint extends SymfonyConstraint {
 
-  #[HasNamedArguments]
   public function __construct(
-    mixed $options = NULL,
     public string $message = 'For security reasons, your upload has been rejected.',
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
-    parent::__construct($options, $groups, $payload);
+    parent::__construct(groups: $groups, payload: $payload);
   }
 
 }

@@ -25,7 +25,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * @see \Drupal\views\Plugin\views\field\EntityField
  */
 #[Group('views')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class FieldFieldTest extends ViewsKernelTestBase {
 
@@ -59,13 +58,6 @@ class FieldFieldTest extends ViewsKernelTestBase {
    * @var \Drupal\entity_test\Entity\EntityTest[]
    */
   protected $entities;
-
-  /**
-   * The stored revisionable test entities.
-   *
-   * @var \Drupal\entity_test\Entity\EntityTestRev[]
-   */
-  protected $entityRevision;
 
   /**
    * Stores a couple of test users.
@@ -183,8 +175,7 @@ class FieldFieldTest extends ViewsKernelTestBase {
     ]);
     $field_multiple->save();
 
-    $this->entityRevision = [];
-    $this->entityRevision[0] = $entity = EntityTestRev::create([
+    $entity = EntityTestRev::create([
       'name' => 'base value',
       'field_test' => 1,
       'field_test_multiple' => [1, 3, 7],
@@ -202,7 +193,6 @@ class FieldFieldTest extends ViewsKernelTestBase {
     $entity->field_test_multiple[2]->value = 5;
     $entity->user_id->target_id = $this->testUsers[1]->id();
     $entity->save();
-    $this->entityRevision[1] = $entity;
 
     $entity = clone $original_entity;
     $entity->setNewRevision(TRUE);
@@ -213,9 +203,8 @@ class FieldFieldTest extends ViewsKernelTestBase {
     $entity->field_test_multiple[2]->value = 9;
     $entity->user_id->target_id = $this->testUsers[2]->id();
     $entity->save();
-    $this->entityRevision[2] = $entity;
 
-    $this->entityRevision[3] = $entity = EntityTestRev::create([
+    $entity = EntityTestRev::create([
       'name' => 'next entity value',
       'field_test' => 4,
       'field_test_multiple' => [2, 9, 9],
@@ -374,7 +363,7 @@ class FieldFieldTest extends ViewsKernelTestBase {
     $output = $executable->preview();
     $output = $renderer->renderRoot($output);
     $this->setRawContent($output);
-    $field_values = $this->xpath('//div[contains(@class, "views-field-id")]/span[contains(@class, :class)]/div', [':class' => 'field-content']);
+    $field_values = $this->getSimpleXmlElementsByXpath('//div[contains(@class, "views-field-id")]/span[contains(@class, :class)]/div', [':class' => 'field-content']);
     $this->assertNotEmpty($field_values);
   }
 

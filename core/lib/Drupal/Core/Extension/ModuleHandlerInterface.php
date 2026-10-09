@@ -126,10 +126,8 @@ interface ModuleHandlerInterface {
    *
    * Examples:
    * @code
-   *   // Load node.admin.inc from the node module.
-   *   $this->loadInclude('node', 'inc', 'node.admin');
-   *   // Load content_types.inc from the node module.
-   *   $this->loadInclude('node', 'inc', 'content_types');
+   *   // Load system.post_update.php from the System module.
+   *   $this->loadInclude('system', 'php', 'post_update');
    * @endcode
    *
    * @param string $module
@@ -186,6 +184,9 @@ interface ModuleHandlerInterface {
 
   /**
    * Invokes a hook in a particular module.
+   *
+   * This will execute multiple implementations as long as all returned values
+   * are void or an array. Arrays will be merged with NestedArray::mergeDeep.
    *
    * @param string $module
    *   The name of the module (without the .module extension).

@@ -4,7 +4,6 @@ namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraints\Length;
 
 /**
@@ -24,7 +23,6 @@ class LengthConstraint extends Length {
   /**
    * {@inheritdoc}
    */
-  #[HasNamedArguments]
   public function __construct(
     int|array|NULL $exactly = NULL,
     ?int $min = NULL,
@@ -38,9 +36,8 @@ class LengthConstraint extends Length {
     ?string $charsetMessage = NULL,
     ?array $groups = NULL,
     mixed $payload = NULL,
-    ?array $options = NULL,
   ) {
-    parent::__construct($exactly, $min, $max, $charset, $normalizer, $countUnit, $exactMessage, $minMessage, $maxMessage, $charsetMessage, $groups, $payload, $options);
+    parent::__construct($exactly, $min, $max, $charset, $normalizer, $countUnit, $exactMessage, $minMessage, $maxMessage, $charsetMessage, $groups, $payload);
   }
 
   /**

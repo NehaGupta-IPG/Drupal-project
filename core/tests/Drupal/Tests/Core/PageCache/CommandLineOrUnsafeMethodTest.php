@@ -10,6 +10,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -21,10 +22,8 @@ class CommandLineOrUnsafeMethodTest extends UnitTestCase {
 
   /**
    * The request policy under test.
-   *
-   * @var \Drupal\Core\PageCache\RequestPolicy\CommandLineOrUnsafeMethod|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $policy;
+  protected CommandLineOrUnsafeMethod&MockObject $policy;
 
   /**
    * {@inheritdoc}
@@ -45,7 +44,7 @@ class CommandLineOrUnsafeMethodTest extends UnitTestCase {
    * @legacy-covers ::check
    */
   #[DataProvider('providerTestHttpMethod')]
-  public function testHttpMethod($expected_result, $method): void {
+  public function testHttpMethod(?string $expected_result, string $method): void {
     $this->policy->expects($this->once())
       ->method('isCli')
       ->willReturn(FALSE);

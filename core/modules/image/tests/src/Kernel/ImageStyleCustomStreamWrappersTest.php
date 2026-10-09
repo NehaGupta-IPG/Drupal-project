@@ -37,18 +37,10 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
   protected $imageStyle;
 
   /**
-   * The file system service.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->fileSystem = $this->container->get('file_system');
     $this->config('system.file')
       ->set('default_scheme', 'public')
       ->set('allow_insecure_uploads', FALSE)
@@ -110,7 +102,7 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
    *   - The derivative expected stream wrapper scheme.
    *   - The stream wrapper service class.
    */
-  public static function providerTestCustomStreamWrappers() {
+  public static function providerTestCustomStreamWrappers(): array {
     return [
       ['public', 'public', PublicStream::class],
       ['private', 'private', PrivateStream::class],

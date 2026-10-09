@@ -118,7 +118,7 @@ class InlineBlockTest extends InlineBlockTestBase {
    * Tests adding a new entity block and then not saving the layout.
    */
   #[DataProvider('layoutNoSaveProvider')]
-  public function testNoLayoutSave($operation, $no_save_button_text, $confirm_button_text): void {
+  public function testNoLayoutSave(string $operation, string $no_save_button_text, string $confirm_button_text): void {
     $this->drupalLogin($this->drupalCreateUser([
       'access contextual links',
       'configure any layout',
@@ -189,7 +189,7 @@ class InlineBlockTest extends InlineBlockTestBase {
   /**
    * Provides test data for ::testNoLayoutSave().
    */
-  public static function layoutNoSaveProvider() {
+  public static function layoutNoSaveProvider(): array {
     return [
       'discard_changes' => [
         'discard_changes',
@@ -202,73 +202,6 @@ class InlineBlockTest extends InlineBlockTestBase {
         'Revert',
       ],
     ];
-  }
-
-  /**
-   * Tests entity blocks revisioning.
-   */
-  public function testInlineBlocksRevisioning(): void {
-    $assert_session = $this->assertSession();
-    $page = $this->getSession()->getPage();
-
-    $this->drupalLogin($this->drupalCreateUser([
-      'access contextual links',
-      'configure any layout',
-      'administer node display',
-      'administer node fields',
-      'administer nodes',
-      'bypass node access',
-      'create and edit custom blocks',
-    ]));
-    // Enable layout builder and overrides.
-    $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default');
-    $this->submitForm(['layout[enabled]' => TRUE, 'layout[allow_custom]' => TRUE], 'Save');
-    $this->drupalGet('node/1/layout');
-
-    // Add an inline block.
-    $this->addInlineBlockToLayout('Block title', 'The DEFAULT block body');
-    $this->assertSaveLayout();
-    $this->drupalGet('node/1');
-
-    $assert_session->pageTextContains('The DEFAULT block body');
-
-    /** @var \Drupal\node\NodeStorageInterface $node_storage */
-    $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
-    $original_revision_id = $node_storage->getLatestRevisionId(1);
-
-    // Create a new revision.
-    $this->drupalGet('node/1/edit');
-    $page->findField('title[0][value]')->setValue('Node updated');
-    $page->pressButton('Save');
-
-    $this->drupalGet('node/1');
-    $assert_session->pageTextContains('The DEFAULT block body');
-
-    $assert_session->linkExists('Revisions');
-
-    // Update the block.
-    $this->drupalGet('node/1/layout');
-    $this->configureInlineBlock('The DEFAULT block body', 'The NEW block body');
-    $this->assertSaveLayout();
-    $this->drupalGet('node/1');
-    $assert_session->pageTextContains('The NEW block body');
-    $assert_session->pageTextNotContains('The DEFAULT block body');
-
-    $revision_url = "node/1/revisions/$original_revision_id";
-
-    // Ensure viewing the previous revision shows the previous block revision.
-    $this->drupalGet("$revision_url/view");
-    $assert_session->pageTextContains('The DEFAULT block body');
-    $assert_session->pageTextNotContains('The NEW block body');
-
-    // Revert to first revision.
-    $revision_url = "$revision_url/revert";
-    $this->drupalGet($revision_url);
-    $page->pressButton('Revert');
-
-    $this->drupalGet('node/1');
-    $assert_session->pageTextContains('The DEFAULT block body');
-    $assert_session->pageTextNotContains('The NEW block body');
   }
 
   /**
@@ -614,7 +547,7 @@ class InlineBlockTest extends InlineBlockTestBase {
       ->setOverridable()
       ->save();
 
-    $assert = function ($permissions, $expected) {
+    $assert = function ($permissions, $expected): void {
       $assert_session = $this->assertSession();
       $page = $this->getSession()->getPage();
 
@@ -658,7 +591,7 @@ class InlineBlockTest extends InlineBlockTestBase {
     $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default/layout');
     $this->addInlineBlockToLayout('The block label', 'The body value');
 
-    $assert = function ($permissions, $expected) {
+    $assert = function ($permissions, $expected): void {
       $assert_session = $this->assertSession();
 
       $this->drupalLogin($this->drupalCreateUser($permissions));

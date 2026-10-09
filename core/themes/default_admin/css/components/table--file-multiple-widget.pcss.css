@@ -1,0 +1,10 @@
+/**
+ * @file
+ * Styles for multiple file widget table.
+ */
+
+.table-file-multiple-widget {
+  .tabledrag-cell {
+    padding-block: var(--admin-space-xs);
+  }
+}

@@ -3,12 +3,18 @@
 namespace Drupal\filter\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Template\Attribute;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\filter\FilterFormatRepositoryInterface;
 
 /**
  * Theme hooks for filter.
  */
 class FilterThemeHooks {
+
+  public function __construct(
+    protected AccountInterface $currentUser,
+    protected FilterFormatRepositoryInterface $formatRepository,
+  ) {}
 
   /**
    * Implements hook_theme().
@@ -21,7 +27,6 @@ class FilterThemeHooks {
           'tips' => NULL,
           'long' => FALSE,
         ],
-        'initial preprocess' => static::class . ':preprocessFilterTips',
       ],
       'text_format_wrapper' => [
         'variables' => [
@@ -61,7 +66,7 @@ class FilterThemeHooks {
     $format = $variables['format'];
     $variables['tips'] = [
       '#theme' => 'filter_tips',
-      '#tips' => _filter_tips($format->id()),
+      '#tips' => $this->getFilterTips($format->id()),
     ];
 
     // Add format id for filter.js.
@@ -89,51 +94,43 @@ class FilterThemeHooks {
   }
 
   /**
-   * Prepares variables for filter tips templates.
+   * Retrieves the filter tips.
    *
-   * Default template: filter-tips.html.twig.
+   * @param string|null $formatId
+   *   (optional) The ID of the text format for which to retrieve tips. If
+   *   omitted, will return tips for all formats accessible to the current user.
    *
-   * @param array $variables
-   *   An associative array containing:
-   *   - tips: An array containing descriptions and a CSS ID in the form of
-   *     'module-name/filter-id' (only used when $long is TRUE) for each
-   *     filter in one or more text formats. Example:
-   *     @code
-   *       [
-   *         'Full HTML' => [
-   *           0 => [
-   *             'tip' => 'Web page addresses and email addresses turn into links automatically.',
-   *             'id' => 'filter/2',
-   *           ],
-   *         ],
-   *       ];
-   *     @endcode
-   *   - long: (optional) Whether the passed-in filter tips contain extended
-   *     explanations, i.e. intended to be output on the path 'filter/tips'
-   *     (TRUE), or are in a short format, i.e. suitable to be displayed below a
-   *     form element. Defaults to FALSE.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is
-   *   no replacement.
-   *
-   * @see https://www.drupal.org/node/3567879
+   * @return array
+   *   An associative array of filtering tips, keyed by the filter name. Each
+   *   filtering tip is an associative array with elements:
+   *   - tip: Tip text.
+   *   - id: Filter ID.
    */
-  public function preprocessFilterTips(array &$variables): void {
-    $tips = $variables['tips'];
+  protected function getFilterTips(?string $formatId = NULL): array {
+    $formats = $this->formatRepository->getFormatsForAccount($this->currentUser);
 
-    foreach ($variables['tips'] as $name => $tip_list) {
-      foreach ($tip_list as $tip_key => $tip) {
-        $tip_list[$tip_key]['attributes'] = new Attribute();
-      }
+    $tips = [];
 
-      $variables['tips'][$name] = [
-        'attributes' => new Attribute(),
-        'name' => $name,
-        'list' => $tip_list,
-      ];
+    // If only listing one format, extract it from the $formats array.
+    if ($formatId !== NULL) {
+      $formats = [$formats[$formatId]];
     }
 
-    $variables['multiple'] = count($tips) > 1;
+    foreach ($formats as $format) {
+      foreach ($format->filters() as $name => $filter) {
+        if ($filter->status) {
+          $tip = $filter->tips();
+          if (isset($tip)) {
+            $tips[$format->label()][$name] = [
+              'tip' => ['#markup' => $tip],
+              'id' => $name,
+            ];
+          }
+        }
+      }
+    }
+
+    return $tips;
   }
 
 }
