@@ -7,6 +7,7 @@ namespace Drupal\Tests\Component\FrontMatter;
 use Drupal\Component\FrontMatter\Exception\FrontMatterParseException;
 use Drupal\Component\FrontMatter\FrontMatter;
 use Drupal\Component\Serialization\Yaml;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -18,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(FrontMatter::class)]
 #[Group('FrontMatter')]
 class FrontMatterTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * A basic source string.

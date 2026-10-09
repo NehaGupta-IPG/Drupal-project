@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests;
 
 use Drupal\TestTools\Extension\Dump\DebugDump;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -29,6 +30,8 @@ use Symfony\Component\VarDumper\VarDumper;
  * @see \Drupal\BuildTests\Framework\BuildTestBase
  */
 trait DrupalTestCaseTrait {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * Registers the dumper CLI handler when the DebugDump extension is enabled.

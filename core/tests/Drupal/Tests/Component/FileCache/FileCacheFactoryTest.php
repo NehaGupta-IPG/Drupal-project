@@ -8,6 +8,7 @@ use Drupal\Component\FileCache\FileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\FileCache\NullFileCache;
 use Drupal\Component\Utility\Random;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,6 +20,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(FileCacheFactory::class)]
 #[Group('FileCache')]
 class FileCacheFactoryTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * {@inheritdoc}

@@ -10,6 +10,7 @@ use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Tests\Component\Plugin\Fixtures\vegetable\Broccoli;
 use Drupal\Tests\Component\Plugin\Fixtures\vegetable\Corn;
 use Drupal\Tests\Component\Plugin\Fixtures\vegetable\VegetableInterface;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +21,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(DefaultFactory::class)]
 #[Group('Plugin')]
 class DefaultFactoryTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * Tests getPluginClass() with a valid array plugin definition.

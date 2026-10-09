@@ -6,6 +6,7 @@ namespace Drupal\Tests\Composer\Plugin\Unpack;
 
 use Composer\Semver\VersionParser;
 use Drupal\Composer\Plugin\RecipeUnpack\SemVer;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -17,6 +18,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SemVer::class)]
 #[Group('Unpack')]
 class SemVerTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * Tests minimize constraints.

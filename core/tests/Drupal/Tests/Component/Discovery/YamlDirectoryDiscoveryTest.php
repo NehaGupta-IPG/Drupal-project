@@ -7,6 +7,7 @@ namespace Drupal\Tests\Component\Discovery;
 use Drupal\Component\Discovery\DiscoveryException;
 use Drupal\Component\Discovery\YamlDirectoryDiscovery;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -18,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(YamlDirectoryDiscovery::class)]
 #[Group('Discovery')]
 class YamlDirectoryDiscoveryTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * {@inheritdoc}

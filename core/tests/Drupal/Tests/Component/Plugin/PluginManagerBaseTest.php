@@ -7,6 +7,7 @@ namespace Drupal\Tests\Component\Plugin;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\Mapper\MapperInterface;
 use Drupal\Component\Plugin\PluginManagerBase;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -21,6 +22,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 class PluginManagerBaseTest extends TestCase {
 
   use ProphecyTrait;
+  use ForwardCompatibilityTrait;
 
   /**
    * A callback method for mocking FactoryInterface objects.

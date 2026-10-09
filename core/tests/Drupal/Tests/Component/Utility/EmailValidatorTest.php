@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\EmailValidator;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -16,6 +17,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(EmailValidator::class)]
 #[Group('Utility')]
 class EmailValidatorTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * Tests is valid.
