@@ -14,7 +14,8 @@ const ckeditor5PluginMapping = {
  * Build the list of assets to be copied based on what exists in the filesystem.
  *
  * @param {string} packageFolder
- *   The path to node_modules folder.
+ *   The path to the node_modules folder, or to a folder containing CKEditor 5
+ *   packages built from source.
  *
  * @return {DrupalLibraryAsset[]}
  *  List of libraries and files to process.
@@ -23,7 +24,7 @@ module.exports = (packageFolder) => {
   const fileList = [];
   // Get all the CKEditor 5 packages.
   const ckeditor5Dirs = globSync(
-    `{${packageFolder}/@ckeditor/ckeditor5*,${packageFolder}/ckeditor5,${packageFolder}/ckeditor5*}`,
+    `{${packageFolder}/@ckeditor/ckeditor5*,${packageFolder}/ckeditor5*}`,
   ).sort();
   for (const ckeditor5package of ckeditor5Dirs) {
     // Add all the files in the build/ directory to the process array for
@@ -36,11 +37,10 @@ module.exports = (packageFolder) => {
       const pack = ckeditor5package.replace(`${packageFolder}/`, '');
       // Use the package name to generate the plugin name. There are some
       // exceptions that needs to be handled. Ideally remove the special cases.
-      const pluginName = pack
-        .replace('@ckeditor/ckeditor5-', '')
-        .replace(`ckeditor5-`, '');
+      // Packages built from source are not in the @ckeditor scope.
+      const pluginName = pack.replace(/^(@ckeditor\/)?ckeditor5-/, '');
       // Target folder in the vendor/assets folder.
-      let folder = `ckeditor5/${pluginName.replace('@ckeditor/ckeditor5-', '').replace('ckeditor5-', '')}`;
+      let folder = `ckeditor5/${pluginName}`;
       // Transform kebab-case to CamelCase.
       let library = pluginName.replace(/-./g, (match) => match[1].toUpperCase());
       // Special case for Drupal implementation.
@@ -53,7 +53,8 @@ module.exports = (packageFolder) => {
         library = `ckeditor5.${library}`;
       }
       fileList.push({
-        pack: process.env.CKEDITOR_PACKAGES_PATH ? ckeditor5package : pack,
+        // Use the absolute path, as the packages may not be in node_modules.
+        pack: ckeditor5package,
         library,
         folder,
         files: buildFiles.map((absolutePath) => ({

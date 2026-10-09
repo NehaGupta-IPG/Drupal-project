@@ -1,15 +1,17 @@
 /**
  * @file
  * Copy files for JS vendor dependencies from node_modules to the assets/vendor
- * folder.
+ * folder, and update their versions in core.libraries.yml.
  *
- * This script handles all dependencies except CKEditor, which require a custom
- * build step.
- *
- * For building unreleased CKEditor, clone the repository and follow their
- * instructions to build the packages with pnpm. Then run this script with the
- * CKEDITOR_PACKAGES_PATH environment variable pointing at the releases/npm
- * folder that outputs. Ensure there is no trailing slash on the path passed.
+ * CKEditor 5 LTS releases are not published to npm. To use one, clone
+ * https://github.com/drupal-ckeditor/ckeditor5 and check out the release tag.
+ * Build the packages with:
+ * @code
+ * pnpm install
+ * pnpm run release:prepare-packages --compile-only --ci
+ * @endcode
+ * Then run this script with the CKEDITOR_PACKAGES_PATH environment variable
+ * set to the release/npm folder created by the build.
  */
 
 const path = require('node:path');
@@ -21,6 +23,9 @@ const mapProcess = require('./assets/process/map');
 const coreFolder = path.resolve(__dirname, '../../');
 const packageFolder = `${coreFolder}/node_modules`;
 const assetsFolder = `${coreFolder}/assets/vendor`;
+const ckeditor5Folder = process.env.CKEDITOR_PACKAGES_PATH
+  ? path.resolve(process.env.CKEDITOR_PACKAGES_PATH)
+  : packageFolder;
 
 (async () => {
   const librariesPath = `${coreFolder}/core.libraries.yml`;
@@ -210,7 +215,7 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
     },
     // CKEditor 5 builds the list of files dynamically based on what exists
     // in the filesystem.
-    ...ckeditor5Files(process.env.CKEDITOR_PACKAGES_PATH || packageFolder),
+    ...ckeditor5Files(ckeditor5Folder),
   ];
 
   /**
@@ -240,6 +245,8 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
 
   for (const { pack, files = [], folder = false, library = false, process = {} } of ASSET_LIST) {
     const sourceFolder = pack;
+    // The package may be specified as an absolute path outside node_modules.
+    const sourcePath = path.resolve(packageFolder, pack);
     const libraryName = library || folder || pack;
     const destFolder = folder || pack;
     // Add a callback for map files by default.
@@ -248,16 +255,14 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
     // Update the library version in core.libraries.yml with the version
     // from the npm package.
     try {
-      const packageInfo = JSON.parse((await readFile(`${packageFolder}/${sourceFolder}/package.json`)).toString());
+      const packageInfo = JSON.parse((await readFile(`${sourcePath}/package.json`)).toString());
       updateLibraryVersion(libraryName, packageInfo);
     } catch (e) {
       // The package.json file doesn't exist, so nothing to do.
     }
 
     for (const file of files.map(normalizeFile)) {
-      const sourceFile = sourceFolder.startsWith('/')
-        ? `${sourceFolder}/${file.from}`
-        : `${packageFolder}/${sourceFolder}/${file.from}`;
+      const sourceFile = `${sourcePath}/${file.from}`;
       const destFile = `${assetsFolder}/${destFolder}/${file.to}`;
       const extension = path.extname(file.from);
 
