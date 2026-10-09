@@ -1,41 +1,47 @@
+/**
+ * @file
+ * Styling and normalization for dropbuttons.
+ */
+
 ((Drupal, once) => {
   /**
    * Normalizes the markup of the dropbutton. Some dropbuttons do not have the
-   * nested list heirarchy that indicates a dropdown. An example is the "View
+   * nested list hierarchy that indicates a dropdown. An example is the "View
    * <DISPLAY>" dropbutton within Views UI.
    *
    * @param {HTMLElement} el - The dropbutton wrapper element.
    */
   function init(el) {
+    // Exit if already in the correct format.
     if (
-      el.querySelectorAll(
+      !el.querySelector(
         '.dropbutton--multiple > .secondary-action:not(:has(ul.dropbutton__items))',
-      ).length
-    ) {
-      const dropdownItems = el.querySelectorAll(
-        '.dropbutton-toggle ~ li.dropbutton__item',
-      );
-      const toggleButtonItem = el.querySelector('li.dropbutton-toggle');
+      )
+    )
+      return;
 
-      const dropdownEl = document.createElement('li');
-      dropdownEl.classList.add(
-        'dropbutton__item',
-        'dropbutton-action',
-        'secondary-action',
-      );
-      dropdownEl.innerHTML = `<ul class="dropbutton__items"></ul>`;
-      const dropdown = dropdownEl.querySelector('ul.dropbutton__items');
+    const dropdownItems = el.querySelectorAll(
+      '.dropbutton-toggle ~ li.dropbutton__item',
+    );
+    const toggleButtonItem = el.querySelector('li.dropbutton-toggle');
 
-      dropdownItems.forEach((el) => {
-        el.querySelector('.button, .button--primary')?.classList.remove(
-          'button',
-          'button--primary',
-        );
-        dropdown.append(el);
-      });
+    const dropdownEl = document.createElement('li');
+    dropdownEl.classList.add(
+      'dropbutton__item',
+      'dropbutton-action',
+      'secondary-action',
+    );
+    dropdownEl.innerHTML = `<ul class="dropbutton__items"></ul>`;
+    const dropdown = dropdownEl.querySelector('ul.dropbutton__items');
 
-      toggleButtonItem?.after(dropdownEl);
-    }
+    dropdownItems.forEach((item) => {
+      item
+        .querySelector('.button, .button--primary')
+        ?.classList.remove('button', 'button--primary');
+      dropdown.append(item);
+    });
+
+    toggleButtonItem?.after(dropdownEl);
   }
 
   /**
@@ -46,7 +52,7 @@
    * @prop {Drupal~behaviorAttach} attach
    *   Normalizes the dropbutton markup.
    */
-  Drupal.behaviors.dropbuttonNormalize = {
+  Drupal.behaviors.adminDropbuttonNormalize = {
     attach(context) {
       once(
         'admin-dropbutton-normalize',
