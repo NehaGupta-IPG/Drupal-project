@@ -82,7 +82,7 @@
   --dropdown-padding: 4px;
 
   position: fixed;
-  z-index: 1; /* Appear above other dropbuttons. */
+  z-index: 502; /* Appear above table header, toolbar, and other dropbuttons. */
   display: none;
   overflow: auto;
   width: max-content;
@@ -108,6 +108,8 @@
       inset-inline-start: 0;
       inset-block-start: calc(100% + 2px);
       min-width: 100%;
+      position-area: none;
+      position-anchor: auto;
     }
   }
 
@@ -156,6 +158,8 @@
         inset-inline-start: 0;
         inset-block-start: calc(100% + 2px);
         min-width: 100%;
+        position-area: none;
+        position-anchor: auto;
       }
     }
   }
