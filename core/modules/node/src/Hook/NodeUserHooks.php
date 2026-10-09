@@ -73,7 +73,7 @@ class NodeUserHooks {
    * @return array<string, int[]>
    *   Node revision IDs (in ascending order).
    */
-  protected function userRevisionIdsGroupedByLanguage(AccountInterface $account) {
+  protected function userRevisionIdsGroupedByLanguage(AccountInterface $account): array {
     $nodeStorage = $this->entityTypeManager->getStorage('node');
     $query = $nodeStorage->getQuery()
       ->accessCheck(FALSE)
