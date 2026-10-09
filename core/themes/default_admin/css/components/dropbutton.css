@@ -119,6 +119,22 @@
   font-size: var(--dropbutton-font-size);
   overflow: auto;
 
+  @media (scripting: none) {
+    .dropbutton-wrapper:is(:hover, :focus-within) & {
+      position-anchor: --dropbutton-anchor;
+      position-area: bottom span-x-end;
+      position-try-fallbacks: flip-block;
+      display: block;
+
+      @supports not (anchor-scope: all) {
+        position: absolute;
+        inset-inline-start: 0;
+        inset-block-start: calc(100% + 2px);
+        min-width: 100%;
+      }
+    }
+  }
+
   .dropbutton-wrapper.open & {
     position-anchor: --dropbutton-anchor;
     position-area: bottom span-x-end;
