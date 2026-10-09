@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\user\AccountCancellation;
@@ -22,7 +23,7 @@ class NodeUserCancelTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'user', 'system', 'field'];
+  protected static $modules = ['node', 'user', 'system', 'field', 'language'];
 
   /**
    * {@inheritdoc}
@@ -32,6 +33,18 @@ class NodeUserCancelTest extends KernelTestBase {
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
     $this->installSchema('node', ['node_access']);
+    $this->installConfig(['language']);
+    // Create the anonymous user, so that Node::preSave() keeps it as the
+    // revision author of the reassigned revisions instead of replacing it with
+    // the node owner.
+    User::create(['uid' => 0, 'name' => ''])->save();
+    ConfigurableLanguage::createFromLangcode('es')->save();
+
+    NodeType::create([
+      'type' => 'test',
+      'name' => 'test',
+      'revision' => TRUE,
+    ])->save();
   }
 
   /**
@@ -41,13 +54,6 @@ class NodeUserCancelTest extends KernelTestBase {
     /** @var \Drupal\node\NodeStorageInterface $nodeStorage */
     $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
 
-    $nodeType = NodeType::create([
-      'type' => 'test',
-      'name' => 'test',
-      'revision' => TRUE,
-    ]);
-    $nodeType->save();
-
     $user1 = User::create(['name' => 'test user 1']);
     $user1->save();
     $user2 = User::create(['name' => 'test user 2']);
@@ -55,7 +61,7 @@ class NodeUserCancelTest extends KernelTestBase {
 
     $node = Node::create([
       'title' => 'test node',
-      'type' => $nodeType->id(),
+      'type' => 'test',
     ]);
 
     // Set to published to test 'user_cancel_reassign' does not unpublish.
@@ -95,6 +101,53 @@ class NodeUserCancelTest extends KernelTestBase {
     $this->assertEquals(0, $secondRevision->getOwnerId());
     $this->assertEquals($user2->id(), $secondRevision->getRevisionUserId());
     $this->assertTrue($secondRevision->isPublished());
+  }
+
+  /**
+   * Tests reassigning a translation owned by the cancelled user.
+   *
+   * The ownership of the other languages of the node must not change.
+   */
+  public function testCancelReassignTranslationOwner(): void {
+    $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
+
+    $user1 = User::create(['name' => 'test user 1']);
+    $user1->save();
+    $user2 = User::create(['name' => 'test user 2']);
+    $user2->save();
+
+    // Create the node as the second user and translate it as the first user.
+    $node = Node::create([
+      'title' => 'test node',
+      'type' => 'test',
+      'langcode' => 'en',
+      'uid' => $user2->id(),
+      'revision_uid' => $user2->id(),
+    ]);
+    $node->save();
+    $originalRevisionId = $node->getRevisionId();
+
+    $node->setNewRevision();
+    $node->addTranslation('es', [
+      'title' => 'test node es',
+      'uid' => $user1->id(),
+    ])
+      ->setRevisionUserId($user1->id())
+      ->save();
+    $translationRevisionId = $node->getRevisionId();
+
+    \Drupal::service(AccountCancellation::class)->cancel([], (int) $user1->id(), 'user_cancel_reassign');
+
+    /** @var \Drupal\node\NodeInterface $originalRevision */
+    $originalRevision = $nodeStorage->loadRevision($originalRevisionId);
+    $this->assertEquals($user2->id(), $originalRevision->getOwnerId());
+    $this->assertEquals($user2->id(), $originalRevision->getRevisionUserId());
+
+    /** @var \Drupal\node\NodeInterface $translationRevision */
+    $translationRevision = $nodeStorage->loadRevision($translationRevisionId);
+    $this->assertEquals($user2->id(), $translationRevision->getOwnerId());
+    $this->assertEquals(0, $translationRevision->getTranslation('es')->getOwnerId());
+    $this->assertEquals(0, $translationRevision->getRevisionUserId());
   }
 
 }
