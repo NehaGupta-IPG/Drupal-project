@@ -14,6 +14,7 @@ use Drupal\Core\Link;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Routing\Attribute\Route;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\ThemeAccessCheck;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -64,8 +65,9 @@ class SystemController extends ControllerBase {
     ],
   )]
   public function overview($link_id) {
-    // Check for status report errors.
-    if ($this->currentUser()->hasPermission('administer site configuration') && $this->systemManager->checkRequirements()) {
+    // Check for status report errors. This runs the requirements checks of all
+    // modules, which can be slow, so sites can turn it off in settings.php.
+    if (Settings::get('status_report_warning', TRUE) && $this->currentUser()->hasPermission('administer site configuration') && $this->systemManager->checkRequirements()) {
       $this->messenger()->addError($this->t('One or more problems were detected with your Drupal installation. Check the <a href=":status">status report</a> for more information.', [':status' => Url::fromRoute('system.status')->toString()]));
     }
     // Load all menu links below it.
