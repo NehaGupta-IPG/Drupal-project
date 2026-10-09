@@ -128,8 +128,8 @@
     @supports not (anchor-scope: all) {
       position: absolute;
       inset-inline-start: 0;
-      inset-block-start: 100%;
-      min-width: 12.5rem;
+      inset-block-start: calc(100% + 2px);
+      min-width: 100%;
     }
   }
 
