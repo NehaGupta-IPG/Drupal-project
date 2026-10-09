@@ -109,7 +109,7 @@ class YamlTest extends YamlTestBase {
    * Tests that missing constants cause exception.
    */
   public function testUndefinedConstant(): void {
-    $this->expectExceptionMessage('The constant "DOES_NOT_EXIST" is not defined');
+    $this->expectExceptionMessageIsOrContains('The constant "DOES_NOT_EXIST" is not defined');
     $yaml = <<<YAML
       foo:
         !php/const DOES_NOT_EXIST
