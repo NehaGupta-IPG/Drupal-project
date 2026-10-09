@@ -112,8 +112,8 @@ class StringFormatter extends FormatterBase {
     }
 
     $form['tag'] = [
-      '#title' => $this->t('Display as'),
       '#type' => 'select',
+      '#title' => $this->t('Display as'),
       '#options' => $this->getTagOptions(),
       '#empty_value' => '',
       '#default_value' => $this->getSetting('tag'),
@@ -138,8 +138,8 @@ class StringFormatter extends FormatterBase {
         default => $this->t('Linked to @link_template', ['@link_template' => $link_rel]),
       };
     }
-    $tag = $this->getTag();
-    $summary[] = $tag ? $this->t('Displayed as @tag', ['@tag' => $tag]) : $this->t('Displayed as plain text');
+    $tag = $this->getSetting('tag');
+    $summary[] = isset($this->getTagOptions()[$tag]) ? $this->t('Displayed as @tag', ['@tag' => $tag]) : $this->t('Displayed as plain text');
     return $summary;
   }
 
@@ -148,7 +148,7 @@ class StringFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
-    $tag = $this->getTag();
+    $tag = $this->getSetting('tag');
     $entity = $items->getEntity();
     $entity_type = $entity->getEntityType();
 
@@ -175,7 +175,9 @@ class StringFormatter extends FormatterBase {
         $elements[$delta] = $this->viewValue($item);
       }
 
-      if ($tag) {
+      // Formatter settings are not always validated before they are saved, so
+      // only add tags from the allowed list to the output.
+      if (isset($this->getTagOptions()[$tag])) {
         $elements[$delta]['#prefix'] = "<$tag>";
         $elements[$delta]['#suffix'] = "</$tag>";
       }
@@ -218,20 +220,6 @@ class StringFormatter extends FormatterBase {
       $options['h' . $level] = 'H' . $level;
     }
     return $options;
-  }
-
-  /**
-   * Returns the configured tag, or an empty string if it is not allowed.
-   *
-   * Formatter settings are not always validated before they are saved, so
-   * only tags from the allowed list are added to the output.
-   *
-   * @return string
-   *   The tag name, or an empty string to output the value unwrapped.
-   */
-  protected function getTag(): string {
-    $tag = $this->getSetting('tag');
-    return is_string($tag) && isset($this->getTagOptions()[$tag]) ? $tag : '';
   }
 
   /**
