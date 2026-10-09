@@ -3,8 +3,8 @@
 namespace Drupal\node;
 
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Defines the storage handler class for nodes.
