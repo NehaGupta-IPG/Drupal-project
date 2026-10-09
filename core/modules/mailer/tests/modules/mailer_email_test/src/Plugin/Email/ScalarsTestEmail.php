@@ -7,13 +7,14 @@ namespace Drupal\mailer_email_test\Plugin\Email;
 use Drupal\Core\Mailer\Attribute\Email;
 use Drupal\Core\Mailer\EmailPluginDefault;
 use Drupal\Core\Render\RenderableInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Scalars test email plugin.
  */
 #[Email(
   id: 'mailer_email_test.scalars',
-  default_subject: 'Scalar Params Test Email',
+  default_subject: new TranslatableMarkup('Scalar Params Test Email'),
 )]
 class ScalarsTestEmail extends EmailPluginDefault {
 
