@@ -76,8 +76,12 @@
   border: 2px solid var(--admin-color-primary);
   border-radius: var(--dropbutton-border-radius-size);
   box-shadow: 0 1px 2px var(--admin-color-primary-soft);
-  anchor-name: --my-anchor;
+  anchor-name: --dropbutton-anchor;
   anchor-scope: all;
+
+  @supports not (anchor-scope: all) {
+    position: relative;
+  }
 
   .dark-mode & {
     box-shadow: 0 4px 18px var(--admin-shadow-color-button);
@@ -104,6 +108,7 @@
   display: none;
   width: max-content;
   min-width: anchor-size(width);
+  max-height: 70dvh;
   margin: 0;
   padding: var(--dropdown-padding);
   list-style: none;
@@ -112,12 +117,20 @@
   background: var(--admin-color-bg-raised);
   box-shadow: var(--admin-shadow-2);
   font-size: var(--dropbutton-font-size);
+  overflow: auto;
 
   .dropbutton-wrapper.open & {
-    position-anchor: --my-anchor;
+    position-anchor: --dropbutton-anchor;
     position-area: bottom span-x-end;
     position-try-fallbacks: flip-block;
     display: block;
+
+    @supports not (anchor-scope: all) {
+      position: absolute;
+      inset-inline-start: 0;
+      inset-block-start: 100%;
+      min-width: 12.5rem;
+    }
   }
 
   /* Some dropdown item actions can be <input> elements. This can be seen on the "View <display>" dropbutton within Views UI. */
