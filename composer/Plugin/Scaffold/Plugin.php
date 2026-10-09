@@ -26,6 +26,39 @@ use Drupal\Composer\Plugin\Scaffold\CommandProvider as ScaffoldCommandProvider;
 class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
 
   /**
+   * Vendor files to add to the classmap, keyed by package name.
+   *
+   * These files are used before the class loader can use APCu, so adding them
+   * to the classmap avoids a filesystem lookup for each one. File paths are
+   * relative to the vendor directory.
+   *
+   * @see \Drupal\Core\DrupalKernel::boot()
+   * @see \Drupal\FunctionalTests\Bootstrap\BootstrapClassmapTest
+   */
+  const BOOTSTRAP_CLASSMAP = [
+    'symfony/http-foundation' => [
+      'symfony/http-foundation/Request.php',
+      'symfony/http-foundation/RequestStack.php',
+      'symfony/http-foundation/ParameterBag.php',
+      'symfony/http-foundation/FileBag.php',
+      'symfony/http-foundation/ServerBag.php',
+      'symfony/http-foundation/HeaderBag.php',
+      'symfony/http-foundation/HeaderUtils.php',
+    ],
+    'symfony/http-kernel' => [
+      'symfony/http-kernel/HttpKernel.php',
+      'symfony/http-kernel/HttpKernelInterface.php',
+      'symfony/http-kernel/TerminableInterface.php',
+    ],
+    'symfony/dependency-injection' => [
+      'symfony/dependency-injection/ContainerInterface.php',
+    ],
+    'psr/container' => [
+      'psr/container/src/ContainerInterface.php',
+    ],
+  ];
+
+  /**
    * The Composer service.
    *
    * @var \Composer\Composer
@@ -56,7 +89,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
   /**
    * {@inheritdoc}
    */
-  public function activate(Composer $composer, IOInterface $io) {
+  public function activate(Composer $composer, IOInterface $io): void {
     $this->composer = $composer;
     $this->io = $io;
     $this->requireWasCalled = FALSE;
@@ -65,26 +98,26 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
   /**
    * {@inheritdoc}
    */
-  public function deactivate(Composer $composer, IOInterface $io) {
+  public function deactivate(Composer $composer, IOInterface $io): void {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function uninstall(Composer $composer, IOInterface $io) {
+  public function uninstall(Composer $composer, IOInterface $io): void {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCapabilities() {
+  public function getCapabilities(): array {
     return [CommandProvider::class => ScaffoldCommandProvider::class];
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     // Important note: We only instantiate our handler on "post" events.
     return [
       ScriptEvents::POST_UPDATE_CMD => 'postCmd',
@@ -216,30 +249,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
     $autoload['classmap'] ??= [];
     // Check for packages used prior to the default classloader being able to
     // use APCu and optimize them if they're present.
-    // @see \Drupal\Core\DrupalKernel::boot()
-    if ($repository->findPackage('symfony/http-foundation', $constraint)) {
-      $autoload['classmap'] = array_merge($autoload['classmap'], [
-        $vendor_dir . '/symfony/http-foundation/Request.php',
-        $vendor_dir . '/symfony/http-foundation/RequestStack.php',
-        $vendor_dir . '/symfony/http-foundation/ParameterBag.php',
-        $vendor_dir . '/symfony/http-foundation/FileBag.php',
-        $vendor_dir . '/symfony/http-foundation/ServerBag.php',
-        $vendor_dir . '/symfony/http-foundation/HeaderBag.php',
-        $vendor_dir . '/symfony/http-foundation/HeaderUtils.php',
-      ]);
-    }
-    if ($repository->findPackage('symfony/http-kernel', $constraint)) {
-      $autoload['classmap'] = array_merge($autoload['classmap'], [
-        $vendor_dir . '/symfony/http-kernel/HttpKernel.php',
-        $vendor_dir . '/symfony/http-kernel/HttpKernelInterface.php',
-        $vendor_dir . '/symfony/http-kernel/TerminableInterface.php',
-      ]);
-    }
-    if ($repository->findPackage('symfony/dependency-injection', $constraint)) {
-      $autoload['classmap'][] = $vendor_dir . '/symfony/dependency-injection/ContainerInterface.php';
-    }
-    if ($repository->findPackage('psr/container', $constraint)) {
-      $autoload['classmap'][] = $vendor_dir . '/psr/container/src/ContainerInterface.php';
+    foreach (static::BOOTSTRAP_CLASSMAP as $package_name => $files) {
+      if ($repository->findPackage($package_name, $constraint)) {
+        foreach ($files as $file) {
+          $autoload['classmap'][] = $vendor_dir . '/' . $file;
+        }
+      }
     }
 
     $filesystem = new Filesystem();
