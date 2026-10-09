@@ -110,14 +110,20 @@
     display: block;
   }
 
-  :is(a, .button) {
+  /* Some dropdown item actions can be <input> elements. This can be seen on the "View <display>" dropbutton within Views UI. */
+  :is(a, input) {
     display: block;
     padding-block: var(--dropbutton-padding-block);
     padding-inline: calc(var(--dropbutton-padding-inline) - var(--dropdown-padding));
     border-radius: var(--dropbutton-border-radius-size);
     text-decoration: none;
     transition: var(--admin-transition);
+    color: var(--admin-color-link);
     -webkit-font-smoothing: antialiased;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: start;
 
     &:hover {
       background-color: var(--admin-color-primary-hover);
