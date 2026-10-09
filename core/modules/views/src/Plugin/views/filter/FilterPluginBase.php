@@ -1299,9 +1299,9 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         'operator' => $row['operator'],
         'value' => $row['value'],
         // These checkboxes should be hidden and only triggered by JavaScript.
-        // JavaScript. However, missing titles are planned to be deprecated by
+        // However, missing titles are planned to be deprecated by
         // https://drupal.org/i/933004, and the checkboxes are currently
-        // visible in Claro and Gin.
+        // visible in Default Admin.
         'remove' => [
           '#title' => $this->t('Remove'),
           '#title_display' => 'invisible',
