@@ -218,9 +218,15 @@ class StringFormatterTest extends KernelTestBase {
       $settings = ['tag' => $tag] + $formatter->getSettings();
       $this->assertCount(0, $typed_config->createFromNameAndData('field.formatter.settings.string', $settings)->validate());
     }
-    foreach (['p', 'script', '<h1>'] as $tag) {
+    // Invalid tags fail validation, and are ignored if saved regardless.
+    $entity = EntityTestRev::create([$this->fieldName => 'Value']);
+    foreach (['p', 'script', 'div class="x"'] as $tag) {
       $settings = ['tag' => $tag] + $formatter->getSettings();
       $this->assertCount(1, $typed_config->createFromNameAndData('field.formatter.settings.string', $settings)->validate());
+      $formatter->setSetting('tag', $tag);
+      $this->assertSame('Displayed as plain text', (string) $formatter->settingsSummary()[0]);
+      $elements = $formatter->viewElements($entity->{$this->fieldName}, 'en');
+      $this->assertSame('Value', (string) $this->container->get('renderer')->renderInIsolation($elements[0]));
     }
   }
 

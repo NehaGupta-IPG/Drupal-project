@@ -111,18 +111,10 @@ class StringFormatter extends FormatterBase {
       }
     }
 
-    $tag_options = [
-      'span' => 'span',
-      'div' => 'div',
-    ];
-    foreach (range(1, 6) as $level) {
-      $tag_options['h' . $level] = 'H' . $level;
-    }
-
     $form['tag'] = [
       '#title' => $this->t('Display as'),
       '#type' => 'select',
-      '#options' => $tag_options,
+      '#options' => $this->getTagOptions(),
       '#empty_value' => '',
       '#default_value' => $this->getSetting('tag'),
     ];
@@ -146,7 +138,7 @@ class StringFormatter extends FormatterBase {
         default => $this->t('Linked to @link_template', ['@link_template' => $link_rel]),
       };
     }
-    $tag = $this->getSetting('tag');
+    $tag = $this->getTag();
     $summary[] = $tag ? $this->t('Displayed as @tag', ['@tag' => $tag]) : $this->t('Displayed as plain text');
     return $summary;
   }
@@ -156,7 +148,7 @@ class StringFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
-    $tag = $this->getSetting('tag');
+    $tag = $this->getTag();
     $entity = $items->getEntity();
     $entity_type = $entity->getEntityType();
 
@@ -209,6 +201,37 @@ class StringFormatter extends FormatterBase {
       '#template' => '{{ value|nl2br }}',
       '#context' => ['value' => $item->value],
     ];
+  }
+
+  /**
+   * Returns the tags that can wrap each value.
+   *
+   * @return array<string, string>
+   *   Option labels, keyed by tag name.
+   */
+  protected function getTagOptions(): array {
+    $options = [
+      'span' => 'span',
+      'div' => 'div',
+    ];
+    foreach (range(1, 6) as $level) {
+      $options['h' . $level] = 'H' . $level;
+    }
+    return $options;
+  }
+
+  /**
+   * Returns the configured tag, or an empty string if it is not allowed.
+   *
+   * Formatter settings are not always validated before they are saved, so
+   * only tags from the allowed list are added to the output.
+   *
+   * @return string
+   *   The tag name, or an empty string to output the value unwrapped.
+   */
+  protected function getTag(): string {
+    $tag = $this->getSetting('tag');
+    return is_string($tag) && isset($this->getTagOptions()[$tag]) ? $tag : '';
   }
 
   /**
