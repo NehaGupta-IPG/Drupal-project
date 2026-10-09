@@ -11,20 +11,32 @@
   --dropbutton-padding-block: 10px;
   --dropbutton-padding-inline: 23px;
 
-  .no-touchevents &.dropbutton--small {
-    --dropbutton-font-size: var(--admin-font-size-xs);
-    --dropbutton-padding-block: 9px;
-    --dropbutton-padding-inline: 16px;
-    --dropbutton-height: 34px;
-    --dropbutton-border-radius-size: 6px;
+  @media (any-pointer: coarse) {
+    &.dropbutton--extrasmall {
+      --dropbutton-font-size: var(--admin-font-size-xs);
+      --dropbutton-padding-block: 9px;
+      --dropbutton-padding-inline: 16px;
+      --dropbutton-height: 34px;
+      --dropbutton-border-radius-size: 6px;
+    }
   }
 
-  .no-touchevents &.dropbutton--extrasmall {
-    --dropbutton-font-size: var(--admin-font-size-xs);
-    --dropbutton-padding-block: 5px;
-    --dropbutton-padding-inline: 10px;
-    --dropbutton-height: 24px;
-    --dropbutton-border-radius-size: 6px;
+  @media not (any-pointer: coarse) {
+    &.dropbutton--small {
+      --dropbutton-font-size: var(--admin-font-size-xs);
+      --dropbutton-padding-block: 9px;
+      --dropbutton-padding-inline: 16px;
+      --dropbutton-height: 34px;
+      --dropbutton-border-radius-size: 6px;
+    }
+
+    &.dropbutton--extrasmall {
+      --dropbutton-font-size: var(--admin-font-size-xs);
+      --dropbutton-padding-block: 5px;
+      --dropbutton-padding-inline: 10px;
+      --dropbutton-height: 28px; /* Necessary for toggle to meet minimum WCAG AA tap size. */
+      --dropbutton-border-radius-size: 6px;
+    }
   }
 }
 
