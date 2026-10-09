@@ -6,6 +6,8 @@ namespace Drupal\node\Hook;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeBulkUpdate;
 use Drupal\user\UserInterface;
@@ -21,6 +23,7 @@ class NodeUserHooks {
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected NodeBulkUpdate $nodeBulkUpdate,
+    protected LanguageManagerInterface $languageManager,
   ) {
   }
 
@@ -74,26 +77,18 @@ class NodeUserHooks {
    *   Node revision IDs (in ascending order).
    */
   protected function userRevisionIdsGroupedByLanguage(AccountInterface $account): array {
-    $nodeStorage = $this->entityTypeManager->getStorage('node');
-    $query = $nodeStorage->getQuery()
-      ->accessCheck(FALSE)
-      ->allRevisions()
-      ->condition('uid', $account->id())
-      ->sort('vid');
-    $revisionIds = array_keys($query->execute());
-
     $grouped = [];
-    foreach ($revisionIds as $revisionId) {
-      $revision = $nodeStorage->loadRevision($revisionId);
-      if ($revision) {
-        // The revision may have translations which are not authored by our
-        // user.
-        foreach ($revision->getTranslationLanguages() as $langcode => $language) {
-          $revisionInLanguage = $revision->getTranslation($langcode);
-          if ($revisionInLanguage->getOwnerId() == $account->id()) {
-            $grouped[$langcode][] = $revisionId;
-          }
-        }
+    // Restrict the owner condition to one language per query, so that only the
+    // translations owned by the user match.
+    foreach (array_keys($this->languageManager->getLanguages(LanguageInterface::STATE_ALL)) as $langcode) {
+      $revisionIds = $this->entityTypeManager->getStorage('node')->getQuery()
+        ->accessCheck(FALSE)
+        ->allRevisions()
+        ->condition('uid', $account->id(), '=', $langcode)
+        ->sort('vid')
+        ->execute();
+      if ($revisionIds) {
+        $grouped[$langcode] = array_keys($revisionIds);
       }
     }
 
