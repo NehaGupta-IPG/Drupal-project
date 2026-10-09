@@ -58,7 +58,6 @@
 
 /**
  * Dropbutton <ul>.
- * CSS Classes: dropbutton dropbutton--extrasmall dropbutton--multiple dropbutton--admin
  */
 .dropbutton {
   display: flex;
@@ -210,7 +209,7 @@
 /**
  * <li> in the first dropbutton list item (that looks like a button).
  *
- * Duplicates base button styles.
+ * Duplicates base button styles for nested element.
  */
 .dropbutton > .dropbutton__item:first-of-type {
   > *:not(.secondary-action) {
