@@ -26,6 +26,22 @@ class PhpContainer extends Container implements ContainerInterface {
   /**
    * {@inheritdoc}
    */
+  public function reset(): void {
+    // Keep synthetic services and the request stack, so that code still
+    // holding a reference to this container after a rebuild can use them.
+    $persist_services = [];
+    foreach ($this->services as $id => $service) {
+      if ($id === 'request_stack' || isset($this->syntheticIds[$id])) {
+        $persist_services[$id] = $service;
+      }
+    }
+    parent::reset();
+    $this->services = $persist_services;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function __sleep(): array {
     assert(FALSE, 'The container was serialized.');
     return array_keys(get_object_vars($this));
