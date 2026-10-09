@@ -83,6 +83,9 @@ class Section implements ThirdPartySettingsInterface {
    *   A renderable array representing the content of the section.
    */
   public function toRenderArray(array $contexts = [], $in_preview = FALSE) {
+    if ($this->getLayoutId() === 'layout_builder_blank') {
+      return [];
+    }
     $regions = [];
     foreach ($this->getComponents() as $component) {
       if ($output = $component->toRenderArray($contexts, $in_preview)) {
