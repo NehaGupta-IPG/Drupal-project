@@ -227,7 +227,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     if ($account->id() === $user->id()) {
       // The user is editing their own account, so they may view their own
       // roles.
-      $rolesViewAccess = $roles && $user->hasPermission('view own account details');
+      $rolesViewAccess = $roles && $user->hasPermission('view own roles');
       if (!$rolesEditAccess) {
         // Remove from the roles array any roles the user doesn't have to
         // prevent disclosing their existence.

@@ -311,9 +311,9 @@ class UserEditTest extends BrowserTestBase {
     $userWithoutAnyPermission = $this->drupalCreateUser();
     $userWithoutAnyPermission->addRole($roleWithoutAnyPermission)->save();
 
-    $roleWithViewOwnAccountDetailsPermission = $this->drupalCreateRole(['view own account details']);
-    $userWithViewOwnAccountDetailsPermission = $this->drupalCreateUser();
-    $userWithViewOwnAccountDetailsPermission->addRole($roleWithViewOwnAccountDetailsPermission)->save();
+    $roleWithViewOwnRolesPermission = $this->drupalCreateRole(['view own roles']);
+    $userWithViewOwnRolesPermission = $this->drupalCreateUser();
+    $userWithViewOwnRolesPermission->addRole($roleWithViewOwnRolesPermission)->save();
 
     $roleWithAdministerPermissionsPermission = $this->drupalCreateRole(['administer permissions']);
     $userWithAdministerPermissionsPermission = $this->drupalCreateUser();
@@ -324,16 +324,16 @@ class UserEditTest extends BrowserTestBase {
     $this->drupalGet("user/" . $userWithoutAnyPermission->id() . "/edit");
     $this->assertSession()->elementNotExists('css', '#edit-roles');
 
-    // Check that the user with view own account details permission can
+    // Check that the user with view own roles permission can
     // view the roles field.
-    $this->drupalLogin($userWithViewOwnAccountDetailsPermission);
-    $this->drupalGet("user/" . $userWithViewOwnAccountDetailsPermission->id() . "/edit");
+    $this->drupalLogin($userWithViewOwnRolesPermission);
+    $this->drupalGet("user/" . $userWithViewOwnRolesPermission->id() . "/edit");
     // They can view but not edit the authenticated role.
     $this->assertSession()->fieldExists(sprintf('roles[%s]', RoleInterface::AUTHENTICATED_ID));
     $this->assertSession()->fieldDisabled(sprintf('roles[%s]', RoleInterface::AUTHENTICATED_ID));
     // They can view but not edit their own role.
-    $this->assertSession()->fieldExists(sprintf('roles[%s]', $roleWithViewOwnAccountDetailsPermission));
-    $this->assertSession()->fieldDisabled(sprintf('roles[%s]', $roleWithViewOwnAccountDetailsPermission));
+    $this->assertSession()->fieldExists(sprintf('roles[%s]', $roleWithViewOwnRolesPermission));
+    $this->assertSession()->fieldDisabled(sprintf('roles[%s]', $roleWithViewOwnRolesPermission));
     // They can't view other roles.
     $this->assertSession()->fieldNotExists(sprintf('roles[%s]', $roleWithAdministerPermissionsPermission));
 
@@ -348,8 +348,8 @@ class UserEditTest extends BrowserTestBase {
     $this->assertSession()->fieldExists(sprintf('roles[%s]', $roleWithAdministerPermissionsPermission));
     $this->assertSession()->fieldEnabled(sprintf('roles[%s]', $roleWithAdministerPermissionsPermission));
     // They can view and edit other roles.
-    $this->assertSession()->fieldExists(sprintf('roles[%s]', $roleWithViewOwnAccountDetailsPermission));
-    $this->assertSession()->fieldEnabled(sprintf('roles[%s]', $roleWithViewOwnAccountDetailsPermission));
+    $this->assertSession()->fieldExists(sprintf('roles[%s]', $roleWithViewOwnRolesPermission));
+    $this->assertSession()->fieldEnabled(sprintf('roles[%s]', $roleWithViewOwnRolesPermission));
   }
 
 }

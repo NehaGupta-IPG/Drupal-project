@@ -483,8 +483,8 @@ class UserTest extends ResourceTestBase {
     $this->assertSame($this->account->uuid(), $doc['data']['2']['id']);
     $this->assertArrayNotHasKey('roles', $doc['data'][2]['relationships'] ?? [], "Own user--user.collection resource's 'roles' relationship is not visible.");
 
-    // Now grant permission to view own account details.
-    $this->grantPermissionsToTestedRole(['view own account details']);
+    // Now grant permission to view own roles.
+    $this->grantPermissionsToTestedRole(['view own roles']);
 
     // Check that the 'roles' relationship is now visible.
     $response = $this->request('GET', $user_url, $request_options);

@@ -155,7 +155,7 @@ class UserAccessControlHandler extends EntityAccessControlHandler {
 
       case 'roles':
         // Allow viewing the roles, but not editing them.
-        return AccessResult::allowedIf($operation == 'view' && $is_own_account && $account->hasPermission('view own account details'))
+        return AccessResult::allowedIf($operation == 'view' && $is_own_account && $account->hasPermission('view own roles'))
           ->cachePerPermissions()
           ->cachePerUser();
 
