@@ -6,6 +6,7 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -74,11 +75,6 @@ class LocalePluralFormatTest extends BrowserTestBase {
       'overwrite_options[not_customized]' => TRUE,
     ]);
 
-    // Reset static caches from locale_get_plural() to ensure we get fresh data.
-    drupal_static_reset('locale_get_plural');
-    drupal_static_reset('locale_get_plural:plurals');
-    drupal_static_reset('locale');
-
     // Expected plural translation strings for each plural index.
     $plural_strings = [
       // English is not imported in this case, so we assume built-in text
@@ -140,13 +136,12 @@ class LocalePluralFormatTest extends BrowserTestBase {
 
     foreach ($plural_tests as $langcode => $tests) {
       foreach ($tests as $count => $expected_plural_index) {
-        // Assert that the we get the right plural index.
-        $this->assertSame($expected_plural_index, locale_get_plural($count, $langcode), 'Computed plural index for ' . $langcode . ' for count ' . $count . ' is ' . $expected_plural_index);
-        // Assert that the we get the right translation for that. Change the
-        // expected index as per the logic for translation lookups.
+        // Assert that we get the right translation, which relies on the
+        // right plural index being computed. Change the expected index as
+        // per the logic for translation lookups.
         $expected_plural_index = ($count == 1) ? 0 : $expected_plural_index;
         $expected_plural_string = str_replace('@count', (string) $count, $plural_strings[$langcode][$expected_plural_index]);
-        $this->assertSame($expected_plural_string, \Drupal::translation()->formatPlural($count, '@count hour', '@count hours', [], ['langcode' => $langcode])->render(), 'Plural translation of @count hour / @count hours for count ' . $count . ' in ' . $langcode . ' is ' . $expected_plural_string);
+        $this->assertSame($expected_plural_string, \Drupal::translation()->formatPlural($count, '@count hour', '@count hours', [], ['langcode' => $langcode])->render(), 'Plural translation of @count hour / @count hours for count ' . $count . ' in ' . $langcode . ' using plural index ' . $expected_plural_index . ' is ' . $expected_plural_string);
         // DO NOT use translation to pass translated strings into
         // PluralTranslatableMarkup::createFromTranslatedString() this way. It
         // is designed to be used with *already* translated text like settings
@@ -172,6 +167,15 @@ class LocalePluralFormatTest extends BrowserTestBase {
 
     // Set French as the site default language.
     $this->config('system.site')->set('default_langcode', 'fr')->save();
+    // Switch the user display to show the created time as time ago, so the
+    // translatable string "seconds" is used.
+    EntityViewDisplay::collectRenderDisplay($this->adminUser, 'default')
+      ->setComponent('created', [
+        'label' => 'above',
+        'type' => 'timestamp_ago',
+        'weight' => 5,
+      ])
+      ->save();
 
     // Visit User Info page before updating translation strings. Change the
     // created time to ensure that the we're dealing in seconds and it can't be
