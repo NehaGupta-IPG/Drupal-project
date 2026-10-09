@@ -20,7 +20,7 @@
     --dropbutton-font-size: var(--admin-font-size-xs);
     --dropbutton-line-height: 0.75rem;
     --dropbutton-padding-block: 9px;
-    --dropbutton-padding-inline: 20px;
+    --dropbutton-padding-inline: 16px;
     --dropbutton-height: 34px;
     --dropbutton-border-radius-size: 6px;
   }
@@ -30,7 +30,7 @@
     --dropbutton-font-size: var(--admin-font-size-xs);
     --dropbutton-line-height: 0.75rem;
     --dropbutton-padding-block: 5px;
-    --dropbutton-padding-inline: 12px;
+    --dropbutton-padding-inline: 10px;
     --dropbutton-height: 24px;
     --dropbutton-border-radius-size: 6px;
   }
@@ -98,6 +98,7 @@
   margin: 0;
   padding: var(--dropdown-padding);
   list-style: none;
+  border: solid 1px transparent;
   border-radius: var(--admin-radius-l);
   background: var(--admin-color-bg-raised);
   box-shadow: var(--admin-shadow-2);
@@ -124,6 +125,10 @@
     padding-block: var(--dropbutton-padding-block);
     padding-inline: calc(var(--dropbutton-padding-inline) - var(--dropdown-padding));
     -webkit-font-smoothing: antialiased;
+
+    &:focus {
+      outline-offset: -2px;
+    }
 
     &:hover {
       background-color: var(--admin-color-primary-hover);
@@ -156,7 +161,7 @@
   height: 100%; /* Necessary for Safari (tested 26.2). */
   cursor: pointer;
   color: var(--admin-color-primary);
-  border: var(--dropbutton-border-size) solid transparent;
+  border: none;
   border-inline-start: var(--dropbutton-border-size) solid var(--admin-color-primary);
   background: none;
   aspect-ratio: 1;
@@ -191,6 +196,10 @@
     mask-repeat: no-repeat;
     mask-position: center center;
     mask-size: 0.75rem 0.75rem;
+
+    @media (forced-colors: active) {
+      background-color: buttonText;
+    }
   }
 
   .dropbutton-wrapper.open &::before {
