@@ -140,7 +140,7 @@ JS);
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    *   When the element doesn't exist.
    */
-  public function assertElementVisible($selector_type, $selector, ElementInterface $container = NULL) {
+  public function assertElementVisible($selector_type, $selector, ?ElementInterface $container = NULL) {
     $node = $this->findNode($selector_type, $selector, $container);
 
     $message = sprintf(
@@ -163,7 +163,7 @@ JS);
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    *   When the element doesn't exist.
    */
-  public function assertElementNotVisible($selector_type, $selector, ElementInterface $container = NULL) {
+  public function assertElementNotVisible($selector_type, $selector, ?ElementInterface $container = NULL) {
     $node = $this->findNode($selector_type, $selector, $container);
 
     $message = sprintf(
@@ -186,7 +186,7 @@ JS);
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    *   When the element doesn't exist.
    */
-  public function assertElementRequired($selector_type, $selector, ElementInterface $container = NULL) {
+  public function assertElementRequired($selector_type, $selector, ?ElementInterface $container = NULL) {
     $node = $this->findNode($selector_type, $selector, $container);
 
     $message = sprintf(
@@ -209,7 +209,7 @@ JS);
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    *   When the element doesn't exist.
    */
-  public function assertElementOptional($selector_type, $selector, ElementInterface $container = NULL) {
+  public function assertElementOptional($selector_type, $selector, ?ElementInterface $container = NULL) {
     $node = $this->findNode($selector_type, $selector, $container);
 
     $message = sprintf(
@@ -247,7 +247,7 @@ JS);
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    *   When the element doesn't exist.
    */
-  protected function findNode($selector_type, $selector, ElementInterface $container = NULL) {
+  protected function findNode($selector_type, $selector, ?ElementInterface $container = NULL) {
     $container = $container ?: $this->session->getPage();
     $node = $container->find($selector_type, $selector);
     if ($node === NULL) {
