@@ -6,7 +6,7 @@ namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\user\Entity\Role;
+use Drupal\user\AccountCancellation;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -45,19 +45,6 @@ class ModerationStateUserTest extends ModerationStateTestBase {
     // Enable translation for the current entity type and ensure the change is
     // picked up.
     \Drupal::service('content_translation.manager')->setEnabled('node', 'moderated_content', TRUE);
-
-    // Set the default user cancel method.
-    $this->config('user.settings')
-      ->set('cancel_method', 'user_cancel_reassign')
-      ->save();
-
-    // Add permissions to the admin account.
-    $role_ids = $this->adminUser->getRoles();
-    $role_id = reset($role_ids);
-    $role = Role::load($role_id);
-    $role->grantPermission('administer users');
-    $role->grantPermission('view any unpublished content');
-    $role->save();
   }
 
   /**
@@ -105,9 +92,7 @@ class ModerationStateUserTest extends ModerationStateTestBase {
     $this->assertUserNodeCount($user2->id(), 2, 'es', 'node_field_revision');
 
     // Cancel the account of the first user.
-    $this->drupalLogin($this->adminUser);
-    $this->drupalGet('user/' . $user1->id() . '/cancel');
-    $this->submitForm([], 'Confirm');
+    \Drupal::service(AccountCancellation::class)->cancel([], (int) $user1->id(), 'user_cancel_reassign');
 
     // Verify that the revision of the first user was assigned to the anonymous
     // user.
