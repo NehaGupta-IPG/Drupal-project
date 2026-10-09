@@ -223,24 +223,22 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     $roles = Role::loadMultiple();
     unset($roles[RoleInterface::ANONYMOUS_ID]);
     $roles = array_map(fn(RoleInterface $role) => Html::escape($role->label()), $roles);
-    $rolesViewAccess = $rolesEditAccess = ($roles && $user->hasPermission('administer permissions'));
-    if ($account->id() === $user->id()) {
-      // The user is editing their own account, so they may view their own
-      // roles.
-      $rolesViewAccess = $roles && $user->hasPermission('view own roles');
-      if (!$rolesEditAccess) {
-        // Remove from the roles array any roles the user doesn't have to
-        // prevent disclosing their existence.
-        $roles = array_intersect_key($roles, array_flip($user->getRoles()));
-      }
+    $roles_edit_access = $roles && $user->hasPermission('administer permissions');
+    $roles_view_access = FALSE;
+    // Users who cannot edit the roles may view their own roles, but not the
+    // other roles of the site.
+    if (!$roles_edit_access && !$register && $account->id() == $user->id()) {
+      $roles = array_intersect_key($roles, array_flip($account->getRoles()));
+      $roles_view_access = $roles && $user->hasPermission('view own roles');
     }
+
     $form['account']['roles'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Roles'),
       '#default_value' => (!$register ? $account->getRoles() : []),
       '#options' => $roles,
-      '#access' => $rolesViewAccess || $rolesEditAccess,
-      '#disabled' => !$rolesEditAccess,
+      '#access' => $roles_edit_access || $roles_view_access,
+      '#disabled' => !$roles_edit_access,
     ];
 
     // Special handling for the inevitable "Authenticated user" role.
