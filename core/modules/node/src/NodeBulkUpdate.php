@@ -104,10 +104,10 @@ class NodeBulkUpdate {
         $node->getTranslation($langcode)->$name = $value;
       }
     }
-    $originalSyncing = $node->isSyncing();
+    $original_syncing = $node->isSyncing();
     $node->setSyncing($syncing);
     $node->save();
-    $node->setSyncing($originalSyncing);
+    $node->setSyncing($original_syncing);
     return $node;
   }
 

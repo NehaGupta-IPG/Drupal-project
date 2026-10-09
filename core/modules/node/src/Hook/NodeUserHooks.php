@@ -52,14 +52,14 @@ class NodeUserHooks {
       // Since the translation revision creates a new record for each
       // language, we need to reassign the ownership in the context of
       // certain language, to not override author for other ones.
-      $revision_ids_by_language = $this->userRevisionIdsGroupedByLanguage($account);
-      foreach ($revision_ids_by_language as $language => $revision_ids) {
-        $this->nodeBulkUpdate->process($revision_ids, ['uid' => 0], $language, TRUE, TRUE, TRUE);
+      $revisionIdsByLanguage = $this->userRevisionIdsGroupedByLanguage($account);
+      foreach ($revisionIdsByLanguage as $language => $revisionIds) {
+        $this->nodeBulkUpdate->process($revisionIds, ['uid' => 0], $language, TRUE, TRUE, TRUE);
       }
       // Reassign revision authors.
-      $revision_ids = $this->userRevisionIdsByRevisionAuthor($account);
-      if (!empty($revision_ids)) {
-        $this->nodeBulkUpdate->process($revision_ids, ['revision_uid' => 0], NULL, TRUE, TRUE, TRUE);
+      $revisionIds = $this->userRevisionIdsByRevisionAuthor($account);
+      if (!empty($revisionIds)) {
+        $this->nodeBulkUpdate->process($revisionIds, ['revision_uid' => 0], NULL, TRUE, TRUE, TRUE);
       }
     }
   }
@@ -80,18 +80,18 @@ class NodeUserHooks {
       ->allRevisions()
       ->condition('uid', $account->id())
       ->sort('vid');
-    $revision_ids = array_keys($query->execute());
+    $revisionIds = array_keys($query->execute());
 
     $grouped = [];
-    foreach ($revision_ids as $revision_id) {
-      $revision = $nodeStorage->loadRevision($revision_id);
+    foreach ($revisionIds as $revisionId) {
+      $revision = $nodeStorage->loadRevision($revisionId);
       if ($revision) {
         // The revision may have translations which are not authored by our
         // user.
         foreach ($revision->getTranslationLanguages() as $langcode => $language) {
           $revisionInLanguage = $revision->getTranslation($langcode);
           if ($revisionInLanguage->getOwnerId() == $account->id()) {
-            $grouped[$langcode][] = $revision_id;
+            $grouped[$langcode][] = $revisionId;
           }
         }
       }
