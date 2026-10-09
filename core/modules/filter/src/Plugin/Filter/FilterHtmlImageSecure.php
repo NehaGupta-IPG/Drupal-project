@@ -85,7 +85,8 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
         $local_image_path = $local_dir . mb_substr($src, $base_path_length);
         $local_image_path = rawurldecode($local_image_path);
 
-        // Remove any query string before checking the file on disk.
+        // A query string is not part of the filename and would cause
+        // getimagesize() to fail even when the local image exists.
         $local_image_path = explode('?', $local_image_path, 2)[0];
 
         if (@getimagesize($local_image_path)) {
