@@ -38,25 +38,25 @@ class DriverModuleMissingDependenciesTest extends UnitTestCase {
     // Mock the container so we don't need to mock drupal_valid_test_ua().
     // @see \Drupal\Core\Extension\ExtensionDiscovery::scan()
     $container = $this->createMock(ContainerInterface::class);
-    $container->expects($this->any())
+    $container
       ->method('has')
       ->with('kernel')
       ->willReturn(TRUE);
-    $container->expects($this->any())
+    $container
       ->method('getParameter')
       ->with()
       ->willReturnMap([
-          ['install_profile', ''],
-          ['site.path', ''],
+        ['install_profile', ''],
+        ['site.path', ''],
       ]);
-    $container->expects($this->any())
+    $container
       ->method('get')
       ->with('extension.list.database_driver')
       ->willReturn(new DatabaseDriverList($root, 'database_driver', new NullBackend('database_driver')));
     \Drupal::setContainer($container);
 
     $this->expectException(UnknownExtensionException::class);
-    $this->expectExceptionMessage("The database_driver a_really_missing_module\dependent_driver does not exist.");
+    $this->expectExceptionMessageIs("The database_driver a_really_missing_module\dependent_driver does not exist.");
     $container->get('extension.list.database_driver')
       ->includeTestDrivers(TRUE)
       ->get('a_really_missing_module\\dependent_driver')

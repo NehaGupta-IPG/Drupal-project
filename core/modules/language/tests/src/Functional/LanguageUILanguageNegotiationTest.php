@@ -20,6 +20,7 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUser;
 use Drupal\user\Plugin\LanguageNegotiation\LanguageNegotiationUserAdmin;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -43,6 +44,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  * - blah-blah/admin/config: Tests the 404 page.
  */
 #[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LanguageUILanguageNegotiationTest extends BrowserTestBase {
 
   /**
@@ -258,7 +260,11 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
       ],
       // Default, browser language preference is not one of site's lang.
       [
-        'language_negotiation' => [LanguageNegotiationUrl::METHOD_ID, LanguageNegotiationBrowser::METHOD_ID, LanguageNegotiationSelected::METHOD_ID],
+        'language_negotiation' => [
+          LanguageNegotiationUrl::METHOD_ID,
+          LanguageNegotiationBrowser::METHOD_ID,
+          LanguageNegotiationSelected::METHOD_ID,
+        ],
         'path' => 'admin/config',
         'expect' => $default_string,
         'expected_method_id' => LanguageNegotiatorInterface::METHOD_ID,
@@ -275,7 +281,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     $definitions = \Drupal::languageManager()->getNegotiator()->getNegotiationMethods();
     // Enable only methods, which are either not limited to a specific language
     // type or are supporting the interface language type.
-    $language_interface_method_definitions = array_filter($definitions, function ($method_definition) {
+    $language_interface_method_definitions = array_filter($definitions, function (array $method_definition): bool {
       return !isset($method_definition['types']) || (isset($method_definition['types']) && in_array(LanguageInterface::TYPE_INTERFACE, $method_definition['types']));
     });
     $this->config('language.types')
@@ -417,7 +423,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
   /**
    * Runs common tests for the language user interface.
    */
-  protected function doRunTest($test): void {
+  protected function doRunTest(array $test): void {
     $test += ['path_options' => []];
     if (!empty($test['language_negotiation'])) {
       $method_weights = array_flip($test['language_negotiation']);

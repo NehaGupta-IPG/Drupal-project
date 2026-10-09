@@ -8,11 +8,13 @@ use Drupal\Core\Config\CachedStorage;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\StreamWrapper\PublicStream;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests CachedStorage operations.
  */
 #[Group('config')]
+#[RunTestsInSeparateProcesses]
 class CachedStorageTest extends ConfigStorageTestBase {
 
   /**
@@ -51,7 +53,7 @@ class CachedStorageTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function read($name) {
+  protected function read($name): array|object {
     $data = $this->cache->get($name);
     // Cache misses fall through to the underlying storage.
     return $data ? $data->data : $this->fileStorage->read($name);

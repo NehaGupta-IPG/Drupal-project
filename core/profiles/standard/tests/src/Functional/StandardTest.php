@@ -7,11 +7,14 @@ namespace Drupal\Tests\standard\Functional;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\standard\Traits\StandardTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Standard installation profile expectations.
  */
 #[Group('standard')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class StandardTest extends BrowserTestBase {
   use StandardTestTrait;
 

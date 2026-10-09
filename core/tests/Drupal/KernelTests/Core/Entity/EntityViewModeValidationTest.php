@@ -6,13 +6,18 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of entity_view_mode entities.
  */
 #[Group('Entity')]
 #[Group('Validation')]
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class EntityViewModeValidationTest extends ConfigEntityValidationTestBase {
 
   /**
@@ -23,8 +28,8 @@ class EntityViewModeValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
 
     $this->installConfig('user');
 

@@ -8,12 +8,14 @@ use Drupal\Core\Condition\ConditionPluginCollection;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\Condition\ConditionPluginCollection.
  */
 #[CoversClass(ConditionPluginCollection::class)]
 #[Group('Condition')]
+#[RunTestsInSeparateProcesses]
 class ConditionPluginCollectionTest extends KernelTestBase {
 
   /**
@@ -27,8 +29,6 @@ class ConditionPluginCollectionTest extends KernelTestBase {
 
   /**
    * Tests get configuration.
-   *
-   * @legacy-covers ::getConfiguration
    */
   public function testGetConfiguration(): void {
     // Include a condition that has custom configuration and a type mismatch on

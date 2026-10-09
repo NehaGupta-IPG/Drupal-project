@@ -25,8 +25,6 @@ class TrustedRedirectResponseTest extends UnitTestCase {
 
   /**
    * Tests set target url with internal url.
-   *
-   * @legacy-covers ::setTargetUrl
    */
   public function testSetTargetUrlWithInternalUrl(): void {
     $redirect_response = new TrustedRedirectResponse('/example');
@@ -37,8 +35,6 @@ class TrustedRedirectResponseTest extends UnitTestCase {
 
   /**
    * Tests set target url with untrusted url.
-   *
-   * @legacy-covers ::setTargetUrl
    */
   public function testSetTargetUrlWithUntrustedUrl(): void {
     $request_context = new RequestContext();
@@ -55,8 +51,6 @@ class TrustedRedirectResponseTest extends UnitTestCase {
 
   /**
    * Tests set target url with trusted url.
-   *
-   * @legacy-covers ::setTargetUrl
    */
   public function testSetTargetUrlWithTrustedUrl(): void {
     $redirect_response = new TrustedRedirectResponse('/example');
@@ -67,11 +61,9 @@ class TrustedRedirectResponseTest extends UnitTestCase {
 
   /**
    * Tests create from redirect response.
-   *
-   * @legacy-covers ::createFromRedirectResponse
    */
   #[DataProvider('providerCreateFromRedirectResponse')]
-  public function testCreateFromRedirectResponse($redirect_response): void {
+  public function testCreateFromRedirectResponse(RedirectResponse $redirect_response): void {
     $trusted_redirect_response = TrustedRedirectResponse::createFromRedirectResponse($redirect_response);
 
     // The trusted redirect response is always a CacheableResponseInterface
@@ -89,7 +81,7 @@ class TrustedRedirectResponseTest extends UnitTestCase {
    * @return array
    *   An array of test cases, each containing a redirect response instance.
    */
-  public static function providerCreateFromRedirectResponse() {
+  public static function providerCreateFromRedirectResponse(): array {
     return [
       'cacheable-with-tags' => [(new CacheableRedirectResponse('/example'))->addCacheableDependency((new CacheableMetadata())->addCacheTags(['foo']))],
       'cacheable-with-max-age-0' => [(new CacheableRedirectResponse('/example'))->addCacheableDependency((new CacheableMetadata())->setCacheMaxAge(0))],

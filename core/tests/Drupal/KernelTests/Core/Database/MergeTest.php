@@ -7,11 +7,13 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Query\InvalidMergeQueryException;
 use Drupal\Core\Database\Query\Merge;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the MERGE query builder.
  */
 #[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class MergeTest extends DatabaseTestBase {
 
   /**
@@ -231,7 +233,7 @@ class MergeTest extends DatabaseTestBase {
    */
   public function testMergeToString(): void {
     $this->expectException(\BadMethodCallException::class);
-    $this->expectExceptionMessage('The merge query can not be converted to a string');
+    $this->expectExceptionMessageIs('The merge query can not be converted to a string');
     (string) $this->connection->merge('test_people');
   }
 

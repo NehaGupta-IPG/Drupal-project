@@ -7,11 +7,13 @@ namespace Drupal\Tests\system\Functional\Render;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Functional test verifying that messages set in placeholders always appear.
  */
 #[Group('Render')]
+#[RunTestsInSeparateProcesses]
 class PlaceholderMessageTest extends BrowserTestBase {
 
   /**
@@ -31,7 +33,7 @@ class PlaceholderMessageTest extends BrowserTestBase {
    * Tests rendering of message placeholder.
    */
   public function testMessagePlaceholder(): void {
-    $messages_markup = '<div role="contentinfo" aria-label="Status message"';
+    $messages_markup = '<div role="status" aria-label="Status message"';
 
     $test_routes = [
       // Messages placeholder rendered first.

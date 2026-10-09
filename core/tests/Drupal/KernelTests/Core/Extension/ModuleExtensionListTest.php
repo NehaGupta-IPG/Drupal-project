@@ -8,18 +8,18 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\Extension\ModuleExtensionList.
  */
 #[CoversClass(ModuleExtensionList::class)]
 #[Group('Extension')]
+#[RunTestsInSeparateProcesses]
 class ModuleExtensionListTest extends KernelTestBase {
 
   /**
    * Tests get list.
-   *
-   * @legacy-covers ::getList
    */
   public function testGetList(): void {
     \Drupal::configFactory()->getEditable('core.extension')

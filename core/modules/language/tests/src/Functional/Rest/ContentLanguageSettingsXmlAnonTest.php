@@ -7,11 +7,13 @@ namespace Drupal\Tests\language\Functional\Rest;
 use Drupal\Tests\rest\Functional\AnonResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Content Language Settings Xml Anon.
  */
 #[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class ContentLanguageSettingsXmlAnonTest extends ContentLanguageSettingsResourceTestBase {
 
   use AnonResourceTestTrait;
@@ -25,7 +27,7 @@ class ContentLanguageSettingsXmlAnonTest extends ContentLanguageSettingsResource
   /**
    * {@inheritdoc}
    */
-  protected static $mimeType = 'text/xml; charset=UTF-8';
+  protected static $mimeType = 'text/xml; charset=utf-8';
 
   /**
    * {@inheritdoc}

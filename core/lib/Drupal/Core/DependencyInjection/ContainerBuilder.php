@@ -37,7 +37,7 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
    *   ContainerBuilder class should be fixed to allow setting synthetic
    *   services in a frozen builder.
    */
-  public function set($id, $service): void {
+  public function set(string $id, ?object $service): void {
     SymfonyContainer::set($id, $service);
   }
 
@@ -65,7 +65,7 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
   /**
    * {@inheritdoc}
    */
-  public function setParameter($name, $value): void {
+  public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value): void {
     if (strtolower($name) !== $name) {
       throw new \InvalidArgumentException("Parameter names must be lowercase: $name");
     }
@@ -78,6 +78,22 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
   public function __sleep(): array {
     assert(FALSE, 'The container was serialized.');
     return array_keys(get_object_vars($this));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function reset(): void {
+    $persist_services = [];
+    foreach (array_keys($this->services) as $id) {
+      $definition = $this->hasDefinition($id) ? $this->getDefinition($id) : NULL;
+
+      if ($id === 'request_stack' || $definition?->isSynthetic()) {
+        $persist_services[$id] = $this->services[$id];
+      }
+    }
+    parent::reset();
+    $this->services = $persist_services;
   }
 
 }

@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the timezone handling of datetime and datelist element types.
@@ -21,12 +22,8 @@ use PHPUnit\Framework\Attributes\Group;
  * tested in various ways for both element types.
  */
 #[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class TimezoneTest extends EntityKernelTestBase implements FormInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * The date used in tests.
@@ -88,7 +85,7 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
 
     $form['test1'] = [
       '#title' => 'No default date, #date_timezone present',
@@ -173,7 +170,7 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
     \Drupal::currentUser()->setAccount($user);
 
     // Set a reference date to use in tests.
-    $this->date = new DrupalDatetime('2000-01-01 12:00', NULL);
+    $this->date = new DrupalDatetime('2000-01-01 12:00');
 
     // Create arrays listing the dates and times of $this->date formatted
     // according to the various timezones of $this->timezones.
@@ -383,20 +380,20 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'test_datetime_elements';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
   }
 
 }

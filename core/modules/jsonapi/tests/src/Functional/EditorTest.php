@@ -12,11 +12,13 @@ use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\jsonapi\JsonApiSpec;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "Editor" config entity type.
  */
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class EditorTest extends ConfigEntityResourceTestBase {
 
   /**
@@ -66,7 +68,7 @@ class EditorTest extends ConfigEntityResourceTestBase {
         'filter_html' => [
           'status' => TRUE,
           'settings' => [
-            'allowed_html' => '<p> <a> <b> <lo>',
+            'allowed_html' => '<a> <b> <lo> <p>',
           ],
         ],
       ],
@@ -184,7 +186,7 @@ class EditorTest extends ConfigEntityResourceTestBase {
         'filter_html' => [
           'status' => TRUE,
           'settings' => [
-            'allowed_html' => '<p> <a> <b> <lo>',
+            'allowed_html' => '<a> <b> <lo> <p>',
           ],
         ],
       ],

@@ -13,16 +13,17 @@ use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the field rendering in views.
  *
- * @group field
- *
  * @todo Extend test coverage in #3046722.
- *
  * @see https://www.drupal.org/project/drupal/issues/3046722
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class HandlerFieldFieldTest extends KernelTestBase {
 
   use NodeCreationTrait;

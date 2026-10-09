@@ -7,11 +7,13 @@ namespace Drupal\Tests\navigation\Functional;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\content_moderation\Functional\ModerationStateTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the top bar behavior along with content moderation.
  */
 #[Group('navigation')]
+#[RunTestsInSeparateProcesses]
 class NavigationTopBarContentModerationTest extends ModerationStateTestBase {
 
   /**
@@ -30,8 +32,6 @@ class NavigationTopBarContentModerationTest extends ModerationStateTestBase {
 
   /**
    * Node used to check top bar options.
-   *
-   * @var \Drupal\node\NodeInterface
    */
   protected NodeInterface $node;
 

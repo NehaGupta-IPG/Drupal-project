@@ -23,12 +23,14 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore eins
 /**
  * Tests the functionality of all core data types.
  */
 #[Group('TypedData')]
+#[RunTestsInSeparateProcesses]
 class TypedDataTest extends KernelTestBase {
 
   use StringTranslationTrait;
@@ -60,7 +62,7 @@ class TypedDataTest extends KernelTestBase {
    *
    * @see \Drupal\Core\TypedData\TypedDataManager::create()
    */
-  protected function createTypedData($definition, $value = NULL, $name = NULL) {
+  protected function createTypedData($definition, $value = NULL, $name = NULL): TypedDataInterface {
     if (is_array($definition)) {
       $definition = DataDefinition::create($definition['type']);
     }
@@ -431,6 +433,7 @@ class TypedDataTest extends KernelTestBase {
     $this->assertSame([], $clone->getValue());
 
     // Test dealing with NULL items.
+    /** @var \Drupal\Core\TypedData\ListInterface $typed_data */
     $typed_data[] = NULL;
     $this->assertTrue($typed_data->isEmpty());
     $this->assertCount(1, $typed_data);
@@ -473,7 +476,7 @@ class TypedDataTest extends KernelTestBase {
     // Check that an all-pass filter leaves the list untouched.
     $value = ['zero', 'one'];
     $typed_data = $this->createTypedData(ListDataDefinition::create('string'), $value);
-    $typed_data->filter(function (TypedDataInterface $item) {
+    $typed_data->filter(function (TypedDataInterface $item): true {
       return TRUE;
     });
     $this->assertEquals(2, $typed_data->count());
@@ -485,7 +488,7 @@ class TypedDataTest extends KernelTestBase {
     // Check that a none-pass filter empties the list.
     $value = ['zero', 'one'];
     $typed_data = $this->createTypedData(ListDataDefinition::create('string'), $value);
-    $typed_data->filter(function (TypedDataInterface $item) {
+    $typed_data->filter(function (TypedDataInterface $item): false {
       return FALSE;
     });
     $this->assertEquals(0, $typed_data->count());
@@ -493,7 +496,7 @@ class TypedDataTest extends KernelTestBase {
     // Check that filtering correctly renumbers elements.
     $value = ['zero', 'one', 'two'];
     $typed_data = $this->createTypedData(ListDataDefinition::create('string'), $value);
-    $typed_data->filter(function (TypedDataInterface $item) {
+    $typed_data->filter(function (TypedDataInterface $item): bool {
       return $item->getValue() !== 'one';
     });
     $this->assertEquals(2, $typed_data->count());

@@ -208,7 +208,8 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
    *   to provide translatable markup to display as a message if an error
    *   occurs, or set this to false to disable error display.
    * @param string|null $reply
-   *   Optional email address to be used to answer.
+   *   (optional) The email address or addresses to set as the reply-to header.
+   *   The format must be the same as the $to parameter.
    * @param bool $send
    *   If TRUE, call an implementation of
    *   \Drupal\Core\Mail\MailInterface->mail() to deliver the message, and
@@ -228,9 +229,6 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
   public function doMail($module, $key, $to, $langcode, $params = [], $reply = NULL, $send = TRUE) {
     $site_config = $this->configFactory->get('system.site');
     $site_mail = $site_config->get('mail');
-    if (empty($site_mail)) {
-      $site_mail = ini_get('sendmail_from');
-    }
 
     // Bundle up the variables into a structured array for altering.
     $message = [
@@ -250,7 +248,7 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
     // Build the default headers.
     $headers = [
       'MIME-Version' => '1.0',
-      'Content-Type' => 'text/plain; charset=UTF-8; format=flowed; delsp=yes',
+      'Content-Type' => 'text/plain; charset=utf-8; format=flowed; delsp=yes',
       'Content-Transfer-Encoding' => '8Bit',
       'X-Mailer' => 'Drupal',
     ];

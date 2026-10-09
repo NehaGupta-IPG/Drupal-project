@@ -23,7 +23,7 @@ interface NodeStorageInterface extends ContentEntityStorageInterface {
    * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use an
    *   entity query instead.
    *
-   * @see https://www.drupal.org/node/3519185
+   * @see https://www.drupal.org/node/3519187
    */
   public function revisionIds(NodeInterface $node);
 
@@ -39,7 +39,7 @@ interface NodeStorageInterface extends ContentEntityStorageInterface {
    * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use an
    *    entity query instead.
    *
-   * @see https://www.drupal.org/node/3519185
+   * @see https://www.drupal.org/node/3519187
    */
   public function userRevisionIds(AccountInterface $account);
 
@@ -55,27 +55,9 @@ interface NodeStorageInterface extends ContentEntityStorageInterface {
    * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no
    *   replacement.
    *
-   * @see https://www.drupal.org/node/3519185
+   * @see https://www.drupal.org/node/3519187
    */
   public function countDefaultLanguageRevisions(NodeInterface $node);
-
-  /**
-   * Updates all nodes of one type to be of another type.
-   *
-   * @param string $old_type
-   *   The current node type of the nodes.
-   * @param string $new_type
-   *   The new node type of the nodes.
-   *
-   * @return int
-   *   The number of nodes whose node type field was modified.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3515214
-   */
-  public function updateType($old_type, $new_type);
 
   /**
    * Unsets the language for all nodes with the given language.

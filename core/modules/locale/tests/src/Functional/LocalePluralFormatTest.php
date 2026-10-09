@@ -6,15 +6,18 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore nmsgid nmsgstr heure heures jours lundi ponedjeljak
 /**
  * Tests plural handling for various languages.
  */
 #[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocalePluralFormatTest extends BrowserTestBase {
 
   /**
@@ -71,11 +74,6 @@ class LocalePluralFormatTest extends BrowserTestBase {
       'langcode' => 'hr',
       'overwrite_options[not_customized]' => TRUE,
     ]);
-
-    // Reset static caches from locale_get_plural() to ensure we get fresh data.
-    drupal_static_reset('locale_get_plural');
-    drupal_static_reset('locale_get_plural:plurals');
-    drupal_static_reset('locale');
 
     // Expected plural translation strings for each plural index.
     $plural_strings = [
@@ -138,13 +136,12 @@ class LocalePluralFormatTest extends BrowserTestBase {
 
     foreach ($plural_tests as $langcode => $tests) {
       foreach ($tests as $count => $expected_plural_index) {
-        // Assert that the we get the right plural index.
-        $this->assertSame($expected_plural_index, locale_get_plural($count, $langcode), 'Computed plural index for ' . $langcode . ' for count ' . $count . ' is ' . $expected_plural_index);
-        // Assert that the we get the right translation for that. Change the
-        // expected index as per the logic for translation lookups.
+        // Assert that we get the right translation, which relies on the
+        // right plural index being computed. Change the expected index as
+        // per the logic for translation lookups.
         $expected_plural_index = ($count == 1) ? 0 : $expected_plural_index;
         $expected_plural_string = str_replace('@count', (string) $count, $plural_strings[$langcode][$expected_plural_index]);
-        $this->assertSame($expected_plural_string, \Drupal::translation()->formatPlural($count, '@count hour', '@count hours', [], ['langcode' => $langcode])->render(), 'Plural translation of @count hour / @count hours for count ' . $count . ' in ' . $langcode . ' is ' . $expected_plural_string);
+        $this->assertSame($expected_plural_string, \Drupal::translation()->formatPlural($count, '@count hour', '@count hours', [], ['langcode' => $langcode])->render(), 'Plural translation of @count hour / @count hours for count ' . $count . ' in ' . $langcode . ' using plural index ' . $expected_plural_index . ' is ' . $expected_plural_string);
         // DO NOT use translation to pass translated strings into
         // PluralTranslatableMarkup::createFromTranslatedString() this way. It
         // is designed to be used with *already* translated text like settings
@@ -170,6 +167,15 @@ class LocalePluralFormatTest extends BrowserTestBase {
 
     // Set French as the site default language.
     $this->config('system.site')->set('default_langcode', 'fr')->save();
+    // Switch the user display to show the created time as time ago, so the
+    // translatable string "seconds" is used.
+    EntityViewDisplay::collectRenderDisplay($this->adminUser, 'default')
+      ->setComponent('created', [
+        'label' => 'above',
+        'type' => 'timestamp_ago',
+        'weight' => 5,
+      ])
+      ->save();
 
     // Visit User Info page before updating translation strings. Change the
     // created time to ensure that the we're dealing in seconds and it can't be
@@ -397,13 +403,13 @@ class LocalePluralFormatTest extends BrowserTestBase {
   /**
    * Returns a .po file with a simple plural formula.
    */
-  public function getPoFileWithSimplePlural() {
+  public function getPoFileWithSimplePlural(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 
@@ -425,13 +431,13 @@ EOF;
   /**
    * Returns a .po file with a complex plural formula.
    */
-  public function getPoFileWithComplexPlural() {
+  public function getPoFileWithComplexPlural(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\\n"
 
@@ -449,13 +455,13 @@ EOF;
   /**
    * Returns a .po file with a missing plural formula.
    */
-  public function getPoFileWithMissingPlural() {
+  public function getPoFileWithMissingPlural(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 
 msgid "Monday"
@@ -466,13 +472,13 @@ EOF;
   /**
    * Returns a .po file with a broken plural formula.
    */
-  public function getPoFileWithBrokenPlural() {
+  public function getPoFileWithBrokenPlural(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: broken, will not parse\\n"
 

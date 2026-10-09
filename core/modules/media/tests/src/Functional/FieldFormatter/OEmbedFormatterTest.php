@@ -14,6 +14,7 @@ use Drupal\Tests\media\Traits\OEmbedTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Schipulcon
 
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[Group('media')]
 #[Group('#slow')]
 #[CoversClass(OEmbedFormatter::class)]
+#[RunTestsInSeparateProcesses]
 class OEmbedFormatterTest extends MediaFunctionalTestBase {
 
   use OEmbedTestTrait;
@@ -51,7 +53,7 @@ class OEmbedFormatterTest extends MediaFunctionalTestBase {
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
   }
@@ -64,7 +66,7 @@ class OEmbedFormatterTest extends MediaFunctionalTestBase {
    * @return array
    *   An array of test data.
    */
-  public static function providerRender() {
+  public static function providerRender(): array {
     return [
       'Vimeo video' => [
         'https://vimeo.com/7073899',
@@ -196,7 +198,7 @@ class OEmbedFormatterTest extends MediaFunctionalTestBase {
    *   Indicator if the HTML element is self closing i.e. <p/> vs <p></p>.
    */
   #[DataProvider('providerRender')]
-  public function testRender($url, $resource_url, array $formatter_settings, array $selectors, bool $self_closing): void {
+  public function testRender(string $url, string $resource_url, array $formatter_settings, array $selectors, bool $self_closing): void {
     $account = $this->drupalCreateUser(['view media']);
     $this->drupalLogin($account);
 

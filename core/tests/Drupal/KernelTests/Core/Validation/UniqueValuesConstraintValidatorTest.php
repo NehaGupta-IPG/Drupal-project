@@ -10,12 +10,14 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the unique field value validation constraint.
  */
 #[CoversClass(UniqueFieldValueValidator::class)]
 #[Group('Validation')]
+#[RunTestsInSeparateProcesses]
 class UniqueValuesConstraintValidatorTest extends KernelTestBase {
   use UserCreationTrait;
 
@@ -52,7 +54,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
   public function testValidation(): void {
     // Create entity with two values for the testing field.
     $definition = [
-      'id' => (int) rand(0, getrandmax()),
+      'id' => rand(0, getrandmax()),
       'user_id' => 0,
       'field_test_text' => [
         'text1',
@@ -68,7 +70,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
 
     // Create another entity with two values for the testing field.
     $definition = [
-      'id' => (int) rand(0, getrandmax()),
+      'id' => rand(0, getrandmax()),
       'user_id' => 0,
       'field_test_text' => [
         'text3',
@@ -92,7 +94,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
 
     // Create another entity with two values, but one value is existing.
     $definition = [
-      'id' => (int) rand(0, getrandmax()),
+      'id' => rand(0, getrandmax()),
       'user_id' => 0,
       'field_test_text' => [
         'text5',
@@ -308,7 +310,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
   public function testValidationCaseInsensitive(): void {
     // Create entity with two values for the testing field.
     $definition = [
-      'id' => (int) rand(0, getrandmax()),
+      'id' => rand(0, getrandmax()),
       'user_id' => 0,
       'field_test_text' => [
         'text1',
@@ -322,7 +324,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
     // identical to other value, but with different capitalization which should
     // still trigger a validation error.
     $definition = [
-      'id' => (int) rand(0, getrandmax()),
+      'id' => rand(0, getrandmax()),
       'user_id' => 0,
       'field_test_text' => [
         'Text1',

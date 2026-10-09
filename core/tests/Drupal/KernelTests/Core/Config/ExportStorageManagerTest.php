@@ -9,12 +9,14 @@ use Drupal\Core\Config\StorageTransformerException;
 use Drupal\Core\Lock\NullLockBackend;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore arrr
 /**
  * Tests the export storage manager.
  */
 #[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ExportStorageManagerTest extends KernelTestBase {
 
   /**
@@ -99,7 +101,7 @@ class ExportStorageManagerTest extends KernelTestBase {
     );
 
     $this->expectException(StorageTransformerException::class);
-    $this->expectExceptionMessage("Cannot acquire config export transformer lock.");
+    $this->expectExceptionMessageIs("Cannot acquire config export transformer lock.");
     $manager->getStorage();
   }
 

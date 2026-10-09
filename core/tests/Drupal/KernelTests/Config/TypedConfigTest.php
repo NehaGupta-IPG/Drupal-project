@@ -13,6 +13,7 @@ use Drupal\Core\TypedData\Type\IntegerInterface;
 use Drupal\Core\TypedData\Type\StringInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -21,6 +22,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  * Tests config validation mechanism.
  */
 #[Group('Config')]
+#[RunTestsInSeparateProcesses]
 class TypedConfigTest extends KernelTestBase {
 
   /**
@@ -31,7 +33,7 @@ class TypedConfigTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $configSchemaCheckerExclusions = ['config_test.validation'];
+  protected static array $configSchemaCheckerExclusions = ['config_test.validation'];
 
   /**
    * {@inheritdoc}
@@ -98,7 +100,22 @@ class TypedConfigTest extends KernelTestBase {
     $typed_config_manager = \Drupal::service('config.typed');
     $typed_config = $typed_config_manager->createFromNameAndData('config_test.validation', \Drupal::configFactory()->get('config_test.validation')->get());
     $this->assertInstanceOf(TypedConfigInterface::class, $typed_config);
-    $this->assertEquals(['_core', 'llama', 'cat', 'giraffe', 'uuid', 'string__not_blank', 'host'], array_keys($typed_config->getElements()));
+    $this->assertEquals([
+      '_core',
+      'llama',
+      'cat',
+      'giraffe',
+      'uuid',
+      'string__not_blank',
+      'host',
+      'block_id',
+      'block_revision_id',
+      'block_serialized',
+      'composite',
+      'string_concat_value_1',
+      'string_concat_value_2',
+      'string_concat_values',
+    ], array_keys($typed_config->getElements()));
     $this->assertSame('config_test.validation', $typed_config->getName());
     $this->assertSame('config_test.validation', $typed_config->getPropertyPath());
     $this->assertSame('config_test.validation.llama', $typed_config->get('llama')->getPropertyPath());
@@ -112,7 +129,21 @@ class TypedConfigTest extends KernelTestBase {
 
     $typed_config = $typed_config_manager->createFromNameAndData($config_test_entity->getConfigDependencyName(), $config_test_entity->toArray());
     $this->assertInstanceOf(TypedConfigInterface::class, $typed_config);
-    $this->assertEquals(['uuid', 'langcode', 'status', 'dependencies', 'id', 'label', 'weight', 'style', 'size', 'size_value', 'protected_property'], array_keys($typed_config->getElements()));
+    $this->assertEquals(
+      [
+        'uuid',
+        'langcode',
+        'status',
+        'dependencies',
+        'id',
+        'label',
+        'weight',
+        'style',
+        'size',
+        'size_value',
+        'protected_property',
+      ],
+      array_keys($typed_config->getElements()));
   }
 
   /**

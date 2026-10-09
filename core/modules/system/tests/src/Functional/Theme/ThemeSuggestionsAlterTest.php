@@ -8,11 +8,13 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests theme suggestion alter hooks.
  */
 #[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class ThemeSuggestionsAlterTest extends BrowserTestBase {
 
   /**
@@ -40,8 +42,8 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
     $this->drupalGet('theme-test/suggestion-provided');
     $this->assertSession()->pageTextContains('Template for testing suggestions provided by the module declaring the theme hook.');
 
-    // Install test_theme, it contains a template suggested by theme_test.module
-    // in theme_test_theme_suggestions_theme_test_suggestion_provided().
+    // Install test_theme, it contains a template suggested by
+    // \Drupal\theme_test\Hook\ThemeTestHooks::themeSuggestionsThemeTestSuggestionProvided().
     $this->config('system.theme')
       ->set('default', 'test_theme')
       ->save();
@@ -56,7 +58,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
   #[IgnoreDeprecations]
   public function testDeprecatedTemplateSuggestions(): void {
 
-    $this->expectDeprecation('Theme suggestion theme_test_suggestion_provided__deprecated is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. This is a test.');
+    $this->expectUserDeprecationMessage('Theme suggestion theme_test_suggestion_provided__deprecated is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. This is a test.');
 
     \Drupal::service('theme_installer')->install(['test_deprecated_suggestion_theme']);
 
@@ -174,8 +176,8 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
       'theme_suggestions_test_theme_suggestions_theme_test_suggestions_alter() executed.',
       'theme_test_theme_suggestions_alter() executed for theme_test_suggestions.',
       'theme_test_theme_suggestions_theme_test_suggestions_alter() executed.',
-      'test_theme_theme_suggestions_alter() executed.',
-      'test_theme_theme_suggestions_theme_test_suggestions_alter() executed.',
+      'Drupal\test_theme\Hook\TestThemeHooks::themeSuggestionsAlter() executed.',
+      'Drupal\test_theme\Hook\TestThemeHooks::themeSuggestionsThemeTestSuggestionsAlter() executed.',
     ];
     $content = preg_replace('/\s+/', ' ', Xss::filter($this->getSession()->getPage()->getContent(), []));
     $order = 0;

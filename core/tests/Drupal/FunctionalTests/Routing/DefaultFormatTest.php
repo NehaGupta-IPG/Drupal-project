@@ -6,17 +6,19 @@ namespace Drupal\FunctionalTests\Routing;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Default Format.
  */
 #[Group('routing')]
+#[RunTestsInSeparateProcesses]
 class DefaultFormatTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system', 'default_format_test'];
+  protected static $modules = ['system', 'default_format_test', 'page_cache'];
 
   /**
    * {@inheritdoc}

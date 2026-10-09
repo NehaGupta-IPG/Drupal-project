@@ -15,18 +15,22 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Node Translation UI.
  */
 #[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeTranslationUITest extends ContentTranslationUITestBase {
 
   use LanguageTestTrait;
   use CommentTestTrait;
+  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -151,7 +155,16 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
    * {@inheritdoc}
    */
   protected function getAdministratorPermissions(): array {
-    return array_merge(parent::getAdministratorPermissions(), ['access administration pages', 'administer content types', 'administer node fields', 'access content overview', 'bypass node access', 'administer languages', 'administer themes', 'view the administration theme']);
+    return array_merge(parent::getAdministratorPermissions(), [
+      'access administration pages',
+      'administer content types',
+      'administer node fields',
+      'access content overview',
+      'bypass node access',
+      'administer languages',
+      'administer themes',
+      'view the administration theme',
+    ]);
   }
 
   /**
@@ -250,12 +263,12 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     $article = $this->drupalCreateNode(['type' => 'article', 'langcode' => $this->langcodes[0]]);
 
     // Set up the default admin theme and use it for node editing.
-    $this->container->get('theme_installer')->install(['claro']);
-    $this->config('system.theme')->set('admin', 'claro')->save();
+    $this->container->get('theme_installer')->install(['default_admin']);
+    $this->config('system.theme')->set('admin', 'default_admin')->save();
 
     // Verify that translation uses the admin theme if edit is admin.
     $this->drupalGet('node/' . $article->id() . '/translations');
-    $this->assertSession()->responseContains('core/themes/claro/css/base/elements.css');
+    $this->assertSession()->responseContains('core/themes/default_admin/css/base/elements.css');
 
     // Turn off admin theme for editing, assert inheritance to translations.
     $this->config('node.settings')->set('use_admin_theme', FALSE)->save();
@@ -264,7 +277,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
 
     // Verify that translation uses the frontend theme if edit is frontend.
     $this->drupalGet('node/' . $article->id() . '/translations');
-    $this->assertSession()->responseNotContains('core/themes/claro/css/base/elements.css');
+    $this->assertSession()->responseNotContains('core/themes/default_admin/css/base/elements.css');
 
     // Assert presence of translation page itself (vs. DisabledBundle below).
     $this->assertSession()->statusCodeEquals(200);
@@ -327,13 +340,16 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     }
     $node->save();
 
-    // Test that the frontpage view displays the correct translations.
+    // Test that the promoted content view displays the correct translations.
     \Drupal::service('module_installer')->install(['views'], TRUE);
     $this->rebuildContainer();
+
+    $this->enablePromotedContentView();
+
     $this->doTestTranslations('node', $values);
 
     // Enable the translation language renderer.
-    $view = \Drupal::entityTypeManager()->getStorage('view')->load('frontpage');
+    $view = \Drupal::entityTypeManager()->getStorage('view')->load('promoted_content');
     $display = &$view->getDisplay('default');
     $display['display_options']['rendering_language'] = '***LANGUAGE_entity_translation***';
     $view->save();
@@ -357,7 +373,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
         $expected_href = $base_path . $langcode . '/' . $node_href;
       }
       $pattern = '|^' . $expected_href . '$|';
-      foreach ($this->xpath("//a[text()='Read more']") as $link) {
+      foreach ($this->getNodeElementsByXpath("//a[text()='Read more']") as $link) {
         if (preg_match($pattern, $link->getAttribute('href'), $matches) == TRUE) {
           $num_match_found++;
         }
@@ -379,7 +395,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
         $expected_href = $base_path . $langcode . '/' . $comment_form_href;
       }
       $pattern = '|^' . $expected_href . '$|';
-      foreach ($this->xpath("//a[text()='Add new comment']") as $link) {
+      foreach ($this->getNodeElementsByXpath("//a[text()='Add new comment']") as $link) {
         if (preg_match($pattern, $link->getAttribute('href'), $matches) == TRUE) {
           $num_match_found++;
         }
@@ -609,68 +625,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
       $this->drupalGet("{$this->langcodes[2]}/admin/content");
       $this->assertSession()->linkByHrefExists("{$this->langcodes[2]}/node/{$article->id()}");
     }
-  }
-
-  /**
-   * Test deletion of translated content from search and index rebuild.
-   */
-  public function testSearchIndexRebuildOnTranslationDeletion(): void {
-    \Drupal::service('module_installer')->install(['search']);
-    $admin_user = $this->drupalCreateUser([
-      'administer site configuration',
-      'access administration pages',
-      'administer content types',
-      'delete content translations',
-      'administer content translation',
-      'translate any entity',
-      'administer search',
-      'search content',
-      'delete any article content',
-    ]);
-    $this->drupalLogin($admin_user);
-
-    // Create a node.
-    $node = $this->drupalCreateNode([
-      'type' => $this->bundle,
-    ]);
-
-    // Add a French translation.
-    $translation = $node->addTranslation('fr');
-    $translation->title = 'First rev fr title';
-    $translation->setNewRevision(FALSE);
-    $translation->save();
-
-    // Check if 1 page is listed for indexing.
-    $this->drupalGet('admin/config/search/pages');
-    $this->assertSession()->pageTextContains('There is 1 item left to index.');
-
-    // Run cron.
-    $this->drupalGet('admin/config/system/cron');
-    $this->getSession()->getPage()->pressButton('Run cron');
-
-    // Assert no items are left for indexing.
-    $this->drupalGet('admin/config/search/pages');
-    $this->assertSession()->pageTextContains('There are 0 items left to index.');
-
-    // Search for French content.
-    $this->drupalGet('search/node', ['query' => ['keys' => urlencode('First rev fr title')]]);
-    $this->assertSession()->pageTextContains('First rev fr title');
-
-    // Delete translation.
-    $this->drupalGet('fr/node/' . $node->id() . '/delete');
-    $this->getSession()->getPage()->pressButton('Delete French translation');
-
-    // Run cron.
-    $this->drupalGet('admin/config/system/cron');
-    $this->getSession()->getPage()->pressButton('Run cron');
-
-    // Assert no items are left for indexing.
-    $this->drupalGet('admin/config/search/pages');
-    $this->assertSession()->pageTextContains('There are 0 items left to index.');
-
-    // Search for French content.
-    $this->drupalGet('search/node', ['query' => ['keys' => urlencode('First rev fr title')]]);
-    $this->assertSession()->pageTextNotContains('First rev fr title');
   }
 
   /**

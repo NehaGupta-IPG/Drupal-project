@@ -13,7 +13,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\link\AttributeXss;
 use Drupal\link\LinkItemInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'link' formatter.
@@ -33,22 +32,6 @@ class LinkFormatter extends FormatterBase {
    * @var \Drupal\Core\Path\PathValidatorInterface
    */
   protected $pathValidator;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $plugin_id,
-      $plugin_definition,
-      $configuration['field_definition'],
-      $configuration['settings'],
-      $configuration['label'],
-      $configuration['view_mode'],
-      $configuration['third_party_settings'],
-      $container->get('path.validator')
-    );
-  }
 
   /**
    * Constructs a new LinkFormatter.
@@ -101,6 +84,11 @@ class LinkFormatter extends FormatterBase {
       '#default_value' => $this->getSetting('trim_length'),
       '#min' => 1,
       '#description' => $this->t('Leave blank to allow unlimited link text lengths.'),
+      '#states' => [
+        'invisible' => [
+          ':input[name*="url_only"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
     $elements['url_only'] = [
       '#type' => 'checkbox',
@@ -142,8 +130,7 @@ class LinkFormatter extends FormatterBase {
     $summary = [];
 
     $settings = $this->getSettings();
-
-    if (!empty($settings['trim_length'])) {
+    if (!empty($settings['trim_length']) && empty($settings['url_only']) && empty($settings['url_plain'])) {
       $summary[] = $this->t('Link text trimmed to @limit characters', ['@limit' => $settings['trim_length']]);
     }
     else {
@@ -169,6 +156,8 @@ class LinkFormatter extends FormatterBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @phpstan-param \Drupal\Core\Field\FieldItemListInterface<\Drupal\link\LinkItemInterface> $items
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
@@ -189,7 +178,7 @@ class LinkFormatter extends FormatterBase {
       }
 
       // Trim the link text to the desired length.
-      if (!empty($settings['trim_length'])) {
+      if (!empty($settings['trim_length']) && empty($settings['url_plain']) && empty($settings['url_only'])) {
         $link_title = Unicode::truncate($link_title, $settings['trim_length'], FALSE, TRUE);
       }
 
@@ -245,7 +234,7 @@ class LinkFormatter extends FormatterBase {
     }
 
     $settings = $this->getSettings();
-    $options = $item->options;
+    $options = $item->options ?? [];
     $options += $url->getOptions();
 
     // Add optional 'rel' attribute to link options.

@@ -9,6 +9,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\ViewExecutable;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests handler UI for views.
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\views\Plugin\views\HandlerBase
  */
 #[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class HandlerTest extends UITestBase {
 
   /**
@@ -218,7 +220,7 @@ class HandlerTest extends UITestBase {
 
     $this->drupalGet('admin/structure/views/nojs/add-handler/content/default/field');
     $this->assertSession()->assertEscaped('The <em>giraffe"</em> label <script>alert("the return of the xss")</script>');
-    $this->assertSession()->assertEscaped('Appears in: page, article. Also known as: Content: The giraffe" label');
+    $this->assertSession()->assertEscaped('Appears in: article, page. Also known as: Content: The giraffe" label');
   }
 
   /**

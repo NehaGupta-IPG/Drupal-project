@@ -9,11 +9,13 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\taxonomy\VocabularyInterface;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests image upload on taxonomy terms.
  */
 #[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TaxonomyImageTest extends TaxonomyTestBase {
 
   use TestFileCreationTrait {
@@ -23,8 +25,6 @@ class TaxonomyImageTest extends TaxonomyTestBase {
 
   /**
    * The taxonomy vocabulary used for the test.
-   *
-   * @var \Drupal\taxonomy\VocabularyInterface
    */
   protected VocabularyInterface $vocabulary;
 

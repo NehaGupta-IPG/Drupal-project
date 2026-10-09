@@ -6,11 +6,14 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\entity_test\EntityTestHelper;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests creation, saving, and loading of entity UUIDs.
  */
 #[Group('Entity')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class EntityUUIDTest extends EntityKernelTestBase {
 
   /**

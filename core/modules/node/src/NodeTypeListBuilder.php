@@ -2,6 +2,7 @@
 
 namespace Drupal\node;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Url;
 use Drupal\Core\Entity\EntityInterface;
@@ -40,10 +41,10 @@ class NodeTypeListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
-    $operations = parent::getDefaultOperations($entity);
-    // Place the edit operation after the operations added by field_ui.module
-    // which have the weights 15, 20, 25.
+  protected function getDefaultOperations(EntityInterface $entity, CacheableMetadata $cacheability) {
+    $operations = parent::getDefaultOperations($entity, $cacheability);
+    // Place the edit operation after the operations added by
+    // FieldUiHooks::entityOperation() which have the weights 15, 20, 25.
     if (isset($operations['edit'])) {
       $operations['edit']['weight'] = 30;
     }

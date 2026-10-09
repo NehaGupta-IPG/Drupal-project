@@ -10,10 +10,13 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\Element\Email;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\user\NotificationHandler;
 use Drupal\user\UserInterface;
 use Drupal\user\UserStorageInterface;
 use Drupal\user\UserNameValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides a user password reset form.
@@ -22,6 +25,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @internal
  */
+#[Route(
+  path: '/user/password',
+  name: 'user.pass',
+  requirements: [
+    '_access' => 'TRUE',
+  ],
+  options: [
+    '_maintenance_access' => TRUE,
+  ],
+  defaults: [
+    '_title' => new TranslatableMarkup('Reset your password'),
+  ],
+)]
 class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
 
   /**
@@ -52,22 +68,6 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
    */
   protected $emailValidator;
 
-  /**
-   * Constructs a UserPasswordForm object.
-   *
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Flood\FloodInterface $flood
-   *   The flood service.
-   * @param \Drupal\user\UserNameValidator $userNameValidator
-   *   The user validator service.
-   * @param \Drupal\Component\Utility\EmailValidatorInterface $email_validator
-   *   The email validator service.
-   */
   public function __construct(
     UserStorageInterface $user_storage,
     LanguageManagerInterface $language_manager,
@@ -75,6 +75,7 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
     FloodInterface $flood,
     protected UserNameValidator $userNameValidator,
     EmailValidatorInterface $email_validator,
+    protected NotificationHandler $notificationHandler,
   ) {
     $this->userStorage = $user_storage;
     $this->languageManager = $language_manager;
@@ -94,6 +95,7 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
       $container->get('flood'),
       $container->get('user.name_validator'),
       $container->get('email.validator'),
+      $container->get(NotificationHandler::class),
     );
   }
 
@@ -196,8 +198,7 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
     $account = $form_state->getValue('account');
     if ($account) {
       // Mail one time login URL and instructions using current language.
-      $mail = _user_mail_notify('password_reset', $account);
-      if (!empty($mail)) {
+      if ($this->notificationHandler->sendPasswordReset($account)) {
         $this->logger('user')
           ->info('Password reset instructions mailed to %name at %email.', [
             '%name' => $account->getAccountName(),

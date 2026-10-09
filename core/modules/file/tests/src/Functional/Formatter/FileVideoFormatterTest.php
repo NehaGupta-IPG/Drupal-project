@@ -10,13 +10,22 @@ use Drupal\file\Plugin\Field\FieldFormatter\FileVideoFormatter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\file\Plugin\Field\FieldFormatter\FileVideoFormatter.
  */
 #[CoversClass(FileVideoFormatter::class)]
 #[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileVideoFormatterTest extends FileMediaFormatterTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = [
+    'image',
+  ];
 
   /**
    * {@inheritdoc}
@@ -29,7 +38,7 @@ class FileVideoFormatterTest extends FileMediaFormatterTestBase {
    * @legacy-covers ::viewElements
    */
   #[DataProvider('dataProvider')]
-  public function testRender($tag_count, $formatter_settings): void {
+  public function testRender(int $tag_count, array $formatter_settings): void {
     $field_config = $this->createMediaField('file_video', 'mp4', $formatter_settings);
 
     file_put_contents('public://file.mp4', str_repeat('t', 10));

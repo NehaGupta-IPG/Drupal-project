@@ -8,12 +8,13 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\field\Functional\FieldTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Options field UI functionality.
  */
 #[Group('options')]
-#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class OptionsFieldUITest extends FieldTestBase {
 
   /**
@@ -424,7 +425,7 @@ class OptionsFieldUITest extends FieldTestBase {
         "fields[$this->fieldName][type]" => $formatter,
         "fields[$this->fieldName][region]" => 'content',
       ];
-      $this->drupalGet('admin/structure/types/manage/' . $this->typeName . '/display');
+      $this->drupalGet('admin/structure/types/manage/' . $this->typeName . '/display/default');
       $this->submitForm($edit, 'Save');
       $this->drupalGet('node/' . $node->id());
 

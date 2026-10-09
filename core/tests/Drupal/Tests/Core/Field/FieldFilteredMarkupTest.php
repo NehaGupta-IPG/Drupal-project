@@ -21,8 +21,6 @@ class FieldFilteredMarkupTest extends UnitTestCase {
 
   /**
    * Tests create.
-   *
-   * @legacy-covers ::create
    */
   #[DataProvider('providerTestCreate')]
   public function testCreate($string, $expected, $instance_of_check): void {
@@ -37,7 +35,7 @@ class FieldFilteredMarkupTest extends UnitTestCase {
   /**
    * Provides data for testCreate().
    */
-  public static function providerTestCreate() {
+  public static function providerTestCreate(): array {
     $data = [];
     $data[] = ['', '', FALSE];
     // Certain tags are filtered.
@@ -57,8 +55,6 @@ class FieldFilteredMarkupTest extends UnitTestCase {
 
   /**
    * Tests display allowed tags.
-   *
-   * @legacy-covers ::displayAllowedTags
    */
   public function testDisplayAllowedTags(): void {
     $expected = '<a> <b> <big> <code> <del> <em> <i> <ins> <pre> <q> <small> <span> <strong> <sub> <sup> <tt> <ol> <ul> <li> <p> <br> <img>';

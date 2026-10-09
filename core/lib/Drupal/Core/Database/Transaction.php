@@ -5,9 +5,6 @@ namespace Drupal\Core\Database;
 /**
  * A wrapper class for creating and managing database transactions.
  *
- * To begin a transaction, simply start it. When the object goes out of scope
- * and is destroyed it will automatically commit.
- *
  * In the vast majority of cases, you should not instantiate this class
  * directly. Instead, call ->startTransaction(), from the appropriate connection
  * object.
@@ -24,6 +21,8 @@ class Transaction {
     // Transactions rely on objects being destroyed in order to be committed.
     // PHP makes no guarantee about the order in which objects are destroyed so
     // ensure all transactions are committed on shutdown.
+    // @todo remove in drupal:13.0.0.
+    // @phpstan-ignore staticMethod.deprecated
     Database::commitAllOnShutdown();
   }
 
@@ -36,6 +35,13 @@ class Transaction {
    */
   public function __destruct() {
     $this->connection->transactionManager()->purge($this->name, $this->id);
+  }
+
+  /**
+   * Prevent transactions from being unserialized.
+   */
+  public function __wakeup(): void {
+    throw new \BadMethodCallException('Cannot unserialize ' . get_class($this));
   }
 
   /**

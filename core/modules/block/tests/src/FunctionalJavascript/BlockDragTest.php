@@ -6,11 +6,13 @@ namespace Drupal\Tests\block\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests drag and drop blocks on block layout page.
  */
 #[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockDragTest extends WebDriverTestBase {
 
   /**
@@ -21,7 +23,7 @@ class BlockDragTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'olivero';
+  protected $defaultTheme = 'default_admin';
 
   /**
    * {@inheritdoc}
@@ -48,22 +50,23 @@ class BlockDragTest extends WebDriverTestBase {
     // Test if drag orientation on block layout page was applied with success.
     $this->assertNotEmpty($assertSession->waitForElementVisible('css', '.tabledrag-handle-y'));
 
-    // Dragging main-menu and status messages to header region.
-    $siteBranding = $this->getDragRow($page, 'edit-blocks-olivero-site-branding');
-    $mainMenuRow = $this->getDragRow($page, 'edit-blocks-olivero-main-menu');
-    $mainMenuRow->dragTo($siteBranding);
-    $messages = $this->getDragRow($page, 'edit-blocks-olivero-messages');
-    $messages->dragTo($siteBranding);
+    // Dragging Secondary tabs and Status messages to header region.
+    $primaryTabs = $this->getDragRow($page, 'edit-blocks-default-admin-primary-local-tasks');
 
-    // Test if both blocks above was positioned on the header region.
+    $secondaryTabs = $this->getDragRow($page, 'edit-blocks-default-admin-secondary-local-tasks');
+    $secondaryTabs->dragTo($primaryTabs);
+    $messages = $this->getDragRow($page, 'edit-blocks-default-admin-messages');
+    $messages->dragTo($primaryTabs);
+
+    // Test if both blocks above were positioned on the header region.
     $this->assertEquals(
       'header',
-      $page->findField('edit-blocks-olivero-main-menu-region')->getValue(),
+      $page->findField('edit-blocks-default-admin-secondary-local-tasks-region')->getValue(),
       'Main menu should be positioned on header region'
     );
     $this->assertEquals(
       'header',
-      $page->findField('edit-blocks-olivero-messages-region')->getValue(),
+      $page->findField('edit-blocks-default-admin-messages-region')->getValue(),
       'Status messages should be positioned on header region'
     );
 
@@ -72,16 +75,16 @@ class BlockDragTest extends WebDriverTestBase {
 
     // Test if the message for empty regions appear after drag the unique block
     // on the region.
-    $noBlockMessage = $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-primary-menu-message"] td')->getText();
-    $this->assertSession()->assert($noBlockMessage === 'No blocks in this region', 'Region primary menu should be empty.');
+    $noBlockMessage = $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-pre-content-message"] td')->getText();
+    $this->assertSession()->assert($noBlockMessage === 'No blocks in this region', 'Region pre-content should be empty.');
 
     // Testing drag row to an empty region.
-    $pageTitle = $this->getDragRow($page, 'edit-blocks-olivero-page-title');
-    $heroRegion = $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-hero-message"]');
+    $pageTitle = $this->getDragRow($page, 'edit-blocks-default-admin-page-title');
+    $heroRegion = $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-help-message"]');
     $pageTitle->dragTo($heroRegion);
     $this->assertSession()->assert(
-      $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-hero-message"] td')->getText() !== 'No blocks in this region',
-      "Region here shouldn't be empty"
+      $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-help-message"] td')->getText() !== 'No blocks in this region',
+      "Region help shouldn't be empty"
     );
 
   }
@@ -89,7 +92,7 @@ class BlockDragTest extends WebDriverTestBase {
   /**
    * Helper function to find block tr element on the page.
    */
-  private function getDragRow($page, $blockId) {
+  private function getDragRow($page, string $blockId) {
     return $page->find('css', '#blocks tbody tr[data-drupal-selector="' . $blockId . '"] a.tabledrag-handle');
   }
 

@@ -10,6 +10,7 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -21,6 +22,7 @@ use Symfony\Component\Routing\Route;
  * @see \Drupal\Core\RouteProcessor\RouteProcessorCurrent
  */
 #[Group('route_processor')]
+#[RunTestsInSeparateProcesses]
 class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
 
   /**
@@ -79,7 +81,7 @@ class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
       'SERVER_NAME' => 'http://www.example.com',
     ];
     $request = Request::create('/subdir/node/add', 'GET', [], [], [], $server);
-    $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'node.add');
+    $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'entity.node.add_form');
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('/node/add'));
     $request->setSession(new Session(new MockArraySessionStorage()));
 
@@ -111,7 +113,7 @@ class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
       'SERVER_NAME' => 'http://www.example.com',
     ];
     $request = Request::create('/node/add', 'GET', [], [], [], $server);
-    $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'node.add');
+    $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'entity.node.add_form');
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('/node/add'));
     $request->setSession(new Session(new MockArraySessionStorage()));
 

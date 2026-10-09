@@ -7,12 +7,14 @@ namespace Drupal\Tests\file\Kernel;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the spaceUsed() function.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class SpaceUsedTest extends FileManagedUnitTestBase {
 
   /**
@@ -47,7 +49,7 @@ class SpaceUsedTest extends FileManagedUnitTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   The file entity.
    */
-  protected function createFileWithSize($uri, $size, $uid, $status = FileInterface::STATUS_PERMANENT): EntityInterface {
+  protected function createFileWithSize($uri, int $size, $uid, $status = FileInterface::STATUS_PERMANENT): EntityInterface {
     file_put_contents($uri, $this->randomMachineName($size));
     $file = File::create([
       'uri' => $uri,

@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Traits;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\field\Traits\BodyFieldCreationTrait;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Provides methods to create content type from given values.
@@ -24,11 +22,13 @@ trait ContentTypeCreationTrait {
    * @param array $values
    *   An array of settings to change from the defaults.
    *   Example: 'type' => 'foo'.
+   * @param bool $create_body
+   *   Whether to create the body field.
    *
    * @return \Drupal\node\Entity\NodeType
    *   Created content type.
    */
-  protected function createContentType(array $values = []) {
+  protected function createContentType(array $values = [], bool $create_body = TRUE) {
     // Find a non-existent random type name.
     if (!isset($values['type'])) {
       do {
@@ -45,14 +45,12 @@ trait ContentTypeCreationTrait {
     $type = NodeType::create($values);
     $status = $type->save();
 
-    $this->createBodyField('node', $type->id());
+    if ($create_body) {
+      $this->createBodyField('node', $type->id());
+    }
 
-    if ($this instanceof TestCase) {
-      $this->assertSame($status, SAVED_NEW, (new FormattableMarkup('Created content type %type.', ['%type' => $type->id()]))->__toString());
-    }
-    else {
-      $this->assertEquals(SAVED_NEW, $status, (new FormattableMarkup('Created content type %type.', ['%type' => $type->id()]))->__toString());
-    }
+    $id = $type->id();
+    $this->assertSame(SAVED_NEW, $status, "Created content type $id.");
 
     return $type;
   }

@@ -13,11 +13,13 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Datetime field functionality.
  */
 #[Group('datetime')]
+#[RunTestsInSeparateProcesses]
 class DateTimeFieldTest extends DateTestBase {
 
   /**
@@ -628,7 +630,7 @@ class DateTimeFieldTest extends DateTestBase {
    * @return array
    *   An array of datelist input permutations to test.
    */
-  protected function datelistDataProvider($field_label) {
+  protected function datelistDataProvider($field_label): array {
     return [
       // Nothing selected.
       [

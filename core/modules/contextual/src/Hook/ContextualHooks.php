@@ -4,7 +4,6 @@ namespace Drupal\contextual\Hook;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
@@ -14,46 +13,6 @@ use Drupal\Core\Hook\Attribute\Hook;
 class ContextualHooks {
 
   use StringTranslationTrait;
-
-  /**
-   * Implements hook_toolbar().
-   */
-  #[Hook('toolbar')]
-  public function toolbar(): array {
-    $items = [];
-    $items['contextual'] = ['#cache' => ['contexts' => ['user.permissions']]];
-    if (!\Drupal::currentUser()->hasPermission('access contextual links')) {
-      return $items;
-    }
-    $items['contextual'] += [
-      '#type' => 'toolbar_item',
-      'tab' => [
-        '#type' => 'html_tag',
-        '#tag' => 'button',
-        '#value' => $this->t('Edit'),
-        '#attributes' => [
-          'class' => [
-            'toolbar-icon',
-            'toolbar-icon-edit',
-          ],
-          'aria-pressed' => 'false',
-          'type' => 'button',
-        ],
-      ],
-      '#wrapper_attributes' => [
-        'class' => [
-          'hidden',
-          'contextual-toolbar-tab',
-        ],
-      ],
-      '#attached' => [
-        'library' => [
-          'contextual/drupal.contextual-toolbar',
-        ],
-      ],
-    ];
-    return $items;
-  }
 
   /**
    * Implements hook_page_attachments().
@@ -84,24 +43,13 @@ class ContextualHooks {
         $output .= '<h2>' . $this->t('Uses') . '</h2>';
         $output .= '<dl>';
         $output .= '<dt>' . $this->t('Displaying contextual links') . '</dt>';
-        $output .= '<dd>';
-        $output .= $this->t('Contextual links for an area on a page are displayed using a contextual links button. There are two ways to make the contextual links button visible:');
-        $output .= '<ol>';
         $sample_picture = [
           '#theme' => 'image',
           '#uri' => 'core/misc/icons/bebebe/pencil.svg',
           '#alt' => $this->t('contextual links button'),
         ];
         $sample_picture = \Drupal::service('renderer')->render($sample_picture);
-        $output .= '<li>' . $this->t('Hovering over the area of interest will temporarily make the contextual links button visible (which looks like a pencil in most themes, and is normally displayed in the upper right corner of the area). The icon typically looks like this: @picture', ['@picture' => $sample_picture]) . '</li>';
-        $output .= '<li>' . $this->t('If you have the <a href=":toolbar">Toolbar module</a> installed, clicking the contextual links button in the toolbar (which looks like a pencil) will make all contextual links buttons on the page visible. Clicking this button again will toggle them to invisible.', [
-          ':toolbar' => \Drupal::moduleHandler()->moduleExists('toolbar') ? Url::fromRoute('help.page', [
-            'name' => 'toolbar',
-          ])->toString() : '#',
-        ]) . '</li>';
-        $output .= '</ol>';
-        $output .= $this->t('Once the contextual links button for the area of interest is visible, click the button to display the links.');
-        $output .= '</dd>';
+        $output .= '<dd>' . $this->t('Contextual links for an area on a page are displayed using a contextual links button. Hovering over the area of interest will temporarily make the contextual links button visible (which looks like a pencil in most themes, and is normally displayed in the upper right corner of the area). The icon typically looks like this: @picture Once the contextual links button for the area of interest is visible, click the button to display the links.', ['@picture' => $sample_picture]) . '</dd>';
         $output .= '</dl>';
         return $output;
     }

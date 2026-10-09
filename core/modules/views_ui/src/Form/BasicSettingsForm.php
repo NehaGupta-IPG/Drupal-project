@@ -5,12 +5,24 @@ namespace Drupal\views_ui\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Form builder for the admin display defaults page.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/structure/views/settings',
+  name: 'views_ui.settings_basic',
+  requirements: [
+    '_permission' => 'administer views',
+  ],
+  defaults: [
+    '_title' => new TranslatableMarkup('Views settings'),
+  ],
+)]
 class BasicSettingsForm extends ConfigFormBase {
   use RedundantEditableConfigNamesTrait;
 
@@ -37,16 +49,10 @@ class BasicSettingsForm extends ConfigFormBase {
       '#config_target' => 'views.settings:ui.show.default_display',
     ];
 
-    $form['basic']['ui_show_advanced_column'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Always show advanced display settings'),
-      '#config_target' => 'views.settings:ui.show.advanced_column',
-    ];
-
     $form['basic']['ui_show_display_embed'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Allow embedded displays'),
-      '#description' => $this->t('Embedded displays can be used in code via views_embed_view().'),
+      '#description' => $this->t("Embedded displays can be used in code via '#type' => 'view' render elements."),
       '#config_target' => 'views.settings:ui.show.display_embed',
     ];
 

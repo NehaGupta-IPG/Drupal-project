@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Routing;
 
 use Drupal\Core\Routing\CurrentRouteMatch;
+use Drupal\Core\Routing\NullRouteMatch;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -78,12 +79,14 @@ class CurrentRouteMatchTest extends RouteMatchTestBase {
     // Restored original request.
     $request_stack->pop();
     $this->assertSame('1', $current_route_match->getParameter('foo'));
+
+    // Test a null request.
+    $request_stack->pop();
+    $this->assertTrue($current_route_match->getCurrentRouteMatch() instanceof NullRouteMatch);
   }
 
   /**
    * Tests get route match from request with routing.
-   *
-   * @legacy-covers ::getRouteMatchFromRequest
    */
   public function testGetRouteMatchFromRequestWithRouting(): void {
     $request_stack = new RequestStack();
@@ -99,8 +102,6 @@ class CurrentRouteMatchTest extends RouteMatchTestBase {
 
   /**
    * Tests get route match from request.
-   *
-   * @legacy-covers ::getRouteMatchFromRequest
    */
   public function testGetRouteMatchFromRequest(): void {
     $request_stack = new RequestStack();
@@ -120,8 +121,6 @@ class CurrentRouteMatchTest extends RouteMatchTestBase {
 
   /**
    * Tests reset route match.
-   *
-   * @legacy-covers ::resetRouteMatch
    */
   public function testResetRouteMatch(): void {
     $route = new Route('/test-route/{foo}');

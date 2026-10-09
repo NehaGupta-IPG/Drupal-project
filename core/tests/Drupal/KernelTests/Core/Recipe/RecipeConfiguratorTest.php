@@ -10,6 +10,7 @@ use Drupal\Core\Recipe\UnknownRecipeException;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\TestWith;
  */
 #[CoversClass(RecipeConfigurator::class)]
 #[Group('Recipe')]
+#[RunTestsInSeparateProcesses]
 class RecipeConfiguratorTest extends KernelTestBase {
 
   /**
@@ -35,7 +37,7 @@ class RecipeConfiguratorTest extends KernelTestBase {
     // Test methods.
     /** @var \Drupal\Core\Recipe\Recipe[] $recipes */
     $recipes = (array) $reflection->invoke($recipe_configurator);
-    $recipes_names = array_map(fn(Recipe $recipe) => $recipe->name, $recipes);
+    $recipes_names = array_map(fn(Recipe $recipe): string => $recipe->name, $recipes);
     $recipe_extensions = $recipe_configurator->listAllExtensions();
     $expected_recipes_names = [
       'Install two modules',

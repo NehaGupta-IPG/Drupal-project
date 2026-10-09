@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_moderation\Kernel;
 
 use Drupal\content_moderation\Entity\ContentModerationState;
-use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\State\StateInterface;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -19,12 +17,15 @@ use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 use Drupal\workflows\Entity\Workflow;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests links between a content entity and a content_moderation_state entity.
- *
- * @group content_moderation
  */
+#[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ContentModerationStateTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -49,10 +50,8 @@ class ContentModerationStateTest extends KernelTestBase {
     'user',
     'system',
     'language',
-    'content_translation',
     'text',
     'workflows',
-    'path_alias',
     'taxonomy',
   ];
 
@@ -60,20 +59,6 @@ class ContentModerationStateTest extends KernelTestBase {
    * @var \Drupal\Core\Entity\EntityTypeManager
    */
   protected $entityTypeManager;
-
-  /**
-   * The state object.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected StateInterface $state;
-
-  /**
-   * The entity definition update manager.
-   *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
-   */
-  protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
 
   /**
    * The ID of the revisionable entity type used in the tests.
@@ -88,6 +73,7 @@ class ContentModerationStateTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
     $this->installSchema('node', 'node_access');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
@@ -101,7 +87,7 @@ class ContentModerationStateTest extends KernelTestBase {
     $this->installEntitySchema('content_moderation_state');
     $this->installConfig('content_moderation');
     $this->installSchema('file', 'file_usage');
-    $this->installConfig(['field', 'file', 'filter', 'image', 'media', 'node', 'system']);
+    $this->installConfig(['field', 'file', 'filter', 'image', 'media', 'node']);
 
     // Add the French language.
     ConfigurableLanguage::createFromLangcode('fr')->save();
@@ -181,7 +167,7 @@ class ContentModerationStateTest extends KernelTestBase {
   /**
    * Test cases for basic moderation test.
    */
-  public static function basicModerationTestCases() {
+  public static function basicModerationTestCases(): array {
     return [
       'Nodes' => [
         'node',
@@ -502,10 +488,9 @@ class ContentModerationStateTest extends KernelTestBase {
 
   /**
    * Tests that entities with special languages can be moderated.
-   *
-   * @dataProvider moderationWithSpecialLanguagesTestCases
    */
-  public function testModerationWithSpecialLanguages($original_language, $updated_language): void {
+  #[DataProvider('moderationWithSpecialLanguagesTestCases')]
+  public function testModerationWithSpecialLanguages(string $original_language, string $updated_language): void {
     $workflow = $this->createEditorialWorkflow();
     $this->addEntityTypeAndBundleToWorkflow($workflow, $this->revEntityTypeId, $this->revEntityTypeId);
 
@@ -527,7 +512,7 @@ class ContentModerationStateTest extends KernelTestBase {
   /**
    * Test cases for ::testModerationWithSpecialLanguages().
    */
-  public static function moderationWithSpecialLanguagesTestCases() {
+  public static function moderationWithSpecialLanguagesTestCases(): array {
     return [
       'Not specified to not specified' => [
         LanguageInterface::LANGCODE_NOT_SPECIFIED,

@@ -10,12 +10,14 @@ use Drupal\file\Plugin\Field\FieldFormatter\FileAudioFormatter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\file\Plugin\Field\FieldFormatter\FileAudioFormatter.
  */
 #[CoversClass(FileAudioFormatter::class)]
 #[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileAudioFormatterTest extends FileMediaFormatterTestBase {
 
   /**
@@ -29,7 +31,7 @@ class FileAudioFormatterTest extends FileMediaFormatterTestBase {
    * @legacy-covers ::viewElements
    */
   #[DataProvider('dataProvider')]
-  public function testRender($tag_count, $formatter_settings): void {
+  public function testRender(int $tag_count, array $formatter_settings): void {
     // Create a file field that accepts .mp3 and an unknown file extension.
     $field_config = $this->createMediaField('file_audio', 'unknown-extension, mp3', $formatter_settings);
 

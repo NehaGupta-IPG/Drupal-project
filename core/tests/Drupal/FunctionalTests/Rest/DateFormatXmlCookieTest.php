@@ -7,11 +7,13 @@ namespace Drupal\FunctionalTests\Rest;
 use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Date Format Xml Cookie.
  */
 #[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class DateFormatXmlCookieTest extends DateFormatResourceTestBase {
 
   use CookieResourceTestTrait;
@@ -25,7 +27,7 @@ class DateFormatXmlCookieTest extends DateFormatResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $mimeType = 'text/xml; charset=UTF-8';
+  protected static $mimeType = 'text/xml; charset=utf-8';
 
   /**
    * {@inheritdoc}

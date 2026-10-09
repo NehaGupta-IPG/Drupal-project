@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Functional;
 
-use Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\workspaces\Entity\Workspace;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests workspace switching functionality.
  */
 #[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceSwitcherTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -26,9 +27,9 @@ class WorkspaceSwitcherTest extends BrowserTestBase {
     'block',
     'dynamic_page_cache',
     'node',
-    'toolbar',
     'workspaces',
     'workspaces_ui',
+    'workspaces_test',
   ];
 
   /**
@@ -62,9 +63,24 @@ class WorkspaceSwitcherTest extends BrowserTestBase {
    * Tests switching workspace via the switcher block and admin page.
    */
   public function testSwitchingWorkspaces(): void {
+    /** @var \Drupal\Core\Cache\CacheBackendInterface $entity_cache */
+    $entity_cache = \Drupal::service('cache.entity');
+
+    $node_type = $this->drupalCreateContentType();
+    $node = $this->drupalCreateNode(['type' => $node_type->id()]);
+    $this->assertFalse($entity_cache->get("values:node:{$node->id()}"));
+
+    // Access the node page to prime its persistent cache.
+    $this->drupalGet($node->toUrl());
+    $this->assertNotFalse($entity_cache->get("values:node:{$node->id()}"));
+
     $vultures = Workspace::load('vultures');
     $gravity = Workspace::load('gravity');
     $this->switchToWorkspace($vultures);
+
+    // Check that switching into a workspace doesn't invalidate the persistent
+    // cache.
+    $this->assertNotFalse($entity_cache->get("values:node:{$node->id()}"));
 
     // Confirm the block shows on the front page.
     $this->drupalGet('<front>');
@@ -107,21 +123,23 @@ class WorkspaceSwitcherTest extends BrowserTestBase {
   }
 
   /**
-   * Tests that the toolbar workspace switcher doesn't disable the page cache.
+   * Tests workspaces with non-default providers in the switcher form.
    */
-  public function testToolbarSwitcherDynamicPageCache(): void {
-    $node_type = $this->drupalCreateContentType();
-    $node = $this->drupalCreateNode(['type' => $node_type->id()]);
-    $this->drupalLogin($this->drupalCreateUser([
-      'access toolbar',
-      'view any workspace',
-    ]));
-    $this->drupalGet($node->toUrl());
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'MISS');
-    // Reload the page, it should be cached now.
-    $this->drupalGet($node->toUrl());
-    $this->assertSession()->elementExists('css', '.workspaces-toolbar-tab');
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
+  public function testSwitcherFormFiltersByProvider(): void {
+    // Create a workspace that uses the test provider.
+    Workspace::create([
+      'id' => 'test_provider_workspace',
+      'label' => 'Test Provider Workspace',
+      'provider' => 'test',
+    ])->save();
+
+    $this->drupalGet('<front>');
+    $assert_session = $this->assertSession();
+
+    // Check that only relevant workspaces are shown.
+    $assert_session->pageTextContains('Vultures');
+    $assert_session->pageTextContains('Gravity');
+    $assert_session->pageTextNotContains('Test Provider Workspace');
   }
 
 }

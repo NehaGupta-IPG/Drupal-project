@@ -14,12 +14,14 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\Plugin\Context\ContextHandler.
  */
 #[CoversClass(ContextHandler::class)]
 #[Group('Plugin')]
+#[RunTestsInSeparateProcesses]
 class ContextHandlerTest extends KernelTestBase {
 
   /**
@@ -32,8 +34,6 @@ class ContextHandlerTest extends KernelTestBase {
 
   /**
    * Tests apply context mapping.
-   *
-   * @legacy-covers ::applyContextMapping
    */
   public function testApplyContextMapping(): void {
     $entity = EntityTest::create([]);
@@ -52,8 +52,6 @@ class ContextHandlerTest extends KernelTestBase {
 
   /**
    * Tests apply context mapping already applied.
-   *
-   * @legacy-covers ::applyContextMapping
    */
   public function testApplyContextMappingAlreadyApplied(): void {
     $entity = EntityTest::create([]);

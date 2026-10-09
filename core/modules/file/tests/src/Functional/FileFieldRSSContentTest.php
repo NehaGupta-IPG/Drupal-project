@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\file\Entity\File;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensure that files added to nodes appear correctly in RSS feeds.
  */
 #[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileFieldRSSContentTest extends FileFieldTestBase {
+
+  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -27,6 +32,8 @@ class FileFieldRSSContentTest extends FileFieldTestBase {
    * Tests RSS enclosure formatter display for RSS feeds.
    */
   public function testFileFieldRSSContent(): void {
+    $this->enablePromotedContentView();
+
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $field_name = $this->randomMachineName();
     $type_name = 'article';
@@ -35,10 +42,12 @@ class FileFieldRSSContentTest extends FileFieldTestBase {
 
     // RSS display must be added manually.
     $this->drupalGet("admin/structure/types/manage/$type_name/display");
-    $edit = [
-      "display_modes_custom[rss]" => '1',
-    ];
-    $this->submitForm($edit, 'Save');
+    // Find and click the enable link for the RSS view mode.
+    $page = $this->getSession()->getPage();
+    $enable_link = $page->find('xpath', "//tr[@id='display-mode-node-article-rss']//a[contains(., 'Enable')]");
+    if ($enable_link) {
+      $enable_link->click();
+    }
 
     // Change the format to 'RSS enclosure'.
     $this->drupalGet("admin/structure/types/manage/$type_name/display/rss");
@@ -48,7 +57,7 @@ class FileFieldRSSContentTest extends FileFieldTestBase {
     ];
     $this->submitForm($edit, 'Save');
 
-    // Create a new node with a file field set. Promote to frontpage
+    // Create a new node with a file field set. Promoted
     // needs to be set so this node will appear in the RSS feed.
     $node = $this->drupalCreateNode(['type' => $type_name, 'promote' => 1]);
     $test_file = $this->getTestFile('text');

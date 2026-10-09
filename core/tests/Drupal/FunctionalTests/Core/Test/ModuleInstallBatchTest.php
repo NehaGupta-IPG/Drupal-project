@@ -7,6 +7,7 @@ namespace Drupal\FunctionalTests\Core\Test;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests batch operations during tests execution.
@@ -16,12 +17,13 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[Group('Test')]
 #[Group('FunctionalTestSetupTrait')]
+#[RunTestsInSeparateProcesses]
 class ModuleInstallBatchTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['test_batch_test', 'entity_test'];
+  protected static $modules = ['entity_test'];
 
   /**
    * {@inheritdoc}
@@ -32,6 +34,7 @@ class ModuleInstallBatchTest extends BrowserTestBase {
    * Tests loading entities created in a batch in test_batch_test_install().
    */
   public function testLoadingEntitiesCreatedInBatch(): void {
+    \Drupal::service('module_installer')->install(['test_batch_test']);
     foreach ([1, 2] as $id) {
       $this->assertNotNull(EntityTest::load($id), 'Successfully loaded entity ' . $id);
     }

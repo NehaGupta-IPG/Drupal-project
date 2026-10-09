@@ -8,11 +8,13 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests user edit page.
  */
 #[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserEditTest extends BrowserTestBase {
 
   /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Menu;
 
+use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
@@ -12,10 +13,12 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Menu\DefaultMenuLinkTreeManipulators;
 use Drupal\Core\Menu\MenuLinkTreeElement;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests the default menu link tree manipulators.
@@ -25,32 +28,24 @@ use PHPUnit\Framework\Attributes\Group;
 class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
 
   /**
-   * The mocked access manager.
-   *
-   * @var \Drupal\Core\Access\AccessManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The access manager.
    */
-  protected $accessManager;
+  protected AccessManagerInterface&Stub $accessManager;
 
   /**
-   * The mocked current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The current user.
    */
-  protected $currentUser;
+  protected AccountInterface&Stub $currentUser;
 
   /**
-   * The mocked entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The entity type manager.
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&Stub $entityTypeManager;
 
   /**
-   * The mocked module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The module handler.
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
    * The default menu link tree manipulators.
@@ -86,12 +81,12 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->accessManager = $this->createMock('\Drupal\Core\Access\AccessManagerInterface');
-    $this->currentUser = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $this->accessManager = $this->createStub(AccessManagerInterface::class);
+    $this->currentUser = $this->createStub(AccountInterface::class);
     $this->currentUser->method('isAuthenticated')
       ->willReturn(TRUE);
-    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
+    $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
 
     $this->defaultMenuTreeManipulators = new DefaultMenuLinkTreeManipulators($this->accessManager, $this->currentUser, $this->entityTypeManager, $this->moduleHandler);
 
@@ -100,6 +95,15 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
     $container->set('cache_contexts_manager', $this->cacheContextManager->reveal());
     $container->set('module_handler', $this->moduleHandler);
     \Drupal::setContainer($container);
+  }
+
+  /**
+   * Reinitializes the access manager as a mock object.
+   */
+  protected function setUpMockAccessManager(): void {
+    $this->accessManager = $this->createMock(AccessManagerInterface::class);
+    $reflection = new \ReflectionProperty($this->defaultMenuTreeManipulators, 'accessManager');
+    $reflection->setValue($this->defaultMenuTreeManipulators, $this->accessManager);
   }
 
   /**
@@ -120,15 +124,61 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
    */
   protected function mockTree(): void {
     $this->links = [
-      1 => MenuLinkMock::create(['id' => 'test.example1', 'route_name' => 'example1', 'title' => 'foo', 'parent' => '']),
-      2 => MenuLinkMock::create(['id' => 'test.example2', 'route_name' => 'example2', 'title' => 'bar', 'parent' => 'test.example1', 'route_parameters' => ['foo' => 'bar']]),
-      3 => MenuLinkMock::create(['id' => 'test.example3', 'route_name' => 'example3', 'title' => 'baz', 'parent' => 'test.example2', 'route_parameters' => ['baz' => 'qux']]),
-      4 => MenuLinkMock::create(['id' => 'test.example4', 'route_name' => 'example4', 'title' => 'qux', 'parent' => 'test.example3']),
-      5 => MenuLinkMock::create(['id' => 'test.example5', 'route_name' => 'example5', 'title' => 'title5', 'parent' => '']),
-      6 => MenuLinkMock::create(['id' => 'test.example6', 'route_name' => '', 'url' => 'https://www.drupal.org/', 'title' => 'bar_bar', 'parent' => '']),
-      7 => MenuLinkMock::create(['id' => 'test.example7', 'route_name' => 'example7', 'title' => 'title7', 'parent' => '']),
-      8 => MenuLinkMock::create(['id' => 'test.example8', 'route_name' => 'example8', 'title' => 'title8', 'parent' => '']),
-      9 => DynamicMenuLinkMock::create(['id' => 'test.example9', 'parent' => ''])->setCurrentUser($this->currentUser),
+      1 => MenuLinkMock::createMock([
+        'id' => 'test.example1',
+        'route_name' => 'example1',
+        'title' => 'foo',
+        'parent' => '',
+      ]),
+      2 => MenuLinkMock::createMock([
+        'id' => 'test.example2',
+        'route_name' => 'example2',
+        'title' => 'bar',
+        'parent' => 'test.example1',
+        'route_parameters' => ['foo' => 'bar'],
+      ]),
+      3 => MenuLinkMock::createMock([
+        'id' => 'test.example3',
+        'route_name' => 'example3',
+        'title' => 'baz',
+        'parent' => 'test.example2',
+        'route_parameters' => ['baz' => 'qux'],
+      ]),
+      4 => MenuLinkMock::createMock([
+        'id' => 'test.example4',
+        'route_name' => 'example4',
+        'title' => 'qux',
+        'parent' => 'test.example3',
+      ]),
+      5 => MenuLinkMock::createMock([
+        'id' => 'test.example5',
+        'route_name' => 'example5',
+        'title' => 'title5',
+        'parent' => '',
+      ]),
+      6 => MenuLinkMock::createMock([
+        'id' => 'test.example6',
+        'route_name' => '',
+        'url' => 'https://www.drupal.org/',
+        'title' => 'bar_bar',
+        'parent' => '',
+      ]),
+      7 => MenuLinkMock::createMock([
+        'id' => 'test.example7',
+        'route_name' => 'example7',
+        'title' => 'title7',
+        'parent' => '',
+      ]),
+      8 => MenuLinkMock::createMock([
+        'id' => 'test.example8',
+        'route_name' => 'example8',
+        'title' => 'title8',
+        'parent' => '',
+      ]),
+      9 => DynamicMenuLinkMock::createMock([
+        'id' => 'test.example9',
+        'parent' => '',
+      ])->setCurrentUser($this->currentUser),
     ];
     $this->originalTree = [];
     $this->originalTree[1] = new MenuLinkTreeElement($this->links[1], FALSE, 1, FALSE, []);
@@ -147,8 +197,6 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
 
   /**
    * Tests the generateIndexAndSort() tree manipulator.
-   *
-   * @legacy-covers ::generateIndexAndSort
    */
   public function testGenerateIndexAndSort(): void {
     $this->mockTree();
@@ -175,6 +223,8 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
    * @legacy-covers ::menuLinkCheckAccess
    */
   public function testCheckAccess(): void {
+    $this->setUpMockAccessManager();
+
     // Those menu links that are non-external will have their access checks
     // performed. 9 routes, but 1 is external, 2 already have their 'access'
     // property set, and 1 is a child if an inaccessible menu link, so only 5
@@ -255,6 +305,8 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
    * @legacy-covers ::menuLinkCheckAccess
    */
   public function testCheckAccessTreeManipulator(): void {
+    $this->setUpMockAccessManager();
+
     $this->mockTree();
     // There are 9 checks but one is on an external link, so the route access
     // checker should be called only 8 times.
@@ -279,8 +331,6 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
 
   /**
    * Tests the flatten() tree manipulator.
-   *
-   * @legacy-covers ::flatten
    */
   public function testFlatten(): void {
     $this->mockTree();
@@ -297,13 +347,49 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
    * @legacy-covers ::checkAccess
    */
   public function testCheckNodeAccess(): void {
+    $this->setUpMockAccessManager();
+
     $links = [
-      1 => MenuLinkMock::create(['id' => 'node.1', 'route_name' => 'entity.node.canonical', 'title' => 'foo', 'parent' => '', 'route_parameters' => ['node' => 1]]),
-      2 => MenuLinkMock::create(['id' => 'node.2', 'route_name' => 'entity.node.canonical', 'title' => 'bar', 'parent' => '', 'route_parameters' => ['node' => 2]]),
-      3 => MenuLinkMock::create(['id' => 'node.3', 'route_name' => 'entity.node.canonical', 'title' => 'baz', 'parent' => 'node.2', 'route_parameters' => ['node' => 3]]),
-      4 => MenuLinkMock::create(['id' => 'node.4', 'route_name' => 'entity.node.canonical', 'title' => 'qux', 'parent' => 'node.3', 'route_parameters' => ['node' => 4]]),
-      5 => MenuLinkMock::create(['id' => 'test.1', 'route_name' => 'test_route', 'title' => 'qux', 'parent' => '']),
-      6 => MenuLinkMock::create(['id' => 'test.2', 'route_name' => 'test_route', 'title' => 'qux', 'parent' => 'test.1']),
+      1 => MenuLinkMock::createMock([
+        'id' => 'node.1',
+        'route_name' => 'entity.node.canonical',
+        'title' => 'foo',
+        'parent' => '',
+        'route_parameters' => ['node' => 1],
+      ]),
+      2 => MenuLinkMock::createMock([
+        'id' => 'node.2',
+        'route_name' => 'entity.node.canonical',
+        'title' => 'bar',
+        'parent' => '',
+        'route_parameters' => ['node' => 2],
+      ]),
+      3 => MenuLinkMock::createMock([
+        'id' => 'node.3',
+        'route_name' => 'entity.node.canonical',
+        'title' => 'baz',
+        'parent' => 'node.2',
+        'route_parameters' => ['node' => 3],
+      ]),
+      4 => MenuLinkMock::createMock([
+        'id' => 'node.4',
+        'route_name' => 'entity.node.canonical',
+        'title' => 'qux',
+        'parent' => 'node.3',
+        'route_parameters' => ['node' => 4],
+      ]),
+      5 => MenuLinkMock::createMock([
+        'id' => 'test.1',
+        'route_name' => 'test_route',
+        'title' => 'qux',
+        'parent' => '',
+      ]),
+      6 => MenuLinkMock::createMock([
+        'id' => 'test.2',
+        'route_name' => 'test_route',
+        'title' => 'qux',
+        'parent' => 'test.1',
+      ]),
     ];
     $tree = [];
     $tree[1] = new MenuLinkTreeElement($links[1], FALSE, 1, FALSE, []);
@@ -326,9 +412,8 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
     $storage->expects($this->once())
       ->method('getQuery')
       ->willReturn($query->reveal());
-    $this->entityTypeManager->expects($this->once())
+    $this->entityTypeManager
       ->method('getStorage')
-      ->with('node')
       ->willReturn($storage);
 
     $this->cacheContextManager->assertValidTokens(['user.permissions'])->shouldBeCalled()->willReturn(TRUE);

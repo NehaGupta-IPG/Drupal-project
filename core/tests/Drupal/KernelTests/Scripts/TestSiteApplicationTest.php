@@ -13,6 +13,7 @@ use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -29,8 +30,9 @@ use Symfony\Component\Process\Process;
  * @see \Drupal\TestSite\Commands\TestSiteTearDownCommand
  */
 #[Group('Setup')]
-#[Group('#slow')]
 #[PreserveGlobalState(FALSE)]
+#[CoversNothing]
+#[RunTestsInSeparateProcesses]
 class TestSiteApplicationTest extends KernelTestBase {
 
   /**
@@ -50,9 +52,8 @@ class TestSiteApplicationTest extends KernelTestBase {
   }
 
   /**
- * Tests install with non existing file.
- */
-  #[CoversNothing]
+   * Tests install with non existing file.
+   */
   public function testInstallWithNonExistingFile(): void {
     $command_line = $this->php . ' core/scripts/test-site.php install --setup-file "this-class-does-not-exist" --db-url "' . getenv('SIMPLETEST_DB') . '"';
     $process = Process::fromShellCommandline($command_line, $this->root);
@@ -62,9 +63,8 @@ class TestSiteApplicationTest extends KernelTestBase {
   }
 
   /**
- * Tests install with file with no class.
- */
-  #[CoversNothing]
+   * Tests install with file with no class.
+   */
   public function testInstallWithFileWithNoClass(): void {
     $command_line = $this->php . ' core/scripts/test-site.php install --setup-file core/tests/fixtures/empty_file.php.module --db-url "' . getenv('SIMPLETEST_DB') . '"';
     $process = Process::fromShellCommandline($command_line, $this->root);
@@ -74,9 +74,8 @@ class TestSiteApplicationTest extends KernelTestBase {
   }
 
   /**
- * Tests install with non setup class.
- */
-  #[CoversNothing]
+   * Tests install with non setup class.
+   */
   public function testInstallWithNonSetupClass(): void {
     $this->markTestIncomplete('Fix this test in https://www.drupal.org/project/drupal/issues/2962157.');
 
@@ -90,9 +89,8 @@ class TestSiteApplicationTest extends KernelTestBase {
   }
 
   /**
- * Tests install script.
- */
-  #[CoversNothing]
+   * Tests install script.
+   */
   public function testInstallScript(): void {
     // Install a site using the JSON output.
     $command_line = $this->php . ' core/scripts/test-site.php install --json --setup-file core/tests/Drupal/TestSite/TestSiteInstallTestScript.php --db-url "' . getenv('SIMPLETEST_DB') . '"';
@@ -186,9 +184,8 @@ class TestSiteApplicationTest extends KernelTestBase {
   }
 
   /**
- * Tests install in different language.
- */
-  #[CoversNothing]
+   * Tests install in different language.
+   */
   public function testInstallInDifferentLanguage(): void {
     $command_line = $this->php . ' core/scripts/test-site.php install --json --langcode fr --setup-file core/tests/Drupal/TestSite/TestSiteMultilingualInstallTestScript.php --db-url "' . getenv('SIMPLETEST_DB') . '"';
     $process = Process::fromShellCommandline($command_line, $this->root);
@@ -219,9 +216,8 @@ class TestSiteApplicationTest extends KernelTestBase {
   }
 
   /**
- * Tests tear down db prefix validation.
- */
-  #[CoversNothing]
+   * Tests tear down db prefix validation.
+   */
   public function testTearDownDbPrefixValidation(): void {
     $command_line = $this->php . ' core/scripts/test-site.php tear-down not-a-valid-prefix';
     $process = Process::fromShellCommandline($command_line, $this->root);
@@ -232,9 +228,8 @@ class TestSiteApplicationTest extends KernelTestBase {
   }
 
   /**
- * Tests user login.
- */
-  #[CoversNothing]
+   * Tests user login.
+   */
   public function testUserLogin(): void {
     $this->markTestIncomplete('Fix this test in https://www.drupal.org/project/drupal/issues/2962157.');
 
@@ -293,7 +288,7 @@ class TestSiteApplicationTest extends KernelTestBase {
    * @return string
    *   The database key of the added connection.
    */
-  protected function addTestDatabase($db_prefix): string {
+  protected function addTestDatabase(string $db_prefix): string {
     $database = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'));
     $database['prefix'] = $db_prefix;
     $target = __CLASS__ . $db_prefix;

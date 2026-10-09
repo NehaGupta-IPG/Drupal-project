@@ -11,11 +11,13 @@ use Drupal\media\MediaInterface;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the revisions of media entities.
  */
 #[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaRevisionTest extends MediaFunctionalTestBase {
 
   /**
@@ -84,15 +86,17 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
 
     // Test 'view all media revisions' permission ('view media' permission is
     // needed as well).
-    user_role_revoke_permissions($role->id(), [
+    Role::loadOverrideFree($role->id())->revokePermissions([
       'view all media revisions',
-    ]);
+    ])->save();
     $this->drupalGet($media->toUrl('revision'));
     $assert->statusCodeEquals(403);
     $this->grantPermissions($role, ['view any test media revisions']);
     $this->drupalGet($media->toUrl('revision'));
     $assert->statusCodeEquals(200);
-    user_role_revoke_permissions($role->id(), ['view any test media revisions']);
+    Role::loadOverrideFree($role->id())->revokePermissions([
+      'view any test media revisions',
+    ])->save();
     $this->grantPermissions($role, ['view all media revisions']);
     $this->drupalGet($media->toUrl('revision'));
     $assert->statusCodeEquals(200);
@@ -201,7 +205,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
    * @return \Drupal\media\MediaInterface
    *   A media object with up to date revision information.
    */
-  protected function createMediaRevision(MediaInterface $media) {
+  protected function createMediaRevision(MediaInterface $media): MediaInterface {
     $media->setName($this->randomMachineName());
     $media->setNewRevision();
     $media->save();
@@ -301,7 +305,6 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
    * Tests reverting a revision.
    */
   public function testRevisionRevert(): void {
-    /** @var \Drupal\user\UserInterface $user */
     $user = $this->drupalCreateUser([
       'edit any test media',
       'view any test media revisions',

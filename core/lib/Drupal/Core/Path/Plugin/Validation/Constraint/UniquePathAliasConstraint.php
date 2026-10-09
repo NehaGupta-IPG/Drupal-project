@@ -15,18 +15,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class UniquePathAliasConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'The alias %alias is already in use in this language.';
-
-  /**
-   * Violation message when the path alias exists with different capitalization.
-   *
-   * @var string
-   */
-  public $differentCapitalizationMessage = 'The alias %alias could not be added because it is already in use in this language with different capitalization: %stored_alias.';
+  public function __construct(
+    public $message = 'The alias %alias is already in use in this language.',
+    public $differentCapitalizationMessage = 'The alias %alias could not be added because it is already in use in this language with different capitalization: %stored_alias.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

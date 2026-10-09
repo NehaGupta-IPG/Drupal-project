@@ -32,9 +32,6 @@ system.site:
         front:
           type: path
           label: 'Default front page'
-    admin_compact_mode:
-      type: boolean
-      label: 'Compact mode'
     weight_select_max:
       type: integer
       label: 'Weight element maximum value'
@@ -137,7 +134,8 @@ system.date:
                 # - UserInterface::TIMEZONE_SELECT
                 # @see \Drupal\user\UserInterface::TIMEZONE_*
                 # @todo Update this to use enum in https://www.drupal.org/project/drupal/issues/3402178
-                Choice: [0, 1, 2]
+                Choice:
+                  choices: [0, 1, 2]
             warn:
               type: boolean
               label: 'Remind users at login if their time zone is not set'
@@ -206,7 +204,7 @@ system.performance:
         preprocess:
           type: boolean
           label: 'Aggregate CSS files'
-        gzip:
+        compress:
           type: boolean
           label: 'Compress CSS files'
     fast_404:
@@ -232,21 +230,9 @@ system.performance:
         preprocess:
           type: boolean
           label: 'JavaScript preprocess'
-        gzip:
+        compress:
           type: boolean
           label: 'Compress JavaScript files.'
-
-system.rss:
-  type: config_object
-  label: 'Feed settings'
-  mapping:
-    items:
-      type: mapping
-      label: 'Feed items'
-      mapping:
-        view_mode:
-          type: string
-          label: 'Feed content'
 
 system.theme:
   type: config_object
@@ -345,10 +331,6 @@ system.file:
         ClassResolver:
           classOrService: 'stream_wrapper_manager'
           method: 'isValidScheme'
-    path:
-      type: mapping
-      label: 'Path settings'
-      deprecated: "The 'path' config schema is deprecated in drupal:11.2.0 and will be removed from drupal 12.0.0. Use 'file_temp_path' key in settings.php instead. See https://www.drupal.org/node/3039255."
     temporary_maximum_age:
       type: integer
       label: 'Maximum age for temporary files'
@@ -446,6 +428,7 @@ block.settings.system_menu_block:*:
   label: 'Menu block'
   constraints:
     FullyValidatable: ~
+    IgnoreActiveTrail: ~
   mapping:
     level:
       type: integer
@@ -464,6 +447,10 @@ block.settings.system_menu_block:*:
     expand_all_items:
       type: boolean
       label: 'Expand all items'
+    ignore_active_trail:
+      type: boolean
+      label: 'Ignore active trail'
+      requiredKey: false
 
 block.settings.local_tasks_block:
   type: block_settings
@@ -486,11 +473,18 @@ condition.plugin.request_path:
 
 condition.plugin.response_status:
   type: condition.plugin
+  constraints:
+    FullyValidatable: ~
   mapping:
     status_codes:
       type: sequence
       sequence:
         type: integer
+        constraints:
+          # @see \Drupal\system\Plugin\Condition\ResponseStatus::buildConfigurationForm()
+          Choice:
+            # HTTP 200 OK, HTTP 403 FORBIDDEN, HTTP 404 NOT FOUND.
+            choices: [200, 403, 404]
 
 system.feature_flags:
   type: config_object

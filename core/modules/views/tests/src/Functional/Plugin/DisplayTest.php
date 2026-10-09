@@ -9,11 +9,13 @@ use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\display\DisplayTest as DisplayTestPlugin;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the basic display plugin.
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class DisplayTest extends ViewTestBase {
 
   /**
@@ -21,7 +23,16 @@ class DisplayTest extends ViewTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_filter_groups', 'test_get_attach_displays', 'test_view', 'test_display_more', 'test_display_invalid', 'test_display_empty', 'test_exposed_relationship_admin_ui', 'test_simple_argument'];
+  public static $testViews = [
+    'test_filter_groups',
+    'test_get_attach_displays',
+    'test_view',
+    'test_display_more',
+    'test_display_invalid',
+    'test_display_empty',
+    'test_exposed_relationship_admin_ui',
+    'test_simple_argument',
+  ];
 
   /**
    * {@inheritdoc}
@@ -140,7 +151,7 @@ class DisplayTest extends ViewTestBase {
     $this->drupalGet('admin/structure/views/view/test_view/edit/display_test_1');
     $this->assertSession()->pageTextContains('Display test settings');
     // Ensure that the order is as expected.
-    $result = $this->xpath('//ul[@id="views-display-menu-tabs"]/li/a/child::text()');
+    $result = $this->getNodeElementsByXpath('//ul[@id="views-display-menu-tabs"]/li/a/child::text()');
     $this->assertEquals('Display test 2', $result[0]->getText());
     $this->assertEquals('Display test', $result[1]->getText());
 
@@ -343,9 +354,8 @@ class DisplayTest extends ViewTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('The "invalid" plugin does not exist.');
 
-    // Rebuild the router, and ensure that the path is not accessible anymore.
-    views_invalidate_cache();
-    \Drupal::service('router.builder')->rebuildIfNeeded();
+    // Rebuild the router and ensure that the path is not accessible anymore.
+    \Drupal::service('router.builder')->rebuild();
 
     $this->drupalGet('test_display_invalid');
     $this->assertSession()->statusCodeEquals(404);

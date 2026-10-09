@@ -11,13 +11,18 @@ use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
 use Drupal\layout_builder\Section;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of entity_view_display entities.
  */
 #[Group('Entity')]
 #[Group('Validation')]
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class EntityViewDisplayValidationTest extends ConfigEntityValidationTestBase {
 
   use ContentTypeCreationTrait;
@@ -35,8 +40,8 @@ class EntityViewDisplayValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
 
     $this->installEntitySchema('node');
     $this->installConfig('node');
@@ -52,6 +57,12 @@ class EntityViewDisplayValidationTest extends ConfigEntityValidationTestBase {
       'targetEntityType' => 'node',
     ])->save();
 
+    EntityViewMode::create([
+      'id' => 'user.test',
+      'label' => 'Test',
+      'targetEntityType' => 'user',
+    ])->save();
+
     $this->entity = $this->container->get(EntityDisplayRepositoryInterface::class)
       ->getViewDisplay('node', 'one', 'test');
     $this->entity->save();
@@ -65,6 +76,10 @@ class EntityViewDisplayValidationTest extends ConfigEntityValidationTestBase {
 
     $this->entity = $this->container->get('entity_display.repository')
       ->getViewDisplay('user', 'user');
+    // Add 'created' field to display content so that there will be sections
+    // populated in Layout Builder display.
+    $this->entity->setComponent('created', ['type' => 'timestamp'])
+      ->save();
     $this->assertInstanceOf(LayoutEntityDisplayInterface::class, $this->entity);
     $this->entity->enableLayoutBuilder()->save();
     $sections = array_map(fn(Section $section) => $section->toArray(), $this->entity->getSections());

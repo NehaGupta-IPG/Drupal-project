@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\CommentPreviewMode;
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\comment\Entity\CommentType;
-use Drupal\comment\Entity\Comment;
+use Drupal\comment\AnonymousContact;
 use Drupal\comment\CommentInterface;
+use Drupal\comment\CommentPreviewMode;
+use Drupal\comment\Entity\Comment;
+use Drupal\comment\Entity\CommentType;
+use Drupal\comment\FormLocation;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
 
@@ -29,7 +29,6 @@ abstract class CommentTestBase extends BrowserTestBase {
     'block',
     'comment',
     'node',
-    'history',
     'field_ui',
     'datetime',
   ];
@@ -119,7 +118,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    * @return \Drupal\comment\CommentInterface|null
    *   The posted comment or NULL when posted comment was not found.
    */
-  protected function postComment($entity, $comment, $subject = '', $contact = NULL, $field_name = 'comment') {
+  protected function postComment($entity, string|int|float|bool $comment, $subject = '', $contact = NULL, string $field_name = 'comment') {
     $edit = [];
     $edit['comment_body[0][value]'] = $comment;
 
@@ -285,20 +284,22 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   Defaults to 'comment'.
    */
   protected function setCommentForm($enabled, $field_name = 'comment') {
-    $this->setCommentSettings('form_location', ($enabled ? CommentItemInterface::FORM_BELOW : CommentItemInterface::FORM_SEPARATE_PAGE), 'Comment controls ' . ($enabled ? 'enabled' : 'disabled') . '.', $field_name);
+    $this->setCommentSettings('form_location', ($enabled ? FormLocation::Below->value : FormLocation::SeparatePage->value), 'Comment controls ' . ($enabled ? 'enabled' : 'disabled') . '.', $field_name);
   }
 
   /**
    * Sets the value governing restrictions on anonymous comments.
    *
-   * @param int $level
-   *   The level of the contact information allowed for anonymous comments:
-   *   - 0: No contact information allowed.
-   *   - 1: Contact information allowed but not required.
-   *   - 2: Contact information required.
+   * @param \Drupal\comment\AnonymousContact|int $level
+   *   The level of the contact information allowed for anonymous comments.
    */
-  protected function setCommentAnonymous($level) {
-    $this->setCommentSettings('anonymous', $level, new FormattableMarkup('Anonymous commenting set to level @level.', ['@level' => $level]));
+  protected function setCommentAnonymous(AnonymousContact|int $level) {
+    if (!$level instanceof AnonymousContact) {
+      @trigger_error('Calling ' . __METHOD__ . ' with an integer $level parameter is deprecated in drupal:11.4.0 and it will be removed in drupal:13.0.0. Use the \Drupal\comment\AnonymousContact enum instead. See https://www.drupal.org/node/3547352', E_USER_DEPRECATED);
+      $level = AnonymousContact::from($level);
+    }
+    $value = $level->value;
+    $this->setCommentSettings('anonymous', $value, "Anonymous commenting set to level $value.");
   }
 
   /**
@@ -311,7 +312,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   Defaults to 'comment'.
    */
   protected function setCommentsPerPage($number, $field_name = 'comment') {
-    $this->setCommentSettings('per_page', $number, new FormattableMarkup('Number of comments per page set to @number.', ['@number' => $number]), $field_name);
+    $this->setCommentSettings('per_page', $number, "Number of comments per page set to $number", $field_name);
   }
 
   /**
@@ -378,7 +379,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    * @return int
    *   Comment id.
    */
-  protected function getUnapprovedComment($subject) {
+  protected function getUnapprovedComment(string $subject) {
     $this->drupalGet('admin/content/comment/approval');
     preg_match('/href="(.*?)#comment-([^"]+)"(.*?)>(' . $subject . ')/', $this->getSession()->getPage()->getContent(), $match);
 

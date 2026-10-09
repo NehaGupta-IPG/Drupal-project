@@ -18,12 +18,12 @@ use PHPUnit\Framework\TestCase;
 class ReflectionTest extends TestCase {
 
   /**
+   * Tests get parameter class name.
+   *
    * @param string|null $expected
    *   The expected value of the parameter.
    * @param \ReflectionParameter $parameter
    *   The reflection parameter.
-   *
-   * @legacy-covers ::getParameterClassName
    */
   #[DataProvider('providerGetParameterClassName')]
   public function testGetParameterClassName(?string $expected, \ReflectionParameter $parameter): void {
@@ -38,7 +38,7 @@ class ReflectionTest extends TestCase {
    *   - string|null $expected: The expected class name.
    *   - \ReflectionParameter $parameter: The reflection parameter.
    */
-  public static function providerGetParameterClassName() {
+  public static function providerGetParameterClassName(): array {
     $reflection_method = new \ReflectionMethod(static::class, 'existsForTesting');
     $parameters = $reflection_method->getParameters();
     return [
@@ -57,7 +57,7 @@ class ReflectionTest extends TestCase {
    * Note the capital P in Parent is intentional and for testing purposes.
    */
   // phpcs:disable Generic.PHP.LowerCaseKeyword.Found
-  protected function existsForTesting(string $string, array $array, ReflectionTest $test, Reflection $reflection, Parent $parent, self $self) {
+  protected function existsForTesting(string $string, array $array, ReflectionTest $test, Reflection $reflection, Parent $parent, self $self): void {
   }
 
   // phpcs:enable

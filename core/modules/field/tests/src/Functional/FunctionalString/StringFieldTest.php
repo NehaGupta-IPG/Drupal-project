@@ -9,11 +9,13 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation of string fields.
  */
 #[Group('text')]
+#[RunTestsInSeparateProcesses]
 class StringFieldTest extends BrowserTestBase {
 
   /**
@@ -60,7 +62,7 @@ class StringFieldTest extends BrowserTestBase {
   /**
    * Helper function for testTextfieldWidgets().
    */
-  public function _testTextfieldWidgets($field_type, $widget_type): void {
+  public function _testTextfieldWidgets($field_type, string $widget_type): void {
     // Create a field.
     $field_name = $this->randomMachineName();
     $field_storage = FieldStorageConfig::create([

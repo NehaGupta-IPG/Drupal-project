@@ -6,18 +6,15 @@ namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the core Drupal\views\Plugin\views\filter\Equality handler.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FilterEqualityTest extends ViewsKernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * Views used by this test.
@@ -168,7 +165,7 @@ class FilterEqualityTest extends ViewsKernelTestBase {
    * Provides grouped exposed filter options for the 'name' field.
    */
   protected function getGroupedExposedFilters(): array {
-    $filters = [
+    return [
       'name' => [
         'id' => 'name',
         'plugin_id' => 'equality',
@@ -202,7 +199,6 @@ class FilterEqualityTest extends ViewsKernelTestBase {
         ],
       ],
     ];
-    return $filters;
   }
 
 }

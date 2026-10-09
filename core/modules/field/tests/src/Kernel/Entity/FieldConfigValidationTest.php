@@ -9,12 +9,18 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of field_config entities.
- *
- * @group field
  */
+#[Group('field')]
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FieldConfigValidationTest extends ConfigEntityValidationTestBase {
 
   use ContentTypeCreationTrait;
@@ -25,10 +31,15 @@ class FieldConfigValidationTest extends ConfigEntityValidationTestBase {
   protected static $modules = ['field', 'node', 'entity_test', 'text', 'user'];
 
   /**
+   * The state key turning off the `broken` entity reference selection fallback.
+   */
+  private const string DISABLE_BROKEN_HANDLER_STATE = 'field_test_disable_broken_entity_reference_handler';
+
+  /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
 
     $this->installEntitySchema('node');
     $this->installConfig('node');
@@ -37,6 +48,13 @@ class FieldConfigValidationTest extends ConfigEntityValidationTestBase {
 
     EntityTestBundle::create(['id' => 'one'])->save();
     EntityTestBundle::create(['id' => 'another'])->save();
+
+    $this->installEntitySchema('user');
+    FieldStorageConfig::create([
+      'type' => 'text_long',
+      'field_name' => 'novel',
+      'entity_type' => 'user',
+    ])->save();
 
     $this->entity = FieldConfig::loadByName('node', 'one', 'body');
   }
@@ -71,15 +89,7 @@ class FieldConfigValidationTest extends ConfigEntityValidationTestBase {
    * Tests validation of a field_config's default value.
    */
   public function testMultilineTextFieldDefaultValue(): void {
-    $this->installEntitySchema('user');
-    // First, create a field storage for which a complex default value exists.
-    $this->enableModules(['text']);
-    $text_field_storage_config = FieldStorageConfig::create([
-      'type' => 'text_with_summary',
-      'field_name' => 'novel',
-      'entity_type' => 'user',
-    ]);
-    $text_field_storage_config->save();
+    $text_field_storage_config = FieldStorageConfig::loadByName('user', 'novel');
 
     $this->entity = FieldConfig::create([
       'field_storage' => $text_field_storage_config,
@@ -87,7 +97,6 @@ class FieldConfigValidationTest extends ConfigEntityValidationTestBase {
       'default_value' => [
         0 => [
           'value' => "Multi\nLine",
-          'summary' => '',
           'format' => 'basic_html',
         ],
       ],
@@ -175,7 +184,7 @@ class FieldConfigValidationTest extends ConfigEntityValidationTestBase {
    */
   public function testEntityReferenceSelectionHandlerIsValidated(): void {
     $this->container->get('state')
-      ->set('field_test_disable_broken_entity_reference_handler', TRUE);
+      ->set(self::DISABLE_BROKEN_HANDLER_STATE, TRUE);
     $this->enableModules(['field_test']);
 
     // The `field_type` property is immutable, so we need to clone the entity in
@@ -187,6 +196,15 @@ class FieldConfigValidationTest extends ConfigEntityValidationTestBase {
     $this->assertValidationErrors([
       'settings.handler' => "The 'non_existent' plugin does not exist.",
     ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function resetEnvironment(): void {
+    parent::resetEnvironment();
+
+    $this->container->get('state')->delete(self::DISABLE_BROKEN_HANDLER_STATE);
   }
 
 }

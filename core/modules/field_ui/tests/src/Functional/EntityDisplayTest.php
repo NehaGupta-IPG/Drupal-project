@@ -6,11 +6,13 @@ namespace Drupal\Tests\field_ui\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the UI for entity displays.
  */
 #[Group('field_ui')]
+#[RunTestsInSeparateProcesses]
 class EntityDisplayTest extends BrowserTestBase {
 
   /**
@@ -38,7 +40,7 @@ class EntityDisplayTest extends BrowserTestBase {
    * Tests the use of regions for entity view displays.
    */
   public function testEntityView(): void {
-    $this->drupalGet('entity_test/structure/entity_test/display');
+    $this->drupalGet('entity_test/structure/entity_test/display/default');
     $this->assertSession()->elementExists('css', '.region-content-message.region-empty');
     $this->assertTrue($this->assertSession()->optionExists('fields[field_test_text][region]', 'hidden')->isSelected());
 
