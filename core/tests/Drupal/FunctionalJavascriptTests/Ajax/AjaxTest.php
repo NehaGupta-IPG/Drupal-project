@@ -328,6 +328,7 @@ JS;
     $this->assertNotNull($textfield1 = $this->assertSession()->elementExists('css', '#edit-textfield'));
     $this->assertNotNull($textfield2 = $this->assertSession()->elementExists('css', '#edit-textfield-2'));
     $this->assertNotNull($textfield3 = $this->assertSession()->elementExists('css', '#edit-textfield-3'));
+    $this->assertNotNull($textfield4 = $this->assertSession()->elementExists('css', '[id^="edit-textfield-4"]'));
 
     // Test textfield with 'blur' event listener.
     $textfield1->setValue('Kittens say purr');
@@ -355,6 +356,27 @@ JS);
     $this->assertSession()->assertWaitOnAjaxRequest();
     $has_focus_id = $this->getSession()->evaluateScript('document.activeElement.id');
     $this->assertEquals('edit-textfield-3', $has_focus_id);
+
+    // Test cursor position after html insert re-focus.
+    $expected_value = "Fox says erm";
+    // Since the driver can not simulate raw keyboard input, I'm doing my best here to simulate it in JS.
+    $textfield4->focus();
+    foreach (mb_str_split($expected_value) as $char) {
+      $this->getSession()->executeScript(<<<JS
+/** @type {HTMLInputElement} */
+const element = document.activeElement;
+const selectionStart = element.selectionStart ?? 0;
+const selectionEnd = element.selectionEnd ?? selectionStart;
+element.value = element.value.slice(0, selectionStart) + "$char" + element.value.slice(selectionEnd);
+element.setSelectionRange(selectionStart + 1, selectionStart + 1);
+element.dispatchEvent(new Event("input", {bubbles: true}));
+element.dispatchEvent(new Event("change", {bubbles:true}));
+element.dispatchEvent(new Event("formUpdated", {bubbles:true}));
+JS);
+      $this->assertSession()->assertWaitOnAjaxRequest();
+    }
+    $actual_value = $textfield4->getValue();
+    $this->assertEquals($expected_value, $actual_value);
 
     $this->assertNotNull($email_field1 = $this->assertSession()->elementExists('css', '#edit-email-field-1'));
     // Test email field with 'blur' event listener.

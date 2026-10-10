@@ -452,6 +452,30 @@
     this.preCommandsFocusedElementSelector = null;
 
     /**
+     * The selectionStart property of the last focused element.
+     *
+     * @type {number|null}
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/selectionStart
+     */
+    this.preCommandsFocusedElementSelectionStart = null;
+
+    /**
+     * The selectionEnd property of the last focused element.
+     *
+     * @type {number|null}
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/selectionEnd
+     */
+    this.preCommandsFocusedElementSelectionEnd = null;
+
+    /**
+     * The selectionDirection property of the last focused element.
+     *
+     * @type {'forward'|'backward'|'none'|undefined}
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/selectionDirection
+     */
+    this.preCommandsFocusedElementSelectionDirection = undefined;
+
+    /**
      * @type {Drupal.Ajax~elementSettings}
      */
     this.elementSettings = elementSettings;
@@ -543,6 +567,9 @@
       beforeSubmit(formValues, elementSettings, options) {
         ajax.ajaxing = true;
         ajax.preCommandsFocusedElementSelector = null;
+        ajax.preCommandsFocusedElementSelectionStart = null;
+        ajax.preCommandsFocusedElementSelectionEnd = null;
+        ajax.preCommandsFocusedElementSelectionDirection = undefined;
         return ajax.beforeSubmit(formValues, elementSettings, options);
       },
       beforeSend(xmlhttprequest, options) {
@@ -552,6 +579,12 @@
       success(response, status, xmlhttprequest) {
         ajax.preCommandsFocusedElementSelector =
           document.activeElement.getAttribute('data-drupal-selector');
+        ajax.preCommandsFocusedElementSelectionStart =
+          document.activeElement.selectionStart ?? null;
+        ajax.preCommandsFocusedElementSelectionEnd =
+          document.activeElement.selectionEnd ?? null;
+        ajax.preCommandsFocusedElementSelectionDirection =
+          document.activeElement.selectionDirection;
 
         // Sanity check for browser support (object expected).
         // When using iFrame uploads, responses must be returned as a string.
@@ -1084,6 +1117,9 @@
       .parents('[data-drupal-selector]')
       .addBack()
       .toArray();
+    let selectionStart = this.element.selectionStart ?? null;
+    let selectionEnd = this.element.selectionEnd ?? null;
+    let selectionDirection = this.element.selectionDirection;
 
     // Track if any command is altering the focus so we can avoid changing the
     // focus set by the Ajax command.
@@ -1112,6 +1148,10 @@
                 target = document.querySelector(
                   `[data-drupal-selector="${this.preCommandsFocusedElementSelector}"]`,
                 );
+                selectionStart = this.preCommandsFocusedElementSelectionStart;
+                selectionEnd = this.preCommandsFocusedElementSelectionEnd;
+                selectionDirection =
+                  this.preCommandsFocusedElementSelectionDirection;
               }
               if (!target && !$(this.element).data('disable-refocus')) {
                 for (
@@ -1129,6 +1169,13 @@
             }
             if (target) {
               $(target).trigger('focus');
+              if (typeof target.setSelectionRange === 'function') {
+                target.setSelectionRange(
+                  selectionStart,
+                  selectionEnd,
+                  selectionDirection,
+                );
+              }
             }
           }
           // Reattach behaviors, if they were detached in beforeSerialize(). The
