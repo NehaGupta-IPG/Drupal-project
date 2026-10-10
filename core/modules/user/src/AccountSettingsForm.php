@@ -5,7 +5,6 @@ namespace Drupal\user;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
@@ -18,39 +17,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class AccountSettingsForm extends ConfigFormBase {
 
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The role storage used when changing the admin role.
-   *
-   * @var \Drupal\user\RoleStorageInterface
-   */
-  protected $roleStorage;
-
-  /**
-   * Constructs a \Drupal\user\AccountSettingsForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\user\RoleStorageInterface|\Drupal\Core\Extension\ModuleHandlerInterface $role_storage
-   *   The role storage.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, RoleStorageInterface|ModuleHandlerInterface $role_storage) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected RoleStorageInterface $roleStorage,
+    protected AccountCancellation $accountCancellation,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
-
-    $this->roleStorage = $role_storage;
-    if ($role_storage instanceof ModuleHandlerInterface) {
-      $this->moduleHandler = $role_storage;
-      $this->roleStorage = func_get_arg(3);
-      @trigger_error('Calling ' . __METHOD__ . '() with the $module_handler argument is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3566911', E_USER_DEPRECATED);
-    }
   }
 
   /**
@@ -60,7 +33,8 @@ class AccountSettingsForm extends ConfigFormBase {
     return new static(
       $container->get('config.factory'),
       $container->get('config.typed'),
-      $container->get('entity_type.manager')->getStorage('user_role')
+      $container->get('entity_type.manager')->getStorage('user_role'),
+      $container->get(AccountCancellation::class),
     );
   }
 
@@ -144,7 +118,7 @@ class AccountSettingsForm extends ConfigFormBase {
           ->toString(),
       ]),
     ];
-    $form['registration_cancellation']['user_cancel_method'] += user_cancel_methods();
+    $form['registration_cancellation']['user_cancel_method'] += $this->accountCancellation->cancelMethods();
     foreach (Element::children($form['registration_cancellation']['user_cancel_method']) as $key) {
       // All account cancellation methods that specify #access cannot be
       // configured as default method.
