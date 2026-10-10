@@ -752,7 +752,20 @@ class FormHooks {
     // Sidebar close button.
     $close_sidebar_translation = $this->t('Close sidebar panel');
     $form['default_admin_sidebar']['default_admin_sidebar_close'] = [
-      '#markup' => '<a href="#close-sidebar" class="meta-sidebar__close trigger" role="button" title="' . $close_sidebar_translation . '"><span class="visually-hidden">' . $close_sidebar_translation . '</span></a>',
+      '#type' => 'html_tag',
+      '#tag' => 'button',
+      '#attributes' => [
+        'type' => 'button',
+        'class' => ['meta-sidebar__close', 'trigger'],
+        'title' => $close_sidebar_translation,
+        'aria-controls' => 'default_admin_sidebar',
+      ],
+      'label' => [
+        '#type' => 'html_tag',
+        '#tag' => 'span',
+        '#value' => $close_sidebar_translation,
+        '#attributes' => ['class' => ['visually-hidden']],
+      ],
     ];
 
     $form['default_admin_sidebar_overlay'] = [
