@@ -4,11 +4,11 @@
  */
 
 /* eslint-disable func-names, comma-dangle, strict */
-((Drupal, drupalSettings, once) => {
+((Drupal, once) => {
   const breakpoint = 1024;
   const breakpointLarge = 1280;
-  const storageMobile = 'Drupal.admin.sidebarExpanded.mobile';
-  const storageDesktop = 'Drupal.admin.sidebarExpanded.desktop';
+  const storageMobile = 'Drupal.defaultAdmin.sidebarExpanded.mobile';
+  const storageDesktop = 'Drupal.defaultAdmin.sidebarExpanded.desktop';
 
   Drupal.behaviors.adminSidebar = {
     attach: function attach(context) {
@@ -47,7 +47,7 @@
       // Toolbar toggle
       once('adminSidebarToggle', '.meta-sidebar__trigger', context).forEach(
         (el) =>
-          el.addEventListener('click', (e) => {
+          el.addEventListener('click', () => {
             this.toggleSidebar();
           }),
       );
@@ -64,6 +64,7 @@
       );
 
       // Add `--admin-theme-toolbar-y-offset` style inline on <html> element.
+      // This is used when positioning the sidebar against the toolbar.
       once('adminSidebarTop', '#default_admin_sidebar', context).forEach(() => {
         const topBar = document.querySelector('.admin--navigation-top-bar');
         const bottomEdge = topBar.getBoundingClientRect().bottom;
@@ -105,21 +106,6 @@
       if (window.innerWidth < breakpointLarge) {
         Drupal.adminCoreNavigation?.collapseToolbar();
       }
-      // document.querySelectorAll('.layout-node-form > *:not(#default_admin_sidebar)').forEach(el => {
-      //   el.inert = true;
-      // });
-
-      // document.querySelectorAll('.region-content > *:not(#block-default-admin-content)').forEach(el => {
-      //   el.inert = true;
-      // });
-
-      // document.querySelectorAll('.page-content > *:not(.region-content)').forEach(el => {
-      //   el.inert = true;
-      // });
-
-      // document.querySelectorAll('.page-wrapper__node-edit-form > *:not(.layout-container)').forEach(el => {
-      //   el.inert = true;
-      // });
     },
 
     collapseSidebar: () => {
@@ -149,4 +135,4 @@
       }
     },
   };
-})(Drupal, drupalSettings, once);
+})(Drupal, once);
