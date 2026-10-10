@@ -67,6 +67,11 @@
       // This is used when positioning the sidebar against the toolbar.
       once('adminSidebarTop', '#default_admin_sidebar', context).forEach(() => {
         const topBar = document.querySelector('.admin--navigation-top-bar');
+        // The top bar is only rendered by the Navigation module. Without it,
+        // keep the offset from CSS.
+        if (!topBar) {
+          return;
+        }
         const bottomEdge = topBar.getBoundingClientRect().bottom;
         document.documentElement.style.setProperty(
           '--admin-theme-toolbar-y-offset',
