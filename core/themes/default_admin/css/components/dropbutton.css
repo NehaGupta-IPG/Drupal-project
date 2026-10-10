@@ -63,7 +63,6 @@
 }
 
 /* <div> that is parent of <ul> */
-
 .dropbutton-widget {
   display: contents;
 }
@@ -71,7 +70,6 @@
 /**
  * Dropbutton <ul>.
  */
-
 .dropbutton {
   display: flex;
   height: var(--dropbutton-height);
@@ -99,7 +97,6 @@
 /**
  * Nested <UL> that is the dropdown.
  */
-
 .dropbutton__items {
   --dropdown-padding: 0.25rem;
 
@@ -121,6 +118,7 @@
 
   .dropbutton-wrapper.open & {
     position-anchor: --dropbutton-anchor;
+    inset-area: bottom span-x-end;
     position-area: bottom span-x-end;
     position-try-fallbacks: flip-block;
     display: block;
@@ -130,6 +128,7 @@
       inset-inline-start: 0;
       inset-block-start: calc(100% + 2px);
       min-width: 100%;
+      inset-area: none;
       position-area: none;
       position-anchor: auto;
     }
@@ -172,6 +171,7 @@
   @media (scripting: none) {
     .dropbutton-wrapper:is(:hover, :focus-within) & {
       position-anchor: --dropbutton-anchor;
+      inset-area: bottom span-x-end;
       position-area: bottom span-x-end;
       position-try-fallbacks: flip-block;
       display: block;
@@ -181,6 +181,7 @@
         inset-inline-start: 0;
         inset-block-start: calc(100% + 2px);
         min-width: 100%;
+        inset-area: none;
         position-area: none;
         position-anchor: auto;
       }
@@ -191,7 +192,6 @@
 /**
  * Dropbutton toggler <li> element.
  */
-
 .dropbutton-toggle {
   display: contents;
 }
@@ -199,7 +199,6 @@
 /**
  * Dropbutton toggler <button> element.
  */
-
 .dropbutton__toggle {
   position: relative;
   display: block;
@@ -257,7 +256,6 @@
  *
  * Duplicates base button styles for nested element.
  */
-
 .dropbutton > .dropbutton__item:first-of-type {
   > *:not(.secondary-action) {
     display: flex;
