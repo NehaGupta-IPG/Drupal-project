@@ -54,7 +54,7 @@ Disallow: /themes/README.txt
 Disallow: /admin/
 Disallow: /comment/reply/
 Disallow: /filter/tips
-Disallow: /node/add/
+Disallow: /node
 Disallow: /search/
 Disallow: /search?
 Disallow: /user/register
