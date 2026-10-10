@@ -112,7 +112,7 @@
   .dropbutton-wrapper.open & {
     position-anchor: --dropbutton-anchor;
     position-area: bottom span-x-end;
-    position-try-fallbacks: flip-block;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;;
     display: block;
 
     @supports not (anchor-scope: all) {
@@ -162,7 +162,7 @@
     .dropbutton-wrapper:is(:hover, :focus-within) & {
       position-anchor: --dropbutton-anchor;
       position-area: bottom span-x-end;
-      position-try-fallbacks: flip-block;
+      position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;;
       display: block;
 
       @supports not (anchor-scope: all) {
