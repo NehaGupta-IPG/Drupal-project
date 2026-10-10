@@ -80,7 +80,6 @@ summary {
  * Reusable heading classes are included to help modules change the styling of
  * headings on a page without affecting accessibility.
  */
-
 h1,
 .heading-a {
   margin: var(--admin-space-m) 0 var(--admin-space-s);
@@ -253,7 +252,6 @@ img {
 /**
  * Default focus styles for focused elements.
  */
-
 :where(.page-wrapper, .ui-dialog) *:focus {
   outline: var(--focus-outline);
   outline-offset: var(--outline-offset);
@@ -264,21 +262,18 @@ img {
  * JavaScript, and views-ui-noscript.css exists so browsers without JavaScript
  * will still display them.
  */
-
 .views-tabs,
 .views-display-top > input.button {
   display: none;
 }
 
 /* Set a dark color scheme to style native browser elements. */
-
 .dark-mode {
   color-scheme: dark;
 }
 
 /* Enforcing colors on visually hidden text prevents accessibility scanners from
    reporting contrast errors for text that is not visually rendered. */
-
 .visually-hidden {
   color: var(--admin-color-text-loud);
 }
