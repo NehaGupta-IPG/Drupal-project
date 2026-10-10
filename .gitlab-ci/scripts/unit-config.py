@@ -12,8 +12,12 @@ def conf(base, docroot='/var/www/html', access_log=True):
     B = base.rstrip('/')
     R = B.replace('.', r'\.')  # base path as a regex fragment
     share = docroot + '$uri'
+    # Anchored: since 1.37.0, FreeUnit caps the cost of a pattern that is not
+    # anchored with a callout before every step, which made this one ~2.7x
+    # slower. "(?s:.*/)?" is equivalent to "(^|/)", as no alternative below
+    # matches a "/".
     files_match = (
-        r'~(^|/)([^/]*\.(engine|inc|install|make|module|profile|po|sh|[^/]*sql|theme|twig|tpl(\.php)?|xtmpl|yml)'
+        r'~^(?s:.*/)?([^/]*\.(engine|inc|install|make|module|profile|po|sh|[^/]*sql|theme|twig|tpl(\.php)?|xtmpl|yml)'
         r'(~|\.sw[op]|\.bak|\.orig|\.save)?|\.(?!well-known)[^/]*|Entries[^/]*|Repository|Root|Tag|Template'
         r'|composer\.(json|lock)|web\.config|yarn\.lock|package(-lock)?\.json|#[^/]*#'
         r'|[^/]*\.php(~|\.sw[op]|\.bak|\.orig|\.save))$'
