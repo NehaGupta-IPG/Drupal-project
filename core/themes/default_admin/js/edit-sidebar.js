@@ -2,12 +2,11 @@
  * @file
  * Interactions for resizable sidebar on edit pages.
  */
-
 /* eslint-disable func-names, no-mutable-exports, comma-dangle, strict */
-((Drupal, drupalSettings, once) => {
+((Drupal) => {
   const reSizer = document.getElementById('sidebar-draggable');
   const resizable = document.getElementById('default_admin_sidebar');
-  const storageWidth = 'Drupal.admin.sidebarWidth';
+  const storageWidth = 'Drupal.defaultAdmin.sidebarWidth';
   let isResizing = false;
   let startX, startWidth;
 
@@ -41,14 +40,15 @@
     },
 
     resizeEnd: () => {
+      if (!isResizing) {
+        return;
+      }
       isResizing = false;
       const setWidth = document.documentElement.style.getPropertyValue(
         '--admin-theme-sidebar-width',
       );
       const currentWidth = setWidth ? setWidth : resizable.style.width;
       localStorage.setItem(storageWidth, currentWidth);
-      document.removeEventListener('mousemove', this.resizeWidth);
-      document.removeEventListener('touchend', this.resizeWidth);
     },
 
     resizeWidth: (e) => {
