@@ -60,8 +60,8 @@ abstract class ConnectionParametersFactory {
     // same name of the driver.
     if (empty($options['module'])) {
       if (!empty($options['namespace'])) {
-        $module = explode('\\', $options['namespace'])[1];
-        if ($module !== '' && $module !== 'Core') {
+        $module = explode('\\', $options['namespace'])[1] ?? '';
+        if ($module !== '') {
           $options['module'] = $module;
         }
       }
