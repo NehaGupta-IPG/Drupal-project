@@ -424,6 +424,13 @@ class SettingsTest extends UnitTestCase {
       ],
       [
         'mysql',
+        'Drupal\\Core\\Database\\Driver\\mysql',
+        NULL,
+        'Drupal\\mysql\\Driver\\Database\\mysql',
+        'core/modules/mysql/src/Driver/Database/mysql/',
+      ],
+      [
+        'mysql',
         'Drupal\\mysql\\Driver\\Database\\mysql',
         NULL,
         'Drupal\\mysql\\Driver\\Database\\mysql',
@@ -453,6 +460,13 @@ class SettingsTest extends UnitTestCase {
       ],
       [
         'pgsql',
+        'Drupal\\Core\\Database\\Driver\\pgsql',
+        NULL,
+        'Drupal\\pgsql\\Driver\\Database\\pgsql',
+        'core/modules/pgsql/src/Driver/Database/pgsql/',
+      ],
+      [
+        'pgsql',
         'Drupal\\pgsql\\Driver\\Database\\pgsql',
         NULL,
         'Drupal\\pgsql\\Driver\\Database\\pgsql',
@@ -476,6 +490,13 @@ class SettingsTest extends UnitTestCase {
       [
         'sqlite',
         '',
+        NULL,
+        'Drupal\\sqlite\\Driver\\Database\\sqlite',
+        'core/modules/sqlite/src/Driver/Database/sqlite/',
+      ],
+      [
+        'sqlite',
+        'Drupal\\Core\\Database\\Driver\\sqlite',
         NULL,
         'Drupal\\sqlite\\Driver\\Database\\sqlite',
         'core/modules/sqlite/src/Driver/Database/sqlite/',
