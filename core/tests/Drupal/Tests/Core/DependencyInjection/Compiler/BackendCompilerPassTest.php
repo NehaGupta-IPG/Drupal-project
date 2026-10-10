@@ -182,6 +182,7 @@ class BackendCompilerPassTest extends UnitTestCase {
       'driver' => 'driver_test',
       'namespace' => 'Drupal\driver_test\Driver\Database\DriverTestMysql',
       'autoload' => $this->root . '/core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTestMysql',
+      'database' => 'test',
     ]);
     $container->set('database', $database);
     return $container;
