@@ -1033,9 +1033,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $this->assertTrue($this->entity->hasTrustedData());
   }
 
-  /**
-   * @legacy-covers ::addConfigEntityDependency
-   */
   public function testAddConfigEntityDependency(): void {
     $values = [
       'id' => 'foo',
@@ -1059,9 +1056,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $this->assertEquals(['config' => ['test_provider.' . $this->entityTypeId . '.foo']], $this->entity->getDependencies());
   }
 
-  /**
-   * @legacy-covers ::addConfigEntityDependency
-   */
   public function testAddConfigEntityDependencyException(): void {
     $storage = $this->createMock(ConfigEntityStorageInterface::class);
     // Behave as if the dependency does not exist.
