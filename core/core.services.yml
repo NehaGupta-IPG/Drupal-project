@@ -493,7 +493,7 @@ services:
       - { name: backend_overridable }
   config.storage.schema:
     class: Drupal\Core\Config\ExtensionInstallStorage
-    arguments: ['@config.storage', 'config/schema', '', true, '%install_profile%']
+    arguments: ['@config.storage', 'config/schema', '', true, '%install_profile%', '@config.parsing_cache']
   config.typed:
     class: Drupal\Core\Config\TypedConfigManager
     arguments: ['@config.storage', '@config.storage.schema', '@cache.discovery', '@module_handler', '@class_resolver']

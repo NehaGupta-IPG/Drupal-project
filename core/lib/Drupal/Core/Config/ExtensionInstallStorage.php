@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config;
 
+use Drupal\Core\Cache\CacheCollectorInterface;
 use Drupal\Core\Extension\ExtensionDiscovery;
 
 /**
@@ -50,9 +51,12 @@ class ExtensionInstallStorage extends InstallStorage {
    *   search and to get overrides from.
    * @param string $profile
    *   The current installation profile.
+   * @param ?Drupal\Core\Cache\CacheCollectorInterface $yamlCacheCollector
+   *   The YAML cache collector. If not passed, a YAMl cache collector with
+   *   a memory backend will be used.
    */
-  public function __construct(StorageInterface $config_storage, $directory, $collection, $include_profile, $profile) {
-    parent::__construct($directory, $collection);
+  public function __construct(StorageInterface $config_storage, $directory, $collection, $include_profile, $profile, ?CacheCollectorInterface $yamlCacheCollector = NULL) {
+    parent::__construct($directory, $collection, $yamlCacheCollector);
     $this->configStorage = $config_storage;
     $this->includeProfile = $include_profile;
     $this->installProfile = $profile;
