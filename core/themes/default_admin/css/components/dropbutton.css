@@ -262,6 +262,7 @@
   > *:not(.secondary-action) {
     display: flex;
     align-items: center;
+    width: max-content;
     height: 100%;
     margin: 0;
     cursor: pointer;
