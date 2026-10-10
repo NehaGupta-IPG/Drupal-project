@@ -3170,6 +3170,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/ImportStorageTransformer.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Command\\\\ConfigExportCommand\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Command/ConfigExportCommand.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Importer\\\\ConfigImporterBatch\\:\\:finish\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17640,12 +17646,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media/src/Controller/OEmbedIframeController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\media\\\\Entity\\\\Media\\:\\:getRequestTime\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Entity/Media.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\media\\\\Entity\\\\Media\\:\\:postSave\\(\\) has no return type specified\\.$#',
