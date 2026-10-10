@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Plugin\views\wizard\WizardInterface;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
@@ -511,39 +512,9 @@ abstract class StylePluginBase extends PluginBase {
         if ($this->usesRowPlugin()) {
           $fibers = [];
           foreach ($set['rows'] as $index => $row) {
-            $fibers[$index] = new \Fiber(function () use ($row, $index) {
-              $this->view->row_index = $index;
-              return $this->view->rowPlugin->render($row);
-            });
+            $fibers[$index] = new \Fiber(fn () => $this->view->rowPlugin->render($row));
           }
-          $iterations = 0;
-          while (count($fibers) > 0) {
-            foreach ($fibers as $key => $fiber) {
-              if (!$fiber->isStarted()) {
-                $fiber->start();
-              }
-              elseif ($fiber->isSuspended()) {
-                $fiber->resume();
-              }
-              // If the Fiber hasn't terminated by this point, move onto the
-              // next placeholder, we'll resume this Fiber again when we get
-              // back here.
-              if (!$fiber->isTerminated()) {
-                // If we've gone through the placeholders once already, and
-                // they're still not finished, then start to allow code higher
-                // up the stack to get on with something else.
-                if ($iterations) {
-                  $fiber = \Fiber::getCurrent();
-                  if ($fiber !== NULL) {
-                    $fiber->suspend();
-                  }
-                }
-                continue;
-              }
-              $set['rows'][$key] = $fiber->getReturn();
-              unset($fibers[$key]);
-            }
-          }
+          $set['rows'] = $this->runRowFibers($fibers);
         }
 
         $single_output = $this->renderRowGroup($set['rows']);
@@ -704,40 +675,11 @@ abstract class StylePluginBase extends PluginBase {
       // If all fields have a field::access FALSE there might be no fields, so
       // there is no reason to execute this code.
       if (!empty($field_ids)) {
-        /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache_plugin */
-
-        /** @var \Drupal\views\ResultRow $row */
         $fibers = [];
-        $iterations = 0;
         foreach ($result as $index => $row) {
-          $fibers[$index] = new \Fiber(fn() => $this->renderFieldRow($index, $row, $field_ids));
+          $fibers[$index] = new \Fiber(fn () => $this->renderFieldRow($index, $row, $field_ids));
         }
-        while (\count($fibers) > 0) {
-          foreach ($fibers as $key => $fiber) {
-            if (!$fiber->isStarted()) {
-              $fiber->start();
-            }
-            elseif ($fiber->isSuspended()) {
-              $fiber->resume();
-            }
-            // If the Fiber hasn't terminated by this point, move onto the next
-            // placeholder, we'll resume this Fiber again when we get back here.
-            if (!$fiber->isTerminated()) {
-              // If we've gone through the placeholders once already, and
-              // they're still not finished, then start to allow code higher up
-              // the stack to get on with something else.
-              if ($iterations) {
-                $fiber = \Fiber::getCurrent();
-                if ($fiber !== NULL) {
-                  $fiber->suspend();
-                }
-              }
-              continue;
-            }
-            unset($fibers[$key]);
-          }
-          $iterations++;
-        }
+        $this->runRowFibers($fibers);
       }
     }
 
@@ -749,7 +691,7 @@ abstract class StylePluginBase extends PluginBase {
    *
    * @param int $index
    *   The index of this row within the result.
-   * @param Drupal\views\ResultRow $row
+   * @param \Drupal\views\ResultRow $row
    *   The row to be rendered.
    * @param array $field_ids
    *   The field IDs present in this row.
@@ -908,6 +850,86 @@ abstract class StylePluginBase extends PluginBase {
     if (isset($this->view->rowPlugin)) {
       $this->view->rowPlugin->query();
     }
+  }
+
+  /**
+   * Captures the render state of the row currently being rendered.
+   *
+   * @return array
+   *   The current row index and the state of each field handler.
+   */
+  protected function captureRowState(): array {
+    $state = [
+      'row_index' => $this->view->row_index ?? NULL,
+      'fields' => [],
+    ];
+    foreach ($this->view->field as $id => $field) {
+      if ($field instanceof FieldPluginBase) {
+        $state['fields'][$id] = $field->getRowRenderState();
+      }
+    }
+    return $state;
+  }
+
+  /**
+   * Restores state previously returned by ::captureRowState().
+   *
+   * @param array $state
+   *   The state to restore.
+   */
+  protected function restoreRowState(array $state): void {
+    $this->view->row_index = $state['row_index'];
+    foreach ($state['fields'] as $id => $field_state) {
+      $this->view->field[$id]->setRowRenderState($field_state);
+    }
+  }
+
+  /**
+   * Runs one Fiber per row, keeping each row's render state separate.
+   *
+   * @param \Fiber[] $fibers
+   *   Unstarted Fibers keyed by row index.
+   *
+   * @return array
+   *   The return value of each Fiber, keyed by row index in the original order.
+   */
+  protected function runRowFibers(array $fibers): array {
+    $results = array_fill_keys(array_keys($fibers), NULL);
+    $last_index = array_key_last($fibers);
+    $initial_state = $this->captureRowState();
+    $states = [];
+    $iterations = 0;
+    while ($fibers) {
+      foreach ($fibers as $index => $fiber) {
+        $this->restoreRowState($states[$index] ?? ['row_index' => $index] + $initial_state);
+        if (!$fiber->isStarted()) {
+          $fiber->start();
+        }
+        elseif ($fiber->isSuspended()) {
+          $fiber->resume();
+        }
+        $states[$index] = $this->captureRowState();
+        if ($fiber->isTerminated()) {
+          $results[$index] = $fiber->getReturn();
+          unset($fibers[$index]);
+          if ($index !== $last_index) {
+            unset($states[$index]);
+          }
+          continue;
+        }
+        // If we've iterated through all rows and we're still waiting, let other
+        // fibres take control.
+        if ($iterations && ($parent = \Fiber::getCurrent()) !== NULL) {
+          $parent->suspend();
+        }
+      }
+      $iterations++;
+    }
+    // Leave object with original row state restored.
+    if ($last_index !== NULL) {
+      $this->restoreRowState($states[$last_index]);
+    }
+    return $results;
   }
 
 }
