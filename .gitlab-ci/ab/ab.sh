@@ -19,8 +19,20 @@
 #   AB_TARGET  optional run-tests.sh selection args instead of a shard
 #   AB_WARMUP  comma-separated test files for the unmeasured warm-up
 #   AB_MICRO   1 = concurrent wrk microbenchmark of the unit arms first
-#   AB_FILLER  0 = no filler (FunctionalJavascript: killing filler strands
-#              Selenium sessions in the shared browser)
+#   AB_FILLER  0 = no filler (FunctionalJavascript, Nightwatch: killing filler
+#              strands Selenium sessions in the shared browser)
+#   AB_RUNNER  run-tests (default) | nightwatch: `yarn test:nightwatch` in the
+#              slot's core/, --workers=CONCURRENCY/N; AB_TARGET and AB_WARMUP
+#              are then nightwatch arguments / one test file.
+#   AB_SLOTS   copy = slot 0 is a copy as well, and copies keep .git. Needed
+#              for Build tests: copyCodebase() mirrors the whole composer root
+#              (ignoreVCS(FALSE): .git too, so the copies cost what the real
+#              job's cost; on main ComposerProjectTemplatesTest never runs
+#              `git describe`, \Drupal::VERSION '12.0-dev' short-circuits
+#              getCoreStability()), so slot 0 = the checkout would also mirror
+#              every other slot under .ab/.
+#   AB_WARMUP_STRICT 1 = a warm-up that fails in any slot aborts the job
+#              (fail fast instead of after the rounds).
 #   TESTSUITE, CONCURRENCY, SIMPLETEST_DB, SIMPLETEST_BASE_URL as in CI.
 set -uo pipefail
 # bash `times` prints a decimal comma in some locales.
@@ -42,15 +54,17 @@ PATCH_FILES=$(for a in "${ARMS[@]}"; do [ -f ".gitlab-ci/ab/$a.patch" ] && sed -
 # Never run the PHP CLI as root with opcache on: the first user to touch a
 # file cache owns its 0700 subdirectory. Every root-side probe uses this.
 PHPQ="php -d opcache.enable_cli=0"
+PHP_INI_DIR_IMG=$($PHPQ -r 'echo PHP_CONFIG_FILE_PATH;')
 
 calc() { awk "BEGIN {print ($1)}"; }
 log() { echo "[ab $(date -u +%T)] $*"; }
 cpu_usage() { awk '/^usage_usec/ {print $2}' /sys/fs/cgroup/cpu.stat; }
 host_stat() { awk '/^cpu / {t=0; for (i=2;i<=NF;i++) t+=$i; print t-$5-$6, t}' /proc/stat; }
-slot_dir() { [ "$1" = 0 ] && echo "$CI_PROJECT_DIR" || echo "$CI_PROJECT_DIR/.ab/slot$1"; }
-docroot() { [ "$1" = 0 ] && echo /var/www/html || echo "/var/www/html$1"; }
-port() { echo $(( $1 == 0 ? 80 : 8080 + $1 )); }
-base_url() { [ "$1" = 0 ] && echo "$SIMPLETEST_BASE_URL" || echo "http://localhost:$(port "$1")/subdirectory"; }
+is_copy() { [ "$1" != 0 ] || [ "${AB_SLOTS:-}" = copy ]; }
+slot_dir() { is_copy "$1" && echo "$CI_PROJECT_DIR/.ab/slot$1" || echo "$CI_PROJECT_DIR"; }
+docroot() { is_copy "$1" && echo "/var/www/html$1" || echo /var/www/html; }
+port() { is_copy "$1" && echo $(( 8080 + $1 )) || echo 80; }
+base_url() { is_copy "$1" && echo "http://localhost:$(port "$1")/subdirectory" || echo "$SIMPLETEST_BASE_URL"; }
 
 # CPU seconds of a process and all its descendants, incl. reaped children.
 tree_cpu() {
@@ -78,20 +92,38 @@ unit_roles() {
 
 # ---- slots ---------------------------------------------------------------------
 setup_slots() {
-  local s d
+  local s d nogit=--exclude=./.git
+  [ "${AB_SLOTS:-}" = copy ] && nogit=
   for s in $(seq 0 $((N - 1))); do
     d=$(slot_dir "$s")
-    if [ "$s" != 0 ]; then
+    if is_copy "$s"; then
       mkdir -p "$d"
-      tar -C "$CI_PROJECT_DIR" --exclude=./.git --exclude=./.ab --exclude=./ab-out --exclude=./sites/default/files \
-        --exclude=./sites/simpletest -cf - . | tar -C "$d" -xf -
+      tar -C "$CI_PROJECT_DIR" $nogit --exclude=./.ab --exclude=./ab-out --exclude=./sites/default/files \
+        --exclude=./sites/simpletest --exclude=./nightwatch_output -cf - . | tar -C "$d" -xf -
       mkdir -p "$(docroot "$s")"
       ln -sfn "$d" "$(docroot "$s")/subdirectory"
+      sudo -u www-data -H git config --global --add safe.directory "$d"
     fi
     mkdir -p "$d/sites/default/files" "$d/sites/simpletest" "/tmp/ab-tmp-$s"
     chown -R www-data:www-data "$d/sites" "/tmp/ab-tmp-$s"
     : > "$d/.ab-patch"
-    if [ "$AB_KIND" != unit ] && [ "$s" != 0 ]; then
+    if [ "${AB_RUNNER:-}" = nightwatch ]; then
+      # As the Nightwatch job writes it, with this slot's server.
+      cp "$d/core/.env.example" "$d/core/.env"
+      cat >> "$d/core/.env" <<EOF
+DRUPAL_TEST_BASE_URL='$(base_url "$s")'
+DRUPAL_TEST_CHROMEDRIVER_AUTOSTART=false
+DRUPAL_TEST_DB_URL='${SIMPLETEST_DB}'
+DRUPAL_TEST_WEBDRIVER_HOSTNAME='${AB_SELENIUM_HOST:-selenium}'
+DRUPAL_TEST_WEBDRIVER_CHROME_ARGS='--disable-dev-shm-usage --disable-gpu --headless --dns-prefetch-disable'
+DRUPAL_TEST_WEBDRIVER_W3C=true
+DRUPAL_TEST_WEBDRIVER_PORT='4444'
+DRUPAL_NIGHTWATCH_OUTPUT='../nightwatch_output'
+COLUMNS=1000
+EOF
+      mkdir -p "$d/nightwatch_output" && chown www-data:www-data "$d/nightwatch_output"
+    fi
+    if [ "$AB_KIND" != unit ] && is_copy "$s"; then
       cat > "/etc/apache2/sites-enabled/ab-slot$s.conf" <<EOF
 Listen $(port "$s")
 <VirtualHost *:$(port "$s")>
@@ -130,14 +162,21 @@ set_slot_arm() {
   ARM_ENV[$s]=""
   case $AB_KIND in
     fc)
+      # Like !17339, the file cache goes into php-cli.ini only: every arm gets
+      # PHPRC with copies of the image's php-cli.ini and php.ini, so `php -S`
+      # (cli-server SAPI, which reads php.ini, not php-cli.ini) stays without
+      # it. A PHP_INI_SCAN_DIR file would reach the built-in servers of Build
+      # tests too.
+      mkdir -p "/tmp/ab-ini-$arm"
+      cp "$PHP_INI_DIR_IMG/php-cli.ini" "$PHP_INI_DIR_IMG/php.ini" "/tmp/ab-ini-$arm/"
       if [[ $arm == on* ]]; then
-        mkdir -p "/tmp/ab-ini-$arm" "/tmp/opcache-cli-$arm"
-        echo "opcache.file_cache=/tmp/opcache-cli-$arm" > "/tmp/ab-ini-$arm/fc.ini"
+        mkdir -p "/tmp/opcache-cli-$arm"
+        printf '\nopcache.file_cache=/tmp/opcache-cli-%s\n' "$arm" >> "/tmp/ab-ini-$arm/php-cli.ini"
         # Cold, like every real job.
         rm -rf "/tmp/opcache-cli-$arm"/*
         chown www-data:www-data "/tmp/opcache-cli-$arm"
-        ARM_ENV[$s]="PHP_INI_SCAN_DIR=:/tmp/ab-ini-$arm"
       fi
+      ARM_ENV[$s]="PHPRC=/tmp/ab-ini-$arm"
       ;;
     patch)
       cur=$(cat "$d/.ab-patch")
@@ -176,8 +215,8 @@ set_slot_arm() {
 arm_ident() {
   local s=$1 d fc
   d=$(slot_dir "$s")
-  fc=$(cd "$d" && sudo -u www-data -E -H env ${ARM_ENV[$s]} $PHPQ -r 'echo ini_get("opcache.file_cache");')
-  printf 'fc=%s' "${fc:-none}"
+  fc=$(cd "$d" && sudo -u www-data -E -H env ${ARM_ENV[$s]} $PHPQ -r 'echo ini_get("opcache.file_cache") ?: "none", " ini=", php_ini_loaded_file();')
+  printf 'fc=%s' "$fc"
   if [ "$AB_KIND" = patch ]; then
     # Content hash of every file any arm's patch touches: equal across slots
     # for the same arm, whatever the slot carried before.
@@ -213,20 +252,30 @@ unit_start() {
 
 restart_servers() {
   [ "$AB_KIND" = unit ] && return 0
-  service apache2 restart >/dev/null 2>&1 || { log "FATAL: apache restart"; tail -5 /var/log/apache2/error.log; exit 1; }
+  local out
+  out=$(service apache2 restart 2>&1) || { log "FATAL: apache restart: $out"; tail -5 /var/log/apache2/error.log; exit 1; }
 }
 
 # ---- running ----------------------------------------------------------------------
 if [ -n "${AB_TARGET:-}" ]; then
   read -r -a TARGET <<< "$AB_TARGET"
+elif [ "${AB_RUNNER:-}" = nightwatch ]; then
+  TARGET=()
 else
   TARGET=(--types "$TESTSUITE" --all --ci-parallel-node-index "$SHARD" --ci-parallel-node-total "$TOTAL")
 fi
 
-# run_tests <slot> <args...>: run-tests.sh in the slot as www-data with the arm env.
+# run_tests <slot> <args...>: run-tests.sh (or Nightwatch) in the slot as
+# www-data with the arm env.
 run_tests() {
   local s=$1
   shift
+  if [ "${AB_RUNNER:-}" = nightwatch ]; then
+    # As the Nightwatch job runs it; test-site.php inherits the arm env.
+    cd "$(slot_dir "$s")/core" && sudo -u www-data -E -H env ${ARM_ENV[$s]} TMPDIR="/tmp/ab-tmp-$s" \
+      yarn run test:nightwatch --workers="$CONC" "$@"
+    return
+  fi
   # run-tests.sh probes symlinks at a fixed $TMPDIR/test_symlink, so runs that
   # start together collide; each slot gets its own TMPDIR.
   cd "$(slot_dir "$s")" && sudo -u www-data -E -H env ${ARM_ENV[$s]} TMPDIR="/tmp/ab-tmp-$s" SIMPLETEST_BASE_URL="$(base_url "$s")" \
@@ -239,9 +288,11 @@ clean_tests() {
   (cd "$CI_PROJECT_DIR" && sudo -u www-data -E -H php ./core/scripts/run-tests.sh --clean --dburl "$SIMPLETEST_DB" >/dev/null 2>&1)
   for s in $(seq 0 $((N - 1))); do
     d=$(slot_dir "$s")
-    rm -rf "$d/sites/default/files/simpletest" "$d/sites/simpletest"
-    mkdir -p "$d/sites/default/files/simpletest" "$d/sites/simpletest"
-    chown -R www-data:www-data "$d/sites/default/files" "$d/sites/simpletest"
+    rm -rf "$d/sites/default/files/simpletest" "$d/sites/simpletest" "$d/nightwatch_output"
+    mkdir -p "$d/sites/default/files/simpletest" "$d/sites/simpletest" "$d/nightwatch_output"
+    chown -R www-data:www-data "$d/sites/default/files" "$d/sites/simpletest" "$d/nightwatch_output"
+    # Build workspaces and port locks left by a killed filler.
+    rm -rf "/tmp/ab-tmp-$s" && mkdir -p "/tmp/ab-tmp-$s" && chown www-data:www-data "/tmp/ab-tmp-$s"
   done
 }
 
@@ -253,12 +304,14 @@ measured() {
   ( run_tests "$s" "${TARGET[@]}" > "$dir/run-tests.log" 2>&1; echo $? > "$dir/rc"; times > "$dir/times" )
   calc "$(date +%s.%N) - $t0" > "$dir/wall"
 }
+# user/sys of the children, e.g. 412.31/180.02: Build is sys-heavy (codebase copies).
+times_us() { sed -n 2p "$1" | awk '{for (i=1;i<=2;i++) {split($i, a, /[ms]/); v[i] = a[1]*60 + a[2]} printf "%.2f/%.2f", v[1], v[2]}'; }
 times_cpu() { sed -n 2p "$1" | awk '{n=0; for (i=1;i<=2;i++) {split($i, a, /[ms]/); n += a[1]*60 + a[2]} printf "%.2f", n}'; }
 
 # Unmeasured filler: the same shard again and again, in its own session.
 filler() {
   local s=$1
-  setsid bash -c "$(declare -f run_tests slot_dir base_url port); declare -A ARM_ENV; ARM_ENV[$s]='${ARM_ENV[$s]}'; CONC=$CONC; \
+  setsid bash -c "$(declare -f run_tests is_copy slot_dir base_url port); declare -A ARM_ENV; ARM_ENV[$s]='${ARM_ENV[$s]}'; CONC=$CONC; \
     while :; do run_tests $s ${TARGET[*]@Q} >/dev/null 2>&1; done" < /dev/null > /dev/null 2>&1 &
   echo $!
 }
@@ -319,19 +372,28 @@ run_round() {
   pkill -9 -u www-data -x php 2>/dev/null
   for i in $(seq 0 $((N - 1))); do
     s=$(( (i + r) % N )); arm=${ARMS[$i]}; dir=$OUT/round-$r-$arm
-    sed 's/\x1b\[[0-9;]*m//g' "$dir/run-tests.log" | grep -E '^ +[0-9.]+s [A-Z]' > "$dir/classes.txt"
+    if [ "${AB_RUNNER:-}" = nightwatch ]; then
+      # One JUnit file per test module.
+      cp -r "$(slot_dir "$s")/nightwatch_output" "$dir/" 2>/dev/null
+      find "$dir/nightwatch_output" -name '*.xml' > "$dir/classes.txt" 2>/dev/null
+    else
+      sed 's/\x1b\[[0-9;]*m//g' "$dir/run-tests.log" | grep -E '^ +[0-9.]+s [A-Z]' > "$dir/classes.txt"
+    fi
     srv=-; req=-; fcf=-
     [ -s "$dir/srv" ] && srv=$(cat "$dir/srv")
     [ -s "$dir/req" ] && req=$(cat "$dir/req")
     fcd=$(cd "$(slot_dir "$s")" && sudo -u www-data -E -H env ${ARM_ENV[$s]} $PHPQ -r 'echo ini_get("opcache.file_cache");')
+    if [ "$AB_KIND" = fc ] && [[ $arm != on* ]] && [ -n "$fcd" ]; then
+      log "ASSERT: file cache $fcd in arm $arm"; FAIL=1
+    fi
     if [ -n "$fcd" ] && [ -d "$fcd" ]; then
-      fcf="$(find "$fcd" -type f | wc -l):$(find "$fcd" -mindepth 1 -maxdepth 1 -printf '%u\n' | sort -u | tr '\n' '+')"
-      if [[ $fcf == 0:* || $fcf != *:www-data+ ]]; then log "ASSERT: file cache not used by www-data in $arm ($fcf)"; FAIL=1; fi
+      fcf="$(find "$fcd" -type f | wc -l):$(find "$fcd" -mindepth 1 -maxdepth 1 -printf '%u\n' | sort -u | tr '\n' '+'):$(du -sk "$fcd" | cut -f1)k"
+      if [[ $fcf == 0:* || $fcf != *:www-data+:* ]]; then log "ASSERT: file cache not used by www-data in $arm ($fcf)"; FAIL=1; fi
     elif [[ $AB_KIND == patch || $arm == on* ]]; then
       log "ASSERT: file cache missing in $arm"; FAIL=1
     fi
-    printf 'AB\t%s\t%s\tshard=%s/%s\tround=%s\tslot=%s\tarm=%s\tcpu_s=%s\twall_s=%.2f\trc=%s\tclasses=%s\tround_job_cpu_s=%.2f\tround_host_busy=%.3f\tload=%s\tsrv=%s\tround_srv_total=%s\treq=%s\tfc=%s\tid=%s\n' \
-      "$CI_JOB_ID" "$CI_JOB_NAME" "$SHARD" "$TOTAL" "$r" "$s" "$arm" "$(times_cpu "$dir/times")" "$(cat "$dir/wall")" \
+    printf 'AB\t%s\t%s\tshard=%s/%s\tround=%s\tslot=%s\tarm=%s\tcpu_s=%s\tcpu_us=%s\twall_s=%.2f\trc=%s\tclasses=%s\tround_job_cpu_s=%.2f\tround_host_busy=%.3f\tload=%s\tsrv=%s\tround_srv_total=%s\treq=%s\tfc=%s\tid=%s\n' \
+      "$CI_JOB_ID" "$CI_JOB_NAME" "$SHARD" "$TOTAL" "$r" "$s" "$arm" "$(times_cpu "$dir/times")" "$(times_us "$dir/times")" "$(cat "$dir/wall")" \
       "$(cat "$dir/rc")" "$(wc -l < "$dir/classes.txt")" "$(calc "($c1 - $c0) / 1000000")" \
       "$(calc "($h1 - $h0) / ($ht1 - $ht0)")" "$(cut -d' ' -f1 /proc/loadavg)" "$srv" "$srvtot" "$req" "$fcf" "${IDENT[$s]}" | tee -a "$SUM"
   done
@@ -391,9 +453,18 @@ if [ -n "${AB_WARMUP:-}" ]; then
   restart_servers
   clean_tests
   for s in $(seq 0 $((N - 1))); do
-    (run_tests "$s" --file "$AB_WARMUP" > "$OUT/warmup-$s.log" 2>&1; log "warm-up slot $s rc=$?") &
+    if [ "${AB_RUNNER:-}" = nightwatch ]; then
+      (run_tests "$s" "$AB_WARMUP" > "$OUT/warmup-$s.log" 2>&1; rc=$?; echo $rc > "$OUT/warmup-$s.rc"; log "warm-up slot $s rc=$rc") &
+    else
+      (run_tests "$s" --file "$AB_WARMUP" > "$OUT/warmup-$s.log" 2>&1; rc=$?; echo $rc > "$OUT/warmup-$s.rc"; log "warm-up slot $s rc=$rc") &
+    fi
   done
   wait
+  if [ "${AB_WARMUP_STRICT:-0}" = 1 ]; then
+    for s in $(seq 0 $((N - 1))); do
+      [ "$(cat "$OUT/warmup-$s.rc" 2>/dev/null)" = 0 ] || { log "FATAL: warm-up failed in slot $s (see ab-out/warmup-$s.log)"; exit 1; }
+    done
+  fi
 fi
 
 [ "${AB_MICRO:-0}" = 1 ] && micro

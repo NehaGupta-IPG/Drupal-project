@@ -93,8 +93,8 @@ variables:
   # Use local cache for yarn, see .yarn-install-from-cache.
   YARN_ENABLE_GLOBAL_CACHE: false
   YARN_ENABLE_MIRROR: false
-  # [DO NOT MERGE] Bench matrix: "pilot" or "main" (ab-* jobs).
-  AB_RUN: "q3"
+  # [DO NOT MERGE] Bench matrix: "pilot", "main", "q3" or "q4" (ab-* jobs).
+  AB_RUN: "q4"
 
 #############
 # Stages    #
@@ -1336,3 +1336,64 @@ default:
     AB_ROUNDS: "0"
     AB_MICRO: "1"
     AB_MICRO_ROUNDS: "9"
+
+#### Q4 (AB_RUN: q4): the CLI file cache in Nightwatch and PHPUnit Build,
+# which !17339 also reaches through server-setup.sh. Arms off/on/off2: on vs
+# off is the effect, off2 vs off the A/A noise of the same job. AB_SLOTS=copy:
+# copyCodebase() mirrors the whole composer root, so no slot may contain the
+# others, and copies keep .git for ComposerProjectTemplatesTest.
+.ab-q4: &ab-q4
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $AB_RUN == "q4"
+
+'ab-fc Build':
+  <<: [ *ab-q4, *ab-job ]
+  parallel: 2
+  variables:
+    TESTSUITE: build
+    CONCURRENCY: "6"
+    KUBERNETES_CPU_REQUEST: "8"
+    AB_TOTAL: "1"
+    # BuildTestTest copies the codebase and stands up php -S, which
+    # ComposerValidateTest does not; with the gate a broken slot layout fails
+    # in ~30 s instead of after three rounds.
+    AB_WARMUP: "core/tests/Drupal/BuildTests/Framework/Tests/BuildTestTest.php"
+    AB_WARMUP_STRICT: "1"
+    CI_DIAG: "0"
+    CLI_OPCACHE_FILE_CACHE: "0"
+    AB_KIND: fc
+    AB_ARMS: "off on off2"
+    AB_ROUNDS: "3"
+    AB_SLOTS: copy
+
+'ab-fc Nightwatch':
+  <<: [ *ab-q4, *ab-job ]
+  parallel: 2
+  services:
+    - name: $_CONFIG_DOCKERHUB_ROOT/mysql-8.4:production@sha256:b4cd1224e704223d1b843bca5982fcc75e05dbd060adf4473864c2b62ea0bc47
+      alias: database
+    - <<: *with-selenium-chrome
+  script:
+    - cd core && corepack enable && yarn install && cd ..
+    - chown -R www-data:www-data ./sites /var/www
+    - .gitlab-ci/ab/ab.sh
+  cache:
+    key:
+      files:
+        - ./core/package.json
+        - ./core/yarn.lock
+    paths:
+      - ./core/.yarn/cache
+    policy: pull
+  variables:
+    CONCURRENCY: "6"
+    KUBERNETES_CPU_REQUEST: "12"
+    AB_RUNNER: nightwatch
+    AB_WARMUP: "tests/Drupal/Nightwatch/Tests/loginTest.js"
+    CI_DIAG: "0"
+    CLI_OPCACHE_FILE_CACHE: "0"
+    AB_KIND: fc
+    AB_ARMS: "off on off2"
+    AB_ROUNDS: "3"
+    AB_SLOTS: copy
+    AB_FILLER: "0"
