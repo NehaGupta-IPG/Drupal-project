@@ -38,22 +38,12 @@ class ConfigEntityMapperTest extends UnitTestCase {
   protected EntityTypeManagerInterface&MockObject $entityTypeManager;
 
   /**
-   * The route provider used for testing.
-   */
-  protected RouteProviderInterface&MockObject $routeProvider;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
 
     $this->entityTypeManager = $this->createMock('Drupal\Core\Entity\EntityTypeManagerInterface');
-
-    $this->routeProvider = $this->createMock(RouteProviderInterface::class);
-
-    $this->routeProvider->expects($this->never())
-      ->method('getRouteByName');
 
     $definition = [
       'class' => '\Drupal\config_translation\ConfigEntityMapper',
@@ -71,7 +61,7 @@ class ConfigEntityMapperTest extends UnitTestCase {
       $this->createStub(TypedConfigManagerInterface::class),
       $this->createStub(LocaleConfigManager::class),
       $this->createStub(ConfigMapperManagerInterface::class),
-      $this->routeProvider,
+      $this->createStub(RouteProviderInterface::class),
       $this->getStringTranslationStub(),
       $this->entityTypeManager,
       $this->createStub(LanguageManagerInterface::class),
