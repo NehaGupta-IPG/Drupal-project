@@ -154,7 +154,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @see https://www.drupal.org/node/3626243
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(#[\SensitiveParameter] array &$connection_options = []) {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ::openWithParameters() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
     /** @var UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $connection_options */
     return static::openWithParameters(ConnectionParametersFactory::createFromOptionsArray($connection_options));

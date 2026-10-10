@@ -218,6 +218,12 @@ abstract class Connection {
    *
    * @return object
    *   A client connection object.
+   *
+   * @todo in drupal:43.0.0, remove the PHPCS toggles and uncomment the new
+   *   method. Drivers that migrate to use ConnectionParameters for
+   *   establishing the database connection must implement it.
+   *
+   * @see \Drupal\sqlite\Driver\Database\sqlite\Connection::openWithParameters()
    */
   // phpcs:disable
   // abstract public static function openWithParameters(ConnectionParametersInterface $connectionParameters): object;

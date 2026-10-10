@@ -42,9 +42,12 @@ abstract class ConnectionParametersFactory {
     /** @var UnprocessedConnectionInfoArray $options */
     $options = $info_pick ?? $connectionOptions;
 
-    // Without driver name, we cannot proceed.
+    // Without driver name, or database, we cannot proceed.
     if (!isset($options['driver'])) {
       throw new \InvalidArgumentException("Database driver name missing from the connection options");
+    }
+    if (!isset($options['database'])) {
+      throw new \InvalidArgumentException("Database name missing from the connection options");
     }
 
     // Force port to an int if it exists.
@@ -52,7 +55,9 @@ abstract class ConnectionParametersFactory {
       $options['port'] = (int) $options['port'];
     }
 
-    // If no module passed in, build it from driver.
+    // If no module passed in, we first try to determine it from the namespace,
+    // and if that is missing on not relevant, we assume the module to have the
+    // same name of the driver.
     if (empty($options['module'])) {
       if (!empty($options['namespace'])) {
         $module = explode('\\', $options['namespace'])[1];
@@ -89,9 +94,9 @@ abstract class ConnectionParametersFactory {
       $options['autoload'] = $driver->getPath() . DIRECTORY_SEPARATOR;
     }
 
-    // If the database driver is provided by a module, then its code may need
-    // to be instantiated prior to when the module's root namespace is added
-    // to the autoloader, because that happens during service container
+    // Since the database driver is provided by a module, then its code may
+    // need to be instantiated prior to when the module's root namespace is
+    // added to the autoloader, because that happens during service container
     // initialization but the container definition is likely in the database.
     // Therefore, allow the connection info to specify an autoload directory
     // for the driver.
