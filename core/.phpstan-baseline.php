@@ -3202,6 +3202,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/ImportStorageTransformer.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Command\\\\ConfigExportCommand\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Command/ConfigExportCommand.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Importer\\\\ConfigImporterBatch\\:\\:finish\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
