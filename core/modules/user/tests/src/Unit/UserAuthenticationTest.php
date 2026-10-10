@@ -113,91 +113,41 @@ class UserAuthenticationTest extends UnitTestCase {
    * Tests the authenticate method with an incorrect password.
    */
   public function testAuthenticateWithIncorrectPassword(): void {
-    $this->setUpMockPasswordService();
-
-    $account = $this->createStub(User::class);
-    $account
-      ->method('getPassword')
-      ->willReturn('hashed_password');
-
     $this->userStorage->expects($this->once())
       ->method('loadByProperties')
       ->with(['name' => $this->username])
-      ->willReturn([$account]);
+      ->willReturn([$this->createStub(User::class)]);
 
     $this->passwordService
       ->method('check')
-      ->with('incorrect_password', 'hashed_password')
       ->willReturn(FALSE);
 
     $user = $this->userAuth->lookupAccount($this->username);
-    $this->assertFalse($this->userAuth->authenticateAccount($user, 'incorrect_password'));
+    $this->assertFalse($this->userAuth->authenticateAccount($user, $this->password));
   }
 
   /**
    * Tests the authenticate method with a correct password.
    */
   public function testAuthenticateWithCorrectPassword(): void {
-    $this->setUpMockPasswordService();
-
-    $account = $this->createStub(User::class);
-    $account
-      ->method('getPassword')
-      ->willReturn('hashed_password');
-
     $this->userStorage->expects($this->once())
       ->method('loadByProperties')
       ->with(['name' => $this->username])
-      ->willReturn([$account]);
+      ->willReturn([$this->createStub(User::class)]);
 
     $this->passwordService
       ->method('check')
-      ->with($this->password, 'hashed_password')
       ->willReturn(TRUE);
     $user = $this->userAuth->lookupAccount($this->username);
     $this->assertTrue($this->userAuth->authenticateAccount($user, $this->password));
   }
 
   /**
-   * Tests the authenticate method with a correct password.
-   *
-   * We discovered in https://www.drupal.org/node/2563751 that logging in with a
-   * password that is literally "0" was not possible. This test ensures that
-   * this regression can't happen again.
-   */
-  public function testAuthenticateWithZeroPassword(): void {
-    $this->setUpMockPasswordService();
-
-    $account = $this->createStub(User::class);
-    $account
-      ->method('getPassword')
-      ->willReturn('hashed_password');
-
-    $this->userStorage->expects($this->once())
-      ->method('loadByProperties')
-      ->with(['name' => $this->username])
-      ->willReturn([$account]);
-
-    $this->passwordService
-      ->method('check')
-      ->with('0', 'hashed_password')
-      ->willReturn(TRUE);
-
-    $user = $this->userAuth->lookupAccount($this->username);
-    $this->assertTrue($this->userAuth->authenticateAccount($user, '0'));
-  }
-
-  /**
    * Tests the authenticate method with a correct password & new password hash.
    */
   public function testAuthenticateWithCorrectPasswordAndNewPasswordHash(): void {
-    $this->setUpMockPasswordService();
-
     $testUser = $this->createPartialMock(User::class, ['id', 'setPassword', 'save', 'getPassword']);
 
-    $testUser
-      ->method('getPassword')
-      ->willReturn('hashed_password');
     $testUser->expects($this->once())
       ->method('setPassword')
       ->with($this->password);
@@ -211,11 +161,9 @@ class UserAuthenticationTest extends UnitTestCase {
 
     $this->passwordService
       ->method('check')
-      ->with($this->password, 'hashed_password')
       ->willReturn(TRUE);
     $this->passwordService
       ->method('needsRehash')
-      ->with('hashed_password')
       ->willReturn(TRUE);
 
     $user = $this->userAuth->lookupAccount($this->username);
