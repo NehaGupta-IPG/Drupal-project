@@ -888,7 +888,7 @@ abstract class StylePluginBase extends PluginBase {
    * Runs one Fiber per row, keeping each row's render state separate.
    *
    * @param \Fiber[] $fibers
-   *   Unstarted Fibers keyed by row index.
+   *   Fibers that have yet to start, keyed by row index.
    *
    * @return array
    *   The return value of each Fiber, keyed by row index in the original order.
