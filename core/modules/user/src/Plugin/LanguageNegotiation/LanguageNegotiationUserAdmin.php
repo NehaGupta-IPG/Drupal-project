@@ -8,6 +8,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\AdminContext;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\language\Attribute\LanguageNegotiation;
 use Drupal\language\LanguageNegotiationMethodBase;
 use Drupal\Core\Routing\RouteObjectInterface;
@@ -66,6 +67,13 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
   protected $stackedRouteMatch;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Constructs a new LanguageNegotiationUserAdmin instance.
    *
    * @param \Drupal\Core\Routing\AdminContext $admin_context
@@ -76,12 +84,15 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
    *   The path processor manager.
    * @param \Drupal\Core\Routing\StackedRouteMatchInterface $stacked_route_match
    *   The stacked route match.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    */
-  public function __construct(AdminContext $admin_context, UrlMatcherInterface $router, PathProcessorManager $path_processor_manager, StackedRouteMatchInterface $stacked_route_match) {
+  public function __construct(AdminContext $admin_context, UrlMatcherInterface $router, PathProcessorManager $path_processor_manager, StackedRouteMatchInterface $stacked_route_match, LanguageManagerInterface $language_manager) {
     $this->adminContext = $admin_context;
     $this->router = $router;
     $this->pathProcessorManager = $path_processor_manager;
     $this->stackedRouteMatch = $stacked_route_match;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -92,7 +103,8 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
       $container->get('router.admin_context'),
       $container->get('router'),
       $container->get('path_processor_manager'),
-      $container->get('current_route_match')
+      $container->get('current_route_match'),
+      $container->get('language_manager')
     );
   }
 
@@ -142,10 +154,14 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
         catch (ExceptionInterface | HttpException) {
           return FALSE;
         }
+        finally {
+          $this->languageManager->reset();
+        }
         $route_object = $attributes[RouteObjectInterface::ROUTE_OBJECT];
       }
       $result = $this->adminContext->isAdminRoute($route_object);
     }
+
     return $result;
   }
 
