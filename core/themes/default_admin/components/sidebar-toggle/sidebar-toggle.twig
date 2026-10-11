@@ -13,6 +13,7 @@
 {%
   set attributes = attributes
     .setAttribute('type', 'button')
+    .setAttribute('title', label)
     .setAttribute('aria-controls', controls)
     .setAttribute('aria-expanded', expanded ? 'true' : 'false')
     .addClass(['meta-sidebar__trigger', 'trigger'])

@@ -11,7 +11,7 @@ props:
     label:
       type: string
       title: Label
-      description: Visually hidden label of the button.
+      description: Visually hidden label and title (tooltip) of the button.
     controls:
       type: string
       title: Controls
