@@ -16,6 +16,8 @@
   height: 100%;
   padding: 0;
   cursor: ew-resize;
+  /* Dragging the handle resizes the sidebar; never start a scroll from it. */
+  touch-action: none;
   inset-block-start: 0;
   inset-inline-start: 0;
 
@@ -29,6 +31,12 @@
 
   @media (prefers-reduced-motion: no-preference) {
     transition: var(--admin-transition-slow);
+  }
+
+  /* The sidebar has a fixed width at small viewports (see below), so resizing
+     would have no visible effect and would only change the stored width. */
+  @media (max-width: 60.99em) {
+    display: none;
   }
 }
 
@@ -89,8 +97,8 @@
 :root[data-meta-sidebar="open"] {
   .layout-region--secondary {
     visibility: visible;
-    opacity: 1;
     transform: none;
+    opacity: 1;
   }
 }
 

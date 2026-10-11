@@ -8,6 +8,9 @@
   let isResizing = false;
   let resizable, startX, startWidth;
 
+  // Touch events have no clientX of their own; read it from the first touch.
+  const getClientX = (e) => (e.touches ? e.touches[0].clientX : e.clientX);
+
   Drupal.behaviors.sidebarResize = {
     attach: function attach(context) {
       Drupal.sidebarResize.init(context);
@@ -36,10 +39,16 @@
     },
 
     resizeStart: (e) => {
-      e.preventDefault();
+      // Touch scrolling from the handle is blocked by `touch-action: none` in
+      // CSS. Chrome marks touchstart as not cancelable while a previous scroll
+      // is still in progress, and calling preventDefault() then only logs an
+      // intervention warning.
+      if (e.cancelable) {
+        e.preventDefault();
+      }
       isResizing = true;
       resizable = e.currentTarget.closest('#default_admin_sidebar');
-      startX = e.clientX;
+      startX = getClientX(e);
       startWidth = parseInt(
         document.defaultView.getComputedStyle(resizable).width,
         10,
@@ -60,7 +69,7 @@
 
     resizeWidth: (e) => {
       if (isResizing) {
-        let sidebarWidth = startWidth - (e.clientX - startX);
+        let sidebarWidth = startWidth - (getClientX(e) - startX);
 
         if (sidebarWidth <= 240) {
           sidebarWidth = 240;
