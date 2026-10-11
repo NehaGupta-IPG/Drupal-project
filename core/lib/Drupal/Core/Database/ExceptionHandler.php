@@ -79,7 +79,7 @@ class ExceptionHandler {
    * @param int|null $errorCode
    *   The native error code of the database, if available.
    * @param string $queryString
-   *   The SQL statement string.
+   *   The SQL query string.
    * @param array $arguments
    *   An array of arguments for the prepared statement.
    * @param array $options

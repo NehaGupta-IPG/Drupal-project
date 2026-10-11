@@ -28,7 +28,7 @@ class DatabaseExceptionWrapperTest extends KernelTestBase {
     }
     catch (DatabaseExceptionWrapper $e) {
       $this->assertInstanceOf(SchemaTableDoesNotExistException::class, $e);
-      $this->assertMatchesRegularExpression('/SELECT \* FROM ".*does_not_exist" WHERE "not_a_column" = :not_a_value/', $e->info->sqlString);
+      $this->assertMatchesRegularExpression('/SELECT \* FROM ".*does_not_exist" WHERE "not_a_column" = :not_a_value/', $e->info->sqlQuery);
       $this->assertSame([':not_a_value' => 'not a value'], $e->info->placeholders);
       $this->assertStringEndsWith(': ' . $e->info->toCompactString(), $e->getMessage());
     }
