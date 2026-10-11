@@ -1,12 +1,23 @@
 /**
  * @file
- * Interactions for collapsible sidebar on edit pages.
+ * Interactions for the collapsible sidebar on entity edit forms.
+ *
+ * - Opens and closes the sidebar from the toggle button, the close button and
+ *   the overlay, and keeps the toggle's aria-expanded state in sync. Stores
+ *   values in localstorage.
+ * - Re-applies the state when the viewport crosses the large breakpoint, and
+ *   collapses the Navigation toolbar when the sidebar opens below the wide
+ *   breakpoint.
+ * - Below the large breakpoint, where the sidebar overlays the page: applies
+ *   focus trap, closes on Escape and returns focus when closed.
+ * - Measures Navigation control bar and top bar, and exposes their heights
+ *   as CSS variables on <html> so the sidebar sits below them.
  */
 
 /* eslint-disable func-names, comma-dangle, strict */
 ((Drupal, once) => {
   // Matches the `--admin-large` custom media query, and the check in
-  // migration/js/init.js that sets the initial sidebar state.
+  // init.js that sets the initial sidebar state.
   const largeQuery = window.matchMedia('(min-width: 64em)');
   // Matches the `--admin-wide` custom media query.
   const wideQuery = window.matchMedia('(min-width: 80em)');
