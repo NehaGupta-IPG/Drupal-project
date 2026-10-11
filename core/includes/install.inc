@@ -635,47 +635,10 @@ function drupal_check_module($module) {
 /**
  * Retrieves information about an installation profile from its .info.yml file.
  *
- * The information stored in a profile .info.yml file is similar to that stored
- * in a normal Drupal module .info.yml file. For example:
- * - name: The real name of the installation profile for display purposes.
- * - description: A brief description of the profile.
- * - dependencies: An array of short names of other modules that this install
- *   profile requires.
- * - install: An array of shortname of other modules to install that are not
- *   required by this install profile.
- *
- * Additional, less commonly-used information that can appear in a
- * profile.info.yml file but not in a normal Drupal module .info.yml file
- * includes:
- *
- * - distribution: Existence of this key denotes that the installation profile
- *   is intended to be the only eligible choice in a distribution and will be
- *   auto-selected during installation, whereas the installation profile
- *   selection screen will be skipped. If more than one distribution profile is
- *   found then the first one discovered will be selected.
- *   The following subproperties may be set:
- *   - name: The name of the distribution that is being installed, to be shown
- *     throughout the installation process. If omitted,
- *     drupal_install_profile_distribution_name() defaults to 'Drupal'.
- *   - install: Optional parameters to override the installer:
- *     - theme: The machine name of a theme to use in the installer instead of
- *       Drupal's default installer theme.
- *     - finish_url: A destination to visit after the installation of the
- *       distribution is finished
- *
  * Note that this function does an expensive file system scan to get info file
  * information for dependencies. If you only need information from the info
  * file itself, use
  * \Drupal::service('extension.list.profile')->getExtensionInfo().
- *
- * Example of .info.yml file:
- * @code
- *    name: Minimal
- *    description: Start fresh, with only a few modules enabled.
- *    install:
- *      - block
- *      - dblog
- * @endcode
  *
  * @param string $profile
  *   Name of profile.
@@ -684,6 +647,8 @@ function drupal_check_module($module) {
  *
  * @return array
  *   The info array.
+ *
+ * @see profile_api
  */
 function install_profile_info($profile, $langcode = 'en') {
   static $cache = [];

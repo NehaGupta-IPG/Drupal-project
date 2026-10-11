@@ -53,8 +53,8 @@ interface InfoParserInterface {
    *
    * See default_admin.info.yml for an example of a theme .info.yml file.
    *
-   * For information stored in a profile .info.yml file see
-   * install_profile_info().
+   * For information stored in a profile .info.yml file, see the
+   * @link profile_api Installation profile API @endlink.
    *
    * @param string $filename
    *   The file we are parsing. Accepts file with relative or absolute path.
@@ -66,7 +66,7 @@ interface InfoParserInterface {
    *   Exception thrown if there is a parsing error or the .info.yml file does
    *   not contain a required key.
    *
-   * @see install_profile_info()
+   * @see profile_api
    */
   public function parse($filename);
 
