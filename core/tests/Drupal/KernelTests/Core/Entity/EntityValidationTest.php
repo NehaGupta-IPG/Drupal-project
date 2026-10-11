@@ -65,7 +65,6 @@ class EntityValidationTest extends EntityKernelTestBase {
     $this->installEntitySchema('entity_test_mulrev_changed');
 
     // Create the test field.
-    // @phpstan-ignore loadIncludes.fileNotLoadable
     $this->container->get('module_handler')->loadInclude('entity_test', 'install');
     entity_test_install();
 
