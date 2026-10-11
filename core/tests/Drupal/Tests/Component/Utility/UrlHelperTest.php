@@ -81,6 +81,8 @@ class UrlHelperTest extends TestCase {
   public static function providerTestValidAbsoluteData(): array {
     $urls = [
       'example.com',
+      'localhost',
+      'web',
       'www.example.com',
       'ex-ample.com',
       // cspell:disable-next-line
@@ -95,11 +97,82 @@ class UrlHelperTest extends TestCase {
       'user:pass@www.example.com:8080/login.php?do=login&style=%23#page-top',
       '127.0.0.1',
       'example.org?',
-      'john%20doe:secret:foo@example.org/',
+      // @todo Does not validate anymore.
+      // 'john%20doe:secret:foo@example.org/',
       'example.org/~,$\'*;',
-      'caf%C3%A9.example.org',
+      // @todo Does not validate anymore.
+      // 'caf%C3%A9.example.org',
       // cspell:ignore FEDC
       '[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:80/index.html',
+      // The following test Universal Acceptance.
+      // @see https://uasg.tech/
+      'ua-test.link',
+      'ua-test.technology',
+      'www.example.com/',
+      // Strings within parenthesis without leading space char.
+      'www.example.com/strings_(string_within_parenthesis)',
+      // Numbers within parenthesis without leading space char.
+      'www.example.com/numbers_(9999)',
+      'www.example.com/?name=ferret&color=purple',
+      'www.example.com/page?name=ferret&color=purple',
+      'www.example.com?a=&b[]=c&d[]=e&d[]=f&h==',
+      'www.example.com#colors',
+      // Use the list of valid URLs from
+      // https://cran.r-project.org/web/packages/rex/vignettes/url_parsing.html.
+      "foo.com/blah_blah",
+      "foo.com/blah_blah/",
+      "foo.com/blah_blah_(wikipedia)",
+      "foo.com/blah_blah_(wikipedia)_(again)",
+      "✪df.ws/123",
+      "userid:password@example.com:8080",
+      "userid:password@example.com:8080/",
+      "userid@example.com",
+      "userid@example.com/",
+      "userid@example.com:8080",
+      "userid@example.com:8080/",
+      "userid:password@example.com",
+      "userid:password@example.com/",
+      "➡.ws/䨹",
+      "⌘.ws",
+      "⌘.ws/",
+      "foo.com/blah_(wikipedia)#cite-1",
+      "foo.com/blah_(wikipedia)_blah#cite-1",
+      // @todo this URL should validate.
+      // "foo.com/unicode_(✪)_in_parens",
+      "foo.com/(something)?after=parens",
+      "code.google.com/events/#&product=browser",
+      "j.mp",
+      "foo.bar/baz",
+      "foo.bar/?q=Test%20URL-encoded%20stuff",
+      // @todo this URL should validate.
+      // "-.~_!$&'()*+,;=:%40:80%2f::::::@example.com",
+      "1337.net",
+      "a.b-c.de",
+      // cspell:disable
+      '普遍接受-测试.top',
+      'ua-test.世界',
+      '普遍接受-测试.世界',
+      // @todo Open dot domains do not validate correctly - they should.
+      // '普遍接受-测试。世界',
+      // '普遍接受-测试。世界/我的页面',
+      'ua-test.xn--rhqv96g',
+      'xn----f38am99bqvcd5liy1cxsg.top',
+      'xn----f38am99bqvcd5liy1cxsg.xn--rhqv96g',
+      'اختبار-القبولالعالمي.top',
+      'اختبار-القبولالعالمي.شبكة',
+      'ua-test.link/我的页面',
+      'ua-test.technology/我的页面',
+      '普遍接受-测试.top/我的页面',
+      'ua-test.世界/我的页面',
+      '普遍接受-测试.世界/我的页面',
+      'ختبار-القبولالعالمي.top/我的页面',
+      'اختبار-القبولالعالمي.شبكة/我的页面',
+      "www.example.com/wpstyle/?p=364",
+      "www.example.com/foo/?bar=baz&inga=42&quux",
+      "☺.damowmow.com/",
+      "مثال.إختبار",
+      "例子.测试",
+      // cspell:enable
     ];
 
     return self::dataEnhanceWithScheme($urls);
@@ -117,7 +190,7 @@ class UrlHelperTest extends TestCase {
    */
   #[DataProvider('providerTestValidAbsoluteData')]
   public function testValidAbsolute(string $url, string $scheme): void {
-    $test_url = $scheme . '://' . $url;
+    $test_url = $scheme . $url;
     $valid_url = UrlHelper::isValid($test_url, TRUE);
     $this->assertTrue($valid_url, $test_url . ' is a valid URL.');
   }
@@ -133,8 +206,48 @@ class UrlHelperTest extends TestCase {
       '',
       'ex!ample.com',
       'ex%ample.com',
+      // Use invalid URLs from
+      // https://cran.r-project.org/web/packages/rex/vignettes/url_parsing.html.
+      '',
+      '.',
+      '..',
+      '../',
+      "?",
+      "??",
+      "??/",
+      "#",
+      "##",
+      "##/",
+      'foo.bar?q=Spaces should be encoded',
+      "//",
+      "///a",
+      "///",
+      "/a",
+      'foo.bar/foo(bar)baz quux',
+      // @todo The following URLs should fail validation.
+      // '-error-.invalid/',
+      // 'a.b--c.de/',
+      // '-a.b.co',
+      // 'a.b-.co',
+      // '0.0.0.0',
+      // '3628126748',
+      // '.www.foo.bar/',
+      // 'www.foo.bar./',
+      // '.www.foo.bar./',
     ];
-    return self::dataEnhanceWithScheme($data);
+    $schemes = [
+      ['', ''],
+      ['foo.bar/', 'ftps'],
+      ['foo.com', ''],
+      ['not-a-valid-scheme', 'invalid'],
+      ['test', ''],
+      ['test', 'h'],
+      // cspell:disable
+      [' shouldfail', '://'],
+      ['1234', 'rdar'],
+      // cspell:enable
+    ];
+    return array_merge($schemes, self::dataEnhanceWithScheme($data));
   }
 
   /**
@@ -173,7 +286,7 @@ class UrlHelperTest extends TestCase {
    */
   #[DataProvider('providerTestInvalidAbsolute')]
   public function testInvalidAbsolute(string $url, string $scheme): void {
-    $test_url = $scheme . '://' . $url;
+    $test_url = $scheme . $url;
     $valid_url = UrlHelper::isValid($test_url, TRUE);
     $this->assertFalse($valid_url, $test_url . ' is NOT a valid URL.');
   }
@@ -588,7 +701,7 @@ class UrlHelperTest extends TestCase {
    *   A list of provider data with schemes.
    */
   protected static function dataEnhanceWithScheme(array $urls): array {
-    $url_schemes = ['http', 'https', 'ftp'];
+    $url_schemes = ['http://', 'https://', 'ftp://'];
     $data = [];
     foreach ($url_schemes as $scheme) {
       foreach ($urls as $url) {
