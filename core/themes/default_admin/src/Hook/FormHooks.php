@@ -749,10 +749,12 @@ class FormHooks {
     $form['default_admin_sidebar']['footer'] = ($form['footer']) ?? [];
     $form['default_admin_sidebar']['footer']['#parents'] = ['footer'];
 
-    // Sidebar close button.
+    // Sidebar close button. Placed first in the meta group, so it is the first
+    // element in the sidebar and receives focus before the fields that follow.
     $close_sidebar_translation = $this->t('Close sidebar panel');
-    $form['default_admin_sidebar']['default_admin_sidebar_close'] = [
+    $form['meta']['default_admin_sidebar_close'] = [
       '#type' => 'html_tag',
+      '#weight' => -1000,
       '#tag' => 'button',
       '#attributes' => [
         'type' => 'button',
