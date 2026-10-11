@@ -204,13 +204,6 @@ default:
       - ./core/.yarn/cache
     policy: pull
 
-# The CLI opcache file cache set in the image's php-cli.ini: effective values,
-# size and owner. An owner other than the test user means no cache was used.
-.fc-report:
-  script:
-    - |
-      echo "opcache-cli fc=$(php -r 'echo ini_get("opcache.file_cache");') rw=$(php -r 'echo ini_get("opcache.record_warnings");') files=$(find /var/cache/opcache-cli -type f 2>/dev/null | wc -l) size=$(du -sh /var/cache/opcache-cli 2>/dev/null | cut -f1) owner=$(stat -c %U /var/cache/opcache-cli/* 2>/dev/null | sort -u | paste -sd,)" || true
-
 .test-setup: &test-setup
   stage: ⚡️ Tests
   rules:
@@ -233,7 +226,6 @@ default:
     - time sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --debug-discovery --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --all --ci-parallel-node-index $CI_NODE_INDEX --ci-parallel-node-total $CI_NODE_TOTAL
   after_script:
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/ci-diag.sh end
-    - !reference [.fc-report, script]
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
   artifacts:
     when: always
@@ -312,7 +304,6 @@ default:
     - <<: *with-selenium-chrome
   after_script:
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/ci-diag.sh end
-    - !reference [.fc-report, script]
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
     - cp /builds/chromedriver.log ./
 
@@ -342,7 +333,7 @@ default:
   extends: '🖱️️️ PHPUnit Functional Javascript'
   variables:
     _TARGET_SERVER: "apache"
-    _TARGET_IMAGE_TAG: "dev@sha256:562dc5a4a74a8ff634055936508b679032cd52f5a89e1cfd781f28aca0a12f89"
+    _TARGET_IMAGE_TAG: "production"
 
 '🦉️️️ Nightwatch':
   <<: [ *with-composer, *test-setup ]
@@ -375,7 +366,6 @@ default:
     - sudo -u www-data -E -H yarn run test:nightwatch --workers=3
   after_script:
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/ci-diag.sh end
-    - !reference [.fc-report, script]
     - cp /builds/chromedriver.log ./
   artifacts:
     when: always
@@ -975,10 +965,7 @@ default:
   needs: []
   parallel:
     matrix:
-      - _TARGET_PHP: "8.5-ubuntu"
-        _TARGET_IMAGE_TAG: "dev@sha256:562dc5a4a74a8ff634055936508b679032cd52f5a89e1cfd781f28aca0a12f89"
-      - _TARGET_PHP: "8.6-ubuntu"
-        _TARGET_IMAGE_TAG: "production"
+      - _TARGET_PHP: !reference [.php_versions]
   allow_failure:
     # It's not possible to set allow failure conditional on a possible value of
     # the matrix, so we intercept failure from the script and exit with a code
@@ -987,6 +974,7 @@ default:
   variables:
     # FreeUnit images exist only for the primary PHP version.
     _TARGET_SERVER: "apache"
+    _TARGET_IMAGE_TAG: "production"
     KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: 24
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
@@ -1002,7 +990,6 @@ default:
       [[ $EXIT_CODE != 0 && $_TARGET_PHP == $NEXT_PHP_MAJOR ]] && exit 100
     - exit $EXIT_CODE
   after_script:
-    - !reference [.fc-report, script]
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
   artifacts:
     when: always
@@ -1023,10 +1010,7 @@ default:
   needs: []
   parallel:
     matrix:
-      - _TARGET_PHP: "8.5-ubuntu"
-        _TARGET_IMAGE_TAG: "dev@sha256:562dc5a4a74a8ff634055936508b679032cd52f5a89e1cfd781f28aca0a12f89"
-      - _TARGET_PHP: "8.6-ubuntu"
-        _TARGET_IMAGE_TAG: "production"
+      - _TARGET_PHP: !reference [.php_versions]
   allow_failure:
     # It's not possible to set allow failure conditional on a possible value of
     # the matrix, so we intercept failure from the script and exit with a code
@@ -1035,6 +1019,7 @@ default:
   variables:
     # FreeUnit images exist only for the primary PHP version.
     _TARGET_SERVER: "apache"
+    _TARGET_IMAGE_TAG: "production"
     KUBERNETES_CPU_REQUEST: "2"
     _ARTIFACTS_DIR: "test-artifacts/phpunit"
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
@@ -1061,7 +1046,6 @@ default:
       [[ $EXIT_CODE != 0 && $_TARGET_PHP == $NEXT_PHP_MAJOR ]] && exit 100
     - exit $EXIT_CODE
   after_script:
-    - !reference [.fc-report, script]
     # Process the coverage text report to produce an OpenMetrics report.
     - |
       [[ $_TARGET_PHP == $PRIMARY_PHP ]] && php .gitlab-ci/scripts/component-coverage-metrics.php $_ARTIFACTS_DIR/component-coverage-report.txt $_ARTIFACTS_DIR/component-coverage-metrics.txt
