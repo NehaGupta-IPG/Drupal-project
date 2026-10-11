@@ -7,7 +7,6 @@ namespace Drupal\Tests\Composer\Generator;
 use Drupal\Composer\Composer;
 use Drupal\Composer\Generator\Builder\DrupalCoreRecommendedBuilder;
 use Drupal\Composer\Generator\Builder\DrupalDevDependenciesBuilder;
-use Drupal\Composer\Generator\Builder\DrupalPinnedDevDependenciesBuilder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -30,19 +29,15 @@ class BuilderTest extends TestCase {
           'type' => 'metapackage',
           'description' => 'Core and its dependencies with known-compatible minor versions. Require this project INSTEAD OF drupal/core.',
           'license' => 'GPL-2.0-or-later',
-          'require' =>
-          [
+          'require' => [
             'drupal/core' => Composer::drupalVersionBranch(),
             'symfony/yaml' => '~v3.4.32',
           ],
-          'conflict' =>
-          [
+          'conflict' => [
             'webflo/drupal-core-strict' => '*',
           ],
-          'extra' =>
-          [
-            'branch-alias' =>
-            [
+          'extra' => [
+            'branch-alias' => [
               'dev-main' => '12.x-dev',
             ],
           ],
@@ -56,53 +51,19 @@ class BuilderTest extends TestCase {
           'type' => 'metapackage',
           'description' => 'require-dev dependencies from drupal/drupal; use in addition to drupal/core-recommended to run tests from drupal/core.',
           'license' => 'GPL-2.0-or-later',
-          'require' =>
-          [
+          'require' => [
             'behat/mink' => '^1.8',
           ],
-          'conflict' =>
-          [
+          'conflict' => [
             'webflo/drupal-core-require-dev' => '*',
           ],
-          'extra' =>
-          [
-            'branch-alias' =>
-            [
+          'extra' => [
+            'branch-alias' => [
               'dev-main' => '12.x-dev',
             ],
           ],
         ],
       ],
-
-      [
-        // @phpstan-ignore classConstant.deprecatedClass
-        DrupalPinnedDevDependenciesBuilder::class,
-        [
-          'name' => 'drupal/core-dev-pinned',
-          'type' => 'metapackage',
-          'description' => 'Deprecated. Pinned require-dev dependencies from drupal/drupal; use in addition to drupal/core-recommended to run tests from drupal/core. Use drupal/core-dev instead to avoid security vulnerabilities from pinned versions.',
-          'license' => 'GPL-2.0-or-later',
-          'abandoned' => 'drupal/core-dev',
-          'require' =>
-          [
-            'drupal/core' => Composer::drupalVersionBranch(),
-            'behat/mink' => 'v1.8.0',
-            'symfony/css-selector' => 'v4.3.5',
-          ],
-          'conflict' =>
-          [
-            'webflo/drupal-core-require-dev' => '*',
-          ],
-          'extra' =>
-          [
-            'branch-alias' =>
-            [
-              'dev-main' => '12.x-dev',
-            ],
-          ],
-        ],
-      ],
-
     ];
   }
 
