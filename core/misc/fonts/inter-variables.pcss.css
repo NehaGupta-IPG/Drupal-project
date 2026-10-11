@@ -6,9 +6,9 @@
  * so that they occupy the same space as Inter. This minimizes layout shift
  * while Inter is loading (font-display: swap) or if it fails to load.
  *
- * Override values are derived from the hhea metrics and the English letter
- * frequency weighted average glyph width of each font, compared against
- * Inter at weight 400 (regular faces) and 700 (bold faces).
+ * Override values are derived from the ascent, descent, and line gap metrics
+ * and the English letter frequency weighted average glyph width of each font,
+ * compared against Inter at weight 400 (regular faces) and 700 (bold faces).
  */
 
 /* Helvetica Neue (macOS, iOS). */
