@@ -154,7 +154,7 @@
       }
 
       @media (prefers-reduced-motion: no-preference) {
-        transition: all var(--admin-transition-slow);
+        transition: transform var(--admin-transition-slow);
       }
     }
   }

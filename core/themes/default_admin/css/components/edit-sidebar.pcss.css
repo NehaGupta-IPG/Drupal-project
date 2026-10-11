@@ -62,7 +62,7 @@
   }
 }
 
-body[data-meta-sidebar="closed"] {
+:root[data-meta-sidebar="closed"] {
   --admin-theme-sidebar-offset: 0px;
 
   .layout-region--secondary {
@@ -75,7 +75,7 @@ body[data-meta-sidebar="closed"] {
   }
 }
 
-body[data-meta-sidebar="open"] {
+:root[data-meta-sidebar="open"] {
   .layout-region--secondary {
     visibility: visible;
     opacity: 1;
@@ -213,8 +213,8 @@ body[data-meta-sidebar="open"] {
   }
 }
 
-body[data-meta-sidebar="open"] :is(#extra-specificity-hack, [data-drupal-admin-styles]) .meta-sidebar__overlay,
-body[data-meta-sidebar="open"] .meta-sidebar__overlay {
+:root[data-meta-sidebar="open"] :is(#extra-specificity-hack, [data-drupal-admin-styles]) .meta-sidebar__overlay,
+:root[data-meta-sidebar="open"] .meta-sidebar__overlay {
   visibility: visible;
   opacity: 0.9;
 }

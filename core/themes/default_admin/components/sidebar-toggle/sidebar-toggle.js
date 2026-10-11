@@ -5,7 +5,9 @@
 
 /* eslint-disable func-names, comma-dangle, strict */
 ((Drupal, once) => {
-  const breakpoint = 1024;
+  // Matches the `--admin-large` custom media query, and the check in
+  // migration/js/init.js that sets the initial sidebar state.
+  const largeQuery = window.matchMedia('(min-width: 64em)');
   const breakpointLarge = 1280;
   const storageMobile = 'Drupal.defaultAdmin.sidebarExpanded.mobile';
   const storageDesktop = 'Drupal.defaultAdmin.sidebarExpanded.desktop';
@@ -26,7 +28,7 @@
           }
 
           // Set mobile initial to false.
-          if (window.innerWidth >= breakpoint) {
+          if (largeQuery.matches) {
             if (localStorage.getItem(storageDesktop) === 'true') {
               this.showSidebar();
             } else {
@@ -37,7 +39,7 @@
           // Resize observer.
           const resizeHandler = new ResizeObserver((entries) => {
             for (let entry of entries) {
-              Drupal.debounce(this.handleResize(entry.contentRect), 150);
+              Drupal.debounce(this.handleResize(), 150);
             }
           });
           resizeHandler.observe(document.querySelector('html'));
@@ -97,12 +99,14 @@
 
     showSidebar: () => {
       const chooseStorage =
-        window.innerWidth < breakpoint ? storageMobile : storageDesktop;
+        largeQuery.matches ? storageDesktop : storageMobile;
       const sidebarTrigger = document.querySelector('.meta-sidebar__trigger');
 
       sidebarTrigger?.setAttribute('aria-expanded', 'true');
       sidebarTrigger?.classList.add('is-active');
-      document.body.setAttribute('data-meta-sidebar', 'open');
+      // State lives on <html> because init.js sets the initial value from
+      // <head>, before <body> exists and before first paint.
+      document.documentElement.setAttribute('data-meta-sidebar', 'open');
 
       // Expose to localStorage.
       localStorage.setItem(chooseStorage, 'true');
@@ -115,20 +119,20 @@
 
     collapseSidebar: () => {
       const chooseStorage =
-        window.innerWidth < breakpoint ? storageMobile : storageDesktop;
+        largeQuery.matches ? storageDesktop : storageMobile;
       const sidebarTrigger = document.querySelector('.meta-sidebar__trigger');
 
       sidebarTrigger?.setAttribute('aria-expanded', 'false');
       sidebarTrigger?.classList.remove('is-active');
-      document.body.setAttribute('data-meta-sidebar', 'closed');
+      document.documentElement.setAttribute('data-meta-sidebar', 'closed');
 
       // Expose to localStorage.
       localStorage.setItem(chooseStorage, 'false');
     },
 
-    handleResize: (windowSize = window) => {
+    handleResize: () => {
       // If small viewport, always collapse sidebar.
-      if (windowSize.width < breakpoint) {
+      if (!largeQuery.matches) {
         Drupal.adminSidebar.collapseSidebar();
       } else {
         // If large viewport, show sidebar if it was open before.

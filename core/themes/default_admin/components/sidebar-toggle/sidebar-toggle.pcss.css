@@ -3,7 +3,7 @@
  * Sidebar panel and controls.
  */
 
-body[data-meta-sidebar="closed"] {
+:root[data-meta-sidebar="closed"] {
   --admin-theme-sidebar-offset: 0px;
 }
 

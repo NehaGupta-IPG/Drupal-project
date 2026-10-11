@@ -63,3 +63,18 @@ if (localStorage.getItem('Drupal.defaultAdmin.sidebarWidth')) {
     sidebarWidth,
   );
 }
+
+// Set the initial edit form sidebar state before first paint. Otherwise the
+// sidebar renders open until the sidebar-toggle behavior runs, then animates
+// closed. The attribute goes on <html> because <body> doesn't exist yet.
+// Small viewports always start closed. On large viewports, the sidebar is open
+// unless the user collapsed it. The media query matches `--admin-large`.
+// @see components/sidebar-toggle/sidebar-toggle.js
+document.documentElement.setAttribute(
+  'data-meta-sidebar',
+  window.matchMedia('(min-width: 64em)').matches &&
+    localStorage.getItem('Drupal.defaultAdmin.sidebarExpanded.desktop') !==
+      'false'
+    ? 'open'
+    : 'closed',
+);
