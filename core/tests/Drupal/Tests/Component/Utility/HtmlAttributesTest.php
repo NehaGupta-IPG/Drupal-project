@@ -165,7 +165,7 @@ class HtmlAttributesTest extends TestCase {
   }
 
   /**
-   * Tests adding class attributes with the HtmlAttributeArray helper method.
+   * Tests adding classes with array syntax and addClass().
    */
   public function testAddClasses(): void {
     // Add a class with the array syntax without first initializing the 'class'
@@ -221,7 +221,7 @@ class HtmlAttributesTest extends TestCase {
   }
 
   /**
-   * Tests removing class attributes with the HtmlAttributeArray helper method.
+   * Tests removing classes with removeClass().
    */
   public function testRemoveClasses(): void {
     // Add duplicate class to ensure that both duplicates are removed.
@@ -251,7 +251,7 @@ class HtmlAttributesTest extends TestCase {
   }
 
   /**
-   * Tests checking for class names with the HtmlAttributes method.
+   * Tests checking for classes with hasClass().
    */
   public function testHasClass(): void {
     // Test an attribute without any classes.
@@ -265,7 +265,7 @@ class HtmlAttributesTest extends TestCase {
   }
 
   /**
-   * Tests removing class attributes with the HtmlAttributes helper methods.
+   * Tests chaining removeClass() and addClass().
    *
    * @legacy-covers ::removeClass
    * @legacy-covers ::addClass
