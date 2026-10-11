@@ -13,6 +13,26 @@ parameters:
   core.moved_classes:
     'Drupal\Core\StringTranslation\TranslationWrapper':
       class: 'Drupal\Core\StringTranslation\TranslatableMarkup'
+    'Drupal\Core\Template\AttributeArray':
+      class: 'Drupal\Component\Utility\HtmlAttributeArray'
+      deprecation_version: drupal:12.1.0
+      removed_version: drupal:13.0.0
+      change_record: https://www.drupal.org/node/3070485
+    'Drupal\Core\Template\AttributeBoolean':
+      class: 'Drupal\Component\Utility\HtmlAttributeBoolean'
+      deprecation_version: drupal:12.1.0
+      removed_version: drupal:13.0.0
+      change_record: https://www.drupal.org/node/3070485
+    'Drupal\Core\Template\AttributeString':
+      class: 'Drupal\Component\Utility\HtmlAttributeString'
+      deprecation_version: drupal:12.1.0
+      removed_version: drupal:13.0.0
+      change_record: https://www.drupal.org/node/3070485
+    'Drupal\Core\Template\AttributeValueBase':
+      class: 'Drupal\Component\Utility\HtmlAttributeValueBase'
+      deprecation_version: drupal:12.1.0
+      removed_version: drupal:13.0.0
+      change_record: https://www.drupal.org/node/3070485
   session.storage.options:
     gc_probability: 1
     gc_divisor: 100
