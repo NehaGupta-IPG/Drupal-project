@@ -37,10 +37,8 @@
           }
 
           // Resize observer.
-          const resizeHandler = new ResizeObserver((entries) => {
-            for (let entry of entries) {
-              Drupal.debounce(this.handleResize(), 150);
-            }
+          const resizeHandler = new ResizeObserver(() => {
+            Drupal.debounce(this.handleResize(), 150);
           });
           resizeHandler.observe(document.querySelector('html'));
         },
@@ -82,8 +80,7 @@
     },
 
     showSidebar: () => {
-      const chooseStorage =
-        largeQuery.matches ? storageDesktop : storageMobile;
+      const chooseStorage = largeQuery.matches ? storageDesktop : storageMobile;
       const sidebarTrigger = document.querySelector('.meta-sidebar__trigger');
 
       sidebarTrigger?.setAttribute('aria-expanded', 'true');
@@ -102,8 +99,7 @@
     },
 
     collapseSidebar: () => {
-      const chooseStorage =
-        largeQuery.matches ? storageDesktop : storageMobile;
+      const chooseStorage = largeQuery.matches ? storageDesktop : storageMobile;
       const sidebarTrigger = document.querySelector('.meta-sidebar__trigger');
 
       sidebarTrigger?.setAttribute('aria-expanded', 'false');

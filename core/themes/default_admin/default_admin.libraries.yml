@@ -488,4 +488,5 @@ edit-sidebar:
   js:
     js/edit-sidebar.js: {}
   dependencies:
+    - core/drupal
     - core/once

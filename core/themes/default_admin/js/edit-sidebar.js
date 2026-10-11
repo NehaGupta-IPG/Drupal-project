@@ -2,36 +2,43 @@
  * @file
  * Interactions for resizable sidebar on edit pages.
  */
-/* eslint-disable func-names, no-mutable-exports, comma-dangle, strict */
-((Drupal) => {
-  const reSizer = document.getElementById('sidebar-draggable');
-  const resizable = document.getElementById('default_admin_sidebar');
+
+((Drupal, once) => {
   const storageWidth = 'Drupal.defaultAdmin.sidebarWidth';
   let isResizing = false;
-  let startX, startWidth;
+  let resizable, startX, startWidth;
 
   Drupal.behaviors.sidebarResize = {
-    attach: function attach() {
-      Drupal.sidebarResize.init();
+    attach: function attach(context) {
+      Drupal.sidebarResize.init(context);
     },
   };
 
   Drupal.sidebarResize = {
-    init: function () {
-      // Mouse
-      reSizer.addEventListener('mousedown', this.resizeStart);
-      document.addEventListener('mousemove', this.resizeWidth);
-      document.addEventListener('mouseup', this.resizeEnd);
+    init: function (context) {
+      // Look up the handle on each attach rather than once at script load, so
+      // a sidebar inserted or re-rendered by AJAX still gets wired up.
+      once('sidebarResize', '#sidebar-draggable', context).forEach(
+        (reSizer) => {
+          reSizer.addEventListener('mousedown', this.resizeStart);
+          reSizer.addEventListener('touchstart', this.resizeStart);
+        },
+      );
 
-      // Touch
-      reSizer.addEventListener('touchstart', this.resizeStart);
-      document.addEventListener('touchmove', this.resizeWidth);
-      document.addEventListener('touchend', this.resizeEnd);
+      // Move and end are tracked on the document so the drag continues when
+      // the pointer leaves the handle. They only need adding once per page.
+      once('sidebarResize', 'html').forEach(() => {
+        document.addEventListener('mousemove', this.resizeWidth);
+        document.addEventListener('mouseup', this.resizeEnd);
+        document.addEventListener('touchmove', this.resizeWidth);
+        document.addEventListener('touchend', this.resizeEnd);
+      });
     },
 
     resizeStart: (e) => {
       e.preventDefault();
       isResizing = true;
+      resizable = e.currentTarget.closest('#default_admin_sidebar');
       startX = e.clientX;
       startWidth = parseInt(
         document.defaultView.getComputedStyle(resizable).width,
@@ -70,4 +77,4 @@
       }
     },
   };
-})(Drupal, drupalSettings, once);
+})(Drupal, once);
