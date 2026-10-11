@@ -163,6 +163,10 @@
     mask-size: var(--admin-icon-size-sidebar-toggle) var(--admin-icon-size-sidebar-toggle);
   }
 
+  &:dir(rtl)::before {
+    scale: -1 1;
+  }
+
   &:hover,
   &:focus,
   &.is-active,
