@@ -27,20 +27,12 @@
             localStorage.setItem(storageDesktop, 'true');
           }
 
-          // Set mobile initial to false.
-          if (largeQuery.matches) {
-            if (localStorage.getItem(storageDesktop) === 'true') {
-              this.showSidebar();
-            } else {
-              this.collapseSidebar();
-            }
-          }
-
-          // Resize observer.
-          const resizeHandler = new ResizeObserver(() => {
-            Drupal.debounce(this.handleResize(), 150);
-          });
-          resizeHandler.observe(document.querySelector('html'));
+          // Sync the toggle with the initial state, then re-run only when the
+          // viewport crosses the breakpoint. Observing size changes instead
+          // also fires when page content grows or shrinks, which re-opened the
+          // sidebar and collapsed the Navigation toolbar below 1280px.
+          this.handleResize();
+          largeQuery.addEventListener('change', () => this.handleResize());
         },
       );
 
