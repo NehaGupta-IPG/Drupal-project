@@ -146,9 +146,14 @@ class ContentTranslationFormLanguageHooks {
           $name = "settings][$entity_type][$bundle][translatable";
 
           $translatable_fields = isset($settings[$entity_type][$bundle]['fields']) ? array_filter($settings[$entity_type][$bundle]['fields']) : FALSE;
+
           if (empty($translatable_fields)) {
-            $t_args = ['%bundle' => $form['settings'][$entity_type][$bundle]['settings']['#label']];
-            $form_state->setErrorByName($name, t('At least one field needs to be translatable to enable %bundle for translation.', $t_args));
+            $has_reference_field = static::hasConfigurableReferenceField($entity_type, $bundle);
+
+            if (!$has_reference_field) {
+              $t_args = ['%bundle' => $form['settings'][$entity_type][$bundle]['settings']['#label']];
+              $form_state->setErrorByName($name, t('At least one field needs to be translatable to enable %bundle for translation.', $t_args));
+            }
           }
 
           $values = $bundle_settings['settings']['language'];
@@ -162,6 +167,29 @@ class ContentTranslationFormLanguageHooks {
         }
       }
     }
+  }
+
+  /**
+   * Checks whether a bundle has a configurable entity reference field.
+   *
+   * @param string $entity_type_id
+   *   The entity type ID.
+   * @param string $bundle
+   *   The bundle.
+   *
+   * @return bool
+   *   TRUE if the bundle has a configurable reference field, FALSE otherwise.
+   */
+  protected static function hasConfigurableReferenceField(string $entity_type_id, string $bundle): bool {
+    $fields = \Drupal::service('entity_field.manager')->getFieldDefinitions($entity_type_id, $bundle);
+    foreach ($fields as $definition) {
+      if (!$definition->getFieldStorageDefinition()->isBaseField()
+        && !$definition->isComputed()
+        && $definition->getSetting('target_type') !== NULL) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
