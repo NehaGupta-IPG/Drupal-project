@@ -45,7 +45,7 @@
   --admin-theme-height-sticky: 60px;
   --admin-theme-toolbar-height: 0px;
   --admin-theme-toolbar-secondary-height: 0px;
-  --admin-theme-toolbar-y-offset: 0px; /* Gets overridden by inline style on <html> element. */
+  --admin-theme-toolbar-y-offset: 0px;
   --admin-theme-toolbar-x-offset: 0px;
   --admin-theme-scroll-offset: 0px;
   --admin-theme-sticky-offset: 0px;
