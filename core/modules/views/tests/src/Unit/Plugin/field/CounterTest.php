@@ -130,7 +130,6 @@ class CounterTest extends UnitTestCase {
     $options = [];
     $counter_handler->init($this->view, $this->display, $options);
 
-    $this->view->row_index = $i;
     $expected = $i + 1;
 
     $counter = $counter_handler->getValue($this->testData[$i]);
@@ -155,7 +154,6 @@ class CounterTest extends UnitTestCase {
     ];
     $counter_handler->init($this->view, $this->display, $options);
 
-    $this->view->row_index = $i;
     $expected = $rand_start + $i;
 
     $counter = $counter_handler->getValue($this->testData[$i]);
@@ -183,7 +181,6 @@ class CounterTest extends UnitTestCase {
     ];
     $counter_handler->init($this->view, $this->display, $options);
 
-    $this->view->row_index = $i;
     $expected = $offset + $rand_start + $i;
 
     $counter = $counter_handler->getValue($this->testData[$i]);
@@ -215,7 +212,6 @@ class CounterTest extends UnitTestCase {
     ];
     $counter_handler->init($this->view, $this->display, $options);
 
-    $this->view->row_index = $i;
     $expected = $items_per_page + $offset + $rand_start + $i;
 
     $counter = $counter_handler->getValue($this->testData[$i]);
