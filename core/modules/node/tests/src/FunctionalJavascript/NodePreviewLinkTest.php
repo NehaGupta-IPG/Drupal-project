@@ -19,7 +19,7 @@ class NodePreviewLinkTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'filter', 'navigation'];
+  protected static $modules = ['node', 'filter'];
 
   /**
    * {@inheritdoc}
@@ -44,7 +44,6 @@ class NodePreviewLinkTest extends WebDriverTestBase {
       'access content',
       'edit own test content',
       'create test content',
-      'access navigation',
       $filtered_html_format->getPermissionName(),
     ]);
     $this->drupalLogin($user);
@@ -83,30 +82,30 @@ class NodePreviewLinkTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests the behavior of leaving the preview area when editing a node.
+   * Tests leaving the preview when other document click handlers exist.
+   *
+   * Themes and modules may bind click handlers directly on the document. jQuery
+   * reuses the same event object for these, so the clicked link must still be
+   * followed rather than navigating to "undefined".
    */
-  public function testEditLeavePreview(): void {
-    // Create a node to edit.
+  public function testLeavePreviewWithOtherDocumentClickHandler(): void {
     $assertSession = $this->assertSession();
-    $this->drupalGet('node/add/test');
-    $this->submitForm([
-      'title[0][value]' => 'Test leave preview',
-      'body[0][value]' => 'Tests clicking outside the preview area.',
-    ], 'Save');
-
-    // Make an edit and preview it.
-    $this->drupalGet('node/1/edit');
-    $this->submitForm([
-      'title[0][value]' => 'Test cancel changed',
-    ], 'Preview');
-
-    // Click a link that will take the user away from the preview.
-    $this->clickLink('Create');
-    $assertSession->pageTextContains('Leave preview?');
-
-    // Click "Leave preview" and expect to get to the target destination.
-    $this->click('button:contains("Leave preview")');
-    $this->assertStringContainsString('node/add/test', $this->getSession()->getCurrentUrl());
+    $cases = [
+      '/foo' => ['<a href="/foo">Normal link</a>', 'a[href="/foo"]'],
+      '/bar' => ['<a href="/bar"><span>Child element link</span></a>', 'a[href="/bar"] span'],
+    ];
+    foreach ($cases as $expected_path => [$body, $selector]) {
+      $this->drupalGet('node/add/test');
+      $this->submitForm([
+        'title[0][value]' => 'Test other click handler',
+        'body[0][value]' => $body,
+      ], 'Preview');
+      $this->getSession()->executeScript("jQuery(document).on('click', function () {});");
+      $assertSession->waitForElementVisible('css', $selector)->click();
+      $assertSession->waitForText('Leave preview?');
+      $this->click('button:contains("Leave preview")');
+      $this->assertTrue($this->getSession()->wait(5000, "window.location.pathname.endsWith('$expected_path')"));
+    }
   }
 
 }

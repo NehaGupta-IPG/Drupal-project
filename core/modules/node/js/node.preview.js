@@ -31,6 +31,10 @@
           !event.shiftKey
         ) {
           event.preventDefault();
+          // Store the link href now, as jQuery reuses the event object for any
+          // subsequent handlers in the same dispatch, which overwrites
+          // event.currentTarget before the dialog button is clicked.
+          const { href } = event.currentTarget;
           const $previewDialog = $(
             `<div>${Drupal.theme('nodePreviewModal')}</div>`,
           ).appendTo('body');
@@ -46,10 +50,6 @@
               {
                 text: Drupal.t('Leave preview'),
                 click() {
-                  let href = event.currentTarget.href;
-                  if (href === undefined) {
-                    href = event.target.href;
-                  }
                   window.top.location.href = href;
                 },
               },
