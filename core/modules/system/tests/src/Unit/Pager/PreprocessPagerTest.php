@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Unit\Pager;
 
+use Drupal\Component\Utility\HtmlAttributeString;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Pager\Pager;
 use Drupal\Core\Pager\PagerManager;
 use Drupal\Core\Pager\PagerPreprocess;
 use Drupal\Core\Routing\UrlGenerator;
-use Drupal\Core\Template\AttributeString;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -101,9 +101,9 @@ class PreprocessPagerTest extends UnitTestCase {
     $this->pagerPreprocess->preprocessPager($variables);
 
     $this->assertEquals(['first', 'previous', 'pages', 'next', 'last'], array_keys($variables['items']));
-    /** @var \Drupal\Core\Template\AttributeString $attribute */
+    /** @var \Drupal\Component\Utility\HtmlAttributeString $attribute */
     $attribute = $variables['items']['pages']['2']['attributes']->offsetGet('aria-current');
-    $this->assertInstanceOf(AttributeString::class, $attribute);
+    $this->assertInstanceOf(HtmlAttributeString::class, $attribute);
     $this->assertEquals('page', $attribute->value());
   }
 

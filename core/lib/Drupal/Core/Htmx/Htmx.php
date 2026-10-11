@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Htmx;
 
+use Drupal\Component\Utility\HtmlAttributeBoolean;
+use Drupal\Component\Utility\HtmlAttributeString;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Template\Attribute;
-use Drupal\Core\Template\AttributeBoolean;
 use Drupal\Core\Template\AttributeHelper;
-use Drupal\Core\Template\AttributeString;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
@@ -187,7 +187,7 @@ class Htmx {
    */
   protected function createStringAttribute(string $id, string $value, int $modifiers): void {
     $key = $this->keyWithModifiers($id, $modifiers);
-    $this->attributes[$key] = new AttributeString($key, $value);
+    $this->attributes[$key] = new HtmlAttributeString($key, $value);
   }
 
   /**
@@ -202,7 +202,7 @@ class Htmx {
    */
   protected function createBooleanAttribute(string $id, bool $value, int $modifiers): void {
     $key = $this->keyWithModifiers($id, $modifiers);
-    $this->attributes[$key] = new AttributeBoolean($key, $value);
+    $this->attributes[$key] = new HtmlAttributeBoolean($key, $value);
 
   }
 
@@ -222,7 +222,7 @@ class Htmx {
     // Ensure the object format HTMX shows in documentation.
     // Ensure numeric strings are encoded as numbers.
     $json = json_encode($value, JSON_FORCE_OBJECT | JSON_NUMERIC_CHECK);
-    $this->attributes[$key] = new AttributeString($key, $json);
+    $this->attributes[$key] = new HtmlAttributeString($key, $json);
   }
 
   /**
