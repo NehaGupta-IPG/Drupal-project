@@ -14,6 +14,8 @@
 @custom-media --admin-wider (min-width: 85em); /* 1360px */
 @custom-media --admin-widest (min-width: 90em); /* 1440px */
 @custom-media --admin-max (min-width: 108.125em); /* 1730px */
+/* Matches the Navigation module's --admin-toolbar-desktop breakpoint. */
+@custom-media --admin-navigation-desktop (min-width: 1024px);
 
 /* Max-width variants (exclusive) */
 @custom-media --admin-to-tiny (max-width: 26.24em);

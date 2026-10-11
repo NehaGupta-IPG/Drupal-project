@@ -4,12 +4,10 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
-
 /**
  * @file
  * Sidebar panel and controls.
  */
-
 #sidebar-draggable {
   position: absolute;
   z-index: 104;
@@ -43,7 +41,8 @@
 }
 
 .layout-region--secondary {
-  --admin-edit-sidebar-top: var(--admin-theme-toolbar-y-offset);
+  /* Sit below the Navigation top bar. */
+  --admin-edit-sidebar-top: var(--admin-theme-top-bar-bottom, var(--admin-theme-toolbar-y-offset));
 
   position: fixed;
   z-index: 103;
@@ -58,12 +57,6 @@
   background: var(--admin-color-bg-surface);
   inset-block-start: var(--admin-edit-sidebar-top);
   inset-inline-end: 0;
-
-  /* Sit below the Navigation module's top bar. Its height is known in CSS, so
-     the sidebar is positioned correctly from first paint without measuring. */
-  :root:has(.admin--navigation-top-bar) & {
-    --admin-edit-sidebar-top: calc(var(--admin-theme-toolbar-height) + var(--admin-toolbar-top-bar-height));
-  }
 
   .dark-mode & {
     box-shadow: 0 0 4px rgb(0, 0, 0, 0.1);

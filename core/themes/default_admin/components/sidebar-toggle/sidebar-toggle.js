@@ -73,6 +73,31 @@
         },
       );
 
+      // The sidebar is positioned below Navigation's control bar and top bar
+      // using CSS fallback heights. The top bar grows when its content wraps,
+      // and the control bar is hidden on desktop, so expose their measured
+      // heights whenever they change.
+      once('adminSidebarTopBar', '.admin--navigation-top-bar', context).forEach(
+        (topBar) => {
+          const bars = new Map([
+            [topBar, '--admin-theme-top-bar-height'],
+            [
+              document.querySelector('.admin-toolbar-control-bar'),
+              '--admin-theme-control-bar-height',
+            ],
+          ]);
+          const observer = new ResizeObserver((entries) => {
+            entries.forEach((entry) => {
+              document.documentElement.style.setProperty(
+                bars.get(entry.target),
+                `${entry.borderBoxSize[0].blockSize}px`,
+              );
+            });
+          });
+          bars.forEach((property, bar) => bar && observer.observe(bar));
+        },
+      );
+
       // Toolbar toggle
       once('adminSidebarToggle', '.meta-sidebar__trigger', context).forEach(
         (el) =>

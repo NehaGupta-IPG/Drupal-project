@@ -20,6 +20,22 @@
   --admin-theme-sticky-offset: 0px;
   --admin-icon-size-toolbar: 1.25rem;
 
+  /* Heights of Navigation's control bar and top bar. The values here are only
+     fallbacks: JS measures both bars and overwrites these variables with an
+     inline style on the <html> element, since the top bar grows when its
+     content wraps. The control bar sits above the top bar below Navigation's
+     desktop breakpoint and is hidden above it.
+     @see components/sidebar-toggle/sidebar-toggle.js */
+  --admin-theme-control-bar-height: 3.0625rem; /* Overwritten by JS on <html>. */
+  --admin-theme-top-bar-height: var(--admin-toolbar-top-bar-height); /* Overwritten by JS on <html>. */
+
+  /* Bottom edge of the top bar with the page scrolled to the top. */
+  --admin-theme-top-bar-bottom: calc(var(--admin-theme-control-bar-height) + var(--admin-theme-top-bar-height));
+
+  @media (min-width: 64rem) {
+    --admin-theme-control-bar-height: 0px;
+  }
+
   @media (min-width: 61em) {
     --admin-theme-toolbar-height: 0px;
     --admin-theme-toolbar-secondary-height: 3.25rem;

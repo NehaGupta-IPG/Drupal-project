@@ -3,6 +3,7 @@
  * Navigation top bar layout styles.
  */
 
+@import "../base/media-queries.pcss.css";
 /* cspell:ignore xxxs */
 :root {
   --drupal-displace-offset-top: 64px;
@@ -16,7 +17,7 @@
   border-block-end: 1px solid var(--admin-color-border-soft);
   background: color-mix(in lch, var(--admin-color-bg-surface) 80%, transparent);
   box-shadow: none;
-  padding-inline: calc(var(--admin-toolbar-sidebar-width) + var(--admin-space-m)) var(--admin-space-m);
+  padding-inline: var(--admin-space-m);
   padding-block: var(--admin-space-3xs);
   backdrop-filter: blur(12px);
 
@@ -136,6 +137,10 @@
   .button.button--danger,
   a.button.button--danger {
     padding-block: calc(var(--admin-space-xs) - 0.5px);
+  }
+
+  @media (--admin-navigation-desktop) {
+    padding-inline-start: calc(var(--admin-toolbar-sidebar-width) + var(--admin-space-m));
   }
 }
 

@@ -4,12 +4,10 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
-
 /**
  * @file
  * Navigation top bar layout styles.
  */
-
 /* cspell:ignore xxxs */
 :root {
   --drupal-displace-offset-top: 4rem;
@@ -23,7 +21,7 @@
   border-block-end: 1px solid var(--admin-color-border-soft);
   background: color-mix(in lch, var(--admin-color-bg-surface) 80%, transparent);
   box-shadow: none;
-  padding-inline: calc(var(--admin-toolbar-sidebar-width) + var(--admin-space-m)) var(--admin-space-m);
+  padding-inline: var(--admin-space-m);
   padding-block: var(--admin-space-3xs);
   backdrop-filter: blur(0.75rem);
 
@@ -145,6 +143,10 @@
   .button.button--danger,
   a.button.button--danger {
     padding-block: calc(var(--admin-space-xs) - 0.5px);
+  }
+
+  @media (min-width: 64rem) {
+    padding-inline-start: calc(var(--admin-toolbar-sidebar-width) + var(--admin-space-m));
   }
 }
 

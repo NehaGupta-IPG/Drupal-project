@@ -40,8 +40,8 @@
    * are *this theme's* layout-geometry tokens, so they get their own
    * --admin-theme-* namespace to keep ownership unambiguous in the public API.
    *
-   * --admin-theme-sidebar-width is written by the theme's JS at runtime
-   * (migration/js/init.js, sidebar.js); the toolbar offsets derive in CSS from
+   * --admin-theme-sidebar-width is overwritten by the theme's JS at runtime with
+   * an inline style on the <html> element; the toolbar offsets derive in CSS from
    * core's --drupal-displace-offset-* (see navigation.pcss.css). Values declared
    * here are only the initial/fallback.
    */
@@ -54,7 +54,7 @@
   --admin-theme-sticky-offset: 0px;
   --admin-theme-sidebar-small-width: 20rem;
   --admin-theme-sidebar-min-width: 15rem;
-  --admin-theme-sidebar-width: 20rem;
+  --admin-theme-sidebar-width: 20rem; /* Overwritten by JS on <html>. */
   --admin-theme-sidebar-max-width: 35rem;
   --admin-theme-sidebar-offset: var(--admin-theme-sidebar-width);
 
