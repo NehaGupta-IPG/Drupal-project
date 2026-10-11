@@ -65,6 +65,7 @@ abstract class EntityLanguageTestBase extends EntityKernelTestBase {
     $this->installConfig(['language']);
 
     // Create the test field.
+    // @phpstan-ignore loadIncludes.fileNotLoadable
     $this->container->get('module_handler')->loadInclude('entity_test', 'install');
     entity_test_install();
 
