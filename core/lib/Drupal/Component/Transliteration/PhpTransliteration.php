@@ -144,7 +144,7 @@ class PhpTransliteration implements TransliterationInterface {
     $string = mb_convert_encoding($string, 'UTF-8', 'UTF-8');
 
     // Compose decomposed characters before transliterating them.
-    if (!\Normalizer::isNormalized($string, \Normalizer::FORM_C)) {
+    if (extension_loaded('intl') && !\Normalizer::isNormalized($string, \Normalizer::FORM_C)) {
       $string = \Normalizer::normalize($string, \Normalizer::FORM_C) ?: $string;
     }
 

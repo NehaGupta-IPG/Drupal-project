@@ -10,6 +10,7 @@ use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -90,6 +91,7 @@ class PhpTransliterationTest extends TestCase {
    *   character's transliteration.
    */
   #[DataProvider('providerTestPhpTransliteration')]
+  #[RequiresPhpExtension('intl')]
   public function testPhpTransliteration(string $langcode, string $original, string $expected, string $unknown_character = '?', ?int $max_length = NULL): void {
     $transliterator_class = new PhpTransliteration();
     $actual = $transliterator_class->transliterate($original, $langcode, $unknown_character, $max_length);
