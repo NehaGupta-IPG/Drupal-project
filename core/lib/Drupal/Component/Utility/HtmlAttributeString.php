@@ -1,25 +1,23 @@
 <?php
 
-namespace Drupal\Core\Template;
-
-use Drupal\Component\Utility\Html;
+namespace Drupal\Component\Utility;
 
 /**
  * A class that represents most standard HTML attributes.
  *
- * To use with the Attribute class, set the key to be the attribute name
+ * To use with the HtmlAttributes class, set the key to be the attribute name
  * and the value the attribute value.
  * @code
- *  $attributes = new Attribute([]);
+ *  $attributes = new HtmlAttributes([]);
  *  $attributes['id'] = 'socks';
  *  $attributes['style'] = 'background-color:white';
  *  echo '<cat ' . $attributes . '>';
  *  // Produces: <cat id="socks" style="background-color:white">.
  * @endcode
  *
- * @see \Drupal\Core\Template\Attribute
+ * @see \Drupal\Component\Utility\HtmlAttributes
  */
-class AttributeString extends AttributeValueBase {
+class HtmlAttributeString extends HtmlAttributeValueBase {
 
   /**
    * Implements the magic __toString() method.
