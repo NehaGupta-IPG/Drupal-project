@@ -12,6 +12,31 @@
   const wideQuery = window.matchMedia('(min-width: 80em)');
   const storageMobile = 'Drupal.defaultAdmin.sidebarExpanded.mobile';
   const storageDesktop = 'Drupal.defaultAdmin.sidebarExpanded.desktop';
+  // Elements that stay interactive while the sidebar overlays the page.
+  const keepInteractive = '.meta-sidebar__overlay, [aria-live]';
+  // Elements made inert while the sidebar overlays the page, and the element
+  // that had focus before it opened.
+  let inertElements = [];
+  let returnFocusTo = null;
+
+  /**
+   * Makes an element inert, unless it is or contains one that must stay usable.
+   *
+   * @param {HTMLElement} el
+   *   The element to make inert.
+   */
+  const makeInert = (el) => {
+    if (el.inert || el.matches(`script, ${keepInteractive}`)) {
+      return;
+    }
+    // An inert element's descendants can't be re-enabled, so descend instead.
+    if (el.querySelector(keepInteractive)) {
+      [...el.children].forEach(makeInert);
+      return;
+    }
+    el.inert = true;
+    inertElements.push(el);
+  };
 
   Drupal.behaviors.adminSidebar = {
     attach: function attach(context) {
@@ -32,6 +57,19 @@
           // viewport crosses the breakpoint.
           this.handleResize();
           largeQuery.addEventListener('change', () => this.handleResize());
+
+          // Escape closes the sidebar while it overlays the page. Handlers
+          // inside the sidebar, such as autocomplete, prevent the default
+          // when they use Escape themselves.
+          document.addEventListener('keydown', (e) => {
+            if (
+              e.key === 'Escape' &&
+              !e.defaultPrevented &&
+              inertElements.length
+            ) {
+              this.collapseSidebar();
+            }
+          });
         },
       );
 
@@ -87,6 +125,13 @@
       if (!wideQuery.matches) {
         Drupal.adminCoreNavigation?.collapseToolbar();
       }
+
+      // Below the large breakpoint the sidebar overlays the page content.
+      if (largeQuery.matches) {
+        Drupal.adminSidebar.restoreCoveredContent(false);
+      } else {
+        Drupal.adminSidebar.inertCoveredContent();
+      }
     },
 
     collapseSidebar: () => {
@@ -99,6 +144,63 @@
 
       // Expose to localStorage.
       localStorage.setItem(chooseStorage, 'false');
+
+      Drupal.adminSidebar.restoreCoveredContent(true);
+    },
+
+    inertCoveredContent: () => {
+      if (inertElements.length) {
+        return;
+      }
+      const sidebar = document.getElementById('default_admin_sidebar');
+      if (!sidebar) {
+        return;
+      }
+
+      // Make the content under the overlay inert, so keyboard and assistive
+      // technology users can't reach it. Walk up from the sidebar and make the
+      // siblings at each level inert, stopping at the main canvas. Navigation
+      // and the top bar are outside it and are not covered by the overlay, so
+      // they stay interactive.
+      const boundary =
+        sidebar.closest('.dialog-off-canvas-main-canvas') || document.body;
+      let node = sidebar;
+      while (node !== boundary && node.parentElement) {
+        [...node.parentElement.children].forEach((sibling) => {
+          if (sibling !== node) {
+            makeInert(sibling);
+          }
+        });
+        node = node.parentElement;
+      }
+
+      // Move focus into the sidebar. It comes before Navigation and the top
+      // bar in the DOM, so tabbing continues from the sidebar to those.
+      returnFocusTo = document.activeElement;
+      (sidebar.querySelector('.meta-sidebar__close') || sidebar).focus();
+    },
+
+    restoreCoveredContent: (returnFocus) => {
+      if (!inertElements.length) {
+        return;
+      }
+      inertElements.forEach((el) => {
+        el.inert = false;
+      });
+      inertElements = [];
+
+      // Return focus to where it was before the sidebar opened, normally the
+      // toggle, if focus was in the now hidden sidebar.
+      const sidebar = document.getElementById('default_admin_sidebar');
+      if (
+        returnFocus &&
+        returnFocusTo?.isConnected &&
+        (sidebar?.contains(document.activeElement) ||
+          document.activeElement === document.body)
+      ) {
+        returnFocusTo.focus();
+      }
+      returnFocusTo = null;
     },
 
     handleResize: () => {
