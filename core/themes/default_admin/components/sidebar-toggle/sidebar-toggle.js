@@ -8,7 +8,8 @@
   // Matches the `--admin-large` custom media query, and the check in
   // migration/js/init.js that sets the initial sidebar state.
   const largeQuery = window.matchMedia('(min-width: 64em)');
-  const breakpointLarge = 1280;
+  // Matches the `--admin-wide` custom media query.
+  const wideQuery = window.matchMedia('(min-width: 80em)');
   const storageMobile = 'Drupal.defaultAdmin.sidebarExpanded.mobile';
   const storageDesktop = 'Drupal.defaultAdmin.sidebarExpanded.desktop';
 
@@ -28,9 +29,7 @@
           }
 
           // Sync the toggle with the initial state, then re-run only when the
-          // viewport crosses the breakpoint. Observing size changes instead
-          // also fires when page content grows or shrinks, which re-opened the
-          // sidebar and collapsed the Navigation toolbar below 1280px.
+          // viewport crosses the breakpoint.
           this.handleResize();
           largeQuery.addEventListener('change', () => this.handleResize());
         },
@@ -50,7 +49,7 @@
         '.meta-sidebar__close, .meta-sidebar__overlay',
         context,
       ).forEach((el) =>
-        el.addEventListener('click', (e) => {
+        el.addEventListener('click', () => {
           this.collapseSidebar();
         }),
       );
@@ -85,7 +84,7 @@
       localStorage.setItem(chooseStorage, 'true');
 
       // Check which toolbar is active.
-      if (window.innerWidth < breakpointLarge) {
+      if (!wideQuery.matches) {
         Drupal.adminCoreNavigation?.collapseToolbar();
       }
     },
