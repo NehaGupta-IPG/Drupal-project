@@ -1960,6 +1960,10 @@ function hook_entity_form_display_alter(\Drupal\Core\Entity\Display\EntityFormDi
  * installed, updated, and uninstalled. This would typically be done through the
  * Entity Update API provided by the entity definition update manager.
  *
+ * Base field definitions are built before any base field override config
+ * entities are applied, so a base field override for a bundle replaces the
+ * definition provided by this hook for that bundle.
+ *
  * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
  *   The entity type definition.
  *
@@ -1970,6 +1974,7 @@ function hook_entity_form_display_alter(\Drupal\Core\Entity\Display\EntityFormDi
  * @see hook_entity_bundle_field_info()
  * @see hook_entity_bundle_field_info_alter()
  * @see \Drupal\Core\Field\FieldDefinitionInterface
+ * @see \Drupal\Core\Field\Entity\BaseFieldOverride
  * @see \Drupal\Core\Entity\EntityFieldManagerInterface::getFieldDefinitions()
  * @see \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
  * @see https://www.drupal.org/node/3034742
@@ -1990,6 +1995,10 @@ function hook_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $en
 /**
  * Alter base field definitions for a content entity type.
  *
+ * This hook is invoked before any base field override config entities are
+ * applied, so a base field override for a bundle replaces the altered
+ * definition for that bundle.
+ *
  * @param \Drupal\Core\Field\FieldDefinitionInterface[] $fields
  *   The array of base field definitions for the entity type.
  * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -1998,6 +2007,7 @@ function hook_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $en
  * @see hook_entity_base_field_info()
  * @see hook_entity_bundle_field_info()
  * @see hook_entity_bundle_field_info_alter()
+ * @see \Drupal\Core\Field\Entity\BaseFieldOverride
  *
  * @todo WARNING: This hook will be changed in
  * https://www.drupal.org/node/2346329.
@@ -2016,6 +2026,10 @@ function hook_entity_base_field_info_alter(&$fields, \Drupal\Core\Entity\EntityT
  * provide a field storage definition via hook_entity_field_storage_info()
  * unless they are computed.
  *
+ * This hook is invoked after base field override config entities have been
+ * applied for the bundle, so a definition returned here for an overridden base
+ * field replaces the base field override.
+ *
  * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
  *   The entity type definition.
  * @param string $bundle
@@ -2033,6 +2047,7 @@ function hook_entity_base_field_info_alter(&$fields, \Drupal\Core\Entity\EntityT
  * @see hook_entity_bundle_field_info_alter()
  * @see \Drupal\Core\Field\FieldDefinitionInterface
  * @see \Drupal\Core\Field\FieldDefinition
+ * @see \Drupal\Core\Field\Entity\BaseFieldOverride
  * @see \Drupal\Core\Entity\EntityFieldManagerInterface::getFieldDefinitions()
  *
  * @todo WARNING: This hook will be changed in
@@ -2052,6 +2067,10 @@ function hook_entity_bundle_field_info(\Drupal\Core\Entity\EntityTypeInterface $
 /**
  * Alter bundle field definitions.
  *
+ * This hook is invoked after base field override config entities have been
+ * applied for the bundle, so changes made here take precedence over base field
+ * overrides.
+ *
  * @param \Drupal\Core\Field\FieldDefinitionInterface[] $fields
  *   The array of bundle field definitions.
  * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -2062,6 +2081,7 @@ function hook_entity_bundle_field_info(\Drupal\Core\Entity\EntityTypeInterface $
  * @see hook_entity_base_field_info()
  * @see hook_entity_base_field_info_alter()
  * @see hook_entity_bundle_field_info()
+ * @see \Drupal\Core\Field\Entity\BaseFieldOverride
  *
  * @todo WARNING: This hook will be changed in
  * https://www.drupal.org/node/2346347.
