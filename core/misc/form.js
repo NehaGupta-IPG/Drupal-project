@@ -328,7 +328,8 @@
    */
   $(document).on(
     'click.form-fragment',
-    'a[href*="#"]',
+    // Target all links except those inside a WYSIWYG editor.
+    'a[href*="#"]:not(.form-textarea-wrapper *)',
     debouncedHandleFragmentLinkClickOrHashChange,
   );
 })(jQuery, Drupal, Drupal.debounce);
