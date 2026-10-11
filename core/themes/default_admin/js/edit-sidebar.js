@@ -6,7 +6,7 @@
 ((Drupal, once) => {
   const storageWidth = 'Drupal.defaultAdmin.sidebarWidth';
   let isResizing = false;
-  let resizable, startX, startWidth;
+  let resizable, startX, startWidth, direction;
 
   // Touch events have no clientX of their own; read it from the first touch.
   const getClientX = (e) => (e.touches ? e.touches[0].clientX : e.clientX);
@@ -49,6 +49,9 @@
       isResizing = true;
       resizable = e.currentTarget.closest('#default_admin_sidebar');
       startX = getClientX(e);
+      // The sidebar sits on the right in LTR and on the left in RTL, so
+      // dragging outward moves the pointer in opposite directions.
+      direction = resizable.matches(':dir(rtl)') ? -1 : 1;
       startWidth = parseInt(
         document.defaultView.getComputedStyle(resizable).width,
         10,
@@ -69,7 +72,7 @@
 
     resizeWidth: (e) => {
       if (isResizing) {
-        let sidebarWidth = startWidth - (getClientX(e) - startX);
+        let sidebarWidth = startWidth - direction * (getClientX(e) - startX);
 
         if (sidebarWidth <= 240) {
           sidebarWidth = 240;
