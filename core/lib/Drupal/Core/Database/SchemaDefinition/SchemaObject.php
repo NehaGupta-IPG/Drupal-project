@@ -7,8 +7,8 @@ namespace Drupal\Core\Database\SchemaDefinition;
 /**
  * Enumeration of possible schema objects.
  */
-enum SchemaObject {
+enum SchemaObject: string {
 
-  case Table;
+  case Table = 'table';
 
 }

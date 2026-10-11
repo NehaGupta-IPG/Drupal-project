@@ -69,7 +69,24 @@ abstract class Schema implements PlaceholderInterface {
   }
 
   /**
-   * Determines if a database object exists is the schema.
+   * Introspect the list of available database objects.
+   *
+   * The list is cached for the duration of the request. Schema operations
+   * adding/renaming/removing database objects adjust the list.
+   *
+   * @param bool $reload
+   *   If TRUE, reloads the objects from the database even if already cached.
+   */
+  protected function fetchObjects(bool $reload = FALSE): void {
+    if ($this->objects && !$reload) {
+      return;
+    }
+    // Load tables.
+    $this->objects[SchemaObject::Table->value] = $this->findTables('%');
+  }
+
+  /**
+   * Determines if a database object exists in the schema.
    *
    * @param string $name
    *   The name of the object to find.
@@ -80,35 +97,46 @@ abstract class Schema implements PlaceholderInterface {
    *   The type of the object found, or FALSE if not found.
    */
   public function hasObject(string $name, ?SchemaObject $objectType = NULL): SchemaObject|false {
+    $this->fetchObjects();
     if ($objectType) {
-      $matchable[$objectType->name] = $this->objects[$objectType->name] ?? [];
+      $matchable[$objectType->value] = $this->objects[$objectType->value] ?? [];
     }
     else {
       $matchable = $this->objects;
     }
     foreach ($matchable as $type => $list) {
       if (isset($list[$name])) {
-        return $type;
+        return SchemaObject::from($type);
       }
     }
     return FALSE;
   }
 
   /**
-   * Introspect the list of available database objects.
+   * Tracks that a database object is added to the schema.
    *
-   * The list is cached for the duration of the request. Schema operations
-   * adding/renaming/removing database objects adjust the list.
-   *
-   * @param bool $reload
-   *   If TRUE, reloads the objects from the database even if already cached.
+   * @param string $name
+   *   The name of the object to find.
+   * @param SchemaObject $objectType
+   *   The type of object to find, or NULL not to restrict.
    */
-  public function fetchObjects(bool $reload = FALSE): void {
-    if ($this->objects && !$reload) {
-      return;
+  protected function addObject(string $name, SchemaObject $objectType): void {
+    $this->objects[$objectType->value][$name] = 1;
+  }
+
+  /**
+   * Tracks that a database object is removed from the schema.
+   *
+   * @param string $name
+   *   The name of the object to find.
+   * @param ?SchemaObject $objectType
+   *   (Optional) The type of object to find, or NULL not to restrict.
+   */
+  protected function removeObject(string $name, ?SchemaObject $objectType = NULL): void {
+    $foundObjectType = $this->hasObject($name, $objectType);
+    if ($foundObjectType) {
+      unset($this->objects[$foundObjectType->value][$name]);
     }
-    // Load tables.
-    $this->objects[SchemaObject::Table->name] = $this->findTables('%');
   }
 
   /**
@@ -751,7 +779,7 @@ abstract class Schema implements PlaceholderInterface {
       $this->executeDdlStatement($statement);
     }
 
-    $this->objects[SchemaObject::Table->name][$name] = 1;
+    $this->addObject($name, SchemaObject::Table);
   }
 
   /**

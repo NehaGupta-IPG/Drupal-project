@@ -392,33 +392,33 @@ class Schema extends DatabaseSchema {
    * {@inheritdoc}
    */
   public function renameTable($table, $new_name) {
+    $this->fetchObjects();
     if (!$this->tableExists($table)) {
       throw new SchemaTableDoesNotExistException("Cannot rename '$table' to '$new_name': table '$table' doesn't exist.");
     }
     if ($this->tableExists($new_name)) {
       throw new SchemaTableAlreadyExistsException("Cannot rename '$table' to '$new_name': table '$new_name' already exists.");
     }
-    $this->fetchObjects();
 
     $info = $this->getPrefixInfo($new_name);
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} RENAME TO [' . $info['table'] . ']');
 
-    unset($this->objects[SchemaObject::Table->name][$table]);
-    $this->objects[SchemaObject::Table->name][$info['table']] = 1;
+    $this->removeObject($table, SchemaObject::Table);
+    $this->addObject($info['table'], SchemaObject::Table);
   }
 
   /**
    * {@inheritdoc}
    */
   public function dropTable($table) {
+    $this->fetchObjects();
     if (!$this->tableExists($table)) {
       return FALSE;
     }
-    $this->fetchObjects();
 
     $this->executeDdlStatement('DROP TABLE {' . $table . '}');
 
-    unset($this->objects[SchemaObject::Table->name][$table]);
+    $this->removeObject($table, SchemaObject::Table);
     return TRUE;
   }
 

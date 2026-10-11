@@ -1250,7 +1250,7 @@ abstract class Connection {
    * @return mixed
    *   The result of the operation.
    */
-  public function executeWithCreateSchemaIfNeeded(SchemaDefinition|SchemaDefinitionCollection $schema, callable $operation): mixed {
+  public function executeWithSchema(SchemaDefinition|SchemaDefinitionCollection $schema, callable $operation): mixed {
     $this->schema()->createSchemaFromDefinition($schema);
     return $operation();
   }
