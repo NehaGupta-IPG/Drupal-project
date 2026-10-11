@@ -93,8 +93,8 @@ variables:
   # Use local cache for yarn, see .yarn-install-from-cache.
   YARN_ENABLE_GLOBAL_CACHE: false
   YARN_ENABLE_MIRROR: false
-  # [DO NOT MERGE] Bench matrix: "pilot", "main", "q3" or "q4" (ab-* jobs).
-  AB_RUN: "q4"
+  # [DO NOT MERGE] Bench matrix: "pilot", "main", "q3", "q4" or "q5" (ab-* jobs).
+  AB_RUN: "q5"
 
 #############
 # Stages    #
@@ -1397,3 +1397,74 @@ default:
     AB_ROUNDS: "3"
     AB_SLOTS: copy
     AB_FILLER: "0"
+
+#### Q5 (AB_RUN: q5): the CLI file cache that the drupalci 8.5 image now sets
+# in php-cli.ini (drupalci_environments production 51ab78f), in the two Unit
+# jobs, set up as CI runs them: no web server, no database, Composer as root
+# first. Arms (ab.sh AB_KIND=img): on = the image's php-cli.ini, off = the
+# previous image's CLI (empty opcache.file_cache, record_warnings 0), off2 =
+# A/A control, onnorw = on plus opcache.record_warnings=0. The image is pinned
+# by digest: the runners pull IfNotPresent, so :production can still be an
+# older build on a node.
+# The runners cap every job at 30m (every ab trace: "activeDeadlineSeconds
+# will be set to the job timeout: 30m0s", also with timeout: 100m); the pod
+# is then killed without after_script or artifacts, the AB rows survive only
+# in the trace. 4 rounds x 4 arms visit every slot once and fit on an EPYC
+# 7571 node (2.6x the CPU of a Xeon 8488C per pass in q4 Build).
+.ab-q5: &ab-q5
+  stage: ⚡️ Tests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $AB_RUN == "q5"
+  needs: []
+  timeout: 30m
+  retry: 0
+  image:
+    name: $_CONFIG_DOCKERHUB_ROOT/php-8.5-ubuntu-apache:production@sha256:5ef773bba43c1fd7da16e6ef6982e08770fede2fddb1925ed84ac9de90f7c23f
+  script:
+    - .gitlab-ci/ab/ab.sh
+  after_script:
+    - grep -h '' ab-out/summary.tsv || true
+  artifacts:
+    when: always
+    expire_in: 1 mos
+    paths:
+      - ab-out/
+
+'ab-q5 Unit Core':
+  <<: *ab-q5
+  parallel: 3
+  before_script:
+    # As '📋 PHPUnit Unit (Core)', with the chown of !17339: Composer runs PHP
+    # as root, which leaves the cache's system-id directory to root (0700).
+    - *composer-setup
+    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
+    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
+    - '[ ! -d /var/cache/opcache-cli ] || chown -R www-data:www-data /var/cache/opcache-cli'
+  variables:
+    KUBERNETES_CPU_REQUEST: "4"
+    CONCURRENCY: "24"
+    AB_KIND: img
+    AB_SERVER: none
+    AB_TARGET: "--types unit --all"
+    AB_WARMUP: "core/tests/Drupal/Tests/Core/Routing/UrlGeneratorTest.php,core/tests/Drupal/Tests/Core/Entity/EntityTypeTest.php"
+    AB_ARMS: "off on off2 onnorw"
+    AB_ROUNDS: "4"
+
+# Runs as root with pcov coverage, as the job does on PRIMARY_PHP. One serial
+# PHPUnit process per arm (~190 tests in separate processes).
+'ab-q5 Unit Component':
+  <<: *ab-q5
+  parallel: 3
+  before_script:
+    # As '📋 PHPUnit Unit (Component)' on PRIMARY_PHP.
+    - *composer-setup
+    - docker-php-ext-enable pcov
+  variables:
+    KUBERNETES_CPU_REQUEST: "4"
+    AB_KIND: img
+    AB_SERVER: none
+    AB_RUNNER: component
+    AB_USER: root
+    AB_WARMUP: "TimeTest"
+    AB_ARMS: "off on off2 onnorw"
+    AB_ROUNDS: "4"
