@@ -23,8 +23,8 @@ interface ContainerStorageInterface {
    * Attempts to load a previously stored container.
    *
    * @param string $identifier
-   *   A hash identifying the container version, computed by the kernel
-   *   from the environment, service providers, deployment identifier, etc.
+   *   A string identifying the container version. See
+   *   \Drupal\Core\DrupalKernel::getContainerIdentifier().
    *
    * @return \Symfony\Component\DependencyInjection\ContainerInterface|null
    *   The loaded container, or NULL if no valid cached container exists.
@@ -37,7 +37,7 @@ interface ContainerStorageInterface {
    * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
    *   The compiled container builder.
    * @param string $identifier
-   *   A hash identifying this container version.
+   *   A string identifying this container version.
    */
   public function dump(ContainerBuilder $container, string $identifier): void;
 
@@ -50,7 +50,7 @@ interface ContainerStorageInterface {
    * Removes stored containers that are no longer in use.
    *
    * @param string $identifier
-   *   A hash identifying the current container version.
+   *   A string identifying the current container version.
    */
   public function garbageCollection(string $identifier): void;
 

@@ -1011,7 +1011,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Returns a string that uniquely identifies the container version.
    *
-   * The identifier is a hash derived from:
+   * The identifier is built from:
    * - The kernel environment string.
    * - A hash based on all the installed package versions.
    * - The deployment identifier from settings.php.
@@ -1020,7 +1020,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * - The paths to any additional container YAMLs from settings.php.
    *
    * Container storage implementations use this identifier to construct their
-   * own cache keys or class names.
+   * own cache keys.
    *
    * @return string
    *   A unique identifier for the current container version.
