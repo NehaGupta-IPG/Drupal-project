@@ -67,7 +67,7 @@ display:
       filters:
         uid_current:
           id: uid_current
-          table: users
+          table: users_field_data
           field: uid_current
           relationship: none
           group_type: group
