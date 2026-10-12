@@ -154,8 +154,10 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
       'packed_order_operations' => $packed_order_operations,
     ]);
 
-    foreach ($this->deprecatedFiles['module'] ?? [] as $deprecatedFile => $v) {
-      @trigger_error('Code in ' . $deprecatedFile . '.module is deprecated in drupal:11.5.0 and must be converted before drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3619765', E_USER_DEPRECATED);
+    foreach ($this->deprecatedFiles ?? [] as $fileExtension => $deprecatedFiles) {
+      foreach ($this->deprecatedFiles[$fileExtension] ?? [] as $deprecatedFile => $v) {
+        @trigger_error('Code in ' . $deprecatedFile . '.' . $fileExtension . ' is deprecated in drupal:11.5.0 and must be converted before drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3619765', E_USER_DEPRECATED);
+      }
     }
   }
 
@@ -355,7 +357,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
       $fileExtension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
 
-      if ($fileExtension === 'module') {
+      if ($fileExtension === 'module' || $fileExtension === 'profile' ) {
         $this->deprecatedFiles[$fileExtension][pathinfo($filename, PATHINFO_FILENAME)] = TRUE;
       }
 
