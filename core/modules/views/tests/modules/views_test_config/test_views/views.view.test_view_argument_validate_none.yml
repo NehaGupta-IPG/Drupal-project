@@ -1,0 +1,42 @@
+langcode: en
+status: true
+dependencies: {  }
+id: test_view_argument_validate_none
+label: 'Test view'
+module: views
+description: ''
+tag: ''
+base_table: user_field_data
+base_field: uid
+display:
+  default:
+    display_options:
+      access:
+        type: none
+      arguments:
+        status:
+          id: status
+          table: users_field_data
+          field: status
+          entity_type: user
+          entity_field: status
+          plugin_id: numeric
+          default_argument_type: fixed
+          specify_validation: false
+          validate:
+            type: none
+            fail: 'not found'
+      cache:
+        type: tag
+      exposed_form:
+        type: basic
+      pager:
+        type: full
+      style:
+        type: default
+      row:
+        type: fields
+    display_plugin: default
+    display_title: Default
+    id: default
+    position: 0

@@ -18,11 +18,16 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class ArgumentValidatorTest extends ViewsKernelTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['node'];
+
+  /**
    * Views used by this test.
    *
    * @var array
    */
-  public static $testViews = ['test_view_argument_validate_numeric', 'test_view'];
+  public static $testViews = ['test_view_argument_validate_numeric', 'test_view', 'test_view_argument_validate_none'];
 
   /**
    * Tests numeric argument validation in a view.
@@ -34,6 +39,28 @@ class ArgumentValidatorTest extends ViewsKernelTestBase {
     // Reset saved argument validation.
     $view->argument['null']->argument_validated = NULL;
     $this->assertTrue($view->argument['null']->validateArgument(12));
+  }
+
+  /**
+   * Tests the None argument validator test plugin.
+   *
+   * @see \Drupal\views\Plugin\views\argument_validator\None
+   */
+  public function testArgumentValidateNone(): void {
+    $view = Views::getView('test_view_argument_validate_none');
+    $view->initHandlers();
+    $this->assertFalse($view->argument['status']->validateArgument('foo'));
+    // Reset saved argument validation.
+    $view->argument['status']->argument_validated = NULL;
+    $this->assertTrue($view->argument['status']->validateArgument(12));
+
+    // Reset saved argument validation.
+    $view->argument['status']->argument_validated = NULL;
+    $this->assertFalse($view->argument['status']->validateArgument(''));
+
+    $view->argument['status']->options['must_not_be'] = 1;
+    $view->argument['status']->argument_validated = NULL;
+    $this->assertFalse($view->argument['status']->validateArgument(12));
   }
 
   /**

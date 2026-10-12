@@ -6,7 +6,14 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsArgumentValidator;
 
 /**
- * Do not validate the argument.
+ * Provide a basic argument validation.
+ *
+ * This can be overridden for more complex types; the basic validator only
+ * checks to see if the argument is not NULL or is numeric if the definition
+ * says it's numeric.
+ *
+ * @return bool
+ *   TRUE is the argument validates, FALSE otherwise.
  *
  * @ingroup views_argument_validate_plugins
  */
@@ -28,7 +35,9 @@ class None extends ArgumentValidatorPluginBase {
       return FALSE;
     }
 
-    if (!empty($this->argument->definition['numeric']) && !isset($this->argument->options['break_phrase'])) {
+    if (($this->argument->getPluginId() === 'numeric')
+      && empty($this->argument->options['break_phrase'])
+      && !is_numeric($argument)) {
       return FALSE;
     }
 
