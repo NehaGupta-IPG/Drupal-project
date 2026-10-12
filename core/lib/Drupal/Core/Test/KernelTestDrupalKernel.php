@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class KernelTestDrupalKernel extends DrupalKernel {
 
   /**
-   * Whether the container should be retrieved from che.
+   * Whether to load the stored container even if the module list is set.
    *
    * Only overrides when it's TRUE, FALSE does nothing.
    */
@@ -30,25 +30,29 @@ class KernelTestDrupalKernel extends DrupalKernel {
   protected int $idSuffix = 0;
 
   /**
-   * Sets whether to override rebuilding the container.
+   * Sets whether the container needs to be rebuilt.
    *
    * @param bool $rebuild
-   *   If TRUE, the container will not be rebuilt, if FALSE, defaults to the
-   *   standard behavior.
+   *   TRUE to rebuild the container when it is next initialized, FALSE to
+   *   load the stored container if possible.
    */
   public function setContainerNeedsRebuild(bool $rebuild): void {
     $this->containerNeedsRebuild = $rebuild;
   }
 
   /**
-   * Resets the id suffix to 0.
+   * Resets the ID suffix to 0.
    */
   public function resetIdSuffix(): void {
     $this->idSuffix = 0;
   }
 
   /**
-   * Sets whether the container should be rebuilt.
+   * Sets whether to load the stored container even if the module list is set.
+   *
+   * @param bool $use
+   *   TRUE to load the stored container once when the container is next
+   *   initialized, instead of rebuilding it.
    */
   public function setOverrideNeedsRebuild(bool $use): void {
     $this->overrideNeedsRebuild = $use;
@@ -69,13 +73,11 @@ class KernelTestDrupalKernel extends DrupalKernel {
   /**
    * {@inheritdoc}
    */
-  protected function getContainerFromStorage($container_id): ?ContainerInterface {
+  protected function getContainerFromStorage(string $container_id): ?ContainerInterface {
     if ($this->overrideNeedsRebuild) {
       // Only override once.
       $this->overrideNeedsRebuild = FALSE;
-      $storage = $this->bootstrapContainer->get('container_storage');
-      $container = $storage->load($container_id);
-      return $container;
+      return $this->bootstrapContainer->get('container_storage')->load($container_id);
     }
     return parent::getContainerFromStorage($container_id);
   }

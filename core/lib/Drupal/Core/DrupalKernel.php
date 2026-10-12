@@ -1095,10 +1095,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     $container_id = $this->getContainerIdentifier();
-
-    // If the module list hasn't already been set in updateModules and we are
-    // not forcing a rebuild, then try and load the container from storage.
-    //
     $container = $this->getContainerFromStorage($container_id);
 
     // If no container was loaded, build a new one from scratch.
@@ -1993,22 +1989,24 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Gets the cached container definition if the cache may be used.
+   * Loads the stored container if the stored container may be used.
    *
    * @param string $container_id
-   *   The container ID.
+   *   The container identifier.
    *
-   * @return Symfony\Component\DependencyInjection\ContainerInterface|null
-   *   The cached container definition, or NULL if the cache must not be used
-   *   or holds no definition.
+   * @return \Symfony\Component\DependencyInjection\ContainerInterface|null
+   *   The stored container, or NULL if the stored container must not be used
+   *   or there is no stored container.
+   *
+   * @see \Drupal\Core\DependencyInjection\ContainerStorageInterface::load()
    */
-  protected function getContainerFromStorage($container_id): ?ContainerInterface {
-    $container = NULL;
+  protected function getContainerFromStorage(string $container_id): ?ContainerInterface {
+    // If the module list hasn't already been set in updateModules and we are
+    // not forcing a rebuild, then try and load the container from storage.
     if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-      $storage = $this->bootstrapContainer->get('container_storage');
-      $container = $storage->load($container_id);
+      return $this->bootstrapContainer->get('container_storage')->load($container_id);
     }
-    return $container;
+    return NULL;
   }
 
 }
