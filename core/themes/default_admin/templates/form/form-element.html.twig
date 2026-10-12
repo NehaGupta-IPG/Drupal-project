@@ -38,7 +38,7 @@ js-form-type-[something] exists on form items. We have to keep them.
       <div class="help-icon">
         {{ label }}
         {{ attach_library('default_admin/description_toggle') }}
-        <button class="help-icon__description-toggle">
+        <button type="button" class="help-icon__description-toggle">
           <span class="visually-hidden">{{ 'Toggle form description'|t }}</span>
         </button>
       </div>
@@ -66,7 +66,7 @@ js-form-type-[something] exists on form items. We have to keep them.
       <div class="help-icon">
         {{ label }}
         {{ attach_library('default_admin/description_toggle') }}
-        <button class="help-icon__description-toggle"></button>
+        <button type="button" class="help-icon__description-toggle"></button>
       </div>
     {% else %}
       {{ label }}
