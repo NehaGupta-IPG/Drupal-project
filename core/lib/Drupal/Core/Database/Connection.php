@@ -219,7 +219,7 @@ abstract class Connection {
    * @return object
    *   A client connection object.
    *
-   * @todo in drupal:43.0.0, remove the PHPCS toggles and uncomment the new
+   * @todo in drupal:13.0.0, remove the PHPCS toggles and uncomment the new
    *   method. Drivers that migrate to use ConnectionParameters for
    *   establishing the database connection must implement it.
    *

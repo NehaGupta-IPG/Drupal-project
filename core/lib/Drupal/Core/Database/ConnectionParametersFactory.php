@@ -115,7 +115,7 @@ abstract class ConnectionParametersFactory {
 
     // Return the driver's ConnectionParameters object if the driver supports
     // it, otherwise a fallback wrapper closure.
-    // @todo in drupal:43.0.0 remove the wrapper.
+    // @todo in drupal:13.0.0 remove the wrapper.
     /** @var class-string<ConnectionParametersInterface> $class */
     $class = $options['namespace'] . '\\ConnectionParameters';
 
