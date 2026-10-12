@@ -96,12 +96,9 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
       throw new \RuntimeException(sprintf('Expected to replace 1 occurrence of "DrupalContainer" with "%s" in the dumped container code.', $containerClass));
     }
 
-    // Only write the container to disk if it does not already exist.
     $filename = $containerClass . '.php';
-    if (!$this->phpStorage->exists($filename)) {
-      if (!$this->phpStorage->save($filename, $code)) {
-        return;
-      }
+    if (!$this->phpStorage->save($filename, $code)) {
+      return;
     }
 
     // Record the hash only after the file is written, so the cache never
@@ -131,6 +128,9 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
    * {@inheritdoc}
    */
   public function garbageCollection(string $identifier): void {
+    // Remove outdated copies left behind when a container file is saved again.
+    $this->phpStorage->garbageCollection();
+
     $cache = $this->cache->get(static::CACHE_PREFIX . $identifier);
     if (!$cache || !($hash = $cache->data)) {
       return;
