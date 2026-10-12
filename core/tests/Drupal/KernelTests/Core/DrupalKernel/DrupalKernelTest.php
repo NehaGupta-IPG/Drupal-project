@@ -65,17 +65,22 @@ class DrupalKernelTest extends KernelTestBase {
    *   A request object to use in booting the kernel.
    * @param array $modules_enabled
    *   A list of modules to install on the kernel.
+   * @param string|null $site_path
+   *   (optional) The site path to set on the kernel before it boots.
    *
    * @return \Drupal\Core\DrupalKernel
    *   New kernel for testing.
    */
-  protected function getTestKernel(Request $request, ?array $modules_enabled = NULL) {
+  protected function getTestKernel(Request $request, ?array $modules_enabled = NULL, ?string $site_path = NULL) {
     // Manually create kernel to avoid replacing settings.
     $class_loader = require $this->root . '/autoload.php';
     $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
     $this->setSetting('container_yamls', []);
     $this->setSetting('hash_salt', $this->databasePrefix);
     $this->setSetting('container_base_class', PhpContainer::class);
+    if (isset($site_path)) {
+      $kernel->setSitePath($site_path);
+    }
     if (isset($modules_enabled)) {
       $kernel->updateModules($modules_enabled);
     }
@@ -396,40 +401,27 @@ class DrupalKernelTest extends KernelTestBase {
    * Tests that a new container is created when the site path changes.
    */
   public function testNewContainerOnSitePathChange(): void {
-    $class_loader = require $this->root . '/autoload.php';
     $request = Request::createFromGlobals();
 
-    // Create a kernel that will dump the container to disk.
-    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
-    $this->setSetting('container_yamls', []);
-    $this->setSetting('hash_salt', $this->databasePrefix);
-    $this->setSetting('site_path', $this->siteDirectory);
-    $kernel->setSitePath($this->siteDirectory);
-    // Need at least one module to ensure container can be dumped.
-    $kernel->updateModules(['system' => 'system']);
-    $kernel->boot();
-    $this->assertSame($this->siteDirectory, $kernel->getContainer()->getParameter('site.path'));
+    // Boot a kernel with a module list so that the container is compiled and
+    // dumped.
+    $kernel = $this->getTestKernel($request, ['system' => 'system'], $this->siteDirectory);
+    $container = $kernel->getContainer();
+    $this->assertInstanceOf(PhpContainer::class, $container);
+    $this->assertSame($this->siteDirectory, $container->getParameter('site.path'));
+    $this->assertSame(['system'], array_keys($container->getParameter('container.modules')));
+
+    // Boot a kernel with the same site path and no module list. The dumped
+    // container is loaded; a newly compiled container would have no modules.
+    $kernel = $this->getTestKernel($request, NULL, $this->siteDirectory);
+    $this->assertSame($container::class, $kernel->getContainer()::class);
     $this->assertSame(['system'], array_keys($kernel->getContainer()->getParameter('container.modules')));
 
-    // Create a new kernel with the same site path but do not call
-    // $kernel->updateModules() to prove this one is loaded from the dumped
-    // container.
-    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
-    $this->setSetting('container_yamls', []);
-    $this->setSetting('hash_salt', $this->databasePrefix);
-    $kernel->setSitePath($this->siteDirectory);
-    $kernel->boot();
-    $this->assertSame($this->siteDirectory, $kernel->getContainer()->getParameter('site.path'));
-    $this->assertSame(['system'], array_keys($kernel->getContainer()->getParameter('container.modules')));
-
-    // Create a new kernel with a different site path. Modules are not injected
-    // to load the container from the PHP dumped container.
-    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
-    $this->setSetting('container_yamls', []);
-    $this->setSetting('hash_salt', $this->databasePrefix);
-    $kernel->setSitePath($this->siteDirectory . '/different');
-    $kernel->boot();
+    // Boot a kernel with a different site path and no module list. The site
+    // path is part of the container identifier, so a new container is compiled.
+    $kernel = $this->getTestKernel($request, NULL, $this->siteDirectory . '/different');
     $this->assertSame($this->siteDirectory . '/different', $kernel->getContainer()->getParameter('site.path'));
+    $this->assertSame([], $kernel->getContainer()->getParameter('container.modules'));
   }
 
   /**
