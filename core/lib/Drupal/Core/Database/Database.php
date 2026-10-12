@@ -250,13 +250,13 @@ abstract class Database {
    * @return ConnectionInfoBaseArray
    *   A validated connection info array.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
    *   ConnectionParametersFactory::createFromArrayOptions() instead.
    *
    * @see https://www.drupal.org/node/3626243
    */
   final public static function parseConnectionInfo(array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): array {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersFactory::createFromArrayOptions() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ConnectionParametersFactory::createFromArrayOptions() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
     return ConnectionParametersFactory::createFromOptionsArray($info, $class_loader, $app_root)->toArray();
   }
 
@@ -320,13 +320,13 @@ abstract class Database {
    *   An associative array of database information, keyed by target. Defaults
    *   to an empty array.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
    *   ::getConnectionParameters() instead.
    *
    * @see https://www.drupal.org/node/3626243
    */
   final public static function getConnectionInfo(string|int $key = 'default'): array {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ::getConnectionParameters() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ::getConnectionParameters() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
     if (is_int($key)) {
       @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
     }
@@ -366,13 +366,13 @@ abstract class Database {
    *   An associative array of database information for all available database,
    *   keyed by the database key and target. Defaults to an empty array.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
    *   ::getAllConnectionParameters() instead.
    *
    * @see https://www.drupal.org/node/3626243
    */
   final public static function getAllConnectionInfo(): array {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ::getAllConnectionParameters() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ::getAllConnectionParameters() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
     $targets = self::getAllConnectionParameters();
     $tmp = [];
     foreach (self::$databaseInfo as $key => $targets) {
@@ -608,13 +608,13 @@ abstract class Database {
    * @throws \RuntimeException
    *   Exception thrown when a module provided database driver does not exist.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
    *   ConnectionParametersFactory::createFromUrl() instead.
    *
    * @see https://www.drupal.org/node/3626243
    */
   public static function convertDbUrlToConnectionInfo(string $url, ?bool $include_test_drivers = NULL): array {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersFactory::createFromUrl() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ConnectionParametersFactory::createFromUrl() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
     return ConnectionParametersFactory::createFromUrl($url, $include_test_drivers)->toArray();
   }
 
@@ -646,13 +646,13 @@ abstract class Database {
    * @throws \RuntimeException
    *   When the database connection is not defined.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
    *   Database::getConnectionInfo()['default']->asUrl() instead.
    *
    * @see https://www.drupal.org/node/3626243
    */
   public static function getConnectionInfoAsUrl(string|int $key = 'default'): string {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use Database::getConnectionInfo()[\'default\']->asUrl() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use Database::getConnectionInfo()[\'default\']->asUrl() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
     $db_info = static::getConnectionParameters($key);
     if (empty($db_info) || empty($db_info['default'])) {
       throw new \RuntimeException("Database connection $key not defined or missing the 'default' settings");

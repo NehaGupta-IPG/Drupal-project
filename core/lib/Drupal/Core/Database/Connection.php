@@ -1395,13 +1395,13 @@ abstract class Connection {
    *
    * @see \Drupal\Core\Database\Database::convertDbUrlToConnectionInfo()
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
    *   ConnectionParametersFactory::createFromUrl() instead.
    *
    * @see https://www.drupal.org/node/3626243
    */
   public static function createConnectionOptionsFromUrl($url) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersFactory::createFromUrl() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ConnectionParametersFactory::createFromUrl() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
     return ConnectionParametersFactory::createFromUrl($url)->toArray();
   }
 
@@ -1426,13 +1426,13 @@ abstract class Connection {
    *
    * @see \Drupal\Core\Database\Database::getConnectionInfoAsUrl()
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
    *   ConnectionParametersFactory::asUrl() instead.
    *
    * @see https://www.drupal.org/node/3626243
    */
   public static function createUrlFromConnectionOptions(array $connection_options) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersFactory::asUrl() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ConnectionParametersFactory::asUrl() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
     return ConnectionParametersFactory::createFromOptionsArray($connection_options)->asUrl();
   }
 
