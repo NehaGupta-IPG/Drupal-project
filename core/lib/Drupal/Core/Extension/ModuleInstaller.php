@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Extension;
 
+use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\DefaultConfigMode;
@@ -18,6 +19,7 @@ use Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent;
 use Drupal\Core\Update\UpdateHookRegistry;
 use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -741,6 +743,15 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   The list of installed modules.
    */
   protected function updateKernel($module_filenames) {
+    // Identify uninstall validator service ids to fetch them again after
+    // the rebuild.
+    $uninstall_validator_service_ids = [];
+
+    $reverse_container = $this->kernel->getContainer()->get(ReverseContainer::class);
+    foreach ($this->uninstallValidators as $validator) {
+      $uninstall_validator_service_ids[] = $reverse_container->getId($validator);
+    }
+
     if (!empty($module_filenames)) {
       // This reboots the kernel to register the module's bundle and its
       // services in the service container. The $module_filenames argument is
@@ -758,6 +769,14 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $this->moduleHandler = $container->get('module_handler');
     $this->connection = $container->get('database');
     $this->updateRegistry = $container->get('update.update_hook_registry');
+
+    $this->uninstallValidators = new RewindableGenerator(function () use ($uninstall_validator_service_ids, $container) {
+      foreach ($uninstall_validator_service_ids as $id) {
+        if ($id && $container->has($id)) {
+          yield $id => $container->get($id);
+        }
+      }
+    }, count($uninstall_validator_service_ids));
   }
 
   /**
@@ -796,6 +815,9 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $schema->createSchemaFromDefinition($schemaDefinition);
     }
     else {
+      if (count($schemaDefinition) !== 0) {
+        @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
+      }
       foreach ($schemaDefinition as $name => $table) {
         $schema->createTable($name, $table);
       }
@@ -812,8 +834,16 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected function uninstallSchema(string $module): void {
     $schemaDefinition = $this->invoke($module, 'schema') ?? [];
+    if ($schemaDefinition instanceof Schema) {
+      $table_names = $schemaDefinition->tableNames();
+    }
+    else {
+      if (count($schemaDefinition) !== 0) {
+        @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
+      }
+      $table_names = array_keys($schemaDefinition);
+    }
     $schema = $this->connection->schema();
-    $table_names = ($schemaDefinition instanceof Schema) ? $schemaDefinition->tableNames() : array_keys($schemaDefinition);
     foreach ($table_names as $table) {
       if ($schema->tableExists($table)) {
         $schema->dropTable($table);
