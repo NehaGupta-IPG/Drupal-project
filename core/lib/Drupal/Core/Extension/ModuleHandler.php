@@ -5,17 +5,30 @@ namespace Drupal\Core\Extension;
 use Drupal\Component\Graph\Graph;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\HookData;
 use Drupal\Core\Hook\ImplementationList;
 use Drupal\Core\Hook\OrderOperation\OrderOperation;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Utility\CallableResolver;
 
 /**
  * Class that manages modules in a Drupal installation.
  */
 class ModuleHandler implements ModuleHandlerInterface {
+
+  use DeprecatedServicePropertyTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $deprecatedProperties = [
+    'keyValueFactory' => 'keyvalue',
+    'cache' => 'cache.bootstrap',
+  ];
 
   /**
    * List of loaded files.
@@ -88,6 +101,11 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected array $orderingRules = [];
 
   /**
+   * The compiler-generated hook data.
+   */
+  protected readonly HookData $hookData;
+
+  /**
    * Constructs a ModuleHandler object.
    *
    * @param string $root
@@ -96,10 +114,13 @@ class ModuleHandler implements ModuleHandlerInterface {
    *   An associative array whose keys are the names of installed modules and
    *   whose values are Extension class parameters. This is normally the
    *   %container.modules% parameter being set up by DrupalKernel.
-   * @param \Drupal\Core\Hook\HookData $hookData
-   *   The compiler-generated hook data.
+   * @param \Drupal\Core\Hook\HookData|\Drupal\Core\KeyValueStore\KeyValueFactoryInterface $hookData
+   *   The compiler-generated hook data. Passing the key value factory is
+   *   deprecated.
    * @param \Drupal\Core\Utility\CallableResolver $callableResolver
    *   The callable resolver.
+   * @param \Drupal\Core\Cache\CacheBackendInterface|null $cache
+   *   (Deprecated) The bootstrap cache.
    *
    * @see \Drupal\Core\DrupalKernel
    * @see \Drupal\Core\CoreServiceProvider
@@ -107,9 +128,18 @@ class ModuleHandler implements ModuleHandlerInterface {
   public function __construct(
     protected $root,
     array $module_list,
-    protected readonly HookData $hookData,
+    HookData|KeyValueFactoryInterface $hookData,
     protected readonly CallableResolver $callableResolver,
+    ?CacheBackendInterface $cache = NULL,
   ) {
+    if ($hookData instanceof KeyValueFactoryInterface) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+      $hookData = \Drupal::service(HookData::class);
+    }
+    elseif ($cache !== NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $cache argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+    }
+    $this->hookData = $hookData;
     $this->moduleList = [];
     foreach ($module_list as $name => $module) {
       $this->moduleList[$name] = new Extension($this->root, $module['type'], $module['pathname'], $module['filename']);

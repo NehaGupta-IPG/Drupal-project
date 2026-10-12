@@ -5,11 +5,13 @@ namespace Drupal\Core\Theme;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\DestructableInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Hook\HookData;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Update\UpdateKernel;
 use Drupal\Core\Utility\ThemeRegistry;
@@ -28,6 +30,13 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * @todo Replace local $registry variables in methods with $this->registry.
  */
 class Registry implements DestructableInterface {
+
+  use DeprecatedServicePropertyTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $deprecatedProperties = ['keyValueFactory' => 'keyvalue'];
 
   /**
    * A common key for storing preprocess invoke locations for modules.
@@ -127,6 +136,11 @@ class Registry implements DestructableInterface {
    */
   protected ?array $themeHookList = NULL;
 
+  /**
+   * The compiler-generated hook data.
+   */
+  protected HookData $hookData;
+
   public function __construct(
     protected CacheBackendInterface $cache,
     protected LockBackendInterface $lock,
@@ -135,8 +149,13 @@ class Registry implements DestructableInterface {
     protected CacheBackendInterface $runtimeCache,
     protected ModuleExtensionList $moduleList,
     protected HttpKernelInterface $kernel,
-    protected HookData $hookData,
+    HookData|KeyValueFactoryInterface $hookData,
   ) {
+    if ($hookData instanceof KeyValueFactoryInterface) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+      $hookData = \Drupal::service(HookData::class);
+    }
+    $this->hookData = $hookData;
   }
 
   /**

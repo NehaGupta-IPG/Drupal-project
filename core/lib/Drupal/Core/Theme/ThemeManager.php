@@ -3,10 +3,13 @@
 namespace Drupal\Core\Theme;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\HookData;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\Core\Utility\CallableResolver;
@@ -18,6 +21,16 @@ use Symfony\Contracts\Service\ServiceCollectionInterface;
  * Provides the default implementation of a theme manager.
  */
 class ThemeManager implements ThemeManagerInterface {
+
+  use DeprecatedServicePropertyTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $deprecatedProperties = [
+    'keyValueFactory' => 'keyvalue',
+    'cache' => 'cache.bootstrap',
+  ];
 
   /**
    * The theme registry used to render an output.
@@ -54,6 +67,11 @@ class ThemeManager implements ThemeManagerInterface {
    */
   protected ?array $themeHookImplementations = NULL;
 
+  /**
+   * The compiler-generated hook data.
+   */
+  protected HookData $hookData;
+
   public function __construct(
     #[Autowire(param: 'app.root')]
     protected string $root,
@@ -63,8 +81,18 @@ class ThemeManager implements ThemeManagerInterface {
     protected CallableResolver $callableResolver,
     #[AutowireLocator('theme_engine', 'engine_name')]
     protected ServiceCollectionInterface $themeEngines,
-    protected HookData $hookData,
+    #[Autowire(service: HookData::class)]
+    HookData|KeyValueFactoryInterface $hookData,
+    ?CacheBackendInterface $cache = NULL,
   ) {
+    if ($hookData instanceof KeyValueFactoryInterface) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+      $hookData = \Drupal::service(HookData::class);
+    }
+    elseif ($cache !== NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $cache argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+    }
+    $this->hookData = $hookData;
   }
 
   /**
