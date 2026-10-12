@@ -1703,6 +1703,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $this->bootstrapContainer->get('cache.container')->set($this->getContainerCacheKey(), $container_definition);
     }
     catch (\Exception) {
+      // There is no way to get from the Cache API if the cache set was
+      // successful or not, hence an Exception is caught and the caller informed
+      // about the error condition.
       $saved = FALSE;
     }
 
