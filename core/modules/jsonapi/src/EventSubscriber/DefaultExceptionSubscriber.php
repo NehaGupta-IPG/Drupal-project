@@ -92,18 +92,19 @@ class DefaultExceptionSubscriber extends SerializationDefaultExceptionSubscriber
 
   /**
    * Checks error message for indication of SQL content.
-   * 
-   * @param string exception message.
-   * 
+   *
+   * @param string $exception_message
+   *   An exception message.
+   *
    * @return bool
    *   TRUE if the message looks SQL related, FALSE otherwise.
    */
   protected function isSqlError($exception_message): bool {
-  $match = FALSE;
-  $match = str_contains($exception_message, 'SQLSTATE') ? TRUE : $match;
-  $match = str_contains($exception_message, 'SQL syntax') ? TRUE : $match;
+    $match = FALSE;
+    $match = str_contains($exception_message, 'SQLSTATE') ? TRUE : $match;
+    $match = str_contains($exception_message, 'SQL syntax') ? TRUE : $match;
 
-  return $match;
+    return $match;
   }
 
 }
