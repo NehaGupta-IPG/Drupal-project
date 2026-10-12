@@ -584,7 +584,15 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
       // database that earlier test methods left behind. It can load a shared
       // container, but must not store one.
       $database_is_empty = Database::getConnection()->schema()->findTables('%') === [];
-      $kernel->shareContainer(getenv(self::CONTAINER_DIRECTORY_ENV), $this, $this->getContainerKey(), $database_is_empty);
+      $kernel->shareContainer(
+        getenv(self::CONTAINER_DIRECTORY_ENV),
+        $this,
+        $this->getContainerKey(...),
+        function (ContainerInterface $container): void {
+          $this->container = $container;
+        },
+        $database_is_empty,
+      );
     }
     // Boot a new one-time container from scratch. Set the module list upfront
     // to avoid a subsequent rebuild or setting the kernel into the

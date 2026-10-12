@@ -76,14 +76,23 @@ class KernelTestShareContainerTest extends KernelTestBase {
   }
 
   /**
-   * Tests that the container is only compiled by the first test method.
+   * Tests that containers are only compiled by the first test method.
    */
   #[TestWith([1])]
   #[TestWith([2])]
   public function testContainerIsShared(int $iteration): void {
     $this->assertInstanceOf(PhpContainer::class, $this->container);
-    $this->assertSame('1', file_get_contents(static::getContainerDirectory() . '/compiled.txt'), "Container compiled once, iteration $iteration");
     $this->assertSame($this, $this->container->get(KernelTestBase::class));
+
+    // The container for the new module list is shared as well.
+    $this->enableModules(['user']);
+    $this->assertInstanceOf(PhpContainer::class, $this->container);
+    $this->assertSame($this, $this->container->get(KernelTestBase::class));
+    $this->assertTrue($this->container->get('module_handler')->moduleExists('user'));
+
+    // The first test method compiled the container the kernel booted with,
+    // and the container for the new module list.
+    $this->assertSame('11', file_get_contents(static::getContainerDirectory() . '/compiled.txt'), "Containers compiled once, iteration $iteration");
   }
 
 }
