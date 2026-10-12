@@ -73,7 +73,7 @@ class KernelTestDrupalKernel extends DrupalKernel {
       $container = $storage->load($container_id);
       return $container;
     }
-    return parent::getContainerFromStorage();
+    return parent::getContainerFromStorage($container_id);
   }
 
   /**
