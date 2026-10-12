@@ -152,7 +152,7 @@ class Registry implements DestructableInterface {
     HookData|KeyValueFactoryInterface $hookData,
   ) {
     if ($hookData instanceof KeyValueFactoryInterface) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/3620769', E_USER_DEPRECATED);
       $hookData = \Drupal::service(HookData::class);
     }
     $this->hookData = $hookData;

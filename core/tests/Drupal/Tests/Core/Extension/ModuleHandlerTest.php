@@ -350,7 +350,7 @@ class ModuleHandlerTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testConstructorKeyValueFactoryArgument(): void {
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Extension\ModuleHandler::__construct() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/9999999');
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Extension\ModuleHandler::__construct() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/3620769');
     $key_value = new KeyValueMemoryFactory();
     $key_value->get('hook_data')->set('hook_list', [
       'some_hook' => [
@@ -370,7 +370,7 @@ class ModuleHandlerTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testConstructorCacheArgument(): void {
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Extension\ModuleHandler::__construct() with the $cache argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/9999999');
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Extension\ModuleHandler::__construct() with the $cache argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3620769');
     $hook_data = new HookData(new KeyValueMemoryFactory(), new NullBackend('bootstrap'));
     $module_handler = new ModuleHandler($this->root, [], $hook_data, $this->createStub(CallableResolver::class), new NullBackend('bootstrap'));
     $this->assertFalse($module_handler->hasImplementations('some_hook'));

@@ -31,7 +31,7 @@ class ThemeManagerTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testConstructorKeyValueFactoryArgument(): void {
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Theme\ThemeManager::__construct() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/9999999');
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Theme\ThemeManager::__construct() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/3620769');
     $hook_data = new HookData(new KeyValueMemoryFactory(), new NullBackend('bootstrap'));
     $container = new ContainerBuilder();
     $container->set(HookData::class, $hook_data);
@@ -45,7 +45,7 @@ class ThemeManagerTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testConstructorCacheArgument(): void {
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Theme\ThemeManager::__construct() with the $cache argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/9999999');
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Theme\ThemeManager::__construct() with the $cache argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3620769');
     $hook_data = new HookData(new KeyValueMemoryFactory(), new NullBackend('bootstrap'));
     $theme_manager = $this->createThemeManager($hook_data, new NullBackend('bootstrap'));
     $this->assertSame($hook_data, (new \ReflectionProperty($theme_manager, 'hookData'))->getValue($theme_manager));

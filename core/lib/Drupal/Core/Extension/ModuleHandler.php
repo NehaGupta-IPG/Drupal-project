@@ -133,11 +133,11 @@ class ModuleHandler implements ModuleHandlerInterface {
     ?CacheBackendInterface $cache = NULL,
   ) {
     if ($hookData instanceof KeyValueFactoryInterface) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/3620769', E_USER_DEPRECATED);
       $hookData = \Drupal::service(HookData::class);
     }
     elseif ($cache !== NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $cache argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $cache argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3620769', E_USER_DEPRECATED);
     }
     $this->hookData = $hookData;
     $this->moduleList = [];
