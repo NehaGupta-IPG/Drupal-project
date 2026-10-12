@@ -130,10 +130,7 @@ class SessionConfiguration implements SessionConfigurationInterface {
       $cookie_domain = $this->options['cookie_domain'];
     }
     else {
-      $host = $request->getHost();
-      // To maximize compatibility and normalize the behavior across user
-      // agents, the cookie domain should start with a dot.
-      $cookie_domain = '.' . $host;
+      $cookie_domain = $request->getHost();
     }
 
     // Cookies for domains without an embedded dot will be rejected by user
