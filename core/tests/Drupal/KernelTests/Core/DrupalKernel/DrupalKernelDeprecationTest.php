@@ -25,7 +25,6 @@ class DrupalKernelDeprecationTest extends KernelTestBase {
   /**
    * Tests that getCachedContainerDefinition() triggers a deprecation.
    */
-  #[IgnoreDeprecations]
   public function testGetCachedContainerDefinitionDeprecation(): void {
     $this->expectUserDeprecationMessage('Drupal\Core\DrupalKernel::getCachedContainerDefinition() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Container loading is now handled by ContainerStorageInterface::load(). See https://www.drupal.org/node/3585642');
     $this->container->get('kernel')->getCachedContainerDefinition();
@@ -34,7 +33,6 @@ class DrupalKernelDeprecationTest extends KernelTestBase {
   /**
    * Tests that getContainerCacheKey() triggers a deprecation.
    */
-  #[IgnoreDeprecations]
   public function testGetContainerCacheKeyDeprecation(): void {
     $this->expectUserDeprecationMessage('Drupal\Core\DrupalKernel::getContainerCacheKey() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use getContainerIdentifier() instead. The cache key prefix is now managed by ContainerStorageInterface implementations. See https://www.drupal.org/node/3585642');
     $kernel = $this->container->get('kernel');
@@ -46,7 +44,6 @@ class DrupalKernelDeprecationTest extends KernelTestBase {
   /**
    * Tests that cacheDrupalContainer() triggers a deprecation.
    */
-  #[IgnoreDeprecations]
   public function testCacheDrupalContainerDeprecation(): void {
     $this->expectUserDeprecationMessage('Drupal\Core\DrupalKernel::cacheDrupalContainer() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Container dumping is now handled by ContainerStorageInterface::dump(). See https://www.drupal.org/node/3585642');
     $kernel = $this->container->get('kernel');
@@ -57,7 +54,6 @@ class DrupalKernelDeprecationTest extends KernelTestBase {
   /**
    * Tests that a custom $phpArrayDumperClass triggers a deprecation on boot.
    */
-  #[IgnoreDeprecations]
   public function testPhpArrayDumperClassDeprecation(): void {
     $this->expectUserDeprecationMessage('Drupal\Core\DrupalKernel::$phpArrayDumperClass is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the bootstrap_container_definition setting to set the class. See https://www.drupal.org/node/3585642');
 
