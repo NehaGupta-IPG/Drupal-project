@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\TestTools\Attribute\ShareContainer;
 use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -13,11 +14,15 @@ use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests that the container is shared between kernel test methods.
+ *
+ * This test counts how often the container is compiled, so it does not share
+ * the container with other test classes.
  */
 #[CoversClass(KernelTestBase::class)]
 #[Group('KernelTests')]
 #[RunTestsInSeparateProcesses]
 #[ShareEnvironment]
+#[ShareContainer(FALSE)]
 class KernelTestSharedContainerTest extends KernelTestBase {
 
   /**

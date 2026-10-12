@@ -235,8 +235,24 @@ for ($i = 0; $i < Config::get('repeat'); $i++) {
   $tests_to_run = array_merge($tests_to_run, $test_list);
 }
 
+// Share compiled containers between the tests of this run, unless a directory
+// for them is set already. Set the variable to an empty string to turn sharing
+// off.
+// @see \Drupal\TestTools\Attribute\ShareContainer
+$container_directory = NULL;
+if (getenv('DRUPAL_TEST_CONTAINER_DIRECTORY') === FALSE) {
+  $container_directory = FileSystem::getOsTemporaryDirectory() . '/drupal-test-containers-' . bin2hex(random_bytes(8));
+  mkdir($container_directory, 0777);
+  putenv('DRUPAL_TEST_CONTAINER_DIRECTORY=' . $container_directory);
+}
+
 // Execute tests.
 $status = simpletest_script_execute_batch($test_run_results_storage, $tests_to_run);
+
+if ($container_directory !== NULL) {
+  \Drupal::service('file_system')->deleteRecursive($container_directory);
+  putenv('DRUPAL_TEST_CONTAINER_DIRECTORY');
+}
 
 // Stop the timer.
 simpletest_script_reporter_timer_stop();

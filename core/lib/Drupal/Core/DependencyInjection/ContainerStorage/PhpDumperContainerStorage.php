@@ -66,9 +66,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
         $this->phpStorage->load($containerClass . '.php');
       }
       if (class_exists($containerClass, FALSE)) {
-        $container = new $containerClass();
-        $container->setRuntimeParameters($this->runtimeParameters);
-        return $container;
+        return $this->createContainer($containerClass);
       }
     }
 
@@ -79,6 +77,56 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
    * {@inheritdoc}
    */
   public function dump(ContainerBuilder $container, string $identifier): void {
+    [$hash, $code] = $this->dumpCode($container);
+    $containerClass = 'DrupalContainer_' . $hash;
+
+    $filename = $containerClass . '.php';
+    if (!$this->phpStorage->save($filename, $code)) {
+      return;
+    }
+
+    // Record the hash only after the file is written, so the cache never
+    // points to a container that failed to save.
+    $this->cache->set(static::CACHE_PREFIX . $identifier, $hash);
+
+    // Mark the container confirmed only now that its hash has been
+    // published. This marker is used by garbage collection to tell a fully
+    // committed container that has since been superseded apart from one whose
+    // dump() call has not finished publishing its hash yet. Skip the write if
+    // the marker is already there (e.g. dump() recompiled to the same hash
+    // after invalidateContainer()).
+    $confirmedFilename = $containerClass . static::CONFIRMED_SUFFIX;
+    if (!$this->phpStorage->exists($confirmedFilename)) {
+      $this->phpStorage->save($confirmedFilename, '1');
+    }
+  }
+
+  /**
+   * Creates a container from a loaded container class.
+   *
+   * @param string $containerClass
+   *   The container class name.
+   *
+   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   *   The container.
+   */
+  protected function createContainer(string $containerClass): ContainerInterface {
+    $container = new $containerClass();
+    $container->setRuntimeParameters($this->runtimeParameters);
+    return $container;
+  }
+
+  /**
+   * Generates the PHP code of a container.
+   *
+   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
+   *   The compiled container builder.
+   *
+   * @return array{string, string}
+   *   The hash of the code, which is part of the container class name, and the
+   *   code.
+   */
+  protected function dumpCode(ContainerBuilder $container): array {
     // Strip leading backslash so the generated PHP code produces a correct
     // fully qualified class name (the dumper prepends its own backslash).
     $baseClass = ltrim($this->settings->get('container_base_class', PhpContainer::class), '\\');
@@ -106,25 +154,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
       throw new \RuntimeException(sprintf('Expected to replace 1 occurrence of "DrupalContainer" with "%s" in the dumped container code.', $containerClass));
     }
 
-    $filename = $containerClass . '.php';
-    if (!$this->phpStorage->save($filename, $code)) {
-      return;
-    }
-
-    // Record the hash only after the file is written, so the cache never
-    // points to a container that failed to save.
-    $this->cache->set(static::CACHE_PREFIX . $identifier, $hash);
-
-    // Mark the container confirmed only now that its hash has been
-    // published. This marker is used by garbage collection to tell a fully
-    // committed container that has since been superseded apart from one whose
-    // dump() call has not finished publishing its hash yet. Skip the write if
-    // the marker is already there (e.g. dump() recompiled to the same hash
-    // after invalidateContainer()).
-    $confirmedFilename = $containerClass . static::CONFIRMED_SUFFIX;
-    if (!$this->phpStorage->exists($confirmedFilename)) {
-      $this->phpStorage->save($confirmedFilename, '1');
-    }
+    return [$hash, $code];
   }
 
   /**
