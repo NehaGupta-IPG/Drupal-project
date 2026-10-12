@@ -214,6 +214,11 @@
       border-inline-start: calc(var(--vertical-tabs-menu-link--active-border-size) + 2px) solid var(--input--error-color);
       border-start-start-radius: var(--vertical-tabs-border-radius);
       border-end-start-radius: var(--vertical-tabs-border-radius);
+
+      @media (forced-colors: active) {
+        /* Match color of details element border */
+        border-color: canvasText;
+      }
     }
   }
 
