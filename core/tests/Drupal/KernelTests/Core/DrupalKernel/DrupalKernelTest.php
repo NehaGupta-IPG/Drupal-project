@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
 use Drupal\Component\PhpStorage\FileStorage;
+use Drupal\Component\PhpStorage\MTimeProtectedFileStorage;
 use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\DependencyInjection\Container;
@@ -67,17 +68,24 @@ class DrupalKernelTest extends KernelTestBase {
    *   A list of modules to install on the kernel.
    * @param string|null $site_path
    *   (optional) The site path to set on the kernel before it boots.
+   * @param array $settings
+   *   (optional) Additional settings to set before the kernel boots.
    *
    * @return \Drupal\Core\DrupalKernel
    *   New kernel for testing.
    */
-  protected function getTestKernel(Request $request, ?array $modules_enabled = NULL, ?string $site_path = NULL) {
+  protected function getTestKernel(Request $request, ?array $modules_enabled = NULL, ?string $site_path = NULL, array $settings = []) {
     // Manually create kernel to avoid replacing settings.
     $class_loader = require $this->root . '/autoload.php';
     $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
-    $this->setSetting('container_yamls', []);
-    $this->setSetting('hash_salt', $this->databasePrefix);
-    $this->setSetting('container_base_class', PhpContainer::class);
+    $settings += [
+      'container_yamls' => [],
+      'hash_salt' => $this->databasePrefix,
+      'container_base_class' => PhpContainer::class,
+    ];
+    foreach ($settings as $name => $value) {
+      $this->setSetting($name, $value);
+    }
     if (isset($site_path)) {
       $kernel->setSitePath($site_path);
     }
@@ -531,62 +539,31 @@ class DrupalKernelTest extends KernelTestBase {
   }
 
   /**
-   * Tests garbage collection cleans up the real storage even if not dumping.
-   */
-  public function testGarbageCollectionIgnoresAllowDumping(): void {
-    $request = Request::createFromGlobals();
-    $kernel = $this->getTestKernel($request, ['system' => 'system']);
-    $container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
-
-    // Switch modules so a second, superseded container file exists on disk.
-    $kernel->updateModules(['system' => 'system', 'user' => 'user']);
-    $new_container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
-    $this->assertNotSame($container_file, $new_container_file);
-    $this->assertFileExists($container_file);
-    $this->assertFileExists($new_container_file);
-
-    // Simulate a kernel that is no longer allowed to dump or load the
-    // container, such as \Drupal\Core\Update\UpdateKernel.
-    (new \ReflectionProperty($kernel, 'allowDumping'))->setValue($kernel, FALSE);
-
-    $kernel->garbageCollection();
-    // The superseded container file should still be deleted, even though
-    // dumping and loading are disallowed.
-    $this->assertFileDoesNotExist($container_file);
-    $this->assertFileExists($new_container_file);
-  }
-
-  /**
-   * Tests garbage collection with a PhpStorage backend other than the default.
+   * Tests that garbage collection removes superseded container files.
    *
-   * PhpDumperContainerStorage::garbageCollection() assumes listAll() and
-   * delete() operate on names without the '.php' extension, which holds for
-   * the default MTimeProtectedFileStorage but not for the plain FileStorage
-   * backend. FileStorage is a shipped, documented PhpStorageInterface
-   * implementation that a site can select via
-   * $settings['php_storage']['service_container']['class'], so garbage
-   * collection must clean up superseded containers with it too.
+   * Some kernels, such as UpdateKernel, are not allowed to dump the container.
+   * Garbage collection must still clean up the real storage for them.
+   *
+   * It must also work with each shipped PhpStorageInterface implementation.
+   * MTimeProtectedFileStorage::listAll() strips the '.php' extension but
+   * FileStorage::listAll() does not.
+   *
+   * @param string|null $storage_class
+   *   The PhpStorage class for the service container, or NULL for the default.
    *
    * @see \Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage::garbageCollection()
    */
-  public function testGarbageCollectionWithFileStorage(): void {
-    $request = Request::createFromGlobals();
-    $class_loader = require $this->root . '/autoload.php';
-
-    // Build a kernel using the plain FileStorage PhpStorage backend.
-    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
-    $this->setSetting('container_yamls', []);
-    $this->setSetting('hash_salt', $this->databasePrefix);
-    $this->setSetting('container_base_class', PhpContainer::class);
-    $this->setSetting('php_storage', [
-      'service_container' => [
-        'class' => FileStorage::class,
-      ],
-    ]);
-    $kernel->updateModules(['system' => 'system']);
-    $kernel->boot();
+  #[TestWith([NULL])]
+  #[TestWith([FileStorage::class])]
+  public function testGarbageCollection(?string $storage_class): void {
+    $settings = [];
+    if ($storage_class) {
+      $settings['php_storage']['service_container']['class'] = $storage_class;
+    }
+    $kernel = $this->getTestKernel(Request::createFromGlobals(), ['system' => 'system'], NULL, $settings);
+    $bootstrap_container = (new \ReflectionProperty($kernel, 'bootstrapContainer'))->getValue($kernel);
+    $this->assertInstanceOf($storage_class ?? MTimeProtectedFileStorage::class, $bootstrap_container->get('php_storage.service_container'));
     $container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
-    $this->assertFileExists($container_file);
 
     // Switch modules so a second, superseded container file exists on disk.
     $kernel->updateModules(['system' => 'system', 'user' => 'user']);
@@ -595,8 +572,10 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertFileExists($container_file);
     $this->assertFileExists($new_container_file);
 
+    // Garbage collection does not depend on whether dumping is allowed.
+    (new \ReflectionProperty($kernel, 'allowDumping'))->setValue($kernel, FALSE);
+
     $kernel->garbageCollection();
-    // Only the old, superseded container file should be deleted.
     $this->assertFileDoesNotExist($container_file);
     $this->assertFileExists($new_container_file);
   }
