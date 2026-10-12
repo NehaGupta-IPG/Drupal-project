@@ -177,7 +177,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 3,
@@ -2495,7 +2495,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -2503,7 +2503,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 2,
@@ -2535,7 +2535,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -2630,6 +2630,12 @@ $ignoreErrors[] = [
 	'identifier' => 'disallowed.function',
 	'count' => 2,
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/Checkpoint/CheckpointStorage.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Command\\\\ConfigExportCommand\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Command/ConfigExportCommand.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot unset property Drupal\\\\Core\\\\Config\\\\Config\\:\\:\\$overriddenData because it might have hooks in a subclass\\.$#',
@@ -3202,12 +3208,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/ImportStorageTransformer.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Command\\\\ConfigExportCommand\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/Command/ConfigExportCommand.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Importer\\\\ConfigImporterBatch\\:\\:finish\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3587,7 +3587,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -3817,7 +3817,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -6159,7 +6159,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -7721,7 +7721,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -9991,7 +9991,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfoAsUrl\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   Database\\:\\:getConnectionInfo\\(\\)\\[\'default\'\\]\\-\\>asUrl\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -10469,7 +10469,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -13321,7 +13321,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -19479,7 +19479,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -19487,7 +19487,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 4,
@@ -19543,7 +19543,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 8,
@@ -19611,7 +19611,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -19691,7 +19691,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 2,
@@ -19699,7 +19699,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 2,
@@ -19707,7 +19707,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -19721,7 +19721,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 2,
@@ -19741,7 +19741,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -20763,7 +20763,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -20903,7 +20903,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -20911,7 +20911,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -21933,7 +21933,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23683,7 +23683,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23709,7 +23709,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23717,7 +23717,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23725,7 +23725,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23733,7 +23733,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23741,7 +23741,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23749,7 +23749,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23757,7 +23757,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23771,7 +23771,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23779,7 +23779,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23787,7 +23787,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23795,7 +23795,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -23869,7 +23869,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 2,
@@ -23877,7 +23877,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfoAsUrl\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   Database\\:\\:getConnectionInfo\\(\\)\\[\'default\'\\]\\-\\>asUrl\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 3,
@@ -32457,7 +32457,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -32735,7 +32735,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -33913,7 +33913,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34341,7 +34341,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34349,7 +34349,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 2,
@@ -34419,7 +34419,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34427,7 +34427,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34435,7 +34435,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34443,7 +34443,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34451,7 +34451,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34459,7 +34459,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34467,7 +34467,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34475,7 +34475,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34495,7 +34495,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34503,7 +34503,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 2,
@@ -34529,7 +34529,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 4,
@@ -34537,7 +34537,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 4,
@@ -34545,7 +34545,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34553,7 +34553,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 2,
@@ -34561,7 +34561,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34569,7 +34569,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34631,7 +34631,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34717,7 +34717,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 2,
@@ -34725,7 +34725,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getAllConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getAllConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 2,
@@ -34733,7 +34733,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 4,
@@ -34747,7 +34747,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34755,7 +34755,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34769,7 +34769,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34789,7 +34789,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34797,7 +34797,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 2,
@@ -34913,7 +34913,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34933,7 +34933,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
@@ -34941,7 +34941,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 4,
@@ -35255,7 +35255,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method convertDbUrlToConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   ConnectionParametersFactory\\:\\:createFromUrl\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 2,
@@ -35263,7 +35263,7 @@ in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
-in drupal\\:42\\.1\\.0 and is removed from drupal\\:43\\.0\\.0\\. Use
+in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
   \\:\\:getConnectionParameters\\(\\) instead\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 5,
