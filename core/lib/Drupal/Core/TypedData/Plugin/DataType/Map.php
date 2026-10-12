@@ -53,6 +53,25 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
   protected $properties = [];
 
   /**
+   * Whether a value has been explicitly set on the map.
+   *
+   * @internal
+   */
+  protected bool $hasValue = FALSE;
+
+  /**
+   * Determines whether a value has been explicitly set on the map.
+   *
+   * @return bool
+   *   TRUE if a non-NULL value has been set, FALSE otherwise.
+   *
+   * @internal
+   */
+  public function hasValue(): bool {
+    return $this->hasValue;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getValue() {
@@ -85,6 +104,7 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
       throw new \InvalidArgumentException("Invalid values given. Values must be represented as an associative array.");
     }
     $this->values = $values;
+    $this->hasValue = isset($values);
 
     // Update any existing property objects.
     foreach ($this->properties as $name => $property) {

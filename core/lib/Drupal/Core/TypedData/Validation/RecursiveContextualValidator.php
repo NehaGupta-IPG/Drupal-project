@@ -3,8 +3,10 @@
 namespace Drupal\Core\TypedData\Validation;
 
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\ListInterface;
+use Drupal\Core\TypedData\Plugin\DataType\Map;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Core\Validation\ExecutionContext;
@@ -179,8 +181,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
       ($is_root_call === TRUE || $constraints_given === FALSE) &&
 
       // If the data is a list or complex data, validate the contained list
-      // items or properties. However, do not recurse if the data is empty.
-      ($data instanceof ListInterface || $data instanceof ComplexDataInterface) && !$data->isEmpty() &&
+      // items or properties. However, do not recurse if the data is empty,
+      // unless it is a map with a value whose properties must be validated.
+      ($data instanceof ListInterface || $data instanceof ComplexDataInterface) && (!$data->isEmpty() || $this->isEmptyMapWithValue($data)) &&
 
       // Next, we do not recurse if given constraints are validated against an
       // entity, since we should determine whether the entity matches the
@@ -197,6 +200,25 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
     }
 
     return $this;
+  }
+
+  /**
+   * Determines whether the data is an empty map that has been given a value.
+   *
+   * An empty map that has a value, for example an empty array, still has to
+   * validate its properties so that missing required properties are reported.
+   * A map without a value (NULL) is not validated further, so that optional
+   * maps may be omitted. Field items are excluded, as empty field items are
+   * expected to be skipped during validation.
+   *
+   * @param \Drupal\Core\TypedData\TypedDataInterface $data
+   *   The data to check.
+   *
+   * @return bool
+   *   TRUE if the data is an empty map with a value, FALSE otherwise.
+   */
+  protected function isEmptyMapWithValue(TypedDataInterface $data): bool {
+    return $data instanceof Map && !$data instanceof FieldItemInterface && $data->hasValue();
   }
 
   /**

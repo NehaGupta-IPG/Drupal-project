@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\TypedData;
 
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
+use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
@@ -113,6 +114,21 @@ class RecursiveContextualValidatorTest extends KernelTestBase {
     $this->assertEquals('This value should not be null.', $violations[0]->getMessage());
     $this->assertEquals('bar', $violations[1]->getPropertyPath());
     $this->assertEquals('This value should not be null.', $violations[1]->getMessage());
+  }
+
+  /**
+   * Tests empty map validation with an entity property.
+   */
+  public function testEmptyMapEntityPropertyValidation(): void {
+    $definition = MapDataDefinition::create()
+      ->setPropertyDefinition('entity', EntityDataDefinition::create('entity_test')
+        ->setRequired(TRUE))
+      ->setPropertyDefinition('label', DataDefinition::create('string'));
+
+    $violations = $this->container->get('typed_data_manager')->create($definition, [])->validate();
+    $this->assertCount(1, $violations);
+    $this->assertEquals('entity', $violations[0]->getPropertyPath());
+    $this->assertEquals('This value should not be null.', $violations[0]->getMessage());
   }
 
   /**
