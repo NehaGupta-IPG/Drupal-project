@@ -43,6 +43,16 @@ namespace Drupal\TestTools\Attribute;
  *   written during "::setUpEnvironment()" does not exist when the next test
  *   method runs. A test class that depends on such files cannot share its
  *   environment.
+ * - The container is loaded from the cache for every test method, and
+ *   "KernelTestBase::bootKernel()" resets it after the kernel boots. The test
+ *   methods then run on the compiled container, not on the container builder
+ *   that "::register()" received. An object that "::register()" set on the
+ *   builder, such as a synthetic service, is not in the compiled container.
+ *   The state that services hold in memory, such as the request that the
+ *   kernel handled at boot, is not carried over either. A test class that
+ *   depends on these cannot share its environment. A service that
+ *   "::register()" adds as a definition is compiled into the cached container
+ *   and is available.
  *
  * @see \Drupal\KernelTests\KernelTestBase::setUpEnvironment()
  * @see \Drupal\KernelTests\KernelTestBase::sharesEnvironment()
