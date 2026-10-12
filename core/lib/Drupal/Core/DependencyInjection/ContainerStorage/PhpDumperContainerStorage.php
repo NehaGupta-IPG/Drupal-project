@@ -41,11 +41,18 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
    *   The PHP storage for compiled container files.
    * @param \Drupal\Core\Site\Settings $settings
    *   The site settings.
+   * @param array $runtimeParameters
+   *   (optional) Parameter values to set on the container when it is loaded,
+   *   keyed by parameter name. These parameters are left out of the dumped
+   *   container.
+   *
+   * @see \Drupal\Core\DependencyInjection\Compiler\RuntimeParametersPass
    */
   public function __construct(
     protected readonly CacheBackendInterface $cache,
     protected readonly PhpStorageInterface $phpStorage,
     protected readonly Settings $settings,
+    protected readonly array $runtimeParameters = [],
   ) {}
 
   /**
@@ -59,7 +66,9 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
         $this->phpStorage->load($containerClass . '.php');
       }
       if (class_exists($containerClass, FALSE)) {
-        return new $containerClass();
+        $container = new $containerClass();
+        $container->setRuntimeParameters($this->runtimeParameters);
+        return $container;
       }
     }
 
@@ -73,11 +82,12 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     // Strip leading backslash so the generated PHP code produces a correct
     // fully qualified class name (the dumper prepends its own backslash).
     $baseClass = ltrim($this->settings->get('container_base_class', PhpContainer::class), '\\');
-    $dumper = new PhpDumper($container);
-    $code = $dumper->dump([
+    // Hide the runtime parameters, so that the dumped code reads them from
+    // the container instead of containing their values.
+    $code = $container->withoutParameters(array_keys($this->runtimeParameters), fn (ContainerBuilder $container): string => (new PhpDumper($container))->dump([
       'class' => 'DrupalContainer',
       'base_class' => $baseClass,
-    ]);
+    ]));
 
     // Hash the built container code to generate a unique class name. This
     // ensures that changes in the container definition result in a different

@@ -9,6 +9,7 @@ use Drupal\Component\PhpStorage\FileStorage;
 use Drupal\Component\PhpStorage\MTimeProtectedFileStorage;
 use Drupal\Component\PhpStorage\PhpStorageInterface;
 use Drupal\Core\Cache\MemoryBackend;
+use Drupal\Core\DependencyInjection\Compiler\RuntimeParametersPass;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage;
 use Drupal\Core\DependencyInjection\PhpContainer;
@@ -18,6 +19,7 @@ use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 /**
  * Tests the PhpDumperContainerStorage.
@@ -140,6 +142,35 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $this->assertInstanceOf($class, $container);
     $this->assertInstanceOf(PhpContainer::class, $container);
     $this->assertSame($builder->getParameter('test_param'), $container->getParameter('test_param'));
+  }
+
+  /**
+   * Tests that runtime parameters are set when the container is loaded.
+   */
+  public function testRuntimeParameters(): void {
+    $builder = new ContainerBuilder();
+    $builder->setParameter('test_param', $this->randomMachineName());
+    $builder->setParameter('site.path', 'sites/compiled');
+    $builder->register('service', \ArrayObject::class)
+      ->setPublic(TRUE)
+      ->addArgument(['%site.path%']);
+    $builder->addCompilerPass(new RuntimeParametersPass(['site.path']), PassConfig::TYPE_AFTER_REMOVING);
+    $builder->compile();
+
+    $phpStorage = $this->createPhpStorage(FileStorage::class);
+    $storage = new PhpDumperContainerStorage($this->cache, $phpStorage, Settings::getInstance(), ['site.path' => 'sites/runtime']);
+    $storage->dump($builder, 'test_identifier');
+
+    // The dumped code does not contain the value used to compile the container.
+    $class = $this->getContainerClass('test_identifier');
+    $this->assertStringNotContainsString('sites/compiled', file_get_contents($phpStorage->getFullPath($class . '.php')));
+    // The container builder still has the parameter.
+    $this->assertSame('sites/compiled', $builder->getParameter('site.path'));
+
+    $container = $storage->load('test_identifier');
+    $this->assertSame('sites/runtime', $container->getParameter('site.path'));
+    $this->assertSame('sites/runtime', $container->getParameterBag()->get('site.path'));
+    $this->assertSame(['sites/runtime'], $container->get('service')->getArrayCopy());
   }
 
   /**

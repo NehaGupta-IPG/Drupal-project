@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\DependencyInjection\ContainerStorage;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper;
 use Drupal\Core\Cache\MemoryBackend;
+use Drupal\Core\DependencyInjection\Compiler\RuntimeParametersPass;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage;
@@ -14,6 +15,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 /**
  * Tests the CacheContainerStorage.
@@ -71,6 +73,26 @@ class CacheContainerStorageTest extends UnitTestCase {
     $this->assertInstanceOf(Container::class, $container);
     $this->assertSame('value', $container->getParameter('test'));
     $this->assertNull($storage->load('other_identifier'));
+  }
+
+  /**
+   * Tests that runtime parameters are set when the container is loaded.
+   */
+  public function testRuntimeParameters(): void {
+    $builder = new ContainerBuilder();
+    $builder->setParameter('site.path', 'sites/compiled');
+    $builder->register('service', \ArrayObject::class)
+      ->setPublic(TRUE)
+      ->addArgument(['%site.path%']);
+    $builder->addCompilerPass(new RuntimeParametersPass(['site.path']), PassConfig::TYPE_AFTER_REMOVING);
+    $builder->compile();
+
+    $storage = new CacheContainerStorage($this->cache, Settings::getInstance(), runtimeParameters: ['site.path' => 'sites/runtime']);
+    $storage->dump($builder, 'test_identifier');
+
+    $container = $storage->load('test_identifier');
+    $this->assertSame('sites/runtime', $container->getParameter('site.path'));
+    $this->assertSame(['sites/runtime'], $container->get('service')->getArrayCopy());
   }
 
   /**

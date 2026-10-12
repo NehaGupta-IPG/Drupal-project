@@ -13,6 +13,33 @@ use Symfony\Component\DependencyInjection\Container;
 class PhpContainer extends Container implements ContainerInterface {
 
   /**
+   * The parameter values.
+   *
+   * Generated containers declare this property and fill it in their
+   * constructor. It is declared without a type to match their declaration.
+   *
+   * @var array
+   */
+  protected $parameters = [];
+
+  /**
+   * Sets the values of parameters that are not stored in the container.
+   *
+   * @param array $parameters
+   *   The parameter values, keyed by parameter name.
+   *
+   * @internal
+   *   Only for use by container storage, before the container is used.
+   *   Generated containers build their parameter bag from the parameter values
+   *   on first use, so the values must be set before that.
+   *
+   * @see \Drupal\Core\DependencyInjection\Compiler\RuntimeParametersPass
+   */
+  public function setRuntimeParameters(array $parameters): void {
+    $this->parameters = $parameters + $this->parameters;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function set(string $id, ?object $service): void {

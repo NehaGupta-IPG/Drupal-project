@@ -413,9 +413,9 @@ class DrupalKernelTest extends KernelTestBase {
   }
 
   /**
-   * Tests that a new container is created when the site path changes.
+   * Tests that the site path is set when a stored container is loaded.
    */
-  public function testNewContainerOnSitePathChange(): void {
+  public function testSitePathIsSetAtRuntime(): void {
     $request = Request::createFromGlobals();
 
     // Boot a kernel with a module list so that the container is compiled and
@@ -426,17 +426,18 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertSame($this->siteDirectory, $container->getParameter('site.path'));
     $this->assertSame(['system'], array_keys($container->getParameter('container.modules')));
 
-    // Boot a kernel with the same site path and no module list. The dumped
-    // container is loaded; a newly compiled container would have no modules.
-    $kernel = $this->getTestKernel($request, NULL, $this->siteDirectory);
+    // Boot a kernel with a different site path and no module list. The site
+    // path is not part of the container identifier, so the dumped container
+    // is loaded and its site path is set at runtime.
+    $site_path = $this->siteDirectory . '/different';
+    $kernel = $this->getTestKernel($request, NULL, $site_path);
     $this->assertSame($container::class, $kernel->getContainer()::class);
     $this->assertSame(['system'], array_keys($kernel->getContainer()->getParameter('container.modules')));
+    $this->assertSame($site_path, $kernel->getContainer()->getParameter('site.path'));
 
-    // Boot a kernel with a different site path and no module list. The site
-    // path is part of the container identifier, so a new container is compiled.
-    $kernel = $this->getTestKernel($request, NULL, $this->siteDirectory . '/different');
-    $this->assertSame($this->siteDirectory . '/different', $kernel->getContainer()->getParameter('site.path'));
-    $this->assertSame([], $kernel->getContainer()->getParameter('container.modules'));
+    // Services that use the site path receive the runtime value.
+    $finder = $kernel->getContainer()->get('library.libraries_directory_file_finder');
+    $this->assertSame($site_path, (new \ReflectionProperty($finder, 'sitePath'))->getValue($finder));
   }
 
   /**

@@ -35,11 +35,17 @@ class CacheContainerStorage implements ContainerStorageInterface {
    *   The site settings.
    * @param string $dumperClass
    *   (optional) The class name of the container dumper to use.
+   * @param array $runtimeParameters
+   *   (optional) Parameter values to set on the container when it is loaded,
+   *   keyed by parameter name.
+   *
+   * @see \Drupal\Core\DependencyInjection\Compiler\RuntimeParametersPass
    */
   public function __construct(
     protected readonly CacheBackendInterface $cache,
     protected readonly Settings $settings,
     protected readonly string $dumperClass = OptimizedPhpArrayDumper::class,
+    protected readonly array $runtimeParameters = [],
   ) {}
 
   /**
@@ -49,6 +55,7 @@ class CacheContainerStorage implements ContainerStorageInterface {
     $cache = $this->cache->get(static::CACHE_PREFIX . $identifier);
     if ($cache) {
       $container_definition = $cache->data;
+      $container_definition['parameters'] = $this->runtimeParameters + $container_definition['parameters'];
       $class = $this->settings->get('container_base_class', Container::class);
       return new $class($container_definition);
     }

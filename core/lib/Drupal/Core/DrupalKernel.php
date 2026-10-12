@@ -124,6 +124,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         'arguments' => [
           'cache' => '@cache.container',
           'settings' => '@settings',
+          'runtimeParameters' => [
+            'app.root' => '%app.root%',
+            'site.path' => '%site.path%',
+          ],
         ],
       ],
       'container_storage.php_dumper' => [
@@ -132,6 +136,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           '@cache.container',
           '@php_storage.service_container',
           '@settings',
+          [
+            'app.root' => '%app.root%',
+            'site.path' => '%site.path%',
+          ],
         ],
       ],
       'php_storage.service_container' => [
@@ -551,6 +559,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $definition = Settings::get('bootstrap_container_definition', []);
     $definition['services'] = array_merge($this->defaultBootstrapContainerDefinition['services'], $definition['services'] ?? []);
+    // Provide the parameters that the container storage sets when it loads the
+    // container.
+    // @see \Drupal\Core\DependencyInjection\Compiler\RuntimeParametersPass
+    $definition['parameters']['app.root'] = $this->getAppRoot();
+    $definition['parameters']['site.path'] = $this->getSitePath();
     // Pass the site path to the php storage service container so the fallback
     // to \Drupal\Core\StreamWrapper\PublicStream::basePath() works.
     $definition['services']['php_storage.service_container']['arguments']['site_path'] = $this->sitePath;
@@ -1016,7 +1029,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * - A hash based on all the installed package versions.
    * - The deployment identifier from settings.php.
    * - The operating system running PHP.
-   * - The application root and site path.
    * - The paths to any additional container YAMLs from settings.php.
    *
    * Container storage implementations use this identifier to construct their
@@ -1029,8 +1041,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $parts = [
       $this->environment,
       class_exists(DrupalInstalled::class) ? DrupalInstalled::VERSIONS_HASH : \Drupal::VERSION,
-      $this->getAppRoot(),
-      $this->getSitePath(),
       Settings::get('deployment_identifier'),
       PHP_OS,
       serialize(Settings::get('container_yamls')),
