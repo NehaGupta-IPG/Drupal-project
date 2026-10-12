@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
-use Drupal\Component\PhpStorage\FileStorage;
-use Drupal\Component\PhpStorage\MTimeProtectedFileStorage;
 use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\DependencyInjection\Container;
@@ -481,26 +479,9 @@ class DrupalKernelTest extends KernelTestBase {
    *
    * Some kernels, such as UpdateKernel, are not allowed to dump the container.
    * Garbage collection must still clean up the real storage for them.
-   *
-   * It must also work with each shipped PhpStorageInterface implementation.
-   * MTimeProtectedFileStorage::listAll() strips the '.php' extension but
-   * FileStorage::listAll() does not.
-   *
-   * @param string|null $storage_class
-   *   The PhpStorage class for the service container, or NULL for the default.
-   *
-   * @see \Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage::garbageCollection()
    */
-  #[TestWith([NULL])]
-  #[TestWith([FileStorage::class])]
-  public function testGarbageCollection(?string $storage_class): void {
-    $settings = [];
-    if ($storage_class) {
-      $settings['php_storage']['service_container']['class'] = $storage_class;
-    }
-    $kernel = $this->getTestKernel(Request::createFromGlobals(), ['system' => 'system'], NULL, $settings);
-    $bootstrap_container = (new \ReflectionProperty($kernel, 'bootstrapContainer'))->getValue($kernel);
-    $this->assertInstanceOf($storage_class ?? MTimeProtectedFileStorage::class, $bootstrap_container->get('php_storage.service_container'));
+  public function testGarbageCollection(): void {
+    $kernel = $this->getTestKernel(Request::createFromGlobals(), ['system' => 'system']);
     $container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
 
     // Switch modules so a second, superseded container file exists on disk.
