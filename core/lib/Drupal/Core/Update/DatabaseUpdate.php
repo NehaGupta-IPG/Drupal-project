@@ -8,6 +8,7 @@ use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
+use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -32,6 +33,7 @@ class DatabaseUpdate {
     protected LoggerChannelFactoryInterface $loggerChannelFactory,
     protected ?UpdateRegistry $postUpdateRegistry = NULL,
     protected ?ModuleExtensionList $moduleExtensionList = NULL,
+    protected ?ThemeExtensionList $themeExtensionList = NULL,
   ) {
     if (!$this->postUpdateRegistry instanceof UpdateRegistry) {
       $this->postUpdateRegistry = \Drupal::service(UpdateRegistry::class);
@@ -40,6 +42,10 @@ class DatabaseUpdate {
     if (!$this->moduleExtensionList instanceof ModuleExtensionList) {
       $this->moduleExtensionList = \Drupal::service(ModuleExtensionList::class);
       @trigger_error('Calling ' . __METHOD__ . '() without the $moduleExtensionList argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3625487', E_USER_DEPRECATED);
+    }
+    if (!$this->themeExtensionList instanceof ThemeExtensionList) {
+      $this->themeExtensionList = \Drupal::service(ThemeExtensionList::class);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $themeExtensionList argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3625487', E_USER_DEPRECATED);
     }
   }
 
@@ -290,7 +296,8 @@ class DatabaseUpdate {
     // Ensure extension post update code is loaded, but only go through all of
     // the discovery process if the extension exists first.
     [$extension, $name] = explode('_post_update_', $function, 2);
-    $extension_exists = $this->moduleExtensionList->exists($extension);
+    $extension_exists = $this->moduleExtensionList->exists($extension) ||
+      $this->themeExtensionList->exists($extension);
     if ($extension_exists) {
       $this->postUpdateRegistry->getUpdateFunctions($extension);
     }
