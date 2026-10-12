@@ -46,7 +46,7 @@ class DefaultExceptionSubscriber extends SerializationDefaultExceptionSubscriber
       return;
     }
     if (($exception = $event->getThrowable()) && !$exception instanceof HttpException) {
-      $exception = new HttpException(500, $exception->getMessage(), $exception);
+      $exception = new HttpException(500, 'Internal Server Error', $exception);
       $event->setThrowable($exception);
     }
 
