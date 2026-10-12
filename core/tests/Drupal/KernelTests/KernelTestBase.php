@@ -20,7 +20,9 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
-use Drupal\Core\Test\KernelTestDrupalKernel;
+use Drupal\Core\Test\SharedContainerTestInterface;
+use Drupal\Core\Test\TestContainerStorage;
+use Drupal\Core\Test\TestDrupalKernel;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -107,7 +109,7 @@ use Symfony\Component\Routing\Route;
  *
  * @ingroup testing
  */
-abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderInterface {
+abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderInterface, SharedContainerTestInterface {
 
   use AssertContentTrait;
   use RandomGeneratorTrait;
@@ -336,15 +338,12 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
   }
 
   /**
-   * Returns a key for the services that this test adds to the container.
+   * {@inheritdoc}
    *
    * Tests with the same key add the same services in ::register(), so they can
    * share a compiled container.
-   *
-   * @return string
-   *   The key.
    */
-  protected function getContainerKey(): string {
+  public function getContainerKey(): string {
     $parts = [
       $this->strictConfigSchema,
       $this->getConfigSchemaExclusions(),
@@ -355,6 +354,13 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
       $parts[] = static::class;
     }
     return serialize($parts);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setContainer(ContainerInterface $container): void {
+    $this->container = $container;
   }
 
   /**
@@ -602,27 +608,19 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
 
     // Bootstrap the kernel. Do not use createFromRequest() to retain Settings.
     $shares_container = $this->sharesContainer();
-    $kernel = new KernelTestDrupalKernel('testing', $this->classLoader, FALSE);
-    $kernel->setSitePath($this->siteDirectory);
     if ($shares_container) {
-      // A test method of a class that shares its environment boots with the
-      // database that earlier test methods left behind. It can load a shared
-      // container, but must not store one.
-      $database_is_empty = Database::getConnection()->schema()->findTables('%') === [];
-      $kernel->shareContainer(
-        getenv(self::CONTAINER_DIRECTORY_ENV),
-        $this,
-        $this->getContainerKey(...),
-        function (ContainerInterface $container): void {
-          $this->container = $container;
-        },
-        $database_is_empty,
-        // A test class that shares its environment checks that no tables are
-        // left behind. Compiling the container can create tables, through
-        // services that the container builder creates while compiling.
-        static::sharesEnvironment(),
-      );
+      $this->setSetting('bootstrap_container_definition', [
+        'services' => [
+          'container_storage' => TestContainerStorage::getServiceDefinition(getenv(self::CONTAINER_DIRECTORY_ENV)),
+        ],
+      ]);
     }
+    // A test class that shares its environment checks that no tables are left
+    // behind. Compiling the container can create tables, through services that
+    // the container builder creates while compiling, so it stores and loads
+    // rebuilt containers instead of using the container builder.
+    $kernel = new TestDrupalKernel('testing', $this->classLoader, $shares_container && static::sharesEnvironment());
+    $kernel->setSitePath($this->siteDirectory);
     // Boot a new one-time container from scratch. Set the module list upfront
     // to avoid a subsequent rebuild or setting the kernel into the
     // pre-installer mode.

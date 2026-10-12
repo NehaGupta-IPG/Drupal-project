@@ -29,15 +29,10 @@ trait SharedContainerKernelTrait {
    * path, which differs for every test, is not part of it: the container
    * storage sets it when it loads the container.
    *
-   * @param bool $include_configuration
-   *   Whether the identifier covers the configuration and state that the
-   *   container depends on. Leave this out only when the container is compiled
-   *   with an empty database.
-   *
    * @return string
    *   The container identifier.
    */
-  protected function getSharedContainerIdentifier(bool $include_configuration = FALSE): string {
+  protected function getSharedContainerIdentifier(): string {
     $this->discoverServiceProviders();
 
     // Service files from settings are copied into the site directory, so
@@ -61,10 +56,8 @@ trait SharedContainerKernelTrait {
       // wrapper when this is set.
       (bool) Settings::get('file_private_path'),
       Settings::get('container_base_class'),
+      $this->getContainerConfiguration(),
     ];
-    if ($include_configuration) {
-      $parts[] = $this->getContainerConfiguration();
-    }
     return 'shared:' . hash('xxh128', serialize($parts));
   }
 
@@ -94,6 +87,17 @@ trait SharedContainerKernelTrait {
   }
 
   /**
+   * Returns the container storage if tests share their containers.
+   *
+   * @return \Drupal\Core\Test\TestContainerStorage|null
+   *   The container storage, or NULL if containers are not shared.
+   */
+  protected function getSharedContainerStorage(): ?TestContainerStorage {
+    $storage = isset($this->bootstrapContainer) ? $this->bootstrapContainer->get('container_storage') : NULL;
+    return $storage instanceof TestContainerStorage ? $storage : NULL;
+  }
+
+  /**
    * Returns a key for a site-specific service provider.
    *
    * @param string|object $provider
@@ -103,7 +107,11 @@ trait SharedContainerKernelTrait {
    *   The key.
    */
   protected function getServiceProviderKey(string|object $provider): string {
-    return is_object($provider) ? $provider::class : $provider;
+    return match (TRUE) {
+      $provider instanceof SharedContainerTestInterface => $provider->getContainerKey(),
+      is_object($provider) => $provider::class,
+      default => $provider,
+    };
   }
 
 }

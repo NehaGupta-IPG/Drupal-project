@@ -29,16 +29,22 @@ class TestInstallerKernel extends InstallerKernel {
   }
 
   /**
+   * The shared identifier of the container that is being initialized.
+   */
+  protected ?string $sharedContainerId = NULL;
+
+  /**
    * {@inheritdoc}
    */
   protected function getContainerFromStorage(string $container_id): ?ContainerInterface {
-    $storage = $this->bootstrapContainer->get('container_storage');
-    if (!$storage instanceof TestContainerStorage) {
+    $storage = $this->getSharedContainerStorage();
+    if (!$storage) {
       return parent::getContainerFromStorage($container_id);
     }
     // The parent always compiles the installer container, so this ignores the
     // flags that make it do so.
-    return $storage->load($this->getSharedContainerIdentifier(TRUE));
+    $this->sharedContainerId = $this->getSharedContainerIdentifier();
+    return $storage->load($this->sharedContainerId);
   }
 
   /**
@@ -49,8 +55,7 @@ class TestInstallerKernel extends InstallerKernel {
     // The installer does not dump its container, so store it here. The
     // compiled container builder is used for the rest of the request, as in
     // the parent.
-    $storage = $this->bootstrapContainer->get('container_storage');
-    if ($storage instanceof TestContainerStorage) {
+    if ($storage = $this->getSharedContainerStorage()) {
       // The installer removes the compiler pass that replaces aliases with
       // the services they point to. The container builder still resolves a
       // public alias to a private service, but a dumped container does not.
@@ -60,7 +65,7 @@ class TestInstallerKernel extends InstallerKernel {
           $container->findDefinition((string) $alias)->setPublic(TRUE);
         }
       }
-      $storage->dump($container, $this->getSharedContainerIdentifier(TRUE));
+      $storage->dump($container, $this->sharedContainerId);
     }
     return $container;
   }
