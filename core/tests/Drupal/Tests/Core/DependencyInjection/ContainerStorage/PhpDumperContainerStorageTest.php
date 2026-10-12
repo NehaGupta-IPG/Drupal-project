@@ -199,9 +199,9 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests that dump() with same hash skips file and cache rewrites.
+   * Tests that dump() with the same hash does not rewrite existing files.
    */
-  public function testDumpSameHashSkipsRewrites(): void {
+  public function testDumpSameHashSkipsFileRewrites(): void {
     $cache = new MemoryBackend($this->createStub(TimeInterface::class));
     $savedFiles = [];
     $phpStorage = $this->createPhpStorage($savedFiles);
@@ -217,12 +217,11 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $this->assertInstanceOf(PhpContainer::class, $storage->load('test_identifier'));
 
     // Dumping the same container again produces the same hash and therefore
-    // the same filename, which already exists, so the container file is not
-    // rewritten. The marker is rewritten (harmless, same content) since it is
-    // not guarded by an exists() check.
+    // the same filenames. Both files already exist, so neither the container
+    // nor its confirmation marker is rewritten.
     $storage->dump($container, 'test_identifier');
-    $containerSaves = array_filter($savedFiles, fn ($name) => !str_ends_with($name, '.confirmed'));
-    $this->assertCount(1, $containerSaves);
+    $this->assertCount(2, $savedFiles);
+    $this->assertInstanceOf(PhpContainer::class, $storage->load('test_identifier'));
   }
 
   /**
