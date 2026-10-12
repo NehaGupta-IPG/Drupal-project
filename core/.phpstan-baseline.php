@@ -9908,6 +9908,20 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined static method Drupal\\\\Core\\\\DrupalKernel\\:\\:getContainerFromCacheIfCacheable\\(\\)\\.$#',
+	'identifier' => 'staticMethod.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Test/KernelTestDrupalKernel.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getCachedContainerDefinition\\(\\) of class Drupal\\\\Core\\\\DrupalKernel\\:
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:13\\.0\\.0\\. Container
+  loading is now handled by ContainerStorageInterface\\:\\:load\\(\\)\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Test/KernelTestDrupalKernel.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Avoid calling Symfony\\\\Component\\\\Yaml\\\\Yaml\\:\\:parse\\(\\) directly\\. Use \\\\Drupal\\\\Component\\\\Serialization\\\\Yaml\\:\\:decode\\(\\) instead, which handles exceptions consistently and applies the correct parse flags\\.$#',
 	'identifier' => 'drupal.symfonyYamlParse',
 	'count' => 1,
