@@ -11,7 +11,6 @@ use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Order\Order;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Site\Settings;
@@ -23,7 +22,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\Error;
-use Drupal\Core\Utility\PhpRequirements;
 use Drupal\system\Install\Requirements\SystemRequirements;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,46 +32,6 @@ use Symfony\Component\HttpFoundation\Request;
 class SystemRequirementsHooks {
 
   use StringTranslationTrait;
-
-  /**
-   * Implements hook_update_requirements().
-   */
-  #[Hook('update_requirements', order: Order::First)]
-  public function phpUpdateRequirements(): array {
-    $requirements = [];
-    $phpversion = phpversion();
-    $requirements['php'] = [
-      'title' => $this->t('PHP'),
-      'value' => $phpversion,
-    ];
-    $this->minimumPhp($phpversion, $requirements, RequirementSeverity::Warning);
-
-    return $requirements;
-  }
-
-  /**
-   * Implements hook_runtime_requirements().
-   */
-  #[Hook('runtime_requirements', order: Order::First)]
-  public function phpRuntimeRequirements(): array {
-    $requirements = [];
-    $phpversion = phpversion();
-    $phpversion_label = $this->t('@phpversion (<a href=":url">more information</a>)', [
-      '@phpversion' => $phpversion,
-
-      ':url' => (new Url('system.php'))->toString(),
-    ]);
-    $requirements['php'] = [
-      'title' => $this->t('PHP'),
-      'value' => $phpversion_label,
-    ];
-    $this->minimumPhp($phpversion, $requirements, RequirementSeverity::Error);
-    if (!isset($requirements['php']['severity'])) {
-      $this->recommendedPhp($phpversion, $requirements);
-    }
-
-    return $requirements;
-  }
 
   /**
    * Implements hook_update_requirements().
@@ -104,7 +62,7 @@ class SystemRequirementsHooks {
   }
 
   /**
-   * Minimum php version.
+   * Check if further requirement checking should be skipped.
    *
    * If the minimum version is not met then further requirements should not be
    * checked, return early.
@@ -114,73 +72,6 @@ class SystemRequirementsHooks {
    */
   protected function skipPhpExtensionChecks(string $phpversion): bool {
     return version_compare($phpversion, \Drupal::MINIMUM_PHP) < 0;
-  }
-
-  /**
-   * Check if environment meets minimum php version requirement.
-   *
-   * @param string $phpversion
-   *   The php version to check.
-   * @param array[] $requirements
-   *   The requirements array as specified in hook_*_requirements().
-   * @param \Drupal\Core\Extension\Requirement\RequirementSeverity $fallback_severity
-   *   Default severity to use if minimum is not met.
-   */
-  protected function minimumPhp(string $phpversion, array &$requirements, RequirementSeverity $fallback_severity): void {
-    // Verify the user is running a supported PHP version.
-    // If the site is running a recommended version of PHP, just display it
-    // as an informational message on the status report. This will be overridden
-    // with an error or warning if the site is running older PHP versions for
-    // which Drupal has already or will soon drop support.
-
-    // Check if the PHP version is below what Drupal supports.
-    if (version_compare($phpversion, PhpRequirements::getMinimumSupportedPhp()) < 0) {
-      $requirements['php']['description'] = $this->t(
-        'Your PHP installation is too old. Drupal requires at least PHP %version. It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support. See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.',
-        [
-          '%version' => PhpRequirements::getMinimumSupportedPhp(),
-          '%recommended' => \Drupal::RECOMMENDED_PHP,
-          ':php_requirements' => 'https://www.drupal.org/docs/system-requirements/php-requirements',
-        ]
-      );
-
-      // If the PHP version is also below the absolute minimum allowed, it's not
-      // safe to continue with the requirements check, and should always be an
-      // error.
-      if (version_compare($phpversion, \Drupal::MINIMUM_PHP) < 0) {
-        $requirements['php']['severity'] = RequirementSeverity::Error;
-      }
-      else {
-        // Otherwise, the message depends on the fallback severity
-        // - RequirementSeverity::Error during runtime
-        // - RequirementSeverity::Warning during update
-        $requirements['php']['severity'] = $fallback_severity;
-      }
-    }
-  }
-
-  /**
-   * Check if environment meets recommended php version requirement.
-   *
-   * @param string $phpversion
-   *   The php version to check.
-   * @param array[] $requirements
-   *   The requirements array as specified in hook_*_requirements().
-   */
-  protected function recommendedPhp(string $phpversion, array &$requirements): void {
-    // For PHP versions that are still supported but no longer recommended,
-    // inform users of what's recommended, allowing them to take action before
-    // it becomes urgent.
-    if (version_compare($phpversion, \Drupal::RECOMMENDED_PHP) < 0) {
-      $requirements['php']['description'] = $this->t(
-        'It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support.  See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.',
-        [
-          '%recommended' => \Drupal::RECOMMENDED_PHP,
-          ':php_requirements' => 'https://www.drupal.org/docs/system-requirements/php-requirements',
-        ]
-      );
-      $requirements['php']['severity'] = RequirementSeverity::Info;
-    }
   }
 
   /**
