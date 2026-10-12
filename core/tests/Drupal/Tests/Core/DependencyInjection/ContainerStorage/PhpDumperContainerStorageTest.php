@@ -243,11 +243,13 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $storage->dump($old, 'old_identifier');
 
     // Two versions under the current identifier; the first is superseded by the
-    // second.
+    // second. The storage is invalidated in between, as happens on a cache
+    // rebuild, which must not stop the superseded container being removed.
     $superseded = new ContainerBuilder();
     $superseded->setParameter('test_param', 'superseded');
     $superseded->compile();
     $storage->dump($superseded, 'current_identifier');
+    $storage->invalidate();
 
     $current = new ContainerBuilder();
     $current->setParameter('test_param', 'current');
@@ -316,36 +318,6 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $this->assertContains($oldClass . '.confirmed', $deletedFiles);
     $this->assertNotContains('DrupalContainer_unconfirmed', $deletedFiles);
     $this->assertCount(2, $deletedFiles);
-  }
-
-  /**
-   * Tests that garbageCollection() still works after cache invalidation.
-   */
-  public function testGarbageCollectionWorksAfterInvalidate(): void {
-    $cache = new MemoryBackend($this->createStub(TimeInterface::class));
-    $savedFiles = [];
-    $deletedFiles = [];
-    $phpStorage = $this->createPhpStorage($savedFiles, $deletedFiles);
-
-    $storage = new PhpDumperContainerStorage($cache, $phpStorage, Settings::getInstance());
-
-    $old = new ContainerBuilder();
-    $old->setParameter('test_param', 'old');
-    $old->compile();
-    $storage->dump($old, 'test_identifier');
-    $oldClass = basename($savedFiles[0], '.php');
-
-    $storage->invalidate();
-
-    $current = new ContainerBuilder();
-    $current->setParameter('test_param', 'current');
-    $current->compile();
-    $storage->dump($current, 'test_identifier');
-
-    $storage->garbageCollection('test_identifier');
-
-    $this->assertContains($oldClass, $deletedFiles);
-    $this->assertContains($oldClass . '.confirmed', $deletedFiles);
   }
 
   /**
