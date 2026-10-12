@@ -8,9 +8,7 @@
     },
     "extra": {
         "drupal": {
-            "extension": {
-                "services_yaml": "services.yml"
-            }
+            "service-providers":  "Excluded\\ExcludedServiceProvider"
         }
     }
 }

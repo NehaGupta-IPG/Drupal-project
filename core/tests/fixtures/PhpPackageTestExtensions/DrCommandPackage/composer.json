@@ -8,7 +8,7 @@
     },
     "extra": {
         "drupal": {
-            "extension": {}
+            "service-providers": "DrCommandPackage\\ServiceProvider"
         }
     }
 }

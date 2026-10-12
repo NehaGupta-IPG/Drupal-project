@@ -647,7 +647,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Add service yamls and providers of php packages.
     if (class_exists('Drupal\PackageExtensionData')) {
-      $this->serviceYamls['app'] += PackageExtensionData::getServicesYamls();
       $this->serviceProviderClasses['app'] += PackageExtensionData::getProviders();
     }
 
@@ -1521,9 +1520,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           $namespaces[$parent_namespace . '\\' . $component->getFilename()] = $path . '/' . $component->getFilename();
         }
       }
-    }
-    if (class_exists('Drupal\PackageExtensionData')) {
-      $namespaces += PackageExtensionData::getNamespaces();
     }
     $container->setParameter('container.namespaces', $namespaces);
 

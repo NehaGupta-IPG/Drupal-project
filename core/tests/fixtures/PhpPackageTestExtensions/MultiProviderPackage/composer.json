@@ -8,12 +8,10 @@
     },
     "extra": {
         "drupal": {
-            "extension": {
-                "providers": [
-                    "MultiProviderPackage\\ProviderOne",
-                    "MultiProviderPackage\\ProviderTwo"
-                ]
-            }
+            "service-providers": [
+                "MultiProviderPackage\\ProviderOne",
+                "MultiProviderPackage\\ProviderTwo"
+            ]
         }
     }
 }

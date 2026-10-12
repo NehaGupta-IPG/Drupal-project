@@ -5,27 +5,22 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Drupal\PackageExtensionData;
-use Composer\Installer\InstallationManager;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Package\Loader\JsonLoader;
 use Composer\Repository\InstalledArrayRepository;
-use Drupal\language\LanguageNegotiationMethodManager;
-use Prophecy\Argument;
+use Excluded\ExcludedServiceProvider;
+use MultiProviderPackage\ProviderOne;
+use MultiProviderPackage\ProviderTwo;
 use DrCommandPackage\Command\PhpPackageTestCommand;
 use Drupal\Composer\Plugin\Scaffold\GeneratePackageExtensionData;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DrupalKernel;
 use Drupal\KernelTests\DrupalApplicationTesterTrait;
 use Drupal\KernelTests\KernelTestBase;
-use Excluded\ExcludedService;
 use NotAnExtension\NoService;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use ServicesPackage\OtherClass;
-use ServicesPackage\TestService;
-use ServicesSecond\SecondTestService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
@@ -62,12 +57,9 @@ class PhpPackageExtensionsTest extends KernelTestBase {
     $fixture_path = Path::canonicalize(dirname(__DIR__, 4) . '/fixtures/PhpPackageTestExtensions');
     $composerFiles = Finder::create()->files()->name('composer.json')->in($fixture_path)->depth(1);
     $loader = new JsonLoader(new ArrayLoader());
-    $paths = [];
     foreach ($composerFiles as $file) {
       $package = $loader->load($file->getContents());
       $packages[] = $package;
-      // Keep track of where it is located.
-      $paths[$package->getName()] = $file->getPath();
       foreach ($package->getAutoload()['psr-4'] ?? [] as $prefix => $path) {
         // We also register the package in tha class loader.
         $this->classLoader->addPsr4($prefix, $file->getPath() . '/' . $path);
@@ -80,16 +72,9 @@ class PhpPackageExtensionsTest extends KernelTestBase {
       'extra' => ['drupal' => ['exclude-package' => ['package-test/excluded-package']]],
     ]);
 
-    $installationManager = $this->prophesize(InstallationManager::class);
-    $installationManager->getInstallPath(Argument::any())
-      ->will(function (array $args) use ($paths) {
-        [$package] = $args;
-        return $paths[$package->getName()];
-      });
-
     $this->vfsRoot->addChild(vfsStream::newDirectory('vendor'));
     $classPath = vfsStream::url('root/vendor/PackageExtensionData.php');
-    file_put_contents($classPath, GeneratePackageExtensionData::getCode($root_package, new InstalledArrayRepository($packages), $installationManager->reveal(), $this->root));
+    file_put_contents($classPath, GeneratePackageExtensionData::getCode($root_package, new InstalledArrayRepository($packages)));
 
     $this->classLoader->addClassMap([
       PackageExtensionData::class => $classPath,
@@ -106,27 +91,22 @@ class PhpPackageExtensionsTest extends KernelTestBase {
     // The package's PSR-4 namespace was merged into container.namespaces.
     $namespaces = $this->container->getParameter('container.namespaces');
     self::assertArrayHasKey('DrCommandPackage', $namespaces);
-    self::assertArrayHasKey('ServicesSecond', $namespaces);
-    self::assertArrayNotHasKey('ServicesPackage', $namespaces);
     self::assertArrayNotHasKey('NotAnExtension', $namespaces);
     self::assertArrayNotHasKey('Excluded', $namespaces);
     // All classes are autoloaded.
     self::assertTrue(class_exists(PhpPackageTestCommand::class));
-    self::assertTrue(class_exists(TestService::class));
-    self::assertTrue(class_exists(SecondTestService::class));
     self::assertTrue(class_exists(NoService::class));
-    self::assertTrue(class_exists(OtherClass::class));
-    self::assertTrue(class_exists(ExcludedService::class));
+    self::assertTrue(class_exists(ProviderOne::class));
+    self::assertTrue(class_exists(ProviderTwo::class));
+    self::assertTrue(class_exists(ExcludedServiceProvider::class));
     // But not all are registered in the service container.
     self::assertTrue($this->container->has(PhpPackageTestCommand::class));
-    self::assertTrue($this->container->has(TestService::class));
-    self::assertTrue($this->container->has(SecondTestService::class));
     self::assertFalse($this->container->has(NoService::class));
-    self::assertFalse($this->container->has(OtherClass::class));
-    self::assertFalse($this->container->has(ExcludedService::class));
 
-    // The DrCommandPackage registered a service provider.
-    self::assertTrue($this->container->getParameter('services_package_test.service_provider_registered'));
+    // Packages can register service providers.
+    self::assertTrue($this->container->getParameter('multi_provider_test.service_provider_one_registered'));
+    self::assertTrue($this->container->getParameter('multi_provider_test.service_provider_two_registered'));
+    self::assertFalse($this->container->hasParameter('indirect_dependency_service_provider.unwanted_changes'));
 
     // The command the package provides under its Command namespace is picked up
     // by Drupal\Core\DependencyInjection\Compiler\ConsoleCompilerPass and can
@@ -135,21 +115,6 @@ class PhpPackageExtensionsTest extends KernelTestBase {
     $code = $tester->run(['command' => 'php-command:test']);
     self::assertSame(Command::SUCCESS, $code, $tester->getDisplay());
     self::assertStringContainsString('[OK] PHP dr tested.', $tester->getDisplay());
-
-    // The service can be retrieved from the container.
-    $service = $this->container->get(TestService::class);
-    $dependencies = $service->getConfiguredDependencies();
-    self::assertInstanceOf(ConfigFactoryInterface::class, $dependencies['config.factory']);
-    self::assertNull($dependencies['language']);
-    self::assertNull($dependencies['help']);
-    self::assertCount(1, $this->container->get(SecondTestService::class)->getConfiguredDependencies());
-
-    // When the module is installed the service is set up with it.
-    $this->enableModules(['language']);
-    $dependencies = $this->container->get(TestService::class)->getConfiguredDependencies();
-    self::assertInstanceOf(ConfigFactoryInterface::class, $dependencies['config.factory']);
-    self::assertInstanceOf(LanguageNegotiationMethodManager::class, $dependencies['language']);
-    self::assertCount(2, $this->container->get(SecondTestService::class)->getConfiguredDependencies());
   }
 
 }

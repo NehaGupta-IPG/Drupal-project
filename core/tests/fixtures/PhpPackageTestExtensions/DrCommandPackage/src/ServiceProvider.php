@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ServicesPackage;
+namespace DrCommandPackage;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
@@ -12,13 +12,16 @@ use Drupal\Core\DependencyInjection\ServiceProviderInterface;
  *
  * @see \Drupal\KernelTests\Core\DrupalKernel\PhpPackageExtensionsTest
  */
-class Provider implements ServiceProviderInterface {
+class ServiceProvider implements ServiceProviderInterface {
 
   /**
    * {@inheritdoc}
    */
   public function register(ContainerBuilder $container) {
-    $container->setParameter('services_package_test.service_provider_registered', TRUE);
+    // Add the namespace to the container namespaces so the dr command is found.
+    $namespaces = $container->getParameter('container.namespaces');
+    $namespaces['DrCommandPackage'] = __DIR__;
+    $container->setParameter('container.namespaces', $namespaces);
   }
 
 }

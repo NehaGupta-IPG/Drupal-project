@@ -8,7 +8,7 @@
     },
     "extra": {
         "drupal": {
-            "note": "This package is also added considered by composer."
+            "note": "This package is just a random other php library."
         }
     }
 }
