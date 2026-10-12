@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Breadcrumb;
 
-use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Breadcrumb\BreadcrumbManager;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\Context\CacheContextsManager;
-use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\RouteMatch;
@@ -19,6 +17,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -55,13 +55,20 @@ class BreadcrumbManagerTest extends UnitTestCase {
   protected ModuleHandlerInterface&MockObject $moduleHandler;
 
   /**
+   * The request stack.
+   */
+  protected RequestStack $requestStack;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
 
     $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $this->breadcrumbManager = new BreadcrumbManager($this->moduleHandler, new MemoryCache($this->createStub(TimeInterface::class)));
+    $this->requestStack = new RequestStack();
+    $this->requestStack->push(new Request());
+    $this->breadcrumbManager = new BreadcrumbManager($this->moduleHandler, $this->requestStack);
     $this->breadcrumb = new Breadcrumb();
 
     $this->container = new ContainerBuilder();
@@ -215,20 +222,20 @@ class BreadcrumbManagerTest extends UnitTestCase {
   }
 
   /**
-   * Tests that breadcrumbs are statically cached per route match.
+   * Tests that breadcrumbs are statically cached per request and route match.
    */
   public function testBuildStaticCache(): void {
     $this->breadcrumb->setLinks(['<a href="/example">Test</a>']);
     $this->breadcrumb->addCacheTags(['node:1']);
 
     $builder = $this->createMock('Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface');
-    $builder->expects($this->exactly(2))
+    $builder->expects($this->exactly(3))
       ->method('applies')
       ->willReturn(TRUE);
-    $builder->expects($this->exactly(2))
+    $builder->expects($this->exactly(3))
       ->method('build')
       ->willReturnCallback(fn () => clone $this->breadcrumb);
-    $this->moduleHandler->expects($this->exactly(2))
+    $this->moduleHandler->expects($this->exactly(3))
       ->method('alter');
     $this->breadcrumbManager->addBuilder($builder, 0);
 
@@ -248,15 +255,19 @@ class BreadcrumbManagerTest extends UnitTestCase {
 
     // Different route parameters build a new breadcrumb.
     $this->breadcrumbManager->build($route_match_2);
+
+    // A new request does not reuse breadcrumbs from the previous request.
+    $this->requestStack->push(new Request());
+    $this->breadcrumbManager->build($route_match_1);
   }
 
   /**
-   * Tests the deprecation of calling the constructor without a memory cache.
+   * Tests the deprecation of calling the constructor without a request stack.
    */
   #[IgnoreDeprecations]
   public function testConstructorDeprecation(): void {
-    $this->container->set('cache.memory', new MemoryCache($this->createStub(TimeInterface::class)));
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Breadcrumb\BreadcrumbManager::__construct() without the $memory_cache argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3621448');
+    $this->container->set('request_stack', $this->requestStack);
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Breadcrumb\BreadcrumbManager::__construct() without the $request_stack argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3621448');
     $this->moduleHandler->expects($this->never())->method('alter');
     new BreadcrumbManager($this->moduleHandler);
   }
