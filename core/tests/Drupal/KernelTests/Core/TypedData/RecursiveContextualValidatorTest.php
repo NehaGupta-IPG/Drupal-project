@@ -6,6 +6,8 @@ namespace Drupal\KernelTests\Core\TypedData;
 
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\Core\TypedData\Validation\RecursiveContextualValidator;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
@@ -84,6 +86,32 @@ class RecursiveContextualValidatorTest extends KernelTestBase {
     $this->assertCount(1, $violations);
     $this->assertEquals('field_test', $violations[0]->getPropertyPath());
     $this->assertEquals('Invalid referenced entity.', $violations[0]->getMessage());
+  }
+
+  /**
+   * Tests that required map properties are validated when the map is empty.
+   */
+  public function testEmptyMapRequiredPropertiesValidation(): void {
+    $typed_data_manager = $this->container->get('typed_data_manager');
+    $definition = MapDataDefinition::create()
+      ->setPropertyDefinition('foo', DataDefinition::create('string')
+        ->setRequired(TRUE))
+      ->setPropertyDefinition('bar', DataDefinition::create('string')
+        ->setRequired(TRUE));
+
+    // A partially populated map reports the missing required property.
+    $violations = $typed_data_manager->create($definition, ['foo' => 'value'])->validate();
+    $this->assertCount(1, $violations);
+    $this->assertEquals('bar', $violations[0]->getPropertyPath());
+    $this->assertEquals('This value should not be null.', $violations[0]->getMessage());
+
+    // An empty map must report every missing required property as well.
+    $violations = $typed_data_manager->create($definition, [])->validate();
+    $this->assertCount(2, $violations);
+    $this->assertEquals('foo', $violations[0]->getPropertyPath());
+    $this->assertEquals('This value should not be null.', $violations[0]->getMessage());
+    $this->assertEquals('bar', $violations[1]->getPropertyPath());
+    $this->assertEquals('This value should not be null.', $violations[1]->getMessage());
   }
 
 }
