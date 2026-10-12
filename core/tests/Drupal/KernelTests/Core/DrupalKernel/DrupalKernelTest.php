@@ -99,31 +99,40 @@ class DrupalKernelTest extends KernelTestBase {
 
   /**
    * Tests DIC compilation.
+   *
+   * @param string $container_base_class
+   *   The container_base_class setting.
    */
-  public function testCompileDIC(): void {
+  #[TestWith([PhpContainer::class], 'PhpContainer')]
+  #[TestWith([Container::class], 'array container')]
+  public function testCompileDIC(string $container_base_class): void {
     // @todo Write a memory based storage backend for testing.
     $modules_enabled = [
       'system' => 'system',
       'user' => 'user',
     ];
+    $settings = ['container_base_class' => $container_base_class];
 
     $request = Request::createFromGlobals();
-    $this->getTestKernel($request, $modules_enabled);
+    $this->getTestKernel($request, $modules_enabled, NULL, $settings);
 
     // Instantiate it a second time and we should get the compiled Container
     // class.
-    $kernel = $this->getTestKernel($request);
+    $kernel = $this->getTestKernel($request, NULL, NULL, $settings);
     $container = $kernel->getContainer();
+    $this->assertInstanceOf($container_base_class, $container);
     $refClass = new \ReflectionClass($container);
     $is_compiled_container = !$refClass->isSubclassOf('Symfony\Component\DependencyInjection\ContainerBuilder');
     $this->assertTrue($is_compiled_container);
+    // Only the PHP dumped container is written to PHP storage.
+    $this->assertSame($container_base_class === PhpContainer::class, is_dir($kernel->getSitePath() . '/files/php/service_container'));
     // Verify that the list of modules is the same for the initial and the
     // compiled container.
     $module_list = array_keys($container->get('module_handler')->getModuleList());
     $this->assertEquals(array_values($modules_enabled), $module_list);
 
     // Get the container another time, simulating a "production" environment.
-    $container = $this->getTestKernel($request)
+    $container = $this->getTestKernel($request, NULL, NULL, $settings)
       ->getContainer();
 
     $refClass = new \ReflectionClass($container);
@@ -149,11 +158,11 @@ class DrupalKernelTest extends KernelTestBase {
     // Add another module so that we can test that the new module's bundle is
     // registered to the new container.
     $modules_enabled['service_provider_test'] = 'service_provider_test';
-    $this->getTestKernel($request, $modules_enabled);
+    $this->getTestKernel($request, $modules_enabled, NULL, $settings);
 
     // Instantiate it a second time and we should not get a ContainerBuilder
     // class because we are loading the container definition from cache.
-    $kernel = $this->getTestKernel($request, $modules_enabled);
+    $kernel = $this->getTestKernel($request, $modules_enabled, NULL, $settings);
     $container = $kernel->getContainer();
 
     $refClass = new \ReflectionClass($container);
@@ -430,77 +439,6 @@ class DrupalKernelTest extends KernelTestBase {
     $kernel = $this->getTestKernel($request, NULL, $this->siteDirectory . '/different');
     $this->assertSame($this->siteDirectory . '/different', $kernel->getContainer()->getParameter('site.path'));
     $this->assertSame([], $kernel->getContainer()->getParameter('container.modules'));
-  }
-
-  /**
-   * Builds a kernel that uses the legacy PHP array container.
-   *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   A request object to use in booting the kernel.
-   * @param array|null $modules_enabled
-   *   A list of modules to install on the kernel.
-   *
-   * @return \Drupal\Core\DrupalKernel
-   *   New kernel for testing.
-   */
-  protected function getTestKernelWithArrayContainer(Request $request, ?array $modules_enabled = NULL): DrupalKernel {
-    $class_loader = require $this->root . '/autoload.php';
-    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
-    $this->setSetting('container_yamls', []);
-    $this->setSetting('hash_salt', $this->databasePrefix);
-    $this->setSetting('container_base_class', Container::class);
-    if (isset($modules_enabled)) {
-      $kernel->updateModules($modules_enabled);
-    }
-    $kernel->boot();
-
-    return $kernel;
-  }
-
-  /**
-   * Tests DIC compilation using the legacy PHP array container.
-   */
-  public function testCompileDICWithArrayContainer(): void {
-    $modules_enabled = [
-      'system' => 'system',
-      'user' => 'user',
-    ];
-
-    $request = Request::createFromGlobals();
-    $kernel = $this->getTestKernelWithArrayContainer($request, $modules_enabled);
-    $container = $kernel->getContainer();
-
-    // The container should be an instance of the legacy Container class.
-    $this->assertInstanceOf(Container::class, $container);
-    $this->assertNotInstanceOf(PhpContainer::class, $container);
-
-    // The container should not be a ContainerBuilder.
-    $refClass = new \ReflectionClass($container);
-    $this->assertFalse($refClass->isSubclassOf('Symfony\Component\DependencyInjection\ContainerBuilder'));
-
-    // No PhpStorage files should be created for the array container.
-    $this->assertDirectoryDoesNotExist($kernel->getSitePath() . '/files/php/service_container');
-
-    // Boot a second time and verify we load from the cached definition.
-    $kernel2 = $this->getTestKernelWithArrayContainer($request);
-    $container2 = $kernel2->getContainer();
-
-    $this->assertInstanceOf(Container::class, $container2);
-    $this->assertNotInstanceOf(PhpContainer::class, $container2);
-
-    // The container should not be a ContainerBuilder.
-    $refClass = new \ReflectionClass($container2);
-    $this->assertFalse($refClass->isSubclassOf('Symfony\Component\DependencyInjection\ContainerBuilder'));
-
-    // Verify that the list of modules is the same for the initial and the
-    // cached container.
-    $module_list = array_keys($container2->get('module_handler')->getModuleList());
-    $this->assertEquals(array_values($modules_enabled), $module_list);
-
-    // Test that our synthetic services are there.
-    $class_loader = $container2->get('class_loader');
-    $refClass = new \ReflectionClass($class_loader);
-    $this->assertTrue($refClass->hasMethod('loadClass'), 'Container has a class loader');
   }
 
   /**
