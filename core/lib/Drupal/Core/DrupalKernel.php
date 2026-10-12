@@ -1998,7 +1998,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @param string $container_id
    *   The container ID.
    *
-   * @return Symfony\Component\DependencyInjection\ContainerInterface|NULL
+   * @return Symfony\Component\DependencyInjection\ContainerInterface|null
    *   The cached container definition, or NULL if the cache must not be used
    *   or holds no definition.
    */
