@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\TypedData;
 
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\Core\TypedData\Validation\RecursiveContextualValidator;
@@ -112,6 +113,44 @@ class RecursiveContextualValidatorTest extends KernelTestBase {
     $this->assertEquals('This value should not be null.', $violations[0]->getMessage());
     $this->assertEquals('bar', $violations[1]->getPropertyPath());
     $this->assertEquals('This value should not be null.', $violations[1]->getMessage());
+  }
+
+  /**
+   * Tests that an optional map without a value is not validated.
+   */
+  public function testNullOptionalMapRequiredPropertiesValidation(): void {
+    $definition = MapDataDefinition::create()
+      ->setPropertyDefinition('foo', DataDefinition::create('string')
+        ->setRequired(TRUE))
+      ->setPropertyDefinition('bar', DataDefinition::create('string')
+        ->setRequired(TRUE));
+
+    $violations = $this->container->get('typed_data_manager')->create($definition, NULL)->validate();
+    $this->assertCount(0, $violations);
+  }
+
+  /**
+   * Tests that empty field items are not validated against their properties.
+   */
+  public function testEmptyFieldItemValidation(): void {
+    $definitions['string_multiple'] = BaseFieldDefinition::create('string')
+      ->setLabel('Multiple strings')
+      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    $this->container->get('state')->set('entity_test.additional_base_field_definitions', $definitions);
+    $this->installEntitySchema('entity_test');
+
+    $entity = EntityTest::create([
+      'name' => 'test',
+      'user_id' => ['target_id' => 0],
+      'string_multiple' => ['value'],
+    ]);
+    // The string item's "value" property is required, but an empty item must
+    // not report it as missing.
+    $entity->get('string_multiple')->appendItem();
+    $this->assertCount(2, $entity->get('string_multiple'));
+    $this->assertTrue($entity->get('string_multiple')->get(1)->isEmpty());
+
+    $this->assertCount(0, $entity->validate());
   }
 
 }
