@@ -235,7 +235,12 @@
   Drupal.AjaxCommands.prototype.setBrowserUrl = (ajax, response) => {
     // Do not change browser URL if we are in a dialog wrapper.
     if (ajax.element && !ajax.element.closest('.ui-dialog-content')) {
-      window.history.replaceState(null, '', response.url);
+      let url = response.url;
+      // Preserve the URL fragment on AJAX updates.
+      if (typeof url === 'string' && !url.includes('#') && window.location.hash) {
+        url += window.location.hash;
+      }
+      window.history.replaceState(null, '', url);
     }
   };
 })(jQuery, Drupal, drupalSettings);
