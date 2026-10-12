@@ -10,7 +10,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Utility\PhpRequirements;
 
 /**
- * Requirements hook implementations for system module.
+ * PHP requirements hook implementations for system module.
  */
 class SystemPhpRequirementsHooks {
 
