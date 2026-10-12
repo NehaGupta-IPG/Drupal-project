@@ -119,7 +119,7 @@ display:
           specify_validation: true
           validate:
             type: 'entity:taxonomy_term'
-            fail: 'not found'
+            fail: 'access denied'
           validate_options:
             bundles: {  }
             access: true

@@ -103,10 +103,8 @@ class TermAccessTest extends TaxonomyTestBase {
     $this->drupalGet('taxonomy/term/' . $published_term->id());
     $assert_session->statusCodeEquals(200);
 
-    // @todo Change this assertion to expect a 403 status code when
-    //   https://www.drupal.org/project/drupal/issues/2983070 is fixed.
     $this->drupalGet('taxonomy/term/' . $unpublished_term->id());
-    $assert_session->statusCodeEquals(404);
+    $assert_session->statusCodeEquals(403);
   }
 
   /**
