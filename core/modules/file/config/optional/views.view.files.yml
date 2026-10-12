@@ -844,7 +844,7 @@ display:
           id: entity_label
           table: file_usage
           field: entity_label
-          relationship: none
+          relationship: fid
           group_type: group
           admin_label: ''
           plugin_id: entity_label
@@ -894,7 +894,7 @@ display:
           id: type
           table: file_usage
           field: type
-          relationship: none
+          relationship: fid
           group_type: group
           admin_label: ''
           plugin_id: standard
@@ -943,7 +943,7 @@ display:
           id: module
           table: file_usage
           field: module
-          relationship: none
+          relationship: fid
           group_type: group
           admin_label: ''
           plugin_id: standard
@@ -992,7 +992,7 @@ display:
           id: count
           table: file_usage
           field: count
-          relationship: none
+          relationship: fid
           group_type: group
           admin_label: ''
           plugin_id: numeric
