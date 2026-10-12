@@ -237,7 +237,11 @@
     if (ajax.element && !ajax.element.closest('.ui-dialog-content')) {
       let url = response.url;
       // Preserve the URL fragment on AJAX updates.
-      if (typeof url === 'string' && !url.includes('#') && window.location.hash) {
+      if (
+        typeof url === 'string' &&
+        !url.includes('#') &&
+        window.location.hash
+      ) {
         url += window.location.hash;
       }
       window.history.replaceState(null, '', url);
