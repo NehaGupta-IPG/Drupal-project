@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Extension;
 
 use Drupal\Core\Cache\NullBackend;
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleHandler;
@@ -343,37 +342,6 @@ class ModuleHandlerTest extends UnitTestCase {
       'module_handler_test' => $this->root . '/core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test',
     ];
     $this->assertEquals($moduleDirectories, $module_handler->getModuleDirectories());
-  }
-
-  /**
-   * Tests the deprecated key value factory constructor argument.
-   */
-  #[IgnoreDeprecations]
-  public function testConstructorKeyValueFactoryArgument(): void {
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Extension\ModuleHandler::__construct() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/3620769');
-    $key_value = new KeyValueMemoryFactory();
-    $key_value->get('hook_data')->set('hook_list', [
-      'some_hook' => [
-        TestHookClass::class . '::someMethod' => 'some_module',
-      ],
-    ]);
-    $container = new ContainerBuilder();
-    $container->set(HookData::class, new HookData($key_value, new NullBackend('bootstrap')));
-    \Drupal::setContainer($container);
-    $module_handler = new ModuleHandler($this->root, [], new KeyValueMemoryFactory(), $this->createStub(CallableResolver::class), new NullBackend('bootstrap'));
-    $module_handler->setModuleList(['some_module' => TRUE]);
-    $this->assertTrue($module_handler->hasImplementations('some_hook'));
-  }
-
-  /**
-   * Tests the deprecated cache constructor argument.
-   */
-  #[IgnoreDeprecations]
-  public function testConstructorCacheArgument(): void {
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Extension\ModuleHandler::__construct() with the $cache argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3620769');
-    $hook_data = new HookData(new KeyValueMemoryFactory(), new NullBackend('bootstrap'));
-    $module_handler = new ModuleHandler($this->root, [], $hook_data, $this->createStub(CallableResolver::class), new NullBackend('bootstrap'));
-    $this->assertFalse($module_handler->hasImplementations('some_hook'));
   }
 
 }

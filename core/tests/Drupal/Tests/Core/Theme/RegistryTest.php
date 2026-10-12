@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Theme;
 
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -19,7 +18,6 @@ use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\theme_test\Hook\ThemeTestHooks;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -545,20 +543,6 @@ class RegistryTest extends UnitTestCase {
     ];
 
     return $data;
-  }
-
-  /**
-   * Tests the deprecated key value factory constructor argument.
-   */
-  #[IgnoreDeprecations]
-  public function testConstructorKeyValueFactoryArgument(): void {
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Theme\Registry::__construct() with the $keyValueFactory argument is deprecated in drupal:12.1.0 and is replaced by $hookData in drupal:13.0.0. See https://www.drupal.org/node/3620769');
-    $hook_data = new HookData($this->keyValueFactory, $this->runtimeCache);
-    $container = new ContainerBuilder();
-    $container->set(HookData::class, $hook_data);
-    \Drupal::setContainer($container);
-    $registry = new Registry($this->cache, $this->lock, $this->moduleHandler, $this->themeHandler, $this->runtimeCache, $this->moduleList, $this->kernel, $this->keyValueFactory);
-    $this->assertSame($hook_data, (new \ReflectionProperty($registry, 'hookData'))->getValue($registry));
   }
 
 }
