@@ -3,6 +3,7 @@
 namespace Drupal\Core\Breadcrumb;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -43,36 +44,37 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
   protected $sortedBuilders;
 
   /**
+   * The memory cache used to statically cache built breadcrumbs.
+   */
+  protected MemoryCacheInterface $memoryCache;
+
+  /**
    * The request stack.
    */
   protected RequestStack $requestStack;
-
-  /**
-   * Statically cached breadcrumbs, keyed by request and then by cache ID.
-   *
-   * The cache is scoped to the request because breadcrumbs can depend on more
-   * than the route match, for example the negotiated language.
-   *
-   * @var \WeakMap<\Symfony\Component\HttpFoundation\Request, \Drupal\Core\Breadcrumb\Breadcrumb[]>
-   */
-  protected \WeakMap $breadcrumbs;
 
   /**
    * Constructs a \Drupal\Core\Breadcrumb\BreadcrumbManager object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface|null $memory_cache
+   *   The memory cache.
    * @param \Symfony\Component\HttpFoundation\RequestStack|null $request_stack
    *   The request stack.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ?RequestStack $request_stack = NULL) {
+  public function __construct(ModuleHandlerInterface $module_handler, ?MemoryCacheInterface $memory_cache = NULL, ?RequestStack $request_stack = NULL) {
     $this->moduleHandler = $module_handler;
+    if (!$memory_cache) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $memory_cache argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3621448', E_USER_DEPRECATED);
+      $memory_cache = \Drupal::service('cache.memory');
+    }
+    $this->memoryCache = $memory_cache;
     if (!$request_stack) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $request_stack argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3621448', E_USER_DEPRECATED);
       $request_stack = \Drupal::requestStack();
     }
     $this->requestStack = $request_stack;
-    $this->breadcrumbs = new \WeakMap();
   }
 
   /**
@@ -97,9 +99,11 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
   public function build(RouteMatchInterface $route_match) {
     $request = $this->requestStack->getCurrentRequest();
     $cid = $request ? $this->getCacheId($route_match) : NULL;
-    if ($cid && isset($this->breadcrumbs[$request][$cid])) {
+    // Breadcrumbs can depend on more than the route match, for example the
+    // negotiated language, so only reuse a breadcrumb built for this request.
+    if ($cid && ($cache = $this->memoryCache->get($cid)) && $cache->data['request']->get() === $request) {
       // Return a copy so that callers cannot alter the cached breadcrumb.
-      return clone $this->breadcrumbs[$request][$cid];
+      return clone $cache->data['breadcrumb'];
     }
 
     $cacheable_metadata = new CacheableMetadata();
@@ -130,9 +134,11 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
     $this->moduleHandler->alter('system_breadcrumb', $breadcrumb, $route_match, $context);
 
     if ($cid) {
-      $cached = $this->breadcrumbs[$request] ?? [];
-      $cached[$cid] = clone $breadcrumb;
-      $this->breadcrumbs[$request] = $cached;
+      $data = [
+        'request' => \WeakReference::create($request),
+        'breadcrumb' => clone $breadcrumb,
+      ];
+      $this->memoryCache->set($cid, $data, MemoryCacheInterface::CACHE_PERMANENT, $breadcrumb->getCacheTags());
     }
 
     return $breadcrumb;
@@ -153,7 +159,7 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
       return NULL;
     }
     $raw_parameters = $route_match->getRawParameters()?->all() ?? [];
-    return $route_name . ':' . hash('xxh64', serialize($raw_parameters));
+    return 'breadcrumb:' . $route_name . ':' . hash('xxh64', serialize($raw_parameters));
   }
 
   /**

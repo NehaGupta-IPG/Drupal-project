@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Breadcrumb;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Breadcrumb\BreadcrumbManager;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\RouteMatch;
@@ -55,6 +57,11 @@ class BreadcrumbManagerTest extends UnitTestCase {
   protected ModuleHandlerInterface&MockObject $moduleHandler;
 
   /**
+   * The memory cache.
+   */
+  protected MemoryCache $memoryCache;
+
+  /**
    * The request stack.
    */
   protected RequestStack $requestStack;
@@ -68,7 +75,10 @@ class BreadcrumbManagerTest extends UnitTestCase {
     $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
     $this->requestStack = new RequestStack();
     $this->requestStack->push(new Request());
-    $this->breadcrumbManager = new BreadcrumbManager($this->moduleHandler, $this->requestStack);
+    $time = $this->createStub(TimeInterface::class);
+    $time->method('getRequestTime')->willReturn(time());
+    $this->memoryCache = new MemoryCache($time);
+    $this->breadcrumbManager = new BreadcrumbManager($this->moduleHandler, $this->memoryCache, $this->requestStack);
     $this->breadcrumb = new Breadcrumb();
 
     $this->container = new ContainerBuilder();
@@ -229,13 +239,13 @@ class BreadcrumbManagerTest extends UnitTestCase {
     $this->breadcrumb->addCacheTags(['node:1']);
 
     $builder = $this->createMock('Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface');
-    $builder->expects($this->exactly(3))
+    $builder->expects($this->exactly(4))
       ->method('applies')
       ->willReturn(TRUE);
-    $builder->expects($this->exactly(3))
+    $builder->expects($this->exactly(4))
       ->method('build')
       ->willReturnCallback(fn () => clone $this->breadcrumb);
-    $this->moduleHandler->expects($this->exactly(3))
+    $this->moduleHandler->expects($this->exactly(4))
       ->method('alter');
     $this->breadcrumbManager->addBuilder($builder, 0);
 
@@ -259,14 +269,21 @@ class BreadcrumbManagerTest extends UnitTestCase {
     // A new request does not reuse breadcrumbs from the previous request.
     $this->requestStack->push(new Request());
     $this->breadcrumbManager->build($route_match_1);
+    $this->breadcrumbManager->build($route_match_1);
+
+    // Invalidating a cache tag of the breadcrumb builds it again.
+    $this->memoryCache->invalidateTags(['node:1']);
+    $this->breadcrumbManager->build($route_match_1);
   }
 
   /**
-   * Tests the deprecation of calling the constructor without a request stack.
+   * Tests the deprecation of calling the constructor without all arguments.
    */
   #[IgnoreDeprecations]
   public function testConstructorDeprecation(): void {
+    $this->container->set('cache.memory', $this->memoryCache);
     $this->container->set('request_stack', $this->requestStack);
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Breadcrumb\BreadcrumbManager::__construct() without the $memory_cache argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3621448');
     $this->expectUserDeprecationMessage('Calling Drupal\Core\Breadcrumb\BreadcrumbManager::__construct() without the $request_stack argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3621448');
     $this->moduleHandler->expects($this->never())->method('alter');
     new BreadcrumbManager($this->moduleHandler);
