@@ -287,11 +287,15 @@ class DatabaseUpdate {
       return;
     }
 
-    // Ensure extension post update code is loaded.
+    // Ensure extension post update code is loaded, but only go through all of
+    // the discovery process if the extension exists first.
     [$extension, $name] = explode('_post_update_', $function, 2);
-    $this->postUpdateRegistry->getUpdateFunctions($extension);
+    $extension_exists = $this->moduleExtensionList->exists($extension);
+    if ($extension_exists) {
+      $this->postUpdateRegistry->getUpdateFunctions($extension);
+    }
 
-    if (function_exists($function)) {
+    if ($extension_exists && function_exists($function)) {
       try {
         $ret['results']['query'] = $function($context['sandbox']);
         $ret['results']['success'] = TRUE;
