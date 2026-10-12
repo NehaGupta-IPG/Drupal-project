@@ -4,67 +4,52 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\DependencyInjection\ContainerStorage;
 
-use Drupal\Component\DependencyInjection\Container;
+use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage;
 use Drupal\Core\DependencyInjection\ContainerStorage\ContainerStorageFactory;
 use Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage;
 use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\Site\Settings;
+use Drupal\FunctionalTests\Bootstrap\ErrorContainer;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Tests the ContainerStorageFactory.
- *
- * Tests run in separate processes because the \Drupal\Core\Site\Settings
- * singleton is used.
  */
 #[CoversClass(ContainerStorageFactory::class)]
 #[Group('DependencyInjection')]
-#[RunTestsInSeparateProcesses]
 class ContainerStorageFactoryTest extends UnitTestCase {
 
   /**
-   * Tests that CacheContainerStorage is returned for the legacy base class.
+   * Tests that the storage is selected by the container base class.
+   *
+   * @param string|null $base_class
+   *   The container_base_class setting, or NULL to leave it unset.
+   * @param string $expected_service
+   *   The ID of the storage service the factory is expected to return.
    */
-  public function testCreatesCacheStorageForLegacyBaseClass(): void {
-    new Settings([
-      'container_base_class' => Container::class,
-    ]);
+  #[TestWith([NULL, 'container_storage.cache'], 'unset')]
+  #[TestWith([Container::class, 'container_storage.cache'], 'array container')]
+  #[TestWith([PhpContainer::class, 'container_storage.php_dumper'], 'PhpContainer')]
+  #[TestWith(['\\' . PhpContainer::class, 'container_storage.php_dumper'], 'PhpContainer with leading backslash')]
+  #[TestWith([ErrorContainer::class, 'container_storage.php_dumper'], 'PhpContainer subclass')]
+  public function testCreate(?string $base_class, string $expected_service): void {
+    new Settings($base_class === NULL ? [] : ['container_base_class' => $base_class]);
 
-    $cacheStorage = $this->createStub(CacheContainerStorage::class);
+    $services = [
+      'settings' => Settings::getInstance(),
+      'container_storage.cache' => $this->createStub(CacheContainerStorage::class),
+      'container_storage.php_dumper' => $this->createStub(PhpDumperContainerStorage::class),
+    ];
     $container = $this->createStub(ContainerInterface::class);
     $container->method('get')
-      ->willReturnMap([
-        ['settings', Settings::getInstance()],
-        ['container_storage.cache', $cacheStorage],
-      ]);
+      ->willReturnCallback(fn (string $id) => $services[$id]);
 
-    $storage = ContainerStorageFactory::create($container);
-    $this->assertSame($cacheStorage, $storage);
-  }
-
-  /**
-   * Tests that PhpDumperContainerStorage is returned for PhpContainer base.
-   */
-  public function testCreatesPhpDumperStorageForPhpContainerBase(): void {
-    new Settings([
-      'container_base_class' => PhpContainer::class,
-    ]);
-
-    $phpDumperStorage = $this->createStub(PhpDumperContainerStorage::class);
-    $container = $this->createStub(ContainerInterface::class);
-    $container->method('get')
-      ->willReturnMap([
-        ['settings', Settings::getInstance()],
-        ['container_storage.php_dumper', $phpDumperStorage],
-      ]);
-
-    $storage = ContainerStorageFactory::create($container);
-    $this->assertSame($phpDumperStorage, $storage);
+    $this->assertSame($services[$expected_service], ContainerStorageFactory::create($container));
   }
 
 }
