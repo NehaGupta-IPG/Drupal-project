@@ -50,6 +50,15 @@ class Fast404Test extends BrowserTestBase {
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache', 'Hit');
     $this->assertSession()->pageTextNotContains('Oops I did it again!');
 
+    // Commonly probed file extensions also return a fast 404. The .sql and .bak
+    // extensions are not tested since web server configurations commonly deny
+    // access to them before the request reaches Drupal.
+    foreach (['php', 'json', 'xml', 'zip', 'gz', 'tar'] as $extension) {
+      $this->drupalGet("does-not-exist.$extension");
+      $this->assertSession()->statusCodeEquals(404);
+      $this->assertSession()->responseNotContains('modules/system/css/');
+    }
+
     // Changing configuration should invalidate the cache.
     $this->config('system.performance')->set('fast_404.html', '<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>Oops I did it again!</h1><p>The requested URL "@path" was not found on this server.</p></body></html>')->save();
     $this->drupalGet('does-not-exist.txt');

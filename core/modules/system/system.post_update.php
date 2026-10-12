@@ -91,3 +91,15 @@ function system_post_update_clear_admin_compact_mode_config(): void {
   $config->clear('admin_compact_mode');
   $config->save();
 }
+
+/**
+ * Add more file extensions to the default fast 404 paths.
+ */
+function system_post_update_fast_404_paths(): void {
+  $config = \Drupal::configFactory()->getEditable('system.performance');
+  // Only update sites that are still using the previous default value.
+  if ($config->get('fast_404.paths') === '/\.(?:txt|png|gif|jpe?g|css|js|ico|swf|flv|cgi|bat|pl|dll|exe|asp)$/i') {
+    $config->set('fast_404.paths', '/\.(?:txt|png|gif|jpe?g|css|js|ico|swf|flv|cgi|bat|pl|dll|exe|asp|php|json|xml|zip|sql|gz|tar|bak)$/i');
+    $config->save();
+  }
+}
