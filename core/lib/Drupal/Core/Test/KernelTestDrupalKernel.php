@@ -11,26 +11,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Subclass of DrupalKernel for kernel testing.
  *
- * This class extends the DrupalKernel to allow re-use of the dependency
- * injection container between kernel test methods.
+ * This class extends the DrupalKernel to share the dependency injection
+ * container between kernel tests.
  *
  * @internal only use in tests.
  */
 class KernelTestDrupalKernel extends DrupalKernel {
 
   use SharedContainerKernelTrait;
-
-  /**
-   * Whether to load the stored container even if the module list is set.
-   *
-   * Only overrides when it's TRUE, FALSE does nothing.
-   */
-  protected bool $overrideNeedsRebuild = FALSE;
-
-  /**
-   * An ID suffix to increment on rebuilds.
-   */
-  protected int $idSuffix = 0;
 
   /**
    * The test whose container is shared with other tests, if any.
@@ -50,7 +38,7 @@ class KernelTestDrupalKernel extends DrupalKernel {
   /**
    * Whether containers rebuilt after the kernel booted are stored.
    */
-  protected bool $allowDumpingAfterBoot = FALSE;
+  protected bool $storeRebuiltContainers = FALSE;
 
   /**
    * Whether the kernel booted with a shared container.
@@ -69,7 +57,7 @@ class KernelTestDrupalKernel extends DrupalKernel {
    * with the same container identifier load the stored container instead of
    * compiling it. The container the kernel boots with is shared, and so are
    * the containers for the module lists that the test changes to later. Other
-   * rebuilt containers are only stored for this process, because the test may
+   * rebuilt containers are only used by this process, because the test may
    * have changed something that the identifier does not cover.
    *
    * @param string $directory
@@ -86,66 +74,34 @@ class KernelTestDrupalKernel extends DrupalKernel {
    *   Whether to store the container the kernel boots with if it is compiled.
    *   Its identifier does not cover configuration and state, so it can only
    *   be stored when it is compiled with an empty database.
+   * @param bool $store_rebuilt
+   *   Whether to store containers that are rebuilt later, and load them back.
+   *   Otherwise the compiled container builder is used.
    */
-  public function shareContainer(string $directory, ServiceProviderInterface $test, \Closure $test_key, \Closure $set_test_container, bool $store): void {
+  public function shareContainer(string $directory, ServiceProviderInterface $test, \Closure $test_key, \Closure $set_test_container, bool $store, bool $store_rebuilt): void {
     $this->sharedContainerTest = $test;
     $this->sharedContainerTestKey = $test_key;
     $this->setTestContainer = $set_test_container;
-    $this->allowDumpingAfterBoot = $this->allowDumping;
     $this->allowDumping = $store;
+    $this->storeRebuiltContainers = $store_rebuilt;
     $this->defaultBootstrapContainerDefinition['services']['container_storage'] = TestContainerStorage::getServiceDefinition($directory);
-  }
-
-  /**
-   * Sets whether the container needs to be rebuilt.
-   *
-   * @param bool $rebuild
-   *   TRUE to rebuild the container when it is next initialized, FALSE to
-   *   load the stored container if possible.
-   */
-  public function setContainerNeedsRebuild(bool $rebuild): void {
-    $this->containerNeedsRebuild = $rebuild;
-  }
-
-  /**
-   * Resets the ID suffix to 0.
-   */
-  public function resetIdSuffix(): void {
-    $this->idSuffix = 0;
-  }
-
-  /**
-   * Sets whether to load the stored container even if the module list is set.
-   *
-   * @param bool $use
-   *   TRUE to load the stored container once when the container is next
-   *   initialized, instead of rebuilding it.
-   */
-  public function setOverrideNeedsRebuild(bool $use): void {
-    $this->overrideNeedsRebuild = $use;
   }
 
   /**
    * {@inheritdoc}
    */
   protected function getContainerIdentifier(): string {
+    if (!$this->sharedContainerTest) {
+      return parent::getContainerIdentifier();
+    }
     if ($this->updatingModules) {
       return $this->getSharedContainerIdentifier(TRUE);
     }
     if ($this->sharedContainerBooted) {
-      // A rebuilt container is only loaded again by the process that stored
-      // it, so it must not be found by any other.
-      return 'private:' . getmypid() . ':' . $this->idSuffix;
+      // A rebuilt container is only loaded by the process that stored it.
+      return 'private:' . getmypid();
     }
-    if ($this->sharedContainerTest) {
-      return $this->getSharedContainerIdentifier();
-    }
-    $identifier = parent::getContainerIdentifier();
-    // Vary by the suffix, so that a container rebuilt during a test method is
-    // written under its own identifier and does not overwrite the initial
-    // container that the other test methods of the class load.
-    $identifier .= ':' . $this->idSuffix;
-    return $identifier;
+    return $this->getSharedContainerIdentifier();
   }
 
   /**
@@ -166,10 +122,8 @@ class KernelTestDrupalKernel extends DrupalKernel {
     if ($this->sharedContainerTest) {
       ($this->setTestContainer)($container);
       if (!$this->sharedContainerBooted) {
-        // Containers that are rebuilt later are stored in the same way as
-        // without sharing, unless the module list changes.
         $this->sharedContainerBooted = TRUE;
-        $this->allowDumping = $this->allowDumpingAfterBoot;
+        $this->allowDumping = $this->storeRebuiltContainers;
       }
     }
     return $container;
@@ -179,12 +133,10 @@ class KernelTestDrupalKernel extends DrupalKernel {
    * {@inheritdoc}
    */
   protected function getContainerFromStorage(string $container_id): ?ContainerInterface {
-    if ($this->updatingModules) {
-      return $this->bootstrapContainer->get('container_storage')->load($container_id);
-    }
-    if ($this->overrideNeedsRebuild) {
-      // Only override once.
-      $this->overrideNeedsRebuild = FALSE;
+    // The parent compiles the container when the module list is set, as it is
+    // when the kernel boots and when the module list changes. The shared
+    // identifier covers the module list, so a stored container can be used.
+    if ($this->sharedContainerTest && (!$this->sharedContainerBooted || $this->updatingModules)) {
       return $this->bootstrapContainer->get('container_storage')->load($container_id);
     }
     return parent::getContainerFromStorage($container_id);
@@ -209,22 +161,6 @@ class KernelTestDrupalKernel extends DrupalKernel {
       $this->updatingModules = FALSE;
       $this->allowDumping = $allow_dumping;
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function rebuildContainer() {
-    $this->idSuffix++;
-    return parent::rebuildContainer();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function resetContainer(): ContainerInterface {
-    $this->idSuffix++;
-    return parent::resetContainer();
   }
 
 }
