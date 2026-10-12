@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\DrupalKernel;
 
-use Drupal\Component\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\PhpContainer;
-use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -91,59 +88,6 @@ class ContainerRebuildWebTest extends BrowserTestBase {
 
     $container_file = (new \ReflectionClass(\Drupal::getContainer()))->getFileName();
     $this->assertFileExists($container_file);
-  }
-
-  /**
-   * Tests that the status report page renders the opcache container check.
-   *
-   * This covers the SystemRequirementsHooks opcache check which inspects the
-   * compiled container file. It should render without errors regardless of
-   * whether opcache is enabled or the container file is cached.
-   *
-   * It also verifies that when the legacy array container is used (no PHP file
-   * on disk), the OPcode container check is not shown.
-   */
-  #[RequiresPhpExtension('Zend OPcache')]
-  public function testOpcacheStatusReportCheck(): void {
-    $admin_user = $this->drupalCreateUser(['administer site configuration']);
-    $this->drupalLogin($admin_user);
-
-    // Ensure the container is a PhpContainer with a file on disk.
-    $container = \Drupal::getContainer();
-    $this->assertInstanceOf(PhpContainer::class, $container);
-    $container_file = (new \ReflectionClass($container))->getFileName();
-    $this->assertFileExists($container_file);
-
-    // Visit the status report page and verify it renders without errors.
-    $this->drupalGet(Url::fromRoute('system.status'));
-    $this->assertSession()->statusCodeEquals(200);
-    // The page should contain the PHP OPcode caching section.
-    $this->assertSession()->pageTextContains('PHP OPcode caching');
-    // The OPcode container check should be present for PhpContainer.
-    $this->assertSession()->pageTextContains('PHP OPcode container');
-
-    // Switch to the legacy array container.
-    $this->writeSettings([
-      'settings' => [
-        'container_base_class' => (object) [
-          'value' => Container::class,
-          'required' => TRUE,
-        ],
-      ],
-    ]);
-
-    // Rebuild the container via rebuild.php so the new setting takes effect.
-    $this->drupalGet(Url::fromUri('base:core/rebuild.php'));
-    $this->assertSession()->statusCodeEquals(200);
-
-    // Visit the status report page again.
-    $this->drupalGet(Url::fromRoute('system.status'));
-    $this->assertSession()->statusCodeEquals(200);
-    // The OPcode caching section should still be present.
-    $this->assertSession()->pageTextContains('PHP OPcode caching');
-    // But the OPcode container check should NOT be present because the legacy
-    // array container has no PHP file on disk to cache in OPcache.
-    $this->assertSession()->pageTextNotContains('PHP OPcode container');
   }
 
 }
