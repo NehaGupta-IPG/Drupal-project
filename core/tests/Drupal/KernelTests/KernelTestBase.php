@@ -317,7 +317,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    */
   protected function sharesContainer(): bool {
     // An empty directory turns sharing off.
-    if (!getenv(self::CONTAINER_DIRECTORY_ENV) || !ShareContainer::isEnabledFor(static::class)) {
+    if (!getenv(self::CONTAINER_DIRECTORY_ENV) || !ShareContainer::isEnabledFor(static::class, !$this->registersServices())) {
       return FALSE;
     }
     // Shared containers are compiled to PHP code.
@@ -359,11 +359,18 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    *   The service ID.
    */
   private function getServiceId(): string {
+    return $this->registersServices() || $this->implementsHooksOrRoutes() ? static::class : self::class;
+  }
+
+  /**
+   * Returns whether this test class registers or alters services.
+   *
+   * @return bool
+   *   TRUE if the test class overrides ::register(), or alters services.
+   */
+  private function registersServices(): bool {
     $register = new \ReflectionMethod($this, 'register');
-    if ($register->getDeclaringClass()->getName() !== self::class || $this instanceof ServiceModifierInterface || $this->implementsHooksOrRoutes()) {
-      return static::class;
-    }
-    return self::class;
+    return $register->getDeclaringClass()->getName() !== self::class || $this instanceof ServiceModifierInterface;
   }
 
   /**

@@ -14,11 +14,16 @@ namespace Drupal\TestTools\Attribute;
  * turns sharing off.
  *
  * A stored container is identified by the modules, the service files and the
- * service providers that build it. When a test class registers services in
- * ::register(), the test class is part of the identifier as well. A test class
- * whose container depends on anything else, such as state that changes between
- * its test methods, must declare #[ShareContainer(FALSE)]. So must a test
- * class that tests how the container is compiled.
+ * service providers that build it. A test class whose container depends on
+ * anything else must declare #[ShareContainer(FALSE)]. So must a test class
+ * that inspects service definitions, because a shared container does not have
+ * them.
+ *
+ * A test class that registers services in ::register() or alters them does not
+ * share its container by default, because ::register() often adds objects
+ * that only exist in the process that compiled the container. Such a test
+ * class can declare #[ShareContainer] to share its container with itself. The
+ * test class is then part of the identifier.
  *
  * Subclasses inherit the attribute.
  *
@@ -40,19 +45,21 @@ class ShareContainer {
    *
    * @param string $class
    *   The name of the class to check.
+   * @param bool $default
+   *   (optional) Whether the class shares its container if neither it nor its
+   *   parents declare the attribute. Defaults to TRUE.
    *
    * @return bool
-   *   FALSE if the class or one of its parents declares that it does not share
-   *   its container, TRUE otherwise.
+   *   The value that the class or its closest parent declares, or the default.
    */
-  public static function isEnabledFor(string $class): bool {
+  public static function isEnabledFor(string $class, bool $default = TRUE): bool {
     for ($reflection = new \ReflectionClass($class); $reflection; $reflection = $reflection->getParentClass()) {
       $attributes = $reflection->getAttributes(self::class);
       if ($attributes !== []) {
         return $attributes[0]->newInstance()->enabled;
       }
     }
-    return TRUE;
+    return $default;
   }
 
 }

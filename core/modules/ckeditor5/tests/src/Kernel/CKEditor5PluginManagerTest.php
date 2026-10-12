@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\ckeditor5\Kernel;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\TestTools\Attribute\ShareContainer;
 use Drupal\ckeditor5\Annotation\CKEditor5AspectsOfCKEditor5Plugin;
 use Drupal\ckeditor5\Annotation\DrupalAspectsOfCKEditor5Plugin;
 use Drupal\ckeditor5\HTMLRestrictions;
@@ -35,6 +36,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 #[Group('ckeditor5')]
 #[RunTestsInSeparateProcesses]
+#[ShareContainer(FALSE)]
 class CKEditor5PluginManagerTest extends KernelTestBase {
 
   use SchemaCheckTestTrait;

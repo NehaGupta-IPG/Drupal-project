@@ -7,6 +7,7 @@ namespace Drupal\KernelTests;
 use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\PhpContainer;
+use Drupal\TestTools\Attribute\ShareContainer;
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[CoversClass(KernelTestBase::class)]
 #[Group('KernelTests')]
 #[RunTestsInSeparateProcesses]
+#[ShareContainer]
 class KernelTestShareContainerTest extends KernelTestBase {
 
   /**

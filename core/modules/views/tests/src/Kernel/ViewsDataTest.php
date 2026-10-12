@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel;
 
+use Drupal\TestTools\Attribute\ShareContainer;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -12,6 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
+#[ShareContainer(FALSE)]
 class ViewsDataTest extends ViewsKernelTestBase {
 
   /**

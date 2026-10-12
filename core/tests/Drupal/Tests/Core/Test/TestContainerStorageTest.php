@@ -58,4 +58,20 @@ class TestContainerStorageTest extends UnitTestCase {
     $this->assertSame(['hook' => []], $container->get('keyvalue')->get('hook_data')->get('hook_list'));
   }
 
+  /**
+   * Tests that a container that cannot be dumped is not stored.
+   */
+  public function testDumpFailure(): void {
+    vfsStream::setup('containers');
+    $storage = new TestContainerStorage(vfsStream::url('containers'), new Settings([]));
+
+    $builder = new ContainerBuilder();
+    $builder->register('service', \ArrayObject::class)
+      ->addArgument([new \stdClass()]);
+    $builder->compile();
+
+    $storage->dump($builder, 'identifier');
+    $this->assertNull($storage->load('identifier'));
+  }
+
 }

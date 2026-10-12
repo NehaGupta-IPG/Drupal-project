@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Console;
 
+use Drupal\TestTools\Attribute\ShareContainer;
 use Drupal\autowire_test\TestInjection;
 use Drupal\console_test\Command\ConsoleExampleCommand;
 use Drupal\console_test\Command\ConsoleExampleConfigureCommand;
@@ -24,6 +25,7 @@ use Symfony\Component\Console\Command\LazyCommand;
 #[RunTestsInSeparateProcesses]
 #[CoversClass(ConsoleCompilerPass::class)]
 #[CoversClass(ConsoleExampleCommand::class)]
+#[ShareContainer(FALSE)]
 class ConsoleTest extends KernelTestBase {
   use DrupalApplicationTesterTrait;
 

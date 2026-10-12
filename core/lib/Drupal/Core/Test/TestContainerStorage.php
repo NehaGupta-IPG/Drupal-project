@@ -10,6 +10,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * Stores compiled containers in a directory shared by the tests of a run.
@@ -83,7 +84,14 @@ class TestContainerStorage extends PhpDumperContainerStorage {
    * {@inheritdoc}
    */
   public function dump(ContainerBuilder $container, string $identifier): void {
-    [$hash, $code] = $this->dumpCode($container);
+    try {
+      [$hash, $code] = $this->dumpCode($container);
+    }
+    catch (RuntimeException) {
+      // The container cannot be dumped, for example because a service argument
+      // is an object. The test uses the container builder instead.
+      return;
+    }
     if (!file_exists($this->getContainerPath($hash))) {
       $this->write($this->getContainerPath($hash), $code);
     }
