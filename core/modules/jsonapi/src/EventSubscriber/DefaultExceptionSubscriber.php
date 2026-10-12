@@ -46,7 +46,9 @@ class DefaultExceptionSubscriber extends SerializationDefaultExceptionSubscriber
       return;
     }
     if (($exception = $event->getThrowable()) && !$exception instanceof HttpException) {
-      $exception = new HttpException(500, 'Internal Server Error', $exception);
+      $exception_message = $exception->getMessage();
+      $exception_message = $this->isSqlError($exception_message) ? 'Internal Server Error: SQL' : $exception_message;
+      $exception = new HttpException(500, $exception_message, $exception);
       $event->setThrowable($exception);
     }
 
@@ -86,6 +88,22 @@ class DefaultExceptionSubscriber extends SerializationDefaultExceptionSubscriber
     $request = $exception_event->getRequest();
     $parameters = $request->attributes->all();
     return $request->getRequestFormat() === 'api_json' || (bool) Routes::getResourceTypeNameFromParameters($parameters);
+  }
+
+  /**
+   * Checks error message for indication of SQL content.
+   * 
+   * @param string exception message.
+   * 
+   * @return bool
+   *   TRUE if the message looks SQL related, FALSE otherwise.
+   */
+  protected function isSqlError($exception_message): bool {
+  $match = FALSE;
+  $match = str_contains($exception_message, 'SQLSTATE') ? TRUE : $match;
+  $match = str_contains($exception_message, 'SQL syntax') ? TRUE : $match;
+
+  return $match;
   }
 
 }
