@@ -23,9 +23,17 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * first and then renamed, so that tests running in parallel never read a
  * partial file.
  *
- * Nothing is ever deleted: the test runner removes the directory after the
- * run. The identifier must change whenever the compiled container would
- * change, because a stored container is never replaced by a different one.
+ * Identifiers that start with 'shared:' are shared by all tests, so they must
+ * change whenever the compiled container would change. Test kernels build them
+ * from everything the compiled container depends on. Other identifiers belong
+ * to the site that stores them, like those of any other container storage: a
+ * functional test and its child site use them to find the container of the
+ * test site.
+ *
+ * Containers are never deleted: the test runner removes the directory after
+ * the run.
+ *
+ * @see \Drupal\Core\Test\SharedContainerKernelTrait
  *
  * @internal
  */
@@ -54,6 +62,31 @@ class TestContainerStorage extends PhpDumperContainerStorage {
   }
 
   /**
+   * Returns the bootstrap container definition of this container storage.
+   *
+   * @param string $directory
+   *   The directory to store containers in.
+   *
+   * @return array
+   *   The service definition.
+   *
+   * @see \Drupal\Core\DrupalKernel::$defaultBootstrapContainerDefinition
+   */
+  public static function getServiceDefinition(string $directory): array {
+    return [
+      'class' => static::class,
+      'arguments' => [
+        $directory,
+        '@settings',
+        [
+          'app.root' => '%app.root%',
+          'site.path' => '%site.path%',
+        ],
+      ],
+    ];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function load(string $identifier): ?ContainerInterface {
@@ -72,12 +105,30 @@ class TestContainerStorage extends PhpDumperContainerStorage {
     $container = $this->createContainer($containerClass);
 
     // Compiling the container writes the hook implementations to key value
-    // storage, which belongs to the test that compiled it.
+    // storage, which belongs to the test that compiled it. A container of
+    // this site was compiled or loaded by this site, which wrote them.
     // @see \Drupal\Core\Hook\HookCollectorKeyValueWritePass
-    $container->get('keyvalue')->get('hook_data')->setMultiple($hook_data);
-    $container->get('cache.bootstrap')->deleteMultiple(['hook_data', 'theme_hook_data']);
+    if ($this->isShared($identifier)) {
+      $container->get('keyvalue')->get('hook_data')->setMultiple($hook_data);
+      $container->get('cache.bootstrap')->deleteMultiple(['hook_data', 'theme_hook_data']);
+    }
 
     return $container;
+  }
+
+  /**
+   * Stores a container under another identifier as well.
+   *
+   * @param string $identifier
+   *   The identifier to add.
+   * @param string $existing_identifier
+   *   The identifier of a stored container.
+   */
+  public function addIdentifier(string $identifier, string $existing_identifier): void {
+    $data = @file_get_contents($this->getIdentifierPath($existing_identifier));
+    if ($data !== FALSE) {
+      $this->write($this->getIdentifierPath($identifier), $data);
+    }
   }
 
   /**
@@ -105,8 +156,14 @@ class TestContainerStorage extends PhpDumperContainerStorage {
    * {@inheritdoc}
    */
   public function invalidate(): void {
-    // Stored containers are shared with other tests, so they are never
-    // invalidated. A test that changes its container rebuilds it.
+    // Shared identifiers change whenever their container would change, so
+    // only the identifiers of this site are removed.
+    $prefix = $this->getSitePrefix();
+    foreach (scandir($this->directory) ?: [] as $filename) {
+      if (str_starts_with($filename, $prefix)) {
+        @unlink($this->directory . '/' . $filename);
+      }
+    }
   }
 
   /**
@@ -126,7 +183,32 @@ class TestContainerStorage extends PhpDumperContainerStorage {
    *   The path.
    */
   protected function getIdentifierPath(string $identifier): string {
-    return $this->directory . '/' . hash('xxh128', $identifier) . '.id';
+    $prefix = $this->isShared($identifier) ? '' : $this->getSitePrefix();
+    return $this->directory . '/' . $prefix . hash('xxh128', $identifier) . '.id';
+  }
+
+  /**
+   * Returns whether an identifier is shared by all tests.
+   *
+   * @param string $identifier
+   *   The container identifier.
+   *
+   * @return bool
+   *   TRUE if the identifier is shared by all tests, FALSE if it belongs to the
+   *   site.
+   */
+  protected function isShared(string $identifier): bool {
+    return str_starts_with($identifier, 'shared:');
+  }
+
+  /**
+   * Returns the file name prefix of the identifiers of this site.
+   *
+   * @return string
+   *   The prefix.
+   */
+  protected function getSitePrefix(): string {
+    return 'site-' . hash('xxh128', $this->runtimeParameters['site.path'] ?? '') . '-';
   }
 
   /**

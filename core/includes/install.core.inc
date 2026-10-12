@@ -434,8 +434,10 @@ function install_begin_request($class_loader, &$install_state): void {
   $GLOBALS['conf']['container_service_providers']['InstallerConfigOverride'] = 'Drupal\Core\Installer\ConfigOverride';
 
   // Note, InstallerKernel::createFromRequest() is not used because Settings is
-  // already initialized.
-  $kernel = new InstallerKernel($environment, $class_loader, FALSE);
+  // already initialized. Another kernel class is only used by the testing
+  // framework, to reduce the number of container rebuilds during test runs.
+  $kernel_class = $install_state['kernel_class'] ?? InstallerKernel::class;
+  $kernel = new $kernel_class($environment, $class_loader, FALSE);
   $kernel::bootEnvironment();
 
   // Add list of all available profiles to the installation state.

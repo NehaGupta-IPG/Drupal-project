@@ -28,6 +28,14 @@ class TestRunnerKernel extends DrupalKernel {
     // always have to rebuild its container, and potentially avoid isolation
     // issues against the tests.
     parent::__construct($environment, $class_loader, FALSE, $app_root);
+
+    // Tests in a run that shares containers share the container of the test
+    // runner as well. It only depends on the site that runs the tests.
+    // @see \Drupal\Core\Test\TestContainerStorage
+    if ($directory = getenv('DRUPAL_TEST_CONTAINER_DIRECTORY')) {
+      $this->allowDumping = TRUE;
+      $this->defaultBootstrapContainerDefinition['services']['container_storage'] = TestContainerStorage::getServiceDefinition($directory);
+    }
   }
 
   /**
@@ -55,10 +63,10 @@ class TestRunnerKernel extends DrupalKernel {
     // In addition, ensure that PHP errors are not hidden away in logs.
     ini_set('display_errors', TRUE);
 
-    // This container is never going to be dumped and therefore it needs a
-    // rebuild. Setting this flag avoids trying to load the container from
-    // cache.
-    $this->containerNeedsRebuild = TRUE;
+    // Unless containers are shared, this container is never going to be dumped
+    // and therefore it needs a rebuild. Setting this flag avoids trying to load
+    // the container from cache.
+    $this->containerNeedsRebuild = !$this->allowDumping;
 
     parent::boot();
 

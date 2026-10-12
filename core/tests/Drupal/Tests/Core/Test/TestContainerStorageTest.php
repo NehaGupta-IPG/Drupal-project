@@ -32,7 +32,7 @@ class TestContainerStorageTest extends UnitTestCase {
     vfsStream::setup('containers');
     $directory = vfsStream::url('containers');
     $storage = new TestContainerStorage($directory, new Settings([]), ['site.path' => 'sites/runtime']);
-    $this->assertNull($storage->load('first'));
+    $this->assertNull($storage->load('shared:first'));
 
     $builder = new ContainerBuilder();
     $builder->setParameter('test_param', $this->randomMachineName());
@@ -48,14 +48,26 @@ class TestContainerStorageTest extends UnitTestCase {
     // Compiling the container writes the hook implementations.
     $builder->get('keyvalue')->get('hook_data')->set('hook_list', ['hook' => []]);
 
-    $storage->dump($builder, 'first');
-    $storage->dump($builder, 'second');
+    $storage->dump($builder, 'shared:first');
+    $storage->dump($builder, 'shared:second');
     // Both identifiers share one container file.
     $this->assertCount(1, preg_grep('/\.php$/', scandir($directory)));
 
-    $container = $storage->load('second');
+    // Loading a shared container writes the hook implementations.
+    $container = $storage->load('shared:second');
     $this->assertSame(['sites/runtime'], $container->get('service')->getArrayCopy());
     $this->assertSame(['hook' => []], $container->get('keyvalue')->get('hook_data')->get('hook_list'));
+
+    // Other identifiers belong to the site, and are removed when the site
+    // invalidates its container.
+    $other_site_storage = new TestContainerStorage($directory, new Settings([]), ['site.path' => 'sites/other']);
+    $storage->addIdentifier('site', 'shared:first');
+    $this->assertNotNull($storage->load('site'));
+    $this->assertNull($other_site_storage->load('site'));
+    $this->assertNotNull($other_site_storage->load('shared:first'));
+    $storage->invalidate();
+    $this->assertNull($storage->load('site'));
+    $this->assertNotNull($storage->load('shared:first'));
   }
 
   /**

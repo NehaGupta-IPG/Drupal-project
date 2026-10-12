@@ -6,9 +6,6 @@ namespace Drupal\Core\Test;
 
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DrupalKernel;
-use Drupal\Core\Language\Language;
-use Drupal\Core\Site\Settings;
-use Drupal\DrupalInstalled;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -20,6 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal only use in tests.
  */
 class KernelTestDrupalKernel extends DrupalKernel {
+
+  use SharedContainerKernelTrait;
 
   /**
    * Whether to load the stored container even if the module list is set.
@@ -94,17 +93,7 @@ class KernelTestDrupalKernel extends DrupalKernel {
     $this->setTestContainer = $set_test_container;
     $this->allowDumpingAfterBoot = $this->allowDumping;
     $this->allowDumping = $store;
-    $this->defaultBootstrapContainerDefinition['services']['container_storage'] = [
-      'class' => TestContainerStorage::class,
-      'arguments' => [
-        $directory,
-        '@settings',
-        [
-          'app.root' => '%app.root%',
-          'site.path' => '%site.path%',
-        ],
-      ],
-    ];
+    $this->defaultBootstrapContainerDefinition['services']['container_storage'] = TestContainerStorage::getServiceDefinition($directory);
   }
 
   /**
@@ -160,77 +149,13 @@ class KernelTestDrupalKernel extends DrupalKernel {
   }
 
   /**
-   * Returns the identifier of a container that is shared with other tests.
-   *
-   * The identifier covers what the compiled container depends on. The site
-   * path, which differs for every test, is not part of it: the container
-   * storage sets it when it loads the container.
-   *
-   * @param bool $include_configuration
-   *   Whether the identifier covers the configuration and state that the
-   *   container depends on. The container the kernel boots with is only
-   *   compiled with an empty database, so its identifier does not.
-   *
-   * @return string
-   *   The container identifier.
+   * {@inheritdoc}
    */
-  protected function getSharedContainerIdentifier(bool $include_configuration = FALSE): string {
-    $this->discoverServiceProviders();
-
-    // Service files from settings are copied into the site directory, so
-    // their content identifies them, not their path.
-    $site_yamls = array_map(fn (string $filename): string => hash_file('xxh128', $filename), $this->serviceYamls['site']);
-    $site_providers = array_map(fn (string|object $provider): string => match (TRUE) {
-      $provider === $this->sharedContainerTest => ($this->sharedContainerTestKey)(),
-      is_object($provider) => $provider::class,
-      default => $provider,
-    }, $this->serviceProviderClasses['site']);
-
-    // The parent identifier is not used, because it contains the paths of the
-    // service files from settings.
-    $parts = [
-      $this->environment,
-      class_exists(DrupalInstalled::class) ? DrupalInstalled::VERSIONS_HASH : \Drupal::VERSION,
-      Settings::get('deployment_identifier'),
-      PHP_OS,
-      // The theme list and the install profile come from configuration, so
-      // they are always empty when a shared container is compiled.
-      $this->getExtensionFileNames($this->moduleList, [$this, 'moduleData']),
-      Language::$defaultValues,
-      $site_yamls,
-      $site_providers,
-      // \Drupal\Core\CoreServiceProvider only registers the private stream
-      // wrapper when this is set.
-      (bool) Settings::get('file_private_path'),
-      Settings::get('container_base_class'),
-    ];
-    if ($include_configuration) {
-      $parts[] = $this->getContainerConfiguration();
+  protected function getServiceProviderKey(string|object $provider): string {
+    if ($provider === $this->sharedContainerTest) {
+      return ($this->sharedContainerTestKey)();
     }
-    return 'shared:' . hash('xxh128', serialize($parts));
-  }
-
-  /**
-   * Returns the configuration and state that compiling the container reads.
-   *
-   * @return array
-   *   The configuration and state.
-   */
-  protected function getContainerConfiguration(): array {
-    $config_storage = $this->getConfigStorage();
-    return [
-      $this->getExtensionFileNames($this->themeList ?? [], [$this, 'themeExtensions']),
-      $this->getInstallProfile() ?: NULL,
-      // The default language.
-      // @see \Drupal\Core\DrupalKernel::compileContainer()
-      // @see \Drupal\language\LanguageServiceProvider
-      $config_storage->read('system.site'),
-      $config_storage->listAll('language.entity.'),
-      // @see \Drupal\locale\LocaleServiceProvider
-      $config_storage->read('locale.settings'),
-      // @see \Drupal\Core\DependencyInjection\Compiler\DevelopmentSettingsPass
-      $this->container->get('keyvalue')->get('development_settings')->getAll(),
-    ];
+    return is_object($provider) ? $provider::class : $provider;
   }
 
   /**

@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Installer;
 
-use Drupal\Component\Datetime\Time;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\NullBackendFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -54,7 +53,7 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     // tag/parameter.
     $definition = $container->getDefinition('cache.file_parsing');
     $definition->setClass(MemoryBackend::class);
-    $definition->setArguments([new Time()]);
+    $definition->setArguments([new Reference('datetime.time')]);
     $definition->setFactory(NULL);
 
     // When installing from existing config, disabling the config cache entirely
