@@ -3,6 +3,8 @@
 namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Core\Database\Connection as DatabaseConnection;
+use Drupal\Core\Database\ConnectionParametersFactory;
+use Drupal\Core\Database\ConnectionParametersInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseAccessDeniedException;
 use Drupal\Core\Database\DatabaseConnectionRefusedException;
@@ -19,6 +21,8 @@ use Pdo\Mysql;
 
 /**
  * MySQL implementation of \Drupal\Core\Database\Connection.
+ *
+ * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
  */
 class Connection extends DatabaseConnection implements SupportsTemporaryTablesInterface {
 
@@ -69,7 +73,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function __construct(Mysql $connection, array $connection_options) {
+  public function __construct(Mysql $connection, ConnectionParameters $connection_options) {
     // If the SQL mode doesn't include 'ANSI_QUOTES' (explicitly or via a
     // combination mode), then MySQL doesn't interpret a double quote as an
     // identifier quote, in which case use the non-ANSI-standard backtick.
@@ -77,12 +81,12 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // @see https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#sqlmode_ansi_quotes
     $ansi_quotes_modes = ['ANSI_QUOTES', 'ANSI'];
     $is_ansi_quotes_mode = FALSE;
-    if (isset($connection_options['init_commands']['sql_mode'])) {
+    if (isset($connection_options->init_commands['sql_mode'])) {
       foreach ($ansi_quotes_modes as $mode) {
         // None of the modes in $ansi_quotes_modes are substrings of other modes
         // that are not in $ansi_quotes_modes, so a simple stripos() does not
         // return false positives.
-        if (stripos($connection_options['init_commands']['sql_mode'], $mode) !== FALSE) {
+        if (stripos($connection_options->init_commands['sql_mode'], $mode) !== FALSE) {
           $is_ansi_quotes_mode = TRUE;
           break;
         }
@@ -96,71 +100,43 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   }
 
   /**
-   * {@inheritdoc}
+   * Opens a client connection.
+   *
+   * @param \Drupal\Core\Database\ConnectionParametersInterface $connectionParameters
+   *   The database connection settings.
+   *
+   * @return \Pdo\Mysql
+   *   A client connection object.
    */
-  public static function open(#[\SensitiveParameter] array &$connection_options = []) {
+  public static function openWithParameters(ConnectionParametersInterface $connectionParameters): Mysql {
+    assert($connectionParameters instanceof ConnectionParameters);
+
     // The DSN should use either a socket or a host/port.
-    if (isset($connection_options['unix_socket'])) {
-      $dsn = 'mysql:unix_socket=' . $connection_options['unix_socket'];
+    if (isset($connectionParameters->unix_socket)) {
+      $dsn = 'mysql:unix_socket=' . $connectionParameters->unix_socket;
     }
     else {
       // Default to TCP connection on port 3306.
-      $dsn = 'mysql:host=' . $connection_options['host'] . ';port=' . (empty($connection_options['port']) ? 3306 : $connection_options['port']);
+      $dsn = 'mysql:host=' . $connectionParameters->host . ';port=' . $connectionParameters->port;
     }
     // Character set is added to dsn to ensure PDO uses the proper character
     // set when escaping. This has security implications. See
     // https://www.drupal.org/node/1201452 for further discussion.
-    $dsn .= ';charset=utf8mb4';
-    if (!empty($connection_options['database'])) {
-      $dsn .= ';dbname=' . $connection_options['database'];
-    }
-    // Allow PDO options to be overridden.
-    $connection_options += [
-      'pdo' => [],
-    ];
-    $connection_options['pdo'] += [
-      \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-    ];
-    // So we don't have to mess around with cursors and unbuffered queries by
-    // default.
-    $connection_options['pdo'] += [
-      Mysql::ATTR_USE_BUFFERED_QUERY => TRUE,
-    ];
-    // Make sure MySQL returns all matched rows on update queries including
-    // rows that actually didn't have to be updated because the values didn't
-    // change. This matches common behavior among other database systems.
-    $connection_options['pdo'] += [
-      Mysql::ATTR_FOUND_ROWS => TRUE,
-    ];
-    // Because MySQL's prepared statements skip the query cache.
-    $connection_options['pdo'] += [
-      \PDO::ATTR_EMULATE_PREPARES => TRUE,
-    ];
-    // Limit SQL to a single statement like mysqli.
-    $connection_options['pdo'] += [
-      Mysql::ATTR_MULTI_STATEMENTS => FALSE,
-    ];
-    // Convert numeric values to strings when fetching. In PHP 8.1,
-    // \PDO::ATTR_EMULATE_PREPARES now behaves the same way as non emulated
-    // prepares and returns integers. See https://externals.io/message/113294
-    // for further discussion.
-    $connection_options['pdo'] += [
-      \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
-    ];
+    $dsn .= ';charset=utf8mb4;dbname=' . $connectionParameters->database;
 
     try {
-      $mysql = new Mysql($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
+      $mysql = new Mysql($dsn, $connectionParameters->username, $connectionParameters->password, $connectionParameters->pdo);
     }
     catch (\PDOException $e) {
       switch ($e->getCode()) {
         case static::CONNECTION_REFUSED:
-          if (isset($connection_options['unix_socket'])) {
+          if (isset($connectionParameters->unix_socket)) {
             // Show message for socket connection via 'unix_socket' option.
             $message = 'Drupal is configured to connect to the database server via a socket, but the socket file could not be found.';
             $message .= ' This message normally means that there is no MySQL server running on the system or that you are using an incorrect Unix socket file name when trying to connect to the server.';
             throw new DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
           }
-          if (isset($connection_options['host']) && in_array(strtolower($connection_options['host']), ['', 'localhost'], TRUE)) {
+          if (isset($connectionParameters->host) && in_array(strtolower($connectionParameters->host), ['', 'localhost'], TRUE)) {
             // Show message for socket connection via 'host' option.
             $message = 'Drupal was attempting to connect to the database server via a socket, but the socket file could not be found.';
             $message .= ' A Unix socket file is used if you do not specify a host name or if you specify the special host name localhost.';
@@ -188,40 +164,33 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // certain one has been set; otherwise, MySQL defaults to
     // 'utf8mb4_general_ci' (MySQL 5) or 'utf8mb4_0900_ai_ci' (MySQL 8) for
     // utf8mb4.
-    if (!empty($connection_options['collation'])) {
-      $mysql->exec('SET NAMES utf8mb4 COLLATE ' . $connection_options['collation']);
+    if (!empty($connectionParameters->collation)) {
+      $mysql->exec('SET NAMES utf8mb4 COLLATE ' . $connectionParameters->collation);
     }
     else {
       $mysql->exec('SET NAMES utf8mb4');
     }
 
-    // Set MySQL init_commands if not already defined.  Default Drupal's MySQL
-    // behavior to conform more closely to SQL standards.  This allows Drupal
-    // to run almost seamlessly on many different kinds of database systems.
-    // These settings force MySQL to behave the same as postgresql, or sqlite
-    // in regards to syntax interpretation and invalid data handling.  See
-    // https://www.drupal.org/node/344575 for further discussion. Also, as MySQL
-    // 5.5 changed the meaning of TRADITIONAL we need to spell out the modes one
-    // by one.
-    $connection_options += [
-      'init_commands' => [],
-    ];
-
-    $connection_options['init_commands'] += [
-      'sql_mode' => "SET sql_mode = 'ANSI,TRADITIONAL'",
-    ];
-    if (!empty($connection_options['isolation_level'])) {
-      $connection_options['init_commands'] += [
-        'isolation_level' => 'SET SESSION TRANSACTION ISOLATION LEVEL ' . strtoupper($connection_options['isolation_level']),
-      ];
-    }
-
     // Execute initial commands.
-    foreach ($connection_options['init_commands'] as $sql) {
+    foreach ($connectionParameters->init_commands as $sql) {
       $mysql->exec($sql);
     }
 
     return $mysql;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   ::openWithParameters() instead.
+   *
+   * @see https://www.drupal.org/node/3626243
+   */
+  public static function open(#[\SensitiveParameter] array &$connection_options = []) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ::openWithParameters() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    /** @var UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $connection_options */
+    return static::openWithParameters(ConnectionParametersFactory::createFromOptionsArray($connection_options));
   }
 
   /**
