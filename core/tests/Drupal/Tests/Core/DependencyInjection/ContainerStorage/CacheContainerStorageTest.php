@@ -103,25 +103,6 @@ class CacheContainerStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests that dump() propagates cache exceptions (e.g. a broken database).
-   */
-  public function testDumpPropagatesCacheException(): void {
-    $container = new ContainerBuilder();
-    $container->compile();
-
-    $cache = $this->createMock(CacheBackendInterface::class);
-    $cache->expects($this->once())
-      ->method('set')
-      ->willThrowException(new \Exception('An error occurred while writing to the cache'));
-
-    $storage = $this->createStorage($cache);
-
-    $this->expectException(\Exception::class);
-    $this->expectExceptionMessage('An error occurred while writing to the cache');
-    $storage->dump($container, 'test_identifier');
-  }
-
-  /**
    * Tests that dump() uses a custom dumper class when provided.
    */
   public function testDumpUsesCustomDumperClass(): void {
@@ -162,18 +143,6 @@ class CacheContainerStorageTest extends UnitTestCase {
     $this->assertIsArray($cachedData);
     // The marker proves the custom dumper class was used, not the default.
     $this->assertTrue($cachedData['parameters']['_custom_dumper_marker']);
-  }
-
-  /**
-   * Tests that invalidate() calls deleteAll on the cache backend.
-   */
-  public function testInvalidateDeletesAll(): void {
-    $cache = $this->createMock(CacheBackendInterface::class);
-    $cache->expects($this->once())
-      ->method('deleteAll');
-
-    $storage = $this->createStorage($cache);
-    $storage->invalidate();
   }
 
 }

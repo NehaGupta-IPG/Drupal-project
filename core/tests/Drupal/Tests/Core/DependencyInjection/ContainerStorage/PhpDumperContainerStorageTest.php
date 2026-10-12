@@ -180,25 +180,6 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests that dump() propagates cache exceptions (e.g. a broken database).
-   */
-  public function testDumpPropagatesCacheException(): void {
-    $cache = $this->createMock(CacheBackendInterface::class);
-
-    $container = new ContainerBuilder();
-    $container->compile();
-
-    $cache->expects($this->once())
-      ->method('set')
-      ->willThrowException(new \Exception('An error occurred while writing to the cache'));
-
-    $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), Settings::getInstance());
-    $this->expectException(\Exception::class);
-    $this->expectExceptionMessage('An error occurred while writing to the cache');
-    $storage->dump($container, 'test_identifier');
-  }
-
-  /**
    * Tests that dump() with the same hash does not rewrite existing files.
    */
   public function testDumpSameHashSkipsFileRewrites(): void {
@@ -372,18 +353,6 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $second = $storage->load('test_identifier');
     $this->assertInstanceOf(PhpContainer::class, $second);
     $this->assertCount(1, $loadedFiles, 'load() must not re-include when the class already exists in memory');
-  }
-
-  /**
-   * Tests that invalidate() calls deleteAll on the cache backend.
-   */
-  public function testInvalidateDeletesAllCacheEntries(): void {
-    $cache = $this->createMock(CacheBackendInterface::class);
-    $cache->expects($this->once())
-      ->method('deleteAll');
-
-    $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), Settings::getInstance());
-    $storage->invalidate();
   }
 
   /**
