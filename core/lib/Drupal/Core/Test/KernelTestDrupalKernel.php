@@ -65,13 +65,15 @@ class KernelTestDrupalKernel extends DrupalKernel {
   /**
    * {@inheritdoc}
    */
-  protected function getContainerFromCacheIfCacheable(): ?array {
+  protected function getContainerFromStorage($container_id): ?ContainerInterface {
     if ($this->overrideUseCache) {
       // Only override once.
       $this->overrideUseCache = FALSE;
-      return $this->getCachedContainerDefinition();
+      $storage = $this->bootstrapContainer->get('container_storage');
+      $container = $storage->load($container_id);
+      return $container;
     }
-    return parent::getContainerFromCacheIfCacheable();
+    return parent::getContainerFromStorage();
   }
 
   /**
