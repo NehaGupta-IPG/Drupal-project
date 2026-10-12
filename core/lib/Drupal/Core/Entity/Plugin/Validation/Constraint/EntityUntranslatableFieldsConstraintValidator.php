@@ -47,6 +47,10 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
    * {@inheritdoc}
    */
   public function validate($entity, Constraint $constraint): void {
+    if (!isset($entity)) {
+      return;
+    }
+
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     /** @var \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityUntranslatableFieldsConstraint $constraint */
 
