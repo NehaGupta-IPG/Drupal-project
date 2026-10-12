@@ -24,6 +24,13 @@ class View extends AreaPluginBase {
   protected $isEmpty;
 
   /**
+   * The render array of the embedded view, once built.
+   *
+   * @var array|null
+   */
+  protected ?array $output = NULL;
+
+  /**
    * The view storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
@@ -101,13 +108,45 @@ class View extends AreaPluginBase {
    * {@inheritdoc}
    */
   public function render($empty = FALSE) {
+    return $this->buildEmbeddedView();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isEmpty() {
+    // The display asks whether its output is empty before the areas are
+    // rendered, which happens in a #pre_render callback, so build the embedded
+    // view now if that has not happened yet.
+    if (!isset($this->isEmpty)) {
+      $this->buildEmbeddedView();
+    }
+    return $this->isEmpty;
+  }
+
+  /**
+   * Builds the embedded view and records whether its output is empty.
+   *
+   * The result is kept, so that isEmpty() and render() run the embedded view
+   * only once between them.
+   *
+   * @return array
+   *   The render array of the embedded view, or an empty array.
+   */
+  protected function buildEmbeddedView(): array {
+    if (isset($this->output)) {
+      return $this->output;
+    }
+    $this->isEmpty = TRUE;
+    $this->output = [];
+
     if (!empty($this->options['view_to_insert'])) {
       [$view_name, $display_id] = explode(':', $this->options['view_to_insert']);
 
       $view = $this->viewStorage->load($view_name)->getExecutable();
 
       if (empty($view) || !$view->access($display_id)) {
-        return [];
+        return $this->output;
       }
       $view->setDisplay($display_id);
 
@@ -126,28 +165,15 @@ class View extends AreaPluginBase {
       }
       else {
         if (!empty($this->options['inherit_arguments']) && !empty($this->view->args)) {
-          $output = $view->preview($display_id, $this->view->args);
+          $this->output = $view->preview($display_id, $this->view->args);
         }
         else {
-          $output = $view->preview($display_id);
+          $this->output = $view->preview($display_id);
         }
         $this->isEmpty = $view->display_handler->outputIsEmpty();
-        return $output;
       }
     }
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isEmpty() {
-    if (isset($this->isEmpty)) {
-      return $this->isEmpty;
-    }
-    else {
-      return parent::isEmpty();
-    }
+    return $this->output;
   }
 
   /**
