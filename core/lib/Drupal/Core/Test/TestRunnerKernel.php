@@ -32,7 +32,7 @@ class TestRunnerKernel extends DrupalKernel {
     // Tests in a run that shares containers share the container of the test
     // runner as well. It only depends on the site that runs the tests.
     // @see \Drupal\Core\Test\TestContainerStorage
-    if ($directory = getenv('DRUPAL_TEST_CONTAINER_DIRECTORY')) {
+    if ($directory = TestContainerStorage::getDirectory()) {
       $this->allowDumping = TRUE;
       $this->defaultBootstrapContainerDefinition['services']['container_storage'] = TestContainerStorage::getServiceDefinition($directory);
     }

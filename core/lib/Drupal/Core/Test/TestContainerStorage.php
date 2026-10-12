@@ -8,6 +8,7 @@ use Drupal\Component\PhpStorage\FileStorage;
 use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage;
+use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -40,6 +41,16 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 class TestContainerStorage extends PhpDumperContainerStorage {
 
   /**
+   * The environment variable that names the directory of shared containers.
+   *
+   * The test runner sets it for each run, unless it is set already. An empty
+   * value turns sharing off.
+   *
+   * @see \Drupal\TestTools\Attribute\ShareContainer
+   */
+  public const string ENVIRONMENT_VARIABLE = 'DRUPAL_TEST_CONTAINER_DIRECTORY';
+
+  /**
    * Constructs a TestContainerStorage.
    *
    * @param string $directory
@@ -62,6 +73,16 @@ class TestContainerStorage extends PhpDumperContainerStorage {
   }
 
   /**
+   * Returns the directory of containers shared between tests.
+   *
+   * @return string|null
+   *   The directory, or NULL if tests do not share their containers.
+   */
+  public static function getDirectory(): ?string {
+    return getenv(self::ENVIRONMENT_VARIABLE) ?: NULL;
+  }
+
+  /**
    * Returns the bootstrap container definition of this container storage.
    *
    * @param string $directory
@@ -78,10 +99,7 @@ class TestContainerStorage extends PhpDumperContainerStorage {
       'arguments' => [
         $directory,
         '@settings',
-        [
-          'app.root' => '%app.root%',
-          'site.path' => '%site.path%',
-        ],
+        DrupalKernel::CONTAINER_RUNTIME_PARAMETERS,
       ],
     ];
   }

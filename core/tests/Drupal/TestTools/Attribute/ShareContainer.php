@@ -28,7 +28,8 @@ namespace Drupal\TestTools\Attribute;
  *
  * Subclasses inherit the attribute.
  *
- * @see \Drupal\KernelTests\KernelTestBase::sharesContainer()
+ * @see \Drupal\KernelTests\KernelTestBase::getContainerDirectory()
+ * @see \Drupal\Core\Test\FunctionalTestSetupTrait::getContainerDirectory()
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class ShareContainer {

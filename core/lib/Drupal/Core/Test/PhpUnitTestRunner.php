@@ -263,9 +263,9 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     // Pass on the directory of containers shared between tests. Variables set
     // with putenv() are not passed to the process otherwise.
     // @see \Drupal\TestTools\Attribute\ShareContainer
-    $container_directory = getenv('DRUPAL_TEST_CONTAINER_DIRECTORY');
+    $container_directory = getenv(TestContainerStorage::ENVIRONMENT_VARIABLE);
     if ($container_directory !== FALSE) {
-      $process_environment_variables['DRUPAL_TEST_CONTAINER_DIRECTORY'] = $container_directory;
+      $process_environment_variables[TestContainerStorage::ENVIRONMENT_VARIABLE] = $container_directory;
     }
 
     // Determine the JUnit file path.

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -41,13 +42,26 @@ class KernelTestSharedContainerTest extends KernelTestBase {
   }
 
   /**
-   * Tests the number of container builds for each iteration of a test.
+   * Tests that containers are only compiled by the first test method.
    */
-  #[TestWith([1, 1])]
-  #[TestWith([2, 1])]
-  #[TestWith([3, 1])]
-  public function testContainerRebuilds($iteration, $container_rebuilds): void {
-    $this->assertSame($container_rebuilds, $this->container->get('state')->get('container_rebuild_test.count', 0), 'Container rebuilt once, iteration ' . $iteration);
+  #[TestWith([1])]
+  #[TestWith([2])]
+  #[TestWith([3])]
+  public function testContainerRebuilds(int $iteration): void {
+    if (!$this->getContainerDirectory()) {
+      $this->markTestSkipped('Containers are not shared.');
+    }
+    $this->assertInstanceOf(PhpContainer::class, $this->container);
+    $this->assertSame($this, $this->container->get(KernelTestBase::class));
+
+    // The container for the new module list is shared as well.
+    $this->enableModules(['user']);
+    $this->assertInstanceOf(PhpContainer::class, $this->container);
+    $this->assertSame($this, $this->container->get(KernelTestBase::class));
+
+    // The first test method compiled the container the kernel booted with,
+    // and the container for the new module list.
+    $this->assertSame(2, $this->container->get('state')->get('container_rebuild_test.count', 0), "Containers compiled once, iteration $iteration");
   }
 
   /**

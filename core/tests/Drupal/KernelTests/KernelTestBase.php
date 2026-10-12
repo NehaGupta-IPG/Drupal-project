@@ -171,13 +171,6 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
   private const string SHARED_DATABASE_PREFIX_ENV = 'DRUPAL_TEST_SHARED_DB_PREFIX';
 
   /**
-   * Environment variable naming the directory of shared containers.
-   *
-   * @see \Drupal\TestTools\Attribute\ShareContainer
-   */
-  private const string CONTAINER_DIRECTORY_ENV = 'DRUPAL_TEST_CONTAINER_DIRECTORY';
-
-  /**
    * The directory of shared containers that the test runner created.
    *
    * A test class that shares its environment shares its containers between
@@ -318,23 +311,25 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
   }
 
   /**
-   * Returns whether this test shares its compiled container with other tests.
+   * Returns the directory of containers shared between tests.
    *
-   * @return bool
-   *   TRUE if the container that the kernel boots with is shared.
+   * @return string|null
+   *   The directory, or NULL if this test does not share its containers.
    *
    * @see \Drupal\TestTools\Attribute\ShareContainer
    */
-  protected function sharesContainer(): bool {
-    // An empty directory turns sharing off. A test class that shares its
-    // environment shares its container between its test methods, even when it
-    // registers services.
-    if (!getenv(self::CONTAINER_DIRECTORY_ENV) || !ShareContainer::isEnabledFor(static::class, !$this->registersServices() || static::sharesEnvironment())) {
-      return FALSE;
+  protected function getContainerDirectory(): ?string {
+    // A test class that shares its environment shares its container between
+    // its test methods, even when it registers services.
+    if (!ShareContainer::isEnabledFor(static::class, !$this->registersServices() || static::sharesEnvironment())) {
+      return NULL;
     }
     // Shared containers are compiled to PHP code.
     $container_base_class = Settings::get('container_base_class');
-    return $container_base_class === NULL || is_a($container_base_class, PhpContainer::class, TRUE);
+    if ($container_base_class !== NULL && !is_a($container_base_class, PhpContainer::class, TRUE)) {
+      return NULL;
+    }
+    return TestContainerStorage::getDirectory();
   }
 
   /**
@@ -444,10 +439,10 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
 
     // Share the containers between the test methods, unless the tests of the
     // run share them already or sharing is turned off.
-    if (getenv(self::CONTAINER_DIRECTORY_ENV) === FALSE) {
+    if (getenv(TestContainerStorage::ENVIRONMENT_VARIABLE) === FALSE) {
       self::$containerDirectory = FileSystem::getOsTemporaryDirectory() . '/drupal-test-containers-' . $test_database->getDatabasePrefix();
       mkdir(self::$containerDirectory);
-      putenv(self::CONTAINER_DIRECTORY_ENV . '=' . self::$containerDirectory);
+      putenv(TestContainerStorage::ENVIRONMENT_VARIABLE . '=' . self::$containerDirectory);
     }
   }
 
@@ -474,7 +469,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     if (self::$containerDirectory !== NULL) {
       array_map('unlink', glob(self::$containerDirectory . '/*'));
       rmdir(self::$containerDirectory);
-      putenv(self::CONTAINER_DIRECTORY_ENV);
+      putenv(TestContainerStorage::ENVIRONMENT_VARIABLE);
       self::$containerDirectory = NULL;
     }
 
@@ -607,11 +602,11 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     }
 
     // Bootstrap the kernel. Do not use createFromRequest() to retain Settings.
-    $shares_container = $this->sharesContainer();
-    if ($shares_container) {
+    $container_directory = $this->getContainerDirectory();
+    if ($container_directory) {
       $this->setSetting('bootstrap_container_definition', [
         'services' => [
-          'container_storage' => TestContainerStorage::getServiceDefinition(getenv(self::CONTAINER_DIRECTORY_ENV)),
+          'container_storage' => TestContainerStorage::getServiceDefinition($container_directory),
         ],
       ]);
     }
@@ -619,7 +614,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     // behind. Compiling the container can create tables, through services that
     // the container builder creates while compiling, so it stores and loads
     // rebuilt containers instead of using the container builder.
-    $kernel = new TestDrupalKernel('testing', $this->classLoader, $shares_container && static::sharesEnvironment());
+    $kernel = new TestDrupalKernel('testing', $this->classLoader, $container_directory && static::sharesEnvironment());
     $kernel->setSitePath($this->siteDirectory);
     // Boot a new one-time container from scratch. Set the module list upfront
     // to avoid a subsequent rebuild or setting the kernel into the

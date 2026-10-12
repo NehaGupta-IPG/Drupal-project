@@ -212,8 +212,7 @@ trait FunctionalTestSetupTrait {
    * @see \Drupal\TestTools\Attribute\ShareContainer
    */
   protected function getContainerDirectory(): ?string {
-    $directory = getenv('DRUPAL_TEST_CONTAINER_DIRECTORY');
-    return $directory && ShareContainer::isEnabledFor(static::class) ? $directory : NULL;
+    return ShareContainer::isEnabledFor(static::class) ? TestContainerStorage::getDirectory() : NULL;
   }
 
   /**

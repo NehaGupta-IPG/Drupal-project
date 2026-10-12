@@ -61,6 +61,21 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   use InstallerRedirectTrait;
 
   /**
+   * The parameters that container storage sets when it loads a container.
+   *
+   * Container storage services receive this as an argument of the bootstrap
+   * container, which resolves the parameter values.
+   *
+   * @see \Drupal\Core\DependencyInjection\Compiler\RuntimeParametersPass
+   *
+   * @internal
+   */
+  public const array CONTAINER_RUNTIME_PARAMETERS = [
+    'app.root' => '%app.root%',
+    'site.path' => '%site.path%',
+  ];
+
+  /**
    * Holds the class used for dumping the container to a PHP array.
    *
    * @var string
@@ -124,10 +139,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         'arguments' => [
           'cache' => '@cache.container',
           'settings' => '@settings',
-          'runtimeParameters' => [
-            'app.root' => '%app.root%',
-            'site.path' => '%site.path%',
-          ],
+          'runtimeParameters' => self::CONTAINER_RUNTIME_PARAMETERS,
         ],
       ],
       'container_storage.php_dumper' => [
@@ -136,10 +148,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           '@cache.container',
           '@php_storage.service_container',
           '@settings',
-          [
-            'app.root' => '%app.root%',
-            'site.path' => '%site.path%',
-          ],
+          self::CONTAINER_RUNTIME_PARAMETERS,
         ],
       ],
       'php_storage.service_container' => [
