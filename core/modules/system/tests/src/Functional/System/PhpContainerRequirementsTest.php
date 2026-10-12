@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Url;
+use Drupal\TestTools\Attribute\ShareContainer;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('system')]
 #[RunTestsInSeparateProcesses]
+#[ShareContainer(FALSE)]
 class PhpContainerRequirementsTest extends BrowserTestBase {
 
   /**

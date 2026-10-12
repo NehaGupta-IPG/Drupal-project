@@ -18,6 +18,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Site\SettingsEditor;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Tests\SessionTestTrait;
+use Drupal\TestTools\Attribute\ShareContainer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
@@ -115,7 +116,7 @@ trait FunctionalTestSetupTrait {
     ];
     // Store the containers of the test site with those of the other tests.
     // @see \Drupal\Core\Test\TestContainerStorage
-    if ($container_directory = getenv('DRUPAL_TEST_CONTAINER_DIRECTORY')) {
+    if ($container_directory = $this->getContainerDirectory()) {
       $settings['settings']['bootstrap_container_definition'] = (object) [
         'value' => [
           'services' => [
@@ -200,6 +201,19 @@ trait FunctionalTestSetupTrait {
     // bootstrap again. Hence, we have to reload the newly written custom
     // settings.php manually.
     Settings::initialize(DRUPAL_ROOT, $this->siteDirectory, $this->classLoader);
+  }
+
+  /**
+   * Returns the directory of containers shared between tests.
+   *
+   * @return string|null
+   *   The directory, or NULL if this test does not share its containers.
+   *
+   * @see \Drupal\TestTools\Attribute\ShareContainer
+   */
+  protected function getContainerDirectory(): ?string {
+    $directory = getenv('DRUPAL_TEST_CONTAINER_DIRECTORY');
+    return $directory && ShareContainer::isEnabledFor(static::class) ? $directory : NULL;
   }
 
   /**
@@ -443,7 +457,7 @@ trait FunctionalTestSetupTrait {
    */
   protected function initKernel(Request $request) {
     // Share the containers of the site with other tests.
-    $kernel_class = getenv('DRUPAL_TEST_CONTAINER_DIRECTORY') ? TestDrupalKernel::class : DrupalKernel::class;
+    $kernel_class = $this->getContainerDirectory() ? TestDrupalKernel::class : DrupalKernel::class;
     $this->kernel = $kernel_class::createFromRequest($request, $this->classLoader, 'prod', TRUE);
     $this->kernel->boot();
     // Add our request to the stack and route context.
@@ -632,7 +646,7 @@ trait FunctionalTestSetupTrait {
       $parameters['default_theme'] = $this->defaultTheme;
     }
     // Share the containers that the installer compiles with other tests.
-    if (getenv('DRUPAL_TEST_CONTAINER_DIRECTORY')) {
+    if ($this->getContainerDirectory()) {
       $parameters['kernel_class'] = TestInstallerKernel::class;
     }
 
