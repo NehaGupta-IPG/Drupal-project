@@ -3,6 +3,7 @@
 namespace Drupal\Core\Breadcrumb;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
@@ -42,13 +43,25 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
   protected $sortedBuilders;
 
   /**
+   * The memory cache used to statically cache built breadcrumbs.
+   */
+  protected MemoryCacheInterface $memoryCache;
+
+  /**
    * Constructs a \Drupal\Core\Breadcrumb\BreadcrumbManager object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface|null $memory_cache
+   *   The memory cache.
    */
-  public function __construct(ModuleHandlerInterface $module_handler) {
+  public function __construct(ModuleHandlerInterface $module_handler, ?MemoryCacheInterface $memory_cache = NULL) {
     $this->moduleHandler = $module_handler;
+    if (!$memory_cache) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $memory_cache argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3621448', E_USER_DEPRECATED);
+      $memory_cache = \Drupal::service('cache.memory');
+    }
+    $this->memoryCache = $memory_cache;
   }
 
   /**
@@ -71,6 +84,12 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
    * {@inheritdoc}
    */
   public function build(RouteMatchInterface $route_match) {
+    $cid = $this->getCacheId($route_match);
+    if ($cid && ($cache = $this->memoryCache->get($cid))) {
+      // Return a copy so that callers cannot alter the cached breadcrumb.
+      return clone $cache->data;
+    }
+
     $cacheable_metadata = new CacheableMetadata();
     $breadcrumb = new Breadcrumb();
     $context = ['builder' => NULL];
@@ -98,7 +117,29 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
     // Allow modules to alter the breadcrumb.
     $this->moduleHandler->alter('system_breadcrumb', $breadcrumb, $route_match, $context);
 
+    if ($cid) {
+      $this->memoryCache->set($cid, clone $breadcrumb, MemoryCacheInterface::CACHE_PERMANENT, $breadcrumb->getCacheTags());
+    }
+
     return $breadcrumb;
+  }
+
+  /**
+   * Returns the static cache ID for the breadcrumb of a route match.
+   *
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The route match.
+   *
+   * @return string|null
+   *   The cache ID, or NULL if the breadcrumb should not be cached.
+   */
+  protected function getCacheId(RouteMatchInterface $route_match): ?string {
+    $route_name = $route_match->getRouteName();
+    if ($route_name === NULL) {
+      return NULL;
+    }
+    $raw_parameters = $route_match->getRawParameters()?->all() ?? [];
+    return 'breadcrumb:' . $route_name . ':' . hash('xxh64', serialize($raw_parameters));
   }
 
   /**

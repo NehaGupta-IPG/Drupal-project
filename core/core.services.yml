@@ -1628,7 +1628,7 @@ services:
   Drupal\Core\Image\ImageFactory: '@image.factory'
   breadcrumb:
     class: Drupal\Core\Breadcrumb\BreadcrumbManager
-    arguments: ['@module_handler']
+    arguments: ['@module_handler', '@cache.memory']
     tags:
       - { name: service_collector, tag: breadcrumb_builder, call: addBuilder }
   Drupal\Core\Breadcrumb\ChainBreadcrumbBuilderInterface: '@breadcrumb'
