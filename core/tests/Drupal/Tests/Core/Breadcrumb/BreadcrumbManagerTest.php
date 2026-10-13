@@ -264,16 +264,23 @@ class BreadcrumbManagerTest extends UnitTestCase {
     $this->assertEquals(['node:1'], $this->breadcrumbManager->build($route_match_1)->getCacheTags());
 
     // Different route parameters build a new breadcrumb.
-    $this->breadcrumbManager->build($route_match_2);
+    $breadcrumb_2 = $this->breadcrumbManager->build($route_match_2);
+    $this->assertEquals($this->breadcrumb->getLinks(), $breadcrumb_2->getLinks());
+    $this->assertNotSame($breadcrumb_1, $breadcrumb_2);
 
     // A new request does not reuse breadcrumbs from the previous request.
     $this->requestStack->push(new Request());
-    $this->breadcrumbManager->build($route_match_1);
-    $this->breadcrumbManager->build($route_match_1);
+    $breadcrumb_new_request = $this->breadcrumbManager->build($route_match_1);
+    $this->assertEquals($this->breadcrumb->getLinks(), $breadcrumb_new_request->getLinks());
+    $this->assertEquals(['node:1'], $breadcrumb_new_request->getCacheTags());
+    // The breadcrumb is then cached for the new request.
+    $this->assertEquals($breadcrumb_new_request, $this->breadcrumbManager->build($route_match_1));
 
     // Invalidating a cache tag of the breadcrumb builds it again.
     $this->memoryCache->invalidateTags(['node:1']);
-    $this->breadcrumbManager->build($route_match_1);
+    $breadcrumb_invalidated = $this->breadcrumbManager->build($route_match_1);
+    $this->assertEquals($this->breadcrumb->getLinks(), $breadcrumb_invalidated->getLinks());
+    $this->assertEquals(['node:1'], $breadcrumb_invalidated->getCacheTags());
   }
 
   /**
@@ -283,8 +290,8 @@ class BreadcrumbManagerTest extends UnitTestCase {
   public function testConstructorDeprecation(): void {
     $this->container->set('cache.memory', $this->memoryCache);
     $this->container->set('request_stack', $this->requestStack);
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Breadcrumb\BreadcrumbManager::__construct() without the $memory_cache argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3621448');
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Breadcrumb\BreadcrumbManager::__construct() without the $request_stack argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3621448');
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Breadcrumb\BreadcrumbManager::__construct() without the $memoryCache argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/CHANGE_RECORD');
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Breadcrumb\BreadcrumbManager::__construct() without the $requestStack argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/CHANGE_RECORD');
     $this->moduleHandler->expects($this->never())->method('alter');
     new BreadcrumbManager($this->moduleHandler);
   }

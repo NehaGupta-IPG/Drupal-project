@@ -21,13 +21,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
 
   /**
-   * The module handler to invoke the alter hook.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * Holds arrays of breadcrumb builders, keyed by priority.
    *
    * @var array
@@ -43,38 +36,19 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
    */
   protected $sortedBuilders;
 
-  /**
-   * The memory cache used to statically cache built breadcrumbs.
-   */
-  protected MemoryCacheInterface $memoryCache;
-
-  /**
-   * The request stack.
-   */
-  protected RequestStack $requestStack;
-
-  /**
-   * Constructs a \Drupal\Core\Breadcrumb\BreadcrumbManager object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface|null $memory_cache
-   *   The memory cache.
-   * @param \Symfony\Component\HttpFoundation\RequestStack|null $request_stack
-   *   The request stack.
-   */
-  public function __construct(ModuleHandlerInterface $module_handler, ?MemoryCacheInterface $memory_cache = NULL, ?RequestStack $request_stack = NULL) {
-    $this->moduleHandler = $module_handler;
-    if (!$memory_cache) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $memory_cache argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3621448', E_USER_DEPRECATED);
-      $memory_cache = \Drupal::service('cache.memory');
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ?MemoryCacheInterface $memoryCache = NULL,
+    protected ?RequestStack $requestStack = NULL,
+  ) {
+    if (!$this->memoryCache) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $memoryCache argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/CHANGE_RECORD', E_USER_DEPRECATED);
+      $this->memoryCache = \Drupal::service('cache.memory');
     }
-    $this->memoryCache = $memory_cache;
-    if (!$request_stack) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $request_stack argument is deprecated in drupal:11.4.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3621448', E_USER_DEPRECATED);
-      $request_stack = \Drupal::requestStack();
+    if (!$this->requestStack) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $requestStack argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/CHANGE_RECORD', E_USER_DEPRECATED);
+      $this->requestStack = \Drupal::requestStack();
     }
-    $this->requestStack = $request_stack;
   }
 
   /**
@@ -98,7 +72,12 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
    */
   public function build(RouteMatchInterface $route_match) {
     $request = $this->requestStack->getCurrentRequest();
-    $cid = $request ? $this->getCacheId($route_match) : NULL;
+    $route_name = $route_match->getRouteName();
+    $cid = NULL;
+    if ($request && $route_name !== NULL) {
+      $raw_parameters = $route_match->getRawParameters()?->all() ?? [];
+      $cid = 'breadcrumb:' . $route_name . ':' . hash('xxh64', serialize($raw_parameters));
+    }
     // Breadcrumbs can depend on more than the route match, for example the
     // negotiated language, so only reuse a breadcrumb built for this request.
     if ($cid && ($cache = $this->memoryCache->get($cid)) && $cache->data['request']->get() === $request) {
@@ -142,24 +121,6 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
     }
 
     return $breadcrumb;
-  }
-
-  /**
-   * Returns the static cache ID for the breadcrumb of a route match.
-   *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The route match.
-   *
-   * @return string|null
-   *   The cache ID, or NULL if the breadcrumb should not be cached.
-   */
-  protected function getCacheId(RouteMatchInterface $route_match): ?string {
-    $route_name = $route_match->getRouteName();
-    if ($route_name === NULL) {
-      return NULL;
-    }
-    $raw_parameters = $route_match->getRawParameters()?->all() ?? [];
-    return 'breadcrumb:' . $route_name . ':' . hash('xxh64', serialize($raw_parameters));
   }
 
   /**
