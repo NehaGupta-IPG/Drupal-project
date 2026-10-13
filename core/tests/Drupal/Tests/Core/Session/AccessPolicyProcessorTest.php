@@ -148,7 +148,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
     $processor->addAccessPolicy(new AlwaysAddsAccessPolicy());
 
     $this->expectException(AccessPolicyScopeException::class);
-    $this->expectExceptionMessage(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', AlwaysAddsAccessPolicy::class, 'bar'));
+    $this->expectExceptionMessageIs(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', AlwaysAddsAccessPolicy::class, 'bar'));
     $processor->processAccessPolicies($this->prophesize(AccountInterface::class)->reveal(), 'bar');
   }
 
@@ -161,7 +161,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
     $processor->addAccessPolicy(new AlwaysAddsAccessPolicy());
 
     $this->expectException(AccessPolicyScopeException::class);
-    $this->expectExceptionMessage(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', AlwaysAddsAccessPolicy::class, 'foo'));
+    $this->expectExceptionMessageIs(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', AlwaysAddsAccessPolicy::class, 'foo'));
     $processor->processAccessPolicies($this->prophesize(AccountInterface::class)->reveal(), 'foo');
   }
 
@@ -174,7 +174,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
     $processor->addAccessPolicy(new AlwaysAltersAccessPolicy());
 
     $this->expectException(AccessPolicyScopeException::class);
-    $this->expectExceptionMessage(sprintf('The access policy "%s" altered permissions in a scope other than "%s".', AlwaysAltersAccessPolicy::class, 'foo'));
+    $this->expectExceptionMessageIs(sprintf('The access policy "%s" altered permissions in a scope other than "%s".', AlwaysAltersAccessPolicy::class, 'foo'));
     $processor->processAccessPolicies($this->prophesize(AccountInterface::class)->reveal(), 'foo');
   }
 
@@ -302,12 +302,11 @@ class AccessPolicyProcessorTest extends UnitTestCase {
    *   A list of testAccountSwitcher method arguments.
    */
   public static function cachingProvider(): array {
-    $cases = [
+    return [
       'no-cache' => [FALSE, FALSE],
       'static-cache-hit' => [FALSE, TRUE],
       'db-cache-hit' => [TRUE, FALSE],
     ];
-    return $cases;
   }
 
   /**

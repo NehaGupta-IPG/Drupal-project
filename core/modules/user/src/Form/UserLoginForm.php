@@ -7,18 +7,34 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\BareHtmlPageRendererInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserInterface;
+use Drupal\user\LoginFinalizer;
 use Drupal\user\UserStorageInterface;
 use Drupal\user\UserFloodControlInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides a user login form.
  *
  * @internal
  */
+#[Route(
+  path: '/user/login',
+  name: 'user.login',
+  requirements: [
+    '_user_is_logged_in' => 'FALSE',
+  ],
+  options: [
+    '_maintenance_access' => TRUE,
+  ],
+  defaults: [
+    '_title' => new TranslatableMarkup('Log in'),
+  ],
+)]
 class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
 
   /**
@@ -56,21 +72,14 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
    */
   protected $bareHtmlPageRenderer;
 
-  /**
-   * Constructs a new UserLoginForm.
-   *
-   * @param \Drupal\user\UserFloodControlInterface $user_flood_control
-   *   The user flood control service.
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage.
-   * @param \Drupal\user\UserAuthenticationInterface $user_auth
-   *   The user authentication object.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bare_html_renderer
-   *   The renderer.
-   */
-  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, UserAuthenticationInterface $user_auth, RendererInterface $renderer, BareHtmlPageRendererInterface $bare_html_renderer) {
+  public function __construct(
+    UserFloodControlInterface $user_flood_control,
+    UserStorageInterface $user_storage,
+    UserAuthenticationInterface $user_auth,
+    RendererInterface $renderer,
+    BareHtmlPageRendererInterface $bare_html_renderer,
+    protected LoginFinalizer $loginFinalizer,
+  ) {
     $this->userFloodControl = $user_flood_control;
     $this->userStorage = $user_storage;
     $this->userAuth = $user_auth;
@@ -87,7 +96,8 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
       $container->get('entity_type.manager')->getStorage('user'),
       $container->get('user.auth'),
       $container->get('renderer'),
-      $container->get('bare_html_page_renderer')
+      $container->get('bare_html_page_renderer'),
+      $container->get(LoginFinalizer::class)
     );
   }
 
@@ -161,7 +171,7 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
       $this->getRequest()->query->set('destination', $this->getRequest()->request->get('destination'));
     }
 
-    user_login_finalize($account);
+    $this->loginFinalizer->finalizeLogin($account);
   }
 
   /**

@@ -188,10 +188,12 @@ class AttachedAssetsTest extends KernelTestBase {
     [$header_js, $footer_js] = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage());
     $this->assertEquals([], \Drupal::service('asset.js.collection_renderer')->render($header_js), 'There are 0 JavaScript assets in the header.');
     $rendered_footer_js = \Drupal::service('asset.js.collection_renderer')->render($footer_js);
-    $this->assertCount(3, $rendered_footer_js, 'There are 3 JavaScript assets in the footer.');
-    $this->assertEquals('drupal-settings-json', $rendered_footer_js[0]['#attributes']['data-drupal-selector'], 'The first of the two JavaScript assets in the footer has drupal settings.');
-    $this->assertStringContainsString('jquery.min.js', $rendered_footer_js[1]['#attributes']['src'], 'The second of the two JavaScript assets in the footer is jquery.min.js.');
-    $this->assertStringStartsWith(base_path(), $rendered_footer_js[2]['#attributes']['src'], 'The third of the two JavaScript assets in the footer has the sole aggregated JavaScript asset.');
+    $this->assertCount(5, $rendered_footer_js, 'There are 5 JavaScript assets in the footer.');
+    $this->assertEquals('drupal-settings-json', $rendered_footer_js[0]['#attributes']['data-drupal-selector'], 'The first of the five JavaScript assets in the footer has drupal settings.');
+    $this->assertStringContainsString('jquery.min.js', $rendered_footer_js[1]['#attributes']['src'], 'The second of the five JavaScript assets in the footer is jquery.min.js.');
+    $this->assertStringContainsString('once.min.js', $rendered_footer_js[2]['#attributes']['src'], 'The third of the five JavaScript assets in the footer is once.min.js.');
+    $this->assertStringStartsWith(base_path(), $rendered_footer_js[3]['#attributes']['src'], 'The fourth of the five JavaScript assets in the footer has an aggregated JavaScript asset.');
+    $this->assertStringStartsWith(base_path(), $rendered_footer_js[4]['#attributes']['src']);
   }
 
   /**
@@ -375,6 +377,34 @@ class AttachedAssetsTest extends KernelTestBase {
   }
 
   /**
+   * Tests using 'before' in library definition.
+   */
+  public function testLibraryBefore(): void {
+    $build['#attached']['library'][] = 'common_test/main';
+    $build['#attached']['library'][] = 'common_test/before_main';
+    $assets = AttachedAssets::createFromRenderArray($build);
+
+    $js = $this->assetResolver->getJsAssets($assets, FALSE)[1];
+    $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
+    $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
+    $this->assertLessThan(strpos($rendered_js, 'common_test/main.js'), strpos($rendered_js, 'common_test/before_main.js'));
+  }
+
+  /**
+   * Tests using 'after' in library definition.
+   */
+  public function testLibraryAfter(): void {
+    $build['#attached']['library'][] = 'common_test/after_main';
+    $build['#attached']['library'][] = 'common_test/main';
+    $assets = AttachedAssets::createFromRenderArray($build);
+
+    $js = $this->assetResolver->getJsAssets($assets, FALSE)[1];
+    $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
+    $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
+    $this->assertGreaterThan(strpos($rendered_js, 'common_test/main.js'), strpos($rendered_js, 'common_test/after_main.js'));
+  }
+
+  /**
    * Tests altering a JavaScript's weight via hook_js_alter().
    *
    * @see common_test_js_alter()
@@ -413,7 +443,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $js = $this->assetResolver->getJsAssets($assets, FALSE, \Drupal::languageManager()->getCurrentLanguage())[1];
     $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
-    $this->assertStringContainsString('core/misc/jquery.form.js', (string) $rendered_js, 'Altered library dependencies are added to the page.');
+    $this->assertStringContainsString('core/misc/jquery.form.js', $rendered_js, 'Altered library dependencies are added to the page.');
   }
 
   /**

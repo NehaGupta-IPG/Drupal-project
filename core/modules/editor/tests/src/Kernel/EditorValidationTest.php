@@ -8,6 +8,8 @@ use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Heading;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -19,6 +21,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[Group('config')]
 #[Group('Validation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class EditorValidationTest extends ConfigEntityValidationTestBase {
 
   /**
@@ -40,8 +43,8 @@ class EditorValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
 
     $format = FilterFormat::create([
       'format' => 'test',
@@ -129,10 +132,10 @@ class EditorValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
+  #[Skip]
   public function testLabelValidation(): void {
     // @todo Remove this override in https://www.drupal.org/i/3231354. The label of Editor entities is dynamically computed: it's retrieved from the associated FilterFormat entity. That issue will change this.
     // @see \Drupal\editor\Entity\Editor::label()
-    $this->markTestSkipped();
   }
 
   /**

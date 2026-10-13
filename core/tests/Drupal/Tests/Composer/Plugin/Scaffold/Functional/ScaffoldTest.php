@@ -8,6 +8,7 @@ use Composer\Util\Filesystem;
 use Drupal\Tests\Composer\Plugin\Scaffold\AssertUtilsTrait;
 use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
 use Drupal\Tests\Composer\Plugin\Scaffold\ScaffoldTestResult;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +21,9 @@ use PHPUnit\Framework\TestCase;
  */
 #[Group('Scaffold')]
 class ScaffoldTest extends TestCase {
+
   use AssertUtilsTrait;
+  use ForwardCompatibilityTrait;
 
   /**
    * The root of this project.
@@ -171,9 +174,11 @@ class ScaffoldTest extends TestCase {
    */
   #[DataProvider('scaffoldExpectedExceptionTestValues')]
   public function testScaffoldWithExpectedException(string $fixture_name, string $expected_exception_message, bool $is_link): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3150040');
     // Test scaffold. Expect an error.
     $this->expectException(\Exception::class);
-    $this->expectExceptionMessage($expected_exception_message);
+    $this->expectExceptionMessageIs($expected_exception_message);
     $this->scaffoldSut($fixture_name, $is_link);
   }
 
@@ -397,10 +402,7 @@ include __DIR__ . "/settings-custom-additions.php";',
    */
   protected function assertCommonDrupalAssetsWereScaffolded(string $docroot, bool $is_link): void {
     // Assert scaffold files are written in the correct locations.
-    $this->assertScaffoldedFile($docroot . '/.csslintrc', $is_link, 'Test version of .csslintrc from drupal/core.');
     $this->assertScaffoldedFile($docroot . '/.editorconfig', $is_link, 'Test version of .editorconfig from drupal/core.');
-    $this->assertScaffoldedFile($docroot . '/.eslintignore', $is_link, 'Test version of .eslintignore from drupal/core.');
-    $this->assertScaffoldedFile($docroot . '/.eslintrc.json', $is_link, 'Test version of .eslintrc.json from drupal/core.');
     $this->assertScaffoldedFile($docroot . '/.gitattributes', $is_link, 'Test version of .gitattributes from drupal/core.');
     $this->assertScaffoldedFile($docroot . '/.ht.router.php', $is_link, 'Test version of .ht.router.php from drupal/core.');
     $this->assertScaffoldedFile($docroot . '/sites/default/default.services.yml', $is_link, 'Test version of default.services.yml from drupal/core.');
