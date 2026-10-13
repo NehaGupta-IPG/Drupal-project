@@ -184,6 +184,116 @@ function hook_migrate_MIGRATION_ID_prepare_row(Row $row, MigrateSourceInterface 
 }
 
 /**
+ * Allows altering the definition for discovered field plugins.
+ *
+ * For example, this implementation removes the support for core version
+ * 6 from the 'email' plugin and adds a new 'email_d6' plugin.
+ *
+ * @param array[] $plugin_definitions
+ *   An associative array of Migrate field plugin definitions, keyed by the
+ *   plugin ID.
+ *
+ * @see \Drupal\migrate_drupal\Annotation\MigrateField
+ * @see \Drupal\migrate_drupal\Attribute\MigrateField
+ *
+ * @ingroup migration
+ */
+function hook_migrate_field_info_alter(array &$plugin_definitions) {
+  if ($plugin_definitions['email']) {
+    $plugin_definitions['email']['core'] = ['7'];
+    $plugin_definitions['email_d6'] = [
+      'id' => 'email_d6',
+      'class' => 'Drupal\my_email_field_plugin\Plugin\migrate\field\EmailD6',
+      'core' => ['6'],
+      'type_map' => [
+        'email' => 'email',
+      ],
+      'source_module' => 'my_email_field_plugin',
+      'destination_module' => 'core',
+    ];
+  }
+}
+
+/**
+ * Allows altering the definition for discovered destination plugins.
+ *
+ * For example, this implementation changes the deriver of the 'entity'
+ * destination plugin.
+ *
+ * @param array[] $plugin_definitions
+ *   An associative array of Migrate destination plugin definitions, keyed by
+ *   the plugin ID.
+ *
+ * @see \Drupal\migrate\Annotation\MigrateDestination
+ * @see \Drupal\migrate\Attribute\MigrateDestination
+ *
+ * @ingroup migration
+ */
+function hook_migrate_destination_info_alter(array &$plugin_definitions) {
+  if ($plugin_definitions['entity']) {
+    $plugin_definitions['entity']['deriver'] = 'Drupal\my_module\Plugin\Deriver\MyEntityDeriver';
+  }
+}
+
+/**
+ * Allows altering the definition for discovered source plugins.
+ *
+ * For example, this implementation changes the class of the
+ * 'content_entity:node' source plugin.
+ *
+ * @param array[] $plugin_definitions
+ *   An associative array of Migrate source plugin definitions, keyed by the
+ *   plugin ID.
+ *
+ * @see \Drupal\migrate\Annotation\MigrateSource
+ * @see \Drupal\migrate\Attribute\MigrateSource
+ *
+ * @ingroup migration
+ */
+function hook_migrate_source_info_alter(array &$plugin_definitions) {
+  if ($plugin_definitions['content_entity:node']) {
+    $plugin_definitions['content_entity:node']['class'] = 'Drupal\my_module\Plugin\migrate\source\MyNode';
+  }
+}
+
+/**
+ * Allows altering the definition for discovered process plugins.
+ *
+ * For example, this implementation removes the download process plugin.
+ *
+ * @param array[] $plugin_definitions
+ *   An associative array of Migrate process plugin definitions, keyed by the
+ *   plugin ID.
+ *
+ * @see \Drupal\migrate\Annotation\MigrateProcessPlugin
+ * @see \Drupal\migrate\Attribute\MigrateProcess
+ *
+ * @ingroup migration
+ */
+function hook_migrate_process_info_alter(array &$plugin_definitions) {
+  unset($plugin_definitions['download']);
+}
+
+/**
+ * Allows altering the definition for discovered ID map plugins.
+ *
+ * For example, this implementation adds a new ID map plugin.
+ *
+ * @param array[] $plugin_definitions
+ *   An associative array of Migrate ID map plugin definitions, keyed by the
+ *   plugin ID.
+ *
+ * @see \Drupal\Component\Plugin\Attribute\PluginID
+ *
+ * @ingroup migration
+ */
+function hook_migrate_id_map_info_alter(array &$plugin_definitions) {
+  $plugin_definitions['my_id_map'] = [
+    'class' => 'Drupal\my_module\Plugin\migrate\id_map\MyIdMap',
+  ];
+}
+
+/**
  * Allows altering the list of discovered migration plugins.
  *
  * Modules are able to alter specific migrations structures or even remove or
