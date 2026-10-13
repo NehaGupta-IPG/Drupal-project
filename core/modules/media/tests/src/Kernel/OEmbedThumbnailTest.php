@@ -200,7 +200,7 @@ class OEmbedThumbnailTest extends MediaKernelTestBase {
       ],
       [
         'thumbnail' => 'https://i.ytimg.com/vi/LMNOPQRSTUV/hqdefault.jpg',
-        'provider' => 'Dailymotion',
+        'provider' => 'Other',
         'image' => $this->imageBytes(640, 360),
       ],
     ];
@@ -220,9 +220,9 @@ class OEmbedThumbnailTest extends MediaKernelTestBase {
   }
 
   /**
-   * Tests a portrait poster falling back to the matching numbered maxres one.
+   * Tests a missing portrait poster falling back to its numbered alternative.
    */
-  public function testPortraitPosterFallsBackToNumberedMaxres(): void {
+  public function testPortraitPosterFallsBackToNumberedHighResolution(): void {
     $original = 'https://i.ytimg.com/vi/ZYXWVUTSRQP/hq2.jpg';
     $candidate = 'https://i.ytimg.com/vi/ZYXWVUTSRQP/maxres2.jpg';
     $image = $this->imageBytes(640, 360);
@@ -399,8 +399,8 @@ class OEmbedThumbnailTest extends MediaKernelTestBase {
    */
   private function imageBytes(int $width, int $height): string {
     $image = imagecreatetruecolor($width, $height);
-    $colour = imagecolorallocate($image, 30, 90, 140);
-    imagefill($image, 0, 0, $colour);
+    $color = imagecolorallocate($image, 30, 90, 140);
+    imagefill($image, 0, 0, $color);
     ob_start();
     imagepng($image);
     $bytes = ob_get_clean();

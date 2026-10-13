@@ -38,6 +38,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\MimeTypes;
 
+// cspell:ignore maxres vimeocdn ytimg
+
 /**
  * Provides a media source plugin for oEmbed resources.
  *
