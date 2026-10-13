@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\entity_test\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
+use Drupal\Core\Entity\Form\RevisionRevertForm;
 use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
 use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -36,6 +37,7 @@ use Drupal\views\EntityViewsData;
     'form' => [
       'default' => EntityTestForm::class,
       'delete' => EntityTestDeleteForm::class,
+      'revision-revert' => RevisionRevertForm::class,
     ],
     'views_data' => EntityViewsData::class,
     'route_provider' => [

@@ -532,4 +532,95 @@ class NodeRevisionsTest extends NodeTestBase {
     $this->assertSession()->linkByHrefExistsExact($secondRevisionRevertUrl->toString());
   }
 
+  /**
+   * Tests revert access uses the latest revision affecting each translation.
+   */
+  public function testRevisionTranslationRevertAccess(): void {
+    // Rebuild the container so that URLs are generated with language prefixes.
+    $this->rebuildContainer();
+    /** @var \Drupal\node\NodeStorageInterface $node_storage */
+    $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
+    $german = \Drupal::languageManager()->getLanguage('de');
+
+    // Revision 1 only affects the English translation.
+    $node = $this->drupalCreateNode(['langcode' => 'en']);
+    $firstRevisionId = $node->getRevisionId();
+
+    // Revisions 2 and 3 only affect the German translation.
+    $translation = $node->addTranslation('de', ['title' => 'Title in DE']);
+    $translation->setNewRevision();
+    $translation->save();
+    $secondRevisionId = $translation->getRevisionId();
+
+    $translation->setTitle('Updated title in DE');
+    $translation->setNewRevision();
+    $translation->save();
+    $thirdRevisionId = $translation->getRevisionId();
+
+    $this->assertEquals($firstRevisionId, $node_storage->getLatestTranslationAffectedRevisionId($node->id(), 'en'));
+    $this->assertEquals($thirdRevisionId, $node_storage->getLatestTranslationAffectedRevisionId($node->id(), 'de'));
+
+    // The first revision is neither the default nor the latest revision, but
+    // it is the latest revision affecting the English translation, so it
+    // cannot be reverted to.
+    $this->drupalGet($node->toUrl('version-history'));
+    $this->assertSession()->elementsCount('css', '.node-revision-table tbody tr', 1);
+    $this->assertSession()->linkByHrefNotExistsExact($this->getRevisionRevertTranslationUrl($node, $firstRevisionId, 'en')->toString());
+    $this->drupalGet($this->getRevisionRevertTranslationUrl($node, $firstRevisionId, 'en'));
+    $this->assertSession()->statusCodeEquals(403);
+
+    // The German translation can be reverted to the second revision, but not
+    // to the third, which is the latest revision affecting it.
+    $this->drupalGet($node->toUrl('version-history', ['language' => $german]));
+    $this->assertSession()->elementsCount('css', '.node-revision-table tbody tr', 2);
+    $this->assertSession()->linkByHrefNotExistsExact($this->getRevisionRevertTranslationUrl($node, $thirdRevisionId, 'de')->toString());
+    $this->assertSession()->linkByHrefExistsExact($this->getRevisionRevertTranslationUrl($node, $secondRevisionId, 'de')->toString());
+    $this->drupalGet($this->getRevisionRevertTranslationUrl($node, $secondRevisionId, 'de'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->drupalGet($this->getRevisionRevertTranslationUrl($node, $thirdRevisionId, 'de'));
+    $this->assertSession()->statusCodeEquals(403);
+
+    // Revert the German translation to the second revision.
+    $this->drupalGet($this->getRevisionRevertTranslationUrl($node, $secondRevisionId, 'de'));
+    $this->submitForm([], 'Revert');
+    $this->assertSession()->pageTextContains('Title in DE has been reverted to the revision from');
+    $fourthRevisionId = $node_storage->getLatestRevisionId($node->id());
+    $this->assertEquals($fourthRevisionId, $node_storage->getLatestTranslationAffectedRevisionId($node->id(), 'de'));
+
+    // The new revision is now the latest affecting the German translation, so
+    // the third revision can be reverted to.
+    $this->drupalGet($node->toUrl('version-history', ['language' => $german]));
+    $this->assertSession()->elementsCount('css', '.node-revision-table tbody tr', 3);
+    $this->assertSession()->linkByHrefNotExistsExact($this->getRevisionRevertTranslationUrl($node, $fourthRevisionId, 'de')->toString());
+    $this->assertSession()->linkByHrefExistsExact($this->getRevisionRevertTranslationUrl($node, $thirdRevisionId, 'de')->toString());
+    $this->assertSession()->linkByHrefExistsExact($this->getRevisionRevertTranslationUrl($node, $secondRevisionId, 'de')->toString());
+
+    // Reverting the German translation did not affect the English translation.
+    $this->drupalGet($this->getRevisionRevertTranslationUrl($node, $firstRevisionId, 'en'));
+    $this->assertSession()->statusCodeEquals(403);
+  }
+
+  /**
+   * Gets the URL to revert a translation to a revision.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   The node.
+   * @param int|string $revisionId
+   *   The revision ID to revert to.
+   * @param string $langcode
+   *   The language code of the translation to revert.
+   *
+   * @return \Drupal\Core\Url
+   *   The revert URL, in the language of the translation.
+   */
+  protected function getRevisionRevertTranslationUrl(NodeInterface $node, int|string $revisionId, string $langcode): Url {
+    return Url::fromRoute('node.revision_revert_translation_confirm', [
+      'node' => $node->id(),
+      'node_revision' => $revisionId,
+      'langcode' => $langcode,
+    ], [
+      'language' => \Drupal::languageManager()->getLanguage($langcode),
+    ]);
+  }
+
 }
