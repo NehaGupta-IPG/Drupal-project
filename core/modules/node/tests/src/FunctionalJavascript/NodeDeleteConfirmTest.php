@@ -68,7 +68,7 @@ class NodeDeleteConfirmTest extends WebDriverTestBase {
     $this->assertEquals('Are you sure you want to delete the content item Delete article from content list?', $assert_session->waitForElement('css', '.ui-dialog-title')->getText());
     $page->find('css', '.ui-dialog-buttonset')->pressButton('Delete');
 
-    $assert_session->pageTextContains('The Article Delete article from content list has been deleted.');
+    $assert_session->statusMessageContainsAfterWait('The Article Delete article from content list has been deleted.');
     // Assert that the node is deleted in above operation.
     $this->drupalGet('admin/content');
     $assert_session->pageTextContains('There are no content items yet.');
@@ -85,7 +85,7 @@ class NodeDeleteConfirmTest extends WebDriverTestBase {
     $this->assertEquals('Are you sure you want to delete the content item Delete article from entity form?', $assert_session->waitForElement('css', '.ui-dialog-title')->getText());
 
     $page->find('css', '.ui-dialog-buttonset')->pressButton('Delete');
-    $assert_session->pageTextContains('The Article Delete article from entity form has been deleted.');
+    $assert_session->statusMessageContainsAfterWait('The Article Delete article from entity form has been deleted.');
 
     $node = $this->createNode([
       'type' => 'article',
@@ -105,7 +105,7 @@ class NodeDeleteConfirmTest extends WebDriverTestBase {
     $this->assertEquals('Are you sure you want to delete the content item Delete article from views entity operations?', $assert_session->waitForElement('css', '.ui-dialog-title')->getText());
     $page->find('css', '.ui-dialog-buttonset')->pressButton('Delete');
 
-    $assert_session->pageTextContains('The Article Delete article from views entity operations has been deleted.');
+    $assert_session->statusMessageContainsAfterWait('The Article Delete article from views entity operations has been deleted.');
     $assert_session->pageTextContains('No content available.');
   }
 
@@ -122,7 +122,7 @@ class NodeDeleteConfirmTest extends WebDriverTestBase {
     $this->clickLink('Delete');
     $this->assertEquals('Are you sure you want to delete the content type Article?', $this->assertSession()->waitForElement('css', '.ui-dialog-title')->getText());
     $page->find('css', '.ui-dialog-buttonset')->pressButton('Delete');
-    $this->assertSession()->pageTextContains('The content type Article has been deleted.');
+    $this->assertSession()->statusMessageContainsAfterWait('The content type Article has been deleted.');
 
     $this->drupalCreateContentType([
       'name' => 'Article',
@@ -134,7 +134,7 @@ class NodeDeleteConfirmTest extends WebDriverTestBase {
     $this->clickLink('Delete');
     $this->assertEquals('Are you sure you want to delete the content type Article?', $this->assertSession()->waitForElement('css', '.ui-dialog-title')->getText());
     $page->find('css', '.ui-dialog-buttonset')->pressButton('Delete');
-    $this->assertSession()->pageTextContains('The content type Article has been deleted.');
+    $this->assertSession()->statusMessageContainsAfterWait('The content type Article has been deleted.');
   }
 
 }
