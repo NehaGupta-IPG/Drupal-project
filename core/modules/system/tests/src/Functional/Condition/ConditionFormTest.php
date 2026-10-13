@@ -57,7 +57,7 @@ class ConditionFormTest extends BrowserTestBase {
     $theme_installer = $this->container->get('theme_installer');
     $theme_installer->install(['olivero']);
     $this->drupalGet('condition_test');
-    $this->submitForm(['current_theme[themes][olivero]' => 'olivero', 'current_theme[negate]' => TRUE], 'Submit');
+    $this->submitForm(['current_theme[theme][olivero]' => 'olivero', 'current_theme[negate]' => TRUE], 'Submit');
     $this->assertSession()->pageTextContains('The current theme is not: Olivero');
   }
 
