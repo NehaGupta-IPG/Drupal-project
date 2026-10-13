@@ -19,10 +19,12 @@ class ConfigLangcodeResolveEventTest extends UnitTestCase {
   /**
    * Tests reading the langcode before it is resolved fails loudly.
    *
-   * There is no meaningful "unresolved" value to return instead - every
-   * caller of getLangcode() is entitled to assume dispatching the event
-   * already produced one, since core.services.yml always registers a
-   * subscriber that resolves unconditionally.
+   * There is no meaningful "unresolved" value. Every caller of getLangcode() is
+   * entitled to assume dispatching the event will result in a valid langcode.
+   * Core registers ConfigLangcodeSiteDefaultSubscriber to ensure a langcode is
+   * resolved unconditionally.
+   *
+   * @see \Drupal\Core\Config\EventSubscriber\ConfigLangcodeSiteDefaultSubscriber
    */
   public function testLangcodeMustBeResolvedBeforeReading(): void {
     $event = new ConfigLangcodeResolveEvent();
@@ -35,11 +37,7 @@ class ConfigLangcodeResolveEventTest extends UnitTestCase {
    *
    * Stopping propagation is what a real dispatch relies on to give a
    * higher-priority, more specific subscriber precedence over a later, more
-   * general one - for example a module always defaulting new configuration
-   * to English regardless of the site default: once it resolves, dispatch()
-   * never calls a later, lower-priority subscriber at all.
-   *
-   * @see https://git.drupalcode.org/project/config_language_lock/-/work_items/3613944
+   * general one.
    */
   public function testSetLangcodeResolvesAndStopsPropagation(): void {
     $event = new ConfigLangcodeResolveEvent();

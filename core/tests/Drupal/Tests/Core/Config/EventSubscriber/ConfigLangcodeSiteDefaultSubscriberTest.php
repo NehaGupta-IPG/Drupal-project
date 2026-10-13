@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Config\EventSubscriber;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigLangcodeResolveEvent;
 use Drupal\Core\Config\EventSubscriber\ConfigLangcodeSiteDefaultSubscriber;
-use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -27,22 +25,12 @@ use PHPUnit\Framework\Attributes\Group;
 class ConfigLangcodeSiteDefaultSubscriberTest extends UnitTestCase {
 
   /**
-   * Builds a subscriber whose site default langcode is $default_langcode.
-   */
-  protected function subscriberWithSiteDefault(string $default_langcode): ConfigLangcodeSiteDefaultSubscriber {
-    $system_site = $this->createMock(ImmutableConfig::class);
-    $system_site->method('get')->with('default_langcode')->willReturn($default_langcode);
-    $config_factory = $this->createMock(ConfigFactoryInterface::class);
-    $config_factory->method('get')->with('system.site')->willReturn($system_site);
-    return new ConfigLangcodeSiteDefaultSubscriber($config_factory);
-  }
-
-  /**
    * Tests the event resolves to the site default.
    */
   public function testResolvesToSiteDefault(): void {
+    $config_factory = $this->getConfigFactoryStub(['system.site' => ['default_langcode' => 'fr']]);
     $event = new ConfigLangcodeResolveEvent();
-    $this->subscriberWithSiteDefault('fr')->onResolveLangcode($event);
+    new ConfigLangcodeSiteDefaultSubscriber($config_factory)->onResolveLangcode($event);
     $this->assertSame('fr', $event->getLangcode());
     $this->assertTrue($event->isPropagationStopped());
   }
