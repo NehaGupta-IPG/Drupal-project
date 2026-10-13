@@ -101,7 +101,7 @@ class View extends AreaPluginBase {
    * {@inheritdoc}
    */
   public function render($empty = FALSE) {
-    if (!empty($this->options['view_to_insert'])) {
+    if ((!$empty && !empty($this->options['view_to_insert'])) || !empty($this->options['empty'])) {
       [$view_name, $display_id] = explode(':', $this->options['view_to_insert']);
 
       $view = $this->viewStorage->load($view_name)->getExecutable();
