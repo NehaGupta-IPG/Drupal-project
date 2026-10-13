@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\Component\Utility;
+namespace Drupal\Tests\Component\Utility\HtmlAttribute;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Render\MarkupInterface;
@@ -23,7 +23,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 #[CoversClass(Attribute::class)]
 #[Group('Utility')]
 #[Group('Template')]
-class HtmlAttributesTest extends TestCase {
+class AttributeTest extends TestCase {
 
   use ProphecyTrait;
 

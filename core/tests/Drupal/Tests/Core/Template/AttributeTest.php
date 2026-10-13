@@ -19,7 +19,7 @@ use Twig\Markup as TwigMarkup;
 /**
  * Tests Drupal\Core\Template\Attribute.
  *
- * @see \Drupal\Tests\Component\Utility\HtmlAttributesTest
+ * @see \Drupal\Tests\Component\Utility\HtmlAttribute\AttributeTest
  */
 #[CoversClass(Attribute::class)]
 #[Group('Template')]
