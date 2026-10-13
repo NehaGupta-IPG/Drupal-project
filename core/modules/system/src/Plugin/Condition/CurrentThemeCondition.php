@@ -63,7 +63,7 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
   /**
    * {@inheritdoc}
    */
-  public function setConfiguration(array $configuration) {
+  public function setConfiguration(array $configuration): void {
     // @todo Remove the conversion of a string 'theme' value in Drupal 13.0.0.
     // @see https://www.drupal.org/node/3523553
     if (isset($configuration['theme']) && is_string($configuration['theme'])) {
