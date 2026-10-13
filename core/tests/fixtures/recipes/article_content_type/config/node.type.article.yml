@@ -8,3 +8,7 @@ help: null
 new_revision: true
 preview_mode: 1
 display_submitted: true
+label_singular: article
+label_plural: articles
+label_count:
+  - "1 article\x03@count articles"

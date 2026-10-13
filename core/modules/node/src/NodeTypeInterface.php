@@ -3,12 +3,13 @@
 namespace Drupal\node;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\EntityBundleWithPluralLabelsInterface;
 use Drupal\Core\Entity\RevisionableEntityBundleInterface;
 
 /**
  * Provides an interface defining a node type entity.
  */
-interface NodeTypeInterface extends ConfigEntityInterface, RevisionableEntityBundleInterface {
+interface NodeTypeInterface extends ConfigEntityInterface, RevisionableEntityBundleInterface, EntityBundleWithPluralLabelsInterface {
 
   /**
    * Determines whether the node type is locked.

@@ -7,6 +7,10 @@ third_party_settings:
   menu_ui:
     available_menus: {  }
     parent: ''
+label_singular: recipe
+label_plural: recipes
+label_count:
+  - "1 recipe\x03@count recipes"
 name: Recipe
 type: recipe
 description: 'Add a new recipe to the site.'

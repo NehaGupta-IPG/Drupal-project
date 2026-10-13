@@ -4,5 +4,5 @@ description: 'Test configuration mapping.'
 dependencies:
   - drupal:node
   - drupal:comment
-package: Core
+package: Testing
 version: VERSION

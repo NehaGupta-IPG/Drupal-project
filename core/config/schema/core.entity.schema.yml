@@ -497,6 +497,29 @@ field.formatter.settings.entity_reference_label:
       type: boolean
       label: 'Link label to the referenced entity'
 
+bundle_entity_with_plural_labels:
+  type: config_entity
+  label: 'Bundle'
+  mapping:
+    label_singular:
+      type: label
+      nullable: true
+      label: 'Indefinite singular name'
+      translation context: 'Bundle singular label'
+    label_plural:
+      type: label
+      nullable: true
+      label: 'Indefinite plural name'
+      translation context: 'Bundle plural label'
+    label_count:
+      type: sequence
+      nullable: true
+      label: 'Count labels'
+      sequence:
+        type: plural_label
+        label: 'Count label'
+        translation context: 'Bundle count label variant'
+
 block.settings.field_block:*:*:*:
   type: block_settings
   mapping:

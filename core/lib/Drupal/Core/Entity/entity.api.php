@@ -866,6 +866,31 @@ function hook_entity_view_mode_info_alter(&$view_modes) {
  *   An associative array of all entity bundles, keyed by the entity
  *   type name, and then the bundle name, with the following keys:
  *   - label: The human-readable name of the bundle.
+ *   - label_singular: (optional) A translated string with the indefinite
+ *     singular label of the bundle. This is typically a lowercase label but it
+ *     can be also translated as a capitalized label for languages such as
+ *     German. For instance, given a bundle with the ID 'fruit', the singular
+ *     label would be 'fruit' but for German translation will be capitalized as
+ *     'Obst'.
+ *   - label_plural: (optional)  A translated string with the indefinite plural
+ *     label of the bundle. The same capitalization rules should be applied as
+ *     for 'label_singular'.
+ *   - label_count: (optional) An array containing one or more count label
+ *     variants for this bundle. Depending on context a site might need
+ *     different versions of the count label. For instance, a site will define
+ *     the following variants, depending on the use-case:
+ *     - On a regular page: @code 1 article\x03@count articles @endcode.
+ *     - On a search results page: @code 1 article was found\x03@count articles
+ *       were found @endcode. Note that we cannot build this version by deriving
+ *       the first one because of the was/were forms.
+ *     - On a different page: @code <span>1</span>
+ *       article\x03<span>@count</span> articles @endcode.
+ *     - On other pages the count might be displayed in a different @code <div>
+ *       @endcode or even in a different theme hook, so it needs a variant
+ *       without the count part: @code Article\x03Articles @endcode.
+ *     A meaningful key may be added to each variant in order to allow a more
+ *     developer friendly identification. If the key is missed, the array index
+ *     value should be used to identify which count plural variant to be used.
  *   - translatable: (optional) A boolean value specifying whether this bundle
  *     has translation support enabled. Defaults to FALSE.
  *   - class: (optional) The fully qualified class name for this bundle. If
@@ -880,6 +905,16 @@ function hook_entity_view_mode_info_alter(&$view_modes) {
  */
 function hook_entity_bundle_info(): array {
   $bundles['user']['user']['label'] = t('User');
+  $bundles['user']['user']['label_singular'] = t('user');
+  $bundles['user']['user']['label_plural'] = t('users');
+  $bundles['user']['user']['label_count'] = [
+    // This variant misses a key and is identifiable by its array delta.
+    t("1 user\x03@count users"),
+    // The following variants have a meaningful identifier as key.
+    'search results' => t("1 user is found\x03@count users were found"),
+    'with_markup' => t("<span>1</span> user\x03<span>@count</span> users"),
+    'no count' => t("User\x03Users"),
+  ];
   return $bundles;
 }
 
@@ -887,7 +922,9 @@ function hook_entity_bundle_info(): array {
  * Alter the bundles for entity types.
  *
  * @param array $bundles
- *   An array of bundles, keyed first by entity type, then by bundle name.
+ *   An array of bundles, keyed first by entity type, then by bundle name. Each
+ *   value is an array with the same structure as the hook_entity_bundle_info()
+ *   return array element.
  *
  * @see Drupal\Core\Entity\EntityTypeBundleInfo::getBundleInfo()
  * @see hook_entity_bundle_info()
@@ -896,6 +933,8 @@ function hook_entity_bundle_info_alter(&$bundles) {
   $bundles['user']['user']['label'] = t('Full account');
   // Override the bundle class for the "article" node type in a custom module.
   $bundles['node']['article']['class'] = 'Drupal\my_module\Entity\Article';
+  // Override the count label.
+  $bundles['user']['user']['label_count']['search results'] = t('1 user is registered\x03@count users are registered');
 }
 
 /**

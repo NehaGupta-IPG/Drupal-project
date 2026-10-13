@@ -1,0 +1,4 @@
+name: 'Entity bundle test'
+type: module
+description: 'Provides support for testing entity bundles.'
+package: Testing

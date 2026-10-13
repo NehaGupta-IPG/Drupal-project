@@ -11,7 +11,7 @@ node.settings:
       label: 'Use administration theme when editing or creating content'
 
 node.type.*:
-  type: config_entity
+  type: bundle_entity_with_plural_labels
   label: 'Content type'
   constraints:
     FullyValidatable: ~

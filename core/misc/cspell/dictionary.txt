@@ -300,6 +300,8 @@ notsimpletest
 nourriture
 nplurals
 ntfs
+nyholm
+obst
 oembed
 onecol
 optgroups

@@ -2,9 +2,12 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Component\Gettext\PoItem;
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\UseCacheBackendTrait;
+use Drupal\Core\Config\Entity\EntityBundleWithPluralLabelsInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
@@ -105,6 +108,13 @@ class EntityTypeBundleInfo implements EntityTypeBundleInfoInterface {
           if ($bundle_entity_type = $entity_type->getBundleEntityType()) {
             foreach ($this->entityTypeManager->getStorage($bundle_entity_type)->loadMultiple() as $entity) {
               $this->bundleInfo[$type][$entity->id()]['label'] = $entity->label();
+              if ($entity instanceof EntityBundleWithPluralLabelsInterface) {
+                $this->bundleInfo[$type][$entity->id()] += [
+                  'label_singular' => $entity->getSingularLabel(),
+                  'label_plural' => $entity->getPluralLabel(),
+                  'label_count' => $entity->getCountLabel(),
+                ];
+              }
             }
           }
           // If entity type bundles are not supported and
@@ -157,6 +167,64 @@ class EntityTypeBundleInfo implements EntityTypeBundleInfoInterface {
     Cache::invalidateTags(['entity_bundles']);
     // Entity bundles are exposed as data types, clear that cache too.
     $this->typedDataManager->clearCachedDefinitions();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBundleCountLabel(string $entity_type_id, string $bundle, int $count, $variant): ?string {
+    if (!$bundles_info = $this->getBundleInfo($entity_type_id)) {
+      throw new \InvalidArgumentException("The '{$entity_type_id}' doesn't exist.");
+    }
+    $bundle_info = $bundles_info[$bundle] ?? NULL;
+    if (!$bundle_info) {
+      throw new \InvalidArgumentException("The '{$entity_type_id}' entity type bundle '{$bundle}' doesn't exist.");
+    }
+
+    if (!empty($bundle_info['label_count'])) {
+      if (empty($bundle_info['label_count'][$variant])) {
+        throw new \InvalidArgumentException("There's no variant '{$variant}' defined in label_count for bundle '{$bundle}' of '{$entity_type_id}' entity type.");
+      }
+
+      $index = static::getPluralIndex($count);
+      if ($index === -1) {
+        // If the index cannot be computed, fallback to a single plural variant.
+        $index = $count > 1 ? 1 : 0;
+      }
+
+      $label_count = explode(PoItem::DELIMITER, $bundle_info['label_count'][$variant]);
+      if (!empty($label_count[$index])) {
+        return new FormattableMarkup($label_count[$index], ['@count' => $count]);
+      }
+    }
+
+    return NULL;
+  }
+
+  /**
+   * Gets the plural index through the gettext formula.
+   *
+   * @param int $count
+   *   Number to return plural for.
+   *
+   * @return int
+   *   The numeric index of the plural variant to use for the current language
+   *   and the given $count number or -1 if the language was not found or does
+   *   not have a plural formula.
+   *
+   * @todo Remove this method when https://www.drupal.org/node/2766857 gets in.
+   */
+  protected static function getPluralIndex(int $count): int {
+    // We have to test both if the function and the service exist since in
+    // certain situations it is possible that locale code might be loaded but
+    // the service does not exist. For example, where the parent test site has
+    // locale installed but the child site does not.
+    // @todo Refactor in https://www.drupal.org/node/2660338 so this code does
+    //   not depend on knowing that the Locale module exists.
+    if (function_exists('locale_get_plural') && \Drupal::hasService('locale.plural.formula')) {
+      return locale_get_plural($count);
+    }
+    return -1;
   }
 
 }
