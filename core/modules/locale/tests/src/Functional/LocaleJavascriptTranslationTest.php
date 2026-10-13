@@ -74,6 +74,9 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
         'Double Quote Concat strings t' => '',
 
         'Context !key Args t' => 'Context string',
+        'Context Null Args t' => 'Context string null args',
+
+        'Template Literal t' => '',
 
         'Context Unquoted t' => 'Context string unquoted',
         'Context Single Quoted t' => 'Context string single quoted',
@@ -89,6 +92,9 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
         "Double Quote \\\"Escaped\\\" plural{$etx}Double Quote \\\"Escaped\\\" @count plural" => '',
 
         "Context !key Args plural{$etx}Context !key Args @count plural" => 'Context string',
+        "Context Null Args plural{$etx}Context Null Args @count plural" => 'Context string null args',
+
+        "Template Literal plural{$etx}Template Literal @count plural" => '',
 
         "Context Unquoted plural{$etx}Context Unquoted @count plural" => 'Context string unquoted',
         "Context Single Quoted plural{$etx}Context Single Quoted @count plural" => 'Context string single quoted',

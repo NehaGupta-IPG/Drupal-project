@@ -148,8 +148,9 @@ class LocaleJs {
    * @internal
    */
   public function parseJsFile(string $filepath): void {
-    // Regular expression pattern used to localize JavaScript strings.
-    $jsStringRegex = '(?:(?:\'(?:\\\\\'|[^\'])*\'|"(?:\\\\"|[^"])*")(?:\s*\+\s*)?)+';
+    // Regular expression pattern used to localize JavaScript strings: single
+    // or double quoted strings, or template literals without substitutions.
+    $jsStringRegex = '(?:(?:\'(?:\\\\\'|[^\'])*\'|"(?:\\\\"|[^"])*"|`(?:\\\\`|[^`$]|\$(?!\{))*`)(?:\s*\+\s*)?)+';
 
     // Regular expression pattern used to match simple JS object literal.
     // This pattern matches a basic JS object, but will fail on an object with
@@ -194,7 +195,7 @@ class LocaleJs {
       [^\w]Drupal\s*\.\s*t\s*                       # match "Drupal.t" with whitespace
       \(\s*                                         # match "(" argument list start
       (' . $jsStringRegex . ')\s*                 # capture string argument
-      (?:,\s*' . $jsObjectRegex . '\s*            # optionally capture str args
+      (?:,\s*(?:' . $jsObjectRegex . '|null)\s*   # optionally capture str args, or null
         (?:,\s*' . $jsObjectContextRegex . '\s*) # optionally capture context
       ?)?                                           # close optional args
       [,\)]                                         # match ")" or "," to finish
@@ -212,11 +213,13 @@ class LocaleJs {
             \'(?:\\\\\'|[^\'])*\'   # match single-quoted string with any character except unescaped single-quote
             |
             "(?:\\\\"|[^"])*"       # match double-quoted string with any character except unescaped double-quote
+            |
+            `(?:\\\\`|[^`$]|\$(?!\{))*`  # match template literal without substitutions
           )
           (?:\s*\+\s*)?             # match "+" with possible whitespace, for str concat
         )+                          # match multiple because we supports concatenating strs
       )\s*                          # end capturing of plural string argument
-      (?:,\s*' . $jsObjectRegex . '\s*          # optionally capture string args
+      (?:,\s*(?:' . $jsObjectRegex . '|null)\s*  # optionally capture string args, or null
         (?:,\s*' . $jsObjectContextRegex . '\s*)?  # optionally capture context
       )?
       [,\)]
@@ -445,14 +448,14 @@ class LocaleJs {
    * Removes the quotes and string concatenations from the string.
    *
    * @param string $string
-   *   Single or double quoted strings, optionally concatenated by plus (+)
-   *   sign.
+   *   Single quoted, double quoted or template literal strings, optionally
+   *   concatenated by plus (+) sign.
    *
    * @return string
    *   String with leading and trailing quotes removed.
    */
   protected function stripQuotes(string $string): string {
-    return implode('', preg_split('~(?<!\\\\)[\'"]\s*\+\s*[\'"]~s', substr($string, 1, -1)));
+    return implode('', preg_split('~(?<!\\\\)[\'"`]\s*\+\s*[\'"`]~s', substr($string, 1, -1)));
   }
 
 }
