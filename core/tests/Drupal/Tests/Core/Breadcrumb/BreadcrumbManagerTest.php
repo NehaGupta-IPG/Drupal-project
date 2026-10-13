@@ -290,8 +290,8 @@ class BreadcrumbManagerTest extends UnitTestCase {
   public function testConstructorDeprecation(): void {
     $this->container->set('cache.memory', $this->memoryCache);
     $this->container->set('request_stack', $this->requestStack);
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Breadcrumb\BreadcrumbManager::__construct() without the $memoryCache argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/CHANGE_RECORD');
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Breadcrumb\BreadcrumbManager::__construct() without the $requestStack argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/CHANGE_RECORD');
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Breadcrumb\BreadcrumbManager::__construct() without the $memoryCache argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3630675');
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Breadcrumb\BreadcrumbManager::__construct() without the $requestStack argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3630675');
     $this->moduleHandler->expects($this->never())->method('alter');
     new BreadcrumbManager($this->moduleHandler);
   }

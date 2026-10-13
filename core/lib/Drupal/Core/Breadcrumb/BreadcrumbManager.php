@@ -42,11 +42,11 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
     protected ?RequestStack $requestStack = NULL,
   ) {
     if (!$this->memoryCache) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $memoryCache argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/CHANGE_RECORD', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $memoryCache argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3630675', E_USER_DEPRECATED);
       $this->memoryCache = \Drupal::service('cache.memory');
     }
     if (!$this->requestStack) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $requestStack argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/CHANGE_RECORD', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $requestStack argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3630675', E_USER_DEPRECATED);
       $this->requestStack = \Drupal::requestStack();
     }
   }
