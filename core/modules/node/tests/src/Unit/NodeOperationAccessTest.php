@@ -269,7 +269,7 @@ class NodeOperationAccessTest extends UnitTestCase {
     ];
 
     // Cannot revert to non-default if also latest.
-    $data['revert, with update access, default revision, not latest'] = [
+    $data['revert, with update access, non default, latest'] = [
       'revert revision',
       [
         ['access content', TRUE],
