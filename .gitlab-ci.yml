@@ -330,7 +330,7 @@ default:
   <<: [ *with-composer, *test-setup ]
   retry: 1
   variables:
-    KUBERNETES_CPU_REQUEST: "9"
+    KUBERNETES_CPU_REQUEST: "2"
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
