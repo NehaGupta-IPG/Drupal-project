@@ -20,7 +20,7 @@ use Drupal\Component\Datetime\TimeInterface;
  *
  * @ingroup cache
  */
-class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterface {
+class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterface, CacheTimeInterface {
 
   /**
    * Array to store cache objects.
@@ -99,7 +99,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
     $prepared->data = unserialize($prepared->data);
 
     // Check expire time.
-    $prepared->valid = $prepared->expire == Cache::PERMANENT || $prepared->expire >= $this->time->getCurrentTime();
+    $prepared->valid = $prepared->expire == Cache::PERMANENT || $prepared->expire >= $this->getTime();
 
     if (!$allow_invalid && !$prepared->valid) {
       return FALSE;
@@ -119,7 +119,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
     $this->cache[$cid] = (object) [
       'cid' => $cid,
       'data' => serialize($data),
-      'created' => $this->time->getCurrentTime(),
+      'created' => $this->getTime(),
       'expire' => $expire,
       'tags' => $tags,
     ];
@@ -189,9 +189,9 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    * {@inheritdoc}
    */
   public function garbageCollection() {
-    $requestTime = $this->time->getRequestTime();
-    $this->cache = array_filter($this->cache, function ($item) use ($requestTime) {
-      return $item->expire == Cache::PERMANENT || $item->expire >= $requestTime;
+    $time = $this->getTime();
+    $this->cache = array_filter($this->cache, function ($item) use ($time) {
+      return $item->expire == Cache::PERMANENT || $item->expire >= $time;
     });
   }
 
@@ -200,6 +200,13 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    */
   public function removeBin() {
     $this->cache = [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTime(): int {
+    return $this->time->getCurrentTime();
   }
 
   /**

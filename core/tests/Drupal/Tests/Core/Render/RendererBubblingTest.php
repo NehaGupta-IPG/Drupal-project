@@ -455,7 +455,9 @@ class RendererBubblingTest extends RendererTestBase {
     $this->setUpMemoryCache();
 
     // Mock the State service.
-    $time = $this->prophesize(TimeInterface::class)->reveal();
+    $time = $this->prophesize(TimeInterface::class);
+    $time->getCurrentTime()->willReturn(12345678);
+    $time = $time->reveal();
     $memory_state = new State(new KeyValueMemoryFactory(), new MemoryBackend($time), new NullLockBackend());
     \Drupal::getContainer()->set('state', $memory_state);
 

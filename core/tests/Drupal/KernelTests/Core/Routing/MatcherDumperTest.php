@@ -53,7 +53,9 @@ class MatcherDumperTest extends KernelTestBase {
     parent::setUp();
 
     $this->fixtures = new RoutingFixtures();
-    $time = $this->prophesize(TimeInterface::class)->reveal();
+    $time = $this->prophesize(TimeInterface::class);
+    $time->getCurrentTime()->willReturn(12345678);
+    $time = $time->reveal();
     $this->state = new State(new KeyValueMemoryFactory(), new MemoryBackend($time), new NullLockBackend());
     $this->logger = new TestLogger();
   }

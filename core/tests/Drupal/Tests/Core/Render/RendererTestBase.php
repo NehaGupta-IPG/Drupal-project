@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Render;
 
-use Drupal\Component\Datetime\Time;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
@@ -187,7 +186,8 @@ abstract class RendererTestBase extends UnitTestCase {
     $this->placeholderGenerator = new PlaceholderGenerator($this->cacheContextsManager, $this->rendererConfig);
     $this->renderCache = new PlaceholderingRenderCache($this->requestStack, $this->cacheFactory, $this->cacheContextsManager, $this->placeholderGenerator);
     $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig);
-    $this->datetimeTime = new Time($this->requestStack);
+    $this->datetimeTime = $this->createStub(TimeInterface::class);
+    $this->datetimeTime->method('getCurrentTime')->willReturn($_SERVER['REQUEST_TIME']);
 
     $container = new ContainerBuilder();
     $container->set('cache_contexts_manager', $this->cacheContextsManager);
@@ -271,7 +271,7 @@ abstract class RendererTestBase extends UnitTestCase {
   protected function setUpMemoryCache(): void {
     $this->setUpMockVariationCacheFactory();
 
-    $this->memoryCache = $this->memoryCache ?: new VariationCache($this->requestStack, new MemoryBackend(new Time($this->requestStack)), $this->cacheContextsManager);
+    $this->memoryCache = $this->memoryCache ?: new VariationCache($this->requestStack, new MemoryBackend($this->datetimeTime), $this->cacheContextsManager);
 
     $this->cacheFactory->expects($this->atLeastOnce())
       ->method('get')

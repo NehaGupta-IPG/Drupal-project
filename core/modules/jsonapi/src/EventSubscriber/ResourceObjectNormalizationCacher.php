@@ -122,7 +122,7 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
     $normalizer_values = $cached->data;
     assert(is_array($normalizer_values));
     if ($cached->expire >= 0) {
-      $max_age = max($cached->expire - $this->requestStack->getCurrentRequest()->server->get('REQUEST_TIME'), 0);
+      $max_age = max($cached->expire - $this->variationCache->getTime(), 0);
       $cacheability = new CacheableMetadata();
       $cacheability->setCacheMaxAge($max_age);
 

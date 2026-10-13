@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Kernel\EventSubscriber;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\entity_test\Entity\EntityTestComputedField;
 use Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
@@ -64,9 +66,23 @@ class ResourceObjectNormalizerCacherTest extends KernelTestBase {
   protected $cacher;
 
   /**
+   * The Unix timestamp to be returned by the 'datetime.time' service.
+   *
+   * If set, the 'datetime.time' service is replaced with a stub that returns
+   * this value from ::getCurrentTime(), which allows controlling the current
+   * time in the test.
+   *
+   * @see self::register()
+   */
+  protected int $currentTime;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if ($this->name() === 'testMaxAgeCorrection') {
+      $this->currentTime = time();
+    }
     parent::setUp();
 
     // Add the entity schemas.
@@ -76,6 +92,19 @@ class ResourceObjectNormalizerCacherTest extends KernelTestBase {
     $this->resourceTypeRepository = $this->container->get('jsonapi.resource_type.repository');
     $this->serializer = $this->container->get('jsonapi.serializer');
     $this->cacher = $this->container->get('jsonapi.normalization_cacher');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function register(ContainerBuilder $container): void {
+    parent::register($container);
+
+    if (isset($this->currentTime)) {
+      $time = $this->createStub(TimeInterface::class);
+      $time->method('getCurrentTime')->willReturnCallback(fn () => $this->currentTime);
+      $container->set('datetime.time', $time);
+    }
   }
 
   /**
@@ -153,26 +182,25 @@ class ResourceObjectNormalizerCacherTest extends KernelTestBase {
     $event = new TerminateEvent($http_kernel->reveal(), $request->reveal(), $response->reveal());
     $this->cacher->onTerminate($event);
 
-    // Change request time to 500 seconds later.
-    $current_request = \Drupal::requestStack()->getCurrentRequest();
-    $current_request->server->set('REQUEST_TIME', $current_request->server->get('REQUEST_TIME') + 500);
+    // Change current time to 500 seconds later.
+    $this->currentTime += 500;
     $resource_normalization = $this->serializer
       ->normalize($resource_object, 'api_json', ['account' => NULL]);
     $this->assertEquals($baseMaxAge - 500, $resource_normalization->getCacheMaxAge(), 'Max age should be 300 since 500 seconds has passed');
 
-    // Change request time to 300 seconds later (800 seconds later in total),
+    // Change current time to 300 seconds later (800 seconds later in total),
     // this is the last second the cache backend would return cached data. The
-    // max-age at that time should be 0 as the request time is the same as the
+    // max-age at that time should be 0 as the current time is the same as the
     // expiration time of the cache entry.
-    $current_request->server->set('REQUEST_TIME', $current_request->server->get('REQUEST_TIME') + 300);
+    $this->currentTime += 300;
     $resource_normalization = $this->serializer
       ->normalize($resource_object, 'api_json', ['account' => NULL]);
     $this->assertEquals(0, $resource_normalization->getCacheMaxAge(), 'Max age should be 0 since max-age has passed');
 
-    // Change request time to 1 second later (801 seconds later in total). This
+    // Change current time to 1 second later (801 seconds later in total). This
     // will generate a new cache entry because the one from above has now
     // expired. Thus, the max age of the normalization is back to 800.
-    $current_request->server->set('REQUEST_TIME', $current_request->server->get('REQUEST_TIME') + 1);
+    $this->currentTime += 1;
     $resource_normalization = $this->serializer
       ->normalize($resource_object, 'api_json', ['account' => NULL]);
     $this->assertEquals(800, $resource_normalization->getCacheMaxAge(), 'Max age should be 800 since a new cache item has been created');
