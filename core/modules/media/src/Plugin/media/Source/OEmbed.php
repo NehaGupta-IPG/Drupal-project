@@ -30,6 +30,8 @@ use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
 use Drupal\media\OEmbed\UrlResolverInterface;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -136,6 +138,13 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    * @var \Drupal\Core\Utility\Token
    */
   protected $token;
+
+  /**
+   * Local thumbnails resolved by this plugin instance, keyed by directory/URL.
+   *
+   * @var array<string, string|null>
+   */
+  protected array $localThumbnails = [];
 
   /**
    * Constructs a new OEmbed instance.
@@ -286,10 +295,14 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
         return $resource->getCacheMaxAge();
 
       case 'thumbnail_width':
-        return $resource->getThumbnailWidth();
-
       case 'thumbnail_height':
-        return $resource->getThumbnailHeight();
+        // Describe the selected local image, which may differ from oEmbed data.
+        $uri = $this->getLocalThumbnailUri($resource, $media);
+        $dimensions = $uri ? @getimagesize($uri) : FALSE;
+        if ($dimensions) {
+          return $dimensions[$name === 'thumbnail_width' ? 0 : 1];
+        }
+        return $name === 'thumbnail_width' ? $resource->getThumbnailWidth() : $resource->getThumbnailHeight();
 
       case 'url':
         $url = $resource->getUrl();
@@ -431,6 +444,13 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
     $directory = $this->token->replace($directory, $token_data);
     $directory = PlainTextOutput::renderFromHtml($directory);
 
+    $remote_thumbnail_url = $remote_thumbnail_url->toString();
+    $cache_key = $directory . ':' . $remote_thumbnail_url;
+    if (array_key_exists($cache_key, $this->localThumbnails)) {
+      return $this->localThumbnails[$cache_key];
+    }
+    $this->localThumbnails[$cache_key] = NULL;
+
     // The local thumbnail doesn't exist yet, so try to download it. First,
     // ensure that the destination directory is writable, and if it's not,
     // log an error and bail out.
@@ -441,36 +461,83 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
       return NULL;
     }
 
-    // The local filename of the thumbnail is always a hash of its remote URL.
-    // If a file with that name already exists in the thumbnails directory,
-    // regardless of its extension, return its URI.
-    $remote_thumbnail_url = $remote_thumbnail_url->toString();
-    $hash = Crypt::hashBase64($remote_thumbnail_url);
-    $files = $this->fileSystem->scanDirectory($directory, "/^$hash\..*/");
-    if (count($files) > 0) {
-      return reset($files)->uri;
-    }
+    foreach ($this->getThumbnailUrls($resource) as $thumbnail_url) {
+      // Reuse a previously selected image without downloading it again.
+      $hash = Crypt::hashBase64($thumbnail_url);
+      $files = $this->fileSystem->scanDirectory($directory, "/^$hash\..*/");
+      if ($files) {
+        return $this->localThumbnails[$cache_key] = reset($files)->uri;
+      }
 
-    // The local thumbnail doesn't exist yet, so we need to download it.
-    try {
-      $response = $this->httpClient->request('GET', $remote_thumbnail_url);
-      if ($response->getStatusCode() === 200) {
-        $local_thumbnail_uri = $directory . DIRECTORY_SEPARATOR . $hash . '.' . $this->getThumbnailFileExtensionFromUrl($remote_thumbnail_url, $response);
-        $this->fileSystem->saveData((string) $response->getBody(), $local_thumbnail_uri, FileExists::Replace);
-        return $local_thumbnail_uri;
+      try {
+        $response = $this->httpClient->request('GET', $thumbnail_url, [
+          RequestOptions::HTTP_ERRORS => $thumbnail_url === $remote_thumbnail_url,
+        ]);
+        if ($response->getStatusCode() !== 200) {
+          continue;
+        }
+        $data = (string) $response->getBody();
+        if ($thumbnail_url !== $remote_thumbnail_url) {
+          $dimensions = @getimagesizefromstring($data);
+          if (!$dimensions || $dimensions[0] * $dimensions[1] <= $resource->getThumbnailWidth() * $resource->getThumbnailHeight()) {
+            continue;
+          }
+        }
+        // Validate and save the same response body, avoiding a second request.
+        $uri = $directory . DIRECTORY_SEPARATOR . $hash . '.' . $this->getThumbnailFileExtensionFromUrl($thumbnail_url, $response);
+        $this->fileSystem->saveData($data, $uri, FileExists::Replace);
+        return $this->localThumbnails[$cache_key] = $uri;
+      }
+      catch (ClientExceptionInterface $e) {
+        if ($thumbnail_url === $remote_thumbnail_url) {
+          $this->logger->warning('Failed to download remote thumbnail file due to "%error".', [
+            '%error' => $e->getMessage(),
+          ]);
+        }
+      }
+      catch (FileException) {
+        $this->logger->warning('Could not download remote thumbnail from {url}.', [
+          'url' => $thumbnail_url,
+        ]);
       }
     }
-    catch (ClientExceptionInterface $e) {
-      $this->logger->warning('Failed to download remote thumbnail file due to "%error".', [
-        '%error' => $e->getMessage(),
-      ]);
-    }
-    catch (FileException) {
-      $this->logger->warning('Could not download remote thumbnail from {url}.', [
-        'url' => $remote_thumbnail_url,
-      ]);
-    }
     return NULL;
+  }
+
+  /**
+   * Returns thumbnail URLs in preference order, ending with the oEmbed URL.
+   *
+   * @param \Drupal\media\OEmbed\Resource $resource
+   *   The oEmbed resource.
+   *
+   * @return string[]
+   *   Candidate thumbnail URLs, with the original URL as the fallback.
+   */
+  protected function getThumbnailUrls(Resource $resource): array {
+    $original_url = $resource->getThumbnailUrl()->toString();
+    $urls = [];
+    $uri = new Uri($original_url);
+    if ($resource->getType() === Resource::TYPE_VIDEO) {
+      $provider = $resource->getProvider()?->getName();
+      if ($provider === 'YouTube' && in_array($uri->getHost(), ['i.ytimg.com', 'img.youtube.com'], TRUE)) {
+        if (preg_match('@^/vi(?:_webp)?/([a-zA-Z0-9_-]{11})/(?:hq|mq|sd|maxres)(default|[1-3])\.(jpg|webp)$@', $uri->getPath(), $matches)) {
+          // Preserve the selected poster/frame when requesting another size.
+          if ($resource->getHeight() > $resource->getWidth()) {
+            $urls[] = (string) $uri->withPath('/vi/' . $matches[1] . '/oar' . $matches[2] . '.jpg');
+          }
+          foreach (['maxres', 'sd'] as $variant) {
+            $path = preg_replace('@/[^/]+$@', '/' . $variant . $matches[2] . '.' . $matches[3], $uri->getPath());
+            $urls[] = (string) $uri->withPath($path);
+          }
+        }
+      }
+      elseif ($provider === 'Vimeo' && $uri->getHost() === 'i.vimeocdn.com' && str_starts_with($uri->getPath(), '/video/')) {
+        $path = preg_replace('@_\d+(?:x\d+)?(?=\.[a-zA-Z]+$|$)@', '', $uri->getPath());
+        $urls[] = (string) $uri->withPath($path);
+      }
+    }
+    $urls[] = $original_url;
+    return array_values(array_unique($urls));
   }
 
   /**
