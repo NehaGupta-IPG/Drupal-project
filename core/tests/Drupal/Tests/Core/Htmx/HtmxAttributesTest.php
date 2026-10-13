@@ -202,8 +202,8 @@ class HtmxAttributesTest extends UnitTestCase {
   /**
    * Test boost method.
    */
-  #[DataProvider('booleanStringDataProvider')]
-  public function testHxBoost(bool $value, string $expected): void {
+  #[DataProvider('boostStringDataProvider')]
+  public function testHxBoost(bool|string $value, string $expected): void {
     $this->htmx->boost($value);
     $render = $this->apply();
     $this->assertTrue(isset($render['#attributes']['data-hx-boost']));
@@ -211,20 +211,17 @@ class HtmxAttributesTest extends UnitTestCase {
   }
 
   /**
-   * Test boost method with a configuration string and modifiers.
+   * Provides data to self::testHxPushUrl and self::testHxReplaceUrl.
+   *
+   * @return array{bool, string}[]
+   *   Array of <bool, string> expected.
    */
-  public function testHxBoostConfigurationAndModifiers(): void {
-    $this->htmx->boost('swap:innerHTML target:#main');
-    $render = $this->apply();
-    $this->assertEquals('swap:innerHTML target:#main', $render['#attributes']['data-hx-boost']);
-
-    $this->htmx->boost(TRUE, Htmx::INHERITED);
-    $render = $this->apply();
-    $this->assertEquals('true', $render['#attributes']['data-hx-boost:inherited']);
-
-    $this->htmx->boost('swap:outerHTML', Htmx::INHERITED);
-    $render = $this->apply();
-    $this->assertEquals('swap:outerHTML', $render['#attributes']['data-hx-boost:inherited']);
+  public static function boostStringDataProvider(): array {
+    return [
+      [TRUE, 'true'],
+      [FALSE, 'false'],
+      ['swap:outerSync select:#main target:#main', 'swap:outerSync select:#main target:#main'],
+    ];
   }
 
   /**

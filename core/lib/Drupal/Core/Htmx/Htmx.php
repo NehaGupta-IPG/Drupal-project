@@ -1046,16 +1046,18 @@ class Htmx {
    * form tags to use AJAX instead. This has the nice fallback that, if the
    * user does not have javascript enabled, the site will continue to work.
    *
-   * In HTMX 4 attributes are not inherited by default. To boost the anchors
-   * and forms inside an element, use the Htmx::INHERITED modifier.
+   * The simple syntax is `hx-boost="true"` or `hx-boost="false"`.
    *
-   * Instead of a boolean, a string of space-separated key:value pairs may be
-   * passed to configure the boosted requests, for example
-   * 'swap:innerHTML target:#main'.
+   * You can configure boost behavior using a config string that sets swap,
+   * target, and other options directly on the hx-boost attribute. Set the
+   * @code Htmx::INHERITED @endcode modifier to pass that config down to all
+   * boosted descendants.
+   *
+   * The documentation link below has more information on the syntax and
+   * precedence of the attributes between inherited and element attributes.
    *
    * @param bool|string $value
-   *   Either a boolean declaring whether the element should be "boosted", or a
-   *   configuration string for the boosted requests.
+   *   The value to be set for the attribute.
    * @param int $modifiers
    *   The modifiers to apply to the attribute. Defaults to no modifiers.
    *
