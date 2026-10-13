@@ -32,9 +32,6 @@ abstract class AttributeValueBase {
    */
   protected $name;
 
-  /**
-   * Constructs a \Drupal\Component\Utility\HtmlAttribute\AttributeValueBase object.
-   */
   public function __construct($name, $value) {
     $this->name = $name;
     $this->value = $value;
