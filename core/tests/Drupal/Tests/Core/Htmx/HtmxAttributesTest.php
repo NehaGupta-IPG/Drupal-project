@@ -211,7 +211,7 @@ class HtmxAttributesTest extends UnitTestCase {
   }
 
   /**
-   * Provides data to self::testHxPushUrl and self::testHxReplaceUrl.
+   * Provides data to self::testHxBoost.
    *
    * @return array{bool, string}[]
    *   Array of <bool, string> expected.
