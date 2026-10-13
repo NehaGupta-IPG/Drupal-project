@@ -204,13 +204,18 @@ default:
   - |
     echo "CPU stats: KUBERNETES_CPU_REQUEST=$KUBERNETES_CPU_REQUEST CONCURRENCY=$CONCURRENCY nproc=$(nproc)"
     echo "CPU model: $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2) loadavg: $(cat /proc/loadavg)"
+    echo "Node memory: $(grep MemTotal /proc/meminfo)"
+    # Kubernetes sets this from the memory request:
+    # 1000 - 1000 * request / node memory.
+    echo "oom_score_adj: $(cat /proc/self/oom_score_adj)"
     if [ -f /sys/fs/cgroup/cpu.stat ]; then
-      for f in cpu.max cpu.stat cpu.pressure memory.max memory.peak; do
+      # cpu.weight reflects the CPU request.
+      for f in cpu.max cpu.weight cpu.stat cpu.pressure memory.max memory.peak; do
         echo "== $f"
         cat /sys/fs/cgroup/$f 2>/dev/null || echo "unavailable"
       done
     else
-      for f in cpu/cpu.cfs_quota_us cpu/cpu.cfs_period_us cpu/cpu.stat cpuacct/cpuacct.usage memory/memory.limit_in_bytes memory/memory.max_usage_in_bytes; do
+      for f in cpu/cpu.cfs_quota_us cpu/cpu.cfs_period_us cpu/cpu.shares cpu/cpu.stat cpuacct/cpuacct.usage memory/memory.limit_in_bytes memory/memory.max_usage_in_bytes; do
         echo "== $f"
         cat /sys/fs/cgroup/$f 2>/dev/null || echo "unavailable"
       done
