@@ -211,6 +211,23 @@ class HtmxAttributesTest extends UnitTestCase {
   }
 
   /**
+   * Test boost method with a configuration string and modifiers.
+   */
+  public function testHxBoostConfigurationAndModifiers(): void {
+    $this->htmx->boost('swap:innerHTML target:#main');
+    $render = $this->apply();
+    $this->assertEquals('swap:innerHTML target:#main', $render['#attributes']['data-hx-boost']);
+
+    $this->htmx->boost(TRUE, Htmx::INHERITED);
+    $render = $this->apply();
+    $this->assertEquals('true', $render['#attributes']['data-hx-boost:inherited']);
+
+    $this->htmx->boost('swap:outerHTML', Htmx::INHERITED);
+    $render = $this->apply();
+    $this->assertEquals('swap:outerHTML', $render['#attributes']['data-hx-boost:inherited']);
+  }
+
+  /**
    * Test headers method.
    */
   public function testHxHeaders(): void {
