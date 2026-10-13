@@ -7,9 +7,9 @@ namespace Drupal\Tests\Component\Utility;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Utility\HtmlAttributeArray;
-use Drupal\Component\Utility\HtmlAttributes;
-use Drupal\Component\Utility\HtmlAttributeString;
+use Drupal\Component\Utility\HtmlAttribute\AttributeArray;
+use Drupal\Component\Utility\HtmlAttribute\Attribute;
+use Drupal\Component\Utility\HtmlAttribute\AttributeString;
 use Drupal\Component\Utility\Random;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -18,9 +18,9 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
- * Tests Drupal\Component\Utility\HtmlAttributes.
+ * Tests Drupal\Component\Utility\HtmlAttribute\Attribute.
  */
-#[CoversClass(HtmlAttributes::class)]
+#[CoversClass(Attribute::class)]
 #[Group('Utility')]
 #[Group('Template')]
 class HtmlAttributesTest extends TestCase {
@@ -28,17 +28,17 @@ class HtmlAttributesTest extends TestCase {
   use ProphecyTrait;
 
   /**
-   * Tests HtmlAttributeValueBase copy.
+   * Tests AttributeValueBase copy.
    */
   public function testAttributeValueBaseCopy(): void {
-    $original_attributes = new HtmlAttributes([
+    $original_attributes = new Attribute([
       'checked' => TRUE,
       'class' => ['who', 'is', 'on'],
       'id' => 'first',
     ]);
     $attributes['selected'] = $original_attributes['checked'];
     $attributes['id'] = $original_attributes['id'];
-    $attributes = new HtmlAttributes($attributes);
+    $attributes = new Attribute($attributes);
     $this->assertSame(' checked class="who is on" id="first"', (string) $original_attributes, 'Original boolean value used with original name.');
     $this->assertSame(' selected id="first"', (string) $attributes, 'Original boolean value used with new name.');
   }
@@ -47,54 +47,54 @@ class HtmlAttributesTest extends TestCase {
    * Tests the constructor of the attribute class.
    */
   public function testConstructor(): void {
-    $attribute = new HtmlAttributes(['class' => ['example-class']]);
+    $attribute = new Attribute(['class' => ['example-class']]);
     $this->assertTrue(isset($attribute['class']));
-    $this->assertEquals(new HtmlAttributeArray('class', ['example-class']), $attribute['class']);
+    $this->assertEquals(new AttributeArray('class', ['example-class']), $attribute['class']);
 
     // Test adding boolean attributes through the constructor.
-    $attribute = new HtmlAttributes(['selected' => TRUE, 'checked' => FALSE]);
+    $attribute = new Attribute(['selected' => TRUE, 'checked' => FALSE]);
     $this->assertTrue($attribute['selected']->value());
     $this->assertFalse($attribute['checked']->value());
 
     // Test that non-array values with name "class" are cast to array.
-    $attribute = new HtmlAttributes(['class' => 'example-class']);
+    $attribute = new Attribute(['class' => 'example-class']);
     $this->assertTrue(isset($attribute['class']));
-    $this->assertEquals(new HtmlAttributeArray('class', ['example-class']), $attribute['class']);
+    $this->assertEquals(new AttributeArray('class', ['example-class']), $attribute['class']);
 
     // Test that safe string objects work correctly.
     $safe_string = $this->prophesize(MarkupInterface::class);
     $safe_string->__toString()->willReturn('example-class');
-    $attribute = new HtmlAttributes(['class' => $safe_string->reveal()]);
+    $attribute = new Attribute(['class' => $safe_string->reveal()]);
     $this->assertTrue(isset($attribute['class']));
-    $this->assertEquals(new HtmlAttributeArray('class', ['example-class']), $attribute['class']);
+    $this->assertEquals(new AttributeArray('class', ['example-class']), $attribute['class']);
   }
 
   /**
    * Tests set of values.
    */
   public function testSet(): void {
-    $attribute = new HtmlAttributes();
+    $attribute = new Attribute();
     $attribute['class'] = ['example-class'];
 
     $this->assertTrue(isset($attribute['class']));
-    $this->assertEquals(new HtmlAttributeArray('class', ['example-class']), $attribute['class']);
+    $this->assertEquals(new AttributeArray('class', ['example-class']), $attribute['class']);
   }
 
   /**
    * Tests adding new values to an existing part of the attribute.
    */
   public function testAdd(): void {
-    $attribute = new HtmlAttributes(['class' => ['example-class']]);
+    $attribute = new Attribute(['class' => ['example-class']]);
 
     $attribute['class'][] = 'other-class';
-    $this->assertEquals(new HtmlAttributeArray('class', ['example-class', 'other-class']), $attribute['class']);
+    $this->assertEquals(new AttributeArray('class', ['example-class', 'other-class']), $attribute['class']);
   }
 
   /**
    * Tests removing of values.
    */
   public function testRemove(): void {
-    $attribute = new HtmlAttributes(['class' => ['example-class']]);
+    $attribute = new Attribute(['class' => ['example-class']]);
     unset($attribute['class']);
     $this->assertFalse(isset($attribute['class']));
   }
@@ -103,25 +103,25 @@ class HtmlAttributesTest extends TestCase {
    * Tests setting attributes.
    */
   public function testSetAttribute(): void {
-    $attribute = new HtmlAttributes();
+    $attribute = new Attribute();
 
     // Test adding various attributes.
     $attributes = ['alt', 'id', 'src', 'title', 'value'];
     foreach ($attributes as $key) {
       foreach (['kitten', ''] as $value) {
-        $attribute = new HtmlAttributes();
+        $attribute = new Attribute();
         $attribute->setAttribute($key, $value);
         $this->assertEquals($value, $attribute[$key]);
       }
     }
 
     // Test adding array to class.
-    $attribute = new HtmlAttributes();
+    $attribute = new Attribute();
     $attribute->setAttribute('class', ['kitten', 'cat']);
     $this->assertEquals(['kitten', 'cat'], $attribute['class']->value());
 
     // Test adding boolean attributes.
-    $attribute = new HtmlAttributes();
+    $attribute = new Attribute();
     $attribute['checked'] = TRUE;
     $this->assertTrue($attribute['checked']->value());
   }
@@ -139,7 +139,7 @@ class HtmlAttributesTest extends TestCase {
       'value' => 'ostrich',
       'checked' => TRUE,
     ];
-    $attribute = new HtmlAttributes($attributes);
+    $attribute = new Attribute($attributes);
 
     // Single value.
     $attribute->removeAttribute('alt');
@@ -170,17 +170,16 @@ class HtmlAttributesTest extends TestCase {
   public function testAddClasses(): void {
     // Add a class with the array syntax without first initializing the 'class'
     // attribute.
-    $attribute = new HtmlAttributes();
+    $attribute = new Attribute();
     $attribute['class'][] = 'test-class';
-    $this->assertEquals(new HtmlAttributeArray('class', ['test-class']), $attribute['class']);
+    $this->assertEquals(new AttributeArray('class', ['test-class']), $attribute['class']);
 
-    $attribute = new HtmlAttributes();
+    $attribute = new Attribute();
     // Add no class on empty attribute.
     $attribute->addClass();
     $this->assertEmpty($attribute['class']->value());
 
-    // Test various permutations of adding values to empty HtmlAttributes
-    // objects.
+    // Test various permutations of adding values to empty Attribute objects.
     foreach ([NULL, FALSE, '', []] as $value) {
       // Single value.
       $attribute->addClass($value);
@@ -226,7 +225,7 @@ class HtmlAttributesTest extends TestCase {
   public function testRemoveClasses(): void {
     // Add duplicate class to ensure that both duplicates are removed.
     $classes = ['example-class', 'aa', 'xx', 'yy', 'red', 'green', 'blue', 'red'];
-    $attribute = new HtmlAttributes(['class' => $classes]);
+    $attribute = new Attribute(['class' => $classes]);
 
     // Remove one class.
     $attribute->removeClass('example-class');
@@ -255,7 +254,7 @@ class HtmlAttributesTest extends TestCase {
    */
   public function testHasClass(): void {
     // Test an attribute without any classes.
-    $attribute = new HtmlAttributes();
+    $attribute = new Attribute();
     $this->assertFalse($attribute->hasClass('a-class-nowhere-to-be-found'));
 
     // Add a class to check for.
@@ -271,7 +270,7 @@ class HtmlAttributesTest extends TestCase {
    * @legacy-covers ::addClass
    */
   public function testChainAddRemoveClasses(): void {
-    $attribute = new HtmlAttributes(
+    $attribute = new Attribute(
       ['class' => ['example-class', 'red', 'green', 'blue']]
     );
 
@@ -287,17 +286,17 @@ class HtmlAttributesTest extends TestCase {
    * Tests iterating on the values of the attribute.
    */
   public function testIterate(): void {
-    $attribute = new HtmlAttributes(['class' => ['example-class'], 'id' => 'example-id']);
+    $attribute = new Attribute(['class' => ['example-class'], 'id' => 'example-id']);
 
     $counter = 0;
     foreach ($attribute as $key => $value) {
       if ($counter == 0) {
         $this->assertEquals('class', $key);
-        $this->assertEquals(new HtmlAttributeArray('class', ['example-class']), $value);
+        $this->assertEquals(new AttributeArray('class', ['example-class']), $value);
       }
       if ($counter == 1) {
         $this->assertEquals('id', $key);
-        $this->assertEquals(new HtmlAttributeString('id', 'example-id'), $value);
+        $this->assertEquals(new AttributeString('id', 'example-id'), $value);
       }
       $counter++;
     }
@@ -307,7 +306,7 @@ class HtmlAttributesTest extends TestCase {
    * Tests printing of an attribute.
    */
   public function testPrint(): void {
-    $attribute = new HtmlAttributes(['class' => ['example-class'], 'id' => 'example-id', 'enabled' => TRUE]);
+    $attribute = new Attribute(['class' => ['example-class'], 'id' => 'example-id', 'enabled' => TRUE]);
 
     $content = (new Random())->machineName();
     $html = '<div' . $attribute . '>' . $content . '</div>';
@@ -327,7 +326,7 @@ class HtmlAttributesTest extends TestCase {
    */
   #[DataProvider('providerTestAttributeValues')]
   public function testAttributeValues(array $attributes, $expected): void {
-    $this->assertEquals($expected, (new HtmlAttributes($attributes))->__toString());
+    $this->assertEquals($expected, (new Attribute($attributes))->__toString());
   }
 
   public static function providerTestAttributeValues(): array {
@@ -455,9 +454,9 @@ class HtmlAttributesTest extends TestCase {
    * Tests the storage method.
    */
   public function testStorage(): void {
-    $attribute = new HtmlAttributes(['class' => ['example-class']]);
+    $attribute = new Attribute(['class' => ['example-class']]);
 
-    $this->assertEquals(['class' => new HtmlAttributeArray('class', ['example-class'])], $attribute->storage());
+    $this->assertEquals(['class' => new AttributeArray('class', ['example-class'])], $attribute->storage());
   }
 
   /**
@@ -482,7 +481,7 @@ class HtmlAttributesTest extends TestCase {
    */
   #[DataProvider('providerTestHasAttribute')]
   public function testHasAttribute(array $test_data, string $test_attribute, bool $expected): void {
-    $attributes = new HtmlAttributes($test_data);
+    $attributes = new Attribute($test_data);
     $this->assertSame($expected, $attributes->hasAttribute($test_attribute));
   }
 

@@ -14,22 +14,22 @@ parameters:
     'Drupal\Core\StringTranslation\TranslationWrapper':
       class: 'Drupal\Core\StringTranslation\TranslatableMarkup'
     'Drupal\Core\Template\AttributeArray':
-      class: 'Drupal\Component\Utility\HtmlAttributeArray'
+      class: 'Drupal\Component\Utility\HtmlAttribute\AttributeArray'
       deprecation_version: drupal:12.1.0
       removed_version: drupal:13.0.0
       change_record: https://www.drupal.org/node/3070485
     'Drupal\Core\Template\AttributeBoolean':
-      class: 'Drupal\Component\Utility\HtmlAttributeBoolean'
+      class: 'Drupal\Component\Utility\HtmlAttribute\AttributeBoolean'
       deprecation_version: drupal:12.1.0
       removed_version: drupal:13.0.0
       change_record: https://www.drupal.org/node/3070485
     'Drupal\Core\Template\AttributeString':
-      class: 'Drupal\Component\Utility\HtmlAttributeString'
+      class: 'Drupal\Component\Utility\HtmlAttribute\AttributeString'
       deprecation_version: drupal:12.1.0
       removed_version: drupal:13.0.0
       change_record: https://www.drupal.org/node/3070485
     'Drupal\Core\Template\AttributeValueBase':
-      class: 'Drupal\Component\Utility\HtmlAttributeValueBase'
+      class: 'Drupal\Component\Utility\HtmlAttribute\AttributeValueBase'
       deprecation_version: drupal:12.1.0
       removed_version: drupal:13.0.0
       change_record: https://www.drupal.org/node/3070485
