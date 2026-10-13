@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests;
 
+use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\Component\Serialization\Json;
@@ -242,6 +243,15 @@ class BrowserTestBaseTest extends BrowserTestBase {
   public function testXpathAsserts(): void {
     $this->drupalGet('test-field-xpath');
     $this->assertSession()->elementTextContains('xpath', '//table/tbody/tr[2]/td[1]', 'one');
+
+    $xpath = '//input[@id=:id]';
+    $arguments = [':id' => 'edit-name'];
+    $elements = $this->getNodeElementsByXpath($xpath, $arguments);
+    $this->assertCount(1, $elements);
+    $this->assertInstanceOf(NodeElement::class, $elements[0]);
+    $this->assertSame('Test name', $elements[0]->getValue());
+    $this->assertEquals($elements, $this->xpath($xpath, $arguments));
+    $this->assertSame([], $this->getNodeElementsByXpath('//nonexisting'));
 
     $this->assertSession()->fieldValueEquals('edit-name', 'Test name');
     $this->assertSession()->fieldValueEquals('edit-options', '2');
