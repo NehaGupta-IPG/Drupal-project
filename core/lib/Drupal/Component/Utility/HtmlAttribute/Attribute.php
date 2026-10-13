@@ -1,6 +1,8 @@
 <?php
 
-namespace Drupal\Component\Utility;
+namespace Drupal\Component\Utility\HtmlAttribute;
+
+use Drupal\Component\Utility\Html;
 
 /**
  * Collects, sanitizes, and renders HTML attributes.
@@ -8,7 +10,7 @@ namespace Drupal\Component\Utility;
  * To use, optionally pass in an associative array of defined attributes, or
  * add attributes using array syntax. For example:
  * @code
- *  $attributes = new HtmlAttributes(['id' => 'socks']);
+ *  $attributes = new Attribute(['id' => 'socks']);
  *  $attributes['class'] = ['black-cat', 'white-cat'];
  *  $attributes['class'][] = 'black-white-cat';
  *  echo '<cat' . $attributes . '>';
@@ -17,7 +19,7 @@ namespace Drupal\Component\Utility;
  *
  * $attributes always prints out all the attributes. For example:
  * @code
- *  $attributes = new HtmlAttributes(['id' => 'socks']);
+ *  $attributes = new Attribute(['id' => 'socks']);
  *  $attributes['class'] = ['black-cat', 'white-cat'];
  *  $attributes['class'][] = 'black-white-cat';
  *  echo '<cat class="cat ' . $attributes['class'] . '"' . $attributes . '>';
@@ -43,7 +45,7 @@ namespace Drupal\Component\Utility;
  * @code
  *  $path = 'javascript:alert("xss");';
  *  $path = UrlHelper::stripDangerousProtocols($path);
- *  $attributes = new HtmlAttributes(['href' => $path]);
+ *  $attributes = new Attribute(['href' => $path]);
  *  echo '<a' . $attributes . '>';
  *  // Produces <a href="alert(&quot;xss&quot;);">
  * @endcode
@@ -53,29 +55,29 @@ namespace Drupal\Component\Utility;
  * PlainTextOutput::renderFromHtml()) before being escaped. For example:
  * @code
  *   $value = t('Highlight the @tag tag', ['@tag' => '<em>']);
- *   $attributes = new HtmlAttributes(['value' => $value]);
+ *   $attributes = new Attribute(['value' => $value]);
  *   echo '<input' . $attributes . '>';
  *   // Produces <input value="Highlight the &lt;em&gt; tag">
  * @endcode
  *
- * @implements \ArrayAccess<string, \Drupal\Component\Utility\HtmlAttributeValueBase>
- * @implements \IteratorAggregate<string, \Drupal\Component\Utility\HtmlAttributeValueBase>
+ * @implements \ArrayAccess<string, \Drupal\Component\Utility\HtmlAttribute\AttributeValueBase>
+ * @implements \IteratorAggregate<string, \Drupal\Component\Utility\HtmlAttribute\AttributeValueBase>
  *
  * @see \Drupal\Component\Utility\Html::escape()
  * @see \Drupal\Component\Render\PlainTextOutput::renderFromHtml()
  * @see \Drupal\Component\Utility\UrlHelper::stripDangerousProtocols()
  */
-class HtmlAttributes implements \ArrayAccess, \IteratorAggregate, \Stringable {
+class Attribute implements \ArrayAccess, \IteratorAggregate, \Stringable {
 
   /**
    * Stores the attribute data.
    *
-   * @var array<string, \Drupal\Component\Utility\HtmlAttributeValueBase>
+   * @var array<string, \Drupal\Component\Utility\HtmlAttribute\AttributeValueBase>
    */
   protected $storage = [];
 
   /**
-   * Constructs a \Drupal\Component\Utility\HtmlAttributes object.
+   * Constructs a \Drupal\Component\Utility\HtmlAttribute\Attribute object.
    *
    * @param array $attributes
    *   An associative array of key-value pairs to be converted to attributes.
@@ -118,18 +120,18 @@ class HtmlAttributes implements \ArrayAccess, \IteratorAggregate, \Stringable {
    * @param mixed $value
    *   The attribute value.
    *
-   * @return \Drupal\Component\Utility\HtmlAttributeValueBase
-   *   An HtmlAttributeValueBase representation of the attribute's value.
+   * @return \Drupal\Component\Utility\HtmlAttribute\AttributeValueBase
+   *   An AttributeValueBase representation of the attribute's value.
    */
   protected function createAttributeValue($name, $value) {
-    // If the value is already an HtmlAttributeValueBase object,
+    // If the value is already an AttributeValueBase object,
     // return a new instance of the same class, but with the new name.
-    if ($value instanceof HtmlAttributeValueBase) {
+    if ($value instanceof AttributeValueBase) {
       $class = get_class($value);
       return new $class($name, $value->value());
     }
     // An array value or 'class' attribute name are forced to always be an
-    // HtmlAttributeArray value for consistency.
+    // AttributeArray value for consistency.
     if ($name == 'class' && !is_array($value)) {
       // Cast the value to string in case it implements MarkupInterface.
       $value = [(string) $value];
@@ -138,10 +140,10 @@ class HtmlAttributes implements \ArrayAccess, \IteratorAggregate, \Stringable {
       // Cast the value to an array if the value was passed in as a string.
       // @todo Decide to fix all the broken instances of class as a string
       // in core or cast them.
-      $value = new HtmlAttributeArray($name, $value);
+      $value = new AttributeArray($name, $value);
     }
     elseif (is_bool($value)) {
-      $value = new HtmlAttributeBoolean($name, $value);
+      $value = new AttributeBoolean($name, $value);
     }
     // As a development aid, we allow the value to be any Stringable object.
     elseif ($value instanceof \Stringable) {
@@ -149,10 +151,10 @@ class HtmlAttributes implements \ArrayAccess, \IteratorAggregate, \Stringable {
       // the value to plain text.
       // @see \Drupal\Component\Render\PlainTextOutput::renderFromHtml()
       $value = Html::decodeEntities(strip_tags((string) $value));
-      $value = new HtmlAttributeString($name, $value);
+      $value = new AttributeString($name, $value);
     }
     elseif (!is_object($value)) {
-      $value = new HtmlAttributeString($name, $value);
+      $value = new AttributeString($name, $value);
     }
     return $value;
   }
@@ -191,7 +193,7 @@ class HtmlAttributes implements \ArrayAccess, \IteratorAggregate, \Stringable {
       $classes = array_merge(...$classes);
 
       // Merge if there are values, just add them otherwise.
-      if (isset($this->storage['class']) && $this->storage['class'] instanceof HtmlAttributeArray) {
+      if (isset($this->storage['class']) && $this->storage['class'] instanceof AttributeArray) {
         // Merge the values passed in from the class value array.
         $classes = array_merge($this->storage['class']->value(), $classes);
         $this->storage['class']->exchangeArray($classes);
@@ -234,7 +236,7 @@ class HtmlAttributes implements \ArrayAccess, \IteratorAggregate, \Stringable {
   }
 
   /**
-   * Removes an attribute from an HtmlAttributes object.
+   * Removes an attribute from an Attribute object.
    *
    * @param string|array ...$args
    *   Attributes to remove from the attribute array.
@@ -267,7 +269,7 @@ class HtmlAttributes implements \ArrayAccess, \IteratorAggregate, \Stringable {
    */
   public function removeClass(...$args) {
     // With no class attribute, there is no need to remove.
-    if (isset($this->storage['class']) && $this->storage['class'] instanceof HtmlAttributeArray) {
+    if (isset($this->storage['class']) && $this->storage['class'] instanceof AttributeArray) {
       $classes = [];
       foreach ($args as $arg) {
         // Merge the values passed in from the classes array.
@@ -290,7 +292,7 @@ class HtmlAttributes implements \ArrayAccess, \IteratorAggregate, \Stringable {
    *
    * This method is implemented to take precedence over hasClass() for Twig 2.0.
    *
-   * @return \Drupal\Component\Utility\HtmlAttributeValueBase
+   * @return \Drupal\Component\Utility\HtmlAttribute\AttributeValueBase
    *   The class attribute value if set.
    *
    * @see twig_get_attribute()
@@ -309,7 +311,7 @@ class HtmlAttributes implements \ArrayAccess, \IteratorAggregate, \Stringable {
    *   Returns TRUE if the class exists, or FALSE otherwise.
    */
   public function hasClass($class) {
-    if (isset($this->storage['class']) && $this->storage['class'] instanceof HtmlAttributeArray) {
+    if (isset($this->storage['class']) && $this->storage['class'] instanceof AttributeArray) {
       return in_array($class, $this->storage['class']->value());
     }
     else {
@@ -322,9 +324,9 @@ class HtmlAttributes implements \ArrayAccess, \IteratorAggregate, \Stringable {
    */
   public function __toString() {
     $return = '';
-    /** @var \Drupal\Component\Utility\HtmlAttributeValueBase $value */
+    /** @var \Drupal\Component\Utility\HtmlAttribute\AttributeValueBase $value */
     foreach ($this->storage as $value) {
-      if (!$value instanceof HtmlAttributeValueBase) {
+      if (!$value instanceof AttributeValueBase) {
         throw new \RuntimeException(sprintf('Unexpected type for $value (%s).', get_debug_type($value)));
       }
       $rendered = $value->render();
@@ -362,7 +364,7 @@ class HtmlAttributes implements \ArrayAccess, \IteratorAggregate, \Stringable {
   /**
    * Retrieves the iterator for the object.
    *
-   * @return \ArrayIterator<string, \Drupal\Component\Utility\HtmlAttributeValueBase>
+   * @return \ArrayIterator<string, \Drupal\Component\Utility\HtmlAttribute\AttributeValueBase>
    *   The iterator.
    */
   public function getIterator(): \ArrayIterator {

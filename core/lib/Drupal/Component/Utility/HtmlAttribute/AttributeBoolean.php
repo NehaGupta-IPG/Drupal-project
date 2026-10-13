@@ -1,6 +1,8 @@
 <?php
 
-namespace Drupal\Component\Utility;
+namespace Drupal\Component\Utility\HtmlAttribute;
+
+use Drupal\Component\Utility\Html;
 
 /**
  * A class that defines a type of boolean HTML attribute.
@@ -9,9 +11,9 @@ namespace Drupal\Component\Utility;
  * They are attributes that if they exist in the tag, they are TRUE.
  * Examples include selected, disabled, checked, readonly.
  *
- * To set a boolean attribute on the HtmlAttributes class, set it to TRUE.
+ * To set a boolean attribute on the Attribute class, set it to TRUE.
  * @code
- *  $attributes = new HtmlAttributes();
+ *  $attributes = new Attribute();
  *  $attributes['disabled'] = TRUE;
  *  echo '<select' . $attributes . '/>';
  *  // produces <select disabled>;
@@ -20,9 +22,9 @@ namespace Drupal\Component\Utility;
  *  // produces <select>;
  * @endcode
  *
- * @see \Drupal\Component\Utility\HtmlAttributes
+ * @see \Drupal\Component\Utility\HtmlAttribute\Attribute
  */
-class HtmlAttributeBoolean extends HtmlAttributeValueBase {
+class AttributeBoolean extends AttributeValueBase {
 
   /**
    * {@inheritdoc}

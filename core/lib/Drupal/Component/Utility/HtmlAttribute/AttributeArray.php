@@ -1,35 +1,37 @@
 <?php
 
-namespace Drupal\Component\Utility;
+namespace Drupal\Component\Utility\HtmlAttribute;
+
+use Drupal\Component\Utility\Html;
 
 /**
  * A class that defines a type of attribute that can be added to as an array.
  *
- * To use with HtmlAttributes, the array must be specified.
+ * To use with Attribute, the array must be specified.
  * Correct:
  * @code
- *  $attributes = new HtmlAttributes();
+ *  $attributes = new Attribute();
  *  $attributes['class'] = [];
  *  $attributes['class'][] = 'cat';
  * @endcode
  * Incorrect:
  * @code
- *  $attributes = new HtmlAttributes();
+ *  $attributes = new Attribute();
  *  $attributes['class'][] = 'cat';
  * @endcode
  *
  * @implements \ArrayAccess<int|string, mixed>
  * @implements \IteratorAggregate<int|string, mixed>
  *
- * @see \Drupal\Component\Utility\HtmlAttributes
+ * @see \Drupal\Component\Utility\HtmlAttribute\Attribute
  */
-class HtmlAttributeArray extends HtmlAttributeValueBase implements \ArrayAccess, \IteratorAggregate {
+class AttributeArray extends AttributeValueBase implements \ArrayAccess, \IteratorAggregate {
 
   /**
    * Ensures empty array as a result of array_filter will not print '$name=""'.
    *
-   * @see \Drupal\Component\Utility\HtmlAttributeArray::__toString()
-   * @see \Drupal\Component\Utility\HtmlAttributeValueBase::render()
+   * @see \Drupal\Component\Utility\HtmlAttribute\AttributeArray::__toString()
+   * @see \Drupal\Component\Utility\HtmlAttribute\AttributeValueBase::render()
    */
   const RENDER_EMPTY_ATTRIBUTE = FALSE;
 

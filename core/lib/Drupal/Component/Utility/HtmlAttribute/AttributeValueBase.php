@@ -1,18 +1,20 @@
 <?php
 
-namespace Drupal\Component\Utility;
+namespace Drupal\Component\Utility\HtmlAttribute;
+
+use Drupal\Component\Utility\Html;
 
 /**
  * Defines the base class for an attribute type.
  *
- * @see \Drupal\Component\Utility\HtmlAttributes
+ * @see \Drupal\Component\Utility\HtmlAttribute\Attribute
  */
-abstract class HtmlAttributeValueBase {
+abstract class AttributeValueBase {
 
   /**
    * Renders '$name=""' if $value is an empty string.
    *
-   * @see \Drupal\Component\Utility\HtmlAttributeValueBase::render()
+   * @see \Drupal\Component\Utility\HtmlAttribute\AttributeValueBase::render()
    */
   const RENDER_EMPTY_ATTRIBUTE = TRUE;
 
@@ -31,7 +33,7 @@ abstract class HtmlAttributeValueBase {
   protected $name;
 
   /**
-   * Constructs a \Drupal\Component\Utility\HtmlAttributeValueBase object.
+   * Constructs a \Drupal\Component\Utility\HtmlAttribute\AttributeValueBase object.
    */
   public function __construct($name, $value) {
     $this->name = $name;

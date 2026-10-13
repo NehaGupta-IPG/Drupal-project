@@ -3,7 +3,7 @@
 namespace Drupal\Core\Template;
 
 use Drupal\Component\Render\MarkupInterface;
-use Drupal\Component\Utility\HtmlAttributes;
+use Drupal\Component\Utility\HtmlAttribute\Attribute as ComponentAttribute;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Serialization\Attribute\JsonSchema;
 
@@ -13,9 +13,9 @@ use Drupal\Core\Serialization\Attribute\JsonSchema;
  * This class adds MarkupInterface, JSON serialization, and merging to the
  * parent class. See the parent class for usage.
  *
- * @see \Drupal\Component\Utility\HtmlAttributes
+ * @see \Drupal\Component\Utility\HtmlAttribute\Attribute
  */
-class Attribute extends HtmlAttributes implements MarkupInterface {
+class Attribute extends ComponentAttribute implements MarkupInterface {
 
   /**
    * Implements the magic __toString() method.

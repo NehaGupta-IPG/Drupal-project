@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Template;
 
 use Drupal\Component\Render\MarkupInterface;
-use Drupal\Component\Utility\HtmlAttributes;
+use Drupal\Component\Utility\HtmlAttribute\Attribute as ComponentAttribute;
 use Drupal\Core\Serialization\Attribute\JsonSchema;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\Loader\StringLoader;
@@ -30,7 +30,7 @@ class AttributeTest extends UnitTestCase {
    */
   public function testClassHierarchy(): void {
     $attribute = new Attribute();
-    $this->assertInstanceOf(HtmlAttributes::class, $attribute);
+    $this->assertInstanceOf(ComponentAttribute::class, $attribute);
     $this->assertInstanceOf(MarkupInterface::class, $attribute);
   }
 

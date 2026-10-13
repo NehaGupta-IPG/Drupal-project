@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Template;
 
-use Drupal\Component\Utility\HtmlAttributeArray;
-use Drupal\Component\Utility\HtmlAttributeBoolean;
-use Drupal\Component\Utility\HtmlAttributeString;
-use Drupal\Component\Utility\HtmlAttributeValueBase;
+use Drupal\Component\Utility\HtmlAttribute\AttributeArray;
+use Drupal\Component\Utility\HtmlAttribute\AttributeBoolean;
+use Drupal\Component\Utility\HtmlAttribute\AttributeString;
+use Drupal\Component\Utility\HtmlAttribute\AttributeValueBase;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -49,19 +49,19 @@ class AttributeMovedClassesTest extends KernelTestBase {
     return [
       'AttributeArray' => [
         'Drupal\Core\Template\AttributeArray',
-        HtmlAttributeArray::class,
+        AttributeArray::class,
       ],
       'AttributeBoolean' => [
         'Drupal\Core\Template\AttributeBoolean',
-        HtmlAttributeBoolean::class,
+        AttributeBoolean::class,
       ],
       'AttributeString' => [
         'Drupal\Core\Template\AttributeString',
-        HtmlAttributeString::class,
+        AttributeString::class,
       ],
       'AttributeValueBase' => [
         'Drupal\Core\Template\AttributeValueBase',
-        HtmlAttributeValueBase::class,
+        AttributeValueBase::class,
       ],
     ];
   }
