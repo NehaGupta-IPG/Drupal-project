@@ -205,9 +205,9 @@ default:
     echo "CPU stats: KUBERNETES_CPU_REQUEST=$KUBERNETES_CPU_REQUEST CONCURRENCY=$CONCURRENCY nproc=$(nproc)"
     echo "CPU model: $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2) loadavg: $(cat /proc/loadavg)"
     echo "Node memory: $(grep MemTotal /proc/meminfo)"
-    # Kubernetes sets this from the memory request:
-    # 1000 - 1000 * request / node memory.
-    echo "oom_score_adj: $(cat /proc/self/oom_score_adj)"
+    # Kubernetes sets this on the container's first process from the memory
+    # request: 1000 - 1000 * request / node memory.
+    echo "oom_score_adj: $(cat /proc/1/oom_score_adj)"
     if [ -f /sys/fs/cgroup/cpu.stat ]; then
       # cpu.weight reflects the CPU request.
       for f in cpu.max cpu.weight cpu.stat cpu.pressure memory.max memory.peak; do
@@ -340,7 +340,7 @@ default:
   parallel: 3
   variables:
     TESTSUITE: kernel
-    KUBERNETES_CPU_REQUEST: "12"
+    KUBERNETES_CPU_REQUEST: "16"
     CONCURRENCY: "24"
   services:
     - <<: *with-database
