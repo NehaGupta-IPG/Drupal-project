@@ -1,4 +1,4 @@
-# cspell:ignore codequality Micheh micheh webide testdox updatedb stylelintrc fastzip phpcscache Ksection drupaltestbot drupaltestbotpw Dwebdriver logfile XVFB cpuacct
+# cspell:ignore codequality Micheh micheh webide testdox updatedb stylelintrc fastzip phpcscache Ksection drupaltestbot drupaltestbotpw Dwebdriver logfile XVFB cpuacct loadavg
 
 ################
 # Drupal GitLabCI template.
@@ -310,7 +310,7 @@ default:
   variables:
     TESTSUITE: functional-javascript
     CONCURRENCY: "12"
-    KUBERNETES_CPU_REQUEST: "14"
+    KUBERNETES_CPU_REQUEST: "6"
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
@@ -394,7 +394,7 @@ default:
   retry: 1
   variables:
     TESTSUITE: build
-    KUBERNETES_CPU_REQUEST: "8"
+    KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: "6"
     # No parallel for this job, setup manually the env variables that need to
     # be passed to run-tests.sh command line options.
