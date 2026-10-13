@@ -236,6 +236,51 @@ class DefaultTableMappingTest extends UnitTestCase {
   }
 
   /**
+   * Tests DefaultTableMapping::getColumnNames() when re-entered from a Fiber.
+   *
+   * Computing the columns of a field can load entities, which suspends the
+   * current Fiber. Another Fiber that asks for the same field in the meantime
+   * must get the complete column names, not an empty array.
+   *
+   * @legacy-covers ::getColumnNames
+   */
+  public function testGetColumnNamesFromSuspendedFiber(): void {
+    $definition = $this->createStub(TestBaseFieldDefinitionInterface::class);
+    $definition
+      ->method('isBaseField')
+      ->willReturn(FALSE);
+    $definition
+      ->method('getName')
+      ->willReturn('test');
+    $definition
+      ->method('getColumns')
+      ->willReturnCallback(function () {
+        // Simulate an entity load that suspends the current Fiber.
+        \Fiber::getCurrent()?->suspend();
+        return ['target_id' => []];
+      });
+    $table_mapping = new TestDefaultTableMapping($this->entityType, ['test' => $definition]);
+
+    $first = new \Fiber(fn() => $table_mapping->getColumnNames('test'));
+    $second = new \Fiber(fn() => $table_mapping->getColumnNames('test'));
+    // The first Fiber is suspended while it computes the column names, and the
+    // second Fiber asks for the same field in the meantime.
+    $first->start();
+    $second->start();
+    while (!$first->isTerminated() || !$second->isTerminated()) {
+      foreach ([$second, $first] as $fiber) {
+        if ($fiber->isSuspended()) {
+          $fiber->resume();
+        }
+      }
+    }
+
+    $expected = ['target_id' => 'test_target_id'];
+    $this->assertSame($expected, $first->getReturn());
+    $this->assertSame($expected, $second->getReturn());
+  }
+
+  /**
    * Tests DefaultTableMapping::getExtraColumns().
    *
    * @legacy-covers ::getExtraColumns
