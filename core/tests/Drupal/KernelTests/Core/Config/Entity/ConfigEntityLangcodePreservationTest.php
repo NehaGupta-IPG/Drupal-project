@@ -11,11 +11,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests English configuration on a non-English default language site.
- *
- * This is the scenario that made \Drupal\Core\Config\Config::save()'s old
- * default-langcode logic wrong: it could not tell a deliberately English
- * config entity apart from one that merely had not had a langcode resolved
- * yet, so it silently rewrote 'en' to the site default on every save.
  */
 #[Group('config')]
 #[RunTestsInSeparateProcesses]
@@ -61,7 +56,7 @@ class ConfigEntityLangcodePreservationTest extends KernelTestBase {
   }
 
   /**
-   * Tests a French entity resolves to the site default when created freely.
+   * Tests an entity resolves to the site default when created freely.
    */
   public function testConfigEntityWithoutExplicitLangcodeGetsSiteDefault(): void {
     $entity = \Drupal::entityTypeManager()->getStorage('config_test')->create([
