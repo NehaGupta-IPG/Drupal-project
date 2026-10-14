@@ -8,6 +8,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * The requirements severity enum.
+ *
+ * @ingroup extension_api
  */
 enum RequirementSeverity: int {
 

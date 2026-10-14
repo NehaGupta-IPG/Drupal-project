@@ -9,6 +9,8 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
  * Ensures install profile can only be uninstalled if the modules are available.
+ *
+ * @ingroup extension_api
  */
 class InstallProfileUninstallValidator implements ModuleUninstallValidatorInterface {
 

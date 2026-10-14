@@ -10,6 +10,8 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
  * Check if an extension (module, theme, or profile) is available.
+ *
+ * @ingroup extension_api
  */
 #[Constraint(
   id: 'ExtensionAvailable',

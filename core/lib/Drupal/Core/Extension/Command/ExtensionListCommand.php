@@ -21,6 +21,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  * List extensions.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 #[AsCommand(
   name: 'ex:list',

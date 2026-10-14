@@ -7,6 +7,8 @@ use Drupal\Core\Extension\Exception\UnknownExtensionTypeException;
 
 /**
  * Factory for getting extension lists by type.
+ *
+ * @ingroup extension_api
  */
 class ExtensionPathResolver {
 

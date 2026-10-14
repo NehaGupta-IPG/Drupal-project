@@ -8,6 +8,8 @@ use Drupal\Component\FileCache\FileCacheInterface;
 
 /**
  * Parses extension .info.yml files.
+ *
+ * @ingroup extension_api
  */
 class InfoParser extends InfoParserDynamic {
 

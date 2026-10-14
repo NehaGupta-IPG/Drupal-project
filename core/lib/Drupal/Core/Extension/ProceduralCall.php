@@ -10,6 +10,8 @@ namespace Drupal\Core\Extension;
  * This will be removed when procedural hooks are no longer supported.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 final class ProceduralCall {
 

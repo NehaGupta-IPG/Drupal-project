@@ -4,6 +4,8 @@ namespace Drupal\Core\Extension;
 
 /**
  * Interface for classes that parses Drupal's info.yml files.
+ *
+ * @ingroup extension_api
  */
 interface InfoParserInterface {
 

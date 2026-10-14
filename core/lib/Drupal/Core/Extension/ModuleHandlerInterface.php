@@ -8,6 +8,8 @@ namespace Drupal\Core\Extension;
  * Classes implementing this interface work with a fixed list of modules and are
  * responsible for loading module files and maintaining information about module
  * dependencies and hook implementations.
+ *
+ * @ingroup extension_api
  */
 interface ModuleHandlerInterface {
 

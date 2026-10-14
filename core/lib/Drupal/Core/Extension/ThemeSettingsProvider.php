@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Default implementation of the theme settings provider service.
+ *
+ * @ingroup extension_api
  */
 class ThemeSettingsProvider {
 

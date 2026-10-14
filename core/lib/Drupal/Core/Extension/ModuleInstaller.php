@@ -33,6 +33,8 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
  * each installation or uninstallation of a module.
  * https://www.drupal.org/project/drupal/issues/2350111 for example tries to
  * solve this dilemma.
+ *
+ * @ingroup extension_api
  */
 class ModuleInstaller implements ModuleInstallerInterface {
 

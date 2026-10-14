@@ -8,6 +8,8 @@ use Drupal\Core\Serialization\Yaml;
 
 /**
  * Parses dynamic .info.yml files that might change during the page request.
+ *
+ * @ingroup extension_api
  */
 class InfoParserDynamic implements InfoParserInterface {
 

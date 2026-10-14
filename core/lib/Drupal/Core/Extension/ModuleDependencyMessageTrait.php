@@ -5,9 +5,9 @@ namespace Drupal\Core\Extension;
 /**
  * Messages for missing or incompatible dependencies on modules.
  *
- * @internal The trait simply helps core classes that display user messages
- *   regarding missing or incompatible module dependencies share exact same
- *   wording and markup.
+ * @internal
+ *
+ * @ingroup extension_api
  */
 trait ModuleDependencyMessageTrait {
 

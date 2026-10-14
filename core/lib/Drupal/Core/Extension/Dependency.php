@@ -6,6 +6,8 @@ use Drupal\Component\Version\Constraint;
 
 /**
  * A value object representing dependency information.
+ *
+ * @ingroup extension_api
  */
 class Dependency {
 

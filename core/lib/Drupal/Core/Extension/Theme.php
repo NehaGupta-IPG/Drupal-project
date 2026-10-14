@@ -17,6 +17,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  *   and dynamic properties with methods.
  *
  * @final
+ *
+ * @ingroup extension_api
  */
 class Theme extends Extension {
 

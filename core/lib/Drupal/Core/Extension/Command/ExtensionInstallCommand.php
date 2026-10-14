@@ -29,6 +29,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Installs modules or themes, resolving and confirming their dependencies.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 #[AsCommand(
   name: 'ex:install',

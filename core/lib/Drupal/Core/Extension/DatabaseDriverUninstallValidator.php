@@ -8,6 +8,8 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
  * Ensures installed modules providing a database driver are not uninstalled.
+ *
+ * @ingroup extension_api
  */
 class DatabaseDriverUninstallValidator implements ModuleUninstallValidatorInterface {
 

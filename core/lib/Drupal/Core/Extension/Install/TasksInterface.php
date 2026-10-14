@@ -10,6 +10,8 @@ namespace Drupal\Core\Extension\Install;
  * If you want to inject dependencies then also implement
  * ContainerInjectionInterface. Only core services can safely be injected
  * since this runs before Drupal is fully installed.
+ *
+ * @ingroup extension_api
  */
 interface TasksInterface {
 

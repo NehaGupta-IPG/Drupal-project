@@ -8,6 +8,8 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
  * Ensures modules cannot be uninstalled if enabled themes depend on them.
+ *
+ * @ingroup extension_api
  */
 class ModuleRequiredByThemesUninstallValidator implements ConfigImportModuleUninstallValidatorInterface {
 

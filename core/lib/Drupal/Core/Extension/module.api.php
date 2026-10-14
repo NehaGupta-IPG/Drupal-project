@@ -3,6 +3,8 @@
 /**
  * @file
  * Hooks related to module and update systems.
+ *
+ * @ingroup extension_api
  */
 
 use Drupal\Core\Database\Database;

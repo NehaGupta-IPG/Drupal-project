@@ -4,6 +4,8 @@ namespace Drupal\Core\Extension;
 
 /**
  * Provides the installation of modules with creating the db schema and more.
+ *
+ * @ingroup extension_api
  */
 interface ModuleInstallerInterface {
 

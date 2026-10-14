@@ -7,6 +7,8 @@ use Drupal\Core\Database\Install\Tasks;
 
 /**
  * Defines a database driver extension object.
+ *
+ * @ingroup extension_api
  */
 class DatabaseDriver extends Extension {
 
