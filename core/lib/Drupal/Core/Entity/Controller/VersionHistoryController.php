@@ -213,6 +213,7 @@ class VersionHistoryController extends ControllerBase {
     $query = $entityStorage->getQuery()
       ->accessCheck(FALSE)
       ->allRevisions()
+      ->addTag('entity_revision_overview')
       ->condition($entityType->getKey('id'), $entity->id())
       ->sort($entityType->getKey('revision'), 'DESC')
       ->pager(self::REVISIONS_PER_PAGE);

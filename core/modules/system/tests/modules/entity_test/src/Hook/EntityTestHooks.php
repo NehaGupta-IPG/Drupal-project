@@ -803,4 +803,15 @@ class EntityTestHooks {
     $state->set($key, $hooks);
   }
 
+  /**
+   * Implements hook_query_TAG_alter() for entity_revision_overview.
+   */
+  #[Hook('query_entity_revision_overview_alter')]
+  public function queryEntityRevisionOverviewAlter(AlterableInterface $query): void {
+    if ($excluded = \Drupal::state()->get('entity_test.revision_overview.excluded_revision_ids')) {
+      $revision_key = $this->entityTypeManager->getDefinition($query->getMetaData('entity_type'))->getKey('revision');
+      $query->condition("base_table.$revision_key", $excluded, 'NOT IN');
+    }
+  }
+
 }
