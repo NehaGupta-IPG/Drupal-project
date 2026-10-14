@@ -9,6 +9,8 @@ use Drupal\Core\Hook\OrderOperation\OrderOperation;
 
 /**
  * Set this implementation to be first or last.
+ *
+ * @ingroup extension_api
  */
 enum Order: int implements OrderInterface {
 

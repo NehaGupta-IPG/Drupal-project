@@ -10,6 +10,8 @@ use Drupal\Core\Hook\OrderOperation\OrderOperation;
 
 /**
  * Orders an implementation relative to other implementations.
+ *
+ * @ingroup extension_api
  */
 abstract readonly class RelativeOrderBase implements OrderInterface {
 

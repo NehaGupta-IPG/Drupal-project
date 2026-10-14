@@ -9,6 +9,8 @@ namespace Drupal\Core\Hook\Attribute;
  *
  * The effect of this attribute is independent from the specific class or method
  * on which it is placed.
+ *
+ * @ingroup extension_api
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class RemoveHook implements HookAttributeInterface {

@@ -14,6 +14,8 @@ namespace Drupal\Core\Hook\Attribute;
  * - hook_requirements()
  * - hook_preprocess()
  * - hook_preprocess_HOOK()
+ *
+ * @ingroup extension_api
  */
 #[\Attribute(\Attribute::TARGET_FUNCTION)]
 class ProceduralHookScanStop {

@@ -11,5 +11,7 @@ namespace Drupal\Core\Hook\Attribute;
  * hook-related attributes in the same call.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 interface HookAttributeInterface {}

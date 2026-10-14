@@ -23,6 +23,8 @@ use Drupal\Core\Hook\OrderOperation\OrderOperation;
  *   @code
  *   #[Hook('custom_hook', order: new OrderBefore(['other_module']))]
  *   @endcode
+ *
+ * @ingroup extension_api
  */
 interface OrderInterface {
 

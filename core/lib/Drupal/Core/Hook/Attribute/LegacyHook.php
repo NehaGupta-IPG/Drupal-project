@@ -19,6 +19,8 @@ namespace Drupal\Core\Hook\Attribute;
  * only the legacy hook implementation is executed.
  *
  * For more information, see https://www.drupal.org/node/3442349.
+ *
+ * @ingroup extension_api
  */
 #[\Attribute(\Attribute::TARGET_FUNCTION)]
 class LegacyHook {
