@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\node_test\Hook;
 
+use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -196,6 +197,17 @@ class NodeTestHooks {
     }
     else {
       \Drupal::messenger()->addStatus('Storage is set');
+    }
+  }
+
+  /**
+   * Implements hook_query_TAG_alter() for entity_revision_overview.
+   */
+  #[Hook('query_entity_revision_overview_alter')]
+  public function queryEntityRevisionOverviewAlter(AlterableInterface $query): void {
+    $excluded = \Drupal::state()->get('node_test.revision_overview.excluded_revision_ids');
+    if ($excluded && $query->getMetaData('entity_type') === 'node') {
+      $query->condition('base_table.vid', $excluded, 'NOT IN');
     }
   }
 

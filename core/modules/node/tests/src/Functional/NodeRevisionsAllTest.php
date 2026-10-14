@@ -220,7 +220,7 @@ class NodeRevisionsAllTest extends NodeTestBase {
    * Tests that modules can alter the revision list query.
    */
   public function testRevisionListQueryAlter(): void {
-    $this->container->get('module_installer')->install(['entity_test']);
+    $this->container->get('module_installer')->install(['node_test']);
 
     // One revision more than fits on a page, so excluding one of them must
     // also remove the pager.
@@ -230,7 +230,7 @@ class NodeRevisionsAllTest extends NodeTestBase {
       $logs[] = $node->revision_log = $this->randomMachineName(32);
       $node = $this->createNodeRevision($node);
     }
-    \Drupal::state()->set('entity_test.revision_overview.excluded_revision_ids', [$this->nodes[1]->getRevisionId()]);
+    \Drupal::state()->set('node_test.revision_overview.excluded_revision_ids', [$this->nodes[1]->getRevisionId()]);
 
     $this->drupalGet('node/' . $node->id() . '/revisions');
     $this->assertSession()->responseNotContains('page=1');
