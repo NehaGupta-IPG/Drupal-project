@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Controller\VersionHistoryController;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Pager\PagerManager;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\entity_test\Entity\EntityTestRev;
@@ -26,6 +28,13 @@ class RevisionVersionHistoryTest extends KernelTestBase {
   use UserCreationTrait {
     createUser as drupalCreateUser;
   }
+
+  /**
+   * Revision IDs to exclude from the revision list query.
+   *
+   * @var int[]
+   */
+  protected array $excludedRevisionIds = [];
 
   /**
    * {@inheritdoc}
@@ -396,7 +405,7 @@ class RevisionVersionHistoryTest extends KernelTestBase {
       $entity->setNewRevision(TRUE);
       $entity->setName('view all revisions,view revision,' . $i)->save();
     }
-    $this->container->get('state')->set('entity_test.revision_overview.excluded_revision_ids', [$excludedRevision]);
+    $this->excludedRevisionIds = [$excludedRevision];
 
     $this->drupalGet($entity->toUrl('version-history'));
     $this->assertSession()->elementsCount('css', 'table tbody tr', VersionHistoryController::REVISIONS_PER_PAGE);
@@ -404,6 +413,17 @@ class RevisionVersionHistoryTest extends KernelTestBase {
 
     $storage = $this->container->get('entity_type.manager')->getStorage($entity->getEntityTypeId());
     $this->assertSession()->linkByHrefNotExists($storage->loadRevision($excludedRevision)->toUrl('revision')->toString());
+  }
+
+  /**
+   * Implements hook_query_TAG_alter() for entity_revision_overview.
+   */
+  #[Hook('query_entity_revision_overview_alter')]
+  public function queryEntityRevisionOverviewAlter(SelectInterface $query): void {
+    if ($this->excludedRevisionIds) {
+      $revision_key = $this->container->get('entity_type.manager')->getDefinition($query->getMetaData('entity_type'))->getKey('revision');
+      $query->condition("base_table.$revision_key", $this->excludedRevisionIds, 'NOT IN');
+    }
   }
 
   /**
