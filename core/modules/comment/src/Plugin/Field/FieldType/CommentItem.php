@@ -117,14 +117,10 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       ->createAccess($this->getSetting('comment_type'), $anonymous_user);
 
     $element['default_mode'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Threading mode'),
-      '#options' => [
-        CommentManagerInterface::COMMENT_MODE_FLAT => $this->t('Flat list'),
-        CommentManagerInterface::COMMENT_MODE_THREADED => $this->t('Threaded'),
-      ],
+      '#type' => 'checkbox',
+      '#title' => $this->t('Threading'),
       '#default_value' => $settings['default_mode'],
-      '#description' => $this->t('If the comments are displayed as a flat list or threaded.'),
+      '#description' => $this->t('Show comment replies in a threaded list.'),
     ];
     $element['limit_reply_depth'] = [
       '#type' => 'checkbox',
