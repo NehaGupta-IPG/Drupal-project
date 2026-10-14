@@ -352,13 +352,19 @@ class UserCancelTest extends BrowserTestBase {
 
     // Create a node with two revisions, the initial one belonging to the
     // cancelling user.
-    $revision_node = $this->drupalCreateNode(['uid' => $account->id()]);
+    $revision_node = $this->drupalCreateNode([
+      'uid' => $account->id(),
+      'revision_uid' => $account->id(),
+    ]);
     $revision = $revision_node->getRevisionId();
-    $settings = get_object_vars($revision_node);
-    $settings['revision'] = 1;
     // Set new/current revision to someone else.
-    $settings['uid'] = 1;
-    $revision_node = $this->drupalCreateNode($settings);
+    $revision_node->setNewRevision();
+    $revision_node
+      ->setOwnerId(1)
+      ->setRevisionUserId(1)
+      ->save();
+    $current_revision = $revision_node->getRevisionId();
+    $this->assertNotEquals($revision, $current_revision);
 
     // Attempt to cancel account.
     $this->drupalGet('user/' . $account->id() . '/cancel');
@@ -380,10 +386,13 @@ class UserCancelTest extends BrowserTestBase {
     $this->assertEquals(0, $test_node->getOwnerId(), 'Node of the user has been attributed to anonymous user.');
     $this->assertTrue($test_node->isPublished());
     $test_node = $node_storage->loadRevision($revision);
+    $this->assertEquals(0, $test_node->getOwnerId(), 'Node revision of the user has been attributed to anonymous user.');
     $this->assertEquals(0, $test_node->getRevisionUser()->id(), 'Node revision of the user has been attributed to anonymous user.');
     $this->assertTrue($test_node->isPublished());
     $test_node = $node_storage->load($revision_node->id());
-    $this->assertNotEquals(0, $test_node->getOwnerId(), "Current revision of the user's node was not attributed to anonymous user.");
+    $this->assertEquals($current_revision, $test_node->getRevisionId(), "The default revision of the user's node was not changed.");
+    $this->assertEquals(1, $test_node->getOwnerId(), "Current revision of the user's node was not attributed to anonymous user.");
+    $this->assertEquals(1, $test_node->getRevisionUserId(), "Current revision of the user's node was not attributed to anonymous user.");
     $this->assertTrue($test_node->isPublished());
 
     $storage = \Drupal::entityTypeManager()->getStorage('comment');
