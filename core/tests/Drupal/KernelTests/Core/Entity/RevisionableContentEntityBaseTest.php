@@ -171,6 +171,64 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
   }
 
   /**
+   * Tests resaving a previous default revision while syncing.
+   */
+  public function testResaveFormerDefaultRevisionWhileSyncing(): void {
+    $definition = $this->entityTypeManager->getDefinition('entity_test_mul_revlog');
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = $this->entityTypeManager->getStorage('entity_test_mul_revlog');
+
+    $entity = EntityTestMulWithRevisionLog::create([
+      'type' => 'entity_test_mul_revlog',
+      'name' => 'first',
+    ]);
+    $entity->save();
+    $firstRevisionId = $entity->getRevisionId();
+    $entity->setNewRevision();
+    $entity->setName('second');
+    $entity->save();
+    $secondRevisionId = $entity->getRevisionId();
+
+    // The first revision was the default revision when it was created, but no
+    // longer is.
+    /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $firstRevision */
+    $firstRevision = $storage->loadRevision($firstRevisionId);
+    $this->assertTrue($firstRevision->wasDefaultRevision());
+    $this->assertFalse($firstRevision->isDefaultRevision());
+
+    // Resaving it with itself as the original revision is not allowed outside
+    // of a sync. This mirrors \Drupal\node\NodeBulkUpdate::processNode().
+    $firstRevision->setOriginal(clone $firstRevision);
+    $firstRevision->setName('first updated');
+    try {
+      $firstRevision->save();
+      $this->fail('Resaving a former default revision without syncing throws an exception.');
+    }
+    catch (EntityStorageException $e) {
+      $this->assertSame("An existing default revision of the 'entity_test_mul_revlog' entity type can not be changed to a non-default revision.", $e->getMessage());
+    }
+
+    // Resaving it while syncing is allowed.
+    $firstRevision = $storage->loadRevision($firstRevisionId);
+    $firstRevision->setOriginal(clone $firstRevision);
+    $firstRevision->setName('first updated');
+    $firstRevision->setSyncing(TRUE);
+    $firstRevision->save();
+
+    // The first revision is updated in place and keeps its flags.
+    $firstRevision = $storage->loadRevisionUnchanged($firstRevisionId);
+    $this->assertEquals('first updated', $firstRevision->label());
+    $this->assertTrue($firstRevision->wasDefaultRevision());
+    $this->assertFalse($firstRevision->isDefaultRevision());
+
+    // The default revision and the data table are unchanged.
+    $entity = $storage->loadUnchanged($entity->id());
+    $this->assertEquals($secondRevisionId, $entity->getRevisionId());
+    $this->assertEquals('second', $entity->label());
+    $this->assertItemsTableCount(2, $definition);
+  }
+
+  /**
    * Asserts the amount of items on entity related tables.
    *
    * @param int $count
