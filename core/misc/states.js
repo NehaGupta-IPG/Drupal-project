@@ -716,22 +716,31 @@
 
   $document.on('state:required', (e) => {
     if (e.trigger) {
+      const wrapperSelector = '.js-form-item, .js-form-wrapper';
+      const wrapper = e.target.closest(wrapperSelector);
+      // Themes mark a label that is not a label element, such as a legend or
+      // a summary, with js-form-label. Prefer the wrapper's own label, then a
+      // label element bound to the target, then any label nested inside a
+      // wrapper that carries none itself.
+      const isOwnLabel = (element) =>
+        element.closest(wrapperSelector) === wrapper;
+      const findLabel = (selector) => {
+        const matches = wrapper
+          ? Array.from(wrapper.querySelectorAll(selector))
+          : [];
+        return matches.find(isOwnLabel) || matches[0];
+      };
+      const label =
+        findLabel('.js-form-label') ||
+        findLabel(`label[for="${e.target.id}"]`) ||
+        findLabel('label');
+
       if (e.value) {
-        const label = `label${e.target.id ? `[for=${e.target.id}]` : ''}`;
-        const $label = $(e.target)
-          .attr({ required: 'required' })
-          .closest('.js-form-item, .js-form-wrapper')
-          .find(label);
-        // Avoids duplicate required markers on initialization.
-        if (!$label.hasClass('js-form-required').length) {
-          $label.addClass('js-form-required form-required');
-        }
+        e.target.setAttribute('required', 'required');
+        label?.classList.add('js-form-required', 'form-required');
       } else {
-        $(e.target)
-          .removeAttr('required')
-          .closest('.js-form-item, .js-form-wrapper')
-          .find('label.js-form-required')
-          .removeClass('js-form-required form-required');
+        e.target.removeAttribute('required');
+        label?.classList.remove('js-form-required', 'form-required');
       }
     }
   });

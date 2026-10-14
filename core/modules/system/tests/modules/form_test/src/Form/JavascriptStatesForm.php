@@ -162,6 +162,61 @@ class JavascriptStatesForm extends FormBase {
         ],
       ],
     ];
+    $form['fieldset_required_when_checkbox_trigger_checked'] = [
+      '#type' => 'fieldset',
+      '#title' => 'Fieldset required when checkbox trigger checked',
+      '#states' => [
+        'required' => [
+          ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['fieldset_required_when_checkbox_trigger_checked']['textfield_in_required_fieldset'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield in required fieldset',
+    ];
+    $form['container_required_when_checkbox_trigger_checked'] = [
+      '#type' => 'container',
+      '#states' => [
+        'required' => [
+          ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['container_required_when_checkbox_trigger_checked']['nested_fieldset'] = [
+      '#type' => 'fieldset',
+      '#title' => 'Fieldset inside a required container',
+    ];
+    $form['container_required_when_checkbox_trigger_checked']['nested_fieldset']['textfield_in_nested_fieldset'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield in nested fieldset',
+    ];
+    $form['container_textfield_required_when_checkbox_trigger_checked'] = [
+      '#type' => 'container',
+      '#states' => [
+        'required' => [
+          ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['container_textfield_required_when_checkbox_trigger_checked']['textfield_in_required_container'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield in required container',
+    ];
+    $form['details_required_when_checkbox_trigger_checked'] = [
+      '#type' => 'details',
+      '#title' => 'Details required when checkbox trigger checked',
+      '#open' => TRUE,
+      '#states' => [
+        'required' => [
+          ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['details_required_when_checkbox_trigger_checked']['textfield_in_required_details'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield in required details',
+    ];
     $form['textfield_readonly_when_checkbox_trigger_checked'] = [
       '#type' => 'textfield',
       '#title' => 'Textfield readonly when checkbox trigger checked',
@@ -225,6 +280,15 @@ class JavascriptStatesForm extends FormBase {
       '#title' => 'Text format invisible when checkbox trigger checked',
       '#states' => [
         'invisible' => [
+          ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['text_format_required_when_checkbox_trigger_checked'] = [
+      '#type' => 'text_format',
+      '#title' => 'Text format required when checkbox trigger checked',
+      '#states' => [
+        'required' => [
           ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
         ],
       ],

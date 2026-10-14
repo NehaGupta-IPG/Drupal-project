@@ -169,8 +169,13 @@ class TextFormat extends RenderElementBase {
     }
 
     // If the value element has #states set, copy it to the format element.
+    // Leave out the required and optional states, since the format wrapper is
+    // not an input and its format selector always has a value.
     if (isset($element['value']['#states'])) {
-      $element['format']['#states'] = $element['value']['#states'];
+      $states = array_diff_key($element['value']['#states'], array_flip(['required', 'optional']));
+      if ($states) {
+        $element['format']['#states'] = $states;
+      }
     }
 
     // Prepare text format guidelines.

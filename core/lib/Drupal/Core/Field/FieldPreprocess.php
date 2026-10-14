@@ -99,7 +99,7 @@ class FieldPreprocess {
       $table_id = Html::getUniqueId($element['#field_name'] . '_values');
       // Using table id allows handing nested content with the same field names.
       $order_class = $table_id . '-delta-order';
-      $header_attributes = new Attribute(['class' => ['label']]);
+      $header_attributes = new Attribute(['class' => ['label', 'js-form-label']]);
       if (!empty($element['#required'])) {
         $header_attributes['class'][] = 'js-form-required';
         $header_attributes['class'][] = 'form-required';
