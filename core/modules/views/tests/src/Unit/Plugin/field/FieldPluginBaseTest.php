@@ -999,6 +999,61 @@ class FieldPluginBaseTest extends UnitTestCase {
     }
   }
 
+  /**
+   * Tests the row render state of a newly created handler.
+   */
+  public function testRowRenderStateNewHandler(): void {
+    $field = $this->setupTestField();
+    $state = $field->getRowRenderState();
+    $this->assertArrayHasKey('original_value', $state);
+    $this->assertNull($state['original_value']);
+    $this->assertArrayHasKey('lastRenderIndex', $state);
+    $this->assertNull($state['lastRenderIndex']);
+    $this->assertArrayNotHasKey('last_render', $state);
+    $this->assertArrayNotHasKey('last_render_text', $state);
+    $this->assertArrayNotHasKey('last_tokens', $state);
+    $this->assertCount(2, $state);
+  }
+
+  /**
+   * Tests saving and restoring state for two interleaved rows.
+   */
+  public function testRowRenderStateInterleavedRows(): void {
+    $field = new FieldPluginBaseTestField($this->configuration, $this->pluginId, $this->pluginDefinition);
+    // Set row A values.
+    $field->last_render = 'Row A render';
+    $field->last_render_text = 'Row A text';
+    $field->last_tokens = ['{{ title }}' => 'Row A title'];
+    $field->original_value = 'Row A original';
+    $field->setLastRenderIndex(3);
+    // Capture row A's state as runRowFibers() does before switching fibers.
+    $state_a = $field->getRowRenderState();
+    // Set row B values.
+    $field->last_render = 'Row B render';
+    $field->last_render_text = 'Row B text';
+    $field->last_tokens = ['{{ title }}' => 'Row B title'];
+    $field->original_value = 'Row B original';
+    $field->setLastRenderIndex(7);
+    // Capture row B's state before switching back.
+    $state_b = $field->getRowRenderState();
+    // Restore row A's state.
+    $field->setRowRenderState($state_a);
+    // Verify row A's state restored correctly.
+    $this->assertSame('Row A render', $field->last_render);
+    $this->assertSame('Row A text', $field->last_render_text);
+    $this->assertSame(['{{ title }}' => 'Row A title'], $field->last_tokens);
+    $this->assertSame('Row A original', $field->original_value);
+    $this->assertSame(3, $field->getLastRenderIndex());
+    // Restore row B's state.
+    $field->setRowRenderState($state_b);
+    // Verify row B's state restored correctly.
+    $this->assertSame('Row B render', $field->last_render);
+    $this->assertSame('Row B text', $field->last_render_text);
+    $this->assertSame(['{{ title }}' => 'Row B title'], $field->last_tokens);
+    $this->assertSame('Row B original', $field->original_value);
+    $this->assertSame(7, $field->getLastRenderIndex());
+  }
+
 }
 
 /**
@@ -1011,6 +1066,26 @@ class FieldPluginBaseTestField extends FieldPluginBase {
    */
   public function setLinkGenerator(LinkGeneratorInterface $link_generator): void {
     $this->linkGenerator = $link_generator;
+  }
+
+  /**
+   * Sets the last render index.
+   *
+   * @param int|null $last_render_index
+   *   The index value.
+   */
+  public function setLastRenderIndex(?int $last_render_index): void {
+    $this->lastRenderIndex = $last_render_index;
+  }
+
+  /**
+   * Gets the last render index.
+   *
+   * @return int|null
+   *   The value of last render index.
+   */
+  public function getLastRenderIndex(): ?int {
+    return $this->lastRenderIndex;
   }
 
 }
