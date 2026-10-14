@@ -59,9 +59,12 @@ class NodeUserCancelTest extends KernelTestBase {
     $user2 = User::create(['name' => 'test user 2']);
     $user2->save();
 
+    // Use a changed time in the past, so that an update of the changed time
+    // can be detected.
     $node = Node::create([
       'title' => 'test node',
       'type' => 'test',
+      'changed' => 1000,
     ]);
 
     // Set to published to test 'user_cancel_reassign' does not unpublish.
@@ -76,13 +79,26 @@ class NodeUserCancelTest extends KernelTestBase {
     $secondRevisionId = $node->getRevisionId();
 
     $this->assertNotEquals($firstRevisionId, $secondRevisionId);
+    $changedTimes = [
+      $firstRevisionId => $nodeStorage->loadRevision($firstRevisionId)->getChangedTime(),
+      $secondRevisionId => $nodeStorage->loadRevision($secondRevisionId)->getChangedTime(),
+    ];
+    $this->assertEquals(1000, $changedTimes[$firstRevisionId]);
 
     \Drupal::service(AccountCancellation::class)->cancel([], (int) $user1->id(), 'user_cancel_reassign');
+
+    // Confirm that no revisions were created and the changed times were not
+    // updated.
+    $this->assertEquals([$firstRevisionId, $secondRevisionId], array_keys($nodeStorage->getQuery()->accessCheck(FALSE)->allRevisions()->sort('vid')->execute()));
+    foreach ($changedTimes as $revisionId => $changedTime) {
+      $this->assertEquals($changedTime, $nodeStorage->loadRevision($revisionId)->getChangedTime());
+    }
 
     // Test default revision.
     // Reload node.
     /** @var \Drupal\node\NodeInterface $node */
     $node = $nodeStorage->load($node->id());
+    $this->assertEquals($secondRevisionId, $node->getRevisionId());
     // Confirm that the author has been assigned to the anonymous user.
     $this->assertEquals(0, $node->getOwnerId());
     $this->assertEquals($user2->id(), $node->getRevisionUserId());
@@ -137,6 +153,9 @@ class NodeUserCancelTest extends KernelTestBase {
     $translationRevisionId = $node->getRevisionId();
 
     \Drupal::service(AccountCancellation::class)->cancel([], (int) $user1->id(), 'user_cancel_reassign');
+
+    // Confirm that no revisions were created.
+    $this->assertEquals([$originalRevisionId, $translationRevisionId], array_keys($nodeStorage->getQuery()->accessCheck(FALSE)->allRevisions()->sort('vid')->execute()));
 
     /** @var \Drupal\node\NodeInterface $originalRevision */
     $originalRevision = $nodeStorage->loadRevision($originalRevisionId);
