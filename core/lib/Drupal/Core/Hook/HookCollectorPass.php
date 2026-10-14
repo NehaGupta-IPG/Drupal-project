@@ -357,7 +357,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
       $fileExtension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
 
-      if ($fileExtension === 'module' || $fileExtension === 'profile' ) {
+      if ($fileExtension === 'module' || $fileExtension === 'profile') {
         $this->deprecatedFiles[$fileExtension][pathinfo($filename, PATHINFO_FILENAME)] = TRUE;
       }
 
