@@ -9,6 +9,8 @@ namespace Drupal\Core\Theme;
  *
  * @see \Drupal\Core\Theme\ThemeManager
  * @see \Drupal\Core\Theme\ThemeInitialization
+ *
+ * @ingroup extension_api
  */
 class ActiveTheme {
 

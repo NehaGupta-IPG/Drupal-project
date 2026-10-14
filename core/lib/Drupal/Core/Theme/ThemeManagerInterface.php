@@ -9,6 +9,8 @@ use Drupal\Core\Routing\RouteMatchInterface;
  *
  * Beside the active theme it provides a wrapper around _theme as well as the
  * alter functionality for themes.
+ *
+ * @ingroup extension_api
  */
 interface ThemeManagerInterface {
 

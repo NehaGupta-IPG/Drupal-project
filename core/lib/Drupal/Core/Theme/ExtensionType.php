@@ -9,6 +9,8 @@ namespace Drupal\Core\Theme;
  * @see https://www.drupal.org/i/3352546
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 enum ExtensionType: string {
   case Module = 'module';
