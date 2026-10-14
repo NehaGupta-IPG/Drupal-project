@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Http;
 
 use GuzzleHttp\HandlerStack;
@@ -7,7 +9,7 @@ use GuzzleHttp\TransportSharing;
 use GuzzleHttp\Utils;
 
 /**
- * Helper class to create a HandlerStack with non-default handler options.
+ * Creates a HandlerStack with non-default handler options.
  */
 class HandlerStackFactory {
 
