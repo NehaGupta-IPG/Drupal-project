@@ -155,7 +155,7 @@ class ModerationStateUserTest extends ModerationStateTestBase {
       ->countQuery()
       ->execute();
 
-    $this->assertEquals($count, $result->fetchField(), 'User with uid ' . $uid . 'should have ' . $count . ' rows on table ' . $table . ' and language ' . $langcode);
+    $this->assertEquals($count, $result->fetchField(), 'User with uid ' . $uid . ' should have ' . $count . ' rows on table ' . $table . ' and language ' . $langcode);
   }
 
 }
