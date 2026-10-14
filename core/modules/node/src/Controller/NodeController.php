@@ -287,6 +287,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     $result = $node_storage->getQuery()
       ->accessCheck(TRUE)
       ->allRevisions()
+      ->addTag('entity_revision_overview')
       ->condition($entityType->getKey('langcode'), $node->language()->getId())
       ->condition($entityType->getKey('revision_translation_affected'), '1')
       ->condition($entityType->getKey('id'), $node->id())

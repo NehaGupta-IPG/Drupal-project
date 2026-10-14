@@ -376,6 +376,37 @@ class RevisionVersionHistoryTest extends KernelTestBase {
   }
 
   /**
+   * Tests that modules can alter the revision list query.
+   */
+  public function testRevisionListQueryAlter(): void {
+    $this->installEntitySchema('entity_test_mulrev');
+    /** @var \Drupal\entity_test\Entity\EntityTestMulRev $entity */
+    $entity = EntityTestMulRev::create([
+      'type' => 'entity_test_mulrev',
+      'name' => 'view all revisions,view revision',
+    ]);
+    $entity->save();
+
+    // One revision more than fits on a page, so excluding one of them must
+    // also remove the pager.
+    $entity->setNewRevision(TRUE);
+    $entity->setName('view all revisions,view revision,0')->save();
+    $excludedRevision = $entity->getRevisionId();
+    for ($i = 1; $i < VersionHistoryController::REVISIONS_PER_PAGE; $i++) {
+      $entity->setNewRevision(TRUE);
+      $entity->setName('view all revisions,view revision,' . $i)->save();
+    }
+    $this->container->get('state')->set('entity_test.revision_overview.excluded_revision_ids', [$excludedRevision]);
+
+    $this->drupalGet($entity->toUrl('version-history'));
+    $this->assertSession()->elementsCount('css', 'table tbody tr', VersionHistoryController::REVISIONS_PER_PAGE);
+    $this->assertSession()->elementNotExists('css', '.pager');
+
+    $storage = $this->container->get('entity_type.manager')->getStorage($entity->getEntityTypeId());
+    $this->assertSession()->linkByHrefNotExists($storage->loadRevision($excludedRevision)->toUrl('revision')->toString());
+  }
+
+  /**
    * Resets pager manager state between requests.
    *
    * The PagerManager service persists maxPagerElementId across requests in
