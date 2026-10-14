@@ -13,7 +13,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -38,10 +37,6 @@ class GotoActionTest extends KernelTestBase {
    */
   #[DataProvider('providerGotoAction')]
   public function testGotoAction(string $url, string $expected): void {
-    // Test the action's listener without other response subscribers, which may
-    // reject external redirects or otherwise change the response.
-    $dispatcher = new EventDispatcher();
-    $this->container->set('event_dispatcher', $dispatcher);
     $entity = $this->createStub(EntityInterface::class);
     $action = Action::create([
       'id' => 'goto',
@@ -51,25 +46,23 @@ class GotoActionTest extends KernelTestBase {
     $action->save();
     $action->execute([$entity]);
 
-    // Simulate a response event to trigger the redirect.
-    $kernel = $this->container->get('http_kernel');
+    // Simulate a request to trigger the redirect.
     $request = Request::create('');
-    $event = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, new Response());
-    $dispatcher->dispatch($event, KernelEvents::RESPONSE);
-    $response = $event->getResponse();
-    $this->assertSame(302, $response->getStatusCode());
+    $response = $this->container->get('http_kernel')->handle($request);
     $location = $response->headers->get('Location');
-    $this->assertNotNull($location);
 
     // Convert to relative path.
-    $base = rtrim(Url::fromUri('base:')->setAbsolute()->toString(), '/');
+    $base = rtrim(Url::fromRoute('<front>')->setAbsolute()->toString(), '/');
     if (str_starts_with($location, $base)) {
       $location = substr($location, strlen($base));
     }
 
+    $this->assertSame(302, $response->getStatusCode());
     $this->assertSame($expected, $location);
 
     // Verify that the next request is not redirected by this action.
+    $kernel = $this->container->get('http_kernel');
+    $dispatcher = $this->container->get('event_dispatcher');
     $response = new Response();
     $event = new ResponseEvent($kernel, Request::create(''), HttpKernelInterface::MAIN_REQUEST, $response);
     $dispatcher->dispatch($event, KernelEvents::RESPONSE);
