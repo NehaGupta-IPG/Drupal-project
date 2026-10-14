@@ -43,11 +43,9 @@ class LocaleConfigSubscriberForeignTest extends LocaleConfigSubscriberTest {
   protected function setUpDefaultLanguage(): void {
     // Setting the site's default language here, before setUp() installs
     // locale_test's shipped configuration, means ConfigInstaller updates that
-    // configuration to 'hu' directly as it installs it (see
-    // \Drupal\Core\Config\ConfigInstaller::createConfiguration()) - so it
-    // ends up both with the 'hu' langcode and holding the translated values,
-    // rather than needing a translation override - see
-    // ::testDefaultConfigLanguage().
+    // configuration's langcode to 'hu' directly as it installs it (see
+    // \Drupal\Core\Config\ConfigInstaller::createConfiguration()). Then the
+    // locale module translates the configuration.
     parent::setUpDefaultLanguage();
     $this->config('system.site')
       ->set('default_langcode', 'hu')
