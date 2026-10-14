@@ -12,8 +12,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
-// cspell:ignore ascript attributename bgsound bscript ckers cript datafld
-// cspell:ignore dataformatas datasrc dynsrc ession livescript msgbox nmouseover
+// cspell:ignore ascript attributename bscript ckers cript
+// cspell:ignore dataformatas dynsrc ession livescript msgbox
 // cspell:ignore noxss pression ript scri scriptlet unicoded vbscript
 /**
  * Tests Drupal\editor\EditorXssFilter\Standard.
