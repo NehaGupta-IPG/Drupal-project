@@ -6,9 +6,9 @@ use Composer\Autoload\ClassLoader;
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
-use Drupal\Component\Serialization\PhpSerialize;
+use Drupal\Component\FileSystem\VersionedFile;
+use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
@@ -64,61 +64,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @var string
    */
   protected $phpArrayDumperClass = '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper';
-
-  /**
-   * Holds the default bootstrap container definition.
-   *
-   * @var array
-   */
-  protected $defaultBootstrapContainerDefinition = [
-    'parameters' => [],
-    'services' => [
-      'database' => [
-        'class' => 'Drupal\Core\Database\Connection',
-        'factory' => 'Drupal\Core\Database\Database::getConnection',
-        'arguments' => ['default'],
-      ],
-      'request_stack' => [
-        'class' => 'Symfony\Component\HttpFoundation\RequestStack',
-      ],
-      'datetime.time' => [
-        'class' => 'Drupal\Component\Datetime\Time',
-        'arguments' => ['@request_stack'],
-      ],
-      'cache.container' => [
-        'class' => 'Drupal\Core\Cache\DatabaseBackend',
-        'arguments' => [
-          '@database',
-          '@cache_tags_provider.container',
-          'container',
-          '@serialization.phpserialize',
-          '@datetime.time',
-          DatabaseBackend::MAXIMUM_NONE,
-        ],
-      ],
-      'cache_tags_provider.container' => [
-        'class' => 'Drupal\Core\Cache\DatabaseCacheTagsChecksum',
-        'arguments' => ['@database'],
-      ],
-      'serialization.phpserialize' => [
-        'class' => PhpSerialize::class,
-      ],
-    ],
-  ];
-
-  /**
-   * Holds the class used for instantiating the bootstrap container.
-   *
-   * @var string
-   */
-  protected $bootstrapContainerClass = '\Drupal\Component\DependencyInjection\PhpArrayContainer';
-
-  /**
-   * Holds the bootstrap container.
-   *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
-   */
-  protected $bootstrapContainer;
 
   /**
    * Holds the container instance.
@@ -518,8 +463,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     FileCacheFactory::setConfiguration($configuration);
     FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
 
-    $this->bootstrapContainer = new $this->bootstrapContainerClass(Settings::get('bootstrap_container_definition', $this->defaultBootstrapContainerDefinition));
-
     // Initialize the container.
     $this->initializeContainer();
 
@@ -571,13 +514,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * {@inheritdoc}
    */
   public function getCachedContainerDefinition() {
-    $cache = $this->bootstrapContainer->get('cache.container')->get($this->getContainerCacheKey());
-
-    if ($cache) {
-      return $cache->data;
-    }
-
-    return NULL;
+    return $this->getVersionedFile()
+      ->readCurrentVersion(static fn (string $filename, string $path): ?array =>
+        ($contents = @file_get_contents($path . $filename)) ? unserialize($contents) : NULL);
   }
 
   /**
@@ -796,6 +735,14 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
+   * @return \Drupal\Component\FileSystem\VersionedFile
+   *   The versioned file handler.
+   */
+  public function getVersionedFile(): VersionedFile {
+    return new VersionedFile(Crypt::hashBase64($this->getContainerCacheKey()));
+  }
+
+  /**
    * Returns module data on the filesystem.
    *
    * @param string $module
@@ -963,6 +910,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       class_exists(DrupalInstalled::class) ? DrupalInstalled::VERSIONS_HASH : \Drupal::VERSION,
       Settings::get('deployment_identifier'),
       PHP_OS,
+      drupal_valid_test_ua(),
       serialize(Settings::get('container_yamls')),
     ];
     return implode(':', $parts);
@@ -1103,7 +1051,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     // If needs dumping flag was set, dump the container.
-    if ($this->containerNeedsDumping && !$this->cacheDrupalContainer($container_definition)) {
+    if ($this->containerNeedsDumping && !$this->cacheDrupalContainer($container_definition, $this->container)) {
       $this->container->get('logger.factory')->get('DrupalKernel')->error('Container cannot be saved to cache.');
     }
 
@@ -1432,7 +1380,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     // Also remove the container definition from the cache backend.
-    $this->bootstrapContainer->get('cache.container')->deleteAll();
+    ($this->getVersionedFile())->reset();
   }
 
   /**
@@ -1630,14 +1578,22 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @param array $container_definition
    *   The container definition to cache.
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The container.
    *
    * @return bool
    *   TRUE if the container was successfully cached.
    */
-  protected function cacheDrupalContainer(array $container_definition) {
+  protected function cacheDrupalContainer(array $container_definition, ContainerInterface $container): bool {
     $saved = TRUE;
+    $data = serialize($container_definition);
     try {
-      $this->bootstrapContainer->get('cache.container')->set($this->getContainerCacheKey(), $container_definition);
+      $this->getVersionedFile()->writeNewVersion(
+        static fn ($filename, $data, $path) => @file_put_contents($path . $filename, $data),
+        static fn ($filename, $path) => @unlink($path . $filename),
+        $data,
+        $container->get('state')->get('container_version', 0),
+      );
     }
     catch (\Exception) {
       // There is no way to get from the Cache API if the cache set was

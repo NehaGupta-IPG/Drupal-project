@@ -4,13 +4,14 @@ namespace Drupal\Core\State;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheCollector;
+use Drupal\Core\KeyValueStore\IncrementableKeyValueStoreInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 
 /**
  * Provides the state system using a key value store.
  */
-class State extends CacheCollector implements StateInterface {
+class State extends CacheCollector implements IncrementableStateInterface {
 
   /**
    * Information about all deprecated state, keyed by legacy state key.
@@ -218,6 +219,19 @@ class State extends CacheCollector implements StateInterface {
     $this->keysSetDuringRequest[$key]['value'] = $value;
     if (!array_key_exists('original', $this->keysSetDuringRequest[$key])) {
       $this->keysSetDuringRequest[$key]['original'] = $previousValue;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function increment(string $key, int $step = 1): void {
+    if ($this->keyValueStore instanceof IncrementableKeyValueStoreInterface) {
+      $this->keyValueStore->increment($key, $step);
+    }
+    else {
+      $value = $this->keyValueStore->get($key);
+      $this->keyValueStore->set($key, $value + $step);
     }
   }
 

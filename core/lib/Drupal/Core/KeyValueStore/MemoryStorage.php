@@ -5,7 +5,7 @@ namespace Drupal\Core\KeyValueStore;
 /**
  * Defines a default key/value store implementation.
  */
-class MemoryStorage extends StorageBase {
+class MemoryStorage extends StorageBase implements IncrementableKeyValueStoreInterface {
 
   /**
    * The actual storage of key-value pairs.
@@ -98,6 +98,13 @@ class MemoryStorage extends StorageBase {
    */
   public function deleteAll() {
     $this->data = [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function increment(string $key, int $step = 1): void {
+    $this->data[$key] = ($this->data[$key] ?? 0) + $step;
   }
 
 }

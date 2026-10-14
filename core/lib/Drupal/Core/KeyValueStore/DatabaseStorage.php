@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\KeyValueStore;
 
+use Drupal\Component\Serialization\PhpSerialize;
 use Drupal\Component\Serialization\SerializationInterface;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Connection;
@@ -14,7 +15,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
  * This is Drupal's default key/value store implementation. It uses the database
  * to store key/value data.
  */
-class DatabaseStorage extends StorageBase {
+class DatabaseStorage extends StorageBase implements IncrementableKeyValueStoreInterface {
 
   use DependencySerializationTrait;
 
@@ -395,6 +396,53 @@ class DatabaseStorage extends StorageBase {
       ],
       'primary key' => ['collection', 'name'],
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function increment(string $key, int $step = 1): void {
+    if (!$this->serializer instanceof PhpSerialize) {
+      throw new \LogicException('Increment is only implemented for PHP serialization.');
+    }
+    try {
+      $this->doIncrement($key, $step);
+    }
+    catch (\Exception $e) {
+      // If there was an exception, try to create the table.
+      if ($this->ensureTableExists()) {
+        $this->doIncrement($key, $step);
+      }
+      else {
+        throw $e;
+      }
+    }
+  }
+
+  /**
+   * Increment the value of a key.
+   *
+   * @param string $key
+   *   The key.
+   * @param int $step
+   *   The value to increment by.
+   */
+  protected function doIncrement(string $key, int $step = 1): void {
+    $this->connection->merge($this->table)
+      ->insertFields([
+        'collection' => $this->collection,
+        'name' => $key,
+        'value' => $this->serializer->encode(1),
+      ])
+      // Integers are stored as i;123456; Extract, increment, re-encode.
+      ->expression('value', 'CONCAT(:prefix, CAST(SUBSTRING(value, 3, LENGTH(value) - 3) AS SIGNED) + :step, :terminator)', [
+        ':prefix' => 'i:',
+        ':step' => $step,
+        ':terminator' => ';',
+      ])
+      ->condition('collection', $this->collection)
+      ->condition('name', $key)
+      ->execute();
   }
 
 }

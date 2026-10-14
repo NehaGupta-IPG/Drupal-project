@@ -7,6 +7,7 @@ use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,7 +47,7 @@ class UpdateKernel extends DrupalKernel {
   /**
    * {@inheritdoc}
    */
-  protected function cacheDrupalContainer(array $container_definition) {
+  protected function cacheDrupalContainer(array $container_definition, ContainerInterface $container): bool {
     // Don't save this particular container to cache, so it does not leak into
     // the main site at all.
     return FALSE;

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\StreamWrapper;
 
+use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -267,12 +268,7 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
    * {@inheritdoc}
    */
   public static function getScheme($uri) {
-    if (preg_match('/^([\w\-]+):\/\/|^(data):/', $uri, $matches)) {
-      // The scheme will always be the last element in the matches array.
-      return array_pop($matches);
-    }
-
-    return FALSE;
+    return FileSystem::getScheme($uri);
   }
 
   /**
