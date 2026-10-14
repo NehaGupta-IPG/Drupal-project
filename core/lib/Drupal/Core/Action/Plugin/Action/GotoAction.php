@@ -87,6 +87,11 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
     }
     $response = new RedirectResponse($url);
     $listener = function (ResponseEvent $event) use ($response, &$listener): void {
+      // Only redirect the main request. Error pages are rendered in
+      // subrequests, which also dispatch the response event.
+      if (!$event->isMainRequest()) {
+        return;
+      }
       $event->setResponse($response);
       // Remove the listener so it does not redirect later requests handled by
       // the same event dispatcher.
