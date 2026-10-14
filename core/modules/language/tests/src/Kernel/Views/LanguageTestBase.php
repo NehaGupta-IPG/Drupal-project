@@ -7,7 +7,6 @@ namespace Drupal\Tests\language\Kernel\Views;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
-use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;

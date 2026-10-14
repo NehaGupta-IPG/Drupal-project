@@ -7,7 +7,6 @@ namespace Drupal\Tests\views_ui\Functional;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\Schema;
-use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\views\Tests\ViewTestData;

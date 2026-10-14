@@ -7,7 +7,6 @@ namespace Drupal\Tests\views\Kernel\Plugin;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\Schema;
-use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\Entity\User;
 use Drupal\views\Views;

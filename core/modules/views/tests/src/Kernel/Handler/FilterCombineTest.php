@@ -6,8 +6,6 @@ namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\Schema;
-use Drupal\Core\Database\SchemaDefinition\StringValue;
-use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Plugin\views\filter\Combine;
 use Drupal\views\Views;

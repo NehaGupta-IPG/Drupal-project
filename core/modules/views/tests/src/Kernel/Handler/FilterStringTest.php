@@ -8,7 +8,6 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\Schema;
-use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
