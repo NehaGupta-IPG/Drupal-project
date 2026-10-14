@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\default_admin\Hook;
 
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\default_admin\Helper;
 use Drupal\default_admin\Settings;
 use Drupal\Core\Ajax\AjaxHelperTrait;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityFormInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\Element;
@@ -35,6 +38,7 @@ class FormHooks {
   public function __construct(
     protected RouteMatchInterface $routeMatch,
     protected AccountInterface $currentUser,
+    protected ModuleHandlerInterface $moduleHandler,
   ) {}
 
   /**
@@ -764,6 +768,19 @@ class FormHooks {
     // Add a class that allows the logic in edit_form.js to identify the form.
     $form['#attributes']['class'][] = 'node-edit-form';
 
+    // Without inline form errors, the error messages are only shown at the top
+    // of the page, where nothing tells that a field is in the sidebar.
+    if (!$this->moduleHandler->moduleExists('inline_form_errors') || !empty($form['#disable_inline_form_errors'])) {
+      $form['#validate'][] = [__CLASS__, 'sidebarErrorsValidate'];
+      if (isset($form['actions'])) {
+        foreach (Element::children($form['actions']) as $action) {
+          if (isset($form['actions'][$action]['#validate'])) {
+            $form['actions'][$action]['#validate'][] = [__CLASS__, 'sidebarErrorsValidate'];
+          }
+        }
+      }
+    }
+
     // If not logged in hide changed and author node info on add forms.
     $not_logged_in = $this->currentUser->isAnonymous();
     $route = $this->routeMatch->getRouteName();
@@ -789,6 +806,138 @@ class FormHooks {
     return $is_content_form ?
       $flag === 'content_forms' || $flag === 'always' :
       $flag === 'always';
+  }
+
+  /**
+   * Validation handler for the error messages of sidebar fields.
+   *
+   * Adds a button that opens the sidebar at the field to the message of each
+   * error set on an element in the sidebar, which may be collapsed. This
+   * changes the error messages in the form state, so it must run after the
+   * other validation handlers.
+   *
+   * @param array $form
+   *   The complete form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
+  public static function sidebarErrorsValidate(array &$form, FormStateInterface $form_state): void {
+    $errors = $form_state->getErrors();
+    if (!$errors) {
+      return;
+    }
+
+    $groups = [];
+    self::collectGroups($form, $groups);
+    $sidebar_names = [];
+    self::collectSidebarNames($form, $groups, FALSE, $sidebar_names);
+
+    $form_state->clearErrors();
+    foreach ($errors as $name => $error) {
+      $sidebar_name = self::findSidebarName((string) $name, $sidebar_names);
+      if ($sidebar_name !== NULL) {
+        $error = new FormattableMarkup('<span id="@error_id" class="meta-sidebar__error">@error</span> <button type="button" class="button button--extrasmall meta-sidebar__open" aria-controls="default_admin_sidebar" aria-describedby="@error_id" data-admin-sidebar-open="@field_id">@label</button>', [
+          '@error_id' => Html::getUniqueId('sidebar-error'),
+          '@error' => $error,
+          '@field_id' => $sidebar_names[$sidebar_name] ?? '',
+          '@label' => t('Open the sidebar'),
+        ]);
+      }
+      $form_state->setErrorByName((string) $name, $error);
+    }
+  }
+
+  /**
+   * Collects the group of each grouped element.
+   *
+   * @param array $element
+   *   The element to collect the groups in.
+   * @param array $groups
+   *   The group names, keyed by the name of the element in the group.
+   */
+  private static function collectGroups(array $element, array &$groups): void {
+    foreach (Element::children($element) as $key) {
+      if (isset($element[$key]['#group'], $element[$key]['#parents'])) {
+        $groups[implode('][', $element[$key]['#parents'])] = $element[$key]['#group'];
+      }
+      self::collectGroups($element[$key], $groups);
+    }
+  }
+
+  /**
+   * Collects the names of the elements rendered in the sidebar.
+   *
+   * The sidebar renders the 'advanced' element, which holds every element
+   * whose group is 'advanced' or a group that is itself in 'advanced'.
+   *
+   * @param array $element
+   *   The element to collect the names in.
+   * @param array $groups
+   *   The group names, keyed by the name of the element in the group.
+   * @param bool $in_sidebar
+   *   Whether the element is in the sidebar.
+   * @param array $names
+   *   The HTML IDs of the elements in the sidebar, keyed by element name.
+   */
+  private static function collectSidebarNames(array $element, array $groups, bool $in_sidebar, array &$names): void {
+    foreach (Element::children($element) as $key) {
+      $child = $element[$key];
+      $name = isset($child['#parents']) ? implode('][', $child['#parents']) : NULL;
+      $child_in_sidebar = $in_sidebar || ($name !== NULL && self::isInAdvanced($name, $groups));
+      if ($child_in_sidebar && $name !== NULL) {
+        $names[$name] = $child['#id'] ?? NULL;
+      }
+      self::collectSidebarNames($child, $groups, $child_in_sidebar, $names);
+    }
+  }
+
+  /**
+   * Checks whether an element is the 'advanced' group or in it.
+   *
+   * @param string $name
+   *   The element name.
+   * @param array $groups
+   *   The group names, keyed by the name of the element in the group.
+   *
+   * @return bool
+   *   TRUE if the element is in the 'advanced' group, directly or not.
+   */
+  private static function isInAdvanced(string $name, array $groups): bool {
+    $seen = [];
+    while (!isset($seen[$name])) {
+      if ($name === 'advanced') {
+        return TRUE;
+      }
+      $seen[$name] = TRUE;
+      if (!isset($groups[$name])) {
+        return FALSE;
+      }
+      $name = $groups[$name];
+    }
+    return FALSE;
+  }
+
+  /**
+   * Finds the sidebar element an error is set on.
+   *
+   * @param string $name
+   *   The error name.
+   * @param array $sidebar_names
+   *   The HTML IDs of the elements in the sidebar, keyed by element name.
+   *
+   * @return string|null
+   *   The name of the sidebar element the error is set on, or of its closest
+   *   ancestor in the sidebar, or NULL if the error is not in the sidebar.
+   */
+  private static function findSidebarName(string $name, array $sidebar_names): ?string {
+    while ($name !== '') {
+      if (array_key_exists($name, $sidebar_names)) {
+        return $name;
+      }
+      $position = strrpos($name, '][');
+      $name = $position === FALSE ? '' : substr($name, 0, $position);
+    }
+    return NULL;
   }
 
   /**

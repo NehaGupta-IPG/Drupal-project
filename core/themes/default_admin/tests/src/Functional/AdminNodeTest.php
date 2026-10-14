@@ -20,6 +20,7 @@ class AdminNodeTest extends BrowserTestBase {
    */
   protected static $modules = [
     'node',
+    'path',
     'default_admin_form_test',
   ];
 
@@ -46,6 +47,7 @@ class AdminNodeTest extends BrowserTestBase {
       'create page content',
       'edit any page content',
       'administer nodes',
+      'create url aliases',
     ]));
   }
 
@@ -71,6 +73,44 @@ class AdminNodeTest extends BrowserTestBase {
       ->getStorage('node')
       ->loadUnchanged($node->id());
     $this->assertTrue($node->isPublished());
+  }
+
+  /**
+   * Tests that error messages of sidebar fields point to the sidebar.
+   *
+   * Without inline form errors, the messages are only shown at the top of the
+   * page. The message of a field in the sidebar gets a button that opens the
+   * sidebar, the message of a field in the main region does not.
+   */
+  public function testSidebarErrorMessages(): void {
+    $this->drupalGet('node/add/page');
+    $this->submitForm([
+      'title[0][value]' => '',
+      'path[0][alias]' => 'no-slash',
+    ], 'Save');
+
+    $this->assertSession()->pageTextContains('Title field is required.');
+    $this->assertSession()->pageTextContains('The alias path has to start with a slash.');
+    $buttons = $this->getSession()->getPage()->findAll('css', '[data-drupal-messages] [data-admin-sidebar-open]');
+    $this->assertCount(1, $buttons);
+    $this->assertSame('Open the sidebar', $buttons[0]->getText());
+    $this->assertStringContainsString('The alias path has to start with a slash.', $buttons[0]->getParent()->getText());
+  }
+
+  /**
+   * Tests that inline form errors leave the error messages unchanged.
+   */
+  public function testSidebarErrorMessagesWithInlineFormErrors(): void {
+    $this->container->get('module_installer')->install(['inline_form_errors']);
+
+    $this->drupalGet('node/add/page');
+    $this->submitForm([
+      'title[0][value]' => 'Title',
+      'path[0][alias]' => 'no-slash',
+    ], 'Save');
+
+    $this->assertSession()->pageTextContains('The alias path has to start with a slash.');
+    $this->assertSession()->elementNotExists('css', '[data-admin-sidebar-open]');
   }
 
 }

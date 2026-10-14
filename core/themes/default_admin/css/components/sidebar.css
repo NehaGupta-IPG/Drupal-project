@@ -163,6 +163,46 @@ body[data-meta-sidebar="open"] {
   }
 }
 
+.messages__content:has(> .meta-sidebar__open),
+.messages__item:has(> .meta-sidebar__open) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--admin-space-s) var(--admin-space-m);
+}
+
+.meta-sidebar__error {
+  flex: 1 1 20ch;
+  overflow-wrap: anywhere;
+}
+
+:is(#extra-specificity-hack, [data-drupal-admin-styles]) .button.meta-sidebar__open,
+.button.meta-sidebar__open {
+  flex-shrink: 0;
+  margin: 0;
+  color: var(--messages-bg-color);
+  border-color: var(--admin-color-white);
+  background: var(--admin-color-white);
+  box-shadow: none;
+
+  &:hover,
+  &:focus {
+    color: var(--messages-bg-color);
+    border-color: var(--messages-fg-color);
+    background: var(--messages-fg-color);
+  }
+
+  &:focus {
+    outline-color: var(--messages-fg-color);
+  }
+}
+
+body[data-meta-sidebar="open"] :is(#extra-specificity-hack, [data-drupal-admin-styles]) .meta-sidebar__open,
+body[data-meta-sidebar="open"] .meta-sidebar__open {
+  display: none;
+}
+
 :is(#extra-specificity-hack, [data-drupal-admin-styles]) .meta-sidebar__close,
 .meta-sidebar__close {
   position: absolute;
