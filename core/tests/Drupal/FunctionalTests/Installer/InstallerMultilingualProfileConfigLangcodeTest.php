@@ -11,8 +11,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests a profile can ship configuration in a language other than English.
  *
  * The site is installed in English throughout. The profile itself defines
- * German as an additional configured language and ships 'de' configuration,
- * neither the language chosen for installation nor English.
+ * German as an additional configured language and ships 'de' configuration.
  *
  * @see \Drupal\Core\Config\ConfigLangcodeResolveEvent
  */
