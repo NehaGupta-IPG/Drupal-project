@@ -92,6 +92,7 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
       // the same event dispatcher.
       $this->dispatcher->removeListener(KernelEvents::RESPONSE, $listener);
     };
+    // Add the listener to the event dispatcher.
     $this->dispatcher->addListener(KernelEvents::RESPONSE, $listener);
   }
 
