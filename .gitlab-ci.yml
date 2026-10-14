@@ -118,6 +118,10 @@ default:
       - scheduler_failure
   image:
     name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:production
+  # Report the CPU and memory the job's container used. Jobs that define their
+  # own after_script add this with *resource-usage.
+  after_script: &resource-usage
+    - .gitlab-ci/scripts/resource-usage.sh || true
 
 #############
 # Templates #
@@ -220,6 +224,7 @@ default:
     - time sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --debug-discovery --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --all --ci-parallel-node-index $CI_NODE_INDEX --ci-parallel-node-total $CI_NODE_TOTAL
   after_script:
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
+    - *resource-usage
   artifacts:
     when: always
     expire_in: 6 mos
@@ -291,12 +296,14 @@ default:
   variables:
     TESTSUITE: functional-javascript
     CONCURRENCY: "12"
-    KUBERNETES_CPU_REQUEST: "14"
+    KUBERNETES_CPU_REQUEST: "6"
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
   after_script:
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
+    # Before the copy, which fails because the project directory is /builds.
+    - *resource-usage
     - cp /builds/chromedriver.log ./
 
 '🌐️️ PHPUnit Functional':
@@ -311,10 +318,10 @@ default:
 
 '⚙️️ PHPUnit Kernel':
   <<: [ *with-composer, *test-setup ]
-  parallel: 4
+  parallel: 3
   variables:
     TESTSUITE: kernel
-    KUBERNETES_CPU_REQUEST: "12"
+    KUBERNETES_CPU_REQUEST: "16"
     CONCURRENCY: "24"
   services:
     - <<: *with-database
@@ -323,7 +330,7 @@ default:
   <<: [ *with-composer, *test-setup ]
   retry: 1
   variables:
-    KUBERNETES_CPU_REQUEST: "9"
+    KUBERNETES_CPU_REQUEST: "2"
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
@@ -349,6 +356,7 @@ default:
     - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - sudo -u www-data -E -H yarn run test:nightwatch --workers=3
   after_script:
+    - *resource-usage
     - cp /builds/chromedriver.log ./
   artifacts:
     when: always
@@ -373,7 +381,7 @@ default:
   retry: 1
   variables:
     TESTSUITE: build
-    KUBERNETES_CPU_REQUEST: "8"
+    KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: "6"
     # No parallel for this job, setup manually the env variables that need to
     # be passed to run-tests.sh command line options.
@@ -434,6 +442,7 @@ default:
     - sudo -u www-data git config --global --add safe.directory $CI_PROJECT_DIR
     - sudo SIMPLETEST_BASE_URL="http://$HOSTNAME/subdirectory" -u www-data -E -H ./vendor/bin/phpunit --display-all-issues -c core --group OpenTelemetry --log-junit=./sites/default/files/simpletest/phpunit-performance.xml
   after_script:
+    - *resource-usage
     - cp /builds/chromedriver-selenium.log ./
 
 ################
@@ -939,47 +948,9 @@ default:
 # Unit test Jobs
 ##################
 
-'📋 PHPUnit Unit (Core)':
-  stage: ⚡️ Tests
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
-      when: never
-    - if: $PERFORMANCE_TEST != "1"
-  needs: []
-  parallel:
-    matrix:
-      - _TARGET_PHP: !reference [.php_versions]
-  allow_failure:
-    # It's not possible to set allow failure conditional on a possible value of
-    # the matrix, so we intercept failure from the script and exit with a code
-    # that we allow here.
-    exit_codes: 100
-  variables:
-    KUBERNETES_CPU_REQUEST: "4"
-    CONCURRENCY: 24
-    PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
-  before_script:
-    - *composer-setup
-    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
-    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
-  script:
-    - export EXIT_CODE=0
-    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "unit" --concurrency "$CONCURRENCY" --repeat "1" --verbose --non-html --all || EXIT_CODE=$?
-    # Allow failure for the next PHP major.
-    - |
-      [[ $EXIT_CODE != 0 && $_TARGET_PHP == $NEXT_PHP_MAJOR ]] && exit 100
-    - exit $EXIT_CODE
-  after_script:
-    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
-  artifacts:
-    when: always
-    expire_in: 6 mos
-    reports:
-      junit: ./sites/default/files/simpletest/phpunit-*.xml
-    paths:
-      - ./sites/default/files/simpletest/phpunit-*.xml
-
-'📋 PHPUnit Unit (Component)':
+'📋 PHPUnit Unit':
+  # Runs the Core unit tests with run-tests.sh, then the Component unit tests
+  # with PHPUnit, in one job to share the pod startup and Composer install.
   # Jobs that produce metrics must run on performance test pipelines so MRs show
   # the correct information.
   rules:
@@ -997,45 +968,58 @@ default:
     # that we allow here.
     exit_codes: 100
   variables:
-    KUBERNETES_CPU_REQUEST: "2"
+    KUBERNETES_CPU_REQUEST: "4"
+    CONCURRENCY: 24
     _ARTIFACTS_DIR: "test-artifacts/phpunit"
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
   before_script:
     - mkdir -p $_ARTIFACTS_DIR
     - *composer-setup
+    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
+    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
+  script:
+    - export EXIT_CODE=0
+    # Core unit tests. Performance test pipelines only need the Component
+    # coverage metrics.
+    - |
+      if [[ $PERFORMANCE_TEST != "1" ]]; then
+        sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "unit" --concurrency "$CONCURRENCY" --repeat "1" --verbose --non-html --all || EXIT_CODE=$?
+      fi
+    # Component tests are run via the PHPUnit CLI using a PHPUnit configuration
+    # file of its own located in the core/tests/Drupal/Tests/Component
+    # directory. Execute test coverage reporting only for the primary PHP
+    # version.
     - |
       [[ $_TARGET_PHP == $PRIMARY_PHP ]] && docker-php-ext-enable pcov
-  script:
-    # Execute test coverage reporting only for the primary PHP version.
-    - |
       [[ $_TARGET_PHP != $PRIMARY_PHP ]] && export _PHPUNIT_COVERAGE=""
       [[ $_TARGET_PHP == $PRIMARY_PHP ]] && export _PHPUNIT_COVERAGE="--coverage-text=$_ARTIFACTS_DIR/component-coverage-report.txt --coverage-cobertura=$_ARTIFACTS_DIR/component-coverage-cobertura.xml"
     - |
       [[ $PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION == false ]] && export _FAIL_ON_PHPUNIT_DEPRECATION=""
       [[ $PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION != false ]] && export _FAIL_ON_PHPUNIT_DEPRECATION="--fail-on-phpunit-deprecation"
-    # Component tests are run via the PHPUnit CLI using a PHPUnit configuration
-    # file of its own located in the core/tests/Drupal/Tests/Component
-    # directory.
-    - export EXIT_CODE=0
     - vendor/bin/phpunit -c core/tests/Drupal/Tests/Component --testsuite unit-component --colors=always --testdox --log-junit $_ARTIFACTS_DIR/junit.xml --fail-on-deprecation $_FAIL_ON_PHPUNIT_DEPRECATION $_PHPUNIT_COVERAGE || EXIT_CODE=$?
     # Allow failure for the next PHP major.
     - |
       [[ $EXIT_CODE != 0 && $_TARGET_PHP == $NEXT_PHP_MAJOR ]] && exit 100
     - exit $EXIT_CODE
   after_script:
+    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
     # Process the coverage text report to produce an OpenMetrics report.
     - |
       [[ $_TARGET_PHP == $PRIMARY_PHP ]] && php .gitlab-ci/scripts/component-coverage-metrics.php $_ARTIFACTS_DIR/component-coverage-report.txt $_ARTIFACTS_DIR/component-coverage-metrics.txt
+    - *resource-usage
   artifacts:
     when: always
     expire_in: 6 mos
     reports:
-      junit: $_ARTIFACTS_DIR/junit.xml
+      junit:
+        - ./sites/default/files/simpletest/phpunit-*.xml
+        - $_ARTIFACTS_DIR/junit.xml
       metrics: $_ARTIFACTS_DIR/component-coverage-metrics.txt
       coverage_report:
         coverage_format: cobertura
         path: $_ARTIFACTS_DIR/component-coverage-cobertura.xml
     paths:
+      - ./sites/default/files/simpletest/phpunit-*.xml
       - $_ARTIFACTS_DIR
 
 '📋 PHPUnit Unit (PHPStan rules)':
