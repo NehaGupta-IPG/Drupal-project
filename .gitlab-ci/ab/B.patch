@@ -1,0 +1,75 @@
+diff --git a/core/tests/bootstrap.php b/core/tests/bootstrap.php
+index 4f38685b2a7..381a6b75f18 100644
+--- a/core/tests/bootstrap.php
++++ b/core/tests/bootstrap.php
+@@ -96,6 +96,56 @@ function drupal_phpunit_get_extension_namespaces($dirs): array {
+   return $namespaces;
+ }
+ 
++/**
++ * Returns the extension namespaces, scanning the file system at most once.
++ *
++ * Every test method that runs in a separate process loads this file again,
++ * and scanning all extension directories costs ~0.1 seconds each time. The
++ * first process scans and stores the result in a temporary file, and passes
++ * its name to child processes in an environment variable. The file is removed
++ * when the process that created it exits.
++ *
++ * @return array
++ *   An associative array of extension directories, keyed by their namespace.
++ */
++function drupal_phpunit_get_cached_extension_namespaces(): array {
++  $root = dirname(__DIR__, 2);
++  $cache_file = getenv('DRUPAL_PHPUNIT_NAMESPACES_CACHE');
++  if ($cache_file && is_file($cache_file)) {
++    $cache = unserialize((string) file_get_contents($cache_file), ['allowed_classes' => FALSE]);
++    if (is_array($cache) && ($cache['root'] ?? NULL) === $root && is_array($cache['namespaces'] ?? NULL)) {
++      return $cache['namespaces'];
++    }
++  }
++
++  // Scan for arbitrary extension namespaces from core and contrib.
++  $extension_roots = drupal_phpunit_contrib_extension_directory_roots($root);
++  $dirs = array_map('drupal_phpunit_find_extension_directories', $extension_roots);
++  $dirs = array_reduce($dirs, 'array_merge', []);
++  $namespaces = drupal_phpunit_get_extension_namespaces($dirs);
++
++  $cache_file = tempnam(sys_get_temp_dir(), 'drupal_phpunit_namespaces_');
++  if ($cache_file !== FALSE) {
++    if (file_put_contents($cache_file, serialize(['root' => $root, 'namespaces' => $namespaces])) !== FALSE) {
++      // PHPUnit passes $_SERVER, not the process environment, to child
++      // processes when a test sets environment variables.
++      putenv('DRUPAL_PHPUNIT_NAMESPACES_CACHE=' . $cache_file);
++      $_SERVER['DRUPAL_PHPUNIT_NAMESPACES_CACHE'] = $_ENV['DRUPAL_PHPUNIT_NAMESPACES_CACHE'] = $cache_file;
++      $pid = getmypid();
++      register_shutdown_function(static function () use ($cache_file, $pid): void {
++        // Forked processes share shutdown functions; only the owner cleans up.
++        if (getmypid() === $pid) {
++          @unlink($cache_file);
++        }
++      });
++    }
++    else {
++      @unlink($cache_file);
++    }
++  }
++  return $namespaces;
++}
++
+ // We define the COMPOSER_INSTALL constant, so that PHPUnit knows where to
+ // autoload from. This is needed for tests run in isolation mode, because
+ // phpunit.xml.dist is located in a non-default directory relative to the
+@@ -127,12 +177,7 @@ function drupal_phpunit_populate_class_loader() {
+   $loader->add('Drupal\\TestTools', __DIR__);
+ 
+   if (!isset($GLOBALS['namespaces'])) {
+-    // Scan for arbitrary extension namespaces from core and contrib.
+-    $extension_roots = drupal_phpunit_contrib_extension_directory_roots();
+-
+-    $dirs = array_map('drupal_phpunit_find_extension_directories', $extension_roots);
+-    $dirs = array_reduce($dirs, 'array_merge', []);
+-    $GLOBALS['namespaces'] = drupal_phpunit_get_extension_namespaces($dirs);
++    $GLOBALS['namespaces'] = drupal_phpunit_get_cached_extension_namespaces();
+   }
+   foreach ($GLOBALS['namespaces'] as $prefix => $paths) {
+     $loader->addPsr4($prefix, $paths);

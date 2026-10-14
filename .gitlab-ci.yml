@@ -93,6 +93,8 @@ variables:
   # Use local cache for yarn, see .yarn-install-from-cache.
   YARN_ENABLE_GLOBAL_CACHE: false
   YARN_ENABLE_MIRROR: false
+  # [DO NOT MERGE] Bench matrix: "pilot", "main", "q3", "q4" or "q5" (ab-* jobs).
+  AB_RUN: "q5"
 
 #############
 # Stages    #
@@ -201,6 +203,8 @@ default:
 .test-setup: &test-setup
   stage: ⚡️ Tests
   rules:
+    # [DO NOT MERGE] Bench pipeline: only the ab-* jobs run.
+    - when: never
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline" && $PERFORMANCE_TEST != "1"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - <<: *on-commit
@@ -942,6 +946,7 @@ default:
 '📋 PHPUnit Unit (Core)':
   stage: ⚡️ Tests
   rules:
+    - when: never
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
     - if: $PERFORMANCE_TEST != "1"
@@ -983,6 +988,7 @@ default:
   # Jobs that produce metrics must run on performance test pipelines so MRs show
   # the correct information.
   rules:
+    - when: never
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
     - if: $PERFORMANCE_TEST != "1" || $_TARGET_PHP == $PRIMARY_PHP
@@ -1044,6 +1050,7 @@ default:
   variables:
     KUBERNETES_CPU_REQUEST: "2"
   rules:
+    - when: never
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
     # Run if PHPStan files have changed, or manually.
@@ -1085,3 +1092,379 @@ default:
     - if [ ! -f core/.stylelintcache ]; then exit 1; fi
     - if [ ! -f core/.phpcscache ]; then exit 1; fi
     - if [ ! -f core/.twigcsfixercache ]; then exit 1; fi
+
+###########################################################################
+# [DO NOT MERGE] Same-node A/B bench (#3627452 / #3628411).
+# Each job runs ALL arms of one shard concurrently, one codebase copy and
+# server port per arm, rotating arms over copies between rounds
+# (.gitlab-ci/ab/ab.sh). AB_RUN selects the pilot or the main matrix.
+# Job names carry no brackets: GitLab merges "[...]" names in test reports.
+###########################################################################
+
+
+.ab-job: &ab-job
+  <<: [ *with-composer, *test-setup ]
+  stage: ⚡️ Tests
+  timeout: 100m
+  retry: 0
+  image:
+    name: $_CONFIG_DOCKERHUB_ROOT/php-8.5-ubuntu-apache:production@sha256:882e8fd8ff1a397a7f24ec0e3bcfc2295c3e02d2e2f5ff50cb86fe0018d3c741
+  services:
+    - name: $_CONFIG_DOCKERHUB_ROOT/mysql-8.4:production@sha256:b4cd1224e704223d1b843bca5982fcc75e05dbd060adf4473864c2b62ea0bc47
+      alias: database
+  script:
+    - .gitlab-ci/ab/ab.sh
+  after_script:
+    - grep -h '' ab-out/summary.tsv || true
+  artifacts:
+    when: always
+    expire_in: 1 mos
+    paths:
+      - ab-out/
+
+.ab-pilot: &ab-pilot
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $AB_RUN == "pilot"
+
+.ab-main: &ab-main
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $AB_RUN == "main"
+
+# Q3 rerun: main run 991786 applied no patch in slots 1-2 (git apply inside the
+# checkout), so the lever jobs run again on their own.
+.ab-q3: &ab-q3
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($AB_RUN == "main" || $AB_RUN == "q3")
+
+.ab-kernel-vars: &ab-kernel-vars
+  TESTSUITE: kernel
+  CONCURRENCY: "24"
+  KUBERNETES_CPU_REQUEST: "12"
+  AB_TOTAL: "4"
+  AB_WARMUP: "core/modules/system/tests/src/Kernel/Common/UrlTest.php,core/modules/user/tests/src/Kernel/UserEntityTest.php,core/modules/node/tests/src/Kernel/NodeAccessTest.php,core/modules/field/tests/src/Kernel/FieldCrudTest.php"
+  CI_DIAG: "0"
+  CLI_OPCACHE_FILE_CACHE: "0"
+
+.ab-functional-vars: &ab-functional-vars
+  TESTSUITE: functional
+  CONCURRENCY: "15"
+  KUBERNETES_CPU_REQUEST: "10"
+  AB_TOTAL: "8"
+  AB_WARMUP: "core/modules/user/tests/src/Functional/UserLoginTest.php,core/modules/node/tests/src/Functional/NodeViewTest.php,core/modules/system/tests/src/Functional/System/SiteMaintenanceTest.php,core/modules/block/tests/src/Functional/BlockUiTest.php"
+  CI_DIAG: "0"
+  CLI_OPCACHE_FILE_CACHE: "0"
+
+# Q1: FreeUnit ac2f2d29 (1.36.1+) vs 1.37.0, both built in the job with the
+# image Dockerfile's flags; the image's own unitd is replaced.
+.ab-unit: &ab-unit
+  image:
+    name: $_CONFIG_DOCKERHUB_ROOT/php-8.5-ubuntu-unit:dev@sha256:531645e528e67787c8423cf7c3e1a5ea7657190b2bb03d493017c635f903c907
+  script:
+    - apt-get update -qq && apt-get install -qy --no-install-recommends gcc make libc6-dev pkgconf libssl-dev zlib1g-dev libpcre2-dev wrk >/dev/null
+    - .gitlab-ci/ab/build-unit.sh ac ac2f2d294ecc970daa74b60b2540e9334c7f14e0 74a2a34688a09e5d7c88cf67863227e0ba921bd968ad0a047caacf353563e36f
+    - .gitlab-ci/ab/build-unit.sh n137 1.37.0 8ae237d5a32d77bb8a7426d844ce75aeb18583a4e47318f55e17839d865fad8c
+    - .gitlab-ci/ab/ab.sh
+
+#### Pilot: A/A noise floor, calibration against known fc ratios, harness shakedown.
+
+'ab-AA Kernel pilot':
+  <<: [ *ab-pilot, *ab-job ]
+  variables:
+    <<: *ab-kernel-vars
+    AB_KIND: fc
+    AB_ARMS: "off off2"
+    AB_ROUNDS: "4"
+    AB_SHARDS: "3"
+
+'ab-fc Kernel pilot':
+  <<: [ *ab-pilot, *ab-job ]
+  variables:
+    <<: *ab-kernel-vars
+    AB_KIND: fc
+    AB_ARMS: "off on"
+    AB_ROUNDS: "4"
+    AB_SHARDS: "2"
+
+'ab-fc Functional pilot':
+  <<: [ *ab-pilot, *ab-job ]
+  variables:
+    <<: *ab-functional-vars
+    AB_KIND: fc
+    AB_ARMS: "off on"
+    AB_ROUNDS: "4"
+    AB_SHARDS: "3"
+
+# A/A control: two identical arms; the measured ratio is the design's noise.
+'ab-AA Functional pilot':
+  <<: [ *ab-pilot, *ab-job ]
+  variables:
+    <<: *ab-functional-vars
+    AB_KIND: fc
+    AB_ARMS: "off off2"
+    AB_ROUNDS: "4"
+    AB_SHARDS: "4"
+
+'ab-unit Functional pilot':
+  <<: [ *ab-pilot, *ab-unit, *ab-job ]
+  variables:
+    <<: *ab-functional-vars
+    AB_KIND: unit
+    AB_ARMS: "ac n137"
+    AB_SHARDS: "1"
+    AB_MICRO: "1"
+    AB_MICRO_ROUNDS: "8"
+
+#### Main matrix (AB_RUN: main). Sized after the pilot.
+
+'ab-fc Kernel':
+  <<: [ *ab-main, *ab-job ]
+  parallel: 3
+  variables:
+    <<: *ab-kernel-vars
+    AB_KIND: fc
+    AB_ARMS: "off on"
+    AB_SHARDS: "1 3 4"
+
+'ab-fc Functional':
+  <<: [ *ab-main, *ab-job ]
+  parallel: 3
+  variables:
+    <<: *ab-functional-vars
+    AB_KIND: fc
+    AB_ARMS: "off on"
+    AB_SHARDS: "1 5 7"
+
+'ab-fc FunctionalJavascript':
+  <<: [ *ab-main, *ab-job ]
+  parallel: 3
+  services:
+    - name: $_CONFIG_DOCKERHUB_ROOT/mysql-8.4:production@sha256:b4cd1224e704223d1b843bca5982fcc75e05dbd060adf4473864c2b62ea0bc47
+      alias: database
+    - <<: *with-selenium-chrome
+  variables:
+    TESTSUITE: functional-javascript
+    CONCURRENCY: "12"
+    KUBERNETES_CPU_REQUEST: "14"
+    AB_TOTAL: "3"
+    AB_WARMUP: "core/modules/user/tests/src/FunctionalJavascript/PasswordConfirmWidgetTest.php"
+    CI_DIAG: "0"
+    CLI_OPCACHE_FILE_CACHE: "0"
+    AB_KIND: fc
+    AB_ARMS: "off on"
+    AB_SHARDS: "1 2 3"
+    AB_FILLER: "0"
+
+# Unit Core does not run server-setup.sh, so !17339 does not reach it; this
+# measures what extending it to Unit Core would give.
+'ab-fc Unit Core':
+  <<: [ *ab-main, *ab-job ]
+  parallel: 2
+  variables:
+    CONCURRENCY: "24"
+    KUBERNETES_CPU_REQUEST: "4"
+    AB_TARGET: "--types unit --all"
+    AB_WARMUP: "core/tests/Drupal/Tests/Core/Routing/UrlGeneratorTest.php,core/tests/Drupal/Tests/Core/Entity/EntityTypeTest.php"
+    CI_DIAG: "0"
+    CLI_OPCACHE_FILE_CACHE: "0"
+    AB_KIND: fc
+    AB_ARMS: "off on"
+
+# Q3, file cache on (warm) in every pass.
+'ab-B Kernel':
+  <<: [ *ab-q3, *ab-job ]
+  parallel: 4
+  variables:
+    <<: *ab-kernel-vars
+    AB_KIND: patch
+    AB_ARMS: "base B"
+    AB_SHARDS: "1 2 3 4"
+
+'ab-AB Functional':
+  <<: [ *ab-q3, *ab-job ]
+  parallel: 4
+  variables:
+    <<: *ab-functional-vars
+    AB_KIND: patch
+    AB_ARMS: "base A B"
+    AB_SHARDS: "2 4 6 8"
+
+# D: correctness and CPU of the split only; its shard effect is a scheduling
+# question answered by simulation from the measured class times.
+'ab-D package_manager':
+  <<: [ *ab-q3, *ab-job ]
+  variables:
+    <<: *ab-kernel-vars
+    AB_KIND: patch
+    AB_ARMS: "base D"
+    AB_TARGET: "--types kernel --module package_manager"
+
+# Co-load bias: does off/on move when the neighbour arm is the other arm?
+'ab-mix Kernel':
+  <<: [ *ab-main, *ab-job ]
+  parallel: 2
+  variables:
+    <<: *ab-kernel-vars
+    AB_KIND: fc
+    AB_ARMS: "off on on2"
+    AB_SHARDS: "2 2"
+
+'ab-mix2 Kernel':
+  <<: [ *ab-main, *ab-job ]
+  parallel: 2
+  variables:
+    <<: *ab-kernel-vars
+    AB_KIND: fc
+    AB_ARMS: "off off2 on"
+    AB_SHARDS: "2 2"
+
+# Q1 parity is settled by the pilot (test CPU 1.000, app CPU 0.996); the
+# router costs more per request on 1.37.0. Bisect it on the microbenchmark only.
+'ab-unit micro bisect':
+  <<: [ *ab-main, *ab-unit, *ab-job ]
+  script:
+    - apt-get update -qq && apt-get install -qy --no-install-recommends gcc make libc6-dev pkgconf libssl-dev zlib1g-dev libpcre2-dev wrk >/dev/null
+    - .gitlab-ci/ab/build-unit.sh ac ac2f2d294ecc970daa74b60b2540e9334c7f14e0 74a2a34688a09e5d7c88cf67863227e0ba921bd968ad0a047caacf353563e36f
+    - .gitlab-ci/ab/build-unit.sh m600 60033ee4f1e5abdc3c1d705c587982a6fffc7d2c 019f465930cb7d3a2468cb9a3998d69752d45f9731b3ddfb15008943004c6598
+    - .gitlab-ci/ab/build-unit.sh n137 1.37.0 8ae237d5a32d77bb8a7426d844ce75aeb18583a4e47318f55e17839d865fad8c
+    - .gitlab-ci/ab/ab.sh
+  parallel: 2
+  variables:
+    <<: *ab-functional-vars
+    AB_WARMUP: ""
+    AB_KIND: unit
+    AB_ARMS: "ac m600 n137"
+    AB_ROUNDS: "0"
+    AB_MICRO: "1"
+    AB_MICRO_ROUNDS: "9"
+
+#### Q4 (AB_RUN: q4): the CLI file cache in Nightwatch and PHPUnit Build,
+# which !17339 also reaches through server-setup.sh. Arms off/on/off2: on vs
+# off is the effect, off2 vs off the A/A noise of the same job. AB_SLOTS=copy:
+# copyCodebase() mirrors the whole composer root, so no slot may contain the
+# others, and copies keep .git for ComposerProjectTemplatesTest.
+.ab-q4: &ab-q4
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $AB_RUN == "q4"
+
+'ab-fc Build':
+  <<: [ *ab-q4, *ab-job ]
+  parallel: 2
+  variables:
+    TESTSUITE: build
+    CONCURRENCY: "6"
+    KUBERNETES_CPU_REQUEST: "8"
+    AB_TOTAL: "1"
+    # BuildTestTest copies the codebase and stands up php -S, which
+    # ComposerValidateTest does not; with the gate a broken slot layout fails
+    # in ~30 s instead of after three rounds.
+    AB_WARMUP: "core/tests/Drupal/BuildTests/Framework/Tests/BuildTestTest.php"
+    AB_WARMUP_STRICT: "1"
+    CI_DIAG: "0"
+    CLI_OPCACHE_FILE_CACHE: "0"
+    AB_KIND: fc
+    AB_ARMS: "off on off2"
+    AB_ROUNDS: "3"
+    AB_SLOTS: copy
+
+'ab-fc Nightwatch':
+  <<: [ *ab-q4, *ab-job ]
+  parallel: 2
+  services:
+    - name: $_CONFIG_DOCKERHUB_ROOT/mysql-8.4:production@sha256:b4cd1224e704223d1b843bca5982fcc75e05dbd060adf4473864c2b62ea0bc47
+      alias: database
+    - <<: *with-selenium-chrome
+  script:
+    - cd core && corepack enable && yarn install && cd ..
+    - chown -R www-data:www-data ./sites /var/www
+    - .gitlab-ci/ab/ab.sh
+  cache:
+    key:
+      files:
+        - ./core/package.json
+        - ./core/yarn.lock
+    paths:
+      - ./core/.yarn/cache
+    policy: pull
+  variables:
+    CONCURRENCY: "6"
+    KUBERNETES_CPU_REQUEST: "12"
+    AB_RUNNER: nightwatch
+    AB_WARMUP: "tests/Drupal/Nightwatch/Tests/loginTest.js"
+    CI_DIAG: "0"
+    CLI_OPCACHE_FILE_CACHE: "0"
+    AB_KIND: fc
+    AB_ARMS: "off on off2"
+    AB_ROUNDS: "3"
+    AB_SLOTS: copy
+    AB_FILLER: "0"
+
+#### Q5 (AB_RUN: q5): the CLI file cache that the drupalci 8.5 image now sets
+# in php-cli.ini (drupalci_environments production 51ab78f), in the two Unit
+# jobs, set up as CI runs them: no web server, no database, Composer as root
+# first. Arms (ab.sh AB_KIND=img): on = the image's php-cli.ini, off = the
+# previous image's CLI (empty opcache.file_cache, record_warnings 0), off2 =
+# A/A control, onnorw = on plus opcache.record_warnings=0. The image is pinned
+# by digest: the runners pull IfNotPresent, so :production can still be an
+# older build on a node.
+# The runners cap every job at 30m (every ab trace: "activeDeadlineSeconds
+# will be set to the job timeout: 30m0s", also with timeout: 100m); the pod
+# is then killed without after_script or artifacts, the AB rows survive only
+# in the trace. 4 rounds x 4 arms visit every slot once and fit on an EPYC
+# 7571 node (2.6x the CPU of a Xeon 8488C per pass in q4 Build).
+.ab-q5: &ab-q5
+  stage: ⚡️ Tests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $AB_RUN == "q5"
+  needs: []
+  timeout: 30m
+  retry: 0
+  image:
+    name: $_CONFIG_DOCKERHUB_ROOT/php-8.5-ubuntu-apache:production@sha256:5ef773bba43c1fd7da16e6ef6982e08770fede2fddb1925ed84ac9de90f7c23f
+  script:
+    - .gitlab-ci/ab/ab.sh
+  after_script:
+    - grep -h '' ab-out/summary.tsv || true
+  artifacts:
+    when: always
+    expire_in: 1 mos
+    paths:
+      - ab-out/
+
+'ab-q5 Unit Core':
+  <<: *ab-q5
+  parallel: 3
+  before_script:
+    # As '📋 PHPUnit Unit (Core)', with the chown of !17339: Composer runs PHP
+    # as root, which leaves the cache's system-id directory to root (0700).
+    - *composer-setup
+    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
+    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
+    - '[ ! -d /var/cache/opcache-cli ] || chown -R www-data:www-data /var/cache/opcache-cli'
+  variables:
+    KUBERNETES_CPU_REQUEST: "4"
+    CONCURRENCY: "24"
+    AB_KIND: img
+    AB_SERVER: none
+    AB_TARGET: "--types unit --all"
+    AB_WARMUP: "core/tests/Drupal/Tests/Core/Routing/UrlGeneratorTest.php,core/tests/Drupal/Tests/Core/Entity/EntityTypeTest.php"
+    AB_ARMS: "off on off2 onnorw"
+    AB_ROUNDS: "4"
+
+# Runs as root with pcov coverage, as the job does on PRIMARY_PHP. One serial
+# PHPUnit process per arm (~190 tests in separate processes).
+'ab-q5 Unit Component':
+  <<: *ab-q5
+  parallel: 3
+  before_script:
+    # As '📋 PHPUnit Unit (Component)' on PRIMARY_PHP.
+    - *composer-setup
+    - docker-php-ext-enable pcov
+  variables:
+    KUBERNETES_CPU_REQUEST: "4"
+    AB_KIND: img
+    AB_SERVER: none
+    AB_RUNNER: component
+    AB_USER: root
+    AB_WARMUP: "TimeTest"
+    AB_ARMS: "off on off2 onnorw"
+    AB_ROUNDS: "4"

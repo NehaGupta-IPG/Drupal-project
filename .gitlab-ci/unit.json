@@ -1,0 +1,291 @@
+{
+  "settings": {
+    "http": {
+      "max_body_size": 1073741824,
+      "chunked_transform": true,
+      "static": {
+        "mime_types": {
+          "text/javascript": [
+            ".js",
+            ".mjs"
+          ],
+          "image/svg+xml": [
+            ".svg",
+            ".svgz"
+          ]
+        }
+      }
+    }
+  },
+  "listeners": {
+    "*:80": {
+      "pass": "routes/main"
+    }
+  },
+  "routes": {
+    "main": [
+      {
+        "match": {
+          "uri": [
+            "!/subdirectory",
+            "!/subdirectory/*"
+          ]
+        },
+        "action": {
+          "return": 404
+        }
+      },
+      {
+        "match": {
+          "uri": [
+            "~^/subdirectory/(\\.(?!well-known/)|.*/\\.)"
+          ]
+        },
+        "action": {
+          "return": 403
+        }
+      },
+      {
+        "match": {
+          "uri": "/subdirectory/system/files/*"
+        },
+        "action": {
+          "pass": "routes/front"
+        }
+      },
+      {
+        "match": {
+          "uri": "~(^|/)([^/]*\\.(engine|inc|install|make|module|profile|po|sh|[^/]*sql|theme|twig|tpl(\\.php)?|xtmpl|yml)(~|\\.sw[op]|\\.bak|\\.orig|\\.save)?|\\.(?!well-known)[^/]*|Entries[^/]*|Repository|Root|Tag|Template|composer\\.(json|lock)|web\\.config|yarn\\.lock|package(-lock)?\\.json|#[^/]*#|[^/]*\\.php(~|\\.sw[op]|\\.bak|\\.orig|\\.save))$"
+        },
+        "action": {
+          "return": 403
+        }
+      },
+      {
+        "match": {
+          "uri": [
+            "/subdirectory/vendor",
+            "/subdirectory/vendor/*",
+            "~^/subdirectory/sites/[^/]+/([^/]+/)?(private|temp)/",
+            "/subdirectory/core/profiles/demo_umami/modules/demo_umami_content/default_content/*"
+          ]
+        },
+        "action": {
+          "return": 403
+        }
+      },
+      {
+        "match": {
+          "uri": [
+            "/subdirectory/index.php",
+            "/subdirectory/index.php/*",
+            "/subdirectory/update.php",
+            "/subdirectory/update.php/*",
+            "~^/subdirectory/core/[^/]*\\.php$",
+            "~^/subdirectory/core/modules/system/tests/https?\\.php(/|$)",
+            "~^/subdirectory/core/modules/system/tests/modules/legacy_front_controller_test/test_index\\.php(/|$)"
+          ]
+        },
+        "action": {
+          "pass": "applications/drupal"
+        }
+      },
+      {
+        "match": {
+          "uri": "~^/subdirectory/(.+/.*|autoload)\\.php($|/)"
+        },
+        "action": {
+          "return": 403
+        }
+      },
+      {
+        "match": {
+          "uri": "~^/subdirectory/[^/]*\\.php($|/)"
+        },
+        "action": {
+          "pass": "routes/front"
+        }
+      },
+      {
+        "match": {
+          "uri": "~/css_[a-zA-Z0-9_-]+\\.css$",
+          "headers": {
+            "Accept-Encoding": "*br*"
+          }
+        },
+        "action": {
+          "share": "/var/www/html$uri.br",
+          "response_headers": {
+            "Content-Type": "text/css",
+            "Content-Encoding": "br",
+            "Vary": "Accept-Encoding",
+            "X-Content-Type-Options": "nosniff"
+          },
+          "fallback": {
+            "pass": "routes/agg_css_gz"
+          }
+        }
+      },
+      {
+        "match": {
+          "uri": "~/css_[a-zA-Z0-9_-]+\\.css$"
+        },
+        "action": {
+          "pass": "routes/agg_css_gz"
+        }
+      },
+      {
+        "match": {
+          "uri": "~/js_[a-zA-Z0-9_-]+\\.js$",
+          "headers": {
+            "Accept-Encoding": "*br*"
+          }
+        },
+        "action": {
+          "share": "/var/www/html$uri.br",
+          "response_headers": {
+            "Content-Type": "text/javascript",
+            "Content-Encoding": "br",
+            "Vary": "Accept-Encoding",
+            "X-Content-Type-Options": "nosniff"
+          },
+          "fallback": {
+            "pass": "routes/agg_js_gz"
+          }
+        }
+      },
+      {
+        "match": {
+          "uri": "~/js_[a-zA-Z0-9_-]+\\.js$"
+        },
+        "action": {
+          "pass": "routes/agg_js_gz"
+        }
+      },
+      {
+        "match": {
+          "uri": "*.svgz"
+        },
+        "action": {
+          "share": "/var/www/html$uri",
+          "response_headers": {
+            "Content-Type": "image/svg+xml",
+            "Content-Encoding": "gzip",
+            "X-Content-Type-Options": "nosniff"
+          },
+          "fallback": {
+            "pass": "routes/front"
+          }
+        }
+      },
+      {
+        "action": {
+          "pass": "routes/static"
+        }
+      }
+    ],
+    "front": [
+      {
+        "action": {
+          "rewrite": "/subdirectory/index.php",
+          "pass": "applications/drupal"
+        }
+      }
+    ],
+    "static": [
+      {
+        "action": {
+          "share": "/var/www/html$uri",
+          "types": [
+            "!application/x-httpd-php"
+          ],
+          "response_headers": {
+            "Cache-Control": "max-age=31536000",
+            "X-Content-Type-Options": "nosniff"
+          },
+          "fallback": {
+            "pass": "routes/front"
+          }
+        }
+      }
+    ],
+    "agg_css_gz": [
+      {
+        "match": {
+          "headers": {
+            "Accept-Encoding": "*gzip*"
+          }
+        },
+        "action": {
+          "share": "/var/www/html$uri.gz",
+          "response_headers": {
+            "Content-Type": "text/css",
+            "Content-Encoding": "gzip",
+            "Vary": "Accept-Encoding",
+            "X-Content-Type-Options": "nosniff"
+          },
+          "fallback": {
+            "pass": "routes/static"
+          }
+        }
+      },
+      {
+        "action": {
+          "pass": "routes/static"
+        }
+      }
+    ],
+    "agg_js_gz": [
+      {
+        "match": {
+          "headers": {
+            "Accept-Encoding": "*gzip*"
+          }
+        },
+        "action": {
+          "share": "/var/www/html$uri.gz",
+          "response_headers": {
+            "Content-Type": "text/javascript",
+            "Content-Encoding": "gzip",
+            "Vary": "Accept-Encoding",
+            "X-Content-Type-Options": "nosniff"
+          },
+          "fallback": {
+            "pass": "routes/static"
+          }
+        }
+      },
+      {
+        "action": {
+          "pass": "routes/static"
+        }
+      }
+    ]
+  },
+  "applications": {
+    "drupal": {
+      "type": "php",
+      "root": "/var/www/html",
+      "index": "index.php",
+      "user": "www-data",
+      "group": "www-data",
+      "processes": {
+        "max": 64,
+        "spare": 5,
+        "idle_timeout": 60
+      },
+      "options": {
+        "admin": {
+          "disable_functions": "fastcgi_finish_request"
+        },
+        "user": {
+          "assert.active": "0"
+        }
+      }
+    }
+  },
+  "access_log": {
+    "path": "/var/log/unit-access.log",
+    "format": "$remote_addr - - [$time_local] \"$request_line\" $status $body_bytes_sent $request_time"
+  }
+}
