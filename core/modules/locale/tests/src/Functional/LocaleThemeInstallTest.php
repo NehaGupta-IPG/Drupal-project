@@ -12,9 +12,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests that installing a theme updates its shipped English config.
  *
- * When a theme ships config with langcode 'en' (or no langcode at all) and
- * the site's configuration default language is not English, ConfigInstaller
- * must update that configuration to the site default while installing it.
+ * When a theme ships config with langcode 'en' and the site's configuration
+ * default language is not English, ConfigInstaller must update that
+ * configuration to the site default while installing it.
  *
  * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
  */
@@ -57,7 +57,7 @@ class LocaleThemeInstallTest extends BrowserTestBase {
    * Tests that installing a theme via the UI updates config language.
    *
    * The locale_test_config_langcode test theme provides
-   * * core.date_format.locale_test_config_langcode_medium with langcode 'en'.
+   * core.date_format.locale_test_config_langcode_medium with langcode 'en'.
    * With a non-English configuration default language, ConfigInstaller updates
    * it to that default while installing the theme's configuration.
    */

@@ -40,8 +40,7 @@ class LocaleConfigBatch {
    *   (optional) Array of component lists indexed by type. If not present or it
    *   is an empty array, it will update all components.
    * @param bool $update_default_config_langcodes
-   *   Determines whether default configuration langcodes should be updated.
-   *   This should only happen during site and extension install.
+   *   (deprecated) No longer used.
    *
    * @return array
    *   The batch definition.
@@ -49,15 +48,13 @@ class LocaleConfigBatch {
   public function buildBatch(array $options, array $langcodes = [], array $components = [], bool $update_default_config_langcodes = FALSE): ?array {
     $langcodes = $langcodes ?: array_keys($this->languageManager->getLanguages());
     if ($langcodes && $names = $this->localeConfigManager->getComponentNames($components)) {
-      // If the component list is empty we need to ensure that all configuration
-      // in the default collection is using the site's default langcode.
       $options += ['finish_feedback' => TRUE];
       $batch_builder = (new BatchBuilder())
         ->setTitle($this->t('Updating configuration translations'))
         ->setInitMessage($this->t('Starting configuration update'))
         ->setErrorMessage($this->t('Error updating configuration translations'));
 
-      if ($update_default_config_langcodes && $this->languageManager->getDefaultLanguage()->getId() !== 'en') {
+      if ($update_default_config_langcodes) {
         @trigger_error('Calling ' . __METHOD__ . '() with $update_default_config_langcodes set to TRUE is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
       }
 
@@ -88,7 +85,7 @@ class LocaleConfigBatch {
    * @param array|\ArrayAccess $context
    *   The batch context.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0.
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0.
    *   There is no replacement.
    *
    * @see https://www.drupal.org/node/3623413

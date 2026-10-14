@@ -710,12 +710,13 @@ class LocaleConfigManager {
    * @see self::isUpdatingTranslationsFromLocale()
    */
   public function executeWithUpdatingTranslationsFromLocale(callable $callback) {
+    $previous = $this->isUpdatingFromLocale;
     $this->isUpdatingFromLocale = TRUE;
     try {
       $result = $callback();
     }
     finally {
-      $this->isUpdatingFromLocale = FALSE;
+      $this->isUpdatingFromLocale = $previous;
     }
     return $result;
   }
