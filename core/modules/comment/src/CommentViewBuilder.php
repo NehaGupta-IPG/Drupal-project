@@ -116,20 +116,6 @@ class CommentViewBuilder extends EntityViewBuilder {
     }
     $this->entityTypeManager->getStorage('user')->loadMultiple(array_unique($uids));
 
-    // Commented entities already loaded after self::getBuildDefaults().
-    $commented_entity = $entity->getCommentedEntity();
-
-    // Compute the comment maximum indent if any.
-    $max_indent = NULL;
-    // The maximum indent can only be determined for non-orphan comments.
-    if ($commented_entity) {
-      $reply_depth_limit = $commented_entity->getFieldDefinition($entity->getFieldName())?->getSetting('thread_reply_depth');
-      if (is_int($reply_depth_limit)) {
-        $max_indent = $reply_depth_limit;
-      }
-    }
-    $reply_depth_limited = is_int($max_indent);
-
     parent::buildComponents($build, $entities, $displays, $view_mode);
 
     // A counter to track the indentation level.
@@ -138,7 +124,7 @@ class CommentViewBuilder extends EntityViewBuilder {
     foreach ($entities as $id => $entity) {
       if ($build[$id]['#comment_threaded']) {
         $comment_indent = count(explode('.', (string) $entity->getThread())) - 1;
-        if ($comment_indent > $current_indent && (!$reply_depth_limited || $comment_indent <= $max_indent)) {
+        if ($comment_indent > $current_indent) {
           // Set 1 to indent this comment from the previous one (its parent).
           // Set only one extra level of indenting even if the difference in
           // depth is higher.
@@ -150,15 +136,11 @@ class CommentViewBuilder extends EntityViewBuilder {
           // or negative value to point an amount indents to close.
           $build[$id]['#comment_indent'] = $comment_indent - $current_indent;
           $current_indent = $comment_indent;
-          // Adjust indentation relative to the defined thread depth.
-          if ($reply_depth_limited && ($comment_indent > $max_indent)) {
-            $indent_adjustment = $comment_indent - $max_indent;
-            $build[$id]['#comment_indent'] -= $indent_adjustment;
-            $current_indent -= $indent_adjustment;
-          }
         }
       }
 
+      // Commented entities already loaded after self::getBuildDefaults().
+      $commented_entity = $entity->getCommentedEntity();
       // Set defaults if the commented_entity does not exist.
       $bundle = $commented_entity ? $commented_entity->bundle() : '';
 
