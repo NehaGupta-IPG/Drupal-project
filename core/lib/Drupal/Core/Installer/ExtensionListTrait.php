@@ -12,6 +12,8 @@ namespace Drupal\Core\Installer;
  *   functionality.
  *
  * @see https://www.drupal.org/node/3577846
+ *
+ * @ingroup extension_api
  */
 trait ExtensionListTrait {
 

@@ -13,6 +13,8 @@ use Drupal\Core\Extension\ModuleExtensionList;
  *   \Drupal\Core\Extension\ModuleExtensionList instead.
  *
  * @see https://www.drupal.org/node/3577846
+ *
+ * @ingroup extension_api
  */
 class InstallerModuleExtensionList extends ModuleExtensionList {
   use ExtensionListTrait;

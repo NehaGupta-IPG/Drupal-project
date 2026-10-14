@@ -174,6 +174,8 @@ class InstallerKernel extends DrupalKernel {
    *
    * @return string[]
    *   The name of the install theme, followed by the names of its base themes.
+   *
+   * @ingroup extension_api
    */
   private function getInstallThemes(null|false|Extension $profile): array {
     if (!$profile) {
@@ -200,6 +202,8 @@ class InstallerKernel extends DrupalKernel {
    *
    * @return string[]
    *   A list of base themes.
+   *
+   * @ingroup extension_api
    */
   private function getBaseThemes(Extension $profile, string $theme): array {
     $base_themes = [];
@@ -230,6 +234,8 @@ class InstallerKernel extends DrupalKernel {
    *   profile, or the profile extension object with the profile info added.
    *
    * @see _install_select_profile()
+   *
+   * @ingroup extension_api
    */
   private function installGetProfile(): null|false|Extension {
     global $install_state;
