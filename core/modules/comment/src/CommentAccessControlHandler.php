@@ -96,7 +96,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
   protected function checkReplyThreadAccess(CommentInterface $comment): AccessResultInterface {
     $access_result = AccessResult::neutral();
     $commented_entity = $comment->getCommentedEntity();
-    if (!$commented_entity instanceof EntityInterface) {
+    if (!$commented_entity instanceof FieldableEntityInterface) {
       return $access_result;
     }
 
@@ -107,7 +107,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
     $reply_depth = $field_definition->getSetting('thread_reply_depth');
 
     // Display mode is really only about how comments and their replies are
-    // displayed. So, we check thread depth regardless which display mode is
+    // displayed. So, we check thread depth regardless of which display mode is
     // set. A NULL depth means reply depth is unlimited.
     if ($reply_depth !== NULL) {
       \assert(is_int($reply_depth) && $reply_depth >= 0, 'Thread reply depth should be greater than or equal to 0.');

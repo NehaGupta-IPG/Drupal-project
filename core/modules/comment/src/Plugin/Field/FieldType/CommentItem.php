@@ -136,7 +136,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       '#title' => $this->t('Thread depth limit'),
       // Use "3" if reply limit was enabled just now.
       '#default_value' => $settings['thread_reply_depth'] ?? 3,
-      '#description' => $this->t('Define the maximum number of replies in a comment thread. Set 0 if no replies are allowed.'),
+      '#description' => $this->t('Define the maximum reply depth in a comment thread. Set 0 if no replies are allowed.'),
       '#min' => 0,
       '#states' => [
         'visible' => [
