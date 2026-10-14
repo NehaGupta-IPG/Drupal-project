@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Builds a confirmation form for enabling experimental themes.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 class ThemeExperimentalConfirmForm extends ConfirmFormBase {
 

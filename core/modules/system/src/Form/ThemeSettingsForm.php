@@ -25,6 +25,8 @@ use Drupal\file\Upload\ManagedFileElementHelper;
  * Displays theme configuration for entire site and individual themes.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 class ThemeSettingsForm extends ConfigFormBase {
 

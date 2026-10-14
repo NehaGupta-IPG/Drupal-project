@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
  * Builds a confirmation form to uninstall a theme.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 class ThemeUninstallConfirmForm extends ConfirmFormBase {
 

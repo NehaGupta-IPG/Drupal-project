@@ -34,6 +34,8 @@ use Drupal\Component\Utility\Xss;
  * @see \Drupal\Core\Extension\InfoParser
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 class ModulesListForm extends FormBase {
 
