@@ -42,6 +42,21 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
   }
 
   /**
+   * Returns a new session ID.
+   *
+   * Required by \SessionHandlerInterface since PHP 8.6, mandatory in PHP 9.
+   * Must not call session_create_id() as that would recurse into the
+   * registered session handler.
+   *
+   * @return string
+   *   A new session ID.
+   */
+  // phpcs:ignore Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+  public function create_sid(): string {
+    return bin2hex(random_bytes(16));
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function doRead(#[\SensitiveParameter] string $sessionId): string {

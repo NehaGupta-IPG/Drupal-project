@@ -763,12 +763,7 @@ class IconFinderTest extends UnitTestCase {
   public function testExtractIconIdFromFilename(string $filename, string $filename_pattern, string $expected): void {
     $method = new \ReflectionMethod(IconFinder::class, 'extractIconIdFromFilename');
 
-    $iconFinder = new IconFinder(
-      $this->createStub(FileUrlGeneratorInterface::class),
-      $this->createStub(LoggerInterface::class),
-      DRUPAL_ROOT,
-    );
-    $this->assertEquals($expected, $method->invoke($iconFinder, $filename, $filename_pattern));
+    $this->assertEquals($expected, $method->invoke(NULL, $filename, $filename_pattern));
   }
 
   /**
@@ -785,18 +780,14 @@ class IconFinderTest extends UnitTestCase {
       return TRUE;
     });
 
-    $iconFinder = new IconFinder(
-      $this->createStub(FileUrlGeneratorInterface::class),
-      $this->createStub(LoggerInterface::class),
-      DRUPAL_ROOT,
-    );
-    $method->invoke($iconFinder, 'foo*bar*baz', 'foo*{icon_id}*baz');
+    $method->invoke(NULL, 'foo*bar*baz', 'foo*{icon_id}*baz');
 
     restore_error_handler();
 
     $this->assertCount(1, $messages);
     $this->assertSame(E_WARNING, $messages[0][0]);
-    $this->assertSame('preg_match(): Compilation failed: quantifier does not follow a repeatable item at offset 19', $messages[0][1]);
+    // The reported offset changed from 19 to 20 in PHP 8.6.
+    $this->assertMatchesRegularExpression('/^preg_match\(\): Compilation failed: quantifier does not follow a repeatable item at offset (19|20)$/', $messages[0][1]);
   }
 
   /**

@@ -95,6 +95,22 @@ class TestSessionHandlerProxy implements \SessionHandlerInterface, \SessionUpdat
   }
 
   /**
+   * Returns a new session ID.
+   *
+   * Required by \SessionHandlerInterface since PHP 8.6, mandatory in PHP 9.
+   *
+   * @return string
+   *   A new session ID.
+   */
+  // phpcs:ignore Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+  public function create_sid(): string {
+    if ($this->sessionHandler instanceof \SessionIdInterface) {
+      return $this->sessionHandler->create_sid();
+    }
+    return bin2hex(random_bytes(16));
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function validateId($session_id): bool {

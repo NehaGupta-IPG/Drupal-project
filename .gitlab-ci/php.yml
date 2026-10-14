@@ -1,7 +1,7 @@
 # Defines PHP related variables.
 variables:
-  PRIMARY_PHP: "8.5-ubuntu"
-  NEXT_PHP_MAJOR: "8.6-ubuntu"
+  PRIMARY_PHP: "8.6-ubuntu"
+  NEXT_PHP_MAJOR: "8.7-ubuntu"
   MINIMUM_PHP: "8.5-ubuntu"
 
 # Used in matrix jobs.
@@ -9,4 +9,4 @@ variables:
 #    matrix:
 #      - _TARGET_PHP: !reference [.php_versions]
 .php_versions:
-  [8.5-ubuntu, 8.6-ubuntu]
+  [8.6-ubuntu]

@@ -794,6 +794,29 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   }
 
   /**
+   * Gets the expected error message for a request body that cannot be decoded.
+   *
+   * The wording of the decoder's error message is provided by PHP and can
+   * differ between PHP versions, so it is derived from the runtime here rather
+   * than being hard-coded.
+   *
+   * @param string $body
+   *   The request body that cannot be decoded.
+   *
+   * @return string
+   *   The expected error message.
+   */
+  protected function getExpectedNotParseableRequestBodyErrorMessage(string $body): string {
+    try {
+      $this->serializer->decode($body, static::$format);
+    }
+    catch (\Exception $e) {
+      return $e->getMessage();
+    }
+    $this->fail('The request body was expected to be undecodable.');
+  }
+
+  /**
    * Tests a POST request for an entity, plus edge cases to ensure good DX.
    */
   protected function doTestPost(): void {
@@ -875,7 +898,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     // DX: 400 when un-parseable request body.
     $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(400, 'Syntax error', $response);
+    $this->assertResourceErrorResponse(400, $this->getExpectedNotParseableRequestBodyErrorMessage($not_parseable_request_body), $response);
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body;
 
@@ -1078,7 +1101,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     // DX: 400 when un-parseable request body.
     $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(400, 'Syntax error', $response);
+    $this->assertResourceErrorResponse(400, $this->getExpectedNotParseableRequestBodyErrorMessage($not_parseable_request_body), $response);
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body;
 

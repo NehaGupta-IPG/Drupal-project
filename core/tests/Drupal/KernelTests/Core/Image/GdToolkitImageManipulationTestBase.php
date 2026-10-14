@@ -206,10 +206,13 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
           'operation' => 'rotate',
           // Fuchsia background.
           'arguments' => ['degrees' => 5, 'background' => '#FF00FF'],
-          'width' => 40,
-          'height' => 23,
+          // Bundled libgd 2.4 in PHP 8.6 computes the rotated canvas as the
+          // ceil()-ed affine bounding box, enlarging it by a pixel or two.
+          'width' => PHP_VERSION_ID >= 80600 ? 42 : 40,
+          'height' => PHP_VERSION_ID >= 80600 ? 24 : 23,
           'corners' => [
-            [255, 0, 93, 0],
+            // The larger canvas puts the corner sample on pure background.
+            PHP_VERSION_ID >= 80600 ? static::FUCHSIA : [255, 0, 93, 0],
             static::FUCHSIA,
             static::FUCHSIA,
             static::FUCHSIA,
@@ -218,10 +221,12 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
         'rotate_transparent_5' => [
           'operation' => 'rotate',
           'arguments' => ['degrees' => 5],
-          'width' => 40,
-          'height' => 23,
+          // See 'rotate_5' for the PHP 8.6 dimension difference.
+          'width' => PHP_VERSION_ID >= 80600 ? 42 : 40,
+          'height' => PHP_VERSION_ID >= 80600 ? 24 : 23,
           'corners' => [
-            [255, 93, 93, 46],
+            // The larger canvas puts the corner sample on pure background.
+            PHP_VERSION_ID >= 80600 ? static::ROTATE_TRANSPARENT : [255, 93, 93, 46],
             static::ROTATE_TRANSPARENT,
             static::ROTATE_TRANSPARENT,
             static::ROTATE_TRANSPARENT,

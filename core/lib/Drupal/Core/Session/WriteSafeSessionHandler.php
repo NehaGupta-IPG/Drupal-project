@@ -61,6 +61,22 @@ class WriteSafeSessionHandler extends SessionHandlerProxy implements \SessionHan
   }
 
   /**
+   * Returns a new session ID.
+   *
+   * Required by \SessionHandlerInterface since PHP 8.6, mandatory in PHP 9.
+   *
+   * @return string
+   *   A session ID valid for the wrapped session handler.
+   */
+  // phpcs:ignore Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+  public function create_sid(): string {
+    if ($this->handler instanceof \SessionIdInterface) {
+      return $this->handler->create_sid();
+    }
+    return bin2hex(random_bytes(16));
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function setSessionWritable($flag) {
