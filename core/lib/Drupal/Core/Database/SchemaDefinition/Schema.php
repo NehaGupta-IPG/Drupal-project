@@ -10,7 +10,7 @@ use Drupal\Core\Database\Exception\SchemaDefinitionException;
 /**
  * Describes a database schema as a collection of database objects.
  */
-final class Schema implements SchemaDefinitionInterface {
+final class Schema extends SchemaDefinitionBase {
 
   /**
    * Constructor.

@@ -60,28 +60,12 @@ class FilterBooleanOperatorTest extends ViewsKernelTestBase {
     $parentSchema = parent::schemaDefinition();
     $table = $parentSchema->getTableDefinition('views_test_data');
     $columns = array_filter($table->columns, fn (Column $column): bool => $column->name !== 'status');
-    $columns[] = Column::int(
-      name: 'status',
-      description: "The status of this record",
-      unsigned: TRUE,
-      notNull: FALSE,
-      default: new IntValue(0),
-    );
-
-    return new Schema(
-      type: $parentSchema->type,
-      name: $parentSchema->name,
-      tables: [
-        new Table(
-          name: $table->name,
-          description: $table->description,
-          columns: $columns,
-          primaryKey: $table->primaryKey,
-          uniqueKeys: $table->uniqueKeys,
-          indexes: $table->indexes,
-        ),
-      ]
-    );
+    $columns[] = $table->getColumnDefinition('status')->with(['notNull' => FALSE]);
+    return $parentSchema->with([
+      'tables' => [
+        $table->with(['columns' => $columns]),
+      ],
+    ]);
   }
 
   /**

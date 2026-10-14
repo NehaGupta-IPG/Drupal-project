@@ -776,27 +776,12 @@ class FilterCombineTest extends ViewsKernelTestBase {
     $parentSchema = parent::schemaDefinition();
     $table = $parentSchema->getTableDefinition('views_test_data');
     $columns = array_filter($table->columns, fn (Column $column): bool => $column->name !== 'job');
-    $columns[] = Column::varchar(
-      name: 'job',
-      description: "The person's job",
-      length: 255,
-      default: new StringValue('Undefined'),
-    );
-
-    return new Schema(
-      type: $parentSchema->type,
-      name: $parentSchema->name,
-      tables: [
-        new Table(
-          name: $table->name,
-          description: $table->description,
-          columns: $columns,
-          primaryKey: $table->primaryKey,
-          uniqueKeys: $table->uniqueKeys,
-          indexes: $table->indexes,
-        ),
-      ]
-    );
+    $columns[] = $table->getColumnDefinition('job')->with(['notNull' => NULL]);
+    return $parentSchema->with([
+      'tables' => [
+        $table->with(['columns' => $columns]),
+      ],
+    ]);
   }
 
 }

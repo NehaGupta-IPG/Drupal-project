@@ -9,7 +9,7 @@ use Drupal\Core\Database\Exception\SchemaDefinitionException;
 /**
  * Base class for table keys (primary, unique, index).
  */
-abstract class KeyBase implements SchemaDefinitionInterface {
+abstract class KeyBase extends SchemaDefinitionBase {
 
   /**
    * The key columns.

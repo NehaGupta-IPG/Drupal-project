@@ -10,7 +10,7 @@ use Drupal\Core\Database\Exception\SchemaDefinitionException;
 /**
  * Describes a database table.
  */
-final class Table implements SchemaDefinitionInterface {
+final class Table extends SchemaDefinitionBase {
 
   /**
    * Constructor.
@@ -107,6 +107,31 @@ final class Table implements SchemaDefinitionInterface {
       fn(Column $column): string => $column->name,
       $this->columns,
     );
+  }
+
+  /**
+   * Gets a specific column definition.
+   *
+   * @param string $name
+   *   The name of the Column object to return.
+   *
+   * @return Column
+   *   The Table object.
+   *
+   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
+   *   When the requested column is missing.
+   */
+  public function getColumnDefinition(string $name): Column {
+    $ret = array_find(
+      $this->columns,
+      function (Column $column) use ($name): bool {
+        return $column->name === $name;
+      },
+    );
+    if (!$ret) {
+      throw new SchemaDefinitionException("Table {$this->name} does not define a column named {$name}");
+    }
+    return $ret;
   }
 
   /**

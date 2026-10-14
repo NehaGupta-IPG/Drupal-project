@@ -10,6 +10,14 @@ namespace Drupal\Core\Database\SchemaDefinition;
 interface SchemaDefinitionInterface {
 
   /**
+   * Returns a clone of the object with modified properties.
+   *
+   * @param array<string,mixed> $properties
+   *   The modified properties.
+   */
+  public function with(array $properties): static;
+
+  /**
    * Converts the object to legacy array-based specifications.
    *
    * @return array

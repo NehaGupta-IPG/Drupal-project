@@ -68,28 +68,12 @@ class FieldTimeIntervalTest extends ViewsKernelTestBase {
     $parentSchema = parent::schemaDefinition();
     $table = $parentSchema->getTableDefinition('views_test_data');
     $columns = array_filter($table->columns, fn (Column $column): bool => $column->name !== 'age');
-    $columns[] = Column::int(
-      name: 'age',
-      description: "The person's age",
-      unsigned: TRUE,
-      notNull: FALSE,
-      default: new IntValue(0),
-    );
-
-    return new Schema(
-      type: $parentSchema->type,
-      name: $parentSchema->name,
-      tables: [
-        new Table(
-          name: $table->name,
-          description: $table->description,
-          columns: $columns,
-          primaryKey: $table->primaryKey,
-          uniqueKeys: $table->uniqueKeys,
-          indexes: $table->indexes,
-        ),
-      ]
-    );
+    $columns[] = $table->getColumnDefinition('age')->with(['notNull' => FALSE]);
+    return $parentSchema->with([
+      'tables' => [
+        $table->with(['columns' => $columns]),
+      ],
+    ]);
   }
 
   /**

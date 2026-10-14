@@ -44,21 +44,11 @@ class FieldDateTest extends ViewsKernelTestBase {
       notNull: FALSE,
       default: new IntValue(0),
     );
-
-    return new Schema(
-      type: $parentSchema->type,
-      name: $parentSchema->name,
-      tables: [
-        new Table(
-          name: $table->name,
-          description: $table->description,
-          columns: $columns,
-          primaryKey: $table->primaryKey,
-          uniqueKeys: $table->uniqueKeys,
-          indexes: $table->indexes,
-        ),
-      ]
-    );
+    return $parentSchema->with([
+      'tables' => [
+        $table->with(['columns' => $columns]),
+      ],
+    ]);
   }
 
   /**

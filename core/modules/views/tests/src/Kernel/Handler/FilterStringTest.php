@@ -62,21 +62,11 @@ class FilterStringTest extends ViewsKernelTestBase {
       size: ColumnSize::Big,
       notNull: FALSE,
     );
-
-    return new Schema(
-      type: $parentSchema->type,
-      name: $parentSchema->name,
-      tables: [
-        new Table(
-          name: $table->name,
-          description: $table->description,
-          columns: $columns,
-          primaryKey: $table->primaryKey,
-          uniqueKeys: $table->uniqueKeys,
-          indexes: $table->indexes,
-        ),
-      ]
-    );
+    return $parentSchema->with([
+      'tables' => [
+        $table->with(['columns' => $columns]),
+      ],
+    ]);
   }
 
   /**
