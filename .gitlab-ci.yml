@@ -77,6 +77,12 @@ variables:
   PHPUNIT_CONFIGURATION_FILE_PATH: $CI_PROJECT_DIR/core
   PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
   _TARGET_PHP: "${PRIMARY_PHP}"
+  # The web server variant of the PHP image: "apache" or "unit" (FreeUnit).
+  _TARGET_SERVER: "unit"
+  # Pinned by digest: runners reuse a cached ":dev", so the tag alone gave a
+  # mix of image builds within one pipeline. CI pulls from registry.gitlab.com,
+  # whose digest differs from Docker Hub's for the same build.
+  _TARGET_IMAGE_TAG: "dev@sha256:a73ee0d95d17177058b0e7bd88c98e13a43461f73596caf6b4d1c59a61d85142"
   _TARGET_DB: "mysql-8.4"
   _TARGET_DB_DRIVER: "mysql"
   _TARGET_DB_DRIVER_MODULE: "mysql"
@@ -117,7 +123,7 @@ default:
       - runner_system_failure
       - scheduler_failure
   image:
-    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:production
+    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-$_TARGET_SERVER:$_TARGET_IMAGE_TAG
 
 #############
 # Templates #
@@ -219,6 +225,7 @@ default:
     # Need to pass this along directly.
     - time sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --debug-discovery --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --all --ci-parallel-node-index $CI_NODE_INDEX --ci-parallel-node-total $CI_NODE_TOTAL
   after_script:
+    - $CI_PROJECT_DIR/.gitlab-ci/scripts/ci-diag.sh end
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
   artifacts:
     when: always
@@ -296,6 +303,7 @@ default:
     - <<: *with-database
     - <<: *with-selenium-chrome
   after_script:
+    - $CI_PROJECT_DIR/.gitlab-ci/scripts/ci-diag.sh end
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
     - cp /builds/chromedriver.log ./
 
@@ -318,6 +326,14 @@ default:
     CONCURRENCY: "24"
   services:
     - <<: *with-database
+
+# [DO NOT MERGE] The same FunctionalJavascript shards on Apache, to tell
+# FreeUnit-specific failures from flaky ones within one pipeline.
+'🖱️️️ PHPUnit Functional Javascript apache':
+  extends: '🖱️️️ PHPUnit Functional Javascript'
+  variables:
+    _TARGET_SERVER: "apache"
+    _TARGET_IMAGE_TAG: "production"
 
 '🦉️️️ Nightwatch':
   <<: [ *with-composer, *test-setup ]
@@ -349,6 +365,7 @@ default:
     - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - sudo -u www-data -E -H yarn run test:nightwatch --workers=3
   after_script:
+    - $CI_PROJECT_DIR/.gitlab-ci/scripts/ci-diag.sh end
     - cp /builds/chromedriver.log ./
   artifacts:
     when: always
@@ -955,6 +972,9 @@ default:
     # that we allow here.
     exit_codes: 100
   variables:
+    # FreeUnit images exist only for the primary PHP version.
+    _TARGET_SERVER: "apache"
+    _TARGET_IMAGE_TAG: "production"
     KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: 24
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
@@ -997,6 +1017,9 @@ default:
     # that we allow here.
     exit_codes: 100
   variables:
+    # FreeUnit images exist only for the primary PHP version.
+    _TARGET_SERVER: "apache"
+    _TARGET_IMAGE_TAG: "production"
     KUBERNETES_CPU_REQUEST: "2"
     _ARTIFACTS_DIR: "test-artifacts/phpunit"
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true

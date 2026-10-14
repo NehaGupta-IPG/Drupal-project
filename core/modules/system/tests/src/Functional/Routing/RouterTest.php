@@ -53,7 +53,7 @@ class RouterTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderEquals('Content-language', 'en');
     $this->assertSession()->responseHeaderEquals('X-Content-Type-Options', 'nosniff');
     $this->assertSession()->responseHeaderEquals('X-Frame-Options', 'SAMEORIGIN');
-    if (strcasecmp($session->getResponseHeader('vary'), 'accept-encoding') !== 0) {
+    if (strcasecmp($session->getResponseHeader('vary') ?? '', 'accept-encoding') !== 0) {
       $this->assertSession()->responseHeaderDoesNotExist('Vary');
     }
 
