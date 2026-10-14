@@ -1901,17 +1901,6 @@ function _install_module_batch(array $modules, array $module_names, array $insta
   \Drupal::service('module_installer')->install($modules, FALSE);
   $context['results'] = array_merge($context['results'], $modules);
   $context['message'] = \Drupal::translation()->formatPlural(count($module_names), 'Installed %module module.', 'Installed %module modules.', ['%module' => implode(', ', $module_names)]);
-
-  // If installing system module, set the langcode to the one chosen in the
-  // installer.
-  if (in_array('system', $modules)) {
-    if (isset($install_state['parameters']['langcode'])) {
-      \Drupal::configFactory()->getEditable('system.site')
-        ->set('langcode', (string) $install_state['parameters']['langcode'])
-        ->set('default_langcode', (string) $install_state['parameters']['langcode'])
-        ->save();
-    }
-  }
 }
 
 /**

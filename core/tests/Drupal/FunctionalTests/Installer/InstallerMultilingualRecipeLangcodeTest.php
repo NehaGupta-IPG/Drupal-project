@@ -8,17 +8,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests a recipe applied during a non-English install resolves langcode correctly.
- *
- * The profile declares no modules of its own - it only applies a recipe,
- * the same fixture used by \Drupal\KernelTests\Core\Recipe\RecipeRunnerTest
- * and \Drupal\FunctionalTests\Core\Recipe\RecipeCommandTest. Recipes listed
- * by a profile are applied in the same install batch as, and after, the
- * profile's own modules - including 'system', whose installation is what
- * writes system.site:default_langcode from the language chosen for this
- * installation. This is the one thing those other two tests can't cover:
- * that the write has already happened by the time a profile-declared
- * recipe's own config installs.
+ * Tests a recipe applied by a non-English install uses the correct langcode.
  *
  * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
  * @see _install_module_batch()
