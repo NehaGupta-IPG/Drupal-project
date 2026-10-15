@@ -21784,12 +21784,6 @@ in drupal\\:12\\.1\\.0 and is removed from drupal\\:13\\.0\\.0\\. Use
 	'path' => __DIR__ . '/modules/system/src/Hook/SystemRequirementsHooks.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$pdo_message might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Install/Requirements/SystemRequirements.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\PhpStorage\\\\MockPhpStorage\\:\\:getConfiguration\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34304,6 +34298,12 @@ $ignoreErrors[] = [
 	'identifier' => 'drupal.entityStoragePropertyAssignment',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigEntityUnitTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) contains unresolvable type\\.$#',
+	'identifier' => 'argument.unresolvableType',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigImporterTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConnectionInfo\\(\\) of class Drupal\\\\Core\\\\Database\\\\Database\\:
