@@ -772,6 +772,54 @@ class TwigExtensionTest extends UnitTestCase {
     ];
   }
 
+  /**
+   * Tests withoutFilter with nested objects in arguments (PHP 8.5).
+   *
+   * @covers ::withoutFilter
+   */
+  public function testWithoutFilterWithNestedObjectArguments(): void {
+    $element = [
+      'keep' => 'yes',
+      'drop' => 'no',
+      'also_drop' => 'no',
+    ];
+    // Simulates a mistaken Twig call like content|without(content.field_x),
+    // where a render array (with object values) is passed instead of a key.
+    $mistaken_render_element = [
+      '#theme' => 'field',
+      '#object' => new \stdClass(),
+      'also_drop' => ['#markup' => 'nested'],
+    ];
+
+    $errors = [];
+    set_error_handler(static function (int $errno, string $errstr) use (&$errors): bool {
+      if ($errno === E_DEPRECATED) {
+        $errors[] = $errstr;
+      }
+      return TRUE;
+    });
+    try {
+      $result = $this->systemUnderTest->withoutFilter(
+        $element,
+        'drop',
+        ['also_drop'],
+        $mistaken_render_element,
+      );
+    }
+    finally {
+      restore_error_handler();
+    }
+
+    $this->assertSame(['keep' => 'yes'], $result);
+    foreach ($errors as $error) {
+      $this->assertStringNotContainsString(
+        'ArrayIterator::__construct()',
+        $error,
+        'withoutFilter must not trigger PHP 8.5 ArrayIterator object-backing deprecations.',
+      );
+    }
+  }
+
 }
 
 /**

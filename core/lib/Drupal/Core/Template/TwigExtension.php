@@ -687,11 +687,17 @@ class TwigExtension extends AbstractExtension {
     else {
       $filtered_element = $element;
     }
-    // Since the remaining arguments can be a mix of arrays and strings, we use
-    // some native PHP iterator classes to allow us to recursively iterate over
-    // everything in a single pass.
-    $iterator = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($args));
-    foreach ($iterator as $key) {
+    // Flatten a mix of arrays and scalar keys. RecursiveArrayIterator is
+    // avoided because PHP 8.5 deprecates using objects as an ArrayIterator
+    // backing store when a nested value is an object (for example when a
+    // template mistakenly passes a render element instead of a string key).
+    $keys = [];
+    array_walk_recursive($args, function ($value) use (&$keys) {
+      if (is_scalar($value) || $value === NULL) {
+        $keys[] = $value;
+      }
+    });
+    foreach ($keys as $key) {
       unset($filtered_element[$key]);
     }
     return $filtered_element;
