@@ -12,7 +12,7 @@ class LocaleTranslatableProject {
   /**
    * @var string|null
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is
    *    no replacement.
    *
    * @see https://www.drupal.org/node/3593802
@@ -24,7 +24,7 @@ class LocaleTranslatableProject {
    *
    * @var string
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is
    *   no replacement.
    *
    * @see https://www.drupal.org/node/3593802
@@ -65,7 +65,7 @@ class LocaleTranslatableProject {
     protected bool $status = FALSE,
   ) {
     if ($langcode !== NULL) {
-      @trigger_error('Passing $langcode to ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Projects have no language, get a source object instead. See https://www.drupal.org/node/3593802', E_USER_DEPRECATED);
+      @trigger_error('Passing $langcode to ' . __METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Projects have no language, get a source object instead. See https://www.drupal.org/node/3593802', E_USER_DEPRECATED);
     }
     // @phpstan-ignore property.deprecated
     $this->langcode = $langcode;
@@ -113,13 +113,13 @@ class LocaleTranslatableProject {
    *
    * @return $this
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Projects
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Projects
    *    have no language, get a source object instead.
    *
    * @see https://www.drupal.org/node/3593802
    */
   public function setLangcode(string $langcode): static {
-    @trigger_error('Method ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Projects have no language, get a source object instead. See https://www.drupal.org/node/3593802', E_USER_DEPRECATED);
+    @trigger_error('Method ' . __METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Projects have no language, get a source object instead. See https://www.drupal.org/node/3593802', E_USER_DEPRECATED);
     $this->langcode = $langcode;
     return $this;
   }
@@ -130,13 +130,13 @@ class LocaleTranslatableProject {
    * @return string|null
    *   Returns the language code or NULL if it was not set.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Projects
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Projects
    *   have no language, get a source object instead.
    *
    * @see https://www.drupal.org/node/3593802
    */
   public function getLangcode(): ?string {
-    @trigger_error('Method ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Projects have no language, get a source object instead. See https://www.drupal.org/node/3593802', E_USER_DEPRECATED);
+    @trigger_error('Method ' . __METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Projects have no language, get a source object instead. See https://www.drupal.org/node/3593802', E_USER_DEPRECATED);
     return $this->langcode;
   }
 

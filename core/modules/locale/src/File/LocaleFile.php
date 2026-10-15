@@ -22,7 +22,7 @@ final class LocaleFile {
    *
    * @var string
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is
    *     no replacement.
    *
    * @see https://www.drupal.org/node/3593802
@@ -34,7 +34,7 @@ final class LocaleFile {
    *
    * @var string|null
    *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is
    *    no replacement.
    *
    * @see https://www.drupal.org/node/3593802

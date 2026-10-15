@@ -38,7 +38,7 @@ class LocaleTranslationSource {
    *
    * @var string
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use the
    *   server pattern of the project instead.
    *
    * @see https://www.drupal.org/node/3593802
@@ -51,7 +51,7 @@ class LocaleTranslationSource {
    *
    * @var string
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use the
    *   project property instead.
    *
    * @see https://www.drupal.org/node/3593802
@@ -70,7 +70,7 @@ class LocaleTranslationSource {
    *
    * @var string
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is
    *   no replacement.
    *
    * @see https://www.drupal.org/node/3593802
