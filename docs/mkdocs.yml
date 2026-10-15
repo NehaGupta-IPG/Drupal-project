@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
+site_name: Drupal Core
+docs_dir: src
+site_url: https://project.pages.drupalcode.org/drupal/
+repo_url: https://git.drupalcode.org/project/drupal
+repo_name: Drupal Core
+edit_uri: /-/edit/main/docs/src
+theme:
+  name: material
+  logo: icon-w-drupal.png
+  favicon: logo.png
+  palette:
+    # Palette toggle for automatic mode
+    - media: '(prefers-color-scheme)'
+      primary: blue
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: '(prefers-color-scheme: light)'
+      primary: blue
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: '(prefers-color-scheme: dark)'
+      primary: blue
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features: []
+plugins:
+  - search
+  - privacy:
+      enabled: !ENV [CI, false]
+nav:
+  - API Documentation: https://api.drupal.org/api/drupal/main
