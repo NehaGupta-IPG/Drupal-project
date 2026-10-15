@@ -1054,6 +1054,51 @@ class FieldPluginBaseTest extends UnitTestCase {
     $this->assertSame(7, $field->getLastRenderIndex());
   }
 
+  /**
+   * Tests uninitialized properties restored as uninitialized.
+   */
+  public function testRowRenderStateInitialState(): void {
+    $field = new FieldPluginBaseTestField($this->configuration, $this->pluginId, $this->pluginDefinition);
+    // Capture initial state before any row rendered.
+    $state_a = $field->getRowRenderState();
+    // Set row B values.
+    $field->last_render = 'Row B render';
+    $field->last_render_text = 'Row B text';
+    $field->last_tokens = ['{{ title }}' => 'Row B title'];
+    $field->original_value = 'Row B original';
+    $field->setLastRenderIndex(7);
+    // Restore row A's state.
+    $field->setRowRenderState($state_a);
+    // Verify row A's state restored correctly.
+    $this->assertFalse((new \ReflectionProperty($field, 'last_render'))->isInitialized($field));
+    $this->assertFalse((new \ReflectionProperty($field, 'last_render_text'))->isInitialized($field));
+    $this->assertFalse((new \ReflectionProperty($field, 'last_tokens'))->isInitialized($field));
+    $this->assertNull($field->original_value);
+    $this->assertNull($field->getLastRenderIndex());
+  }
+
+  /**
+   * Tests NULL properties restored as NULL, not unset.
+   */
+  public function testRowRenderStateNullKept(): void {
+    $field = new FieldPluginBaseTestField($this->configuration, $this->pluginId, $this->pluginDefinition);
+    // Set row A's typed properties to NULL.
+    $field->last_render = NULL;
+    $field->last_render_text = NULL;
+    // Capture NULL values.
+    $state_a = $field->getRowRenderState();
+    // Set row B values.
+    $field->last_render = 'Row B render';
+    $field->last_render_text = 'Row B text';
+    // Restore row A's state.
+    $field->setRowRenderState($state_a);
+    // Verify row A's state restored correctly.
+    $this->assertTrue((new \ReflectionProperty($field, 'last_render'))->isInitialized($field));
+    $this->assertNull($field->last_render);
+    $this->assertTrue((new \ReflectionProperty($field, 'last_render_text'))->isInitialized($field));
+    $this->assertNull($field->last_render_text);
+  }
+
 }
 
 /**
