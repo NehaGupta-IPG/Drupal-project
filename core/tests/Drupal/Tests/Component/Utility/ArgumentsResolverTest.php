@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\ArgumentsResolver;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -16,6 +17,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ArgumentsResolver::class)]
 #[Group('Access')]
 class ArgumentsResolverTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * Tests the getArgument() method.
@@ -132,7 +135,7 @@ class ArgumentsResolverTest extends TestCase {
 
     $callable = function ($route): void {};
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('requires a value for the "$route" argument.');
+    $this->expectExceptionMessageMatches('/Callable \".*testGetWildcardArgumentNoTypeHint.*\" requires a value for the \"\$route\" argument\./');
     $resolver->getArguments($callable);
   }
 
@@ -152,16 +155,17 @@ class ArgumentsResolverTest extends TestCase {
   }
 
   /**
-   * Tests handleUnresolvedArgument() for a scalar argument.
+   * Tests handleUnresolvedArgument() for a non-upcasted argument.
    */
   public function testHandleNotUpcastedArgument(): void {
     $objects = ['foo' => 'bar'];
     $scalars = ['foo' => 'baz'];
+    // @phpstan-ignore argument.type
     $resolver = new ArgumentsResolver($scalars, $objects, []);
 
     $callable = function (\stdClass $foo): void {};
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('requires a value for the "$foo" argument.');
+    $this->expectExceptionMessageMatches('/Callable \".*testHandleNotUpcastedArgument.*\" requires a value for the \"\$foo\" argument\./');
     $resolver->getArguments($callable);
   }
 
@@ -172,7 +176,7 @@ class ArgumentsResolverTest extends TestCase {
   public function testHandleUnresolvedArgument(callable $callable): void {
     $resolver = new ArgumentsResolver([], [], []);
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('requires a value for the "$foo" argument.');
+    $this->expectExceptionMessageMatches('/Callable \".*\" requires a value for the \"\$foo\" argument\./');
     $resolver->getArguments($callable);
   }
 
@@ -194,7 +198,7 @@ class ArgumentsResolverTest extends TestCase {
  */
 class TestClass {
 
-  public function access($foo) {
+  public function access($foo): void {
   }
 
 }
@@ -204,7 +208,7 @@ class TestClass {
  */
 class TestStaticMethodClass {
 
-  public static function access($foo) {
+  public static function access($foo): void {
   }
 
 }
