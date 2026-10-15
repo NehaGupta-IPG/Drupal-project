@@ -50,7 +50,8 @@ class BlockContentCacheTest extends KernelTestBase {
     ]);
 
     $plugin = $block->getPlugin();
-    $this->assertContains('block_content:' . $block_content->id(), $plugin->getCacheTags());
+    $this->assertCount(0, \array_diff($block_content->getCacheContexts(), $plugin->getCacheContexts()));
+    $this->assertSame($block_content->getCacheMaxAge(), $plugin->getCacheMaxAge());
     $this->assertCount(0, \array_diff($block_content->getCacheTags(), $plugin->getCacheTags()));
   }
 
