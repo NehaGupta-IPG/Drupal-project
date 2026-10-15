@@ -14,6 +14,7 @@ use Drupal\Core\TypedData\Validation\RecursiveContextualValidator;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -143,6 +144,88 @@ class RecursiveContextualValidatorTest extends KernelTestBase {
 
     $violations = $this->container->get('typed_data_manager')->create($definition, NULL)->validate();
     $this->assertCount(0, $violations);
+  }
+
+  /**
+   * Data provider for ::testNestedMapValidation().
+   */
+  public static function nestedMapValidationProvider(): array {
+    return [
+      'optional child map omitted' => [
+        'parent_values' => [],
+        'expected_violations' => [],
+      ],
+      'optional child map given as empty array' => [
+        'parent_values' => ['child' => []],
+        'expected_violations' => ['child.foo', 'child.bar'],
+      ],
+    ];
+  }
+
+  /**
+   * Tests validation of an optional nested map given different values.
+   */
+  #[DataProvider('nestedMapValidationProvider')]
+  public function testNestedMapValidation(array $parent_values, array $expected_violations): void {
+    $child_definition = MapDataDefinition::create()
+      ->setPropertyDefinition('foo', DataDefinition::create('string')->setRequired(TRUE))
+      ->setPropertyDefinition('bar', DataDefinition::create('string')->setRequired(TRUE));
+
+    $definition = MapDataDefinition::create()
+      ->setPropertyDefinition('child', $child_definition);
+
+    $violations = $this->container->get('typed_data_manager')
+      ->create($definition, $parent_values)
+      ->validate();
+
+    $this->assertCount(count($expected_violations), $violations);
+    foreach ($expected_violations as $i => $path) {
+      $this->assertEquals($path, $violations[$i]->getPropertyPath());
+    }
+  }
+
+  /**
+   * Tests that a required map given as [] validates its required properties.
+   */
+  public function testRequiredMapValidation(): void {
+    $definition = MapDataDefinition::create()
+      ->setRequired(TRUE)
+      ->setPropertyDefinition('foo', DataDefinition::create('string')->setRequired(TRUE))
+      ->setPropertyDefinition('bar', DataDefinition::create('string')->setRequired(TRUE));
+
+    $violations = $this->container->get('typed_data_manager')
+      ->create($definition, [])
+      ->validate();
+
+    // Three violations: one for the required root map (it is empty, so the
+    // NotNull constraint fires on the map itself), and one for each required
+    // child property that is missing.
+    $this->assertCount(3, $violations);
+    $paths = array_map(fn($v) => $v->getPropertyPath(), iterator_to_array($violations));
+    $this->assertContains('', $paths);
+    $this->assertContains('foo', $paths);
+    $this->assertContains('bar', $paths);
+  }
+
+  /**
+   * Tests that a partly-filled map with a missing entity property is handled.
+   *
+   * This is a pre-existing bug: before the fix to
+   * EntityUntranslatableFieldsConstraintValidator, a partly-filled map whose
+   * entity property was not given caused a fatal error.
+   */
+  public function testPartlyFilledMapEntityPropertyValidation(): void {
+    $definition = MapDataDefinition::create()
+      ->setPropertyDefinition('entity', EntityDataDefinition::create('entity_test')->setRequired(TRUE))
+      ->setPropertyDefinition('label', DataDefinition::create('string'));
+
+    $violations = $this->container->get('typed_data_manager')
+      ->create($definition, ['label' => 'test'])
+      ->validate();
+
+    $this->assertCount(1, $violations);
+    $this->assertEquals('entity', $violations[0]->getPropertyPath());
+    $this->assertEquals('This value should not be null.', $violations[0]->getMessage());
   }
 
   /**
