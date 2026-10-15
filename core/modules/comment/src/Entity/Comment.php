@@ -362,7 +362,14 @@ class Comment extends ContentEntityBase implements CommentInterface {
    * {@inheritdoc}
    */
   public function getCommentedEntity() {
-    return $this->get('entity_id')->first()?->get('entity')->getValue();
+    // Avoid the magic $field->entity getter as this is unsafe with fibers.
+    // @see https://github.com/php/php-src/issues/14983
+    /** @var \Drupal\Core\Field\FieldItemInterface|null $item */
+    $item = $this->get('entity_id')->first();
+    if ($item === NULL) {
+      return NULL;
+    }
+    return $item->get('entity')->getValue();
   }
 
   /**

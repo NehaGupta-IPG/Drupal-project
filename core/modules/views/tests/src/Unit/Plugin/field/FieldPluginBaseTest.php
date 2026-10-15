@@ -1003,7 +1003,7 @@ class FieldPluginBaseTest extends UnitTestCase {
    * Tests the row render state of a newly created handler.
    */
   public function testRowRenderStateNewHandler(): void {
-    $field = $this->setupTestField();
+    $field = new FieldPluginBaseTestField($this->configuration, $this->pluginId, $this->pluginDefinition);
     $state = $field->getRowRenderState();
     $this->assertArrayHasKey('original_value', $state);
     $this->assertNull($state['original_value']);
@@ -1036,6 +1036,7 @@ class FieldPluginBaseTest extends UnitTestCase {
     $field->setLastRenderIndex(7);
     // Capture row B's state before switching back.
     $state_b = $field->getRowRenderState();
+    $this->assertCount(5, $state_b);
     // Restore row A's state.
     $field->setRowRenderState($state_a);
     // Verify row A's state restored correctly.
