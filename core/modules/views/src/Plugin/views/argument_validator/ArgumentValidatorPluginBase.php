@@ -113,7 +113,7 @@ abstract class ArgumentValidatorPluginBase extends PluginBase {
    *   TRUE if the argument is valid, FALSE otherwise.
    *
    * @todo Uncomment the new $cacheability method parameter before
-   *   drupal:13.0.0. https://www.drupal.org/node/2778345
+   *   drupal:13.0.0. https://www.drupal.org/node/3631113
    */
   public function validateArgument($arg /* , RefinableCacheableDependencyInterface $cacheability = new CacheableMetadata() */) {
     return TRUE;
