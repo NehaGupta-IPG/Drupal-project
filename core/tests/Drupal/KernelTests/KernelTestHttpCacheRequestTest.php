@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Drupal\KernelTests;
 
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
-use Drupal\Tests\HttpKernelUiHelperTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\Traits\Core\Cache\PageCachePolicyTrait;
-use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Tests making HTTP requests with page cache in a kernel test.
  */
-#[CoversTrait(HttpKernelUiHelperTrait::class)]
+#[CoversNothing]
 #[Group('PHPUnit')]
 #[Group('Test')]
 #[Group('KernelTests')]

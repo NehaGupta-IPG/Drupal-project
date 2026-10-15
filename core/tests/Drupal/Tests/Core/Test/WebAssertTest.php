@@ -13,7 +13,7 @@ use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Tests\WebAssert;
 use PHPUnit\Framework\AssertionFailedError;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Response;
@@ -21,7 +21,7 @@ use Symfony\Component\BrowserKit\Response;
 /**
  * Tests WebAssert functionality.
  */
-#[CoversClass(WebAssert::class)]
+#[CoversNothing]
 #[Group('browsertestbase')]
 class WebAssertTest extends UnitTestCase {
 

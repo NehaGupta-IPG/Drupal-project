@@ -6,7 +6,7 @@ namespace Drupal\BuildTests\Framework\Tests;
 
 use Drupal\BuildTests\Framework\BuildTestBase;
 use org\bovigo\vfs\vfsStream;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -14,7 +14,7 @@ use Symfony\Component\Finder\Finder;
 /**
  * Tests Drupal\BuildTests\Framework\BuildTestBase.
  */
-#[CoversClass(BuildTestBase::class)]
+#[CoversNothing]
 #[Group('Build')]
 class BuildTestTest extends BuildTestBase {
 

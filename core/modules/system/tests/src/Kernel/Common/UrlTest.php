@@ -20,7 +20,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the Url object.
  */
 #[Group('Common')]
-#[CoversMethod(UrlHelper::class, 'filterQueryParameters')]
 #[CoversMethod(LinkGenerator::class, 'generate')]
 #[RunTestsInSeparateProcesses]
 class UrlTest extends KernelTestBase {

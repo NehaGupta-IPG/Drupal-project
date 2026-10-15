@@ -6,18 +6,17 @@ namespace Drupal\FunctionalJavascriptTests\Tests;
 
 use Behat\Mink\Driver\Selenium2Driver;
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\FunctionalJavascriptTests\DrupalSelenium2Driver;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\file\Functional\FileFieldCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the DrupalSelenium2Driver methods.
  */
-#[CoversClass(DrupalSelenium2Driver::class)]
+#[CoversNothing]
 #[Group('javascript')]
 #[RunTestsInSeparateProcesses]
 class DrupalSelenium2DriverTest extends WebDriverTestBase {

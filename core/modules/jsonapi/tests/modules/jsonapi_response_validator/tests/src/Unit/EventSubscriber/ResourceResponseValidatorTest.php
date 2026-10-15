@@ -13,7 +13,7 @@ use Drupal\jsonapi\Routing\Routes;
 use Drupal\node\Entity\Node;
 use Drupal\rest\ResourceResponse;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @internal
  */
-#[CoversClass(ResourceResponseValidator::class)]
+#[CoversNothing]
 #[Group('jsonapi')]
 class ResourceResponseValidatorTest extends UnitTestCase {
 

@@ -6,7 +6,7 @@ namespace Drupal\KernelTests;
 
 use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Every test method runs in its own process, so the assertions here cross the
  * process boundary.
  */
-#[CoversClass(KernelTestBase::class)]
+#[CoversNothing]
 #[Group('PHPUnit')]
 #[Group('Test')]
 #[Group('KernelTests')]

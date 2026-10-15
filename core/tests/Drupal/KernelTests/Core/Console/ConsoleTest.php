@@ -23,7 +23,6 @@ use Symfony\Component\Console\Command\LazyCommand;
 #[Group('Console')]
 #[RunTestsInSeparateProcesses]
 #[CoversClass(ConsoleCompilerPass::class)]
-#[CoversClass(ConsoleExampleCommand::class)]
 class ConsoleTest extends KernelTestBase {
   use DrupalApplicationTesterTrait;
 
