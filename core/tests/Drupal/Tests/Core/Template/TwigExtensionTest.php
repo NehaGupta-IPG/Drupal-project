@@ -774,8 +774,6 @@ class TwigExtensionTest extends UnitTestCase {
 
   /**
    * Tests withoutFilter with nested objects in arguments (PHP 8.5).
-   *
-   * @covers ::withoutFilter
    */
   public function testWithoutFilterWithNestedObjectArguments(): void {
     $element = [
