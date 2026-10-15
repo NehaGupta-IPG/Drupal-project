@@ -20,8 +20,10 @@ use Drupal\Core\TypedData\TypedDataInterface;
 abstract class FieldItemBase extends Map implements FieldItemInterface {
 
   /**
-   * Field items always use an array as their internal value storage, even when
-   * empty, to preserve the field layer's existing behavior.
+   * An array of values for the contained properties.
+   *
+   * Overrides Map::$values to keep an array default for field items, so that
+   * the field layer is unaffected by Map defaulting its storage to NULL.
    *
    * @var array
    */
