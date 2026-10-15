@@ -142,4 +142,30 @@ class OptionsFieldTest extends OptionsFieldUnitTestBase {
     $this->fieldStorage->save();
   }
 
+  /**
+   * Tests that changing to/from allowed_values_function is allowed.
+   */
+  public function testUpdateAllowedValuesWithDynamicFunction(): void {
+    // Save an entity so the field storage has data.
+    $entity = EntityTest::create();
+    $entity->{$this->fieldName}->value = 1;
+    $entity->save();
+
+    // Scenario 1: switching TO allowed_values_function should never throw,
+    // even though the entity still holds value 1.
+    $this->fieldStorage->setSetting('allowed_values', []);
+    $this->fieldStorage->setSetting('allowed_values_function',
+      '\Drupal\options_test\OptionsAllowedValues::simpleValues');
+    $this->fieldStorage->save();
+    $this->assertEquals('\Drupal\options_test\OptionsAllowedValues::simpleValues', $this->fieldStorage->getSetting('allowed_values_function'));
+
+    // Scenario 2: switching FROM allowed_values_function back to static values
+    // that omit key 1 should also not throw, because the *prior* config had a
+    // function.
+    $this->fieldStorage->setSetting('allowed_values_function', '');
+    $this->fieldStorage->setSetting('allowed_values', [2 => 'Two']);
+    $this->fieldStorage->save();
+    $this->assertEquals([2 => 'Two'], $this->fieldStorage->getSetting('allowed_values'));
+  }
+
 }
