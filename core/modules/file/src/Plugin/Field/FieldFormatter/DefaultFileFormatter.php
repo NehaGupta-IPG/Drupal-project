@@ -22,7 +22,7 @@ class DefaultFileFormatter extends BaseFieldFileFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public static function defaultSettings() {
+  public static function defaultSettings(): array {
     $settings = parent::defaultSettings();
     $settings['link_to_file'] = TRUE;
 
@@ -32,9 +32,9 @@ class DefaultFileFormatter extends BaseFieldFileFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
+  public function settingsForm(array $form, FormStateInterface $form_state): array {
     // We don't call the parent in order to bypass the link to file form.
-    return $form;
+    return [];
   }
 
   /**
