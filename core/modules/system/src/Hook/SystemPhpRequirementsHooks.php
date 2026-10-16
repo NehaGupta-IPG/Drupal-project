@@ -18,12 +18,30 @@ class SystemPhpRequirementsHooks {
 
   /**
    * Implements hook_runtime_requirements().
-   *
-   * Implements hook_update_requirements().
    */
   #[Hook('runtime_requirements', order: Order::First)]
-  #[Hook('update_requirements', order: Order::First)]
   public function phpRuntimeRequirements(): array {
+    return $this->phpRequirements(RequirementSeverity::Error);
+  }
+
+  /**
+   * Implements hook_update_requirements().
+   */
+  #[Hook('update_requirements', order: Order::First)]
+  public function phpUpdateequirements(): array {
+    return $this->phpRequirements(RequirementSeverity::Warning);
+  }
+
+  /**
+   * Get the phpRequirements for drupal.
+   *
+   * @param \Drupal\Core\Extension\Requirement\RequirementSeverity $fallbackSeverity
+   *   The severity of the requirement.
+   *
+   * @return array
+   *   Current requirements array.
+   */
+  public function phpRequirements(RequirementSeverity $fallbackSeverity): array {
     $requirements = [];
     $phpversion = phpversion();
     $phpversion_label = $this->t('@phpversion (<a href=":url">more information</a>)', [
@@ -34,7 +52,7 @@ class SystemPhpRequirementsHooks {
       'title' => $this->t('PHP'),
       'value' => $phpversion_label,
     ];
-    $this->minimumPhp($phpversion, $requirements, RequirementSeverity::Error);
+    $this->minimumPhp($phpversion, $requirements, $fallbackSeverity);
     if (!isset($requirements['php']['severity'])) {
       $this->recommendedPhp($phpversion, $requirements);
     }
@@ -49,10 +67,10 @@ class SystemPhpRequirementsHooks {
    *   The php version to check.
    * @param array[] $requirements
    *   The requirements array as specified in hook_*_requirements().
-   * @param \Drupal\Core\Extension\Requirement\RequirementSeverity $fallback_severity
+   * @param \Drupal\Core\Extension\Requirement\RequirementSeverity $fallbackSeverity
    *   Default severity to use if minimum is not met.
    */
-  protected function minimumPhp(string $phpversion, array &$requirements, RequirementSeverity $fallback_severity): void {
+  protected function minimumPhp(string $phpversion, array &$requirements, RequirementSeverity $fallbackSeverity): void {
     // Verify the user is running a supported PHP version.
     // If the site is running a recommended version of PHP, just display it
     // as an informational message on the status report. This will be overridden
@@ -80,7 +98,7 @@ class SystemPhpRequirementsHooks {
         // Otherwise, the message depends on the fallback severity
         // - RequirementSeverity::Error during runtime
         // - RequirementSeverity::Warning during update
-        $requirements['php']['severity'] = $fallback_severity;
+        $requirements['php']['severity'] = $fallbackSeverity;
       }
     }
   }

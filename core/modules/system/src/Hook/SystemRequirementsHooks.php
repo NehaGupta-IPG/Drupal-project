@@ -40,7 +40,7 @@ class SystemRequirementsHooks {
   public function updateRequirements(): array {
     $requirements = [];
 
-    if ($this->skipPhpExtensionChecks(phpversion())) {
+    if ($this->isPhpBelowMinimumAllowed()) {
       return $requirements;
     }
 
@@ -54,7 +54,7 @@ class SystemRequirementsHooks {
   public function runtimeRequirements(): array {
     $requirements = [];
 
-    if ($this->skipPhpExtensionChecks(phpversion())) {
+    if ($this->isPhpBelowMinimumAllowed()) {
       return $requirements;
     }
 
@@ -67,14 +67,11 @@ class SystemRequirementsHooks {
    * If the minimum version is not met then further requirements should not be
    * checked, return early.
    *
-   * @param string $phpversion
-   *   The php version to check.
-   *
    * @return bool
-   *   Whether further php extension checks are unsafe.
+   *   Whether further requirements checks are unsafe.
    */
-  protected function skipPhpExtensionChecks(string $phpversion): bool {
-    return version_compare($phpversion, \Drupal::MINIMUM_PHP) < 0;
+  protected function isPhpBelowMinimumAllowed(): bool {
+    return version_compare(phpversion(), \Drupal::MINIMUM_PHP) < 0;
   }
 
   /**
