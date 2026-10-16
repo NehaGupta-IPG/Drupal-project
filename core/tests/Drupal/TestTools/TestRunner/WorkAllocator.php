@@ -82,13 +82,13 @@ class WorkAllocator {
     // appear in more than one group, and weigh them.
     $tests = array_merge(...array_values($this->groupedTestClassInfoList));
     $slowTests = $this->groupedTestClassInfoList['#slow'] ?? [];
-    $weights = [];
-    foreach ($tests as $class => $test) {
-      $weights[$class] = $test['tests_count'] * (isset($slowTests[$class]) ? self::SLOW_TEST_WEIGHT : 1);
+    foreach ($tests as $class => &$test) {
+      $test['weight'] = $test['tests_count'] * (isset($slowTests[$class]) ? self::SLOW_TEST_WEIGHT : 1);
     }
+    unset($test);
 
     // Sort all tests.
-    $this->sortTestsByTypeAndWeight($tests, $weights);
+    $this->sortTestsByTypeAndWeight($tests);
     $this->sortedList = $tests;
     $this->assignTestsSequence($this->sortedList, 'sorted_sequence');
 
@@ -99,7 +99,7 @@ class WorkAllocator {
       return;
     }
 
-    $binnedTests = $this->placeTestsIntoBins($this->sortedList, $weights);
+    $binnedTests = $this->placeTestsIntoBins($this->sortedList);
     $this->allocatedList = $binnedTests[$this->binIndex - 1];
     $this->assignTestsSequence($this->allocatedList, 'worker_sequence');
   }
@@ -116,14 +116,12 @@ class WorkAllocator {
    *
    * @param TestClassInfoList $tests
    *   The tests to sort.
-   * @param array<class-string,int> $weights
-   *   The weight of each test, keyed by class name.
    */
-  private function sortTestsByTypeAndWeight(array &$tests, array $weights): void {
+  private function sortTestsByTypeAndWeight(array &$tests): void {
     uasort(
       $tests,
       fn(array $a, array $b): int => $this->getTestTypeWeight($b) <=> $this->getTestTypeWeight($a)
-        ?: $weights[$b['name']] <=> $weights[$a['name']]
+        ?: $b['weight'] <=> $a['weight']
           ?: strcmp($a['name'], $b['name']),
     );
   }
@@ -167,19 +165,17 @@ class WorkAllocator {
    *
    * @param TestClassInfoList $tests
    *   The sorted tests.
-   * @param array<class-string,int> $weights
-   *   The weight of each test, keyed by class name.
    *
    * @return array<int,TestClassInfoList>
    *   An associative array of bins and the test class names in each bin.
    */
-  private function placeTestsIntoBins(array $tests, array $weights): array {
+  private function placeTestsIntoBins(array $tests): array {
     $bins = array_fill(0, $this->totalBins, []);
     $binWeights = array_fill(0, $this->totalBins, 0);
     foreach ($tests as $key => $test) {
       $bin = array_search(min($binWeights), $binWeights, TRUE);
       $bins[$bin][$key] = $test;
-      $binWeights[$bin] += $weights[$key];
+      $binWeights[$bin] += $test['weight'];
     }
     return $bins;
   }
