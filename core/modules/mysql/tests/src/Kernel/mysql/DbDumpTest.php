@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\mysql\Kernel\mysql;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Command\DbDumpApplication;
+use Drupal\Core\Command\DbDumpCommand;
 use Drupal\Core\Config\DatabaseStorage;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -146,9 +146,8 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
    * Tests the command directly.
    */
   public function testDbDumpCommand(): void {
-    $application = new DbDumpApplication();
-    $command = $application->find('dump-database-d8-mysql');
-    $command_tester = new CommandTester($command);
+    $application = new DbDumpCommand();
+    $command_tester = new CommandTester($application);
     $command_tester->execute([]);
 
     // Tables that are schema-only should not have data exported.
@@ -176,9 +175,8 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
    */
   public function testScriptLoad(): void {
     // Generate the script.
-    $application = new DbDumpApplication();
-    $command = $application->find('dump-database-d8-mysql');
-    $command_tester = new CommandTester($command);
+    $application = new DbDumpCommand();
+    $command_tester = new CommandTester($application);
     $command_tester->execute([]);
     $script = $command_tester->getDisplay();
 
