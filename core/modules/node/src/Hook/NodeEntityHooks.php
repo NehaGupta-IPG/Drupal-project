@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\node\Hook;
 
 use Drupal\Core\Access\AccessResultInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\ConfigurableLanguageInterface;
 use Drupal\Core\Access\AccessResult;
@@ -21,11 +19,6 @@ use Drupal\Core\Hook\Attribute\Hook;
 class NodeEntityHooks {
 
   use StringTranslationTrait;
-
-  public function __construct(
-    protected readonly EntityTypeManagerInterface $entityTypeManager,
-    protected readonly LanguageManagerInterface $languageManager,
-  ) {}
 
   /**
    * Implements hook_entity_extra_field_info().
@@ -52,9 +45,9 @@ class NodeEntityHooks {
   public function userPredelete($account): void {
     // Delete nodes (current revisions).
     // @todo Introduce node_mass_delete() or make NodeBulkUpdate::process() more flexible.
-    $storage_controller = $this->entityTypeManager->getStorage('node');
-    $nids = $storage_controller->getQuery()->condition('uid', $account->id())->accessCheck(FALSE)->execute();
+    $nids = \Drupal::entityQuery('node')->condition('uid', $account->id())->accessCheck(FALSE)->execute();
     // Delete old revisions.
+    $storage_controller = \Drupal::entityTypeManager()->getStorage('node');
     $nodes = $storage_controller->loadMultiple($nids);
     $storage_controller->delete($nodes);
     $query = $storage_controller->getQuery()
@@ -156,7 +149,7 @@ class NodeEntityHooks {
     // On nodes with this language, unset the language unless it is the site
     // default language.
     if (!$language->isDefault()) {
-      $this->entityTypeManager->getStorage('node')->clearRevisionsLanguage($language);
+      \Drupal::entityTypeManager()->getStorage('node')->clearRevisionsLanguage($language);
     }
   }
 
