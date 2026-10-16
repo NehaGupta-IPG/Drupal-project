@@ -137,6 +137,26 @@ class ToolkitGdTest extends KernelTestBase {
   }
 
   /**
+   * Tests that saving an image replaces the destination file atomically.
+   */
+  public function testSaveIsAtomic(): void {
+    $file_path = $this->directory . '/atomic.png';
+    file_put_contents($file_path, 'Existing file.');
+    $handle = fopen($file_path, 'r');
+
+    $image = $this->imageFactory->get();
+    $image->createNew(50, 20, 'png');
+    $this->assertTrue($image->save($file_path));
+
+    // An open handle still reads the replaced file's content after a rename.
+    $this->assertSame('Existing file.', stream_get_contents($handle, -1, 0));
+    fclose($handle);
+    $this->assertTrue($this->imageFactory->get($file_path)->isValid());
+    // No temporary file is left behind.
+    $this->assertSame(['atomic.png'], array_values(array_diff(scandir($this->directory), ['.', '..'])));
+  }
+
+  /**
    * Tests failures of the 'create_new' operation.
    */
   public function testCreateNewFailures(): void {
