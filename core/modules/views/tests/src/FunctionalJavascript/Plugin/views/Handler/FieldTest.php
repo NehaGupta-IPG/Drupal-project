@@ -112,7 +112,29 @@ class FieldTest extends WebDriverTestBase {
     $page->clickLink('Content link');
     // Verify the modal title.
     $web_assert->assertWaitOnAjaxRequest();
-    $this->assertEquals('Content', $web_assert->waitForElement('css', '.ui-dialog-title')->getText());
+    $dialog_title_text = $web_assert->waitForElement('css', '.ui-dialog-title')->getText();
+    $message = '';
+    if ($dialog_title_text !== 'Content') {
+      // Collect diagnostics after the text read to preserve its timing.
+      $dialog_title_state = $this->getSession()->evaluateScript(<<<'JS'
+        Array.from(document.querySelectorAll('.ui-dialog-title'), (title) => {
+          const style = getComputedStyle(title);
+          const dialog = title.closest('.ui-dialog');
+          return {
+            html: title.outerHTML,
+            textContent: title.textContent,
+            innerText: title.innerText,
+            visible: jQuery(title).is(':visible'),
+            bounds: title.getBoundingClientRect().toJSON(),
+            display: style.display,
+            visibility: style.visibility,
+            dialogStyle: dialog?.getAttribute('style'),
+          };
+        })
+        JS);
+      $message = 'Dialog title state after unexpected rendered text: ' . json_encode($dialog_title_state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+    $this->assertEquals('Content', $dialog_title_text, $message);
   }
 
   /**
