@@ -27,7 +27,7 @@ class SystemPhpRequirementsHooks {
    * Implements hook_update_requirements().
    */
   #[Hook('update_requirements')]
-  public function phpUpdateequirements(): array {
+  public function phpUpdateRequirements(): array {
     return $this->phpRequirements(RequirementSeverity::Warning);
   }
 
