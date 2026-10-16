@@ -20,12 +20,14 @@
   class DrupalDialog extends HTMLElement {
     connectedCallback() {
       const waitForDialog = new Promise((resolve) => {
-        const dialog = this.querySelector('dialog');
+        const dialog = this.querySelector('dialog, #drupal-off-canvas-wrapper');
         if (dialog) {
           resolve(dialog);
         } else {
           const observer = new MutationObserver((mutations, observer) => {
-            const element = this.querySelector('dialog');
+            const element = this.querySelector(
+              'dialog, #drupal-off-canvas-wrapper',
+            );
             if (element) {
               observer.disconnect();
               resolve(element);
@@ -46,6 +48,16 @@
             if (e.target === dialog) dialog.close();
           };
           dialog.addEventListener('click', this._backdropHandler);
+        } else if (dialog.id === 'drupal-off-canvas-wrapper') {
+          // Initialize the off-canvas dialog.
+          const closeButton = dialog.querySelector('.dialog__titlebar-close');
+          if (closeButton) {
+            closeButton.addEventListener('click', (event) => {
+              event.preventDefault();
+              const closeEvent = new Event('close', { bubbles: true });
+              event.target.dispatchEvent(closeEvent);
+            });
+          }
         }
 
         // Remove self from DOM on close unless data-persist.
