@@ -9,6 +9,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\file\FileReferenceResolver;
 use Drupal\file\FileRepositoryInterface;
 use Drupal\file\FileUsage\FileUsageInterface;
+use Drupal\system\FileDownloadController;
 
 /**
  * Implements hook_file_download().
@@ -42,7 +43,7 @@ class FileDownloadHook {
         // usage was removed and before it is actually deleted from the file
         // system. Modules that depend on this behavior should make the file
         // permanent instead.
-        return -1;
+        return FileDownloadController::FILE_DOWNLOAD_DENY;
       }
     }
     // Find out which (if any) fields of this type contain the file, loop but
@@ -62,7 +63,7 @@ class FileDownloadHook {
       return NULL;
     }
     if (!$file->access('download')) {
-      return -1;
+      return FileDownloadController::FILE_DOWNLOAD_DENY;
     }
     // Access is granted.
     return $file->getDownloadHeaders();

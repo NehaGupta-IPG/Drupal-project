@@ -16,6 +16,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class FileDownloadController extends ControllerBase {
 
   /**
+   * Flag to indicate that file download request is denied.
+   */
+  public const int FILE_DOWNLOAD_DENY = -1;
+
+  /**
    * The stream wrapper manager.
    *
    * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface

@@ -23,6 +23,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\system\FileDownloadController;
 
 /**
  * Hook implementations for system.
@@ -451,7 +452,7 @@ class SystemHooks {
           }
           $parts = explode('/', $target);
           if (array_intersect($parts, ['.', '..'])) {
-            return -1;
+            return FileDownloadController::FILE_DOWNLOAD_DENY;
           }
         }
       }

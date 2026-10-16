@@ -15,6 +15,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\image\ImageDerivativeUtilities;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
+use Drupal\system\FileDownloadController;
 
 /**
  * Hook implementations for image.
@@ -126,7 +127,7 @@ class ImageHooks {
           ];
         }
       }
-      return -1;
+      return FileDownloadController::FILE_DOWNLOAD_DENY;
     }
     // If it is the sample image we need to grant access.
     $samplePath = \Drupal::config('image.settings')->get('preview_image');
