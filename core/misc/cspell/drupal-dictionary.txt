@@ -19,6 +19,8 @@ drupalmedia
 drupalorg
 druplicon
 drush
+exin
+exun
 fapi
 fieldable
 fulldate
@@ -32,7 +34,6 @@ langcodes
 mulrev
 mulrevpub
 olivero
-olivero's
 prerender
 renderable
 revlog

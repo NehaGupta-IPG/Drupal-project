@@ -61,24 +61,12 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
    */
   protected $messenger;
 
-  /**
-   * The theme handler interface.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected ThemeHandlerInterface $themeHandler;
-
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ThemeManagerInterface $theme_manager, FormBuilderInterface $form_builder, MessengerInterface $messenger, ?ThemeHandlerInterface $theme_handler = NULL) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ThemeManagerInterface $theme_manager, FormBuilderInterface $form_builder, MessengerInterface $messenger, protected ThemeHandlerInterface $themeHandler) {
     parent::__construct($entity_type, $storage);
 
     $this->themeManager = $theme_manager;
     $this->formBuilder = $form_builder;
     $this->messenger = $messenger;
-    if (!$theme_handler instanceof ThemeHandlerInterface) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $theme_handler argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3015925', E_USER_DEPRECATED);
-      $theme_handler = \Drupal::service(ThemeHandlerInterface::class);
-    }
-    $this->themeHandler = $theme_handler;
     $this->limit = FALSE;
   }
 
@@ -394,21 +382,6 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
       $entity->save();
     }
     $this->messenger->addStatus($this->t('The block settings have been updated.'));
-  }
-
-  /**
-   * Wraps system_region_list().
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
-   *   $this->themeHandler->getTheme()->listAllRegions() or
-   *   $this->themeHandler->getTheme()->listVisibleRegions() instead.
-   *
-   * @see https://www.drupal.org/node/3015925
-   */
-  // @phpstan-ignore-next-line
-  protected function systemRegionList($theme, $show = REGIONS_ALL) {
-    @trigger_error(__CLASS__ . '::systemRegionList() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use $this->themeHandler->getTheme()->listAllRegions() or $this->themeHandler->getTheme()->listVisibleRegions() instead. See https://www.drupal.org/node/3015925', E_USER_DEPRECATED);
-    return $show === 'all' ? $this->themeHandler->getTheme($theme)->listAllRegions() : $this->themeHandler->getTheme($theme)->listVisibleRegions();
   }
 
 }
