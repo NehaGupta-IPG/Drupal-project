@@ -49,6 +49,33 @@ class ParamConverterManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests resolving a stale lazy-proxy converter ID to the plain service ID.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3612050
+   */
+  public function testGetConverterProxyOriginalServiceFallback(): void {
+    $converter = $this->createMock(ParamConverterInterface::class);
+    $manager = new ParamConverterManager(new ServiceLocator([
+      'paramconverter.configentity_admin' => fn() => $converter,
+    ]));
+
+    $this->assertSame(
+      $converter,
+      $manager->getConverter('drupal.proxy_original_service.paramconverter.configentity_admin'),
+    );
+  }
+
+  /**
+   * Tests that an unknown proxy-prefixed converter ID still throws.
+   */
+  public function testGetConverterProxyOriginalServiceException(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('No converter has been registered for drupal.proxy_original_service.missing');
+    $manager = new ParamConverterManager(new ServiceLocator([]));
+    $manager->getConverter('drupal.proxy_original_service.missing');
+  }
+
+  /**
    * Provide data for parameter converter manager tests.
    *
    * @return array

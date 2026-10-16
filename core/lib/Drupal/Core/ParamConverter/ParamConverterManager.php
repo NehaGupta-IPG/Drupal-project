@@ -34,6 +34,21 @@ class ParamConverterManager implements ParamConverterManagerInterface {
       return $this->converters->get($converter);
     }
 
+    // Routes built while a param converter was lazy: true may still store the
+    // proxy original service ID (drupal.proxy_original_service.*) in the
+    // {router} table. After lazy was removed (e.g. in 11.4), that ID no longer
+    // exists in the locator. Fall back to the plain service ID so upgrades and
+    // mid-update route matches do not fail before the router is rebuilt.
+    // @see https://www.drupal.org/project/drupal/issues/3612050
+    // @see https://www.drupal.org/project/drupal/issues/3436295
+    $proxy_prefix = 'drupal.proxy_original_service.';
+    if (str_starts_with($converter, $proxy_prefix)) {
+      $plain_id = substr($converter, strlen($proxy_prefix));
+      if ($this->converters->has($plain_id)) {
+        return $this->converters->get($plain_id);
+      }
+    }
+
     throw new \InvalidArgumentException(sprintf('No converter has been registered for %s', $converter));
   }
 
