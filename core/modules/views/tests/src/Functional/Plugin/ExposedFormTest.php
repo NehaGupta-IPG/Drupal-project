@@ -38,6 +38,7 @@ class ExposedFormTest extends ViewTestBase {
     'test_exposed_form_sort_items_per_page',
     'test_exposed_form_pager',
     'test_remember_selected',
+    'test_exposed_form_required_filters',
   ];
 
   /**
@@ -397,6 +398,50 @@ class ExposedFormTest extends ViewTestBase {
     // is applied.
     $this->drupalGet('test_exposed_form_buttons', ['query' => ['type' => 'article']]);
     $this->assertSession()->pageTextNotContains($on_demand_text);
+  }
+
+  /**
+   * Tests required exposed filters.
+   */
+  public function testRequiredExposedFilters(): void {
+    $this->drupalGet('test_exposed_form_required_filters');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Ensure that no error element is shown when a text filter is required.
+    $this->assertSession()->elementNotExists('css', '.messages--error');
+    $this->assertFalse($this->getSession()->getPage()->findField('title')->hasClass('error'));
+
+    $view = Views::getView('test_exposed_form_required_filters');
+    $display = &$view->storage->getDisplay('default');
+
+    // Turn off required text filter.
+    $display['display_options']['filters']['title']['expose']['required'] = FALSE;
+    $view->save();
+
+    $this->drupalGet('test_exposed_form_required_filters');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Ensure that results are displayed by default when no input is provided.
+    $this->assertSession()->elementsCount('xpath', "//div[contains(@class, 'views-row')]", 10);
+
+    $view = Views::getView('test_exposed_form_required_filters');
+    $display = &$view->storage->getDisplay('default');
+
+    // Turn on required type filter.
+    $display['display_options']['filters']['type']['expose']['required'] = TRUE;
+    $display['display_options']['filters']['type']['value'] = [
+      'article' => 'article',
+      'page' => 'page',
+    ];
+    $view->save();
+
+    $this->drupalGet('test_exposed_form_required_filters');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Ensure that results are filtered by default when input is required, since
+    // the first filter will be selected by default if "Select all" is not an
+    // option.
+    $this->assertSession()->elementsCount('xpath', "//div[contains(@class, 'views-row')]", 5);
   }
 
   /**
