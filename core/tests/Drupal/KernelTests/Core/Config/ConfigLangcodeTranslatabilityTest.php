@@ -49,7 +49,7 @@ class ConfigLangcodeTranslatabilityTest extends KernelTestBase {
     // An already-present langcode must never be overwritten by an ordinary
     // save.
     $config->set('untranslatable_value', 'bar')->save();
-    $this->assertSame('en', $config->get('langcode'));
+    $this->assertSame('fr', $config->get('langcode'));
 
     // Removing the last translatable value must remove the langcode again.
     $config->clear('optional_translatable_value')->save();

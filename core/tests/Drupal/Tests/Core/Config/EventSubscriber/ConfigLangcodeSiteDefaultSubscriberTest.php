@@ -30,7 +30,7 @@ class ConfigLangcodeSiteDefaultSubscriberTest extends UnitTestCase {
   public function testResolvesToSiteDefault(): void {
     $config_factory = $this->getConfigFactoryStub(['system.site' => ['default_langcode' => 'fr']]);
     $event = new ConfigLangcodeResolveEvent();
-    new ConfigLangcodeSiteDefaultSubscriber($config_factory)->onResolveLangcode($event);
+    (new ConfigLangcodeSiteDefaultSubscriber($config_factory))->onResolveLangcode($event);
     $this->assertSame('fr', $event->getLangcode());
     $this->assertTrue($event->isPropagationStopped());
   }
