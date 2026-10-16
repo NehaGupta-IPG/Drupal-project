@@ -127,7 +127,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
   /**
    * {@inheritdoc}
    */
-  public function install(array $theme_list, $install_dependencies = TRUE) {
+  public function install(array $theme_list, $install_dependencies = TRUE, $reset_system = TRUE) {
     $extension_config = $this->configFactory->getEditable('core.extension');
 
     $theme_data = $this->themeExtensionList->reset()->getList();
@@ -197,14 +197,17 @@ class ThemeInstaller implements ThemeInstallerInterface {
       $this->logger->info('%theme theme installed.', ['%theme' => $key]);
     }
 
-    // Add new themes to the list of installed themes.
-    $register_themes = array_merge(array_keys($installed_themes), $themes_installed);
-    // Get list of extensions for the new list of themes.
-    $register_themes = array_intersect_key($theme_data, array_flip($register_themes));
-    $this->resetSystem($register_themes);
+    if ($reset_system || $this->moduleHandler->hasImplementations('themes_installed')) {
 
-    // Invoke hook_themes_installed() after the themes have been installed.
-    $this->moduleHandler->invokeAll('themes_installed', [$themes_installed]);
+      // Add new themes to the list of installed themes.
+      $register_themes = array_merge(array_keys($installed_themes), $themes_installed);
+      // Get list of extensions for the new list of themes.
+      $register_themes = array_intersect_key($theme_data, array_flip($register_themes));
+      $this->resetSystem($register_themes);
+
+      // Invoke hook_themes_installed() after the themes have been installed.
+      $this->moduleHandler->invokeAll('themes_installed', [$themes_installed]);
+    }
 
     return !empty($themes_installed);
   }

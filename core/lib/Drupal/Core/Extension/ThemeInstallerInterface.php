@@ -16,6 +16,10 @@ interface ThemeInstallerInterface {
    *   (optional) If TRUE, dependencies will automatically be installed in the
    *   correct order. This incurs a significant performance cost, so use FALSE
    *   if you know $theme_list is already complete and in the correct order.
+   * @param bool $reset_system
+   *   (optional) If TRUE, the kernel and container will be refreshed after
+   *   theme install. Should only be set to FALSE if the kernel and container
+   *   will be refreshed manually.
    *
    * @return bool
    *   Whether any of the given themes have been installed.
@@ -33,7 +37,7 @@ interface ThemeInstallerInterface {
    * @throws \Drupal\Core\Extension\MissingDependencyException
    *   Thrown when a requested dependency can't be found.
    */
-  public function install(array $theme_list, $install_dependencies = TRUE);
+  public function install(array $theme_list, $install_dependencies = TRUE, bool $reset_system = TRUE);
 
   /**
    * Determines the full set of themes corresponding to the given list.
