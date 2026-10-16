@@ -283,8 +283,6 @@ default:
 
 '📦 Composer':
   stage: 🪄 Lint
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
   variables:
     KUBERNETES_CPU_REQUEST: "1"
   needs: []
