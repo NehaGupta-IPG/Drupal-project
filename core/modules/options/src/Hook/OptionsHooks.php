@@ -83,13 +83,12 @@ class OptionsHooks {
       return FALSE;
     }
 
-    $result = \Drupal::entityQuery($entity_type_id)
+    return (bool) \Drupal::entityQuery($entity_type_id)
       ->accessCheck(FALSE)
       ->condition($field_name . '.value', $values, 'IN')
       ->count()
       ->range(0, 1)
       ->execute();
-    return (bool) $result;
   }
 
 }
