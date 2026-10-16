@@ -24,7 +24,14 @@ class SharedDatabaseStateViolationTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system', 'user'];
+  protected static $modules = [
+    'system',
+    'user',
+    // Listed twice, as when more than one class of the hierarchy declares it.
+    // The module list does not change, so every test method has to pass
+    // ::checkNoModuleWasEnabledOrDisabled() in ::tearDown().
+    'user',
+  ];
 
   /**
    * The name of a table belonging to the initial state.
@@ -60,6 +67,85 @@ class SharedDatabaseStateViolationTest extends KernelTestBase {
     $connection = $this->container->get('database');
     $connection->schema()->createTable(self::PROBE_TABLE, self::PROBE_SCHEMA);
     $connection->insert(self::PROBE_TABLE)->fields(['id' => 1])->execute();
+  }
+
+  /**
+   * Tests that ::setUpEnvironment() changing the module list is reported.
+   */
+  public function testChangedModuleListIsReported(): void {
+    $storage = $this->container->get('config.storage');
+    $extension = $storage->read('core.extension');
+
+    // The theme list is kept between test methods, so a change to it passes.
+    $changed = $extension;
+    $changed['theme']['stark'] = 0;
+    $storage->write('core.extension', $changed);
+    $this->checkModuleListWasNotChanged($extension);
+
+    $changed = $extension;
+    $changed['module']['user'] = 1;
+    $storage->write('core.extension', $changed);
+    $caught = NULL;
+    try {
+      $this->checkModuleListWasNotChanged($extension);
+    }
+    catch (\LogicException $e) {
+      $caught = $e;
+    }
+    $storage->write('core.extension', $extension);
+
+    $this->assertNotNull($caught, 'A change to the module list is reported.');
+    $this->assertStringContainsString('changed the module list', $caught->getMessage());
+  }
+
+  /**
+   * Tests that a test method changing the module list is reported.
+   */
+  public function testChangedModuleListInTestMethodIsReported(): void {
+    // Changing the theme list or the weights passes, the module list is the
+    // same.
+    $storage = $this->container->get('config.storage');
+    $extension = $storage->read('core.extension');
+    $changed = $extension;
+    $changed['theme']['stark'] = 0;
+    $changed['module']['user'] = 10;
+    $storage->write('core.extension', $changed);
+    $this->checkNoModuleWasEnabledOrDisabled();
+    $storage->write('core.extension', $extension);
+
+    $this->enableModules(['field']);
+    $caught = NULL;
+    try {
+      $this->checkNoModuleWasEnabledOrDisabled();
+    }
+    catch (\LogicException $e) {
+      $caught = $e;
+    }
+    // Disabling the module again is enough to let the check in ::tearDown()
+    // pass.
+    $this->disableModules(['field']);
+    $this->checkNoModuleWasEnabledOrDisabled();
+
+    $this->assertNotNull($caught, 'Enabling a module is reported.');
+    $this->assertStringContainsString('enabled field.', $caught->getMessage());
+
+    // Enabling and disabling the module rebuilt the container, so write
+    // through the current one.
+    $storage = $this->container->get('config.storage');
+    $changed = $extension;
+    unset($changed['module']['user']);
+    $storage->write('core.extension', $changed);
+    $caught = NULL;
+    try {
+      $this->checkNoModuleWasEnabledOrDisabled();
+    }
+    catch (\LogicException $e) {
+      $caught = $e;
+    }
+    $storage->write('core.extension', $extension);
+
+    $this->assertNotNull($caught, 'Disabling a module is reported.');
+    $this->assertStringContainsString('disabled user.', $caught->getMessage());
   }
 
   /**
