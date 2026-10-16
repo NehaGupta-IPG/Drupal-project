@@ -133,6 +133,7 @@ class FieldTest extends WebDriverTestBase {
         })
         JS);
       $message = 'Dialog title state after unexpected rendered text: ' . json_encode($dialog_title_state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+      $this->htmlOutput();
     }
     $this->assertEquals('Content', $dialog_title_text, $message);
   }
