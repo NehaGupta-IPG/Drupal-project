@@ -4,7 +4,6 @@ namespace Drupal\system\Hook;
 
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Order\Order;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\PhpRequirements;
@@ -19,7 +18,7 @@ class SystemPhpRequirementsHooks {
   /**
    * Implements hook_runtime_requirements().
    */
-  #[Hook('runtime_requirements', order: Order::First)]
+  #[Hook('runtime_requirements')]
   public function phpRuntimeRequirements(): array {
     return $this->phpRequirements(RequirementSeverity::Error);
   }
@@ -27,7 +26,7 @@ class SystemPhpRequirementsHooks {
   /**
    * Implements hook_update_requirements().
    */
-  #[Hook('update_requirements', order: Order::First)]
+  #[Hook('update_requirements')]
   public function phpUpdateequirements(): array {
     return $this->phpRequirements(RequirementSeverity::Warning);
   }
