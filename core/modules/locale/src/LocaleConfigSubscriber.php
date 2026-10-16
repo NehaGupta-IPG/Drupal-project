@@ -143,9 +143,9 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
    *   override but still in the active configuration.
    * @param array $original_config
    *   (Optional) The configuration's values before this save, keyed the same
-   *   way as $config. When given, a leaf value unchanged from $original_config
-   *   is never fed back into locale storage, since it was not actually
-   *   (re)authored in $langcode by this save.
+   *   way as $config. When given, a translatable value unchanged from
+   *   $original_config is never written to locale storage, since it was not
+   *   actually (re)authored in $langcode by this save.
    */
   protected function processTranslatableData($name, array $config, array $translatable, $langcode, array $reference_config = [], array $original_config = []) {
     foreach ($translatable as $key => $item) {
@@ -156,8 +156,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
         continue;
       }
       // A value unchanged from before this save was not (re)authored in
-      // $langcode now, so there is nothing to feed back. See the @param
-      // documentation above for why this matters.
+      // $langcode now, so nothing should be written to locale storage.
       if (array_key_exists($key, $original_config) && $original_config[$key] === $config[$key]) {
         continue;
       }
