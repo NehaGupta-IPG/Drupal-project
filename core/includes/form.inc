@@ -110,7 +110,7 @@ function form_select_options($element, $choices = NULL): array {
  *   An array of indexes that match the given $key. Array will be
  *   empty if no elements were found. FALSE if optgroups were found.
  *
- * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0.
+ * @deprecated in drupal:11.6.0 and is removed from drupal:13.0.0.
  *    There is no replacement.
  *
  * @see https://www.drupal.org/node/3412600
