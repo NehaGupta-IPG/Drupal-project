@@ -102,8 +102,15 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *   A client connection object.
    */
   public static function openWithParameters(ConnectionParametersInterface $connectionParameters): SqliteConnection {
+    // Defaults for the options parameter.
+    $pdo_options = $connectionParameters->pdo + [
+      \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+      // Convert numeric values to strings when fetching.
+      \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
+    ];
+
     try {
-      $sqlite = new SqliteConnection('sqlite:' . $connectionParameters->database, '', '', $connectionParameters->pdo);
+      $sqlite = new SqliteConnection('sqlite:' . $connectionParameters->database, '', '', $pdo_options);
     }
     catch (\PDOException $e) {
       if ($e->getCode() == static::DATABASE_NOT_FOUND) {
@@ -138,10 +145,14 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // Create a user-space case-insensitive collation with UTF-8 support.
     $sqlite->createCollation('NOCASE_UTF8', Unicode::strcasecmp(...));
 
-    // Execute sqlite init_commands.
-    if (!empty($connectionParameters->init_commands)) {
-      $sqlite->exec(implode('; ', $connectionParameters->init_commands));
-    }
+    // Execute init_commands.
+    // Enable the Write-Ahead Logging (WAL) for SQLite if not set. See
+    // https://www.drupal.org/node/2348137 and
+    // https://www.sqlite.org/wal.html.
+    $init_commands = $connectionParameters->init_commands + [
+      'wal' => "PRAGMA journal_mode=WAL",
+    ];
+    $sqlite->exec(implode('; ', $init_commands));
 
     return $sqlite;
   }
