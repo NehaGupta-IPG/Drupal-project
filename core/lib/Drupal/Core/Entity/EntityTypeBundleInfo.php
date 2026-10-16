@@ -96,26 +96,33 @@ class EntityTypeBundleInfo implements EntityTypeBundleInfoInterface {
    * {@inheritdoc}
    */
   public function getAllBundleInfo() {
-    if (empty($this->bundleInfo)) {
-      $langcode = $this->languageManager->getCurrentLanguage()->getId();
-      if ($cache = $this->cacheGet("entity_bundle_info:$langcode")) {
-        $this->bundleInfo = $cache->data;
+    // Bundle labels may be t() instances or bundle config strings.
+    // So this must respect both cache contexts.
+    // @todo Find a way to have real cache contexts in bundle info.
+    $interfaceLangcode = $this->languageManager->getCurrentLanguage()->getId();
+    $configLangcode = $this->languageManager->getConfigOverrideLanguage()->getId();
+
+    $bundleInfo =& $this->bundleInfo[$interfaceLangcode][$configLangcode];
+    if (!isset($bundleInfo)) {
+      $cid = "entity_bundle_info:$interfaceLangcode:$configLangcode";
+      if ($cache = $this->cacheGet($cid)) {
+        $bundleInfo = $cache->data;
       }
       else {
-        $this->bundleInfo = $this->moduleHandler->invokeAll('entity_bundle_info');
+        $bundleInfo = $this->moduleHandler->invokeAll('entity_bundle_info');
         foreach ($this->entityTypeManager->getDefinitions() as $type => $entity_type) {
           // First look for entity types that act as bundles for others, load
           // them and add them as bundles.
           if ($bundle_entity_type = $entity_type->getBundleEntityType()) {
             foreach ($this->entityTypeManager->getStorage($bundle_entity_type)->loadMultiple() as $entity) {
-              $this->bundleInfo[$type][$entity->id()]['label'] = $entity->label();
+              $bundleInfo[$type][$entity->id()]['label'] = $entity->label();
             }
           }
           // If entity type bundles are not supported and
           // hook_entity_bundle_info() has not already set up bundle
           // information, use the entity type name and label.
-          elseif (!isset($this->bundleInfo[$type])) {
-            $this->bundleInfo[$type][$type]['label'] = $entity_type->getLabel();
+          elseif (!isset($bundleInfo[$type])) {
+            $bundleInfo[$type][$type]['label'] = $entity_type->getLabel();
           }
 
           // Add bundle information provided by entity type plugin discovery
@@ -125,32 +132,32 @@ class EntityTypeBundleInfo implements EntityTypeBundleInfoInterface {
             continue;
           }
           foreach ($attribute_entity_type_bundle_info as $bundle => $info) {
-            if ($bundle_entity_type && !isset($this->bundleInfo[$type][$bundle])) {
+            if ($bundle_entity_type && !isset($bundleInfo[$type][$bundle])) {
               // If the entity type has a bundle entity type, do not allow
               // bundle definitions to be created by attributes.
               continue;
             }
-            $this->bundleInfo[$type][$bundle]['class'] = $info['class'];
+            $bundleInfo[$type][$bundle]['class'] = $info['class'];
             $additional_bundle_info = array_filter([
               'label' => $info['label'],
               'translatable' => $info['translatable'],
             ], fn($property) => $property !== NULL);
-            $this->bundleInfo[$type][$bundle] = $additional_bundle_info + $this->bundleInfo[$type][$bundle];
+            $bundleInfo[$type][$bundle] = $additional_bundle_info + $bundleInfo[$type][$bundle];
 
             // Make sure the bundle has a label.
-            $this->bundleInfo[$type][$bundle]['label'] ??= $bundle;
+            $bundleInfo[$type][$bundle]['label'] ??= $bundle;
           }
         }
 
-        $this->moduleHandler->alter('entity_bundle_info', $this->bundleInfo);
-        $this->cacheSet("entity_bundle_info:$langcode", $this->bundleInfo, Cache::PERMANENT, [
+        $this->moduleHandler->alter('entity_bundle_info', $bundleInfo);
+        $this->cacheSet($cid, $bundleInfo, Cache::PERMANENT, [
           'entity_types',
           'entity_bundles',
         ]);
       }
     }
 
-    return $this->bundleInfo;
+    return $bundleInfo;
   }
 
   /**
