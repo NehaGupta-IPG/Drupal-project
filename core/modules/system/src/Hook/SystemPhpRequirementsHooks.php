@@ -28,7 +28,6 @@ class SystemPhpRequirementsHooks {
     $phpversion = phpversion();
     $phpversion_label = $this->t('@phpversion (<a href=":url">more information</a>)', [
       '@phpversion' => $phpversion,
-
       ':url' => (new Url('system.php'))->toString(),
     ]);
     $requirements['php'] = [

@@ -44,7 +44,7 @@ class SystemRequirementsHooks {
       return $requirements;
     }
 
-    return $this->checkRequirements('update', $requirements);
+    return $this->checkRequirements('update');
   }
 
   /**
@@ -58,7 +58,7 @@ class SystemRequirementsHooks {
       return $requirements;
     }
 
-    return $this->checkRequirements('runtime', $requirements);
+    return $this->checkRequirements('runtime');
   }
 
   /**
@@ -67,8 +67,11 @@ class SystemRequirementsHooks {
    * If the minimum version is not met then further requirements should not be
    * checked, return early.
    *
+   * @param string $phpversion
+   *   The php version to check.
+   *
    * @return bool
-   *   Whether further php extension checks are safe.
+   *   Whether further php extension checks are unsafe.
    */
   protected function skipPhpExtensionChecks(string $phpversion): bool {
     return version_compare($phpversion, \Drupal::MINIMUM_PHP) < 0;
@@ -80,18 +83,17 @@ class SystemRequirementsHooks {
    * @param string $phase
    *   The phase in which requirements are checked, as documented in
    *   hook_runtime_requirements() and hook_update_requirements().
-   * @param array[] $requirements
-   *   The requirements array as specified in hook_*_requirements().
    *
    * @return array
    *   An associative array of requirements, as documented in
    *   hook_runtime_requirements() and hook_update_requirements().
    */
-  protected function checkRequirements(string $phase, array $requirements): array {
+  protected function checkRequirements(string $phase): array {
     /** @var \Drupal\Core\Extension\ModuleExtensionList $module_extension_list */
     $module_extension_list = \Drupal::service('extension.list.module');
     /** @var \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list */
     $theme_extension_list = \Drupal::service('extension.list.theme');
+    $requirements = [];
 
     // Report Drupal version
     if ($phase == 'runtime') {
