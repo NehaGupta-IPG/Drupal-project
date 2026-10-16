@@ -184,6 +184,13 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
   private ?array $environmentTables = NULL;
 
   /**
+   * The names of the modules that ::bootKernel() enabled for the test method.
+   *
+   * @var list<string>
+   */
+  private array $bootedModules = [];
+
+  /**
    * The key value factory of the container that booted the test method.
    *
    * It is not refreshed when the container is rebuilt during the test method.
@@ -516,6 +523,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
       'module' => array_fill_keys($modules, 0),
       'theme' => $themes,
     ]);
+    $this->bootedModules = array_values(array_unique($modules));
 
     $settings = Settings::getAll();
     $settings['php_storage']['default'] = [
@@ -556,8 +564,10 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $kernel->resetContainer();
 
     if ($record === NULL) {
+      $extension = $config_storage->read('core.extension');
       try {
         $this->setUpEnvironment();
+        $this->checkModuleListWasNotChanged($extension);
       }
       catch (\Throwable $e) {
         // The initial state is half built. Record that, so the test methods
@@ -1239,6 +1249,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     try {
       $this->checkNoSharedTableWasDropped();
       $this->checkNoTableWasLeftBehind();
+      $this->checkNoModuleWasEnabledOrDisabled();
     }
     catch (\Throwable $e) {
       $this->invalidateDatabaseState($e->getMessage());
@@ -1267,6 +1278,47 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $added_tables = array_diff($this->getSharedStateTables(), $this->environmentTables ?? [], static::INFRASTRUCTURE_TABLES);
     if ($added_tables !== []) {
       throw new \RuntimeException(sprintf('%s left %s behind. A test method that adds to the database schema must remove what it added, in ::resetEnvironment().', static::class, implode(', ', $added_tables)));
+    }
+  }
+
+  /**
+   * Fails when a test method left the module list changed.
+   *
+   * @see \Drupal\TestTools\Attribute\ShareEnvironment
+   */
+  protected function checkNoModuleWasEnabledOrDisabled(): void {
+    $extension = $this->container->get('config.storage')->read('core.extension');
+    $current = array_keys($extension['module'] ?? []);
+    $booted = $this->bootedModules;
+    sort($current);
+    sort($booted);
+    if ($current !== $booted) {
+      $changes = [];
+      if ($enabled = array_diff($current, $booted)) {
+        $changes[] = 'enabled ' . implode(', ', $enabled);
+      }
+      if ($disabled = array_diff($booted, $current)) {
+        $changes[] = 'disabled ' . implode(', ', $disabled);
+      }
+      throw new \LogicException(sprintf('%s %s. A test class that shares its environment must not change the module list during a test method, because the changes the modules make to the database are shared with the test methods that follow. Declare the modules in static::$modules instead, move the test method to a separate test class, or do not share the environment.', static::class, implode(' and ', $changes)));
+    }
+  }
+
+  /**
+   * Fails when ::setUpEnvironment() changed the module list.
+   *
+   * @param array $extension
+   *   The core.extension configuration from before ::setUpEnvironment() ran.
+   *
+   * @see \Drupal\TestTools\Attribute\ShareEnvironment
+   */
+  protected function checkModuleListWasNotChanged(array $extension): void {
+    // ::setUpEnvironment() may have rebuilt the container, so read through the
+    // current one.
+    $current = $this->container->get('config.storage')->read('core.extension');
+    unset($extension['theme'], $current['theme']);
+    if ($current !== $extension) {
+      throw new \LogicException(sprintf('%s::setUpEnvironment() changed the module list or the install profile. ::bootKernel() writes them again from static::$modules for every test method, so the test methods that follow do not see the change. Declare the modules in static::$modules instead, and set the install profile in ::setUp().', static::class));
     }
   }
 

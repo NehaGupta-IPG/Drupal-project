@@ -119,6 +119,13 @@ class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
     parent::resetEnvironment();
 
     $this->container->get('state')->delete(self::MENU_UI_VALIDATABLE_STATE);
+    // The test class shares its environment, so the module list must be left
+    // as it was.
+    $module_handler = $this->container->get('module_handler');
+    $modules = array_filter(['menu_ui', 'config_schema_test'], $module_handler->moduleExists(...));
+    if ($modules) {
+      $this->disableModules($modules);
+    }
   }
 
 }
