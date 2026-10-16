@@ -5,5 +5,5 @@
 
 /** @todo Move to the admin theme before Workspaces is marked stable. */
 tr.active-workspace {
-  background-color: #ebeae4;
+  background-color: var(--workspaces-active-background, light-dark(#f5f5f5, #252527));
 }

@@ -149,6 +149,9 @@ class WorkspaceListBuilder extends EntityListBuilder {
 
     $active_workspace = $this->workspaceManager->getActiveWorkspace();
     if ($active_workspace && $entity->id() === $active_workspace->id()) {
+      $row['data']['label']['data']['#title'] = $this->t('@workspace (active)', ['@workspace' => $entity->label()]);
+      $row['data']['label']['data']['#prefix'] .= '<strong>';
+      $row['data']['label']['data']['#suffix'] = '</strong>';
       $row['class'] = ['active-workspace', 'active-workspace--not-default'];
     }
     return $row;
@@ -238,7 +241,11 @@ class WorkspaceListBuilder extends EntityListBuilder {
     }
     else {
       // Add a row for switching to Live.
-      $has_active_workspace = $this->workspaceManager->hasActiveWorkspace();
+      $active_workspace = $this->workspaceManager->getActiveWorkspace();
+      $has_active_workspace = (bool) $active_workspace;
+      $build['table']['#caption'] = $this->t('Current workspace: @workspace', [
+        '@workspace' => $active_workspace ? $active_workspace->label() : $this->t('Live'),
+      ]);
       $row_live = [
         'data' => [
           'label' => [
@@ -264,6 +271,9 @@ class WorkspaceListBuilder extends EntityListBuilder {
       ];
 
       if (!$has_active_workspace) {
+        $row_live['data']['label']['data']['#markup'] = $this->t('Live (active)');
+        $row_live['data']['label']['data']['#prefix'] = '<strong>';
+        $row_live['data']['label']['data']['#suffix'] = '</strong>';
         $row_live['class'] = ['active-workspace', 'active-workspace--default'];
       }
       array_unshift($build['table']['#rows'], $row_live);
