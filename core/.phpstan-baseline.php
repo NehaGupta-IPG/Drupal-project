@@ -1028,6 +1028,30 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Component/Utility/Html.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Component\\\\Utility\\\\HtmlAttribute\\\\Attribute\\:\\:storage\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Component/Utility/HtmlAttribute/Attribute.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$value of method Drupal\\\\Component\\\\Utility\\\\HtmlAttribute\\\\Attribute\\:\\:offsetSet\\(\\) expects Drupal\\\\Component\\\\Utility\\\\HtmlAttribute\\\\AttributeValueBase, array given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/lib/Drupal/Component/Utility/HtmlAttribute/Attribute.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$value of method Drupal\\\\Component\\\\Utility\\\\HtmlAttribute\\\\Attribute\\:\\:offsetSet\\(\\) expects Drupal\\\\Component\\\\Utility\\\\HtmlAttribute\\\\AttributeValueBase, array\\|string given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Component/Utility/HtmlAttribute/Attribute.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Component\\\\Utility\\\\HtmlAttribute\\\\AttributeValueBase\\:\\:value\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Component/Utility/HtmlAttribute/AttributeValueBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Component\\\\Utility\\\\HtmlSerializerRules\\:\\:escape\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -2600,6 +2624,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/Checkpoint/CheckpointStorage.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Command\\\\ConfigExportCommand\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Command/ConfigExportCommand.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Cannot unset property Drupal\\\\Core\\\\Config\\\\Config\\:\\:\\$overriddenData because it might have hooks in a subclass\\.$#',
 	'identifier' => 'unset.possiblyHookedProperty',
 	'count' => 1,
@@ -3168,12 +3198,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/ImportStorageTransformer.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Command\\\\ConfigExportCommand\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/Command/ConfigExportCommand.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Importer\\\\ConfigImporterBatch\\:\\:finish\\(\\) has no return type specified\\.$#',
@@ -9828,30 +9852,6 @@ $ignoreErrors[] = [
 	'identifier' => 'drupal.entityStoragePropertyAssignment',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/TempStore/SharedTempStore.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Template\\\\Attribute\\:\\:storage\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Template/Attribute.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$value of method Drupal\\\\Core\\\\Template\\\\Attribute\\:\\:offsetSet\\(\\) expects Drupal\\\\Core\\\\Template\\\\AttributeValueBase, array given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/Template/Attribute.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$value of method Drupal\\\\Core\\\\Template\\\\Attribute\\:\\:offsetSet\\(\\) expects Drupal\\\\Core\\\\Template\\\\AttributeValueBase, array\\|string given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Template/Attribute.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Template\\\\AttributeValueBase\\:\\:value\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Template/AttributeValueBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$expr of class Drupal\\\\Core\\\\Template\\\\TwigSimpleCheckToStringNode constructor expects Twig\\\\Node\\\\Expression\\\\AbstractExpression, Twig\\\\Node\\\\Node given\\.$#',
@@ -34792,7 +34792,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$array of function array_key_first expects array, Drupal\\\\Core\\\\Template\\\\AttributeValueBase\\|null given\\.$#',
+	'message' => '#^Parameter \\#1 \\$array of function array_key_first expects array, Drupal\\\\Component\\\\Utility\\\\HtmlAttribute\\\\AttributeValueBase\\|null given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/themes/default_admin/src/Hook/PreprocessHooks.php',
