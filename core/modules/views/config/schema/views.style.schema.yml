@@ -69,7 +69,7 @@ views.style.grid_responsive:
       label: 'Custom grid wrapper classes'
     grid_cell_class_custom:
       type: string
-      label: 'Custom grid cell class'
+      label: 'Custom grid cell classes'
 
 views.style.table:
   type: views_style
