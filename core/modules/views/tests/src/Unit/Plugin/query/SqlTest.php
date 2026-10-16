@@ -13,6 +13,7 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\query\DateSqlInterface;
 use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\ResultRow;
+use Drupal\views\Entity\View;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\views\ViewsData;
@@ -36,6 +37,9 @@ class SqlTest extends UnitTestCase {
    */
   public function testGetCacheTags(): void {
     $view = $this->prophesize('Drupal\views\ViewExecutable')->reveal();
+    $view->storage = $this->prophesize(View::class)->reveal();
+    $views_data = $this->prophesize(ViewsData::class);
+    $this->setupViewsData($views_data->reveal());
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     $date_sql = $this->prophesize(DateSqlInterface::class);
     $messenger = $this->prophesize(MessengerInterface::class);
@@ -86,6 +90,9 @@ class SqlTest extends UnitTestCase {
    */
   public function testGetCacheMaxAge(): void {
     $view = $this->prophesize('Drupal\views\ViewExecutable')->reveal();
+    $view->storage = $this->prophesize(View::class)->reveal();
+    $views_data = $this->prophesize(ViewsData::class);
+    $this->setupViewsData($views_data->reveal());
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     $date_sql = $this->prophesize(DateSqlInterface::class);
     $messenger = $this->prophesize(MessengerInterface::class);

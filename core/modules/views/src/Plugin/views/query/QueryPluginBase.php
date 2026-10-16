@@ -353,7 +353,14 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
    * {@inheritdoc}
    */
   public function getCacheMaxAge() {
-    return Cache::PERMANENT;
+    $max_age = Cache::PERMANENT;
+    // Bubble the max age from views data if available.
+    foreach ($this->_getViewsDataPerTable() as $views_data) {
+      if (isset($views_data['table']['base']['cache_max_age'])) {
+        $max_age = Cache::mergeMaxAges($max_age, $views_data['table']['base']['cache_max_age']);
+      }
+    }
+    return $max_age;
   }
 
   /**
@@ -366,6 +373,12 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
       $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
       $contexts = $entity_type->getListCacheContexts();
     }
+    // Bubble the contexts from views data if available.
+    foreach ($this->_getViewsDataPerTable() as $views_data) {
+      if (isset($views_data['table']['base']['cache_contexts'])) {
+        $contexts = Cache::mergeContexts($contexts, $views_data['table']['base']['cache_contexts']);
+      }
+    }
     return $contexts;
   }
 
@@ -373,7 +386,30 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
    * {@inheritdoc}
    */
   public function getCacheTags() {
-    return [];
+    $tags = [];
+    // Bubble the tags from views data if available.
+    foreach ($this->_getViewsDataPerTable() as $views_data) {
+      if (isset($views_data['table']['base']['cache_tags'])) {
+        $tags = Cache::mergeTags($tags, $views_data['table']['base']['cache_tags']);
+      }
+    }
+    return $tags;
+  }
+
+  /**
+   * Gets the views data arrays for each table involved in the query.
+   *
+   * @return array
+   *   The views data array of each table used in the query.
+   */
+  protected function _getViewsDataPerTable() {
+    $tables = [$base_table = $this->view->storage->get('base_table')];
+    foreach ((array) $this->view->relationship as $relationship) {
+      $tables[] = $relationship->definition['base'];
+    }
+    foreach (array_unique($tables) as $table) {
+      yield Views::viewsData()->get($table);
+    }
   }
 
   /**

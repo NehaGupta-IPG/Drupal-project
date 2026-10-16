@@ -1720,7 +1720,7 @@ class Sql extends QueryPluginBase {
    * {@inheritdoc}
    */
   public function getCacheTags() {
-    $tags = [];
+    $tags = parent::getCacheTags();
     // Add cache tags for each row, if there is an entity associated with it.
     if (!$this->hasAggregate) {
       foreach ($this->getAllEntities() as $entity) {
