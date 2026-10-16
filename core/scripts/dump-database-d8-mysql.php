@@ -6,9 +6,10 @@
  * A command line application to dump a database to a generation script.
  */
 
-use Drupal\Core\Command\DbDumpApplication;
+use Drupal\Core\Command\DbDumpCommand;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
+use Symfony\Component\Console\Application;
 use Symfony\Component\HttpFoundation\Request;
 
 if (PHP_SAPI !== 'cli') {
@@ -25,5 +26,9 @@ return static function () {
   DrupalKernel::createFromRequest($request, $autoloader, 'prod')->boot();
 
   // Run the database dump command.
-  return new DbDumpApplication();
+  (new Application())
+    ->addCommand(new DbDumpCommand())
+    ->getApplication()
+    ->setDefaultCommand('dump-database-d8-mysql', TRUE)
+    ->run();
 };
