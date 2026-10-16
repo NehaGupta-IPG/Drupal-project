@@ -84,7 +84,7 @@ class NodeStorageLoadFieldDataTest extends KernelTestBase {
 
     // Create a node in a non-default language. When the configurable language
     // is deleted, the row for the node in the revision table will be set to
-    // 'und'. Confirm that data for fields on a node in the state still populate
+    // 'und'. Confirm that data for fields on a node in that state still populate
     // correctly on entity load.
     // @see NodeEntityHooks::configurableLanguageDelete()
     // @see NodeStorage::clearRevisionsLanguage()
@@ -112,7 +112,7 @@ class NodeStorageLoadFieldDataTest extends KernelTestBase {
       $this->assertSame($fieldValue, array_column($storedValues[$fieldName], 'value'));
     }
     $esLanguage->delete();
-    $langcodes = Database::getConnection()->select($storage->getRevisionTable(), 'node_revision')
+    $langcodes = \Drupal::database()->select($storage->getRevisionTable(), 'node_revision')
       ->condition('nid', $esId)
       ->fields('node_revision', ['langcode'])
       ->execute()

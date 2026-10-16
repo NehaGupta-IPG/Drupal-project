@@ -155,7 +155,7 @@ class NodeEntityHooks {
   public function configurableLanguageDelete(ConfigurableLanguageInterface $language): void {
     // On nodes with this language, unset the language unless it is the site
     // default language.
-    if ($language->getId() !== $this->languageManager->getDefaultLanguage()->getId()) {
+    if (!$language->isDefault()) {
       $this->entityTypeManager->getStorage('node')->clearRevisionsLanguage($language);
     }
   }
