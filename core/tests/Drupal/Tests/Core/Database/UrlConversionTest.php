@@ -94,13 +94,8 @@ class UrlConversionTest extends UnitTestCase {
           'prefix' => '',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
-          'init_commands' => [
-            'wal' => 'PRAGMA journal_mode=WAL',
-          ],
-          'pdo' => [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
-          ],
+          'init_commands' => [],
+          'pdo' => [],
         ],
         [
           'driver' => 'sqlite',
@@ -109,13 +104,8 @@ class UrlConversionTest extends UnitTestCase {
           'prefix' => '',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
-          'init_commands' => [
-            'wal' => 'PRAGMA journal_mode=WAL',
-          ],
-          'pdo' => [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
-          ],
+          'init_commands' => [],
+          'pdo' => [],
         ],
         FALSE,
       ],
@@ -152,13 +142,8 @@ class UrlConversionTest extends UnitTestCase {
           'prefix' => 'foo',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
-          'init_commands' => [
-            'wal' => 'PRAGMA journal_mode=WAL',
-          ],
-          'pdo' => [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
-          ],
+          'init_commands' => [],
+          'pdo' => [],
         ],
         [
           'driver' => 'sqlite',
@@ -167,13 +152,8 @@ class UrlConversionTest extends UnitTestCase {
           'prefix' => 'foo',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
-          'init_commands' => [
-            'wal' => 'PRAGMA journal_mode=WAL',
-          ],
-          'pdo' => [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
-          ],
+          'init_commands' => [],
+          'pdo' => [],
         ],
         FALSE,
       ],
@@ -186,13 +166,8 @@ class UrlConversionTest extends UnitTestCase {
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
           'prefix' => '',
-          'init_commands' => [
-            'wal' => 'PRAGMA journal_mode=WAL',
-          ],
-          'pdo' => [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
-          ],
+          'init_commands' => [],
+          'pdo' => [],
         ],
         [
           'driver' => 'sqlite',
@@ -201,13 +176,8 @@ class UrlConversionTest extends UnitTestCase {
           'prefix' => '',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
-          'init_commands' => [
-            'wal' => 'PRAGMA journal_mode=WAL',
-          ],
-          'pdo' => [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
-          ],
+          'init_commands' => [],
+          'pdo' => [],
         ],
         FALSE,
       ],
@@ -451,13 +421,8 @@ class UrlConversionTest extends UnitTestCase {
           'prefix' => '',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
-          'init_commands' => [
-            'wal' => 'PRAGMA journal_mode=WAL',
-          ],
-          'pdo' => [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
-          ],
+          'init_commands' => [],
+          'pdo' => [],
         ],
         [
           'driver' => 'sqlite',
@@ -466,18 +431,13 @@ class UrlConversionTest extends UnitTestCase {
           'prefix' => '',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
-          'init_commands' => [
-            'wal' => 'PRAGMA journal_mode=WAL',
-          ],
-          'pdo' => [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
-          ],
+          'init_commands' => [],
+          'pdo' => [],
         ],
         FALSE,
       ],
       'SQLite, relative to root, with prefix, with the module name sqlite, with extra parameter' => [
-        'sqlite://localhost/test_database?module=sqlite&tree=palm#baz',
+        'sqlite://localhost/test_database?module=sqlite&tree=palm&pdo[3]=2#baz',
         [
           'driver' => 'sqlite',
           'module' => 'sqlite',
@@ -485,12 +445,9 @@ class UrlConversionTest extends UnitTestCase {
           'prefix' => 'baz',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
-          'init_commands' => [
-            'wal' => 'PRAGMA journal_mode=WAL',
-          ],
+          'init_commands' => [],
           'pdo' => [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
           ],
           'tree' => 'palm',
         ],
@@ -501,12 +458,9 @@ class UrlConversionTest extends UnitTestCase {
           'prefix' => 'baz',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
-          'init_commands' => [
-            'wal' => 'PRAGMA journal_mode=WAL',
-          ],
+          'init_commands' => [],
           'pdo' => [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
           ],
         ],
         FALSE,
