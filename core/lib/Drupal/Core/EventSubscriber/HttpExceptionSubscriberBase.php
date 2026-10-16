@@ -3,6 +3,7 @@
 namespace Drupal\Core\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -94,7 +95,15 @@ abstract class HttpExceptionSubscriberBase implements EventSubscriberInterface {
 
     $handled_formats = $this->getHandledFormats();
 
-    $format = $request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT, $request->getRequestFormat());
+    // This runs during exception handling and must not throw. A non-scalar
+    // _wrapper_format throws from InputBag::get(), so fall back to the request
+    // format.
+    try {
+      $format = $request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT, $request->getRequestFormat());
+    }
+    catch (BadRequestException) {
+      $format = $request->getRequestFormat();
+    }
 
     if ($exception instanceof HttpExceptionInterface && (empty($handled_formats) || in_array($format, $handled_formats))) {
       $method = 'on' . $exception->getStatusCode();

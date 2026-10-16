@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -61,6 +62,19 @@ class NegotiationMiddlewareTest extends UnitTestCase {
     $request->query->set('_format', 'bob');
 
     $this->assertSame('bob', $this->contentNegotiation->getContentType($request));
+  }
+
+  /**
+   * Tests that a non-scalar _format query parameter returns a 400.
+   *
+   * @legacy-covers ::getContentType
+   */
+  public function testNonScalarFormatViaQueryParameter(): void {
+    $request = new Request();
+    $request->query->set('_format', ['html']);
+
+    $this->expectException(BadRequestHttpException::class);
+    $this->contentNegotiation->getContentType($request);
   }
 
   /**

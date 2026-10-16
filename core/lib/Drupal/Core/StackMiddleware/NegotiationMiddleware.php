@@ -2,8 +2,10 @@
 
 namespace Drupal\Core\StackMiddleware;
 
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -86,7 +88,13 @@ class NegotiationMiddleware implements HttpKernelInterface {
     }
 
     if ($request->query->has('_format')) {
-      return $request->query->get('_format');
+      // A non-scalar _format throws from InputBag::get(); return a 400.
+      try {
+        return $request->query->get('_format');
+      }
+      catch (BadRequestException $e) {
+        throw new BadRequestHttpException($e->getMessage(), $e);
+      }
     }
 
     // No format was specified in the request.

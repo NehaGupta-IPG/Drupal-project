@@ -380,6 +380,16 @@ class RequestSanitizerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that a non-scalar destination returns a 400.
+   */
+  public function testNonScalarDestination(): void {
+    $request = $this->createRequestForTesting(['destination' => ['/node']]);
+
+    $this->expectException(BadRequestHttpException::class);
+    RequestSanitizer::sanitize($request, []);
+  }
+
+  /**
    * Creates a request and sets PHP globals for testing.
    *
    * @param array $query
