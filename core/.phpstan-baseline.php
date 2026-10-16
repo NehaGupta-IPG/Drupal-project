@@ -3170,6 +3170,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/ImportStorageTransformer.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Command\\\\ConfigExportCommand\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Command/ConfigExportCommand.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Importer\\\\ConfigImporterBatch\\:\\:finish\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3875,12 +3881,6 @@ $ignoreErrors[] = [
 	'message' => '#^Variable \\$container might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$container_definition might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
 ];
 $ignoreErrors[] = [
