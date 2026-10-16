@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Functional;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Core\Url;
@@ -12,6 +13,7 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
 use Drupal\user\OneTimeAuthentication;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -341,6 +343,9 @@ class UserPasswordResetTest extends BrowserTestBase {
 
   /**
    * Retrieves password reset email and extracts the login link.
+   *
+   * @return string
+   *   A password reset url string.
    */
   public function getResetURL(): string {
     // Assume the most recent email.
@@ -350,6 +355,66 @@ class UserPasswordResetTest extends BrowserTestBase {
     preg_match('#.+user/reset/.+#', $email['body'], $urls);
 
     return $urls[0];
+  }
+
+  /**
+   * Tests password reset functionality when user has set hook mail language.
+   */
+  #[DataProvider('languageHookTestProvider')]
+  public function testUserPasswordResetHookLanguage(
+    string $setPreferredLangcode,
+    string $activeLangcode,
+    string $prefix,
+    string $visitingUrl,
+    string $expectedResetUrl,
+    string $unexpectedResetUrl,
+  ): void {
+    // Enable the newly mail language alter hook.
+    \Drupal::state()->set('user_hooks_test_user_mail_language_alter', TRUE);
+    \Drupal::service('module_installer')->install(['user_hooks_test']);
+    Cache::invalidateTags(['rendered']);
+
+    // Set two new languages.
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    ConfigurableLanguage::createFromLangcode('zh-hant')->save();
+
+    // Set language prefixes.
+    $config = $this->config('language.negotiation');
+    $config->set('url.prefixes', ['en' => '', 'fr' => 'fr', 'zh-hant' => 'zh'])->save();
+    $this->rebuildContainer();
+
+    $this->account->preferred_langcode = $setPreferredLangcode;
+    $this->account->save();
+    $this->assertSame($setPreferredLangcode, $this->account->getPreferredLangcode(FALSE));
+
+    // Test password reset with language prefixes.
+    $this->drupalGet($visitingUrl);
+    $edit = ['name' => $this->account->getAccountName()];
+    $this->submitForm($edit, 'Submit');
+    $this->assertValidPasswordReset($edit['name']);
+
+    $resetURL = $this->getResetURL();
+    $this->assertStringContainsString($expectedResetUrl, $resetURL);
+    $this->assertStringNotContainsString($unexpectedResetUrl, $resetURL);
+  }
+
+  /**
+   * Data provider for testUserPasswordResetHookLanguage().
+   *
+   * @return array
+   *   data provider array for the PasswordResetHookLanguage test.
+   */
+  public static function languageHookTestProvider(): array {
+    return [
+      'Test language prefix set as en, visiting default with hook language set as fr' => [
+        'setPreferredLangcode' => 'en',
+        'activeLangcode' => 'en',
+        'prefix' => '',
+        'visitingUrl' => 'user/password',
+        'expectedResetUrl' => 'fr/user/reset',
+        'unexpectedResetUrl' => 'en/user/reset',
+      ],
+    ];
   }
 
   /**
