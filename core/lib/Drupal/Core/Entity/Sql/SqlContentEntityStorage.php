@@ -735,13 +735,19 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     try {
       $transaction = $this->database->startTransaction();
       parent::deleteRevision($revision_id);
+      $transaction->commitOrRelease();
 
       // Ignore replica server temporarily.
       \Drupal::service('database.replica_kill_switch')->trigger();
     }
-    catch (\Exception $e) {
+    catch (\Throwable $e) {
       if (isset($transaction)) {
-        $transaction->rollBack();
+        try {
+          $transaction->rollBack();
+        }
+        catch (TransactionOutOfOrderException $rollbackException) {
+          Error::logException(\Drupal::logger($this->entityTypeId), $rollbackException);
+        }
       }
       Error::logException(\Drupal::logger($this->entityTypeId), $e);
       throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
