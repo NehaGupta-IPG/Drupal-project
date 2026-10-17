@@ -4,11 +4,13 @@ namespace Drupal\options\Hook;
 
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Hook implementations for options.
  */
 class OptionsViewsHooks {
+  use StringTranslationTrait;
 
   /**
    * Implements hook_field_views_data().
@@ -24,6 +26,17 @@ class OptionsViewsHooks {
       foreach ($table_data as $field_name => $field_data) {
         if (isset($field_data['filter']) && $field_name != 'delta') {
           $data[$table_name][$field_name]['filter']['id'] = 'list_field';
+
+          // Add a numeric filter for numeric list fields.
+          if ($field->getType() != 'list_string') {
+            $data[$table_name][$field_name . '_numeric'] = [
+              'group' => $data[$table_name][$field_name]['group'],
+              'title' => $data[$table_name][$field_name]['title'] . ' ' . $this->t('(numeric)'),
+              'title short' => $data[$table_name][$field_name]['title short'] . ' ' . $this->t('(numeric)'),
+              'help' => $this->t('Numeric filter for %label field.', ['%label' => $data[$table_name][$field_name]['title']]) . ' ' . $data[$table_name][$field_name]['help'],
+              'filter' => ['id' => 'numeric'] + $data[$table_name][$field_name]['filter'],
+            ];
+          }
         }
         if (isset($field_data['argument']) && $field_name != 'delta') {
           if ($field->getType() == 'list_string') {
