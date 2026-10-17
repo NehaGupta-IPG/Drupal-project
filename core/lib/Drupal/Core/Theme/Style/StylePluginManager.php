@@ -11,10 +11,9 @@ use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
+use Drupal\Core\Plugin\JsonSchemaDefinitionValidatorTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
-use JsonSchema\Constraints\Constraint;
-use JsonSchema\Validator;
 
 /**
  * Provides the default style plugin manager.
@@ -116,16 +115,9 @@ use JsonSchema\Validator;
  */
 class StylePluginManager extends DefaultPluginManager implements StylePluginManagerInterface {
 
-  private const string SCHEMA_VALIDATE = 'core/assets/schemas/v1/style.schema.json';
+  use JsonSchemaDefinitionValidatorTrait;
 
-  /**
-   * The schema validator.
-   *
-   * This property will only be set if the validator library is available.
-   *
-   * @var \JsonSchema\Validator|null
-   */
-  private ?Validator $validator = NULL;
+  private const string SCHEMA_VALIDATE = 'core/assets/schemas/v1/style.schema.json';
 
   public function __construct(
     ModuleHandlerInterface $module_handler,
@@ -137,22 +129,6 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     $this->factory = new ContainerFactory($this);
     $this->alterInfo('style');
     $this->setCacheBackend($cacheBackend, 'style', ['style_plugin']);
-  }
-
-  /**
-   * Sets the validator service if available.
-   *
-   * @param \JsonSchema\Validator|null $validator
-   *   The JSON Validator class.
-   */
-  public function setValidator(?Validator $validator = NULL): void {
-    if (NULL !== $validator) {
-      $this->validator = $validator;
-      return;
-    }
-    if (class_exists(Validator::class)) {
-      $this->validator = new Validator();
-    }
   }
 
   /**
@@ -294,53 +270,17 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   }
 
   /**
-   * Validates a definition against the JSON schema specification.
-   *
-   * @param array $definition
-   *   The definition to check.
-   *
-   * @return bool
-   *   FALSE if the response failed validation, otherwise TRUE.
-   *
-   * @throws \Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException
-   *   Thrown when the definition is not valid.
+   * {@inheritdoc}
    */
-  protected function validateDefinition(array $definition): bool {
-    // If the validator isn't set, then the validation library is not installed.
-    if (!$this->validator) {
-      return TRUE;
-    }
+  protected function getDefinitionSchemaPath(): string {
+    return $this->appRoot . '/' . self::SCHEMA_VALIDATE;
+  }
 
-    $schema_ref = sprintf(
-      'file://%s/%s',
-      $this->appRoot,
-      self::SCHEMA_VALIDATE
-    );
-    $schema = (object) ['$ref' => $schema_ref];
-
-    $definition_object = Validator::arrayToObjectRecursive($definition);
-
-    $this->validator->validate($definition_object, $schema, Constraint::CHECK_MODE_COERCE_TYPES);
-
-    if ($this->validator->isValid()) {
-      return TRUE;
-    }
-
-    $message_parts = array_map(
-      static fn (array $error): string => sprintf("[%s] %s", $error['property'], $error['message']),
-      $this->validator->getErrors()
-    );
-    $message = implode(", ", $message_parts);
-
-    throw new StyleDefinitionErrorException(
-      sprintf(
-        '%s:%s Error in definition `%s`:%s',
-        $definition['provider'],
-        $definition['id'],
-        $definition_object->id,
-        $message
-      )
-    );
+  /**
+   * {@inheritdoc}
+   */
+  protected function createInvalidDefinitionException(string $message): \Exception {
+    return new StyleDefinitionErrorException($message);
   }
 
 }
