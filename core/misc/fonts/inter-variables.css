@@ -13,16 +13,28 @@
  * so that they occupy the same space as Inter. This minimizes layout shift
  * while Inter is loading (font-display: swap) or if it fails to load.
  *
- * Override values are derived from the ascent, descent, and line gap metrics
- * and the English letter frequency weighted average glyph width of each font,
- * compared against Inter at weight 400 (regular faces) and 700 (bold faces).
+ * Override values are calculated from each font's metrics:
+ * - size-adjust = Inter average glyph width / fallback average glyph width
+ * - ascent-override = Inter ascent / (Inter units per em * size-adjust)
+ * - descent-override = Inter descent / (Inter units per em * size-adjust)
+ * - line-gap-override = Inter line gap / (Inter units per em * size-adjust)
+ *
+ * Average glyph widths are weighted by English letter frequency. Each face is
+ * compared against the Inter weight it stands in for: regular against 400,
+ * medium against 550, and bold against 650 (Helvetica Neue) or 625 (Arial).
+ * Arial has no medium, so medium weights use Arial Bold, matching the
+ * browser's own weight matching for plain Arial.
+ *
+ * @see https://developer.chrome.com/blog/font-fallbacks
+ * @see https://www.w3.org/TR/css-fonts-5/#font-metrics-override-desc
+ * @see https://www.w3.org/TR/css-fonts-5/#size-adjust-desc
  */
 
 /* Helvetica Neue (macOS, iOS). */
 @font-face {
   font-family: "Inter Fallback Helvetica Neue";
   src: local("Helvetica Neue"), local("HelveticaNeue");
-  font-weight: 100 500;
+  font-weight: 100 450;
   font-style: normal;
   size-adjust: 105.99%;
   ascent-override: 91.4%;
@@ -32,12 +44,23 @@
 
 @font-face {
   font-family: "Inter Fallback Helvetica Neue";
+  src: local("Helvetica Neue Medium"), local("HelveticaNeue-Medium");
+  font-weight: 451 599;
+  font-style: normal;
+  size-adjust: 103.9%;
+  ascent-override: 93.24%;
+  descent-override: 23.22%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Inter Fallback Helvetica Neue";
   src: local("Helvetica Neue Bold"), local("HelveticaNeue-Bold");
   font-weight: 600 900;
   font-style: normal;
-  size-adjust: 101.97%;
-  ascent-override: 95%;
-  descent-override: 23.66%;
+  size-adjust: 101.53%;
+  ascent-override: 95.42%;
+  descent-override: 23.76%;
   line-gap-override: 0%;
 }
 
@@ -56,15 +79,17 @@
 @font-face {
   font-family: "Inter Fallback Arial";
   src: local("Arial Bold"), local("Arial-BoldMT");
-  font-weight: 600 900;
+  font-weight: 501 900;
   font-style: normal;
-  size-adjust: 101.96%;
-  ascent-override: 95.01%;
-  descent-override: 23.66%;
+  size-adjust: 101.29%;
+  ascent-override: 95.64%;
+  descent-override: 23.81%;
   line-gap-override: 0%;
 }
 
 :root {
+  --font-inter: "Helvetica Neue", Arial, sans-serif;
+  --font-inter: "Inter Fallback Helvetica Neue", "Inter Fallback Arial", sans-serif;
   --font-inter: inter, "Inter Fallback Helvetica Neue", "Inter Fallback Arial", sans-serif;
   /* Inter's x-height ratio, for use with font-size-adjust. Optional: the
      fallback faces above already match Inter's metrics. */
