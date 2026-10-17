@@ -50,6 +50,18 @@ class Error {
     // Add the line throwing the exception to the backtrace.
     array_unshift($backtrace, ['line' => $exception->getLine(), 'file' => $exception->getFile()]);
 
+    // If there are closures in the exception, modify the backtrace.
+    foreach ($backtrace as &$trace) {
+      if (isset($trace['args'])) {
+        foreach ($trace['args'] as $k => $arg) {
+          if ($arg instanceof \Closure) {
+            // Remove the closure to prevent problems later.
+            unset($trace['args'][$k]);
+          }
+        }
+      }
+    }
+
     // For PDOException errors, we try to return the initial caller,
     // skipping internal functions of the database layer.
     if ($exception instanceof \PDOException || $exception instanceof DatabaseExceptionWrapper) {

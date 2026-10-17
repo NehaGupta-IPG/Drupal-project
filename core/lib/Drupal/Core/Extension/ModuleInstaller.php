@@ -19,6 +19,7 @@ use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent;
 use Drupal\Core\Update\UpdateHookRegistry;
 use Drupal\Core\Utility\Error;
+use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -460,18 +461,24 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // @see https://www.drupal.org/node/2208429
     \Drupal::service('theme_handler')->refreshInfo();
 
-    // Modules may provide single directory components which are added to
-    // the core library definitions rather than the module itself, this
-    // requires the library discovery cache to be rebuilt.
-    \Drupal::service('library.discovery')->clear();
-
     $config_installer = \Drupal::service('config.installer');
     foreach ($module_list as $module) {
       // Create config entities a module has in the /install directory.
       $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::InstallEntities);
 
-      // Allow the module to perform install tasks.
-      $this->invoke($module, 'install', [$sync_status]);
+      try {
+        // Allow the module to perform install tasks.
+        $this->moduleHandler->invoke($module, 'install');
+      }
+      catch (\Exception $e) {
+        // In the rare case there is an exception, log this to watchdog
+        // instead of just dumping the error...
+        $logger = \Drupal::logger('system');
+        Error::logException($logger, $e, 'Exception thrown by %module during hook_install', ['%module' => $module], LogLevel::ERROR);
+        // ...and then throw it again so that the user knows and the
+        // exception is not compounded with other modules installing.
+        throw $e;
+      }
 
       // Record the fact that it was installed.
       \Drupal::logger('system')->info('%module module installed.', ['%module' => $module]);
@@ -891,7 +898,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected function invoke(string $module, string $hook, array $args = []): mixed {
     $function = $module . '_' . $hook;
-    return function_exists($function) ? $function(... $args) : NULL;
+    return function_exists($function) ? $function(...$args) : NULL;
   }
 
 }

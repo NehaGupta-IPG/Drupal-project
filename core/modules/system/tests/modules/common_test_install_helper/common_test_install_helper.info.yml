@@ -1,0 +1,5 @@
+name: 'Common Test Install Helper'
+description: 'Helper module for ExceptionTest::testInstallException().'
+package: Testing
+version: VERSION
+hidden: TRUE
