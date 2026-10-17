@@ -50,6 +50,31 @@ class CKEditor5StylesheetsTest extends KernelTestBase {
   }
 
   /**
+   * Tests that a theme on disk but not installed still provides stylesheets.
+   *
+   * The stylesheets come from the 'ckeditor5-stylesheets' key of the theme's
+   * .info.yml, which is read from disk. They must therefore be resolved from
+   * the list of available themes rather than the list of installed themes:
+   * \Drupal\Core\Extension\ExtensionList::getExtensionInfo() only knows about
+   * installed themes and throws an exception for a theme that merely exists on
+   * disk. Sites can name a default theme that is not installed, and so can
+   * tests that install modules without installing a theme.
+   */
+  public function testStylesheetsOfThemeThatIsNotInstalled(): void {
+    $theme = 'test_ckeditor_stylesheets_relative';
+    $this->config('system.theme')->set('default', $theme)->save();
+    $hooks_service = $this->container->get(Ckeditor5Hooks::class);
+    $class = new \ReflectionClass($hooks_service);
+    $theme_css_method = $class->getMethod('themeCss');
+
+    $this->assertSame(
+      ['/core/modules/system/tests/themes/test_ckeditor_stylesheets_relative/css/yokotsoko.css'],
+      $theme_css_method->invokeArgs($hooks_service, [$theme]),
+      'The stylesheets of a theme that is not installed are resolved.'
+    );
+  }
+
+  /**
    * Provides test cases for external stylesheets.
    *
    * @return array
