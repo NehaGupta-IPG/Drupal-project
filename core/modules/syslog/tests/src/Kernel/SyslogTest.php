@@ -34,8 +34,8 @@ class SyslogTest extends KernelTestBase {
     parent::setUp();
     $this->installConfig(['syslog']);
 
-    // With logger.factory injected in renderer, it is already instantiated with
-    // previous configuration so need to rebuild the container.
+    // The renderer is set a logger channel, so the logger factory is already
+    // instantiated with the previous configuration. Rebuild the container.
     $user = $this->getStubBuilder(AccountInterface::class)->getStub();
     $user->method('id')->willReturn(42);
     $this->container->set('current_user', $user);

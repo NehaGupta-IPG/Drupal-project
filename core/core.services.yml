@@ -606,6 +606,9 @@ services:
   logger.channel.image:
     parent: logger.channel_base
     arguments: ['image']
+  logger.channel.style:
+    parent: logger.channel_base
+    arguments: ['style']
   logger.channel.cron:
     parent: logger.channel_base
     arguments: ['cron']
@@ -1854,6 +1857,8 @@ services:
   twig.extension:
     class: Drupal\Core\Template\TwigExtension
     arguments: ['@renderer', '@url_generator', '@theme.manager', '@date.formatter', '@file_url_generator', '@plugin.manager.style']
+    calls:
+      - [setLogger, ['@logger.channel.style']]
     tags:
       - { name: twig.extension, priority: 100 }
   Drupal\Core\Template\ComponentsTwigExtension:
@@ -1949,7 +1954,9 @@ services:
   Drupal\Core\Render\RenderCacheInterface: '@render_cache'
   renderer:
     class: Drupal\Core\Render\Renderer
-    arguments: ['@callable_resolver', '@theme.manager', '@plugin.manager.element_info', '@render_placeholder_generator', '@render_cache', '@request_stack', '%renderer.config%', '@plugin.manager.style', '@logger.factory']
+    arguments: ['@callable_resolver', '@theme.manager', '@plugin.manager.element_info', '@render_placeholder_generator', '@render_cache', '@request_stack', '%renderer.config%', '@plugin.manager.style']
+    calls:
+      - [setLogger, ['@logger.channel.style']]
   Drupal\Core\Render\RendererInterface: '@renderer'
   early_rendering_controller_wrapper_subscriber:
     class: Drupal\Core\EventSubscriber\EarlyRenderingControllerWrapperSubscriber
@@ -2105,11 +2112,11 @@ services:
     class: Drupal\Core\Theme\Style\StylePluginManager
     calls:
       - [ setValidator, [ ] ]
+      - [setLogger, ['@logger.channel.style']]
     arguments:
       - '@module_handler'
       - '@theme_handler'
       - '@cache.discovery'
-      - '@logger.factory'
       - '%app.root%'
   Drupal\Core\Theme\Style\StylePluginManagerInterface: '@plugin.manager.style'
   Drupal\Core\Extension\ThemeSettingsProvider:

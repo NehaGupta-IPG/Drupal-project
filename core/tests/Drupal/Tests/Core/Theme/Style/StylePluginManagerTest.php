@@ -7,7 +7,7 @@ namespace Drupal\Tests\Core\Theme\Style;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
 use Drupal\Core\Theme\Style\StyleDefinition;
 use Drupal\Core\Theme\Style\StylePluginManager;
@@ -16,6 +16,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Psr\Log\LoggerInterface;
 
 /**
  * Test the style plugin manager.
@@ -44,9 +45,31 @@ class StylePluginManagerTest extends UnitTestCase {
       $moduleHandler,
       $themeHandler,
       $cacheBackend,
-      $this->createStub(LoggerChannelFactoryInterface::class),
       $this->root,
     );
+  }
+
+  /**
+   * Test addStyleToAttribute with an unknown style.
+   */
+  public function testAddStyleToAttributeUnknownStyle(): void {
+    $logger = $this->createMock(LoggerInterface::class);
+    $logger->expects($this->once())
+      ->method('error')
+      ->with($this->stringContains('The "unknown" plugin does not exist.'));
+    $this->stylePluginManager->setLogger($logger);
+
+    $attribute = new Attribute();
+    $this->assertFalse($this->stylePluginManager->addStyleToAttribute($attribute, 'unknown', 'option'));
+    $this->assertEquals(new Attribute(), $attribute);
+  }
+
+  /**
+   * Test addStyleToAttribute with an unknown style and no logger.
+   */
+  public function testAddStyleToAttributeUnknownStyleWithoutLogger(): void {
+    $attribute = new Attribute();
+    $this->assertFalse($this->stylePluginManager->addStyleToAttribute($attribute, 'unknown', 'option'));
   }
 
   /**
@@ -136,7 +159,6 @@ class StylePluginManagerTest extends UnitTestCase {
       $moduleHandler,
       $this->createStub(ThemeHandlerInterface::class),
       $this->createStub(CacheBackendInterface::class),
-      $this->createStub(LoggerChannelFactoryInterface::class),
       $this->root,
     );
     $stylePluginManager->setStyles([

@@ -12,7 +12,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormHelper;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Render\Element\RenderCallbackInterface;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
@@ -20,13 +19,16 @@ use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Core\Utility\FiberResumeType;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Turns a render array into an HTML string.
  */
-class Renderer implements RendererInterface {
+class Renderer implements RendererInterface, LoggerAwareInterface {
   use DoTrustedCallbackTrait;
+  use LoggerAwareTrait;
 
   /**
    * The renderer configuration array.
@@ -41,13 +43,6 @@ class Renderer implements RendererInterface {
    * @var \Drupal\Core\Theme\Style\StylePluginManagerInterface
    */
   protected $stylePluginManager;
-
-  /**
-   * The logger channel factory.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
-   */
-  protected $loggerFactory;
 
   /**
    * Whether we're currently in a ::renderRoot() call.
@@ -92,8 +87,6 @@ class Renderer implements RendererInterface {
    *   The renderer configuration array.
    * @param \Drupal\Core\Theme\Style\StylePluginManagerInterface|null $stylePluginManager
    *   The style plugin manager.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface|null $loggerFactory
-   *   The logger factory.
    */
   public function __construct(
     protected CallableResolver $callableResolver,
@@ -104,7 +97,6 @@ class Renderer implements RendererInterface {
     protected RequestStack $requestStack,
     array $renderer_config,
     ?StylePluginManagerInterface $stylePluginManager = NULL,
-    ?LoggerChannelFactoryInterface $loggerFactory = NULL,
   ) {
     if (!isset($renderer_config['debug'])) {
       $renderer_config['debug'] = FALSE;
@@ -116,12 +108,6 @@ class Renderer implements RendererInterface {
       $stylePluginManager = \Drupal::service(StylePluginManagerInterface::class);
     }
     $this->stylePluginManager = $stylePluginManager;
-
-    if (!isset($loggerFactory)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $loggerFactory argument is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/node/3631504', E_USER_DEPRECATED);
-      $loggerFactory = \Drupal::service(LoggerChannelFactoryInterface::class);
-    }
-    $this->loggerFactory = $loggerFactory;
 
     // Initialize the context collection if needed.
     if (!isset(static::$contextCollection)) {
@@ -462,10 +448,10 @@ class Renderer implements RendererInterface {
           $style->applyOrBubbleOnArray($styleOption, $elements);
         }
         catch (PluginNotFoundException $exception) {
-          $this->loggerFactory->get('renderer')->error($exception->getMessage());
+          $this->logger?->error($exception->getMessage());
         }
         catch (StyleDefinitionErrorException $exception) {
-          $this->loggerFactory->get('renderer')->error($exception->getMessage());
+          $this->logger?->error($exception->getMessage());
         }
       }
       // Avoid processing multiple times. Keep #styles so #pre_render callbacks

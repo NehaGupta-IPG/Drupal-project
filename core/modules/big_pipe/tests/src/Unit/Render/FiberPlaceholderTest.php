@@ -7,7 +7,6 @@ namespace Drupal\Tests\big_pipe\Unit\Render;
 use Drupal\big_pipe\Render\BigPipe;
 use Drupal\big_pipe\Render\BigPipeResponse;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\HtmlResponse;
@@ -66,7 +65,6 @@ class FiberPlaceholderTest extends UnitTestCase {
         ],
       ],
       $this->prophesize(StylePluginManagerInterface::class)->reveal(),
-      $this->prophesize(LoggerChannelFactoryInterface::class)->reveal(),
     );
 
     $session = $this->prophesize(SessionInterface::class);

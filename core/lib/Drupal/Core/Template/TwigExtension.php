@@ -19,6 +19,8 @@ use Drupal\Core\Theme\Style\StyleDefinitionInterface;
 use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Markup as TwigMarkup;
@@ -37,7 +39,9 @@ use Twig\Runtime\EscaperRuntime;
  *
  * @see \Drupal\Core\CoreServiceProvider
  */
-class TwigExtension extends AbstractExtension {
+class TwigExtension extends AbstractExtension implements LoggerAwareInterface {
+
+  use LoggerAwareTrait;
 
   /**
    * The URL generator.
@@ -154,10 +158,10 @@ class TwigExtension extends AbstractExtension {
       return $this->stylePluginManager->getDefinition($styleId);
     }
     catch (PluginNotFoundException $exception) {
-      \Drupal::logger('twig')->error($exception->getMessage());
+      $this->logger?->error($exception->getMessage());
     }
     catch (StyleDefinitionErrorException $exception) {
-      \Drupal::logger('twig')->error($exception->getMessage());
+      $this->logger?->error($exception->getMessage());
     }
     return NULL;
   }

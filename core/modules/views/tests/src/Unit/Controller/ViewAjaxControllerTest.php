@@ -6,7 +6,6 @@ namespace Drupal\Tests\views\Unit\Controller;
 
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Path\CurrentPathStack;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\PlaceholderGeneratorInterface;
@@ -159,7 +158,6 @@ class ViewAjaxControllerTest extends UnitTestCase {
         ],
       ],
       $this->createStub(StylePluginManagerInterface::class),
-      $this->createStub(LoggerChannelFactoryInterface::class),
     );
     $container = new ContainerBuilder();
     $container->set('renderer', $this->renderer);

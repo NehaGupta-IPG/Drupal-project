@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Render;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\Renderer;
 use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
 use Drupal\Core\Theme\Style\StyleDefinitionInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use Psr\Log\LoggerInterface;
 
 /**
  * Tests Drupal\Core\Render\Renderer.
@@ -142,20 +142,12 @@ class RendererStyleTest extends RendererTestBase {
       ->method('getDefinition')
       ->willThrowException($exception);
 
-    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger = $this->createMock(LoggerInterface::class);
     $logger->expects($this->once())
       ->method('error')
       ->with("Plugin ID 'my_style' was not found.");
 
-    $this->loggerFactory
-      ->method('get')
-      ->willReturnCallback(static function (string $string) use ($logger) {
-        switch ($string) {
-          case 'renderer':
-            return $logger;
-        }
-        return '';
-      });
+    $this->renderer->setLogger($logger);
 
     $element = [
       '#type' => 'container',
@@ -179,20 +171,12 @@ class RendererStyleTest extends RendererTestBase {
       ->method('getDefinition')
       ->willThrowException($exception);
 
-    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger = $this->createMock(LoggerInterface::class);
     $logger->expects($this->once())
       ->method('error')
       ->with('message');
 
-    $this->loggerFactory
-      ->method('get')
-      ->willReturnCallback(static function (string $string) use ($logger) {
-        switch ($string) {
-          case 'renderer':
-            return $logger;
-        }
-        return '';
-      });
+    $this->renderer->setLogger($logger);
 
     $element = [
       '#type' => 'container',

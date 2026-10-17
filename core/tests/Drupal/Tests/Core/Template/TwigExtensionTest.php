@@ -11,8 +11,6 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\GeneratedLink;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
-use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Render\RendererInterface;
@@ -33,7 +31,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\Stub;
 use Prophecy\Prophet;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Psr\Log\LoggerInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 use Twig\Loader\FilesystemLoader;
@@ -525,20 +523,11 @@ class TwigExtensionTest extends UnitTestCase {
       ->with('id_1')
       ->willThrowException($exception);
 
-    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger = $this->createMock(LoggerInterface::class);
     $logger->expects($this->once())
       ->method('error')
       ->with("Plugin ID 'id_1' was not found.");
-
-    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
-    $loggerFactory->expects($this->once())
-      ->method('get')
-      ->with('twig')
-      ->willReturn($logger);
-
-    $container = new ContainerBuilder();
-    $container->set('logger.factory', $loggerFactory);
-    \Drupal::setContainer($container);
+    $this->systemUnderTest->setLogger($logger);
 
     $this->assertNull($this->systemUnderTest->getStyle('id_1'));
   }
@@ -556,20 +545,11 @@ class TwigExtensionTest extends UnitTestCase {
       ->with('id_1')
       ->willThrowException($exception);
 
-    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger = $this->createMock(LoggerInterface::class);
     $logger->expects($this->once())
       ->method('error')
       ->with('message');
-
-    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
-    $loggerFactory->expects($this->once())
-      ->method('get')
-      ->with('twig')
-      ->willReturn($logger);
-
-    $container = new ContainerBuilder();
-    $container->set('logger.factory', $loggerFactory);
-    \Drupal::setContainer($container);
+    $this->systemUnderTest->setLogger($logger);
 
     $this->assertNull($this->systemUnderTest->getStyle('id_1'));
   }

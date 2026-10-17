@@ -7,7 +7,6 @@ namespace Drupal\Tests\Core\Render;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\PlaceholderGeneratorInterface;
@@ -65,7 +64,6 @@ class BubbleableMetadataTest extends UnitTestCase {
         new RequestStack(),
         [],
         $this->createStub(StylePluginManagerInterface::class),
-        $this->createStub(LoggerChannelFactoryInterface::class),
       );
     }
 
