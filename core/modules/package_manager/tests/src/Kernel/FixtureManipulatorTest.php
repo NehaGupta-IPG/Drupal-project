@@ -113,19 +113,6 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
       $this->assertSame("'my_drupal_module' is not a valid package name.", $e->getMessage());
     }
 
-    // We should not be able to add an existing package.
-    try {
-      $manipulator = new ActiveFixtureManipulator();
-      $manipulator->addPackage([
-        'name' => 'my/package',
-        'type' => 'library',
-      ])
-        ->commitChanges();
-      $this->fail('Trying to add an existing package should raise an error.');
-    }
-    catch (\LogicException $e) {
-      $this->assertStringContainsString("Expected package 'my/package' to not be installed, but it was.", $e->getMessage());
-    }
     // Ensure that none of the failed calls to ::addPackage() changed the
     // installed packages.
     $this->assertPackageListsEqual($this->originalFixturePackages, $this->inspector->getInstalledPackagesList($this->dir));

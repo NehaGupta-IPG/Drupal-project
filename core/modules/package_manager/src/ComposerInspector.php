@@ -225,8 +225,6 @@ class ComposerInspector implements LoggerAwareInterface {
    * @see \Composer\Command\ConfigCommand::execute()
    */
   public function getConfig(string $key, string $context): ?string {
-    $this->validateExecutable();
-
     $command = ['config', $key];
     // If we're consulting a specific file for the config value, we don't need
     // to validate the project as a whole.
@@ -234,7 +232,6 @@ class ComposerInspector implements LoggerAwareInterface {
       $command[] = "--file={$context}";
     }
     else {
-      $this->validateProject($context);
       $command[] = "--working-dir={$context}";
     }
     try {
@@ -288,8 +285,8 @@ class ComposerInspector implements LoggerAwareInterface {
    *   working directory, and it is not of the `metapackage` type.
    */
   public function getInstalledPackagesList(string $working_dir): InstalledPackagesList {
+    $this->invalidateCacheIfNeeded($working_dir);
     $working_dir = realpath($working_dir);
-    $this->validate($working_dir);
 
     if (array_key_exists($working_dir, $this->packageLists)) {
       return $this->packageLists[$working_dir];
@@ -374,7 +371,6 @@ class ComposerInspector implements LoggerAwareInterface {
    *   The parsed output of `composer show --self`.
    */
   public function getRootPackageInfo(string $working_dir): array {
-    $this->validate($working_dir);
 
     $this->runner->run(['show', '--self', '--format=json', "--working-dir={$working_dir}"], callback: $this->processCallback->reset());
     return $this->processCallback->parseJsonOutput();

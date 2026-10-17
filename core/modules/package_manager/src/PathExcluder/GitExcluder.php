@@ -48,15 +48,6 @@ final class GitExcluder implements EventSubscriberInterface {
   public function excludeGitDirectories(CollectPathsToExcludeEvent $event): void {
     $project_root = $this->pathLocator->getProjectRoot();
 
-    // To determine which .git directories to exclude, the installed packages
-    // must be known, and that requires Composer commands to be able to run.
-    // This intentionally does not catch exceptions: failed Composer validation
-    // in the project root implies that this excluder cannot function correctly.
-    // Note: the call to ComposerInspector::getInstalledPackagesList() would
-    // also have triggered this, but explicitness is preferred here.
-    // @see \Drupal\package_manager\StatusCheckTrait::runStatusCheck()
-    $this->composerInspector->validate($project_root);
-
     $paths_to_exclude = [];
 
     $installed_paths = [];

@@ -38,6 +38,7 @@ final class PackageManagerUninstallValidator implements ModuleUninstallValidator
     private readonly TimeInterface $time,
     private readonly PathFactoryInterface $pathFactory,
     private readonly FailureMarker $failureMarker,
+    private readonly ComposerInspector $composerInspector,
   ) {}
 
   /**
@@ -54,7 +55,8 @@ final class PackageManagerUninstallValidator implements ModuleUninstallValidator
       $this->sharedTempStoreFactory,
       $this->time,
       $this->pathFactory,
-      $this->failureMarker) extends SandboxManagerBase {};
+      $this->failureMarker,
+      $this->composerInspector) extends SandboxManagerBase {};
     $reasons = [];
     if (!$sandbox_manager->isAvailable() && $sandbox_manager->isApplying()) {
       $reasons[] = $this->t('Modules cannot be uninstalled while Package Manager is applying staged changes to the active code base.');

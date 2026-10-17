@@ -111,14 +111,6 @@ class FixtureManipulator {
       throw new \UnexpectedValueException(sprintf("'%s' is not a valid package name.", $package['name']));
     }
 
-    // `composer require` happily will re-require already required packages.
-    // Prevent test authors from thinking this has any effect when it does not.
-    $json = $this->runComposerCommand(['show', '--name-only', '--format=json'])->stdout;
-    $installed_package_names = array_column(json_decode($json)?->installed ?? [], 'name');
-    if (in_array($package['name'], $installed_package_names)) {
-      throw new \LogicException(sprintf("Expected package '%s' to not be installed, but it was.", $package['name']));
-    }
-
     $repo_path = $this->addRepository($package);
     if (is_null($extra_files) && isset($package['type'])
       && in_array($package['type'], ['drupal-module', 'drupal-theme', 'drupal-profile'], TRUE)) {

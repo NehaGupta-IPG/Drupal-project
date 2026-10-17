@@ -13,6 +13,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\fixture_manipulator\StageFixtureManipulator;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\package_manager\Attribute\AllowDirectWrite;
+use Drupal\package_manager\ComposerInspector;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Exception\SandboxEventException;
@@ -184,7 +185,8 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
       $this->container->get('tempstore.shared'),
       $this->container->get('datetime.time'),
       $this->container->get(PathFactoryInterface::class),
-      $this->container->get(FailureMarker::class)
+      $this->container->get(FailureMarker::class),
+      $this->container->get(ComposerInspector::class)
     );
   }
 

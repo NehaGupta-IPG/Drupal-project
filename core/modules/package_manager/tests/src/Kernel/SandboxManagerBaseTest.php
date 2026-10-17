@@ -12,6 +12,7 @@ use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\Event\SandboxEvent;
 use Drupal\package_manager\EventSubscriber\LongLivedSandboxSubscriber;
 use Drupal\package_manager\Exception\ApplyFailedException;
+use Drupal\package_manager\Exception\ComposerNotReadyException;
 use Drupal\package_manager\Exception\FailureMarkerExistsException;
 use Drupal\package_manager\Exception\SandboxException;
 use Drupal\package_manager\FailureMarker;
@@ -425,8 +426,8 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
   public function testFailureCollectPathsToExclude(): void {
     $project_root = $this->container->get(PathLocator::class)->getProjectRoot();
     unlink($project_root . '/composer.json');
-    $this->expectException(SandboxException::class);
-    $this->expectExceptionMessageIsOrContains("composer.json not found.");
+    $this->expectException(ComposerNotReadyException::class);
+    $this->expectExceptionMessageIs("composer.json not found.");
     $this->createStage()->create();
   }
 

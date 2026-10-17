@@ -8,6 +8,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Url;
 use Drupal\package_manager\Attribute\AllowDirectWrite;
+use Drupal\package_manager\ComposerInspector;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\SandboxManagerBase;
@@ -50,6 +51,7 @@ class ApiController extends ControllerBase {
       $container->get('datetime.time'),
       $container->get(PathFactoryInterface::class),
       $container->get(FailureMarker::class),
+      $container->get(ComposerInspector::class),
     );
     return new static($stage);
   }
