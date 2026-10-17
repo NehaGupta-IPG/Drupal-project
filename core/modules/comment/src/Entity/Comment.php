@@ -42,6 +42,7 @@ use Drupal\user\EntityOwnerTrait;
     'uuid' => 'uuid',
     'published' => 'status',
     'owner' => 'uid',
+    'changed' => 'changed',
   ],
   handlers: [
     'storage' => CommentStorage::class,

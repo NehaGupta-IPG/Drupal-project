@@ -47,6 +47,7 @@ use Drupal\block_content\BlockContentInterface;
     'langcode' => 'langcode',
     'uuid' => 'uuid',
     'published' => 'status',
+    'changed' => 'changed',
   ],
   handlers: [
     'storage' => SqlContentEntityStorage::class,

@@ -35,6 +35,7 @@ use Drupal\workspaces\WorkspaceInterface;
     'label' => 'label',
     'uid' => 'uid',
     'owner' => 'uid',
+    'changed' => 'changed',
   ],
   handlers: [
     'access' => WorkspaceAccessControlHandler::class,
