@@ -1,0 +1,4 @@
+style_test:
+  css:
+    theme:
+      assets/css/test.css: {}

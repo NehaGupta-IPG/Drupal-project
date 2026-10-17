@@ -1,0 +1,186 @@
+{
+  "type": "object",
+  "required": [
+    "label",
+    "options"
+  ],
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "label": {
+      "title": "Label",
+      "description": "Translatable label",
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "description": "Translatable description",
+      "type": "string"
+    },
+    "category": {
+      "title": "Category",
+      "description": "Translatable category",
+      "type": "string"
+    },
+    "links": {
+      "title": "External links",
+      "description": "Both compact and full syntaxes are available",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "iri-reference"
+          },
+          {
+            "type": "object",
+            "required": ["url"],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "iri-reference"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "weight": {
+      "title": "Weight",
+      "description": "Weight of the style",
+      "type": "integer"
+    },
+    "status": {
+      "type": "string",
+      "title": "Development Status",
+      "description": "Use this property to identify if the style can be safely used in production.",
+      "enum": [
+        "experimental",
+        "stable",
+        "deprecated",
+        "obsolete"
+      ]
+    },
+    "type": {
+      "title": "Type",
+      "description": "If the style is a theme or an utility.",
+      "type": "string",
+      "enum": [
+        "utility",
+        "theme"
+      ]
+    },
+    "attribute": {
+      "title": "Attribute",
+      "description": "The HTML attribute to which the style is applied",
+      "type": "string"
+    },
+    "target": {
+      "title": "Target",
+      "description": "The HTML tag to which the style is applied. If present the theme is global only, otherwise the style can be applied on any tag.",
+      "type": "string",
+      "enum": [
+        "html",
+        "body",
+        "meta"
+      ]
+    },
+    "options": {
+      "title": "Options",
+      "description": "The mutually exclusive style options.",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9_ -]+$": {
+          "type": "object",
+          "required": ["label"],
+          "properties": {
+            "value": {
+              "title": "Option value",
+              "description": "If not defined the value will be the option ID",
+              "type": "string"
+            },
+            "label": {
+              "title": "Option label",
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "title": "Option description",
+              "type": "string",
+              "minLength": 1
+            },
+            "attribute": {
+              "title": "Option attribute",
+              "type": "string"
+            },
+            "target": {
+              "title": "Option target",
+              "type": "string",
+              "enum": [
+                "html",
+                "body",
+                "meta"
+              ]
+            },
+            "modes": {
+              "title": "Modes",
+              "description": "The user preferences the option is adapted to. An unspecified mode means the option is adapted to any value of this user preference.",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "color_scheme": {
+                  "title": "Color scheme",
+                  "description": "Matches the CSS media feature prefers-color-scheme.",
+                  "type": "string",
+                  "enum": [
+                    "light",
+                    "dark"
+                  ]
+                },
+                "contrast": {
+                  "title": "Contrast",
+                  "description": "Matches the CSS media feature prefers-contrast.",
+                  "type": "string",
+                  "enum": [
+                    "more",
+                    "less"
+                  ]
+                },
+                "reduced_motion": {
+                  "title": "Reduced motion",
+                  "description": "Matches the CSS media feature prefers-reduced-motion.",
+                  "type": "string",
+                  "enum": [
+                    "reduce"
+                  ]
+                }
+              }
+            },
+            "status": {
+              "type": "string",
+              "title": "Option Status",
+              "description": "Use this property to identify if the option can be safely used in production.",
+              "enum": [
+                "experimental",
+                "stable",
+                "deprecated",
+                "obsolete"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "library": {
+      "title": "Asset library",
+      "description": "The ID of an asset library",
+      "type": "string",
+      "pattern": "^\\w+/[A-Za-z]+[\\w\\.-]*$"
+    }
+  }
+}
