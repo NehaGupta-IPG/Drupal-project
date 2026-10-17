@@ -71,6 +71,8 @@ class Styles extends FormElementBase {
     else {
       $value = $element['#default_value'] ?? [];
     }
+    // Remove unselected styles: empty select or unchecked checkbox. An option
+    // ID cannot be "0", see core/assets/schemas/v1/style.schema.json.
     /** @var array $value */
     return \array_filter($value);
   }

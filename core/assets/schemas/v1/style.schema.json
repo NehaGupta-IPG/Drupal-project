@@ -19,7 +19,7 @@
       "properties": {
         "options": {
           "patternProperties": {
-            "^[a-zA-Z0-9_ -]+$": {
+            "^(?!0$)[a-zA-Z0-9_ -]+$": {
               "not": {
                 "required": ["modes"]
               }
@@ -116,11 +116,11 @@
     },
     "options": {
       "title": "Options",
-      "description": "The mutually exclusive style options.",
+      "description": "The mutually exclusive style options. An option ID cannot be 0.",
       "type": "object",
       "additionalProperties": false,
       "patternProperties": {
-        "^[a-zA-Z0-9_ -]+$": {
+        "^(?!0$)[a-zA-Z0-9_ -]+$": {
           "type": "object",
           "required": ["label"],
           "properties": {

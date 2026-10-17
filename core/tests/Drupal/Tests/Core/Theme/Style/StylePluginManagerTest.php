@@ -698,6 +698,49 @@ class StylePluginManagerTest extends UnitTestCase {
       ],
       FALSE,
     ];
+    yield 'Options: IDs containing 0' => [
+      [
+        'options' => [
+          '00' => [
+            'label' => 'Double zero',
+          ],
+          'top_0' => [
+            'label' => 'Top 0',
+          ],
+          '0_top' => [
+            'label' => '0 top',
+          ],
+          '1' => [
+            'label' => 'One',
+          ],
+        ],
+      ],
+      TRUE,
+    ];
+    yield 'Options: ID 0' => [
+      [
+        'options' => [
+          '0' => [
+            'label' => 'Zero',
+          ],
+        ],
+      ],
+      FALSE,
+    ];
+    yield 'Options: ID 0 with modes on theme' => [
+      [
+        'type' => 'theme',
+        'options' => [
+          '0' => [
+            'label' => 'Zero',
+            'modes' => [
+              'color_scheme' => 'dark',
+            ],
+          ],
+        ],
+      ],
+      FALSE,
+    ];
     yield 'Options: missing label' => [
       [
         'options' => [

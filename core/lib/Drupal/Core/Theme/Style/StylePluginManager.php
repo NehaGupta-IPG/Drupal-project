@@ -31,8 +31,9 @@ use JsonSchema\Validator;
  * @code
  * example_style:
  *   label: (string) The name of the style for display.
- *   options: (array) The list of options for the style. Each option must have a
- *     label property. Then optional properties are:
+ *   options: (array) The list of options for the style, keyed by option ID.
+ *     An option ID cannot be `0`. Each option must have a label property. Then
+ *     optional properties are:
  *     - value: (string) The value of the option. The option key is value is not
  *         specified.
  *     - description: (string) The description of the option.
