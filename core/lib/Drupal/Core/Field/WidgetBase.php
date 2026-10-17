@@ -508,7 +508,9 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
         // The original delta, before drag-and-drop reordering, is needed to
         // route errors to the correct form element.
         foreach ($values as $delta => &$value) {
-          $value['_original_delta'] = $delta;
+          if (is_array($value)) {
+            $value['_original_delta'] = $delta;
+          }
         }
 
         usort($values, function ($a, $b) {
