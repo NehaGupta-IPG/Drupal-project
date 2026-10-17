@@ -405,7 +405,7 @@ class AttributeTest extends UnitTestCase {
   }
 
   /**
-   * Tests that stringifying an attribute never touches the renderer.
+   * Tests that casting an attribute to a string never touches the renderer.
    *
    * Attachments only bubble when an Attribute object is printed from within
    * a Twig template, via \Drupal\Core\Template\TwigExtension::escapeFilter().

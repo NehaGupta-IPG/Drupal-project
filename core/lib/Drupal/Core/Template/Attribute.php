@@ -359,10 +359,10 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface, At
    * from within a Twig template bubbles its attachments to the current
    * render context through
    * \Drupal\Core\Template\TwigExtension::bubbleArgMetadata(), since Attribute
-   * implements \Drupal\Core\Render\AttachmentsInterface. Stringifying an
-   * Attribute object outside of Twig rendering (for example directly in PHP)
-   * is safe, but discards any attachments, since there is no render array
-   * for them to bubble into.
+   * implements \Drupal\Core\Render\AttachmentsInterface. Casting an
+   * Attribute object to a string outside of Twig rendering (for example
+   * directly in PHP) is safe, but discards any attachments, since there is no
+   * render array for them to bubble into.
    *
    * @see \Drupal\Core\Template\TwigExtension::bubbleArgMetadata()
    */

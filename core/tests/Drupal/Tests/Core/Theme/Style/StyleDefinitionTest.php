@@ -460,7 +460,6 @@ class StyleDefinitionTest extends UnitTestCase {
     ];
   }
 
-
   /**
    * Test applyOnAttribute.
    *

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Theme;
 
-use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\RenderContext;
-use Drupal\Core\Render\Renderer;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\TwigEnvironment;
