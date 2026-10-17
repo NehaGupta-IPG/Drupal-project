@@ -107,6 +107,61 @@ EOS,
   }
 
   /**
+   * Test that a style can be overridden by another extension of the same type.
+   */
+  public function testOverrideSameType(): void {
+    vfsStream::setup('root');
+    vfsStream::create([
+      'module_a' => [
+        'module_a.themes.yml' => <<<'EOS'
+theme_a:
+  label: 'Theme A'
+EOS,
+        'module_a.utilities.yml' => <<<'EOS'
+utility_a:
+  label: 'Utility A'
+EOS,
+      ],
+      'module_b' => [
+        'module_b.themes.yml' => <<<'EOS'
+theme_a:
+  enabled: false
+  label: 'Overridden theme'
+EOS,
+        'module_b.utilities.yml' => <<<'EOS'
+utility_a:
+  enabled: false
+  label: 'Overridden utility'
+EOS,
+      ],
+    ]);
+
+    // The last extension in the directories wins.
+    $discovery = new StyleYamlDiscovery([
+      'module_a' => vfsStream::url('root/module_a'),
+      'module_b' => vfsStream::url('root/module_b'),
+    ]);
+    $definitions = $discovery->getDefinitions();
+
+    $this->assertEquals([
+      'theme_a' => [
+        'enabled' => FALSE,
+        'label' => 'Overridden theme',
+        'type' => 'theme',
+        'provider' => 'module_b',
+        'id' => 'theme_a',
+      ],
+      'utility_a' => [
+        'enabled' => FALSE,
+        'label' => 'Overridden utility',
+        'type' => 'utility',
+        'provider' => 'module_b',
+        'id' => 'utility_a',
+      ],
+    ], $definitions);
+  }
+
+  /**
    * Test that a style ID declared for several types throws an exception.
    */
   public function testDuplicateIdAcrossTypes(): void {
