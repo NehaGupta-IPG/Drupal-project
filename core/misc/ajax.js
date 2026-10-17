@@ -1781,18 +1781,24 @@
      */
     add_module_preload(ajax, response, status) {
       const head = document.head;
+      // Collect the hrefs that are already in the document once, so that the
+      // check below is not quadratic in the number of preloads.
+      const preloaded = new Set(
+        Array.from(head.querySelectorAll('link[rel="modulepreload"]'), (link) =>
+          link.getAttribute('href'),
+        ),
+      );
       response.data.forEach((attributes) => {
         // Do not add the same module preload twice.
-        const alreadyPreloaded = Array.from(
-          head.querySelectorAll('link[rel="modulepreload"]'),
-        ).some((link) => link.getAttribute('href') === attributes.href);
-        if (!alreadyPreloaded) {
-          const link = document.createElement('link');
-          Object.keys(attributes).forEach((attributeKey) => {
-            link.setAttribute(attributeKey, attributes[attributeKey]);
-          });
-          head.appendChild(link);
+        if (preloaded.has(attributes.href)) {
+          return;
         }
+        preloaded.add(attributes.href);
+        const link = document.createElement('link');
+        Object.keys(attributes).forEach((attributeKey) => {
+          link.setAttribute(attributeKey, attributes[attributeKey]);
+        });
+        head.appendChild(link);
       });
     },
 

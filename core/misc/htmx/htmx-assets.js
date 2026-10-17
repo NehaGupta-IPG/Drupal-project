@@ -53,16 +53,23 @@
     //
     // The preloads are added before the assets are loaded, so the browser can
     // start fetching the modules while the module scripts are still loading.
-    doc.querySelectorAll('link[rel="modulepreload"][href]').forEach((el) => {
-      // Do not add the same module preload twice.
-      const alreadyPreloaded = Array.from(
+    // The hrefs already in the document, collected once so that the check
+    // below is not quadratic in the number of preloads.
+    const preloaded = new Set(
+      Array.from(
         document.head.querySelectorAll('link[rel="modulepreload"]'),
-      ).some((link) => link.getAttribute('href') === el.getAttribute('href'));
-      if (!alreadyPreloaded) {
-        document.head.appendChild(el);
-      } else {
+        (link) => link.getAttribute('href'),
+      ),
+    );
+    doc.querySelectorAll('link[rel="modulepreload"][href]').forEach((el) => {
+      const href = el.getAttribute('href');
+      // Do not add the same module preload twice.
+      if (preloaded.has(href)) {
         el.remove();
+        return;
       }
+      preloaded.add(href);
+      document.head.appendChild(el);
     });
 
     if (assets.length) {
