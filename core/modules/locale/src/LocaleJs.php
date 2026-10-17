@@ -332,22 +332,21 @@ class LocaleJs {
       }
     }
 
-    // Construct the JavaScript file, if there are translations.
-    $dataHash = NULL;
-    $data = $status = '';
-    if (!empty($translations)) {
-      $data = [
-        'strings' => $translations,
-      ];
+    // Construct the JavaScript file. The file is always created, even if there
+    // are no translations, so that window.drupalTranslations is always defined
+    // and cannot be replaced via DOM clobbering.
+    $status = '';
+    $data = [
+      'strings' => $translations,
+    ];
 
-      $localePlurals = $this->pluralFormula->getFormula($language->getId());
-      if ($localePlurals) {
-        $data['pluralFormula'] = $localePlurals;
-      }
-
-      $data = 'window.drupalTranslations = ' . Json::encode($data) . ';';
-      $dataHash = Crypt::hashBase64($data);
+    $localePlurals = $this->pluralFormula->getFormula($language->getId());
+    if ($localePlurals) {
+      $data['pluralFormula'] = $localePlurals;
     }
+
+    $data = 'window.drupalTranslations = ' . Json::encode($data) . ';';
+    $dataHash = Crypt::hashBase64($data);
 
     // Construct the filepath where JS translation files are stored.
     // There is (on purpose) no front end to edit that variable.
