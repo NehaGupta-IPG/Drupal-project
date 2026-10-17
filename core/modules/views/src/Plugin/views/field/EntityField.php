@@ -573,10 +573,6 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       '#fieldset' => 'multiple_field_settings',
     ];
 
-    // Make the string translatable by keeping it as a whole rather than
-    // translating prefix and suffix separately.
-    [$prefix, $suffix] = explode('@count', $this->t('Display @count value(s)'));
-
     if ($field->getCardinality() == FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
       $type = 'textfield';
       $options = NULL;
@@ -618,7 +614,23 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       '#fieldset' => 'multiple_field_settings',
     ];
 
-    $form['delta_limit'] = [
+    $form['multiple_field_settings_order'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Values order'),
+      '#weight' => 7,
+      '#fieldset' => 'multiple_field_settings',
+    ];
+
+    $form['multiple_field_settings_inline'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['container-inline']],
+    ];
+
+    // Make the string translatable by keeping it as a whole rather than
+    // translating prefix and suffix separately.
+    [$prefix, $suffix] = explode('@count', $this->t('Display @count value(s)'));
+
+    $form['multiple_field_settings_order']['multiple_field_settings_inline']['delta_limit'] = [
       '#type' => $type,
       '#size' => $size,
       '#field_prefix' => $prefix,
@@ -631,48 +643,47 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
           ':input[name="options[group_rows]"]' => ['checked' => TRUE],
         ],
       ],
-      '#fieldset' => 'multiple_field_settings',
+      '#parents' => ['options', 'delta_limit'],
     ];
 
     [$prefix, $suffix] = explode('@count', $this->t('starting from @count'));
-    $form['delta_offset'] = [
+    $form['multiple_field_settings_order']['multiple_field_settings_inline']['delta_offset'] = [
       '#type' => 'textfield',
       '#size' => 5,
       '#field_prefix' => $prefix,
       '#field_suffix' => $suffix,
       '#default_value' => $this->options['delta_offset'],
-      '#states' => [
-        'visible' => [
-          ':input[name="options[group_rows]"]' => ['checked' => TRUE],
-        ],
-      ],
-      '#description' => $this->t('(first item is 0)'),
-      '#fieldset' => 'multiple_field_settings',
-    ];
-    $form['delta_reversed'] = [
-      '#title' => $this->t('Reversed'),
-      '#type' => 'checkbox',
-      '#default_value' => $this->options['delta_reversed'],
-      '#suffix' => $suffix,
-      '#states' => [
-        'visible' => [
-          ':input[name="options[group_rows]"]' => ['checked' => TRUE],
-        ],
-      ],
-      '#description' => $this->t('(start from last values)'),
-      '#fieldset' => 'multiple_field_settings',
-    ];
-    $form['delta_first_last'] = [
-      '#title' => $this->t('First and last only'),
-      '#type' => 'checkbox',
-      '#default_value' => $this->options['delta_first_last'],
       '#suffix' => '</div>',
       '#states' => [
         'visible' => [
           ':input[name="options[group_rows]"]' => ['checked' => TRUE],
         ],
       ],
-      '#fieldset' => 'multiple_field_settings',
+      '#description' => $this->t('(first item is 0).'),
+      '#parents' => ['options', 'delta_offset'],
+    ];
+    $form['multiple_field_settings_order']['delta_reversed'] = [
+      '#title' => $this->t('Reversed'),
+      '#type' => 'checkbox',
+      '#default_value' => $this->options['delta_reversed'],
+      '#states' => [
+        'visible' => [
+          ':input[name="options[group_rows]"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#description' => $this->t('Start from last values.'),
+      '#parents' => ['options', 'delta_reversed'],
+    ];
+    $form['multiple_field_settings_order']['delta_first_last'] = [
+      '#title' => $this->t('First and last only'),
+      '#type' => 'checkbox',
+      '#default_value' => $this->options['delta_first_last'],
+      '#states' => [
+        'visible' => [
+          ':input[name="options[group_rows]"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#parents' => ['options', 'delta_first_last'],
     ];
   }
 
