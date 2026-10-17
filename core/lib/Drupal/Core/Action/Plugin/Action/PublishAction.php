@@ -22,6 +22,7 @@ class PublishAction extends EntityActionBase {
    */
   public function execute($entity = NULL) {
     $entity->setPublished()->save();
+    $this->logStateChange($entity, '@type: published %title.');
   }
 
   /**

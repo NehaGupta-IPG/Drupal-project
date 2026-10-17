@@ -21,7 +21,7 @@ class PublishActionTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system', 'entity_test', 'user'];
+  protected static $modules = ['system', 'entity_test', 'user', 'dblog'];
 
   /**
    * {@inheritdoc}
@@ -29,6 +29,7 @@ class PublishActionTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('entity_test_mulrevpub');
+    $this->installSchema('dblog', ['watchdog']);
   }
 
   /**
@@ -63,9 +64,12 @@ class PublishActionTest extends KernelTestBase {
     ]);
     $action->save();
     $this->assertFalse($entity->isPublished());
+    \Drupal::database()->truncate('watchdog')->execute();
     $action->execute([$entity]);
     $this->assertTrue($entity->isPublished());
     $this->assertSame(['module' => ['entity_test']], $action->getDependencies());
+
+    $this->assertWatchdogLogEntry('@type: published %title.');
   }
 
   /**
@@ -83,9 +87,29 @@ class PublishActionTest extends KernelTestBase {
     ]);
     $action->save();
     $this->assertTrue($entity->isPublished());
+    \Drupal::database()->truncate('watchdog')->execute();
     $action->execute([$entity]);
     $this->assertFalse($entity->isPublished());
     $this->assertSame(['module' => ['entity_test']], $action->getDependencies());
+
+    $this->assertWatchdogLogEntry('@type: unpublished %title.');
+  }
+
+  /**
+   * Asserts that a single watchdog log entry was written for the action.
+   */
+  private function assertWatchdogLogEntry(string $expected_message): void {
+    $logs = \Drupal::database()->select('watchdog', 'w')
+      ->fields('w', ['type', 'message', 'variables'])
+      ->execute()
+      ->fetchAll();
+    $this->assertCount(1, $logs);
+    $vars = unserialize($logs[0]->variables);
+    $this->assertIsArray($vars, 'unserialize($logs[0]->variables) failed');
+    $this->assertSame('entity_test', $logs[0]->type);
+    $this->assertSame($expected_message, $logs[0]->message);
+    $this->assertSame('entity_test_mulrevpub', $vars['@type']);
+    $this->assertSame('test', $vars['%title']);
   }
 
 }

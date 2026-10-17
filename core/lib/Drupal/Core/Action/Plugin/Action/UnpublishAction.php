@@ -22,6 +22,7 @@ class UnpublishAction extends EntityActionBase {
    */
   public function execute($entity = NULL) {
     $entity->setUnpublished()->save();
+    $this->logStateChange($entity, '@type: unpublished %title.');
   }
 
   /**
