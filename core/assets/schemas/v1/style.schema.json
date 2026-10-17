@@ -92,7 +92,7 @@
     },
     "type": {
       "title": "Type",
-      "description": "If the style is a theme or an utility.",
+      "description": "If the style is a theme or an utility. Set from the file name the style is declared in: EXTENSION_NAME.themes.yml or EXTENSION_NAME.utilities.yml.",
       "type": "string",
       "enum": [
         "utility",

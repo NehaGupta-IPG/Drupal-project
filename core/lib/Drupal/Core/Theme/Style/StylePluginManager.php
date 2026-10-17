@@ -10,7 +10,6 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
-use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
@@ -20,8 +19,13 @@ use JsonSchema\Validator;
 /**
  * Provides the default style plugin manager.
  *
- * An extension can define a style in an EXTENSION_NAME.styles.yml file
- * contained in the extension's base directory.
+ * An extension can define styles in YAML files contained in the extension's
+ * base directory:
+ * - EXTENSION_NAME.utilities.yml: styles of type `utility`. They can be
+ *   applied on anything.
+ * - EXTENSION_NAME.themes.yml: styles of type `theme`. Depending on target,
+ *   their application is limited to specific elements.
+ * The type of a style is set from the file it is declared in.
  * Each style must have a `label` and `options` property.
  *
  * @code
@@ -36,7 +40,7 @@ use JsonSchema\Validator;
  *         default.
  *     - target: (string) Override the target of the style for the option.
  *     - modes: (array) The user preferences the option is adapted to. Only
- *         allowed when the style type is `theme`. Each mode matches a CSS
+ *         allowed in EXTENSION_NAME.themes.yml files. Each mode matches a CSS
  *         media feature. An unspecified mode means the option is adapted to
  *         any value of this user preference. Possible modes are:
  *         - color_scheme: `light` or `dark`. See `prefers-color-scheme`.
@@ -62,13 +66,10 @@ use JsonSchema\Validator;
  *     - `obsolete`: The style is obsoleted.
  *     Using a style or an option marked as `deprecated` or `obsolete` will log
  *     warnings.
- *   type: (string) The type of the style. Possible values are:
- *     - `theme`: The style is a theme and depending on target, its application is
- *         limited to specific elements.
- *     - `utility`: The style can be applied on anything. Default value.
  *   attribute: (string) The attribute to set on the element. Default is
  *     `class`.
- *   target: (string) The target of the style. Possible values are:
+ *   target: (string) The target of the style. Only relevant in
+ *     EXTENSION_NAME.themes.yml files. Possible values are:
  *     - `html`: The style is applicable on the html tag only.
  *     - `body`: The style is applicable on the body tag only.
  *     - `meta`: When applied, the style will generate a meta tag.
@@ -76,7 +77,7 @@ use JsonSchema\Validator;
  *         Default value.
  *   library: (string) Drupal library machine name to include.
  * @endcode
- * For example:
+ * For example, in EXTENSION_NAME.utilities.yml:
  * @code
  * background_color:
  *   enabled: true
@@ -158,7 +159,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    */
   protected function getDiscovery(): DiscoveryInterface {
     if (!$this->discovery) {
-      $discovery = new YamlDiscovery('styles', $this->moduleHandler->getModuleDirectories() + $this->themeHandler->getThemeDirectories());
+      $discovery = new StyleYamlDiscovery($this->moduleHandler->getModuleDirectories() + $this->themeHandler->getThemeDirectories());
       $discovery->addTranslatableProperty('label');
       $discovery->addTranslatableProperty('description');
       $discovery->addTranslatableProperty('category');

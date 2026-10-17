@@ -24,4 +24,14 @@ enum Type: string {
     };
   }
 
+  /**
+   * Returns the file name suffix used to discover styles of the type.
+   */
+  public function discoveryName(): string {
+    return match ($this) {
+      self::Theme => 'themes',
+      self::Utility => 'utilities',
+    };
+  }
+
 }

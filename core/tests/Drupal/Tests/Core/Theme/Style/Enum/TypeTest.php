@@ -29,12 +29,15 @@ class TypeTest extends UnitTestCase {
    *   The expected type name.
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup $expectedLabel
    *   The expected type label.
+   * @param string $expectedDiscoveryName
+   *   The expected discovery file name suffix.
    */
   #[DataProvider('providerEnum')]
-  public function testEnum(Type $type, string $expectedValue, string $expectedName, TranslatableMarkup $expectedLabel): void {
+  public function testEnum(Type $type, string $expectedValue, string $expectedName, TranslatableMarkup $expectedLabel, string $expectedDiscoveryName): void {
     $this->assertEquals($expectedValue, $type->value);
     $this->assertEquals($expectedName, $type->name);
     $this->assertEquals($expectedLabel, $type->label());
+    $this->assertEquals($expectedDiscoveryName, $type->discoveryName());
   }
 
   /**
@@ -49,12 +52,14 @@ class TypeTest extends UnitTestCase {
       'theme',
       'Theme',
       new TranslatableMarkup('Theme'),
+      'themes',
     ];
     yield 'utility' => [
       Type::Utility,
       'utility',
       'Utility',
       new TranslatableMarkup('Utility'),
+      'utilities',
     ];
   }
 

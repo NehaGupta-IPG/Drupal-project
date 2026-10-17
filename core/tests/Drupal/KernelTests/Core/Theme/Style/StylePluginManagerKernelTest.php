@@ -20,7 +20,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  *
  * Any change of the definition will impact the tests.
  *
- * @see core/modules/system/tests/modules/style_test/style_test.styles.yml
+ * @see core/modules/system/tests/modules/style_test/style_test.themes.yml
+ * @see core/modules/system/tests/modules/style_test/style_test.utilities.yml
  */
 #[CoversClass(StylePluginManager::class)]
 #[Group('style')]
@@ -174,7 +175,9 @@ class StylePluginManagerKernelTest extends KernelTestBase {
     // Test when the module overriding the definition is executed before.
     \Drupal::service(ModuleWeight::class)->set('style_override_test', -1);
     $this->stylePluginManager = $this->container->get(StylePluginManagerInterface::class);
-    $this->assertArrayHasKey('test_theme', $this->stylePluginManager->getDefinitions());
+    $definitions = $this->stylePluginManager->getDefinitions();
+    $this->assertArrayHasKey('test_theme', $definitions);
+    $this->assertArrayHasKey('test_utility', $definitions);
 
     // Test when the module overriding the definition is executed after.
     \Drupal::service(ModuleWeight::class)->set('style_override_test', 1);
@@ -186,7 +189,11 @@ class StylePluginManagerKernelTest extends KernelTestBase {
     $kernel->rebuildContainer();
 
     $this->stylePluginManager = $this->container->get(StylePluginManagerInterface::class);
-    $this->assertArrayNotHasKey('test_theme', $this->stylePluginManager->getDefinitions());
+    $definitions = $this->stylePluginManager->getDefinitions();
+    $this->assertArrayNotHasKey('test_theme', $definitions);
+    $this->assertArrayNotHasKey('test_utility', $definitions);
+    // Styles not overridden are still available.
+    $this->assertArrayHasKey('test_utility_library', $definitions);
   }
 
 }
