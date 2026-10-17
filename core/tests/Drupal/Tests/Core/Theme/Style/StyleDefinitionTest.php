@@ -155,6 +155,7 @@ class StyleDefinitionTest extends UnitTestCase {
   public static function providerGetProcessedOptions(): iterable {
     yield 'All cases' => [
       [
+        'type' => 'theme',
         'attribute' => 'my-attribute',
         'target' => 'body',
         'options' => [

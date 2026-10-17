@@ -83,6 +83,22 @@ class StylePluginManagerKernelTest extends KernelTestBase {
             'value' => 'body-style-value',
             'target' => 'body',
           ],
+          'single_mode' => [
+            'label' => 'Single mode',
+            'value' => 'single-mode',
+            'modes' => [
+              'color_scheme' => 'dark',
+            ],
+          ],
+          'all_modes' => [
+            'label' => 'All modes',
+            'value' => 'all-modes',
+            'modes' => [
+              'color_scheme' => 'light',
+              'contrast' => 'more',
+              'reduced_motion' => 'reduce',
+            ],
+          ],
         ],
       ],
       'test_utility' => [
@@ -121,22 +137,6 @@ class StylePluginManagerKernelTest extends KernelTestBase {
             'label' => 'Obsolete',
             'value' => 'obsolete',
             'status' => 'obsolete',
-          ],
-          'single_mode' => [
-            'label' => 'Single mode',
-            'value' => 'single-mode',
-            'modes' => [
-              'color_scheme' => 'dark',
-            ],
-          ],
-          'all_modes' => [
-            'label' => 'All modes',
-            'value' => 'all-modes',
-            'modes' => [
-              'color_scheme' => 'light',
-              'contrast' => 'more',
-              'reduced_motion' => 'reduce',
-            ],
           ],
         ],
       ],

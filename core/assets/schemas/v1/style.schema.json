@@ -4,6 +4,31 @@
     "label",
     "options"
   ],
+  "anyOf": [
+    {
+      "description": "Modes are allowed on options of theme styles.",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "enum": ["theme"]
+        }
+      }
+    },
+    {
+      "description": "Modes are not allowed on options of other styles.",
+      "properties": {
+        "options": {
+          "patternProperties": {
+            "^[a-zA-Z0-9_ -]+$": {
+              "not": {
+                "required": ["modes"]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "properties": {
     "enabled": {
       "type": "boolean"
@@ -129,7 +154,7 @@
             },
             "modes": {
               "title": "Modes",
-              "description": "The user preferences the option is adapted to. An unspecified mode means the option is adapted to any value of this user preference.",
+              "description": "The user preferences the option is adapted to. An unspecified mode means the option is adapted to any value of this user preference. Only allowed on styles of type theme.",
               "type": "object",
               "additionalProperties": false,
               "properties": {

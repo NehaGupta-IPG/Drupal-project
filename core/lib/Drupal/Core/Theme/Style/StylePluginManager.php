@@ -35,10 +35,10 @@ use JsonSchema\Validator;
  *     - attribute: (string) The attribute to set on the element. `class` by
  *         default.
  *     - target: (string) Override the target of the style for the option.
- *     - modes: (array) The user preferences the option is adapted to. Each
- *         mode matches a CSS media feature. An unspecified mode means the
- *         option is adapted to any value of this user preference. Possible
- *         modes are:
+ *     - modes: (array) The user preferences the option is adapted to. Only
+ *         allowed when the style type is `theme`. Each mode matches a CSS
+ *         media feature. An unspecified mode means the option is adapted to
+ *         any value of this user preference. Possible modes are:
  *         - color_scheme: `light` or `dark`. See `prefers-color-scheme`.
  *         - contrast: `more` or `less`. See `prefers-contrast`.
  *         - reduced_motion: `reduce`. See `prefers-reduced-motion`.
@@ -97,8 +97,6 @@ use JsonSchema\Validator;
  *     dark:
  *       label: "Dark"
  *       value: "bg-dark"
- *       modes:
- *         color_scheme: "dark"
  *     ...
  *   library: "my_theme/my_lib"
  *   weight: 50

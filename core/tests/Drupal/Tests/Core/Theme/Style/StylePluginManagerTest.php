@@ -635,6 +635,21 @@ class StylePluginManagerTest extends UnitTestCase {
             'label' => 'Obsolete',
             'status' => 'obsolete',
           ],
+          'additional_property' => [
+            'label' => 'bar',
+            'baz' => 'bar',
+          ],
+        ],
+      ],
+      TRUE,
+    ];
+    yield 'Options: modes on theme' => [
+      [
+        'type' => 'theme',
+        'options' => [
+          'no_modes' => [
+            'label' => 'No modes',
+          ],
           'modes_partial' => [
             'label' => 'Dark',
             'modes' => [
@@ -649,13 +664,39 @@ class StylePluginManagerTest extends UnitTestCase {
               'reduced_motion' => 'reduce',
             ],
           ],
-          'additional_property' => [
-            'label' => 'bar',
-            'baz' => 'bar',
-          ],
         ],
       ],
       TRUE,
+    ];
+    yield 'Options: modes on utility' => [
+      [
+        'type' => 'utility',
+        'options' => [
+          'foo' => [
+            'label' => 'bar',
+            'modes' => [
+              'color_scheme' => 'dark',
+            ],
+          ],
+        ],
+      ],
+      FALSE,
+    ];
+    yield 'Options: modes without type' => [
+      [
+        'options' => [
+          'foo' => [
+            'label' => 'bar',
+          ],
+          'dark' => [
+            'label' => 'Dark',
+            'modes' => [
+              'color_scheme' => 'dark',
+            ],
+          ],
+        ],
+      ],
+      FALSE,
     ];
     yield 'Options: missing label' => [
       [
@@ -702,6 +743,7 @@ class StylePluginManagerTest extends UnitTestCase {
     ];
     yield 'Options: invalid mode name' => [
       [
+        'type' => 'theme',
         'options' => [
           'foo' => [
             'label' => 'bar',
@@ -715,6 +757,7 @@ class StylePluginManagerTest extends UnitTestCase {
     ];
     yield 'Options: invalid color scheme mode' => [
       [
+        'type' => 'theme',
         'options' => [
           'foo' => [
             'label' => 'bar',
@@ -728,6 +771,7 @@ class StylePluginManagerTest extends UnitTestCase {
     ];
     yield 'Options: invalid contrast mode' => [
       [
+        'type' => 'theme',
         'options' => [
           'foo' => [
             'label' => 'bar',
@@ -741,6 +785,7 @@ class StylePluginManagerTest extends UnitTestCase {
     ];
     yield 'Options: invalid reduced motion mode' => [
       [
+        'type' => 'theme',
         'options' => [
           'foo' => [
             'label' => 'bar',
