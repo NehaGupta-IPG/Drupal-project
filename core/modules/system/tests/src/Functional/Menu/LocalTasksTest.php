@@ -356,6 +356,33 @@ class LocalTasksTest extends BrowserTestBase {
   }
 
   /**
+   * Tests local tasks and actions blocks do not error on unrouted requests.
+   *
+   * On 4xx pages, getRouteName() returns NULL via NullRouteMatch. Using NULL
+   * as an array offset (e.g. $array[null]) is deprecated in PHP 8.5+. This
+   * test confirms both the local tasks and local actions blocks render without
+   * errors when BigPipe is enabled and an authenticated user visits a
+   * non-existent URL.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3565887
+   */
+  public function testLocalTasksAndActionsOnUnroutedRequest(): void {
+    $this->container->get('module_installer')->install(['big_pipe']);
+    // Place local actions block on all pages (local tasks block is placed in setUp()).
+    $this->drupalPlaceBlock('local_actions_block');
+
+    // BigPipe only activates for authenticated users.
+    $this->drupalLogin($this->drupalCreateUser());
+
+    // Navigate to a non-existent path (unrouted request / 404 page).
+    // Before the fix, this caused: "Using null as an array offset is
+    // deprecated" in LocalTaskManager::getLocalTasks() and
+    // LocalActionManager::getActionsForRoute().
+    $this->drupalGet('/path-that-does-not-exist');
+    $this->assertSession()->statusCodeEquals(404);
+  }
+
+  /**
    * Asserts that the local task URL matches the expected alias.
    *
    * @param string $alias
