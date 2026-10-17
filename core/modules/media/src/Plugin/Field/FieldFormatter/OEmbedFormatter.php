@@ -223,6 +223,25 @@ class OEmbedFormatter extends FormatterBase {
         // add it if the resource has a title.
         $title = $resource->getTitle();
         if ($title) {
+          // Prefix the title to ensure it is distinct from the inner
+          // iframe's title provided by the oEmbed provider, which would
+          // otherwise be identical and violate frame-title-unique.
+          $element[$delta]['#attributes']['title'] = $this->t('Embedded @title', [
+            '@title' => $title,
+          ]);
+        }
+        else {
+          // If no title is provided, use a generic title with the
+          // provider name.
+          $provider = $resource->getProvider();
+          if ($provider) {
+            $title = $this->t('Embedded content from @provider', [
+              '@provider' => $provider->getName(),
+            ]);
+          }
+          else {
+            $title = $this->t('Embedded content');
+          }
           $element[$delta]['#attributes']['title'] = $title;
         }
 
