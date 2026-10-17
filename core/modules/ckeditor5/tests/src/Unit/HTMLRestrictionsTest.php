@@ -747,6 +747,63 @@ class HTMLRestrictionsTest extends UnitTestCase {
       ],
     ];
 
+    yield '$text-container and $any-html5-element wildcards' => [
+      new HTMLRestrictions([
+        '$text-container' => [
+          'class' => TRUE,
+        ],
+        '$any-html5-element' => [
+          'id' => TRUE,
+        ],
+        'div' => FALSE,
+        'span' => FALSE,
+        'p' => ['data-llama' => TRUE],
+      ]),
+      [
+        '<$any-html5-element id>',
+        '<$text-container class>',
+        '<div>',
+        '<p data-llama>',
+        '<span>',
+      ],
+      '<div class id> <p data-llama class id> <span id>',
+      [
+        [
+          'name' => 'div',
+          'classes' => TRUE,
+          'attributes' => [
+            [
+              'key' => 'id',
+              'value' => TRUE,
+            ],
+          ],
+        ],
+        [
+          'name' => 'span',
+          'attributes' => [
+            [
+              'key' => 'id',
+              'value' => TRUE,
+            ],
+          ],
+        ],
+        [
+          'name' => 'p',
+          'attributes' => [
+            [
+              'key' => 'data-llama',
+              'value' => TRUE,
+            ],
+            [
+              'key' => 'id',
+              'value' => TRUE,
+            ],
+          ],
+          'classes' => TRUE,
+        ],
+      ],
+    ];
+
     yield 'realistic' => [
       new HTMLRestrictions([
         'a' => [
