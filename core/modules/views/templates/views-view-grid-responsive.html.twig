@@ -38,7 +38,7 @@
 %}
 
 {%
-  set column_classes = [
+  set cell_classes = [
     'views-view-responsive-grid__item',
     options.grid_cell_class_custom,
   ]
@@ -56,7 +56,7 @@
 {% endif %}
 <div{{ attributes.addClass(classes).setAttribute('style', responsive_grid_styles|join()) }}>
   {% for item in items %}
-    <div{{ item.attributes.addClass(column_classes) }}>
+    <div{{ item.attributes.addClass(cell_classes) }}>
       <div class="views-view-responsive-grid__item-inner">
         {{- item.content -}}
       </div>

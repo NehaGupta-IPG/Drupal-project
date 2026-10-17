@@ -82,13 +82,13 @@ class GridResponsive extends StylePluginBase {
       '#description' => $this->t('Horizontal alignment will place items starting in the upper left and moving right. Vertical alignment will place items starting in the upper left and moving down.'),
     ];
     $form['grid_wrapper_class_custom'] = [
-      '#title' => $this->t('Custom grid wrapper class'),
+      '#title' => $this->t('Custom grid wrapper classes'),
       '#description' => $this->t('Additional classes to provide on each grid wrapper. Separated by a space.'),
       '#type' => 'textfield',
       '#default_value' => $this->options['grid_wrapper_class_custom'],
     ];
     $form['grid_cell_class_custom'] = [
-      '#title' => $this->t('Custom grid cell class'),
+      '#title' => $this->t('Custom grid cell classes'),
       '#description' => $this->t('Additional classes to provide on each cell. Separated by a space.'),
       '#type' => 'textfield',
       '#default_value' => $this->options['grid_cell_class_custom'],
@@ -101,20 +101,18 @@ class GridResponsive extends StylePluginBase {
   }
 
   /**
-   * Return the token-replaced wrapper or cell classes for the specified result.
+   * Returns the token-replaced wrapper/cell classes for the specified result.
    *
-   * @param int $result_index
-   *   The delta of the result item to get custom classes for.
    * @param string $type
-   *   The type of custom grid class, either "grid_wrapper" or "grid_wrapper".
+   *   The type of custom grid class, either "grid_wrapper" or "grid_cell".
    *
    * @return string
    *   A space-delimited string of classes.
    */
-  public function getCustomClass(int $result_index, string $type) {
+  public function getCustomClasses(string $type): string {
     $class = $this->options[$type . '_class_custom'];
     if ($this->usesFields() && $this->view->field) {
-      $class = strip_tags($this->tokenizeValue($class, $result_index));
+      $class = strip_tags($this->tokenizeValue($class, 0));
     }
 
     $classes = explode(' ', $class);
