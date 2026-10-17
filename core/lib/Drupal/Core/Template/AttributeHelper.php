@@ -63,6 +63,7 @@ class AttributeHelper {
     }
     // If both collections are arrays, just merge them.
     if (is_array($a) && is_array($b)) {
+      static::matchCollectionsTypes($a, $b);
       return NestedArray::mergeDeep($a, $b);
     }
     // If at least one collections is an Attribute object, merge through
@@ -71,6 +72,33 @@ class AttributeHelper {
     $merge_b = $b instanceof Attribute ? $b : new Attribute($b);
     $merge_a->merge($merge_b);
     return $a instanceof Attribute ? $merge_a : $merge_a->toArray();
+  }
+
+  /**
+   * Ensure arrays are preserved.
+   *
+   * Example: if one Attribute object had set "style" attribute as an array and
+   * the other as a string, the result should be the string added to the array.
+   *
+   * @param array $a
+   *   One array.
+   * @param array $b
+   *   The other array.
+   */
+  public static function matchCollectionsTypes(array &$a, array &$b): void {
+    foreach (array_unique(array_merge(array_keys($a), array_keys($b))) as $key) {
+      if (
+        (isset($a[$key]) && is_array($a[$key]))
+        || (isset($b[$key]) && is_array($b[$key]))
+      ) {
+        if (isset($a[$key]) && !is_array($a[$key])) {
+          $a[$key] = [$a[$key]];
+        }
+        if (isset($b[$key]) && !is_array($b[$key])) {
+          $b[$key] = [$b[$key]];
+        }
+      }
+    }
   }
 
 }

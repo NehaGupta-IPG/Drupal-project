@@ -562,6 +562,45 @@ class AttributeTest extends UnitTestCase {
           'href' => 'bar',
         ]),
       ],
+      [
+        new Attribute([]),
+        new Attribute(['class' => ['class1']]),
+        new Attribute(['class' => ['class1']]),
+      ],
+      [
+        new Attribute(['class' => ['example-class']]),
+        new Attribute(['class' => ['class1']]),
+        new Attribute(['class' => ['example-class', 'class1']]),
+      ],
+      [
+        new Attribute(['class' => ['example-class']]),
+        new Attribute(['id' => 'foo', 'href' => 'bar']),
+        new Attribute([
+          'class' => ['example-class'],
+          'id' => 'foo',
+          'href' => 'bar',
+        ]),
+      ],
+      [
+        new Attribute(['style' => 'color: pink;']),
+        new Attribute(['style' => 'color: red;']),
+        new Attribute(['style' => 'color: red;']),
+      ],
+      [
+        new Attribute(['style' => ['color: pink;']]),
+        new Attribute(['style' => 'color: red;']),
+        new Attribute(['style' => ['color: pink;', 'color: red;']]),
+      ],
+      [
+        new Attribute(['style' => 'color: pink;']),
+        new Attribute(['style' => ['color: red;']]),
+        new Attribute(['style' => ['color: pink;', 'color: red;']]),
+      ],
+      [
+        new Attribute(['style' => ['color: pink;']]),
+        new Attribute(['style' => ['color: red;']]),
+        new Attribute(['style' => ['color: pink;', 'color: red;']]),
+      ],
     ];
   }
 
