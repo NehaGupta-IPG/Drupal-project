@@ -103,7 +103,52 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
       $collection->add('entity.' . $entity_type->id() . '.delete_multiple_form', $delete_multiple_route);
     }
 
+    $this->applyRouteSettings($collection, $entity_type);
+
     return $collection;
+  }
+
+  /**
+   * Applies declarative route settings from the entity type definition.
+   *
+   * Merges the extra defaults, requirements and options declared in the entity
+   * type's route settings into the generated routes. This lets entity types
+   * customize their generated routes with static metadata instead of a custom
+   * route provider subclass.
+   *
+   * A 'route_name' key renames the generated route in place. Use this to
+   * preserve a historical, non-conventional route name for backwards
+   * compatibility.
+   *
+   * @param \Symfony\Component\Routing\RouteCollection $collection
+   *   The generated route collection.
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type.
+   *
+   * @see \Drupal\Core\Entity\EntityType::$route_settings
+   */
+  protected function applyRouteSettings(RouteCollection $collection, EntityTypeInterface $entity_type): void {
+    $entity_type_id = $entity_type->id();
+    foreach ($entity_type->getRouteSettings() as $rel => $settings) {
+      $route_name = "entity.{$entity_type_id}." . str_replace('-', '_', $rel);
+      $route = $collection->get($route_name);
+      if ($route === NULL) {
+        continue;
+      }
+      if (!empty($settings['defaults'])) {
+        $route->addDefaults($settings['defaults']);
+      }
+      if (!empty($settings['requirements'])) {
+        $route->addRequirements($settings['requirements']);
+      }
+      if (!empty($settings['options'])) {
+        $route->addOptions($settings['options']);
+      }
+      if (!empty($settings['route_name']) && $settings['route_name'] !== $route_name) {
+        $collection->add($settings['route_name'], $route);
+        $collection->remove($route_name);
+      }
+    }
   }
 
   /**

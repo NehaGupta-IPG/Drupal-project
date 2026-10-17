@@ -6,9 +6,11 @@ use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\node\Controller\NodeController;
 use Drupal\node\Form\DeleteMultiple;
 use Drupal\node\Form\NodeDeleteForm;
 use Drupal\node\Form\NodeForm;
@@ -56,7 +58,7 @@ use Drupal\user\EntityOwnerTrait;
       'delete-multiple-confirm' => DeleteMultiple::class,
     ],
     'route_provider' => [
-      'html' => NodeRouteProvider::class,
+      'html' => DefaultHtmlRouteProvider::class,
     ],
     'list_builder' => NodeListBuilder::class,
     'translation' => NodeTranslationHandler::class,
@@ -71,6 +73,27 @@ use Drupal\user\EntityOwnerTrait;
     'version-history' => '/node/{node}/revisions',
     'revision' => '/node/{node}/revisions/{node_revision}/view',
     'create' => '/node',
+  ],
+  route_settings: [
+    'add-page' => [
+      // @todo Deprecate custom route name in https://www.drupal.org/i/3506653
+      'route_name' => 'node.add_page',
+      'defaults' => [
+        '_controller' => NodeController::class . '::addPage',
+        '_title' => 'Add content',
+      ],
+      'options' => ['_node_operation_route' => TRUE],
+    ],
+    'add-form' => [
+      // @todo Deprecate custom route name in https://www.drupal.org/i/3506653
+      'route_name' => 'node.add',
+      'defaults' => [
+        '_title_callback' => NodeController::class . '::addPageTitle',
+      ],
+      'options' => ['_node_operation_route' => TRUE],
+    ],
+    'edit-form' => ['options' => ['_node_operation_route' => TRUE]],
+    'delete-form' => ['options' => ['_node_operation_route' => TRUE]],
   ],
   collection_permission: 'access content overview',
   permission_granularity: 'bundle',

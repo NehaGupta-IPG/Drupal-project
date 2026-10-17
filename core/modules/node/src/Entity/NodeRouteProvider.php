@@ -2,14 +2,30 @@
 
 namespace Drupal\node\Entity;
 
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
 use Drupal\node\Controller\NodeController;
 
 /**
  * Provides routes for nodes.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The node
+ *   entity type now uses \Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider
+ *   with declarative route settings. See the "route_settings" key on the node
+ *   entity type definition.
+ *
+ * @see https://www.drupal.org/node/9999999
+ * @see \Drupal\node\Entity\Node
+ * @see \Drupal\Core\Entity\EntityType::$route_settings
  */
 class NodeRouteProvider extends DefaultHtmlRouteProvider {
+
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager) {
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The node entity type now uses \Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider with declarative route settings. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+    parent::__construct($entity_type_manager, $entity_field_manager);
+  }
 
   /**
    * {@inheritdoc}

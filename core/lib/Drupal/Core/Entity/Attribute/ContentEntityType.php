@@ -37,6 +37,7 @@ class ContentEntityType extends EntityType {
     protected readonly array $entity_keys = [],
     protected readonly array $handlers = [],
     protected readonly array $links = [],
+    protected readonly array $route_settings = [],
     public readonly ?string $admin_permission = NULL,
     public readonly ?string $collection_permission = NULL,
     public readonly string $permission_granularity = 'entity_type',
