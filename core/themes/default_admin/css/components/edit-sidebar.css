@@ -123,6 +123,10 @@
 
     &::before {
       background-color: var(--admin-color-primary);
+
+      @media (forced-colors: active) {
+        background-color: canvasText;
+      }
     }
   }
 
