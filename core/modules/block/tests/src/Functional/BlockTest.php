@@ -50,7 +50,7 @@ class BlockTest extends BlockTestBase {
     $this->assertSession()->checkboxChecked('edit-visibility-request-path-negate-0');
 
     $this->submitForm($edit, 'Save block');
-    $this->assertSession()->statusMessageContains('The block configuration has been saved.', 'status');
+    $this->assertSession()->statusMessageContains('The ' . $title . ' block configuration has been saved.', 'status');
 
     $this->clickLink('Configure');
     $this->assertSession()->checkboxChecked('edit-visibility-request-path-negate-1');
@@ -140,7 +140,7 @@ class BlockTest extends BlockTestBase {
     // authenticated users.
     $this->drupalGet('admin/structure/block/add/' . $block_name . '/' . $default_theme);
     $this->submitForm($edit, 'Save block');
-    $this->assertSession()->statusMessageContains('The block configuration has been saved.', 'status');
+    $this->assertSession()->statusMessageContains('The ' . $title . ' block configuration has been saved.', 'status');
 
     // Confirm that block was not displayed according to block visibility
     // rules.
@@ -221,7 +221,8 @@ class BlockTest extends BlockTestBase {
     // Select the 'Powered by Drupal' block to be configured and moved.
     $block = [];
     $block['id'] = 'system_powered_by_block';
-    $block['settings[label]'] = $this->randomMachineName(8);
+    $title = $this->randomMachineName(8);
+    $block['settings[label]'] = $title;
     $block['settings[label_display]'] = TRUE;
     $block['theme'] = $this->config('system.theme')->get('default');
     $block['region'] = 'header';
@@ -235,7 +236,7 @@ class BlockTest extends BlockTestBase {
       'id' => $block['id'],
       'region' => $block['region'],
     ], 'Save block');
-    $this->assertSession()->statusMessageContains('The block configuration has been saved.', 'status');
+    $this->assertSession()->statusMessageContains('The ' . $title . ' block configuration has been saved.', 'status');
     // Check to see if the block was created by checking its configuration.
     $instance = Block::load($block['id']);
 
@@ -308,12 +309,13 @@ class BlockTest extends BlockTestBase {
       $this->assertSession()->titleEquals('Block layout | Drupal');
       // Select the 'Powered by Drupal' block to be placed.
       $block = [];
-      $block['id'] = $this->randomMachineName();
+      $title = $this->randomMachineName();
+      $block['settings[label]'] = $title;
       $block['theme'] = $theme;
       $block['region'] = 'content';
       $this->drupalGet('admin/structure/block/add/system_powered_by_block');
       $this->submitForm($block, 'Save block');
-      $this->assertSession()->statusMessageContains('The block configuration has been saved.', 'status');
+      $this->assertSession()->statusMessageContains('The ' . $title . ' block configuration has been saved.', 'status');
       $this->assertSession()->addressEquals('admin/structure/block/list/' . $theme . '?block-placement=' . Html::getClass($block['id']));
 
       // Set the default theme and ensure the block is placed.
@@ -357,7 +359,7 @@ class BlockTest extends BlockTestBase {
     ];
     $this->drupalGet('admin/structure/block/add/' . $block_name . '/' . $default_theme);
     $this->submitForm($edit, 'Save block');
-    $this->assertSession()->statusMessageContains('The block configuration has been saved.', 'status');
+    $this->assertSession()->statusMessageContains('The ' . $title . ' block configuration has been saved.', 'status');
 
     // Confirm that the block is not displayed by default.
     $this->drupalGet('user');

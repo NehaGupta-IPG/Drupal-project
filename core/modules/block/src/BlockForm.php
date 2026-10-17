@@ -350,7 +350,14 @@ class BlockForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $value = parent::save($form, $form_state);
 
-    $this->messenger()->addStatus($this->t('The block configuration has been saved.'));
+    if (isset($_GET['destination'])) {
+      $block_link = $this->entity->toLink($this->entity->label(), 'edit-form', ['query' => ['destination' => $_GET['destination']]])->toString();
+    }
+    else {
+      $block_link = $this->entity->toLink($this->entity->label(), 'edit-form')->toString();
+    }
+
+    $this->messenger()->addStatus($this->t('The %block block configuration has been saved.', ['%block' => $block_link]));
     $form_state->setRedirect(
       'block.admin_display_theme',
       [

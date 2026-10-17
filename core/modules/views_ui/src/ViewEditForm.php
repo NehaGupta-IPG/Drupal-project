@@ -341,6 +341,7 @@ class ViewEditForm extends ViewFormBase {
     // @todo Revisit this when https://www.drupal.org/node/1668866 is in.
     $query = $this->requestStack->getCurrentRequest()->query;
     $destination = $query->get('destination');
+    $name = $view->label();
 
     if (!empty($destination)) {
       // Find out the first display which has a changed path and redirect to
@@ -360,11 +361,12 @@ class ViewEditForm extends ViewFormBase {
         }
       }
       $form_state->setRedirectUrl(Url::fromUri("base:$destination"));
+      $name = $view->toLink($view->label(), 'edit-form', ['query' => ['destination' => $destination]])->toString();
     }
 
     $view->save();
 
-    $this->messenger()->addStatus($this->t('The view %name has been saved.', ['%name' => $view->label()]));
+    $this->messenger()->addStatus($this->t('The view %name has been saved.', ['%name' => $name]));
 
     // Remove this view from cache so we can edit it properly.
     $this->tempStore->delete($view->id());

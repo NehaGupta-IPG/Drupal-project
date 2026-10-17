@@ -111,6 +111,8 @@ class FieldBlockTest extends WebDriverTestBase {
 
     $this->drupalGet($block_url);
     $page->fillField('region', 'content');
+    $label = $this->randomMachineName();
+    $page->fillField('settings[label]', $label);
 
     // Assert the default formatter configuration.
     $assert_session->fieldValueEquals('settings[formatter][type]', 'datetime_default');
@@ -123,7 +125,7 @@ class FieldBlockTest extends WebDriverTestBase {
     $assert_session->fieldNotExists('settings[formatter][settings][format_type]');
     $assert_session->fieldExists('settings[formatter][settings][granularity]');
     $page->pressButton('Save block');
-    $this->assertTrue($assert_session->waitForText('The block configuration has been saved.'));
+    $this->assertTrue($assert_session->waitForText("The $label block configuration has been saved."));
 
     // Configure the block and change the formatter again.
     $this->clickLink('Configure');
@@ -133,7 +135,7 @@ class FieldBlockTest extends WebDriverTestBase {
     $page->selectFieldOption('settings[formatter][settings][format_type]', 'long');
 
     $page->pressButton('Save block');
-    $this->assertTrue($assert_session->waitForText('The block configuration has been saved.'));
+    $this->assertTrue($assert_session->waitForText("The $label block configuration has been saved."));
 
     // Assert that the field value is updated.
     $this->clickLink('Configure');

@@ -278,17 +278,20 @@ class BlockUiTest extends BrowserTestBase {
     $url = 'admin/structure/block/add/test_block_instantiation/stark';
     $this->drupalGet($url);
     $this->assertSession()->fieldValueEquals('id', 'stark_displaymessage');
-    $edit = ['region' => 'content'];
+    $edit = [];
+    $edit['region'] = 'content';
+    $label = $this->randomMachineName();
+    $edit['settings[label]'] = $label;
     $this->drupalGet($url);
     $this->submitForm($edit, 'Save block');
-    $this->assertSession()->pageTextContains('The block configuration has been saved.');
+    $this->assertSession()->pageTextContains("The $label block configuration has been saved.");
 
     // Now, check to make sure the form starts by auto-incrementing correctly.
     $this->drupalGet($url);
     $this->assertSession()->fieldValueEquals('id', 'stark_displaymessage_2');
     $this->drupalGet($url);
     $this->submitForm($edit, 'Save block');
-    $this->assertSession()->pageTextContains('The block configuration has been saved.');
+    $this->assertSession()->pageTextContains("The $label block configuration has been saved.");
 
     // And verify that it continues working beyond just the first two.
     $this->drupalGet($url);
