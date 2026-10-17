@@ -590,7 +590,7 @@ EOF;
           $ajax_response = new AjaxResponse();
           if ($response instanceof SecuredRedirectResponse) {
             // Only redirect to safe locations.
-            $ajax_response->addCommand(new RedirectCommand($response->getTargetUrl()));
+            $ajax_response->addCommand(new RedirectCommand($response->getTargetUrl(), TRUE));
           }
           else {
             try {

@@ -29,9 +29,11 @@ use Drupal\Core\Ajax\SetDialogTitleCommand;
 use Drupal\Core\Ajax\SettingsCommand;
 use Drupal\Core\Ajax\UpdateBuildIdCommand;
 use Drupal\Core\Asset\AttachedAssets;
+use Drupal\Core\Routing\RequestContext;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Test coverage for various classes in the \Drupal\Core\Ajax namespace.
@@ -591,15 +593,46 @@ class AjaxCommandsTest extends UnitTestCase {
   }
 
   /**
-   * Tests redirect command.
+   * Tests redirect command with a local URL.
    *
    * @legacy-covers \Drupal\Core\Ajax\RedirectCommand
    */
   public function testRedirectCommand(): void {
-    $command = new RedirectCommand('http://example.com');
+    $command = new RedirectCommand('/example');
     $expected = [
       'command' => 'redirect',
-      'url' => 'http://example.com',
+      'url' => '/example',
+    ];
+
+    $this->assertEquals($expected, $command->render());
+  }
+
+  /**
+   * Tests redirect command with an untrusted external URL.
+   *
+   * @legacy-covers \Drupal\Core\Ajax\RedirectCommand
+   */
+  public function testRedirectCommandWithUntrustedExternalUrl(): void {
+    $request_context = new RequestContext();
+    $request_context->setCompleteBaseUrl('https://www.drupal.org');
+    $container = new ContainerBuilder();
+    $container->set('router.request_context', $request_context);
+    \Drupal::setContainer($container);
+
+    $this->expectException(\InvalidArgumentException::class);
+    new RedirectCommand('http://evil-url.com/example');
+  }
+
+  /**
+   * Tests redirect command with a URL explicitly marked as trusted.
+   *
+   * @legacy-covers \Drupal\Core\Ajax\RedirectCommand
+   */
+  public function testRedirectCommandWithTrustedExternalUrl(): void {
+    $command = new RedirectCommand('http://good-external-url.com/example', TRUE);
+    $expected = [
+      'command' => 'redirect',
+      'url' => 'http://good-external-url.com/example',
     ];
 
     $this->assertEquals($expected, $command->render());
