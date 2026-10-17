@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Cache;
 
-use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
 use Drupal\Component\Assertion\Inspector;
+use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
@@ -194,7 +194,14 @@ class DatabaseBackend implements CacheBackendInterface {
 
     // Unserialize and return the cached data.
     if ($cache->serialized) {
-      $cache->data = $this->serializer->decode($cache->data);
+      $unserialized = @unserialize($cache->data);
+      // Make sure that corrupt items are properly identified and treated as
+      // cache misses. Otherwise, broken items will be treated as cache hits,
+      // and return a FALSE as the cached data.
+      if ($unserialized === FALSE && $cache->data !== serialize(FALSE)) {
+        return FALSE;
+      }
+      $cache->data = $unserialized;
     }
 
     return $cache;

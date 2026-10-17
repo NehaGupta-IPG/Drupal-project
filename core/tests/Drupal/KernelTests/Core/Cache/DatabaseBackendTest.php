@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\DatabaseBackend;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -51,7 +52,6 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
     // can test cache ID normalization.
     $cid_long = str_repeat('愛€', 500);
     $cached_value_long = $this->randomMachineName();
-    $backend->set($cid_long, $cached_value_long);
     $this->assertSame($cached_value_long, $backend->get($cid_long)->data, "Backend contains the correct value for long, non-ASCII cache id.");
 
     $cid_short = '愛1€';
@@ -118,7 +118,35 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   }
 
   /**
-   * Tests that "cache_tags.invalidator.checksum" is backend overridable.
+   * Tests getting a FALSE when requesting a corrupt cache item.
+   */
+  public function testCorruptCacheReturnsFalse(): void {
+    $corrupt_backend = $this->getCacheBackend('corrupt');
+    $cache_tags_checksum = $this->container->get('cache_tags.invalidator.checksum');
+
+    $cid = $this->randomMachineName();
+    $valid_data = $this->randomObject();
+
+    $corrupt_backend->set($cid, $valid_data, CacheBackendInterface::CACHE_PERMANENT);
+
+    $this->assertEquals($valid_data, $corrupt_backend->get($cid)->data, "Valid cache item is correctly retrieved.");
+
+    // Insert a corrupted cache item into the database.
+    \Drupal::database()->insert('cache_corrupt')->fields([
+      'cid' => $cid,
+      'created' => round(microtime(TRUE), 3),
+      'data' => substr(serialize($this->randomObject()), 0, -5),
+      'expire' => CacheBackendInterface::CACHE_PERMANENT,
+      'tags' => '',
+      'serialized' => 1,
+      'checksum' => $cache_tags_checksum->getCurrentChecksum([]),
+    ])->execute();
+
+    $this->assertFalse($corrupt_backend->get($cid), "Returns FALSE when requesting the corrupt object.");
+  }
+
+  /**
+   * Test the service "cache_tags.invalidator.checksum" is backend overridable.
    */
   public function testCacheTagsInvalidatorChecksumIsBackendOverridable(): void {
     $definition = $this->container->getDefinition('cache_tags.invalidator.checksum');
