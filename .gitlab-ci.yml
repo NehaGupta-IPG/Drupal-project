@@ -745,9 +745,6 @@ default:
     expire_in: 1 week
     expose_as: 'web-vendor'
     paths:
-      - vendor/
-      - composer.lock
-      - composer/Metapackage/
       - $_ARTIFACTS_DIR
       - core/.phpcscache
 
