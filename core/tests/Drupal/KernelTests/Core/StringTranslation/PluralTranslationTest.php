@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\StringTranslation;
 
 use Drupal\Component\Gettext\PoHeader;
@@ -7,12 +9,14 @@ use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the PluralTranslatableMarkup translation.
- *
- * @group StringTranslation
  */
+#[Group('StringTranslation')]
+#[RunTestsInSeparateProcesses]
 class PluralTranslationTest extends KernelTestBase {
 
   /**
@@ -43,7 +47,7 @@ class PluralTranslationTest extends KernelTestBase {
   /**
    * Tests that PluralTranslatableMarkup objects translates properly.
    */
-  public function testPluralWithCount() {
+  public function testPluralWithCount(): void {
     /** @var \Drupal\locale\StringStorageInterface $storage */
     $storage = \Drupal::service('locale.storage');
     $source = $storage->createString([
@@ -53,20 +57,20 @@ class PluralTranslationTest extends KernelTestBase {
       'lid' => $source->lid,
       'language' => 'ru',
       'translation' => implode(PoItem::DELIMITER, [
-        '@count день',
-        '@count дня',
-        '@count[2] дней',
+        '@count day, one form',
+        '@count days, few form',
+        '@count[2] days, many form',
       ]),
     ])->save();
     $string = new PluralTranslatableMarkup(21, '1 day', '@count days', [], ['langcode' => 'ru']);
-    $this->assertEquals('21 день', $string);
+    $this->assertEquals('21 day, one form', $string);
     $translation->setString(implode(PoItem::DELIMITER, [
-      '@count день',
-      '@count[2] дней',
+      '@count day, one form',
+      '@count[2] days, many form',
     ]))->save();
     \Drupal::translation()->reset();
     $string = new PluralTranslatableMarkup(21, '1 day', '@count days', [], ['langcode' => 'ru']);
-    $this->assertEquals('21 день', $string);
+    $this->assertEquals('21 day, one form', $string);
   }
 
 }
