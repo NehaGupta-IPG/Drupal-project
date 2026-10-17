@@ -198,7 +198,11 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
       return FALSE;
     }
     $this->view->setDisplay($display_name);
-
+    $this->view->initPager();
+    $items_per_page = $this->view->getItemsPerPage();
+    if ($items_per_page > 0) {
+      $limit = $items_per_page;
+    }
     // Pass options to the display handler to make them available later.
     $entity_reference_options = [
       'match' => $match,
