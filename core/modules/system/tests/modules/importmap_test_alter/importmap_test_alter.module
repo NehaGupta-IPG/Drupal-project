@@ -40,6 +40,7 @@ function importmap_test_alter_importmap_alter(array &$import_map, array &$confli
       'data' => "$path/js/altered.js",
       'external' => FALSE,
       'version' => '1.0',
+      'cache' => TRUE,
     ];
   }
   elseif ($mode === 'resolve') {

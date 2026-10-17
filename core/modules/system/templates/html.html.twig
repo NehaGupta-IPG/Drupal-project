@@ -20,6 +20,12 @@
  * - placeholder_token: The token for generating head, css, js and js-bottom
  *   placeholders.
  *
+ * The head-placeholder must be printed before the css-placeholder and the
+ * js-placeholder. The import map of the site is delivered through the head
+ * placeholder, and a browser ignores an import map that appears after a module
+ * script or a module preload, so a theme that prints the placeholders in
+ * another order, or that omits the head-placeholder, breaks ES modules.
+ *
  * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
  *
  * @ingroup themeable

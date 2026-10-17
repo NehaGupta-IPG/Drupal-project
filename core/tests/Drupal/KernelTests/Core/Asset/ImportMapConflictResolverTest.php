@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Asset;
 
+use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -80,6 +81,7 @@ class ImportMapConflictResolverTest extends KernelTestBase {
       'data' => $this->modulePath() . "/js/$file",
       'external' => FALSE,
       'version' => '1.0',
+      'cache' => TRUE,
     ];
   }
 
@@ -152,6 +154,24 @@ class ImportMapConflictResolverTest extends KernelTestBase {
       $this->assertTrue(in_array($message[0], ['error', 3], TRUE), 'The conflict is logged as an error.');
       $this->assertStringContainsString('hook_importmap_alter', $message[1]);
     }
+  }
+
+  /**
+   * Tests that a library which lost a conflict contributes no preloads.
+   *
+   * The preloads are derived from the aggregated import map, so the modules of
+   * a library whose definition was dropped in favour of another library's are
+   * not reachable by their module specifier, and must not be preloaded.
+   */
+  public function testLosingLibrariesContributeNoPreloads(): void {
+    $assets = (new AttachedAssets())->setLibraries(['importmap_test_conflicts/conflict-b']);
+    $this->assertSame([], $this->assetResolver->getModulePreloads($assets), 'A library that lost both of its entries preloads nothing.');
+
+    $assets = (new AttachedAssets())->setLibraries(['importmap_test_conflicts/conflict-a']);
+    $this->assertSame([
+      $this->entry('multi-a.js'),
+      $this->entry('pair-a.js'),
+    ], $this->assetResolver->getModulePreloads($assets), 'The winning library preloads its own definitions.');
   }
 
   /**

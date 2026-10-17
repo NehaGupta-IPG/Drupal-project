@@ -565,6 +565,7 @@ function hook_preprocess(&$variables, $hook): void {
   static $hooks;
 
   // Add contextual links to the variables, if the user has permission.
+
   if (!\Drupal::currentUser()->hasPermission('access contextual links')) {
     return;
   }
@@ -1102,9 +1103,9 @@ function hook_css_alter(&$css, \Drupal\Core\Asset\AttachedAssetsInterface $asset
  * by another extension, or to resolve a conflict between two libraries that
  * define the same module specifier with different values. In the latter case,
  * the merge keeps the definition of the extension that comes first in the
- * merge order (core, then the modules in the module list, then the themes in
- * the theme chain), and logs an error mentioning the two libraries. An
- * implementation that resolves the conflict (by changing or removing the
+ * merge order (core, then the enabled modules sorted by machine name, then the
+ * themes in the theme chain), and logs an error mentioning the two libraries.
+ * An implementation that resolves the conflict (by changing or removing the
  * entry) should unset the conflict from $conflicts, so that the error is not
  * logged.
  *
@@ -1114,19 +1115,20 @@ function hook_css_alter(&$css, \Drupal\Core\Asset\AttachedAssetsInterface $asset
  * the current user) must invalidate the 'library_info' cache tag when that
  * dependency changes.
  *
- * Note that the module preloads of attached libraries (see
+ * The module preloads of the libraries attached to a response (see
  * \Drupal\Core\Asset\AssetResolverInterface::getModulePreloads()) are derived
- * from the library definitions, not from the aggregated import map, so an
- * entry altered here does not change the preloads.
+ * from the altered map, so replacing or removing an entry here also changes
+ * what is preloaded.
  *
  * @param array $import_map
  *   The aggregated import map, passed by reference, with the keys 'imports',
  *   'scopes' and 'integrity'. Entries under 'imports' and 'scopes' are keyed
  *   by the module specifier, and resolve to an array with the keys 'data'
  *   (the resolved path or URL), 'external' (a boolean, TRUE for external
- *   URLs) and 'version'. Entries under 'integrity' are keyed by the resolved
- *   path or URL, and resolve to an array with the keys 'data', 'external',
- *   'version' and 'integrity' (the integrity metadata string).
+ *   URLs), 'version' and 'cache' (a boolean, FALSE for modules that must not
+ *   be cached). Entries under 'integrity' are keyed by the resolved path or
+ *   URL, and resolve to an array with the same keys plus 'integrity' (the
+ *   integrity metadata string).
  * @param array $conflicts
  *   The conflicts found while the import map was aggregated, passed by
  *   reference, with the same top-level keys as $import_map. Each conflict is
@@ -1134,10 +1136,11 @@ function hook_css_alter(&$css, \Drupal\Core\Asset\AttachedAssetsInterface $asset
  *   in the conflict, keyed by the name of the library that provided the
  *   definition, e.g. 'module/library'. The first definition listed is the
  *   one used by the merge, which is the entry currently in $import_map.
- *   An implementation
- *   that resolves a conflict (by changing or removing the entry in
- *   $import_map) should unset the conflict from $conflicts; the remaining
- *   conflicts are logged as errors.
+ *   An implementation that resolves a conflict (by changing or removing the
+ *   entry in $import_map) should unset the conflict from $conflicts; the
+ *   remaining conflicts are logged as errors. Only remove keys from
+ *   $conflicts: adding a key that no library definition provides cannot be
+ *   attributed to a library, and is reported as an error without details.
  *
  * @see \Drupal\Core\Asset\AssetResolver::getImportMap()
  * @see hook_library_info_alter()

@@ -70,26 +70,31 @@ class ImportMapResolverTest extends KernelTestBase {
           'data' => $winner_data,
           'external' => FALSE,
           'version' => '1.0',
+          'cache' => TRUE,
         ],
         'importmap-test-prefix/' => [
           'data' => "$path/js/prefix/",
           'external' => FALSE,
           'version' => '1.0',
+          'cache' => TRUE,
         ],
         'importmap-test-external' => [
           'data' => 'https://example.com/importmap-test-external.mjs',
           'external' => TRUE,
           'version' => '1.0',
+          'cache' => TRUE,
         ],
         'importmap-test-altered' => [
           'data' => "$path/js/altered.js",
           'external' => FALSE,
           'version' => '1.0',
+          'cache' => TRUE,
         ],
         'importmap-test-duplicate' => [
           'data' => "$conflict_path/js/duplicate.js",
           'external' => FALSE,
           'version' => '1.0',
+          'cache' => TRUE,
         ],
       ],
       'scopes' => [
@@ -98,6 +103,7 @@ class ImportMapResolverTest extends KernelTestBase {
             'data' => "$path/js/scope/foo.js",
             'external' => FALSE,
             'version' => '1.0',
+            'cache' => TRUE,
           ],
         ],
       ],
@@ -106,6 +112,7 @@ class ImportMapResolverTest extends KernelTestBase {
           'data' => "$path/js/foo.js",
           'external' => FALSE,
           'version' => '1.0',
+          'cache' => TRUE,
           'integrity' => 'sha384-oXiGjHO+NOxR1XH8somfajtqMWa5PTleNh5VGncEbQQTrZZboU8xIMhoDzGBbroU',
         ],
       ],
@@ -142,6 +149,7 @@ class ImportMapResolverTest extends KernelTestBase {
       'data' => "$path/js/altered.js",
       'external' => FALSE,
       'version' => '1.0',
+      'cache' => TRUE,
     ], $import_map['imports']['importmap-test-foo']);
     // The alteration does not resolve the conflict, so it is still logged.
     $conflict_messages = array_filter($this->logger->messages, static function (array $message) {
@@ -165,6 +173,7 @@ class ImportMapResolverTest extends KernelTestBase {
       'data' => "$conflict_path/js/conflict-foo.js",
       'external' => FALSE,
       'version' => '1.0',
+      'cache' => TRUE,
     ], $import_map['imports']['importmap-test-foo']);
     // The conflict is resolved in hook_importmap_alter(), so it is not
     // logged.
@@ -200,6 +209,7 @@ class ImportMapResolverTest extends KernelTestBase {
       'data' => "$path/js/altered.js",
       'external' => FALSE,
       'version' => '1.0',
+      'cache' => TRUE,
     ], $import_map['imports']['importmap-test-altered']);
   }
 
@@ -232,21 +242,25 @@ class ImportMapResolverTest extends KernelTestBase {
         'data' => "$path/js/foo.js",
         'external' => FALSE,
         'version' => '1.0',
+        'cache' => TRUE,
       ],
       [
         'data' => 'https://example.com/importmap-test-external.mjs',
         'external' => TRUE,
         'version' => '1.0',
+        'cache' => TRUE,
       ],
       [
         'data' => "$path/js/altered.js",
         'external' => FALSE,
         'version' => '1.0',
+        'cache' => TRUE,
       ],
       [
         'data' => "$path/js/scope/foo.js",
         'external' => FALSE,
         'version' => '1.0',
+        'cache' => TRUE,
       ],
     ], $preloads);
   }
@@ -263,21 +277,25 @@ class ImportMapResolverTest extends KernelTestBase {
         'data' => "$path/js/foo.js",
         'external' => FALSE,
         'version' => '1.0',
+        'cache' => TRUE,
       ],
       [
         'data' => 'https://example.com/importmap-test-external.mjs',
         'external' => TRUE,
         'version' => '1.0',
+        'cache' => TRUE,
       ],
       [
         'data' => "$path/js/altered.js",
         'external' => FALSE,
         'version' => '1.0',
+        'cache' => TRUE,
       ],
       [
         'data' => "$path/js/scope/foo.js",
         'external' => FALSE,
         'version' => '1.0',
+        'cache' => TRUE,
       ],
     ], $preloads);
   }

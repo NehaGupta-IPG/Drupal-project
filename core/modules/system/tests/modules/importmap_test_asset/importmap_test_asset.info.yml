@@ -1,0 +1,5 @@
+name: 'Import map asset test'
+type: module
+description: 'Tests that modules which are both JavaScript assets and import map entries keep a single URL.'
+package: Testing
+core_version_requirement: ^12 || ^13

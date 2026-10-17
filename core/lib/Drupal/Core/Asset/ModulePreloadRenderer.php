@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Asset;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 
 /**
@@ -26,10 +27,13 @@ class ModulePreloadRenderer implements AssetCollectionRendererInterface {
    *   The file URL generator.
    * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
    *   The asset query string.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time.
    */
   public function __construct(
     protected FileUrlGeneratorInterface $fileUrlGenerator,
     protected AssetQueryStringInterface $assetQueryString,
+    protected TimeInterface $time,
   ) {
   }
 
@@ -48,6 +52,10 @@ class ModulePreloadRenderer implements AssetCollectionRendererInterface {
       if ($entry['external']) {
         $attributes['crossorigin'] = 'anonymous';
       }
+      // The path is part of the key, like the 'html_head_link:*' keys of
+      // \Drupal\Core\Render\HtmlResponseAttachmentsProcessor, because a page
+      // can preload many modules and head elements are merged by key: numbered
+      // elements would overwrite each other.
       $elements['modulepreload:' . $entry['data']] = [
         '#type' => 'html_tag',
         '#tag' => 'link',

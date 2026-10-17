@@ -34,7 +34,7 @@ class LibraryDiscoveryParser {
     ?LibraryImportMapProcessorInterface $importMapProcessor = NULL,
   ) {
     if (!isset($importMapProcessor)) {
-      @trigger_error('Constructing LibraryDiscoveryParser without an import map processor is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+      @trigger_error('Constructing LibraryDiscoveryParser without an import map processor is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
       $importMapProcessor = new LibraryImportMapProcessor($this->librariesDirectoryFileFinder, $this->streamWrapperManager);
     }
     $this->importMapProcessor = $importMapProcessor;
@@ -335,20 +335,28 @@ class LibraryDiscoveryParser {
    *   page, its entries are preloaded with <link rel="modulepreload">
    *   elements. All of its entries are preloaded, including entries that the
    *   attached module scripts do not import, so a library should keep its
-   *   import map entries limited to the modules that its scripts import.
-   *   Libraries that consume an import map entry should declare a
-   *   normal library dependency on the library that provides the entry. The
-   *   importmap of a library may be overridden in the libraries-override of
-   *   a theme: the override uses the same structure as the definition. The
-   *   sources of the override are relative to the theme, or may be absolute
-   *   paths or URLs; FALSE removes an entry; integrity entries may be added.
+   *   import map entries limited to the modules that its scripts import: the
+   *   entries of every enabled module are shipped to every page, and each
+   *   preloaded module is fetched by the browser. The value of an entry under
+   *   'imports' or a scope is either the module source, or a mapping with the
+   *   keys 'path' and 'cache'. Set 'cache' to FALSE when the same file is
+   *   attached as a JavaScript asset with 'cache: false': the query string of
+   *   a module URL is derived from its cacheability, and a browser identifies
+   *   an ES module by its URL, so the two URLs must match or the module is
+   *   instantiated twice. Libraries that consume an import map entry should
+   *   declare a normal library dependency on the library that provides the
+   *   entry. The importmap of a library may be overridden in the
+   *   libraries-override of a theme: the override uses the same structure as
+   *   the definition. The sources of the override are relative to the theme,
+   *   or may be absolute paths or URLs; FALSE removes an entry; integrity
+   *   entries may be added.
    *   Note that the aggregated import map resolves conflicts between
    *   extensions in favor of the first definition, so an override has no
    *   effect when an extension that comes earlier in that order (core, then
-   *   the modules in the module list, then the themes in the theme chain)
-   *   defines the same module specifier with a different value. Such a
-   *   conflict is logged as an error; it can be resolved, and the log message
-   *   suppressed, by implementing hook_importmap_alter().
+   *   the enabled modules sorted by machine name, then the themes in the
+   *   theme chain) defines the same module specifier with a different value.
+   *   Such a conflict is logged as an error; it can be resolved, and the log
+   *   message suppressed, by implementing hook_importmap_alter().
    *   @code
    *   importmap:
    *     imports:

@@ -85,21 +85,25 @@ class ImportMapOverrideResolverTest extends KernelTestBase {
           'data' => "$theme_path/js/theme-foo.js",
           'external' => FALSE,
           'version' => '1.0',
+          'cache' => TRUE,
         ],
         'importmap-test-prefix/' => [
           'data' => "$path/js/prefix/",
           'external' => FALSE,
           'version' => '1.0',
+          'cache' => TRUE,
         ],
         'importmap-test-external' => [
           'data' => 'https://example.com/importmap-test-external.mjs',
           'external' => TRUE,
           'version' => '1.0',
+          'cache' => TRUE,
         ],
         'importmap-test-duplicate' => [
           'data' => "$conflict_path/js/duplicate.js",
           'external' => FALSE,
           'version' => '1.0',
+          'cache' => TRUE,
         ],
       ],
       'scopes' => [
@@ -108,6 +112,7 @@ class ImportMapOverrideResolverTest extends KernelTestBase {
             'data' => "$path/js/scope/foo.js",
             'external' => FALSE,
             'version' => '1.0',
+            'cache' => TRUE,
           ],
         ],
       ],
@@ -116,12 +121,14 @@ class ImportMapOverrideResolverTest extends KernelTestBase {
           'data' => "$path/js/foo.js",
           'external' => FALSE,
           'version' => '1.0',
+          'cache' => TRUE,
           'integrity' => 'sha384-oXiGjHO+NOxR1XH8somfajtqMWa5PTleNh5VGncEbQQTrZZboU8xIMhoDzGBbroU',
         ],
         "$theme_path/js/theme-foo.js" => [
           'data' => "$theme_path/js/theme-foo.js",
           'external' => FALSE,
           'version' => '1.0',
+          'cache' => TRUE,
           'integrity' => 'sha384-theme',
         ],
       ],
@@ -194,16 +201,19 @@ class ImportMapOverrideResolverTest extends KernelTestBase {
         'data' => "$theme_path/js/theme-foo.js",
         'external' => FALSE,
         'version' => '1.0',
+        'cache' => TRUE,
       ],
       [
         'data' => 'https://example.com/importmap-test-external.mjs',
         'external' => TRUE,
         'version' => '1.0',
+        'cache' => TRUE,
       ],
       [
         'data' => "$path/js/scope/foo.js",
         'external' => FALSE,
         'version' => '1.0',
+        'cache' => TRUE,
       ],
     ], $preloads);
   }

@@ -8,6 +8,7 @@ use Drupal\Component\Datetime\Time;
 use Drupal\Core\Asset\AssetResolver;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Asset\ImportMapBuilder;
 use Drupal\Core\Asset\JsCollectionGrouper;
 use Drupal\Core\Asset\LibraryDependencyResolver;
 use Drupal\Core\Asset\LibraryDiscoveryCollector;
@@ -16,9 +17,11 @@ use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -112,7 +115,16 @@ class AssetResolverTest extends UnitTestCase {
    *
    * @var string[]
    */
-  protected array $modules = [];
+  /**
+   * The machine names of the enabled modules.
+   *
+   * The import map is aggregated from the libraries of core, the enabled
+   * modules and the active theme, so the modules whose libraries the tests use
+   * have to be enabled.
+   *
+   * @var string[]
+   */
+  protected array $modules = ['llama', 'piggy'];
 
   /**
    * {@inheritdoc}
@@ -205,13 +217,33 @@ class AssetResolverTest extends UnitTestCase {
         'js' => [],
         'importmap' => [
           'imports' => [
-            'llama' => ['data' => 'modules/llama/llama.mjs', 'external' => FALSE, 'version' => '2.0'],
-            'llama-prefix/' => ['data' => 'modules/llama/', 'external' => FALSE, 'version' => '2.0'],
-            'llama-ext' => ['data' => 'https://example.com/llama.mjs', 'external' => TRUE, 'version' => '2.0'],
+            'llama' => [
+              'data' => 'modules/llama/llama.mjs',
+              'external' => FALSE,
+              'version' => '2.0',
+              'cache' => TRUE,
+            ],
+            'llama-prefix/' => [
+              'data' => 'modules/llama/',
+              'external' => FALSE,
+              'version' => '2.0',
+              'cache' => TRUE,
+            ],
+            'llama-ext' => [
+              'data' => 'https://example.com/llama.mjs',
+              'external' => TRUE,
+              'version' => '2.0',
+              'cache' => TRUE,
+            ],
           ],
           'scopes' => [
             '/modules/llama/v1' => [
-              'llama' => ['data' => 'modules/llama/v1/llama.mjs', 'external' => FALSE, 'version' => '1.0'],
+              'llama' => [
+                'data' => 'modules/llama/v1/llama.mjs',
+                'external' => FALSE,
+                'version' => '1.0',
+                'cache' => TRUE,
+              ],
             ],
           ],
           'integrity' => [
@@ -219,6 +251,7 @@ class AssetResolverTest extends UnitTestCase {
               'data' => 'modules/llama/llama.mjs',
               'external' => FALSE,
               'version' => '2.0',
+              'cache' => TRUE,
               'integrity' => 'sha384-llama',
             ],
           ],
@@ -236,6 +269,14 @@ class AssetResolverTest extends UnitTestCase {
         ],
       ],
     ];
+    // Group the library definitions by extension, so that the two lookups of
+    // the library discovery stubs stay consistent: the import map is aggregated
+    // per extension, while the asset resolvers look up a single library.
+    foreach ($this->libraries as $library_id => $definition) {
+      [$extension, $name] = explode('/', $library_id, 2);
+      $this->extensionLibraries[$extension][$name] = $definition;
+    }
+
     $this->libraryDependencyResolver = new LibraryDependencyResolver($this->libraryDiscovery);
     $this->libraryDiscovery
       ->method('getLibrariesByExtension')
@@ -250,7 +291,7 @@ class AssetResolverTest extends UnitTestCase {
     $this->themeManager = $this->createStub(ThemeManagerInterface::class);
     $this->themeManager
       ->method('getActiveTheme')
-      ->willReturn($active_theme);
+      ->willReturn(new ActiveTheme(['name' => $active_theme->getName()]));
 
     $english = $this->createStub('\Drupal\Core\Language\LanguageInterface');
     $english
@@ -275,7 +316,7 @@ class AssetResolverTest extends UnitTestCase {
 
     $this->logger = $this->createStub(LoggerChannelInterface::class);
 
-    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler, $this->logger);
+    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler, $this->logger, $this->createImportMapBuilder());
   }
 
   /**
@@ -285,7 +326,22 @@ class AssetResolverTest extends UnitTestCase {
    */
   protected function createAssetResolverWithLogger(): void {
     $this->logger = $this->createMock(LoggerChannelInterface::class);
-    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler, $this->logger);
+    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler, $this->logger, $this->createImportMapBuilder());
+  }
+
+  /**
+   * Returns an import map builder using the same stubs as the resolver.
+   *
+   * The resolver delegates the aggregation of the import map to the builder, so
+   * the tests for the module preloads exercise the real collaboration instead of
+   * a mocked builder that would only assert the mock's configuration.
+   *
+   * @return \Drupal\Core\Asset\ImportMapBuilder
+   *   The import map builder.
+   */
+  protected function createImportMapBuilder(): ImportMapBuilder {
+    $state = $this->createStub(StateInterface::class);
+    return new ImportMapBuilder($this->libraryDiscovery, $this->moduleHandler, $this->themeManager, $state, $this->cache, $this->logger);
   }
 
   /**
@@ -431,185 +487,6 @@ class AssetResolverTest extends UnitTestCase {
   }
 
   /**
-   * Returns an import map entry.
-   *
-   * @param string $data
-   *   The resolved path or URL.
-   * @param int|string $version
-   *   The version of the library providing the entry, or -1.
-   * @param bool $external
-   *   Whether the entry is an external URL.
-   *
-   * @return array
-   *   An import map entry.
-   */
-  protected function importMapEntry(string $data, int|string $version = -1, bool $external = FALSE): array {
-    return [
-      'data' => $data,
-      'external' => $external,
-      'version' => $version,
-    ];
-  }
-
-  /**
-   * Tests get import map.
-   */
-  public function testGetImportMap(): void {
-    $this->modules = ['llama', 'piggy'];
-    $this->extensionLibraries = [
-      'core' => [
-        'core-library' => [
-          'importmap' => [
-            'imports' => [
-              'core-library' => $this->importMapEntry('/core/lib/core-library.mjs', '1.0'),
-            ],
-            'scopes' => [],
-            'integrity' => [],
-          ],
-        ],
-      ],
-      'llama' => [
-        'llama-library' => [
-          'importmap' => [
-            'imports' => [
-              'llama' => $this->importMapEntry('modules/llama/llama.mjs', '2.0'),
-            ],
-            'scopes' => [
-              '/modules/llama/v1' => [
-                'llama' => $this->importMapEntry('modules/llama/v1/llama.mjs', '1.0'),
-              ],
-            ],
-            'integrity' => [
-              'modules/llama/llama.mjs' => [
-                'data' => 'modules/llama/llama.mjs',
-                'external' => FALSE,
-                'version' => '2.0',
-                'integrity' => 'sha384-llama',
-              ],
-            ],
-          ],
-        ],
-        'no-import-map' => [
-          'importmap' => [
-            'imports' => [],
-            'scopes' => [],
-            'integrity' => [],
-          ],
-        ],
-      ],
-      'stark' => [
-        'theme-library' => [
-          'importmap' => [
-            'imports' => [
-              'theme' => $this->importMapEntry('https://example.com/theme.mjs', -1, TRUE),
-            ],
-            'scopes' => [],
-            'integrity' => [],
-          ],
-        ],
-      ],
-    ];
-    $import_map = $this->assetResolver->getImportMap();
-    $this->assertSame([
-      'imports' => [
-        'core-library' => $this->importMapEntry('/core/lib/core-library.mjs', '1.0'),
-        'llama' => $this->importMapEntry('modules/llama/llama.mjs', '2.0'),
-        'theme' => $this->importMapEntry('https://example.com/theme.mjs', -1, TRUE),
-      ],
-      'scopes' => [
-        '/modules/llama/v1' => [
-          'llama' => $this->importMapEntry('modules/llama/v1/llama.mjs', '1.0'),
-        ],
-      ],
-      'integrity' => [
-        'modules/llama/llama.mjs' => [
-          'data' => 'modules/llama/llama.mjs',
-          'external' => FALSE,
-          'version' => '2.0',
-          'integrity' => 'sha384-llama',
-        ],
-      ],
-    ], $import_map);
-  }
-
-  /**
-   * Tests that a conflicting import map entry is ignored, and logged.
-   */
-  public function testGetImportMapWithConflict(): void {
-    $this->createAssetResolverWithLogger();
-    $this->modules = ['llama', 'piggy'];
-    $this->extensionLibraries = [
-      'llama' => [
-        'llama-library' => [
-          'importmap' => [
-            'imports' => [
-              'llama' => $this->importMapEntry('modules/llama/llama.mjs', '2.0'),
-            ],
-            'scopes' => [],
-            'integrity' => [],
-          ],
-        ],
-      ],
-      'piggy' => [
-        'piggy-library' => [
-          'importmap' => [
-            'imports' => [
-              'llama' => $this->importMapEntry('modules/piggy/piggy-llama.mjs', '1.0'),
-            ],
-            'scopes' => [],
-            'integrity' => [],
-          ],
-        ],
-      ],
-    ];
-    $this->logger->expects($this->once())
-      ->method('error')
-      ->with($this->stringContains("The module specifier 'llama' in the 'imports' section is defined by both llama/llama-library and piggy/piggy-library with different values. The value from llama/llama-library is used."));
-    $import_map = $this->assetResolver->getImportMap();
-    $this->assertSame($this->importMapEntry('modules/llama/llama.mjs', '2.0'), $import_map['imports']['llama']);
-  }
-
-  /**
-   * Tests that a duplicate import map entry is not a conflict.
-   *
-   * The entry maps the same module specifier to the same file, but the
-   * library versions differ. The version only affects the query string of
-   * the module URL, so this is not a conflict.
-   */
-  public function testGetImportMapWithDuplicate(): void {
-    $this->createAssetResolverWithLogger();
-    $this->modules = ['llama', 'piggy'];
-    $this->extensionLibraries = [
-      'llama' => [
-        'llama-library' => [
-          'importmap' => [
-            'imports' => [
-              'llama' => $this->importMapEntry('modules/llama/llama.mjs', '2.0'),
-            ],
-            'scopes' => [],
-            'integrity' => [],
-          ],
-        ],
-      ],
-      'piggy' => [
-        'piggy-library' => [
-          'importmap' => [
-            'imports' => [
-              'llama' => $this->importMapEntry('modules/llama/llama.mjs', '1.0'),
-            ],
-            'scopes' => [],
-            'integrity' => [],
-          ],
-        ],
-      ],
-    ];
-    $this->logger->expects($this->never())
-      ->method('error');
-    $import_map = $this->assetResolver->getImportMap();
-    $this->assertCount(1, $import_map['imports']);
-  }
-
-  /**
    * Tests get module preloads.
    */
   #[DataProvider('providerGetModulePreloads')]
@@ -635,17 +512,17 @@ class AssetResolverTest extends UnitTestCase {
       'library with import map' => [
         ['llama/llama-library'],
         [
-          ['data' => 'modules/llama/llama.mjs', 'external' => FALSE, 'version' => '2.0'],
-          ['data' => 'https://example.com/llama.mjs', 'external' => TRUE, 'version' => '2.0'],
-          ['data' => 'modules/llama/v1/llama.mjs', 'external' => FALSE, 'version' => '1.0'],
+          ['data' => 'modules/llama/llama.mjs', 'external' => FALSE, 'version' => '2.0', 'cache' => TRUE],
+          ['data' => 'https://example.com/llama.mjs', 'external' => TRUE, 'version' => '2.0', 'cache' => TRUE],
+          ['data' => 'modules/llama/v1/llama.mjs', 'external' => FALSE, 'version' => '1.0', 'cache' => TRUE],
         ],
       ],
       'import map pulled in as a dependency' => [
         ['piggy/consumer'],
         [
-          ['data' => 'modules/llama/llama.mjs', 'external' => FALSE, 'version' => '2.0'],
-          ['data' => 'https://example.com/llama.mjs', 'external' => TRUE, 'version' => '2.0'],
-          ['data' => 'modules/llama/v1/llama.mjs', 'external' => FALSE, 'version' => '1.0'],
+          ['data' => 'modules/llama/llama.mjs', 'external' => FALSE, 'version' => '2.0', 'cache' => TRUE],
+          ['data' => 'https://example.com/llama.mjs', 'external' => TRUE, 'version' => '2.0', 'cache' => TRUE],
+          ['data' => 'modules/llama/v1/llama.mjs', 'external' => FALSE, 'version' => '1.0', 'cache' => TRUE],
         ],
       ],
     ];

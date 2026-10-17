@@ -11,6 +11,7 @@ use Drupal\Core\Asset\Exception\InvalidLibraryFileException;
 use Drupal\Core\Asset\Exception\LibraryDefinitionMissingLicenseException;
 use Drupal\Core\Asset\LibrariesDirectoryFileFinder;
 use Drupal\Core\Asset\LibraryDiscoveryParser;
+use Drupal\Core\Asset\LibraryImportMapProcessor;
 use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -118,7 +119,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
 
     $this->yamlCacheCollector = new YamlCacheCollector('library.yaml_parser', new MemoryCache(new Time()), new NullLockBackend(), new Time());
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+    $this->libraryDiscoveryParser = $this->createParser();
   }
 
   /**
@@ -144,7 +145,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
    */
   #[RunInSeparateProcess]
   public function testBuildByExtensionSimple(): void {
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+    $this->libraryDiscoveryParser = $this->createParser();
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
       ->with('example_module')
@@ -424,36 +425,43 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
           'data' => $path . '/js/foo.js',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
         'importmap-test-absolute' => [
           'data' => 'core/misc/align-right.js',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
         'importmap-test-libraries' => [
           'data' => 'libraries/llama/lib.mjs',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
         'importmap-test-protocol-free' => [
           'data' => '//example.com/importmap-test-foo.js',
           'external' => TRUE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
         'importmap-test-external' => [
           'data' => 'https://example.com/importmap-test-foo.js',
           'external' => TRUE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
         'importmap-test-prefix/' => [
           'data' => $path . '/js/prefix/',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
         'importmap-test-root' => [
           'data' => '',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
       ],
       'scopes' => [
@@ -462,6 +470,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
             'data' => $path . '/js/foo-v1.js',
             'external' => FALSE,
             'version' => '2.0',
+            'cache' => TRUE,
           ],
         ],
         'absolute-scope' => [
@@ -469,6 +478,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
             'data' => $path . '/js/foo-v2.js',
             'external' => FALSE,
             'version' => '2.0',
+            'cache' => TRUE,
           ],
         ],
       ],
@@ -477,12 +487,14 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
           'data' => $path . '/js/foo.js',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
           'integrity' => 'sha384-oXiGjHO+NOxR1XH8somfajtqMWa5PTleNh5VGncEbQQTrZZboU8xIMhoDzGBbroU',
         ],
         'core/misc/align-right.js' => [
           'data' => 'core/misc/align-right.js',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
           'integrity' => 'sha384-other',
         ],
       ],
@@ -517,7 +529,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->with('module', 'importmap_module')
       ->willReturn($path);
 
-    $parser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+    $parser = $this->createParser();
     $libraries = $parser->buildByExtension('importmap_module');
     $this->assertSame('libraries/llama/lib.mjs', $libraries['importmap']['importmap']['imports']['importmap-test-libraries']['data']);
   }
@@ -560,7 +572,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn($path);
     $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
 
-    $parser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+    $parser = $this->createParser();
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
       ->with('importmap_module')
@@ -617,31 +629,37 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
           'data' => 'mocked_themes/kittens/js/override-foo.js',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
         'importmap-test-absolute' => [
           'data' => 'core/misc/other.js',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
         'importmap-test-libraries' => [
           'data' => 'libraries/llama/lib.mjs',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
         'importmap-test-protocol-free' => [
           'data' => '//example.com/importmap-test-foo.js',
           'external' => TRUE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
         'importmap-test-prefix/' => [
           'data' => $path . '/js/prefix/',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
         'importmap-test-root' => [
           'data' => '',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
         ],
       ],
       'scopes' => [
@@ -650,6 +668,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
             'data' => 'mocked_themes/kittens/js/override-foo-v1.js',
             'external' => FALSE,
             'version' => '2.0',
+            'cache' => TRUE,
           ],
         ],
         'absolute-scope' => [
@@ -657,6 +676,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
             'data' => $path . '/js/foo-v2.js',
             'external' => FALSE,
             'version' => '2.0',
+            'cache' => TRUE,
           ],
         ],
       ],
@@ -665,18 +685,21 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
           'data' => $path . '/js/foo.js',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
           'integrity' => 'sha384-override',
         ],
         'core/misc/align-right.js' => [
           'data' => 'core/misc/align-right.js',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
           'integrity' => 'sha384-other',
         ],
         'mocked_themes/kittens/js/override-foo.js' => [
           'data' => 'mocked_themes/kittens/js/override-foo.js',
           'external' => FALSE,
           'version' => '2.0',
+          'cache' => TRUE,
           'integrity' => 'sha384-added',
         ],
       ],
@@ -824,7 +847,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn($path);
 
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage("The value of the module specifier 'importmap-test-foo' in the importmap definition of the library importmap_module_non_string/importmap must be a non-empty string.");
+    $this->expectExceptionMessage("The value of the module specifier 'importmap-test-foo' in the importmap definition of the library importmap_module_non_string/importmap must be a non-empty string, or a mapping with a 'path' key.");
     $this->libraryDiscoveryParser->buildByExtension('importmap_module_non_string');
   }
 
@@ -1098,7 +1121,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn($path);
     $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
 
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+    $this->libraryDiscoveryParser = $this->createParser();
 
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
@@ -1154,7 +1177,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->with('module', 'deprecated')
       ->willReturn($path);
     $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+    $this->libraryDiscoveryParser = $this->createParser();
 
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
@@ -1306,6 +1329,17 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $libraries = $this->libraryDiscoveryParser->buildByExtension('empty');
 
     $this->assertEquals([], $libraries);
+  }
+
+  /**
+   * Returns the library discovery parser under test.
+   *
+   * @return \Drupal\Tests\Core\Asset\TestLibraryDiscoveryParser
+   *   The library discovery parser, wired with the dependencies shared by the
+   *   tests of this file.
+   */
+  protected function createParser(): TestLibraryDiscoveryParser {
+    return new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector, new LibraryImportMapProcessor($this->librariesDirectoryFileFinder, $this->streamWrapperManager));
   }
 
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Asset;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 
@@ -27,10 +28,13 @@ class ImportMapRenderer implements AssetCollectionRendererInterface {
    *   The file URL generator.
    * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
    *   The asset query string.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time.
    */
   public function __construct(
     protected FileUrlGeneratorInterface $fileUrlGenerator,
     protected AssetQueryStringInterface $assetQueryString,
+    protected TimeInterface $time,
   ) {
   }
 
@@ -58,6 +62,11 @@ class ImportMapRenderer implements AssetCollectionRendererInterface {
       return [];
     }
     return [
+      // The 'importmap' head key is reserved for the map of the site. A page
+      // supports a single import map, and a browser ignores a second one, so a
+      // module or theme that needs to change the map must do so in
+      // hook_importmap_alter() rather than by attaching its own
+      // <script type="importmap"> element through 'html_head'.
       'importmap' => [
         '#type' => 'html_tag',
         '#tag' => 'script',

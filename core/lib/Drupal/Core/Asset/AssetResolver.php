@@ -6,7 +6,6 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -76,6 +75,13 @@ class AssetResolver implements AssetResolverInterface {
   protected $logger;
 
   /**
+   * The import map builder.
+   *
+   * @var \Drupal\Core\Asset\ImportMapBuilderInterface
+   */
+  protected $importMapBuilder;
+
+  /**
    * Constructs a new AssetResolver instance.
    *
    * @param \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery
@@ -95,8 +101,11 @@ class AssetResolver implements AssetResolverInterface {
    * @param \Psr\Log\LoggerInterface|null $logger
    *   The logger. Omitted for backwards compatibility; the 'asset' logger
    *   channel is used as a fallback.
+   * @param \Drupal\Core\Asset\ImportMapBuilderInterface|null $import_map_builder
+   *   The import map builder. Omitted for backwards compatibility; the
+   *   'asset.import_map_builder' service is used as a fallback.
    */
-  public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler, ?LoggerInterface $logger = NULL) {
+  public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler, ?LoggerInterface $logger = NULL, ?ImportMapBuilderInterface $import_map_builder = NULL) {
     $this->libraryDiscovery = $library_discovery;
     $this->libraryDependencyResolver = $library_dependency_resolver;
     $this->moduleHandler = $module_handler;
@@ -106,10 +115,17 @@ class AssetResolver implements AssetResolverInterface {
     $this->themeHandler = $theme_handler;
     if (!isset($logger)) {
       $this->logger = \Drupal::logger('asset');
-      @trigger_error('Constructing AssetResolver without a logger is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+      @trigger_error('Constructing AssetResolver without a logger is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
     }
     else {
       $this->logger = $logger;
+    }
+    if (!isset($import_map_builder)) {
+      $this->importMapBuilder = \Drupal::service('asset.import_map_builder');
+      @trigger_error('Constructing AssetResolver without an import map builder is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+    }
+    else {
+      $this->importMapBuilder = $import_map_builder;
     }
   }
 
@@ -234,244 +250,7 @@ class AssetResolver implements AssetResolverInterface {
    * {@inheritdoc}
    */
   public function getImportMap(): array {
-    $active_theme = $this->themeManager->getActiveTheme()->getName();
-    // The import map is built from all known libraries: core, the enabled
-    // modules, and the active theme including its base themes, not just the
-    // libraries attached to the current response. Module scripts can be
-    // attached at any time, e.g., in an Ajax, BigPipe or HTMX response, and
-    // it is not possible to know in advance which of those will import a
-    // module. Browsers only support a single import map per page (Firefox
-    // does not support multiple import maps), and the import map cannot be
-    // updated once it has been loaded, so the complete import map has to be
-    // emitted with the main HTML document.
-    $extensions = ['core'];
-    foreach (array_keys($this->moduleHandler->getModuleList()) as $module) {
-      $extensions[] = $module;
-    }
-    foreach ($this->getThemeWithBaseThemes($active_theme) as $theme) {
-      $extensions[] = $theme;
-    }
-    $cid = 'importmap:' . $active_theme . ':' . hash('sha256', implode(',', $extensions));
-    if ($cached = $this->cache->get($cid)) {
-      return $cached->data;
-    }
-    $import_map = [
-      'imports' => [],
-      'scopes' => [],
-      'integrity' => [],
-    ];
-    $provenance = [
-      'imports' => [],
-      'scopes' => [],
-      'integrity' => [],
-    ];
-    $conflicts = [
-      'imports' => [],
-      'scopes' => [],
-      'integrity' => [],
-    ];
-    foreach ($extensions as $extension) {
-      foreach ($this->libraryDiscovery->getLibrariesByExtension($extension) as $name => $definition) {
-        if (empty($definition['importmap'])) {
-          continue;
-        }
-        $this->mergeImportMap($import_map, $definition['importmap'], "$extension/$name", $provenance, $conflicts);
-      }
-    }
-    // Allow modules and themes to alter the aggregated import map, e.g. to
-    // resolve a conflict between libraries that define the same module
-    // specifier with different values. The altered map is cached, tagged with
-    // 'library_info', so the hook is only invoked when the library information
-    // changes; implementations must therefore be static, like
-    // hook_library_info_alter(). A conflict that is not resolved (by unsetting
-    // it from $conflicts) is logged as an error.
-    $this->moduleHandler->alter('importmap', $import_map, $conflicts);
-    $this->themeManager->alter('importmap', $import_map, $conflicts);
-    // The provenance is only used to log conflicts while the map is built;
-    // it is not part of the cached import map. The import map cache is tagged
-    // with 'library_info', so a conflict is logged again whenever the library
-    // information changes.
-    $this->logImportMapConflicts($conflicts, $provenance);
-    $this->cache->set($cid, $import_map, CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
-
-    return $import_map;
-  }
-
-  /**
-   * Merges the import map of a single library into an aggregated import map.
-   *
-   * The first definition of a module specifier or integrity key wins. A
-   * conflicting definition (the same key with a different value) is recorded
-   * in $conflicts, so that it can be resolved in hook_importmap_alter().
-   * Conflicts that are not resolved are logged as errors, since they will
-   * most likely result in broken JavaScript.
-   *
-   * @param array $import_map
-   *   The aggregated import map, by reference.
-   * @param array $new_import_map
-   *   The import map of the library being merged in.
-   * @param string $library
-   *   The name of the library being merged in, e.g. 'module/library'.
-   * @param array $provenance
-   *   By reference. The aggregated provenance, keyed by section and key, with
-   *   the name of the library that provided the entry.
-   * @param array $conflicts
-   *   By reference. The conflicts found while merging, with the same
-   *   structure as passed to hook_importmap_alter().
-   */
-  protected function mergeImportMap(array &$import_map, array $new_import_map, string $library, array &$provenance, array &$conflicts): void {
-    foreach ($new_import_map['imports'] as $key => $value) {
-      $this->mergeImportMapEntry($import_map['imports'], $provenance['imports'], $conflicts['imports'], (string) $key, $value, $library);
-    }
-    foreach ($new_import_map['scopes'] as $scope => $entries) {
-      if (!isset($import_map['scopes'][$scope])) {
-        $import_map['scopes'][$scope] = [];
-        $provenance['scopes'][$scope] = [];
-        $conflicts['scopes'][$scope] = [];
-      }
-      foreach ($entries as $key => $value) {
-        $this->mergeImportMapEntry($import_map['scopes'][$scope], $provenance['scopes'][$scope], $conflicts['scopes'][$scope], (string) $key, $value, $library);
-      }
-    }
-    foreach ($new_import_map['integrity'] as $key => $value) {
-      $this->mergeImportMapEntry($import_map['integrity'], $provenance['integrity'], $conflicts['integrity'], (string) $key, $value, $library);
-    }
-  }
-
-  /**
-   * Merges a single import map entry into an aggregated set of entries.
-   *
-   * @param array $entries
-   *   The aggregated entries, by reference, keyed by the module specifier or
-   *   path.
-   * @param array $provenance
-   *   By reference. The aggregated provenance, keyed like $entries, with the
-   *   name of the library that provided the entry.
-   * @param array $conflicts
-   *   By reference. The conflicts found while merging, keyed by the module
-   *   specifier or path, for the section the entry belongs to. Each conflict
-   *   lists the definitions involved, keyed by the name of the library that
-   *   provided the definition.
-   * @param string $key
-   *   The module specifier or path.
-   * @param mixed $value
-   *   The entry value.
-   * @param string $library
-   *   The name of the library providing the entry, e.g. 'module/library'.
-   */
-  protected function mergeImportMapEntry(array &$entries, array &$provenance, array &$conflicts, string $key, mixed $value, string $library): void {
-    if (array_key_exists($key, $entries)) {
-      // Compare the entries without their version. Two libraries may map the
-      // same module specifier to the same file, with different library
-      // versions. The version only affects the query string of the module
-      // URL, not the module itself, so it is not a conflict.
-      $existing = $entries[$key];
-      $existing_without_version = $existing;
-      $value_without_version = $value;
-      unset($existing_without_version['version'], $value_without_version['version']);
-      if ($existing_without_version === $value_without_version) {
-        // The entry is identical to the existing one: nothing to do.
-        return;
-      }
-      // A conflicting definition: the entry of the library that defined the
-      // key first is kept. Record the definitions involved in the conflict,
-      // so that it can be resolved in hook_importmap_alter().
-      $existing_library = $provenance[$key];
-      if (!isset($conflicts[$key])) {
-        $conflicts[$key] = [$existing_library => $existing];
-      }
-      $conflicts[$key][$library] = $value;
-      return;
-    }
-    $entries[$key] = $value;
-    $provenance[$key] = $library;
-  }
-
-  /**
-   * Logs the import map conflicts not resolved in hook_importmap_alter().
-   *
-   * A conflict is a module specifier or integrity key that is defined by
-   * multiple libraries with different values. The merge resolves the conflict
-   * in favor of the first definition in the merge order, so the other
-   * definitions are dropped, and will most likely result in broken
-   * JavaScript.
-   *
-   * @param array $conflicts
-   *   The conflicts remaining after hook_importmap_alter(), with the same
-   *   structure as passed to the hook.
-   * @param array $provenance
-   *   The provenance of the merged import map, keyed by section and key, with
-   *   the name of the library that provided the entry that was used.
-   */
-  protected function logImportMapConflicts(array $conflicts, array $provenance): void {
-    foreach ($conflicts['imports'] as $key => $definitions) {
-      $this->logImportMapConflict($key, "'imports' section", $definitions, $provenance['imports'][$key]);
-    }
-    foreach ($conflicts['scopes'] as $scope => $conflicts_by_key) {
-      foreach ($conflicts_by_key as $key => $definitions) {
-        $this->logImportMapConflict($key, sprintf("'scopes' section, scope '%s'", $scope), $definitions, $provenance['scopes'][$scope][$key]);
-      }
-    }
-    foreach ($conflicts['integrity'] as $key => $definitions) {
-      $this->logImportMapConflict($key, "'integrity' section", $definitions, $provenance['integrity'][$key]);
-    }
-  }
-
-  /**
-   * Logs an import map conflict for a module specifier or integrity key.
-   *
-   * The conflict is logged for each definition that was not used by the
-   * merge.
-   *
-   * @param string $key
-   *   The module specifier or path.
-   * @param string $context
-   *   A description of the section the entry belongs to, for the log message.
-   * @param array $definitions
-   *   The definitions involved in the conflict, keyed by the name of the
-   *   library that provided the definition.
-   * @param string $winner
-   *   The name of the library whose definition was used by the merge, e.g.
-   *   'module/library'.
-   */
-  protected function logImportMapConflict(string $key, string $context, array $definitions, string $winner): void {
-    foreach ($definitions as $library => $value) {
-      if ($library === $winner) {
-        continue;
-      }
-      $this->logger->error(sprintf("Import map conflict: the module specifier '%s' in the %s is defined by both %s and %s with different values. The value from %s is used. Remove the duplicate definition from one of the libraries, or resolve the conflict in hook_importmap_alter().", $key, $context, $winner, $library, $winner));
-    }
-  }
-
-  /**
-   * Returns the given theme and its base themes.
-   *
-   * The base themes come first, starting with the most distant ancestor,
-   * followed by the given theme itself.
-   *
-   * @param string $theme
-   *   The machine name of a theme.
-   *
-   * @return string[]
-   *   The machine names of the base themes and the theme itself.
-   */
-  protected function getThemeWithBaseThemes(string $theme): array {
-    $themes = [];
-    $name = $theme;
-    while (TRUE) {
-      $themes[] = $name;
-      try {
-        $extension = $this->themeHandler->getTheme($name);
-      }
-      catch (UnknownExtensionException) {
-        break;
-      }
-      $name = $extension->info['base theme'] ?? '';
-      if (!is_string($name) || $name === '') {
-        break;
-      }
-    }
-    return array_reverse($themes);
+    return $this->importMapBuilder->getImportMap();
   }
 
   /**
@@ -487,42 +266,53 @@ class AssetResolver implements AssetResolverInterface {
     if (!$libraries_to_load) {
       return [];
     }
-    // Add the active theme name to the cache key, since active themes may
-    // implement hook_library_info_alter().
-    $active_theme = $this->themeManager->getActiveTheme()->getName();
-    $cid = 'importmap_preloads:' . $active_theme . ':' . Crypt::hashBase64(serialize($libraries_to_load));
-    if ($cached = $this->cache->get($cid)) {
-      return $cached->data;
-    }
+    // The preloads are derived from the aggregated import map rather than from
+    // the library definitions, so that the map the browser receives is
+    // authoritative: an entry that hook_importmap_alter() replaced or removed,
+    // or that a conflict dropped in favour of another library's definition,
+    // must not be preloaded. The aggregated map is cached by
+    // \Drupal\Core\Asset\ImportMapBuilderInterface, and what is left here is a
+    // lookup in that map, so the result is not cached separately.
+    $import_map = $this->importMapBuilder->getImportMap();
+    $provenance = $this->importMapBuilder->getProvenance();
+    $loaded = array_flip($libraries_to_load);
     $preloads = [];
-    foreach ($libraries_to_load as $library) {
-      [$extension, $name] = explode('/', $library, 2);
-      $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
-      if (empty($definition['importmap'])) {
-        continue;
+    foreach ($provenance['imports'] as $specifier => $library) {
+      if (isset($loaded[$library])) {
+        $this->addModulePreload($preloads, $import_map['imports'][$specifier] ?? NULL);
       }
-      foreach ($definition['importmap']['imports'] as $entry) {
-        // Module specifier mappings with a trailing slash map a class of
-        // modules to a class of URLs, and there is no single module to
-        // preload.
-        if (str_ends_with($entry['data'], '/')) {
-          continue;
-        }
-        $preloads[$entry['data']] = $entry;
-      }
-      foreach ($definition['importmap']['scopes'] as $entries) {
-        foreach ($entries as $entry) {
-          if (str_ends_with($entry['data'], '/')) {
-            continue;
-          }
-          $preloads[$entry['data']] = $entry;
+    }
+    foreach ($provenance['scopes'] as $scope => $entries) {
+      foreach ($entries as $specifier => $library) {
+        if (isset($loaded[$library])) {
+          $this->addModulePreload($preloads, $import_map['scopes'][$scope][$specifier] ?? NULL);
         }
       }
     }
-    $preloads = array_values($preloads);
-    $this->cache->set($cid, $preloads, CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
 
-    return $preloads;
+    return array_values($preloads);
+  }
+
+  /**
+   * Adds an import map entry to the list of modules to preload.
+   *
+   * @param array $preloads
+   *   The entries to preload, by reference, keyed by the module path or URL so
+   *   that a module mapped by more than one specifier is preloaded once.
+   * @param array|null $entry
+   *   The import map entry to preload, or NULL when there is no entry, for
+   *   example because hook_importmap_alter() removed it.
+   */
+  protected function addModulePreload(array &$preloads, ?array $entry): void {
+    if ($entry === NULL) {
+      return;
+    }
+    // Module specifier mappings with a trailing slash map a class of modules to
+    // a class of URLs, and there is no single module to preload.
+    if (str_ends_with($entry['data'], '/')) {
+      return;
+    }
+    $preloads[$entry['data']] = $entry;
   }
 
   /**

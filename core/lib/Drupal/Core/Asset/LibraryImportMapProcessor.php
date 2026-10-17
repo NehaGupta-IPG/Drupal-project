@@ -79,6 +79,7 @@ class LibraryImportMapProcessor implements LibraryImportMapProcessorInterface {
           'data' => $data,
           'external' => $external,
           'version' => $version,
+          'cache' => TRUE,
           'integrity' => $integrity,
         ];
       }
@@ -90,7 +91,9 @@ class LibraryImportMapProcessor implements LibraryImportMapProcessorInterface {
    * Processes the module specifier entries of an importmap definition.
    *
    * @param array $entries
-   *   The module specifier entries, keyed by the module specifier.
+   *   The module specifier entries, keyed by the module specifier. Each value
+   *   is either the source of the module, or a mapping with the keys 'path'
+   *   (the source, required) and 'cache' (a boolean, defaulting to TRUE).
    * @param string $id
    *   The name of the library containing the definition.
    * @param string $extension
@@ -103,17 +106,36 @@ class LibraryImportMapProcessor implements LibraryImportMapProcessorInterface {
    *
    * @return array
    *   The processed entries, keyed by the module specifier, and resolving to
-   *   an array with the keys 'data', 'external' and 'version'.
+   *   an array with the keys 'data', 'external', 'version' and 'cache'.
    *
    * @throws \UnexpectedValueException
    *   Thrown when the entries are invalid.
    */
   protected function processImportMapEntries(array $entries, string $id, string $extension, string $path, int|string $version): array {
     $processed = [];
-    foreach ($entries as $specifier => $source) {
+    foreach ($entries as $specifier => $entry) {
       $specifier = (string) $specifier;
       if ($specifier === '') {
         throw new \UnexpectedValueException(sprintf("The importmap definition of the library %s/%s contains an empty module specifier.", $extension, $id));
+      }
+      // Defaults to TRUE, like the 'cache' option of a JavaScript asset.
+      $entry_cache = TRUE;
+      if (is_array($entry)) {
+        if (!isset($entry['path'])) {
+          throw new \UnexpectedValueException(sprintf("The value of the module specifier '%s' in the importmap definition of the library %s/%s must be a non-empty string, or a mapping with a 'path' key.", $specifier, $extension, $id));
+        }
+        $extra_keys = array_diff(array_keys($entry), ['path', 'cache']);
+        if ($extra_keys) {
+          throw new \UnexpectedValueException(sprintf("The value of the module specifier '%s' in the importmap definition of the library %s/%s has unknown keys (%s). Only the keys 'path' and 'cache' are allowed.", $specifier, $extension, $id, implode(', ', $extra_keys)));
+        }
+        if (array_key_exists('cache', $entry) && !is_bool($entry['cache'])) {
+          throw new \UnexpectedValueException(sprintf("The 'cache' key of the module specifier '%s' in the importmap definition of the library %s/%s must be a boolean.", $specifier, $extension, $id));
+        }
+        $entry_cache = $entry['cache'];
+        $source = $entry['path'];
+      }
+      else {
+        $source = $entry;
       }
       if (!is_string($source) || $source === '') {
         throw new \UnexpectedValueException(sprintf("The value of the module specifier '%s' in the importmap definition of the library %s/%s must be a non-empty string.", $specifier, $extension, $id));
@@ -126,6 +148,7 @@ class LibraryImportMapProcessor implements LibraryImportMapProcessorInterface {
         'data' => $data,
         'external' => $external,
         'version' => $version,
+        'cache' => $entry_cache,
       ];
     }
     return $processed;

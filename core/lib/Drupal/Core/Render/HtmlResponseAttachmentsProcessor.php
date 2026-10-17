@@ -86,11 +86,11 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     $this->config = $config_factory->get('system.performance');
     if (!isset($importMapRenderer)) {
       $this->importMapRenderer = \Drupal::service('asset.importmap.renderer');
-      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without an import map renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without an import map renderer is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
     }
     if (!isset($modulePreloadRenderer)) {
       $this->modulePreloadRenderer = \Drupal::service('asset.modulepreload.renderer');
-      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without a module preload renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without a module preload renderer is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
     }
   }
 
@@ -225,20 +225,10 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
         // replacements) must not add a second import map; they can only add
         // module preloads. See
         // \Drupal\Core\Ajax\AjaxResponseAttachmentsProcessor::processAttachments().
-        //
-        // The import map is only built during normal site operation. Building
-        // it scans the libraries of all enabled modules, which invokes
-        // hook_library_info_alter(). Some implementations of that hook make
-        // assumptions about the installed site that do not hold during
-        // installation or in maintenance mode, so the import map must not be
-        // built in those contexts.
-        $maintenance_mode = defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
-        if (!$maintenance_mode) {
-          $head_elements = $this->importMapRenderer->render($this->assetResolver->getImportMap())
-            + $this->modulePreloadRenderer->render($this->assetResolver->getModulePreloads($assets));
-          if ($head_elements) {
-            $variables['head'] = $head_elements + ($variables['head'] ?? []);
-          }
+        $head_elements = $this->importMapRenderer->render($this->assetResolver->getImportMap())
+          + $this->modulePreloadRenderer->render($this->assetResolver->getModulePreloads($assets));
+        if ($head_elements) {
+          $variables['head'] = $head_elements + ($variables['head'] ?? []);
         }
       }
 
@@ -377,12 +367,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     // core/misc/htmx/htmx-assets.js. The import map itself is not rendered:
     // a page only supports a single import map, and it was already sent with
     // the main HTML document.
-    //
-    // The preloads are only built during normal site operation. Building them
-    // resolves the libraries to load, which invokes hook_library_info_alter().
-    // Some implementations of that hook make assumptions about the installed
-    // site that do not hold during installation or in maintenance mode.
-    if (isset($placeholders['modulepreload']) && !$maintenance_mode) {
+    if (isset($placeholders['modulepreload'])) {
       $variables['modulepreload'] = $this->modulePreloadRenderer->render($this->assetResolver->getModulePreloads($assets));
     }
 

@@ -1796,10 +1796,10 @@ services:
     arguments: ['@file_system']
   asset.importmap.renderer:
     class: Drupal\Core\Asset\ImportMapRenderer
-    arguments: [ '@file_url_generator', '@asset.query_string' ]
+    arguments: [ '@file_url_generator', '@asset.query_string', '@datetime.time' ]
   asset.modulepreload.renderer:
     class: Drupal\Core\Asset\ModulePreloadRenderer
-    arguments: [ '@file_url_generator', '@asset.query_string' ]
+    arguments: [ '@file_url_generator', '@asset.query_string', '@datetime.time' ]
   asset.js.collection_renderer:
     class: Drupal\Core\Asset\JsCollectionRenderer
     arguments: [ '@asset.query_string','@file_url_generator', '@datetime.time' ]
@@ -1818,6 +1818,10 @@ services:
     class: Drupal\Core\Asset\LibraryImportMapProcessor
     arguments: [ '@library.libraries_directory_file_finder', '@stream_wrapper_manager' ]
   Drupal\Core\Asset\LibraryImportMapProcessorInterface: '@asset.library_import_map_processor'
+  asset.import_map_builder:
+    class: Drupal\Core\Asset\ImportMapBuilder
+    arguments: [ '@library.discovery', '@module_handler', '@theme.manager', '@state', '@cache.asset_chain', '@logger.channel.asset' ]
+  Drupal\Core\Asset\ImportMapBuilderInterface: '@asset.import_map_builder'
   library.discovery:
     class: Drupal\Core\Asset\LibraryDiscoveryCollector
     arguments: ['@cache.discovery', '@lock', '@library.discovery.parser', '@theme.manager']
@@ -1851,7 +1855,7 @@ services:
       - [ appendBackend, [ '@cache.data' ] ]
   asset.resolver:
     class: Drupal\Core\Asset\AssetResolver
-    arguments: ['@library.discovery', '@library.dependency_resolver', '@module_handler', '@theme.manager', '@language_manager', '@cache.asset_chain', '@theme_handler', '@logger.channel.asset']
+    arguments: ['@library.discovery', '@library.dependency_resolver', '@module_handler', '@theme.manager', '@language_manager', '@cache.asset_chain', '@theme_handler', '@logger.channel.asset', '@asset.import_map_builder']
   Drupal\Core\Asset\AssetResolverInterface: '@asset.resolver'
   info_parser:
     class: Drupal\Core\Extension\InfoParser

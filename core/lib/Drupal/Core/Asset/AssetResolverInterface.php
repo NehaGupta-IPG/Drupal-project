@@ -121,12 +121,14 @@ interface AssetResolverInterface {
    *   The import map, with the keys 'imports', 'scopes' and 'integrity'.
    *   Entries under 'imports' and 'scopes' are keyed by the module specifier,
    *   and resolve to an array with the keys 'data' (the resolved path or
-   *   URL), 'external' (a boolean, TRUE for external URLs) and 'version'.
-   *   Entries under 'integrity' are keyed by the resolved path or URL, and
-   *   resolve to an array with the keys 'data', 'external', 'version' and
-   *   'integrity' (the integrity metadata string).
+   *   URL), 'external' (a boolean, TRUE for external URLs), 'version' and
+   *   'cache' (a boolean, FALSE for assets that must not be cached, mirroring
+   *   the 'cache' key of the library definition). Entries under 'integrity'
+   *   are keyed by the resolved path or URL, and resolve to an array with the
+   *   same keys plus 'integrity' (the integrity metadata string).
    *
    * @see hook_importmap_alter()
+   * @see \Drupal\Core\Asset\ImportMapBuilderInterface
    */
   public function getImportMap(): array;
 
@@ -138,12 +140,16 @@ interface AssetResolverInterface {
    * scripts can start importing them as soon as they execute. The preloads
    * are rendered as <link rel="modulepreload"> elements.
    *
+   * The entries to preload are taken from the aggregated import map of the
+   * libraries that are attached to the response, so that an entry replaced or
+   * removed by hook_importmap_alter() is never preloaded.
+   *
    * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
    *   The assets attached to the current response.
    *
    * @return array
    *   An array of import map entries to preload, each with the keys 'data',
-   *   'external' and 'version'.
+   *   'external', 'version' and 'cache'.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/modulepreload
    */

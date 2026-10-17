@@ -22,7 +22,12 @@ interface LibraryImportMapProcessorInterface {
    *
    * @param array $importmap
    *   The importmap definition, as declared in the library definition. It may
-   *   contain the keys 'imports', 'scopes' and 'integrity'.
+   *   contain the keys 'imports', 'scopes' and 'integrity'. The value of an
+   *   'imports' or scope entry is either the source of the module, or a
+   *   mapping with the keys 'path' and 'cache'. 'cache' defaults to TRUE, and
+   *   must be set to FALSE when the same file is attached as a JavaScript
+   *   asset with 'cache: false': a browser identifies a module by its URL, so
+   *   the two URLs have to match.
    * @param string $id
    *   The name of the library containing the definition.
    * @param string $extension
@@ -37,10 +42,10 @@ interface LibraryImportMapProcessorInterface {
    *   The processed importmap definition, with the keys 'imports', 'scopes'
    *   and 'integrity'. Entries under 'imports' and 'scopes' are keyed by the
    *   module specifier, and resolve to an array with the keys 'data' (the
-   *   resolved path or URL), 'external' (a boolean, TRUE for external URLs)
-   *   and 'version'. Entries under 'integrity' are keyed by the resolved path
-   *   or URL, and resolve to an array with the keys 'data', 'external',
-   *   'version' and 'integrity' (the integrity metadata string).
+   *   resolved path or URL), 'external' (a boolean, TRUE for external URLs),
+   *   'version' and 'cache'. Entries under 'integrity' are keyed by the
+   *   resolved path or URL, and resolve to an array with the same keys plus
+   *   'integrity' (the integrity metadata string).
    *
    * @throws \UnexpectedValueException
    *   Thrown when the importmap definition is invalid.
