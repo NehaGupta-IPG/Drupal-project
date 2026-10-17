@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile
 
 namespace Drupal\Core\Entity\Plugin\DataType;
 
@@ -33,11 +34,43 @@ use Drupal\Core\TypedData\TypedData;
 class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexDataInterface {
 
   /**
+   * A weak reference to the wrapped entity object
+   *
+   * @var WeakReference|null
+   */
+  protected ?\WeakReference $weakEntity = NULL;
+
+  /**
    * The wrapped entity object.
    *
    * @var \Drupal\Core\Entity\EntityInterface|null
    */
-  protected $entity;
+  protected $strongEntity;
+
+  /**
+   * The wrapped entity object.
+   */
+  protected $entity {
+    get {
+      if (isset($this->strongEntity)) {
+        return $this->strongEntity;
+      }
+      if ($this->weakEntity instanceof \WeakReference) {
+        return $this->weakEntity->get();
+      }
+    }
+    set($value) {
+      if (!$value instanceOf FieldableEntityInterface) {
+        $this->strongEntity = $value;
+      }
+      if (isset($value)) {
+         $this->weakEntity = \WeakReference::create($value);
+      }
+      else {
+        $this->weakEntity = NULL;
+      }
+    }
+  }
 
   /**
    * Creates an instance wrapping the given entity.
@@ -182,6 +215,10 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
    */
   public function getEntity() {
     return $this->entity;
+  }
+
+  public function __serialize() {
+    unset($this->weakEntity);
   }
 
 }

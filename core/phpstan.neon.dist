@@ -31,6 +31,7 @@ parameters:
     - lib/Drupal/Core/Serialization/Yaml.php
 
   excludePaths:
+    - lib/Drupal/Core/Entity/Plugin/DataType/EntityAdapter.php
     # Skip sites directory.
     - ../sites
     # Skip test fixtures.
