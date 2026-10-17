@@ -24,6 +24,7 @@ use Twig\Node\Node;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 use Twig\Runtime\EscaperRuntime;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * A class providing Drupal Twig extensions.
@@ -211,7 +212,12 @@ class TwigExtension extends AbstractExtension {
     assert($this->urlGenerator instanceof UrlGeneratorInterface, "The URL generator hasn't been set up. Any configuration YAML file with a service directive dealing with the Twig configuration can cause this, most likely found in a recently installed or changed module.");
 
     $options['absolute'] = FALSE;
-    return $this->urlGenerator->generateFromRoute($name, $parameters, $options);
+    try {
+      return $this->urlGenerator->generateFromRoute($name, $parameters, $options);
+    }
+    catch (RouteNotFoundException) {
+      return NULL;
+    }
   }
 
   /**
