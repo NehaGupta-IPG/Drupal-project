@@ -74,3 +74,16 @@ field.formatter.settings.responsive_image:
         attribute:
           type: string
           label: 'Loading attribute'
+
+
+field.widget.settings.responsive_image_image:
+  type: field.widget.settings.image_image
+  label: 'Responsive image field display format settings'
+  mapping:
+    preview_responsive_image_style:
+      type: string
+      nullable: true
+      label: 'Preview responsive image style'
+      constraints:
+        ConfigExists:
+          prefix: 'responsive_image.styles.'
