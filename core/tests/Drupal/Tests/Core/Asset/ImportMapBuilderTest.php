@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Asset;
 
 use Drupal\Component\Datetime\Time;
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Asset\ImportMapBuilder;
 use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Cache\MemoryBackend;
@@ -229,6 +230,87 @@ class ImportMapBuilderTest extends UnitTestCase {
         ],
       ],
     ], $import_map);
+  }
+
+  /**
+   * Tests that the aggregated map is written to the cache and reused.
+   */
+  public function testImportMapIsCached(): void {
+    $this->modules = ['llama'];
+    $this->extensionLibraries = [
+      'llama' => [
+        'llama-library' => [
+          'importmap' => [
+            'imports' => [
+              'llama' => $this->importMapEntry('modules/llama/llama.mjs', '2.0'),
+            ],
+            'scopes' => [],
+            'integrity' => [],
+          ],
+        ],
+      ],
+    ];
+
+    $builder = $this->createBuilder();
+    $map = $builder->getImportMap();
+    $provenance = $builder->getProvenance();
+
+    // The cache key holds the active theme and every known extension, so that
+    // installing or uninstalling an extension is picked up.
+    $cid = 'importmap:stark:' . Crypt::hashBase64('core,llama,stark');
+    $cached = $this->cache->get($cid);
+    $this->assertNotNull($cached, 'The built map is written to the cache.');
+    $this->assertSame([
+      'map' => $map,
+      'provenance' => $provenance,
+    ], $cached->data, 'The provenance is cached alongside the map.');
+    $this->assertSame(['library_info'], $cached->tags);
+
+    // A later request is served from the cache. Reading the libraries of every
+    // known extension again would invoke hook_library_info_alter() and both
+    // implementations of hook_importmap_alter() on every page view.
+    $this->extensionLibraries = [];
+    $this->libraryDiscovery->expects($this->never())
+      ->method('getLibrariesByExtension');
+    $this->moduleHandler->expects($this->never())
+      ->method('alter');
+    $this->themeManager->expects($this->never())
+      ->method('alter');
+    $this->assertSame($map, $this->createBuilder()->getImportMap());
+  }
+
+  /**
+   * Tests that invalidating 'library_info' discards the cached map.
+   *
+   * The map is derived from library definitions, so an extension that changes
+   * one invalidates the 'library_info' tag, and the map has to be rebuilt.
+   */
+  public function testCachedImportMapIsInvalidatedWithLibraryInfo(): void {
+    $this->modules = ['llama'];
+    $this->extensionLibraries = [
+      'llama' => [
+        'llama-library' => [
+          'importmap' => [
+            'imports' => [
+              'llama' => $this->importMapEntry('modules/llama/llama.mjs', '1.0'),
+            ],
+            'scopes' => [],
+            'integrity' => [],
+          ],
+        ],
+      ],
+    ];
+    $builder = $this->createBuilder();
+    $this->assertSame('modules/llama/llama.mjs', $builder->getImportMap()['imports']['llama']['data']);
+
+    $this->cache->invalidateTags(['library_info']);
+    $this->extensionLibraries['llama']['llama-library']['importmap']['imports']['llama'] = $this->importMapEntry('modules/llama/llama-2.0.mjs', '2.0');
+
+    $this->assertSame(
+      'modules/llama/llama-2.0.mjs',
+      $this->createBuilder()->getImportMap()['imports']['llama']['data'],
+      'The map is rebuilt from the changed library definition.'
+    );
   }
 
   /**

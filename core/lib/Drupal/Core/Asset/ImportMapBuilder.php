@@ -133,10 +133,13 @@ class ImportMapBuilder implements ImportMapBuilderInterface {
     // cached alongside it so that module preloads can be derived from the
     // altered map. The cache item is tagged with 'library_info', so conflicts
     // are logged again whenever the library information changes.
-    return $this->result = [
+    $result = [
       'map' => $map,
       'provenance' => $provenance,
     ];
+    $this->cache->set($cid, $result, CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
+
+    return $this->result = $result;
   }
 
   /**
