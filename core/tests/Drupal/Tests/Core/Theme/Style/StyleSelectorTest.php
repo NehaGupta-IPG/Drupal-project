@@ -11,6 +11,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Render\Element\StyleSelector;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\Style\StyleDefinition;
 use Drupal\Core\Theme\Style\StylePluginManagerInterface;
@@ -64,6 +65,7 @@ class StyleSelectorTest extends UnitTestCase {
       $moduleHandler,
       $themeHandler,
       $cacheBackend,
+      $this->createStub(LoggerChannelFactoryInterface::class),
       $this->root,
     );
     $container->set(StylePluginManagerInterface::class, $stylePluginManager);

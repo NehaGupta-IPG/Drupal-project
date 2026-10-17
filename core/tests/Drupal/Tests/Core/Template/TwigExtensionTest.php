@@ -6,10 +6,13 @@ namespace Drupal\Tests\Core\Template;
 
 // cspell:ignore mila
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\GeneratedLink;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Render\RendererInterface;
@@ -19,6 +22,9 @@ use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\Loader\StringLoader;
 use Drupal\Core\Template\TwigEnvironment;
 use Drupal\Core\Template\TwigExtension;
+use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
+use Drupal\Core\Theme\Style\StyleDefinitionInterface;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
@@ -27,6 +33,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\Stub;
 use Prophecy\Prophet;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 use Twig\Loader\FilesystemLoader;
@@ -73,6 +80,11 @@ class TwigExtensionTest extends UnitTestCase {
   protected FileUrlGeneratorInterface&Stub $fileUrlGenerator;
 
   /**
+   * The style plugin manager.
+   */
+  protected StylePluginManagerInterface&Stub $stylePluginManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -83,8 +95,9 @@ class TwigExtensionTest extends UnitTestCase {
     $this->themeManager = $this->createStub(ThemeManagerInterface::class);
     $this->dateFormatter = $this->createStub(DateFormatterInterface::class);
     $this->fileUrlGenerator = $this->createStub(FileUrlGeneratorInterface::class);
+    $this->stylePluginManager = $this->createStub(StylePluginManagerInterface::class);
 
-    $this->systemUnderTest = new TwigExtension($this->renderer, $this->urlGenerator, $this->themeManager, $this->dateFormatter, $this->fileUrlGenerator);
+    $this->systemUnderTest = new TwigExtension($this->renderer, $this->urlGenerator, $this->themeManager, $this->dateFormatter, $this->fileUrlGenerator, $this->stylePluginManager);
   }
 
   /**
@@ -121,6 +134,15 @@ class TwigExtensionTest extends UnitTestCase {
     $this->themeManager = $this->createMock(ThemeManagerInterface::class);
     $reflection = new \ReflectionProperty($this->systemUnderTest, 'themeManager');
     $reflection->setValue($this->systemUnderTest, $this->themeManager);
+  }
+
+  /**
+   * Reinitializes the style plugin manager as a mock object.
+   */
+  protected function setUpMockStylePluginManager(): void {
+    $this->stylePluginManager = $this->createMock(StylePluginManagerInterface::class);
+    $reflection = new \ReflectionProperty($this->systemUnderTest, 'stylePluginManager');
+    $reflection->setValue($this->systemUnderTest, $this->stylePluginManager);
   }
 
   /**
@@ -431,6 +453,125 @@ class TwigExtensionTest extends UnitTestCase {
       ]);
     $result = $this->systemUnderTest->escapeFilter($twig, $link, 'html', NULL, TRUE);
     $this->assertEquals('<a href="http://example.com"></a>', $result);
+  }
+
+  /**
+   * Tests escape with an Attribute object that has attachments.
+   *
+   * Printing an Attribute object from within a Twig template must bubble its
+   * attachments to the current render context, the same way it already does
+   * for other objects implementing AttachmentsInterface, such as
+   * GeneratedLink (see ::testEscapeWithGeneratedLink()).
+   *
+   * @legacy-covers ::escapeFilter
+   * @legacy-covers ::bubbleArgMetadata
+   */
+  public function testEscapeWithAttribute(): void {
+    $this->setUpMockRenderer();
+
+    $loader = new FilesystemLoader();
+    $twig = new Environment($loader, [
+      'debug' => TRUE,
+      'cache' => FALSE,
+      'autoescape' => 'html',
+      'optimizations' => 0,
+    ]);
+    $twig->addExtension($this->systemUnderTest);
+
+    $attribute = new Attribute(['class' => ['example-class']]);
+    $attribute->setAttachments(['library' => ['core/drupal.ajax']]);
+
+    $this->renderer->expects($this->atLeastOnce())
+      ->method('render')
+      ->with([
+        '#cache' => [
+          'contexts' => [],
+          'tags' => [],
+          'max-age' => -1,
+        ],
+        '#attached' => ['library' => ['core/drupal.ajax']],
+      ]);
+
+    $result = $this->systemUnderTest->escapeFilter($twig, $attribute, 'html', NULL, TRUE);
+    $this->assertSame(' class="example-class"', $result);
+  }
+
+  /**
+   * Tests the style function.
+   *
+   * @legacy-covers ::getStyle
+   */
+  public function testGetStyle(): void {
+    $this->setUpMockStylePluginManager();
+
+    $definition = $this->createStub(StyleDefinitionInterface::class);
+    $this->stylePluginManager->method('getDefinition')
+      ->with('id_1')
+      ->willReturn($definition);
+
+    $this->assertSame($definition, $this->systemUnderTest->getStyle('id_1'));
+  }
+
+  /**
+   * Tests the style function: exception missing plugin.
+   *
+   * @legacy-covers ::getStyle
+   */
+  public function testGetStyleMissingPlugin(): void {
+    $this->setUpMockStylePluginManager();
+
+    $exception = new PluginNotFoundException('id_1');
+    $this->stylePluginManager->method('getDefinition')
+      ->with('id_1')
+      ->willThrowException($exception);
+
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('error')
+      ->with("Plugin ID 'id_1' was not found.");
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('twig')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $this->assertNull($this->systemUnderTest->getStyle('id_1'));
+  }
+
+  /**
+   * Tests the style function: exception style definition error.
+   *
+   * @legacy-covers ::getStyle
+   */
+  public function testGetStyleDefinitionError(): void {
+    $this->setUpMockStylePluginManager();
+
+    $exception = new StyleDefinitionErrorException('message');
+    $this->stylePluginManager->method('getDefinition')
+      ->with('id_1')
+      ->willThrowException($exception);
+
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('error')
+      ->with('message');
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('twig')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $this->assertNull($this->systemUnderTest->getStyle('id_1'));
   }
 
   /**

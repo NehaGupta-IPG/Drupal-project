@@ -7,6 +7,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Template\Attribute;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 
 /**
  * Initial preprocess callbacks for the form system.
@@ -14,6 +15,10 @@ use Drupal\Core\Template\Attribute;
  * @internal
  */
 class FormPreprocess {
+
+  public function __construct(
+    protected StylePluginManagerInterface $stylePluginManager,
+  ) {}
 
   /**
    * Prepares variables for form templates.
@@ -250,7 +255,7 @@ class FormPreprocess {
     $resizable = !empty($element['#resizable']) ? $element['#resizable'] : NULL;
     $variables['resizable'] = $resizable;
     if ($resizable) {
-      $variables['attributes']->addClass('resize-' . $resizable);
+      $this->stylePluginManager->addStyleToAttribute($variables['attributes'], 'core_resize', $resizable);
     }
     $variables['required'] = !empty($element['#required']) ? $element['#required'] : NULL;
   }

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Theme\Style;
 
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\Style\Enum\ModeColorScheme;
 use Drupal\Core\Theme\Style\Enum\ModeContrast;
 use Drupal\Core\Theme\Style\Enum\ModeReducedMotion;
@@ -16,6 +19,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Tests Drupal\Core\Theme\Style\StyleDefinition.
@@ -454,6 +458,1010 @@ class StyleDefinitionTest extends UnitTestCase {
         ],
       ],
     ];
+  }
+
+
+  /**
+   * Test applyOnAttribute.
+   *
+   * @param string $type
+   *   The type of the style.
+   * @param array $option
+   *   The option like in the YAML declaration.
+   * @param array $expected
+   *   The expected attribute storage.
+   */
+  #[DataProvider('providerApplyOnAttribute')]
+  public function testApplyOnAttribute(string $type, array $option, array $expected): void {
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'type' => $type,
+      'options' => [
+        'test' => $option,
+      ],
+    ]);
+    $attribute = new Attribute([]);
+    $definition->applyOnAttribute('test', $attribute);
+    $this->assertEquals($expected, $attribute->toArray());
+  }
+
+  /**
+   * Data provider for ::testApplyOnAttribute().
+   *
+   * @return \Generator
+   *   The test cases.
+   */
+  public static function providerApplyOnAttribute(): iterable {
+    yield 'Utility: default' => [
+      'utility',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+      ],
+      [
+        'class' => ['my-class'],
+      ],
+    ];
+
+    yield 'Utility: on an attribute' => [
+      'utility',
+      [
+        'label' => 'Label',
+        'value' => 'data',
+        'attribute' => 'data-test',
+      ],
+      [
+        'data-test' => 'data',
+      ],
+    ];
+
+    yield 'Utility: inline style' => [
+      'utility',
+      [
+        'label' => 'Label',
+        'value' => 'font-size: 15px',
+        'attribute' => 'style',
+      ],
+      [
+        'style' => 'font-size: 15px',
+      ],
+    ];
+
+    yield 'Utility: experimental option' => [
+      'utility',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+        'status' => 'experimental',
+      ],
+      [
+        'class' => ['my-class'],
+      ],
+    ];
+
+    yield 'Theme: default' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+      ],
+      [
+        'class' => ['my-class'],
+      ],
+    ];
+
+    yield 'Theme: on an attribute' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'data',
+        'attribute' => 'data-test',
+      ],
+      [
+        'data-test' => 'data',
+      ],
+    ];
+
+    yield 'Theme: inline style' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'font-size: 15px',
+        'attribute' => 'style',
+      ],
+      [
+        'style' => 'font-size: 15px',
+      ],
+    ];
+
+    yield 'Theme: target body' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+        'target' => 'body',
+      ],
+      [
+        'class' => ['my-class'],
+      ],
+    ];
+
+    yield 'Theme: target html' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+        'target' => 'html',
+      ],
+      [
+        'class' => ['my-class'],
+      ],
+    ];
+
+    yield 'Theme: target meta' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+        'target' => 'meta',
+      ],
+      [],
+    ];
+  }
+
+  /**
+   * Test applyOnAttribute: style with a library.
+   */
+  public function testApplyOnAttributeWithLibrary(): void {
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+        ],
+      ],
+      'library' => 'my_module/my_library',
+    ]);
+    $expected = [
+      'class' => ['my-class'],
+    ];
+    $attribute = new Attribute([]);
+    $definition->applyOnAttribute('test', $attribute);
+    $this->assertEquals($expected, $attribute->toArray());
+    $this->assertEquals([], $attribute->getAttachments(), 'The library should not have been attached.');
+  }
+
+  /**
+   * Test applyOnAttribute: triggering logger.
+   */
+  public function testApplyOnAttributeUndefinedOption(): void {
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('error')
+      ->with('Invalid style option %optionId for style %styleId.', [
+        '%styleId' => 'test',
+        '%optionId' => 'foo',
+      ]);
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('style')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+        ],
+      ],
+    ]);
+    $attribute = new Attribute([]);
+    $definition->applyOnAttribute('foo', $attribute);
+    $this->assertEquals([], $attribute->toArray(), 'The attribute should be unchanged.');
+  }
+
+  /**
+   * Test applyOnAttribute: triggering logger.
+   */
+  public function testApplyOnAttributeWarningStatus(): void {
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('warning')
+      ->with('Usage of style %styleId which is in %status status.', [
+        '%styleId' => 'test',
+        '%status' => new TranslatableMarkup('Deprecated'),
+      ]);
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('style')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'status' => 'deprecated',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+        ],
+      ],
+    ]);
+    $expected = [
+      'class' => ['my-class'],
+    ];
+    $attribute = new Attribute([]);
+    $definition->applyOnAttribute('test', $attribute);
+    $this->assertEquals($expected, $attribute->toArray());
+  }
+
+  /**
+   * Test applyOnAttribute: triggering logger.
+   */
+  public function testApplyOnAttributeWarningStatusOption(): void {
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('warning')
+      ->with('Usage of style option %optionId which is in %status status for style %styleId.', [
+        '%styleId' => 'test',
+        '%optionId' => 'test',
+        '%status' => new TranslatableMarkup('Obsolete'),
+      ]);
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('style')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+          'status' => 'obsolete',
+        ],
+      ],
+    ]);
+    $expected = [
+      'class' => ['my-class'],
+    ];
+    $attribute = new Attribute([]);
+    $definition->applyOnAttribute('test', $attribute);
+    $this->assertEquals($expected, $attribute->toArray());
+  }
+
+  /**
+   * Test applyOrBubbleOnAttribute.
+   *
+   * @param string $type
+   *   The type of the style.
+   * @param array $option
+   *   The option like in the YAML declaration.
+   * @param array $expected
+   *   The expected attribute storage.
+   * @param array $expectedAttachments
+   *   The expected attachments.
+   */
+  #[DataProvider('providerApplyOrBubbleOnAttribute')]
+  public function testApplyOrBubbleOnAttribute(string $type, array $option, array $expected, array $expectedAttachments = []): void {
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'type' => $type,
+      'options' => [
+        'test' => $option,
+      ],
+    ]);
+    $attribute = new Attribute([]);
+    $definition->applyOrBubbleOnAttribute('test', $attribute);
+    $this->assertEquals($expected, $attribute->toArray());
+    $this->assertEquals($expectedAttachments, $attribute->getAttachments());
+  }
+
+  /**
+   * Data provider for ::testApplyOrBubbleOnAttribute().
+   *
+   * @return \Generator
+   *   The test cases.
+   */
+  public static function providerApplyOrBubbleOnAttribute(): iterable {
+    yield 'Utility: default' => [
+      'utility',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+      ],
+      [
+        'class' => ['my-class'],
+      ],
+    ];
+
+    yield 'Utility: on an attribute' => [
+      'utility',
+      [
+        'label' => 'Label',
+        'value' => 'data',
+        'attribute' => 'data-test',
+      ],
+      [
+        'data-test' => 'data',
+      ],
+    ];
+
+    yield 'Utility: inline style' => [
+      'utility',
+      [
+        'label' => 'Label',
+        'value' => 'font-size: 15px',
+        'attribute' => 'style',
+      ],
+      [
+        'style' => 'font-size: 15px',
+      ],
+    ];
+
+    yield 'Utility: experimental option' => [
+      'utility',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+        'status' => 'experimental',
+      ],
+      [
+        'class' => ['my-class'],
+      ],
+    ];
+
+    yield 'Theme: default' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+      ],
+      [
+        'class' => ['my-class'],
+      ],
+    ];
+
+    yield 'Theme: on an attribute' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'data',
+        'attribute' => 'data-test',
+      ],
+      [
+        'data-test' => 'data',
+      ],
+    ];
+
+    yield 'Theme: inline style' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'font-size: 15px',
+        'attribute' => 'style',
+      ],
+      [
+        'style' => 'font-size: 15px',
+      ],
+    ];
+
+    yield 'Theme: target body' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+        'target' => 'body',
+      ],
+      [],
+      [
+        'styles' => [
+          'test' => 'test',
+        ],
+      ],
+    ];
+
+    yield 'Theme: target html' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+        'target' => 'html',
+      ],
+      [],
+      [
+        'styles' => [
+          'test' => 'test',
+        ],
+      ],
+    ];
+
+    yield 'Theme: target meta' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+        'attribute' => 'my-name',
+        'target' => 'meta',
+      ],
+      [],
+      [
+        'html_head' => [
+          [
+            [
+              '#tag' => 'meta',
+              '#attributes' => [
+                'name' => 'my-name',
+                'content' => 'my-class',
+              ],
+            ],
+            'style:test:test',
+          ],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Test applyOrBubbleOnAttribute: style with a library.
+   */
+  public function testApplyOrBubbleOnAttributeWithLibrary(): void {
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+        ],
+      ],
+      'library' => 'my_module/my_library',
+    ]);
+    $expected = [
+      'class' => ['my-class'],
+    ];
+    $expectedAttachments = [
+      'library' => [
+        'my_module/my_library',
+      ],
+    ];
+    $attribute = new Attribute([]);
+    $definition->applyOrBubbleOnAttribute('test', $attribute);
+    $this->assertEquals($expected, $attribute->toArray());
+    $this->assertEquals($expectedAttachments, $attribute->getAttachments());
+  }
+
+  /**
+   * Test applyOrBubbleOnAttribute: triggering logger.
+   */
+  public function testApplyOrBubbleOnAttributeUndefinedOption(): void {
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('error')
+      ->with('Invalid style option %optionId for style %styleId.', [
+        '%styleId' => 'test',
+        '%optionId' => 'foo',
+      ]);
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('style')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+        ],
+      ],
+    ]);
+    $attribute = new Attribute([]);
+    $definition->applyOrBubbleOnAttribute('foo', $attribute);
+    $this->assertEquals([], $attribute->toArray(), 'The attribute should be unchanged.');
+  }
+
+  /**
+   * Test applyOrBubbleOnAttribute: triggering logger.
+   */
+  public function testApplyOrBubbleOnAttributeWarningStatus(): void {
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('warning')
+      ->with('Usage of style %styleId which is in %status status.', [
+        '%styleId' => 'test',
+        '%status' => new TranslatableMarkup('Deprecated'),
+      ]);
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('style')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'status' => 'deprecated',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+        ],
+      ],
+    ]);
+    $expected = [
+      'class' => ['my-class'],
+    ];
+    $attribute = new Attribute([]);
+    $definition->applyOrBubbleOnAttribute('test', $attribute);
+    $this->assertEquals($expected, $attribute->toArray());
+  }
+
+  /**
+   * Test applyOrBubbleOnAttribute: triggering logger.
+   */
+  public function testApplyOrBubbleOnAttributeWarningStatusOption(): void {
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('warning')
+      ->with('Usage of style option %optionId which is in %status status for style %styleId.', [
+        '%styleId' => 'test',
+        '%optionId' => 'test',
+        '%status' => new TranslatableMarkup('Obsolete'),
+      ]);
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('style')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+          'status' => 'obsolete',
+        ],
+      ],
+    ]);
+    $expected = [
+      'class' => ['my-class'],
+    ];
+    $attribute = new Attribute([]);
+    $definition->applyOrBubbleOnAttribute('test', $attribute);
+    $this->assertEquals($expected, $attribute->toArray());
+  }
+
+  /**
+   * Test applyOrBubbleOnArray.
+   *
+   * @param string $type
+   *   The type of the style.
+   * @param array $option
+   *   The option like in the YAML declaration.
+   * @param array $expected
+   *   The expected element structure.
+   */
+  #[DataProvider('providerApplyOrBubbleOnArray')]
+  public function testApplyOrBubbleOnArray(string $type, array $option, array $expected): void {
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'type' => $type,
+      'options' => [
+        'test' => $option,
+      ],
+    ]);
+    $element = [];
+    $definition->applyOrBubbleOnArray('test', $element);
+    $this->assertEquals($expected, $element);
+  }
+
+  /**
+   * Data provider for ::testApplyOrBubbleOnArray().
+   *
+   * @return \Generator
+   *   The test cases.
+   */
+  public static function providerApplyOrBubbleOnArray(): iterable {
+    yield 'Utility: default' => [
+      'utility',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+      ],
+      [
+        '#attributes' => [
+          'class' => ['my-class'],
+        ],
+        '#attached' => [],
+      ],
+    ];
+
+    yield 'Utility: on an attribute' => [
+      'utility',
+      [
+        'label' => 'Label',
+        'value' => 'data',
+        'attribute' => 'data-test',
+      ],
+      [
+        '#attributes' => [
+          'data-test' => 'data',
+        ],
+        '#attached' => [],
+      ],
+    ];
+
+    yield 'Utility: inline style' => [
+      'utility',
+      [
+        'label' => 'Label',
+        'value' => 'font-size: 15px',
+        'attribute' => 'style',
+      ],
+      [
+        '#attributes' => [
+          'style' => 'font-size: 15px',
+        ],
+        '#attached' => [],
+      ],
+    ];
+
+    yield 'Utility: experimental option' => [
+      'utility',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+        'status' => 'experimental',
+      ],
+      [
+        '#attributes' => [
+          'class' => ['my-class'],
+        ],
+        '#attached' => [],
+      ],
+    ];
+
+    yield 'Theme: default' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+      ],
+      [
+        '#attributes' => [
+          'class' => ['my-class'],
+        ],
+        '#attached' => [],
+      ],
+    ];
+
+    yield 'Theme: on an attribute' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'data',
+        'attribute' => 'data-test',
+      ],
+      [
+        '#attributes' => [
+          'data-test' => 'data',
+        ],
+        '#attached' => [],
+      ],
+    ];
+
+    yield 'Theme: inline style' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'font-size: 15px',
+        'attribute' => 'style',
+      ],
+      [
+        '#attributes' => [
+          'style' => 'font-size: 15px',
+        ],
+        '#attached' => [],
+      ],
+    ];
+
+    yield 'Theme: target body' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+        'target' => 'body',
+      ],
+      [
+        '#attached' => [
+          'styles' => [
+            'test' => 'test',
+          ],
+        ],
+      ],
+    ];
+
+    yield 'Theme: target html' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+        'target' => 'html',
+      ],
+      [
+        '#attached' => [
+          'styles' => [
+            'test' => 'test',
+          ],
+        ],
+      ],
+    ];
+
+    yield 'Theme: target meta' => [
+      'theme',
+      [
+        'label' => 'Label',
+        'value' => 'my-class',
+        'attribute' => 'my-name',
+        'target' => 'meta',
+      ],
+      [
+        '#attached' => [
+          'html_head' => [
+            [
+              [
+                '#tag' => 'meta',
+                '#attributes' => [
+                  'name' => 'my-name',
+                  'content' => 'my-class',
+                ],
+              ],
+              'style:test:test',
+            ],
+          ],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Test applyOrBubbleOnArray: style with a library.
+   */
+  public function testApplyOrBubbleOnArrayWithLibrary(): void {
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+        ],
+      ],
+      'library' => 'my_module/my_library',
+    ]);
+    $element = [];
+    $expected = [
+      '#attributes' => [
+        'class' => ['my-class'],
+      ],
+      '#attached' => [
+        'library' => [
+          'my_module/my_library',
+        ],
+      ],
+    ];
+    $definition->applyOrBubbleOnArray('test', $element);
+    $this->assertEquals($expected, $element);
+  }
+
+  /**
+   * Test applyOrBubbleOnArray: apply on another attributes key.
+   */
+  public function testApplyOrBubbleOnArrayWithOtherKey(): void {
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+        ],
+      ],
+    ]);
+    $element = [];
+    $expected = [
+      '#content_attributes' => [
+        'class' => ['my-class'],
+      ],
+      '#attached' => [],
+    ];
+    $definition->applyOrBubbleOnArray('test', $element, '#content_attributes');
+    $this->assertEquals($expected, $element);
+  }
+
+  /**
+   * Test applyOrBubbleOnArray: apply on non accepting attributes element.
+   */
+  public function testApplyOrBubbleOnArrayNonAccepting(): void {
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+        ],
+      ],
+      'library' => 'my_module/my_library',
+    ]);
+    $element = [
+      '#accept_attributes' => FALSE,
+    ];
+    $expected = [
+      '#accept_attributes' => FALSE,
+      '#attached' => [
+        'library' => [
+          'my_module/my_library',
+        ],
+      ],
+    ];
+    $definition->applyOrBubbleOnArray('test', $element);
+    $this->assertEquals($expected, $element);
+  }
+
+  /**
+   * Test applyOrBubbleOnArray: triggering logger.
+   */
+  public function testApplyOrBubbleOnArrayUndefinedOption(): void {
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('error')
+      ->with('Invalid style option %optionId for style %styleId.', [
+        '%styleId' => 'test',
+        '%optionId' => 'foo',
+      ]);
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('style')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+        ],
+      ],
+    ]);
+    $element = [];
+    $definition->applyOrBubbleOnArray('foo', $element);
+    $this->assertEquals([], $element, 'The element should be unchanged.');
+  }
+
+  /**
+   * Test applyOrBubbleOnArray: triggering logger.
+   */
+  public function testApplyOrBubbleOnArrayWarningStatus(): void {
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('warning')
+      ->with('Usage of style %styleId which is in %status status.', [
+        '%styleId' => 'test',
+        '%status' => new TranslatableMarkup('Deprecated'),
+      ]);
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('style')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'status' => 'deprecated',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+        ],
+      ],
+    ]);
+    $expected = [
+      '#attributes' => [
+        'class' => ['my-class'],
+      ],
+      '#attached' => [],
+    ];
+    $element = [];
+    $definition->applyOrBubbleOnArray('test', $element);
+    $this->assertEquals($expected, $element);
+  }
+
+  /**
+   * Test applyOrBubbleOnArray: triggering logger.
+   */
+  public function testApplyOrBubbleOnArrayWarningStatusOption(): void {
+    $logger = $this->createMock(LoggerChannelInterface::class);
+    $logger->expects($this->once())
+      ->method('warning')
+      ->with('Usage of style option %optionId which is in %status status for style %styleId.', [
+        '%styleId' => 'test',
+        '%optionId' => 'test',
+        '%status' => new TranslatableMarkup('Obsolete'),
+      ]);
+
+    $loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
+    $loggerFactory->expects($this->once())
+      ->method('get')
+      ->with('style')
+      ->willReturn($logger);
+
+    $container = new ContainerBuilder();
+    $container->set('logger.factory', $loggerFactory);
+    \Drupal::setContainer($container);
+
+    $definition = new StyleDefinition([
+      'id' => 'test',
+      'options' => [
+        'test' => [
+          'label' => 'Label',
+          'value' => 'my-class',
+          'status' => 'obsolete',
+        ],
+      ],
+    ]);
+    $expected = [
+      '#attributes' => [
+        'class' => ['my-class'],
+      ],
+      '#attached' => [],
+    ];
+    $element = [];
+    $definition->applyOrBubbleOnArray('test', $element);
+    $this->assertEquals($expected, $element);
   }
 
 }

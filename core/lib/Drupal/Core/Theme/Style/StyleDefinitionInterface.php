@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Theme\Style;
 
+use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\Style\Enum\Type;
 use Drupal\Core\Theme\Style\Enum\Status;
 use Drupal\Core\Theme\Style\Enum\Target;
@@ -45,6 +46,41 @@ interface StyleDefinitionInterface {
    *   Processed options.
    */
   public function getProcessedOptions(): array;
+
+  /**
+   * Apply a style option depending on its type and target.
+   *
+   * @param string $optionId
+   *   The style option ID.
+   * @param \Drupal\Core\Template\Attribute $attribute
+   *   The attribute object to apply style to.
+   */
+  public function applyOrBubbleOnAttribute(string $optionId, Attribute $attribute): void;
+
+  /**
+   * Apply a style option to an attribute object.
+   *
+   * For usage when attachments had already been processed.
+   *
+   * @param string $optionId
+   *   The style option ID.
+   * @param \Drupal\Core\Template\Attribute $attribute
+   *   The attribute object to apply style to.
+   */
+  public function applyOnAttribute(string $optionId, Attribute $attribute): void;
+
+  /**
+   * Apply a style option depending on its type and target.
+   *
+   * @param string $optionId
+   *   The style option ID.
+   * @param array $element
+   *   The render array to apply style to. Local attributes are only applied
+   *   when the element does not declare '#accept_attributes' as FALSE.
+   * @param string $attributesKey
+   *   The render array key containing the attributes.
+   */
+  public function applyOrBubbleOnArray(string $optionId, array &$element, string $attributesKey = '#attributes'): void;
 
   /**
    * Getter.

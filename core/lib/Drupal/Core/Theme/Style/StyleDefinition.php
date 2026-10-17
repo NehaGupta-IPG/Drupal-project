@@ -6,6 +6,8 @@ namespace Drupal\Core\Theme\Style;
 
 use Drupal\Component\Plugin\Definition\PluginDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Template\Attribute;
+use Drupal\Core\Template\AttributeHelper;
 use Drupal\Core\Theme\Style\Enum\ModeColorScheme;
 use Drupal\Core\Theme\Style\Enum\ModeContrast;
 use Drupal\Core\Theme\Style\Enum\ModeReducedMotion;
@@ -135,6 +137,179 @@ class StyleDefinition extends PluginDefinition implements StyleDefinitionInterfa
 
     $this->processedOptions = $options;
     return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applyOrBubbleOnAttribute(string $optionId, Attribute $attribute): void {
+    $styleId = $this->id();
+    $options = $this->getProcessedOptions();
+    $status = $this->getStatus();
+
+    if ($status->triggerWarning()) {
+      \Drupal::logger('style')->warning('Usage of style %styleId which is in %status status.', [
+        '%styleId' => $styleId,
+        '%status' => $status->label(),
+      ]);
+    }
+    if (!isset($options[$optionId])) {
+      \Drupal::logger('style')->error('Invalid style option %optionId for style %styleId.', [
+        '%styleId' => $styleId,
+        '%optionId' => $optionId,
+      ]);
+      return;
+    }
+    elseif ($options[$optionId]['status']->triggerWarning()) {
+      \Drupal::logger('style')->warning('Usage of style option %optionId which is in %status status for style %styleId.', [
+        '%styleId' => $styleId,
+        '%optionId' => $optionId,
+        '%status' => $options[$optionId]['status']->label(),
+      ]);
+    }
+
+    $type = $this->getType();
+    $optionTarget = $options[$optionId]['target'];
+    $optionAttribute = $options[$optionId]['attribute'];
+    $optionValue = $options[$optionId]['value'];
+    $attachments = [];
+
+    if ($type == Type::Theme && $optionTarget == Target::Meta) {
+      $meta = [
+        '#tag' => 'meta',
+        '#attributes' => [
+          'name' => $optionAttribute,
+          'content' => $optionValue,
+        ],
+      ];
+      $attachments['html_head'][] = [$meta, "style:{$styleId}:{$optionId}"];
+    }
+    // Target: HTML or body.
+    elseif ($type == Type::Theme && $optionTarget != Target::Any) {
+      $attachments['styles'][$styleId] = $optionId;
+    }
+    else {
+      $attribute->merge(new Attribute([$optionAttribute => $optionValue]));
+    }
+
+    $styleLibrary = $this->getLibrary();
+    if (!empty($styleLibrary)) {
+      $attachments['library'][] = $styleLibrary;
+    }
+
+    if (!empty($attachments)) {
+      $attribute->addAttachments($attachments);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applyOnAttribute(string $optionId, Attribute $attribute): void {
+    $styleId = $this->id();
+    $options = $this->getProcessedOptions();
+    $status = $this->getStatus();
+
+    if ($status->triggerWarning()) {
+      \Drupal::logger('style')->warning('Usage of style %styleId which is in %status status.', [
+        '%styleId' => $styleId,
+        '%status' => $status->label(),
+      ]);
+    }
+    if (!isset($options[$optionId])) {
+      \Drupal::logger('style')->error('Invalid style option %optionId for style %styleId.', [
+        '%styleId' => $styleId,
+        '%optionId' => $optionId,
+      ]);
+      return;
+    }
+    elseif ($options[$optionId]['status']->triggerWarning()) {
+      \Drupal::logger('style')->warning('Usage of style option %optionId which is in %status status for style %styleId.', [
+        '%styleId' => $styleId,
+        '%optionId' => $optionId,
+        '%status' => $options[$optionId]['status']->label(),
+      ]);
+    }
+
+    $type = $this->getType();
+    $optionTarget = $options[$optionId]['target'];
+    $optionAttribute = $options[$optionId]['attribute'];
+    $optionValue = $options[$optionId]['value'];
+
+    // Ignore type 'theme' with target 'meta' as it is too late.
+    if ($type == Type::Utility || ($type == Type::Theme && $optionTarget != Target::Meta)) {
+      $attribute->merge(new Attribute([$optionAttribute => $optionValue]));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applyOrBubbleOnArray(string $optionId, array &$element, string $attributesKey = '#attributes'): void {
+    $styleId = $this->id();
+    $options = $this->getProcessedOptions();
+    $status = $this->getStatus();
+
+    if ($status->triggerWarning()) {
+      \Drupal::logger('style')->warning('Usage of style %styleId which is in %status status.', [
+        '%styleId' => $styleId,
+        '%status' => $status->label(),
+      ]);
+    }
+    if (!isset($options[$optionId])) {
+      \Drupal::logger('style')->error('Invalid style option %optionId for style %styleId.', [
+        '%styleId' => $styleId,
+        '%optionId' => $optionId,
+      ]);
+      return;
+    }
+    elseif ($options[$optionId]['status']->triggerWarning()) {
+      \Drupal::logger('style')->warning('Usage of style option %optionId which is in %status status for style %styleId.', [
+        '%styleId' => $styleId,
+        '%optionId' => $optionId,
+        '%status' => $options[$optionId]['status']->label(),
+      ]);
+    }
+
+    $type = $this->getType();
+    $optionTarget = $options[$optionId]['target'];
+    $optionAttribute = $options[$optionId]['attribute'];
+    $optionValue = $options[$optionId]['value'];
+    $element['#attached'] = $element['#attached'] ?? [];
+
+    if ($type == Type::Theme && $optionTarget == Target::Meta) {
+      $meta = [
+        '#tag' => 'meta',
+        '#attributes' => [
+          'name' => $optionAttribute,
+          'content' => $optionValue,
+        ],
+      ];
+      $element['#attached']['html_head'][] = [$meta, "style:{$styleId}:{$optionId}"];
+    }
+    // Target: HTML or body.
+    elseif ($type == Type::Theme && $optionTarget != Target::Any) {
+      $element['#attached']['styles'][$styleId] = $optionId;
+    }
+    elseif (!isset($element['#accept_attributes']) || $element['#accept_attributes'] === TRUE) {
+      // Need special case for class if the attribute does not have any yet.
+      if ($optionAttribute == 'class') {
+        $optionValue = [$optionValue];
+      }
+
+      $element[$attributesKey] = $element[$attributesKey] ?? [];
+      $element[$attributesKey] = AttributeHelper::mergeCollections(
+        $element[$attributesKey],
+        [
+          $optionAttribute => $optionValue,
+        ]
+      );
+    }
+
+    $styleLibrary = $this->getLibrary();
+    if (!empty($styleLibrary)) {
+      $element['#attached']['library'][] = $styleLibrary;
+    }
   }
 
   /**

@@ -569,6 +569,7 @@ services:
   Drupal\Core\Form\FormCacheInterface: '@form_cache'
   Drupal\Core\Form\FormPreprocess:
     class: Drupal\Core\Form\FormPreprocess
+    arguments: ['@plugin.manager.style']
   keyvalue:
     class: Drupal\Core\KeyValueStore\KeyValueFactory
     arguments: ['@service_container', '%factory.keyvalue%']
@@ -1852,7 +1853,7 @@ services:
   Drupal\Core\Template\TwigEnvironment: '@twig'
   twig.extension:
     class: Drupal\Core\Template\TwigExtension
-    arguments: ['@renderer', '@url_generator', '@theme.manager', '@date.formatter', '@file_url_generator']
+    arguments: ['@renderer', '@url_generator', '@theme.manager', '@date.formatter', '@file_url_generator', '@plugin.manager.style']
     tags:
       - { name: twig.extension, priority: 100 }
   Drupal\Core\Template\ComponentsTwigExtension:
@@ -1948,7 +1949,7 @@ services:
   Drupal\Core\Render\RenderCacheInterface: '@render_cache'
   renderer:
     class: Drupal\Core\Render\Renderer
-    arguments: ['@callable_resolver', '@theme.manager', '@plugin.manager.element_info', '@render_placeholder_generator', '@render_cache', '@request_stack', '%renderer.config%']
+    arguments: ['@callable_resolver', '@theme.manager', '@plugin.manager.element_info', '@render_placeholder_generator', '@render_cache', '@request_stack', '%renderer.config%', '@plugin.manager.style', '@logger.factory']
   Drupal\Core\Render\RendererInterface: '@renderer'
   early_rendering_controller_wrapper_subscriber:
     class: Drupal\Core\EventSubscriber\EarlyRenderingControllerWrapperSubscriber
@@ -2108,6 +2109,7 @@ services:
       - '@module_handler'
       - '@theme_handler'
       - '@cache.discovery'
+      - '@logger.factory'
       - '%app.root%'
   Drupal\Core\Theme\Style\StylePluginManagerInterface: '@plugin.manager.style'
   Drupal\Core\Extension\ThemeSettingsProvider:

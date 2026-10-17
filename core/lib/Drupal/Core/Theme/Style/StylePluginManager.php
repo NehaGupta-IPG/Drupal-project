@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Core\Theme\Style;
 
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\MultipleYamlDiscovery;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
 use Drupal\Core\Plugin\JsonSchemaDefinitionValidatorTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\Style\Enum\Type;
 use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
 
@@ -125,6 +128,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     ModuleHandlerInterface $module_handler,
     protected readonly ThemeHandlerInterface $themeHandler,
     CacheBackendInterface $cacheBackend,
+    protected LoggerChannelFactoryInterface $loggerChannelFactory,
     protected string $appRoot,
   ) {
     $this->moduleHandler = $module_handler;
@@ -230,6 +234,21 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       $grouped_definitions[(string) $definition->getCategory()][$id] = $definition;
     }
     return $grouped_definitions;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addStyleToAttribute(Attribute $attribute, string $styleId, string $styleOption): bool {
+    try {
+      $styleDefinition = $this->getDefinition($styleId);
+      $attribute->addStyle($styleDefinition, $styleOption);
+      return TRUE;
+    }
+    catch (PluginNotFoundException | StyleDefinitionErrorException $exception) {
+      $this->loggerChannelFactory->get('twig')->error($exception->getMessage());
+    }
+    return FALSE;
   }
 
   /**

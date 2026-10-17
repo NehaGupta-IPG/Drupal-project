@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Template;
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -13,6 +14,9 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
+use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
+use Drupal\Core\Theme\Style\StyleDefinitionInterface;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Twig\Environment;
@@ -71,6 +75,13 @@ class TwigExtension extends AbstractExtension {
   protected $fileUrlGenerator;
 
   /**
+   * The style plugin manager.
+   *
+   * @var \Drupal\Core\Theme\Style\StylePluginManagerInterface
+   */
+  protected $stylePluginManager;
+
+  /**
    * Constructs \Drupal\Core\Template\TwigExtension.
    *
    * @param \Drupal\Core\Render\RendererInterface $renderer
@@ -83,13 +94,20 @@ class TwigExtension extends AbstractExtension {
    *   The date formatter.
    * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
    *   The file URL generator.
+   * @param \Drupal\Core\Theme\Style\StylePluginManagerInterface|null $style_plugin_manager
+   *   The style plugin manager.
    */
-  public function __construct(RendererInterface $renderer, UrlGeneratorInterface $url_generator, ThemeManagerInterface $theme_manager, DateFormatterInterface $date_formatter, FileUrlGeneratorInterface $file_url_generator) {
+  public function __construct(RendererInterface $renderer, UrlGeneratorInterface $url_generator, ThemeManagerInterface $theme_manager, DateFormatterInterface $date_formatter, FileUrlGeneratorInterface $file_url_generator, ?StylePluginManagerInterface $style_plugin_manager = NULL) {
     $this->renderer = $renderer;
     $this->urlGenerator = $url_generator;
     $this->themeManager = $theme_manager;
     $this->dateFormatter = $date_formatter;
     $this->fileUrlGenerator = $file_url_generator;
+    if (!isset($style_plugin_manager)) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $style_plugin_manager argument is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/node/3631504', E_USER_DEPRECATED);
+      $style_plugin_manager = \Drupal::service(StylePluginManagerInterface::class);
+    }
+    $this->stylePluginManager = $style_plugin_manager;
   }
 
   /**
@@ -109,7 +127,39 @@ class TwigExtension extends AbstractExtension {
       new TwigFunction('active_theme_path', [$this, 'getActiveThemePath']),
       new TwigFunction('active_theme', [$this, 'getActiveTheme']),
       new TwigFunction('create_attribute', [$this, 'createAttribute']),
+      new TwigFunction('style', [$this, 'getStyle']),
     ];
+  }
+
+  /**
+   * Resolves a style plugin ID to its definition.
+   *
+   * Allows Twig templates to resolve a style ID to the definition expected
+   * by \Drupal\Core\Template\Attribute::addStyle(), for example:
+   * @code
+   * {{ attributes.addStyle(style('my_style'), 'my_value') }}
+   * @endcode
+   *
+   * @param string $styleId
+   *   The style plugin ID.
+   *
+   * @return \Drupal\Core\Theme\Style\StyleDefinitionInterface|null
+   *   The style definition, or NULL if the style ID does not resolve to a
+   *   valid definition. In that case the failure is logged and the caller is
+   *   expected to silently skip applying a style, matching the previous
+   *   behavior of \Drupal\Core\Template\Attribute::addStyle().
+   */
+  public function getStyle(string $styleId): ?StyleDefinitionInterface {
+    try {
+      return $this->stylePluginManager->getDefinition($styleId);
+    }
+    catch (PluginNotFoundException $exception) {
+      \Drupal::logger('twig')->error($exception->getMessage());
+    }
+    catch (StyleDefinitionErrorException $exception) {
+      \Drupal::logger('twig')->error($exception->getMessage());
+    }
+    return NULL;
   }
 
   /**

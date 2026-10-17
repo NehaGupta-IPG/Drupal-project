@@ -33,6 +33,17 @@ class SyslogTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installConfig(['syslog']);
+
+    // With logger.factory injected in renderer, it is already instantiated with
+    // previous configuration so need to rebuild the container.
+    $user = $this->getStubBuilder(AccountInterface::class)->getStub();
+    $user->method('id')->willReturn(42);
+    $this->container->set('current_user', $user);
+
+    /** @var \Drupal\Core\DrupalKernelInterface $kernel */
+    $kernel = \Drupal::service('kernel');
+    $kernel->invalidateContainer();
+    $kernel->rebuildContainer();
   }
 
   /**

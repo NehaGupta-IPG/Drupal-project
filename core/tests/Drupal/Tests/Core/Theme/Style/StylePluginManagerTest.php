@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\Theme\Style;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
 use Drupal\Core\Theme\Style\StyleDefinition;
 use Drupal\Core\Theme\Style\StylePluginManager;
@@ -43,6 +44,7 @@ class StylePluginManagerTest extends UnitTestCase {
       $moduleHandler,
       $themeHandler,
       $cacheBackend,
+      $this->createStub(LoggerChannelFactoryInterface::class),
       $this->root,
     );
   }
@@ -134,6 +136,7 @@ class StylePluginManagerTest extends UnitTestCase {
       $moduleHandler,
       $this->createStub(ThemeHandlerInterface::class),
       $this->createStub(CacheBackendInterface::class),
+      $this->createStub(LoggerChannelFactoryInterface::class),
       $this->root,
     );
     $stylePluginManager->setStyles([

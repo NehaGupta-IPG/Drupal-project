@@ -6,6 +6,7 @@ namespace Drupal\Core\Theme\Style;
 
 use Drupal\Component\Plugin\CategorizingPluginManagerInterface;
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Core\Template\Attribute;
 
 /**
  * Interface for style plugin managers.
@@ -61,5 +62,21 @@ interface StylePluginManagerInterface extends PluginManagerInterface, Categorizi
    *   The sorted definitions grouped by category.
    */
   public function getGroupedDefinitions(?array $definitions = NULL, string $label_key = 'label'): array;
+
+  /**
+   * Applies a style ID and option pair to an Attribute.
+   *
+   * @param \Drupal\Core\Template\Attribute $attribute
+   *   The attribute to apply the style to.
+   * @param string $styleId
+   *   The style ID to apply.
+   * @param string $styleOption
+   *   The style option to apply.
+   *
+   * @return bool
+   *   TRUE if the style applied, FALSE if the style ID does not exist or has
+   *   an invalid definition.
+   */
+  public function addStyleToAttribute(Attribute $attribute, string $styleId, string $styleOption): bool;
 
 }
