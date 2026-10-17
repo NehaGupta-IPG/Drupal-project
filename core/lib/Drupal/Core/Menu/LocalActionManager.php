@@ -99,7 +99,7 @@ class LocalActionManager extends DefaultPluginManager implements LocalActionMana
   /**
    * {@inheritdoc}
    */
-  public function getActionsForRoute($route_appears) {
+  public function getActionsForRoute(string $route_appears) {
     if (!isset($this->instances[$route_appears])) {
       $route_names = [];
       $this->instances[$route_appears] = [];

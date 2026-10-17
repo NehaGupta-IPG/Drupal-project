@@ -88,16 +88,17 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
     ];
 
     // Add only selected levels for the printed output.
-    if ($config['primary']) {
-      $links = $this->localTaskManager->getLocalTasks($this->routeMatch->getRouteName(), 0);
+    $route_name = $this->routeMatch->getRouteName();
+    if ($route_name && $config['primary']) {
+      $links = $this->localTaskManager->getLocalTasks($route_name, 0);
       $cacheability = $cacheability->merge($links['cacheability']);
       // Do not display single tabs.
       $tabs += [
         '#primary' => count(Element::getVisibleChildren($links['tabs'])) > 1 ? $links['tabs'] : [],
       ];
     }
-    if ($config['secondary']) {
-      $links = $this->localTaskManager->getLocalTasks($this->routeMatch->getRouteName(), 1);
+    if ($route_name && $config['secondary']) {
+      $links = $this->localTaskManager->getLocalTasks($route_name, 1);
       $cacheability = $cacheability->merge($links['cacheability']);
       // Do not display single tabs.
       $tabs += [

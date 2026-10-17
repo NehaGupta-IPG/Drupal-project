@@ -63,10 +63,11 @@ class LocalActionsBlock extends BlockBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function build() {
-    $route_name = $this->routeMatch->getRouteName();
-    $local_actions = $this->localActionManager->getActionsForRoute($route_name);
+    if ($route_name = $this->routeMatch->getRouteName()) {
+      return $this->localActionManager->getActionsForRoute($route_name);
+    }
 
-    return $local_actions;
+    return [];
   }
 
   /**
