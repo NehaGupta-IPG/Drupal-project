@@ -728,6 +728,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
   /**
    * {@inheritdoc}
+   *
+   * @return void
    */
   public function deleteRevision($revision_id) {
     try {
