@@ -14,7 +14,6 @@ use Drupal\Core\Asset\LibraryDependencyResolverInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
-use Drupal\system\FileDownloadController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

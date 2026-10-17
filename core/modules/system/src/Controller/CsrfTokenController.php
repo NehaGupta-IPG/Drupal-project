@@ -7,6 +7,7 @@ use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Returns responses for CSRF token routes.
@@ -45,6 +46,13 @@ class CsrfTokenController implements ContainerInjectionInterface {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    */
+  #[Route(
+    path: '/session/token',
+    name: 'system.csrftoken',
+    requirements: [
+      '_access' => 'TRUE',
+    ],
+  )]
   public function csrfToken() {
     return new Response($this->tokenGenerator->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY), 200, ['Content-Type' => 'text/plain']);
   }

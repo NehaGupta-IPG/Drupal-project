@@ -2,60 +2,19 @@
 
 namespace Drupal\system;
 
-use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\CronInterface;
-use Symfony\Component\HttpFoundation\Response;
+use Drupal\system\Controller\CronController as NewCronController;
+
+// phpcs:ignore Drupal.Semantics.FunctionTriggerError
+@trigger_error(__NAMESPACE__ . '\CronController is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\system\Controller\CronController instead. See https://www.drupal.org/node/3610540', E_USER_DEPRECATED);
 
 /**
  * Controller for Cron handling.
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\system\Controller\CronController instead.
+ *
+ * @see https://www.drupal.org/node/3610540
  */
-class CronController extends ControllerBase {
-
-  /**
-   * The cron service.
-   *
-   * @var \Drupal\Core\CronInterface
-   */
-  protected $cron;
-
-  /**
-   * Constructs a CronController object.
-   *
-   * @param \Drupal\Core\CronInterface $cron
-   *   The cron service.
-   */
-  public function __construct(CronInterface $cron) {
-    $this->cron = $cron;
-  }
-
-  /**
-   * Run Cron once.
-   *
-   * @return \Symfony\Component\HttpFoundation\Response
-   *   A Symfony response object.
-   */
-  public function run() {
-    $this->cron->run();
-
-    // HTTP 204 is "No content", meaning "I did what you asked and we're done.".
-    return new Response('', 204);
-  }
-
-  /**
-   * Run cron manually.
-   *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
-   *   A Symfony direct response object.
-   */
-  public function runManually() {
-    if ($this->cron->run()) {
-      $this->messenger()->addStatus($this->t('Cron ran successfully.'));
-    }
-    else {
-      $this->messenger()->addError($this->t('Cron run failed.'));
-    }
-
-    return $this->redirect('system.status');
-  }
+class CronController extends NewCronController {
 
 }
