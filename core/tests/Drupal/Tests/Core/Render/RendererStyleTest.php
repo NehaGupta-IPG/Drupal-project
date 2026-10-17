@@ -70,7 +70,66 @@ class RendererStyleTest extends RendererTestBase {
 
     $this->assertArrayHasKey('#styles', $element);
     $this->renderer->renderRoot($element);
-    $this->assertArrayNotHasKey('#styles', $element);
+    $this->assertArrayHasKey('#styles', $element);
+    $this->assertTrue($element['#styles_processed']);
+  }
+
+  /**
+   * Tests that #styles is still available to #pre_render callbacks.
+   */
+  public function testStylesPropertyAvailableInPreRender(): void {
+    $definition = $this->createMock(StyleDefinitionInterface::class);
+    $definition->expects($this->once())
+      ->method('applyOrBubbleOnArray');
+
+    $this->stylePluginManager
+      ->method('getDefinition')
+      ->willReturn($definition);
+
+    $styles = [
+      'my_style' => 'option_1',
+    ];
+    $preRenderStyles = NULL;
+    $preRenderProcessed = NULL;
+    $element = [
+      '#type' => 'container',
+      '#styles' => $styles,
+      '#pre_render' => [
+        static function (array $element) use (&$preRenderStyles, &$preRenderProcessed): array {
+          $preRenderStyles = $element['#styles'] ?? NULL;
+          $preRenderProcessed = $element['#styles_processed'] ?? NULL;
+          return $element;
+        },
+      ],
+    ];
+
+    $this->renderer->renderRoot($element);
+    $this->assertSame($styles, $preRenderStyles);
+    $this->assertTrue($preRenderProcessed);
+  }
+
+  /**
+   * Tests that styles are not applied again on an already processed element.
+   */
+  public function testStylesPropertyAlreadyProcessed(): void {
+    $definition = $this->createMock(StyleDefinitionInterface::class);
+    $definition->expects($this->never())
+      ->method('applyOrBubbleOnArray');
+
+    $this->stylePluginManager
+      ->method('getDefinition')
+      ->willReturn($definition);
+
+    $element = [
+      '#type' => 'container',
+      '#styles' => [
+        'my_style' => 'option_1',
+      ],
+      '#styles_processed' => TRUE,
+    ];
+
+    $this->renderer->renderRoot($element);
+    $this->assertArrayHasKey('#styles', $element);
   }
 
   /**
@@ -106,7 +165,8 @@ class RendererStyleTest extends RendererTestBase {
     ];
 
     $this->renderer->renderRoot($element);
-    $this->assertArrayNotHasKey('#styles', $element);
+    $this->assertArrayHasKey('#styles', $element);
+    $this->assertTrue($element['#styles_processed']);
   }
 
   /**
@@ -142,7 +202,8 @@ class RendererStyleTest extends RendererTestBase {
     ];
 
     $this->renderer->renderRoot($element);
-    $this->assertArrayNotHasKey('#styles', $element);
+    $this->assertArrayHasKey('#styles', $element);
+    $this->assertTrue($element['#styles_processed']);
   }
 
   /**

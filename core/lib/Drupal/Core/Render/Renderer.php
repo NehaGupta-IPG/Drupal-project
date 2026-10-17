@@ -455,7 +455,7 @@ class Renderer implements RendererInterface {
       $elements['#lazy_builder_built'] = TRUE;
     }
 
-    if (isset($elements['#styles']) && !empty($elements['#styles'])) {
+    if (!empty($elements['#styles']) && empty($elements['#styles_processed'])) {
       foreach ($elements['#styles'] as $styleId => $styleOption) {
         try {
           $style = $this->stylePluginManager->getDefinition($styleId);
@@ -468,8 +468,9 @@ class Renderer implements RendererInterface {
           $this->loggerFactory->get('renderer')->error($exception->getMessage());
         }
       }
-      // Avoid processing multiple times.
-      unset($elements['#styles']);
+      // Avoid processing multiple times. Keep #styles so #pre_render callbacks
+      // can still read it.
+      $elements['#styles_processed'] = TRUE;
     }
 
     // Make any final changes to the element before it is rendered. This means
