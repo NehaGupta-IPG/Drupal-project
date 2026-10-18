@@ -116,11 +116,56 @@
     }
     event.data.$element.dialog('option', adjustedOptions);
 
+    const uiDialogEl = event.data.$element.dialog('widget')[0];
+    if (uiDialogEl && uiDialogEl.style.position === 'fixed') {
+      window.requestAnimationFrame(() => {
+        fixMobilePosition(uiDialogEl);
+      });
+    }
+
     event.data.$element
       ?.get(0)
       ?.dispatchEvent(
         new CustomEvent('dialogContentResize', { bubbles: true }),
       );
+  }
+
+  /**
+   * Fixes an issue on mobile devices where the dialog is positioned off-screen.
+   *
+   * @param {HTMLElement} uiDialogEl
+   *   The dialog DOM element.
+   */
+  function fixMobilePosition(uiDialogEl) {
+    if (!uiDialogEl) {
+      return;
+    }
+
+    const currentTop = parseFloat(uiDialogEl.style.top);
+
+    if (Number.isNaN(currentTop)) {
+      return;
+    }
+
+    const viewportHeight = window.visualViewport
+      ? window.visualViewport.height
+      : window.innerHeight;
+    const dialogHeight = uiDialogEl.offsetHeight || 0;
+
+    if (currentTop <= viewportHeight) {
+      return;
+    }
+    const topOffset = displace.offsets.top || 0;
+    const bottomOffset = displace.offsets.bottom || 0;
+
+    const availableHeight = viewportHeight - topOffset - bottomOffset;
+
+    const centeredTop = Math.max(
+      topOffset,
+      Math.round(topOffset + (availableHeight - dialogHeight) / 2)
+    );
+
+    uiDialogEl.style.top = `${centeredTop}px`;
   }
 
   window.addEventListener('dialog:aftercreate', (e) => {
@@ -144,6 +189,9 @@
         eventData,
         autoResize,
       );
+      window.requestAnimationFrame(() => {
+        fixMobilePosition(uiDialog[0]);
+      });
     }
   });
 
