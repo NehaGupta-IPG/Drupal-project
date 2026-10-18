@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides an entity autocomplete form element.
@@ -340,7 +341,7 @@ class EntityAutocomplete extends Textfield {
     if (empty($entities)) {
       if ($strict) {
         // Error if there are no entities available for a required field.
-        $form_state->setError($element, t('There are no @entity_type_plural matching "%value".', $params));
+        $form_state->setError($element, static::getNoMatchingEntityMessage($element['#target_type'], $input));
       }
     }
     elseif (count($entities) > 5) {
@@ -361,6 +362,24 @@ class EntityAutocomplete extends Textfield {
       // Take the one and only matching entity.
       return key($entities);
     }
+  }
+
+  /**
+   * Gets the validation message for an input without a matching entity.
+   *
+   * @param string $target_type
+   *   The target entity type ID.
+   * @param string $input
+   *   The input without a matching entity.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The validation message.
+   */
+  public static function getNoMatchingEntityMessage(string $target_type, string $input): TranslatableMarkup {
+    return new TranslatableMarkup('There are no @entity_type_plural matching "%value".', [
+      '@entity_type_plural' => \Drupal::entityTypeManager()->getDefinition($target_type)->getPluralLabel(),
+      '%value' => $input,
+    ]);
   }
 
   /**

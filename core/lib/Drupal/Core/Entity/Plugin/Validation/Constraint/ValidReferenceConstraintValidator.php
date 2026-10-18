@@ -117,19 +117,6 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
               continue;
             }
 
-            // If the referenced entity has been validated somewhere else then
-            // we shouldn't validate it again, as code validating the entity and
-            // leaving the validated flag set to TRUE is required of taking care
-            // of the validation errors. If we ignore the fact that the entity
-            // is already validated, then we might show the same errors multiple
-            // times. In order to prevent this whoever is validating the entity
-            // is also responsible for showing the errors or resetting the
-            // validated flag of the entity.
-            // @see \Drupal\Core\Entity\FieldableEntityInterface::validate()
-            // @see \Drupal\Core\Entity\FieldableEntityInterface::setValidated()
-            if ($entity->isValidated()) {
-              continue;
-            }
             $violations = $entity->validate();
           }
           else {

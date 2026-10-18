@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Entity\Element\EntityAutocomplete;
+use Drupal\Core\Entity\Plugin\Validation\Constraint\ValidReferenceConstraint;
 use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
@@ -139,6 +141,18 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function errorElement(array $element, ConstraintViolationInterface $error, array $form, FormStateInterface $form_state) {
+    // Autocomplete cannot collect the values needed to fix an invalid new
+    // entity. Report the input as unmatched, as when autocreation is disabled.
+    // Form state keeps one error per element even if the entity has multiple
+    // violations or is invalid through more than one nested reference path.
+    $constraint = $error->getConstraint();
+    if ($constraint instanceof ValidReferenceConstraint && $error->getMessageTemplate() === $constraint->invalidNewEntity) {
+      $form_state->setError($element['target_id'], EntityAutocomplete::getNoMatchingEntityMessage(
+        $element['target_id']['#target_type'],
+        (string) $error->getParameters()['%label'],
+      ));
+      return FALSE;
+    }
     return $element['target_id'];
   }
 

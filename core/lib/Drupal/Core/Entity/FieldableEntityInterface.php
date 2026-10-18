@@ -227,25 +227,6 @@ interface FieldableEntityInterface extends EntityInterface {
   public function isValidationRunning(): bool;
 
   /**
-   * Checks whether the entity has been validated.
-   *
-   * @return bool
-   *   TRUE if the entity has been validated, FALSE if not.
-   */
-  public function isValidated(): bool;
-
-  /**
-   * Sets the validated flag.
-   *
-   * @param bool $validated
-   *   If set to TRUE the entity will be flagged as validated, otherwise as not
-   *   validated.
-   *
-   * @return $this
-   */
-  public function setValidated(bool $validated): static;
-
-  /**
    * Checks whether entity validation is required before saving the entity.
    *
    * @return bool
