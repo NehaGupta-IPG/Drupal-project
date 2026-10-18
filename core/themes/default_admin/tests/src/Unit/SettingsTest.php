@@ -14,6 +14,7 @@ use Drupal\user\UserDataInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests the lifetime of admin settings dependencies.
@@ -34,7 +35,9 @@ class SettingsTest extends UnitTestCase {
    * Tests that settings operations use the current services and account.
    */
   #[DataProvider('containerReplacementProvider')]
+  #[IgnoreDeprecations]
   public function testCurrentDependencies(bool $replace_container): void {
+    $this->expectUserDeprecationMessage('Drupal\\default_admin\\Settings::getInstance() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Inject \\Drupal\\Core\\DependencyInjection\\ClassResolverInterface and use it to resolve \\Drupal\\default_admin\\Settings, or use \\Drupal::classResolver(\\Drupal\\default_admin\\Settings::class) where injection is not possible. See https://www.drupal.org/node/3626158');
     $container = new ContainerBuilder();
     foreach ([1, 2] as $uid) {
       if ($replace_container) {
@@ -81,7 +84,9 @@ class SettingsTest extends UnitTestCase {
   /**
    * Tests that the accessor does not retain resolved settings.
    */
+  #[IgnoreDeprecations]
   public function testReleasesSettings(): void {
+    $this->expectUserDeprecationMessage('Drupal\\default_admin\\Settings::getInstance() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Inject \\Drupal\\Core\\DependencyInjection\\ClassResolverInterface and use it to resolve \\Drupal\\default_admin\\Settings, or use \\Drupal::classResolver(\\Drupal\\default_admin\\Settings::class) where injection is not possible. See https://www.drupal.org/node/3626158');
     $container = new ContainerBuilder();
     $container->set('class_resolver', new ClassResolver($container));
     $container->set('current_user', new UserSession());

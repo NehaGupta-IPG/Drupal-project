@@ -58,8 +58,17 @@ final class Settings implements ContainerInjectionInterface {
    *
    * @return \Drupal\default_admin\Settings
    *   The admin settings.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Inject
+   *   \Drupal\Core\DependencyInjection\ClassResolverInterface and use it to
+   *   resolve \Drupal\default_admin\Settings, or use
+   *   \Drupal::classResolver(\Drupal\default_admin\Settings::class) where
+   *   injection is not possible.
+   *
+   * @see https://www.drupal.org/node/3626158
    */
   public static function getInstance(): Settings {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Inject \Drupal\Core\DependencyInjection\ClassResolverInterface and use it to resolve \Drupal\default_admin\Settings, or use \Drupal::classResolver(\Drupal\default_admin\Settings::class) where injection is not possible. See https://www.drupal.org/node/3626158', E_USER_DEPRECATED);
     return \Drupal::classResolver(Settings::class);
   }
 
@@ -388,7 +397,7 @@ final class Settings implements ContainerInjectionInterface {
    *   The updated renderable array containing the new description.
    */
   public static function overriddenSettingByUser(array $element): array {
-    $settings = self::getInstance();
+    $settings = \Drupal::classResolver(self::class);
     // Check if this is overridden by the logged in user.
     if ($element && isset($element['#name']) && $settings->overridden($element['#name'])) {
       $userEditUrl = Url::fromRoute('entity.user.edit_form', ['user' => \Drupal::currentUser()->id()])->toString();

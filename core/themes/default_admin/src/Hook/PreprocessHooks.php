@@ -12,6 +12,7 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -45,6 +46,11 @@ final class PreprocessHooks implements TrustedCallbackInterface {
   use StringTranslationTrait;
 
   /**
+   * The admin theme settings.
+   */
+  protected readonly Settings $settings;
+
+  /**
    * Constructs the theme related hooks.
    */
   public function __construct(
@@ -58,7 +64,10 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     protected readonly BlockManagerInterface $blockManager,
     protected readonly RendererInterface $renderer,
     protected readonly ModuleHandlerInterface $moduleHandler,
-  ) {}
+    ClassResolverInterface $classResolver,
+  ) {
+    $this->settings = $classResolver->getInstanceFromDefinition(Settings::class);
+  }
 
   /**
    * {@inheritdoc}
@@ -609,22 +618,19 @@ final class PreprocessHooks implements TrustedCallbackInterface {
       return;
     }
 
-    // Get theme settings.
-    $settings = Settings::getInstance();
-
     // Old way to set accent color.
-    $variables['html_attributes']['data-accent'] = $settings->get('preset_accent_color');
+    $variables['html_attributes']['data-accent'] = $this->settings->get('preset_accent_color');
 
     // New way to set accent color.
     $accent_colors = Helper::accentColors();
     // The theme settings are not available while Drupal is being installed,
     // because they are stored in configuration. Fall back to an empty string so
     // that the preset can be used as an array offset.
-    $preset = $settings->get('preset_accent_color') ?? '';
+    $preset = $this->settings->get('preset_accent_color') ?? '';
     $accent_color = '';
 
-    if ($preset === 'custom' && $settings->get('accent_color')) {
-      $accent_color = $settings->get('accent_color');
+    if ($preset === 'custom' && $this->settings->get('accent_color')) {
+      $accent_color = $this->settings->get('accent_color');
     }
     elseif (isset($accent_colors[$preset]['hex'])) {
       $accent_color = $accent_colors[$preset]['hex'];
@@ -635,15 +641,15 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     }
 
     // Set focus color.
-    $variables['html_attributes']['data-admin-focus'] = $settings->get('preset_focus_color');
+    $variables['html_attributes']['data-admin-focus'] = $this->settings->get('preset_focus_color');
 
     // High contrast mode.
-    if ($settings->get('high_contrast_mode')) {
+    if ($this->settings->get('high_contrast_mode')) {
       $variables['html_attributes']['class'][] = 'high-contrast-mode';
     }
 
     // Set layout density.
-    $variables['html_attributes']['data-layout-density'] = $settings->get('layout_density');
+    $variables['html_attributes']['data-layout-density'] = $this->settings->get('layout_density');
 
     // Edit form? Use the new admin Edit form layout.
     if (Helper::isContentForm()) {
@@ -991,8 +997,8 @@ final class PreprocessHooks implements TrustedCallbackInterface {
   #[Hook('preprocess_navigation')]
   public function preprocessNavigation(array &$variables): void {
     // Get theme configs.
-    $logo_default = Settings::getInstance()->getDefault('logo.use_default');
-    $variables['icon_path'] = !$logo_default ? Settings::getInstance()->getDefault('logo.path') : '';
+    $logo_default = $this->settings->getDefault('logo.use_default');
+    $variables['icon_path'] = !$logo_default ? $this->settings->getDefault('logo.path') : '';
     $variables['navigation'] = $this->moduleHandler->moduleExists('navigation');
     $variables['is_backend'] = TRUE;
 
@@ -1223,7 +1229,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     }
     $variables['description_attributes'] = new Attribute($description_attributes);
 
-    if (!empty($variables['description']) && Settings::getInstance()->get('show_description_toggle')) {
+    if (!empty($variables['description']) && $this->settings->get('show_description_toggle')) {
       $variables['description_display'] = 'invisible';
       $variables['description_toggle'] = TRUE;
     }
@@ -1526,7 +1532,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    *   The variables array (modify in place).
    */
   private function preprocessDescriptionToggle(array &$variables): void {
-    $isEnabled = Settings::getInstance()->get('show_description_toggle') && Helper::isContentForm();
+    $isEnabled = $this->settings->get('show_description_toggle') && Helper::isContentForm();
     if ((isset($variables['element']['#description_toggle']) && $variables['element']['#description_toggle']) || $isEnabled) {
       if (!empty($variables['description'])) {
         $variables['description_display_toggle'] = $variables['description_display'] ?? 'after';

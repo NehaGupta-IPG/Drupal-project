@@ -145,6 +145,7 @@ class BreadcrumbPreprocessTest extends KernelTestBase {
       $this->container->get('plugin.manager.block'),
       $this->container->get('renderer'),
       $this->container->get('module_handler'),
+      $this->container->get('class_resolver'),
     );
 
     $variables = [

@@ -8,6 +8,7 @@ use Drupal\default_admin\Helper;
 use Drupal\default_admin\Settings;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Asset\AssetQueryStringInterface;
+use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\Element;
@@ -20,13 +21,21 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ThemeHooks implements TrustedCallbackInterface {
 
   /**
+   * The admin theme settings.
+   */
+  protected readonly Settings $settings;
+
+  /**
    * Constructs the theme related hooks.
    */
   public function __construct(
     protected readonly ThemeExtensionList $themeExtensionList,
     protected readonly RequestStack $requestStack,
     protected readonly AssetQueryStringInterface $assetQueryString,
-  ) {}
+    ClassResolverInterface $classResolver,
+  ) {
+    $this->settings = $classResolver->getInstanceFromDefinition(Settings::class);
+  }
 
   /**
    * {@inheritdoc}
@@ -146,19 +155,18 @@ class ThemeHooks implements TrustedCallbackInterface {
     // Attach sticky library.
     $page['#attached']['library'][] = 'default_admin/sticky';
 
-    $settings = Settings::getInstance();
     // Expose theme settings to JS.
     $default_admin_settings = [
-      'dark_mode' => $settings->get('enable_dark_mode'),
+      'dark_mode' => $this->settings->get('enable_dark_mode'),
       'dark_mode_class' => 'dark-mode',
       'accent_colors' => Helper::accentColors(),
-      'preset_accent_color' => $settings->get('preset_accent_color'),
-      'accent_color' => $settings->get('accent_color'),
-      'preset_focus_color' => $settings->get('preset_focus_color'),
-      'focus_color' => $settings->get('focus_color'),
-      'high_contrast_mode' => $settings->get('high_contrast_mode'),
+      'preset_accent_color' => $this->settings->get('preset_accent_color'),
+      'accent_color' => $this->settings->get('accent_color'),
+      'preset_focus_color' => $this->settings->get('preset_focus_color'),
+      'focus_color' => $this->settings->get('focus_color'),
+      'high_contrast_mode' => $this->settings->get('high_contrast_mode'),
       'high_contrast_mode_class' => 'high-contrast-mode',
-      'show_user_theme_settings' => $settings->get('show_user_theme_settings'),
+      'show_user_theme_settings' => $this->settings->get('show_user_theme_settings'),
     ];
     $page['#attached']['drupalSettings']['defaultAdmin'] = $default_admin_settings;
     // Retain the previous key for integrations while the theme is experimental.
@@ -171,7 +179,7 @@ class ThemeHooks implements TrustedCallbackInterface {
           'type' => 'application/json',
           'id' => 'default-admin-setting-dark_mode',
         ],
-        '#value' => new FormattableMarkup('{ "defaultAdminDarkMode": "@value" }', ['@value' => $settings->get('enable_dark_mode') ?? 'unknown']),
+        '#value' => new FormattableMarkup('{ "defaultAdminDarkMode": "@value" }', ['@value' => $this->settings->get('enable_dark_mode') ?? 'unknown']),
       ],
       'default_admin_dark_mode',
     ];
