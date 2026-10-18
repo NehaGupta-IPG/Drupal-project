@@ -507,12 +507,47 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
     $validator->expects($this->exactly(2))
       ->method('validate')
       ->with($this->entity->getTypedData())
-      ->willReturnOnConsecutiveCalls($empty_violation_list, $non_empty_violation_list);
+      ->willReturnCallback(function () use ($empty_violation_list, $non_empty_violation_list) {
+        $this->assertTrue($this->entity->isValidationRunning());
+        static $calls = 0;
+        return $calls++ === 0 ? $empty_violation_list : $non_empty_violation_list;
+      });
     $this->typedDataManager->expects($this->exactly(2))
       ->method('getValidator')
       ->willReturn($validator);
+    $this->assertFalse($this->entity->isValidationRunning());
     $this->assertCount(0, $this->entity->validate());
+    $this->assertFalse($this->entity->isValidationRunning());
     $this->assertCount(1, $this->entity->validate());
+    $this->assertFalse($this->entity->isValidationRunning());
+  }
+
+  /**
+   * Tests that exceptions do not leave the entity marked as being validated.
+   */
+  public function testValidationRunningAfterException(): void {
+    $this->commonSetUp(0, 2);
+    $this->setUpMockTypedDataManager();
+    $exception = new \RuntimeException('Validation failed unexpectedly.');
+    $validator = $this->createMock(ValidatorInterface::class);
+    $validator->expects($this->once())
+      ->method('validate')
+      ->with($this->entity->getTypedData())
+      ->willReturnCallback(function () use ($exception) {
+        $this->assertTrue($this->entity->isValidationRunning());
+        throw $exception;
+      });
+    $this->typedDataManager->expects($this->once())
+      ->method('getValidator')
+      ->willReturn($validator);
+    try {
+      $this->entity->validate();
+      $this->fail('Validation should have thrown an exception.');
+    }
+    catch (\RuntimeException $caught) {
+      $this->assertSame($exception, $caught);
+    }
+    $this->assertFalse($this->entity->isValidationRunning());
   }
 
   /**

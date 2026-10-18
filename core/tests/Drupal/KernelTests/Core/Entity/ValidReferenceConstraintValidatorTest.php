@@ -305,4 +305,87 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     ]), $violation->getMessage());
   }
 
+  /**
+   * Tests self-references and cycles without losing nested violations.
+   */
+  public function testCircularValidation(): void {
+    $this->createEntityReferenceField('entity_test', 'entity_test', 'field_cycle', 'Cycle', 'entity_test');
+    $parent = EntityTest::create(['name' => 'Parent', 'user_id' => 0]);
+    $parent->field_cycle->entity = $parent;
+    $this->assertCount(0, $parent->validate());
+    $this->assertFalse($parent->isValidationRunning());
+
+    $child = EntityTest::create(['name' => str_repeat('x', 65), 'user_id' => 0]);
+    $child->field_cycle->entity = $parent;
+    $parent->field_cycle->entity = $child;
+    $violations = $parent->validate();
+    $this->assertCount(1, $violations);
+    $this->assertSame('field_cycle.0.entity.name.0.value', $violations[0]->getPropertyPath());
+    $this->assertFalse($parent->isValidationRunning());
+    $this->assertFalse($child->isValidationRunning());
+
+    // Changing the invalid child must allow it to be validated again.
+    $child->name = 'Child';
+    $this->assertCount(0, $parent->validate());
+  }
+
+  /**
+   * Tests a cycle between new entities from two different bundles.
+   */
+  public function testCircularValidationAcrossBundles(): void {
+    [$article, $page] = $this->createCircularReferencesAcrossBundles();
+    $this->assertSame($page, $article->field_to_page->entity);
+    $this->assertSame($article, $page->field_to_article->entity);
+    $this->assertCount(0, $article->validate());
+    $this->assertFalse($article->isValidationRunning());
+    $this->assertFalse($page->isValidationRunning());
+  }
+
+  /**
+   * Tests that repeated validation preserves errors in a cyclic target.
+   */
+  public function testRepeatedCircularValidationAcrossBundles(): void {
+    [$article, $page] = $this->createCircularReferencesAcrossBundles();
+    $page->setTitle(str_repeat('x', 256));
+    $violations = $article->validate();
+    $this->assertCount(1, $violations);
+    $this->assertSame('field_to_page.0.entity.title.0.value', $violations[0]->getPropertyPath());
+    $repeated_violations = $article->validate();
+    $this->assertCount(1, $repeated_violations);
+    $this->assertSame($violations[0]->getPropertyPath(), $repeated_violations[0]->getPropertyPath());
+    $this->assertSame((string) $violations[0]->getMessage(), (string) $repeated_violations[0]->getMessage());
+    $this->assertFalse($article->isValidationRunning());
+    $this->assertFalse($page->isValidationRunning());
+    $page->setTitle('Page');
+    $this->assertCount(0, $article->validate());
+  }
+
+  /**
+   * Tests that a previous target validation cannot hide reference errors.
+   */
+  public function testPreviouslyValidatedTargetAcrossBundles(): void {
+    [$article, $page] = $this->createCircularReferencesAcrossBundles();
+    $page->field_to_article->entity = NULL;
+    $page->setTitle(str_repeat('x', 256));
+    $this->assertCount(1, $page->validate());
+    $this->assertCount(1, $article->validate());
+    $this->assertCount(1, $article->validate());
+  }
+
+  /**
+   * Creates an article and a page referencing each other without saving them.
+   *
+   * @return \Drupal\node\NodeInterface[]
+   *   The article and the page.
+   */
+  private function createCircularReferencesAcrossBundles(): array {
+    $this->createEntityReferenceField('node', 'article', 'field_to_page', 'Page', 'node', 'default', ['target_bundles' => ['page' => 'page']]);
+    $this->createEntityReferenceField('node', 'page', 'field_to_article', 'Article', 'node', 'default', ['target_bundles' => ['article' => 'article']]);
+    $article = Node::create(['type' => 'article', 'title' => 'Article', 'uid' => 0]);
+    $page = Node::create(['type' => 'page', 'title' => 'Page', 'uid' => 0]);
+    $article->field_to_page->entity = $page;
+    $page->field_to_article->entity = $article;
+    return [$article, $page];
+  }
+
 }

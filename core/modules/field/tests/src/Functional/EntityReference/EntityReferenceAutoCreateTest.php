@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Functional\EntityReference;
 
+use Drupal\Component\Utility\Tags;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -11,6 +12,7 @@ use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -157,6 +159,68 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     $this->drupalGet('node/' . $referencing_node->id());
     $this->assertSession()->pageTextContains($referencing_node->label());
     $this->assertSession()->pageTextContains($referenced_node->label());
+  }
+
+  /**
+   * Tests invalid autocreation reports the same error as disabled autocreation.
+   */
+  #[DataProvider('autocompleteWidgets')]
+  public function testInvalidAutocreateMessage(string $widget): void {
+    // Two missing required values must produce only one autocomplete error.
+    foreach (['field_required_one', 'field_required_two'] as $field_name) {
+      FieldStorageConfig::create([
+        'entity_type' => 'node',
+        'field_name' => $field_name,
+        'type' => 'string',
+      ])->save();
+      FieldConfig::create([
+        'entity_type' => 'node',
+        'bundle' => $this->referencedType,
+        'field_name' => $field_name,
+        'label' => $field_name,
+        'required' => TRUE,
+      ])->save();
+    }
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay('node', $this->referencingType)
+      ->setComponent('test_field', ['type' => $widget])
+      ->save();
+    $is_tags = $widget === 'entity_reference_autocomplete_tags';
+    $names = $is_tags ? ['Missing target', 'Another missing target'] : ['Missing target'];
+    $input = $is_tags ? Tags::implode($names) : $names[0];
+    $edit = [
+      'title[0][value]' => 'Host entity',
+      ($is_tags ? 'test_field[target_id]' : 'test_field[0][target_id]') => $input,
+    ];
+    $field = FieldConfig::loadByName('node', $this->referencingType, 'test_field');
+    $settings = $field->getSetting('handler_settings');
+    $settings['auto_create'] = FALSE;
+    $field->setSetting('handler_settings', $settings)->save();
+    $this->drupalGet("node/add/{$this->referencingType}");
+    $this->submitForm($edit, 'Save');
+    $expected = $this->assertSession()->elementExists('css', '[data-drupal-messages]')->getText();
+    $this->assertStringContainsString('There are no content items matching "Missing target".', $expected);
+
+    $settings['auto_create'] = TRUE;
+    $field->setSetting('handler_settings', $settings)->save();
+    $this->drupalGet("node/add/{$this->referencingType}");
+    $this->submitForm($edit, 'Save');
+    $actual = $this->assertSession()->elementExists('css', '[data-drupal-messages]')->getText();
+    $this->assertSame($expected, $actual);
+    $this->assertSame(1, substr_count($actual, 'There are no'));
+    $this->assertSession()->pageTextNotContains('cannot be created');
+    $this->assertSession()->pageTextNotContains('This value should not be null');
+    $this->assertSame(0, (int) \Drupal::entityQuery('node')->accessCheck(FALSE)->count()->execute());
+  }
+
+  /**
+   * Provides the autocomplete widgets.
+   */
+  public static function autocompleteWidgets(): array {
+    return [
+      'single input' => ['entity_reference_autocomplete'],
+      'tags input' => ['entity_reference_autocomplete_tags'],
+    ];
   }
 
   /**
