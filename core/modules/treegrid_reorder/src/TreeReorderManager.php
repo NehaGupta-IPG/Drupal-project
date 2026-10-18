@@ -10,13 +10,12 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  * Orchestrates a tree move: universal validation and the commit replay.
  *
  * The reusable half of reordering. It enforces the two structural rules that
- * hold for every tree — you cannot drop an item onto itself, nor into one of
- * its own descendants — and runs the Save-time commit: validate the whole batch
- * up front, then apply each move in order, re-validating immediately before its
- * write so a move made invalid by an earlier one (a newly formed cycle) is
- * caught. Everything domain-specific (movability, scope, depth, ancestry, the
- * write) is delegated to a TreeMoveHandlerInterface, so this class never knows
- * how a particular tree is stored.
+ * hold for every tree: you cannot drop an item onto itself, nor into one of
+ * its own descendants. It also replays a batch of recorded moves in order,
+ * validating each against the current state immediately before its write.
+ * Everything domain-specific (movability, scope, depth, ancestry, the write)
+ * is delegated to a TreeMoveHandlerInterface, so this class never knows how a
+ * particular tree is stored.
  *
  * Instantiated directly rather than injected (see the constructor note on the
  * consuming move handler), so it has no constructor-injected translation
@@ -66,17 +65,15 @@ final class TreeReorderManager {
   /**
    * Commits a batch of pending working-copy moves to storage.
    *
-   * Validates every recorded move first, so a batch with an individually
-   * invalid move aborts before anything is written, then applies the moves in
-   * order, re-validating each against the now-current state. Non-move ops are
-   * ignored. The caller clears the working copy after a successful commit.
+   * Applies the moves in order, validating each against the current state
+   * immediately before its write. Non-move ops are ignored. The caller clears
+   * the working copy after a successful commit.
    *
-   * Application is best-effort, not transactional: the pre-flight pass prevents
-   * a known-bad batch from writing anything, but if a move fails partway
-   * through (e.g. a cycle formed by an earlier applied move), the moves already
-   * applied stand — applyMove() is not assumed to be wrapped in a transaction.
-   * The returned 'applied_ops' lets the caller reconcile the working copy with
-   * what actually got written.
+   * The batch is not validated up front, so a move that fails partway through
+   * leaves the earlier moves written. A handler that wants nothing written
+   * when any move is invalid validates the sequence before calling this. On
+   * the first failure this returns 'failed_op' and the 'applied_ops' already
+   * written, so the caller can reconcile the working copy with storage.
    *
    * @param string $tree_id
    *   The tree whose working copy to commit.
@@ -112,16 +109,6 @@ final class TreeReorderManager {
       );
     }, $move_indices);
 
-    // Pre-flight: reject the batch if any op is individually invalid, before
-    // writing anything.
-    foreach ($intents as $i => $intent) {
-      $validation = $this->validateMove($tree_id, $intent, $handler);
-      if (!$validation['ok']) {
-        return $this->commitFailure($validation, $move_indices[$i]);
-      }
-    }
-
-    // Apply in order, re-validating against the now-current state.
     $applied = [];
     foreach ($intents as $i => $intent) {
       $validation = $this->validateMove($tree_id, $intent, $handler);

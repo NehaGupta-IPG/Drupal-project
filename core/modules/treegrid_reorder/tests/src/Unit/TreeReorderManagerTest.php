@@ -138,7 +138,7 @@ final class TreeReorderManagerTest extends UnitTestCase {
   }
 
   /**
-   * Committing applies every move in order once the batch validates.
+   * Committing applies every move in order.
    */
   public function testCommitAppliesAllMoves(): void {
     $ops = [
@@ -172,11 +172,8 @@ final class TreeReorderManagerTest extends UnitTestCase {
   /**
    * A move made invalid by an earlier applied move reports the applied index.
    *
-   * Both ops pass pre-flight validation (checked against the unmodified
-   * state), so the batch starts applying; the handler's second constraint
-   * check depends on what the first move already applied, failing only once
-   * the apply loop reaches it — the "cycle formed by an earlier applied move"
-   * case commitWorkingCopy()'s docblock describes.
+   * The handler's second constraint check depends on what the first move
+   * already applied, so it fails only once the apply loop reaches it.
    */
   public function testPartialFailureReportsAppliedOps(): void {
     $this->handler = new class() implements TreeMoveHandlerInterface {
@@ -222,6 +219,58 @@ final class TreeReorderManagerTest extends UnitTestCase {
 
     $this->assertFalse($result['ok']);
     $this->assertSame('cycle', $result['code']);
+    $this->assertSame(1, $result['failed_op']);
+    $this->assertSame([0], $result['applied_ops']);
+    $this->assertSame(['a'], $this->handler->applied);
+  }
+
+  /**
+   * The batch is not validated up front, so earlier valid moves are written.
+   */
+  public function testInvalidLaterOpDoesNotBlockEarlierMoves(): void {
+    $this->handler = new class() implements TreeMoveHandlerInterface {
+
+      /**
+       * Ids of moves applied, in order.
+       *
+       * @var string[]
+       */
+      public array $applied = [];
+
+      /**
+       * {@inheritdoc}
+       */
+      public function validateConstraints(string $tree_id, MoveIntent $intent): array {
+        if ($intent->id === 'b') {
+          return ['ok' => FALSE, 'code' => 'not_moveable', 'message' => 'No.'];
+        }
+        return ['ok' => TRUE];
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function getAncestorIds(string $tree_id, string $parent_id): array {
+        return [];
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function applyMove(string $tree_id, MoveIntent $intent): void {
+        $this->applied[] = $intent->id;
+      }
+
+    };
+    $ops = [
+      ['type' => 'move', 'id' => 'a', 'new_parent' => '', 'before_id' => NULL],
+      ['type' => 'move', 'id' => 'b', 'new_parent' => '', 'before_id' => 'a'],
+    ];
+
+    $result = $this->manager->commitWorkingCopy('t', $ops, $this->handler);
+
+    $this->assertFalse($result['ok']);
+    $this->assertSame('not_moveable', $result['code']);
     $this->assertSame(1, $result['failed_op']);
     $this->assertSame([0], $result['applied_ops']);
     $this->assertSame(['a'], $this->handler->applied);

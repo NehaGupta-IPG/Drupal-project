@@ -43,10 +43,12 @@ user-facing UI of its own.
 
 **Run moves through `TreeReorderManager`**: `validateMove()` for a
 record-time check (drag drop, keyboard move-mode confirm, Shift+Arrow), and
-`commitWorkingCopy()` to replay a working copy's ops on Save — it validates
-the whole batch first, then applies in order, re-validating each move
-immediately before its write so one move invalidated by an earlier one in the
-same batch (a newly formed cycle) is caught rather than silently applied.
+`commitWorkingCopy()` to replay a working copy's ops on Save. It applies the
+moves in order, validating each against the current state immediately before
+its write, and does not pre-validate the batch. A handler that wants nothing
+written when any move is invalid validates the sequence itself before calling
+it. On the first failure it returns `failed_op` and the `applied_ops` already
+written, so the caller can reconcile the working copy with storage.
 
 **`MoveIntent`** is the shared move vocabulary: `{ id, newParent, beforeId }`
 — the same shape the client POSTs and the working copy records.

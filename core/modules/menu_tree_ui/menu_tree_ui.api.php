@@ -105,10 +105,11 @@ function hook_menu_tree_ui_row_operations_alter(array &$operations, MenuLinkTree
  * Fires from \Drupal\menu_tree_ui\Service\MenuTreeMover::validateConstraints(),
  * after \Drupal\treegrid_reorder\TreeReorderManager's universal self-target and
  * cycle checks pass, but before menu_tree_ui checks whether the link is
- * movable, belongs to the target menu, or fits the 9-level depth cap. This
- * runs on every validation, including the record-time check made as the
- * editor drags or keyboard-moves a row, and the re-validation made when the
- * working copy is committed on Save.
+ * movable, belongs to the target menu, or fits the 9-level depth cap. It fires
+ * at record time as the editor drags or keyboard-moves a row (against live
+ * storage plus the pending moves), during Save's validation of the recorded
+ * moves in order (against live storage, before the batch is written), and
+ * again immediately before each move is written.
  *
  * To block the move, set $veto['veto'] = TRUE. Set $veto['message'] to a
  * translated string to give the editor a specific reason; otherwise a generic
@@ -145,7 +146,8 @@ function hook_menu_tree_ui_pre_move_alter(array &$veto, string $menu_name, strin
  * Fires from \Drupal\menu_tree_ui\Service\MenuTreeMover::applyMove(), once the
  * move has been persisted through the menu link manager (and destination
  * siblings renumbered). Implementations receive the final weight the moved
- * link was given; the parent is $new_parent_id, exactly as validated.
+ * link was given; the parent is $new_parent_id, exactly as validated. It fires
+ * once per move, after that move is written during Save.
  *
  * @param string $menu_name
  *   The menu the move happened within.

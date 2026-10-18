@@ -22,11 +22,11 @@ use Psr\Log\LoggerInterface;
  *
  * Read paths live on MenuTreeLoader; this service owns the single write
  * operation in v1 (drag-and-drop / keyboard reorder). The universal parts of a
- * move — the self-target and cycle checks, and the validate-then-apply commit
- * loop — belong to TreeReorderManager; this class is the menu move handler it
- * delegates to, supplying the menu-specific rules and the write. Its public
- * validateMove()/commitWorkingCopy() are thin facades over the manager so the
- * controller's surface is unchanged.
+ * move, the self-target and cycle checks and the in-order apply loop, belong
+ * to TreeReorderManager; this class is the menu move handler it delegates to,
+ * supplying the menu-specific rules and the write. commitWorkingCopy()
+ * validates the recorded moves in sequence before handing them to the manager
+ * to apply, so a batch with an invalid move writes nothing.
  *
  * Both menu_link_content links and static (*.links.menu.yml) links that support
  * parent/weight overrides are moveable — see MenuLinkMovability. Writes go
@@ -59,11 +59,12 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
   /**
    * Pending re-parents to overlay on live ancestry, or NULL for live-only.
    *
-   * Set only for the duration of a record-time validateMove() so the cycle and
-   * depth checks see the tree the editor is looking at (live storage with the
-   * menu's pending working-copy moves applied). NULL during commit, where ops
-   * are replayed against live storage as they apply and the overlay must not be
-   * counted on top.
+   * Set during a record-time validateMove() so the cycle and depth checks see
+   * the tree the editor is looking at (live storage with the menu's pending
+   * working-copy moves applied), and during Save's sequential validation, where
+   * it holds the moves recorded before the one being checked. NULL during the
+   * apply loop, where ops are replayed against live storage as they apply and
+   * the overlay must not be counted on top.
    *
    * @var array<string, string>|null
    */
@@ -84,11 +85,11 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
   /**
    * Validates a move without persisting it.
    *
-   * Thin facade over TreeReorderManager: the manager runs the universal
-   * structural checks (self-target, cycle) and then calls back into this
-   * handler's menu rules. The editing UI records a move only after this
-   * passes, and Save re-runs it, so a move that became invalid after an earlier
-   * pending change (or a concurrent edit) is caught at commit time.
+   * Runs the universal structural checks (self-target, cycle) and then this
+   * handler's menu rules against the tree the editor sees: live storage with
+   * the menu's pending working-copy moves applied. The editing UI records a
+   * move only after this passes, and Save validates the recorded moves again
+   * in sequence before writing any of them.
    *
    * @param string $menu_name
    *   The menu the move is happening within.
@@ -108,31 +109,25 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
     string $new_parent_id,
     ?string $before_id,
   ): array {
-    // Validate against the overlaid tree the editor sees: live storage with the
-    // menu's already-pending moves applied. The move being recorded is not yet
-    // in the working copy, so it is not double-counted.
-    $this->overlayEffectiveParents = $this->loader->getPendingParentMap($menu_name);
-    try {
-      return $this->reorderManager->validateMove(
-        $menu_name,
-        new MoveIntent($moved_id, $new_parent_id, $before_id),
-        $this,
-      );
-    }
-    finally {
-      $this->overlayEffectiveParents = NULL;
-    }
+    // The move being recorded is not yet in the working copy, so it is not
+    // double-counted.
+    return $this->validateAgainstOverlay(
+      $menu_name,
+      new MoveIntent($moved_id, $new_parent_id, $before_id),
+      $this->loader->getPendingParentMap($menu_name),
+    );
   }
 
   /**
    * Commits a menu's pending working-copy moves to live storage.
    *
-   * Thin facade over TreeReorderManager::commitWorkingCopy(); the manager owns
-   * the validate-all-then-apply-in-order replay and calls back into this
-   * handler to validate and write each move. Menu link writes are not safe to
-   * wrap in a database transaction — the menu storage rebuild closes it — so
-   * this is ordered, best-effort application, matching core's menu overview
-   * form. The caller clears the working copy after a successful commit.
+   * Validates each recorded move in order, against live storage plus the moves
+   * before it, and writes nothing if any fails. Otherwise the moves are
+   * applied in order through TreeReorderManager, which validates each again
+   * immediately before its write. Already-written moves stay written if a
+   * module hook or a concurrent change makes a later move fail during the
+   * apply loop, or if a write throws; the result's 'applied_ops' lists them.
+   * The caller clears the working copy after a successful commit.
    *
    * @param string $menu_name
    *   The menu whose working copy to commit.
@@ -144,7 +139,67 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
    *   the $ops indices of any moves from this batch already applied.
    */
   public function commitWorkingCopy(string $menu_name, array $ops): array {
+    foreach ($ops as $index => $op) {
+      if (($op['type'] ?? '') !== 'move') {
+        continue;
+      }
+      $before_id = $op['before_id'] ?? NULL;
+      $intent = new MoveIntent(
+        (string) ($op['id'] ?? ''),
+        (string) ($op['new_parent'] ?? ''),
+        $before_id === NULL ? NULL : (string) $before_id,
+      );
+      $validation = $this->validateAgainstOverlay(
+        $menu_name,
+        $intent,
+        $this->loader->pendingParentMapFromOps(array_slice($ops, 0, $index, TRUE)),
+      );
+      if (!$validation['ok']) {
+        return [
+          'ok' => FALSE,
+          'code' => $validation['code'] ?? 'commit_failed',
+          'message' => (string) $this->t('Could not save the move of "@title": @reason', [
+            '@title' => $this->linkTitle($intent->id),
+            '@reason' => $validation['message'] ?? $this->t('A pending change could not be saved.'),
+          ]),
+          'failed_op' => $index,
+          'applied_ops' => [],
+        ];
+      }
+    }
     return $this->reorderManager->commitWorkingCopy($menu_name, $ops, $this);
+  }
+
+  /**
+   * Validates one intent with the given pending parents overlaid on storage.
+   *
+   * @param string $menu_name
+   *   The menu the move happens within.
+   * @param \Drupal\treegrid_reorder\MoveIntent $intent
+   *   The move to validate.
+   * @param array<string, string> $overlay
+   *   Plugin ID => pending new parent plugin ID, for the moves that precede
+   *   $intent.
+   *
+   * @return array{ok: bool, code?: string, message?: string}
+   *   ['ok' => TRUE] when the move is allowed, otherwise an error outcome.
+   */
+  private function validateAgainstOverlay(string $menu_name, MoveIntent $intent, array $overlay): array {
+    $this->overlayEffectiveParents = $overlay;
+    try {
+      return $this->reorderManager->validateMove($menu_name, $intent, $this);
+    }
+    finally {
+      $this->overlayEffectiveParents = NULL;
+    }
+  }
+
+  /**
+   * The display title of a link, or its plugin ID when it no longer exists.
+   */
+  private function linkTitle(string $plugin_id): string {
+    $link = $this->loadLink($plugin_id);
+    return $link === NULL ? $plugin_id : (string) $link->getTitle();
   }
 
   /**
@@ -260,15 +315,13 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
   }
 
   /**
-   * Writes a validated move to live storage (no transaction, no validation).
+   * Writes a validated move to live storage (no validation).
    *
    * Renumbers the destination siblings first — reading their current order
    * (before the move) and re-weighting everything except the moved link, which
    * yields the weight the moved link should take — then writes the moved link's
    * parent and weight together through the menu link manager, which routes to
-   * the entity or to StaticMenuLinkOverrides. Callers own the transaction so a
-   * single move and a batched Save can each wrap their work atomically without
-   * nesting transactions.
+   * the entity or to StaticMenuLinkOverrides.
    *
    * @param string $menu_name
    *   The menu the move happens within.
@@ -309,8 +362,9 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
   /**
    * Checks that moved subtree height + new parent depth <= core's 9 limit.
    *
-   * During a record-time validation the new parent's depth is measured on the
-   * overlaid tree, so a pending move that deepened the parent is accounted for.
+   * When the overlay is set the new parent's depth is measured on the overlaid
+   * tree, so a pending move that deepened the parent is accounted for, and the
+   * moved link's height includes pending moves that put links below it.
    */
   private function fitsWithinDepthCap(string $moved_id, string $new_parent_id): bool {
     $max = $this->treeStorage->maxDepth();
@@ -324,6 +378,21 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
       $new_parent_depth = count($this->treeStorage->getRootPathIds($new_parent_id));
     }
     $moved_height = $this->treeStorage->getSubtreeHeight($moved_id);
+    if ($this->overlayEffectiveParents !== NULL) {
+      // The bound over-counts descendants a pending move takes out of the
+      // moved link's subtree, so it can refuse a move that would fit but never
+      // accepts one that doesn't.
+      foreach (array_keys($this->overlayEffectiveParents) as $pending_id) {
+        $pending_id = (string) $pending_id;
+        if ($pending_id === $moved_id) {
+          continue;
+        }
+        $steps_up = array_search($moved_id, $this->overlayAncestorChain($pending_id), TRUE);
+        if ($steps_up !== FALSE) {
+          $moved_height = max($moved_height, $steps_up + $this->treeStorage->getSubtreeHeight($pending_id));
+        }
+      }
+    }
     return ($new_parent_depth + $moved_height) <= $max;
   }
 

@@ -127,8 +127,24 @@ final class MenuTreeLoader {
    *   Plugin ID => pending new parent plugin ID ('' for the menu root).
    */
   public function getPendingParentMap(string $menu_name): array {
+    return $this->pendingParentMapFromOps($this->workingCopy->getOps($menu_name));
+  }
+
+  /**
+   * Collapses move ops into a map of link plugin ID to its new parent.
+   *
+   * The last move of a link wins. Non-move ops are ignored, and the root-level
+   * key ('') is never present.
+   *
+   * @param array<int, array<string, mixed>> $ops
+   *   The ops to collapse, in order.
+   *
+   * @return array<string, string>
+   *   Plugin ID => new parent plugin ID ('' for the menu root).
+   */
+  public function pendingParentMapFromOps(array $ops): array {
     $map = [];
-    foreach ($this->workingCopy->getOps($menu_name) as $op) {
+    foreach ($ops as $op) {
       if (($op['type'] ?? '') === 'move') {
         $moved = (string) ($op['id'] ?? '');
         if ($moved !== '') {
