@@ -109,8 +109,9 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
   /**
    * Returns whether the display for the field can be configured.
    *
-   * @param string $display_context
-   *   The display context. Either 'view' or 'form'.
+   * @param string|\Drupal\Core\Field\DisplayContext $display_context
+   *   The display context. Either 'view' or 'form', or a DisplayContext
+   *   enum value.
    *
    * @return bool
    *   TRUE if the display for this field is configurable in the given context.
@@ -128,8 +129,9 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
    * as default values and may be overridden via the respective entity display.
    * Otherwise, the display options will be applied to entity displays as is.
    *
-   * @param string $display_context
-   *   The display context. Either 'view' or 'form'.
+   * @param string|\Drupal\Core\Field\DisplayContext $display_context
+   *   The display context. Either 'view' or 'form', or a DisplayContext
+   *   enum value.
    *
    * @return array|null
    *   The array of display options for the field, or NULL if the field is not
@@ -185,8 +187,7 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
    *
    * @return array
    *   The default value for the field, as a numerically indexed array of items,
-   *   each item being a property/value array. An empty array when there is no
-   *   default value.
+   *   each item being a property/value array (array() for no default value).
    *
    * @see FieldDefinitionInterface::getDefaultValue()
    * @see FieldDefinitionInterface::getDefaultValueCallback()
@@ -221,8 +222,7 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
    *
    * @return array
    *   The default value for the field, as a numerically indexed array of items,
-   *   each item being a property/value array. An empty array when there is no
-   *    default value.
+   *   each item being a property/value array (array() for no default value).
    *
    * @see FieldDefinitionInterface::getDefaultValueLiteral()
    * @see FieldDefinitionInterface::getDefaultValueCallback()
@@ -255,10 +255,10 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
    * @param string $bundle
    *   The bundle to get the configurable field for.
    *
-   * @return \Drupal\Core\Field\FieldConfigInterface
-   *   The configuration entity for the field.
-   *
    * @see \Drupal\Core\Field\Entity\BaseFieldBundleOverride
+   *
+   * @return \Drupal\Core\Field\FieldConfigInterface
+   *   A configurable field definition object for the specified bundle.
    */
   public function getConfig($bundle);
 
@@ -266,7 +266,7 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
    * Returns a unique identifier for the field.
    *
    * @return string
-   *   The unique ID for the field.
+   *   The unique identifier for the field.
    */
   public function getUniqueIdentifier();
 
