@@ -56,7 +56,10 @@
    *   The last value of the input field.
    */
   function extractLastTerm(terms) {
-    return autocomplete.splitValues(terms).pop();
+    const term = autocomplete.splitValues(terms).pop();
+    // The pattern ../ is stripped since it may be misinterpreted by the
+    // browser.
+    return term.replace(/\.{2,}\//g, '');
   }
 
   /**
