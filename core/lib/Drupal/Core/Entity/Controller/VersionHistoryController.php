@@ -235,6 +235,21 @@ class VersionHistoryController extends ControllerBase {
   }
 
   /**
+   * Builds the header row for the entity revision listing.
+   *
+   * @return array
+   *   A render array structure of header strings.
+   *
+   * @see \Drupal\Core\Entity\Controller\VersionHistoryController::revisionOverview()
+   */
+  protected function buildHeader(): array {
+    return [
+      'revision' => ['data' => $this->t('Revision')],
+      'operations' => ['data' => $this->t('Operations')],
+    ];
+  }
+
+  /**
    * Generates an overview table of revisions of an entity.
    *
    * @param \Drupal\Core\Entity\RevisionableInterface $entity
@@ -246,10 +261,7 @@ class VersionHistoryController extends ControllerBase {
   protected function revisionOverview(RevisionableInterface $entity): array {
     $build['entity_revisions_table'] = [
       '#theme' => 'table',
-      '#header' => [
-        'revision' => ['data' => $this->t('Revision')],
-        'operations' => ['data' => $this->t('Operations')],
-      ],
+      '#header' => $this->buildHeader(),
     ];
 
     foreach ($this->loadRevisions($entity) as $revision) {
