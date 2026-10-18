@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\TypedData;
 
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
+use Drupal\Core\Entity\Plugin\Validation\Constraint\ValidReferenceConstraint;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\TypedData\Validation\RecursiveContextualValidator;
 use Drupal\entity_test\Entity\EntityTest;
@@ -81,9 +82,14 @@ class RecursiveContextualValidatorTest extends KernelTestBase {
     // The child entity should fail the validation and the violation should
     // propagate to the parent.
     $violations = $parent->validate();
-    $this->assertCount(1, $violations);
+    // Both the test constraint and ValidReference validate the child entity.
+    // Each must propagate its own violation without losing the parent context.
+    $this->assertCount(2, $violations);
     $this->assertEquals('field_test', $violations[0]->getPropertyPath());
     $this->assertEquals('Invalid referenced entity.', $violations[0]->getMessage());
+    $this->assertEquals('field_test.0.entity.string_required', $violations[1]->getPropertyPath());
+    $this->assertInstanceOf(ValidReferenceConstraint::class, $violations[1]->getConstraint());
+    $this->assertEquals('This value should not be null.', $violations[1]->getParameters()['%reason']);
   }
 
 }

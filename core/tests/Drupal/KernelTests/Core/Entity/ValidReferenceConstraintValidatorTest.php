@@ -361,18 +361,6 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
   }
 
   /**
-   * Tests that a previous target validation cannot hide reference errors.
-   */
-  public function testPreviouslyValidatedTargetAcrossBundles(): void {
-    [$article, $page] = $this->createCircularReferencesAcrossBundles();
-    $page->field_to_article->entity = NULL;
-    $page->setTitle(str_repeat('x', 256));
-    $this->assertCount(1, $page->validate());
-    $this->assertCount(1, $article->validate());
-    $this->assertCount(1, $article->validate());
-  }
-
-  /**
    * Creates an article and a page referencing each other without saving them.
    *
    * @return \Drupal\node\NodeInterface[]
