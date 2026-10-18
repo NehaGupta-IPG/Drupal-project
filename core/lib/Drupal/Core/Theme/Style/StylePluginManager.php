@@ -10,9 +10,11 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
+use Drupal\Core\Plugin\Discovery\MultipleYamlDiscovery;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
 use Drupal\Core\Plugin\JsonSchemaDefinitionValidatorTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Theme\Style\Enum\Type;
 use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
 
 /**
@@ -136,7 +138,13 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    */
   protected function getDiscovery(): DiscoveryInterface {
     if (!$this->discovery) {
-      $discovery = new StyleYamlDiscovery($this->moduleHandler->getModuleDirectories() + $this->themeHandler->getThemeDirectories());
+      // Styles of each type are discovered in their own files, for example
+      // EXTENSION_NAME.utilities.yml for the utility type.
+      $names = [];
+      foreach (Type::cases() as $type) {
+        $names[$type->value] = $type->discoveryName();
+      }
+      $discovery = new MultipleYamlDiscovery($names, $this->moduleHandler->getModuleDirectories() + $this->themeHandler->getThemeDirectories(), 'type');
       $discovery->addTranslatableProperty('label');
       $discovery->addTranslatableProperty('description');
       $discovery->addTranslatableProperty('category');

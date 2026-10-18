@@ -2,22 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\Core\Theme\Style;
+namespace Drupal\Tests\Core\Plugin\Discovery;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Core\Plugin\Discovery\MultipleYamlDiscovery;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
-use Drupal\Core\Theme\Style\StyleYamlDiscovery;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Tests Drupal\Core\Theme\Style\StyleYamlDiscovery.
+ * Tests Drupal\Core\Plugin\Discovery\MultipleYamlDiscovery.
  */
-#[CoversClass(StyleYamlDiscovery::class)]
-#[Group('style')]
-class StyleYamlDiscoveryTest extends UnitTestCase {
+#[CoversClass(MultipleYamlDiscovery::class)]
+#[Group('Plugin')]
+class MultipleYamlDiscoveryTest extends UnitTestCase {
+
+  /**
+   * The base filenames, keyed by type.
+   */
+  protected const array NAMES = [
+    'theme' => 'themes',
+    'utility' => 'utilities',
+  ];
 
   /**
    * Test that the type is set from the file name.
@@ -50,10 +58,10 @@ EOS,
       ],
     ]);
 
-    $discovery = new StyleYamlDiscovery([
+    $discovery = new MultipleYamlDiscovery(static::NAMES, [
       'module_a' => vfsStream::url('root/module_a'),
       'module_b' => vfsStream::url('root/module_b'),
-    ]);
+    ], 'type');
     $definitions = $discovery->getDefinitions();
 
     $this->assertEquals([
@@ -96,9 +104,9 @@ EOS,
       ],
     ]);
 
-    $discovery = new StyleYamlDiscovery([
+    $discovery = new MultipleYamlDiscovery(static::NAMES, [
       'module_a' => vfsStream::url('root/module_a'),
-    ]);
+    ], 'type');
     $discovery->addTranslatableProperty('label');
     $definitions = $discovery->getDefinitions();
 
@@ -107,7 +115,7 @@ EOS,
   }
 
   /**
-   * Test that a style can be overridden by another extension of the same type.
+   * Test that a plugin can be overridden by another extension of the same type.
    */
   public function testOverrideSameType(): void {
     vfsStream::setup('root');
@@ -137,10 +145,10 @@ EOS,
     ]);
 
     // The last extension in the directories wins.
-    $discovery = new StyleYamlDiscovery([
+    $discovery = new MultipleYamlDiscovery(static::NAMES, [
       'module_a' => vfsStream::url('root/module_a'),
       'module_b' => vfsStream::url('root/module_b'),
-    ]);
+    ], 'type');
     $definitions = $discovery->getDefinitions();
 
     $this->assertEquals([
@@ -162,7 +170,7 @@ EOS,
   }
 
   /**
-   * Test that a style ID declared for several types throws an exception.
+   * Test that a plugin ID declared for several types throws an exception.
    */
   public function testDuplicateIdAcrossTypes(): void {
     vfsStream::setup('root');
@@ -181,13 +189,13 @@ EOS,
       ],
     ]);
 
-    $discovery = new StyleYamlDiscovery([
+    $discovery = new MultipleYamlDiscovery(static::NAMES, [
       'module_a' => vfsStream::url('root/module_a'),
       'module_b' => vfsStream::url('root/module_b'),
-    ]);
+    ], 'type');
 
-    $this->expectException(StyleDefinitionErrorException::class);
-    $this->expectExceptionMessage('Style "duplicate" is declared as theme by module_a and as utility by module_b.');
+    $this->expectException(InvalidPluginDefinitionException::class);
+    $this->expectExceptionMessage('Plugin "duplicate" is declared with type "theme" by module_a and with type "utility" by module_b.');
     $discovery->getDefinitions();
   }
 
