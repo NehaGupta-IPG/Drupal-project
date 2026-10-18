@@ -243,6 +243,9 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
   public function testWidgetOEmbedAdvancedUi(): void {
     $this->config('media_library.settings')->set('advanced_ui', TRUE)->save();
 
+    // Allow room for the additional selection's portrait thumbnail.
+    $this->getSession()->resizeWindow(1024, 900);
+
     $this->hijackProviderEndpoints();
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
