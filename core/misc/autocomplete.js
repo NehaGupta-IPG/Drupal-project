@@ -116,7 +116,19 @@
           suggestions.splice(suggestions.indexOf(tagged[i]), 1);
         }
       }
-      response(suggestions);
+
+      const labels = suggestions.map((item) => item.label);
+      const duplicates = new Set(
+        labels.filter(
+          (item) => labels.indexOf(item) !== labels.lastIndexOf(item),
+        ),
+      );
+
+      response(
+        suggestions.map((item) =>
+          duplicates.has(item.label) ? { ...item, showId: true } : item,
+        ),
+      );
     }
 
     // Get the desired term and construct the autocomplete URL for it.
@@ -173,7 +185,12 @@
     // Remove the current input.
     terms.pop();
     // Add the selected item.
-    terms.push(ui.item.value);
+    // @todo this should be dynamic based on the formatter show_id setting. Use
+    // the value property to display entity ids and use the label property to
+    // not display them.
+    const hideIds = this.hasAttribute('data-drupal-autocomplete-hide-ids');
+
+    terms.push(hideIds && !ui.item.showId ? ui.item.label : ui.item.value);
 
     event.target.value = terms.join(', ');
     // Return false to tell jQuery UI that we've filled in the value already.
@@ -192,7 +209,9 @@
    *   jQuery collection of the ul element.
    */
   function renderItem(ul, item) {
-    return $('<li>').append($('<a>').html(item.label)).appendTo(ul);
+    return $('<li>')
+      .append($('<a>').html(item.showId ? item.value : item.label))
+      .appendTo(ul);
   }
 
   /**

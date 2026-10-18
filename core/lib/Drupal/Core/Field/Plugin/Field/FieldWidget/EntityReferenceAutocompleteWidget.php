@@ -30,6 +30,7 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
       'match_limit' => 10,
       'size' => 60,
       'placeholder' => '',
+      'show_id' => TRUE,
     ] + parent::defaultSettings();
   }
 
@@ -64,6 +65,12 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
       '#default_value' => $this->getSetting('placeholder'),
       '#description' => $this->t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
     ];
+    $element['show_id'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show Entity ID'),
+      '#default_value' => $this->getSetting('show_id') ?? TRUE,
+      '#description' => $this->t('Will display the entity id of the selection. When disabled, the entity id will still be shown for items with duplicate titles.'),
+    ];
     return $element;
   }
 
@@ -85,6 +92,8 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
     else {
       $summary[] = $this->t('No placeholder');
     }
+
+    $summary[] = $this->t('Show entity IDs: @show', ['@show' => $this->getSetting('match_operator') ? 'Yes' : 'No']);
 
     return $summary;
   }
@@ -123,6 +132,7 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
       '#default_value' => $referenced_entities[$delta] ?? NULL,
       '#size' => $this->getSetting('size'),
       '#placeholder' => $this->getSetting('placeholder'),
+      '#show_id' => $this->getSetting('show_id'),
     ];
 
     if ($bundle = $this->getAutocreateBundle()) {

@@ -22,6 +22,8 @@ use Drupal\Core\Site\Settings;
  * - #target_type: (required) The ID of the target entity type.
  * - #tags: (optional) TRUE if the element allows multiple selection. Defaults
  *   to FALSE.
+ * - #show_id: (optional) TRUE if the element should display the entity ID
+ *   in the autocomplete list. Defaults to TRUE.
  * - #default_value: (optional) The default entity or an array of default
  *   entities, depending on the value of #tags.
  * - #selection_handler: (optional) The plugin ID of the entity reference
@@ -50,6 +52,7 @@ use Drupal\Core\Site\Settings;
  *  '#type' => 'entity_autocomplete',
  *  '#target_type' => 'node',
  *  '#tags' => TRUE,
+ *  '#show_id' => TRUE,
  *  '#default_value' => $node,
  *  '#selection_handler' => 'default',
  *  '#selection_settings' => [
@@ -78,6 +81,7 @@ class EntityAutocomplete extends Textfield {
     $info['#selection_handler'] = 'default';
     $info['#selection_settings'] = [];
     $info['#tags'] = FALSE;
+    $info['#show_id'] = TRUE;
     $info['#autocreate'] = NULL;
     // This should only be set to FALSE if proper validation by the selection
     // handler is performed at another level on the extracted form values.
@@ -115,7 +119,7 @@ class EntityAutocomplete extends Textfield {
 
         // Extract the labels from the passed-in entity objects, taking access
         // checks into account.
-        return static::getEntityLabels($element['#default_value']);
+        return static::getEntityLabels($element['#default_value'], $element['#show_id'] ?? TRUE);
       }
     }
 
@@ -371,15 +375,18 @@ class EntityAutocomplete extends Textfield {
    *
    * @param \Drupal\Core\Entity\EntityInterface[] $entities
    *   An array of entity objects.
+   * @param bool $show_id
+   *   If the label should show the entity id.
    *
    * @return string
    *   A string of entity labels separated by commas.
    */
-  public static function getEntityLabels(array $entities) {
+  public static function getEntityLabels(array $entities, $show_id = TRUE) {
     /** @var \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository */
     $entity_repository = \Drupal::service('entity.repository');
 
     $entity_labels = [];
+    $entity_ids = [];
     foreach ($entities as $entity) {
       // Set the entity in the correct language for display.
       $entity = $entity_repository->getTranslationFromContext($entity);
@@ -389,12 +396,22 @@ class EntityAutocomplete extends Textfield {
       $label = ($entity->access('view label')) ? $entity->label() : t('- Restricted access -');
 
       // Take into account "autocreated" entities.
-      if (!$entity->isNew()) {
+      if (!$entity->isNew() && $show_id) {
         $label .= ' (' . $entity->id() . ')';
       }
 
       // Labels containing commas or quotes must be wrapped in quotes.
       $entity_labels[] = Tags::encode($label);
+      $entity_ids[] = ($entity->access('view label')) ? $entity->id() : -1;
+    }
+
+    $duplicates = array_diff_assoc($entity_labels, array_unique($entity_labels));
+    if (!$show_id && count($duplicates) > 0) {
+      foreach ($entity_labels as $key => $value) {
+        if (in_array($value, $duplicates) && $entity_ids[$key] > 0) {
+          $entity_labels[$key] .= ' (' . $entity_ids[$key] . ')';
+        }
+      }
     }
 
     return implode(', ', $entity_labels);
@@ -420,6 +437,17 @@ class EntityAutocomplete extends Textfield {
     }
 
     return $match;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public static function preRenderTextfield($element) {
+    if ($element['#show_id'] === FALSE) {
+      $element['#attributes']['data-drupal-autocomplete-hide-ids'] = '';
+    }
+
+    return parent::preRenderTextfield($element);
   }
 
 }

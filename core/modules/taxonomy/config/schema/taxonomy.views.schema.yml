@@ -141,6 +141,9 @@ views.filter.taxonomy_index_tid:
       sequence:
         type: integer
         label: 'Value'
+      show_id:
+        type: boolean
+        label: 'Show ID'
 
 views.filter.taxonomy_index_tid_depth:
   type: views.filter.taxonomy_index_tid

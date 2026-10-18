@@ -327,6 +327,9 @@ field.widget.settings.entity_reference_autocomplete_tags:
     placeholder:
       type: label
       label: 'Placeholder'
+    show_id:
+      type: boolean
+      label: 'Show ID'
 
 field.widget.settings.entity_reference_autocomplete:
   type: mapping
@@ -344,6 +347,9 @@ field.widget.settings.entity_reference_autocomplete:
     placeholder:
       type: label
       label: 'Placeholder'
+    show_id:
+      type: boolean
+      label: 'Show ID'
 
 field.formatter.settings.boolean:
   type: mapping

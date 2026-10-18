@@ -34,6 +34,7 @@ class TaxonomyIndexTidDepth extends TaxonomyIndexTid {
     $options = parent::defineOptions();
 
     $options['depth'] = ['default' => 0];
+    $options['show_id'] = ['default' => TRUE];
 
     return $options;
   }
@@ -49,6 +50,13 @@ class TaxonomyIndexTidDepth extends TaxonomyIndexTid {
       '#title' => $this->t('Depth'),
       '#default_value' => $this->options['depth'],
       '#description' => $this->t('The depth will match nodes tagged with terms in the hierarchy. For example, if you have the term "fruit" and a child term "apple", with a depth of 1 (or higher) then filtering for the term "fruit" will get nodes that are tagged with "apple" as well as "fruit". If negative, the reverse is true; searching for "apple" will also pick up nodes tagged with "fruit" if depth is -1 (or lower).'),
+    ];
+
+    $form['show_id'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show Entity ID'),
+      '#default_value' => $this->options['show_id'],
+      '#description' => $this->t('Will display the entity id of the selection. When disabled, the entity id will still be shown for items with duplicate titles.'),
     ];
   }
 
