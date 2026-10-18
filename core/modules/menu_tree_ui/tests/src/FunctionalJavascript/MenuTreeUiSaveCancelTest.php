@@ -25,6 +25,11 @@ final class MenuTreeUiSaveCancelTest extends MenuTreeUiJavascriptTestBase {
   use MenuTreeUiDragGestureTrait;
 
   /**
+   * Selector for an error message in the action bar's save-error container.
+   */
+  private const SAVE_ERROR_SELECTOR = '.menu-tree-ui__save-error [data-drupal-message-type="error"]';
+
+  /**
    * Seeds a menu with three top-level links A, B, C (A has one child, A1).
    *
    * A1 lets a test expand A and check that a Save keeps it open.
@@ -73,6 +78,32 @@ final class MenuTreeUiSaveCancelTest extends MenuTreeUiJavascriptTestBase {
     $this->waitForSave();
 
     $this->assertSiblings(['C', 'A', 'B'], $this->childRowsSelector(NULL));
+    $this->assertNull($this->getSession()->getPage()->find('css', self::SAVE_ERROR_SELECTOR));
+  }
+
+  /**
+   * A Save that fails shows the error and keeps the unsaved notice.
+   *
+   * C is recorded as a child of A, then A is made a child of C behind the
+   * editor's back, so the recorded move would now form a cycle.
+   */
+  public function testFailedSaveShowsErrorAndKeepsWorkingCopy(): void {
+    $this->drag('C', 'A', 'child');
+    $this->assertJsCondition(
+      "!document.querySelector('.menu-tree-ui__unsaved').classList.contains('js-hide')",
+    );
+    $this->container->get('plugin.manager.menu.link')->updateDefinition(
+      $this->linkIds['A'],
+      ['parent' => $this->linkIds['C']],
+    );
+
+    $this->getSession()->getPage()->find('css', '[data-mtu-action="save"]')->click();
+
+    $this->assertNotNull($this->assertSession()->waitForElementVisible('css', self::SAVE_ERROR_SELECTOR));
+    $this->assertFalse(
+      $this->getSession()->getPage()->find('css', '.menu-tree-ui__unsaved')->hasClass('js-hide'),
+      'The unsaved notice should stay visible after a failed Save.',
+    );
   }
 
   /**

@@ -20,6 +20,7 @@ use Drupal\menu_tree_ui\MenuTreeUiConstants;
 use Drupal\treegrid\TreegridColumnManager;
 use Drupal\menu_tree_ui\Service\MenuTreeLoader;
 use Drupal\menu_tree_ui\Service\MenuTreeMover;
+use Drupal\menu_tree_ui\Service\MenuTreeWorkingCopyLock;
 use Drupal\treegrid_reorder\TreegridWorkingCopy;
 use Drupal\system\MenuInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -49,6 +50,7 @@ final class MenuTreeController extends ControllerBase {
     private readonly TreegridColumnManager $columnManager,
     private readonly TreegridWorkingCopy $workingCopy,
     private readonly MenuLinkManagerInterface $menuLinkManager,
+    private readonly MenuTreeWorkingCopyLock $workingCopyLock,
   ) {}
 
   /**
@@ -62,6 +64,7 @@ final class MenuTreeController extends ControllerBase {
       $container->get('plugin.manager.treegrid_column'),
       $container->get('menu_tree_ui.working_copy'),
       $container->get('plugin.manager.menu.link'),
+      $container->get('menu_tree_ui.working_copy_lock'),
     );
   }
 
@@ -238,7 +241,7 @@ final class MenuTreeController extends ControllerBase {
   }
 
   /**
-   * Applies a drag-and-drop move and returns the outcome as JSON.
+   * Records a drag-and-drop move in the working copy and returns JSON.
    *
    * Body shape: { id, new_parent, before_id }.
    */
@@ -266,73 +269,79 @@ final class MenuTreeController extends ControllerBase {
     }
 
     $menu_name = $menu->id();
-    if ($this->workingCopy->isLocked($menu_name)) {
-      return new JsonResponse(
-        ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
-        409,
-      );
-    }
+    return $this->withMenuLock($menu_name, function () use ($menu_name, $id, $new_parent, $before_id): JsonResponse {
+      if ($this->workingCopy->isLocked($menu_name)) {
+        return new JsonResponse(
+          ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
+          409,
+        );
+      }
 
-    // Validate against the live tree, then record the move in the working copy
-    // instead of writing it. Save replays it (re-validating) to persist.
-    $validation = $this->mover->validateMove($menu_name, $id, $new_parent, $before_id);
-    if (!$validation['ok']) {
-      return new JsonResponse($validation, 400);
-    }
+      // Validate against the live tree plus the pending moves, then record the
+      // move in the working copy instead of writing it. Save validates the
+      // recorded moves in order before it writes any of them.
+      $validation = $this->mover->validateMove($menu_name, $id, $new_parent, $before_id);
+      if (!$validation['ok']) {
+        return new JsonResponse($validation, 400);
+      }
 
-    // addOp is the authoritative lock gate: it refuses if the working copy was
-    // claimed by another editor between the check above and this write. Honor
-    // that refusal rather than reporting a success that did not happen.
-    if (!$this->workingCopy->addOp($menu_name, [
-      'type' => 'move',
-      'id' => $id,
-      'new_parent' => $new_parent,
-      'before_id' => $before_id,
-    ])) {
-      return new JsonResponse(
-        ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
-        409,
-      );
-    }
+      // addOp is the authoritative lock gate: it refuses if the working copy
+      // was claimed by another editor between the check above and this write.
+      // Honor that refusal rather than reporting a success that did not happen.
+      if (!$this->workingCopy->addOp($menu_name, [
+        'type' => 'move',
+        'id' => $id,
+        'new_parent' => $new_parent,
+        'before_id' => $before_id,
+      ])) {
+        return new JsonResponse(
+          ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
+          409,
+        );
+      }
 
-    return new JsonResponse(['ok' => TRUE, 'dirty' => TRUE]);
+      return new JsonResponse(['ok' => TRUE, 'dirty' => TRUE]);
+    });
   }
 
   /**
    * Commits the menu's pending working-copy moves to live storage.
    *
-   * A partial failure (one move invalidated by an earlier one in the same
-   * batch) leaves the already-applied moves written; those are dropped from
-   * the working copy so a retry does not replay them, and the response names
-   * how many of the batch went through.
+   * Nothing is written when a recorded move no longer validates. A partial
+   * failure happens only when a module hook or a concurrent change makes a
+   * later move fail while the batch is being written; the already-applied
+   * moves are then dropped from the working copy so a retry does not replay
+   * them, and the response names how many of the batch went through.
    */
   public function save(MenuInterface $menu): JsonResponse {
     $menu_name = $menu->id();
-    if ($this->workingCopy->isLocked($menu_name)) {
-      return new JsonResponse(
-        ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
-        409,
-      );
-    }
+    return $this->withMenuLock($menu_name, function () use ($menu_name): JsonResponse {
+      if ($this->workingCopy->isLocked($menu_name)) {
+        return new JsonResponse(
+          ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
+          409,
+        );
+      }
 
-    $ops = $this->workingCopy->getOps($menu_name);
-    $result = $this->mover->commitWorkingCopy($menu_name, $ops);
-    if (!empty($result['ok'])) {
-      $this->workingCopy->clear($menu_name);
-      return new JsonResponse($result);
-    }
+      $ops = $this->workingCopy->getOps($menu_name);
+      $result = $this->mover->commitWorkingCopy($menu_name, $ops);
+      if (!empty($result['ok'])) {
+        $this->workingCopy->clear($menu_name);
+        return new JsonResponse($result);
+      }
 
-    $applied = $result['applied_ops'] ?? [];
-    if ($applied !== []) {
-      $this->workingCopy->dropOps($menu_name, $applied);
-      $total = count(array_filter($ops, static fn(array $op): bool => ($op['type'] ?? '') === 'move'));
-      $result['message'] = (string) $this->t('Saved @applied of @total changes; the rest could not be saved. @reason', [
-        '@applied' => count($applied),
-        '@total' => $total,
-        '@reason' => $result['message'] ?? '',
-      ]);
-    }
-    return new JsonResponse($result, 400);
+      $applied = $result['applied_ops'] ?? [];
+      if ($applied !== []) {
+        $this->workingCopy->dropOps($menu_name, $applied);
+        $total = count(array_filter($ops, static fn(array $op): bool => ($op['type'] ?? '') === 'move'));
+        $result['message'] = (string) $this->t('Saved @applied of @total changes; the rest could not be saved. @reason', [
+          '@applied' => count($applied),
+          '@total' => $total,
+          '@reason' => $result['message'] ?? '',
+        ]);
+      }
+      return new JsonResponse($result, 400);
+    });
   }
 
   /**
@@ -340,14 +349,16 @@ final class MenuTreeController extends ControllerBase {
    */
   public function cancel(MenuInterface $menu): JsonResponse {
     $menu_name = $menu->id();
-    if ($this->workingCopy->isLocked($menu_name)) {
-      return new JsonResponse(
-        ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
-        409,
-      );
-    }
-    $this->workingCopy->clear($menu_name);
-    return new JsonResponse(['ok' => TRUE]);
+    return $this->withMenuLock($menu_name, function () use ($menu_name): JsonResponse {
+      if ($this->workingCopy->isLocked($menu_name)) {
+        return new JsonResponse(
+          ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
+          409,
+        );
+      }
+      $this->workingCopy->clear($menu_name);
+      return new JsonResponse(['ok' => TRUE]);
+    });
   }
 
   /**
@@ -404,6 +415,34 @@ final class MenuTreeController extends ControllerBase {
   }
 
   // Private helpers.
+
+  /**
+   * Runs an action while holding the menu's working-copy lock.
+   *
+   * Serializes the actions that read or write a menu's working copy. Returns a
+   * 409 'busy' response without running the action when the lock cannot be
+   * acquired.
+   *
+   * @param string $menu_name
+   *   The menu whose working copy the action touches.
+   * @param callable(): \Symfony\Component\HttpFoundation\JsonResponse $action
+   *   The action to run.
+   */
+  private function withMenuLock(string $menu_name, callable $action): JsonResponse {
+    if (!$this->workingCopyLock->acquire($menu_name)) {
+      return new JsonResponse([
+        'ok' => FALSE,
+        'code' => 'busy',
+        'message' => (string) $this->t('Another change to this menu is being processed. Try again.'),
+      ], 409);
+    }
+    try {
+      return $action();
+    }
+    finally {
+      $this->workingCopyLock->release($menu_name);
+    }
+  }
 
   /**
    * Whether a link's title should render as a link to its destination.

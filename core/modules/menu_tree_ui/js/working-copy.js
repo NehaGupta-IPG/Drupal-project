@@ -25,15 +25,18 @@
   let changedListenerBound = false;
 
   /**
-   * Reveals the unsaved-changes notice when a change is recorded.
+   * Reveals the unsaved-changes notice and clears save errors on a change.
    *
-   * Queries the notice fresh rather than closing over one, so a single listener
-   * serves whatever action bar is currently in the DOM.
+   * Queries the elements fresh rather than closing over them, so a single
+   * listener serves whatever action bar is currently in the DOM.
    */
-  function revealUnsavedNotices() {
+  function handleChanged() {
     document
       .querySelectorAll('.menu-tree-ui__unsaved')
       .forEach((notice) => notice.classList.remove('js-hide'));
+    document
+      .querySelectorAll('.menu-tree-ui__save-error')
+      .forEach((container) => new Drupal.Message(container).clear());
   }
 
   /**
@@ -95,54 +98,76 @@
    */
   function setupActions(bar) {
     const settings = drupalSettings.menuTreeUi ?? {};
-    // The unsaved notice sits in the action bar beside these buttons; scope the
-    // lookup to the whole region so it is found wherever in the bar it renders.
-    const notice = bar
-      .closest('.menu-tree-ui')
-      ?.querySelector('.menu-tree-ui__unsaved');
+    // The notice and the error container sit in the action bar beside these
+    // buttons; scope the lookups to the whole region so they are found wherever
+    // in the bar they render.
+    const region = bar.closest('.menu-tree-ui');
+    const notice = region?.querySelector('.menu-tree-ui__unsaved');
+    const errorContainer = region?.querySelector('.menu-tree-ui__save-error');
+    const messages = errorContainer ? new Drupal.Message(errorContainer) : null;
     const save = bar.querySelector('[data-mtu-action="save"]');
     const cancel = bar.querySelector('[data-mtu-action="cancel"]');
+    let inFlight = false;
 
-    save?.addEventListener('click', async () => {
-      if (!settings.saveUrl) {
+    /**
+     * Posts to a working-copy endpoint, one request at a time.
+     *
+     * aria-disabled rather than disabled keeps the buttons focusable, so
+     * keyboard focus is not lost while the request runs.
+     *
+     * @param {string|undefined} url
+     *   The save or cancel URL.
+     * @param {string} failureMessage
+     *   Shown when the response carries no message of its own.
+     * @param {Function} onSuccess
+     *   Called when the server reports success.
+     */
+    async function submit(url, failureMessage, onSuccess) {
+      if (!url || inFlight) {
         return;
       }
-      const result = await post(settings.saveUrl);
-      if (result.ok) {
+      inFlight = true;
+      [save, cancel].forEach((button) =>
+        button?.setAttribute('aria-disabled', 'true'),
+      );
+      messages?.clear();
+      try {
+        const result = await post(url);
+        if (result.ok) {
+          onSuccess();
+        } else {
+          messages?.add(result.message ?? failureMessage, { type: 'error' });
+        }
+      } finally {
+        inFlight = false;
+        [save, cancel].forEach((button) =>
+          button?.removeAttribute('aria-disabled'),
+        );
+      }
+    }
+
+    save?.addEventListener('click', () =>
+      submit(settings.saveUrl, Drupal.t('Save failed.'), () => {
         // The tree already shows the saved order (it was rendering the working
         // copy, which is now committed), so there is nothing to re-fetch. Don't
-        // reload — that would collapse every expanded section and lose scroll
+        // reload: that would collapse every expanded section and lose scroll
         // position on large menus. Just retire the unsaved notice.
         notice?.classList.add('js-hide');
         Drupal.treegrid.announce(Drupal.t('Changes saved.'), 'polite');
-      } else {
-        Drupal.treegrid.announce(
-          result.message ?? Drupal.t('Save failed.'),
-          'assertive',
-        );
-      }
-    });
+      }),
+    );
 
-    cancel?.addEventListener('click', async () => {
-      if (!settings.cancelUrl) {
-        return;
-      }
-      const result = await post(settings.cancelUrl);
-      if (result.ok) {
-        window.location.reload();
-      } else {
-        Drupal.treegrid.announce(
-          result.message ?? Drupal.t('Cancel failed.'),
-          'assertive',
-        );
-      }
-    });
+    cancel?.addEventListener('click', () =>
+      submit(settings.cancelUrl, Drupal.t('Cancel failed.'), () =>
+        window.location.reload(),
+      ),
+    );
   }
 
   Drupal.behaviors.menuTreeUiWorkingCopy = {
     attach(context) {
       if (!changedListenerBound) {
-        document.addEventListener('menu-tree-ui:changed', revealUnsavedNotices);
+        document.addEventListener('menu-tree-ui:changed', handleChanged);
         changedListenerBound = true;
       }
       once('mtu-working-copy', '.menu-tree-ui__actions', context).forEach(

@@ -29,6 +29,12 @@ services:
       - '@string_translation'
   Drupal\menu_tree_ui\Service\MenuTreeMover: '@menu_tree_ui.mover'
 
+  menu_tree_ui.working_copy_lock:
+    class: Drupal\menu_tree_ui\Service\MenuTreeWorkingCopyLock
+    arguments:
+      - '@lock'
+  Drupal\menu_tree_ui\Service\MenuTreeWorkingCopyLock: '@menu_tree_ui.working_copy_lock'
+
   logger.channel.menu_tree_ui:
     parent: logger.channel_base
     arguments: ['menu_tree_ui']

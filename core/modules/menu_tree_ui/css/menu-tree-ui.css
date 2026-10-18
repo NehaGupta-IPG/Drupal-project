@@ -171,6 +171,24 @@
   padding-block: 0.25rem;
 }
 
+/*
+ * Save and Cancel failures render here (Drupal.Message), on a row of their own
+ * in the action bar. aria-disabled marks the buttons as busy while a request
+ * is in flight; the admin theme only styles the disabled attribute.
+ */
+.menu-tree-ui__save-error {
+  flex-basis: 100%;
+}
+
+.menu-tree-ui__save-error:empty {
+  display: none;
+}
+
+.menu-tree-ui__actions [aria-disabled="true"] {
+  cursor: progress;
+  opacity: 0.6;
+}
+
 /* ──────────────────────────────────────────────────────────────── tree */
 
 /*

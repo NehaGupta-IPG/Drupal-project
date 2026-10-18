@@ -10,6 +10,7 @@ use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\menu_tree_ui\Service\MenuTreeWorkingCopyLock;
 use Drupal\system\MenuInterface;
 use Drupal\treegrid_reorder\TreegridWorkingCopy;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,6 +35,7 @@ final class MenuTreeBreakLockForm extends ConfirmFormBase {
     protected readonly TreegridWorkingCopy $workingCopy,
     protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly DateFormatterInterface $dateFormatter,
+    protected readonly MenuTreeWorkingCopyLock $workingCopyLock,
   ) {}
 
   /**
@@ -44,6 +46,7 @@ final class MenuTreeBreakLockForm extends ConfirmFormBase {
       $container->get('menu_tree_ui.working_copy'),
       $container->get('entity_type.manager'),
       $container->get('date.formatter'),
+      $container->get('menu_tree_ui.working_copy_lock'),
     );
   }
 
@@ -106,8 +109,18 @@ final class MenuTreeBreakLockForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
-    $this->workingCopy->breakLock($this->menu->id());
     $form_state->setRedirectUrl($this->getCancelUrl());
+
+    if (!$this->workingCopyLock->acquire($this->menu->id())) {
+      $this->messenger()->addError($this->t('Another change to this menu is being processed. Try again.'));
+      return;
+    }
+    try {
+      $this->workingCopy->breakLock($this->menu->id());
+    }
+    finally {
+      $this->workingCopyLock->release($this->menu->id());
+    }
     $this->messenger()->addStatus($this->t('The lock has been broken. You may now edit %menu.', [
       '%menu' => $this->menu->label(),
     ]));

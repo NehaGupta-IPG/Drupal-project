@@ -17,5 +17,6 @@ menu_tree_ui:
     - core/htmx
     - core/drupal.htmx
     - core/drupal.dropbutton
+    - core/drupal.message
     - treegrid/treegrid
     - treegrid_reorder/treegrid_reorder
