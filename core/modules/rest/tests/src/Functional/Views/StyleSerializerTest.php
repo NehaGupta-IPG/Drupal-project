@@ -338,4 +338,40 @@ class StyleSerializerTest extends ViewTestBase {
     $this->assertSame($expected, $names, 'The translated content was found in the JSON.');
   }
 
+  /**
+   * Tests that the REST export live preview is not HTML-encoded.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3594185
+   */
+  public function testLivePreviewNotEncoded(): void {
+    $this->drupalCreateContentType(['type' => 'page']);
+    $this->drupalCreateNode([
+      'type' => 'page',
+      'title' => 'AT&T rocks & rolls',
+    ]);
+
+    $view = Views::getView('test_serializer_node_display_field');
+    $view->setDisplay('rest_export_1');
+
+    // Simulate a live preview as the Views UI does.
+    $view->live_preview = TRUE;
+    $view->preview('rest_export_1');
+    $build = $view->render('rest_export_1');
+    $rendered = (string) $this->renderer->renderRoot($build);
+
+    // Before the fix, #plain_text caused the renderer to HTML-encode the entire
+    // JSON output, turning every " into &quot;. Verify this is no longer the
+    // case — JSON structural characters must appear unencoded.
+    $this->assertStringNotContainsString('&quot;', $rendered, 'Preview must not contain HTML-encoded double quotes (&quot;).');
+
+    // The rendered output must be valid JSON (pretty-printed, inside <pre>).
+    $inner = strip_tags($rendered);
+    $decoded = json_decode(trim($inner), TRUE);
+    $this->assertNotNull($decoded, 'Preview output must be valid JSON.');
+
+    // The preview must be wrapped in a <pre> tag.
+    $this->assertStringStartsWith('<pre>', $rendered);
+    $this->assertStringEndsWith('</pre>', $rendered);
+  }
+
 }

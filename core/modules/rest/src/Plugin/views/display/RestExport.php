@@ -439,12 +439,19 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
     $this->view->element['#content_type'] = $this->getMimeType();
     $this->view->element['#cache_properties'][] = '#content_type';
 
-    // Encode and wrap the output in a pre tag if this is for a live preview.
+    // Wrap the output in a pre tag if this is for a live preview.
     if (!empty($this->view->live_preview)) {
+      $markup = $build['#markup'];
+      // Pretty-print JSON for readability in the preview.
+      if (str_contains($this->getMimeType(), 'json')) {
+        $decoded = json_decode($markup);
+        if ($decoded !== NULL) {
+          $markup = json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+      }
       $build['#prefix'] = '<pre>';
-      $build['#plain_text'] = $build['#markup'];
+      $build['#markup'] = ViewsRenderPipelineMarkup::create($markup);
       $build['#suffix'] = '</pre>';
-      unset($build['#markup']);
     }
     else {
       // This display plugin is for returning non-HTML formats. However, we
