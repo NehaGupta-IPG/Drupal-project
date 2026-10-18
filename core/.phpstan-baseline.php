@@ -8558,10 +8558,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Path/PathValidator.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Path\\\\Plugin\\\\Validation\\\\Constraint\\\\UniquePathAliasConstraintValidator\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Path/Plugin/Validation/Constraint/UniquePathAliasConstraintValidator.php',
+  	'message' => '#^Method Drupal\\\\path_alias\\\\Plugin\\\\Validation\\\\Constraint\\\\UniquePathAliasConstraintValidator\\:\\:create\\(\\) has no return type specified\\.$#',
+  	'identifier' => 'missingType.return',
+ 	'count' => 1,
+ 	'path' => __DIR__ . '/modules/path_alias/src/Plugin/Validation/Constraint/UniquePathAliasConstraintValidator.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Path\\\\Plugin\\\\Validation\\\\Constraint\\\\ValidPathConstraintValidator\\:\\:create\\(\\) has no return type specified\\.$#',

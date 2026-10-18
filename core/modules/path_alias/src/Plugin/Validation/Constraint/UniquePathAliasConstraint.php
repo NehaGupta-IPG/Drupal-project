@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Core\Path\Plugin\Validation\Constraint;
+namespace Drupal\path_alias\Plugin\Validation\Constraint;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
