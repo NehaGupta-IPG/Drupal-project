@@ -32,11 +32,10 @@ class ProgressAnnounceTest extends WebDriverTestBase {
   public function testProgressAnnounce(): void {
     $this->drupalGet('ajax-test/progress-announce-form');
 
-    // The default message is announced, and repeated with an alternating
-    // non-breaking space until the request completes.
+    // The default message is announced assertively, then repeated politely.
     $this->pressButtonWithHeldResponse('default', function () {
-      $this->assertAnnouncement('Processing...');
-      $this->assertAnnouncement("Processing...\u{00A0}");
+      $this->assertAnnouncement('Processing...', 'assertive');
+      $this->assertAnnouncement("Processing...\u{00A0}", 'polite');
     });
     $this->assertNoAnnouncement();
 
@@ -81,9 +80,15 @@ class ProgressAnnounceTest extends WebDriverTestBase {
    *
    * @param string $message
    *   The expected message.
+   * @param string|null $priority
+   *   (optional) The expected aria-live priority of the announcement.
    */
-  protected function assertAnnouncement(string $message): void {
-    $this->assertTrue($this->getSession()->wait(5000, sprintf('document.getElementById("drupal-live-announce")?.textContent === %s', json_encode($message))), "Announced: $message");
+  protected function assertAnnouncement(string $message, ?string $priority = NULL): void {
+    $condition = sprintf('document.getElementById("drupal-live-announce")?.textContent === %s', json_encode($message));
+    if ($priority) {
+      $condition .= sprintf(' && document.getElementById("drupal-live-announce").getAttribute("aria-live") === %s', json_encode($priority));
+    }
+    $this->assertTrue($this->getSession()->wait(5000, $condition), "Announced: $message");
   }
 
   /**

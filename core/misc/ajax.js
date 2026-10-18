@@ -365,16 +365,15 @@
    *   Type of progress element, core provides `'bar'`, `'throbber'` and
    *   `'fullscreen'`.
    * @prop {string} [progress.message=Drupal.t('Processing...')]
-   *   Custom message to be used with the progress indicator, and announced to
-   *   assistive technology.
+   *   Message shown with the progress indicator and announced to assistive
+   *   technology.
    * @prop {boolean} [progress.announce=true]
    *   Whether to announce the progress message to assistive technology.
    * @prop {number} [progress.announceDelay=1000]
-   *   Number of milliseconds to wait before announcing the progress message.
-   *   Requests that complete within this delay are not announced.
+   *   Milliseconds before the first announcement. Faster requests are not
+   *   announced.
    * @prop {number} [progress.announceInterval=2000]
-   *   Number of milliseconds between repeated announcements while the request
-   *   is in progress.
+   *   Milliseconds between repeated announcements.
    * @prop {object} [submit]
    *   Extra data to be sent with the Ajax request.
    * @prop {boolean} [submit.js=true]
@@ -1038,38 +1037,33 @@
   };
 
   /**
-   * Announces the progress message to assistive technology.
-   *
-   * The message is only announced when the request takes longer than
-   * `progress.announceDelay`, and is then repeated every
-   * `progress.announceInterval` milliseconds until the request completes, so
-   * that an operation in progress can be distinguished from one that stalled.
+   * Announces the progress message to assistive technology until completion.
    */
   Drupal.Ajax.prototype.announceProgress = function () {
     this.clearProgressAnnouncement();
     if (this.progress.announce === false) {
       return;
     }
-    // Instances created with custom progress settings, such as links with the
-    // 'use-ajax' class, may not have a message.
-    const message =
-      typeof this.progress.message === 'string' && this.progress.message
-        ? this.progress.message
-        : Drupal.t('Processing...');
+    // Custom progress settings replace the defaults and may lack a message.
+    const message = this.progress.message || Drupal.t('Processing...');
     let count = 0;
     const announce = () => {
-      // Screen readers do not repeat a live region whose content did not
-      // change, so alternate a trailing non-breaking space.
-      Drupal.announce(message + '\u00A0'.repeat(count % 2));
+      // Screen readers skip unchanged text, so alternate a trailing
+      // non-breaking space. Disabling the element moves focus, which can
+      // silence a polite first announcement.
+      Drupal.announce(
+        message + '\u00A0'.repeat(count % 2),
+        count === 0 ? 'assertive' : 'polite',
+      );
       count += 1;
     };
     this.progressAnnounceTimeout = setTimeout(() => {
       announce();
       this.progressAnnounceInterval = setInterval(
         announce,
-        this.progress.announceInterval || 2000,
+        this.progress.announceInterval ?? 2000,
       );
-    }, this.progress.announceDelay || 1000);
+    }, this.progress.announceDelay ?? 1000);
   };
 
   /**
