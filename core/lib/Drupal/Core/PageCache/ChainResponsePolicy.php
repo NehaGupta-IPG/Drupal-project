@@ -16,15 +16,20 @@ use Symfony\Component\HttpFoundation\Response;
  *   <li>Returns static::DENY if any of the rules evaluated to static::DENY</li>
  *   <li>Otherwise returns NULL</li>
  * </ol>
+ *
+ * @phpstan-ignore class.implementsDeprecatedInterface
  */
 class ChainResponsePolicy implements ChainResponsePolicyInterface {
 
   /**
-   * A list of policy rules to apply when this policy is checked.
+   * Constructs a ChainResponsePolicy object.
    *
-   * @var \Drupal\Core\PageCache\ResponsePolicyInterface[]
+   * @param \Traversable<\Drupal\Core\PageCache\ResponsePolicyInterface> $rules
+   *   The response policies to evaluate.
    */
-  protected $rules = [];
+  public function __construct(
+    protected \Traversable $rules,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -39,14 +44,6 @@ class ChainResponsePolicy implements ChainResponsePolicyInterface {
         throw new \UnexpectedValueException('Return value of ResponsePolicyInterface::check() must be one of ResponsePolicyInterface::DENY or NULL');
       }
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addPolicy(ResponsePolicyInterface $policy) {
-    $this->rules[] = $policy;
-    return $this;
   }
 
 }

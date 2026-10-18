@@ -17,15 +17,20 @@ use Symfony\Component\HttpFoundation\Request;
  *       static::ALLOW and none to static::DENY</li>
  *   <li>Otherwise returns NULL</li>
  * </ol>
+ *
+ * @phpstan-ignore class.implementsDeprecatedInterface
  */
 class ChainRequestPolicy implements ChainRequestPolicyInterface {
 
   /**
-   * A list of policy rules to apply when this policy is evaluated.
+   * Constructs a ChainRequestPolicy object.
    *
-   * @var \Drupal\Core\PageCache\RequestPolicyInterface[]
+   * @param \Traversable<\Drupal\Core\PageCache\RequestPolicyInterface> $rules
+   *   The request policies to evaluate.
    */
-  protected $rules = [];
+  public function __construct(
+    protected \Traversable $rules,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -47,14 +52,6 @@ class ChainRequestPolicy implements ChainRequestPolicyInterface {
     }
 
     return $final_result;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addPolicy(RequestPolicyInterface $policy) {
-    $this->rules[] = $policy;
-    return $this;
   }
 
 }

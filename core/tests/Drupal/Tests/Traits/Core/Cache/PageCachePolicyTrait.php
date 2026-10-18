@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Traits\Core\Cache;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\PageCache\DefaultRequestPolicy as PageCacheDefaultRequestPolicy;
-use Drupal\Core\PageCache\RequestPolicy\NoSessionOpen;
-use Drupal\Core\Session\SessionConfigurationInterface;
-use Drupal\dynamic_page_cache\PageCache\RequestPolicy\DefaultRequestPolicy as DynamicPageCacheDefaultRequestPolicy;
+use Drupal\Core\PageCache\RequestPolicy\CommandLineOrUnsafeMethod;
 
 /**
  * Trait for using page caching modules in Kernel tests.
@@ -19,8 +16,8 @@ use Drupal\dynamic_page_cache\PageCache\RequestPolicy\DefaultRequestPolicy as Dy
  *   installed, as desired.
  * - The test class must implement
  *   \Drupal\Core\DependencyInjection\ServiceModifierInterface. This trait
- *   provides an implementation of the alter() method which replaces the cache
- *   policies of the page cache modules.
+ *   provides an implementation of the alter() method which removes the request
+ *   policy that denies caching when running from the command line.
  * - The 'user' module must be installed if 'dynamic_page_cache' is installed.
  *
  * @see \Drupal\Tests\HttpKernelUiHelperTrait
@@ -28,7 +25,10 @@ use Drupal\dynamic_page_cache\PageCache\RequestPolicy\DefaultRequestPolicy as Dy
 trait PageCachePolicyTrait {
 
   /**
-   * Sets up mock cache policies.
+   * Removes the command line request policy from the page cache policies.
+   *
+   * Tests always run from the command line, so this policy would otherwise
+   * deny caching for every request.
    *
    * To use this, the test class must implement
    * \Drupal\Core\DependencyInjection\ServiceModifierInterface.
@@ -37,36 +37,11 @@ trait PageCachePolicyTrait {
    *   The DI container.
    */
   public function alter(ContainerBuilder $container): void {
-    if ($container->hasDefinition('page_cache_request_policy')) {
-      $service_definition = $container->getDefinition('page_cache_request_policy');
-      $service_definition->setClass(KernelTestPageCacheRequestPolicy::class);
+    if ($container->hasDefinition(CommandLineOrUnsafeMethod::class)) {
+      $container->getDefinition(CommandLineOrUnsafeMethod::class)
+        ->clearTag('page_cache_request_policy')
+        ->clearTag('dynamic_page_cache_request_policy');
     }
-
-    if ($container->hasDefinition('dynamic_page_cache_request_policy')) {
-      $service_definition = $container->getDefinition('dynamic_page_cache_request_policy');
-      $service_definition->setClass(KernelTestDynamicPageCacheRequestPolicy::class);
-    }
-  }
-
-}
-
-/**
- * Replaces the page_cache module's default request policy.
- */
-class KernelTestPageCacheRequestPolicy extends PageCacheDefaultRequestPolicy {
-
-  public function __construct(SessionConfigurationInterface $session_configuration) {
-    $this->addPolicy(new NoSessionOpen($session_configuration));
-  }
-
-}
-
-/**
- * Replaces the dynamic_page_cache module's default request policy.
- */
-class KernelTestDynamicPageCacheRequestPolicy extends DynamicPageCacheDefaultRequestPolicy {
-
-  public function __construct() {
   }
 
 }

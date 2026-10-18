@@ -8,9 +8,10 @@ use Drupal\Core\PageCache\RequestPolicy\CommandLineOrUnsafeMethod;
 /**
  * The default Dynamic Page Cache request policy.
  *
- * Delivery of cached pages is denied if either the application is running from
- * the command line or the request was not initiated with a safe method (GET or
- * HEAD).
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\PageCache\ChainRequestPolicy with tagged services instead.
+ *
+ * @see https://www.drupal.org/node/3579668
  */
 class DefaultRequestPolicy extends ChainRequestPolicy {
 
@@ -18,7 +19,8 @@ class DefaultRequestPolicy extends ChainRequestPolicy {
    * Constructs the default Dynamic Page Cache request policy.
    */
   public function __construct() {
-    $this->addPolicy(new CommandLineOrUnsafeMethod());
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\Core\PageCache\ChainRequestPolicy with tagged services instead. See https://www.drupal.org/node/3579668', E_USER_DEPRECATED);
+    parent::__construct(new \ArrayIterator([new CommandLineOrUnsafeMethod()]));
   }
 
 }
