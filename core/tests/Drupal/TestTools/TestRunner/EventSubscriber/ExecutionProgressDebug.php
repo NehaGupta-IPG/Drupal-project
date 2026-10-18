@@ -71,10 +71,7 @@ class ExecutionProgressDebug extends ExecutionProgress {
   }
 
   /**
-   * Subscribes to a test execution end event.
-   *
-   * @param \Drupal\TestTools\TestRunner\Event\TestExecutionFinished $event
-   *   The event.
+   * {@inheritdoc}
    */
   public function onTestExecutionFinished(TestExecutionFinished $event): void {
     $this->io->write(sprintf(
