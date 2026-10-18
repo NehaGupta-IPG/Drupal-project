@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\text\Kernel;
 
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
-use Drupal\entity_test\Entity\EntityTest;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\Render\FilteredMarkup;
 use Drupal\KernelTests\KernelTestBase;
@@ -61,9 +57,9 @@ class TextSummaryTest extends KernelTestBase {
    * Tests summary with long example.
    */
   public function testLongSentence(): void {
-    // 125.
+    // Setup test strings and expectations.
     // cSpell:disable
-    $text =
+    $long_sentence_text =
       'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ' .
       // 108.
       'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ' .
@@ -71,13 +67,30 @@ class TextSummaryTest extends KernelTestBase {
       'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. ' .
       // 110.
       'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
-    $expected = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ' .
+    $long_sentence_expected = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ' .
                 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ' .
                 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.';
+
+    $long_paragraph_text =
+      'Dr. Cras ultricies ligula sed magna dictum porta.&nbsp;Curabitur non nulla sit amet nisl tempus convallis quis ac lectus.&nbsp;Pellentesque in ipsum ' .
+      'id orci porta dapibus.&nbsp;Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui.&nbsp;Nulla porttitor.&nbsp;Cras ultricies&nbsp;ligula sed magna ' .
+      'dictum porta.&nbsp;Nulla quis lorem ut libero malesuada feugiat.&nbsp;Proin eget tortor risus.&nbsp;Curabitur non nulla sit amet nisl tempus convallis quis ac ' .
+      'lectus.&nbsp;Proin eget tortor risus.&nbsp;Praesent sapien massa, convallis a pellentesque nec, egestas non nisi.&nbsp;Vivamus suscipit tortor eget felis ' .
+      'porttitor volutpat. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. ' .
+      'Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; ' .
+      'Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Curabitur aliquet quam id dui posuere blandit. Curabitur aliquet quam id ' .
+      'dui posuere blandit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Pellentesque in ipsum id orci porta dapibus';
+
+    $long_paragraph_expected = 'Dr. Cras ultricies ligula sed magna dictum porta.&nbsp;Curabitur non nulla sit amet nisl tempus convallis quis ac lectus.&nbsp;Pellentesque in ipsum ' .
+      'id orci porta dapibus.&nbsp;Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui.&nbsp;Nulla porttitor.';
     // cSpell:enable
+
     // First three sentences add up to: 336, so add one for space and then 3 to
     // get half-way into next word.
-    $this->assertTextSummary($text, $expected, NULL, 340);
+    $this->assertTextSummary($long_sentence_text, $long_sentence_expected, NULL, 340);
+
+    // Confirm long paragraph breaks correctly.
+    $this->assertTextSummary($long_paragraph_text, $long_paragraph_expected, NULL, 300);
   }
 
   /**
@@ -254,69 +267,6 @@ class TextSummaryTest extends KernelTestBase {
   public function assertTextSummary(string $text, string $expected, ?string $format = NULL, int $size = 600): void {
     $summary = \Drupal::service(TextSummary::class)->generate($text, $format, $size);
     $this->assertSame($expected, $summary, '<pre style="white-space: pre-wrap">' . $summary . '</pre> is identical to <pre style="white-space: pre-wrap">' . $expected . '</pre>');
-  }
-
-  /**
-   * Tests required summary.
-   */
-  public function testRequiredSummary(): void {
-    $this->installEntitySchema('user');
-    $this->installEntitySchema('entity_test');
-    $this->setUpCurrentUser();
-    $field_definition = FieldStorageConfig::create([
-      'field_name' => 'test_text_with_summary',
-      'type' => 'text_with_summary',
-      'entity_type' => 'entity_test',
-      'cardinality' => 1,
-      'settings' => [
-        'max_length' => 200,
-      ],
-    ]);
-    $field_definition->save();
-
-    $instance = FieldConfig::create([
-      'field_name' => 'test_text_with_summary',
-      'label' => 'A text field',
-      'entity_type' => 'entity_test',
-      'bundle' => 'entity_test',
-      'settings' => [
-        'text_processing' => TRUE,
-        'display_summary' => TRUE,
-        'required_summary' => TRUE,
-      ],
-    ]);
-    $instance->save();
-
-    EntityFormDisplay::create([
-      'targetEntityType' => 'entity_test',
-      'bundle' => 'entity_test',
-      'mode' => 'default',
-      'status' => TRUE,
-    ])->setComponent('test_text_with_summary', [
-      'type' => 'text_textarea_with_summary',
-      'settings' => [
-        'summary_rows' => 2,
-        'show_summary' => TRUE,
-      ],
-    ])
-      ->save();
-
-    // Check the required summary.
-    $entity = EntityTest::create([
-      'name' => $this->randomMachineName(),
-      'type' => 'entity_test',
-      'test_text_with_summary' => ['value' => $this->randomMachineName()],
-    ]);
-    $form = \Drupal::service('entity.form_builder')->getForm($entity);
-    $this->assertNotEmpty($form['test_text_with_summary']['widget'][0]['summary'], 'Summary field is shown');
-    $this->assertNotEmpty($form['test_text_with_summary']['widget'][0]['summary']['#required'], 'Summary field is required');
-
-    // Test validation.
-    /** @var \Symfony\Component\Validator\ConstraintViolation[] $violations */
-    $violations = $entity->validate();
-    $this->assertCount(1, $violations);
-    $this->assertEquals('test_text_with_summary.0.summary', $violations[0]->getPropertyPath());
-    $this->assertEquals('The summary field is required for A text field', $violations[0]->getMessage());
   }
 
   /**

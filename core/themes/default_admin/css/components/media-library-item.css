@@ -82,7 +82,7 @@
 
     .media-library-item__preview-wrapper {
       outline: var(--focus-outline);
-      box-shadow: var(--focus-box-shadow);
+      outline-offset: var(--outline-offset);
     }
   }
 
@@ -90,15 +90,9 @@
   .form-item {
     margin: 0.75em;
   }
-
-  .form-boolean--type-checkbox:checked {
-    border-color: var(--button--focus-border-color);
-    background-color: var(--button--focus-border-color);
-  }
 }
 
 /* Edit/remove button base appearance. */
-
 .media-library-edit__link,
 .media-library-item__edit,
 .media-library-item__edit.button,
@@ -164,14 +158,12 @@
 }
 
 /* Media library item table styles. */
-
 .media-library-item--table img {
   max-width: 6.25rem;
   height: auto;
 }
 
 /* Media library entity view display styles. */
-
 .media-library-item__preview {
   position: relative;
   overflow: clip;
@@ -201,7 +193,7 @@
     border-color: var(--admin-color-text);
     box-shadow: 0 0 0 2px var(--admin-color-text);
 
-    .gin--dark-mode & {
+    .dark-mode & {
       border-color: var(--admin-color-border);
     }
   }
@@ -217,7 +209,6 @@
  * Status overlay shown during media processing; only fires for transient
  * states.
  */
-
 .media-library-item__status {
   position: absolute;
   inset-block-start: 2.5rem;
@@ -265,7 +256,6 @@
  * We have to override the .button styles since buttons make heavy use of
  * background and border property changes.
  */
-
 .media-library-item__edit,
 .media-library-item__edit:hover,
 .media-library-item__edit:focus,
