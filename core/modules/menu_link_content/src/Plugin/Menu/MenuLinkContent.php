@@ -177,6 +177,20 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    */
+  public function getUrlObject($title_attribute = TRUE) {
+    // We only need to get the title from the actual entity if it may be a
+    // translation based on the current language context. This can only happen
+    // if the site is configured to be multilingual.
+    if ($this->languageManager->isMultilingual()) {
+      return $this->getEntity()->get('link')->first()->getUrl();
+    }
+
+    return parent::getUrlObject($title_attribute);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getDeleteRoute() {
     $operations = $this->getListBuilderOperations();
     return isset($operations['delete']) ? $operations['delete']['url'] : NULL;
