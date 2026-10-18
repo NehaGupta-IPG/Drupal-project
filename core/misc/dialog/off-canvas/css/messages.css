@@ -113,3 +113,23 @@
     }
   }
 }
+
+#drupal-off-canvas .messages {
+  background-image: none;
+}
+
+#drupal-off-canvas .messages .messages__content {
+  padding-top: 1.25rem;
+}
+
+#drupal-off-canvas .messages.messages--error .messages__content {
+  color: var(--off-canvas-messages-text-color-error);
+}
+
+#drupal-off-canvas .messages.messages--warning .messages__content {
+  color: var(--off-canvas-messages-text-color-warning);
+}
+
+#drupal-off-canvas .messages.messages--status .messages__content {
+  color: var(--off-canvas-messages-text-color-status);
+}

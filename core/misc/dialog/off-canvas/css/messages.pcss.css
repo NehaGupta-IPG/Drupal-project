@@ -105,3 +105,31 @@
     }
   }
 }
+
+#drupal-off-canvas {
+  & .messages {
+    background-image: none;
+
+    & .messages__content {
+      padding-top: 1.25rem;
+    }
+
+    &.messages--error {
+      & .messages__content {
+        color: var(--off-canvas-messages-text-color-error);
+      }
+    }
+
+    &.messages--warning {
+      & .messages__content {
+        color: var(--off-canvas-messages-text-color-warning);
+      }
+    }
+
+    &.messages--status {
+      & .messages__content {
+        color: var(--off-canvas-messages-text-color-status);
+      }
+    }
+  }
+}
