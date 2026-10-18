@@ -28,14 +28,14 @@ use Drupal\Core\Theme\Style\StylePluginManagerInterface;
  *
  * @code
  * $form['styles'] = [
- *   '#type' => 'styles',
+ *   '#type' => 'style_selector',
  *   '#title' => $this->t('Styles'),
  *   '#default_value' => [],
  * ];
  * @endcode
  */
-#[FormElement('styles')]
-class Styles extends FormElementBase {
+#[FormElement('style_selector')]
+class StyleSelector extends FormElementBase {
 
   /**
    * {@inheritdoc}

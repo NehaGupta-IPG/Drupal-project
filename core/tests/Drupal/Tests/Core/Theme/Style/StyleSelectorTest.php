@@ -10,7 +10,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\FormState;
-use Drupal\Core\Render\Element\Styles;
+use Drupal\Core\Render\Element\StyleSelector;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\Style\StyleDefinition;
 use Drupal\Core\Theme\Style\StylePluginManagerInterface;
@@ -22,11 +22,11 @@ use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Test the styles form element.
+ * Test the style selector form element.
  */
-#[CoversClass(Styles::class)]
+#[CoversClass(StyleSelector::class)]
 #[Group('style')]
-class StylesFormElementTest extends UnitTestCase {
+class StyleSelectorTest extends UnitTestCase {
 
   public const string APPLIED_SUFFIX = ' <sup>(<mark>applied</mark>)</sup>';
 
@@ -89,7 +89,7 @@ class StylesFormElementTest extends UnitTestCase {
 
     $formState = new FormState();
     $completeForm = [];
-    $this->assertEquals($expected, Styles::buildForm($formElement, $formState, $completeForm));
+    $this->assertEquals($expected, StyleSelector::buildForm($formElement, $formState, $completeForm));
   }
 
   /**
@@ -195,40 +195,40 @@ class StylesFormElementTest extends UnitTestCase {
     ];
 
     yield 'Default behavior: one group' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       'wrapper' => $commonExpectedDefaultStyleElements,
     ], $commonDefaultStyles, [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
     ],
     ];
 
     yield 'Default behavior: no styles' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
     ], [], [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
     ],
     ];
 
     yield 'Element with: description' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#description' => 'My description',
       'wrapper' => NestedArray::mergeDeep($commonExpectedDefaultStyleElements, [
         '#description' => 'My description',
       ]),
     ], $commonDefaultStyles, [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#description' => 'My description',
     ],
     ];
 
     yield 'Element with: states' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       'wrapper' => NestedArray::mergeDeep($commonExpectedDefaultStyleElements, [
         '#states' => [
@@ -243,7 +243,7 @@ class StylesFormElementTest extends UnitTestCase {
         ],
       ],
     ], $commonDefaultStyles, [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#states' => [
         'invisible' => [
@@ -254,35 +254,35 @@ class StylesFormElementTest extends UnitTestCase {
     ];
 
     yield 'Element with: container wrapper' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#wrapper_type' => 'container',
       'wrapper' => NestedArray::mergeDeep($commonExpectedDefaultStyleElements, [
         '#type' => 'container',
       ]),
     ], $commonDefaultStyles, [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#wrapper_type' => 'container',
     ],
     ];
 
     yield 'Element with: forced open' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#open' => TRUE,
       'wrapper' => NestedArray::mergeDeep($commonExpectedDefaultStyleElements, [
         '#open' => TRUE,
       ]),
     ], $commonDefaultStyles, [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#open' => TRUE,
     ],
     ];
 
     yield 'Element with: opened with errors' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#children_errors' => [
         'error',
@@ -291,7 +291,7 @@ class StylesFormElementTest extends UnitTestCase {
         '#open' => TRUE,
       ]),
     ], $commonDefaultStyles, [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#children_errors' => [
         'error',
@@ -300,7 +300,7 @@ class StylesFormElementTest extends UnitTestCase {
     ];
 
     yield 'One group: one default value' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#default_value' => [
         'test2' => 'opt2',
@@ -314,7 +314,7 @@ class StylesFormElementTest extends UnitTestCase {
       ],
       ),
     ], $commonDefaultStyles, [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#default_value' => [
         'test2' => 'opt2',
@@ -323,7 +323,7 @@ class StylesFormElementTest extends UnitTestCase {
     ];
 
     yield 'One group: checkbox one default value' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#default_value' => [
         'test3' => 'opt1',
@@ -349,7 +349,7 @@ class StylesFormElementTest extends UnitTestCase {
         ],
       ],
     ]), [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#default_value' => [
         'test3' => 'opt1',
@@ -358,7 +358,7 @@ class StylesFormElementTest extends UnitTestCase {
     ];
 
     yield 'One group: two default values' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#default_value' => [
         'test1' => 'opt1',
@@ -376,7 +376,7 @@ class StylesFormElementTest extends UnitTestCase {
         ],
       ]),
     ], $commonDefaultStyles, [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#default_value' => [
         'test1' => 'opt1',
@@ -386,7 +386,7 @@ class StylesFormElementTest extends UnitTestCase {
     ];
 
     yield 'Multiple groups' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       'wrapper' => $twoGroupsExpectedDefaultStyleElements,
     ], NestedArray::mergeDeep($commonDefaultStyles, [
@@ -394,13 +394,13 @@ class StylesFormElementTest extends UnitTestCase {
         'category' => 'Main',
       ],
     ]), [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
     ],
     ];
 
     yield 'Multiple groups: one default value' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#default_value' => [
         'test1' => 'opt1',
@@ -420,7 +420,7 @@ class StylesFormElementTest extends UnitTestCase {
         'category' => 'Main',
       ],
     ]), [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#default_value' => [
         'test1' => 'opt1',
@@ -429,7 +429,7 @@ class StylesFormElementTest extends UnitTestCase {
     ];
 
     yield 'Multiple groups: two default values' => [[
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#default_value' => [
         'test1' => 'opt1',
@@ -457,7 +457,7 @@ class StylesFormElementTest extends UnitTestCase {
         'category' => 'Main',
       ],
     ]), [
-      '#type' => 'styles',
+      '#type' => 'style_selector',
       '#title' => 'My styles',
       '#default_value' => [
         'test1' => 'opt1',
@@ -479,7 +479,7 @@ class StylesFormElementTest extends UnitTestCase {
    */
   #[DataProvider('providerGetFormElement')]
   public function testGetFormElement(array $expected, StyleDefinition $definition, string $defaultValue): void {
-    $reflection = new \ReflectionClass(Styles::class);
+    $reflection = new \ReflectionClass(StyleSelector::class);
     $method = $reflection->getMethod('getFormElement');
     $actual = $method->invoke(NULL, $definition, $defaultValue);
 
@@ -649,7 +649,7 @@ class StylesFormElementTest extends UnitTestCase {
   public function testValueCallback(array $expected, array $input): void {
     $element = [];
     $form_state = new FormState();
-    $this->assertSame($expected, Styles::valueCallback($element, ['wrapper' => $input], $form_state));
+    $this->assertSame($expected, StyleSelector::valueCallback($element, ['wrapper' => $input], $form_state));
   }
 
   /**
