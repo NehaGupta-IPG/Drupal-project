@@ -261,7 +261,7 @@ class FormValidator implements FormValidatorInterface {
         // form constructors are encouraged to set #title anyway, and then set
         // #title_display to 'invisible'. This improves accessibility.
         elseif (isset($elements['#title'])) {
-          $form_state->setError($elements, $this->t('@name field is required.', ['@name' => $elements['#title']]));
+          $form_state->setError($elements, $this->t("The '@name' field is required.", ['@name' => $elements['#title']]));
         }
         else {
           $form_state->setError($elements);

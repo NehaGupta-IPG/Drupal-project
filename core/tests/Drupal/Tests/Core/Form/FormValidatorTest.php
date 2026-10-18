@@ -387,7 +387,7 @@ class FormValidatorTest extends UnitTestCase {
       [
         // Use the default message with a title.
         ['#title' => 'Test'],
-        'Test field is required.',
+        "The 'Test' field is required.",
       ],
       // Use a custom message.
       [
@@ -486,7 +486,7 @@ class FormValidatorTest extends UnitTestCase {
           '#empty_value' => 'baz',
           '#multiple' => FALSE,
         ],
-        'Test field is required.',
+        "The 'Test' field is required.",
         FALSE,
       ],
       [
