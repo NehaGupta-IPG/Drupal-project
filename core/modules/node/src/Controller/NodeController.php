@@ -272,7 +272,8 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
   /**
    * Gets a list of node revision IDs for a specific node.
    *
-   * Only returns revisions that are affected by the $node language.
+   * For translatable nodes, only returns revisions that are affected by the
+   * $node language.
    *
    * @param \Drupal\node\NodeInterface $node
    *   The node entity.
@@ -284,16 +285,21 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
    */
   protected function getRevisionIds(NodeInterface $node, NodeStorageInterface $node_storage) {
     $entityType = $node->getEntityType();
-    $result = $node_storage->getQuery()
+    $query = $node_storage->getQuery()
       ->accessCheck(TRUE)
       ->allRevisions()
-      ->condition($entityType->getKey('langcode'), $node->language()->getId())
-      ->condition($entityType->getKey('revision_translation_affected'), '1')
       ->condition($entityType->getKey('id'), $node->id())
       ->sort($entityType->getKey('revision'), 'DESC')
-      ->pager(50)
-      ->execute();
-    return array_keys($result);
+      ->pager(50);
+
+    // Only show revisions that are affected by the language that is being
+    // displayed.
+    if ($node->isTranslatable()) {
+      $query->condition($entityType->getKey('langcode'), $node->language()->getId())
+        ->condition($entityType->getKey('revision_translation_affected'), '1');
+    }
+
+    return array_keys($query->execute());
   }
 
 }
