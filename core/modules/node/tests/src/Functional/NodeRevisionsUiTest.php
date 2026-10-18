@@ -139,7 +139,12 @@ class NodeRevisionsUiTest extends NodeTestBase {
   }
 
   /**
-   * Checks the Revisions tab.
+   * Checks the Revisions tab when the default revision is filtered out.
+   *
+   * Revisions without translation changes are only filtered out for
+   * translatable nodes. When the default revision is filtered out, the latest
+   * displayed revision that was a default revision is shown as the current
+   * revision.
    */
   public function testNodeRevisionsTabWithDefaultRevision(): void {
     $this->enablePageTranslation();
