@@ -9,8 +9,8 @@
     // Merge strings on top of drupalSettings so that they are not mutable.
     {
       strings: {
-        open: Drupal.t('Open'),
-        close: Drupal.t('Close'),
+        open: Drupal.t('Open', {}, { context: 'Verb' }),
+        close: Drupal.t('Close', {}, { context: 'Verb' }),
       },
     },
   );
