@@ -272,8 +272,8 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
   /**
    * Gets a list of node revision IDs for a specific node.
    *
-   * For translatable nodes, only returns revisions that are affected by the
-   * $node language.
+   * For translatable nodes, or nodes with translations, only returns revisions
+   * that are affected by the $node language.
    *
    * @param \Drupal\node\NodeInterface $node
    *   The node entity.
@@ -294,7 +294,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
 
     // Only show revisions that are affected by the language that is being
     // displayed.
-    if ($node->isTranslatable()) {
+    if ($node->isTranslatable() || count($node->getTranslationLanguages()) > 1) {
       $query->condition($entityType->getKey('langcode'), $node->language()->getId())
         ->condition($entityType->getKey('revision_translation_affected'), '1');
     }

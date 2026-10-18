@@ -206,7 +206,7 @@ class VersionHistoryController extends ControllerBase {
    */
   protected function loadRevisions(RevisionableInterface $entity) {
     $entityType = $entity->getEntityType();
-    $translatable = $entity->isTranslatable();
+    $translatable = $entity->isTranslatable() || count($entity->getTranslationLanguages()) > 1;
     $entityStorage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
     assert($entityStorage instanceof RevisionableStorageInterface);
 
