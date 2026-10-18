@@ -9,6 +9,7 @@ use Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -49,13 +50,22 @@ final class RevisionVersionHistoryTranslatableTest extends BrowserTestBase {
 
   /**
    * Tests the version history page for translations.
+   *
+   * @param bool $bundleTranslatable
+   *   Whether the entity bundle is translatable.
    */
-  public function testVersionHistoryTranslations(): void {
+  #[DataProvider('providerVersionHistoryTranslations')]
+  public function testVersionHistoryTranslations(bool $bundleTranslatable): void {
+    if ($bundleTranslatable) {
+      $this->container->get('content_translation.manager')->setEnabled('entity_test_mul_revlog', 'entity_test_mul_revlog', TRUE);
+    }
+
     $label = 'view all revisions,revert,delete revision';
     $entity = EntityTestMulWithRevisionLog::create([
       'name' => $label,
       'type' => 'entity_test_mul_revlog',
     ]);
+    $this->assertSame($bundleTranslatable, $entity->isTranslatable());
     $entity->addTranslation('es', ['label' => 'version history test translations es']);
     $entity->save();
 
@@ -83,6 +93,19 @@ final class RevisionVersionHistoryTranslatableTest extends BrowserTestBase {
     $this->assertSession()->linkByHrefNotExistsExact($firstRevision->toUrl('revision-delete-form')->toString());
     $this->assertSession()->linkByHrefExists($firstRevision->getTranslation('es')->toUrl('revision-revert-form')->toString());
     $this->assertSession()->linkByHrefExists($firstRevision->getTranslation('es')->toUrl('revision-delete-form')->toString());
+  }
+
+  /**
+   * Data provider for ::testVersionHistoryTranslations().
+   *
+   * @return array<string, array{bool}>
+   *   Test cases.
+   */
+  public static function providerVersionHistoryTranslations(): array {
+    return [
+      'translatable bundle' => [TRUE],
+      'bundle not translatable, translation exists' => [FALSE],
+    ];
   }
 
 }

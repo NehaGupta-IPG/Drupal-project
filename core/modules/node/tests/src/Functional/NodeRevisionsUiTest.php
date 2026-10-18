@@ -7,6 +7,7 @@ namespace Drupal\Tests\node\Functional;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\filter\FilterFormatRepositoryInterface;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use PHPUnit\Framework\Attributes\Group;
@@ -27,7 +28,7 @@ class NodeRevisionsUiTest extends NodeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block'];
+  protected static $modules = ['block', 'content_translation'];
 
   /**
    * @var \Drupal\user\Entity\User
@@ -141,6 +142,7 @@ class NodeRevisionsUiTest extends NodeTestBase {
    * Checks the Revisions tab.
    */
   public function testNodeRevisionsTabWithDefaultRevision(): void {
+    $this->enablePageTranslation();
     $this->drupalLogin($this->editor);
 
     // Create the node.
@@ -191,9 +193,41 @@ class NodeRevisionsUiTest extends NodeTestBase {
   }
 
   /**
+   * Checks the Revisions tab for a node that is not translatable.
+   */
+  public function testNodeRevisionsTabNotTranslatable(): void {
+    $this->drupalLogin($this->editor);
+
+    // Revision 1.
+    $node = $this->drupalCreateNode();
+
+    // Revision 2, without translation changes.
+    $node->setNewRevision(TRUE);
+    $node->save();
+
+    // Revision 3, without translation changes.
+    $node->isDefaultRevision(FALSE);
+    $node->setNewRevision(TRUE);
+    $node->save();
+
+    $node_id = $node->id();
+    $this->drupalGet($node->toUrl('version-history'));
+
+    // All revisions are listed as the node is not translatable.
+    $this->assertSession()->elementsCount('css', 'table tbody tr', 3);
+    $this->assertSession()->linkByHrefExists('/node/' . $node_id . '/revisions/1/revert');
+    $this->assertSession()->linkByHrefExists('/node/' . $node_id . '/revisions/3/revert');
+    $this->assertSession()->linkByHrefNotExists('/node/' . $node_id . '/revisions/2/revert');
+    // Revision 2 is the default revision.
+    $this->assertSession()->elementAttributeContains('xpath', '//tr[contains(@class, "revision-current")]/td/a[1]', 'href', '/node/' . $node_id);
+    $this->assertSession()->elementsCount('css', 'tr.revision-current', 1);
+  }
+
+  /**
    * Tests the revision tab paginates correctly with affected translations.
    */
   public function testNodeRevisionsTabPagerAffectedTranslations(): void {
+    $this->enablePageTranslation();
     $this->drupalLogin($this->editor);
 
     $node = $this->drupalCreateNode();
@@ -260,6 +294,15 @@ class NodeRevisionsUiTest extends NodeTestBase {
     // There must be exactly one 'Revisions' local task.
     $xpath = $this->assertSession()->buildXPathQuery('//a[contains(@href, :href)]', [':href' => $node->toUrl('version-history')->toString()]);
     $this->assertSession()->elementsCount('xpath', $xpath, 1);
+  }
+
+  /**
+   * Adds a second language and makes the page content type translatable.
+   */
+  protected function enablePageTranslation(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    $this->container->get('content_translation.manager')->setEnabled('node', 'page', TRUE);
+    $this->rebuildContainer();
   }
 
 }
