@@ -557,6 +557,10 @@ abstract class EntityDisplayFormBase extends EntityForm {
 
     // Collect data for 'regular' fields.
     foreach ($form['#fields'] as $field_name) {
+      if (!isset($form_values['fields'][$field_name])) {
+        continue;
+      }
+
       $values = $form_values['fields'][$field_name];
 
       if ($values['region'] == 'hidden') {
@@ -587,6 +591,10 @@ abstract class EntityDisplayFormBase extends EntityForm {
 
     // Collect data for 'extra' fields.
     foreach ($form['#extra'] as $name) {
+      if (!isset($form_values['fields'][$name])) {
+        continue;
+      }
+
       if ($form_values['fields'][$name]['region'] == 'hidden') {
         $entity->removeComponent($name);
       }
