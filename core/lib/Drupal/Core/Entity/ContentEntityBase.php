@@ -161,6 +161,13 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   protected $validated = FALSE;
 
   /**
+   * A flag indicating whether the entity is being validated.
+   *
+   * @var bool
+   */
+  protected $validationRunning = FALSE;
+
+  /**
    * Whether entity validation is required before saving the entity.
    *
    * @var bool
@@ -516,9 +523,37 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function validate() {
+    $this->validationRunning = TRUE;
     $this->validated = TRUE;
-    $violations = $this->getTypedData()->validate();
-    return new EntityConstraintViolationList($this, $violations);
+    try {
+      $violations = $this->getTypedData()->validate();
+      return new EntityConstraintViolationList($this, $violations);
+    }
+    finally {
+      $this->validationRunning = FALSE;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isValidationRunning(): bool {
+    return $this->validationRunning;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isValidated(): bool {
+    return $this->validated;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setValidated(bool $validated): static {
+    $this->validated = $validated;
+    return $this;
   }
 
   /**
@@ -533,6 +568,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   public function setValidationRequired($required) {
     $this->validationRequired = $required;
+    if ($required) {
+      $this->setValidated(FALSE);
+    }
     return $this;
   }
 
@@ -885,6 +923,10 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         $this->setRevisionTranslationAffectedEnforced(TRUE);
         break;
     }
+
+    // If entity was already validated before, isValidated() will return TRUE
+    // and validation would be skipped. To avoid this, we reset this flag.
+    $this->setValidated(FALSE);
   }
 
   /**

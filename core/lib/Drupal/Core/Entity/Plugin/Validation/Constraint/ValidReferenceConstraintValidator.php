@@ -6,6 +6,8 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\EntityReferenceFieldItemList;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -91,25 +93,85 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
       return;
     }
 
-    $entity = !empty($value->getParent()) ? $value->getEntity() : NULL;
+    $parent_entity = !empty($value->getParent()) ? $value->getEntity() : NULL;
 
     /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $handler * */
-    $handler = $this->selectionManager->getSelectionHandler($value->getFieldDefinition(), $entity);
+    $handler = $this->selectionManager->getSelectionHandler($value->getFieldDefinition(), $parent_entity);
     $target_type_id = $value->getFieldDefinition()->getSetting('target_type');
 
     // Add violations on deltas with a new entity that is not valid.
     if ($new_entities) {
       if ($handler instanceof SelectionWithAutocreateInterface) {
-        $valid_new_entities = $handler->validateReferenceableNewEntities($new_entities);
-        $invalid_new_entities = array_diff_key($new_entities, $valid_new_entities);
+        $referenceable_new_entities = $handler->validateReferenceableNewEntities($new_entities);
+        $non_referenceable_new_entities = array_diff_key($new_entities, $referenceable_new_entities);
+
+        // The entities which could be created should run through the entity
+        // validation before being saved.
+        foreach ($referenceable_new_entities as $delta => $entity) {
+          if ($entity instanceof FieldableEntityInterface) {
+            // If a referenced entity is currently being validated then we've
+            // encountered a cyclic reference and therefore should skip starting
+            // the validation of the entity again in order to prevent an endless
+            // loop.
+            if ($entity->isValidationRunning()) {
+              continue;
+            }
+
+            // If the referenced entity has been validated somewhere else then
+            // we shouldn't validate it again, as code validating the entity and
+            // leaving the validated flag set to TRUE is required of taking care
+            // of the validation errors. If we ignore the fact that the entity
+            // is already validated, then we might show the same errors multiple
+            // times. In order to prevent this whoever is validating the entity
+            // is also responsible for showing the errors or resetting the
+            // validated flag of the entity.
+            // @see \Drupal\Core\Entity\FieldableEntityInterface::validate()
+            // @see \Drupal\Core\Entity\FieldableEntityInterface::setValidated()
+            if ($entity->isValidated()) {
+              continue;
+            }
+            $violations = $entity->validate();
+          }
+          else {
+            $violations = $entity->getTypedData()->validate();
+          }
+
+          if ($violations->count() !== 0) {
+            $entity_type = $entity->getEntityType();
+            $type_label = $entity_type->getLabel();
+            // If the entity supports bundles, then add the bundle label to the
+            // type label.
+            if ($entity_type->hasKey('bundle')) {
+              /** @var \Drupal\Core\Field\FieldItemListInterface $bundle_field */
+              $bundle_field = $entity->{$entity_type->getKey('bundle')};
+              if ($bundle_field instanceof EntityReferenceFieldItemList) {
+                $type_label .= ' ' . $bundle_field->entity->label();
+              }
+              else {
+                $type_label .= ' ' . $bundle_field->getString();
+              }
+            }
+            /** @var \Symfony\Component\Validator\ConstraintViolationInterface $violation */
+            foreach ($violations as $violation) {
+              // Add the validation failure reason to the current context.
+              $this->context->buildViolation($constraint->invalidNewEntity)
+                ->setParameter('%type', $type_label)
+                ->setParameter('%label', $entity->label())
+                ->setParameter('%reason', $violation->getMessage())
+                ->atPath($delta . '.entity.' . $violation->getPropertyPath())
+                ->setInvalidValue($violation->getInvalidValue())
+                ->addViolation();
+            }
+          }
+        }
       }
       else {
         // If the selection handler does not support referencing newly created
         // entities, all of them should be invalidated.
-        $invalid_new_entities = $new_entities;
+        $non_referenceable_new_entities = $new_entities;
       }
 
-      foreach ($invalid_new_entities as $delta => $entity) {
+      foreach ($non_referenceable_new_entities as $delta => $entity) {
         $this->context->buildViolation($constraint->invalidAutocreateMessage)
           ->setParameter('%type', $target_type_id)
           ->setParameter('%label', $entity->label())
@@ -125,8 +187,8 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
       if ($invalid_target_ids = array_diff($target_ids, $valid_target_ids)) {
         // Get a list of pre-existing references.
         $previously_referenced_ids = [];
-        if ($entity && !$entity->isNew()) {
-          $existing_entity = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->loadUnchanged($entity->id());
+        if ($parent_entity && !$parent_entity->isNew()) {
+          $existing_entity = $this->entityTypeManager->getStorage($parent_entity->getEntityTypeId())->loadUnchanged($parent_entity->id());
           foreach ($existing_entity->{$value->getFieldDefinition()->getName()}->getValue() as $item) {
             $previously_referenced_ids[$item['target_id']] = $item['target_id'];
           }

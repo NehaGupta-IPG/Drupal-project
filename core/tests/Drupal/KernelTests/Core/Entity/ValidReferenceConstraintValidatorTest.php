@@ -6,7 +6,9 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\entity_test\Entity\EntityTestConstraintViolation;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
@@ -231,6 +233,76 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $this->assertCount(2, $violations);
     $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $different_bundle_node->id()), $violations[0]->getMessage());
     $this->assertEquals(sprintf('The referenced entity (node: %s) does not exist.', $deleted_node->id()), $violations[1]->getMessage());
+  }
+
+  /**
+   * Tests the validation of new entities on an entity reference field.
+   *
+   * Additionally the test covers the recursive validation. The constraint
+   * validator "ValidReferenceConstraintValidator" will be executed for the
+   * parent entity and will trigger the validation of the referenced entities,
+   * which will lead to executing the same validator for each referenced entity.
+   * In order for the validation errors of the referenced entities to propagate
+   * it shouldn't happen that the same constraint validator object of the parent
+   * is used for the referenced entities. If the constraint validator object is
+   * reused during the recursive validation then its execution context will be
+   * exchanged when validating the referenced entities, which will not allow for
+   * their validation errors to propagate.
+   */
+  public function testRecursiveValidation(): void {
+    $this->installEntitySchema('entity_test_constraint_violation');
+
+    // Add an entity reference field.
+    $this->createEntityReferenceField(
+      'entity_test',
+      'entity_test',
+      'field_test',
+      'Field test',
+      'entity_test_constraint_violation',
+      'default',
+      ['target_bundles' => ['entity_test_constraint_violation']],
+      FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED
+    );
+
+    // Create a new entity which will be referenced and should fail the
+    // validation.
+    $referenced_new_entity = EntityTestConstraintViolation::create([
+      'name' => 'Referenced Entity',
+      'user_id' => ['target_id' => 0],
+    ]);
+
+    $referencing_entity = EntityTest::create([
+      'field_test' => [
+        ['entity' => $referenced_new_entity],
+      ],
+      'user_id' => ['target_id' => 1],
+    ]);
+
+    $violations = $referencing_entity->validate();
+    $this->assertCount(3, $violations);
+
+    $violation = $violations[0];
+    $this->assertEquals('user_id.0.target_id', $violation->getPropertyPath());
+    $this->assertEquals(new TranslatableMarkup('The referenced entity (%type: %id) does not exist.', [
+      '%type' => 'user',
+      '%id' => 1,
+    ]), $violation->getMessage());
+
+    $violation = $violations[1];
+    $this->assertEquals('field_test.0.entity.name', $violation->getPropertyPath());
+    $this->assertEquals(new TranslatableMarkup('This entity (%type: %label) cannot be created. Reason(s): "%reason".', [
+      '%type' => $referenced_new_entity->getEntityType()->getLabel() . ' ' . $referenced_new_entity->type->value,
+      '%label' => $referenced_new_entity->label(),
+      '%reason' => 'Widget constraint has failed.',
+    ]), $violation->getMessage());
+
+    $violation = $violations[2];
+    $this->assertEquals('field_test.0.entity.test_field', $violation->getPropertyPath());
+    $this->assertEquals(new TranslatableMarkup('This entity (%type: %label) cannot be created. Reason(s): "%reason".', [
+      '%type' => $referenced_new_entity->getEntityType()->getLabel() . ' ' . $referenced_new_entity->type->value,
+      '%label' => $referenced_new_entity->label(),
+      '%reason' => 'Widget constraint has failed.',
+    ]), $violation->getMessage());
   }
 
 }
