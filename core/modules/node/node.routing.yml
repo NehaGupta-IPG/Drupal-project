@@ -32,7 +32,7 @@ node.revision_revert_translation_confirm:
     _form: '\Drupal\node\Form\NodeRevisionRevertTranslationForm'
     _title: 'Revert to earlier revision of a translation'
   requirements:
-    _entity_access: 'node_revision.revert revision'
+    _entity_access: 'node_revision.revert'
     node: \d+
   options:
     _node_operation_route: TRUE
