@@ -8,6 +8,8 @@ use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -157,6 +159,20 @@ class MediaAccessControlHandler extends EntityAccessControlHandler implements En
       'create ' . $entity_bundle . ' media',
     ];
     return AccessResult::allowedIfHasPermissions($account, $permissions, 'OR');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL) {
+    // Only users with the update media permission can edit administrative
+    // fields.
+    $administrative_fields = ['uid', 'status', 'created'];
+    if ($operation == 'edit' && in_array($field_definition->getName(), $administrative_fields, TRUE)) {
+      return $this->access($items->getEntity(), 'update', $account, TRUE);
+    }
+
+    return parent::checkFieldAccess($operation, $field_definition, $account, $items);
   }
 
 }

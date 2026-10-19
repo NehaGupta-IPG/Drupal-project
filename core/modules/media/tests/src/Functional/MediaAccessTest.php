@@ -80,6 +80,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $assert_session->statusCodeEquals(200);
     $this->drupalGet('media/' . $user_media->id() . '/edit');
     $this->assertCacheContext('user.permissions');
+    $assert_session->elementExists('css', '.media-form-author');
     $assert_session->statusCodeEquals(200);
     $this->drupalGet('media/' . $user_media->id() . '/delete');
     $this->assertCacheContext('user.permissions');
@@ -238,6 +239,21 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     // Second row of the View contains media created by non-admin user.
     $assert_session->elementTextEquals('xpath', '//div[@class="views-element-container"]//tbody/tr[2]/td[contains(@class, "views-field-uid")]/a', $this->nonAdminUser->getDisplayName());
     $assert_session->elementTextEquals('xpath', "//div[@class='views-element-container']//tbody/tr[2]/td[contains(@class, 'views-field-name')]/a[contains(@href, '/media/{$user_media->id()}')]", 'Unnamed');
+
+    // Check that being able to edit a media allows changing the author.
+    $this->drupalGet('media/' . $media->id() . '/edit');
+    $assert_session->elementExists('css', '.media-form-author');
+    $this->drupalGet('media/' . $user_media->id() . '/edit');
+    $assert_session->elementExists('css', '.media-form-author');
+    $this->grantPermissions($role, ['create ' . $media_type->id() . ' media']);
+
+    // Check that you can only set the author if you can edit the new media.
+    $this->drupalGet('media/add/' . $media_type->id());
+    $assert_session->elementExists('css', '.media-form-author');
+    user_role_revoke_permissions($role->id(), $permissions);
+    $this->drupalGet('media/add/' . $media_type->id());
+    $assert_session->statusCodeEquals(200);
+    $assert_session->elementNotExists('css', '.media-form-author');
   }
 
   /**
