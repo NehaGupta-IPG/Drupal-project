@@ -6,6 +6,7 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Component\Gettext\PoItem;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\locale\LocaleJs;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\WaitTerminateTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -78,18 +79,24 @@ class LocaleLocaleLookupTest extends BrowserTestBase {
 
   /**
    * Tests old plural style @count[number] fix.
+   *
+   * The translated text is in a user profile extra field provided by a
+   * test module.
+   *
+   * @see \Drupal\locale_test\Hook\LocaleTestHooks::entityExtraFieldInfo()
+   * @see \Drupal\locale_test\Hook\LocaleTestHooks::userView()
    */
   #[DataProvider('providerTestFixOldPluralStyle')]
   public function testFixOldPluralStyle(string $translation_value, string $expected): void {
     $string_storage = \Drupal::service('locale.storage');
-    $string = $string_storage->findString(['source' => 'Member for', 'context' => '']);
+    $string = $string_storage->findString(['source' => 'This is translatable text', 'context' => '']);
     $lid = $string->getId();
     $string_storage->createTranslation([
       'lid' => $lid,
       'language' => 'fr',
       'translation' => $translation_value,
     ])->save();
-    _locale_refresh_translations(['fr'], [$lid]);
+    \Drupal::service(LocaleJs::class)->refreshTranslations(['fr'], [$lid]);
 
     // Check that 'count[2]' was fixed for render value.
     $this->drupalGet('');

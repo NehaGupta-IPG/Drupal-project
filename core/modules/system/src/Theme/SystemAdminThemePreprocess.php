@@ -4,6 +4,7 @@ namespace Drupal\system\Theme;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Extension\Dependency;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
@@ -47,10 +48,9 @@ class SystemAdminThemePreprocess {
    */
   public function preprocessAdminBlockContent(array &$variables): void {
     if (!empty($variables['content'])) {
-      $variables['compact'] = system_admin_compact_mode();
       foreach ($variables['content'] as $key => $item) {
         $variables['content'][$key]['link'] = Link::fromTextAndUrl($item['title'], $item['url'])->toString();
-        if (!$variables['compact'] && !empty($item['description'])) {
+        if (!empty($item['description'])) {
           $variables['content'][$key]['description'] = ['#markup' => $item['description']];
         }
         else {
@@ -160,9 +160,12 @@ class SystemAdminThemePreprocess {
     $themes = $this->themeExtensionList->getList();
     foreach ($themes as $theme) {
       foreach ($theme->info['dependencies'] as $dependency) {
-        if (isset($form[$dependency])) {
+        // A dependency may be prefixed with its project, for example
+        // 'drupal:node'. Compare only the dependency name.
+        $dependency_name = Dependency::createFromString($dependency)->getName();
+        if (isset($form[$dependency_name])) {
           // Add themes to the module's required by list.
-          $form[$dependency]['#required_by'][] = $theme->status ? $this->t('@theme (theme)', ['@theme' => $theme->info['name']]) : $this->t('@theme (theme) (<span class="admin-disabled">disabled</span>)', ['@theme' => $theme->info['name']]);
+          $form[$dependency_name]['#required_by'][] = $theme->status ? $this->t('@theme (theme)', ['@theme' => $theme->info['name']]) : $this->t('@theme (theme) (<span class="admin-disabled">disabled</span>)', ['@theme' => $theme->info['name']]);
         }
       }
     }
