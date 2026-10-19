@@ -561,7 +561,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
 
     // Create the tag field itself.
     $field_name = 'taxonomy_tags';
-    $this->createEntityReferenceField('node', $node_type->id(), $field_name, NULL, 'taxonomy_term');
+    $this->createEntityReferenceField('node', $node_type->id(), $field_name, $field_name, 'taxonomy_term');
 
     // Create 3 nodes: 1 without a term and 2 with different terms.
     $this->drupalCreateNode();
@@ -590,9 +590,8 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     $view->save();
 
     $this->drupalGet('test-filter-taxonomy-index-tid');
-    $xpath = $this->xpath('//div[@class="view-content"]//a');
     // We expect both nodes with terms but not the node without a term.
-    $this->assertCount(2, $xpath);
+    $this->assertSession()->elementsCount('xpath', '//div[@class="view-content"]//a', 2);
   }
 
 }
