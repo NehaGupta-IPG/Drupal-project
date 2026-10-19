@@ -630,6 +630,12 @@ display:
         type: fields
       query:
         type: views_query
+        options:
+          disable_sql_rewrite: false
+          distinct: true
+          replica: false
+          query_comment: ''
+          query_tags: {  }
       relationships:
         uid:
           id: uid
