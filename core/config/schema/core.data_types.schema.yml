@@ -1013,10 +1013,13 @@ text_format:
       # formatted text can participate in the string translation system.
       translatable: true
     format:
-      type: string
+      type: machine_name
       label: 'Text format'
       # The text format should not be translated as part of the string
       # translation system, so this is not marked as translatable.
+      constraints:
+        ConfigExists:
+          prefix: filter.format.
 
 # Base schema for all entity reference selection handler schemas.
 entity_reference_selection:
