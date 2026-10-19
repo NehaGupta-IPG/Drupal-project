@@ -201,7 +201,7 @@ class RecursiveContextualValidatorTest extends KernelTestBase {
     // NotNull constraint fires on the map itself), and one for each required
     // child property that is missing.
     $this->assertCount(3, $violations);
-    $paths = array_map(fn($v) => $v->getPropertyPath(), iterator_to_array($violations));
+    $paths = array_map(fn($violation) => $violation->getPropertyPath(), iterator_to_array($violations));
     $this->assertContains('', $paths);
     $this->assertContains('foo', $paths);
     $this->assertContains('bar', $paths);
@@ -226,6 +226,14 @@ class RecursiveContextualValidatorTest extends KernelTestBase {
     $this->assertCount(1, $violations);
     $this->assertEquals('entity', $violations[0]->getPropertyPath());
     $this->assertEquals('This value should not be null.', $violations[0]->getMessage());
+  }
+
+  /**
+   * Tests that a map created without a value returns NULL from getValue().
+   */
+  public function testMapGetValueReturnsNullWhenNotSet(): void {
+    $map = $this->container->get('typed_data_manager')->create(MapDataDefinition::create());
+    $this->assertNull($map->getValue());
   }
 
   /**

@@ -183,7 +183,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
       // items or properties. However, do not recurse if the data is empty,
       // unless it is a map that was explicitly given a value (e.g. []), in
       // which case its required properties must still be validated.
-      ($data instanceof ListInterface || $data instanceof ComplexDataInterface) && (!$data->isEmpty() || ($data->getDataDefinition() instanceof MapDataDefinition && $data->getValue() !== NULL)) &&
+      ($data instanceof ListInterface || $data instanceof ComplexDataInterface) && (!$data->isEmpty() || $this->isEmptyMapWithValue($data)) &&
 
       // Next, we do not recurse if given constraints are validated against an
       // entity, since we should determine whether the entity matches the
@@ -200,6 +200,32 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
     }
 
     return $this;
+  }
+
+  /**
+   * Determines whether the data is an empty map that has been given a value.
+   *
+   * An empty map that has a value, for example an empty array, still has to
+   * validate its properties so that missing required properties are reported.
+   * A map without a value (NULL) is not validated further, so that optional
+   * maps may be omitted.
+   *
+   * This check uses the data definition rather than the class, so that field
+   * items (whose definition is FieldItemDataDefinition, not MapDataDefinition)
+   * are excluded without coupling this class to the field API.
+   *
+   * Config mappings also use MapDataDefinition, but an empty config mapping is
+   * always harmless: ArrayElement::parse() only builds child elements for keys
+   * that are present in the source data, so there is nothing to recurse into.
+   *
+   * @param \Drupal\Core\TypedData\TypedDataInterface $data
+   *   The data to check.
+   *
+   * @return bool
+   *   TRUE if the data is an empty map with a value, FALSE otherwise.
+   */
+  protected function isEmptyMapWithValue(TypedDataInterface $data): bool {
+    return $data->getDataDefinition() instanceof MapDataDefinition && $data->getValue() !== NULL;
   }
 
   /**
