@@ -483,7 +483,7 @@ window.Drupal = { behaviors: {}, locale: {} };
    *   of any key in this array are replaced with the corresponding value.
    *   See {@link Drupal.formatString}.
    *   Note that you do not need to include @count in this array.
-   *   This replacement is done automatically for the plural case.
+   *   This replacement is done automatically.
    * @param {object} [options]
    *   The options to pass to the {@link Drupal.t} function.
    *

@@ -45,8 +45,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   (optional) An array with placeholder replacements, keyed by placeholder.
    *   See \Drupal\Component\Render\FormattableMarkup::placeholderFormat() for
    *   additional information about placeholders. Note that you do not need to
-   *   include @count in this array; this replacement is done automatically
-   *   for the plural cases.
+   *   include @count in this array; this replacement is done automatically.
    * @param array $options
    *   (optional) An associative array of additional options. See t() for
    *   allowed keys.
@@ -78,7 +77,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   Based on the first character of the key, the value is escaped and/or
    *   themed. See \Drupal\Component\Render\FormattableMarkup. Note that you
    *   do not need to include @count in this array; this replacement is done
-   *   automatically for the plural cases.
+   *   automatically.
    * @param array $options
    *   An associative array of additional options. See t() for allowed keys.
    *

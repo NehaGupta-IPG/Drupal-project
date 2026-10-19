@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\StringTranslation;
 
 use Drupal\Component\Gettext\PoHeader;
-use Drupal\Component\Gettext\PoItem;
-use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
+use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the PluralTranslatableMarkup translation.
+ * Tests the plural strings of core without a translation.
  */
 #[Group('StringTranslation')]
 #[RunTestsInSeparateProcesses]
@@ -45,32 +44,17 @@ class PluralTranslationTest extends KernelTestBase {
   }
 
   /**
-   * Tests that PluralTranslatableMarkup objects translates properly.
+   * Tests a plural string of core without a translation.
+   *
+   * Without a translation, the English source is displayed, but using the 
+   * plural formula of the target language. In Russian, the first form, which is
+   * the singular in English, is used for 21. If "1 byte" would be the singular,
+   * "1 byte" would be displayed for 21 bytes.
    */
-  public function testPluralWithCount(): void {
-    /** @var \Drupal\locale\StringStorageInterface $storage */
-    $storage = \Drupal::service('locale.storage');
-    $source = $storage->createString([
-      'source' => implode(PoItem::DELIMITER, ['1 day', '@count days']),
-    ])->save();
-    $translation = $storage->createTranslation([
-      'lid' => $source->lid,
-      'language' => 'ru',
-      'translation' => implode(PoItem::DELIMITER, [
-        '@count day, one form',
-        '@count days, few form',
-        '@count[2] days, many form',
-      ]),
-    ])->save();
-    $string = new PluralTranslatableMarkup(21, '1 day', '@count days', [], ['langcode' => 'ru']);
-    $this->assertEquals('21 day, one form', $string);
-    $translation->setString(implode(PoItem::DELIMITER, [
-      '@count day, one form',
-      '@count[2] days, many form',
-    ]))->save();
-    \Drupal::translation()->reset();
-    $string = new PluralTranslatableMarkup(21, '1 day', '@count days', [], ['langcode' => 'ru']);
-    $this->assertEquals('21 day, one form', $string);
+  public function testUntranslatedSingular(): void {
+    $this->assertSame('1 byte', (string) ByteSizeMarkup::create(1, 'ru'));
+    $this->assertSame('21 byte', (string) ByteSizeMarkup::create(21, 'ru'));
+    $this->assertSame('22 bytes', (string) ByteSizeMarkup::create(22, 'ru'));
   }
 
 }

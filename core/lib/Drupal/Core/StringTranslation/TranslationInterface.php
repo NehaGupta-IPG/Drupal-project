@@ -76,7 +76,7 @@ interface TranslationInterface {
    *   $output = $string_translation->formatPlural($update_count,
    *     'Changed the content type of @count post from %old-type to %new-type.',
    *     'Changed the content type of @count posts from %old-type to %new-type.',
-   *     ['%old-type' => $info->old_type, '%new-type' => $info->new_type)];
+   *     ['%old-type' => $info->old_type, '%new-type' => $info->new_type]);
    * @endcode
    *
    * @param int $count
@@ -97,7 +97,7 @@ interface TranslationInterface {
    *   Based on the first character of the key, the value is escaped and/or
    *   themed. See \Drupal\Component\Render\FormattableMarkup. Note that you do
    *   not need to include @count in this array; this replacement is done
-   *   automatically for the plural cases.
+   *   automatically.
    * @param array $options
    *   An associative array of additional options. See t() for allowed keys.
    *
