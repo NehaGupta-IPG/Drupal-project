@@ -271,15 +271,49 @@ trait PerformanceTestTrait {
           $args[$name] = str_replace($search, $replace, $arg);
         }
       }
+      elseif (preg_match('@/sites/simpletest/(\d{8})/files/((js)|%)/(.*)@', $args[':patterns__0'], $matches)) {
+        $search = [$matches[1], $matches[4]];
+        $replace = ['TEST_ID', 'JS_FILE'];
+        foreach ($args as $name => $arg) {
+          if (!is_string($arg)) {
+            continue;
+          }
+          $args[$name] = str_replace($search, $replace, $arg);
+        }
+      }
     }
     elseif (str_starts_with($query, 'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table"')) {
       if (str_contains($args[':db_condition_placeholder_1'], 'files/css')) {
         $args[':db_condition_placeholder_1'] = 'CSS_FILE';
       }
+      elseif (str_contains($args[':db_condition_placeholder_1'], 'files/js')) {
+        $args[':db_condition_placeholder_1'] = 'JS_FILE';
+      }
     }
     elseif (str_starts_with($query, 'SELECT "name", "value" FROM "key_value_expire" WHERE "expire" >')) {
       $args[':now'] = 'NOW';
       $args[':keys__0'] = 'KEY';
+    }
+    elseif (str_starts_with($query, 'INSERT INTO "key_value"')) {
+      if ('entity_autocomplete' === $args[':db_insert_placeholder_1']) {
+        $args[':db_insert_placeholder_0'] = 'AUTOCOMPLETE_HASH';
+      }
+      elseif ('twig_extension_hash_prefix' === $args[':db_insert_placeholder_0']) {
+        $value = unserialize($args[':db_insert_placeholder_2']);
+        $value['twig_extension_hash'] = 'TWIG_EXTENSION_HASH';
+        $value['twig_cache_prefix'] = 'TWIG_CACHE_PREFIX';
+        $args[':db_insert_placeholder_2'] = serialize($value);
+      }
+    }
+    elseif (str_starts_with($query, 'SELECT 1 AS "expression" FROM "key_value"')) {
+      if ('entity_autocomplete' === $args[':db_condition_placeholder_1']) {
+        $args[':db_condition_placeholder_0'] = 'AUTOCOMPLETE_HASH';
+      }
+    }
+    elseif (str_starts_with($query, 'SELECT 1 FROM "key_value"')) {
+      if ('entity_autocomplete' === $args[':collection']) {
+        $args[':key'] = 'AUTOCOMPLETE_HASH';
+      }
     }
 
     // Inline query arguments and log the query, reverse arguments to avoid
