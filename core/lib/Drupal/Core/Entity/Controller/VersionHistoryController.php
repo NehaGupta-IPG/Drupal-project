@@ -39,6 +39,11 @@ class VersionHistoryController extends ControllerBase {
   const REVISIONS_PER_PAGE = 50;
 
   /**
+   * Whether a row has been displayed as the current revision.
+   */
+  protected bool $currentRevisionDisplayed = FALSE;
+
+  /**
    * Constructs a new VersionHistoryController.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
@@ -252,6 +257,7 @@ class VersionHistoryController extends ControllerBase {
       ],
     ];
 
+    $this->currentRevisionDisplayed = FALSE;
     foreach ($this->loadRevisions($entity) as $revision) {
       $build['entity_revisions_table']['#rows'][$revision->getRevisionId()] = $this->buildRow($revision);
     }
@@ -283,14 +289,19 @@ class VersionHistoryController extends ControllerBase {
     $row['revision']['data'] = $this->getRevisionDescription($revision);
     $row['operations']['data'] = [];
 
-    // Revision status.
-    if ($revision->isDefaultRevision()) {
+    // When revisions are filtered by translation, the default revision is not
+    // listed if it has no changes for the current language. The latest listed
+    // revision that was a default revision has the same values for the current
+    // language, so it is treated as the current revision.
+    $isCurrentRevision = $revision->isDefaultRevision() || (!$this->currentRevisionDisplayed && $revision->wasDefaultRevision());
+    if ($isCurrentRevision) {
+      $this->currentRevisionDisplayed = TRUE;
       $rowAttributes['class'][] = 'revision-current';
       $row['operations']['data']['status']['#markup'] = $this->t('<em>Current revision</em>');
     }
 
-    // Operation links.
-    $links = $this->getOperationLinks($revision);
+    // The current revision cannot be reverted or deleted.
+    $links = $isCurrentRevision ? [] : $this->getOperationLinks($revision);
     if (count($links) > 0) {
       $row['operations']['data']['operations'] = [
         '#type' => 'operations',
