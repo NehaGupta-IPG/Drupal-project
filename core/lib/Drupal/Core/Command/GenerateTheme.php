@@ -92,7 +92,7 @@ class GenerateTheme extends Command {
 
     $io->writeln("<info>Generating theme $theme_label ($destination_theme) from $starterkit_id starterkit.</info>");
 
-    $destination = trim($input->getOption('path'), '/') . '/' . $destination_theme;
+    $destination = trim($input->getOption('path'), '/') . '/custom/' . $destination_theme;
     if (is_dir($destination)) {
       $io->getErrorStyle()->error("Theme could not be generated because the destination directory $destination exists already.");
       return 1;
