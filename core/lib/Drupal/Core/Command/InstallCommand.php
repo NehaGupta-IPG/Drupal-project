@@ -66,7 +66,7 @@ class InstallCommand extends Command {
       ->addOption('langcode', NULL, InputOption::VALUE_OPTIONAL, 'The language to install the site in.', 'en')
       ->addOption('password', NULL, InputOption::VALUE_OPTIONAL, 'The password to use for the site. Defaults to random password.')
       ->addOption('site-name', NULL, InputOption::VALUE_OPTIONAL, 'Set the site name.', 'Drupal')
-      ->addOption('yes', 'y', InputOption::VALUE_OPTIONAL, 'Answer the confirmation question with yes.')
+      ->addOption('yes', 'y', InputOption::VALUE_NONE, 'Answer the confirmation question with yes.')
       ->addUsage('demo_umami --langcode fr')
       ->addUsage('standard --site-name QuickInstall')
       ->addUsage('core/recipes/standard --site-name RecipeBuiltSite');
@@ -101,7 +101,7 @@ class InstallCommand extends Command {
     // existing settings.
     if ($this->useExistingSettings &&
         !$input->getOption('yes') &&
-        !$io->confirm((string) $this->t('Existing settings were found. Do you want to install Drupal with these settings?'))) {
+        !$io->confirm('Existing settings were found. Do you want to install Drupal with these settings?')) {
       throw new UserAbortException('Cancelled');
     }
 
