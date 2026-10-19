@@ -4,11 +4,13 @@ namespace Drupal\workspaces\EventSubscriber;
 
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeEventSubscriberTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeListenerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\workspaces\Entity\Handler\IgnoredWorkspaceHandler;
 use Drupal\workspaces\WorkspaceInformationInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -70,7 +72,7 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
   public function onEntityTypeCreate(EntityTypeInterface $entity_type) {
     // If the entity type is supported by Workspaces, add the revision metadata
     // field.
-    if ($this->workspaceInfo->isEntityTypeSupported($entity_type)) {
+    if ($this->isEntityTypeSupported($entity_type)) {
       $this->addRevisionMetadataField($entity_type);
     }
   }
@@ -88,13 +90,13 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
   public function onEntityTypeUpdate(EntityTypeInterface $entity_type, EntityTypeInterface $original) {
     // If the entity type is now supported by Workspaces, add the revision
     // metadata field.
-    if ($this->workspaceInfo->isEntityTypeSupported($entity_type) && !$this->workspaceInfo->isEntityTypeSupported($original)) {
+    if ($this->isEntityTypeSupported($entity_type) && !$this->isEntityTypeSupported($original)) {
       $this->addRevisionMetadataField($entity_type);
     }
 
     // If the entity type is no longer supported by Workspaces, remove the
     // revision metadata field.
-    if ($this->workspaceInfo->isEntityTypeSupported($original) && !$this->workspaceInfo->isEntityTypeSupported($entity_type)) {
+    if ($this->isEntityTypeSupported($original) && !$this->isEntityTypeSupported($entity_type)) {
       $revision_metadata_keys = $original->get('revision_metadata_keys');
       $field_storage_definition = $this->entityLastInstalledSchemaRepository->getLastInstalledFieldStorageDefinitions($entity_type->id())[$revision_metadata_keys['workspace']];
       $this->entityDefinitionUpdateManager->uninstallFieldStorageDefinition($field_storage_definition);
@@ -156,6 +158,26 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
       ->setInternal(TRUE)
       ->setTranslatable(FALSE)
       ->setRevisionable(TRUE);
+  }
+
+  /**
+   * Determines whether an entity type can belong to a workspace.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type to check.
+   *
+   * @return bool
+   *   TRUE if the entity type can belong to a workspace, FALSE otherwise.
+   */
+  protected function isEntityTypeSupported(EntityTypeInterface $entity_type): bool {
+    if ($entity_type->hasHandlerClass('workspace')) {
+      $supported = !is_a($entity_type->getHandlerClass('workspace'), IgnoredWorkspaceHandler::class, TRUE);
+    }
+    else {
+      $supported = $entity_type->entityClassImplements(EntityPublishedInterface::class) && $entity_type->isRevisionable();
+    }
+
+    return $supported;
   }
 
 }
