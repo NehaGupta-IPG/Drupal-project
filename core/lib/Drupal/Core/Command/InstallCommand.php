@@ -91,9 +91,10 @@ class InstallCommand extends Command {
       return Command::SUCCESS;
     }
 
-    // Check whether the SQLite fallback can be used.
-    if (empty(Database::getConnectionInfo()) && !extension_loaded('pdo_sqlite')) {
-      $io->getErrorStyle()->error('You must have the pdo_sqlite PHP extension installed. See core/INSTALL.sqlite.txt for instructions.');
+    // Check whether a generic connection can be made.
+    $database_error = $this->getDatabaseError();
+    if ($database_error) {
+      $io->getErrorStyle()->error(sprintf('Drupal cannot be installed because of the following error: %s. See core/INSTALL.txt for instructions.', $database_error));
       return Command::FAILURE;
     }
 
@@ -174,6 +175,41 @@ class InstallCommand extends Command {
       // (for example, it does not exist yet), so Drupal is not installed
       // and the install can proceed.
       return FALSE;
+    }
+  }
+
+  /**
+   * Gets any database error prior to installation.
+   *
+   * This attempts to create a database connection using either the existing
+   * settings or a default connection using the SQLite fallback.
+   *
+   * @return string|null
+   *   An exception message, if an error occurred, such as a class not found
+   *   error when pdo_sqlite is not enabled.
+   */
+  protected function getDatabaseError(): ?string {
+    try {
+      if (!$this->useExistingSettings) {
+        $kernel = new DrupalKernel('prod', $this->classLoader, FALSE);
+        $kernel::bootEnvironment();
+        $kernel->setSitePath($this->getSitePath());
+        $sqliteDriverNamespace = 'Drupal\\sqlite\\Driver\\Database\\sqlite';
+        Database::setMultipleConnectionInfo([
+          'default' => [
+            'default' => [
+              'driver' => 'sqlite',
+              'database' => $kernel->getSitePath() . '/files/.sqlite',
+              'namespace' => $sqliteDriverNamespace,
+            ],
+          ],
+        ], $this->classLoader, $kernel->getAppRoot());
+      }
+      Database::getConnection();
+      return NULL;
+    }
+    catch (\Throwable $e) {
+      return $e->getMessage();
     }
   }
 
