@@ -16,6 +16,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides a form for deleting a node revision.
  *
  * @internal
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Entity\Form\RevisionDeleteForm instead.
+ *
+ * @see https://www.drupal.org/node/3153559
  */
 class NodeRevisionDeleteForm extends ConfirmFormBase implements WorkspaceSafeFormInterface {
 
@@ -35,6 +40,7 @@ class NodeRevisionDeleteForm extends ConfirmFormBase implements WorkspaceSafeFor
     protected AccessManagerInterface $accessManager,
     protected DateFormatterInterface $dateFormatter,
   ) {
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Entity\Form\RevisionDeleteForm instead. See https://www.drupal.org/node/3153559', E_USER_DEPRECATED);
   }
 
   /**
