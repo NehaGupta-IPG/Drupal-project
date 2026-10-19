@@ -114,7 +114,7 @@ class DrupalSelenium2Driver extends Selenium2Driver {
     $desiredCapabilities['goog:chromeOptions']['args'][] = '--disable-features=DeferRendererTasksAfterInput';
     parent::setDesiredCapabilities([
       ...self::CAPABILITIES,
-      ...($desiredCapabilities ?? []),
+      ...$desiredCapabilities,
     ]);
   }
 
