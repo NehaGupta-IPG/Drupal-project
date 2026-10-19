@@ -147,17 +147,21 @@ class ConfigurableLanguageManagerTest extends LanguageTestBase {
     // Get the switch links result from the language manager. Confirm during
     // links generation that the entity parameter converter upcasts to the
     // correct translation per link and that the access is controlled correctly
-    // by ::entityTestMulRevAccess() and , where English and French are allowed, but not
-    // Spanish.
+    // by ::entityTestMulRevAccess() and ::customEntityTestMulRevAccess().
+    // English and French are allowed, but not Spanish.
     $links = $this->languageManager->getLanguageSwitchLinks(LanguageInterface::TYPE_CONTENT, new Url('entity.entity_test_mulrev.canonical', ['entity_test_mulrev' => $entity->id()]));
     $this->assertArrayHasKey('en', $links->links);
     $this->assertSame('/en/entity_test_mulrev/manage/1', $links->links['en']['url']->toString());
     $this->assertArrayHasKey('fr', $links->links);
     $this->assertSame('/fr/entity_test_mulrev/manage/1', $links->links['fr']['url']->toString());
     $this->assertArrayNotHasKey('es', $links->links);
+    // Check customAccessInvocations property is populated by
+    // ::customEntityTestMulRevAccess(). In the case of Spanish, since entity
+    // access is already forbidden, the access check exits early and
+    // ::customEntityTestMulRevAccess() does not run.
     $this->assertSame('allowed', $this->customAccessInvocations['en']);
-    $this->assertSame('allowed', $this->customAccessInvocations['es']);
     $this->assertSame('allowed', $this->customAccessInvocations['fr']);
+    $this->assertArrayNotHasKey('es', $this->customAccessInvocations);
 
     // Create a new revision for the entity.
     $originalRevisionId = $entity->getRevisionId();
@@ -181,9 +185,13 @@ class ConfigurableLanguageManagerTest extends LanguageTestBase {
     $this->assertArrayHasKey('es', $links->links);
     $this->assertSame('/es/entity_test_mulrev/1/revision/1/view', $links->links['es']['url']->toString());
     $this->assertArrayNotHasKey('fr', $links->links);
+    // Check customAccessInvocations property is populated by
+    // ::customEntityTestMulRevAccess(). In the case of 'fr', since entity access
+    // is already forbidden, the access check exits early and
+    // ::customEntityTestMulRevAccess() does not run.
     $this->assertSame('forbidden', $this->customAccessInvocations['en']);
     $this->assertSame('allowed', $this->customAccessInvocations['es']);
-    $this->assertSame('allowed', $this->customAccessInvocations['fr']);
+    $this->assertArrayNotHasKey('fr', $this->customAccessInvocations);
   }
 
   /**
