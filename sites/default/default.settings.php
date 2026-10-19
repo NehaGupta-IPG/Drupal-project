@@ -252,11 +252,11 @@ $databases = [];
  * directory used for syncing configuration data. On install, the directory is
  * created. This is used for configuration imports.
  *
- * The default location for this directory is inside a randomly-named
- * directory in the public files path. The setting below allows you to set
- * its location.
+ * If the DRUPAL_CONFIG_SYNC_DIRECTORY environment variable is not set, the
+ * default location for this directory is inside a randomly-named directory
+ * in the public files path.
  */
-# $settings['config_sync_directory'] = '/directory/outside/webroot';
+$settings['config_sync_directory'] = getenv('DRUPAL_CONFIG_SYNC_DIRECTORY');
 
 /**
  * Settings:
