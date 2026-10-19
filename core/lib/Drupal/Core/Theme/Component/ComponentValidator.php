@@ -65,6 +65,21 @@ class ComponentValidator {
       );
       throw new InvalidComponentException($message);
     }
+    // Prop/slot names are exposed as Twig identifiers in the component
+    // template, and those must start with a letter or underscore and cannot
+    // contain dashes.
+    // @see https://www.php.net/manual/en/language.variables.basics.php
+    $invalid_prop_names = array_filter(
+      $prop_names,
+      static fn(string $name) => !preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $name),
+    );
+    if ($invalid_prop_names) {
+      throw new InvalidComponentException(sprintf(
+        'The component "%s" declares prop(s) with invalid name(s): [%s]. Prop names must match the pattern "^[a-zA-Z_][a-zA-Z0-9_]*$" so they can be used as Twig variables.',
+        $definition['id'],
+        implode(', ', $invalid_prop_names),
+      ));
+    }
     // If the validator isn't set, then the validation library is not installed.
     if (!$this->validator) {
       return TRUE;
@@ -80,6 +95,14 @@ class ComponentValidator {
     // If there are no props, force casting to object instead of array.
     if (($schema['properties'] ?? NULL) === []) {
       $schema['properties'] = new \stdClass();
+    }
+
+    // If a slot has an empty definition,
+    // force casting to object instead of array.
+    foreach ($definition['slots'] ?? [] as $slot_name => $slot) {
+      if ($slot === []) {
+        $definition['slots'][$slot_name] = new \stdClass();
+      }
     }
 
     // Ensure that all property types are strings. For example, a null value
@@ -136,6 +159,7 @@ class ComponentValidator {
       $this->validator->getErrors()
     );
     $message_parts = [
+      sprintf('In component %s:', $definition['id']),
       ...$message_parts,
       ...$missing_class_errors,
     ];
@@ -199,9 +223,7 @@ class ComponentValidator {
     $errors = array_filter(
       $this->validator->getErrors(),
       function (array $error) use ($context): bool {
-        // Support 5.0 ($error['constraint']) and 6.0
-        // ($error['constraint']['name']) at the same time.
-        if (($error['constraint']['name'] ?? $error['constraint'] ?? '') !== 'type') {
+        if ($error['constraint']['name'] !== 'type') {
           return TRUE;
         }
         return !Element::isRenderArray($context[$error['property']] ?? NULL);

@@ -46,8 +46,6 @@ class AliasTest extends KernelTestBase {
 
   /**
    * Tests preload path alias.
-   *
-   * @legacy-covers ::preloadPathAlias
    */
   public function testPreloadPathAlias(): void {
     $path_alias_repository = $this->container->get('path_alias.repository');
@@ -288,12 +286,21 @@ class AliasTest extends KernelTestBase {
         'xx-lolspeak'
       )
     );
+
+    // Test preloading using the same path in different cases.
+    $this->createPathAlias('/test-source-Case', '/test-alias');
+    $path_alias_repository = $this->container->get('path_alias.repository');
+    $this->assertEquals([
+      '/test-source-Case' => '/test-alias',
+    ], $path_alias_repository->preloadPathAlias(['/test-source-Case'], LanguageInterface::LANGCODE_NOT_SPECIFIED));
+    $this->assertEquals([
+      '/test-source-Case' => '/test-alias',
+      '/test-source-case' => '/test-alias',
+    ], $path_alias_repository->preloadPathAlias(['/test-source-case'], LanguageInterface::LANGCODE_NOT_SPECIFIED));
   }
 
   /**
    * Tests lookup by system path.
-   *
-   * @legacy-covers ::lookupBySystemPath
    */
   public function testLookupBySystemPath(): void {
     $this->createPathAlias('/test-source-Case', '/test-alias');
@@ -305,8 +312,6 @@ class AliasTest extends KernelTestBase {
 
   /**
    * Tests lookup by alias.
-   *
-   * @legacy-covers ::lookupByAlias
    */
   public function testLookupByAlias(): void {
     $this->createPathAlias('/test-source', '/test-alias-Case');
@@ -330,7 +335,20 @@ class AliasTest extends KernelTestBase {
     // Start with a language-neutral alias, which we will override.
     $path_alias = $this->createPathAlias('/user/1', '/foo');
     $this->assertEquals($path_alias->getAlias(), $aliasManager->getAliasByPath($path_alias->getPath()), 'Basic alias lookup works.');
+    $this->assertEquals($path_alias->getAlias(), $aliasManager->getAliasByPath(strtoupper($path_alias->getPath())), 'Basic alias lookup is case-insensitive.');
     $this->assertEquals($path_alias->getPath(), $aliasManager->getPathByAlias($path_alias->getAlias()), 'Basic source lookup works.');
+
+    // Ensure that ::getPathByAlias() returns the stored path and not the user
+    // provided path if path with a different case was looked up first.
+    $aliasManager->cacheClear();
+    $this->assertEquals($path_alias->getAlias(), $aliasManager->getAliasByPath(strtoupper($path_alias->getPath())), 'Basic alias lookup is case-insensitive.');
+    $this->assertEquals($path_alias->getAlias(), $aliasManager->getAliasByPath($path_alias->getPath()), 'Basic alias lookup works.');
+    $this->assertEquals($path_alias->getPath(), $aliasManager->getPathByAlias($path_alias->getAlias()), 'Basic source lookup works.');
+
+    // Ensure that path alias data is used.
+    $path_alias = $this->createPathAlias('/user/2', '/bar');
+    $this->assertEquals($path_alias->getPath(), $aliasManager->getPathByAlias(strtoupper($path_alias->getAlias())), 'Basic source lookup is case insensitive.');
+    $this->assertEquals($path_alias->getAlias(), $aliasManager->getAliasByPath($path_alias->getPath()), 'Basic alias lookup returns the stored alias if getPathByAlias() is called with a case insensitive alias.');
 
     // Create a language specific alias for the default language (English).
     $path_alias = $this->createPathAlias('/user/1', '/users/Dries', 'en');
@@ -390,7 +408,9 @@ class AliasTest extends KernelTestBase {
     $this->createPathAlias('/user/1', '/' . $this->randomMachineName());
     $aliasManager->cacheClear();
     $this->assertTrue($prefix_list->get('user'));
+    $this->assertTrue($prefix_list->get('User'), 'Prefix list should be case insensitive.');
     $this->assertNull($prefix_list->get('admin'));
+    $this->assertNull($prefix_list->get('Admin'), 'Prefix list should be case insensitive.');
     $this->assertNull($prefix_list->get($this->randomMachineName()));
 
     // Add an alias for admin, both should get cached now.
@@ -432,7 +452,7 @@ class AliasTest extends KernelTestBase {
   /**
    * Tests situation where the prefix list  cache is deleted mid-request.
    */
-  public function testPrefixListCacheDeletionMidRequest() {
+  public function testPrefixListCacheDeletionMidRequest(): void {
     $memoryCounterBackend = new MemoryCounterBackend(\Drupal::service(TimeInterface::class));
 
     // Create AliasManager and Path object.

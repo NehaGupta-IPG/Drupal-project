@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\Kernel;
 
+use Drupal\ckeditor5\Plugin\CKEditor5PluginManager;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,9 +19,9 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  * Tests Wildcard Html Support.
  *
  * @internal
- * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::getCKEditor5PluginConfig
  */
 #[Group('ckeditor5')]
+#[CoversMethod(CKEditor5PluginManager::class, 'getCKEditor5PluginConfig')]
 #[RunTestsInSeparateProcesses]
 class WildcardHtmlSupportTest extends KernelTestBase {
 
@@ -92,7 +94,7 @@ class WildcardHtmlSupportTest extends KernelTestBase {
     $editor = Editor::create($editor_config);
     $editor->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -201,12 +203,6 @@ class WildcardHtmlSupportTest extends KernelTestBase {
         ['<$text-container data-llama>', '<div>', '<mark>', '<abbr title>'],
         [
           [
-            'name' => 'div',
-          ],
-          [
-            'name' => 'mark',
-          ],
-          [
             'name' => 'abbr',
             'attributes' => [
               [
@@ -214,6 +210,12 @@ class WildcardHtmlSupportTest extends KernelTestBase {
                 'value' => TRUE,
               ],
             ],
+          ],
+          [
+            'name' => 'div',
+          ],
+          [
+            'name' => 'mark',
           ],
           [
             'name' => 'p',

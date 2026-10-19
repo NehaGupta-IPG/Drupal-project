@@ -45,8 +45,6 @@ class VendorHardeningPluginTest extends TestCase {
 
   /**
    * Tests clean package.
-   *
-   * @legacy-covers ::cleanPackage
    */
   public function testCleanPackage(): void {
 
@@ -83,8 +81,6 @@ class VendorHardeningPluginTest extends TestCase {
 
   /**
    * Tests clean paths for package.
-   *
-   * @legacy-covers ::cleanPathsForPackage
    */
   public function testCleanPathsForPackage(): void {
     $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
@@ -113,8 +109,6 @@ class VendorHardeningPluginTest extends TestCase {
 
   /**
    * Tests clean all packages.
-   *
-   * @legacy-covers ::cleanAllPackages
    */
   public function testCleanAllPackages(): void {
     $config = $this->getMockBuilder(Config::class)
@@ -124,8 +118,8 @@ class VendorHardeningPluginTest extends TestCase {
       ->method('getAllCleanupPaths')
       ->willReturn(['drupal/package' => ['tests']]);
 
-    $package = $this->createMock(PackageInterface::class);
-    $package->expects($this->any())
+    $package = $this->createStub(PackageInterface::class);
+    $package
       ->method('getName')
       ->willReturn('drupal/package');
 
@@ -155,8 +149,6 @@ class VendorHardeningPluginTest extends TestCase {
 
   /**
    * Tests write access restriction files.
-   *
-   * @legacy-covers ::writeAccessRestrictionFiles
    */
   public function testWriteAccessRestrictionFiles(): void {
     $dir = vfsStream::url('vendor');
@@ -182,7 +174,7 @@ class VendorHardeningPluginTest extends TestCase {
     $this->assertFileExists($dir . '/.htaccess');
   }
 
-  public static function providerFindBinOverlap() {
+  public static function providerFindBinOverlap(): array {
     return [
       [
         [],
@@ -229,14 +221,10 @@ class VendorHardeningPluginTest extends TestCase {
 
   /**
    * Tests find bin overlap.
-   *
-   * @legacy-covers ::findBinOverlap
    */
   #[DataProvider('providerFindBinOverlap')]
-  public function testFindBinOverlap($expected, $binaries, $clean_paths): void {
-    $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+  public function testFindBinOverlap(array $expected, array $binaries, array $clean_paths): void {
+    $plugin = $this->createStub(VendorHardeningPlugin::class);
 
     $ref_find_bin_overlap = new \ReflectionMethod($plugin, 'findBinOverlap');
 

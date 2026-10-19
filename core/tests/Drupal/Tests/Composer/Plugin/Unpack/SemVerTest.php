@@ -6,6 +6,7 @@ namespace Drupal\Tests\Composer\Plugin\Unpack;
 
 use Composer\Semver\VersionParser;
 use Drupal\Composer\Plugin\RecipeUnpack\SemVer;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -18,10 +19,10 @@ use PHPUnit\Framework\TestCase;
 #[Group('Unpack')]
 class SemVerTest extends TestCase {
 
+  use ForwardCompatibilityTrait;
+
   /**
    * Tests minimize constraints.
-   *
-   * @legacy-covers ::minimizeConstraints
    */
   #[TestWith(["^6.1", "^6.3", "^6.3"])]
   #[TestWith(["*", "^6.3", "^6.3"])]
@@ -34,8 +35,6 @@ class SemVerTest extends TestCase {
 
   /**
    * Tests minimize constraints which are not subsets.
-   *
-   * @legacy-covers ::minimizeConstraints
    */
   #[TestWith(["^6.1 || ^4.0", "^6.3 || ^7.4", ">=6.3.0.0-dev, <7.0.0.0-dev"])]
   public function testMinimizeConstraintsWhichAreNotSubsets(string $constraint_a, string $constraint_b, string $expected): void {
@@ -44,13 +43,11 @@ class SemVerTest extends TestCase {
 
   /**
    * Tests minimize constraints which do not intersect.
-   *
-   * @legacy-covers ::minimizeConstraints
    */
   #[TestWith(["^6.1", "^5.1", ">=6.3.0.0-dev, <7.0.0.0-dev"])]
   public function testMinimizeConstraintsWhichDoNotIntersect(string $constraint_a, string $constraint_b, string $expected): void {
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('The constraints "^6.1" and "^5.1" do not intersect and cannot be minimized.');
+    $this->expectExceptionMessageIs('The constraints "^6.1" and "^5.1" do not intersect and cannot be minimized.');
     $this->assertSame($expected, SemVer::minimizeConstraints(new VersionParser(), $constraint_a, $constraint_b));
   }
 

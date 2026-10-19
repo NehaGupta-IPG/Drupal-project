@@ -14,9 +14,9 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\workspaces\WorkspaceAssociationInterface;
 use Drupal\workspaces\WorkspaceInformationInterface;
 use Drupal\workspaces\WorkspaceManagerInterface;
+use Drupal\workspaces\WorkspaceTrackerInterface;
 
 /**
  * Hook implementations for workspaces.
@@ -27,7 +27,7 @@ class WorkspacesHooks {
 
   public function __construct(
     protected WorkspaceManagerInterface $workspaceManager,
-    protected WorkspaceAssociationInterface $workspaceAssociation,
+    protected WorkspaceTrackerInterface $workspaceTracker,
     protected WorkspaceInformationInterface $workspaceInfo,
     protected EntityTypeManagerInterface $entityTypeManager,
     protected StateInterface $state,
@@ -109,7 +109,7 @@ class WorkspacesHooks {
 
       $all_associated_revisions = [];
       foreach (array_keys($this->workspaceInfo->getSupportedEntityTypes()) as $entity_type_id) {
-        $all_associated_revisions[$entity_type_id] = $this->workspaceAssociation->getAssociatedRevisions($workspace_id, $entity_type_id);
+        $all_associated_revisions[$entity_type_id] = $this->workspaceTracker->getAllTrackedRevisions($workspace_id, $entity_type_id);
       }
       $all_associated_revisions = array_filter($all_associated_revisions);
 
@@ -119,23 +119,52 @@ class WorkspacesHooks {
         $associated_entity_storage = $this->entityTypeManager->getStorage($entity_type_id);
 
         // Sort the associated revisions in reverse ID order, so we can delete
-        // the most recent revisions first.
+        // the most recent revisions first, and only keep the revisions that
+        // fit in the current batch.
         krsort($associated_revisions);
+        $associated_revisions = array_slice($associated_revisions, 0, max(0, $batch_size - $count + 1), TRUE);
 
         // Get a list of default revisions tracked by the given workspace,
         // because they need to be handled differently than pending revisions.
-        $initial_revision_ids = $this->workspaceAssociation->getAssociatedInitialRevisions($workspace_id, $entity_type_id);
+        $initial_revision_ids = $this->workspaceTracker->getTrackedInitialRevisions($workspace_id, $entity_type_id);
+
+        // Load all the entities of this batch that are tracked through their
+        // initial revision in a single storage call.
+        $initial_revision_entities = [];
+        if ($initial_entity_ids = array_intersect_key($initial_revision_ids, $associated_revisions)) {
+          $initial_revision_entities = $associated_entity_storage->loadMultiple($initial_entity_ids);
+        }
 
         foreach (array_keys($associated_revisions) as $revision_id) {
-          if ($count > $batch_size) {
-            continue 2;
-          }
-
           // If the workspace is tracking the entity's default revision (i.e.
           // the entity was created inside that workspace), we need to delete
           // the whole entity after all of its pending revisions are gone.
           if (isset($initial_revision_ids[$revision_id])) {
-            $associated_entity_storage->delete([$associated_entity_storage->load($initial_revision_ids[$revision_id])]);
+            /** @var \Drupal\Core\Entity\RevisionableInterface&\Drupal\Core\Entity\EntityPublishedInterface $entity */
+            $entity = $initial_revision_entities[$initial_revision_ids[$revision_id]] ?? NULL;
+            if (!$entity) {
+              continue;
+            }
+
+            // The entity might have gone live after it was created in this
+            // workspace. This can happen when the entity is edited in multiple
+            // workspaces at the same time and one of the others is published.
+            // An entity with a published default revision is live content, so
+            // we only delete the revision created in this workspace, not the
+            // whole entity.
+            if ($entity->isPublished()) {
+              if ($entity->getRevisionId() != $revision_id) {
+                $associated_entity_storage->deleteRevision($revision_id);
+              }
+              else {
+                // The default revision of an entity can not be deleted, so we
+                // only remove its tracking records.
+                $this->workspaceTracker->deleteTrackedEntities($workspace_id, $entity_type_id, [$entity->id()], [$revision_id]);
+              }
+            }
+            else {
+              $associated_entity_storage->delete([$entity]);
+            }
           }
           else {
             // Delete the associated entity revision.
@@ -150,7 +179,7 @@ class WorkspacesHooks {
       // ahead and remove the deleted workspace ID entry from state.
       $has_associated_revisions = FALSE;
       foreach (array_keys($this->workspaceInfo->getSupportedEntityTypes()) as $entity_type_id) {
-        if (!empty($this->workspaceAssociation->getAssociatedRevisions($workspace_id, $entity_type_id))) {
+        if (!empty($this->workspaceTracker->getAllTrackedRevisions($workspace_id, $entity_type_id))) {
           $has_associated_revisions = TRUE;
           break;
         }
@@ -160,7 +189,7 @@ class WorkspacesHooks {
         $this->state->set('workspace.deleted', $deleted_workspace_ids);
 
         // Delete any possible leftover association entries.
-        $this->workspaceAssociation->deleteAssociations($workspace_id);
+        $this->workspaceTracker->deleteTrackedEntities($workspace_id);
       }
     });
   }

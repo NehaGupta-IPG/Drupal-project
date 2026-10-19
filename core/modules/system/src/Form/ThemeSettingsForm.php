@@ -17,6 +17,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\file\Upload\ManagedFileElementHelper;
 
 // cspell:ignore apng
 
@@ -192,7 +193,8 @@ class ThemeSettingsForm extends ConfigFormBase {
 
     // Some features are not always available.
     $disabled = [];
-    if (!user_picture_enabled()) {
+    $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('user', 'user');
+    if (!isset($field_definitions['user_picture'])) {
       $disabled['toggle_node_user_picture'] = TRUE;
       $disabled['toggle_comment_user_picture'] = TRUE;
     }
@@ -211,7 +213,8 @@ class ThemeSettingsForm extends ConfigFormBase {
         $form['theme_settings']['toggle_' . $name] = [
           '#type' => 'checkbox',
           '#title' => $title,
-          '#default_value' => $this->themeSettingsProvider->getSetting('features.' . $name, $theme),
+          '#default_value' => $this->themeSettingsProvider
+            ->getSetting('features.' . $name, $theme),
         ];
         // Disable checkboxes for features not supported in the current
         // configuration.
@@ -347,19 +350,6 @@ class ThemeSettingsForm extends ConfigFormBase {
     }
 
     if ($theme) {
-      // Call engine-specific settings.
-      $function = $themes[$theme]->prefix . '_engine_settings';
-      if (function_exists($function)) {
-        @trigger_error('The theme-engine-specific settings function ' . $function . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Implement hook_form_system_theme_settings_alter() in a module instead. See https://www.drupal.org/node/3547356', E_USER_DEPRECATED);
-        $form['engine_specific'] = [
-          '#type' => 'details',
-          '#title' => $this->t('Theme-engine-specific settings'),
-          '#open' => TRUE,
-          '#description' => $this->t('These settings only exist for the themes based on the %engine theme engine.', ['%engine' => $themes[$theme]->prefix]),
-        ];
-        $function($form, $form_state);
-      }
-
       // Create a list which includes the current theme and all its base themes.
       if (isset($themes[$theme]->base_themes)) {
         $theme_keys = array_keys($themes[$theme]->base_themes);
@@ -377,7 +367,11 @@ class ThemeSettingsForm extends ConfigFormBase {
       $default_theme = $default_active_theme->getName();
       /** @var \Drupal\Core\Theme\ThemeInitialization $theme_initialization */
       $theme_initialization = \Drupal::service('theme.initialization');
-      $this->themeManager->setActiveTheme($theme_initialization->getActiveThemeByName($theme));
+
+      // We need to account for viewing themes that are not currently active so
+      // we temporarily set the theme we are viewing as active.
+      $editing_active_theme = $theme_initialization->getActiveThemeByName($theme);
+      $this->themeManager->setActiveTheme($editing_active_theme);
 
       // Process the theme and all its base themes.
       foreach ($theme_keys as $theme) {
@@ -398,13 +392,10 @@ class ThemeSettingsForm extends ConfigFormBase {
             $form_state->addBuildInfo('files', $files);
           }
         }
-
-        // Call theme-specific settings.
-        $function = $theme . '_form_system_theme_settings_alter';
-        if (function_exists($function)) {
-          $function($form, $form_state);
-        }
       }
+
+      // Call theme-specific settings.
+      $this->themeManager->alterForTheme($editing_active_theme, 'form_system_theme_settings', $form, $form_state);
 
       // Restore the original current theme.
       if (isset($default_theme)) {
@@ -428,7 +419,7 @@ class ThemeSettingsForm extends ConfigFormBase {
 
       // Check for a new uploaded logo.
       if (isset($form['logo'])) {
-        $file = _file_save_upload_from_form($form['logo']['settings']['logo_upload'], $form_state, 0);
+        $file = \Drupal::service(ManagedFileElementHelper::class)->saveFileUploads($form['logo']['settings']['logo_upload'], $form_state, 0);
         if ($file) {
           // Put the temporary file in form_values so we can save it on submit.
           $form_state->setValue('logo_upload', $file);
@@ -437,7 +428,7 @@ class ThemeSettingsForm extends ConfigFormBase {
 
       // Check for a new uploaded favicon.
       if (isset($form['favicon'])) {
-        $file = _file_save_upload_from_form($form['favicon']['settings']['favicon_upload'], $form_state, 0);
+        $file = \Drupal::service(ManagedFileElementHelper::class)->saveFileUploads($form['favicon']['settings']['favicon_upload'], $form_state, 0);
         if ($file) {
           // Put the temporary file in form_values so we can save it on submit.
           $form_state->setValue('favicon_upload', $file);

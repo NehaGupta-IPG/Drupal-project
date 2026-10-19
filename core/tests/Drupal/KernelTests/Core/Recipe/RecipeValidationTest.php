@@ -16,7 +16,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests Recipe Validation.
  */
 #[Group('Recipe')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class RecipeValidationTest extends KernelTestBase {
 
@@ -228,7 +227,7 @@ YAML,
 name: 'Only installs extensions'
 install:
   - filter
-  - drupal:claro
+  - drupal:default_admin
 YAML,
       NULL,
     ];
@@ -238,8 +237,8 @@ name: 'Correct config import list'
 config:
   import:
     config_test: '*'
-    claro:
-      - claro.settings
+    default_admin:
+      - default_admin.settings
 YAML,
       NULL,
     ];
@@ -352,6 +351,29 @@ YAML,
           'Config actions cannot be applied to 0 because the 0 extension is not installed, and is not installed by this recipe or any of the recipes it depends on.',
         ],
       ],
+    ];
+    yield 'config action targets an unknown extension' => [
+      <<<YAML
+name: Config action targets unknown extension
+config:
+  actions:
+    node.settings:
+      simpleConfigUpdate:
+        use_admin_theme: true
+YAML,
+      [
+        '[config][actions][node.settings]' => ['Config actions cannot be applied to node.settings because the node extension is not installed, and is not installed by this recipe or any of the recipes it depends on.'],
+      ],
+    ];
+    yield 'optional config action targets an unknown extension' => [
+      <<<YAML
+name: Optional config action targets unknown extension
+config:
+  actions:
+    ?node.type.test:
+      setDescription: 'Hello there'
+YAML,
+      NULL,
     ];
     yield 'input definitions are an indexed array' => [
       <<<YAML

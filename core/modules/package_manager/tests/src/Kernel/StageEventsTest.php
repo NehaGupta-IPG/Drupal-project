@@ -30,6 +30,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @internal
  */
 #[Group('package_manager')]
+#[Group('#slow')]
 #[CoversClass(SandboxEvent::class)]
 #[RunTestsInSeparateProcesses]
 class StageEventsTest extends PackageManagerKernelTestBase implements EventSubscriberInterface {
@@ -41,14 +42,12 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
    *
    * @var string[]
    */
-  private $events = [];
+  private array $events = [];
 
   /**
    * The stage under test.
-   *
-   * @var \Drupal\package_manager\SandboxManagerBase
    */
-  private $stage;
+  private TestSandboxManager $stage;
 
   /**
    * {@inheritdoc}
@@ -169,7 +168,7 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
     $warning = ValidationResult::createWarning([
       $this->t('The path ahead is scary...'),
     ]);
-    $excluded_paths = $this->createMock(PathListInterface::class);
+    $excluded_paths = $this->createStub(PathListInterface::class);
 
     // Status check events can accept both errors and warnings.
     $event = new StatusCheckEvent($stage, $excluded_paths);
@@ -183,7 +182,7 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
     $event->addResult($error);
     $this->assertSame([$error], $event->getResults());
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Only errors are allowed.');
+    $this->expectExceptionMessageIs('Only errors are allowed.');
     $event->addResult($warning);
   }
 
@@ -216,7 +215,7 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
     $this->addEventTestListener($listener, PreCreateEvent::class);
 
     $this->expectException(SandboxEventException::class);
-    $this->expectExceptionMessage('Event propagation stopped without any errors added to the event. This bypasses the package_manager validation system.');
+    $this->expectExceptionMessageIs("Event propagation stopped without any errors added to the event. This bypasses the package_manager validation system.\n");
     $stage = $this->createStage();
     $stage->create();
   }

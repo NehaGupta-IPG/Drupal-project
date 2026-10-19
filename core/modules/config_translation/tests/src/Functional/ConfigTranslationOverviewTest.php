@@ -34,12 +34,18 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
     'node',
     'views',
     'views_ui',
+    'body_field',
   ];
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile = 'testing_locale';
 
   /**
    * Languages to enable.
@@ -195,7 +201,7 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
       'field_storage' => FieldStorageConfig::loadByName('node', 'body'),
       'bundle' => $node_type->id(),
       'label' => 'Body',
-      'settings' => ['display_summary' => FALSE],
+      'settings' => [],
     ]);
     $field->save();
 

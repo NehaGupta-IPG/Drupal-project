@@ -19,26 +19,13 @@ use Symfony\Component\HttpFoundation\Request;
 class SessionConfigurationTest extends UnitTestCase {
 
   /**
-   * Constructs a partially mocked SUT.
-   *
-   * @return \Drupal\Core\Session\SessionConfiguration|\PHPUnit\Framework\MockObject\MockObject
-   *   A mock object of SessionConfiguration with specific methods overridden.
-   */
-  protected function createSessionConfiguration($options = []) {
-    return $this->getMockBuilder('Drupal\Core\Session\SessionConfiguration')
-      ->onlyMethods(['drupalValidTestUa'])
-      ->setConstructorArgs([$options])
-      ->getMock();
-  }
-
-  /**
    * Tests whether the session.cookie_domain ini settings is computed correctly.
    *
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestGeneratedCookieDomain')]
-  public function testGeneratedCookieDomain($uri, $expected_domain): void {
-    $config = $this->createSessionConfiguration();
+  public function testGeneratedCookieDomain(string $uri, string $expected_domain): void {
+    $config = new SessionConfiguration();
 
     $request = Request::create($uri);
     $options = $config->getOptions($request);
@@ -52,7 +39,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @return array
    *   Test data
    */
-  public static function providerTestGeneratedCookieDomain() {
+  public static function providerTestGeneratedCookieDomain(): array {
     return [
       ['http://example.com/path/index.php', '.example.com'],
       ['http://www.example.com/path/index.php', '.www.example.com'],
@@ -75,8 +62,8 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestEnforcedCookieDomain')]
-  public function testEnforcedCookieDomain($uri, $expected_domain): void {
-    $config = $this->createSessionConfiguration(['cookie_domain' => '.example.com']);
+  public function testEnforcedCookieDomain(string $uri, string $expected_domain): void {
+    $config = new SessionConfiguration(['cookie_domain' => '.example.com']);
 
     $request = Request::create($uri);
     $options = $config->getOptions($request);
@@ -90,7 +77,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @return array
    *   Test data
    */
-  public static function providerTestEnforcedCookieDomain() {
+  public static function providerTestEnforcedCookieDomain(): array {
     return [
       ['http://example.com/path/index.php', '.example.com'],
       ['http://www.example.com/path/index.php', '.example.com'],
@@ -112,8 +99,8 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestCookieSecure')]
-  public function testCookieSecure($uri, $expected_secure): void {
-    $config = $this->createSessionConfiguration();
+  public function testCookieSecure(string $uri, bool $expected_secure): void {
+    $config = new SessionConfiguration();
 
     $request = Request::create($uri);
     $options = $config->getOptions($request);
@@ -127,7 +114,7 @@ class SessionConfigurationTest extends UnitTestCase {
   public function testSameSiteCookie(): void {
     $request = Request::create('https://example.com');
 
-    $config = $this->createSessionConfiguration(['cookie_samesite' => 'Strict']);
+    $config = new SessionConfiguration(['cookie_samesite' => 'Strict']);
     $options = $config->getOptions($request);
     $this->assertEquals('Strict', $options['cookie_samesite']);
   }
@@ -139,8 +126,8 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestCookieSecure')]
-  public function testCookieSecureNotOverridable($uri, $expected_secure): void {
-    $config = $this->createSessionConfiguration(['cookie_secure' => FALSE]);
+  public function testCookieSecureNotOverridable(string $uri, bool $expected_secure): void {
+    $config = new SessionConfiguration(['cookie_secure' => FALSE]);
 
     $request = Request::create($uri);
     $options = $config->getOptions($request);
@@ -154,7 +141,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @return array
    *   Test data
    */
-  public static function providerTestCookieSecure() {
+  public static function providerTestCookieSecure(): array {
     return [
       ['http://example.com/path/index.php', FALSE],
       ['https://www.example.com/path/index.php', TRUE],
@@ -171,8 +158,8 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestGeneratedSessionName')]
-  public function testGeneratedSessionName($uri, $expected_name): void {
-    $config = $this->createSessionConfiguration();
+  public function testGeneratedSessionName(string $uri, $expected_name): void {
+    $config = new SessionConfiguration();
 
     $request = Request::create($uri);
     $options = $config->getOptions($request);
@@ -186,7 +173,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @return array
    *   Test data
    */
-  public static function providerTestGeneratedSessionName() {
+  public static function providerTestGeneratedSessionName(): array {
     $data = [
       ['http://example.com/path/index.php', 'SESS', 'example.com'],
       ['http://www.example.com/path/index.php', 'SESS', 'www.example.com'],
@@ -207,7 +194,7 @@ class SessionConfigurationTest extends UnitTestCase {
       ['https://[::1]:8443/path/index.php', 'SSESS', '[::1]'],
     ];
 
-    return array_map(function ($record) {
+    return array_map(function (array $record): array {
       return [$record[0], $record[1] . substr(hash('sha256', $record[2]), 0, 32)];
     }, $data);
   }
@@ -218,8 +205,8 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestEnforcedSessionName')]
-  public function testEnforcedSessionNameViaCookieDomain($uri, $expected_name): void {
-    $config = $this->createSessionConfiguration(['cookie_domain' => '.example.com']);
+  public function testEnforcedSessionNameViaCookieDomain(string $uri, $expected_name): void {
+    $config = new SessionConfiguration(['cookie_domain' => '.example.com']);
 
     $request = Request::create($uri);
     $options = $config->getOptions($request);
@@ -233,7 +220,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @return array
    *   Test data
    */
-  public static function providerTestEnforcedSessionName() {
+  public static function providerTestEnforcedSessionName(): array {
     $data = [
       ['http://example.com/path/index.php', 'SESS', '.example.com'],
       ['http://www.example.com/path/index.php', 'SESS', '.example.com'],
@@ -254,7 +241,7 @@ class SessionConfigurationTest extends UnitTestCase {
       ['https://[::1]:8443/path/index.php', 'SSESS', '.example.com'],
     ];
 
-    return array_map(function ($record) {
+    return array_map(function (array $record): array {
       return [$record[0], $record[1] . substr(hash('sha256', $record[2]), 0, 32)];
     }, $data);
   }
@@ -265,11 +252,11 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::__construct
    */
   public function testConstructorDefaultSettings(): void {
-    $config = $this->createSessionConfiguration([]);
+    $config = new SessionConfiguration([]);
     $options = $config->getOptions(Request::createFromGlobals());
     $this->assertSame('', $options['name_suffix']);
 
-    $config = $this->createSessionConfiguration(['name_suffix' => 'some-suffix']);
+    $config = new SessionConfiguration(['name_suffix' => 'some-suffix']);
     $options = $config->getOptions(Request::createFromGlobals());
     $this->assertSame('some-suffix', $options['name_suffix']);
   }

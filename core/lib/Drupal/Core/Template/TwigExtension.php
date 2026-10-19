@@ -95,7 +95,7 @@ class TwigExtension extends AbstractExtension {
   /**
    * {@inheritdoc}
    */
-  public function getFunctions() {
+  public function getFunctions(): array {
     return [
       // This function will receive a renderable array, if an array is detected.
       new TwigFunction('render_var', [$this, 'renderVar']),
@@ -115,7 +115,11 @@ class TwigExtension extends AbstractExtension {
   /**
    * {@inheritdoc}
    */
-  public function getFilters() {
+  public function getFilters(): array {
+    $escape_options = [
+      'needs_environment' => TRUE,
+      'is_safe_callback' => [static::class, 'escapeFilterIsSafe'],
+    ];
     return [
       // Translation filters.
       new TwigFilter('t', 't', ['is_safe' => ['html']]),
@@ -127,15 +131,14 @@ class TwigExtension extends AbstractExtension {
       // @see TwigNodeTrans::compileString()
       new TwigFilter('placeholder', [$this, 'escapePlaceholder'], ['is_safe' => ['html'], 'needs_environment' => TRUE]),
 
-      // Replace twig's escape filter with our own.
-      new TwigFilter(
-        'drupal_escape',
-        [$this, 'escapeFilter'],
-        [
-          'needs_environment' => TRUE,
-          'is_safe_callback' => 'twig_escape_filter_is_safe',
-        ]
-      ),
+      // Replace Twig's escape filters with our own MarkupInterface-aware
+      // filter. Filters registered by later extensions override those with
+      // the same name, and this extension is always added after Twig's
+      // EscaperExtension. Twig's auto-escaping always uses the filter
+      // named 'escape'.
+      new TwigFilter('escape', [$this, 'escapeFilter'], $escape_options),
+      new TwigFilter('e', [$this, 'escapeFilter'], $escape_options),
+      new TwigFilter('drupal_escape', [$this, 'escapeFilter'], $escape_options),
 
       // Implements safe joining.
       // @todo Make that the default for |join? Upstream issue:
@@ -162,7 +165,7 @@ class TwigExtension extends AbstractExtension {
   /**
    * {@inheritdoc}
    */
-  public function getNodeVisitors() {
+  public function getNodeVisitors(): array {
     // The node visitor is needed to wrap all variables with
     // render_var -> TwigExtension->renderVar() function.
     $visitors = [
@@ -182,17 +185,10 @@ class TwigExtension extends AbstractExtension {
   /**
    * {@inheritdoc}
    */
-  public function getTokenParsers() {
+  public function getTokenParsers(): array {
     return [
       new TwigTransTokenParser(),
     ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getName() {
-    return 'drupal_core';
   }
 
   /**
@@ -400,6 +396,25 @@ class TwigExtension extends AbstractExtension {
     $return = $this->escapeFilter($env, $string);
 
     return $return ? '<em class="placeholder">' . $return . '</em>' : NULL;
+  }
+
+  /**
+   * Determines which strategies the output of the escape filter is safe for.
+   *
+   * @param \Twig\Node\Node $filter_args
+   *   The arguments passed to the escape filter.
+   *
+   * @return string[]
+   *   The escaping strategies the output is safe for.
+   */
+  public static function escapeFilterIsSafe(Node $filter_args): array {
+    foreach ($filter_args as $arg) {
+      if ($arg instanceof ConstantExpression) {
+        return [$arg->getAttribute('value')];
+      }
+      return [];
+    }
+    return ['html'];
   }
 
   /**

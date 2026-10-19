@@ -37,8 +37,6 @@ class TranslationTest extends UnitTestCase {
 
   /**
    * Tests get.
-   *
-   * @legacy-covers ::get
    */
   #[DataProvider('providerTestGet')]
   public function testGet(array $values, $expected): void {
@@ -54,7 +52,7 @@ class TranslationTest extends UnitTestCase {
   /**
    * Provides data to self::testGet().
    */
-  public static function providerTestGet() {
+  public static function providerTestGet(): array {
     $data = [];
     $data[] = [
       [

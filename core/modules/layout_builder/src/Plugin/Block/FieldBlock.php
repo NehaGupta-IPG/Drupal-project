@@ -20,13 +20,14 @@ use Drupal\Core\Form\FormHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\field\FieldConfigInterface;
 use Drupal\layout_builder\Plugin\Derivative\FieldBlockDeriver;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\field\FieldLabelOptionsTrait;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Provides a block that renders a field from an entity.
@@ -115,7 +116,17 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, FormatterPluginManager $formatter_manager, ModuleHandlerInterface $module_handler, LoggerInterface $logger) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    EntityFieldManagerInterface $entity_field_manager,
+    #[Autowire(service: 'plugin.manager.field.formatter')]
+    FormatterPluginManager $formatter_manager,
+    ModuleHandlerInterface $module_handler,
+    #[Autowire(service: 'logger.channel.layout_builder')]
+    LoggerInterface $logger,
+  ) {
     $this->entityFieldManager = $entity_field_manager;
     $this->formatterManager = $formatter_manager;
     $this->moduleHandler = $module_handler;
@@ -128,21 +139,6 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
     $this->fieldName = $field_name;
 
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_field.manager'),
-      $container->get('plugin.manager.field.formatter'),
-      $container->get('module_handler'),
-      $container->get('logger.channel.layout_builder')
-    );
   }
 
   /**
@@ -159,13 +155,17 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    * {@inheritdoc}
    */
   public function build() {
+    $cacheability = CacheableMetadata::createFromObject($this);
     $display_settings = $this->getConfiguration()['formatter'];
     $display_settings['third_party_settings']['layout_builder']['view_mode'] = $this->getContextValue('view_mode');
     $entity = $this->getEntity();
     try {
       $build = [];
       $view = $entity->get($this->fieldName)->view($display_settings);
-      if ($view) {
+      if (Element::isEmpty($view)) {
+        $cacheability->addCacheableDependency(CacheableMetadata::createFromRenderArray($view));
+      }
+      else {
         $build = [$view];
       }
     }
@@ -180,7 +180,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
         '%error' => $e->getMessage(),
       ]);
     }
-    CacheableMetadata::createFromRenderArray($build)->addCacheableDependency($this)->applyTo($build);
+    $cacheability->applyTo($build);
     return $build;
   }
 
@@ -227,7 +227,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    */
   public function defaultConfiguration() {
     return [
-      'label_display' => FALSE,
+      'label_display' => '0',
       'formatter' => [
         'label' => 'above',
         'type' => $this->pluginDefinition['default_formatter'],
@@ -389,7 +389,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Field\FormatterInterface
+   * @return \Drupal\Core\Field\FormatterInterface<\Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>>
    *   The formatter object.
    */
   protected function getFormatter(array $parents, FormStateInterface $form_state) {

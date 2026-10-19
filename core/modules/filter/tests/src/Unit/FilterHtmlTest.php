@@ -45,11 +45,9 @@ class FilterHtmlTest extends UnitTestCase {
    *   Input HTML.
    * @param string $expected
    *   The expected output string.
-   *
-   * @legacy-covers ::filterAttributes
    */
   #[DataProvider('providerFilterAttributes')]
-  public function testFilterAttributes($html, $expected): void {
+  public function testFilterAttributes(string $html, string $expected): void {
     $this->assertSame($expected, $this->filter->filterAttributes($html));
   }
 
@@ -59,7 +57,7 @@ class FilterHtmlTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerFilterAttributes() {
+  public static function providerFilterAttributes(): array {
     return [
       ['<a href="/blog" title="Blog">Blog</a>', '<a href="/blog">Blog</a>'],
       ['<p dir="rtl" />', '<p dir="rtl"></p>'],
@@ -121,8 +119,6 @@ class FilterHtmlTest extends UnitTestCase {
 
   /**
    * Tests set configuration.
-   *
-   * @legacy-covers ::setConfiguration
    */
   public function testSetConfiguration(): void {
     $configuration['settings'] = [

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_translation\Unit\Menu;
 
+use Drupal\content_translation\ContentTranslationManagerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
@@ -27,8 +29,8 @@ class ContentTranslationLocalTasksTest extends LocalTaskIntegrationTestBase {
     ];
     parent::setUp();
 
-    $entity_type = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
-    $entity_type->expects($this->any())
+    $entity_type = $this->createStub(EntityTypeInterface::class);
+    $entity_type
       ->method('getLinkTemplate')
       ->willReturnMap([
         ['canonical', 'entity.node.canonical'],
@@ -37,23 +39,24 @@ class ContentTranslationLocalTasksTest extends LocalTaskIntegrationTestBase {
           'entity.node.content_translation_overview',
         ],
       ]);
-    $entity_type->expects($this->any())
+    $entity_type
       ->method('hasLinkTemplate')
-      ->with('version-history')
-      ->willReturn(TRUE);
-    $content_translation_manager = $this->createMock('Drupal\content_translation\ContentTranslationManagerInterface');
-    $content_translation_manager->expects($this->any())
+      ->willReturnMap([
+        ['version-history', TRUE],
+      ]);
+    $content_translation_manager = $this->createStub(ContentTranslationManagerInterface::class);
+    $content_translation_manager
       ->method('getSupportedEntityTypes')
       ->willReturn([
         'node' => $entity_type,
       ]);
     // Setup theme handler for ThemeLocalTask.
-    $theme_handler = $this->createMock(ThemeHandlerInterface::class);
-    $theme_handler->expects($this->any())
+    $theme_handler = $this->createStub(ThemeHandlerInterface::class);
+    $theme_handler
       ->method('listInfo')
       ->willReturn([]);
-    $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
-    $entity_type_manager->expects($this->any())
+    $entity_type_manager = $this->createStub(EntityTypeManagerInterface::class);
+    $entity_type_manager
       ->method('getDefinitions')
       ->willReturn([
         'node' => $entity_type,
@@ -68,14 +71,14 @@ class ContentTranslationLocalTasksTest extends LocalTaskIntegrationTestBase {
    * Tests the block admin display local tasks.
    */
   #[DataProvider('providerTestBlockAdminDisplay')]
-  public function testBlockAdminDisplay($route, $expected): void {
+  public function testBlockAdminDisplay(string $route, array $expected): void {
     $this->assertLocalTasks($route, $expected);
   }
 
   /**
    * Provides a list of routes to test.
    */
-  public static function providerTestBlockAdminDisplay() {
+  public static function providerTestBlockAdminDisplay(): array {
     return [
       [
         'entity.node.canonical',

@@ -20,13 +20,11 @@ class LoggerChannelFactoryTest extends UnitTestCase {
 
   /**
    * Tests LoggerChannelFactory::get().
-   *
-   * @legacy-covers ::get
    */
   public function testGet(): void {
     $factory = new LoggerChannelFactory(
-      $this->createMock(RequestStack::class),
-      $this->createMock(AccountInterface::class),
+      $this->createStub(RequestStack::class),
+      $this->createStub(AccountInterface::class),
     );
 
     // Ensure that when called with the same argument, always the same instance

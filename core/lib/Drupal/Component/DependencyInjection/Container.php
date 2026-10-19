@@ -125,12 +125,8 @@ class Container implements ContainerInterface, ResetInterface {
    * {@inheritdoc}
    */
   public function get(string $id, int $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): ?object {
-    if ($this->hasParameter('_deprecated_service_list')) {
-      if ($deprecation = $this->getParameter('_deprecated_service_list')[$id] ?? '') {
-        @trigger_error($deprecation, E_USER_DEPRECATED);
-      }
-    }
     if (isset($this->aliases[$id])) {
+      $alias = $id;
       $id = $this->aliases[$id];
     }
 
@@ -189,6 +185,13 @@ class Container implements ContainerInterface, ResetInterface {
 
     unset($this->loading[$id]);
 
+    if (isset($this->parameters['_deprecated_service_list'][$id])) {
+      @trigger_error($this->parameters['_deprecated_service_list'][$id], E_USER_DEPRECATED);
+    }
+    if (isset($alias) && isset($this->parameters['_deprecated_service_list'][$alias])) {
+      @trigger_error($this->parameters['_deprecated_service_list'][$alias], E_USER_DEPRECATED);
+    }
+
     return $service;
   }
 
@@ -201,7 +204,24 @@ class Container implements ContainerInterface, ResetInterface {
    * a new instance of the shared service.
    */
   public function reset(): void {
-    $this->services = [];
+    $this->privateServices = [];
+    foreach (array_keys($this->services) as $id) {
+
+      if ($id === 'request_stack') {
+        continue;
+      }
+
+      $definition = $this->serviceDefinitions[$id] ?? NULL;
+
+      // Definitions can either be a keyed array or a serialized string.
+      if (is_string($definition)) {
+        $definition = unserialize($definition);
+      }
+
+      if (!isset($definition['synthetic']) || $definition['synthetic'] === FALSE) {
+        unset($this->services[$id]);
+      }
+    }
   }
 
   /**

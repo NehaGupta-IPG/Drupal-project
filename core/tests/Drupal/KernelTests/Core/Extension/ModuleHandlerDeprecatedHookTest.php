@@ -25,16 +25,13 @@ class ModuleHandlerDeprecatedHookTest extends KernelTestBase {
    */
   protected static $modules = [
     'deprecation_test',
-    'deprecation_hook_attribute_test',
   ];
 
   /**
    * Tests invoke deprecated.
-   *
-   * @legacy-covers ::invokeDeprecated
    */
   public function testInvokeDeprecated(): void {
-    $this->expectDeprecation('The deprecated hook hook_deprecated_hook() is implemented in these modules: deprecation_test, deprecation_hook_attribute_test. Use something else.');
+    $this->expectUserDeprecationMessage('The deprecated hook hook_deprecated_hook() is implemented in these modules: deprecation_test. Use something else.');
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
     $arg = 'an_arg';
@@ -46,17 +43,14 @@ class ModuleHandlerDeprecatedHookTest extends KernelTestBase {
 
   /**
    * Tests invoke all deprecated.
-   *
-   * @legacy-covers ::invokeAllDeprecated
    */
   public function testInvokeAllDeprecated(): void {
-    $this->expectDeprecation('The deprecated hook hook_deprecated_hook() is implemented in these modules: deprecation_test, deprecation_hook_attribute_test. Use something else.');
+    $this->expectUserDeprecationMessage('The deprecated hook hook_deprecated_hook() is implemented in these modules: deprecation_test. Use something else.');
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
     $arg = 'an_arg';
     $this->assertEquals(
       [
-        $arg,
         $arg,
       ],
       $module_handler->invokeAllDeprecated('Use something else.', 'deprecated_hook', [$arg])
@@ -65,11 +59,9 @@ class ModuleHandlerDeprecatedHookTest extends KernelTestBase {
 
   /**
    * Tests alter deprecated.
-   *
-   * @legacy-covers ::alterDeprecated
    */
   public function testAlterDeprecated(): void {
-    $this->expectDeprecation('The deprecated alter hook hook_deprecated_alter_alter() is implemented in these locations: deprecation_test_deprecated_alter_alter, Drupal\deprecation_hook_attribute_test\Hook\DeprecationHookAttributeTestHooks::deprecatedAlterAlterFirst. Alter something else.');
+    $this->expectUserDeprecationMessage('The deprecated alter hook hook_deprecated_alter_alter() is implemented in these locations: Drupal\deprecation_test\Hook\DeprecationTestHooks::deprecatedAlterAlterFirst. Alter something else.');
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
     $data = [];

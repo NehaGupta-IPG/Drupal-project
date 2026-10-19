@@ -6,6 +6,7 @@ namespace Drupal\Tests\package_manager\Kernel;
 
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\package_manager\ProjectInfo;
+use Drupal\update\UpdateManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -30,8 +31,6 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
    *   The installed version core version to set.
    * @param string[] $expected_versions
    *   The expected versions.
-   *
-   * @legacy-covers ::getInstallableReleases
    */
   #[DataProvider('providerGetInstallableReleases')]
   public function testGetInstallableReleases(string $fixture, string $installed_version, array $expected_versions): void {
@@ -142,7 +141,7 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
     $metadata_fixtures['drupal'] = $fixtures_directory . 'drupal.9.8.2.xml';
     $metadata_fixtures['package_manager_test_update'] = $fixtures_directory . 'package_manager_test_update.7.0.1.xml';
     $this->setReleaseMetadata($metadata_fixtures);
-    $available = update_get_available(TRUE);
+    $available = \Drupal::service(UpdateManagerInterface::class)->getAvailable(TRUE);
     $this->assertSame(['drupal'], array_keys($available));
     $this->setReleaseMetadata($metadata_fixtures);
     $state = $this->container->get('state');
@@ -195,7 +194,7 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
     $this->setReleaseMetadata(['drupal' => __DIR__ . '/../../fixtures/release-history/drupal.9.8.2_unknown_status.xml']);
     $project_info = new ProjectInfo('drupal');
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage("The project 'drupal' can not be updated because its status is any status besides published");
+    $this->expectExceptionMessageIs("The project 'drupal' can not be updated because its status is any status besides published");
     $project_info->getInstallableReleases();
   }
 
@@ -298,8 +297,6 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
    *   The path of the release metadata.
    * @param string[] $expected_supported_branches
    *   The expected supported branches.
-   *
-   * @legacy-covers ::getSupportedBranches
    */
   #[DataProvider('providerGetSupportedBranches')]
   public function testGetSupportedBranches(string $release_xml, array $expected_supported_branches): void {

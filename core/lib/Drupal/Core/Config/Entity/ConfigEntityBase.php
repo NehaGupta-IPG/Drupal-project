@@ -16,6 +16,7 @@ use Drupal\Core\Plugin\RemovableDependentPluginInterface;
 use Drupal\Core\Plugin\PluginDependencyTrait;
 use Drupal\Core\Plugin\RemovableDependentPluginReturn;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Utility\NaturalSort;
 
 /**
  * Defines a base configuration entity class.
@@ -85,7 +86,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    *
    * @var array
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $third_party_settings = [];
 
   /**
@@ -97,13 +98,18 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    *
    * @var array
    */
-  // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $_core = [];
 
   /**
    * Trust supplied data and not use configuration schema on save.
    *
    * @var bool
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3348180
    */
   protected $trustedData = FALSE;
 
@@ -243,7 +249,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     if ($a_weight == $b_weight) {
       $a_label = $a->label() ?? '';
       $b_label = $b->label() ?? '';
-      return strnatcasecmp($a_label, $b_label);
+      return NaturalSort::strnatcasecmp($a_label, $b_label);
     }
     return $a_weight <=> $b_weight;
   }
@@ -332,6 +338,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
       // If the data is trusted we need to ensure that the dependencies are
       // sorted as per their schema. If the save is not trusted then the
       // configuration will be sorted by StorableConfigBase.
+      // @phpstan-ignore-next-line
       if ($this->trustedData) {
         $mapping = ['config' => 0, 'content' => 1, 'module' => 2, 'theme' => 3, 'enforced' => 4];
         $dependency_sort = function ($dependencies) use ($mapping) {
@@ -617,6 +624,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * {@inheritdoc}
    */
   public function trustData() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3348180', E_USER_DEPRECATED);
     $this->trustedData = TRUE;
     return $this;
   }
@@ -625,6 +633,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * {@inheritdoc}
    */
   public function hasTrustedData() {
+    // @phpstan-ignore-next-line
     return $this->trustedData;
   }
 
@@ -633,8 +642,44 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    */
   public function save() {
     $return = parent::save();
+    // @phpstan-ignore-next-line
     $this->trustedData = FALSE;
     return $return;
+  }
+
+  /**
+   * Loads one entity in their original form without overrides.
+   *
+   * @param string $id
+   *   The ID of the entity to load.
+   *
+   * @return static|null
+   *   An entity object. NULL if no matching entity is found.
+   */
+  public static function loadOverrideFree(string $id): ConfigEntityInterface|null {
+    $entity_type_repository = \Drupal::service('entity_type.repository');
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $storage = $entity_type_manager->getStorage($entity_type_repository->getEntityTypeFromClass(static::class));
+    assert($storage instanceof ConfigEntityStorageInterface);
+    return $storage->loadOverrideFree($id);
+  }
+
+  /**
+   * Loads one or more entities in their original form without overrides.
+   *
+   * @param string[]|null $ids
+   *   An array of entity IDs, or NULL to load all entities.
+   *
+   * @return static[]
+   *   An array of entity objects indexed by their IDs. Returns an empty array
+   *   if no matching entities are found.
+   */
+  public static function loadMultipleOverrideFree(?array $ids = NULL): array {
+    $entity_type_repository = \Drupal::service('entity_type.repository');
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $storage = $entity_type_manager->getStorage($entity_type_repository->getEntityTypeFromClass(static::class));
+    assert($storage instanceof ConfigEntityStorageInterface);
+    return $storage->loadMultipleOverrideFree($ids);
   }
 
 }

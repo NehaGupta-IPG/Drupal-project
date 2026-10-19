@@ -24,6 +24,11 @@ class InstallerExistingSettingsTest extends InstallerTestBase {
 
   /**
    * {@inheritdoc}
+   */
+  protected $profile = 'testing_locale';
+
+  /**
+   * {@inheritdoc}
    *
    * Fully configures a preexisting settings.php file before invoking the
    * interactive installer.
@@ -61,9 +66,9 @@ class InstallerExistingSettingsTest extends InstallerTestBase {
   /**
    * Visits the interactive installer.
    */
-  protected function visitInstaller(): void {
+  protected function visitInstaller(array $query = []): void {
     // Should redirect to the installer.
-    $this->drupalGet($GLOBALS['base_url']);
+    parent::visitInstaller();
     // Ensure no database tables have been created yet.
     $this->assertSame([], Database::getConnection()->schema()->findTables('%'));
     $this->assertSession()->addressEquals($GLOBALS['base_url'] . '/core/install.php');
@@ -83,7 +88,7 @@ class InstallerExistingSettingsTest extends InstallerTestBase {
   public function testInstaller(): void {
     $this->assertSession()->addressEquals('user/1');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertEquals('testing', \Drupal::installProfile());
+    $this->assertEquals('testing_locale', \Drupal::installProfile());
   }
 
 }

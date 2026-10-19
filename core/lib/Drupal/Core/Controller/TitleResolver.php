@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Controller;
 
+use Drupal\Core\Routing\Attribute\Route as RouteAttribute;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -57,6 +58,14 @@ class TitleResolver implements TitleResolverInterface {
       $callable = $this->controllerResolver->getControllerFromDefinition($callback);
       $arguments = $this->argumentResolver->getArguments($request, $callable);
       $route_title = call_user_func_array($callable, $arguments);
+    }
+    elseif ($reference = $route->getDefault('_title_closure')) {
+      $callable = RouteAttribute::getTitleClosure(...$reference);
+      $arguments = $this->argumentResolver->getArguments($request, $callable);
+      $route_title = call_user_func_array($callable, $arguments);
+    }
+    elseif ($route->hasDefault('_title') && $route->getDefault('_title') instanceof TranslatableMarkup) {
+      $route_title = $route->getDefault('_title');
     }
     elseif ($route->hasDefault('_title') && strlen($route->getDefault('_title')) > 0) {
       $title = $route->getDefault('_title');

@@ -222,7 +222,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
         'DESC' => $this->options['sort_desc_label'],
       ];
       $user_input = $form_state->getUserInput();
-      if (isset($user_input['sort_by']) && isset($exposed_sorts[$user_input['sort_by']]) && isset($this->view->sort[$exposed_sorts[$user_input['sort_by']]])) {
+      if (isset($user_input['sort_by']) && is_string($user_input['sort_by']) && isset($exposed_sorts[$user_input['sort_by']]) && isset($this->view->sort[$exposed_sorts[$user_input['sort_by']]])) {
         $default_sort_order = $this->view->sort[$exposed_sorts[$user_input['sort_by']]]->options['order'];
       }
       else {
@@ -230,7 +230,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
         $default_sort_order = $first_sort->options['order'];
       }
 
-      if (!isset($user_input['sort_by'])) {
+      if (!isset($user_input['sort_by']) || !is_string($user_input['sort_by'])) {
         $keys = array_keys($exposed_sorts);
         $user_input['sort_by'] = array_shift($keys);
         $form_state->setUserInput($user_input);
@@ -262,8 +262,11 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       }
       $all_exposed = array_merge($exposed_sorts, $exposed_filters);
 
-      // Set the access to FALSE if there is no exposed input.
-      if (!array_intersect_key($all_exposed, $this->view->getExposedInput())) {
+      // Don't display the reset button if there is no input in the exposed
+      // form or while using the default sort.
+      $exposed_input = $this->view->getExposedInput();
+      $reset = array_intersect_key($all_exposed, $exposed_input) || isset($exposed_input['order']) || isset($exposed_input['sort']);
+      if (!$reset) {
         $form['actions']['reset']['#access'] = FALSE;
       }
     }

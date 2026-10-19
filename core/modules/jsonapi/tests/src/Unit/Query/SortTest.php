@@ -39,11 +39,9 @@ class SortTest extends UnitTestCase {
 
   /**
    * Tests create from query parameter.
-   *
-   * @legacy-covers ::createFromQueryParameter
    */
   #[DataProvider('parameterProvider')]
-  public function testCreateFromQueryParameter($input, $expected): void {
+  public function testCreateFromQueryParameter(string|array $input, array $expected): void {
     $sort = Sort::createFromQueryParameter($input);
     foreach ($sort->fields() as $index => $sort_field) {
       $this->assertEquals($expected[$index]['path'], $sort_field['path']);
@@ -55,7 +53,7 @@ class SortTest extends UnitTestCase {
   /**
    * Provides a suite of shortcut sort parameters and their expected expansions.
    */
-  public static function parameterProvider() {
+  public static function parameterProvider(): array {
     return [
       ['lorem', [['path' => 'lorem', 'direction' => 'ASC', 'langcode' => NULL]]],
       [
@@ -89,11 +87,9 @@ class SortTest extends UnitTestCase {
 
   /**
    * Tests create from query parameter fail.
-   *
-   * @legacy-covers ::createFromQueryParameter
    */
   #[DataProvider('badParameterProvider')]
-  public function testCreateFromQueryParameterFail($input): void {
+  public function testCreateFromQueryParameterFail(string|array $input): void {
     $this->expectException(BadRequestHttpException::class);
     Sort::createFromQueryParameter($input);
   }
@@ -101,7 +97,7 @@ class SortTest extends UnitTestCase {
   /**
    * Data provider for testCreateFromQueryParameterFail.
    */
-  public static function badParameterProvider() {
+  public static function badParameterProvider(): array {
     return [
       [[['lorem']]],
       [''],
