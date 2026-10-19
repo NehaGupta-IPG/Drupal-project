@@ -232,10 +232,10 @@ class ManyToOneHelper {
         $this->handler->tableAliases = [];
         foreach ($this->handler->value as $value) {
           $join = $this->getJoin();
-          if (isset($join) && $this->handler->operator == 'and') {
-            $join->type = 'INNER';
-          }
           if (isset($join)) {
+            if ($this->handler->operator == 'and') {
+              $join->type = 'INNER';
+            }
             $join->extra = [
               [
                 'field' => $this->handler->realField,
