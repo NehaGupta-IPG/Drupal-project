@@ -393,44 +393,35 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       // translation. This way we can ensure we always have only one affected
       // translation in pending revisions. This constraint is enforced by
       // EntityUntranslatableFieldsConstraintValidator.
-      if (!isset($keep_untranslatable_fields)) {
-        $keep_untranslatable_fields = $entity->isDefaultTranslation() && $entity->isDefaultTranslationAffectedOnly();
-      }
+      $sync_untranslatable_fields = $keep_untranslatable_fields ?? ($entity->isDefaultTranslation() && $entity->isDefaultTranslationAffectedOnly());
 
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $default_revision */
-      $default_revision = $this->load($entity->id());
-      $translation_languages = $default_revision->getTranslationLanguages();
-      foreach ($translation_languages as $langcode => $language) {
-        if ($langcode == $active_langcode) {
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $default_revision_merge */
+      $default_revision_merge = $this->loadUnchanged($entity->id());
+      $translation_languages = $default_revision_merge->getTranslationLanguages();
+      foreach (array_keys($translation_languages) as $langcode) {
+        if (!$new_revision->hasTranslation($langcode)) {
           continue;
         }
+        $default_revision_merge_translation = $default_revision_merge->getTranslation($langcode);
+        $new_revision_translation = $new_revision->getTranslation($langcode);
 
-        $default_revision_translation = $default_revision->getTranslation($langcode);
-        $new_revision_translation = $new_revision->hasTranslation($langcode) ?
-          $new_revision->getTranslation($langcode) : $new_revision->addTranslation($langcode);
+        $sync_items = array_intersect_key($new_revision_translation->getFields(), $skipped_field_names);
+        if ($langcode === $active_langcode) {
+          $sync_items += $new_revision_translation->getTranslatableFields();
+        }
+        if ($sync_untranslatable_fields) {
+          $sync_items += array_diff_key($new_revision_translation->getFields(), $new_revision_translation->getTranslatableFields());
+        }
 
-        /** @var \Drupal\Core\Field\FieldItemListInterface[] $sync_items */
-        $sync_items = array_diff_key(
-          $keep_untranslatable_fields ? $default_revision_translation->getTranslatableFields() : $default_revision_translation->getFields(),
-          $skipped_field_names
-        );
         foreach ($sync_items as $field_name => $items) {
-          $new_revision_translation->set($field_name, $items->getValue());
+          $default_revision_merge_translation->set($field_name, $items->getValue());
         }
 
         // Make sure the "revision_translation_affected" flag is recalculated.
         $new_revision_translation->setRevisionTranslationAffected(NULL);
 
         // No need to copy untranslatable field values more than once.
-        $keep_untranslatable_fields = TRUE;
-      }
-
-      // Make sure we do not inadvertently recreate removed translations.
-      foreach (array_diff_key($new_revision->getTranslationLanguages(), $translation_languages) as $langcode => $language) {
-        // Allow a new revision to be created for the active language.
-        if ($langcode !== $active_langcode) {
-          $new_revision->removeTranslation($langcode);
-        }
+        $sync_untranslatable_fields = FALSE;
       }
 
       // The "original" property is used in various places to detect changes in
@@ -438,7 +429,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       // defined, the stored version is loaded explicitly. Since the merged
       // revision generated here is not stored anywhere, we need to populate the
       // "original" property manually, so that changes can be properly detected.
-      $new_revision->setOriginal(clone $new_revision);
+      $new_revision->setOriginal($default_revision_merge);
     }
 
     // Eventually mark the new revision as such.
