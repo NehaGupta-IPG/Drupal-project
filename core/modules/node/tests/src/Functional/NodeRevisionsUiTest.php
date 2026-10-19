@@ -226,7 +226,7 @@ class NodeRevisionsUiTest extends NodeTestBase {
     $this->drupalGet($node->toUrl('version-history'));
     $assert = $this->assertSession();
     $assert->pageTextContains('translation change 49');
-    $assert->elementsCount('css', '.node-revision-table tbody tr', 50);
+    $assert->elementsCount('css', 'table tbody tr', 50);
     $assert->elementNotExists('css', '.pager');
 
     // Create another translation affecting revision.
@@ -242,7 +242,7 @@ class NodeRevisionsUiTest extends NodeTestBase {
     $assert->elementExists('css', '.pager');
     $assert->elementNotExists('css', '.revision-current');
     $this->clickLink('Page 2');
-    $assert->elementsCount('css', '.node-revision-table tbody tr', 1);
+    $assert->elementsCount('css', 'table tbody tr', 1);
     $assert->elementExists('css', '.revision-current');
   }
 

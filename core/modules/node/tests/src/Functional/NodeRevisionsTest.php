@@ -497,7 +497,7 @@ class NodeRevisionsTest extends NodeTestBase {
     // Reverting the non-default revision should create a new revision and set
     // it as the default, meaning there should be 3 revisions displayed and no
     // Set as current revision link.
-    $this->assertSession()->elementsCount('css', '.node-revision-table tbody tr', 3);
+    $this->assertSession()->elementsCount('css', 'table tbody tr', 3);
     $this->assertSession()->linkNotExists('Set as current revision');
     $this->assertSession()->pageTextContains('Copy of the revision from');
     // The first row (the revision we just reverted to) should be displayed as
