@@ -12,8 +12,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests the language formatter update.
  *
- * Language formatter update sets the configuration back to the previous
- * hardcoded values.
+ * The language formatter update preserves existing configuration.
  *
  * @see language_post_update_language_component_plain_text()
  */
@@ -44,10 +43,10 @@ class NodeLanguageFormatterUpdateTest extends UpdatePathTestBase {
 
     $this->runUpdates();
 
-    // Confirm that config was reverted to previous hardcoded values.
+    // Confirm that the existing formatter settings and label are preserved.
     $updated_config = $this->config('core.entity_view_display.node.page.default');
-    $this->assertFalse($updated_config->get('content.langcode.settings.link_to_entity'));
-    $this->assertEquals('above', $updated_config->get('content.langcode.label'));
+    $this->assertTrue($updated_config->get('content.langcode.settings.link_to_entity'));
+    $this->assertEquals('hidden', $updated_config->get('content.langcode.label'));
   }
 
 }

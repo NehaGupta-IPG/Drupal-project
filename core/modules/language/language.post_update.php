@@ -19,7 +19,7 @@ function language_removed_post_updates(): array {
 }
 
 /**
- * Set language form display component as plain text and with label above.
+ * Add missing language formatter defaults to node view displays.
  */
 function language_post_update_language_component_plain_text(&$sandbox = []): void {
   $entityViewDisplayConfigUpdater = \Drupal::classResolver(EntityViewDisplayConfigUpdater::class);

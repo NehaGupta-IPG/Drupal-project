@@ -29,7 +29,7 @@ class EntityViewDisplayConfigUpdater {
   }
 
   /**
-   * Performs the required update.
+   * Adds language formatter defaults while preserving configured values.
    *
    * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $entityViewDisplay
    *   The entity_view_display entity to update.
@@ -47,12 +47,16 @@ class EntityViewDisplayConfigUpdater {
       return FALSE;
     }
 
-    $langcode['label'] = 'above';
-    // Set to show it as plain text.
-    $langcode['settings'] = [
+    $original = $langcode;
+    $langcode['label'] ??= 'above';
+    $langcode['settings'] = ($langcode['settings'] ?? []) + [
       'link_to_entity' => FALSE,
       'native_language' => FALSE,
     ];
+
+    if ($langcode === $original) {
+      return FALSE;
+    }
 
     $entityViewDisplay->setComponent('langcode', $langcode);
     return TRUE;
