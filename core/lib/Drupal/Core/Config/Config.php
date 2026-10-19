@@ -209,35 +209,19 @@ class Config extends StorableConfigBase {
 
     // If there is a schema for this configuration object, cast all values to
     // conform to the schema.
-    if (!$has_trusted_data) {
-      if ($this->typedConfigManager->hasConfigSchema($this->name)) {
-        // Ensure that the schema wrapper has the latest data.
-        $this->schemaWrapper = NULL;
-        if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
-          $this->reconcileLangcodeWithTranslatability($this->getSchemaWrapper());
-        }
-        $this->data = $this->castValue(NULL, $this->data);
-        // Reclaim the memory used by the schema wrapper.
-        $this->schemaWrapper = NULL;
+    if (!$has_trusted_data && $this->typedConfigManager->hasConfigSchema($this->name)) {
+      // Ensure that the schema wrapper has the latest data.
+      $this->schemaWrapper = NULL;
+      if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+        $this->reconcileLangcodeWithTranslatability($this->getSchemaWrapper());
       }
-      else {
-        foreach ($this->data as $key => $value) {
-          $this->validateValue($key, $value);
-        }
-      }
+      $this->data = $this->castValue(NULL, $this->data);
+      // Reclaim the memory used by the schema wrapper.
+      $this->schemaWrapper = NULL;
     }
     else {
-      // This path is deprecated as it is only called if $has_trusted_data is
-      // TRUE. The deprecation is trigger above.
       foreach ($this->data as $key => $value) {
         $this->validateValue($key, $value);
-      }
-      if ($this->typedConfigManager->hasConfigSchema($this->name) && $this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
-        // Ensure that the schema wrapper has the latest data.
-        $this->schemaWrapper = NULL;
-        $this->reconcileLangcodeWithTranslatability($this->getSchemaWrapper());
-        // Reclaim the memory used by the schema wrapper.
-        $this->schemaWrapper = NULL;
       }
     }
 
