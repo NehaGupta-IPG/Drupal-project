@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Command;
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Command\Exception\UserAbortException;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
@@ -37,6 +38,13 @@ class InstallCommand extends Command {
   protected $classLoader;
 
   /**
+   * Flags whether to use existing database settings.
+   *
+   * @var bool
+   */
+  protected bool $useExistingSettings = FALSE;
+
+  /**
    * Constructs a new InstallCommand command.
    *
    * @param object $class_loader
@@ -53,11 +61,12 @@ class InstallCommand extends Command {
   protected function configure(): void {
     $this->setName('install')
       ->setDescription('Install Drupal using an install profile or recipe.')
-      ->setHelp('This is not meant for production and might be too simple for custom development. It is a quick and easy way to get Drupal running.')
+      ->setHelp('This will install Drupal using an existing database connection or fallback to using a SQLite database not meant for production as a quick and easy way to get Drupal running.')
       ->addArgument('install-profile-or-recipe', InputArgument::OPTIONAL, 'Install profile or recipe directory from which to install the site.')
       ->addOption('langcode', NULL, InputOption::VALUE_OPTIONAL, 'The language to install the site in.', 'en')
       ->addOption('password', NULL, InputOption::VALUE_OPTIONAL, 'The password to use for the site. Defaults to random password.')
       ->addOption('site-name', NULL, InputOption::VALUE_OPTIONAL, 'Set the site name.', 'Drupal')
+      ->addOption('yes', 'y', InputOption::VALUE_OPTIONAL, 'Answer the confirmation question with yes.')
       ->addUsage('demo_umami --langcode fr')
       ->addUsage('standard --site-name QuickInstall')
       ->addUsage('core/recipes/standard --site-name RecipeBuiltSite');
@@ -70,10 +79,6 @@ class InstallCommand extends Command {
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
     $io = new SymfonyStyle($input, $output);
-    if (!extension_loaded('pdo_sqlite')) {
-      $io->getErrorStyle()->error('You must have the pdo_sqlite PHP extension installed. See core/INSTALL.sqlite.txt for instructions.');
-      return 1;
-    }
 
     // Change the directory to the Drupal root.
     chdir(dirname(__DIR__, 5));
@@ -82,8 +87,22 @@ class InstallCommand extends Command {
     if ($this->isDrupalInstalled()) {
       // Do not fail if the site is already installed so this command can be
       // chained with ServerCommand.
-      $output->writeln('<info>Drupal is already installed.</info> If you want to reinstall, remove sites/default/files and sites/default/settings.php.');
-      return 0;
+      $output->writeln('<info>Drupal is already installed.</info> If you want to reinstall, remove sites/default/files and and empty the database defined in settings.php.');
+      return Command::SUCCESS;
+    }
+
+    // Check whether the SQLite fallback can be used.
+    if (empty(Database::getConnectionInfo()) && !extension_loaded('pdo_sqlite')) {
+      $io->getErrorStyle()->error('You must have the pdo_sqlite PHP extension installed. See core/INSTALL.sqlite.txt for instructions.');
+      return Command::FAILURE;
+    }
+
+    // Check whether the user has confirmed to attempt installation with
+    // existing settings.
+    if ($this->useExistingSettings &&
+        !$input->getOption('yes') &&
+        !$io->confirm((string) $this->t('Existing settings were found. Do you want to install Drupal with these settings?'))) {
+      throw new UserAbortException('Cancelled');
     }
 
     $install_profile_or_recipe = $input->getArgument('install-profile-or-recipe');
@@ -119,7 +138,7 @@ class InstallCommand extends Command {
         }
       }
       $io->getErrorStyle()->error($error_msg);
-      return 1;
+      return Command::FAILURE;
     }
 
     return $this->install($this->classLoader, $io, $install_profile ?? '', $input->getOption('langcode'), $this->getSitePath(), $input->getOption('site-name'), $recipe ?? '', $input->getOption('password'));
@@ -137,12 +156,58 @@ class InstallCommand extends Command {
       $kernel::bootEnvironment();
       $kernel->setSitePath($this->getSitePath());
       Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classLoader);
+      $this->useExistingSettings = is_readable($kernel->getAppRoot() . '/' . $kernel->getSitePath() . '/settings.php');
       $kernel->boot();
     }
     catch (ConnectionNotDefinedException) {
       return FALSE;
     }
-    return !empty(Database::getConnectionInfo());
+
+    if (empty(Database::getConnectionInfo())) {
+      return FALSE;
+    }
+    try {
+      return Database::getConnection()->schema()->tableExists('key_value');
+    }
+    catch (\Exception) {
+      // The connection is defined, but the database is unreachable or empty
+      // (for example, it does not exist yet), so Drupal is not installed
+      // and the install can proceed.
+      return FALSE;
+    }
+  }
+
+  /**
+   * Gets default form values for install_settings_form.
+   *
+   * @return array
+   *   An associative array keys driver and a key that equals the namespace
+   *   for the driver. When using existing settings, the value of the namespace
+   *   key is an empty array as those parameters are overridden by the existing
+   *   database settings. Otherwise the settings are populated by default for
+   *   SQLite.
+   */
+  protected function getInstallSettingsFormValues(): array {
+    if ($this->useExistingSettings) {
+      // If there are existing database settings, then these will be used
+      // regardless of the values set in install_settings_form so this only
+      // sets the driver and namespace keys.
+      $info = Database::getConnectionInfo();
+      $default = $info['default'];
+      return [
+        'driver' => $default['namespace'],
+        $default['namespace'] => [],
+      ];
+    }
+
+    $sqliteDriverNamespace = 'Drupal\\sqlite\\Driver\\Database\\sqlite';
+
+    return [
+      'driver' => $sqliteDriverNamespace,
+      $sqliteDriverNamespace => [
+        'database' => $this->getSitePath() . '/files/.sqlite',
+      ],
+    ];
   }
 
   /**
@@ -172,7 +237,6 @@ class InstallCommand extends Command {
    *   The command exit status.
    */
   protected function install($class_loader, SymfonyStyle $io, $profile, $langcode, $site_path, $site_name, string $recipe, #[\SensitiveParameter] ?string $password = NULL) {
-    $sqliteDriverNamespace = 'Drupal\\sqlite\\Driver\\Database\\sqlite';
     $password ??= Crypt::randomBytesBase64(12);
     $parameters = [
       'interactive' => FALSE,
@@ -182,12 +246,7 @@ class InstallCommand extends Command {
         'langcode' => $langcode,
       ],
       'forms' => [
-        'install_settings_form' => [
-          'driver' => $sqliteDriverNamespace,
-          $sqliteDriverNamespace => [
-            'database' => $site_path . '/files/.sqlite',
-          ],
-        ],
+        'install_settings_form' => $this->getInstallSettingsFormValues(),
         'install_configure_form' => [
           'site_name' => $site_name,
           'site_mail' => 'drupal@example.com',
