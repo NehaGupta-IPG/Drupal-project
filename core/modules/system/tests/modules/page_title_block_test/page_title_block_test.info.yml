@@ -1,0 +1,7 @@
+name: Page Title Block Test
+type: module
+description: 'Test the Page Title Block.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:block
