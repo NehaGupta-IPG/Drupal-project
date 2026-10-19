@@ -14,28 +14,21 @@ use Symfony\Component\Validator\ConstraintValidator;
 class UniquePathAliasConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * Creates a new UniquePathAliasConstraintValidator instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
-    $this->entityTypeManager = $entity_type_manager;
-  }
+  public function __construct(
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
     );
   }
 
@@ -77,6 +70,41 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
         ])->addViolation();
       }
     }
+    elseif ($viewName = $this->validatePathViews($alias)) {
+      $this->context->buildViolation($constraint->viewsMessage, [
+        '%alias' => $alias,
+        '%view' => $viewName,
+      ])->addViolation();
+    }
+  }
+
+  /**
+   * Check if the alias is used by any view page display.
+   *
+   * @param string $alias
+   *   The path alias to check.
+   *
+   * @return string|null
+   *   The view name if alias is used by a view page display, NULL otherwise.
+   */
+  protected function validatePathViews(string $alias): ?string {
+    if (!$this->entityTypeManager->hasDefinition('view')) {
+      return NULL;
+    }
+    if ($alias[0] === '/') {
+      $alias = substr($alias, 1);
+    }
+    foreach ($this->entityTypeManager->getStorage('view')->loadMultiple() as $view) {
+      if (array_find(
+        $view->get('display'),
+        fn($display) => $display['display_plugin'] === 'page'
+        && isset($display['display_options']['path'])
+        && $display["display_options"]["path"] === $alias)
+      ) {
+        return $view->label();
+      }
+    }
+    return NULL;
   }
 
 }

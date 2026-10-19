@@ -24,4 +24,11 @@ class UniquePathAliasConstraint extends SymfonyConstraint {
     parent::__construct(groups: $groups, payload: $payload);
   }
 
+  /**
+   * Violation message when the path alias is used by a view.
+   *
+   * @var string
+   */
+  public $viewsMessage = 'This alias %alias is already in use by the view %view.';
+
 }
