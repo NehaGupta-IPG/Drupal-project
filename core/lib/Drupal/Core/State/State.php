@@ -103,11 +103,27 @@ class State extends CacheCollector implements IncrementableStateInterface {
    * {@inheritdoc}
    */
   public function setMultiple(array $data) {
+    $this->doSetMultiple($data);
+  }
+
+  /**
+   * Saves key/value pairs.
+   *
+   * This method always writes the caches and might write to the underlying
+   * key-value store as well.
+   *
+   * @param array $data
+   *   An associative array of key/value pairs.
+   * @param array $previous
+   *   An associative array of key/previous value pairs. When this is not
+   *   empty only the cache is written.
+   */
+  protected function doSetMultiple(array $data, array $previous = []): void {
     $lock_name = $this->getCid() . ':' . CacheCollector::class;
     $lock_acquired = $this->lock->acquire($lock_name);
     $this->lazyLoadCache();
     foreach ($data as $key => $value) {
-      $this->registerKeySetDuringRequest($key, $value, parent::get($key));
+      $this->registerKeySetDuringRequest($key, $value, $previous[$key] ?? parent::get($key));
       if (isset(self::$deprecatedState[$key])) {
         // phpcs:ignore Drupal.Semantics.FunctionTriggerError
         @trigger_error(self::$deprecatedState[$key]['message'], E_USER_DEPRECATED);
@@ -115,7 +131,9 @@ class State extends CacheCollector implements IncrementableStateInterface {
         unset($data[$key]);
       }
     }
-    $this->keyValueStore->setMultiple($data);
+    if (!$previous) {
+      $this->keyValueStore->setMultiple($data);
+    }
     // If another request had a cache miss before this request, and also hasn't
     // written to cache yet, then it may already have read the previous value
     // from the database and could write it to the cache at the end of the
@@ -225,13 +243,14 @@ class State extends CacheCollector implements IncrementableStateInterface {
   /**
    * {@inheritdoc}
    */
-  public function increment(string $key, int $step = 1): void {
+  public function increment(string $key, int $step = 1): int {
     if ($this->keyValueStore instanceof IncrementableKeyValueStoreInterface) {
-      $this->keyValueStore->increment($key, $step);
+      $newValue = $this->keyValueStore->increment($key, $step);
+      $this->doSetMultiple([$key => $newValue], [$key => $newValue - $step]);
+      return $newValue;
     }
     else {
-      $value = $this->keyValueStore->get($key);
-      $this->keyValueStore->set($key, $value + $step);
+      throw new \LogicException('The key-value store underlying state does not support increment.');
     }
   }
 

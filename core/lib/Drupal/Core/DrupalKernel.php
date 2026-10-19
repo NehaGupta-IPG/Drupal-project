@@ -25,6 +25,7 @@ use Drupal\Core\Installer\InstallerRedirectTrait;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Security\RequestSanitizer;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\State\IncrementableStateInterface;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\DrupalInstalled;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -1380,7 +1381,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     // Also remove the container definition from the cache backend.
-    ($this->getVersionedFile())->reset();
+    $versionedFile = $this->getVersionedFile();
+    if (isset($this->container) && (($state = $this->container->get('state')) instanceof IncrementableStateInterface)) {
+      $versionedFile->resetIfNecessary($state->increment('container_version'));
+    }
+    else {
+      $versionedFile->reset();
+    }
   }
 
   /**

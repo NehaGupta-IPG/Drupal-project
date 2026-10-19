@@ -103,8 +103,8 @@ class MemoryStorage extends StorageBase implements IncrementableKeyValueStoreInt
   /**
    * {@inheritdoc}
    */
-  public function increment(string $key, int $step = 1): void {
-    $this->data[$key] = ($this->data[$key] ?? 0) + $step;
+  public function increment(string $key, int $step = 1): int {
+    return $this->data[$key] = ($this->data[$key] ?? 0) + $step;
   }
 
 }
