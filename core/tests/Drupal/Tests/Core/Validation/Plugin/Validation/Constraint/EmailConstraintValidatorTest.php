@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Validation\Plugin\Validation\Constraint;
 
+// cspell:ignore UASG
+
 use Drupal\Core\Validation\Plugin\Validation\Constraint\EmailConstraint;
 use Drupal\Tests\EmailTestDataTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -25,6 +27,7 @@ class EmailConstraintValidatorTest extends TestCase {
    * Tests field validation against the same contract as the email service.
    */
   #[DataProvider('internationalizedMailboxProvider')]
+  #[DataProvider('uasgMailboxProvider')]
   public function testMailboxSyntax(string $mailbox, bool $valid): void {
     $violations = Validation::createValidator()->validate($mailbox, new EmailConstraint());
     // Optional empty values are validated separately by required constraints.

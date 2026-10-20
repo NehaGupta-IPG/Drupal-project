@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Mail\Plugin\Mail;
 
+// cspell:ignore UASG
+
 use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Mail\Plugin\Mail\SymfonyMailer;
 use Drupal\Core\Render\Markup;
 use Drupal\Tests\UnitTestCase;
+use Drupal\Tests\EmailTestDataTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\Email;
 
 /**
@@ -21,6 +25,8 @@ use Symfony\Component\Mime\Email;
 #[CoversClass(SymfonyMailer::class)]
 #[Group('Mail')]
 class SymfonyMailerTest extends UnitTestCase {
+
+  use EmailTestDataTrait;
 
   /**
    * Tests that mixed plain text and html body is converted correctly.
@@ -204,6 +210,31 @@ class SymfonyMailerTest extends UnitTestCase {
         ],
       ],
     ];
+  }
+
+  /**
+   * Tests historical UASG addresses through the mail backend and envelope.
+   */
+  #[DataProvider('uasgEnvelopeProvider')]
+  public function testUasgRecipient(string $mailbox, bool $valid, string $encoded): void {
+    $captured = [];
+    $mailer = $this->createMock(MailerInterface::class);
+    $mailer->expects($valid ? $this->once() : $this->never())->method('send')->willReturnCallback(
+      static function (Email $email) use (&$captured): void {
+        foreach (Envelope::create($email)->getRecipients() as $recipient) {
+          $captured[] = $recipient->getEncodedAddress();
+        }
+      }
+    );
+    $logger = $this->createStub(LoggerInterface::class);
+    $plugin = new SymfonyMailer($logger, $mailer);
+    $this->assertSame($valid, $plugin->mail([
+      'to' => $mailbox,
+      'headers' => ['From' => 'sender@example.org'],
+      'subject' => 'Internationalized recipient test',
+      'body' => 'No real transport is used.',
+    ]));
+    $this->assertSame($valid ? [$encoded] : [], $captured);
   }
 
 }

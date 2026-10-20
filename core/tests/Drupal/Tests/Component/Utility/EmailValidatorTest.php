@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Utility;
 
+// cspell:ignore UASG
+
 use Drupal\Component\Utility\EmailValidator;
 use Drupal\Tests\EmailTestDataTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -42,6 +44,7 @@ class EmailValidatorTest extends TestCase {
    * Tests the SMTP mailbox syntax contract.
    */
   #[DataProvider('internationalizedMailboxProvider')]
+  #[DataProvider('uasgMailboxProvider')]
   public function testMailboxSyntax(string $mailbox, bool $valid): void {
     $validator = new EmailValidator();
     $this->assertSame($valid, $validator->isValid($mailbox));
