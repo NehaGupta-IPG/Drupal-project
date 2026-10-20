@@ -4,11 +4,13 @@ namespace Drupal\views\Plugin\views\filter;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsFilter;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Form\OptGroup;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Filter to handle matching of multiple options selectable via checkboxes.
@@ -16,6 +18,8 @@ use Drupal\Core\Form\OptGroup;
  * Definition items:
  * - options callback: The function to call in order to generate the value
  *   options. If omitted, the options 'Yes' and 'No' will be used.
+ *   This can be a callable, static method, or a service method in the
+ *   format 'service_id:method'.
  * - options arguments: An array of arguments to pass to the options callback.
  *
  * @ingroup views_filter_handlers
@@ -31,8 +35,9 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
   protected $valueFormType = 'checkboxes';
 
   /**
-   * @var array
    * Stores all operations which are available on the form.
+   *
+   * @var array
    */
   protected $valueOptions = NULL;
 
@@ -42,6 +47,34 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
    * @var string
    */
   protected $valueTitle;
+
+  /**
+   * Constructs a InOperator object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver
+   *   The controller resolver.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected ?ControllerResolverInterface $controllerResolver = NULL) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('controller_resolver')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -71,18 +104,41 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
       return $this->valueOptions;
     }
 
-    if (isset($this->definition['options callback']) && is_callable($this->definition['options callback'])) {
-      if (isset($this->definition['options arguments']) && is_array($this->definition['options arguments'])) {
-        $this->valueOptions = call_user_func_array($this->definition['options callback'], $this->definition['options arguments']);
+    if (isset($this->definition['options callback'])) {
+      $callback = $this->definition['options callback'];
+
+      // Use ControllerResolver to handle service methods and other callables.
+      if ($this->controllerResolver) {
+        try {
+          $callable = $this->controllerResolver->getControllerFromDefinition($callback);
+
+          if (isset($this->definition['options arguments']) && is_array($this->definition['options arguments'])) {
+            $this->valueOptions = call_user_func_array($callable, $this->definition['options arguments']);
+          }
+          else {
+            $this->valueOptions = call_user_func($callable);
+          }
+          return $this->valueOptions;
+        }
+        catch (\InvalidArgumentException) {
+          // If ControllerResolver fails, fall through to try is_callable.
+        }
       }
-      else {
-        $this->valueOptions = call_user_func($this->definition['options callback']);
+
+      // Fallback to traditional callable check for backwards compatibility.
+      if (is_callable($callback)) {
+        if (isset($this->definition['options arguments']) && is_array($this->definition['options arguments'])) {
+          $this->valueOptions = call_user_func_array($callback, $this->definition['options arguments']);
+        }
+        else {
+          $this->valueOptions = call_user_func($callback);
+        }
+        return $this->valueOptions;
       }
-    }
-    else {
-      $this->valueOptions = [$this->t('Yes'), $this->t('No')];
     }
 
+    // Default fallback.
+    $this->valueOptions = [$this->t('Yes'), $this->t('No')];
     return $this->valueOptions;
   }
 
@@ -339,11 +395,8 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     // was not set, and the key to the checkbox if it is set.
     // Unfortunately, this means that if the key to that checkbox is 0,
     // we are unable to tell if that checkbox was set or not.
-
     // Luckily, the '#value' on the checkboxes form actually contains
-    // *only* a list of checkboxes that were set, and we can use that
-    // instead.
-
+    // *only* a list of checkboxes that were set, and we can use that instead.
     $form_state->setValue(['options', 'value'], $form['value']['#value']);
   }
 
@@ -496,11 +549,8 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
       }
     }
     elseif (!empty($this->value) && ($this->operator == 'in' || $this->operator == 'not in')) {
-      $errors[] = $this->t('The value @value is not an array for @operator on filter: @filter', [
-        '@value' => var_export($this->value, TRUE),
-        '@operator' => $this->operator,
-        '@filter' => $this->adminLabel(TRUE),
-      ]);
+      $errors[] = $this->t('The value @value is not an array for @operator on filter: @filter',
+      ['@value' => var_export($this->value, TRUE), '@operator' => $this->operator, '@filter' => $this->adminLabel(TRUE)]);
     }
     return $errors;
   }
