@@ -25,13 +25,7 @@ class SearchPluginManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    // Deprecated search plugins are kept in their original modules to support
-    // updates before the replacement modules are installed. Discover namespaces
-    // alphabetically so the replacements in search_help and search_node take
-    // precedence, regardless of the order of modules in the container.
-    $namespaces = iterator_to_array($namespaces);
-    ksort($namespaces);
-    parent::__construct('Plugin/Search', new \ArrayObject($namespaces), $module_handler, SearchInterface::class, Search::class, 'Drupal\search\Annotation\SearchPlugin');
+    parent::__construct('Plugin/Search', $namespaces, $module_handler, SearchInterface::class, Search::class, 'Drupal\search\Annotation\SearchPlugin');
     $this->setCacheBackend($cache_backend, 'search_plugins');
     $this->alterInfo('search_plugin');
   }

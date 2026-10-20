@@ -12,6 +12,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\help\Hook\HelpHooks;
 use Drupal\search\SearchPluginManager;
+use Drupal\search_help\Plugin\Search\SearchHelpSearch;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -52,6 +53,20 @@ class SearchHelpHooks {
     $section .= '</dl>';
     $output['#markup'] .= $section;
     return $output;
+  }
+
+  /**
+   * Implements hook_search_plugin_alter().
+   */
+  #[Hook('search_plugin_alter')]
+  public function searchPluginAlter(array &$definitions): void {
+    // The deprecated plugin in the help module uses the same ID. Discovery
+    // keeps the last definition that it finds, and the order depends on module
+    // weights. Always use the plugin from this module.
+    if (isset($definitions['help_search'])) {
+      $definitions['help_search']['class'] = SearchHelpSearch::class;
+      $definitions['help_search']['provider'] = 'search_help';
+    }
   }
 
   /**
