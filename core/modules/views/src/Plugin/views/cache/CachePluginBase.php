@@ -91,6 +91,9 @@ abstract class CachePluginBase extends PluginBase {
    * Determines cache expiration time based on its type.
    *
    * Plugins must override this to implement expiration in the cache table.
+   * This controls the expiration of cached view results written by
+   * ::cacheSet(); it does not set the max-age of the rendered view. See
+   * ::getCacheMaxAge().
    *
    * @param string $type
    *   The cache type.
@@ -110,7 +113,8 @@ abstract class CachePluginBase extends PluginBase {
    * A plugin should override this to provide specialized caching behavior.
    *
    * @param string $type
-   *   The cache type, either 'query', 'result'.
+   *   The cache type. Currently, only 'results' is supported; 'query' is not
+   *   cached.
    */
   public function cacheSet($type) {
     switch ($type) {
@@ -136,7 +140,8 @@ abstract class CachePluginBase extends PluginBase {
    * A plugin should override this to provide specialized caching behavior.
    *
    * @param string $type
-   *   The cache type, either 'query', 'result'.
+   *   The cache type. Currently, only 'results' is supported; 'query' is not
+   *   cached.
    *
    * @return bool
    *   TRUE if data has been taken from the cache, otherwise FALSE.
@@ -237,10 +242,16 @@ abstract class CachePluginBase extends PluginBase {
   }
 
   /**
-   * Gets an array of cache tags for the current view.
+   * Gets cache tags for the current view.
+   *
+   * These tags are used to invalidate cached view results and are also exposed
+   * through \Drupal\views\ViewExecutable::getCacheTags() for the rendered
+   * view.
    *
    * @return string[]
-   *   An array of cache tags based on the current view.
+   *   The cache tags for the current view.
+   *
+   * @see \Drupal\views\ViewExecutable::getCacheTags()
    */
   public function getCacheTags() {
     $tags = $this->view->storage->getCacheTags();
@@ -261,10 +272,12 @@ abstract class CachePluginBase extends PluginBase {
   }
 
   /**
-   * Gets the max age for the current view.
+   * Gets the max-age for the rendered view.
+   *
+   * The max-age is merged with the max-age provided by the view query.
    *
    * @return int
-   *   The maximum age for the current view's cache.
+   *   The max-age for the rendered view.
    */
   public function getCacheMaxAge() {
     $max_age = $this->getDefaultCacheMaxAge();
