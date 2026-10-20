@@ -177,7 +177,7 @@
           $(this)
             .closest('div.js-form-managed-file')
             .prepend(
-              `<div class="messages messages--error file-upload-js-error" aria-live="polite">${error}</div>`,
+              `<div class="messages messages--error file-upload-js-error" aria-live="assertive">${error}</div>`,
             );
           this.value = '';
           // Cancel all other change event handlers.
