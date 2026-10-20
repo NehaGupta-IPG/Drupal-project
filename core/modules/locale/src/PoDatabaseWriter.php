@@ -174,7 +174,7 @@ class PoDatabaseWriter implements PoWriterInterface {
       throw new \Exception('Langcode should be set before assigning a PoHeader.');
     }
 
-    $plural_formula = \Drupal::service('locale.plural.formula');
+    $plural_formula = \Drupal::service(PluralFormulaInterface::class);
     if (array_sum($overwrite_options) || !$plural_formula->getFormula($langcode)) {
       // Get and store the plural formula if available.
       $plural = $header->getPluralForms();
