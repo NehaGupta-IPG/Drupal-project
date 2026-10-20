@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\search\Kernel;
 
 use Drupal\Core\Cache\MemoryBackend;
+use Drupal\Core\Extension\ModuleWeight;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\search\SearchPluginManager;
 use Drupal\search_help\Plugin\Search\SearchHelpSearch;
@@ -64,8 +65,9 @@ class SearchPluginDiscoveryTest extends KernelTestBase {
    * namespaces first.
    */
   public function testReplacementPluginsWithModuleWeights(): void {
-    module_set_weight('help', 1);
-    module_set_weight('node', 1);
+    $module_weight = $this->container->get(ModuleWeight::class);
+    $module_weight->set('help', 1);
+    $module_weight->set('node', 1);
     $this->container->get('kernel')->updateModules($this->container->get('module_handler')->getModuleList());
     $this->container = \Drupal::getContainer();
 
