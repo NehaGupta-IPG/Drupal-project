@@ -709,6 +709,37 @@ class UrlHelperTest extends TestCase {
   }
 
   /**
+   * Tests absolute URL syntax accepted before internationalized host support.
+   */
+  #[DataProvider('providerAbsoluteUrlCompatibility')]
+  public function testAbsoluteUrlCompatibility(string $url): void {
+    $this->assertTrue(UrlHelper::isValid($url, TRUE));
+  }
+
+  /**
+   * Provides absolute URLs for compatibility regression tests.
+   */
+  public static function providerAbsoluteUrlCompatibility(): array {
+    return [
+      'Unreserved characters in user information' => ['https://user-._name:pass@example.org/'],
+      'Sub-delimiters in user information' => ['https://user!$&\'()*+,;=name:pass@example.org/'],
+      'Encoded delimiters in user information' => ['https://user%40name:pass%3Aword@example.org/'],
+      'Unreserved characters in path' => ['https://example.org/path-._~part'],
+      'Sub-delimiters in path' => ['https://example.org/path!$&\'()*+,;=part'],
+      'Encoded delimiters in path' => ['https://example.org/path%2Fpart%3Fquery%23fragment'],
+      'Reserved characters in query' => ['https://example.org/?value=!$&\'()*+,;=:@/?'],
+      'Encoded delimiters in query' => ['https://example.org/?value=%26%3D%23'],
+      'Reserved characters in fragment' => ['https://example.org/#value=!$&\'()*+,;=:@/?'],
+      'Encoded delimiters in fragment' => ['https://example.org/#value=%23%3F%2F'],
+      'Uppercase scheme' => ['HTTPS://example.org:8080/path?query=value#fragment'],
+      'Single-label host with port' => ['https://localhost:8080/path?query=value#fragment'],
+      'Trailing dot in hostname' => ['https://example.org.:8080/path?query=value#fragment'],
+      'IPv4 address with port' => ['https://127.0.0.1:8080/path?query=value#fragment'],
+      'Compressed IPv6 address with port' => ['https://[::1]:8080/path?query=value#fragment'],
+    ];
+  }
+
+  /**
    * Tests internationalized absolute URL syntax.
    */
   #[DataProvider('providerInternationalizedUrls')]
