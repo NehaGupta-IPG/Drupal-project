@@ -116,4 +116,22 @@ class BlockSystemBrandingTest extends BlockTestBase {
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:system.site');
   }
 
+  /**
+   * Tests that SVG logo containing Twig syntax is rendered as markup and not compiled as Twig template.
+   */
+  public function testSvgLogoWithTwigSyntax(): void {
+    $svg_content = '<svg viewBox="0 0 10 10"><text>{{ 1 + 1 }}</text><text>{% if true %}twig_tag{% endif %}</text></svg>';
+    $logo_path = 'public://twig_test_logo.svg';
+    \Drupal::service('file_system')->saveData($svg_content, $logo_path);
+
+    $this->config('stark.settings')
+      ->set('logo.use_default', FALSE)
+      ->set('logo.path', $logo_path)
+      ->save();
+
+    $this->drupalGet('');
+    $this->assertSession()->responseContains($svg_content);
+    $this->assertSession()->responseNotContains('<text>2</text>');
+  }
+
 }

@@ -10,6 +10,7 @@ use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
@@ -142,10 +143,9 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
       $build['site_logo'] = [
         '#access' => $this->configuration['use_site_logo'],
       ];
-      // SVG uses an inline template. Otherwise, use the image factory.
+      // SVG uses markup. Otherwise, use the image factory.
       if ($extension === 'svg' && file_exists($logo_uri)) {
-        $build['site_logo']['#type'] = 'inline_template';
-        $build['site_logo']['#template'] = file_get_contents($logo_uri);
+        $build['site_logo']['#markup'] = Markup::create(file_get_contents($logo_uri));
       }
       else {
         $image = $this->imageFactory->get($logo_uri);
