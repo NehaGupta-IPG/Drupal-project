@@ -697,7 +697,8 @@ class Renderer implements RendererInterface {
    * Placeholders may have:
    * - #lazy_builder callback, to build a render array to be rendered into
    *   markup that can replace the placeholder
-   * - #cache: to cache the result of the placeholder   *
+   * - #cache: to cache the result of the placeholder
+   *
    * Also merges the bubbleable metadata resulting from the rendering of the
    * contents of the placeholders. Hence $elements will be contain the entirety
    * of bubbleable metadata.
@@ -729,6 +730,7 @@ class Renderer implements RendererInterface {
     // to this one special case, with this hard-coded solution.
     // @see \Drupal\Core\Render\Element\StatusMessages
     // @see https://www.drupal.org/node/2712935#comment-11368923
+
     // First render all placeholders except 'status messages' placeholders.
     $message_placeholders = [];
     $fibers = [];
@@ -883,10 +885,9 @@ class Renderer implements RendererInterface {
    */
   protected function doCallback($callback_type, $callback, array $args) {
     $callable = $this->callableResolver->getCallableFromDefinition($callback);
-    // This message is formatted in two stages. The callback type is injected
-    // here while keeping a literal '%s' placeholder for the callback
-    // description. The placeholder is later substituted via sprintf() 
-    // in \Drupal\Core\Security\DoTrustedCallbackTrait::doTrustedCallback().
+    // Substitute the callback type here, leaving a literal '%s' for the
+    // callback description. It is replaced in
+    // \Drupal\Core\Security\DoTrustedCallbackTrait::doTrustedCallback().
     $message = sprintf('Render %s callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/2966725', $callback_type, '%s');
     // Add \Drupal\Core\Render\Element\RenderCallbackInterface as an extra
     // trusted interface so that:
