@@ -91,8 +91,14 @@ trait StringTranslationTrait {
    *
    * @return int
    *   The number of plurals supported.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\locale\PluralFormulaInterface::getNumberOfPlurals() instead.
+   *
+   * @see https://www.drupal.org/node/3631890
    */
   protected function getNumberOfPlurals($langcode = NULL) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\locale\PluralFormulaInterface::getNumberOfPlurals() instead. See https://www.drupal.org/node/3631890', E_USER_DEPRECATED);
     if (\Drupal::hasService('locale.plural.formula')) {
       return \Drupal::service('locale.plural.formula')->getNumberOfPlurals($langcode);
     }

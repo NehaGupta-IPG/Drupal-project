@@ -4,10 +4,15 @@ namespace Drupal\locale\Form;
 
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\State\StateInterface;
 use Drupal\locale\LocaleJs;
+use Drupal\locale\LocaleLanguages;
 use Drupal\locale\LocaleXss;
+use Drupal\locale\PluralFormulaInterface;
 use Drupal\locale\SourceString;
+use Drupal\locale\StringStorageInterface;
 
 /**
  * Defines a translation edit form.
@@ -15,6 +20,16 @@ use Drupal\locale\SourceString;
  * @internal
  */
 class TranslateEditForm extends TranslateFormBase {
+
+  public function __construct(
+    StringStorageInterface $localeStorage,
+    StateInterface $state,
+    LanguageManagerInterface $languageManager,
+    LocaleLanguages $localeLanguages,
+    protected PluralFormulaInterface $pluralFormula,
+  ) {
+    parent::__construct($localeStorage, $state, $languageManager, $localeLanguages);
+  }
 
   /**
    * {@inheritdoc}
@@ -57,7 +72,7 @@ class TranslateEditForm extends TranslateFormBase {
     if (isset($langcode)) {
       $strings = $this->translateFilterLoadStrings();
 
-      $plurals = $this->getNumberOfPlurals($langcode);
+      $plurals = $this->pluralFormula->getNumberOfPlurals($langcode);
 
       foreach ($strings as $string) {
         // Cast into source string, will do for our purposes.

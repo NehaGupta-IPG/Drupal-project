@@ -7,6 +7,7 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Config\LanguageConfigOverride;
+use Drupal\locale\PluralFormulaInterface;
 
 /**
  * Defines form elements for plurals in configuration translation.
@@ -17,7 +18,7 @@ class PluralVariants extends FormElementBase {
    * {@inheritdoc}
    */
   protected function getSourceElement(LanguageInterface $source_language, $source_config) {
-    $plurals = $this->getNumberOfPlurals($source_language->getId());
+    $plurals = \Drupal::service(PluralFormulaInterface::class)->getNumberOfPlurals($source_language->getId());
     $values = explode(PoItem::DELIMITER, $source_config);
     $element = [
       '#type' => 'fieldset',
@@ -47,7 +48,7 @@ class PluralVariants extends FormElementBase {
    * {@inheritdoc}
    */
   protected function getTranslationElement(LanguageInterface $translation_language, $source_config, $translation_config) {
-    $plurals = $this->getNumberOfPlurals($translation_language->getId());
+    $plurals = \Drupal::service(PluralFormulaInterface::class)->getNumberOfPlurals($translation_language->getId());
     $values = explode(PoItem::DELIMITER, $translation_config);
     $element = [
       '#type' => 'fieldset',
