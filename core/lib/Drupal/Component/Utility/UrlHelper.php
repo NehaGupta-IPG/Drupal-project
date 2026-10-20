@@ -447,6 +447,14 @@ class UrlHelper {
    */
   public static function isValid($url, $absolute = FALSE) {
     if ($absolute) {
+      // Decode percent-encoded non-ASCII bytes in the hostname for validation.
+      // Leave ASCII escapes intact so encoded delimiters cannot change the
+      // URL structure. Do not decode user information, paths, or queries.
+      if (preg_match('~^[a-z][a-z0-9+.-]*://(?:[^/?#@]*@)?([^/?#:]+)~i', $url, $matches, PREG_OFFSET_CAPTURE)) {
+        [$host, $offset] = $matches[1];
+        $decoded_host = preg_replace_callback('/(?:%[89a-f][0-9a-f])+/i', static fn(array $matches): string => rawurldecode($matches[0]), $host);
+        $url = substr_replace($url, $decoded_host, $offset, strlen($host));
+      }
       $allowed_protocols = array_unique(array_merge(static::$allowedProtocols, ['http', 'https', 'ftp', 'feed']));
       $violations = Validation::createValidator()->validate($url, [
         new Url(protocols: $allowed_protocols, requireTld: FALSE),

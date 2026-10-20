@@ -99,8 +99,9 @@ class UrlHelperTest extends TestCase {
       'example.org?',
       'john%20doe:secret:foo@example.org/',
       'example.org/~,$\'*;',
-      // @todo Does not validate anymore.
-      // 'caf%C3%A9.example.org',
+      'caf%C3%A9.example.org',
+      'caf%c3%a9.example.org',
+      'user:pass@caf%C3%A9.example.org:8080/path%2Fpart?value=%40#fragment',
       // cspell:ignore FEDC
       '[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:80/index.html',
       // The following test Universal Acceptance.
@@ -201,6 +202,12 @@ class UrlHelperTest extends TestCase {
    */
   public static function providerTestInvalidAbsolute(): array {
     $data = [
+      'caf%C3.example.org',
+      'caf%FF.example.org',
+      'caf%GG.example.org',
+      'example.org%2Fother.example.org',
+      'example.org%40other.example.org',
+      'example.org%3A8080',
       '',
       'ex!ample.com',
       'ex%ample.com',
@@ -686,6 +693,36 @@ class UrlHelperTest extends TestCase {
       ['http://example.com', 'http://example.com', ['https', 'http']],
       // Colon not part of the URL scheme.
       ['/test:8888', '/test:8888', ['http']],
+    ];
+  }
+
+  /**
+   * Tests internationalized absolute URL syntax.
+   */
+  #[DataProvider('providerInternationalizedUrls')]
+  public function testInternationalizedUrls(string $url, bool $expected): void {
+    $this->assertSame($expected, UrlHelper::isValid($url, TRUE));
+  }
+
+  /**
+   * Provides internationalized URL syntax cases.
+   */
+  public static function providerInternationalizedUrls(): array {
+    return [
+      'Unicode hostname' => ['https://例子.测试', TRUE],
+      'Punycode hostname' => ['https://xn--fsqu00a.xn--0zwm56d', TRUE],
+      'Right-to-left hostname' => ['https://مثال.إختبار', TRUE],
+      'Unicode path' => ['https://example.org/我的页面', TRUE],
+      'Encoded UTF-8 hostname' => ['https://caf%C3%A9.example.org', TRUE],
+      'Truncated UTF-8' => ['https://caf%C3.example.org', FALSE],
+      'Overlong UTF-8' => ['https://example%C0%AEorg', FALSE],
+      'UTF-8 surrogate' => ['https://example%ED%A0%80.org', FALSE],
+      'Invalid UTF-8 byte' => ["https://example\xFF.org", FALSE],
+      'Encoded slash' => ['https://example.org%2Fother.example.org', FALSE],
+      'Encoded at sign' => ['https://example.org%40other.example.org', FALSE],
+      'Encoded colon' => ['https://example.org%3A8080', FALSE],
+      'Encoded control character' => ['https://example%00.org', FALSE],
+      'Empty URL' => ['', FALSE],
     ];
   }
 
