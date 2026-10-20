@@ -47,7 +47,6 @@ class ActiveLinkTest extends WebDriverTestBase {
     // The query string contains characters that a naive string comparison
     // between JavaScript's JSON.stringify() and PHP's Json::encode() would
     // not match on, such as a quote.
-    // @see https://www.drupal.org/project/drupal/issues/2902769
     $query = ['foo' => '<bar>&\'"/'];
     $this->drupalGet('common-test/type-link-active-class', ['query' => $query]);
     $page = $this->getSession()->getPage();
@@ -74,25 +73,15 @@ class ActiveLinkTest extends WebDriverTestBase {
 
     $dynamic_link = $page->find('css', '#dynamic-active-link');
     $this->assertTrue($dynamic_link->hasClass('is-active'));
-  }
 
-  /**
-   * Tests that a query string with non-Latin characters is matched.
-   *
-   * PHP's Json::encode() renders non-Latin text as Unicode escapes (e.g.
-   * "к..."), while the browser's URL is percent-encoded UTF-8, so a
-   * naive string comparison between the two never matches.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/2525830
-   */
-  public function testQueryStringNonLatinCharacters(): void {
-    $this->drupalLogin($this->createUser());
+    // PHP's Json::encode() renders non-Latin text as Unicode escapes (e.g.
+    // "к..."), while the browser's URL is percent-encoded UTF-8, so a
+    // naive string comparison between the two never matches.
     $this->drupalGet('common-test/type-link-active-class', [
       'query' => ['foo' => 'комацу'],
     ]);
-
-    $link = $this->getSession()->getPage()->findLink('Link with non-Latin characters in the query string');
-    $this->assertTrue($link->hasClass('is-active'));
+    $non_latin_link = $page->findLink('Link with non-Latin characters in the query string');
+    $this->assertTrue($non_latin_link->hasClass('is-active'));
   }
 
 }
