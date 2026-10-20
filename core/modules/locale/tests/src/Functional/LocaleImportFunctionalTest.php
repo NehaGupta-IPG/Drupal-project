@@ -172,7 +172,7 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('No strings available.');
 
     // This import should not have changed number of plural forms.
-    $locale_plurals = \Drupal::service('locale.plural.formula')->getNumberOfPlurals('fr');
+    $locale_plurals = \Drupal::service('locale.plural.formula')->reset()->getNumberOfPlurals('fr');
     $this->assertEquals(2, $locale_plurals, 'Plural numbers untouched.');
 
     // Try importing a .po file with overriding strings, and ensure existing
