@@ -189,8 +189,11 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
     $this->thumbnail->width = $this->getThumbnailWidth($from_queue);
     $this->thumbnail->height = $this->getThumbnailHeight($from_queue);
 
-    // Flush related image styles.
-    \Drupal::service(ImageDerivativeUtilities::class)->pathFlush($thumbnail_uri);
+    // Only flush derivatives when the source returned a thumbnail URI.
+    // loadThumbnail() uses the default thumbnail when this value is empty.
+    if (!empty($thumbnail_uri)) {
+      \Drupal::service(ImageDerivativeUtilities::class)->pathFlush($thumbnail_uri);
+    }
 
     // Set the thumbnail alt.
     $media_source = $this->getSource();
