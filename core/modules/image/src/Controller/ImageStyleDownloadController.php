@@ -207,12 +207,23 @@ class ImageStyleDownloadController extends FileDownloadController {
     // Don't start generating the image if the derivative already exists or if
     // generation is in progress in another thread.
     if (!file_exists($derivative_uri)) {
-      $lock_name = 'image_style_deliver:' . $image_style->id() . ':' . Crypt::hashBase64($image_uri);
+      // Lock the derivative, not the source: a style can build several
+      // derivatives from one source.
+      $lock_name = 'image_style_deliver:' . Crypt::hashBase64($derivative_uri);
       $lock_acquired = $this->lock->acquire($lock_name);
       if (!$lock_acquired) {
-        // Tell client to retry again in 3 seconds. Currently no browsers are
-        // known to support Retry-After.
-        throw new ServiceUnavailableHttpException(3, 'Image generation in progress. Try again shortly.');
+        // Wait for the other request to build the derivative, as browsers do
+        // not retry an image after a 503. If it failed, build it here. While
+        // the lock is held, the derivative may be only partly written.
+        $lock_held = $this->lock->wait($lock_name, 10);
+        if (!$lock_held && !file_exists($derivative_uri)) {
+          $lock_acquired = $this->lock->acquire($lock_name);
+        }
+        if ($lock_held || (!$lock_acquired && !file_exists($derivative_uri))) {
+          // Tell client to retry again in 3 seconds. Currently no browsers are
+          // known to support Retry-After.
+          throw new ServiceUnavailableHttpException(3, 'Image generation in progress. Try again shortly.');
+        }
       }
     }
 
