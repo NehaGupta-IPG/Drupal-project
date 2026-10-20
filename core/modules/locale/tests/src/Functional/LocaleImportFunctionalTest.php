@@ -10,6 +10,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\locale\Model\TranslationUpdateMode;
+use Drupal\locale\PluralFormulaInterface;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -98,7 +99,7 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains("One translation file imported. 8 translations were added, 0 translations were updated and 0 translations were removed.");
 
     // This import should have saved plural forms to have 2 variants.
-    $locale_plurals = \Drupal::service('locale.plural.formula')->getNumberOfPlurals('fr');
+    $locale_plurals = \Drupal::service(PluralFormulaInterface::class)->getNumberOfPlurals('fr');
     $this->assertEquals(2, $locale_plurals, 'Plural number initialized.');
 
     // Ensure we were redirected correctly.
@@ -194,7 +195,7 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
     $this->submitForm($search, 'Filter');
     $this->assertSession()->pageTextNotContains('No strings available.');
     // This import should have changed number of plural forms.
-    $locale_plurals = \Drupal::service('locale.plural.formula')->reset()->getNumberOfPlurals('fr');
+    $locale_plurals = \Drupal::service(PluralFormulaInterface::class)->reset()->getNumberOfPlurals('fr');
     $this->assertEquals(3, $locale_plurals, 'Plural numbers changed.');
 
     // Importing a .po file and mark its strings as customized strings.
