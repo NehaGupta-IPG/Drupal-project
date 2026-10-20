@@ -447,12 +447,16 @@ class UrlHelper {
    */
   public static function isValid($url, $absolute = FALSE) {
     if ($absolute) {
-      // Decode percent-encoded non-ASCII bytes in the hostname for validation.
-      // Leave ASCII escapes intact so encoded delimiters cannot change the
-      // URL structure. Do not decode user information, paths, or queries.
+      // Decode percent-encoded non-ASCII bytes and unreserved ASCII characters
+      // in the hostname for validation. Leave other escapes intact so encoded
+      // delimiters cannot change the URL structure. Do not decode user
+      // information, paths, or queries.
       if (preg_match('~^[a-z][a-z0-9+.-]*://(?:[^/?#@]*@)?([^/?#:]+)~i', $url, $matches, PREG_OFFSET_CAPTURE)) {
         [$host, $offset] = $matches[1];
-        $decoded_host = preg_replace_callback('/(?:%[89a-f][0-9a-f])+/i', static fn(array $matches): string => rawurldecode($matches[0]), $host);
+        $decoded_host = preg_replace_callback('/%[0-9a-f]{2}/i', static function (array $matches): string {
+          $decoded = rawurldecode($matches[0]);
+          return ord($decoded) >= 0x80 || preg_match('/[a-z0-9._~-]/i', $decoded) ? $decoded : $matches[0];
+        }, $host);
         // Normalize Unicode domain separators only within the hostname.
         $decoded_host = strtr($decoded_host, ['。' => '.', '．' => '.', '｡' => '.']);
         $url = substr_replace($url, $decoded_host, $offset, strlen($host));
