@@ -989,6 +989,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       '#description_display' => 'after',
       '#errors' => NULL,
     ];
+    // Add required indicator for details elements within forms.
+    $element['#pre_render'][] = [FormElementBase::class, 'preRenderRequiredElementTitle'];
 
     // Special handling if we're on the top level form element.
     if (isset($element['#type']) && $element['#type'] == 'form') {
@@ -1389,8 +1391,6 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     if (!NestedArray::keyExists($form_state->getValues(), $element['#parents'])) {
       $form_state->setValueForElement($element, $element['#value']);
     }
-
-    $element['#pre_render'][] = '\Drupal\Core\Render\Element\FormElementBase::preRenderRequiredElementTitle';
   }
 
   /**

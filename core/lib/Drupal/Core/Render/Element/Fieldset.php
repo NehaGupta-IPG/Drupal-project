@@ -37,7 +37,6 @@ class Fieldset extends RenderElementBase {
       ],
       '#pre_render' => [
         [static::class, 'preRenderGroup'],
-        [FormElementBase::class, 'preRenderRequiredElementTitle'],
       ],
       '#value' => NULL,
       '#theme_wrappers' => ['fieldset'],
