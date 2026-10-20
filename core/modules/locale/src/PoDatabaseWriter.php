@@ -160,7 +160,6 @@ class PoDatabaseWriter implements PoWriterInterface {
    */
   public function setHeader(PoHeader $header) {
     $this->header = $header;
-    $locale_plurals = \Drupal::state()->get('locale.translation.plurals', []);
 
     // Check for options.
     $options = $this->getOptions();
@@ -175,12 +174,13 @@ class PoDatabaseWriter implements PoWriterInterface {
       throw new \Exception('Langcode should be set before assigning a PoHeader.');
     }
 
-    if (array_sum($overwrite_options) || empty($locale_plurals[$langcode]['plurals'])) {
+    $plural_formula = \Drupal::service('locale.plural.formula');
+    if (array_sum($overwrite_options) || !$plural_formula->getFormula($langcode)) {
       // Get and store the plural formula if available.
       $plural = $header->getPluralForms();
       if (isset($plural) && $p = $header->parsePluralForms($plural)) {
         [$nplurals, $formula] = $p;
-        \Drupal::service('locale.plural.formula')->setPluralFormula($langcode, $nplurals, $formula);
+        $plural_formula->setPluralFormula($langcode, $nplurals, $formula);
       }
     }
   }
