@@ -78,7 +78,7 @@ class ContentEntityFormWithSidebar extends ContentEntityForm {
    */
   public function form(array $form, FormStateInterface $form_state): array {
 
-    $form['#theme'] = ['content_entity_form'];
+    $form['#theme'] = ['content_entity_form_with_sidebar'];
 
     // Advanced tab must be the first, because other fields rely on that.
     if (!isset($form['advanced'])) {
