@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\EmailValidator;
+use Drupal\Tests\EmailTestDataTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -18,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 #[Group('Utility')]
 class EmailValidatorTest extends TestCase {
 
+  use EmailTestDataTrait;
   use ForwardCompatibilityTrait;
 
   /**
@@ -33,6 +36,18 @@ class EmailValidatorTest extends TestCase {
     $this->assertFalse($validator->isValid('example@example.com@'));
     $this->assertFalse($validator->isValid('example@example .com'));
     $this->assertFalse($validator->isValid('example @example.com'));
+  }
+
+  /**
+   * Tests the SMTP mailbox syntax contract.
+   */
+  #[DataProvider('internationalizedMailboxProvider')]
+  public function testMailboxSyntax(string $mailbox, bool $valid): void {
+    $validator = new EmailValidator();
+    $this->assertSame($valid, $validator->isValid($mailbox));
+    if (!$valid) {
+      $this->assertNotNull($validator->getError());
+    }
   }
 
   /**

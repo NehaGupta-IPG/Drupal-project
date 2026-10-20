@@ -10,6 +10,7 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
+use Drupal\Tests\EmailTestDataTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -19,6 +20,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('field')]
 #[RunTestsInSeparateProcesses]
 class EmailItemTest extends FieldKernelTestBase {
+
+  use EmailTestDataTrait;
 
   /**
    * {@inheritdoc}
@@ -80,6 +83,27 @@ class EmailItemTest extends FieldKernelTestBase {
     $entity = EntityTest::create();
     $entity->field_email->generateSampleItems();
     $this->entityValidateAndSave($entity);
+  }
+
+  /**
+   * Tests validation and storage of the shared mailbox syntax contract.
+   */
+  public function testMailboxSyntax(): void {
+    $storage = $this->container->get('entity_type.manager')->getStorage('entity_test');
+    $index = 0;
+    foreach (self::internationalizedMailboxProvider() as $label => [$mailbox, $valid]) {
+      $entity = EntityTest::create([
+        'name' => 'mailbox-' . $index++,
+        'field_email' => $mailbox,
+      ]);
+      $this->assertSame($valid || $mailbox === '', count($entity->validate()) === 0, $label);
+      if ($valid) {
+        $entity->save();
+        $id = $entity->id();
+        $storage->resetCache([$id]);
+        $this->assertSame($mailbox, $storage->load($id)->field_email->value, $label);
+      }
+    }
   }
 
 }

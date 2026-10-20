@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\EmailTestDataTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Form')]
 #[RunTestsInSeparateProcesses]
 class EmailTest extends BrowserTestBase {
+
+  use EmailTestDataTrait;
 
   /**
    * {@inheritdoc}
@@ -54,6 +57,19 @@ class EmailTest extends BrowserTestBase {
     $values = Json::decode($this->getSession()->getPage()->getContent());
     $this->assertEquals('foo@example.com', $values['email']);
     $this->assertEquals('example@drupal.org', $values['email_required']);
+  }
+
+  /**
+   * Tests supported SMTP mailbox syntax through form submission.
+   */
+  public function testMailboxSyntax(): void {
+    foreach (self::internationalizedMailboxProvider() as [$mailbox]) {
+      $this->drupalGet('form-test/email');
+      $this->submitForm(['email' => $mailbox, 'email_required' => $mailbox], 'Submit');
+      $values = Json::decode($this->getSession()->getPage()->getContent());
+      $this->assertSame($mailbox, $values['email']);
+      $this->assertSame($mailbox, $values['email_required']);
+    }
   }
 
 }
