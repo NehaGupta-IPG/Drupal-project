@@ -464,7 +464,8 @@ window.Drupal = { behaviors: {}, locale: {} };
    *
    * See the documentation of the server-side
    * \Drupal\Core\StringTranslation\TranslationInterface::formatPlural()
-   * function for more details.
+   * function for more details. The plural variant selection is the same as in
+   * \Drupal\Core\StringTranslation\TranslationManager::selectPluralForm().
    *
    * @param {number} count
    *   The item count to display.
@@ -498,19 +499,25 @@ window.Drupal = { behaviors: {}, locale: {} };
       args,
       options,
     ).split(pluralDelimiter);
-    let index = 0;
 
-    // Determine the index of the plural form.
+    // Plural formulae are defined over integers, and the formula table has
+    // the numbers from 0 to 199. Without a plural formula, the first variant
+    // is for 1, and the second variant for other counts.
+    let index = Number(count) === 1 ? 0 : 1;
     if (drupalTranslations?.pluralFormula) {
+      let number = Math.trunc(count);
+      if (number > 199) {
+        number = 100 + (number % 100);
+      }
       index =
-        count in drupalTranslations.pluralFormula
-          ? drupalTranslations.pluralFormula[count]
+        number in drupalTranslations.pluralFormula
+          ? drupalTranslations.pluralFormula[number]
           : drupalTranslations.pluralFormula.default;
-    } else if (args['@count'] !== 1) {
-      index = 1;
     }
 
-    return translations[index];
+    // Fall back to the second, then to the first variant, when the variant is
+    // missing or empty.
+    return translations[index] || translations[1] || translations[0];
   };
 
   /**
