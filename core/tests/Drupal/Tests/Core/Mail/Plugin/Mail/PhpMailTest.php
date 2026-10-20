@@ -158,6 +158,7 @@ class PhpMailTest extends UnitTestCase {
    * Tests domain separators in the recipient passed to PHP's mail boundary.
    */
   #[DataProvider('normalizedDomainMailboxProvider')]
+  #[DataProvider('recipientSyntaxProvider')]
   public function testNormalizedDomainRecipient(string $mailbox, string $normalized): void {
     $mailer = $this->createPhpMailInstance();
     $mailer->expects($this->once())->method('doMail')
@@ -169,6 +170,20 @@ class PhpMailTest extends UnitTestCase {
       'subject' => 'Domain separator test',
       'body' => 'No real transport is used.',
     ]));
+  }
+
+  /**
+   * Provides recipient lists whose mailbox quoting must remain intact.
+   */
+  public static function recipientSyntaxProvider(): array {
+    return [
+      'Quoted comma' => ['"first,last。part"@example。org', '"first,last。part"@example.org'],
+      'Quoted at sign' => ['"first@last。part"@example．org', '"first@last。part"@example.org'],
+      'Display name and recipients' => [
+        '"Name。 <local@work>" <person@example。org>, other@example｡org',
+        '"Name。 <local@work>" <person@example.org>, other@example.org',
+      ],
+    ];
   }
 
 }

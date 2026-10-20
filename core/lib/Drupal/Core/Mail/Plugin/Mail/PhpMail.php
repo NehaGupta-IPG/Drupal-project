@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Mail\Plugin\Mail;
 
+use Drupal\Component\Utility\EmailAddress;
+
 use Drupal\Core\Mail\Attribute\Mail;
 use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Mail\MailInterface;
@@ -83,6 +85,7 @@ class PhpMail implements MailInterface {
    * @see \Drupal\Core\Mail\MailManagerInterface::mail()
    */
   public function mail(array $message) {
+    $message['to'] = EmailAddress::normalizeDomainSeparators($message['to']);
     // If 'Return-Path' isn't already set in php.ini, we pass it separately
     // as an additional parameter instead of in the header.
     if (isset($message['headers']['Return-Path'])) {
