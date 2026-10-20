@@ -153,11 +153,6 @@ class ViewAjaxController implements ContainerInjectionInterface {
         }
         $this->redirectDestination->set($origin_destination);
 
-        // Override the display's pager_element with the one actually used.
-        if (isset($pager_element)) {
-          $response->addCommand(new ScrollTopCommand(".js-view-dom-id-$dom_id"));
-          $view->displayHandlers->get($display_id)->setOption('pager_element', $pager_element);
-        }
         // Reuse the same DOM id so it matches that in drupalSettings.
         $view->dom_id = $dom_id;
 
@@ -167,6 +162,12 @@ class ViewAjaxController implements ContainerInjectionInterface {
         }
         $response->addCommand(new ReplaceCommand(".js-view-dom-id-$dom_id", $preview));
         $response->addCommand(new PrependCommand(".js-view-dom-id-$dom_id", ['#type' => 'status_messages']));
+
+        // Override the display's pager_element with the one actually used.
+        if (isset($pager_element)) {
+          $response->addCommand(new ScrollTopCommand(".js-view-dom-id-$dom_id"));
+          $view->displayHandlers->get($display_id)->setOption('pager_element', $pager_element);
+        }
 
         if (!empty($preview['#attached'])) {
           $response->setAttachments($preview['#attached']);
