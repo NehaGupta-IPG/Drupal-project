@@ -244,7 +244,6 @@ class RecursiveContextualValidatorTest extends KernelTestBase {
       ->setLabel('Multiple strings')
       ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
     $this->container->get('state')->set('entity_test.additional_base_field_definitions', $definitions);
-    $this->installEntitySchema('entity_test');
 
     $entity = EntityTest::create([
       'name' => 'test',
