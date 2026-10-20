@@ -12,11 +12,14 @@ interface PagerParametersInterface {
   /**
    * Gets all request URL query parameters that are unrelated to paging.
    *
+   * @param array $context
+   *   Additional options for processing the pager arguments such as a view.
+   *
    * @return array
    *   A URL query parameter array that consists of all components of the
    *   current page request except for those pertaining to paging.
    */
-  public function getQueryParameters();
+  public function getQueryParameters($context = []);
 
   /**
    * Returns the current page being requested for display within a pager.

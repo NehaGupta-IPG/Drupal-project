@@ -63,16 +63,26 @@ class ViewsHooks {
    */
   #[Hook('views_pre_render')]
   public function viewsPreRender($view): void {
+    // Add some basic information about the views loaded on the page.
+    $settings = [
+      'instances' => [
+        'views_dom_id:' . $view->dom_id => [
+          'pager_strict_query_args' => isset($view->pager) ? $view->pager->usesStrictQueryArgs() : FALSE,
+        ],
+      ],
+    ];
+
     // If using AJAX, send identifying data about this view.
-    if ($view->ajaxEnabled() && empty($view->is_attachment) && empty($view->live_preview)) {
-      $view->element['#attached']['drupalSettings']['views'] = [
+    if ($view->ajaxEnabled()) {
+      // If using AJAX, send more identifying data about this view.
+      $settings = array_merge($settings, [
         'ajax_path' => Url::fromRoute('views.ajax')->toString(),
         'ajaxViews' => [
           'views_dom_id:' . $view->dom_id => [
             'view_name' => $view->storage->id(),
             'view_display_id' => $view->current_display,
             'view_args' => Html::escape(implode('/', $view->args)),
-            'view_path' => Html::escape(\Drupal::service('path.current')->getPath()),
+            // We're adding the view_path client-side.
             'view_base_path' => $view->getPath(),
             'view_dom_id' => $view->dom_id,
                     // To fit multiple views on a page, the programmer may have
@@ -80,9 +90,12 @@ class ViewsHooks {
             'pager_element' => isset($view->pager) ? $view->pager->getPagerId() : 0,
           ],
         ],
-      ];
+      ]);
       $view->element['#attached']['library'][] = 'views/views.ajax';
     }
+
+    $view->element['#attached']['drupalSettings']['views'] = $settings;
+    $view->element['#attached']['library'][] = 'views/views.base';
   }
 
   /**

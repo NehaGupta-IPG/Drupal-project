@@ -101,6 +101,7 @@ class Full extends SqlBase {
       '#pagination_heading_level' => parent::getHeadingLevel(),
       '#parameters' => $input,
       '#quantity' => $this->options['quantity'],
+      '#view' => $this->view,
       '#route_name' => !empty($this->view->live_preview) ? '<current>' : '<none>',
     ];
   }

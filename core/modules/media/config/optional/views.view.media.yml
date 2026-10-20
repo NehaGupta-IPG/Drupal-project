@@ -879,6 +879,9 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - 'url.query_args:items_per_page'
+        - 'url.query_args:offset'
+        - 'url.query_args:page'
         - user
         - user.permissions
       tags: {  }
@@ -907,6 +910,9 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - 'url.query_args:items_per_page'
+        - 'url.query_args:offset'
+        - 'url.query_args:page'
         - user
         - user.permissions
       tags: {  }

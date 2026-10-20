@@ -32,12 +32,22 @@ class PagerParameters implements PagerParametersInterface {
   /**
    * {@inheritdoc}
    */
-  public function getQueryParameters() {
+  public function getQueryParameters($context = []) {
     $request = $this->requestStack->getCurrentRequest();
     if ($request) {
-      return UrlHelper::filterQueryParameters(
-        $request->query->all(), ['page']
-      );
+      $parameters = \Drupal::request()->query->all();
+
+      if (isset($context['view'])) {
+        /** @var \Drupal\views\Plugin\views\pager\PagerPluginBase $pager */
+        $pager = $context['view']->display_handler->getPlugin('pager');
+        if ($pager && $pager->usesStrictQueryArgs()) {
+          // Filter out $parameters based on
+          // the views url.query_args:* cache contexts.
+          $pager->filterQueryArgs($parameters);
+        }
+      }
+
+      return UrlHelper::filterQueryParameters($parameters, ['page']);
     }
     return [];
   }

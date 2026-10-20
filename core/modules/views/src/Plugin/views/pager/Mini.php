@@ -109,6 +109,7 @@ class Mini extends SqlBase {
       '#element' => $this->options['id'],
       '#pagination_heading_level' => parent::getHeadingLevel(),
       '#parameters' => $input,
+      '#view' => $this->view,
       '#route_name' => !empty($this->view->live_preview) ? '<current>' : '<none>',
     ];
   }

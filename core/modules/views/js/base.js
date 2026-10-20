@@ -111,4 +111,43 @@
     }
     return href;
   };
+
+  Drupal.Views.updatePagerLinkHref = function (link) {
+    let href = link.href;
+    const hrefArgs = Drupal.Views.parseQueryString(href);
+    const urlArgs = Drupal.Views.parseQueryString(window.location.search);
+    let updated = false;
+    let sep = hrefArgs === {} ? '?' : '&';
+    Object.keys(urlArgs).forEach(function (arg) {
+      if (urlArgs.hasOwnProperty(arg) && !hrefArgs[arg]) {
+        href += sep + arg + (urlArgs[arg] ? `=${urlArgs[arg]}` : '');
+        sep = '&';
+        updated = true;
+      }
+    });
+    if (updated) {
+      link.href = href;
+    }
+  };
+
+  Drupal.behaviors.Views = {};
+  Drupal.behaviors.Views.attach = function (context) {
+    const $links = $('.view .pager__items .pager__item > a', context);
+    $links
+      .once('js-pager-query-args')
+      .each(Drupal.behaviors.Views.addClientQueryArgs);
+  };
+
+  Drupal.behaviors.Views.addClientQueryArgs = function (i, link) {
+    const $link = $(link);
+    const $view = $link.closest('.view');
+    const viewDomId = $view.attr('data-views-dom-id');
+    if (drupalSettings.views && drupalSettings.views.instances) {
+      const settings =
+        drupalSettings.views.instances[`views_dom_id:${viewDomId}`] || {};
+      if (settings.pager_strict_query_args === true) {
+        Drupal.Views.updatePagerLinkHref(link);
+      }
+    }
+  };
 })(jQuery, Drupal, drupalSettings);

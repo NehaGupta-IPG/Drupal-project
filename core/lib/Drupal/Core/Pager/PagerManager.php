@@ -75,7 +75,7 @@ class PagerManager implements PagerManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getUpdatedParameters(array $query, $element, $index) {
+  public function getUpdatedParameters(array $query, $element, $index, $context = []) {
     // Build the 'page' query parameter. This is built based on the current
     // page of each pager element (or NULL if the pager is not set), with the
     // exception of the requested page index for the current element.
@@ -90,7 +90,7 @@ class PagerManager implements PagerManagerInterface {
     // Merge the query parameters passed to this function with the parameters
     // from the current request. In case of collision, the parameters passed
     // into this function take precedence.
-    if ($current_query = $this->pagerParams->getQueryParameters()) {
+    if ($current_query = $this->pagerParams->getQueryParameters($context)) {
       $query = array_merge($current_query, $query);
     }
     return $query;

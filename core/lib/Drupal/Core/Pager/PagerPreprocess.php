@@ -48,6 +48,11 @@ class PagerPreprocess {
     $quantity = empty($variables['pager']['#quantity']) ? 0 : $variables['pager']['#quantity'];
     $route_name = $variables['pager']['#route_name'];
     $route_parameters = $variables['pager']['#route_parameters'] ?? [];
+    $view = $variables['pager']['#view'] ?? NULL;
+    $context = [];
+    if ($view) {
+      $context['view'] = $view;
+    }
 
     $link_attributes = [];
 
@@ -108,7 +113,7 @@ class PagerPreprocess {
       $items['first'] = [];
       $items['first']['attributes'] = new Attribute($link_attributes);
       $options = [
-        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, 0),
+        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, 0, $context),
       ];
       $items['first']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
       if (isset($tags[0])) {
@@ -118,7 +123,7 @@ class PagerPreprocess {
       $items['previous'] = [];
       $items['previous']['attributes'] = new Attribute($link_attributes);
       $options = [
-        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $current_page - 1),
+        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $current_page - 1, $context),
       ];
       $items['previous']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
       if (isset($tags[1])) {
@@ -133,7 +138,7 @@ class PagerPreprocess {
     // Now generate the actual pager piece.
     for (; $i <= $pager_last && $i <= $pager_max; $i++) {
       $options = [
-        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $i - 1),
+        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $i - 1, $context),
       ];
       $items['pages'][$i]['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
       $items['pages'][$i]['attributes'] = new Attribute($link_attributes);
@@ -152,7 +157,7 @@ class PagerPreprocess {
       $items['next'] = [];
       $items['next']['attributes'] = new Attribute($link_attributes);
       $options = [
-        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $current_page + 1),
+        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $current_page + 1, $context),
       ];
       $items['next']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
       if (isset($tags[3])) {
@@ -162,7 +167,7 @@ class PagerPreprocess {
       $items['last'] = [];
       $items['last']['attributes'] = new Attribute($link_attributes);
       $options = [
-        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $pager_max - 1),
+        'query' => $this->pagerManager->getUpdatedParameters($parameters, $element, $pager_max - 1, $context),
       ];
       $items['last']['href'] = Url::fromRoute($route_name, $route_parameters, $options)->toString();
       if (isset($tags[4])) {
