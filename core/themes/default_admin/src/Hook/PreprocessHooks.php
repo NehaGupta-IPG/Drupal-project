@@ -261,15 +261,6 @@ final class PreprocessHooks implements TrustedCallbackInterface {
       }
     }
 
-    // Adjust breadcrumb for nodes: unset all items, except home link.
-    if ($entity instanceof NodeInterface) {
-      foreach ($variables['breadcrumb'] as $key => $item) {
-        if ($key > 0) {
-          unset($variables['breadcrumb'][$key]);
-        }
-      }
-    }
-
     // Adjust breadcrumb for entities.
     if ($operation_label !== NULL) {
       // Add bundle info.
