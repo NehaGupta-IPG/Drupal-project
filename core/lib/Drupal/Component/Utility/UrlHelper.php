@@ -457,9 +457,8 @@ class UrlHelper {
         $decoded_host = strtr($decoded_host, ['。' => '.', '．' => '.', '｡' => '.']);
         $url = substr_replace($url, $decoded_host, $offset, strlen($host));
       }
-      $allowed_protocols = array_unique(array_merge(static::$allowedProtocols, ['http', 'https', 'ftp', 'feed']));
       $violations = Validation::createValidator()->validate($url, [
-        new Url(protocols: $allowed_protocols, requireTld: FALSE),
+        new Url(protocols: ['http', 'https', 'ftp', 'feed'], requireTld: FALSE),
         new NotBlank(),
       ]);
       return count($violations) === 0;

@@ -696,6 +696,19 @@ class UrlHelperTest extends TestCase {
   }
 
   /**
+   * Tests that URL validation is independent of protocol filtering settings.
+   */
+  #[RunInSeparateProcess]
+  public function testValidAbsoluteProtocols(): void {
+    UrlHelper::setAllowedProtocols(['custom']);
+
+    foreach (['http', 'https', 'ftp', 'feed'] as $protocol) {
+      $this->assertTrue(UrlHelper::isValid($protocol . '://example.org', TRUE));
+    }
+    $this->assertFalse(UrlHelper::isValid('custom://example.org', TRUE));
+  }
+
+  /**
    * Tests internationalized absolute URL syntax.
    */
   #[DataProvider('providerInternationalizedUrls')]
