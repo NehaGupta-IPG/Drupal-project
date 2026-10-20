@@ -46,7 +46,7 @@ class PluralTranslationTest extends KernelTestBase {
   /**
    * Tests a plural string of core without a translation.
    *
-   * Without a translation, the English source is displayed, but using the 
+   * Without a translation, the English source is displayed, but using the
    * plural formula of the target language. In Russian, the first form, which is
    * the singular in English, is used for 21. If "1 byte" would be the singular,
    * "1 byte" would be displayed for 21 bytes.
