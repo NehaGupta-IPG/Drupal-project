@@ -25,9 +25,9 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
    * Overrides Map::$values to keep an array default for field items, so that
    * the field layer is unaffected by Map defaulting its storage to NULL.
    *
-   * @see https://www.drupal.org/node/3631125
-   *
    * @var array
+   *
+   * @see https://www.drupal.org/node/3631125
    */
   protected $values = [];
 
