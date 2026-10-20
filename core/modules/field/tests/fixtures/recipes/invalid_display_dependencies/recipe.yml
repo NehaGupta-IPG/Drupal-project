@@ -1,0 +1,5 @@
+name: Invalid display dependencies
+description: Sets up a content type with display configuration that has missing dependencies
+type: Testing
+install:
+  - field_dynamic_dependencies_test

@@ -1,0 +1,34 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.dynamic_dependencies.field_field_test_field_1
+    - field.field.node.dynamic_dependencies.field_field_test_field_2
+    - node.type.dynamic_dependencies
+  module:
+    - field_dynamic_dependencies_test
+    - locale
+    - user
+id: node.dynamic_dependencies.default
+targetEntityType: node
+bundle: dynamic_dependencies
+mode: default
+content:
+  field_field_test_field_1:
+    type: test_field_dynamic_dependencies
+    label: above
+    settings:
+      dependent_module: language
+    third_party_settings: {}
+    weight: 0
+    region: content
+  field_field_test_field_2:
+    type: test_field_dynamic_dependencies
+    label: above
+    settings:
+      dependent_module: locale
+    third_party_settings: {}
+    weight: 1
+    region: content
+hidden:
+  links: true
