@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Functional;
 
-use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\EmailTestDataTrait;
 use Drupal\user\UserInterface;
@@ -19,7 +18,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class UserEmailDomainSeparatorTest extends BrowserTestBase {
 
-  use AssertMailTrait;
   use EmailTestDataTrait;
 
   /**
@@ -52,7 +50,7 @@ class UserEmailDomainSeparatorTest extends BrowserTestBase {
     $accounts = $storage->loadByProperties(['name' => $name]);
     $this->assertCount(1, $accounts);
     $this->assertSame($normalized, reset($accounts)->getEmail());
-    $mails = $this->getMails(['id' => 'user_register_no_approval_required']);
+    $mails = $this->getMails('user_register_no_approval_required');
     $this->assertCount(1, $mails);
     $this->assertSame($normalized, $mails[0]['to']);
   }
@@ -85,7 +83,7 @@ class UserEmailDomainSeparatorTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('is already taken.');
     $storage = $this->container->get('entity_type.manager')->getStorage('user');
     $this->assertCount(0, $storage->loadByProperties(['name' => $name]));
-    $this->assertCount(0, $this->getMails(['id' => 'user_register_no_approval_required']));
+    $this->assertCount(0, $this->getMails('user_register_no_approval_required'));
   }
 
   /**
@@ -98,7 +96,7 @@ class UserEmailDomainSeparatorTest extends BrowserTestBase {
     $other = $this->drupalCreateUser([], NULL, FALSE, ['mail' => 'other@例子.测试']);
     $this->drupalGet('user/password');
     $this->submitForm(['name' => $mailbox], 'Submit');
-    $mails = $this->getMails(['id' => 'user_password_reset']);
+    $mails = $this->getMails('user_password_reset');
     $this->assertCount(1, $mails);
     $this->assertSame($normalized, $mails[0]['to']);
     $this->assertStringContainsString('/user/reset/' . $account->id() . '/', $mails[0]['body']);
@@ -112,10 +110,18 @@ class UserEmailDomainSeparatorTest extends BrowserTestBase {
     $account = $this->drupalCreateUser([], 'name。part');
     $this->drupalGet('user/password');
     $this->submitForm(['name' => $account->getAccountName()], 'Submit');
-    $mails = $this->getMails(['id' => 'user_password_reset']);
+    $mails = $this->getMails('user_password_reset');
     $this->assertCount(1, $mails);
     $this->assertSame($account->getEmail(), $mails[0]['to']);
     $this->assertStringContainsString('/user/reset/' . $account->id() . '/', $mails[0]['body']);
+  }
+
+  /**
+   * Gets collected messages for one user notification without sending email.
+   */
+  private function getMails(string $id): array {
+    $messages = $this->container->get('state')->get('system.test_mail_collector', []);
+    return array_values(array_filter($messages, static fn (array $message) => $message['id'] === $id));
   }
 
 }
