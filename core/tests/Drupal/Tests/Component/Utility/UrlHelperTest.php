@@ -97,8 +97,7 @@ class UrlHelperTest extends TestCase {
       'user:pass@www.example.com:8080/login.php?do=login&style=%23#page-top',
       '127.0.0.1',
       'example.org?',
-      // @todo Does not validate anymore.
-      // 'john%20doe:secret:foo@example.org/',
+      'john%20doe:secret:foo@example.org/',
       'example.org/~,$\'*;',
       // @todo Does not validate anymore.
       // 'caf%C3%A9.example.org',
@@ -137,8 +136,7 @@ class UrlHelperTest extends TestCase {
       "⌘.ws/",
       "foo.com/blah_(wikipedia)#cite-1",
       "foo.com/blah_(wikipedia)_blah#cite-1",
-      // @todo this URL should validate.
-      // "foo.com/unicode_(✪)_in_parens",
+      "foo.com/unicode_(✪)_in_parens",
       "foo.com/(something)?after=parens",
       "code.google.com/events/#&product=browser",
       "j.mp",
@@ -701,7 +699,7 @@ class UrlHelperTest extends TestCase {
    *   A list of provider data with schemes.
    */
   protected static function dataEnhanceWithScheme(array $urls): array {
-    $url_schemes = ['http://', 'https://', 'ftp://'];
+    $url_schemes = ['http://', 'https://', 'ftp://', 'feed://'];
     $data = [];
     foreach ($url_schemes as $scheme) {
       foreach ($urls as $url) {
