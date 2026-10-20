@@ -457,7 +457,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     // Add this test class as a service provider.
     $GLOBALS['conf']['container_service_providers']['test'] = $this;
 
-    $modules = self::getModulesToEnable(static::class);
+    $modules = static::getModulesToEnable(static::class);
 
     // When a module is providing the database driver, then enable that module.
     $connection_info = Database::getConnectionInfo();

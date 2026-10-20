@@ -29,12 +29,22 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
+  protected static $modules = [
+    'system',
+    // Without configurable languages, the language module behaves as if it
+    // were not enabled. Only ::testConfigurableLanguage() adds one.
+    'language',
+  ];
 
   /**
    * The key-value entry holding the type and the ID of the entity being tested.
    */
   private const string ENTITY_UNDER_TEST = 'config_entity_validation_test.entity_under_test';
+
+  /**
+   * The langcode of the language that ::testConfigurableLanguage() creates.
+   */
+  private const string CONFIGURABLE_LANGCODE = 'kthxbai';
 
   /**
    * The config entity being tested.
@@ -508,37 +518,22 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
     $this->assertValidationErrors([
       'langcode' => 'The value you selected is not a valid choice.',
     ]);
+  }
 
+  /**
+   * Tests that the langcode of a configurable language is accepted.
+   */
+  public function testConfigurableLanguage(): void {
     // If a new configurable language is created with a non-standard langcode,
     // it should be acceptable.
-    $enable_language = !$this->container->get('module_handler')->moduleExists('language');
-    if ($enable_language) {
-      $this->enableModules(['language']);
-    }
     // The language doesn't exist yet, so it shouldn't be a valid choice.
-    $this->entity->set('langcode', 'kthxbai');
+    $this->entity->set('langcode', self::CONFIGURABLE_LANGCODE);
     $this->assertValidationErrors([
       'langcode' => 'The value you selected is not a valid choice.',
     ]);
     // Once we create the language, it should be a valid choice.
-    $language = ConfigurableLanguage::createFromLangcode('kthxbai');
-    $language->save();
+    ConfigurableLanguage::createFromLangcode(self::CONFIGURABLE_LANGCODE)->save();
     $this->assertValidationErrors([]);
-
-    // The language is a config entity, so it outlives this test method when the
-    // test class shares its environment. Remove it, otherwise the test methods
-    // that follow would validate against a language list this one invented.
-    // Deleting the configuration rather than the entity: deleting the entity
-    // invokes hooks that update the langcode of existing content, and the
-    // subclasses of this class may not install the schema of the entity types
-    // those hooks touch.
-    \Drupal::configFactory()->getEditable($language->getConfigDependencyName())->delete();
-    // A test class sharing its environment must not leave the module list
-    // changed. Enabling the module did not install anything, so disabling it
-    // restores the module list.
-    if ($enable_language) {
-      $this->disableModules(['language']);
-    }
   }
 
   /**
@@ -827,6 +822,33 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
     }
 
     return $optional_properties;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function resetEnvironment(): void {
+    parent::resetEnvironment();
+
+    // Without a shared environment, the parent dropped all the tables.
+    if (!static::sharesEnvironment()) {
+      return;
+    }
+
+    // The language that ::testConfigurableLanguage() creates is a config
+    // entity, so it would outlive the test method when the test class shares
+    // its environment. Deleting the configuration rather than the entity:
+    // deleting the entity invokes hooks that update the langcode of existing
+    // content, and the subclasses of this class may not install the schema of
+    // the entity types those hooks touch.
+    $config = $this->container->get('config.factory')
+      ->getEditable('language.entity.' . self::CONFIGURABLE_LANGCODE);
+    if (!$config->isNew()) {
+      $config->delete();
+      // Deleting the entity would also reset the language manager, which
+      // clears the language configuration IDs it caches in cache.bootstrap.
+      $this->container->get('language_manager')->reset();
+    }
   }
 
 }
