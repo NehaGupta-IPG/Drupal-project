@@ -24,12 +24,10 @@ class ConfigLangcodeInstallerSubscriber implements EventSubscriberInterface {
       return;
     }
     global $install_state;
-    $installer_langcode = $install_state['parameters']['langcode'] ?? NULL;
-    if ($installer_langcode === NULL) {
-      return;
-    }
 
-    $event->setLangcode($installer_langcode);
+    if (isset($install_state['parameters']['langcode'])) {
+      $event->setLangcode($install_state['parameters']['langcode']);
+    }
   }
 
   /**
