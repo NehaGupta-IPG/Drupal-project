@@ -53,4 +53,16 @@ final class EmailAddress {
     return $normalized;
   }
 
+  /**
+   * Checks the SMTP local-part length of a parsed mailbox in octets.
+   *
+   * This does not validate mailbox syntax or domain length.
+   *
+   * @see https://www.rfc-editor.org/rfc/rfc5321#section-4.5.3.1.1
+   */
+  public static function hasValidLocalPartLength(string $mailbox): bool {
+    $separator = strrpos($mailbox, '@');
+    return $separator !== FALSE && $separator > 0 && $separator <= 64;
+  }
+
 }

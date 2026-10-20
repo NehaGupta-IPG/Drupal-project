@@ -264,4 +264,38 @@ class SymfonyMailerTest extends UnitTestCase {
     $this->assertSame([$encoded], $captured);
   }
 
+  /**
+   * Tests accepted and rejected local-part lengths before transport delivery.
+   */
+  #[DataProvider('recipientLengthProvider')]
+  public function testRecipientLength(string $mailbox, bool $valid, string $header): void {
+    $mailer = $this->createMock(MailerInterface::class);
+    $mailer->expects($valid ? $this->once() : $this->never())->method('send');
+    $plugin = new SymfonyMailer($this->createStub(LoggerInterface::class), $mailer);
+    $headers = ['From' => 'sender@example.org'];
+    if ($header !== 'To') {
+      $headers[$header] = $mailbox;
+    }
+    $this->assertSame($valid, $plugin->mail([
+      'to' => $header === 'To' ? $mailbox : 'recipient@example.org',
+      'headers' => $headers,
+      'subject' => 'Mailbox length test',
+      'body' => 'No real transport is used.',
+    ]));
+  }
+
+  /**
+   * Provides octet boundaries, including copied and blind copied recipients.
+   */
+  public static function recipientLengthProvider(): array {
+    return [
+      '64 ASCII octets' => [str_repeat('a', 64) . '@example.org', TRUE, 'To'],
+      '65 ASCII octets' => [str_repeat('a', 65) . '@example.org', FALSE, 'To'],
+      '64 UTF-8 octets' => [str_repeat('é', 32) . '@example.org', TRUE, 'To'],
+      '66 UTF-8 octets' => [str_repeat('é', 33) . '@example.org', FALSE, 'To'],
+      'Overlong Cc' => [str_repeat('a', 65) . '@example.org', FALSE, 'Cc'],
+      'Overlong Bcc' => [str_repeat('é', 33) . '@example.org', FALSE, 'Bcc'],
+    ];
+  }
+
 }
