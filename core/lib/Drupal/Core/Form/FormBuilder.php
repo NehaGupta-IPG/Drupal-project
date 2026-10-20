@@ -989,7 +989,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       '#description_display' => 'after',
       '#errors' => NULL,
     ];
-    // Add required indicator for details elements within forms.
+    // Check for non-CSS required indicator.
     $element['#pre_render'][] = [FormElementBase::class, 'preRenderRequiredElementTitle'];
 
     // Special handling if we're on the top level form element.
