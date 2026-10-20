@@ -35,31 +35,18 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
   }
 
   /**
-   * Tests configuration without an explicit langcode gets the new default.
-   */
-  public function testConfigWithoutExplicitLangcode(): void {
-    $this->config('config_test.langcode_test')
-      ->set('optional_translatable_value', 'Hello')
-      ->save();
-    $this->assertSame('en', $this->config('config_test.langcode_test')->get('langcode'));
-
-    $this->reconcile('en', 'fr');
-
-    $this->assertSame('fr', $this->config('config_test.langcode_test')->get('langcode'));
-  }
-
-  /**
    * Tests configuration with the previous default is updated.
    */
-  public function testConfigEWithOldDefaultIsUpdated(): void {
+  public function testConfigWithOldDefaultIsUpdated(): void {
     $this->config('config_test.langcode_test')
       ->set('optional_translatable_value', 'Hello')
       ->set('langcode', 'en')
       ->save();
 
-    $this->reconcile('en', 'fr');
+    $context = $this->reconcile('en', 'fr');
 
     $this->assertSame('fr', $this->config('config_test.langcode_test')->get('langcode'));
+    $this->assertContains('config_test.langcode_test', $context['results']['updated_names']);
   }
 
   /**
@@ -71,10 +58,11 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
       ->set('langcode', 'de')
       ->save();
 
-    $this->reconcile('en', 'fr');
+    $context = $this->reconcile('en', 'fr');
 
     $this->assertSame('de', $this->config('config_test.langcode_test')->get('langcode'));
     $this->assertSame('Hallo', $this->config('config_test.langcode_test')->get('optional_translatable_value'));
+    $this->assertNotContains('config_test.langcode_test', $context['results']['updated_names']);
   }
 
   /**
@@ -90,20 +78,6 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
     $this->reconcile('en', 'fr');
 
     $this->assertSame('fr', $this->config('config_test.dynamic.no_explicit_langcode')->get('langcode'));
-  }
-
-  /**
-   * Tests the updated names are returned for other batch operations.
-   */
-  public function testUpdatedNamesAreRecorded(): void {
-    $this->config('config_test.langcode_test')
-      ->set('optional_translatable_value', 'Hello')
-      ->set('untranslatable_value', 'foo')
-      ->save();
-
-    $context = $this->reconcile('en', 'fr');
-
-    $this->assertContains('config_test.langcode_test', $context['results']['updated_names']);
   }
 
   /**
@@ -135,7 +109,7 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
   /**
    * Tests an existing override for the new default is merged and removed.
    */
-  public function testExistingOverrideForNewDefaultIsAbsorbed(): void {
+  public function testExistingOverrideForNewDefaultIsMerged(): void {
     $this->config('config_test.langcode_test')
       ->set('optional_translatable_value', 'Hello')
       ->set('untranslatable_value', 'foo')
