@@ -5,12 +5,9 @@ namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
 use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\Constraints\EmailValidator;
 
 /**
- * Count constraint.
- *
- * Overrides the symfony constraint to use the strict setting.
+ * Validates email addresses using Drupal mailbox validation.
  */
 #[Constraint(
   id: 'Email',
@@ -36,7 +33,7 @@ class EmailConstraint extends Email {
    * {@inheritdoc}
    */
   public function validatedBy(): string {
-    return EmailValidator::class;
+    return EmailConstraintValidator::class;
   }
 
 }
