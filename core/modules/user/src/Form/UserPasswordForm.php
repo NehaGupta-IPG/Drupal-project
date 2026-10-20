@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Form;
 
+use Drupal\Component\Utility\EmailAddress;
 use Drupal\Component\Utility\EmailValidatorInterface;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Flood\FloodInterface;
@@ -171,7 +172,8 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
     }
 
     // Try to load by email.
-    $users = $this->userStorage->loadByProperties(['mail' => $name]);
+    $mail = EmailAddress::normalizeDomainSeparators($name);
+    $users = $this->userStorage->loadByProperties(['mail' => $mail]);
     if (empty($users)) {
       // No success, try to load by name.
       $users = $this->userStorage->loadByProperties(['name' => $name]);

@@ -105,4 +105,17 @@ class UserEmailDomainSeparatorTest extends BrowserTestBase {
     $this->assertStringNotContainsString('/user/reset/' . $other->id() . '/', $mails[0]['body']);
   }
 
+  /**
+   * Tests that separator mapping does not change a recovery username.
+   */
+  public function testPasswordRecoveryByUsername(): void {
+    $account = $this->drupalCreateUser([], 'name。part');
+    $this->drupalGet('user/password');
+    $this->submitForm(['name' => $account->getAccountName()], 'Submit');
+    $mails = $this->getMails(['id' => 'user_password_reset']);
+    $this->assertCount(1, $mails);
+    $this->assertSame($account->getEmail(), $mails[0]['to']);
+    $this->assertStringContainsString('/user/reset/' . $account->id() . '/', $mails[0]['body']);
+  }
+
 }
