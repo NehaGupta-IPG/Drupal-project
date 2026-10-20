@@ -101,12 +101,6 @@ function system_post_update_clear_admin_compact_mode_config(): void {
 
 /**
  * Adds or removes a langcode on simple config to match its translatability.
- *
- * Config::save() only reconciles langcode with translatability at save time,
- * so it cannot fix up configuration that already exists on a site being
- * updated: a value-based translatability check may now disagree with a
- * langcode the configuration was given under previous rules. This applies
- * the same value-based check to all existing simple configuration once.
  */
 function system_post_update_reconcile_translatable_config_langcode(&$sandbox = NULL): TranslatableMarkup {
   $config_factory = \Drupal::configFactory();
@@ -120,30 +114,28 @@ function system_post_update_reconcile_translatable_config_langcode(&$sandbox = N
 
   $typed_config_manager = \Drupal::service(TypedConfigManagerInterface::class);
   $config_manager = \Drupal::service(ConfigManagerInterface::class);
-  // The site's default language and the configuration default language are
-  // guaranteed to be the same at this point: nothing before this update has
-  // ever allowed them to diverge.
   $default_langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
 
   $names = array_splice($sandbox['names'], 0, Settings::get('entity_update_batch_size', 50));
   foreach ($names as $name) {
-    // Configuration entities are always considered translatable and always
-    // have a langcode of their own regardless of their current values, so
-    // they never need reconciling here.
+    // We're only dealing with simple config, which won't map to an entity type.
+    // All configuration objects must have schema to be translatable.
     if ($config_manager->getEntityTypeIdByName($name) || !$typed_config_manager->hasConfigSchema($name)) {
       continue;
     }
 
     $config = $config_factory->getEditable($name);
     $typed_config = $typed_config_manager->createFromNameAndData($name, $config->getRawData());
-    // Simple config is always a mapping. Assertions are disabled in
-    // production, so the assert() alone would not stop a fatal error below
-    // if that ever turned out false there - the continue does.
+    // Simple config is always a mapping.
     assert($typed_config instanceof Mapping);
     if (!$typed_config instanceof Mapping) {
       continue;
     }
 
+    // If this config contains any elements (at any level of nesting) which
+    // are translatable, but the config hasn't got a langcode, assign one. But
+    // if nothing in the config structure is translatable, the config shouldn't
+    // have a langcode at all.
     if ($typed_config->hasTranslatableElements()) {
       if (array_key_exists('langcode', $config->getRawData())) {
         continue;
