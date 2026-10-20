@@ -53,7 +53,7 @@ trait EmailTestDataTrait {
    *
    * The Khmer example has a 66-octet local part and exceeds the SMTP limit.
    *
-   * @see https://www.drupal.org/files/issues/2022-05-10/3045516-22-Email-Address-Internationalization.patch
+   * @see https://www.drupal.org/files/issues/2022-05-10/3045516-24-Email-Address-Internationalization.patch
    * @see https://www.rfc-editor.org/rfc/rfc5321#section-4.5.3.1.1
    */
   public static function uasgEnvelopeProvider(): array {
@@ -214,6 +214,56 @@ trait EmailTestDataTrait {
         TRUE,
         'གློག་འཕྲིན་བརྟག་དཔྱད@xn--nbdaaaa43akakd8katrtf0o1ao4cf63b7ah26finra.com',
       ],
+      'ASCII local part with Hebrew TLD' => [
+        'email-test@universal-acceptance-test.קום',
+        TRUE,
+        'email-test@universal-acceptance-test.xn--9dbq2a',
+      ],
+      'Accented Latin mailbox' => [
+        'email-épreuve@épreuve-acceptation-universelle.org',
+        TRUE,
+        'email-épreuve@xn--preuve-acceptation-universelle-9wc.org',
+      ],
+      'Uppercase accented local part' => [
+        'Email-Épreuve@épreuve-acceptation-universelle.org',
+        TRUE,
+        'Email-Épreuve@xn--preuve-acceptation-universelle-9wc.org',
+      ],
+      'Decomposed domain' => [
+        'email-épreuve@épreuve-acceptation-universelle.org',
+        TRUE,
+        'email-épreuve@xn--preuve-acceptation-universelle-9wc.org',
+      ],
+      'Decomposed local part' => [
+        'email-épreuve@épreuve-acceptation-universelle.org',
+        TRUE,
+        'email-épreuve@xn--preuve-acceptation-universelle-9wc.org',
+      ],
+      'Chinese ideographic separator' => [
+        '电子邮件测试@普遍适用测试。我爱你',
+        TRUE,
+        '电子邮件测试@xn--tkvs6ms8gqpywye3ma.xn--6qq986b3xl',
+      ],
+      'Arabic ASCII and Unicode labels' => [
+        'تجربة-بريد-الكتروني@xn-----ctdbabcfhu9c2b9l1acccr4c.موريتانيا',
+        TRUE,
+        'تجربة-بريد-الكتروني@xn-----ctdbabcfhu9c2b9l1acccr4c.xn--mgbah1a3hjkrd',
+      ],
+      'Arabic Unicode and ASCII labels' => [
+        'تجربة-بريد-الكتروني@تجربة-القبول-الشامل.xn--mgbah1a3hjkrd',
+        TRUE,
+        'تجربة-بريد-الكتروني@xn-----ctdbabcfhu9c2b9l1acccr4c.xn--mgbah1a3hjkrd',
+      ],
+      'Arabic ASCII labels' => [
+        'تجربة-بريد-الكتروني@xn-----ctdbabcfhu9c2b9l1acccr4c.xn--mgbah1a3hjkrd',
+        TRUE,
+        'تجربة-بريد-الكتروني@xn-----ctdbabcfhu9c2b9l1acccr4c.xn--mgbah1a3hjkrd',
+      ],
+      'ASCII local part with Arabic ASCII labels' => [
+        'email-test@xn-----ctdbabcfhu9c2b9l1acccr4c.xn--mgbah1a3hjkrd',
+        TRUE,
+        'email-test@xn-----ctdbabcfhu9c2b9l1acccr4c.xn--mgbah1a3hjkrd',
+      ],
     ];
     // cspell:enable
   }
@@ -223,6 +273,13 @@ trait EmailTestDataTrait {
    */
   public static function uasgMailboxProvider(): array {
     return array_map(static fn (array $case) => array_slice($case, 0, 2), self::uasgEnvelopeProvider());
+  }
+
+  /**
+   * Provides all issue and historical mailbox examples.
+   */
+  public static function allMailboxProvider(): array {
+    return [...self::internationalizedMailboxProvider(), ...self::uasgMailboxProvider()];
   }
 
 }
