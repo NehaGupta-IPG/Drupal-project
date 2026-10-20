@@ -8,6 +8,7 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\EmailTestDataTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -67,9 +68,27 @@ class EmailTest extends BrowserTestBase {
       $this->drupalGet('form-test/email');
       $this->submitForm(['email' => $mailbox, 'email_required' => $mailbox], 'Submit');
       $values = Json::decode($this->getSession()->getPage()->getContent());
-      $this->assertSame($mailbox, $values['email']);
-      $this->assertSame($mailbox, $values['email_required']);
+      $expected = match ($mailbox) {
+        'info5@普遍接受-测试。世界' => 'info5@普遍接受-测试.世界',
+        '测试5@普遍接受-测试。世界' => '测试5@普遍接受-测试.世界',
+        default => $mailbox,
+      };
+      $this->assertSame($expected, $values['email']);
+      $this->assertSame($expected, $values['email_required']);
     }
+  }
+
+  /**
+   * Tests normalization of optional and required email element values.
+   */
+  #[DataProvider('normalizedDomainMailboxProvider')]
+  public function testDomainSeparatorNormalization(string $mailbox, string $normalized): void {
+    $this->drupalGet('form-test/email');
+    $this->submitForm(['email' => $mailbox, 'email_required' => $mailbox], 'Submit');
+    $this->assertSession()->pageTextNotContains('is not valid');
+    $values = Json::decode($this->getSession()->getPage()->getContent());
+    $this->assertSame($normalized, $values['email']);
+    $this->assertSame($normalized, $values['email_required']);
   }
 
 }

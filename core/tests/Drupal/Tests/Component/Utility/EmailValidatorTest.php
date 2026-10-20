@@ -63,4 +63,14 @@ class EmailValidatorTest extends TestCase {
     $validator->isValid('example@example.com', (new NoRFCWarningsValidation()));
   }
 
+  /**
+   * Tests recognition of supported domain input by the shared validator.
+   */
+  #[DataProvider('normalizedDomainMailboxProvider')]
+  public function testDomainSeparatorValidation(string $mailbox, string $normalized): void {
+    $validator = new EmailValidator();
+    $this->assertTrue($validator->isValid($normalized));
+    $this->assertTrue($validator->isValid($mailbox));
+  }
+
 }

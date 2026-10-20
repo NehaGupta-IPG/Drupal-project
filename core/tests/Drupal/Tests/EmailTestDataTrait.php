@@ -282,4 +282,22 @@ trait EmailTestDataTrait {
     return [...self::internationalizedMailboxProvider(), ...self::uasgMailboxProvider()];
   }
 
+  /**
+   * Provides separator input and the expected normalized mailbox.
+   */
+  public static function normalizedDomainMailboxProvider(): array {
+    // The second local part includes a decomposed accent and a Unicode dot.
+    // Both must remain unchanged: mapping applies only after the final @.
+    $cases = [];
+    foreach (['ASCII' => '.', 'Ideographic' => '。', 'Fullwidth' => '．', 'Halfwidth' => '｡'] as $label => $separator) {
+      foreach (['ASCII local' => 'Person', 'Unicode local' => "Te\u{0301}st。用户"] as $local_label => $local) {
+        $cases[$label . ' ' . $local_label] = [
+          $local . '@例子' . $separator . '测试',
+          $local . '@例子.测试',
+        ];
+      }
+    }
+    return $cases;
+  }
+
 }

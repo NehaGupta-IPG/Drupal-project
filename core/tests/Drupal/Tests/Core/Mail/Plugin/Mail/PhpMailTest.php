@@ -7,8 +7,10 @@ namespace Drupal\Tests\Core\Mail\Plugin\Mail;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Mail\Plugin\Mail\PhpMail;
 use Drupal\Tests\UnitTestCase;
+use Drupal\Tests\EmailTestDataTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -18,6 +20,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 #[CoversClass(PhpMail::class)]
 #[Group('Mail')]
 class PhpMailTest extends UnitTestCase {
+
+  use EmailTestDataTrait;
 
   /**
    * The configuration factory.
@@ -148,6 +152,23 @@ class PhpMailTest extends UnitTestCase {
       ->willReturn(TRUE);
 
     $this->assertTrue($mailer->mail($message));
+  }
+
+  /**
+   * Tests domain separators in the recipient passed to PHP's mail boundary.
+   */
+  #[DataProvider('normalizedDomainMailboxProvider')]
+  public function testNormalizedDomainRecipient(string $mailbox, string $normalized): void {
+    $mailer = $this->createPhpMailInstance();
+    $mailer->expects($this->once())->method('doMail')
+      ->with($normalized, $this->anything(), $this->anything(), $this->anything(), $this->anything())
+      ->willReturn(TRUE);
+    $this->assertTrue($mailer->mail([
+      'to' => $mailbox,
+      'headers' => ['From' => 'sender@example.org'],
+      'subject' => 'Domain separator test',
+      'body' => 'No real transport is used.',
+    ]));
   }
 
 }

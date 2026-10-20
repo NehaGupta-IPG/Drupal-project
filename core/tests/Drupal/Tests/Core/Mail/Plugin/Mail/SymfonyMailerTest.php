@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Mail\Plugin\Mail;
 
-// cspell:ignore UASG
+// cspell:ignore UASG IDNA
 
 use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Mail\Plugin\Mail\SymfonyMailer;
@@ -235,6 +235,33 @@ class SymfonyMailerTest extends UnitTestCase {
       'body' => 'No real transport is used.',
     ]));
     $this->assertSame($valid ? [$encoded] : [], $captured);
+  }
+
+  /**
+   * Tests separator mapping and exact local-part preservation in the envelope.
+   */
+  #[DataProvider('normalizedDomainMailboxProvider')]
+  public function testNormalizedDomainRecipient(string $mailbox, string $normalized): void {
+    $captured = [];
+    $mailer = $this->createMock(MailerInterface::class);
+    $mailer->expects($this->once())->method('send')->willReturnCallback(
+      static function (Email $email) use (&$captured): void {
+        foreach (Envelope::create($email)->getRecipients() as $recipient) {
+          $captured[] = $recipient->getEncodedAddress();
+        }
+      }
+    );
+    $plugin = new SymfonyMailer($this->createStub(LoggerInterface::class), $mailer);
+    $this->assertTrue($plugin->mail([
+      'to' => $mailbox,
+      'headers' => ['From' => 'sender@example.org'],
+      'subject' => 'Domain separator test',
+      'body' => 'No real transport is used.',
+    ]));
+    // This fixture domain has a fixed IDNA form. Do not normalize the local part.
+    // cspell:ignore fsqu
+    $encoded = str_replace('@例子.测试', '@xn--fsqu00a.xn--0zwm56d', $normalized);
+    $this->assertSame([$encoded], $captured);
   }
 
 }

@@ -37,4 +37,14 @@ class EmailConstraintValidatorTest extends TestCase {
     }
   }
 
+  /**
+   * Tests the same domain input through field constraint validation.
+   */
+  #[DataProvider('normalizedDomainMailboxProvider')]
+  public function testDomainSeparatorValidation(string $mailbox, string $normalized): void {
+    $validator = Validation::createValidator();
+    $this->assertCount(0, $validator->validate($normalized, new EmailConstraint()));
+    $this->assertCount(0, $validator->validate($mailbox, new EmailConstraint()));
+  }
+
 }
