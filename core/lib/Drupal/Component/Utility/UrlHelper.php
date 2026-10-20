@@ -453,6 +453,8 @@ class UrlHelper {
       if (preg_match('~^[a-z][a-z0-9+.-]*://(?:[^/?#@]*@)?([^/?#:]+)~i', $url, $matches, PREG_OFFSET_CAPTURE)) {
         [$host, $offset] = $matches[1];
         $decoded_host = preg_replace_callback('/(?:%[89a-f][0-9a-f])+/i', static fn(array $matches): string => rawurldecode($matches[0]), $host);
+        // Normalize Unicode domain separators only within the hostname.
+        $decoded_host = strtr($decoded_host, ['。' => '.', '．' => '.', '｡' => '.']);
         $url = substr_replace($url, $decoded_host, $offset, strlen($host));
       }
       $allowed_protocols = array_unique(array_merge(static::$allowedProtocols, ['http', 'https', 'ftp', 'feed']));
