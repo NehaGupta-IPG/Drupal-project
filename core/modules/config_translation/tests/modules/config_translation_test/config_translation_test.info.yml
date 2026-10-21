@@ -3,6 +3,8 @@ description: 'Helpers to test the configuration translation system'
 type: module
 package: Testing
 version: VERSION
+container_rebuild_required: true
 dependencies:
   - drupal:config_translation
   - drupal:config_test
+  - drupal:filter
