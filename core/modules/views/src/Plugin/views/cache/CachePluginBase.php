@@ -91,9 +91,10 @@ abstract class CachePluginBase extends PluginBase {
    * Determines cache expiration time based on its type.
    *
    * Plugins must override this to implement expiration in the cache table.
-   * This controls the expiration of cached view results written by
-   * ::cacheSet(); it does not set the max-age of the rendered view. See
-   * ::getCacheMaxAge().
+   * The expiration of cached view results is determined by
+   * ::cacheSetMaxAge() when called with the 'results' type. It does not set the
+   * max-age of the rendered view, which is determined separately using the
+   * 'output' cache type.
    *
    * @param string $type
    *   The cache type.
