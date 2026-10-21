@@ -82,7 +82,7 @@ class SerializationTest extends KernelTestBase {
     $data = $this->container->get('typed_data_manager')->create(DataDefinition::create('string'));
     $schema = $this->serializer->getJsonSchema($data, []);
 
-    $this->expectUserDeprecationMessage('Passing an array to the $object parameter in Drupal\serialization\Serializer\Serializer::getJsonSchema() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Call it once for each object instead. See https://www.drupal.org/project/drupal/issues/3627338');
+    $this->expectUserDeprecationMessage('Passing anything other than an object to the $object parameter in Drupal\serialization\Serializer\Serializer::getJsonSchema() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Pass one object per call instead. See https://www.drupal.org/project/drupal/issues/3627338');
     $this->assertSame([$schema], $this->serializer->getJsonSchema([$data], []));
   }
 
