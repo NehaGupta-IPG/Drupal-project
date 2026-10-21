@@ -98,24 +98,16 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->doTestLanguageBlock404($block->label(), 'system/404');
     $this->drupalLogin($this->drupalCreateUser());
     $this->doTestLanguageBlock404($block->label(), 'system/404');
-    $this->assertHiddenLanguageBlockAccessibleName();
-  }
 
-  /**
-   * Tests the accessible name when the configured block label is hidden.
-   */
-  protected function assertHiddenLanguageBlockAccessibleName(): void {
-    $block_label = $this->randomMachineName(8);
-    $this->drupalPlaceBlock('language_block:' . LanguageInterface::TYPE_INTERFACE, [
-      'id' => 'hidden_language_block',
-      'label' => $block_label,
-      'label_display' => '0',
-    ]);
-
+    // Hide the configured label. The heading is no longer rendered, but the
+    // navigation landmark keeps the configured label as its accessible name.
+    $block->getPlugin()->setConfigurationValue('label_display', '0');
+    $block->save();
     $this->drupalGet('<front>');
+    $this->assertSession()->elementNotExists('xpath', '//div[@id="block-test-language-block"]/h2');
     $language_switcher_nav = $this->xpath('//div[@id=:id and @role="navigation" and @aria-label=:label]', [
-      ':id' => 'block-hidden-language-block',
-      ':label' => $block_label,
+      ':id' => 'block-test-language-block',
+      ':label' => $block->label(),
     ]);
     $this->assertNotEmpty($language_switcher_nav);
   }
@@ -138,9 +130,9 @@ class LanguageSwitchingTest extends BrowserTestBase {
 
     $language_switcher_nav = $this->xpath('//div[@id=:id and @role="navigation" and @aria-label=:label]', [
       ':id' => 'block-test-language-block',
-      ':label' => (string) $block_label,
+      ':label' => $block_label,
     ]);
-    $this->assertNotEmpty($language_switcher_nav, 'Language switcher block navigation landmark has accessible name.');
+    $this->assertNotEmpty($language_switcher_nav);
 
     // Assert that each list item and anchor element has the appropriate data-
     // attributes.
