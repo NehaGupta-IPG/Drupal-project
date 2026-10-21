@@ -109,7 +109,9 @@ final class ClassWriter {
       if (!is_dir($directory) && !@mkdir($directory, 0777, TRUE) && !is_dir($directory)) {
         throw new \RuntimeException('Unable to create directory: ' . $directory);
       }
-      file_put_contents($full_path, $altered_code);
+      $temp_path = tempnam($directory, 'class_writer_');
+      file_put_contents($temp_path, $altered_code, LOCK_EX);
+      rename($temp_path, $full_path);
     }
 
     return $full_path;
