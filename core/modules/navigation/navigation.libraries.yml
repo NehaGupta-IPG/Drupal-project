@@ -8,6 +8,7 @@ internal.navigation:
     js/sidebar.js: {}
     js/admin-toolbar-wrapper.js: {}
     js/arrow-navigation.js: {}
+    js/form-actions.js: {}
   css:
     theme:
       css/base/fonts.css: {}
