@@ -95,9 +95,13 @@ class NodePreviewEmbedTestController extends ControllerBase {
     $build = [
       '#type' => 'container',
       '#attributes' => ['id' => self::WRAPPER_ID],
+      'preview' => $this->entityTypeManager()
+        ->getViewBuilder('node')
+        ->view($node_preview),
       // NodePreviewController adds this container through
       // #attached['page_top'], which is not rendered for an AJAX response, so
-      // build it here.
+      // build it here. It is position: fixed, so it goes after the preview to
+      // avoid covering the links in it.
       // @see \Drupal\node\Controller\NodePreviewController::view()
       'preview_container' => [
         '#type' => 'container',
@@ -106,9 +110,6 @@ class NodePreviewEmbedTestController extends ControllerBase {
         ],
         'view_mode' => $this->formBuilder()->getForm(NodePreviewForm::class, $node_preview),
       ],
-      'preview' => $this->entityTypeManager()
-        ->getViewBuilder('node')
-        ->view($node_preview),
     ];
     // Don't render cache previews.
     unset($build['preview']['#cache']);
