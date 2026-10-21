@@ -3,6 +3,7 @@
 namespace Drupal\Core\Cache;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseException;
 
 /**
@@ -42,7 +43,28 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
           ->execute();
       }
     }
-    catch (\Exception $e) {
+    catch (\Throwable $e) {
+      // Reopen connection + retry when post-tx callback hits a nulled PDO
+      // (destructor race; \Error bypassed the original \Exception catch).
+      if ($e instanceof \TypeError && str_contains($e->getMessage(), 'null given')) {
+        try {
+          $target = $this->connection->getTarget();
+          $key = $this->connection->getKey();
+          Database::closeConnection($target, $key);
+          $fresh = Database::getConnection($target, $key);
+          foreach ($tags as $tag) {
+            $fresh->merge('cachetags')
+              ->insertFields(['invalidations' => 1])
+              ->expression('invalidations', '[invalidations] + 1')
+              ->key('tag', $tag)
+              ->execute();
+          }
+          return;
+        }
+        catch (\Throwable $retry) {
+          $e = $retry;
+        }
+      }
       // Create the cache table, which will be empty. This fixes cases during
       // core install where cache tags are invalidated before the table is
       // created.
