@@ -234,4 +234,55 @@ class ConfigActionsTest extends KernelTestBase {
     $this->assertSame(1, $query->execute());
   }
 
+  /**
+   * @testWith ["setBlockSettings"]
+   */
+  public function testSetBlockSettingsActionOnlyWorksOnBlocks(string $action): void {
+    $this->expectException(PluginNotFoundException::class);
+    $this->expectExceptionMessage("The \"user_role\" entity does not support the \"$action\" config action.");
+    $this->configActionManager->applyAction($action, 'user.role.anonymous', []);
+  }
+
+  /**
+   * @testWith ["setBlockSettings"]
+   */
+  public function testSetBlockSettingsActionWithInvalidBlock(string $action): void {
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage("The config block.block.invalid_block is not a valid Drupal block.");
+    $this->configActionManager->applyAction($action, 'block.block.invalid_block', []);
+  }
+
+  /**
+   * @testWith ["setBlockSettings"]
+   */
+  public function testSetBlockSettingsActionWithInvalidBlockSettings(string $action): void {
+    $this->expectException(ConfigActionException::class);
+    $block_to_test = Block::load('claro_primary_local_tasks');
+    $this->assertNotNull($block_to_test);
+    $block_settings = $block_to_test->get('settings');
+    $this->assertArrayNotHasKey('foo', $block_settings);
+    $this->expectExceptionMessage('Invalid settings "foo" provided for the block block.block.claro_primary_local_tasks.');
+    $this->configActionManager->applyAction($action, 'block.block.claro_primary_local_tasks', ['foo' => 'bar']);
+  }
+
+  /**
+   * @testWith ["setBlockSettings"]
+   */
+  public function testSetBlockSettingsAction(string $action): void {
+    $block_to_test = Block::load('claro_primary_local_tasks');
+    $this->assertNotNull($block_to_test);
+    $block_settings = $block_to_test->get('settings');
+    $this->assertNotEmpty($block_settings);
+    $settings_to_update = [
+      'label' => 'Primary tabs - Test',
+      'label_display' => '1',
+    ];
+    $this->configActionManager->applyAction($action, 'block.block.claro_primary_local_tasks', $settings_to_update);
+    // Load the block again and check the settings.
+    $block = Block::load('claro_primary_local_tasks');
+    $settings = $block->get('settings');
+    $this->assertSame('Primary tabs - Test', $settings['label']);
+    $this->assertSame('1', $settings['label_display']);
+  }
+
 }
