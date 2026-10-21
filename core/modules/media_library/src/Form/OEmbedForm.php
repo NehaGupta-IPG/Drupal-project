@@ -159,6 +159,7 @@ class OEmbedForm extends AddFormBase {
       }
       catch (ResourceException $e) {
         $form_state->setErrorByName('url', $e->getMessage());
+        $this->logger('media')->error($e->getMessage() . ' URL: {url}.', ['url' => $e->getUrl()]);
       }
     }
   }

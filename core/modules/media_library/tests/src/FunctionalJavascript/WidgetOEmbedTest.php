@@ -137,7 +137,7 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     // consistently match their label's "for" attribute.
     $assert_session->assertWaitOnAjaxRequest();
     // Check if the correct error message appears:
-    $assert_session->pageTextContains('Could not retrieve the oEmbed resource: Client error: `GET http://web/media_test_oembed/resource?url=https://www.youtube.com/watch?v=PWjcqE3QKBg1` resulted in a `404 Not Found` response: Not Found');
+    $assert_session->pageTextContains('Could not retrieve the oEmbed resource: Client error: `GET ' . $this->baseUrl . '/media_test_oembed/resource?url=https%3A//www.youtube.com/watch%3Fv%3DPWjcqE3QKBg1` resulted in a `404 Not Found` response: Not Found');
 
     // Select a media item to check if the selection is persisted when adding
     // new items.
@@ -326,7 +326,7 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     // consistently match their label's "for" attribute.
     $assert_session->assertWaitOnAjaxRequest();
     // Check if the correct error message appears:
-    $assert_session->pageTextContains('Could not retrieve the oEmbed resource: Client error: `GET http://web/media_test_oembed/resource?url=https://www.youtube.com/watch?v=PWjcqE3QKBg1` resulted in a `404 Not Found` response: Not Found');
+    $assert_session->pageTextContains('Could not retrieve the oEmbed resource: Client error: `GET ' . $this->baseUrl . '/media_test_oembed/resource?url=https%3A//www.youtube.com/watch%3Fv%3DPWjcqE3QKBg1` resulted in a `404 Not Found` response: Not Found');
 
     // Select a media item to check if the selection is persisted when adding
     // new items.
@@ -450,9 +450,15 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
-    // Login as root, to access the watchdog overview later on:
-    $this->drupalLogout();
-    $this->drupalLogin($this->rootUser);
+    // Log in as a user who can also access the watchdog overview later on.
+    $this->drupalLogin($this->drupalCreateUser([
+      'access content',
+      'create basic_page content',
+      'view media',
+      'create media',
+      'administer media',
+      'access site reports',
+    ]));
 
     $youtube404Resource = 'https://www.youtube.com/watch?v=PWjcqE3QKBg1';
     ResourceController::setResource404($youtube404Resource);
@@ -472,7 +478,7 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     // Wait for the button ajax to do its thing:
     $assert_session->assertWaitOnAjaxRequest();
     // Check if the correct error message appears:
-    $assert_session->pageTextContains('Could not retrieve the oEmbed resource: Client error: `GET http://web/media_test_oembed/resource?url=' . $youtube404Resource . '` resulted in a `404 Not Found` response: Not Found');
+    $assert_session->pageTextContains('Could not retrieve the oEmbed resource: Client error: `GET ' . $this->baseUrl . '/media_test_oembed/resource?url=https%3A//www.youtube.com/watch%3Fv%3DPWjcqE3QKBg1` resulted in a `404 Not Found` response: Not Found');
 
     // Get the latest logged watchdog entry and get its id, it should be our
     // oembed error event (Taken from dblog/tests/src/Functional/DbLogTest.php,
@@ -484,7 +490,7 @@ class WidgetOEmbedTest extends MediaLibraryTestBase {
     // Go to the oembed watchdog event entry and check, that the Client error
     // is logged there:
     $this->drupalGet('admin/reports/dblog/event/' . $wid);
-    $assert_session->pageTextContains('Client error: `GET http://web/media_test_oembed/resource?url=' . $youtube404Resource . '` resulted in a `404 Not Found` response: Not Found');
+    $assert_session->pageTextContains('Client error: `GET ' . $this->baseUrl . '/media_test_oembed/resource?url=https%3A//www.youtube.com/watch%3Fv%3DPWjcqE3QKBg1` resulted in a `404 Not Found` response: Not Found');
   }
 
 }
