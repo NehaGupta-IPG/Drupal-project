@@ -162,6 +162,7 @@ class LinkFieldUITest extends BrowserTestBase {
     $field_edit = [
       'description' => $description,
       'settings[link_type]' => (int) $link_type,
+      'settings[language]' => LinkTitleVisibility::Disabled->value,
     ];
     if (!empty($default_uri)) {
       $field_edit['set_default_value'] = '1';
