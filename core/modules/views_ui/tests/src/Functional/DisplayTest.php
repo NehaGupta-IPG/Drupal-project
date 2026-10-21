@@ -194,6 +194,54 @@ class DisplayTest extends UITestBase {
   }
 
   /**
+   * Tests the AJAX options of the use_ajax setting.
+   */
+  public function testUseAjaxOptions(): void {
+    $use_ajax_path = 'admin/structure/views/nojs/display/test_display/default/use_ajax';
+
+    // AJAX is used on all elements by default.
+    $this->drupalGet($use_ajax_path);
+    $this->assertSession()->checkboxChecked('use_ajax_options[pager]');
+    $this->assertSession()->checkboxChecked('use_ajax_options[sorting]');
+    $this->assertSession()->checkboxChecked('use_ajax_options[exposed_form]');
+
+    $this->submitForm([
+      'use_ajax' => TRUE,
+      'use_ajax_options[pager]' => TRUE,
+      'use_ajax_options[sorting]' => FALSE,
+      'use_ajax_options[exposed_form]' => FALSE,
+    ], 'Apply');
+    $this->submitForm([], 'Save');
+    $display = View::load('test_display')->getDisplay('default');
+    $this->assertTrue($display['display_options']['use_ajax']);
+    $this->assertSame([
+      'pager' => TRUE,
+      'sorting' => FALSE,
+      'exposed_form' => FALSE,
+    ], $display['display_options']['use_ajax_options']);
+
+    $this->drupalGet($use_ajax_path);
+    $this->assertSession()->checkboxChecked('use_ajax_options[pager]');
+    $this->assertSession()->checkboxNotChecked('use_ajax_options[sorting]');
+    $this->assertSession()->checkboxNotChecked('use_ajax_options[exposed_form]');
+
+    // Selecting no element means AJAX is used on all of them.
+    $this->submitForm([
+      'use_ajax' => TRUE,
+      'use_ajax_options[pager]' => FALSE,
+      'use_ajax_options[sorting]' => FALSE,
+      'use_ajax_options[exposed_form]' => FALSE,
+    ], 'Apply');
+    $this->submitForm([], 'Save');
+    $display = View::load('test_display')->getDisplay('default');
+    $this->assertSame([
+      'pager' => TRUE,
+      'sorting' => TRUE,
+      'exposed_form' => TRUE,
+    ], $display['display_options']['use_ajax_options']);
+  }
+
+  /**
    * Tests that the view status is correctly reflected on the edit form.
    */
   public function testViewStatus(): void {
