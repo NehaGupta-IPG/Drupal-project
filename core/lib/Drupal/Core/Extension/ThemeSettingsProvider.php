@@ -109,6 +109,7 @@ class ThemeSettingsProvider {
       if ($themeSettings->get('logo.use_default')) {
         $logo = $this->themeInitialization->getActiveThemeByName($theme)->getLogo();
         $themeSettings->set('logo.url', $this->fileUrlGenerator->generateString($logo));
+        $themeSettings->set('logo.path', $logo);
       }
       elseif ($logo_path = $themeSettings->get('logo.path')) {
         $themeSettings->set('logo.url', $this->fileUrlGenerator->generateString($logo_path));

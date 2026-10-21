@@ -129,29 +129,21 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
     $build = [];
     $site_config = $this->configFactory->get('system.site');
 
-    $logo_uri = $this->themeSettingsProvider->getSetting('logo.url');
-    if ($logo_uri !== NULL) {
-      $extension = pathinfo($logo_uri, PATHINFO_EXTENSION);
-    }
-
-    if (isset($extension)) {
-      $base_path = base_path();
-      if (str_starts_with($logo_uri, $base_path)) {
-        $logo_uri = substr($logo_uri, strlen($base_path));
-      }
-      $logo_uri = ltrim($logo_uri, '/');
+    $logo_path = $this->themeSettingsProvider->getSetting('logo.path');
+    if ($logo_path) {
+      $extension = pathinfo($logo_path, PATHINFO_EXTENSION);
       $build['site_logo'] = [
         '#access' => $this->configuration['use_site_logo'],
       ];
       // SVG uses markup. Otherwise, use the image factory.
-      if ($extension === 'svg' && file_exists($logo_uri)) {
-        $build['site_logo']['#markup'] = Markup::create(file_get_contents($logo_uri));
+      if ($extension === 'svg' && file_exists($logo_path)) {
+        $build['site_logo']['#markup'] = Markup::create(file_get_contents($logo_path));
       }
       else {
-        $image = $this->imageFactory->get($logo_uri);
+        $image = $this->imageFactory->get($logo_path);
         if ($image->isValid()) {
           $build['site_logo']['#theme'] = 'image';
-          $build['site_logo']['#uri'] = $logo_uri;
+          $build['site_logo']['#uri'] = $logo_path;
           $build['site_logo']['#alt'] = $this->t('Home');
           $build['site_logo']['#attributes'] = [
             'loading' => 'eager',

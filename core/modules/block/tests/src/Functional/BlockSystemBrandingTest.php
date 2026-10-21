@@ -117,7 +117,7 @@ class BlockSystemBrandingTest extends BlockTestBase {
   }
 
   /**
-   * Tests that SVG logo containing Twig syntax is rendered as markup and not compiled as Twig template.
+   * Tests SVG logo containing Twig syntax is not compiled as Twig template.
    */
   public function testSvgLogoWithTwigSyntax(): void {
     $svg_content = '<svg viewBox="0 0 10 10"><text>{{ 1 + 1 }}</text><text>{% if true %}twig_tag{% endif %}</text></svg>';
@@ -132,6 +132,37 @@ class BlockSystemBrandingTest extends BlockTestBase {
     $this->drupalGet('');
     $this->assertSession()->responseContains($svg_content);
     $this->assertSession()->responseNotContains('<text>2</text>');
+  }
+
+  /**
+   * Tests logo file names with spaces for both SVG and raster images.
+   */
+  public function testLogoWithSpacesInFilename(): void {
+    // 1. Test SVG logo with space in the filename.
+    $svg_content = '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="5"/></svg>';
+    $svg_logo_path = 'public://logo with spaces.svg';
+    \Drupal::service('file_system')->saveData($svg_content, $svg_logo_path);
+
+    $this->config('stark.settings')
+      ->set('logo.use_default', FALSE)
+      ->set('logo.path', $svg_logo_path)
+      ->save();
+
+    $this->drupalGet('');
+    $this->assertSession()->responseContains($svg_content);
+
+    // 2. Test PNG logo with space in the filename.
+    $png_data = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
+    $png_logo_path = 'public://logo with spaces.png';
+    \Drupal::service('file_system')->saveData($png_data, $png_logo_path);
+
+    $this->config('stark.settings')
+      ->set('logo.use_default', FALSE)
+      ->set('logo.path', $png_logo_path)
+      ->save();
+
+    $this->drupalGet('');
+    $this->assertSession()->elementExists('xpath', '//div[@id="block-site-branding"]//img[contains(@src, "logo%20with%20spaces.png")]');
   }
 
 }

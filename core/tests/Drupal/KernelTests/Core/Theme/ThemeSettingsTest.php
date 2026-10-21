@@ -79,6 +79,7 @@ class ThemeSettingsTest extends KernelTestBase {
     // Tests default behavior.
     $expected = '/' . $theme->getPath() . '/logo.svg';
     $this->assertEquals($expected, \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.url', 'stark'));
+    $this->assertEquals($theme->getPath() . '/logo.svg', \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.path', 'stark'));
 
     $config = $this->config('stark.settings');
     \Drupal::service('cache.memory')->invalidateTags(['config:stark.settings']);
@@ -94,6 +95,7 @@ class ThemeSettingsTest extends KernelTestBase {
     $file_url_generator = \Drupal::service('file_url_generator');
     $expected = $file_url_generator->generateString('public://logo_with_scheme.png');
     $this->assertEquals($expected, \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.url', 'stark'));
+    $this->assertEquals('public://logo_with_scheme.png', \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.path', 'stark'));
 
     $values = [
       'default_logo' => FALSE,
@@ -106,6 +108,20 @@ class ThemeSettingsTest extends KernelTestBase {
     // Tests relative path.
     $expected = '/' . $theme->getPath() . '/logo_relative_path.gif';
     $this->assertEquals($expected, \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.url', 'stark'));
+    $this->assertEquals($theme->getPath() . '/logo_relative_path.gif', \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.path', 'stark'));
+
+    $values = [
+      'default_logo' => FALSE,
+      'logo_path' => 'public://logo with spaces.svg',
+    ];
+    theme_settings_convert_to_config($values, $config)->save();
+
+    \Drupal::service('cache.memory')->invalidateTags(['config:stark.settings']);
+
+    // Tests logo path with spaces.
+    $expected = $file_url_generator->generateString('public://logo with spaces.svg');
+    $this->assertEquals($expected, \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.url', 'stark'));
+    $this->assertEquals('public://logo with spaces.svg', \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.path', 'stark'));
 
     $theme_installer->install(['test_theme']);
     \Drupal::configFactory()
@@ -118,6 +134,7 @@ class ThemeSettingsTest extends KernelTestBase {
     // Tests logo set in test_theme.info.yml.
     $expected = '/' . $theme->getPath() . '/images/logo2.svg';
     $this->assertEquals($expected, \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.url', 'test_theme'));
+    $this->assertEquals($theme->getPath() . '/images/logo2.svg', \Drupal::service(ThemeSettingsProvider::class)->getSetting('logo.path', 'test_theme'));
   }
 
 }
