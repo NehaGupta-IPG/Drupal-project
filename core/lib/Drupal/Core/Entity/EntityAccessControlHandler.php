@@ -66,6 +66,12 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
       $operation = 'view';
     }
 
+    // You cannot delete an unsaved entity. This is not cached, as the entity
+    // has no ID and hence no cache tags to invalidate once it is saved.
+    if ($operation === 'delete' && $entity->isNew()) {
+      return $return_as_object ? AccessResult::forbidden() : FALSE;
+    }
+
     // If an entity does not have a UUID, either from not being set or from not
     // having them, use the 'entity type:ID' pattern as the cache $cid.
     $cid = $entity->uuid() ?: $entity->getEntityTypeId() . ':' . $entity->id();
@@ -101,16 +107,6 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
       $this->moduleHandler()->invokeAll($entity->getEntityTypeId() . '_access', [$entity, $operation, $account])
     );
 
-    // You cannot delete an unsaved entity.
-    $set_cache = TRUE;
-    if ($operation === 'delete' && $entity && $entity->isNew()) {
-      $result = AccessResult::forbidden();
-      // We cannot cache this, as the entity has no ID and hence no tags to
-      // invalidate.
-      $set_cache = FALSE;
-      $access[] = $result;
-    }
-
     $return = $this->processAccessHookResults($access);
 
     // Also execute the default access check except when the access result is
@@ -118,9 +114,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
     if (!$return->isForbidden()) {
       $return = $return->orIf($this->checkAccess($entity, $operation, $account));
     }
-    if ($set_cache) {
-      $result = $this->setCache($return, $cid, $operation, $langcode, $account);
-    }
+    $result = $this->setCache($return, $cid, $operation, $langcode, $account);
     return $return_as_object ? $result : $result->isAllowed();
   }
 
