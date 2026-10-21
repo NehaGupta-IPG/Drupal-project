@@ -119,16 +119,37 @@ class TaxonomyTermViewTest extends TaxonomyTestBase {
     $this->drupalGet('node/' . $node->id() . '/translations/add/en/ur');
     $this->submitForm($edit, 'Save (this translation)');
 
+    // Create a second term that will not reference the term in one of its
+    // languages.
+    $edit = [];
+    $edit['title[0][value]'] = $original_title_2 = $this->randomMachineName();
+    $edit['body[0][value]'] = $this->randomMachineName();
+    $edit["{$this->fieldName1}[]"] = $term->id();
+    $this->drupalGet('node/add/article');
+    $this->submitForm($edit, 'Save');
+    $node_2 = $this->drupalGetNodeByTitle($edit['title[0][value]']);
+
+    $edit['title[0][value]'] = $translated_title_2 = $this->randomMachineName();
+    $edit["{$this->fieldName1}[]"] = '_none';
+    $this->drupalGet('node/' . $node_2->id() . '/translations/add/en/ur');
+    $this->submitForm($edit, 'Save (this translation)');
+
     $this->drupalGet('taxonomy/term/' . $term->id());
     $this->assertSession()->pageTextContains($term->label());
     $this->assertSession()->pageTextContains($original_title);
     $this->assertSession()->pageTextNotContains($translated_title);
+    $this->assertSession()->pageTextContains($original_title_2);
 
     $this->drupalGet('ur/taxonomy/term/' . $term->id());
     $this->assertSession()->pageTextContains($term->label());
     $this->assertSession()->pageTextNotContains($original_title);
     $this->assertSession()->pageTextContains($translated_title);
+    $this->assertSession()->pageTextNotContains($translated_title_2);
 
+    // As node 2 does not reference the term, it should not appear on the
+    // translated term page.
+    $this->assertSession()->pageTextNotContains($original_title_2);
+    $this->assertSession()->pageTextNotContains($translated_title_2);
     // Uninstall language module and ensure that the language is not part of the
     // query anymore.
     // @see \Drupal\views\Plugin\views\filter\LanguageFilter::query()

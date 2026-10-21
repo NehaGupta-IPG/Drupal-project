@@ -214,6 +214,17 @@ class TermViewsData extends EntityViewsData {
       ],
     ];
 
+    $data['taxonomy_index']['langcode'] = [
+      'title' => $this->t('Node language'),
+      'help' => $this->t('The langcode of the node.'),
+      'filter' => [
+        'id' => 'language',
+      ],
+      'sort' => [
+        'id' => 'standard',
+      ],
+    ];
+
     $data['taxonomy_index']['created'] = [
       'title' => $this->t('Post date'),
       'help' => $this->t('The date the content related to a term was posted.'),

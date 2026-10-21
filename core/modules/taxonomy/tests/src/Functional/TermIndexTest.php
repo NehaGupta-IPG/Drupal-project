@@ -6,6 +6,8 @@ namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Link;
+use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -234,6 +236,149 @@ class TermIndexTest extends TaxonomyTestBase {
       ->execute()
       ->fetchField();
     $this->assertEquals(0, $index_count, 'Term 2 is not indexed.');
+  }
+
+  /**
+   * Tests that there is a link to the parent term on the child term page.
+   */
+  public function testTaxonomyTermHierarchyBreadcrumbs(): void {
+    // Create two taxonomy terms and set term2 as the parent of term1.
+    $term1 = $this->createTerm($this->vocabulary);
+    $term2 = $this->createTerm($this->vocabulary);
+    $term1->parent = [$term2->id()];
+    $term1->save();
+
+    // Verify that the page breadcrumbs include a link to the parent term.
+    $this->drupalGet('taxonomy/term/' . $term1->id());
+    // Breadcrumbs are not rendered with a language, prevent the term
+    // language from being added to the options.
+    // Check that parent term link is displayed when viewing the node.
+    $this->assertSession()->responseContains(Link::fromTextAndUrl($term2->getName(), $term2->toUrl('canonical', ['language' => NULL]))->toString());
+  }
+
+  /**
+   * Helper function.
+   *
+   * @param int $nid
+   *   The node ID.
+   * @param int $tid
+   *   The taxonomy term ID.
+   * @param array $expected_numbers
+   *   The expected number of entries keyed by the langcode.
+   *
+   * @return array
+   *   An array of results for each language code, including the expected number and actual count.
+   */
+  protected function checkNumberOfEntriesPerLanguage(int $nid, int $tid, array $expected_numbers): array {
+    $connection = Database::getConnection();
+    // Initialize an array to store the results.
+    $results = [];
+
+    foreach ($expected_numbers as $langcode => $expected_number) {
+      $index_count = $connection->query('SELECT COUNT(*) FROM {taxonomy_index} WHERE nid = :nid AND tid = :tid AND langcode = :langcode', [
+        ':nid' => $nid,
+        ':tid' => $tid,
+        ':langcode' => $langcode,
+      ])->fetchField();
+      $this->assertEquals($expected_number, $index_count, 'The actual number of entry ' . $index_count . ' for langcode ' . $langcode . ' is matching the expected number of ' . $expected_number);
+
+      // Store the result in the array.
+      $results[$langcode] = [
+        'expected' => $expected_number,
+        'actual' => $index_count,
+      ];
+    }
+
+    // Return the results array.
+    return $results;
+  }
+
+  /**
+   * Tests that the taxonomy index is maintained properly.
+   */
+  public function testTaxonomyIndexMultilingual(): void {
+    \Drupal::service('module_installer')->install(['language', 'content_translation']);
+    // Create an Urdu language for translations.
+    ConfigurableLanguage::createFromLangcode('ur')->save();
+    // Create a French language for translations.
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    // Enable translation for the article content type and ensure the change is
+    // picked up.
+    \Drupal::service('content_translation.manager')->setEnabled('node', 'article', TRUE);
+
+    /** @var \Drupal\node\NodeStorageInterface $node_storage */
+    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+    // Create term in the vocabulary.
+    $term_1 = $this->createTerm($this->vocabulary);
+
+    // Create an article.
+    /** @var \Drupal\node\NodeInterface $node */
+    $node = $node_storage->create([
+      'type' => 'article',
+      'title' => $this->randomMachineName(),
+      'langcode' => 'en',
+      $this->fieldName1 => [
+        $term_1->id(),
+      ],
+    ]);
+    $node->save();
+    $nid = $node->id();
+
+    // Reload the node to be sure every modification had been taken into
+    // account.
+    $node = $node_storage->load($nid);
+    $node->addTranslation('ur', [
+      'title' => $this->randomMachineName(),
+      $this->fieldName1 => [
+        $term_1->id(),
+      ],
+    ]);
+    $node->save();
+
+    $node = $node_storage->load($nid);
+    $node->addTranslation('fr', [
+      'title' => $this->randomMachineName(),
+    ]);
+    $node->save();
+
+    // Check taxonomy index entries after translation creation.
+    $this->checkNumberOfEntriesPerLanguage((int) $nid, (int) $term_1->id(), [
+      'en' => 1,
+      'ur' => 1,
+      'fr' => 0,
+    ]);
+
+    // Add a reference to the term in French.
+    $node = $node_storage->load($nid);
+    $translation = $node->getTranslation('fr');
+    $translation->set($this->fieldName1, [
+      $term_1->id(),
+    ]);
+    $translation->save();
+    $this->checkNumberOfEntriesPerLanguage((int) $nid, (int) $term_1->id(), [
+      'en' => 1,
+      'ur' => 1,
+      'fr' => 1,
+    ]);
+
+    // Delete the Urdu translation.
+    $node = $node_storage->load($nid);
+    $node->removeTranslation('ur');
+    $node->save();
+    $this->checkNumberOfEntriesPerLanguage((int) $nid, (int) $term_1->id(), [
+      'en' => 1,
+      'ur' => 0,
+      'fr' => 1,
+    ]);
+
+    // Delete the whole node.
+    $node = $node_storage->load($nid);
+    $node->delete();
+    $this->checkNumberOfEntriesPerLanguage((int) $nid, (int) $term_1->id(), [
+      'en' => 0,
+      'ur' => 0,
+      'fr' => 0,
+    ]);
   }
 
 }

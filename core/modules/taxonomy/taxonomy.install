@@ -5,9 +5,110 @@
  * Install, update and uninstall functions for the taxonomy module.
  */
 
+use Drupal\Core\Database\Database;
+
 /**
  * Implements hook_update_last_removed().
  */
 function taxonomy_update_last_removed(): int {
   return 10100;
+}
+
+/**
+ * Add 'langcode' field to 'taxonomy_index' entities.
+ *
+ * Content needs to be updated.
+ */
+function taxonomy_update_10400(): void {
+  if (!Database::getConnection()->schema()->fieldExists('taxonomy_index', 'langcode')) {
+    Database::getConnection()
+      ->schema()
+      ->addField('taxonomy_index', 'langcode', [
+        'description' => 'The langcode of the node.',
+        'type' => 'varchar_ascii',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+      ]);
+
+    Database::getConnection()->schema()->dropPrimaryKey('taxonomy_index');
+    Database::getConnection()->schema()->addPrimaryKey(
+      'taxonomy_index',
+      ['nid', 'tid', 'langcode']
+    );
+  }
+
+  // Recreate the index to be sure it has the correct configuration.
+  if (Database::getConnection()->schema()->indexExists('taxonomy_index', 'term_node')) {
+    Database::getConnection()->schema()->dropIndex('taxonomy_index', 'term_node');
+  }
+
+  Database::getConnection()->schema()->addIndex(
+    'taxonomy_index',
+    'term_node',
+    ['tid', 'status', 'sticky', 'created', 'langcode'],
+    [
+      'description' => 'Maintains denormalized information about node/term relationships.',
+      'fields' => [
+        'nid' => [
+          'description' => 'The {node}.nid this record tracks.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'tid' => [
+          'description' => 'The term ID.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'status' => [
+          'description' => 'Boolean indicating whether the node is published (visible to non-administrators).',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 1,
+        ],
+        'sticky' => [
+          'description' => 'Boolean indicating whether the node is sticky.',
+          'type' => 'int',
+          'not null' => FALSE,
+          'default' => 0,
+          'size' => 'tiny',
+        ],
+        'created' => [
+          'description' => 'The Unix timestamp when the node was created.',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'langcode' => [
+          'description' => 'The langcode of the node.',
+          'type' => 'varchar_ascii',
+          'length' => 12,
+          'not null' => TRUE,
+        ],
+      ],
+      'primary key' => ['nid', 'tid', 'langcode'],
+      'indexes' => [
+        'term_node' => ['tid', 'status', 'sticky', 'created', 'langcode'],
+      ],
+      'foreign keys' => [
+        'tracked_node' => [
+          'table' => 'node',
+          'columns' => ['nid' => 'nid'],
+        ],
+        'term' => [
+          'table' => 'taxonomy_term_data',
+          'columns' => ['tid' => 'tid'],
+        ],
+      ],
+    ]
+  );
+
+  // See https://www.drupal.org/node/3034742.
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $definition_update_manager->getEntityType('taxonomy_term');
+  $definition_update_manager->updateEntityType($entity_type);
 }

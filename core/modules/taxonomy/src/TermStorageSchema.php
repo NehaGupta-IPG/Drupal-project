@@ -60,8 +60,15 @@ class TermStorageSchema extends SqlContentEntityStorageSchema {
           'not null' => TRUE,
           'default' => 0,
         ],
+        'langcode' => [
+          'description' => 'The langcode of the node or translation.',
+          'type' => 'varchar_ascii',
+          'length' => 12,
+          'not null' => TRUE,
+          'default' => '',
+        ],
       ],
-      'primary key' => ['nid', 'tid'],
+      'primary key' => ['nid', 'tid', 'langcode'],
       'indexes' => [
         'term_node' => ['tid', 'status', 'sticky', 'created'],
       ],
