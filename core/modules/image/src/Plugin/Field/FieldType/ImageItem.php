@@ -222,7 +222,7 @@ class ImageItem extends FileItem {
       '#title' => $this->t('Maximum image dimensions'),
       '#element_validate' => [[static::class, 'validateResolution']],
       '#weight' => 4.1,
-      '#description' => $this->t('The maximum allowed image size expressed as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction. If a larger image is uploaded, it will be resized to reflect the given width and height. Resizing images on upload will cause the loss of <a href="http://wikipedia.org/wiki/Exchangeable_image_file_format">EXIF data</a> in the image.'),
+      '#description' => $this->t('The maximum allowed image dimensions as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction. If a larger image is uploaded, it will be resized to the given width and height. Depending on the toolkit in use, resizing images on upload may cause the loss of image metadata.'),
     ];
     $element['max_resolution']['x'] = [
       '#type' => 'number',
@@ -249,7 +249,7 @@ class ImageItem extends FileItem {
       '#title' => $this->t('Minimum image dimensions'),
       '#element_validate' => [[static::class, 'validateResolution']],
       '#weight' => 4.2,
-      '#description' => $this->t('The minimum allowed image size expressed as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction. If a smaller image is uploaded, it will be rejected.'),
+      '#description' => $this->t('The minimum allowed image dimensions as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction. If a smaller image is uploaded, it will be rejected.'),
     ];
     $element['min_resolution']['x'] = [
       '#type' => 'number',
