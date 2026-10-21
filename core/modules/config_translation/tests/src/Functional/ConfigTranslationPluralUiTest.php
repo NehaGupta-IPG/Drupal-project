@@ -108,6 +108,11 @@ class ConfigTranslationPluralUiTest extends ConfigTranslationUiTestBase {
     $this->assertSession()->fieldValueEquals('translation[config_names][views.view.files][display][default][display_options][fields][count][format_plural_string][1]', "$field_value_plural 1 SL");
     $this->assertSession()->fieldValueEquals('translation[config_names][views.view.files][display][default][display_options][fields][count][format_plural_string][2]', "$field_value_plural 2 SL");
     $this->assertSession()->fieldValueEquals('translation[config_names][views.view.files][display][default][display_options][fields][count][format_plural_string][3]', "$field_value_plural 3 SL");
+
+    // Empty variants remove the translation.
+    $this->submitForm(array_fill_keys(array_keys($edit), ''), 'Save translation');
+    $this->drupalGet($translation_url);
+    $this->assertSession()->fieldValueEquals('translation[config_names][views.view.files][display][default][display_options][fields][count][format_plural_string][0]', $field_value);
   }
 
 }
