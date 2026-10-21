@@ -145,8 +145,7 @@ class LocaleLookup extends CacheCollector {
     ]);
 
     if ($translation) {
-      $check = \str_replace(PoItem::DELIMITER, '', $translation->translation ?? '');
-      $value = !empty($check) ? $translation->translation : TRUE;
+      $value = !empty($translation->translation) ? $translation->translation : TRUE;
     }
     else {
       // We don't have the source string, update the {locales_source} table to
