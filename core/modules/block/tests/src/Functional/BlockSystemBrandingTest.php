@@ -130,7 +130,7 @@ class BlockSystemBrandingTest extends BlockTestBase {
       ->save();
 
     $this->drupalGet('');
-    $this->assertSession()->responseContains($svg_content);
+    $this->assertSession()->responseContains('<svg aria-label="Home" viewBox="0 0 10 10"><text>{{ 1 + 1 }}</text><text>{% if true %}twig_tag{% endif %}</text></svg>');
     $this->assertSession()->responseNotContains('<text>2</text>');
   }
 
@@ -149,7 +149,7 @@ class BlockSystemBrandingTest extends BlockTestBase {
       ->save();
 
     $this->drupalGet('');
-    $this->assertSession()->responseContains($svg_content);
+    $this->assertSession()->responseContains('<svg aria-label="Home" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5"/></svg>');
 
     // 2. Test PNG logo with space in the filename.
     $png_data = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
@@ -163,6 +163,66 @@ class BlockSystemBrandingTest extends BlockTestBase {
 
     $this->drupalGet('');
     $this->assertSession()->elementExists('xpath', '//div[@id="block-site-branding"]//img[contains(@src, "logo%20with%20spaces.png")]');
+  }
+
+  /**
+   * Tests SVG logo accessible name and invalid logo handling.
+   */
+  public function testLogoAccessibilityAndInvalidImage(): void {
+    // 1. Default SVG logo has aria-label="Home".
+    $this->drupalGet('');
+    $this->assertSession()->elementAttributeContains('xpath', '//div[@id="block-site-branding"]//a[@rel="home"]/svg', 'aria-label', 'Home');
+
+    // 2. Custom SVG logo without aria-label gets aria-label="Home".
+    $svg_content = '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="5"/></svg>';
+    $svg_logo_path = 'public://accessible_logo.svg';
+    \Drupal::service('file_system')->saveData($svg_content, $svg_logo_path);
+
+    $this->config('stark.settings')
+      ->set('logo.use_default', FALSE)
+      ->set('logo.path', $svg_logo_path)
+      ->save();
+
+    $this->drupalGet('');
+    $this->assertSession()->elementAttributeContains('xpath', '//div[@id="block-site-branding"]//a[@rel="home"]/svg', 'aria-label', 'Home');
+
+    // 3. Custom SVG logo with existing aria-label preserves its label.
+    $svg_custom_label = '<svg aria-label="Custom site logo" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5"/></svg>';
+    $svg_custom_path = 'public://custom_label_logo.svg';
+    \Drupal::service('file_system')->saveData($svg_custom_label, $svg_custom_path);
+
+    $this->config('stark.settings')
+      ->set('logo.path', $svg_custom_path)
+      ->save();
+
+    $this->drupalGet('');
+    $this->assertSession()->elementAttributeContains('xpath', '//div[@id="block-site-branding"]//a[@rel="home"]/svg', 'aria-label', 'Custom site logo');
+
+    // 4. Invalid/non-existent SVG path does not render an empty <a rel="home">.
+    $this->config('stark.settings')
+      ->set('logo.path', 'public://non_existent.svg')
+      ->save();
+
+    $this->drupalGet('');
+    $this->assertSession()->elementNotExists('xpath', '//div[@id="block-site-branding"]//a[@rel="home"]/svg');
+    $this->assertSession()->elementNotExists('xpath', '//div[@id="block-site-branding"]//a[@rel="home" and not(text())]');
+
+    // 5. Invalid/non-existent raster image path does not render an empty <a rel="home">.
+    $this->config('stark.settings')
+      ->set('logo.path', 'public://non_existent.png')
+      ->save();
+
+    $this->drupalGet('');
+    $this->assertSession()->elementNotExists('xpath', '//div[@id="block-site-branding"]//a[@rel="home"]/img');
+    $this->assertSession()->elementNotExists('xpath', '//div[@id="block-site-branding"]//a[@rel="home" and not(text())]');
+
+    // 6. When the site name is disabled and the logo is invalid, no <a rel="home"> at all is rendered.
+    $block = Block::load('site_branding');
+    $block->getPlugin()->setConfigurationValue('use_site_name', 0);
+    $block->save();
+
+    $this->drupalGet('');
+    $this->assertSession()->elementNotExists('xpath', '//div[@id="block-site-branding"]//a[@rel="home"]');
   }
 
 }

@@ -132,24 +132,35 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
     $logo_path = $this->themeSettingsProvider->getSetting('logo.path');
     if ($logo_path) {
       $extension = pathinfo($logo_path, PATHINFO_EXTENSION);
-      $build['site_logo'] = [
-        '#access' => $this->configuration['use_site_logo'],
-      ];
       // SVG uses markup. Otherwise, use the image factory.
-      if ($extension === 'svg' && file_exists($logo_path)) {
-        $build['site_logo']['#markup'] = Markup::create(file_get_contents($logo_path));
+      if ($extension === 'svg') {
+        if (file_exists($logo_path)) {
+          $svg_content = @file_get_contents($logo_path);
+          if ($svg_content !== FALSE && !empty($svg_content) && preg_match('/<svg\b/i', $svg_content)) {
+            if (!preg_match('/<svg\b[^>]*\baria-label\b/i', $svg_content)) {
+              $svg_content = preg_replace('/<svg\b/i', '<svg aria-label="' . $this->t('Home') . '"', $svg_content, 1);
+            }
+            $build['site_logo'] = [
+              '#markup' => Markup::create($svg_content),
+              '#access' => $this->configuration['use_site_logo'],
+            ];
+          }
+        }
       }
       else {
         $image = $this->imageFactory->get($logo_path);
         if ($image->isValid()) {
-          $build['site_logo']['#theme'] = 'image';
-          $build['site_logo']['#uri'] = $logo_path;
-          $build['site_logo']['#alt'] = $this->t('Home');
-          $build['site_logo']['#attributes'] = [
-            'loading' => 'eager',
-            'fetchpriority' => 'high',
-            'width' => $image->getWidth(),
-            'height' => $image->getHeight(),
+          $build['site_logo'] = [
+            '#theme' => 'image',
+            '#uri' => $logo_path,
+            '#alt' => $this->t('Home'),
+            '#attributes' => [
+              'loading' => 'eager',
+              'fetchpriority' => 'high',
+              'width' => $image->getWidth(),
+              'height' => $image->getHeight(),
+            ],
+            '#access' => $this->configuration['use_site_logo'],
           ];
         }
       }
