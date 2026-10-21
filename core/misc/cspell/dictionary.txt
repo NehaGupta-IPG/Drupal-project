@@ -432,6 +432,7 @@ smtps
 squaresmall
 squiz
 squizlabs
+srclang
 srcset
 ssess
 starterkit
@@ -527,6 +528,7 @@ trgm
 truecolor
 twistie
 twocol
+ufffd
 uids
 unban
 uncacheable

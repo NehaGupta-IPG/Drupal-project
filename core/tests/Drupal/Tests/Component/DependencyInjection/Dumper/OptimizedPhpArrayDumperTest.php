@@ -6,7 +6,6 @@ namespace Drupal\Tests\Component\DependencyInjection\Dumper;
 
 use Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper;
 use Drupal\Component\Utility\Crypt;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -31,7 +30,6 @@ use Symfony\Component\ExpressionLanguage\Expression;
 #[Group('DependencyInjection')]
 class OptimizedPhpArrayDumperTest extends TestCase {
 
-  use ExpectDeprecationTrait;
   use ProphecyTrait;
 
   /**
@@ -107,8 +105,6 @@ class OptimizedPhpArrayDumperTest extends TestCase {
 
   /**
    * Tests that alias processing works properly.
-   *
-   * @legacy-covers ::getAliases
    */
   #[DataProvider('getAliasesDataProvider')]
   public function testGetAliases($aliases, $definition_aliases): void {
@@ -559,8 +555,6 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    *
    * Tests that the correct InvalidArgumentException is thrown for
    * getDecoratedService().
-   *
-   * @legacy-covers ::getServiceDefinition
    */
   public function testGetServiceDefinitionForDecoratedService(): void {
     $bar_definition = new Definition('\stdClass');

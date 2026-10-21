@@ -87,7 +87,7 @@ class ReflectionFactoryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::createInstance
+   * Tests create instance.
    */
   #[DataProvider('providerGetInstanceArguments')]
   public function testCreateInstance($expected, $reflector_name, $plugin_id, $plugin_definition, $configuration): void {
@@ -112,13 +112,11 @@ class ReflectionFactoryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getInstanceArguments
+   * Tests get instance arguments.
    */
   #[DataProvider('providerGetInstanceArguments')]
   public function testGetInstanceArguments($expected, $reflector_name, $plugin_id, $plugin_definition, $configuration): void {
-    $reflection_factory = $this->getMockBuilder('Drupal\Component\Plugin\Factory\ReflectionFactory')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $reflection_factory = $this->createStub(ReflectionFactory::class);
     $get_instance_arguments_ref = new \ReflectionMethod($reflection_factory, 'getInstanceArguments');
 
     // Special case for plugin class without a constructor.

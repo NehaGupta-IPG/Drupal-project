@@ -38,14 +38,12 @@ class ModuleHandlerTest extends KernelTestBase {
    */
   #[IgnoreDeprecations]
   public function testGetNameDeprecation(): void {
-    $this->expectDeprecation('Drupal\Core\Extension\ModuleHandler::getName() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Extension\ModuleExtensionList::getName($module) instead. See https://www.drupal.org/node/3310017');
+    $this->expectUserDeprecationMessage('Drupal\Core\Extension\ModuleHandler::getName() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Extension\ModuleExtensionList::getName($module) instead. See https://www.drupal.org/node/3310017');
     $this->assertNotNull(\Drupal::service('module_handler')->getName('module_test'));
   }
 
   /**
    * Tests that resetImplementations() clears the hook memory cache.
-   *
-   * @legacy-covers ::resetImplementations
    */
   public function testResetImplementationsClearsHooks(): void {
     $oldModuleHandler = \Drupal::moduleHandler();

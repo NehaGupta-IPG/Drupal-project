@@ -33,6 +33,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
     'migrate_drupal_ui',
     'telephone',
     'update',
+    'shortcut',
   ];
 
   /**
@@ -59,7 +60,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
 
     $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal6.php');
 
-    $this->expectedLoggedErrors = 41;
+    $this->expectedLoggedErrors = 39;
     // If saving the logs, then set the admin user.
     if ($this->outputLogs) {
       $this->migratedAdminUserName = 'admin';
@@ -78,7 +79,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
    */
   protected function getEntityCounts(): array {
     return [
-      'block' => 36,
+      'block' => 33,
       'block_content' => 2,
       'block_content_type' => 1,
       'comment' => 8,
@@ -99,11 +100,10 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       // The 'book' module provides the 'book' node type, and the migration
       // creates 12 node types.
       'node_type' => 13,
-      'search_page' => 3,
-      'shortcut' => 2,
+      'shortcut' => 0,
       'shortcut_set' => 1,
       'action' => 30,
-      'menu' => 8,
+      'menu' => 10,
       'path_alias' => 8,
       'taxonomy_term' => 15,
       'taxonomy_vocabulary' => 7,
@@ -164,7 +164,6 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'Option Widgets',
       'Path',
       'Profile translation',
-      'Search',
       'String translation',
       'Synchronize translations',
       'System',
@@ -196,6 +195,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'Aggregator',
       'Book',
       'Forum',
+      'Search',
       'Statistics',
     ];
   }

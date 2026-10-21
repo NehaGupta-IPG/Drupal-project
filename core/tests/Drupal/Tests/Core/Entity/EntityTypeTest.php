@@ -8,11 +8,14 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\Entity\EntityFormMode;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Exception\EntityTypeIdLengthException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests Drupal\Core\Entity\EntityType.
@@ -39,8 +42,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get.
-   *
-   * @legacy-covers ::get
    */
   #[DataProvider('providerTestGet')]
   public function testGet(array $definition, $key, $expected): void {
@@ -281,11 +282,52 @@ class EntityTypeTest extends UnitTestCase {
   }
 
   /**
-   * Tests get original class unchanged.
+   * Tests maxlength validation of ID when it is a derivative.
    *
-   * @legacy-covers ::getOriginalClass
+   * Bundle class plugin IDs have derivative form of {entity type ID}:{bundle},
+   * and both the entity type ID and the bundle can be up to 32 characters. As
+   * long as each is 32 or less, the combined ID is valid.
+   *
+   * @param bool $invalid_entity_type
+   *   Whether the entity type ID is too long.
+   * @param bool $invalid_bundle
+   *   Whether the bundle is too long.
    */
+  #[TestWith([TRUE, TRUE])]
+  #[TestWith([TRUE, FALSE])]
+  #[TestWith([FALSE, TRUE])]
+  #[TestWith([FALSE, FALSE])]
+  public function testDerivativeIdMaxlength(bool $invalid_entity_type, bool $invalid_bundle): void {
+    $entity_type_id = $invalid_entity_type ? $this->randomMachineName(EntityTypeInterface::ID_MAX_LENGTH + 1) : $this->randomMachineName(EntityTypeInterface::ID_MAX_LENGTH);
+    $bundle = $invalid_bundle ? $this->randomMachineName(EntityTypeInterface::BUNDLE_MAX_LENGTH + 1) : $this->randomMachineName(EntityTypeInterface::BUNDLE_MAX_LENGTH);
+
+    try {
+      $t = NULL;
+      $entity_type = $this->setUpEntityType(['id' => "$entity_type_id:$bundle"]);
+    }
+    catch (\Throwable $t) {
+      $entity_type = NULL;
+    }
+    if ($invalid_bundle) {
+      $this->assertInstanceOf(EntityTypeIdLengthException::class, $t);
+      $this->assertSame('Attempt to create an entity type bundle class with an ID longer than ' . EntityTypeInterface::ID_MAX_LENGTH . " characters: $bundle.", $t->getMessage());
+    }
+    elseif ($invalid_entity_type) {
+      $this->assertInstanceOf(EntityTypeIdLengthException::class, $t);
+      $this->assertSame('Attempt to create an entity type with an ID longer than ' . EntityTypeInterface::ID_MAX_LENGTH . " characters: $entity_type_id.", $t->getMessage());
+    }
+    else {
+      $this->assertInstanceOf(EntityTypeInterface::class, $entity_type);
+    }
+
+  }
+
+  /**
+   * Tests get original class unchanged.
+   */
+  #[IgnoreDeprecations]
   public function testGetOriginalClassUnchanged(): void {
+    $this->expectUserDeprecationMessage('The "getOriginalClass" method is deprecated in drupal:11.4.0 and will be removed in drupal:12.0.0. Use getDecoratedClasses() instead. See https://www.drupal.org/node/3557464');
     $class = $this->randomMachineName();
     $entity_type = $this->setUpEntityType(['class' => $class]);
     $this->assertEquals($class, $entity_type->getOriginalClass());
@@ -297,7 +339,9 @@ class EntityTypeTest extends UnitTestCase {
    * @legacy-covers ::setClass
    * @legacy-covers ::getOriginalClass
    */
+  #[IgnoreDeprecations]
   public function testGetOriginalClassChanged(): void {
+    $this->expectUserDeprecationMessage('The "getOriginalClass" method is deprecated in drupal:11.4.0 and will be removed in drupal:12.0.0. Use getDecoratedClasses() instead. See https://www.drupal.org/node/3557464');
     $class = $this->randomMachineName();
     $entity_type = $this->setUpEntityType(['class' => $class]);
     $entity_type->setClass($this->randomMachineName());
@@ -365,8 +409,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests id.
-   *
-   * @legacy-covers ::id
    */
   public function testId(): void {
     $id = $this->randomMachineName(32);
@@ -376,8 +418,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get label.
-   *
-   * @legacy-covers ::getLabel
    */
   public function testGetLabel(): void {
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
@@ -392,8 +432,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get group label.
-   *
-   * @legacy-covers ::getGroupLabel
    */
   public function testGetGroupLabel(): void {
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
@@ -412,8 +450,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get collection label.
-   *
-   * @legacy-covers ::getCollectionLabel
    */
   public function testGetCollectionLabel(): void {
     $translatable_label = new TranslatableMarkup('Entity test collection', [], [], $this->getStringTranslationStub());
@@ -424,8 +460,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get singular label.
-   *
-   * @legacy-covers ::getSingularLabel
    */
   public function testGetSingularLabel(): void {
     $translatable_label = new TranslatableMarkup('entity test singular', [], [], $this->getStringTranslationStub());
@@ -436,8 +470,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get singular label default.
-   *
-   * @legacy-covers ::getSingularLabel
    */
   public function testGetSingularLabelDefault(): void {
     $entity_type = $this->setUpEntityType(['label' => 'Entity test Singular']);
@@ -447,8 +479,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get plural label.
-   *
-   * @legacy-covers ::getPluralLabel
    */
   public function testGetPluralLabel(): void {
     $translatable_label = new TranslatableMarkup('entity test plural', [], [], $this->getStringTranslationStub());
@@ -459,8 +489,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get plural label default.
-   *
-   * @legacy-covers ::getPluralLabel
    */
   public function testGetPluralLabelDefault(): void {
     $entity_type = $this->setUpEntityType(['label' => 'Entity test Plural']);
@@ -470,8 +498,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get count label.
-   *
-   * @legacy-covers ::getCountLabel
    */
   public function testGetCountLabel(): void {
     $entity_type = $this->setUpEntityType([
@@ -500,8 +526,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get count label default.
-   *
-   * @legacy-covers ::getCountLabel
    */
   public function testGetCountLabelDefault(): void {
     $entity_type = $this->setUpEntityType(['label' => 'Entity test Plural']);
@@ -514,8 +538,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests the ::getBundleLabel() method.
-   *
-   * @legacy-covers ::getBundleLabel
    */
   #[DataProvider('providerTestGetBundleLabel')]
   public function testGetBundleLabel($definition, $expected): void {
@@ -536,8 +558,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests set link template with invalid path.
-   *
-   * @legacy-covers ::setLinkTemplate
    */
   public function testSetLinkTemplateWithInvalidPath(): void {
     $entity_type = $this->setUpEntityType(['id' => $this->randomMachineName()]);
@@ -581,8 +601,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests entity class implements.
-   *
-   * @legacy-covers ::entityClassImplements
    */
   public function testEntityClassImplements(): void {
     $entity_type = $this->setUpEntityType(['class' => EntityFormMode::class]);
@@ -592,8 +610,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests the ::getBundleListCacheTags() method.
-   *
-   * @legacy-covers ::getBundleListCacheTags
    */
   public function testGetBundleListCacheTags(): void {
     $entity_type = $this->setUpEntityType(['entity_keys' => ['id' => 'id']]);

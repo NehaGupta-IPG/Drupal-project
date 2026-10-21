@@ -144,6 +144,31 @@ class AccessResultTest extends UnitTestCase {
   }
 
   /**
+   * Tests access neutral reason.
+   *
+   * @legacy-covers ::neutral
+   */
+  public function testAccessNeutralReason(): void {
+    $verify = function (AccessResult $access, $reason): void {
+      $this->assertInstanceOf(AccessResultReasonInterface::class, $access);
+      $this->assertSame($reason, $access->getReason());
+    };
+
+    $b = AccessResult::neutral();
+    $verify($b, '');
+
+    $reason = $this->getRandomGenerator()->string();
+    $b = AccessResult::neutral($reason);
+    $verify($b, $reason);
+
+    $b = AccessResult::forbiddenIf(FALSE, '', $reason);
+    $verify($b, $reason);
+
+    $b = AccessResult::allowedIf(FALSE, $reason);
+    $verify($b, $reason);
+  }
+
+  /**
    * Tests access conditionally allowed.
    *
    * @legacy-covers ::allowedIf
@@ -189,8 +214,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests and if.
-   *
-   * @legacy-covers ::andIf
    */
   public function testAndIf(): void {
     $neutral = AccessResult::neutral('neutral message');
@@ -282,8 +305,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests or if.
-   *
-   * @legacy-covers ::orIf
    */
   public function testOrIf(): void {
     $neutral = AccessResult::neutral('neutral message');
@@ -551,8 +572,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests inherit cacheability.
-   *
-   * @legacy-covers ::inheritCacheability
    */
   public function testInheritCacheability(): void {
     // andIf(); 1st has defaults, 2nd has custom tags, contexts and max-age.
@@ -905,8 +924,6 @@ class AccessResultTest extends UnitTestCase {
    * This is only the case for non-forbidden access results; we still abort the
    * ORing process as soon as a forbidden access result is encountered. This is
    * tested in ::testOrIf().
-   *
-   * @legacy-covers ::orIf
    */
   public function testOrIfCacheabilityMerging(): void {
     $merge_both_directions = function (AccessResult $a, AccessResult $b): void {
@@ -939,8 +956,6 @@ class AccessResultTest extends UnitTestCase {
    *   The conjunction to use when checking for permission. 'AND' or 'OR'.
    * @param \Drupal\Core\Access\AccessResult $expected_access
    *   The expected access check result.
-   *
-   * @legacy-covers ::allowedIfHasPermissions
    */
   #[DataProvider('providerTestAllowedIfHasPermissions')]
   public function testAllowedIfHasPermissions($permissions, $conjunction, AccessResult $expected_access): void {

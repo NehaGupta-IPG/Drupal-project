@@ -328,8 +328,6 @@ class UrlConversionTest extends UnitTestCase {
 
   /**
    * Tests get connection info as url.
-   *
-   * @legacy-covers ::getConnectionInfoAsUrl
    */
   #[DataProvider('providerGetConnectionInfoAsUrl')]
   public function testGetConnectionInfoAsUrl(array $info, $expected_url): void {
@@ -542,7 +540,7 @@ class UrlConversionTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testDeprecationOfRootParameter(): void {
-    $this->expectDeprecation('Passing a string $root value to Drupal\\Core\\Database\\Database::convertDbUrlToConnectionInfo() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287');
+    $this->expectUserDeprecationMessage('Passing a string $root value to Drupal\\Core\\Database\\Database::convertDbUrlToConnectionInfo() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287');
     Database::convertDbUrlToConnectionInfo('sqlite://localhost/test_database', $this->root, TRUE);
   }
 
