@@ -79,13 +79,6 @@ class ViewExecutable {
   protected $ajaxEnabled = FALSE;
 
   /**
-   * List of options where activating AJAX.
-   *
-   * @var array
-   */
-  protected $ajaxOptions = [];
-
-  /**
    * The plugin name.
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
@@ -715,26 +708,6 @@ class ViewExecutable {
    */
   public function ajaxEnabled() {
     return $this->ajaxEnabled;
-  }
-
-  /**
-   * Sets options where AJAX should be used.
-   *
-   * If AJAX is used, users can select if using with paging, table sorting
-   * or exposed filters will be fetched
-   * via an AJAX call rather than a page refresh.
-   *
-   * @param bool $ajax_options
-   *   list of options where activating AJAX.
-   */
-  public function setAjaxOptions($ajax_options): void {
-    if ($this->ajaxEnabled) {
-      $this->ajaxOptions = $ajax_options;
-    }
-  }
-
-  public function getAjaxOptions(): array {
-    return $this->ajaxOptions ?? [];
   }
 
   /**
