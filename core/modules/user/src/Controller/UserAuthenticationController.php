@@ -7,6 +7,9 @@ use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\user\LoginFinalizer;
+use Drupal\user\LogoutFinalizer;
+use Drupal\user\NotificationHandler;
 use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserFloodControlInterface;
 use Drupal\user\UserInterface;
@@ -17,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 
@@ -95,27 +99,19 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    */
   protected $logger;
 
-  /**
-   * Constructs a new UserAuthenticationController object.
-   *
-   * @param \Drupal\user\UserFloodControlInterface $user_flood_control
-   *   The user flood control service.
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage.
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
-   *   The CSRF token generator.
-   * @param \Drupal\user\UserAuthenticationInterface $user_auth
-   *   The user authentication.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
-   * @param \Symfony\Component\Serializer\Serializer $serializer
-   *   The serializer.
-   * @param array $serializer_formats
-   *   The available serialization formats.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   */
-  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
+  public function __construct(
+    UserFloodControlInterface $user_flood_control,
+    UserStorageInterface $user_storage,
+    CsrfTokenGenerator $csrf_token,
+    UserAuthenticationInterface $user_auth,
+    RouteProviderInterface $route_provider,
+    Serializer $serializer,
+    array $serializer_formats,
+    LoggerInterface $logger,
+    protected LoginFinalizer $loginFinalizer,
+    protected LogoutFinalizer $logoutFinalizer,
+    protected readonly NotificationHandler $notificationHandler,
+  ) {
     $this->userFloodControl = $user_flood_control;
     $this->userStorage = $user_storage;
     $this->csrfToken = $csrf_token;
@@ -148,7 +144,10 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       $container->get('router.route_provider'),
       $serializer,
       $formats,
-      $container->get('logger.factory')->get('user')
+      $container->get('logger.factory')->get('user'),
+      $container->get(LoginFinalizer::class),
+      $container->get(LogoutFinalizer::class),
+      $container->get(NotificationHandler::class),
     );
   }
 
@@ -161,6 +160,15 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   A response which contains the ID and CSRF token.
    */
+  #[Route(
+    path: '/user/login',
+    name: 'user.login.http',
+    methods: ['POST'],
+    requirements: [
+      '_user_is_logged_in' => 'FALSE',
+      '_format' => 'json',
+    ],
+  )]
   public function login(Request $request) {
     $format = $this->getRequestFormat($request);
 
@@ -230,6 +238,15 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    */
+  #[Route(
+    path: '/user/password',
+    name: 'user.pass.http',
+    methods: ['POST'],
+    requirements: [
+      '_access' => 'TRUE',
+      '_format' => 'json',
+    ],
+  )]
   public function resetPassword(Request $request) {
     $format = $this->getRequestFormat($request);
 
@@ -263,8 +280,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       }
 
       // Send the password reset email.
-      $mail = _user_mail_notify('password_reset', $account);
-      if (empty($mail)) {
+      if (!$this->notificationHandler->sendPasswordReset($account)) {
         throw new BadRequestHttpException('Unable to send email. Contact the site administrator if the problem persists.');
       }
       else {
@@ -290,7 +306,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    *   The user.
    */
   protected function userLoginFinalize(UserInterface $user) {
-    user_login_finalize($user);
+    $this->loginFinalizer->finalizeLogin($user);
   }
 
   /**
@@ -299,6 +315,16 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    */
+  #[Route(
+    path: '/user/logout',
+    name: 'user.logout.http',
+    methods: ['POST'],
+    requirements: [
+      '_user_is_logged_in' => 'TRUE',
+      '_format' => 'json',
+      '_csrf_token' => 'TRUE',
+    ],
+  )]
   public function logout() {
     $this->userLogout();
     return new Response(NULL, 204);
@@ -308,7 +334,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * Logs the user out.
    */
   protected function userLogout() {
-    user_logout();
+    $this->logoutFinalizer->finalizeLogout();
   }
 
   /**
@@ -317,6 +343,15 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
+  #[Route(
+    path: '/user/login_status',
+    name: 'user.login_status.http',
+    methods: ['GET'],
+    requirements: [
+      '_access' => 'TRUE',
+      '_format' => 'json',
+    ],
+  )]
   public function loginStatus() {
     if ($this->currentUser()->isAuthenticated()) {
       $response = new Response(self::LOGGED_IN);

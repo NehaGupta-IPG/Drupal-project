@@ -90,8 +90,8 @@ class InputTest extends KernelTestBase {
     $collector = $this->createMock(InputCollectorInterface::class);
     $collector->expects($this->atLeastOnce())
       ->method('collectValue')
-      ->willReturnCallback(function (string $name): string {
-        return match($name) {
+      ->willReturnCallback(function (string $name) {
+        return match ($name) {
           'create_node_type.node_type' => 'test',
           'input_test.owner' => 'hack',
         };
@@ -171,7 +171,7 @@ YAML
     );
 
     $this->expectException(\ArgumentCountError::class);
-    $this->expectExceptionMessageIs('Argument #1 ($question) not passed');
+    $this->expectExceptionMessageIsOrContains('::ask(): Argument #1 ($question) not passed');
     $recipe->input->collectAll($collector);
   }
 
