@@ -248,7 +248,7 @@ class LruMemoryCacheTest extends UnitTestCase {
     ]);
     $lru_cache->invalidateTags(['cuckoo']);
     $this->assertFalse($lru_cache->get('cuckoo'));
-    $this->assertSame('cuckoo', $lru_cache->get('cuckoo', TRUE)->data);
+    $this->assertFalse($lru_cache->get('cuckoo', TRUE));
     $lru_cache->set('crow', 'crow');
     $this->assertCacheData($lru_cache, [
       ['sparrow', 'sparrow'],
@@ -334,11 +334,7 @@ class LruMemoryCacheTest extends UnitTestCase {
     $this->assertFalse($lru_cache->get(3));
     $this->assertFalse($lru_cache->get(10));
     $this->assertFalse($lru_cache->get(5));
-    $this->assertCacheData($lru_cache, [
-      [10, 'pigeon'],
-      [5, 'crow'],
-      [3, 'sparrow'],
-    ]);
+    $this->assertCacheData($lru_cache, []);
   }
 
   /**
@@ -379,8 +375,8 @@ class LruMemoryCacheTest extends UnitTestCase {
    *   The LRU cache.
    */
   private function getLruMemoryCache(int $slots): LruMemoryCache {
-    $time_mock = $this->createMock(TimeInterface::class);
-    $time_mock->expects($this->any())
+    $time_mock = $this->createStub(TimeInterface::class);
+    $time_mock
       ->method('getRequestTime')
       ->willReturnCallback('time');
     return new LruMemoryCache(

@@ -51,6 +51,30 @@ interface ModuleInstallerInterface {
   public function install(array $module_list, $enable_dependencies = TRUE);
 
   /**
+   * Determines the full set of modules corresponding to the given list.
+   *
+   * @param string[] $module_list
+   *   An array of module machine names.
+   * @param bool $enable_dependencies
+   *   (optional) If TRUE, dependencies are resolved and added to the returned
+   *   list in the correct install order. If FALSE, only the given modules that
+   *   are not yet installed are returned.
+   *
+   * @return string[]
+   *   The machine names of the modules that are not yet installed, including
+   *   resolved dependencies, ordered the way ::install() would install them.
+   *   Already installed modules are omitted.
+   *
+   * @throws \Drupal\Core\Extension\MissingDependencyException
+   *   Thrown when a requested module, or a dependency of one, can not be found
+   *   or is incompatible with this version of Drupal core.
+   *
+   * @throws \Drupal\Core\Extension\Exception\ObsoleteExtensionException
+   *   Thrown when a requested module is obsolete.
+   */
+  public function getModulesToInstall(array $module_list, bool $enable_dependencies = TRUE): array;
+
+  /**
    * Uninstalls a given list of modules.
    *
    * @param string[] $module_list
@@ -73,17 +97,24 @@ interface ModuleInstallerInterface {
   public function uninstall(array $module_list, $uninstall_dependents = TRUE);
 
   /**
-   * Adds a module uninstall validator.
+   * Determines the full set of modules to uninstall for the given list.
    *
-   * @param \Drupal\Core\Extension\ModuleUninstallValidatorInterface $uninstall_validator
-   *   The uninstall validator to add.
+   * @param string[] $module_list
+   *   An array of module machine names.
+   * @param bool $uninstall_dependents
+   *   (optional) If TRUE, installed modules that depend on the given modules
+   *   are added to the returned list. If FALSE, only the given modules that
+   *   are currently installed are returned.
    *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject
-   *   the uninstall validators into the constructor instead.
+   * @return string[]
+   *   The machine names of the installed modules to uninstall, including any
+   *   dependents, ordered the way ::uninstall() would uninstall them. Modules
+   *   that are not installed are omitted.
    *
-   * @see https://www.drupal.org/node/3432595
+   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   *   Thrown when a requested module, or a dependent of one, does not exist.
    */
-  public function addUninstallValidator(ModuleUninstallValidatorInterface $uninstall_validator);
+  public function getModulesToUninstall(array $module_list, bool $uninstall_dependents = TRUE): array;
 
   /**
    * Determines whether a list of modules can be uninstalled.

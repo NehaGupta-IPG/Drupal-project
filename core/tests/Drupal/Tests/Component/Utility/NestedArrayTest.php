@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -16,6 +17,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(NestedArray::class)]
 #[Group('Utility')]
 class NestedArrayTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * Form array to check.
@@ -89,7 +92,7 @@ class NestedArrayTest extends TestCase {
     $this->assertTrue($this->form['details']['element']['#required'], 'New nested element value found.');
 
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Cannot create key "child" on non-array value.');
+    $this->expectExceptionMessageIs('Cannot create key "child" on non-array value.');
     NestedArray::setValue($this->form, ['details', 'element', '#value', 'child'], $new_value);
   }
 
@@ -260,7 +263,7 @@ class NestedArrayTest extends TestCase {
    * Tests filter.
    */
   #[DataProvider('providerTestFilter')]
-  public function testFilter($array, $callable, $expected): void {
+  public function testFilter(array $array, ?callable $callable, $expected): void {
     $this->assertEquals($expected, NestedArray::filter($array, $callable));
   }
 
@@ -271,7 +274,7 @@ class NestedArrayTest extends TestCase {
     ];
     $data['1d-array-callable'] = [
       [0, 1, '', TRUE],
-      function ($element) {
+      function ($element): bool {
         return $element === '';
       },
       [2 => ''],
@@ -281,7 +284,7 @@ class NestedArrayTest extends TestCase {
     ];
     $data['2d-array-callable'] = [
       [[0, 1, '', TRUE], [0, 1, 2, 3]],
-      function ($element) {
+      function ($element): bool {
         return is_array($element) || $element === 3;
       },
       [0 => [], 1 => [3 => 3]],

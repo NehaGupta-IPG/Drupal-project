@@ -36,14 +36,14 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $module_handler->expects($this->any())
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
+    $module_handler
       ->method('getModuleList')
       ->willReturn(['node' => []]);
-    $module_extension_list = $this->createMock(ModuleExtensionList::class);
-    $module_extension_list->expects($this->any())
+    $module_extension_list = $this->createStub(ModuleExtensionList::class);
+    $module_extension_list
       ->method('getName')
-      ->willReturnCallback(function ($argument) {
+      ->willReturnCallback(function ($argument): string {
         if ($argument == 'node') {
           return 'Node';
         }
@@ -128,6 +128,7 @@ class CategorizingPluginManager extends DefaultPluginManager implements Categori
    * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
    *   The module extension list.
    */
+  // @phpstan-ignore pluginManagerSetsCacheBackend.missingCacheBackend
   public function __construct(ModuleHandlerInterface $module_handler, ModuleExtensionList $module_extension_list) {
     $this->moduleHandler = $module_handler;
     $this->moduleExtensionList = $module_extension_list;

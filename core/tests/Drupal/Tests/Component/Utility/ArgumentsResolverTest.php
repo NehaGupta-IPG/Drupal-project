@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\ArgumentsResolver;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,11 +18,13 @@ use PHPUnit\Framework\TestCase;
 #[Group('Access')]
 class ArgumentsResolverTest extends TestCase {
 
+  use ForwardCompatibilityTrait;
+
   /**
    * Tests the getArgument() method.
    */
   #[DataProvider('providerTestGetArgument')]
-  public function testGetArgument($callable, $scalars, $objects, $wildcards, $expected): void {
+  public function testGetArgument(callable $callable, $scalars, $objects, $wildcards, $expected): void {
     $arguments = (new ArgumentsResolver($scalars, $objects, $wildcards))->getArguments($callable);
     $this->assertSame($expected, $arguments);
   }
@@ -98,9 +101,9 @@ class ArgumentsResolverTest extends TestCase {
    * Tests getArgument() with a Route, Request, and Account object.
    */
   public function testGetArgumentOrder(): void {
-    $a1 = $this->getMockBuilder('\Drupal\Tests\Component\Utility\Test1Interface')->getMock();
-    $a2 = $this->getMockBuilder('\Drupal\Tests\Component\Utility\TestClass')->getMock();
-    $a3 = $this->getMockBuilder('\Drupal\Tests\Component\Utility\Test2Interface')->getMock();
+    $a1 = $this->createStub(Test1Interface::class);
+    $a2 = $this->createStub(TestClass::class);
+    $a3 = $this->createStub(Test2Interface::class);
 
     $objects = [
       't1' => $a1,
@@ -126,13 +129,13 @@ class ArgumentsResolverTest extends TestCase {
    * callable.
    */
   public function testGetWildcardArgumentNoTypeHint(): void {
-    $a = $this->getMockBuilder('\Drupal\Tests\Component\Utility\Test1Interface')->getMock();
+    $a = $this->createStub(Test1Interface::class);
     $wildcards = [$a];
     $resolver = new ArgumentsResolver([], [], $wildcards);
 
     $callable = function ($route): void {};
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('requires a value for the "$route" argument.');
+    $this->expectExceptionMessageMatches('/Callable \".*testGetWildcardArgumentNoTypeHint.*\" requires a value for the \"\$route\" argument\./');
     $resolver->getArguments($callable);
   }
 
@@ -152,16 +155,17 @@ class ArgumentsResolverTest extends TestCase {
   }
 
   /**
-   * Tests handleUnresolvedArgument() for a scalar argument.
+   * Tests handleUnresolvedArgument() for a non-upcasted argument.
    */
   public function testHandleNotUpcastedArgument(): void {
     $objects = ['foo' => 'bar'];
     $scalars = ['foo' => 'baz'];
+    // @phpstan-ignore argument.type
     $resolver = new ArgumentsResolver($scalars, $objects, []);
 
     $callable = function (\stdClass $foo): void {};
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('requires a value for the "$foo" argument.');
+    $this->expectExceptionMessageMatches('/Callable \".*testHandleNotUpcastedArgument.*\" requires a value for the \"\$foo\" argument\./');
     $resolver->getArguments($callable);
   }
 
@@ -169,10 +173,10 @@ class ArgumentsResolverTest extends TestCase {
    * Tests handleUnresolvedArgument() for missing arguments.
    */
   #[DataProvider('providerTestHandleUnresolvedArgument')]
-  public function testHandleUnresolvedArgument($callable): void {
+  public function testHandleUnresolvedArgument(callable $callable): void {
     $resolver = new ArgumentsResolver([], [], []);
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('requires a value for the "$foo" argument.');
+    $this->expectExceptionMessageMatches('/Callable \".*\" requires a value for the \"\$foo\" argument\./');
     $resolver->getArguments($callable);
   }
 
@@ -194,7 +198,7 @@ class ArgumentsResolverTest extends TestCase {
  */
 class TestClass {
 
-  public function access($foo) {
+  public function access($foo): void {
   }
 
 }
@@ -204,7 +208,7 @@ class TestClass {
  */
 class TestStaticMethodClass {
 
-  public static function access($foo) {
+  public static function access($foo): void {
   }
 
 }

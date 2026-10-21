@@ -7,19 +7,19 @@ namespace Drupal\Tests\block\Kernel;
 use Drupal\block\Entity\Block;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of block entities.
  */
 #[Group('block')]
-#[Group('#slow')]
 #[Group('config')]
 #[Group('Validation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class BlockValidationTest extends ConfigEntityValidationTestBase {
 
   /**
@@ -49,10 +49,8 @@ class BlockValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->container->get('theme_installer')->install(['stark']);
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
 
     $this->entity = Block::create([
       'id' => 'test_block',
@@ -178,17 +176,6 @@ class BlockValidationTest extends ConfigEntityValidationTestBase {
 
     $this->entity->set('weight', 10);
     $this->assertValidationErrors([]);
-  }
-
-  /**
- * Tests weight cannot be null.
- */
-  #[IgnoreDeprecations]
-  public function testWeightCannotBeNull(): void {
-    $this->entity->set('weight', NULL);
-    $this->assertNull($this->entity->getWeight());
-    $this->expectDeprecation('Saving a block with a non-integer weight is deprecated in drupal:11.1.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3462474');
-    $this->entity->save();
   }
 
   /**

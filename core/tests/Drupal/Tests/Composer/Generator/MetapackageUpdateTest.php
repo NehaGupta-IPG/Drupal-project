@@ -6,7 +6,6 @@ namespace Drupal\Tests\Composer\Generator;
 
 use Drupal\Composer\Generator\Builder\DrupalCoreRecommendedBuilder;
 use Drupal\Composer\Generator\Builder\DrupalDevDependenciesBuilder;
-use Drupal\Composer\Generator\Builder\DrupalPinnedDevDependenciesBuilder;
 use Drupal\Composer\Generator\PackageGenerator;
 use Drupal\Composer\Generator\Util\DrupalCoreComposer;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -32,10 +31,6 @@ class MetapackageUpdateTest extends TestCase {
         DrupalDevDependenciesBuilder::class,
         'composer/Metapackage/DevDependencies',
       ],
-      [
-        DrupalPinnedDevDependenciesBuilder::class,
-        'composer/Metapackage/PinnedDevDependencies',
-      ],
     ];
   }
 
@@ -54,7 +49,7 @@ class MetapackageUpdateTest extends TestCase {
    *   The relative path to the metapackage.
    */
   #[DataProvider('updatedTestData')]
-  public function testUpdated($builderClass, $path): void {
+  public function testUpdated(string $builderClass, string $path): void {
     // Create a DrupalCoreComposer for the System Under Test (current repo)
     $repositoryRoot = dirname(__DIR__, 6);
     $drupalCoreInfo = DrupalCoreComposer::createFromPath($repositoryRoot);

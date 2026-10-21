@@ -377,9 +377,26 @@ function drupal_maintenance_theme(): void {
  * @return mixed
  *   Returns a variable by reference.
  *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal::cache('memory')->set() and \Drupal::cache('memory')->get()
+ *   instead.
+ *
+ * @see https://www.drupal.org/node/2661204
  * @see drupal_static_reset()
  */
 function &drupal_static($name, $default_value = NULL, $reset = FALSE) {
+  if ($name === 'clear_all_skip_deprecation') {
+    $name = NULL;
+  }
+  else {
+    $cid = $name ?? 'null';
+    $cid = $cid . 'drupal_static_deprecation';
+    if (!\Drupal::cache('memory')->get($cid)) {
+      // The memory cache ensures the deprecation only triggers once.
+      \Drupal::cache('memory')->set($cid, TRUE);
+      @trigger_error("Calling drupal_static() with \"$name\" as argument is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::cache('memory')->set() and \Drupal::cache('memory')->get() instead. See https://www.drupal.org/node/2661204", E_USER_DEPRECATED);
+    }
+  }
   static $data = [], $defaults = [];
   if (isset($name)) {
     // Check if we're dealing with a previously defined static variable.
@@ -424,12 +441,61 @@ function &drupal_static($name, $default_value = NULL, $reset = FALSE) {
  *   Name of the static variable to reset. Omit to reset all variables.
  *   Resetting all variables should only be used, for example, for running
  *   unit tests with a clean environment.
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal::cache('memory')->delete() instead.
+ *
+ * @see https://www.drupal.org/node/2661204
  */
 function drupal_static_reset($name = NULL): void {
   switch ($name) {
-    case 'node_access_view_all_nodes':
-      @trigger_error('Calling drupal_static_reset() with "node_access_view_all_nodes" as argument is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'node.view_all_nodes_memory_cache\')->deleteAll(); instead. See https://www.drupal.org/node/3038909', E_USER_DEPRECATED);
-      \Drupal::service('node.view_all_nodes_memory_cache')->deleteAll();
+    case 'locale_translation_get_projects':
+      @trigger_error('Calling drupal_static_reset() with "locale_translation_get_projects" as argument is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service("cache.memory")->delete("locale_get_projects") instead. See https://www.drupal.org/node/3569330', E_USER_DEPRECATED);
+      if (\Drupal::hasService('cache.memory')) {
+        \Drupal::service('cache.memory')->delete('locale_get_projects');
+      }
+      break;
+
+    case 'locale_translation_project_list':
+      @trigger_error("Using drupal_static_reset() with 'locale_translation_project_list' as argument is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3037033", E_USER_DEPRECATED);
+      break;
+
+    case 'locale_translation_get_file_history':
+      @trigger_error('Calling drupal_static_reset() with "locale_translation_get_file_history" as argument is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service("cache.memory")->invalidateTags(["locale_current_import"]) instead. See https://www.drupal.org/node/3037162', E_USER_DEPRECATED);
+      \Drupal::service('cache.memory')->invalidateTags(['locale_current_import']);
+      break;
+
+    case 'filter_formats':
+      @trigger_error("Using drupal_static_reset() with 'filter_formats' as argument is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. No replacement is provided. See https://www.drupal.org/node/3035368", E_USER_DEPRECATED);
+      break;
+
+    case 'file_get_file_references':
+    case 'file_get_file_references:field_columns':
+      @trigger_error("Calling drupal_static_reset() with \"$name\" as argument is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service('cache.memory')->invalidateTags(['file_references']) instead. See https://www.drupal.org/node/3573884", E_USER_DEPRECATED);
+      \Drupal::service('cache.memory')->invalidateTags(['file_references']);
+      break;
+
+    case 'options_allowed_values':
+      @trigger_error("Calling drupal_static_reset() with 'options_allowed_values' as argument is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::cache('memory')->delete('options.allowed_values') instead. See https://www.drupal.org/node/3572185", E_USER_DEPRECATED);
+      \Drupal::cache('memory')->delete('options.allowed_values');
+      break;
+
+    case 'clear_all_skip_deprecation':
+      break;
+
+    default:
+      $cid = $name ?? 'null';
+      $cid = $cid . 'drupal_static_reset_deprecation';
+      if (!\Drupal::cache('memory')->get($cid)) {
+        // The memory cache ensures the deprecation only triggers once.
+        \Drupal::cache('memory')->set($cid, TRUE);
+        if (!isset($name)) {
+          @trigger_error("Calling drupal_static_reset() with \"NULL\" as argument is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::cache('memory')->delete() instead. See https://www.drupal.org/node/2661204", E_USER_DEPRECATED);
+        }
+        else {
+          @trigger_error("Calling drupal_static_reset() with \"$name\" as argument is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::cache('memory')->delete() instead. See https://www.drupal.org/node/2661204", E_USER_DEPRECATED);
+        }
+      }
       break;
 
   }

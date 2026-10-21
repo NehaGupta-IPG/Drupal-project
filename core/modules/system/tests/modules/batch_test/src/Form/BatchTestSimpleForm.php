@@ -39,6 +39,7 @@ class BatchTestSimpleForm extends FormBase {
         'batch6' => 'batch 6',
         'batch7' => 'batch 7',
         'batch8' => 'batch 8',
+        'batch9' => 'batch 9',
       ],
       '#multiple' => TRUE,
     ];
@@ -53,7 +54,7 @@ class BatchTestSimpleForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
