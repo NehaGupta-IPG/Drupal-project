@@ -75,6 +75,12 @@ class PluralVariants extends FormElementBase {
    * {@inheritdoc}
    */
   public function setConfig(Config $base_config, LanguageConfigOverride $config_translation, $config_values, $base_key = NULL) {
+    // When all the variants are empty, remove the translation, like the
+    // interface translation form does.
+    if (implode('', $config_values) === '') {
+      $config_translation->clear($base_key);
+      return;
+    }
     $config_values = implode(PoItem::DELIMITER, $config_values);
     parent::setConfig($base_config, $config_translation, $config_values, $base_key);
   }
