@@ -18,6 +18,9 @@ trait JsonSchemaProviderSerializerTrait {
    * {@inheritdoc}
    */
   public function getJsonSchema(mixed $object, array $context): array {
+    if (is_array($object)) {
+      @trigger_error('Passing an array to the $object parameter in ' . __CLASS__ . '::' . __FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Call it once for each object instead. See https://www.drupal.org/project/drupal/issues/3627338', E_USER_DEPRECATED);
+    }
     try {
       $normalizer_schema = $this->normalize($object, 'json_schema', $context);
     }
