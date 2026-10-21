@@ -1,0 +1,25 @@
+services:
+  cache.cache_test_missing:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin, default_backend: cache.backend.missing }
+    factory: [ '@cache_factory', 'get' ]
+    arguments: [ cache_test_missing ]
+  cache.cache_test_lost:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin, default_backend: cache.backend.lost }
+    factory: [ '@cache_factory', 'get' ]
+    arguments: [ cache_test_lost ]
+  cache.cache_test_memory:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin, default_backend: cache.backend.memory }
+    factory: [ '@cache_factory', 'get' ]
+    arguments: [ cache_test_memory ]
+  cache.cache_test_no_default:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: [ '@cache_factory', 'get' ]
+    arguments: [ cache_test_no_default ]
