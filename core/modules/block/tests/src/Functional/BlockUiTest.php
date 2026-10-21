@@ -192,6 +192,13 @@ class BlockUiTest extends BrowserTestBase {
    * Tests the block categories on the listing page.
    */
   public function testCandidateBlockList(): void {
+    $arguments = [
+      ':title' => 'Display message',
+      ':category' => 'Block test',
+      ':href' => 'admin/structure/block/add/test_block_instantiation/classy',
+    ];
+    $pattern = '//tr[.//td/div[text()=:title] and .//td/div[text()=:category] and .//td//a[contains(@href, :href)]]';
+
     $this->drupalGet('admin/structure/block');
     $this->clickLink('Place block');
     $this->assertSession()->elementExists('xpath', '//tr[.//td/div[text()="Display message"] and .//td[text()="Block test"] and .//td//a[contains(@href, "admin/structure/block/add/test_block_instantiation/stark")]]');
@@ -227,7 +234,17 @@ class BlockUiTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('Test context-aware block');
     $this->assertSession()->responseNotContains($expected_text);
 
+<<<<<<< HEAD
     $block_url = 'admin/structure/block/add/test_context_aware/stark';
+=======
+    $block_url = 'admin/structure/block/add/test_context_aware/classy';
+    $arguments = [
+      ':title' => 'Test context-aware block',
+      ':category' => 'Block test',
+      ':href' => $block_url,
+    ];
+    $pattern = '//tr[.//td/div[text()=:title] and .//td/div[text()=:category] and .//td//a[contains(@href, :href)]]';
+>>>>>>> 056c5214685 (Patch from #33)
 
     $this->drupalGet('admin/structure/block');
     $this->clickLink('Place block');

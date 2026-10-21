@@ -44,9 +44,18 @@
          *   The label of the block.
          */
         function toggleBlockEntry(index, label) {
+          const $label = $(label);
           const $row = $(label).parent().parent();
-          const textMatch = label.textContent.toLowerCase().includes(query);
-          $row.toggle(textMatch);
+          const labelMatch = label.textContent.toLowerCase().includes(query);
+
+          let categoryMatch = false;
+
+          if (!labelMatch) {
+            const $category = $row.find('div.block-filter-category-source');
+            categoryMatch = $category.text().toLowerCase().includes(query);
+          }
+
+          $row.toggle(labelMatch || categoryMatch);
         }
 
         // Filter if the length of the query is at least 2 characters.

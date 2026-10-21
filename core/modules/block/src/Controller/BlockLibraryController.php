@@ -124,7 +124,13 @@ class BlockLibraryController extends ControllerBase {
           'label' => $plugin_definition['admin_label'],
         ],
       ];
-      $row['category']['data'] = $plugin_definition['category'];
+      $row['category']['data'] = [
+        '#type' => 'inline_template',
+        '#template' => '<div class="block-filter-category-source">{{ category }}</div>',
+        '#context' => [
+          'category' => $plugin_definition['category'],
+        ],
+      ];
       $links['add'] = [
         'title' => $this->t('Place block'),
         'url' => Url::fromRoute('block.admin_add', ['plugin_id' => $plugin_id, 'theme' => $theme]),
@@ -156,11 +162,11 @@ class BlockLibraryController extends ControllerBase {
       '#title' => $this->t('Filter'),
       '#title_display' => 'invisible',
       '#size' => 30,
-      '#placeholder' => $this->t('Filter by block name'),
+      '#placeholder' => $this->t('Filter by block name or category'),
       '#attributes' => [
         'class' => ['block-filter-text'],
         'data-element' => '.block-add-table',
-        'title' => $this->t('Enter a part of the block name to filter by.'),
+        'title' => $this->t('Enter a part of the block name or category to filter by.'),
       ],
     ];
 
