@@ -25,7 +25,7 @@ class ContextDefinition implements ContextDefinitionInterface {
   /**
    * The human-readable label.
    *
-   * @var string
+   * @var string|null|\Stringable
    *   The label.
    */
   protected $label;
@@ -33,7 +33,7 @@ class ContextDefinition implements ContextDefinitionInterface {
   /**
    * The human-readable description.
    *
-   * @var string|null
+   * @var string|null|\Stringable
    *   The description, or NULL if no description is available.
    */
   protected $description;
@@ -97,7 +97,7 @@ class ContextDefinition implements ContextDefinitionInterface {
    *   Whether the context definition is required.
    * @param bool $multiple
    *   Whether the context definition is multivalue.
-   * @param string|null $description
+   * @param string|null|\Stringable $description
    *   The description of this context definition for the UI.
    * @param mixed $default_value
    *   The default value of this definition.
