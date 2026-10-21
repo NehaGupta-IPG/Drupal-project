@@ -335,6 +335,81 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
   }
 
   /**
+   * Tests that fields use content language when rendering default translations.
+   */
+  public function testDefaultTranslationFieldLangcode(): void {
+    // Allow access to view entity translations.
+    Role::load(RoleInterface::ANONYMOUS_ID)
+      ->grantPermission('view test entity translations')
+      ->save();
+    $this->enableModules(['language', 'content_translation']);
+    $this->installEntitySchema('entity_test_mul');
+    $en = ConfigurableLanguage::createFromLangcode('en');
+    $en->save();
+    $fr = ConfigurableLanguage::createFromLangcode('fr');
+    $fr->save();
+    $de = ConfigurableLanguage::createFromLangcode('de');
+    $de->save();
+    $this->container->get('content_translation.manager')->setEnabled('entity_test_mul', 'entity_test_mul', TRUE);
+
+    // Create a non-translatable entity reference field and update display.
+    $this->createEntityReferenceField('entity_test_mul', 'entity_test_mul', 'ref_field', 'Reference', 'entity_test_mul');
+    $ref_field_config = FieldConfig::loadByName('entity_test_mul', 'entity_test_mul', 'ref_field');
+    $ref_field_config->set('translatable', FALSE)->save();
+
+    EntityViewDisplay::create([
+      'targetEntityType' => 'entity_test_mul',
+      'bundle' => 'entity_test_mul',
+      'mode' => 'default',
+      'label' => 'My view mode',
+      'status' => TRUE,
+    ])
+      ->setComponent('ref_field', [
+        'type' => 'entity_reference_entity_view',
+        'settings' => ['view_mode' => 'default'],
+      ])
+      ->setComponent('name', [
+        'type' => 'string',
+        'region' => 'content',
+      ])
+      ->save();
+
+    // Create a referenced entity with English, French, and German translations.
+    $referenced_entity = $this->createTestEntity('entity_test_mul');
+    $referenced_entity->set('name', 'EN ref entity');
+    $referenced_entity->addTranslation('fr', ['name' => 'FR ref entity']);
+    $referenced_entity->addTranslation('de', ['name' => 'DE ref entity']);
+    $referenced_entity->save();
+
+    // Create the main entity in EN with DE translation.
+    $main_entity = $this->createTestEntity('entity_test_mul');
+    $main_entity->set('ref_field', $referenced_entity);
+    $main_entity->addTranslation('de');
+    $main_entity->save();
+
+    $view_builder = $this->container->get('entity_type.manager')->getViewBuilder('entity_test_mul');
+    $renderer = $this->container->get('renderer');
+
+    // Set the default language to FR.
+    \Drupal::service('language.default')->set($fr);
+    \Drupal::languageManager()->reset();
+
+    // Render the default (EN) translation: the referenced entity should
+    // show in FR.
+    $build = $view_builder->view($main_entity, 'default', 'en');
+    $rendered = (string) $renderer->renderRoot($build);
+    $this->assertStringContainsString('FR ref entity', $rendered);
+    $this->assertStringNotContainsString('EN ref entity', $rendered);
+
+    // Render the non-default DE translation: the referenced entity should
+    // show in DE even though the content language is FR.
+    $build = $view_builder->view($main_entity, 'default', 'de');
+    $rendered = (string) $renderer->renderRoot($build);
+    $this->assertStringContainsString('DE ref entity', $rendered);
+    $this->assertStringNotContainsString('FR ref entity', $rendered);
+  }
+
+  /**
    * Tests a view mode alter on an entity.
    */
   public function testHookEntityTypeViewModeAlter(): void {
