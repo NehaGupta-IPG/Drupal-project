@@ -105,7 +105,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $block->save();
     $this->drupalGet('<front>');
     $this->assertSession()->elementNotExists('xpath', '//div[@id="block-test-language-block"]/h2');
-    $language_switcher_nav = $this->xpath('//div[@id=:id and @role="navigation" and @aria-label=:label]', [
+    $language_switcher_nav = $this->getNodeElementsByXpath('//div[@id=:id and @role="navigation" and @aria-label=:label]', [
       ':id' => 'block-test-language-block',
       ':label' => $block->label(),
     ]);
@@ -128,7 +128,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     // The language switcher block should display.
     $this->assertSession()->pageTextContains($block_label);
 
-    $language_switcher_nav = $this->xpath('//div[@id=:id and @role="navigation" and @aria-label=:label]', [
+    $language_switcher_nav = $this->getNodeElementsByXpath('//div[@id=:id and @role="navigation" and @aria-label=:label]', [
       ':id' => 'block-test-language-block',
       ':label' => $block_label,
     ]);
