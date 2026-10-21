@@ -11,7 +11,7 @@ use Drupal\Tests\media\Traits\OEmbedTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cspell:ignore Drupalin Hustlin Schipulcon
+// cspell:ignore Drupalin Hustlin Schipulcon Wjcq
 /**
  * Tests that oEmbed media can be added in the Media library's widget.
  */
