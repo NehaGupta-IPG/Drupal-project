@@ -41,6 +41,10 @@
  * @code
  * 'interface translation server pattern': public://translations/%project-%version.%language.po
  * @endcode
+ * Streamwrapper "extension://" addresses paths relative to the current project.
+ * @code
+ * 'interface translation server pattern': extension://translations/%version.%language.po
+ * @endcode
  *
  * Multiple custom modules or themes sharing the same po file should have
  * matching definitions. Such as modules and sub-modules or multiple modules in
@@ -69,8 +73,8 @@
  *   the same project name will be listed as one the translation status list.
  * - "interface translation server pattern": URL of the .po translation files
  *   used to download the files from. The URL contains tokens which will be
- *   replaced by appropriate values. The file can be locate both at a local
- *   relative path, a local absolute path and a remote server location.
+ *   replaced by appropriate values. This value can be a local path relative to
+ *   the Drupal root, a local absolute path, or a remote server location.
  *
  * The following tokens are available for the server pattern:
  * - "%core": Core version. Value example: "8.x".

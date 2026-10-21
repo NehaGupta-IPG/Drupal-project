@@ -6,6 +6,7 @@ namespace Drupal\Tests\locale\Unit;
 
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
@@ -61,6 +62,13 @@ class LocaleProjectRepositoryTest extends UnitTestCase {
   private ConfigFactoryInterface $config;
 
   /**
+   * The key value memory factory.
+   *
+   * @var \Drupal\Core\Extension\ExtensionPathResolver
+   */
+  private ExtensionPathResolver $extensionPathResolver;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -71,6 +79,7 @@ class LocaleProjectRepositoryTest extends UnitTestCase {
     $this->moduleExtensionList = $this->createStub(ModuleExtensionList::class);
     $this->themeExtensionList = $this->createStub(ThemeExtensionList::class);
     $this->config = $this->createStub(ConfigFactoryInterface::class);
+    $this->extensionPathResolver = $this->createStub(ExtensionPathResolver::class);
     $this->localeProjectRepository = new LocaleProjectRepository(
       $this->cache,
       $this->keyValueMemoryFactory,
@@ -78,6 +87,7 @@ class LocaleProjectRepositoryTest extends UnitTestCase {
       $this->moduleExtensionList,
       $this->themeExtensionList,
       $this->config,
+      $this->extensionPathResolver,
     );
   }
 
@@ -129,6 +139,7 @@ class LocaleProjectRepositoryTest extends UnitTestCase {
       $this->moduleExtensionList,
       $this->themeExtensionList,
       $this->config,
+      $this->extensionPathResolver,
     );
     $z = new LocaleTranslatableProject('z', 'z', 'z', 'z', 'z');
     $this->localeProjectRepository->set($z);
