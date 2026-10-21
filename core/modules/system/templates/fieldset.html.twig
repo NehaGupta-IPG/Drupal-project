@@ -53,7 +53,7 @@
       <div{{ description.attributes.addClass('description') }}>{{ description.content }}</div>
     {% endif %}
     {% if errors %}
-      <div>
+      <div id="{{ element['#id'] }}--error-message" class="form-item--error-message">
         {{ errors }}
       </div>
     {% endif %}

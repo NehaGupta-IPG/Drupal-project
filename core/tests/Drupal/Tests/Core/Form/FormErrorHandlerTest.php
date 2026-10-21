@@ -9,6 +9,7 @@ use Drupal\Core\Form\FormErrorHandler;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Tests\UnitTestCase;
+use Prophecy\Argument;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -30,6 +31,13 @@ class FormErrorHandlerTest extends UnitTestCase {
   protected MessengerInterface $messenger;
 
   /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface|\Prophecy\Prophecy\ObjectProphecy
+   */
+  protected $renderer;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -40,7 +48,7 @@ class FormErrorHandlerTest extends UnitTestCase {
     $container->set('messenger', $this->messenger);
     \Drupal::setContainer($container);
 
-    $this->formErrorHandler = new FormErrorHandler();
+    $this->formErrorHandler = new FormErrorHandler($this->renderer);
   }
 
   /**
@@ -79,6 +87,9 @@ class FormErrorHandlerTest extends UnitTestCase {
         }),
         'error',
       );
+
+    $this->renderer->renderInIsolation(Argument::any())
+      ->will(fn(array $args) => $args[0]['message']['#markup']);
 
     $form = [
       '#parents' => [],

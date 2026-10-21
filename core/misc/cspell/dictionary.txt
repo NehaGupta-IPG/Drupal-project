@@ -151,6 +151,7 @@ endtrans
 enoki
 entityviewedit
 errmode
+errormessages
 eslintcache
 español
 eurozone
