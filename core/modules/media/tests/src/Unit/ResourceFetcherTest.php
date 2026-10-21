@@ -11,11 +11,14 @@ use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcher;
 use Drupal\Tests\UnitTestCase;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -107,6 +110,54 @@ class ResourceFetcherTest extends UnitTestCase {
     $this->expectException(ResourceException::class);
     $this->expectExceptionMessageIs('The oEmbed resource could not be decoded.');
     $fetcher->fetchResource('non_array');
+  }
+
+  /**
+   * Tests the exception message when the resource cannot be retrieved.
+   *
+   * @param \GuzzleHttp\Psr7\Response|\Throwable $mock_result
+   *   The response or exception returned by the HTTP client.
+   * @param string[] $expected_messages
+   *   Strings the ResourceException message must contain.
+   */
+  #[DataProvider('providerFetchFailure')]
+  public function testFetchFailure(Response|\Throwable $mock_result, array $expected_messages): void {
+    $client = new Client([
+      'handler' => HandlerStack::create(new MockHandler([$mock_result])),
+    ]);
+    $fetcher = new ResourceFetcher($client, $this->createStub(ProviderRepositoryInterface::class), new NullBackend('default'));
+
+    try {
+      $fetcher->fetchResource('https://example.com/oembed?url=resource');
+      $this->fail('Expected a ResourceException to be thrown.');
+    }
+    catch (ResourceException $e) {
+      foreach ($expected_messages as $expected_message) {
+        $this->assertStringContainsString($expected_message, $e->getMessage());
+      }
+    }
+  }
+
+  /**
+   * Data provider for ::testFetchFailure().
+   */
+  public static function providerFetchFailure(): array {
+    return [
+      'provider error response' => [
+        new Response(400, ['Content-Type' => 'application/json'], Json::encode([
+          'error' => ['message' => 'Invalid OAuth access token.'],
+        ])),
+        [
+          'Could not retrieve the oEmbed resource: ',
+          '400 Bad Request',
+          'Invalid OAuth access token.',
+        ],
+      ],
+      'network error' => [
+        new ConnectException('Connection timed out', new Request('GET', 'https://example.com/oembed?url=resource')),
+        ['Could not retrieve the oEmbed resource: Connection timed out'],
+      ],
+    ];
   }
 
 }
