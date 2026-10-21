@@ -59,7 +59,7 @@ class FilterTest extends JsonapiKernelTestBase {
   protected $resourceTypeRepository;
 
   /**
-   * @var \Drupal\jsonapi\Context\FieldResolver
+   * The field resolver.
    */
   protected FieldResolver $fieldResolver;
 
@@ -254,8 +254,7 @@ class FilterTest extends JsonapiKernelTestBase {
             'condition' => [
               'path' => 'colors.value',
               'value' => 'yellow',
-              'operator' =>
-              'CONTAINS',
+              'operator' => 'CONTAINS',
               'memberOf' => 'nested-and-group',
             ],
           ],

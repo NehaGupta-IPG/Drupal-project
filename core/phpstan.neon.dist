@@ -35,8 +35,9 @@ parameters:
     - ../sites
     # Skip test fixtures.
     - ../*/node_modules/*
-    - */tests/fixtures/*.php
-    - */tests/fixtures/*.php.gz
+    - */fixtures/*.php
+    - */fixtures/*.php.gz
+    - tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures
     # Skip the phpstan tmpDir
     - phpstan-tmp/*
     # Skip Drupal's own PHPStan rules test fixtures.
@@ -67,6 +68,9 @@ parameters:
     - "#Drupal calls should be avoided in classes, use dependency injection instead#"
     - "#^Class .* extends @internal class#"
     - identifier: missingType.iterableValue
+
+    # @todo Fix this in https://www.drupal.org/project/drupal/issues/3624168
+    - identifier: loadIncludes.fileNotLoadable
 
   disallowedFunctionCalls:
     -

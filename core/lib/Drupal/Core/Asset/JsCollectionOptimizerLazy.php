@@ -119,7 +119,7 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
         'include' => UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($libraries))),
       ];
       $ajax_page_state = $this->requestStack->getCurrentRequest()->attributes->get('ajax_page_state');
-      $already_loaded = isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : [];
+      $already_loaded = isset($ajax_page_state['libraries']) ? explode(',', $ajax_page_state['libraries']) : [];
       if ($already_loaded) {
         $query_args['exclude'] = UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($already_loaded)));
       }
@@ -137,7 +137,10 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
           // either the include or exclude query arguments. Replace this with
           // the explicit list of libraries in the aggregate.
           if (isset($js_asset['libraries'])) {
-            unset($query['include'], $query['exclude'], $query['delta']);
+            unset($query['include'], $query['exclude'], $query['delta'], $query['scope']);
+            foreach ($js_asset['items'] as &$asset) {
+              unset($asset['scope']);
+            }
             $query['libraries'] = UrlHelper::compressQueryParameter(implode(',', $js_asset['libraries']));
           }
           // Add a filename prefix to mitigate ad blockers which can block

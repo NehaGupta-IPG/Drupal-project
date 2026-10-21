@@ -189,7 +189,7 @@ class EntityFieldManagerTest extends UnitTestCase {
   /**
    * Sets up the entity type manager to be tested.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
+   * @param array<\Prophecy\Prophecy\ProphecyInterface<\Drupal\Core\Entity\EntityTypeInterface>> $definitions
    *   (optional) An array of entity type definitions.
    */
   protected function setUpEntityTypeDefinitions(array $definitions = []): void {
@@ -203,7 +203,7 @@ class EntityFieldManagerTest extends UnitTestCase {
     }
 
     $this->entityTypeManager->getDefinition(Argument::type('string'))
-      ->will(function ($args) use ($definitions) {
+      ->will(function (array $args) use ($definitions): EntityTypeInterface {
         if (isset($definitions[$args[0]])) {
           return $definitions[$args[0]];
         }
@@ -600,10 +600,10 @@ class EntityFieldManagerTest extends UnitTestCase {
    *   (optional) An array of entity keys for the mocked entity type. Defaults
    *   to an empty array.
    *
-   * @return \Prophecy\Prophecy\ProphecyInterface<\Drupal\Core\Field\BaseFieldDefinition>
+   * @return \Prophecy\Prophecy\ProphecyInterface<\Drupal\Core\Field\FieldStorageDefinitionInterface>
    *   A field definition object.
    */
-  protected function setUpEntityWithFieldDefinition($custom_invoke_all = FALSE, $field_definition_id = 'id', $entity_keys = []) {
+  protected function setUpEntityWithFieldDefinition($custom_invoke_all = FALSE, $field_definition_id = 'id', $entity_keys = []): FieldStorageDefinitionInterface {
     $field_type_manager = $this->prophesize(FieldTypePluginManagerInterface::class);
     $field_type_manager->getDefaultStorageSettings('boolean')->willReturn([]);
     $field_type_manager->getDefaultFieldSettings('boolean')->willReturn([]);

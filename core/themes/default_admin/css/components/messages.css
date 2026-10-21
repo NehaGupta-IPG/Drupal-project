@@ -52,7 +52,7 @@
     margin: 0;
   }
 
-  .gin--dark-mode & {
+  .dark-mode & {
     box-shadow: 0 6px 16px var(--admin-color-border-soft);
   }
 
@@ -120,7 +120,6 @@
  * dark-banner treatment. The global status semantics (light tint + dark text)
  * are --admin-color-bg-* / --admin-color-text-*.
  */
-
 .messages--error {
   --messages-bg-color: #583333;
   --messages-fg-color: #f39b9d;

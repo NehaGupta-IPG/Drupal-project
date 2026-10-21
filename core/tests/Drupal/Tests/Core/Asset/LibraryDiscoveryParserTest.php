@@ -771,7 +771,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     return [
       'css_bad_category' => [
         'css_bad_category',
-        'See https://www.drupal.org/node/2274843.',
+        'Invalid CSS category: bad_category. See https://www.drupal.org/node/2274843.',
       ],
       'Improper CSS nesting' => [
         'css_bad_nesting',
@@ -891,15 +891,15 @@ class TestLibraryDiscoveryParser extends LibraryDiscoveryParser {
   /**
    * The valid URIs.
    *
-   * @var array
+   * @var array<string,bool>
    */
-  protected $validUris;
+  protected array $validUris;
 
-  protected function fileValidUri($source) {
+  protected function fileValidUri($source): bool {
     return $this->validUris[$source] ?? FALSE;
   }
 
-  public function setFileValidUri($source, $valid): void {
+  public function setFileValidUri(string $source, bool $valid): void {
     $this->validUris[$source] = $valid;
   }
 

@@ -33,7 +33,7 @@ class DistributionProfileExistingSettingsTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $profile = NULL;
+  protected $profile;
 
   /**
    * {@inheritdoc}
@@ -47,7 +47,7 @@ class DistributionProfileExistingSettingsTest extends InstallerTestBase {
       'distribution' => [
         'name' => 'My Distribution',
         'install' => [
-          'theme' => 'olivero',
+          'theme' => 'default_admin',
         ],
       ],
     ];

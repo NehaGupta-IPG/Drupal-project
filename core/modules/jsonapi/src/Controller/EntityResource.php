@@ -58,6 +58,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
+use Drupal\user\AccountCancellation;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -91,7 +92,9 @@ class EntityResource {
     protected TimeInterface $time,
     protected AccountInterface $user,
     protected EventDispatcherInterface $eventDispatcher,
-  ) {}
+    protected AccountCancellation $accountCancellation,
+  ) {
+  }
 
   /**
    * Gets the individual entity.
@@ -277,9 +280,9 @@ class EntityResource {
 
       // Allow other modules to act.
 
-      user_cancel([], $entity->id(), $cancel_method);
-      // Since user_cancel() is not invoked via Form API, batch processing
-      // needs to be invoked manually.
+      $this->accountCancellation->cancel([], $entity->id(), $cancel_method);
+      // Since AccountCancellation::cancel() is not invoked via Form API, batch
+      // processing needs to be invoked manually.
       $batch =& batch_get();
       // Mark this batch as non-progressive to bypass the progress bar and
       // redirect.

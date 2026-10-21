@@ -14,6 +14,7 @@ use Drupal\Core\Render\Element\FormElementBase;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
+use Drupal\file\Upload\ManagedFileElementHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 // cspell:ignore filefield
@@ -72,9 +73,17 @@ class ManagedFile extends FormElementBase {
       $return = $input;
 
       // Uploads take priority over all other values.
-      if ($files = file_managed_file_save_upload($element, $form_state)) {
+      if ($files = \Drupal::service(ManagedFileElementHelper::class)->managedFileSaveUpload($element, $form_state)) {
         if ($element['#multiple']) {
           $fids = array_merge($fids, array_keys($files));
+          $denied_fids = [];
+          foreach (File::loadMultiple($fids) as $fid => $file) {
+            if (!$file->access('download')) {
+              $denied_fids[] = $fid;
+            }
+          }
+          // Remove denied file ids from the original file ID array.
+          $fids = array_diff($fids, $denied_fids);
         }
         else {
           $fids = array_keys($files);
@@ -147,8 +156,8 @@ class ManagedFile extends FormElementBase {
       // Confirm that the file exists when used as a default value.
       if (!empty($default_fids)) {
         $fids = [];
-        foreach ($default_fids as $fid) {
-          if ($file = File::load($fid)) {
+        foreach (File::loadMultiple($default_fids) as $file) {
+          if ($file->access('download')) {
             $fids[] = $file->id();
           }
         }

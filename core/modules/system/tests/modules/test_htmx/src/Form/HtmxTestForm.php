@@ -7,12 +7,14 @@ namespace Drupal\test_htmx\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Htmx\Htmx;
+use Drupal\Core\Htmx\HtmxRequestInfoTrait;
 use Drupal\Core\Url;
 
 /**
  * A small form used to test HTMX dynamic forms.
  */
 class HtmxTestForm extends FormBase {
+  use HtmxRequestInfoTrait;
 
   /**
    * {@inheritdoc}
@@ -65,12 +67,55 @@ class HtmxTestForm extends FormBase {
       ->swapOob(TRUE)
       ->applyTo($form['data'], '#wrapper_attributes');
 
+    $form['bad_swap_target'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Target does not exist',
+    ];
+    (new Htmx())
+      ->get($formUrl)
+      ->select('select')
+      ->swap('innerHTML')
+      ->target('div.bad-target')
+      ->applyTo($form['bad_swap_target']);
+    // Test hx-replace fragments.
+    $partialReplace = Url::fromRoute('test_htmx.htmx_fragment');
+    $form['partial-replace'] = [
+      '#type' => 'item',
+      '#title' => 'Replacement target',
+    ];
+    $form['partial'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Replace via partial',
+    ];
+    (new Htmx())
+      ->get($partialReplace)
+      ->onlyMainContent()
+      ->applyTo($form['partial']);
+    $partialMissingTarget = Url::fromRoute('test_htmx.htmx_fragment_missing');
+    $form['partial_missing'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Target does not exist',
+    ];
+    (new Htmx())
+      ->get($partialMissingTarget)
+      ->onlyMainContent()
+      ->applyTo($form['partial_missing']);
+    $partialDelete = Url::fromRoute('test_htmx.htmx_fragment_delete');
+    $form['partial_delete'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Delete via partial',
+    ];
+    (new Htmx())
+      ->get($partialDelete)
+      ->onlyMainContent()
+      ->applyTo($form['partial_delete']);
+
     $push = FALSE;
-    if ($this->getTriggerElement($form_state) === 'type') {
+    if ($this->getHtmxTriggerName() === 'type') {
       $form['data']['#markup'] = '';
       $push = Url::fromRoute('test_htmx.form_builder_test');
     }
-    elseif ($this->getTriggerElement($form_state) === 'selected') {
+    elseif ($this->getHtmxTriggerName() === 'selected') {
       // A value is selected.
       $defaultSelection = $form_state->getValue('selected', $selected);
       // Also update the browser URL.
@@ -111,11 +156,6 @@ class HtmxTestForm extends FormBase {
       ],
     ];
     return $options[$selected] ?? [];
-  }
-
-  protected function getTriggerElement($form_state): string|bool {
-    $input = $form_state->getUserInput();
-    return !empty($input['_triggering_element_name']) ? $input['_triggering_element_name'] : FALSE;
   }
 
 }

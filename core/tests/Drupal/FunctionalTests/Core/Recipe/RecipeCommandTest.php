@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Core\Recipe;
 
+use Drupal\config_enum_test\EnumValue;
 use Drupal\Core\Config\Checkpoint\Checkpoint;
 use Drupal\Core\Recipe\Command\RecipeCommand;
 use Drupal\Tests\BrowserTestBase;
@@ -84,6 +85,34 @@ class RecipeCommandTest extends BrowserTestBase {
   }
 
   /**
+   * Tests the isApplying flag when a recipe is applied via a batch.
+   */
+  public function testIsApplyingDuringBatch(): void {
+    // The default content importer needs an administrative account to import
+    // the content as.
+    $this->drupalCreateUser(admin: TRUE);
+
+    $this->applyRecipe('core/tests/fixtures/recipes/recipe_is_applying_test');
+
+    // Prove that the recipe did what it is expected to do.
+    $this->assertTrue(\Drupal::moduleHandler()->moduleExists('recipe_is_applying_test'));
+    $this->assertTrue(\Drupal::service('theme_handler')->themeExists('test_base_theme'));
+    $this->assertSame('Only in the recipe', $this->config('recipe_is_applying_test.settings')->get('recipe'));
+    $entity = \Drupal::service('entity.repository')->loadEntityByUuid('entity_test', '290a8baa-837f-4a81-8a37-1c54ae407080');
+    $this->assertNotNull($entity);
+
+    // The recipe_is_applying_test module records the value of
+    // RecipeRunner::isApplying() in a key value collection as each batch
+    // operation runs.
+    $key_value = \Drupal::keyValue('recipe_is_applying_test');
+    $this->assertTrue($key_value->get('modules_installed'), 'RecipeRunner::isApplying() returned TRUE during hook_modules_installed()');
+    $this->assertTrue($key_value->get('themes_installed'), 'RecipeRunner::isApplying() returned TRUE during hook_themes_installed()');
+    $this->assertTrue($key_value->get('config_save'), 'RecipeRunner::isApplying() returned TRUE while saving recipe-provided configuration');
+    $this->assertTrue($key_value->get('entity_test_insert'), 'RecipeRunner::isApplying() returned TRUE while creating recipe-provided content');
+    $this->assertFalse($key_value->get('recipe_applied_event'), 'RecipeRunner::isApplying() returned FALSE while triggering the recipe-applied event');
+  }
+
+  /**
    * Tests that errors during config rollback won't steamroll validation errors.
    */
   public function testExceptionOnRollback(): void {
@@ -107,6 +136,56 @@ class RecipeCommandTest extends BrowserTestBase {
     $output = trim(preg_replace('/\s+/', ' ', $process->getOutput()));
     $this->assertSame('[ERROR] The supplied path core/tests/fixtures/recipes/does_not_exist is not a directory', $output);
     $this->assertEmpty($process->getErrorOutput());
+  }
+
+  /**
+   * Test installing a module with recipe config using an enum from module.
+   *
+   * This test is a functional test because all code is autoloadable in tests.
+   * Using the CLI command means that we test loading the recipe prior to the
+   * module being installed.
+   */
+  public function testEnumInRecipeConfig(): void {
+    $this->applyRecipe('core/tests/fixtures/recipes/enum_config_test');
+    $this->assertSame(EnumValue::Yes, $this->config('config_enum_test.settings')->get('foo'));
+  }
+
+  /**
+   * Test installing a module with recipe action using an enum from module.
+   *
+   * This test is a functional test because all code is autoloadable in tests.
+   * Using the CLI command means that we test loading the recipe prior to the
+   * module being installed.
+   */
+  public function testEnumInRecipeAction(): void {
+    $this->applyRecipe('core/tests/fixtures/recipes/enum_action_test');
+    $this->assertSame(EnumValue::No, $this->config('config_enum_test.settings')->get('foo'));
+  }
+
+  /**
+   * Test installing a module with recipe action using a constant from module.
+   *
+   * This test is a functional test because all code is autoloadable in tests.
+   * Using the CLI command means that we test loading the recipe prior to the
+   * module being installed.
+   */
+  public function testConstantInRecipeAction(): void {
+    $this->applyRecipe('core/tests/fixtures/recipes/constant_action_test');
+    $this->assertSame('bar', $this->config('config_constant_test.settings')->get('foo'));
+    $this->assertSame(EnumValue::No, $this->config('config_enum_test.settings')->get('foo'));
+  }
+
+  /**
+   * Test installing a module with recipe action using a broken enum.
+   *
+   * This test is a functional test because all code is autoloadable in tests.
+   * Using the CLI command means that we test loading the recipe prior to the
+   * module being installed.
+   */
+  public function testBrokenEnumInRecipeAction(): void {
+    $process = $this->applyRecipe('core/tests/fixtures/recipes/broken_enum_action_test', 1);
+    $output = trim(preg_replace('/\s+/', ' ', $process->getErrorOutput()));
+    $this->assertStringContainsString('The enum "Drupal\config_enum_test\DoesNotExistEnumValue" is not defined', $output);
   }
 
   /**

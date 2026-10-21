@@ -30,8 +30,6 @@ class ConfigExportTest extends WebDriverTestBase {
 
   /**
    * A prefix string used in naming the test blocks.
-   *
-   * @var string
    */
   protected string $blockNamePrefix = 'aaaaaa_config_export_test_block';
 
@@ -90,6 +88,11 @@ class ConfigExportTest extends WebDriverTestBase {
     $this->assertSession()->fieldValueEquals('export', '');
 
     // Check that the export is emptied again when selecting a config type.
+    // First select a config name to populate the export.
+    $page->selectFieldOption('config_name', 'system.site');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->fieldValueNotEquals('export', '');
+    // Then select a config type to empty the export.
     $page->selectFieldOption('config_type', 'Action');
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->fieldValueEquals('export', '');

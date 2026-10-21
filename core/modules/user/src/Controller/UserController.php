@@ -8,17 +8,22 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Flood\FloodInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\user\AccountCancellation;
 use Drupal\user\Form\UserPasswordResetForm;
 use Drupal\user\OneTimeAuthentication;
 use Drupal\user\UserDataInterface;
 use Drupal\user\UserInterface;
+use Drupal\user\LoginFinalizer;
+use Drupal\user\LogoutFinalizer;
 use Drupal\user\UserStorageInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Controller routines for user routes.
@@ -60,11 +65,6 @@ class UserController extends ControllerBase {
    */
   protected $flood;
 
-  /**
-   * One time authentication service.
-   */
-  protected OneTimeAuthentication $oneTimeAuthentication;
-
   public function __construct(
     DateFormatterInterface $date_formatter,
     UserStorageInterface $user_storage,
@@ -72,17 +72,16 @@ class UserController extends ControllerBase {
     LoggerInterface $logger,
     FloodInterface $flood,
     protected TimeInterface $time,
-    ?OneTimeAuthentication $one_time_authentication = NULL,
+    protected OneTimeAuthentication $oneTimeAuthentication,
+    protected LoginFinalizer $loginFinalizer,
+    protected LogoutFinalizer $logoutFinalizer,
+    protected AccountCancellation $accountCancellation,
   ) {
     $this->dateFormatter = $date_formatter;
     $this->userStorage = $user_storage;
     $this->userData = $user_data;
     $this->logger = $logger;
     $this->flood = $flood;
-    if ($one_time_authentication === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $one_time_authentication argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3581062', E_USER_DEPRECATED);
-    }
-    $this->oneTimeAuthentication = $one_time_authentication ?? \Drupal::service(OneTimeAuthentication::class);
   }
 
   /**
@@ -97,6 +96,9 @@ class UserController extends ControllerBase {
       $container->get('flood'),
       $container->get('datetime.time'),
       $container->get(OneTimeAuthentication::class),
+      $container->get(LoginFinalizer::class),
+      $container->get(LogoutFinalizer::class),
+      $container->get(AccountCancellation::class),
     );
   }
 
@@ -118,6 +120,16 @@ class UserController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   The redirect response.
    */
+  #[Route(
+    path: '/user/reset/{uid}/{timestamp}/{hash}',
+    name: 'user.reset',
+    requirements: ['_access' => 'TRUE'],
+    options: [
+      '_maintenance_access' => TRUE,
+      'no_cache' => TRUE,
+    ],
+    defaults: ['_title' => new TranslatableMarkup('Reset password')],
+  )]
   public function resetPass(Request $request, $uid, $timestamp, $hash) {
     $account = $this->currentUser();
     // When processing the one-time login link, we have to make sure that a user
@@ -125,7 +137,7 @@ class UserController extends ControllerBase {
     if ($account->isAuthenticated()) {
       // The current user is already logged in.
       if ($account->id() == $uid) {
-        user_logout();
+        $this->logoutFinalizer->finalizeLogout();
         // We need to begin the redirect process again because logging out will
         // destroy the session.
         return $this->redirect(
@@ -188,6 +200,16 @@ class UserController extends ControllerBase {
    *   If the pass_reset_timeout or pass_reset_hash are not available in the
    *   session. Or if $uid is for a blocked user or invalid user ID.
    */
+  #[Route(
+    path: '/user/reset/{uid}',
+    name: 'user.reset.form',
+    requirements: ['_user_is_logged_in' => 'FALSE'],
+    options: [
+      '_maintenance_access' => TRUE,
+      'no_cache' => TRUE,
+    ],
+    defaults: ['_title' => new TranslatableMarkup('Reset password')],
+  )]
   public function getResetPassForm(Request $request, $uid) {
     $session = $request->getSession();
     $timestamp = $session->get('pass_reset_timeout');
@@ -236,6 +258,16 @@ class UserController extends ControllerBase {
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    *   If $uid is for a blocked user or invalid user ID.
    */
+  #[Route(
+    path: '/user/reset/{uid}/{timestamp}/{hash}/login',
+    name: 'user.reset.login',
+    requirements: ['_user_is_logged_in' => 'FALSE'],
+    options: [
+      '_maintenance_access' => TRUE,
+      'no_cache' => TRUE,
+    ],
+    defaults: ['_title' => new TranslatableMarkup('Reset password')],
+  )]
   public function resetPassLogin($uid, $timestamp, $hash, Request $request) {
     /** @var \Drupal\user\UserInterface $user */
     $user = $this->userStorage->load($uid);
@@ -254,7 +286,7 @@ class UserController extends ControllerBase {
     $this->flood->clear('user.failed_login_user', $identifier);
     $this->flood->clear('user.http_login', $identifier);
 
-    user_login_finalize($user);
+    $this->loginFinalizer->finalizeLogin($user);
     $this->logger->info('User %name used one-time login link at time %timestamp.', [
       '%name' => $user->getDisplayName(),
       '%timestamp' => $timestamp,
@@ -324,30 +356,6 @@ class UserController extends ControllerBase {
   }
 
   /**
-   * Validates hash and timestamp.
-   *
-   * @param \Drupal\user\UserInterface $user
-   *   User requesting reset.
-   * @param int $timestamp
-   *   The timestamp.
-   * @param string $hash
-   *   Login link hash.
-   * @param int $timeout
-   *   Link expiration timeout.
-   *
-   * @return bool
-   *   Whether the provided data are valid.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
-   *   \Drupal\user\OneTimeAuthentication::verifyHmac() instead.
-   * @see https://www.drupal.org/node/3581062
-   */
-  protected function validatePathParameters(UserInterface $user, int $timestamp, string $hash, int $timeout = 0): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\user\OneTimeAuthentication::verifyHmac() instead. See https://www.drupal.org/node/3581062', E_USER_DEPRECATED);
-    return $this->oneTimeAuthentication->verifyHmac($user, $timestamp, $hash, $timeout);
-  }
-
-  /**
    * Redirects users to their profile page.
    *
    * This controller assumes that it is only invoked for authenticated users.
@@ -357,6 +365,12 @@ class UserController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   Returns a redirect to the profile of the currently logged in user.
    */
+  #[Route(
+    path: '/user',
+    name: 'user.page',
+    requirements: ['_user_is_logged_in' => 'TRUE'],
+    defaults: ['_title' => new TranslatableMarkup('My account')],
+  )]
   public function userPage() {
     return $this->redirect('entity.user.canonical', ['user' => $this->currentUser()->id()]);
   }
@@ -371,6 +385,17 @@ class UserController extends ControllerBase {
    *   Returns a redirect to the profile edit form of the currently logged in
    *   user.
    */
+  #[Route(
+    path: '/user/edit',
+    name: 'user.edit',
+    requirements: ['_user_is_logged_in' => 'TRUE'],
+    defaults: ['_title' => new TranslatableMarkup('Edit account')],
+  )]
+  #[Route(
+    path: '/.well-known/change-password',
+    name: 'user.well-known.change_password',
+    requirements: ['_user_is_logged_in' => 'TRUE'],
+  )]
   public function userEditPage() {
     return $this->redirect('entity.user.edit_form', ['user' => $this->currentUser()->id()], [], 302);
   }
@@ -395,9 +420,18 @@ class UserController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A redirection to home page.
    */
+  #[Route(
+    path: '/user/logout',
+    name: 'user.logout',
+    requirements: [
+      '_user_is_logged_in' => 'TRUE',
+      '_csrf_token' => 'TRUE',
+    ],
+    options: ['_csrf_confirm_form_route' => 'user.logout.confirm'],
+  )]
   public function logout() {
     if ($this->currentUser()->isAuthenticated()) {
-      user_logout();
+      $this->logoutFinalizer->finalizeLogout();
     }
     return $this->redirect('<front>');
   }
@@ -415,6 +449,19 @@ class UserController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A redirect response.
    */
+  #[Route(
+    path: '/user/{user}/cancel/confirm/{timestamp}/{hashed_pass}',
+    name: 'user.cancel_confirm',
+    requirements: [
+      '_entity_access' => 'user.delete',
+      'user' => '\d+',
+    ],
+    defaults: [
+      '_title' => new TranslatableMarkup('Confirm account cancellation'),
+      'timestamp' => 0,
+      'hashed_pass' => '',
+    ],
+  )]
   public function confirmCancel(UserInterface $user, $timestamp = 0, $hashed_pass = '') {
     // Time out in seconds until cancel URL expires; 24 hours = 86400 seconds.
     $timeout = 86400;
@@ -427,7 +474,7 @@ class UserController extends ControllerBase {
         $edit = [
           'user_cancel_notify' => $account_data['cancel_notify'] ?? $this->config('user.settings')->get('notify.status_canceled'),
         ];
-        user_cancel($edit, $user->id(), $account_data['cancel_method']);
+        $this->accountCancellation->cancel($edit, $user->id(), $account_data['cancel_method']);
         // Since user_cancel() is not invoked via Form API, batch processing
         // needs to be invoked manually and should redirect to the front page
         // after completion.

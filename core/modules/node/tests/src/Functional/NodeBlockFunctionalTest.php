@@ -9,6 +9,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Url;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -44,7 +45,12 @@ class NodeBlockFunctionalTest extends NodeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'views', 'node_block_test'];
+  protected static $modules = [
+    'block',
+    'views',
+    'node_block_test',
+    'dynamic_page_cache',
+  ];
 
   /**
    * {@inheritdoc}
@@ -73,12 +79,15 @@ class NodeBlockFunctionalTest extends NodeTestBase {
     $this->drupalLogin($this->adminUser);
 
     // Disallow anonymous users to view content.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions([
       'access content' => FALSE,
-    ]);
+    ])->save();
 
     // Enable the recent content block with two items.
-    $block = $this->drupalPlaceBlock('views_block:content_recent-block_1', ['id' => 'test_block', 'items_per_page' => 2]);
+    $block = $this->drupalPlaceBlock('views_block:test_content_recent-block_1', [
+      'id' => 'test_block',
+      'items_per_page' => 2,
+    ]);
 
     // Test that block is not visible without nodes.
     $this->drupalGet('');

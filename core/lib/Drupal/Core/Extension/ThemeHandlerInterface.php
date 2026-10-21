@@ -21,8 +21,8 @@ interface ThemeHandlerInterface {
    *   - stylesheets: A two dimensional array, using the first key for the
    *     media attribute (e.g. 'all'), the second for the name of the file
    *     (e.g. style.css). The value is a complete filepath (e.g.
-   *     themes/olivero/style.css). Not set if no stylesheets are defined in the
-   *     .info.yml file.
+   *     themes/my_theme/style.css). Not set if no stylesheets are defined in
+   *     the .info.yml file.
    *   - scripts: An associative array of JavaScripts, using the filename as key
    *     and the complete filepath as value. Not set if no scripts are defined
    *     in the .info.yml file.
@@ -107,7 +107,7 @@ interface ThemeHandlerInterface {
    * Determines whether a given theme is installed.
    *
    * @param string $theme
-   *   The name of the theme (without the .theme extension).
+   *   The machine name of the theme.
    *
    * @return bool
    *   TRUE if the theme is installed.

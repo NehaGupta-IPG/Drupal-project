@@ -68,6 +68,8 @@ parameters:
   tempstore.expire: 604800
   queue.config:
     suspendMaximumWait: 30.0
+  instant_queue.config:
+    maximumItems: 5
   stream_wrapper.allowed_file_extensions:
     module:
       - json
@@ -470,9 +472,20 @@ services:
     arguments: ['@config.storage', '@database', '@event_dispatcher', '@lock']
     public: false
   Drupal\Core\Config\StorageManagerInterface: '@config.storage.export.manager'
+  config.parsing_cache:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['config.parsing_cache', '@cache.file_parsing', '@lock', '@datetime.time']
+    tags:
+      - { name: needs_destruction }
+  config.file_storage.factory:
+    class: Drupal\Core\Config\FileStorageFactory
+  Drupal\Core\Config\FileStorageFactory: '@config.file_storage.factory'
   config.storage.sync:
-    class: Drupal\Core\Config\FileStorage
-    factory: Drupal\Core\Config\FileStorageFactory::getSync
+    class: Drupal\Core\Config\AutoloadingStorage
+    factory: ['@Drupal\Core\Config\SyncFactory', 'get']
+  Drupal\Core\Config\SyncFactory:
+    autowire: true
+    public: false
   config.storage.snapshot:
     class: Drupal\Core\Config\DatabaseStorage
     arguments: ['@database', config_snapshot]
@@ -611,6 +624,9 @@ services:
   logger.channel.menu:
     parent: logger.channel_base
     arguments: ['menu']
+  logger.channel.queue:
+    parent: logger.channel_base
+    arguments: ['queue']
   logger.channel.router:
     parent: logger.channel_base
     arguments: ['router']
@@ -647,6 +663,11 @@ services:
   path.current:
     class: Drupal\Core\Path\CurrentPathStack
     arguments: ['@request_stack']
+  Drupal\Core\Queue\InstantQueueRunnerInterface:
+    class: 'Drupal\Core\Queue\InstantQueueRunner'
+    autowire: true
+    tags:
+      - { name: needs_destruction }
   Drupal\Core\Path\CurrentPathStack: '@path.current'
   http_handler_stack:
     class: GuzzleHttp\HandlerStack
@@ -692,10 +713,6 @@ services:
   container.namespaces:
     class: ArrayObject
     arguments: [ '%container.namespaces%' ]
-  container.trait:
-    abstract: true
-    calls:
-      - [setContainer, ['@service_container']]
   default_plugin_manager:
     abstract: true
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
@@ -859,9 +876,12 @@ services:
   plugin.manager.action:
     class: Drupal\Core\Action\ActionManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
+  menu_link.yaml_cache_collector:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['menu.link.yaml', '@cache.file_parsing', '@lock', '@datetime.time']
   plugin.manager.menu.link:
     class: Drupal\Core\Menu\MenuLinkManager
-    arguments: ['@menu.tree_storage', '@menu_link.static.overrides', '@module_handler']
+    arguments: ['@menu.tree_storage', '@menu_link.static.overrides', '@module_handler', '@menu_link.yaml_cache_collector']
   Drupal\Core\Menu\MenuLinkManagerInterface: '@plugin.manager.menu.link'
   menu.link_tree:
     class: Drupal\Core\Menu\MenuLinkTree
@@ -882,13 +902,19 @@ services:
     class: Drupal\Core\Menu\MenuParentFormSelector
     arguments: ['@menu.link_tree', '@entity_type.manager', '@string_translation']
   Drupal\Core\Menu\MenuParentFormSelectorInterface: '@menu.parent_form_selector'
+  local_action.yaml_cache_collector:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['menu.local_action.yaml', '@cache.file_parsing', '@lock', '@datetime.time']
   plugin.manager.menu.local_action:
     class: Drupal\Core\Menu\LocalActionManager
-    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user']
+    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user', '@local_action.yaml_cache_collector']
   Drupal\Core\Menu\LocalActionManagerInterface: '@plugin.manager.menu.local_action'
+  local_task.yaml_cache_collector:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['menu.local_task.yaml', '@cache.file_parsing', '@lock', '@datetime.time']
   plugin.manager.menu.local_task:
     class: Drupal\Core\Menu\LocalTaskManager
-    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user']
+    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user', '@local_task.yaml_cache_collector']
   Drupal\Core\Menu\LocalTaskManagerInterface: '@plugin.manager.menu.local_task'
   plugin.manager.menu.contextual_link:
     class: Drupal\Core\Menu\ContextualLinkManager
@@ -1076,7 +1102,7 @@ services:
       - { name: string_translator, priority: 30 }
   string_translation:
     class: Drupal\Core\StringTranslation\TranslationManager
-    arguments: ['@language.default']
+    autowire: true
     tags:
       - { name: service_collector, tag: string_translator, call: addTranslator }
   Drupal\Core\StringTranslation\TranslationInterface: '@string_translation'
@@ -1102,13 +1128,11 @@ services:
     arguments: ['@database']
     tags:
       - { name: backend_overridable }
-    lazy: true
   lock.persistent:
     class: Drupal\Core\Lock\PersistentDatabaseLockBackend
     arguments: ['@database']
     tags:
       - { name: backend_overridable }
-    lazy: true
   router.request_context:
     class: Drupal\Core\Routing\RequestContext
     tags:
@@ -1445,7 +1469,7 @@ services:
     class: Drupal\Core\Access\CsrfRequestHeaderAccessCheck
     arguments: ['@session_configuration', '@csrf_token']
     tags:
-      - { name: access_check, needs_incoming_request: TRUE }
+      - { name: access_check, applies_to: _csrf_request_header_token, needs_incoming_request: TRUE }
   maintenance_mode:
     class: Drupal\Core\Site\MaintenanceMode
     arguments: ['@state', '@config.factory']
@@ -1895,6 +1919,8 @@ services:
     class: Drupal\Core\File\HtaccessWriter
     arguments: ['@logger.channel.security', '@stream_wrapper_manager', '@settings']
   Drupal\Core\File\HtaccessWriterInterface: '@file.htaccess_writer'
+  Drupal\Core\File\UploadedFilesExtractor:
+    autowire: true
   file.mime_type.guesser:
     class: Drupal\Core\File\MimeType\MimeTypeGuesser
     arguments: ['@stream_wrapper_manager', !tagged_iterator mime_type_guesser]
@@ -1948,13 +1974,16 @@ services:
   email.validator:
     class: Drupal\Component\Utility\EmailValidator
   Drupal\Component\Utility\EmailValidatorInterface: '@email.validator'
+  Drupal\Core\Update\DatabaseUpdate:
+    autowire: true
   update.update_hook_registry:
     class: Drupal\Core\Update\UpdateHookRegistry
     arguments: ['%container.modules%', '@keyvalue']
   Drupal\Core\Update\UpdateHookRegistry: '@update.update_hook_registry'
   update.post_update_registry:
     class: Drupal\Core\Update\UpdateRegistry
-    arguments: ['%app.root%', '%site.path%', '%container.modules%', '@update.key_value.post_update', '@theme_handler', 'post_update']
+    arguments: ['%app.root%', '%site.path%', '%container.modules%', '@update.key_value.post_update', '@theme_handler', '@cache.memory', 'post_update']
+  Drupal\Core\Update\UpdateRegistry: '@update.post_update_registry'
   update.key_value.post_update:
     class: Drupal\Core\KeyValueStore\KeyValueStoreInterface
     factory: ['@keyvalue', 'get']
@@ -2059,6 +2088,18 @@ services:
       ]
     tags:
       - { name: needs_destruction }
+  plugin.manager.design_token:
+    class: Drupal\Core\Theme\DesignToken\DesignTokenPluginManager
+    arguments:
+      - '@module_handler'
+      - '@theme_handler'
+      - '@cache.discovery'
+      - '@plugin.manager.design_token_value'
+  Drupal\Core\Theme\DesignToken\DesignTokenPluginManagerInterface: '@plugin.manager.design_token'
+  plugin.manager.design_token_value:
+    class: Drupal\Core\Theme\DesignToken\DesignTokenValuePluginManager
+    parent: default_plugin_manager
+  Drupal\Core\Theme\DesignToken\DesignTokenValuePluginManagerInterface: '@plugin.manager.design_token_value'
   Drupal\Core\Extension\ThemeSettingsProvider:
     autowire: true
   Drupal\Core\Extension\ModuleWeight:
