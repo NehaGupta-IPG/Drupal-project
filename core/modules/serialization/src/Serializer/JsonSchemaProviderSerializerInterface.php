@@ -24,6 +24,8 @@ interface JsonSchemaProviderSerializerInterface {
    * @return array
    *   Schema.
    *
+   * @see https://www.drupal.org/project/drupal/issues/3632107
+   *
    * @todo Type $object as object before drupal:13.0.0.
    */
   public function getJsonSchema(mixed $object, array $context): array;
