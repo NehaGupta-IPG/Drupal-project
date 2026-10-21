@@ -67,7 +67,13 @@ trait RevisionLogEntityTrait {
    * {@inheritdoc}
    */
   public function getRevisionCreationTime() {
-    return $this->{$this->getEntityType()->getRevisionMetadataKey('revision_created')}->value;
+    $revision_created = $this->{$this->getEntityType()->getRevisionMetadataKey('revision_created')}->value;
+    // If revision_created is null (i.e. in the case of an entity type that was previously not revisionable),
+    // fallback to the changed time.
+    if (is_null($revision_created) && is_callable([$this, 'getChangedTime'])) {
+      $revision_created = $this->getChangedTime();
+    }
+    return $revision_created ?? 0;
   }
 
   /**
