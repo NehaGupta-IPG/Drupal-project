@@ -267,10 +267,19 @@ abstract class ExtensionList {
   /**
    * Returns all available extensions.
    *
+   * @param bool $skip_cache
+   *   Whether to skip the extension list cache.
+   *
    * @return \Drupal\Core\Extension\Extension[]
    *   Processed extension objects, keyed by machine name.
    */
-  public function getList() {
+  public function getList(bool $skip_cache = FALSE) {
+    if ($skip_cache) {
+      // Although we're skipping the persistent cache, populate the extensions
+      // class property so that any subsequent calls use the latest information.
+      $this->extensions = $this->doList();
+      return $this->extensions;
+    }
     if ($this->extensions !== NULL) {
       return $this->extensions;
     }
@@ -471,11 +480,17 @@ abstract class ExtensionList {
    *   The pathname of the extension which is to be set explicitly rather
    *   than by consulting the dynamic extension listing.
    *
+   * @see ::getPathname
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is
+   *   no replacement.
+   *
    * @internal
    *
-   * @see ::getPathname
+   * @see https://www.drupal.org/node/2934063
    */
   public function setPathname($extension_name, $pathname) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/2934063', E_USER_DEPRECATED);
     $this->addedPathNames[$extension_name] = $pathname;
   }
 

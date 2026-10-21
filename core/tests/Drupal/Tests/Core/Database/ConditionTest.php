@@ -10,12 +10,13 @@ use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Tests\Core\Database\Stub\StubCondition;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
-use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
+
+// cSpell:ignore ilike
 
 /**
  * Tests Drupal\Core\Database\Query\Condition.
@@ -185,6 +186,36 @@ class ConditionTest extends UnitTestCase {
   }
 
   /**
+   * Tests compile with an operator that appends a suffix to the field.
+   *
+   * @legacy-covers ::compile
+   */
+  public function testCompileWithFieldSuffixOperator(): void {
+    $connection = $this->createStub(Connection::class);
+    $connection->method('escapeField')->willReturnCallback(function (string $field): string|array|null {
+      return preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
+    });
+    $connection->method('mapConditionOperator')->willReturn(['operator' => 'ILIKE', 'field_suffix' => '::text']);
+    $connection->method('condition')->willReturn(new Condition('AND'));
+
+    $query_placeholder = $this->prophesize(PlaceholderInterface::class);
+
+    $counter = 0;
+    $query_placeholder->nextPlaceholder()->will(function () use (&$counter): int {
+      return $counter++;
+    });
+    $query_placeholder->uniqueIdentifier()->willReturn(4);
+    $query_placeholder = $query_placeholder->reveal();
+
+    $condition = $connection->condition('AND');
+    $condition->condition('name', '%value%', 'LIKE');
+    $condition->compile($connection, $query_placeholder);
+
+    $this->assertEquals('name::text ILIKE :db_condition_placeholder_0', $condition->__toString());
+    $this->assertEquals([':db_condition_placeholder_0' => '%value%'], $condition->arguments());
+  }
+
+  /**
    * Tests compile with sql injection for operator.
    */
   #[DataProvider('providerTestCompileWithSqlInjectionForOperator')]
@@ -209,7 +240,7 @@ class ConditionTest extends UnitTestCase {
     $condition = $connection->condition('AND');
     $condition->condition('name', 'value', $operator);
     $this->expectException(InvalidQueryException::class);
-    $this->expectExceptionMessage('Invalid characters in query operator:');
+    $this->expectExceptionMessageIsOrContains('Invalid characters in query operator:');
     $condition->compile($connection, $query_placeholder);
   }
 
@@ -230,7 +261,7 @@ class ConditionTest extends UnitTestCase {
    * Tests that the core Condition can be overridden.
    */
   public function testContribCondition(): void {
-    $connection = new StubConnection($this->createMock(StubPDO::class), [
+    $connection = new StubConnection($this->createStub(\PDO::class), [
       'namespace' => 'Drupal\mock\Driver\Database\mock',
       'prefix' => '',
     ]);

@@ -94,7 +94,7 @@ class ShortcutHooks {
           'children' => [
             '#lazy_builder' => [
               'shortcut.lazy_builders:lazyLinks',
-                        [],
+              [],
             ],
             '#create_placeholder' => TRUE,
             '#cache' => [
@@ -195,6 +195,39 @@ class ShortcutHooks {
     if ($base_table) {
       $query->condition("$base_table.shortcut_set", $shortcut_set->id());
     }
+  }
+
+  /**
+   * Implements hook_navigation_defaults().
+   */
+  #[Hook('navigation_defaults')]
+  public function navigationDefaults(): array {
+    return [
+      [
+        'region' => 'content',
+        'configuration' => [
+          'id' => 'navigation_shortcuts',
+          'label' => 'Shortcuts',
+          'label_display' => '0',
+          'provider' => 'shortcut',
+        ],
+        'weight' => 0,
+        'additional' => [],
+      ],
+    ];
+  }
+
+  /**
+   * Implements hook_block_alter().
+   */
+  #[Hook('block_alter')]
+  public function blockAlter(array &$definitions): void {
+    // Add the allow_in_navigation attribute to the navigation_shortcuts block.
+    // @todo Refactor to use actual block Attribute once
+    //   https://www.drupal.org/project/drupal/issues/3443882 is merged.
+    $definitions['navigation_shortcuts']['allow_in_navigation'] = TRUE;
+    // Hide Navigation specific blocks from the generic UI.
+    $definitions['navigation_shortcuts']['_block_ui_hidden'] = TRUE;
   }
 
 }

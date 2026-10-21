@@ -204,7 +204,7 @@ abstract class Connection {
    * @return object
    *   A client connection object.
    */
-  abstract public static function open(array &$connection_options = []);
+  abstract public static function open(#[\SensitiveParameter] array &$connection_options = []);
 
   /**
    * Ensures that the client connection can be garbage collected.
@@ -223,8 +223,15 @@ abstract class Connection {
    *   This method exists only to work around a bug caused by Drupal incorrectly
    *   relying on object destruction order to commit transactions. Xdebug 3.3.0
    *   changes the order of object destruction when the develop mode is enabled.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3524461
    */
   public function commitAll() {
+    // Only soft deprecation (no @trigger_error) to avoid thousands of
+    // occurrences per test run. PHPStan reports usage errors anyway.
     $manager = $this->transactionManager();
     if ($manager->inTransaction() && method_exists($manager, 'commitAll')) {
       $this->transactionManager()->commitAll();
@@ -505,6 +512,9 @@ abstract class Connection {
    *   (optional) The target this connection is for.
    */
   public function setTarget($target = NULL) {
+    if (!is_string($target)) {
+      @trigger_error('Passing a non-string value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+    }
     if (!isset($this->target)) {
       $this->target = $target;
     }
@@ -527,6 +537,9 @@ abstract class Connection {
    *   The key this connection is for.
    */
   public function setKey($key) {
+    if (!is_string($key)) {
+      @trigger_error('Passing a non-string value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+    }
     if (!isset($this->key)) {
       $this->key = $key;
     }
@@ -748,7 +761,7 @@ abstract class Connection {
    *   The name of the class that should be used for this driver.
    */
   public function getDriverClass($class) {
-    match($class) {
+    match ($class) {
       'Install\\Tasks',
       'ExceptionHandler',
       'Select',
@@ -821,6 +834,7 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Connection::defaultOptions()
    */
   public function insert($table, array $options = []) {
+    @trigger_error('Calling ' . __METHOD__ . '() as a concrete method is deprecated in drupal:11.5.0 and it is made abstract in drupal:12.0.0. Each database driver should should provide its own implementation. See https://www.drupal.org/node/3612421', E_USER_DEPRECATED);
     return new Insert($this, $table, $options);
   }
 
@@ -1227,6 +1241,21 @@ abstract class Connection {
   }
 
   /**
+   * Determines if this connection supports virtual generated columns.
+   *
+   * @internal
+   *   Only meant to be used by database drivers and their tests.
+   *
+   * @return bool
+   *   TRUE if generated columns can use
+   *   \Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage::Virtual,
+   *   FALSE if only GeneratedColumnStorage::Stored is available.
+   */
+  public function supportsVirtualGeneratedColumns(): bool {
+    return TRUE;
+  }
+
+  /**
    * Returns the name of the database engine accessed by this driver.
    *
    * @return string
@@ -1257,11 +1286,46 @@ abstract class Connection {
    *   The condition operator, such as "IN", "BETWEEN", etc. Case-sensitive.
    *
    * @return array|null
-   *   The extra handling directives for the specified operator, or NULL.
+   *   The extra handling directives for the specified operator, or NULL. The
+   *   directives are an array with any of the following keys:
+   *   - operator: The replacement operator.
+   *   - field_suffix: SQL to append to the field, such as a type cast.
+   *   - prefix: SQL to add before the value.
+   *   - postfix: SQL to add after the value.
+   *   - delimiter: The delimiter to implode multiple values with.
+   *   - use_value: Whether to compile the value part. Defaults to TRUE.
    *
    * @see \Drupal\Core\Database\Query\Condition::compile()
    */
   abstract public function mapConditionOperator($operator);
+
+  /**
+   * Gets the field suffix for the specified condition operator.
+   *
+   * Only needed when a condition is built as an SQL snippet, for example
+   * with where(). Conditions added with condition() get the suffix added
+   * when the condition is compiled.
+   *
+   * For example, on PostgreSQL the LIKE operator needs a '::text' type-cast
+   * on the field:
+   * @code
+   * $suffix = $connection->getConditionFieldSuffix('LIKE');
+   * $query->where("[title]$suffix LIKE :pattern", [
+   *   ':pattern' => '%foo%',
+   * ]);
+   * @endcode
+   *
+   * @param string $operator
+   *   The condition operator, such as "LIKE", "REGEXP", etc. Case-sensitive.
+   *
+   * @return string
+   *   The SQL the database driver needs appended to the field for this
+   *   operator, for example a type-cast, or an empty string.
+   */
+  public function getConditionFieldSuffix(string $operator): string {
+    $mapping = $this->mapConditionOperator($operator);
+    return $mapping['field_suffix'] ?? '';
+  }
 
   /**
    * Quotes a string for use in a query.

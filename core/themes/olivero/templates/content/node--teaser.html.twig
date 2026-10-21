@@ -37,7 +37,7 @@
  *     teaser would result in: "node--view-mode-teaser", and
  *     full: "node--view-mode-full".
  *   The following are controlled through the node publishing options.
- *   - node--promoted: Appears on nodes promoted to the front page.
+ *   - node--promoted: Appears on promoted nodes.
  *   - node--sticky: Appears on nodes ordered above other non-sticky nodes in
  *     teaser listings.
  *   - node--unpublished: Appears on unpublished nodes visible only to site
@@ -70,8 +70,7 @@
   ]
 %}
 
-
-{% embed "olivero:teaser" with {
+{% embed 'olivero:teaser' with {
   attributes: attributes.addClass(classes),
   author_attributes,
   author_name,

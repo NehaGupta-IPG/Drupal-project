@@ -30,11 +30,13 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
     'config_translation',
     'contact',
     'content_translation',
+    'comment',
     'datetime_range',
     'language',
     'migrate_drupal_ui',
     'telephone',
     'shortcut',
+    'text_with_summary',
   ];
 
   /**
@@ -62,7 +64,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
 
     $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal7.php');
 
-    $this->expectedLoggedErrors = 29;
+    $this->expectedLoggedErrors = 31;
     // If saving the logs, then set the admin user.
     if ($this->outputLogs) {
       $this->migratedAdminUserName = 'admin';
@@ -81,7 +83,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
    */
   protected function getEntityCounts(): array {
     return [
-      'block' => 24,
+      'block' => 12,
       'block_content' => 1,
       'block_content_type' => 1,
       'comment' => 4,
@@ -94,8 +96,8 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'contact_form' => 2,
       'contact_message' => 0,
       'editor' => 2,
-      'field_config' => 90,
-      'field_storage_config' => 69,
+      'field_config' => 88,
+      'field_storage_config' => 68,
       'file' => 3,
       'filter_format' => 7,
       'image_style' => 7,
@@ -113,12 +115,13 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'user_role' => 4,
       'menu_link_content' => 12,
       'view' => 14,
-      'date_format' => 12,
-      'entity_form_display' => 23,
+      'date_format' => 11,
+      'entity_form_display' => 22,
       'entity_form_mode' => 1,
-      'entity_view_display' => 32,
-      'entity_view_mode' => 11,
-      'base_field_override' => 2,
+      'entity_view_display' => 31,
+      'entity_view_mode' => 9,
+      'base_field_override' => 1,
+      'design_token' => 0,
     ];
   }
 

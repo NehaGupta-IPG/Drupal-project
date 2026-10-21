@@ -5,6 +5,7 @@ install:
   - image
   - node
   - path
+  - text_with_summary
 config:
   strict:
     # Treat field storages strictly, since they influence the database layout.
@@ -38,7 +39,7 @@ config:
       setComponents:
         - name: body
           options:
-            type: text_textarea
+            type: text_textarea_with_summary
             weight: 2
             region: content
         - name: created
@@ -131,7 +132,7 @@ config:
       setComponents:
         - name: body
           options:
-            type: text_trimmed
+            type: text_summary_or_trimmed
             label: hidden
             weight: 0
             region: content

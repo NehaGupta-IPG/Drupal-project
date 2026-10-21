@@ -12,11 +12,13 @@ use Drupal\Tests\block\Functional\AssertBlockAppearsTrait;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Create, view, edit, delete, and change shortcut links.
  */
+#[IgnoreDeprecations]
 #[Group('shortcut')]
 #[RunTestsInSeparateProcesses]
 class ShortcutLinksTest extends ShortcutTestBase {
@@ -138,7 +140,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
     $this->drupalGet('admin/config/user-interface/shortcut/manage/' . $set->id() . '/add-link');
     $this->submitForm($form_data, 'Save');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains("The path '/admin' is inaccessible.");
+    $this->assertSession()->pageTextContains("The URL '/admin' is inaccessible.");
 
     $form_data = [
       'title[0][value]' => $title,

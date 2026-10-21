@@ -79,8 +79,8 @@ class ModuleConfigureRouteTest extends KernelTestBase {
   /**
    * Tests if the module with lifecycle deprecated configure routes exists.
    *
-   * Note: This test is part of group legacy, to make sure installing the
-   * deprecated module doesn't trigger a deprecation notice.
+   * Deprecations are ignored because the module installer issues a
+   * E_USER_DEPRECATED message when a deprecated module is installed.
    */
   #[IgnoreDeprecations]
   public function testDeprecatedModuleConfigureRoutes(): void {

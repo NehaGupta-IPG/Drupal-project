@@ -1,4 +1,3 @@
-abnf
 absolutezero
 adamson
 addedline
@@ -46,7 +45,6 @@ bgblue
 bgred
 bidi
 bigpipe
-bitmask
 bkmgtpezy
 blockarticles
 blockcontent
@@ -95,7 +93,6 @@ classmaps
 classtype
 cldr
 closethick
-codesniffer
 colgroups
 colinodell
 colspans
@@ -126,6 +123,7 @@ defgroup
 delayable
 deletedline
 delsp
+demi
 denormalizable
 denormalizer
 denormalizers
@@ -149,6 +147,7 @@ dragtable
 drillable
 dropbutton
 dropbuttons
+dtcg
 editables
 egulias
 elbonia
@@ -184,8 +183,8 @@ fieldgroups
 fieldnames
 fieldsets
 filemime
+finalizer
 findwith
-flickr
 flipfit
 foat
 fodg
@@ -195,6 +194,7 @@ fodt
 fouc
 fourcol
 francais
+franken
 français
 fraîche
 frontpage
@@ -227,16 +227,15 @@ imagecache
 inglés
 inited
 inno
-instantiator
 interruptible
 introspectable
 invalidators
 invokable
 isam
+iterability
 javascripts
 jessebeach
 jqueryui
-jsonlint
 justinrainbow
 keypresses
 kinberg
@@ -278,8 +277,6 @@ metapackage
 metapackages
 metatag
 metatags
-mglaman
-micheh
 mikey
 mimetypes
 minusthick
@@ -297,11 +294,9 @@ multisite
 multistep
 multivalue
 multivalued
-myclabs
 mysqladmin
 mysqldump
 mystarterkit
-namespacing
 navs
 ndocs
 necolas
@@ -330,13 +325,11 @@ oneplusfourgrid
 optgroups
 optin
 orgchart
-ossp
 outdent
 overrider
 overrider's
 overriders
 paramconverter
-parseable
 parsererror
 pathauto
 pcre
@@ -346,7 +339,6 @@ persistable
 phpass
 phpcbf
 phpcodesniffer
-phpdocumentor
 phpserialize
 phpspec
 pickable
@@ -356,15 +348,10 @@ placeholdering
 plusthick
 porterstemmer
 postorder
-preconfigured
 predelete
 prefixsqlite
 preloadable
 preorder
-prepopulate
-prepopulates
-prepopulating
-prepopulation
 prerendered
 preuninstall
 prewarmable
@@ -380,7 +367,6 @@ quicklinks
 quinlan
 qvalue
 qvalues
-ralouphie
 rasterizable
 rasterizes
 realpaths
@@ -417,7 +403,6 @@ schemaapi
 schemeless
 scorewords
 scriptable
-seld
 selectbox
 sess
 settingstray
@@ -428,12 +413,11 @@ sitewide
 slatkin
 smacss
 smalldatetime
+smartdate
 smtps
 squaresmall
 squiz
 squizlabs
-srclang
-srcset
 ssess
 starterkit
 statuscode
@@ -462,8 +446,6 @@ subkeys
 suboption
 subparse
 subplugins
-subproject
-subprojects
 subproperties
 subrequest
 subrequest's
@@ -489,12 +471,12 @@ tabledrag
 tableheader
 tableinfo
 tableresponsive
+tablesaw
 tableselect
 tablesort
 tablesorts
 tabset
 tabwidth
-tbachert
 tenderwolf
 testbot
 testlogger
@@ -504,7 +486,6 @@ themename
 themer
 themers
 themey
-theseer
 threecol
 tids
 timegate
@@ -526,13 +507,14 @@ translatables
 trayblock
 trgm
 truecolor
+twigcs
+twigcsfixercache
 twistie
 twocol
 ufffd
 uids
 unban
 uncacheable
-uncategorized
 undoable
 unfieldable
 ungroup
@@ -559,6 +541,7 @@ userinfo
 versionable
 vfsstream
 viewports
+vincentlanglet
 warmable
 wcag
 webcal
@@ -573,6 +556,7 @@ writeln
 xbitmap
 xmlhttp
 xpsdocument
+xsmall
 xtmpl
 yamls
 yearless
@@ -585,4 +569,3 @@ zipf's
 zoneinfo
 zoomin
 zoomout
-zxvf

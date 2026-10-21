@@ -299,12 +299,12 @@ class LibraryDependencyResolverTest extends UnitTestCase {
         ['test/nested_deps_b', 'test/deps_c', 'test/no_deps_c'],
         [
           'test/no_deps_a',
+          'test/no_deps_c',
           'test/deps_a',
           'test/nested_deps_a',
           'test/nested_deps_b',
           'test/no_deps_b',
           'test/deps_c',
-          'test/no_deps_c',
         ],
       ],
     ];
@@ -376,7 +376,7 @@ class LibraryDependencyResolverTest extends UnitTestCase {
    */
   public function testGetMinimalRepresentativeSubsetInvalidInput(): void {
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('$libraries can\'t contain duplicate items.');
+    $this->expectExceptionMessageIs('$libraries can\'t contain duplicate items.');
     $this->libraryDependencyResolver->getMinimalRepresentativeSubset(['test/no_deps_a', 'test/no_deps_a']);
   }
 

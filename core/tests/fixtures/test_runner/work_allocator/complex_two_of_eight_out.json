@@ -1,0 +1,135 @@
+{
+   "Drupal\\Tests\\block_content\\Kernel\\BlockContentTypeValidationTest":{
+      "name":"Drupal\\Tests\\block_content\\Kernel\\BlockContentTypeValidationTest",
+      "group":"block_content",
+      "groups":[
+         "block_content",
+         "#slow"
+      ],
+      "type":"PHPUnit-Kernel",
+      "description":"Tests validation of block_content_type entities.",
+      "file":"\/Users\/foo\/Dev\/drupal\/core\/modules\/block_content\/tests\/src\/Kernel\/BlockContentTypeValidationTest.php",
+      "tests_count":22,
+      "worker_sequence":1
+   },
+   "Drupal\\Tests\\block\\FunctionalJavascript\\BlockAddTest":{
+      "name":"Drupal\\Tests\\block\\FunctionalJavascript\\BlockAddTest",
+      "group":"block",
+      "groups":[
+         "block"
+      ],
+      "type":"PHPUnit-FunctionalJavascript",
+      "description":"Tests the JS functionality in the block add form.",
+      "file":"\/Users\/foo\/Dev\/drupal\/core\/modules\/block\/tests\/src\/FunctionalJavascript\/BlockAddTest.php",
+      "tests_count":1,
+      "worker_sequence":2
+   },
+   "Drupal\\Tests\\block_content\\Functional\\BlockContentTypeTest":{
+      "name":"Drupal\\Tests\\block_content\\Functional\\BlockContentTypeTest",
+      "group":"block_content",
+      "groups":[
+         "block_content"
+      ],
+      "type":"PHPUnit-Functional",
+      "description":"Ensures that block type functions work correctly.",
+      "file":"\/Users\/foo\/Dev\/drupal\/core\/modules\/block_content\/tests\/src\/Functional\/BlockContentTypeTest.php",
+      "tests_count":5,
+      "worker_sequence":3
+   },
+   "Drupal\\Tests\\block\\Functional\\BlockAdminThemeTest":{
+      "name":"Drupal\\Tests\\block\\Functional\\BlockAdminThemeTest",
+      "group":"block",
+      "groups":[
+         "block"
+      ],
+      "type":"PHPUnit-Functional",
+      "description":"Tests the block system with admin themes.",
+      "file":"\/Users\/foo\/Dev\/drupal\/core\/modules\/block\/tests\/src\/Functional\/BlockAdminThemeTest.php",
+      "tests_count":2,
+      "worker_sequence":4
+   },
+   "Drupal\\Tests\\block_content\\Functional\\BlockContentTranslationUITest":{
+      "name":"Drupal\\Tests\\block_content\\Functional\\BlockContentTranslationUITest",
+      "group":"block_content",
+      "groups":[
+         "block_content"
+      ],
+      "type":"PHPUnit-Functional",
+      "description":"Tests the block content translation UI.",
+      "file":"\/Users\/foo\/Dev\/drupal\/core\/modules\/block_content\/tests\/src\/Functional\/BlockContentTranslationUITest.php",
+      "tests_count":1,
+      "worker_sequence":5
+   },
+   "Drupal\\Tests\\block\\Functional\\BlockDemoTest":{
+      "name":"Drupal\\Tests\\block\\Functional\\BlockDemoTest",
+      "group":"block",
+      "groups":[
+         "block"
+      ],
+      "type":"PHPUnit-Functional",
+      "description":"Tests the block demo page with admin themes.",
+      "file":"\/Users\/foo\/Dev\/drupal\/core\/modules\/block\/tests\/src\/Functional\/BlockDemoTest.php",
+      "tests_count":1,
+      "worker_sequence":6
+   },
+   "Drupal\\Tests\\block\\Functional\\BlockSystemBrandingTest":{
+      "name":"Drupal\\Tests\\block\\Functional\\BlockSystemBrandingTest",
+      "group":"block",
+      "groups":[
+         "block"
+      ],
+      "type":"PHPUnit-Functional",
+      "description":"Tests branding block display.",
+      "file":"\/Users\/foo\/Dev\/drupal\/core\/modules\/block\/tests\/src\/Functional\/BlockSystemBrandingTest.php",
+      "tests_count":1,
+      "worker_sequence":7
+   },
+   "Drupal\\Tests\\block_content\\Kernel\\BlockContentTest":{
+      "name":"Drupal\\Tests\\block_content\\Kernel\\BlockContentTest",
+      "group":"block_content",
+      "groups":[
+         "block_content"
+      ],
+      "type":"PHPUnit-Kernel",
+      "description":"Tests the block content.",
+      "file":"\/Users\/foo\/Dev\/drupal\/core\/modules\/block_content\/tests\/src\/Kernel\/BlockContentTest.php",
+      "tests_count":2,
+      "worker_sequence":8
+   },
+   "Drupal\\Tests\\block_content\\Kernel\\BlockTemplateSuggestionsTest":{
+      "name":"Drupal\\Tests\\block_content\\Kernel\\BlockTemplateSuggestionsTest",
+      "group":"block_content",
+      "groups":[
+         "block_content"
+      ],
+      "type":"PHPUnit-Kernel",
+      "description":"Tests the block_content_theme_suggestions_block() function.",
+      "file":"\/Users\/foo\/Dev\/drupal\/core\/modules\/block_content\/tests\/src\/Kernel\/BlockTemplateSuggestionsTest.php",
+      "tests_count":1,
+      "worker_sequence":9
+   },
+   "Drupal\\Tests\\block\\Kernel\\BlockInterfaceTest":{
+      "name":"Drupal\\Tests\\block\\Kernel\\BlockInterfaceTest",
+      "group":"block",
+      "groups":[
+         "block"
+      ],
+      "type":"PHPUnit-Kernel",
+      "description":"Tests that the block plugin can work properly without a supporting entity.",
+      "file":"\/Users\/foo\/Dev\/drupal\/core\/modules\/block\/tests\/src\/Kernel\/BlockInterfaceTest.php",
+      "tests_count":1,
+      "worker_sequence":10
+   },
+   "Drupal\\Tests\\block\\Unit\\BlockRepositoryTest":{
+      "name":"Drupal\\Tests\\block\\Unit\\BlockRepositoryTest",
+      "group":"block",
+      "groups":[
+         "block"
+      ],
+      "type":"PHPUnit-Unit",
+      "description":"Tests \\Drupal\\block\\BlockRepository.",
+      "file":"\/Users\/foo\/Dev\/drupal\/core\/modules\/block\/tests\/src\/Unit\/BlockRepositoryTest.php",
+      "tests_count":2,
+      "worker_sequence":11
+   }
+}

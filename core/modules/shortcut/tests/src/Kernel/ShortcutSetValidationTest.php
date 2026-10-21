@@ -6,16 +6,20 @@ namespace Drupal\Tests\shortcut\Kernel;
 
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\shortcut\Entity\ShortcutSet;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of shortcut_set entities.
  */
+#[IgnoreDeprecations]
 #[Group('shortcut')]
 #[Group('config')]
 #[Group('Validation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ShortcutSetValidationTest extends ConfigEntityValidationTestBase {
 
   /**
@@ -26,8 +30,8 @@ class ShortcutSetValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig('shortcut');
     $this->installEntitySchema('shortcut');
 

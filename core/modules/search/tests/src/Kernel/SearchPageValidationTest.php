@@ -8,7 +8,9 @@ use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\search\Entity\SearchPage;
 use Drupal\search\Plugin\Derivative\SearchLocalTask;
 use Drupal\search\SearchPageRepository;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -17,19 +19,35 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('search')]
 #[Group('config')]
 #[Group('Validation')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class SearchPageValidationTest extends ConfigEntityValidationTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['search', 'user'];
+  protected static $modules = ['search', 'search_user', 'user'];
+
+  /**
+   * {@inheritdoc}
+   *
+   * ::testBaseRouteIsValid() reads a route, so Drupal builds the router and the
+   * menu tree. The file parsing cache carries no "cache.bin" tag, so ::register()
+   * does not move it to memory.
+   */
+  protected const array INFRASTRUCTURE_TABLES = [
+    ...parent::INFRASTRUCTURE_TABLES,
+    'cache_file_parsing',
+    'menu_tree',
+    'router',
+  ];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
 
     $this->entity = SearchPage::create([
       'id' => 'test',

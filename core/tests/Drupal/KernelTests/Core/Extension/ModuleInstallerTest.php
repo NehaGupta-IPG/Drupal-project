@@ -124,7 +124,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
   #[DataProvider('providerTestInvalidCoreInstall')]
   public function testInvalidCoreInstall($module_name, $install_dependencies): void {
     $this->expectException(MissingDependencyException::class);
-    $this->expectExceptionMessage("Unable to install modules: module '$module_name' is incompatible with this version of Drupal core.");
+    $this->expectExceptionMessageIs("Unable to install modules: module '$module_name' is incompatible with this version of Drupal core.");
     $this->container->get('module_installer')->install([$module_name], $install_dependencies);
   }
 
@@ -151,7 +151,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    */
   public function testDependencyInvalidCoreInstall(): void {
     $this->expectException(MissingDependencyException::class);
-    $this->expectExceptionMessage("Unable to install modules: module 'system_incompatible_core_version_dependencies_test'. Its dependency module 'system_core_incompatible_semver_test' is incompatible with this version of Drupal core.");
+    $this->expectExceptionMessageIs("Unable to install modules: module 'system_incompatible_core_version_dependencies_test'. Its dependency module 'system_core_incompatible_semver_test' is incompatible with this version of Drupal core.");
     $this->container->get('module_installer')->install(['system_incompatible_core_version_dependencies_test']);
   }
 
@@ -171,7 +171,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    */
   public function testObsoleteInstall(): void {
     $this->expectException(ObsoleteExtensionException::class);
-    $this->expectExceptionMessage("Unable to install modules: module 'system_status_obsolete_test' is obsolete.");
+    $this->expectExceptionMessageIs("Unable to install modules: module 'system_status_obsolete_test' is obsolete.");
     $this->container->get('module_installer')->install(['system_status_obsolete_test']);
   }
 
@@ -244,7 +244,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
       $this->container->get('logger.channel.default'),
     );
 
-    $this->expectUserDeprecationMessage('Drupal\Core\Extension\ModuleInstaller::addUninstallValidator is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject the uninstall validators into the constructor instead. See https://www.drupal.org/node/3432595');
+    $this->expectUserDeprecationMessage('Drupal\Core\Extension\ModuleInstaller::addUninstallValidator() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject the uninstall validators into the constructor instead. See https://www.drupal.org/node/3432595');
     $module_installer->addUninstallValidator($this->createMock(ModuleUninstallValidatorInterface::class));
   }
 

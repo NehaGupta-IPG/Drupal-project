@@ -43,7 +43,6 @@ class ViewEntityDependenciesTest extends ViewsKernelTestBase {
     'comment',
     'field',
     'text',
-    'search',
   ];
 
   /**
@@ -129,9 +128,8 @@ class ViewEntityDependenciesTest extends ViewsKernelTestBase {
         'ArgumentValidatorTest',
       ],
       'module' => [
+        'comment',
         'node',
-        // The argument handler is provided by the search module.
-        'search',
         'text',
         'user',
       ],
@@ -156,9 +154,9 @@ class ViewEntityDependenciesTest extends ViewsKernelTestBase {
         'ArgumentValidatorTest',
       ],
       'module' => [
+        'comment',
         'core',
         'node',
-        'search',
         'user',
         'views',
       ],

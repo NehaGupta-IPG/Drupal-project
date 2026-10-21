@@ -26,10 +26,12 @@ class EntityRevisionTest extends MigrateTestBase {
    */
   protected static $modules = [
     'field',
+    'filter',
     'language',
     'node',
     'system',
     'text',
+    'text_with_summary',
     'user',
   ];
 

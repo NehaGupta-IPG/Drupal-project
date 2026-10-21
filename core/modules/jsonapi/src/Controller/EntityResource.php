@@ -57,6 +57,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
+use Drupal\user\AccountCancellation;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -187,8 +188,24 @@ class EntityResource {
    *   The current user account.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
+   * @param \Drupal\user\AccountCancellation $accountCancellation
+   *   The account cancellation service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $field_manager, ResourceTypeRepositoryInterface $resource_type_repository, RendererInterface $renderer, EntityRepositoryInterface $entity_repository, IncludeResolver $include_resolver, EntityAccessChecker $entity_access_checker, FieldResolver $field_resolver, SerializerInterface $serializer, TimeInterface $time, AccountInterface $user, ?EventDispatcherInterface $event_dispatcher = NULL) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    EntityFieldManagerInterface $field_manager,
+    ResourceTypeRepositoryInterface $resource_type_repository,
+    RendererInterface $renderer,
+    EntityRepositoryInterface $entity_repository,
+    IncludeResolver $include_resolver,
+    EntityAccessChecker $entity_access_checker,
+    FieldResolver $field_resolver,
+    SerializerInterface $serializer,
+    TimeInterface $time,
+    AccountInterface $user,
+    ?EventDispatcherInterface $event_dispatcher = NULL,
+    protected ?AccountCancellation $accountCancellation = NULL,
+  ) {
     $this->entityTypeManager = $entity_type_manager;
     $this->fieldManager = $field_manager;
     $this->resourceTypeRepository = $resource_type_repository;
@@ -206,6 +223,11 @@ class EntityResource {
       $event_dispatcher = \Drupal::service('event_dispatcher');
     }
     $this->eventDispatcher = $event_dispatcher;
+    if ($accountCancellation === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $accountCancellation argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3620934', E_USER_DEPRECATED);
+      $accountCancellation = \Drupal::service(AccountCancellation::class);
+    }
+    $this->accountCancellation = $accountCancellation;
   }
 
   /**
@@ -392,9 +414,9 @@ class EntityResource {
 
       // Allow other modules to act.
 
-      user_cancel([], $entity->id(), $cancel_method);
-      // Since user_cancel() is not invoked via Form API, batch processing
-      // needs to be invoked manually.
+      $this->accountCancellation->cancel([], $entity->id(), $cancel_method);
+      // Since AccountCancellation::cancel() is not invoked via Form API, batch
+      // processing needs to be invoked manually.
       $batch =& batch_get();
       // Mark this batch as non-progressive to bypass the progress bar and
       // redirect.
@@ -659,6 +681,10 @@ class EntityResource {
       throw new ConflictHttpException(sprintf('You can only POST to to-many relationships. %s is a to-one relationship.', $related));
     }
 
+    // @todo Inject the plugin manager service.
+    $definition = \Drupal::service('plugin.manager.field.field_type')->getDefinition($field_definition->getType());
+    $serialized_property_names = $definition['serialized_property_names'] ?? [];
+
     $original_resource_identifiers = ResourceIdentifier::toResourceIdentifiersWithArityRequired($field_list);
     $new_resource_identifiers = array_udiff(
       ResourceIdentifier::deduplicate(array_merge($original_resource_identifiers, $resource_identifiers)),
@@ -678,7 +704,16 @@ class EntityResource {
       $new_field_value = ['entity' => $this->getEntityFromResourceIdentifier($new_resource_identifier)];
       // Remove `arity` from the received extra properties, otherwise this
       // will fail field validation.
-      $new_field_value += array_diff_key($new_resource_identifier->getMeta(), array_flip([ResourceIdentifier::ARITY_KEY]));
+      $meta = array_diff_key($new_resource_identifier->getMeta(), array_flip([ResourceIdentifier::ARITY_KEY]));
+      foreach ($serialized_property_names as $property_name) {
+        if (isset($meta[$property_name]) && is_string($meta[$property_name])) {
+          throw new BadRequestHttpException(sprintf(
+            'The relationship meta field "%s" cannot accept a serialized string value.',
+            $property_name,
+          ));
+        }
+      }
+      $new_field_value += $meta;
       $field_list->appendItem($new_field_value);
     }
 
@@ -762,13 +797,26 @@ class EntityResource {
    *   The field definition of the entity field to be updated.
    */
   protected function doPatchMultipleRelationship(EntityInterface $entity, array $resource_identifiers, FieldDefinitionInterface $field_definition) {
-    $entity->{$field_definition->getName()} = array_map(function (ResourceIdentifier $resource_identifier) {
+    // @todo Inject the plugin manager service.
+    $definition = \Drupal::service('plugin.manager.field.field_type')->getDefinition($field_definition->getType());
+    $serialized_property_names = $definition['serialized_property_names'] ?? [];
+
+    $entity->{$field_definition->getName()} = array_map(function (ResourceIdentifier $resource_identifier) use ($serialized_property_names) {
       // We assume all entity reference fields have an 'entity' computed
       // property that can be used to assign the needed values.
       $field_properties = ['entity' => $this->getEntityFromResourceIdentifier($resource_identifier)];
       // Remove `arity` from the received extra properties, otherwise this
       // will fail field validation.
-      $field_properties += array_diff_key($resource_identifier->getMeta(), array_flip([ResourceIdentifier::ARITY_KEY]));
+      $meta = array_diff_key($resource_identifier->getMeta(), array_flip([ResourceIdentifier::ARITY_KEY]));
+      foreach ($serialized_property_names as $property_name) {
+        if (isset($meta[$property_name]) && is_string($meta[$property_name])) {
+          throw new BadRequestHttpException(sprintf(
+            'The relationship meta field "%s" cannot accept a serialized string value.',
+            $property_name,
+          ));
+        }
+      }
+      $field_properties += $meta;
       return $field_properties;
     }, $resource_identifiers);
   }

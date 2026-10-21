@@ -8,15 +8,12 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
+use Drupal\Core\Language\LanguageDefault;
+use Drupal\Core\StringTranslation\TranslationManager;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
-use Drupal\TestTools\Extension\Dump\DebugDump;
-use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Provides a base class and helpers for Drupal unit tests.
@@ -43,23 +40,6 @@ abstract class UnitTestCase extends TestCase {
   use RandomGeneratorTrait;
 
   /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
-   * Registers the dumper CLI handler when the DebugDump extension is enabled.
-   */
-  #[BeforeClass]
-  public static function setDebugDumpHandler(): void {
-    if (DebugDump::isEnabled()) {
-      VarDumper::setHandler(DebugDump::class . '::cliHandler');
-    }
-  }
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -74,7 +54,6 @@ abstract class UnitTestCase extends TestCase {
     // Ensure that FileCacheFactory has a prefix.
     FileCacheFactory::setPrefix('prefix');
 
-    $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
     chdir($this->root);
   }
 
@@ -146,29 +125,16 @@ abstract class UnitTestCase extends TestCase {
   /**
    * Returns a stub translation manager that just returns the passed string.
    *
-   * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\StringTranslation\TranslationInterface
-   *   A mock translation object.
+   * @return \Drupal\Core\StringTranslation\TranslationManager
+   *   A stub translation object.
    */
   public function getStringTranslationStub() {
-    $translation = $this->createMock('Drupal\Core\StringTranslation\TranslationInterface');
-    $translation->expects($this->any())
-      ->method('translate')
-      ->willReturnCallback(function ($string, array $args = [], array $options = []) use ($translation) {
-        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-        return new TranslatableMarkup($string, $args, $options, $translation);
-      });
-    $translation->expects($this->any())
-      ->method('translateString')
-      ->willReturnCallback(function (TranslatableMarkup $wrapper) {
-        return $wrapper->getUntranslatedString();
-      });
-    $translation->expects($this->any())
-      ->method('formatPlural')
-      ->willReturnCallback(function ($count, $singular, $plural, array $args = [], array $options = []) use ($translation) {
-        $wrapper = new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $translation);
-        return $wrapper;
-      });
-    return $translation;
+    // A TranslationManager without any translators added behaves as an
+    // identity translator: \Drupal\Core\StringTranslation\TranslationManager::doTranslate()
+    // falls back to the untranslated string whenever no translator supplies
+    // a translation, so this reuses the real plural/translation logic
+    // instead of duplicating it here.
+    return new TranslationManager(new LanguageDefault([]));
   }
 
   /**

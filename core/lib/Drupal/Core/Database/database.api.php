@@ -6,6 +6,16 @@
  */
 
 use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\ForeignKey;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
 
 /**
  * @defgroup database Database abstraction layer
@@ -159,18 +169,16 @@ use Drupal\Core\Database\Query\SelectInterface;
  * @endcode
  *
  * @section sec_transaction Transactions
- * Drupal supports transactions, including a transparent fallback for
- * databases that do not support transactions. To start a new transaction,
- * call startTransaction(), like this:
+ * Drupal supports transactions. To start a new transaction, call
+ * startTransaction(), like this:
  * @code
  * $transaction = \Drupal::database()->startTransaction();
  * @endcode
- * The transaction will remain open for as long as the variable $transaction
- * remains in scope; when $transaction is destroyed, the transaction will be
- * committed. If your transaction is nested inside of another then Drupal will
- * track each transaction and only commit the outer-most transaction when the
- * last transaction object goes out of scope (when all relevant queries have
- * completed successfully).
+ * The transaction needs to be explicitly committed or rolled back once you
+ * have completed the database operations requested. If your transaction is
+ * nested inside of another then Drupal will track each transaction and only
+ * commit the outer-most transaction when the last transaction object is
+ * committed (when all relevant queries have completed successfully).
  *
  * Example:
  * @code
@@ -189,6 +197,9 @@ use Drupal\Core\Database\Query\SelectInterface;
  *       ->execute();
  *
  *     my_other_function($id);
+ *
+ *     // The transaction has completed, commit it here.
+ *     $transaction->commitOrRelease();
  *
  *     return $id;
  *   }
@@ -366,6 +377,13 @@ use Drupal\Core\Database\Query\SelectInterface;
  *       'varchar' or 'text' fields to use case-sensitive binary collation.
  *       This has no effect on other database types for which case sensitivity
  *       is already the default behavior.
+ *     - 'generated': A \Drupal\Core\Database\SchemaDefinition\Column object
+ *       returned by Column::generated(). It holds the expression the database
+ *       computes the column value from, and whether that value is stored on
+ *       write or computed on read. A generated column cannot have a 'default'
+ *       or a 'not null' constraint, and cannot be part of the primary key.
+ *       Prefer stored over virtual for portability: PostgreSQL supports virtual
+ *       columns only from version 18 and cannot index them.
  *     All parameters apart from 'type' are optional except that type
  *     'numeric' columns must specify 'precision' and 'scale', and type
  *     'varchar' must specify the 'length' parameter.
@@ -551,8 +569,8 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  *
  * Only procedural implementations are supported for this hook.
  *
- * A Drupal schema definition is an array structure representing one or more
- * tables and their related keys and indexes. A schema is defined by
+ * A Drupal schema definition is a structure of value objects representing one
+ * or more tables and their related keys and indexes. A schema is defined by
  * hook_schema() which must live in your module's .install file.
  *
  * The tables declared by this hook will be automatically created when the
@@ -565,75 +583,78 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  * engines. You don't have to deal with the different SQL dialects for table
  * creation and alteration of the supported database engines.
  *
- * See the Schema API Handbook at https://www.drupal.org/node/146843 for details
- * on schema definition structures. Note that foreign key definitions are for
- * documentation purposes only; foreign keys are not created in the database,
- * nor are they enforced by Drupal.
+ * See the Schema API documentation for details on schema definition
+ * structures. Note that foreign key definitions are for documentation purposes
+ * only; foreign keys are not created in the database, nor are they enforced by
+ * Drupal.
  *
- * @return array
- *   A schema definition structure array. For each element of the
- *   array, the key is a table name and the value is a table structure
- *   definition.
+ * @return \Drupal\Core\Database\SchemaDefinition\Schema
+ *   A schema definition.
  *
  * @ingroup schemaapi
  */
-function hook_schema(): array {
-  $schema['users_data'] = [
-    'description' => 'Stores module data as key/value pairs per user.',
-    'fields' => [
-      'uid' => [
-        'description' => 'The {users}.uid this record affects.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ],
-      'module' => [
-        'description' => 'The name of the module declaring the variable.',
-        'type' => 'varchar_ascii',
-        'length' => DRUPAL_EXTENSION_NAME_MAX_LENGTH,
-        'not null' => TRUE,
-        'default' => '',
-      ],
-      'name' => [
-        'description' => 'The identifier of the data.',
-        'type' => 'varchar_ascii',
-        'length' => 128,
-        'not null' => TRUE,
-        'default' => '',
-      ],
-      'value' => [
-        'description' => 'The value.',
-        'type' => 'blob',
-        'not null' => FALSE,
-        'size' => 'big',
-      ],
-      'serialized' => [
-        'description' => 'Whether value is serialized.',
-        'type' => 'int',
-        'size' => 'tiny',
-        'unsigned' => TRUE,
-        'default' => 0,
-      ],
+function hook_schema(): Schema {
+  $tables[] = new Table(
+    name: 'users_data',
+    description: 'Stores module data as key/value pairs per user.',
+    columns: [
+      Column::int(
+        name: 'uid',
+        description: 'The {users}.uid this record affects.',
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      Column::varcharAscii(
+        name: 'module',
+        description: 'The name of the module declaring the variable.',
+        length: DRUPAL_EXTENSION_NAME_MAX_LENGTH,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      Column::varcharAscii(
+        name: 'name',
+        description: 'The identifier of the data.',
+        length: 128,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      Column::blob(
+        name: 'value',
+        description: 'The value.',
+        size: ColumnSize::Big,
+        notNull: FALSE,
+      ),
+      Column::int(
+        name: 'serialized',
+        description: 'Whether value is serialized.',
+        size: ColumnSize::Tiny,
+        unsigned: TRUE,
+        default: new IntValue(0),
+      ),
     ],
-    'primary key' => ['uid', 'module', 'name'],
-    'indexes' => [
-      'module' => ['module'],
-      'name' => ['name'],
+    primaryKey: new PrimaryKey(['uid', 'module', 'name']),
+    indexes: [
+      new Index(name: 'module', columns: ['module']),
+      new Index(name: 'name', columns: ['name']),
     ],
     // For documentation purposes only; foreign keys are not created in the
     // database.
-    'foreign keys' => [
-      'data_user' => [
-        'table' => 'users',
-        'columns' => [
-          'uid' => 'uid',
-        ],
-      ],
+    foreignKeys: [
+      new ForeignKey(
+      name: 'data_user',
+      foreignTable: 'users',
+      columns: ['uid'],
+      foreignColumns: ['uid'],
+      ),
     ],
-  ];
+  );
 
-  return $schema;
+  return new Schema(
+    type: SchemaDefinitionType::Module,
+    name: 'hook',
+    tables: $tables,
+  );
 }
 
 /**

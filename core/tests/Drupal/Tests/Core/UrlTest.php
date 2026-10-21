@@ -76,7 +76,7 @@ class UrlTest extends UnitTestCase {
     parent::setUp();
 
     $map = [];
-    $map[] = ['view.frontpage.page_1', [], ['query' => []], FALSE, '/node'];
+    $map[] = ['view.promoted_content.page_1', [], ['query' => []], FALSE, '/node'];
     $map[] = ['node_view', ['node' => '1'], ['query' => []], FALSE, '/node/1'];
     $map[] = ['node_edit', ['node' => '2'], ['query' => []], FALSE, '/node/2/edit'];
     $this->map = $map;
@@ -132,8 +132,8 @@ class UrlTest extends UnitTestCase {
     $this->router->expects($this->exactly(3))
       ->method('matchRequest')
       ->willReturnCallback(function (Request $request) {
-        [$route_name, $vars] = match($request->getPathInfo()) {
-          '/node' => ['view.frontpage.page_1', []],
+        [$route_name, $vars] = match ($request->getPathInfo()) {
+          '/node' => ['view.promoted_content.page_1', []],
           '/node/1' => ['node_view', ['node' => '1']],
           '/node/2/edit' => ['node_edit', ['node' => '2']],
         };
@@ -165,7 +165,7 @@ class UrlTest extends UnitTestCase {
     $this->router->expects($this->once())
       ->method('matchRequest')
       ->willReturn([
-        RouteObjectInterface::ROUTE_NAME => 'view.frontpage.page_1',
+        RouteObjectInterface::ROUTE_NAME => 'view.promoted_content.page_1',
         '_raw_variables' => new InputBag([]),
       ]);
     $request = Request::create('/node', 'GET', $queryParameters);
@@ -354,7 +354,7 @@ class UrlTest extends UnitTestCase {
   #[Depends('testUrlFromRequest')]
   public function testGetInternalPath($urls): void {
     $map = [];
-    $map[] = ['view.frontpage.page_1', [], '/node'];
+    $map[] = ['view.promoted_content.page_1', [], '/node'];
     $map[] = ['node_view', ['node' => '1'], '/node/1'];
     $map[] = ['node_edit', ['node' => '2'], '/node/2/edit'];
 
@@ -431,7 +431,7 @@ class UrlTest extends UnitTestCase {
   public function testGetRouteParametersWithExternalUrl(): void {
     $url = Url::fromUri('http://example.com');
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage('http://example.com has no corresponding route.');
+    $this->expectExceptionMessageIs('http://example.com has no corresponding route.');
     $url->getRouteParameters();
   }
 
@@ -443,7 +443,7 @@ class UrlTest extends UnitTestCase {
   public function testSetRouteParametersWithUnroutedUrl(): void {
     $url = Url::fromUri('https://example.com');
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage('https://example.com has no corresponding route.');
+    $this->expectExceptionMessageIs('https://example.com has no corresponding route.');
     $url->setRouteParameters(['foo' => 'bar']);
   }
 
@@ -455,7 +455,7 @@ class UrlTest extends UnitTestCase {
   public function testSetRouteParameterWithUnroutedUrl(): void {
     $url = Url::fromUri('https://example.com');
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage('https://example.com has no corresponding route.');
+    $this->expectExceptionMessageIs('https://example.com has no corresponding route.');
     $url->setRouteParameter('foo', 'bar');
   }
 
@@ -854,7 +854,7 @@ class UrlTest extends UnitTestCase {
    */
   public function testFromRouteUriWithMissingRouteName(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage("The route URI 'route:' is invalid.");
+    $this->expectExceptionMessageIs("The route URI 'route:' is invalid. You must have a route name in the URI. e.g., route:system.admin");
     Url::fromUri('route:');
   }
 

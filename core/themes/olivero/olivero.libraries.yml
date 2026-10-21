@@ -1,4 +1,6 @@
 global-styling:
+  aggregate_target:
+    css: true
   version: VERSION
   fonts:
     fonts/metropolis/Metropolis-Regular.woff2:
@@ -50,7 +52,6 @@ global-styling:
       css/components/navigation/nav-button-mobile.css: {}
       css/components/node.css: {}
       css/components/node-teaser.css: {}
-      css/components/page-title.css: {}
       css/components/site-header.css: {}
       css/components/skip-link.css: {}
       css/components/pager.css: {}
@@ -91,6 +92,9 @@ comments:
       css/components/comments.css: {}
   js:
     js/comments.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
 
 content-below:
   version: VERSION
@@ -287,6 +291,9 @@ tabs:
       css/components/tabs.css: {}
   js:
     js/tabs.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
 
 tabledrag:
   version: VERSION

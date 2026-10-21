@@ -13,6 +13,7 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -32,6 +33,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('toolbar')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class ToolbarAdminMenuTest extends BrowserTestBase {
 
   use StringTranslationTrait;
@@ -70,7 +72,6 @@ class ToolbarAdminMenuTest extends BrowserTestBase {
     'language',
     'test_page_test',
     'locale',
-    'search',
   ];
 
   /**
@@ -101,7 +102,6 @@ class ToolbarAdminMenuTest extends BrowserTestBase {
       'administer taxonomy',
       'administer languages',
       'translate interface',
-      'administer search',
     ];
 
     // Create an administrative user and log it in.
@@ -339,7 +339,7 @@ class ToolbarAdminMenuTest extends BrowserTestBase {
     // We need to visit the page to get the string to be translated.
     $this->drupalGet($langcode . '/admin/config');
     $search = [
-      'string' => 'Search and metadata',
+      'string' => 'Performance',
       'langcode' => $langcode,
       'translation' => 'untranslated',
     ];

@@ -214,6 +214,12 @@ class ExposedFormTest extends ViewTestBase {
     $this->drupalGet('test_exposed_form_buttons');
     $this->assertSession()->fieldNotExists('edit-reset');
 
+    // Verify Reset button appears with just order + sort keys.
+    $this->drupalGet('test_exposed_form_buttons', [
+      'query' => ['order' => 'id', 'sort' => 'asc'],
+    ]);
+    $this->assertSession()->buttonExists('Reset');
+
     $this->drupalGet('test_exposed_form_buttons', ['query' => ['type' => 'article']]);
     // Test that the type has been set.
     $this->assertSession()->fieldValueEquals('edit-type', 'article');
@@ -416,6 +422,18 @@ class ExposedFormTest extends ViewTestBase {
     ];
 
     $this->drupalGet('test_exposed_form_sort_items_per_page');
+    $this->assertCacheContexts($contexts);
+    $this->assertIds(range(1, 10, 1));
+
+    // Test that malformed sort_by is not causing PHP errors.
+    $this->drupalGet('test_exposed_form_sort_items_per_page', [
+      'query' => [
+        // Sort by must be a string, not an array.
+        'sort_by' => [
+          'aaa' => 'bbb',
+        ],
+      ],
+    ]);
     $this->assertCacheContexts($contexts);
     $this->assertIds(range(1, 10, 1));
 

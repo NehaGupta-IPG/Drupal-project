@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\shortcut\Functional;
 
+use Drupal\locale\Model\TranslationUpdateMode;
 use Drupal\shortcut\Entity\ShortcutSet;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -14,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  *
  * @see \Drupal\Tests\config_translation\Functional\ConfigTranslationListUiTest
  */
+#[IgnoreDeprecations]
 #[Group('shortcut')]
 #[RunTestsInSeparateProcesses]
 class ConfigTranslationListUiTest extends BrowserTestBase {
@@ -25,7 +28,6 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
     'block',
     'config_translation',
     'shortcut',
-    'toolbar',
   ];
 
   /**
@@ -48,7 +50,7 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
 
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->set('translation.use_source', TranslationUpdateMode::Local->value)
       ->save();
     $this->drupalPlaceBlock('local_tasks_block');
   }

@@ -3,6 +3,7 @@
 namespace Drupal\Core;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\PhpSerialize;
@@ -12,7 +13,6 @@ use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\YamlFileLoader;
@@ -626,9 +626,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Set the allowed protocols.
     UrlHelper::setAllowedProtocols($this->container->getParameter('filter_protocols'));
 
-    // Override of Symfony's MIME type guesser singleton.
-    MimeTypeGuesser::registerWithSymfonyGuesser($this->container);
-
     $this->prepared = TRUE;
   }
 
@@ -1115,6 +1112,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $this->container->get('logger.factory')->get('DrupalKernel')->error('Container cannot be saved to cache.');
     }
 
+    // Override of Symfony's MIME type guesser singleton.
+    MimeTypeGuesser::registerWithSymfonyGuesser($this->container);
+
     return $this->container;
   }
 
@@ -1168,7 +1168,29 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     mb_internal_encoding('utf-8');
     mb_language('uni');
 
-    // Indicate that code is operating in a test child site.
+    // Set DRUPAL_TEST_IN_CHILD_SITE if we're inside a test.
+    static::setupDrupalTestInChildSite($app_root);
+
+    // Set the Drupal custom error handler.
+    set_error_handler('_drupal_error_handler');
+    set_exception_handler('_drupal_exception_handler');
+
+    static::$isEnvironmentInitialized = TRUE;
+  }
+
+  /**
+   * Define the DRUPAL_TEST_IN_CHILD_SITE constant as appropriate.
+   *
+   * @param string $app_root
+   *   The path to the application root.
+   *
+   * @internal This method is only intended to be called by this class and
+   *   \Drupal\Core\Command\DrupalApplication. We aim to remove the need for it
+   *   without a BC layer during Drupal 12.
+   * @see https://www.drupal.org/node/2690035
+   */
+  public static function setupDrupalTestInChildSite(string $app_root): void {
+    // Indicate if code is operating in a test child site or not.
     if (!defined('DRUPAL_TEST_IN_CHILD_SITE')) {
       if ($test_prefix = drupal_valid_test_ua()) {
         $test_db = new TestDatabase($test_prefix);
@@ -1191,12 +1213,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         define('DRUPAL_TEST_IN_CHILD_SITE', FALSE);
       }
     }
-
-    // Set the Drupal custom error handler.
-    set_error_handler('_drupal_error_handler');
-    set_exception_handler('_drupal_exception_handler');
-
-    static::$isEnvironmentInitialized = TRUE;
   }
 
   /**
@@ -1452,6 +1468,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Set the class loader which was registered as a synthetic service.
     $container->set('class_loader', $this->classLoader);
+
+    // Reset any existing container in order to avoid holding on to old object
+    // references, otherwise memory usage grows exponentially with each rebuild.
+    $this->container?->reset();
+
     return $container;
   }
 
@@ -1494,6 +1515,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         /** @var \DirectoryIterator $component */
         $pathname = $component->getPathname();
         if (!$component->isDot() && $component->isDir() && (
+          is_dir($pathname . '/Command') ||
           is_dir($pathname . '/Plugin') ||
           is_dir($pathname . '/Entity') ||
           is_dir($pathname . '/Element')

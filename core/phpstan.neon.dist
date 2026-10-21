@@ -14,10 +14,13 @@ parameters:
 
   fileExtensions:
     - sh
+    - ''
 
   paths:
     - .
     - ../composer
+    - scripts/dr
+    - scripts/drupal
 
   bootstrapFiles:
     # Load aliases.
@@ -28,8 +31,8 @@ parameters:
     - ../sites
     # Skip test fixtures.
     - ../*/node_modules/*
-    - */tests/fixtures/*.php
-    - */tests/fixtures/*.php.gz
+    - */fixtures/*.php
+    - */fixtures/*.php.gz
     # Skip the phpstan tmpDir
     - phpstan-tmp/*
     # Skip Drupal's own PHPStan rules test fixtures.
@@ -47,6 +50,8 @@ parameters:
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/fruit/ExtendingNonInstalledClass.php
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/custom_annotation/UsingNonInstalledTraitClass.php
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/custom_annotation/ExtendingNonInstalledClass.php
+    - modules/system/tests/modules/router_test_directory/src/Controller/TestInvalidController.php
+    - modules/system/tests/modules/router_test_directory/src/Controller/TestMissingDependency.php
     # Needs to be skipped until PHPStan recognises the existence of Pdo\Sqlite
     - modules/sqlite/src/Driver/Database/sqlite/SqliteConnection.php
 
@@ -58,6 +63,9 @@ parameters:
     - "#Drupal calls should be avoided in classes, use dependency injection instead#"
     - "#^Class .* extends @internal class#"
     - identifier: missingType.iterableValue
+
+    # @todo Fix this in https://www.drupal.org/project/drupal/issues/3624168
+    - identifier: loadIncludes.fileNotLoadable
 
 rules:
   - Drupal\PHPStan\Rules\ComponentTestDoesNotExtendCoreTest

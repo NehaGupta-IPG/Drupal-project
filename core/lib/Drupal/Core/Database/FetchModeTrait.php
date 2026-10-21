@@ -12,6 +12,10 @@ trait FetchModeTrait {
   /**
    * Map FETCH_* modes to their literal for inclusion in messages.
    *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is
+   *   no replacement.
+   *
+   * @see https://www.drupal.org/node/3611848
    * @see https://github.com/php/php-src/blob/master/ext/pdo/php_pdo_driver.h#L65-L80
    */
   protected array $fetchModeLiterals = [
@@ -131,7 +135,7 @@ trait FetchModeTrait {
    *   If the column index is not defined.
    */
   protected function assocToFetchMode(array $rowAssoc, FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL {
-    return match($mode) {
+    return match ($mode) {
       FetchAs::Associative => $rowAssoc,
       FetchAs::ClassObject => $this->assocToClass($rowAssoc, $fetchOptions['class'], $fetchOptions['constructor_args']),
       FetchAs::Column => $this->assocToColumn($rowAssoc, array_keys($rowAssoc), $fetchOptions['column']),

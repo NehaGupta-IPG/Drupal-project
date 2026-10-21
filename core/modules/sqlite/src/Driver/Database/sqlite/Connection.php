@@ -96,7 +96,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(#[\SensitiveParameter] array &$connection_options = []) {
     // Allow PDO options to be overridden.
     $connection_options += [
       'pdo' => [],
@@ -109,7 +109,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
     try {
       if (\PHP_VERSION_ID >= 80400) {
-        // @phpstan-ignore new.noConstructor
         $sqlite = new SqliteConnection('sqlite:' . $connection_options['database'], '', '', $connection_options['pdo']);
       }
       else {

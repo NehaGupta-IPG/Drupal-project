@@ -70,21 +70,6 @@ final class NavigationRenderer {
   ) {}
 
   /**
-   * Remove the toolbar provided by Toolbar module.
-   *
-   * @param array $page_top
-   *   A renderable array representing the top of the page.
-   *
-   * @see toolbar_page_top()
-   * @see hook_page_top()
-   */
-  public function removeToolbar(array &$page_top): void {
-    if (isset($page_top['toolbar'])) {
-      unset($page_top['toolbar']);
-    }
-  }
-
-  /**
    * Build out the navigation bar.
    *
    * @param array $page_top
@@ -101,6 +86,11 @@ final class NavigationRenderer {
       ],
       '#lazy_builder' => ['navigation.renderer:doBuildNavigation', []],
       '#create_placeholder' => TRUE,
+      // Prevent this placeholder being handled by Big Pipe.
+      // @todo remove in https://www.drupal.org/project/drupal/issues/3505610
+      '#placeholder_strategy_denylist' => [
+        BigPipeStrategy::class => TRUE,
+      ],
     ];
   }
 

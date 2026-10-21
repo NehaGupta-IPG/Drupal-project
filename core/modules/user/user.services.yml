@@ -33,7 +33,7 @@ services:
   Drupal\user\UserDataInterface: '@user.data'
   user_maintenance_mode_subscriber:
     class: Drupal\user\EventSubscriber\MaintenanceModeSubscriber
-    arguments: ['@maintenance_mode', '@current_user']
+    autowire: true
   user_access_denied_subscriber:
     class: Drupal\user\EventSubscriber\AccessDeniedSubscriber
     arguments: ['@current_user']
@@ -59,10 +59,6 @@ services:
     arguments: ['@current_user', '@entity_type.manager']
     tags:
       - { name: 'context_provider' }
-  user.toolbar_link_builder:
-    class: Drupal\user\ToolbarLinkBuilder
-    arguments: ['@current_user']
-  Drupal\user\ToolbarLinkBuilder: '@user.toolbar_link_builder'
   user.flood_control:
     class: Drupal\user\UserFloodControl
     arguments: ['@flood', '@event_dispatcher', '@request_stack']
@@ -81,3 +77,13 @@ services:
     class: Drupal\user\UserNameValidator
     arguments: ['@validation.basic_recursive_validator_factory', '@validation.constraint']
   Drupal\user\UserNameValidator: '@user.name_validator'
+  Drupal\user\OneTimeAuthentication:
+    arguments: ['@datetime.time', '@language_manager']
+  Drupal\user\NotificationHandler:
+    autowire: true
+  Drupal\user\LoginFinalizer:
+    autowire: true
+  Drupal\user\LogoutFinalizer:
+    autowire: true
+  Drupal\user\AccountCancellation:
+    autowire: true

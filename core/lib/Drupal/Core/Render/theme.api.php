@@ -630,9 +630,8 @@ function hook_preprocess_HOOK(&$variables): void {
  * hook called (in this case 'node__article') is available in
  * $variables['theme_hook_original'].
  *
- * Implementations of this hook must be placed in *.module or *.theme files, or
- * must otherwise make sure that the hook implementation is available at
- * any given time.
+ * Implementations of this hook must be placed in src/Hook and tagged with the
+ * #[Hook('theme_suggestions_HOOK')] attribute.
  *
  * Suggestions must begin with the value of HOOK, followed by two underscores to
  * be discoverable.
@@ -749,9 +748,8 @@ function hook_theme_suggestions_alter(array &$suggestions, array &$variables, $h
  *   - node--article is invalid
  *   - article__custom_template is invalid
  *
- * Implementations of this hook must be placed in *.module or *.theme files, or
- * must otherwise make sure that the hook implementation is available at
- * any given time.
+ * Implementations of this hook must be placed in src/Hook and tagged with the
+ * #[Hook('theme_suggestions_HOOK_alter')] attribute.
  *
  * In the following example, we provide an alternative template suggestion to
  * node templates based on the user being logged in.
@@ -1321,16 +1319,16 @@ function hook_theme($existing, $type, $theme, $path): array {
  * @code
  * $theme_registry['entity_add_list'] = [
  *   'template' => 'entity-add-list',
- *   'path' => 'core/themes/claro/templates',
+ *   'path' => 'core/themes/my_theme/templates',
  *   'type' => 'theme_engine',
- *   'theme path' => 'core/themes/claro',
+ *   'theme path' => 'core/themes/my_theme',
  *   'variables' => [
  *     'bundles' => NULL,
  *   ],
  *   'preprocess functions' => [
  *     1 => 'template_preprocess_entity_add_list',
  *     2 => 'contextual_preprocess',
- *     3 => 'claro_preprocess_entity_add_list',
+ *     3 => 'my_theme_preprocess_entity_add_list',
  *   ],
  * ];
  * @endcode
