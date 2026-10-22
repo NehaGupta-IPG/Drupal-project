@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Theme;
 
-use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
@@ -14,11 +13,11 @@ use Drupal\Core\Routing\RouteMatchInterface;
 class ThemeNegotiator implements ThemeNegotiatorInterface {
 
   /**
-   * Holds an array of theme negotiator IDs, sorted by priority.
+   * Holds theme negotiators, sorted by priority.
    *
-   * @var string[]
+   * @var iterable<\Drupal\Core\Theme\ThemeNegotiatorInterface>
    */
-  protected $negotiators = [];
+  protected iterable $negotiators;
 
   /**
    * The access checker for themes.
@@ -28,26 +27,16 @@ class ThemeNegotiator implements ThemeNegotiatorInterface {
   protected $themeAccess;
 
   /**
-   * The class resolver.
-   *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
-   */
-  protected $classResolver;
-
-  /**
    * Constructs a new ThemeNegotiator.
    *
    * @param \Drupal\Core\Theme\ThemeAccessCheck $theme_access
    *   The access checker for themes.
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
-   *   The class resolver.
-   * @param string[] $negotiators
-   *   An array of negotiator IDs.
+   * @param iterable<\Drupal\Core\Theme\ThemeNegotiatorInterface> $negotiators
+   *   The theme negotiators, sorted by priority.
    */
-  public function __construct(ThemeAccessCheck $theme_access, ClassResolverInterface $class_resolver, array $negotiators) {
+  public function __construct(ThemeAccessCheck $theme_access, iterable $negotiators) {
     $this->themeAccess = $theme_access;
     $this->negotiators = $negotiators;
-    $this->classResolver = $class_resolver;
   }
 
   /**
@@ -61,8 +50,7 @@ class ThemeNegotiator implements ThemeNegotiatorInterface {
    * {@inheritdoc}
    */
   public function determineActiveTheme(RouteMatchInterface $route_match) {
-    foreach ($this->negotiators as $negotiator_id) {
-      $negotiator = $this->classResolver->getInstanceFromDefinition($negotiator_id);
+    foreach ($this->negotiators as $negotiator) {
 
       if ($negotiator->applies($route_match)) {
         $theme = $negotiator->determineActiveTheme($route_match);

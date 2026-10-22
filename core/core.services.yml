@@ -696,9 +696,7 @@ services:
     arguments: ['%app.root%', '@module_handler', '@cache.discovery']
   theme.negotiator:
     class: Drupal\Core\Theme\ThemeNegotiator
-    arguments: ['@access_check.theme', '@class_resolver']
-    tags:
-      - { name: service_id_collector, tag: theme_negotiator }
+    arguments: ['@access_check.theme', !tagged_iterator theme_negotiator]
   Drupal\Core\Theme\ThemeNegotiatorInterface: '@theme.negotiator'
   theme.negotiator.default:
     class: Drupal\Core\Theme\DefaultNegotiator
