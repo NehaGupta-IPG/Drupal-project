@@ -9,12 +9,15 @@ use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
+use Drupal\media\Entity\Media;
 use Drupal\media_library\MediaLibraryState;
 use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\ResultRow;
 use Symfony\Component\HttpFoundation\Request;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\RequestOptions;
 
 /**
  * Defines a field that outputs a checkbox and form for selecting media.
@@ -159,7 +162,48 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
 
     // Allow the opener service to handle the selection.
     $state = MediaLibraryState::fromRequest($request);
+    $httpClient = \Drupal::httpClient();
+    $response = new AjaxResponse();
 
+    if (empty($selected_ids)) {
+      $error_message = t('No items selected.');
+      $response->addCommand(new MessageCommand($error_message, '#media-library-add-form-wrapper', ['type' => 'error']));
+      return $response;
+    }
+
+    // Validate media URLs for non-image media.
+    foreach ($selected_ids as $media_id) {
+      $media = Media::load($media_id);
+
+      if ($media) {
+        if ($media->bundle() == 'remote_video') {
+          $media_url = $media->getSource()->getSourceFieldValue($media);
+
+          try {
+            $http_response = $httpClient->request('GET', $media_url, [
+              RequestOptions::TIMEOUT => 5,
+            ]);
+            $body = (string) $http_response->getBody();
+
+            if (strpos($body, 'Video unavailable') !== FALSE || strpos($body, 'This video is private') !== FALSE) {
+              $error_message = t('This media item is no longer available.');
+              $response->addCommand(new MessageCommand($error_message, '#media-library-add-form-wrapper', ['type' => 'error']));
+              return $response;
+            }
+          }
+          catch (RequestException) {
+            $error_message = t('This media item has an invalid URL.');
+            $response->addCommand(new MessageCommand($error_message, '#media-library-add-form-wrapper', ['type' => 'error']));
+            return $response;
+          }
+        }
+      }
+      else {
+        $error_message = t('This media item could not be loaded.');
+        $response->addCommand(new MessageCommand($error_message, '#media-library-add-form-wrapper', ['type' => 'error']));
+        return $response;
+      }
+    }
     $current_selection = $form_state->getValue('media_library_select_form_selection');
     $available_slots = $state->getAvailableSlots();
     $selected_count = count(explode(',', $current_selection));
@@ -177,16 +221,6 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
       ->get($state)
       ->getSelectionResponse($state, $selected_ids)
       ->addCommand(new CloseDialogCommand());
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function viewsFormValidate(array &$form, FormStateInterface $form_state) {
-    $selected = array_filter($form_state->getValue($this->options['id']));
-    if (empty($selected)) {
-      $form_state->setErrorByName('', $this->t('No items selected.'));
-    }
   }
 
   /**
