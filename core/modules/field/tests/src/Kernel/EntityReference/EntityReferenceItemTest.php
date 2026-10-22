@@ -7,6 +7,7 @@ namespace Drupal\Tests\field\Kernel\EntityReference;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\Plugin\Validation\Constraint\ValidReferenceConstraint;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -470,6 +471,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $errors = $entity->validate();
     $this->assertCount(1, $errors);
     $this->assertEquals('The selected content item cannot be referenced.', $errors[0]->getMessage());
+    $this->assertSame(ValidReferenceConstraint::NEW_ENTITY_NOT_REFERENCEABLE_ERROR, $errors[0]->getCode());
     $this->assertEquals('field_test_node.0.entity', $errors[0]->getPropertyPath());
 
     // Publish the node and try again.

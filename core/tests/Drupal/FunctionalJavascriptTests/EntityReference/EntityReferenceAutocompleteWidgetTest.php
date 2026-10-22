@@ -58,6 +58,69 @@ class EntityReferenceAutocompleteWidgetTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests progressively enhanced ambiguity messages for single and tag inputs.
+   */
+  public function testAmbiguousReferenceMessages(): void {
+    for ($i = 0; $i < 6; $i++) {
+      $this->createNode(['title' => 'Example']);
+    }
+    $display = EntityFormDisplay::load('node.page.default');
+    foreach (['field_single' => 'entity_reference_autocomplete', 'field_tags' => 'entity_reference_autocomplete_tags'] as $field_name => $widget) {
+      $this->createEntityReferenceField('node', 'page', $field_name, $field_name, 'node', 'default', ['target_bundles' => ['page']], -1);
+      $display->setComponent($field_name, ['type' => $widget]);
+    }
+    $display->save();
+
+    $this->drupalGet('node/add/page');
+    $page = $this->getSession()->getPage();
+    $page->fillField('title[0][value]', 'Ambiguous references');
+    $page->fillField('field_single[0][target_id]', 'Example');
+    $page->fillField('field_tags[target_id]', 'Example');
+    $page->pressButton('Save');
+
+    $messages = $page->findAll('css', '[data-drupal-autocomplete-message]');
+    $this->assertCount(2, $messages);
+    foreach ($messages as $message) {
+      // Check initial CSS visibility before the behavior takes control.
+      $selector = json_encode('[data-drupal-autocomplete-message="' . $message->getAttribute('data-drupal-autocomplete-message') . '"]');
+      $this->getSession()->executeScript(<<<JS
+        const message = document.querySelector($selector);
+        const full = message.querySelector('.autocomplete-message-full');
+        const short = message.querySelector('.autocomplete-message-short');
+        full.classList.remove('visually-hidden');
+        full.classList.add('js-hide');
+        short.hidden = false;
+        short.classList.add('js-show');
+        JS);
+      $this->assertFalse($message->find('css', '.autocomplete-message-full')->isVisible());
+      $this->assertTrue($message->find('css', '.autocomplete-message-short')->isVisible());
+      $this->getSession()->executeScript("Drupal.attachBehaviors(document.querySelector($selector));");
+      $short = $message->find('css', '.autocomplete-message-short');
+      $this->assertTrue($short->isVisible());
+      $this->assertFalse($short->hasClass('js-show'));
+      $this->assertSame('true', $short->getAttribute('aria-hidden'));
+      $this->assertSame('Multiple content items match Example. Select a match from the autocomplete suggestions.', $short->getText());
+      $full = $message->find('css', '.autocomplete-message-full');
+      $this->assertTrue($full->hasClass('visually-hidden'));
+      $this->assertFalse($full->hasClass('js-hide'));
+      $this->assertNull($full->getAttribute('hidden'));
+      $this->assertNull($full->getAttribute('aria-hidden'));
+      $this->assertStringContainsString('To select a specific match, append its ID in parentheses', $full->getText());
+      $this->assertCount(5, $full->findAll('css', 'ul > li > code'));
+    }
+
+    // Reattaching a message must reflect the current autocomplete availability.
+    $input_id = json_encode($messages[0]->getAttribute('data-drupal-autocomplete-message'));
+    $this->getSession()->executeScript("jQuery(document.getElementById($input_id)).autocomplete('destroy');");
+    $this->getSession()->executeScript('Drupal.attachBehaviors(document.querySelector("[data-drupal-autocomplete-message]"));');
+    $this->assertFalse($messages[0]->find('css', '.autocomplete-message-full')->hasClass('visually-hidden'));
+    $this->assertFalse($messages[0]->find('css', '.autocomplete-message-short')->isVisible());
+    $this->getSession()->executeScript("once.remove('autocomplete', document.getElementById($input_id)); Drupal.attachBehaviors(document);");
+    $this->assertTrue($messages[0]->find('css', '.autocomplete-message-full')->hasClass('visually-hidden'));
+    $this->assertTrue($messages[0]->find('css', '.autocomplete-message-short')->isVisible());
+  }
+
+  /**
    * Tests that the default autocomplete widget return the correct results.
    */
   public function testEntityReferenceAutocompleteWidget(): void {

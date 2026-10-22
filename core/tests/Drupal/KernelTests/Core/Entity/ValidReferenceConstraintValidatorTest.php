@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\Plugin\Validation\Constraint\ValidReferenceConstraint;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\entity_test\Entity\EntityTest;
@@ -81,6 +82,7 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     // Make sure the information provided by a violation is correct.
     $violation = $violations[0];
     $this->assertEquals(sprintf('The referenced entity (user: %s) does not exist.', $entity->id()), $violation->getMessage(), 'The message for invalid value is correct.');
+    $this->assertSame(ValidReferenceConstraint::ENTITY_DOES_NOT_EXIST_ERROR, $violation->getCode());
     $this->assertEquals($typed_data, $violation->getRoot(), 'Violation root is correct.');
     $this->assertSame($entity->id(), $violation->getInvalidValue());
     $this->assertSame('0.target_id', $violation->getPropertyPath());
@@ -173,6 +175,7 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $violations = $referencing_entity->field_test->validate();
     $this->assertCount(1, $violations);
     $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $unpublished_node->id()), $violations[0]->getMessage());
+    $this->assertSame(ValidReferenceConstraint::EXISTING_ENTITY_NOT_REFERENCEABLE_ERROR, $violations[0]->getCode());
 
     // Now save the referencing entity which will create a pre-existing state
     // for it and repeat the checks. This time, the user without access should
