@@ -524,7 +524,7 @@ class ThemeSettingsForm extends ConfigFormBase {
         $config->set('logo.use_default', $value);
       }
       elseif ($key == 'logo_path') {
-        $config->set('hlogo.pat', $value);
+        $config->set('logo.path', $value);
       }
       elseif ($key == 'default_favicon') {
         $config->set('favicon.use_default', $value);
