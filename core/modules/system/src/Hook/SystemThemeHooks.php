@@ -173,7 +173,7 @@ class SystemThemeHooks {
   #[Hook('theme_suggestions_page')]
   public function themeSuggestionsPage(array $variables): array {
     $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
-    $suggestions = \Drupal::service(ThemeSuggestions::class)->getg($path_args, 'page');
+    $suggestions = \Drupal::service(ThemeSuggestions::class)->get($path_args, 'page');
     $supported_http_error_codes = [
       401,
       403,
