@@ -163,10 +163,10 @@ class UserEditTest extends BrowserTestBase {
   }
 
   /**
-   * Tests editing of a user account without an email address.
+   * Tests editing of a user account email address validation.
    */
-  public function testUserWithoutEmailEdit(): void {
-    // Test that an admin can edit users without an email address.
+  public function testUserEmailValidation(): void {
+    // Test that an admin can not edit users without an email address.
     $admin = $this->drupalCreateUser(['administer users']);
     $this->drupalLogin($admin);
     // Create a regular user.
@@ -176,7 +176,7 @@ class UserEditTest extends BrowserTestBase {
     $user1->save();
     $this->drupalGet("user/" . $user1->id() . "/edit");
     $this->submitForm(['mail' => ''], 'Save');
-    $this->assertSession()->pageTextContains("The changes have been saved.");
+    $this->assertSession()->pageTextContains("Email address field is required.");
   }
 
   /**
