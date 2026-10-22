@@ -68,8 +68,12 @@
      * Automatically updates visibility of the view/edit mode toggle.
      */
     updateVisibility() {
-      this.isVisible = this.contextualCount > 0;
-      this.$el[0].classList.toggle('hidden', !this.isVisible);
+      const isVisible = this.contextualCount > 0;
+      this.$el[0].classList.toggle('hidden', !isVisible);
+      if (isVisible !== this.isVisible) {
+        this.isVisible = isVisible;
+        this.manageTabbing();
+      }
     }
 
     /**
@@ -98,8 +102,9 @@
         tabbingContext.release();
         this.tabbingContext = null;
       }
-      // Create a new tabbing context when edit mode is enabled.
-      if (!this.isViewing) {
+      // Create a new tabbing context when edit mode is enabled and the page has
+      // contextual links.
+      if (!this.isViewing && this.isVisible) {
         tabbingContext = Drupal.tabbingManager.constrain(
           $('.contextual-toolbar-tab, .contextual'),
         );

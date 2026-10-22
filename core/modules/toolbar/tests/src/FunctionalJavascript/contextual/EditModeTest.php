@@ -114,6 +114,29 @@ class EditModeTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests that the edit mode toggle is only shown with contextual links.
+   */
+  public function testEditModeToggleVisibility(): void {
+    $web_assert = $this->assertSession();
+    $page = $this->getSession()->getPage();
+    $toggle_selector = '#toolbar-bar div.contextual-toolbar-tab';
+
+    $this->drupalGet('user');
+    $this->assertGreaterThan(0, count($page->findAll('css', '[data-contextual-id]')));
+    $this->assertNotNull($web_assert->waitForElementVisible('css', $toggle_selector));
+
+    // Load the page again so the contextual links are restored from the
+    // client-side cache.
+    $this->drupalGet('user');
+    $this->assertNotNull($web_assert->waitForElementVisible('css', $toggle_selector));
+
+    $this->drupalGet('admin/structure/block');
+    $this->assertJsCondition('Drupal.contextualToolbar.model !== null');
+    $this->assertEquals(0, count($page->findAll('css', '[data-contextual-id]')));
+    $this->assertTrue($page->find('css', $toggle_selector)->hasClass('hidden'));
+  }
+
+  /**
    * Presses the toolbar edit mode.
    */
   protected function pressToolbarEditButton(): void {
