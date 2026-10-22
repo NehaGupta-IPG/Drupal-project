@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Functional\Theme;
 
 use Dom\HTMLDocument;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Theme\TemplateFinder;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -57,8 +58,8 @@ class TwigDebugMarkupTest extends BrowserTestBase {
 
     $cache = $this->container->get('theme.registry')->get();
     // Create array of Twig templates.
-    $templates = drupal_find_theme_templates($cache, '.html.twig', $this->getThemePath('test_theme'));
-    $templates += drupal_find_theme_templates($cache, '.html.twig', $this->getModulePath('node'));
+    $templates = \Drupal::service(TemplateFinder::class)->scan($cache, '.html.twig', $this->getThemePath('test_theme'));
+    $templates += \Drupal::service(TemplateFinder::class)->scan($cache, '.html.twig', $this->getModulePath('node'));
 
     // Create a node and test different features of the debug markup.
     $node = $this->drupalCreateNode();

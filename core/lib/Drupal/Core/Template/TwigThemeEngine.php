@@ -5,6 +5,7 @@ namespace Drupal\Core\Template;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Theme\TemplateFinder;
 use Drupal\Core\Theme\ThemeEngineInterface;
 use Twig\Error\RuntimeError;
 
@@ -23,7 +24,7 @@ class TwigThemeEngine implements ThemeEngineInterface {
    * {@inheritdoc}
    */
   public function theme(array $existing, string $type, string $theme, string $path): array {
-    return drupal_find_theme_templates($existing, self::EXTENSION, $path);
+    return \Drupal::service(TemplateFinder::class)->scan($existing, self::EXTENSION, $path);
   }
 
   /**

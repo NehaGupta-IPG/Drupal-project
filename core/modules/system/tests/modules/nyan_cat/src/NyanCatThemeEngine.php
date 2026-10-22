@@ -6,6 +6,7 @@ namespace Drupal\nyan_cat;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Theme\TemplateFinder;
 use Drupal\Core\Theme\ThemeEngineInterface;
 
 // cspell:ignore nyan nyancat
@@ -22,7 +23,7 @@ class NyanCatThemeEngine implements ThemeEngineInterface {
    * {@inheritdoc}
    */
   public function theme(array $existing, string $type, string $theme, string $path): ?array {
-    return drupal_find_theme_templates($existing, '.nyan-cat.html', $path);
+    return \Drupal::service(TemplateFinder::class)->scan($existing, '.nyan-cat.html', $path);
   }
 
   /**

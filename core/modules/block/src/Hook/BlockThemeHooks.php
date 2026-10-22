@@ -18,7 +18,7 @@ class BlockThemeHooks {
     $suggestions[] = 'block__' . $variables['elements']['#configuration']['provider'];
     // Hyphens (-) and underscores (_) play a special role in theme
     // suggestions. Theme suggestions should only contain underscores, because
-    // within drupal_find_theme_templates(), underscores are converted to
+    // within TemplateFinder::scan(), underscores are converted to
     // hyphens to match template file names, and then converted back to
     // underscores to match pre-processing and other function names. So if your
     // theme suggestion contains a hyphen, it will end up as an underscore
