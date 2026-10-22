@@ -3,6 +3,7 @@
 namespace Drupal\Core\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
+use Drupal\Core\Plugin\Context\ContextDefinitionInterface;
 
 /**
  * @defgroup plugin_context Annotation for context definition
@@ -112,7 +113,7 @@ class ContextDefinition extends Plugin {
         $values[$key] = NULL;
       }
     }
-    if (isset($values['class']) && !in_array('Drupal\Core\Plugin\Context\ContextDefinitionInterface', class_implements($values['class']))) {
+    if (isset($values['class']) && !is_subclass_of($values['class'], ContextDefinitionInterface::class)) {
       throw new \Exception('ContextDefinition class must implement \Drupal\Core\Plugin\Context\ContextDefinitionInterface.');
     }
 

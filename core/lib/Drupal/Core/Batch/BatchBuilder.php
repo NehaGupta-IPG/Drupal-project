@@ -313,7 +313,7 @@ class BatchBuilder {
       throw new \InvalidArgumentException('Class ' . $class . ' does not exist.');
     }
 
-    if (!in_array(QueueInterface::class, class_implements($class))) {
+    if (!is_subclass_of($class, QueueInterface::class)) {
       throw new \InvalidArgumentException(
         'Class ' . $class . ' does not implement \Drupal\Core\Queue\QueueInterface.'
       );
