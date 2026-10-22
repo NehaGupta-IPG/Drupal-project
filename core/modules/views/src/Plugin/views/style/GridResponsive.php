@@ -83,7 +83,7 @@ class GridResponsive extends StylePluginBase {
     ];
     $form['grid_wrapper_class_custom'] = [
       '#title' => $this->t('Custom grid wrapper classes'),
-      '#description' => $this->t('Additional classes to provide on each grid wrapper. Separated by a space.'),
+      '#description' => $this->t('Additional classes to provide on the grid wrapper. Separated by a space.'),
       '#type' => 'textfield',
       '#default_value' => $this->options['grid_wrapper_class_custom'],
     ];
