@@ -6,6 +6,9 @@ namespace Drupal\KernelTests\Core\Entity\Element;
 
 use Drupal\Core\Entity\Element\EntityAutocomplete;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
@@ -340,6 +343,88 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
     // The input is complete (i.e. contains an entity ID at the end), no errors
     // are triggered.
     $this->assertCount(0, $form_state->getErrors());
+
+    // Mixed input uses its configured handler without loading rejected targets.
+    $selection_manager = $this->container->get('plugin.manager.entity_reference_selection');
+    $entity_type_manager = $this->container->get('entity_type.manager');
+    try {
+      foreach ([FALSE, TRUE] as $new_first) {
+        $target = EntityTest::create(['name' => 'First new target']);
+        $other_target = EntityTest::create(['name' => 'Second new target']);
+        $calls = [];
+        $handler = $this->createMock(DefaultSelection::class);
+        $handler->expects($this->once())->method('validateReferenceableEntities')
+          ->with($new_first ? [1 => 17, 3 => 18] : [0 => 17, 2 => 18])
+          ->willReturnCallback(static function (array $ids) use (&$calls): array {
+            $calls[] = 'existing';
+            return [];
+          });
+        $handler->expects($this->once())->method('validateReferenceableNewEntities')
+          ->with($new_first ? [0 => $target, 2 => $other_target] : [1 => $target, 3 => $other_target])
+          ->willReturnCallback(static function (array $entities) use (&$calls): array {
+            $calls[] = 'new';
+            return [];
+          });
+        $manager = $this->createMock(SelectionPluginManagerInterface::class);
+        $manager->expects($this->once())->method('getInstance')->willReturn($handler);
+        $manager->expects($this->never())->method('getSelectionHandler');
+        $this->container->set('plugin.manager.entity_reference_selection', $manager);
+        $storage_manager = $this->createMock(EntityTypeManagerInterface::class);
+        $storage_manager->method('getDefinition')->willReturn($target->getEntityType());
+        $storage_manager->expects($this->never())->method('getStorage');
+        $this->container->set('entity_type.manager', $storage_manager);
+
+        $values = $new_first
+          ? [['entity' => $target], ['target_id' => 17], ['entity' => $other_target], ['target_id' => 18]]
+          : [['target_id' => 17], ['entity' => $target], ['target_id' => 18], ['entity' => $other_target]];
+        $element = [
+          '#value' => $values,
+          '#target_type' => 'entity_test',
+          '#selection_handler' => 'default',
+          '#selection_settings' => [],
+          '#autocreate' => ['bundle' => 'entity_test'],
+          '#validate_reference' => TRUE,
+          '#tags' => TRUE,
+          '#parents' => ['reference'],
+        ];
+        $state = new class extends FormState {
+
+          /**
+           * All reported errors, including those discarded by FormState.
+           *
+           * @var string[]
+           */
+          public array $reportedErrors = [];
+
+          /**
+           * {@inheritdoc}
+           */
+          public function setError(array &$element, $message = '') {
+            $this->reportedErrors[] = (string) $message;
+            return parent::setError($element, $message);
+          }
+
+        };
+        $state->clearErrors();
+        $form = [];
+        EntityAutocomplete::validateEntityAutocomplete($element, $state, $form);
+        $this->assertSame(['new', 'existing'], $calls);
+        $expected = [
+          'The referenced entity (<em class="placeholder">entity_test</em>: <em class="placeholder">17</em>) does not exist.',
+          'The referenced entity (<em class="placeholder">entity_test</em>: <em class="placeholder">18</em>) does not exist.',
+          'This entity (<em class="placeholder">entity_test</em>: <em class="placeholder">First new target</em>) cannot be referenced.',
+          'This entity (<em class="placeholder">entity_test</em>: <em class="placeholder">Second new target</em>) cannot be referenced.',
+        ];
+        $this->assertSame($expected, $state->reportedErrors);
+        $this->assertSame($expected[0], (string) $state->getError($element));
+        $this->assertSame($values, $state->getValue('reference'));
+        $this->container->set('entity_type.manager', $entity_type_manager);
+      }
+    }
+    finally {
+      $this->container->set('plugin.manager.entity_reference_selection', $selection_manager);
+      $this->container->set('entity_type.manager', $entity_type_manager);
+    }
   }
 
   /**

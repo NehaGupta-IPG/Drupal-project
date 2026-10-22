@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\Plugin\Validation\Constraint\ValidReferenceConstraint;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\entity_test\Entity\EntityTest;
@@ -82,6 +83,44 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $violation = $violations[0];
     $this->assertEquals(sprintf('The referenced entity (user: %s) does not exist.', $entity->id()), $violation->getMessage(), 'The message for invalid value is correct.');
     $this->assertEquals($typed_data, $violation->getRoot(), 'Violation root is correct.');
+
+    // Resolved and supplied handlers apply the same rules to new targets.
+    $definition = BaseFieldDefinition::create('entity_reference')->setSettings([
+      'target_type' => 'node',
+      'handler' => 'default',
+      'handler_settings' => ['target_bundles' => ['page' => 'page']],
+    ]);
+    $handler = $this->container->get('plugin.manager.entity_reference_selection')->getSelectionHandler($definition);
+    $validator = $this->container->get('validation.basic_recursive_validator_factory')->createValidator();
+    foreach (['page' => TRUE, 'article' => FALSE] as $bundle => $accepted) {
+      $target = Node::create(['type' => $bundle, 'title' => 'New target']);
+      $field = $this->typedDataManager->create($definition, [['entity' => $target]]);
+      $constraints = [
+        new ValidReferenceConstraint(),
+        new ValidReferenceConstraint(invalidAutocreateMessage: 'Custom rejection: %label.'),
+      ];
+      foreach ($constraints as $constraint) {
+        $field_errors = $validator->validate($field, $constraint);
+        $supplied_constraint = clone $constraint;
+        $supplied_constraint->handler = $handler;
+        $standalone_errors = $validator->validate($field, $supplied_constraint);
+        $this->assertCount($accepted ? 0 : 1, $field_errors);
+        $this->assertCount($accepted ? 0 : 1, $standalone_errors);
+        if (!$accepted) {
+          $this->assertSame($field_errors[0]->getMessageTemplate(), $standalone_errors[0]->getMessageTemplate());
+          $this->assertSame($field_errors[0]->getParameters(), $standalone_errors[0]->getParameters());
+          $this->assertSame('0.entity', $field_errors[0]->getPropertyPath());
+          $this->assertSame('0.entity', $standalone_errors[0]->getPropertyPath());
+          $this->assertSame($target, $field_errors[0]->getInvalidValue());
+          $this->assertSame($target, $standalone_errors[0]->getInvalidValue());
+          $this->assertSame($constraint, $field_errors[0]->getConstraint());
+          $this->assertSame($supplied_constraint, $standalone_errors[0]->getConstraint());
+        }
+      }
+      $this->assertTrue($target->isNew());
+      $this->assertNull($target->id());
+      $this->assertSame('New target', $target->label());
+    }
   }
 
   /**
