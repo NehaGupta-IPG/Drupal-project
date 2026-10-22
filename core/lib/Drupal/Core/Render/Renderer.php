@@ -885,7 +885,14 @@ class Renderer implements RendererInterface {
    */
   protected function doCallback($callback_type, $callback, array $args) {
     $callable = $this->callableResolver->getCallableFromDefinition($callback);
-    $message = sprintf('Render %s callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/2966725', $callback_type, '%s');
+    // Convert callable to a human-readable string for error messages.
+    // Variable::callableToString() returns '[unknown]' for invokable objects,
+    // so we handle that case separately by using the class name.
+    $callable_string = Variable::callableToString($callable);
+    if ($callable_string === '[unknown]' && is_object($callable)) {
+      $callable_string = get_class($callable);
+    }
+    $message = sprintf('Render %s callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/2966725', $callback_type, $callable_string);
     // Add \Drupal\Core\Render\Element\RenderCallbackInterface as an extra
     // trusted interface so that:
     // - All public methods on Render elements are considered trusted.
