@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -131,6 +132,22 @@ class EntityTypedDataDefinitionTest extends KernelTestBase {
     // Config entities don't support typed data.
     $entity_definition = EntityDataDefinition::create('entity_test_bundle');
     $this->assertEquals([], $entity_definition->getPropertyDefinitions());
+  }
+
+  /**
+   * Tests property definitions when no entity type is specified.
+   */
+  public function testUnspecifiedEntityTypeProperties(): void {
+    $this->assertSame([], EntityDataDefinition::create()->getPropertyDefinitions());
+  }
+
+  /**
+   * Tests that an unknown entity type is still rejected.
+   */
+  public function testUnknownEntityTypeProperties(): void {
+    $this->expectException(PluginNotFoundException::class);
+    $this->expectExceptionMessageIs('The "missing_entity_type" entity type does not exist.');
+    EntityDataDefinition::create('missing_entity_type')->getPropertyDefinitions();
   }
 
   /**
