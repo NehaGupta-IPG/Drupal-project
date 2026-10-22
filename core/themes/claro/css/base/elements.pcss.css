@@ -193,7 +193,8 @@ img {
  * Default focus styles for focused elements.
  */
 .page-wrapper *:focus,
-.ui-dialog *:focus {
+.ui-dialog *:focus,
+#toolbar-bar *:focus-visible {
   outline: var(--focus-outline);
   box-shadow: var(--focus-box-shadow);
 }

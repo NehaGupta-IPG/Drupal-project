@@ -181,19 +181,19 @@ class ShortcutLinksTest extends ShortcutTestBase {
     // Test the "Add to shortcuts" link.
     $this->clickLink('Add to Default shortcuts');
     $this->assertSession()->pageTextContains('Added a shortcut for Cron.');
-    $this->assertSession()->linkExists('Cron', 0, 'Shortcut link found on page');
+    $this->assertSession()->elementExists('css', '#toolbar-item-shortcuts-tray [href$="admin/config/system/cron"]');
 
     $this->drupalGet('admin/structure');
-    $this->assertSession()->linkExists('Cron', 0, 'Shortcut link found on different page');
+    $this->assertSession()->elementExists('css', '#toolbar-item-shortcuts-tray [href$="admin/config/system/cron"]');
 
     // Test the "Remove from shortcuts" link.
     $this->clickLink('Cron');
     $this->clickLink('Remove from Default shortcuts');
     $this->assertSession()->pageTextContains('The shortcut Cron has been deleted.');
-    $this->assertSession()->linkNotExists('Cron', 'Shortcut link removed from page');
+    $this->assertSession()->elementNotExists('css', '#toolbar-item-shortcuts-tray [href$="admin/config/system/cron"]');
 
     $this->drupalGet('admin/structure');
-    $this->assertSession()->linkNotExists('Cron', 'Shortcut link removed from different page');
+    $this->assertSession()->elementNotExists('css', '#toolbar-item-shortcuts-tray [href$="admin/config/system/cron"]');
 
     $this->drupalGet('admin/people');
 

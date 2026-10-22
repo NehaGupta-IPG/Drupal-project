@@ -82,10 +82,9 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
   public static function preRenderAdministrationTray(array $element) {
     $menu_tree = \Drupal::service('toolbar.menu_tree');
     // Load the administrative menu. The first level is the "Administration"
-    // link. In order to load the children of that link, start and end on the
-    // second level.
+    // link.
     $parameters = new MenuTreeParameters();
-    $parameters->setMinDepth(2)->setMaxDepth(2)->onlyEnabledLinks();
+    $parameters->setRoot('system.admin')->excludeRoot()->setMaxDepth(4)->onlyEnabledLinks();
     // @todo Make the menu configurable in https://www.drupal.org/node/1869638.
     $tree = $menu_tree->load('admin', $parameters);
     $manipulators = [
