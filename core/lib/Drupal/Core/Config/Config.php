@@ -268,11 +268,6 @@ class Config extends StorableConfigBase {
     // required langcode. Additionally, once
     // \Drupal\Core\Config\Schema\ArrayElement::hasTranslatableElements() has
     // found a translatable key it returns early.
-    // @todo consider if the langcode requiredKey flag for simple configuration
-    //   could be set correctly in
-    //   \Drupal\Core\Config\TypedConfigManager::buildDataDefinition(). This
-    //   would remove the need for the LangcodeRequiredIfTranslatableValues
-    //   constraint and calling $typed_config->hasTranslatableElements() here.
     if (!$required_langcode && !$typed_config->hasTranslatableElements()) {
       unset($this->data['langcode']);
       return;
