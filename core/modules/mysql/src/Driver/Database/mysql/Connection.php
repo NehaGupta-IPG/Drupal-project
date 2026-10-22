@@ -372,6 +372,15 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return new TransactionManager($this);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function setIdleTimeout(int $timeout): void {
+    // Since the timeout needs to be an integer, we cannot use a parameterized
+    // query here. The argument is guaranteed to have been coerced to an int.
+    $this->query("SET SESSION wait_timeout = $timeout");
+  }
+
 }
 
 

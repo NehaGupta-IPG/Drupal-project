@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\package_manager;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\File\FileSystemInterface;
 use PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface;
 use PhpTuf\ComposerStager\API\Path\Value\PathInterface;
@@ -12,9 +13,9 @@ use PhpTuf\ComposerStager\API\Process\Factory\ProcessFactoryInterface;
 use PhpTuf\ComposerStager\API\Process\Service\ComposerProcessRunnerInterface;
 use PhpTuf\ComposerStager\API\Process\Service\OutputCallbackInterface;
 use PhpTuf\ComposerStager\API\Process\Service\ProcessInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Process\PhpExecutableFinder;
-
-// cspell:ignore BINDIR
 
 /**
  * Runs Composer through the current PHP interpreter.
@@ -24,13 +25,16 @@ use Symfony\Component\Process\PhpExecutableFinder;
  *   at any time without warning. External code should not interact with this
  *   class.
  */
-final class ComposerRunner implements ComposerProcessRunnerInterface {
+final class ComposerRunner implements ComposerProcessRunnerInterface, LoggerAwareInterface {
+
+  use LoggerAwareTrait;
 
   public function __construct(
     private readonly ExecutableFinderInterface $executableFinder,
     private readonly ProcessFactoryInterface $processFactory,
     private readonly FileSystemInterface $fileSystem,
     private readonly ConfigFactoryInterface $configFactory,
+    private readonly Connection $database,
   ) {}
 
   /**
@@ -46,6 +50,17 @@ final class ComposerRunner implements ComposerProcessRunnerInterface {
     $home .= $this->configFactory->get('system.site')->get('uuid');
     $this->fileSystem->prepareDirectory($home, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
 
+    try {
+      $this->database->setIdleTimeout($timeout + 5);
+    }
+    catch (\Throwable $e) {
+      // If we weren't able to set the idle timeout for whatever reason, bravely
+      // continue anyway and hope for the best, but do log the problem for
+      // forensic purposes.
+      $this->logger?->warning("Could not adjust the database server's idle timeout before running Composer: @message", [
+        '@message' => $e->getMessage(),
+      ]);
+    }
     $process = $this->processFactory->create($command, $cwd, $env + ['COMPOSER_HOME' => $home]);
     $process->setTimeout($timeout);
     $process->mustRun($callback);

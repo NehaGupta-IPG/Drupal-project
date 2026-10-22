@@ -542,6 +542,17 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return new TransactionManager($this);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function setIdleTimeout(int $timeout): void {
+    // PostgreSQL timeouts are in milliseconds.
+    $timeout *= 1000;
+    // Since the timeout needs to be an integer, we cannot use a parameterized
+    // query here. The argument is guaranteed to have been coerced to an int.
+    $this->query("SET SESSION idle_session_timeout = $timeout");
+  }
+
 }
 
 /**
