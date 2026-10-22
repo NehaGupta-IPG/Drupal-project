@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Extension;
 
+use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\DefaultConfigMode;
@@ -12,12 +13,14 @@ use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\Exception\ObsoleteExtensionException;
+use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent;
 use Drupal\Core\Update\UpdateHookRegistry;
 use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -512,58 +515,71 @@ class ModuleInstaller implements ModuleInstallerInterface {
   /**
    * {@inheritdoc}
    */
-  public function uninstall(array $module_list, $uninstall_dependents = TRUE) {
-    // Get all module data so we can find dependencies and sort.
+  public function getModulesToUninstall(array $module_list, bool $uninstall_dependents = TRUE): array {
+    // Get all module data so we can find dependents and sort.
     $module_data = \Drupal::service('extension.list.module')->getList();
-    $sync_status = \Drupal::service('config.installer')->isSyncing();
     $module_list = $module_list ? array_combine($module_list, $module_list) : [];
-    if (array_diff_key($module_list, $module_data)) {
-      // One or more of the given modules doesn't exist.
-      return FALSE;
+    if ($missing = array_diff_key($module_list, $module_data)) {
+      throw new UnknownExtensionException(sprintf('Unable to uninstall modules %s due to unknown modules %s.', implode(', ', $module_list), implode(', ', $missing)));
     }
 
-    $extension_config = \Drupal::configFactory()->getEditable('core.extension');
-    $installed_modules = $extension_config->get('module') ?: [];
+    // Only process currently installed modules.
+    $installed_modules = \Drupal::config('core.extension')->get('module') ?: [];
     if (!$module_list = array_intersect_key($module_list, $installed_modules)) {
-      // Nothing to do. All modules already uninstalled.
-      return TRUE;
+      return [];
     }
 
     if ($uninstall_dependents) {
       $theme_list = \Drupal::service('extension.list.theme')->getList();
 
-      // Add dependent modules to the list. The new modules will be processed as
-      // the foreach loop continues.
-      foreach ($module_list as $module => $value) {
+      // Add installed dependent modules to the list. Themes that depend on a
+      // module are left to the uninstall validators.
+      foreach ($module_list as $module) {
         foreach (array_keys($module_data[$module]->required_by) as $dependent) {
           if (!isset($module_data[$dependent]) && !isset($theme_list[$dependent])) {
-            // The dependent module or theme does not exist.
-            return FALSE;
+            throw new UnknownExtensionException("Unable to uninstall module '$module' due to unknown dependent '$dependent'.");
           }
-
-          // Skip already uninstalled modules.
-          if (isset($installed_modules[$dependent]) && !isset($module_list[$dependent])) {
+          if (isset($installed_modules[$dependent])) {
             $module_list[$dependent] = $dependent;
           }
         }
       }
     }
 
-    // Use the validators and throw an exception with the reasons.
-    if ($reasons = $this->validateUninstall($module_list)) {
+    // Sort the module list by their weights.
+    $module_list = array_map(fn ($module) => $module_data[$module]->sort, $module_list);
+    asort($module_list);
+    return array_keys($module_list);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function uninstall(array $module_list, $uninstall_dependents = TRUE) {
+    $requested = $module_list;
+    try {
+      $module_list = $this->getModulesToUninstall($module_list, $uninstall_dependents);
+    }
+    catch (UnknownExtensionException) {
+      // One or more of the given modules, or a dependent, doesn't exist.
+      return FALSE;
+    }
+    if (empty($module_list)) {
+      // Nothing to do. All modules already uninstalled.
+      return TRUE;
+    }
+
+    // Use the validators and throw an exception with the reasons, reported in
+    // the requested order followed by any added dependents.
+    $to_validate = array_merge(array_intersect($requested, $module_list), array_diff($module_list, $requested));
+    if ($reasons = $this->validateUninstall($to_validate)) {
       foreach ($reasons as $reason) {
         $reason_message[] = implode(', ', $reason);
       }
       throw new ModuleUninstallValidatorException('The following reasons prevent the modules from being uninstalled: ' . implode('; ', $reason_message));
     }
-    // Set the actual module weights.
-    $module_list = array_map(function ($module) use ($module_data) {
-      return $module_data[$module]->sort;
-    }, $module_list);
 
-    // Sort the module list by their weights.
-    asort($module_list);
-    $module_list = array_keys($module_list);
+    $sync_status = \Drupal::service('config.installer')->isSyncing();
 
     // Only process modules that are enabled. A module is only enabled if it is
     // configured as enabled. Custom or overridden module handlers might contain
@@ -741,6 +757,15 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   The list of installed modules.
    */
   protected function updateKernel($module_filenames) {
+    // Identify uninstall validator service ids to fetch them again after
+    // the rebuild.
+    $uninstall_validator_service_ids = [];
+
+    $reverse_container = $this->kernel->getContainer()->get(ReverseContainer::class);
+    foreach ($this->uninstallValidators as $validator) {
+      $uninstall_validator_service_ids[] = $reverse_container->getId($validator);
+    }
+
     if (!empty($module_filenames)) {
       // This reboots the kernel to register the module's bundle and its
       // services in the service container. The $module_filenames argument is
@@ -758,6 +783,14 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $this->moduleHandler = $container->get('module_handler');
     $this->connection = $container->get('database');
     $this->updateRegistry = $container->get('update.update_hook_registry');
+
+    $this->uninstallValidators = new RewindableGenerator(function () use ($uninstall_validator_service_ids, $container) {
+      foreach ($uninstall_validator_service_ids as $id) {
+        if ($id && $container->has($id)) {
+          yield $id => $container->get($id);
+        }
+      }
+    }, count($uninstall_validator_service_ids));
   }
 
   /**
