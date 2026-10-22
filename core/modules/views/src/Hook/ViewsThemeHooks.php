@@ -864,8 +864,8 @@ class ViewsThemeHooks {
     $variables['responsive'] = FALSE;
     // If the table has headers and it should react responsively to columns
     // hidden with the classes represented by the constants
-    // RESPONSIVE_PRIORITY_MEDIUM and RESPONSIVE_PRIORITY_LOW, add the
-    // tableresponsive behaviors.
+    // Table::RESPONSIVE_PRIORITY_MEDIUM and Table::RESPONSIVE_PRIORITY_LOW,
+    // add the tableresponsive behaviors.
     if (isset($variables['header']) && $responsive) {
       $variables['view']->element['#attached']['library'][] = 'core/drupal.tableresponsive';
       // Add 'responsive-enabled' class to the table to identify it for JS.

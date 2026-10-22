@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Render\Element\Table;
 use Drupal\path_alias\AliasManagerInterface;
 use Drupal\Core\Url;
 use Drupal\path\Form\PathFilterForm;
@@ -148,7 +149,7 @@ class PathAliasListBuilder extends EntityListBuilder {
         'data' => $this->t('Language'),
         'field' => 'langcode',
         'specifier' => 'langcode',
-        'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+        'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM],
       ];
     }
 

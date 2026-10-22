@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Render\Element\Table;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -80,30 +81,30 @@ class MediaListBuilder extends EntityListBuilder {
     if ($this->thumbnailStyleExists) {
       $header['thumbnail'] = [
         'data' => $this->t('Thumbnail'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ];
     }
     $header += [
       'name' => $this->t('Media Name'),
       'type' => [
         'data' => $this->t('Type'),
-        'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+        'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM],
       ],
       'author' => [
         'data' => $this->t('Author'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ],
       'status' => $this->t('Status'),
       'changed' => [
         'data' => $this->t('Updated'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ],
     ];
     // Enable language column if multiple languages are added.
     if ($this->languageManager->isMultilingual()) {
       $header['language'] = [
         'data' => $this->t('Language'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ];
     }
     return $header + parent::buildHeader();

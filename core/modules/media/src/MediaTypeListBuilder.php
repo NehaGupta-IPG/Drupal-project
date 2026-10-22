@@ -4,6 +4,7 @@ namespace Drupal\media;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Render\Element\Table;
 use Drupal\Core\Url;
 
 /**
@@ -18,7 +19,7 @@ class MediaTypeListBuilder extends ConfigEntityListBuilder {
     $header['title'] = $this->t('Name');
     $header['description'] = [
       'data' => $this->t('Description'),
-      'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+      'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM],
     ];
     return $header + parent::buildHeader();
   }

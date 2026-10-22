@@ -8,6 +8,7 @@ use Drupal\Core\Database\DatabaseConnectionRefusedException;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Form\FormBuilderInterface;
+use Drupal\Core\Render\Element\Table;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\migrate\Exception\RequirementsException;
@@ -161,14 +162,14 @@ class MigrateMessageController extends ControllerBase {
       $header[] = [
         'data' => ucfirst($display_name),
         'field' => 'sourceid' . $count++,
-        'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+        'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM],
       ];
     }
 
     $header[] = [
       'data' => $this->t('Severity level'),
       'field' => 'level',
-      'class' => [RESPONSIVE_PRIORITY_LOW],
+      'class' => [Table::RESPONSIVE_PRIORITY_LOW],
     ];
     $header[] = [
       'data' => $this->t('Message'),

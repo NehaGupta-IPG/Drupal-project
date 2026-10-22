@@ -8,6 +8,7 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\Table;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -134,17 +135,17 @@ class CommentAdminOverview extends FormBase {
       'author' => [
         'data' => $this->t('Author'),
         'specifier' => 'name',
-        'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+        'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM],
       ],
       'posted_in' => [
         'data' => $this->t('Posted in'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ],
       'changed' => [
         'data' => $this->t('Updated'),
         'specifier' => 'changed',
         'sort' => 'desc',
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ],
       'operations' => $this->t('Operations'),
     ];

@@ -11,6 +11,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\Element\Table;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -458,11 +459,12 @@ class ThemePreprocess {
    *     - class: An array of values for the 'class' attribute. In particular,
    *       the least important columns that can be hidden on narrow and medium
    *       width screens should have a 'priority-low' class, referenced with the
-   *       RESPONSIVE_PRIORITY_LOW constant. Columns that should be shown on
-   *       medium+ wide screens should be marked up with a class of
-   *       'priority-medium', referenced by with the RESPONSIVE_PRIORITY_MEDIUM
-   *       constant. Themes may hide columns with one of these two classes on
-   *       narrow viewports to save horizontal space.
+   *       Table::RESPONSIVE_PRIORITY_LOW constant. Columns that should be
+   *       shown on medium+ wide screens should be marked up with a class of
+   *       'priority-medium', referenced by with the
+   *       Table::RESPONSIVE_PRIORITY_MEDIUM constant. Themes may hide columns
+   *       with one of these two classes on narrow viewports to save horizontal
+   *       space.
    *     - Any HTML attributes, such as "colspan", to apply to the column header
    *       cell.
    *   - rows: An array of table rows. Every row is an array of cells, or an
@@ -598,11 +600,11 @@ class ThemePreprocess {
           // module developer or themer. The responsive classes on the header
           // cells must be transferred to the content cells.
           if (!empty($cell['class']) && is_array($cell['class'])) {
-            if (in_array(RESPONSIVE_PRIORITY_MEDIUM, $cell['class'])) {
-              $responsive_classes[$responsive_index] = RESPONSIVE_PRIORITY_MEDIUM;
+            if (in_array(Table::RESPONSIVE_PRIORITY_MEDIUM, $cell['class'])) {
+              $responsive_classes[$responsive_index] = Table::RESPONSIVE_PRIORITY_MEDIUM;
             }
-            elseif (in_array(RESPONSIVE_PRIORITY_LOW, $cell['class'])) {
-              $responsive_classes[$responsive_index] = RESPONSIVE_PRIORITY_LOW;
+            elseif (in_array(Table::RESPONSIVE_PRIORITY_LOW, $cell['class'])) {
+              $responsive_classes[$responsive_index] = Table::RESPONSIVE_PRIORITY_LOW;
             }
           }
 
@@ -672,8 +674,9 @@ class ThemePreprocess {
               if (isset($variables['header'][$col_key]['data']) && $variables['header'][$col_key]['data'] == $ts['name'] && !empty($variables['header'][$col_key]['field'])) {
                 $variables[$section][$row_key]['cells'][$col_key]['active_table_sort'] = TRUE;
               }
-              // Copy RESPONSIVE_PRIORITY_LOW/RESPONSIVE_PRIORITY_MEDIUM
-              // class from header to cell as needed.
+              // Copy Table::RESPONSIVE_PRIORITY_LOW
+              // Table::RESPONSIVE_PRIORITY_MEDIUM class from header to cell as
+              // needed.
               if (isset($responsive_classes[$responsive_index])) {
                 $cell_attributes['class'][] = $responsive_classes[$responsive_index];
               }

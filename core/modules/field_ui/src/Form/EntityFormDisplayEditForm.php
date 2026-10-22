@@ -5,6 +5,7 @@ namespace Drupal\field_ui\Form;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\PluginSettingsInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\Table;
 use Drupal\Core\Url;
 use Drupal\field_ui\FieldUI;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -98,7 +99,7 @@ class EntityFormDisplayEditForm extends EntityDisplayFormBase {
       $this->t('Field'),
       [
         'data' => $this->t('Machine name'),
-        'class' => [RESPONSIVE_PRIORITY_MEDIUM, 'machine-name'],
+        'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM, 'machine-name'],
       ],
       $this->t('Weight'),
       $this->t('Parent'),

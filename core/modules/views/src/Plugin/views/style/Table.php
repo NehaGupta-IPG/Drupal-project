@@ -389,8 +389,8 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
         '#default_value' => $this->options['info'][$field]['responsive'] ?? '',
         '#options' => [
           '' => $this->t('High'),
-          RESPONSIVE_PRIORITY_MEDIUM => $this->t('Medium'),
-          RESPONSIVE_PRIORITY_LOW => $this->t('Low'),
+          Table::RESPONSIVE_PRIORITY_MEDIUM => $this->t('Medium'),
+          Table::RESPONSIVE_PRIORITY_LOW => $this->t('Low'),
         ],
         '#states' => [
           'visible' => [

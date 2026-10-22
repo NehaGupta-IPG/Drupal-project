@@ -54,6 +54,12 @@ const MARK_UPDATED = 2;
  *
  * Indicates that a column has medium priority and thus can be hidden on narrow
  * width devices and shown on medium+ width devices (i.e. tablets and desktops).
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Render\Element\Table::RESPONSIVE_PRIORITY_MEDIUM instead of
+ *   RESPONSIVE_PRIORITY_MEDIUM;
+ *
+ * @see https://www.drupal.org/node/3632395
  */
 const RESPONSIVE_PRIORITY_MEDIUM = 'priority-medium';
 
@@ -62,6 +68,12 @@ const RESPONSIVE_PRIORITY_MEDIUM = 'priority-medium';
  *
  * Indicates that a column has low priority and thus can be hidden on narrow
  * and medium viewports and shown on wide devices (i.e. desktops).
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Render\Element\Table::RESPONSIVE_PRIORITY_LOW instead of
+ *   RESPONSIVE_PRIORITY_LOW;
+ *
+ * @see https://www.drupal.org/node/3632395
  */
 const RESPONSIVE_PRIORITY_LOW = 'priority-low';
 

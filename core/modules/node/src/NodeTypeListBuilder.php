@@ -6,6 +6,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Url;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Render\Element\Table;
 
 /**
  * Defines a class to build a listing of node type entities.
@@ -21,7 +22,7 @@ class NodeTypeListBuilder extends ConfigEntityListBuilder {
     $header['title'] = $this->t('Name');
     $header['description'] = [
       'data' => $this->t('Description'),
-      'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+      'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM],
     ];
     return $header + parent::buildHeader();
   }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Render\Element;
 
+use Drupal\Core\Render\Element\Table;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -202,9 +203,9 @@ class TableTest extends KernelTestBase {
   public function testThemeTableResponsivePriority(): void {
     $header = [
       // Test associative header indices.
-      'associative_key' => ['data' => 1, 'class' => [RESPONSIVE_PRIORITY_MEDIUM]],
+      'associative_key' => ['data' => 1, 'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM]],
       // Test non-associative header indices.
-      ['data' => 2, 'class' => [RESPONSIVE_PRIORITY_LOW]],
+      ['data' => 2, 'class' => [Table::RESPONSIVE_PRIORITY_LOW]],
       // Test no responsive priorities.
       ['data' => 3],
     ];
