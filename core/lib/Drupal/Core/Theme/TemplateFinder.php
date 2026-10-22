@@ -12,7 +12,7 @@ class TemplateFinder {
 
   public function __construct(
     protected readonly ThemeHandlerInterface $themeHandler,
-    protected readonly ThemeManagerInterface  $themeManager,
+    protected readonly ThemeManagerInterface $themeManager,
     protected readonly FileSystemInterface $fileSystem,
   ) {}
 
@@ -89,10 +89,10 @@ class TemplateFinder {
       }
     }
 
-    // Find templates that implement possible "suggestion" variants of registered
-    // theme hooks and add those as new registered theme hooks. See
-    // hook_theme_suggestions_alter() for more information about suggestions and
-    // the use of 'pattern' and 'base hook'.
+    // Find templates that implement possible "suggestion" variants of
+    // registered theme hooks and add those as new registered theme hooks. See
+    // hook_theme_suggestions_alter() for more information about suggestions
+    // and the use of 'pattern' and 'base hook'.
     $patterns = array_keys($files);
     foreach ($cache as $hook => $info) {
       $pattern = $info['pattern'] ?? ($hook . '__');

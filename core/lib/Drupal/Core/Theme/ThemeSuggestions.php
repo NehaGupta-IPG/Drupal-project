@@ -24,8 +24,8 @@ class ThemeSuggestions {
    * @param array $args
    *   An array of path arguments.
    * @param string $base
-   *   A string identifying the base 'thing' from which more specific suggestions
-   *   are derived. For example, 'page' or 'html'.
+   *   A string identifying the base 'thing' from which more specific
+   *   suggestions are derived. For example, 'page' or 'html'.
    * @param string $delimiter
    *   The string used to delimit increasingly specific information. The default
    *   of '__' is appropriate for theme hook suggestions. '-' is appropriate for
@@ -33,15 +33,16 @@ class ThemeSuggestions {
    *
    * @return array
    *   An array of suggestions, suitable for adding to
-   *   hook_theme_suggestions_HOOK_alter() or to $variables['attributes']['class']
-   *   if the suggestions represent extra CSS classes.
+   *   hook_theme_suggestions_HOOK_alter() or to
+   *   $variables['attributes']['class'] if the suggestions represent extra
+   *   CSS classes.
    */
   public function get($args, $base, $delimiter = '__'): array {
     // Build a list of suggested theme hooks in order of
-    // specificity. One suggestion is made for every element of the current path,
-    // though numeric elements are not carried to subsequent suggestions. For
-    // example, for $base='page', http://www.example.com/node/1/edit would result
-    // in the following suggestions:
+    // specificity. One suggestion is made for every element of the current
+    // path, though numeric elements are not carried to subsequent suggestions.
+    // For example, for $base='page', http://www.example.com/node/1/edit would
+    // result in the following suggestions:
     //
     // page__node
     // page__node__%

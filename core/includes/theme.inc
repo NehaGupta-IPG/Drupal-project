@@ -80,7 +80,7 @@ function _system_default_theme_features() {
  * @param string $path
  *   The path to search.
  *
- * @deprecated in drupal:12,1.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(TemplateFinder::class)->scan() instead.
  *
  * @see https://www.drupal.org/node/3632286
@@ -132,7 +132,7 @@ function theme_get_setting($setting_name, $theme = NULL) {
  *
  * @see system_theme_settings_submit()
  *
- * @deprecated in drupal:12,1.0 and is removed from drupal:13.0.0. There
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
  *   is no replacement.
  *
  * @see https://www.drupal.org/node/3632286
@@ -188,7 +188,7 @@ function theme_settings_convert_to_config(array $theme_settings, Config $config)
  *   hook_theme_suggestions_HOOK_alter() or to $variables['attributes']['class']
  *   if the suggestions represent extra CSS classes.
  *
- * @deprecated in drupal:12,1.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(ThemeSuggestions::class)->get() instead.
  *
  * @see https://www.drupal.org/node/3632286
