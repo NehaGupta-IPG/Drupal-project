@@ -1,0 +1,4 @@
+name: 'NoVersionTest'
+type: module
+description: 'Module without version in info file.'
+package: Testing
