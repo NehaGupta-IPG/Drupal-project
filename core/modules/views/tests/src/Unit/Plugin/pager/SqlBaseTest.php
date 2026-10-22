@@ -100,4 +100,49 @@ class SqlBaseTest extends UnitTestCase {
     $this->assertSame(0, $this->pager->options['items_per_page']);
   }
 
+  /**
+   * Tests the query() method ignores invalid exposed input.
+   *
+   * @see \Drupal\views\Plugin\views\pager\SqlBase::query()
+   */
+  public function testQueryInvalidExposedInput(): void {
+    $request = new Request([
+      'items_per_page' => '99999999999999999999',
+      'offset' => 'abc',
+    ]);
+    $this->view
+      ->method('getRequest')
+      ->willReturn($request);
+
+    $options = [
+      'expose' => [
+        'items_per_page' => TRUE,
+        'offset' => TRUE,
+      ],
+    ];
+    $this->pager->init($this->view, $this->display, $options);
+    $this->pager->query();
+    $this->assertSame(10, $this->pager->options['items_per_page']);
+    $this->assertSame(0, $this->pager->options['offset']);
+  }
+
+  /**
+   * Tests the query() method when the offset overflows.
+   *
+   * @see \Drupal\views\Plugin\views\pager\SqlBase::query()
+   */
+  public function testQueryOffsetOverflow(): void {
+    $query = $this->createMock(QueryPluginBase::class);
+    $query->expects($this->once())
+      ->method('setOffset')
+      ->with(0);
+    $this->view->query = $query;
+
+    $options = [];
+    $this->pager->init($this->view, $this->display, $options);
+    $this->pager->setCurrentPage(PHP_INT_MAX);
+    $this->pager->query();
+    $this->assertSame(0, $this->pager->getCurrentPage());
+  }
+
 }

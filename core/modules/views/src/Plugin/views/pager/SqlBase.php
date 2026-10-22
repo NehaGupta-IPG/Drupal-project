@@ -265,8 +265,8 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     if ($this->itemsPerPageExposed()) {
       $query = $this->view->getRequest()->query;
       $items_per_page = $query->get('items_per_page');
-      if ((int) $items_per_page > 0) {
-        $this->options['items_per_page'] = $items_per_page;
+      if ($valid_items_per_page = filter_var($items_per_page, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])) {
+        $this->options['items_per_page'] = $valid_items_per_page;
       }
       elseif ($items_per_page == 'All' && $this->options['expose']['items_per_page_options_all']) {
         $this->options['items_per_page'] = 0;
@@ -274,14 +274,19 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     }
     if ($this->isOffsetExposed()) {
       $query = $this->view->getRequest()->query;
-      $offset = $query->get('offset');
-      if (isset($offset) && $offset >= 0) {
+      $offset = filter_var($query->get('offset'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+      if ($offset !== FALSE) {
         $this->options['offset'] = $offset;
       }
     }
 
     $limit = $this->options['items_per_page'];
     $offset = $this->current_page * $this->options['items_per_page'] + $this->options['offset'];
+    // Fall back to the first page for overflowed integers.
+    if (!is_int($offset)) {
+      $this->current_page = 0;
+      $offset = $this->options['offset'];
+    }
     if (!empty($this->options['total_pages'])) {
       if ($this->current_page >= $this->options['total_pages']) {
         $limit = $this->options['items_per_page'];

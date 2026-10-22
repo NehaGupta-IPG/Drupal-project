@@ -47,7 +47,10 @@ class PagerParameters implements PagerParametersInterface {
    */
   public function findPage($pager_id = 0) {
     $pages = $this->getPagerQuery();
-    return (int) ($pages[$pager_id] ?? 0);
+    // Ignore anything that is not a non-negative integer, including numbers
+    // too large to be represented as one.
+    $page = filter_var($pages[$pager_id] ?? 0, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+    return $page === FALSE ? 0 : $page;
   }
 
   /**
