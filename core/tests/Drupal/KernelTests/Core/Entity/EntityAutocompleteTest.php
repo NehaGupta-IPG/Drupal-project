@@ -142,6 +142,15 @@ class EntityAutocompleteTest extends EntityKernelTestBase {
     $data = $this->getAutocompleteResult($input);
     $this->assertSame(Html::escape($entity_1->name->value), $data[0]['label'], 'Autocomplete returned the first matching entity');
     $this->assertSame(Html::escape($entity_2->name->value), $data[1]['label'], 'Autocomplete returned the second matching entity');
+
+    // Quoted labels retain valid tag syntax after whitespace normalization.
+    $entity = $this->container->get('entity_type.manager')
+      ->getStorage($this->entityType)
+      ->create(['name' => "Normalization \"quoted\", &  spaced\n label"]);
+    $entity->save();
+    $data = $this->getAutocompleteResult('Normalization');
+    $this->assertSame('"Normalization ""quoted"", & spaced label (' . $entity->id() . ')"', $data[0]['value']);
+    $this->assertSame(Html::escape($entity->label()), $data[0]['label']);
   }
 
   /**

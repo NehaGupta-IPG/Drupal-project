@@ -82,6 +82,9 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $violation = $violations[0];
     $this->assertEquals(sprintf('The referenced entity (user: %s) does not exist.', $entity->id()), $violation->getMessage(), 'The message for invalid value is correct.');
     $this->assertEquals($typed_data, $violation->getRoot(), 'Violation root is correct.');
+    $this->assertSame($entity->id(), $violation->getInvalidValue());
+    $this->assertSame('0.target_id', $violation->getPropertyPath());
+    $this->assertSame($entity->id(), $violation->getParameters()['%id']);
   }
 
   /**
