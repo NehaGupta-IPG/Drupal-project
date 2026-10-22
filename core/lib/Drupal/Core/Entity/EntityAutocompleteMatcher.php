@@ -2,8 +2,7 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Component\Utility\Html;
-use Drupal\Component\Utility\Tags;
+use Drupal\Core\Entity\Element\EntityAutocomplete;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 
 /**
@@ -49,13 +48,10 @@ class EntityAutocompleteMatcher implements EntityAutocompleteMatcherInterface {
       // Loop through the entities and convert them into autocomplete output.
       foreach ($entity_labels as $values) {
         foreach ($values as $entity_id => $label) {
-          $key = "$label ($entity_id)";
-          // Strip things like starting/trailing white spaces, line breaks and
-          // tags.
-          $key = preg_replace('/\s\s+/', ' ', str_replace("\n", '', trim(Html::decodeEntities(strip_tags($key)))));
-          // Names containing commas or quotes must be wrapped in quotes.
-          $key = Tags::encode($key);
-          $matches[] = ['value' => $key, 'label' => $label];
+          $matches[] = [
+            'value' => EntityAutocomplete::formatAutocompleteInput($label, $entity_id),
+            'label' => $label,
+          ];
         }
       }
     }

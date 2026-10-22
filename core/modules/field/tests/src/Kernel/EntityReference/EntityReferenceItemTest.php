@@ -469,7 +469,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
 
     $errors = $entity->validate();
     $this->assertCount(1, $errors);
-    $this->assertEquals('This entity (node: ' . Html::escape($title) . ') cannot be referenced.', $errors[0]->getMessage());
+    $this->assertEquals('The selected content item cannot be referenced.', $errors[0]->getMessage());
     $this->assertEquals('field_test_node.0.entity', $errors[0]->getPropertyPath());
 
     // Publish the node and try again.
@@ -517,7 +517,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
 
     $errors = $entity->validate();
     $this->assertCount(2, $errors);
-    $this->assertEquals('This entity (node: ' . Html::escape($unsaved_unpublished_node_title) . ') cannot be referenced.', $errors[0]->getMessage());
+    $this->assertEquals('The selected content item cannot be referenced.', $errors[0]->getMessage());
     $this->assertEquals('field_test_node.0.entity', $errors[0]->getPropertyPath());
     $this->assertEquals('This entity (node: ' . Html::escape($saved_unpublished_node->id()) . ') cannot be referenced.', $errors[1]->getMessage());
     $this->assertEquals('field_test_node.1.target_id', $errors[1]->getPropertyPath());
@@ -527,7 +527,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $saved_unpublished_node->save();
     $errors = $entity->validate();
     $this->assertCount(1, $errors);
-    $this->assertEquals('This entity (node: ' . Html::escape($unsaved_unpublished_node_title) . ') cannot be referenced.', $errors[0]->getMessage());
+    $this->assertEquals('The selected content item cannot be referenced.', $errors[0]->getMessage());
     $this->assertEquals('field_test_node.0.entity', $errors[0]->getPropertyPath());
 
     // Publish the last invalid node and try again.
@@ -551,7 +551,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
 
     $errors = $entity->validate();
     $this->assertCount(1, $errors);
-    $this->assertEquals('This entity (comment: ' . Html::escape($title) . ') cannot be referenced.', $errors[0]->getMessage());
+    $this->assertEquals('The selected comment cannot be referenced.', $errors[0]->getMessage());
     $this->assertEquals('field_test_comment.0.entity', $errors[0]->getPropertyPath());
 
     // Publish the comment and try again.
@@ -574,7 +574,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
 
     $errors = $entity->validate();
     $this->assertCount(1, $errors);
-    $this->assertEquals('This entity (user: ' . Html::escape($name) . ') cannot be referenced.', $errors[0]->getMessage());
+    $this->assertEquals('The selected user cannot be referenced.', $errors[0]->getMessage());
     $this->assertEquals('field_test_user.0.entity', $errors[0]->getPropertyPath());
 
     // Activate the user and try again.
@@ -597,7 +597,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
 
     $errors = $entity->validate();
     $this->assertCount(1, $errors);
-    $this->assertEquals('This entity (file: ' . $filename . ') cannot be referenced.', $errors[0]->getMessage());
+    $this->assertEquals('The selected file cannot be referenced.', $errors[0]->getMessage());
     $this->assertEquals('field_test_file.0.entity', $errors[0]->getPropertyPath());
 
     // Set the file as permanent and try again.

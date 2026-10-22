@@ -232,6 +232,23 @@
           });
         },
       );
+
+      // Keep errors in sync with their input, including after AJAX updates.
+      $(context)
+        .find('[data-drupal-autocomplete-message]')
+        .addBack('[data-drupal-autocomplete-message]')
+        .each((index, message) => {
+          const input = document.getElementById(
+            message.dataset.drupalAutocompleteMessage,
+          );
+          const enabled = Boolean(input && $(input).autocomplete('instance'));
+          const full = message.querySelector('.autocomplete-message-full');
+          const short = message.querySelector('.autocomplete-message-short');
+          full.classList.toggle('visually-hidden', enabled);
+          full.classList.remove('js-hide');
+          short.hidden = !enabled;
+          short.classList.remove('js-show');
+        });
     },
     detach(context, settings, trigger) {
       if (trigger === 'unload') {

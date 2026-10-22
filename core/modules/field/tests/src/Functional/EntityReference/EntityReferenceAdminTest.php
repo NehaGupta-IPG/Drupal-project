@@ -180,7 +180,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
 
     // Assert that entity reference autocomplete field is validated.
-    $this->assertSession()->pageTextContains('There are no content items matching "Test"');
+    $this->assertSession()->pageTextContains('No content item matching Test can be referenced.');
 
     $edit = [
       'title[0][value]' => 'Test',
@@ -191,10 +191,10 @@ class EntityReferenceAdminTest extends BrowserTestBase {
 
     // Assert the results multiple times to avoid sorting problem of nodes with
     // the same title.
-    $this->assertSession()->pageTextContains('Multiple content items match this reference;');
+    $this->assertSession()->pageTextContains('Multiple content items match ' . $node1->getTitle() . '.');
     $this->assertSession()->pageTextContains($node1->getTitle() . ' (' . $node1->id() . ')');
     $this->assertSession()->pageTextContains($node2->getTitle() . ' (' . $node2->id() . ')');
-    $this->assertSession()->pageTextContains('Specify the one you want by appending the id in parentheses, like "' . $node2->getTitle() . ' (' . $node2->id() . ')".');
+    $this->assertSession()->pageTextContains('To select a specific match, append its ID in parentheses, as in:');
 
     $edit = [
       'title[0][value]' => 'Test',

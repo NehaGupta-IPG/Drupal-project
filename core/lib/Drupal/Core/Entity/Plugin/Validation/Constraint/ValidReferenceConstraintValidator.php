@@ -99,6 +99,7 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
 
     // Add violations on deltas with a new entity that is not valid.
     if ($new_entities) {
+      $entity_type_label = $this->entityTypeManager->getDefinition($target_type_id)->getSingularLabel();
       if ($handler instanceof SelectionWithAutocreateInterface) {
         $valid_new_entities = $handler->validateReferenceableNewEntities($new_entities);
         $invalid_new_entities = array_diff_key($new_entities, $valid_new_entities);
@@ -111,10 +112,12 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
 
       foreach ($invalid_new_entities as $delta => $entity) {
         $this->context->buildViolation($constraint->invalidAutocreateMessage)
+          ->setParameter('@entity_type', (string) $entity_type_label)
           ->setParameter('%type', $target_type_id)
           ->setParameter('%label', $entity->label())
           ->atPath((string) $delta . '.entity')
           ->setInvalidValue($entity)
+          ->setCode(ValidReferenceConstraint::NEW_ENTITY_NOT_REFERENCEABLE_ERROR)
           ->addViolation();
       }
     }
@@ -149,6 +152,7 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
             ->setParameter('%id', $target_id)
             ->atPath((string) $delta . '.target_id')
             ->setInvalidValue($target_id)
+            ->setCode(isset($existing_entities[$target_id]) ? ValidReferenceConstraint::EXISTING_ENTITY_NOT_REFERENCEABLE_ERROR : ValidReferenceConstraint::ENTITY_DOES_NOT_EXIST_ERROR)
             ->addViolation();
         }
       }

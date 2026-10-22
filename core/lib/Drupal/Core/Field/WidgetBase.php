@@ -519,8 +519,18 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       // Let the widget massage the submitted values.
       $values = $this->massageFormValues($values, $form, $form_state);
 
-      // Assign the values and remove the empty ones.
+      // Assign the values and preserve deltas before removing empty items.
       $items->setValue($values);
+
+      if ($this->handlesMultipleValues()) {
+        $original_deltas = array_keys((array) $values);
+        foreach ($items as $delta => $item) {
+          if (!isset($item->_original_delta)) {
+            $item->set('_original_delta', $original_deltas[$delta], FALSE);
+          }
+        }
+      }
+
       $items->filterEmptyItems();
 
       // Put delta mapping in $form_state, so that flagErrors() can use it.
@@ -560,6 +570,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
 
       // Only set errors if the element is visible.
       if (Element::isVisibleElement($element)) {
+        $violations = $this->prepareViolations($violations, $element, $field_state['original_deltas'] ?? []);
         $handles_multiple = $this->handlesMultipleValues();
 
         $violations_by_delta = $item_list_violations = [];
@@ -604,6 +615,27 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
         }
       }
     }
+  }
+
+  /**
+   * Prepares field violations for presentation by this widget.
+   *
+   * The default returns the original list. Overrides can adapt messages to the
+   * submitted input without repeating validation or changing the original
+   * violations. Error element resolution and reporting remain in flagErrors().
+   *
+   * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violations
+   *   The field violations to prepare for presentation.
+   * @param array $element
+   *   The complete widget element.
+   * @param int[] $original_deltas
+   *   Submitted deltas, keyed by the current field item delta.
+   *
+   * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+   *   The violations to report, retaining their order and property paths.
+   */
+  protected function prepareViolations(ConstraintViolationListInterface $violations, array $element, array $original_deltas): ConstraintViolationListInterface {
+    return $violations;
   }
 
   /**
