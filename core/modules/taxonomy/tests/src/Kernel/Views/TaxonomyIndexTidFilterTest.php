@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Kernel\Views;
 
+use Drupal\Core\Form\FormState;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\views\Entity\View;
 use Drupal\views\Tests\ViewTestData;
+use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -23,7 +25,10 @@ class TaxonomyIndexTidFilterTest extends TaxonomyTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $testViews = ['test_filter_taxonomy_index_tid__non_existing_dependency'];
+  public static $testViews = [
+    'test_filter_taxonomy_index_tid__non_existing_dependency',
+    'test_taxonomy_exposed_grouped_filter',
+  ];
 
   /**
    * @var \Drupal\taxonomy\TermInterface[]
@@ -101,6 +106,18 @@ class TaxonomyIndexTidFilterTest extends TaxonomyTestBase {
         'user',
       ],
     ], $view->calculateDependencies()->getDependencies());
+  }
+
+  /**
+   * Tests validating a grouped exposed filter without input.
+   */
+  public function testValidateExposedGroupedWithoutInput(): void {
+    $view = Views::getView('test_taxonomy_exposed_grouped_filter');
+    $view->initHandlers();
+    $filter = $view->filter['field_views_testing_tags_target_id'];
+    $form = [];
+    $filter->validateExposed($form, new FormState());
+    $this->assertSame([], $filter->validated_exposed_input);
   }
 
 }
