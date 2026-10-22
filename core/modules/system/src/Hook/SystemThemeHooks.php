@@ -6,6 +6,7 @@ use Drupal\Core\Theme\ThemeCommonElements;
 use Drupal\system\Theme\SystemAdminThemePreprocess;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Theme\ThemeSuggestions;
 
 /**
  * Hook implementations for system.
@@ -163,7 +164,7 @@ class SystemThemeHooks {
   #[Hook('theme_suggestions_html')]
   public function themeSuggestionsHtml(array $variables): array {
     $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
-    return theme_get_suggestions($path_args, 'html');
+    return \Drupal::service(ThemeSuggestions::class)->get($path_args, 'html');
   }
 
   /**
@@ -172,7 +173,7 @@ class SystemThemeHooks {
   #[Hook('theme_suggestions_page')]
   public function themeSuggestionsPage(array $variables): array {
     $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
-    $suggestions = theme_get_suggestions($path_args, 'page');
+    $suggestions = \Drupal::service(ThemeSuggestions::class)->getg($path_args, 'page');
     $supported_http_error_codes = [
       401,
       403,
