@@ -6,169 +6,170 @@
  */
 
 #drupal-off-canvas-wrapper {
-  --drupal-off-canvas-input-padding: var(--off-canvas-vertical-spacing-unit);
-  --drupal-off-canvas-input-background-color: #fff;
-  --drupal-off-canvas-input-border: solid 1px transparent;
-  --drupal-off-canvas-input-border-radius: 2px;
-  --drupal-off-canvas-input-font-size: 14px;
-  --drupal-off-canvas-input-text-color: #333;
-  --drupal-off-canvas-fieldset-background-color: transparent;
-  --drupal-off-canvas-fieldset-border-width: 1px;
-  --drupal-off-canvas-fieldset-border-color: var(--off-canvas-border-color);
 
   & form {
+    --drupal-off-canvas-input-padding: var(--off-canvas-vertical-spacing-unit);
+    --drupal-off-canvas-input-background-color: #fff;
+    --drupal-off-canvas-input-border: solid 1px transparent;
+    --drupal-off-canvas-input-border-radius: 2px;
+    --drupal-off-canvas-input-font-size: 14px;
+    --drupal-off-canvas-input-text-color: #333;
+    --drupal-off-canvas-fieldset-background-color: transparent;
+    --drupal-off-canvas-fieldset-border-width: 1px;
+    --drupal-off-canvas-fieldset-border-color: var(--off-canvas-border-color);
+
     padding-block: var(--off-canvas-padding);
 
     & > *:first-child {
       margin-top: 0;
       padding-top: 0;
     }
-  }
 
-  & .ck-content {
-    color: var(--drupal-off-canvas-input-text-color);
-  }
-
-  & .form-item:where(:not(fieldset)) {
-    padding: var(--off-canvas-vertical-spacing-unit) 0;
-  }
-
-  & .form-items-inline > * {
-    display: inline-block;
-  }
-
-  & label {
-    display: block;
-  }
-
-  & .form-type-boolean {
-    padding: calc(0.5 * var(--off-canvas-vertical-spacing-unit)) 0;
-  }
-
-  & .description,
-  & .form-item__description {
-    margin: calc(0.5 * var(--off-canvas-vertical-spacing-unit)) 0;
-    font-size: 12px;
-  }
-
-  & .form-required::after {
-    content: "*";
-  }
-
-  & .fieldset,
-  & fieldset {
-    margin: calc(2 * var(--off-canvas-vertical-spacing-unit)) 0;
-    padding: var(--off-canvas-vertical-spacing-unit);
-    border: solid var(--drupal-off-canvas-fieldset-border-width) var(--drupal-off-canvas-fieldset-border-color);
-    background-color: var(--drupal-off-canvas-fieldset-background-color);
-  }
-
-  & legend, /* Bartik doesn't apply BEM classes, so we use the element. */
-  & .fieldset__legend {
-    display: contents;
-    font-weight: bold;
-  }
-
-  & :is(.fieldset, fieldset, .draggable-table) input:where(:not([type="submit"], [type="checkbox"], [type="radio"])) {
-    width: 100%; /* Prevent text fields from breaking out of tables and fieldsets at narrow widths. */
-  }
-
-  & input,
-  & textarea {
-    font-family: inherit;
-  }
-
-  & input:where(:not([type="submit"], [type="checkbox"], [type="radio"], [type="file"])),
-  & select,
-  & textarea {
-    max-width: 100%;
-    padding: var(--drupal-off-canvas-input-padding);
-    color: var(--drupal-off-canvas-input-text-color);
-    border: var(--drupal-off-canvas-input-border);
-    border-radius: var(--drupal-off-canvas-input-border-radius);
-    background-color: var(--drupal-off-canvas-input-background-color);
-    font-size: var(--drupal-off-canvas-input-font-size);
-  }
-
-  & input[type="checkbox"],
-  & input[type="radio"] {
-    & + label {
-      display: inline;
-    }
-  }
-
-  & input[type="file"] {
-    margin-bottom: var(--off-canvas-vertical-spacing-unit);
-  }
-
-  & input[type="search"] {
-    appearance: none; /* Necessary for Safari. */
-  }
-
-  & select {
-    appearance: none;
-    padding-inline-end: 20px;
-    border: var(--drupal-off-canvas-input-border);
-    border-radius: var(--drupal-off-canvas-input-border-radius);
-    background-image: url(../../../../../misc/icons/545560/chevron-down.svg);
-    background-repeat: no-repeat;
-    background-position: center right 5px; /* LTR */
-    background-size: 12px;
-
-    &:dir(rtl) {
-      background-position: center left 5px;
+    & .form-item:where(:not(fieldset)) {
+      padding: var(--off-canvas-vertical-spacing-unit) 0;
     }
 
-    @media (forced-colors: active) {
-      appearance: revert;
-      padding-inline-end: 0;
-      background: revert;
-    }
-  }
-
-  /*
-   * Autocomplete.
-   */
-  & .form-autocomplete {
-    padding-inline-end: 40px; /* Room for icon. */
-    background-image: url(../../../../../misc/icons/868686/magnifier.svg);
-    background-repeat: no-repeat;
-    background-position: center right 1px; /* LTR */
-
-    &.ui-autocomplete-loading {
-      background-image: url(../../../../../misc/icons/spinner.gif);
+    & .form-items-inline > * {
+      display: inline-block;
     }
 
-    &:dir(rtl) {
-      background-position: center left 1px;
-    }
-  }
-
-  /* This is the background <ul> for the autocomplete dropdown. */
-  & .ui-autocomplete {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    border: var(--drupal-off-canvas-input-border);
-    background-color: var(--drupal-off-canvas-input-background-color);
-    box-shadow: 0 1px 1px 0 var(--off-canvas-background-color); /* Ensure edge is visible if appearing over another form element. */
-
-    & a {
+    & label {
       display: block;
+    }
+
+    & .form-type-boolean {
+      padding: calc(0.5 * var(--off-canvas-vertical-spacing-unit)) 0;
+    }
+
+    & .description,
+    & .form-item__description {
+      margin: calc(0.5 * var(--off-canvas-vertical-spacing-unit)) 0;
+      font-size: 12px;
+    }
+
+    & .form-required::after {
+      content: "*";
+    }
+
+    & .fieldset,
+    & fieldset {
+      margin: calc(2 * var(--off-canvas-vertical-spacing-unit)) 0;
+      padding: var(--off-canvas-vertical-spacing-unit);
+      border: solid var(--drupal-off-canvas-fieldset-border-width) var(--drupal-off-canvas-fieldset-border-color);
+      background-color: var(--drupal-off-canvas-fieldset-background-color);
+    }
+
+    & legend,
+    & .fieldset__legend {
+      display: contents;
+      font-weight: bold;
+    }
+
+    & :is(.fieldset, fieldset, .draggable-table) input:where(:not([type="submit"], [type="checkbox"], [type="radio"])) {
+      width: 100%; /* Prevent text fields from breaking out of tables and fieldsets at narrow widths. */
+    }
+
+    & input,
+    & textarea {
+      font-family: inherit;
+    }
+
+    & input:where(:not([type="submit"], [type="checkbox"], [type="radio"], [type="file"])),
+    & select,
+    & textarea {
+      max-width: 100%;
       padding: var(--drupal-off-canvas-input-padding);
-      cursor: pointer;
       color: var(--drupal-off-canvas-input-text-color);
+      border: var(--drupal-off-canvas-input-border);
+      border-radius: var(--drupal-off-canvas-input-border-radius);
+      background-color: var(--drupal-off-canvas-input-background-color);
       font-size: var(--drupal-off-canvas-input-font-size);
+    }
 
-      &:hover {
-        background-color: #eee;
+    & input[type="checkbox"],
+    & input[type="radio"] {
+      & + label {
+        display: inline;
+      }
+    }
+
+    & input[type="file"] {
+      margin-bottom: var(--off-canvas-vertical-spacing-unit);
+    }
+
+    & input[type="search"] {
+      appearance: none; /* Necessary for Safari. */
+    }
+
+    & select {
+      appearance: none;
+      padding-inline-end: 20px;
+      border: var(--drupal-off-canvas-input-border);
+      border-radius: var(--drupal-off-canvas-input-border-radius);
+      background-image: url(../../../../../misc/icons/545560/chevron-down.svg);
+      background-repeat: no-repeat;
+      background-position: center right 5px; /* LTR */
+      background-size: 12px;
+
+      &:dir(rtl) {
+        background-position: center left 5px;
       }
 
-      &:focus,
-      &.ui-state-active {
-        outline: solid 2px currentColor;
-        outline-offset: -2px;
+      @media (forced-colors: active) {
+        appearance: revert;
+        padding-inline-end: 0;
+        background: revert;
       }
+    }
+
+    /*
+     * Autocomplete.
+     */
+    & .form-autocomplete {
+      padding-inline-end: 40px; /* Room for icon. */
+      background-image: url(../../../../../misc/icons/868686/magnifier.svg);
+      background-repeat: no-repeat;
+      background-position: center right 1px; /* LTR */
+
+      &.ui-autocomplete-loading {
+        background-image: url(../../../../../misc/icons/spinner.gif);
+      }
+
+      &:dir(rtl) {
+        background-position: center left 1px;
+      }
+    }
+
+    /* This is the background <ul> for the autocomplete dropdown. */
+    & .ui-autocomplete {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border: var(--drupal-off-canvas-input-border);
+      background-color: var(--drupal-off-canvas-input-background-color);
+      box-shadow: 0 1px 1px 0 var(--off-canvas-background-color); /* Ensure edge is visible if appearing over another form element. */
+
+      & a {
+        display: block;
+        padding: var(--drupal-off-canvas-input-padding);
+        cursor: pointer;
+        color: var(--drupal-off-canvas-input-text-color);
+        font-size: var(--drupal-off-canvas-input-font-size);
+
+        &:hover {
+          background-color: #eee;
+        }
+
+        &:focus,
+        &.ui-state-active {
+          outline: solid 2px currentColor;
+          outline-offset: -2px;
+        }
+      }
+    }
+
+    & .ck-content {
+      color: var(--drupal-off-canvas-input-text-color);
     }
   }
 
@@ -178,5 +179,400 @@
    */
   & .claro-autocomplete__message {
     display: none;
+  }
+
+/**
+ * Visual styling for buttons in the off-canvas dialog.
+ */
+  --off-canvas-button-background-color: #777;
+  --off-canvas-button-background-color-hover: #999;
+  --off-canvas-button-text-color: #f5f5f5;
+  --off-canvas-button-text-color-hover: #fff;
+  --off-canvas-button-font-size: 14px;
+  --off-canvas-button-padding: calc(var(--off-canvas-vertical-spacing-unit) / 2) 20px;
+  --off-canvas-button-border-color: transparent;
+  --off-canvas-button-border-radius: 20em;
+  --off-canvas-button-font-weight: 600;
+  --off-canvas-primary-button-background-color: #277abd;
+  --off-canvas-primary-button-background-color-hover: #236aaf;
+  --off-canvas-primary-button-text-color: #fff;
+  --off-canvas-primary-button-text-color-hover: #fff;
+
+  & .button {
+    display: inline-block;
+    height: auto;
+    margin: 0 0 10px;
+    padding: var(--off-canvas-button-padding);
+    cursor: pointer;
+    transition: background 0.5s ease;
+    text-align: center;
+    color: var(--off-canvas-button-text-color);
+    border: solid 1px var(--off-canvas-button-border-color);
+    border-radius: var(--off-canvas-button-border-radius);
+    background: var(--off-canvas-button-background-color);
+    font-family: inherit;
+    font-size: var(--off-canvas-button-font-size);
+    font-weight: var(--off-canvas-button-font-weight);
+    line-height: normal;
+    appearance: none;
+
+    &:hover,
+    &:active {
+      z-index: 10;
+      text-decoration: none;
+      color: var(--off-canvas-button-text-color-hover);
+      background-color: var(--off-canvas-button-background-color-hover);
+    }
+
+    &:disabled,
+    &:disabled:active,
+    &.is-disabled,
+    &.is-disabled:active {
+      cursor: default;
+      color: #5c5c5c;
+      background: #555;
+      font-weight: normal;
+    }
+  }
+
+  & .button--primary {
+    margin-top: 15px;
+    color: var(--off-canvas-primary-button-text-color);
+    background: var(--off-canvas-primary-button-background-color);
+
+    &:hover,
+    &:active {
+      color: var(--off-canvas-primary-button-text-color-hover);
+      background: var(--off-canvas-primary-button-background-color-hover);
+    }
+  }
+
+  & button.link {
+    display: inline;
+    transition: color 0.5s ease;
+    color: var(--off-canvas-link-color);
+    border: 0;
+    background: transparent;
+    font-size: var(--off-canvas-button-font-size);
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      color: var(--off-canvas-link-color);
+    }
+  }
+
+  & .button--danger {
+    text-decoration: none;
+    color: #c72100;
+    border-radius: 0;
+    font-weight: 400;
+
+    &:hover,
+    &:focus,
+    &:active {
+      text-decoration: none;
+      color: #ff2a00;
+      text-shadow: none;
+    }
+
+    &:disabled,
+    &.is-disabled {
+      cursor: default;
+      color: #737373;
+    }
+  }
+
+  .no-touchevents & .button--small {
+    padding: 2px 1em;
+    font-size: 13px;
+  }
+
+  /**
+   * Visual styling for summary and details in the off-canvas dialog.
+   */
+
+  --off-canvas-details-border-width: 0;
+  --off-canvas-details-border-color: none;
+  --off-canvas-details-background-color: #474747;
+  --off-canvas-details-text-color: #ddd;
+  --off-canvas-details-summary-border: none;
+  --off-canvas-details-summary-padding: 10px 20px;
+  --off-canvas-details-summary-font-size: 14px;
+  --off-canvas-details-summary-background-color: #333;
+  --off-canvas-details-summary-background-color-hover: #222;
+  --off-canvas-details-summary-text-color: #eee;
+  --off-canvas-details-summary-text-color-hover: #fff;
+
+  & details {
+    margin: var(--off-canvas-vertical-spacing-unit) calc(-1 * var(--off-canvas-padding)); /* Cancel out the padding of the parent. */
+    padding: 0 var(--off-canvas-padding);
+    color: var(--off-canvas-details-text-color);
+    border: solid var(--off-canvas-details-border-color) var(--off-canvas-details-border-width);
+    background: var(--off-canvas-details-background-color);
+
+    & + details {
+      margin-top: calc(-1 * var(--off-canvas-details-border-width));
+    }
+  }
+
+  & summary {
+    margin: 0 calc(-1 * var(--off-canvas-padding));
+    padding: var(--off-canvas-details-summary-padding);
+    color: var(--off-canvas-details-summary-text-color);
+    border: var(--off-canvas-details-summary-border);
+    background-color: var(--off-canvas-details-summary-background-color);
+    font-size: var(--off-canvas-details-summary-font-size);
+
+    &:hover {
+      color: var(--off-canvas-details-summary-text-color-hover);
+      background-color: var(--off-canvas-details-summary-background-color-hover);
+    }
+
+    &:focus {
+      outline-offset: -4px; /* Ensure focus doesn't get cut off. */
+    }
+
+    & a {
+      color: var(--off-canvas-details-text-color);
+
+      &:hover {
+        color: var(--off-canvas-details-summary-text-color-hover);
+      }
+    }
+  }
+
+  & .details-wrapper {
+    padding: var(--off-canvas-vertical-spacing-unit) 0;
+  }
+
+/**
+ * Styles for dropbuttons in the off-canvas dialog.
+ */
+  --off-canvas-dropbutton-height: 24px;
+  --off-canvas-dropbutton-primary-background-color: var(--off-canvas-button-background-color);
+  --off-canvas-dropbutton-secondary-background-color: var(--off-canvas-button-hover-background-color);
+  --off-canvas-dropbutton-border-color: transparent;
+  --off-canvas-dropbutton-border-width: 1px;
+  --off-canvas-dropbutton-border-radius: 2px;
+  --off-canvas-dropbutton-focus-outline-color: var(--off-canvas-focus-outline-color);
+  --off-canvas-dropbutton-font-size: 12px;
+  --off-canvas-dropbutton-text-color: var(--off-canvas-button-text-color); /* Minimum 4.5:1 contrast ratio against --off-canvas-dropbutton-primary-background-color and --off-canvas-dropbutton-secondary-background-color. */
+  --off-canvas-dropbutton-text-color-hover: var(--off-canvas-button-text-color-hover); /* Minimum 4.5:1 contrast ratio against --off-canvas-dropbutton-primary-background-color and --off-canvas-dropbutton-secondary-background-color. */
+
+  & .dropbutton-wrapper {
+    margin-block: var(--off-canvas-vertical-spacing-unit);
+
+    /*
+     * Styles for when the dropbutton is expanded.
+     */
+    &.open {
+      position: relative;
+      z-index: 100;
+
+      & .secondary-action {
+        visibility: visible;
+      }
+
+      & .dropbutton-widget {
+        border-radius: var(--off-canvas-dropbutton-border-radius) var(--off-canvas-dropbutton-border-radius) 0 0;
+      }
+
+      & .dropbutton-toggle button::before {
+        transform: translateY(25%) rotate(225deg);
+      }
+    }
+
+    /*
+    * Styles for single link variant of dropbutton.
+    */
+    &.dropbutton-single {
+      & .dropbutton-widget {
+        padding-inline-end: 0;
+      }
+
+      & .dropbutton-action {
+        &:first-child {
+          border-right: solid 1px var(--off-canvas-dropbutton-border-color); /* LTR */
+          border-radius: var(--off-canvas-dropbutton-border-radius);
+
+          &:dir(rtl) {
+            border: solid 1px var(--off-canvas-dropbutton-border-color);
+          }
+        }
+
+        & a {
+          justify-content: center;
+        }
+      }
+    }
+  }
+
+  & .dropbutton-widget {
+    position: relative;
+    width: max-content;
+    max-width: 100%;
+    height: var(--off-canvas-dropbutton-height);
+    padding-inline-end: var(--off-canvas-dropbutton-height);
+    border-radius: var(--off-canvas-dropbutton-border-radius);
+  }
+
+  & .dropbutton {
+    height: var(--off-canvas-dropbutton-height);
+    margin-block: 0;
+    margin-inline-start: 0;
+    padding-inline-start: 0;
+    list-style: none;
+    font-size: var(--off-canvas-dropbutton-font-size);
+  }
+
+  /* This is the button that expands/collapses the secondary options. */
+  & .dropbutton-toggle {
+    padding: 0;
+    border: 0;
+
+    & button {
+      position: absolute;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--off-canvas-dropbutton-height);
+      height: var(--off-canvas-dropbutton-height);
+      padding: 0;
+      cursor: pointer;
+      border-color: var(--off-canvas-dropbutton-border-color);
+      border-radius: 0 var(--border-radius) var(--border-radius) 0; /* LTR */
+      background: var(--off-canvas-dropbutton-primary-background-color);
+      inset-inline-end: 0;
+
+      &:focus {
+        outline: solid 2px var(--off-canvas-dropbutton-focus-outline-color);
+        outline-offset: -2px;
+      }
+
+      &::before {
+        display: block;
+        width: 6px;
+        height: 6px;
+        content: "";
+        transform: translateY(-25%) rotate(45deg);
+        border-right: solid 2px var(--off-canvas-dropbutton-text-color);
+        border-bottom: solid 2px var(--off-canvas-dropbutton-text-color);
+      }
+
+      &:dir(rtl) {
+        border-radius: var(--off-canvas-dropbutton-border-radius) 0 0 var(--off-canvas-dropbutton-border-radius);
+      }
+    }
+  }
+
+  /* This is the first <li> element in the list of actions. */
+  & .dropbutton-action {
+    &:first-child {
+      margin-inline-end: 2px;
+      border: solid var(--off-canvas-dropbutton-border-width) var(--off-canvas-dropbutton-border-color);
+      border-radius: var(--off-canvas-dropbutton-border-radius) 0 0 var(--off-canvas-dropbutton-border-radius); /* LTR */
+      background: var(--off-canvas-dropbutton-primary-background-color);
+
+      &:dir(rtl) {
+        border: solid var(--off-canvas-dropbutton-border-width) var(--off-canvas-dropbutton-border-color);
+        border-radius: 0 var(--off-canvas-dropbutton-border-radius) var(--off-canvas-dropbutton-border-radius) 0;
+      }
+    }
+
+    & a {
+      display: flex;
+      align-items: center;
+      min-height: var(--off-canvas-dropbutton-height);
+      margin-bottom: -2px;
+      padding: 0 9px;
+      text-decoration: none;
+      color: var(--off-canvas-dropbutton-text-color);
+      font-weight: 600;
+
+      &:hover {
+        color: var(--off-canvas-dropbutton-text-color);
+      }
+
+      &:focus {
+        outline: solid 2px var(--off-canvas-dropbutton-focus-outline-color);
+        outline-offset: -1px; /* Overlap parent container by 1px. */
+      }
+    }
+  }
+
+  /* These are the <li> elements other than the first. */
+  & .secondary-action {
+    visibility: hidden;
+    width: calc(100% + var(--off-canvas-dropbutton-height));
+    margin-top: var(--off-canvas-dropbutton-border-width);
+    border-right: var(--off-canvas-dropbutton-border-width) solid var(--off-canvas-dropbutton-border-color);
+    border-left: var(--off-canvas-dropbutton-border-width) solid var(--off-canvas-dropbutton-border-color);
+    background-color: var(--off-canvas-dropbutton-primary-background-color);
+
+    &:last-child {
+      border-bottom: var(--off-canvas-dropbutton-border-width) solid var(--off-canvas-dropbutton-border-color);
+    }
+
+    & a:hover {
+      color: var(--off-canvas-dropbutton-text-color-hover);
+      background-color: var(--off-canvas-dropbutton-secondary-background-color);
+    }
+  }
+
+/**
+ * Recreate Drupal admin styling that was removed with reset.
+ * @see system.admin.css
+ */
+
+  & .panel {
+    padding: 5px 5px 15px;
+  }
+
+  & .panel__description {
+    margin: 0 0 3px;
+    padding: 2px 0 3px 0;
+  }
+
+  & .compact-link {
+    margin: 0 0 10px 0;
+  }
+
+  & small .admin-link::before {
+    content: " [";
+  }
+
+  & small .admin-link::after {
+    content: "]";
+  }
+
+  /**
+   * Re-create utility styles for off-canvas dialog that are removed in the reset.
+   */
+
+  & .hidden {
+    display: none;
+  }
+
+  & .visually-hidden {
+    position: absolute !important;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    width: 1px !important;
+    height: 1px !important;
+    word-wrap: normal;
+
+    &.focusable:is(:active, :focus) {
+      position: static !important;
+      overflow: visible;
+      clip: auto;
+      width: auto !important;
+      height: auto !important;
+    }
+  }
+
+  & .invisible {
+    visibility: hidden;
   }
 }

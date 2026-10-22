@@ -12,7 +12,7 @@ variants:
   modal:
     title: Modal
     description: A blocking, or modal, dialog.
-  off_canvas:
+  off-canvas:
     title: Off-canvas
     description: An interactive element that is inserted at the side, rather than above the document.
 
@@ -54,19 +54,12 @@ libraryOverrides:
   css:
     component:
       drupal-dialog.css: {}
-      off-canvas/reset.css: { }
-      off-canvas/base.css: { }
-      off-canvas/utility.css: { }
-      off-canvas/button.css: { }
-      off-canvas/drupal.css: { }
-      off-canvas/form.css: { }
-      off-canvas/table.css: { }
-      off-canvas/details.css: { }
-      off-canvas/messages.css: { }
-      off-canvas/tabledrag.css: { }
-      off-canvas/throbber.css: { }
-      off-canvas/dropbutton.css: { }
-      off-canvas/titlebar.css: { }
-      off-canvas/wrapper.css: { }
+      off-canvas/reset.css: {}
+      off-canvas/ajax.css: {}
+      off-canvas/base.css: {}
+      off-canvas/form.css: {}
+      off-canvas/table.css: {}
   js:
     drupal-dialog.js: {}
+  dependencies:
+  - core/drupal.displace

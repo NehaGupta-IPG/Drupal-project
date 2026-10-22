@@ -5,99 +5,168 @@
 
 // cspell:ignore closedby
 
-(function (Drupal, drupalSettings) {
+(function (Drupal, drupalSettings, displace) {
+  // True if this browser supports the closedBy property.
   const supportsClosedBy =
     HTMLDialogElement.prototype.hasOwnProperty('closedBy');
 
-  /*
+  /**
    * Light DOM wrapper around a native <dialog>. Owns exactly:
    *   1. showModal() / show() on connectedCallback based on the `data-modal`
    *   attribute
-   *   2. closedby="any" backdrop-click polyfill for Safari
-   *   3. Self-removal from DOM on dialog close (unless data-persist)
-   *   4. Cleanup when removed by other code via disconnectedCallback
+   *   2. Off-canvas dialog initialization and displacement.
+   *   3. closedby="any" backdrop-click polyfill for Safari
+   *   4. Self-removal from DOM on dialog close (unless data-persist)
+   *   5. Cleanup when removed by other code via disconnectedCallback
    */
   class DrupalDialog extends HTMLElement {
+    adjustForDisplacement(dialog, removed = false) {
+      // Add the attributes needed by Drupal.displace.
+      const edge = document.documentElement.dir === 'rtl' ? 'left' : 'right';
+      const dimensions = dialog.getBoundingClientRect();
+      const offset = removed ? 0 : dimensions.width;
+      dialog.setAttribute(`data-offset-${edge}`, offset);
+      // Signal the displacement and calculate the CSS variables used
+      // in our style sheets.
+      displace();
+    }
+
     connectedCallback() {
-      const waitForDialog = new Promise((resolve) => {
-        const dialog = this.querySelector('dialog, #drupal-off-canvas-wrapper');
+      this._abortController = new AbortController();
+      const signal = this._abortController.signal;
+
+      // The web component can connect to the DOM before its dialog child.
+      const waitForDialog = new Promise((resolve, reject) => {
+        const dialog = this.querySelector(
+          'dialog, div#drupal-off-canvas-wrapper',
+        );
+        const observer = new MutationObserver(() => {
+          const element = this.querySelector(
+            'dialog, div#drupal-off-canvas-wrapper',
+          );
+          if (element) {
+            observer.disconnect();
+            resolve(element);
+          }
+        });
+
         if (dialog) {
           resolve(dialog);
         } else {
-          const observer = new MutationObserver((mutations, observer) => {
-            const element = this.querySelector(
-              'dialog, #drupal-off-canvas-wrapper',
-            );
-            if (element) {
-              observer.disconnect();
-              resolve(element);
-            }
-          });
-
-          observer.observe(document.body, {
+          observer.observe(this, {
             childList: true,
             subtree: true,
           });
         }
-      });
-
-      waitForDialog.then((dialog) => {
-        // Backdrop polyfill for closedby="any" on Safari.
-        if (!supportsClosedBy && dialog.getAttribute('closedby') === 'any') {
-          this._backdropHandler = (e) => {
-            if (e.target === dialog) dialog.close();
-          };
-          dialog.addEventListener('click', this._backdropHandler);
-        } else if (dialog.id === 'drupal-off-canvas-wrapper') {
-          // Initialize the off-canvas dialog.
-          const closeButton = dialog.querySelector('.dialog__titlebar-close');
-          if (closeButton) {
-            closeButton.addEventListener('click', (event) => {
-              event.preventDefault();
-              const closeEvent = new Event('close', { bubbles: true });
-              event.target.dispatchEvent(closeEvent);
-            });
-          }
-        }
-
-        // Remove self from DOM on close unless data-persist.
-        let skipClose = false;
-        dialog.addEventListener('close', () => {
-          if (skipClose) {
-            skipClose = false;
-            return;
-          }
-          if (!this.hasAttribute('data-persist')) this.remove();
+        signal.addEventListener('abort', () => {
+          observer.disconnect();
+          reject(signal.reason);
         });
-
-        // Open the dialog — open attribute is the declarative signal from the server.
-        // data-modal on <dialog> upgrades to showModal(); plain open = non-modal show().
-        if (dialog.hasAttribute('open')) {
-          skipClose = true;
-          dialog.close();
-          if (dialog.hasAttribute('data-modal') || !supportsClosedBy) {
-            // Our current polyfill needs the entire screen to be a click target..
-            dialog.showModal();
-          } else {
-            dialog.show();
-          }
-        }
       });
+
+      waitForDialog.then(
+        (dialog) => {
+          // Guard against a disconnection while waiting for dialog.
+          if (!this.isConnected) return;
+          // Remove self from DOM on close unless data-persist or skipClose.
+          let skipClose = false;
+          dialog.addEventListener(
+            'close',
+            (e) => {
+              if (e.target !== dialog) return;
+              if (skipClose) {
+                skipClose = false;
+                return;
+              }
+              if (!this.hasAttribute('data-persist')) this.remove();
+            },
+            { signal },
+          );
+
+          switch (dialog.tagName.toLowerCase()) {
+            case 'dialog':
+              // Backdrop polyfill for closedby="any" on Safari.
+              if (
+                !supportsClosedBy &&
+                dialog.getAttribute('closedby') === 'any'
+              ) {
+                this._backdropHandler = (e) => {
+                  if (e.target === dialog) dialog.close();
+                };
+                dialog.addEventListener('click', this._backdropHandler, {
+                  signal,
+                });
+              }
+              if (dialog.hasAttribute('open')) {
+                skipClose = true;
+                dialog.close();
+                if (
+                  dialog.hasAttribute('data-modal') ||
+                  this._backdropHandler
+                ) {
+                  // Our current polyfill needs the entire screen to be a click target.
+                  dialog.showModal();
+                } else {
+                  dialog.show();
+                }
+              }
+
+              break;
+            case 'div': {
+              // Initialize the off-canvas dialog.
+              const closeButton = dialog.querySelector(
+                '.dialog__titlebar-close',
+              );
+              if (closeButton) {
+                closeButton.addEventListener(
+                  'click',
+                  (event) => {
+                    event.preventDefault();
+                    const closeEvent = new Event('close', { bubbles: false });
+                    dialog.dispatchEvent(closeEvent);
+                  },
+                  { signal },
+                );
+              }
+              this._resizeObserver = new ResizeObserver(() => {
+                this.adjustForDisplacement(dialog);
+              });
+              this._resizeObserver.observe(dialog);
+              signal.addEventListener('abort', () => {
+                this._resizeObserver?.disconnect();
+              });
+              break;
+            }
+            default:
+              return;
+          }
+        },
+        (reason) => {
+          console.warn(
+            `DrupalDialog.waitForDialog aborted before dialog was found. Reason: ${reason}`,
+          );
+        },
+      );
     }
 
     disconnectedCallback() {
-      // This element was deleted without calling
-      // dialog.close(). Clean up and close silently if still open.
-      const dialog = this.querySelector('dialog');
+      // Clean up and close silently if still open.
+      this._abortController?.abort('DrupalDialog disconnected');
+      if (this._resizeObserver) this._resizeObserver = null;
+      const dialog = this.querySelector(
+        'dialog, div#drupal-off-canvas-wrapper',
+      );
       if (!dialog) return;
-      if (this._backdropHandler)
-        dialog.removeEventListener('click', this._backdropHandler);
       // Our htmx integration detaches behaviors, but since this is an SDC
       // we also need to call it as this may be used elsewhere.
       Drupal.detachBehaviors(this, drupalSettings, 'unload');
-      if (dialog.open) dialog.close();
+      // Was the web component removed without calling dialog.close()?
+      if (dialog instanceof HTMLDialogElement && dialog.open) dialog.close();
+      if (dialog instanceof HTMLDivElement) {
+        this.adjustForDisplacement(dialog, true);
+      }
     }
   }
 
   customElements.define('drupal-dialog', DrupalDialog);
-})(Drupal, drupalSettings);
+})(Drupal, drupalSettings, Drupal.displace);
