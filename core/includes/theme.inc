@@ -132,8 +132,14 @@ function theme_get_setting($setting_name, $theme = NULL) {
  *   The Config object with updated data.
  *
  * @see system_theme_settings_submit()
+ *
+ * @deprecated in drupal:12,1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3632286
  */
 function theme_settings_convert_to_config(array $theme_settings, Config $config) {
+  @trigger_error('theme_settings_convert_to_config() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3632286', E_USER_DEPRECATED);
   foreach ($theme_settings as $key => $value) {
     if ($key == 'default_logo') {
       $config->set('logo.use_default', $value);
