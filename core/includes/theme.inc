@@ -12,7 +12,6 @@ use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Theme\TemplateFinder;
 use Drupal\Core\Theme\ThemeSuggestions;
-use Drupal\default_admin\Hook\ThemeSuggestionHooks;
 
 /**
  * @defgroup content_flags Content markers
