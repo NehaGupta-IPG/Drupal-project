@@ -1850,6 +1850,8 @@ services:
     tags:
       - { name: service_collector, tag: 'twig.extension', call: addExtension }
   Drupal\Core\Template\TwigEnvironment: '@twig'
+  Drupal\Core\Theme\ThemeSuggestions:
+    autowire: true
   Drupal\Core\Theme\TemplateFinder:
     autowire: true
   twig.extension:
