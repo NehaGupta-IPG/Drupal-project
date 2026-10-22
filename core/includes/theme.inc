@@ -21,16 +21,31 @@ use Drupal\Core\Config\Config;
 
 /**
  * Mark content as read.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. MARK_READ has
+ *   no replacement.
+ *
+ * @see https://www.drupal.org/node/3632395
  */
 const MARK_READ = 0;
 
 /**
  * Mark content as being new.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. MARK_NEW has
+ *   no replacement.
+ *
+ * @see https://www.drupal.org/node/3632395
  */
 const MARK_NEW = 1;
 
 /**
  * Mark content as being updated.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. MARK_UPDATED
+ *   has no replacement.
+ *
+ * @see https://www.drupal.org/node/3632395
  */
 const MARK_UPDATED = 2;
 
