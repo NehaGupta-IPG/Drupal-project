@@ -5,7 +5,6 @@ namespace Drupal\file\Element;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Component\Utility\Variable;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Form\FormStateInterface;
@@ -15,6 +14,7 @@ use Drupal\Core\Render\Element\FormElementBase;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Security\StaticTrustedCallbackHelper;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Security\UntrustedCallbackException;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
@@ -101,12 +101,17 @@ class ManagedFile extends FormElementBase {
         if (isset($element['#file_value_callbacks'])) {
           foreach ($element['#file_value_callbacks'] as $callback) {
             $message = sprintf(
-              'Using ManagedFile element #file_value_callbacks callbacks that are not tagged with the %s attribute, not methods of a class that implements %s, and not anonymous functions is deprecated in drupal:12.1.0 and will throw an exception in drupal:13.0.0. The callback was %s. See https://www.drupal.org/node/3620771',
+              'Using ManagedFile element #file_value_callbacks callbacks that are not tagged with the %s attribute, not methods of a class that implements %s, and not anonymous functions is deprecated in drupal:12.1.0 and will throw an exception in drupal:13.0.0. The callback was %%s. See https://www.drupal.org/node/3620771',
               TrustedCallback::class,
               TrustedCallbackInterface::class,
-              Variable::callableToString($callback)
             );
-            StaticTrustedCallbackHelper::callback($callback, [&$element, $input, $form_state], $message, TrustedCallbackInterface::TRIGGER_SILENCED_DEPRECATION);
+            try {
+              StaticTrustedCallbackHelper::callback($callback, [&$element, $input, $form_state], $message);
+            }
+            catch (UntrustedCallbackException $e) {
+              @trigger_error($e->getMessage(), E_USER_DEPRECATED);
+              $callback($element, $input, $form_state);
+            }
           }
         }
 
