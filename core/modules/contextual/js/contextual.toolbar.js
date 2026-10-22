@@ -48,6 +48,11 @@
     };
     new contextualToolbar.VisualView(viewOptions);
     new contextualToolbar.AuralView(viewOptions);
+
+    contextualToolbar.model.countContextualLinks(
+      null,
+      Drupal.contextual.collection,
+    );
   }
 
   /**
