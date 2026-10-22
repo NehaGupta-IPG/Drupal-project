@@ -114,8 +114,9 @@ class Table extends FormElementBase {
   /**
    * A responsive table class; hide table cell on narrow devices.
    *
-   * Indicates that a column has medium priority and thus can be hidden on narrow
-   * width devices and shown on medium+ width devices (i.e. tablets and desktops).
+   * Indicates that a column has medium priority and thus can be hidden on
+   * narrow width devices and shown on medium+ width devices (i.e. tablets and
+   * desktops).
    */
   public const string RESPONSIVE_PRIORITY_MEDIUM = 'priority-medium';
 
