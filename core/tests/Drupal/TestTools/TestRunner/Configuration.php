@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\TestRunner;
 
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 // cspell:ignore testbots
@@ -69,16 +69,14 @@ final class Configuration {
   /**
    * Builds the test runner configuration from command line arguments.
    */
-  public static function createFromCommandLine(array $arguments): self {
+  public static function createFromCommandLine(InputInterface $input): self {
     if (self::$instance) {
       return self::instance();
     }
 
-    if (count($arguments) < 2) {
-      $arguments[] = '--help';
+    if (count($_SERVER['argv']) < 2) {
+      $input->setOption('help', TRUE);
     }
-
-    $input = new ArgvInput($arguments, self::commandLineDefinition());
 
     if ($input->getOption('directory') && ($input->getOption('file') || $input->getOption('class'))) {
       throw new \RuntimeException("--directory cannot be specified together with the --class or --file options.");

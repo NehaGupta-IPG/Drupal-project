@@ -33,6 +33,7 @@ use Drupal\TestTools\TestRunner\Event\TestExecutionFinished;
 use Drupal\TestTools\TestRunner\Event\TestExecutionStart;
 use Drupal\TestTools\TestRunner\EventSubscriber\ExecutionProgress;
 use Drupal\TestTools\TestRunner\EventSubscriber\ExecutionProgressDebug;
+use Drupal\TestTools\TestRunner\CliPrinter;
 use Drupal\TestTools\TestRunner\Configuration as Config;
 use Drupal\TestTools\TestRunner\MemoryTestRunResultsStorage;
 use Drupal\TestTools\TestRunner\WorkAllocator;
@@ -40,10 +41,12 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Version;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Helper\DescriptorHelper;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Process\PhpExecutableFinder;
 
 // cspell:ignore wwwrun
 
@@ -71,30 +74,43 @@ const SIMPLETEST_SCRIPT_EXIT_FAILURE = 1;
 const SIMPLETEST_SCRIPT_EXIT_ERROR = 2;
 const SIMPLETEST_SCRIPT_EXIT_EXCEPTION = 3;
 
+$results_map = [
+  'pass' => 'Pass',
+  'fail' => 'Fail',
+  'error' => 'Error',
+  'skipped' => 'Skipped',
+  'cli_fail' => 'Failure',
+  'exception' => 'Exception',
+  'debug' => 'Log',
+];
+
 // Setup class autoloading.
 $autoloader = require_once __DIR__ . '/../../autoload.php';
 $autoloader->addPsr4('Drupal\\TestTools\\', __DIR__ . '/../tests/Drupal/TestTools');
 
 // Start overall timer.
 Timer::start('run-tests');
+$input = new ArgvInput($_SERVER['argv'], Config::commandLineDefinition());
+$output = new ConsoleOutput();
+$io = new SymfonyStyle($input, $output);
 
 // Get the configuration from the command line.
 $script_basename = basename($_SERVER['argv'][0]);
 try {
-  Config::createFromCommandLine($_SERVER['argv']);
+  Config::createFromCommandLine($input);
 }
 catch (\RuntimeException $e) {
-  simpletest_script_print_error($e->getMessage() . ' ' . "Use the --help option for the list and usage of the options available.\n");
-  simpletest_script_print(Config::commandLineDefinition()->getSynopsis(), SIMPLETEST_SCRIPT_COLOR_PASS);
+  $io->error($e->getMessage() . ' ' . "Use the --help option for the list and usage of the options available.\n");
+  $io->info('Options and arguments: ' . Config::commandLineDefinition()->getSynopsis());
   exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
 }
 
-// Setup console output.
-$console_output = new ConsoleOutput();
+// Setup console printer.
+$cliPrinter = new CliPrinter($io, Config::instance());
 
 // If --help requested, show it and exit.
 if (Config::get('help')) {
-  simpletest_script_help(Config::commandLineDefinition(), $script_basename, $console_output);
+  $cliPrinter->help(Config::commandLineDefinition(), $script_basename, $io);
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
@@ -104,8 +120,8 @@ simpletest_script_init($autoloader);
 // Register the event subscriber.
 $eventDispatcher = \Drupal::service(EventDispatcherInterface::class);
 $executionProgress = Config::get('debug-execution') ?
-  new ExecutionProgressDebug($console_output, Config::instance()) :
-  new ExecutionProgress($console_output, Config::instance());
+  new ExecutionProgressDebug($io, Config::instance()) :
+  new ExecutionProgress($io, Config::instance());
 $eventDispatcher->addSubscriber($executionProgress);
 
 if (!class_exists(TestCase::class)) {
@@ -188,7 +204,7 @@ if (Config::get('clean')) {
     DRUPAL_ROOT,
     Database::getConnection(),
     $test_run_results_storage,
-    $console_output,
+    $io,
     \Drupal::service('file_system')
   );
   try {
@@ -208,25 +224,7 @@ if (Config::get('clean')) {
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
-echo "\n";
-echo "Drupal test run\n\n";
-echo "--------------------------------------------------------------\n";
-echo sprintf("Drupal Version.......: %s\n", \Drupal::VERSION);
-echo sprintf("PHP Version..........: %s\n", \PHP_VERSION);
-echo sprintf("PHP Binary...........: %s\n", (new PhpExecutableFinder())->find());
-echo sprintf("PHPUnit Version......: %s\n", Version::id());
-echo sprintf("PHPUnit configuration: %s\n", Config::get('phpunit-configuration'));
-if (Config::get('dburl')) {
-  $sut_connection_info = Database::getConnectionInfo();
-  $sut_tasks_class = $sut_connection_info['default']['namespace'] . "\\Install\\Tasks";
-  $sut_installer = new $sut_tasks_class();
-  $sut_connection = Database::getConnection();
-  echo sprintf("Database.............: %s\n", (string) $sut_installer->name());
-  echo sprintf("Database Version.....: %s\n", $sut_connection->version());
-}
-echo sprintf("Working directory....: %s\n", getcwd());
-echo sprintf("Concurrency..........: %d\n", Config::get('concurrency'));
-echo "--------------------------------------------------------------\n";
+$cliPrinter->startTable();
 
 // Discover tests and allocate them to worker bins.
 Timer::start('run-tests:discovery');
@@ -241,10 +239,14 @@ $test_list = array_keys($workAllocator->getAllocatedList());
 
 if (Config::get('debug-discovery')) {
   if ((int) Config::get('ci-parallel-node-total') > 1) {
-    dump_bin_tests_sequence((int) Config::get('ci-parallel-node-index'), $workAllocator->getSortedList(), $workAllocator->getAllocatedList());
+    $cliPrinter->testBinSequenceTable(
+      (int) Config::get('ci-parallel-node-index'),
+      $workAllocator->getSortedList(),
+      $workAllocator->getAllocatedList()
+    );
   }
   else {
-    dump_tests_sequence($workAllocator->getAllocatedList());
+    $cliPrinter->testSequenceTable($workAllocator->getAllocatedList());
   }
 }
 $tests_to_run = [];
@@ -254,9 +256,9 @@ for ($i = 0; $i < Config::get('repeat'); $i++) {
 // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 $end_discovery = Timer::stop('run-tests:discovery');
 
-simpletest_script_reporter_init();
+$io->title("Test log");
 
-// Execute tests.
+  // Execute tests.
 $eventDispatcher->dispatch(new RunnerTestsExecutionStart($tests_to_run));
 // Try to allocate unlimited time to run the tests.
 Environment::setTimeLimit(0);
@@ -275,9 +277,6 @@ if (Config::get('xml')) {
   simpletest_script_reporter_write_xml_results($test_run_results_storage);
 }
 
-// Stop the timer.
-simpletest_script_reporter_timer_stop();
-
 // Clean up all test results.
 if (!Config::get('keep-results')) {
   try {
@@ -285,7 +284,7 @@ if (!Config::get('keep-results')) {
       DRUPAL_ROOT,
       Database::getConnection(),
       $test_run_results_storage,
-      $console_output,
+      $io,
       \Drupal::service('file_system')
     );
     $cleaner->cleanResults();
@@ -299,49 +298,12 @@ if (!Config::get('keep-results')) {
   }
 }
 
+// Stop the timer.
+$end = Timer::stop('run-tests');
+$cliPrinter->summaryTable($end, $total_time, $end_discovery, $overall_test_time);
+
 // Test complete, exit.
 exit($status);
-
-/**
- * Print help text.
- */
-function simpletest_script_help(InputDefinition $input_definition, string $script_basename, ConsoleOutput $console_output): void {
-
-  echo <<<EOF
-
-Run Drupal tests from the shell.
-
-Usage:        {$script_basename} [OPTIONS] <tests>
-Example:      {$script_basename} Profile
-
-
-EOF;
-
-  $helper = new DescriptorHelper();
-  $helper->describe($console_output, $input_definition);
-
-  echo <<<EOF
-
-
-To run this script you will normally invoke it from the root directory of your
-Drupal installation as the webserver user (differs per configuration), or root:
-
-sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$script_basename} --url http://example.com/ --all
-
-sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$script_basename} --url http://example.com/ --class Drupal\\\\Tests\\\\block\\\\Functional\\\\BlockTest
-
-Without a preinstalled Drupal site, specify a SQLite database pathname to create
-(for the test runner) and the default database connection info (for Drupal) to
-use in tests:
-
-sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$script_basename}
-  --sqlite /tmpfs/drupal/test.sqlite
-  --dburl mysql://username:password@localhost/database
-  --url http://example.com/ --all
-
-
-EOF;
-}
 
 /**
  * Initialize script variables and perform general setup requirements.
@@ -656,35 +618,14 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
 function simpletest_script_get_test_list() {
   $testDiscovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath(Config::get('phpunit-configuration'));
 
-  echo "Test discovery\n";
-
   try {
     if (Config::get('all') || Config::get('module') || Config::get('directory')) {
-      if (Config::get('types')) {
-        echo sprintf("PHPUnit test suite(s): %s\n", implode(', ', Config::get('types')));
-      }
-      if (Config::get('module')) {
-        echo sprintf("Drupal module........: %s\n", Config::get('module'));
-      }
-      if (Config::get('directory')) {
-        echo sprintf("Directory............: %s\n", Config::get('directory'));
-      }
-      if (Config::getTests()) {
-        echo sprintf("PHPUnit test group(s): %s\n", implode(', ', Config::getTests()));
-      }
-      echo "--------------------------------------------------------------\n";
       $groupedTestClassInfoList = $testDiscovery->getTestClasses(Config::get('module'), Config::get('types'), Config::get('directory'), Config::getTests());
     }
     elseif (Config::get('class')) {
       // When --class is specified, we have to find the file of each of the
       // classes indicated as argument and run test discovery for it, then
       // merge the results.
-      $classesArg = Config::getTests();
-      echo sprintf("Test class(es).......: %s\n", array_shift($classesArg));
-      foreach ($classesArg as $arg) {
-        echo sprintf("                     : %s\n", $arg);
-      }
-      echo "--------------------------------------------------------------\n";
       $groupedTestClassInfoList = [];
       foreach (Config::getTests() as $test_class) {
         [$class_name] = explode('::', $test_class, 2);
@@ -718,12 +659,6 @@ function simpletest_script_get_test_list() {
     elseif (Config::get('file')) {
       // When --file is specified, we have to run test discovery for each of
       // the files indicated, then merge the results.
-      $filesArg = Config::getTests();
-      echo sprintf("Test file(s).........: %s\n", array_shift($filesArg));
-      foreach ($filesArg as $arg) {
-        echo sprintf("                     : %s\n", $arg);
-      }
-      echo "--------------------------------------------------------------\n";
       $groupedTestClassInfoList = [];
       foreach (Config::getTests() as $file) {
         if (!file_exists($file) || is_dir($file)) {
@@ -744,13 +679,6 @@ function simpletest_script_get_test_list() {
     else {
       // When no restriction options are specified, we consider the argument as
       // a list of groups of tests to be executed.
-      if (Config::get('types')) {
-        echo sprintf("PHPUnit test suite(s): %s\n", implode(', ', Config::get('types')));
-      }
-      if (Config::getTests()) {
-        echo sprintf("PHPUnit test group(s): %s\n", implode(', ', Config::getTests()));
-      }
-      echo "--------------------------------------------------------------\n";
       $groupedTestClassInfoList = [];
       try {
         $groupedTestClassInfoFullSuiteList = $testDiscovery->getTestClasses(NULL, Config::get('types'));
@@ -797,92 +725,6 @@ function simpletest_script_get_test_list() {
   }
 
   return $groupedTestClassInfoList;
-}
-
-/**
- * Dumps the list of tests in order of execution after sorting.
- *
- * @param array $tests
- *   The array of test class info.
- */
-function dump_tests_sequence(array $tests): void {
-  if (!Config::get('debug-discovery')) {
-    return;
-  }
-  echo "Test execution sequence\n";
-  echo "-----------------------\n\n";
-  echo " Seq Slow? Group            Cnt Class\n";
-  echo "-----------------------------------------\n";
-  foreach ($tests as $testInfo) {
-    echo sprintf(
-      "%4d %5s %15s %4d %s\n",
-      $testInfo['worker_sequence'],
-      in_array('#slow', $testInfo['groups']) ? '#slow' : '',
-      trim_with_ellipsis($testInfo['group'], 15, \STR_PAD_RIGHT),
-      $testInfo['tests_count'],
-      trim_with_ellipsis($testInfo['name'], 60, \STR_PAD_LEFT),
-    );
-  }
-  echo "-----------------------------------------\n\n";
-}
-
-/**
- * Dumps the list of tests in order of execution for a bin.
- *
- * @param int $bin
- *   The bin.
- * @param array $allTests
- *   The list of all test classes discovered.
- * @param array $tests
- *   The list of test class to run for this bin.
- */
-function dump_bin_tests_sequence(int $bin, array $allTests, array $tests): void {
-  echo "Test execution sequence. ";
-  echo "Tests marked *** will be executed in this PARALLEL BIN #{$bin}.\n";
-  echo "-------------------------------------------------------------------------------------\n\n";
-  echo "    Sort  Bin                                 \n";
-  echo "Bin  Seq  Seq Slow? Group            Cnt Class\n";
-  echo "-------------------------------------------------------------------------------------\n";
-  foreach ($allTests as $testInfo) {
-    $inBin = isset($tests[$testInfo['name']]);
-    $message = sprintf(
-      "%s %4d %s %5s %15s %4d %s\n",
-      $inBin ? "***" : "   ",
-      $testInfo['sorted_sequence'],
-      $inBin ? sprintf('%4d', $tests[$testInfo['name']]['worker_sequence']) : "    ",
-      in_array('#slow', $testInfo['groups']) ? '#slow' : '',
-      trim_with_ellipsis($testInfo['group'], 15, \STR_PAD_RIGHT),
-      $testInfo['tests_count'],
-      trim_with_ellipsis($testInfo['name'], 60, \STR_PAD_LEFT),
-    );
-    simpletest_script_print($message, $inBin ? SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE : SIMPLETEST_SCRIPT_COLOR_GRAY);
-  }
-  echo "-------------------------------------------------------------------------------------\n\n";
-}
-
-/**
- * Initialize the reporter.
- */
-function simpletest_script_reporter_init(): void {
-  global $results_map;
-
-  $results_map = [
-    'pass' => 'Pass',
-    'fail' => 'Fail',
-    'error' => 'Error',
-    'skipped' => 'Skipped',
-    'cli_fail' => 'Failure',
-    'exception' => 'Exception',
-    'debug' => 'Log',
-  ];
-
-  echo "Test run started:\n";
-  echo "  " . date('l, F j, Y - H:i', $_SERVER['REQUEST_TIME']) . "\n";
-  echo "\n";
-
-  echo "Test log\n";
-  echo "--------\n";
-  echo "\n";
 }
 
 /**
@@ -966,29 +808,6 @@ function simpletest_script_reporter_write_xml_results(TestRunResultsStorageInter
     file_put_contents(Config::get('xml') . '/' . str_replace('\\', '_', $test_class) . '.xml', $xml_files[$test_class]['doc']->saveXML());
     unset($xml_files[$test_class]);
   }
-}
-
-/**
- * Stop the test timer.
- */
-function simpletest_script_reporter_timer_stop(): void {
-  global $total_time, $end_discovery, $overall_test_time;
-
-  echo "\n";
-  $end = Timer::stop('run-tests');
-  $wall_seconds = $end['time'] / 1000;
-  $discovery_seconds = $end_discovery['time'] / 1000;
-  $formatter = \Drupal::service('date.formatter');
-  echo "Wall time..............: " . $formatter->formatInterval((int) $wall_seconds) . "\n";
-  echo "Test discovery time....: " . $formatter->formatInterval((int) $discovery_seconds) . "\n";
-  if (isset($overall_test_time)) {
-    echo "Total testing time.....: " . $formatter->formatInterval((int) round($overall_test_time)) . "\n";
-  }
-  echo "Total execution time...: " . $formatter->formatInterval((int) $total_time) . "\n";
-  if (Config::get('concurrency') > 1 && $wall_seconds > 0) {
-    echo sprintf("Speedup................: %.2fx (concurrency %d)\n", $total_time / ($wall_seconds - $discovery_seconds), Config::get('concurrency'));
-  }
-  echo "\n";
 }
 
 /**

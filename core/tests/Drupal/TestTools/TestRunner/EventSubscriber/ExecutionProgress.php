@@ -16,7 +16,7 @@ use Drupal\TestTools\TestRunner\Event\RunnerTestsExecutionPoll;
 use Drupal\TestTools\TestRunner\Event\RunnerTestsExecutionStart;
 use Drupal\TestTools\TestRunner\Event\TestExecutionFinished;
 use Drupal\TestTools\TestRunner\Event\TestExecutionStart;
-use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -59,7 +59,7 @@ class ExecutionProgress implements EventSubscriberInterface {
   public protected(set) float $timeAtTestsExecutionFinish;
 
   public function __construct(
-    protected ConsoleOutput $io,
+    protected StyleInterface $io,
     protected Config $config,
   ) {
     $tot_memory = NULL;
