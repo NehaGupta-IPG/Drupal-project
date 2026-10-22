@@ -11,6 +11,7 @@ use Drupal\Core\Render\Element\Checkboxes;
 use Drupal\Core\Url;
 use Drupal\views\ExposedFormCache;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 /**
  * Provides the views exposed form.
@@ -121,7 +122,16 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       '#id' => Html::getUniqueId('edit-submit-' . $view->storage->id()),
     ];
 
-    if (!$view->hasUrl()) {
+    if ($view->hasUrl()) {
+      try {
+        $form_action = $view->getUrl()->toString();
+      }
+      catch (InvalidParameterException) {
+        $form_action = NULL;
+      }
+    }
+
+    if (!isset($form_action)) {
       // On any non views.ajax route, use the current route for the form action.
       if ($this->getRouteMatch()->getRouteName() !== 'views.ajax') {
         $form_action = Url::fromRoute('<current>')->toString();
@@ -130,9 +140,6 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
         // On the views.ajax route, set the action to the page we were on.
         $form_action = Url::fromUserInput($this->currentPathStack->getPath())->toString();
       }
-    }
-    else {
-      $form_action = $view->getUrl()->toString();
     }
 
     $form['#action'] = $form_action;
