@@ -204,6 +204,7 @@ class MappingTest extends KernelTestBase {
       [
         // Keys inherited from `type: config_object`.
         // @see core/config/schema/core.data_types.schema.yml
+        'dependencies',
         '_core',
         'langcode',
         // Keys defined locally, in `type: core.extension`.
@@ -213,6 +214,7 @@ class MappingTest extends KernelTestBase {
         'profile',
       ],
       [
+        'dependencies',
         '_core',
         'langcode',
         'profile',
@@ -230,6 +232,7 @@ class MappingTest extends KernelTestBase {
       [
         // Keys inherited from `type: config_object`.
         // @see core/config/schema/core.data_types.schema.yml
+        'dependencies',
         '_core',
         'langcode',
         // Keys defined locally, in `type:
@@ -237,7 +240,7 @@ class MappingTest extends KernelTestBase {
         // @see core/modules/config/tests/config_schema_deprecated_test/config/schema/config_schema_deprecated_test.schema.yml
         'complex_structure_deprecated',
       ],
-      ['_core', 'langcode', 'complex_structure_deprecated'],
+      ['dependencies', '_core', 'langcode', 'complex_structure_deprecated'],
       [],
     ];
     yield 'No dynamic type: config_schema_deprecated_test.settings:complex_structure_deprecated' => [

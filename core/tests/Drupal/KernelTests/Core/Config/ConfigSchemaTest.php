@@ -75,6 +75,11 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['mapping']['_core']['requiredKey'] = FALSE;
     $expected['mapping']['test_item'] = ['label' => 'Test item'];
     $expected['mapping']['test_list'] = ['label' => 'Test list'];
+    $expected['mapping']['dependencies'] = [
+      'label' => 'Dependencies',
+      'requiredKey' => FALSE,
+      'type' => 'config_dependencies',
+    ];
     $expected['type'] = 'config_schema_test.some_schema';
     $expected['definition_class'] = '\Drupal\Core\TypedData\MapDataDefinition';
     $expected['unwrap_for_canonical_representation'] = TRUE;
@@ -128,6 +133,11 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['mapping']['langcode']['requiredKey'] = FALSE;
     $expected['mapping']['_core']['type'] = '_core_config_info';
     $expected['mapping']['_core']['requiredKey'] = FALSE;
+    $expected['mapping']['dependencies'] = [
+      'label' => 'Dependencies',
+      'requiredKey' => FALSE,
+      'type' => 'config_dependencies',
+    ];
     $expected['type'] = 'system.maintenance';
     $expected['definition_class'] = '\Drupal\Core\TypedData\MapDataDefinition';
     $expected['unwrap_for_canonical_representation'] = TRUE;
@@ -165,6 +175,11 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['mapping']['weight'] = [
       'label' => 'Weight',
       'type' => 'weight',
+    ];
+    $expected['mapping']['dependencies'] = [
+      'label' => 'Dependencies',
+      'requiredKey' => FALSE,
+      'type' => 'config_dependencies',
     ];
     $expected['type'] = 'config_schema_test.ignore';
     $expected['unwrap_for_canonical_representation'] = TRUE;
@@ -302,6 +317,11 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['mapping']['test_id']['label'] = 'ID';
     $expected['mapping']['test_description']['type'] = 'text';
     $expected['mapping']['test_description']['label'] = 'Description';
+    $expected['mapping']['dependencies'] = [
+      'label' => 'Dependencies',
+      'requiredKey' => FALSE,
+      'type' => 'config_dependencies',
+    ];
     $expected['type'] = 'config_schema_test.some_schema.some_module.*.*';
     $expected['definition_class'] = '\Drupal\Core\TypedData\MapDataDefinition';
     $expected['unwrap_for_canonical_representation'] = TRUE;
@@ -592,6 +612,11 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['mapping']['test_id']['label'] = 'ID';
     $expected['mapping']['test_description']['type'] = 'text';
     $expected['mapping']['test_description']['label'] = 'Description';
+    $expected['mapping']['dependencies'] = [
+      'label' => 'Dependencies',
+      'requiredKey' => FALSE,
+      'type' => 'config_dependencies',
+    ];
     $expected['type'] = 'config_schema_test.wildcard_fallback.*';
     $expected['constraints'] = [
       'ValidKeys' => ['allowedKeys' => '<infer>'],

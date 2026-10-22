@@ -219,6 +219,11 @@ _core_config_info:
 config_object:
   type: mapping
   mapping:
+    dependencies:
+      # All dependency keys are optional: this may have no dependencies at all.
+      requiredKey: false
+      type: config_dependencies
+      label: 'Dependencies'
     _core:
       # This only exists for merging configuration; it's not required.
       requiredKey: false
