@@ -16,6 +16,8 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 
+// cspell:ignore wwwrun
+
 /**
  * CLI printer.
  *
@@ -162,14 +164,14 @@ class CliPrinter {
     foreach ($allTests as $testInfo) {
       $inBin = isset($tests[$testInfo['name']]);
       $style = $inBin ? $activeCellStyle : $inactiveCellStyle;
-      $rightAlignedstyle = $inBin ? $activeRightAlignedCellStyle : $inactiveRightAlignedCellStyle;
+      $rightAlignedStyle = $inBin ? $activeRightAlignedCellStyle : $inactiveRightAlignedCellStyle;
       $rows[] = [
         new TableCell($inBin ? "***" : '', ['style' => $style]),
-        new TableCell((string) $testInfo['sorted_sequence'], ['style' => $rightAlignedstyle]),
-        new TableCell($inBin ? (string) $tests[$testInfo['name']]['worker_sequence'] : '', ['style' => $rightAlignedstyle]),
+        new TableCell((string) $testInfo['sorted_sequence'], ['style' => $rightAlignedStyle]),
+        new TableCell($inBin ? (string) $tests[$testInfo['name']]['worker_sequence'] : '', ['style' => $rightAlignedStyle]),
         new TableCell(in_array('#slow', $testInfo['groups']) ? '#slow' : '', ['style' => $style]),
         new TableCell(\trim_with_ellipsis($testInfo['group'], 15, \STR_PAD_RIGHT), ['style' => $style]),
-        new TableCell((string) $testInfo['tests_count'], ['style' => $rightAlignedstyle]),
+        new TableCell((string) $testInfo['tests_count'], ['style' => $rightAlignedStyle]),
         new TableCell(\trim_with_ellipsis($testInfo['name'], 60, \STR_PAD_LEFT), ['style' => $style]),
       ];
     }

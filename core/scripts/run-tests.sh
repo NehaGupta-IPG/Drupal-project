@@ -40,15 +40,10 @@ use Drupal\TestTools\TestRunner\WorkAllocator;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Version;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\HttpFoundation\Request;
-
-// cspell:ignore wwwrun
 
 // Define some colors for display.
 // A nice calming green.
@@ -74,6 +69,7 @@ const SIMPLETEST_SCRIPT_EXIT_FAILURE = 1;
 const SIMPLETEST_SCRIPT_EXIT_ERROR = 2;
 const SIMPLETEST_SCRIPT_EXIT_EXCEPTION = 3;
 
+// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 $results_map = [
   'pass' => 'Pass',
   'fail' => 'Fail',
@@ -258,7 +254,7 @@ $end_discovery = Timer::stop('run-tests:discovery');
 
 $io->title("Test log");
 
-  // Execute tests.
+// Execute tests.
 $eventDispatcher->dispatch(new RunnerTestsExecutionStart($tests_to_run));
 // Try to allocate unlimited time to run the tests.
 Environment::setTimeLimit(0);
@@ -300,7 +296,7 @@ if (!Config::get('keep-results')) {
 
 // Stop the timer.
 $end = Timer::stop('run-tests');
-$cliPrinter->summaryTable($end, $total_time, $end_discovery, $overall_test_time);
+$cliPrinter->summaryTable($end, $total_time ?? 0.0, $end_discovery, $overall_test_time ?? NULL);
 
 // Test complete, exit.
 exit($status);
