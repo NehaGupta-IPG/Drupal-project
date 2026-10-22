@@ -263,6 +263,15 @@ class ViewUI implements ViewEntityInterface {
       // Overwrite the default display with the current form values, and make
       // the current display use the new default values.
       $display = &$this->getExecutable()->displayHandlers->get($display_id);
+
+      $options = $display->defaultableSections($form_state->get('section'));
+      if (!empty($options)) {
+        $default = &$this->getExecutable()->displayHandlers->get('default');
+        foreach ($options as $option) {
+          $default->setOption($option, $display->getOption($option));
+        }
+      }
+
       // optionsOverride toggles the override of this section.
       $display->optionsOverride($form, $form_state);
       $display->submitOptionsForm($form, $form_state);
