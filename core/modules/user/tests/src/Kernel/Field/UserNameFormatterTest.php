@@ -63,10 +63,9 @@ class UserNameFormatterTest extends KernelTestBase {
    * @return string
    *   The rendered entity fields.
    */
-  protected function renderEntityFields(FieldableEntityInterface $entity, EntityViewDisplayInterface $display) {
+  protected function renderEntityFields(FieldableEntityInterface $entity, EntityViewDisplayInterface $display): string {
     $content = $display->build($entity);
-    $content = $this->render($content);
-    return $content;
+    return $this->render($content);
   }
 
   /**
@@ -80,7 +79,7 @@ class UserNameFormatterTest extends KernelTestBase {
 
     $result = $user->{$this->fieldName}->view(['type' => 'user_name']);
     $this->assertEquals('username', $result[0]['#theme']);
-    $this->assertEquals(spl_object_hash($user), spl_object_hash($result[0]['#account']));
+    $this->assertSame($user, $result[0]['#account']);
 
     $result = $user->{$this->fieldName}->view(['type' => 'user_name', 'settings' => ['link_to_entity' => FALSE]]);
     $this->assertEquals($user->getDisplayName(), $result[0]['#markup']);
@@ -89,7 +88,7 @@ class UserNameFormatterTest extends KernelTestBase {
 
     $result = $user->{$this->fieldName}->view(['type' => 'user_name']);
     $this->assertEquals('username', $result[0]['#theme']);
-    $this->assertEquals(spl_object_hash($user), spl_object_hash($result[0]['#account']));
+    $this->assertSame($user, $result[0]['#account']);
 
     $result = $user->{$this->fieldName}->view(['type' => 'user_name', 'settings' => ['link_to_entity' => FALSE]]);
     $this->assertEquals($user->getDisplayName(), $result[0]['#markup']);

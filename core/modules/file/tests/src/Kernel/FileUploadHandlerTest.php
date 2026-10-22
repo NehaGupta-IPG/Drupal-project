@@ -26,19 +26,6 @@ class FileUploadHandlerTest extends KernelTestBase {
   protected static $modules = ['file', 'file_validator_test'];
 
   /**
-   * The file upload handler under test.
-   */
-  protected FileUploadHandler $fileUploadHandler;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->fileUploadHandler = $this->container->get('file.upload_handler');
-  }
-
-  /**
    * Test the lock acquire exception.
    */
   public function testLockAcquireException(): void {
@@ -66,7 +53,7 @@ class FileUploadHandlerTest extends KernelTestBase {
     $file_info->expects($this->once())->method('validate')->willReturn(new ConstraintViolationList());
 
     $this->expectException(LockAcquiringException::class);
-    $this->expectExceptionMessage(sprintf('File "temporary://%s" is already locked for writing.', $file_name));
+    $this->expectExceptionMessageIs(sprintf('File "temporary://%s" is already locked for writing.', $file_name));
 
     $fileUploadHandler->handleFileUpload(uploadedFile: $file_info);
   }

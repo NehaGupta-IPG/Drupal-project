@@ -388,7 +388,7 @@ class RouterTest extends BrowserTestBase {
 
     // Check an aliased route with a deprecation message.
     $deprecated_route_url = Url::fromRoute('router_test.deprecated');
-    $this->expectDeprecation('The "router_test.deprecated" route is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Use the "router_test.1" route instead.');
+    $this->expectUserDeprecationMessage('The "router_test.deprecated" route is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Use the "router_test.1" route instead.');
     $this->drupalGet($deprecated_route_url);
     $this->assertSession()->addressEquals($request->getUriForPath('/router_test/test1'));
 
@@ -400,6 +400,33 @@ class RouterTest extends BrowserTestBase {
     $this->assertEquals('drupal/core', $deprecation['package']);
     $this->assertEquals('11.2.0', $deprecation['version']);
     $this->assertEquals('The "router_test.deprecated" route is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Use the "router_test.1" route instead.', $deprecation['message']);
+  }
+
+  /**
+   * Tests routes defined using PHP attributes.
+   */
+  public function testAttributeDiscovery(): void {
+    $this->drupalGet('/test_class_attribute');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Testing __invoke() with a Route attribute on the class');
+
+    $this->drupalGet('/test_method_attribute');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Testing method with a Route attribute');
+
+    $this->drupalGet('/test-form-route');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->addressEquals('test-form-route');
+    $this->assertSession()->buttonExists('Click here');
+
+    // Route attribute used on a FormInterface class method is not discoverable.
+    $this->drupalGet('/invalid-form-method-route');
+    $this->assertSession()->statusCodeEquals(404);
+    // Route attribute used on non-FormInterface class in Form namespace is not
+    // discoverable.
+    $this->drupalGet('/non-form-object-route');
+    $this->assertSession()->statusCodeEquals(404);
+
   }
 
 }

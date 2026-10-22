@@ -94,7 +94,7 @@ class WildcardHtmlSupportTest extends KernelTestBase {
     $editor = Editor::create($editor_config);
     $editor->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -203,12 +203,6 @@ class WildcardHtmlSupportTest extends KernelTestBase {
         ['<$text-container data-llama>', '<div>', '<mark>', '<abbr title>'],
         [
           [
-            'name' => 'div',
-          ],
-          [
-            'name' => 'mark',
-          ],
-          [
             'name' => 'abbr',
             'attributes' => [
               [
@@ -216,6 +210,12 @@ class WildcardHtmlSupportTest extends KernelTestBase {
                 'value' => TRUE,
               ],
             ],
+          ],
+          [
+            'name' => 'div',
+          ],
+          [
+            'name' => 'mark',
           ],
           [
             'name' => 'p',

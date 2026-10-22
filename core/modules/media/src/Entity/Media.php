@@ -449,10 +449,31 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
         $translation = $this->getTranslation($langcode);
         // Try to set fields provided by the media source and mapped in
         // media type config.
+        $original = $this->getOriginal();
         foreach ($translation->bundle->entity->getFieldMap() as $metadata_attribute_name => $entity_field_name) {
-          // Only save value in the entity if the field is empty or if the
-          // source field changed.
-          if ($translation->hasField($entity_field_name) && ($translation->get($entity_field_name)->isEmpty() || $translation->hasSourceFieldChanged())) {
+          if (!$translation->hasField($entity_field_name)) {
+            continue;
+          }
+          $set_metadata = FALSE;
+          // Only save value in the entity if the field is empty, or if the
+          // source field changed from one non-empty value to another non-empty
+          // value.
+          // 1st scenario: field is empty, safely store metadata there.
+          if ($translation->get($entity_field_name)->isEmpty()) {
+            $set_metadata = TRUE;
+          }
+          else {
+            // 2nd scenario: field is not empty, but the source field has
+            // changed between two non-empty values.
+            $original_source_field_empty = ($original instanceof MediaInterface) && $media_source->getSourceFieldValue($original) === NULL;
+            $new_source_field_empty = $media_source->getSourceFieldValue($translation) === NULL;
+            if (!$original_source_field_empty &&
+                !$new_source_field_empty &&
+                $translation->hasSourceFieldChanged()) {
+              $set_metadata = TRUE;
+            }
+          }
+          if ($set_metadata) {
             $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
           }
         }
@@ -570,7 +591,6 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
       ->setDescription(t('The time the media item was created.'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
-      ->setDefaultValueCallback(static::class . '::getRequestTime')
       ->setDisplayOptions('form', [
         'type' => 'datetime_timestamp',
         'weight' => 10,
@@ -593,9 +613,19 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Gets the default value used for the created field.
+   *
+   * @return int
+   *   The current request time.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3624921
    */
-  public static function getRequestTime() {
+  public static function getRequestTime(): int {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3624921', E_USER_DEPRECATED);
+
     return \Drupal::time()->getRequestTime();
   }
 

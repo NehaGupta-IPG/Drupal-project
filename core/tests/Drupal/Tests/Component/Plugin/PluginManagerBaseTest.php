@@ -7,8 +7,10 @@ namespace Drupal\Tests\Component\Plugin;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\Mapper\MapperInterface;
 use Drupal\Component\Plugin\PluginManagerBase;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -20,6 +22,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 class PluginManagerBaseTest extends TestCase {
 
   use ProphecyTrait;
+  use ForwardCompatibilityTrait;
 
   /**
    * A callback method for mocking FactoryInterface objects.
@@ -40,7 +43,7 @@ class PluginManagerBaseTest extends TestCase {
   /**
    * Generates a mocked FactoryInterface object with known properties.
    */
-  public function getMockFactoryInterface($expects_count) {
+  public function getMockFactoryInterface(int $expects_count): MockObject {
     $mock_factory = $this->createMock('Drupal\Component\Plugin\Factory\FactoryInterface');
     $mock_factory->expects($this->exactly($expects_count))
       ->method('createInstance')
@@ -119,7 +122,7 @@ class PluginManagerBaseTest extends TestCase {
     $manager = new StubPluginManagerBase();
     // Set the expected exception thrown by ::getInstance.
     $this->expectException(\BadMethodCallException::class);
-    $this->expectExceptionMessage(sprintf('%s does not support this method unless %s::$mapper is set.', get_class($manager), get_class($manager)));
+    $this->expectExceptionMessageIs(sprintf('%s does not support this method unless %s::$mapper is set.', get_class($manager), get_class($manager)));
     $manager->getInstance($options);
   }
 

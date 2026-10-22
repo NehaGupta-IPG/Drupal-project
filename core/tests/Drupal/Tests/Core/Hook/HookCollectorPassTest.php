@@ -6,8 +6,8 @@ namespace Drupal\Tests\Core\Hook;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Extension\ProceduralCall;
+use Drupal\Core\Hook\HookCollectorBase;
 use Drupal\Core\Hook\HookCollectorPass;
-use Drupal\Tests\Core\GroupIncludesTestTrait;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -21,13 +21,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 #[Group('Hook')]
 class HookCollectorPassTest extends UnitTestCase {
 
-  use GroupIncludesTestTrait;
-
   /**
    * Tests collect all hook implementations.
    *
    * @legacy-covers ::collectAllHookImplementations
-   * @legacy-covers ::filterIterator
+   * @legacy-covers ::getHookFileIterator
    */
   public function testCollectAllHookImplementations(): void {
     vfsStream::setup('drupal_root');
@@ -44,9 +42,7 @@ class HookCollectorPassTest extends UnitTestCase {
     $module_filenames = [
       'test_module' => ['pathname' => 'vfs://drupal_root/modules/test_module/test_module_info.yml'],
     ];
-    // This directory, however, should be included.
-    mkdir('vfs://drupal_root/modules/test_module/includes');
-    file_put_contents('vfs://drupal_root/modules/test_module/includes/test_module.inc', <<<__EOF__
+    file_put_contents('vfs://drupal_root/modules/test_module/test_module.module', <<<__EOF__
 <?php
 
 function test_module_test_hook();
@@ -70,35 +66,52 @@ __EOF__
       ['test_module_test_hook' => 'test_module'],
       $container->getParameter('.hook_data')['hook_list']['test_hook'],
     );
-    $this->assertEquals(['test_hook' => ['vfs://drupal_root/modules/test_module/includes/test_module.inc']], $container->getParameter('.hook_data')['includes']);
   }
 
-  /**
-   * Tests group includes.
-   *
-   * @legacy-covers ::process
-   * @legacy-covers ::collectModuleHookImplementations
-   */
-  public function testGroupIncludes(): void {
-    $module_filenames = self::setupGroupIncludes();
-
-    $container = new ContainerBuilder();
-    $container->setParameter('container.modules', $module_filenames);
-    (new HookCollectorPass())->process($container);
-
-    $expected_hook_list = [
-      'hook_info' => [
-        'test_module_hook_info' => 'test_module',
+  public function testCollectsOnlyRootProceduralAndHookDirectoryFiles(): void {
+    vfsStream::setup('drupal_root');
+    vfsStream::create([
+      'test_module' => [
+        'test_module.module' => '',
+        'test_module.install' => '',
+        'test_module.profile' => '',
+        'another_module.module' => '',
+        'ignored.php' => '',
+        'src' => [
+          'Hook' => [
+            'TestHooks.php' => '',
+            'Subdirectory' => ['NestedHooks.php' => ''],
+          ],
+          'Other' => ['IgnoredHooks.php' => ''],
+        ],
+        'ignored_directory' => ['ignored.module' => ''],
       ],
-      'token_info' => [
-        'test_module_token_info' => 'test_module',
-      ],
-    ];
-    $hook_data = $container->getParameter('.hook_data');
-    $this->assertEquals($expected_hook_list, $hook_data['hook_list']);
-    // Assert that the group include is not duplicated into the includes list.
-    $this->assertEquals([], $hook_data['includes']);
-    $this->assertEquals(['token_info' => ['vfs://drupal_root/test_module.tokens.inc']], $hook_data['group_includes']);
+    ]);
+
+    $collector = new HookCollectorPass();
+    $get_files = \Closure::bind(
+      static function (HookCollectorPass $collector, string $directory, string $module): array {
+        $procedural_files = [
+          "$module.module",
+          "$module.profile",
+          "$module.install",
+        ];
+        return iterator_to_array($collector->getHookFileIterator($directory, $procedural_files));
+      },
+      NULL,
+      HookCollectorBase::class,
+    );
+    $files = $get_files($collector, 'vfs://drupal_root/test_module', 'test_module');
+    $paths = array_map(static fn (\SplFileInfo $file): string => $file->getPathname(), $files);
+    sort($paths);
+
+    $this->assertSame([
+      'vfs://drupal_root/test_module/src/Hook/Subdirectory/NestedHooks.php',
+      'vfs://drupal_root/test_module/src/Hook/TestHooks.php',
+      'vfs://drupal_root/test_module/test_module.install',
+      'vfs://drupal_root/test_module/test_module.module',
+      'vfs://drupal_root/test_module/test_module.profile',
+    ], $paths);
   }
 
   /**

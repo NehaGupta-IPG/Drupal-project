@@ -32,19 +32,11 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
   protected $fileRepository;
 
   /**
-   * The file system service.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
     $this->fileRepository = $this->container->get('file.repository');
-    $this->fileSystem = $this->container->get('file_system');
   }
 
   /**
@@ -174,7 +166,7 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
    */
   public function testInvalidStreamWrapper(): void {
     $this->expectException(InvalidStreamWrapperException::class);
-    $this->expectExceptionMessage('Invalid stream wrapper: foo://');
+    $this->expectExceptionMessageIs('Invalid stream wrapper: foo://');
     $this->fileRepository->writeData('asdf', 'foo://');
   }
 

@@ -39,7 +39,7 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
    *
    * @see \Drupal\Core\EventSubscriber\ActiveLinkResponseFilter::setLinkActiveClass()
    */
-  public static function providerTestSetLinkActiveClass() {
+  public static function providerTestSetLinkActiveClass(): array {
     // Define all the variations that *don't* affect whether or not an
     // "is-active" class is set, but that should remain unchanged:
     // - surrounding HTML
@@ -696,7 +696,7 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
         for ($c = 0; $c < count($contents); $c++) {
           $tag_content = $contents[$c];
 
-          $create_markup = function (Attribute $attributes) use ($html_prefix, $html_suffix, $tag, $tag_content) {
+          $create_markup = function (Attribute $attributes) use ($html_prefix, $html_suffix, $tag, $tag_content): string {
             return $html_prefix . '<' . $tag . $attributes . '>' . $tag_content . '</' . $tag . '>' . $html_suffix;
           };
 
@@ -878,6 +878,58 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
       $response
     ));
     $this->assertSame($response->getContent(), $content);
+  }
+
+  /**
+   * Tests a response with a NULL Content-Type header is ignored.
+   *
+   * @legacy-covers ::onResponse
+   */
+  public function testOnResponseNullContentType(): void {
+    $session = new AnonymousUserSession();
+    $language_manager = new LanguageManager(new LanguageDefault([]));
+    $request_stack = new RequestStack();
+    $request_stack->push(new Request());
+    $current_path_stack = new CurrentPathStack($request_stack);
+
+    // Make sure path matcher isn't called and we didn't get to the link logic.
+    $path_matcher = $this->prophesize(PathMatcherInterface::class);
+    $path_matcher->isFrontPage()->shouldNotBeCalled();
+
+    $subscriber = new ActiveLinkResponseFilter(
+      $session,
+      $current_path_stack,
+      $path_matcher->reveal(),
+      $language_manager
+    );
+
+    // A header can be present with a NULL value, which HeaderBag::get()
+    // returns in place of the default. Passing that to stripos() raises a
+    // deprecation rather than throwing, so promote it to an exception.
+    $content = '<a data-drupal-link-system-path="other-page">Other page</a>';
+    $response = new Response();
+    $response->setContent($content);
+    $response->headers->set('Content-Type', NULL);
+
+    set_error_handler(
+      static function (int $severity, string $message): never {
+        throw new \ErrorException($message, 0, $severity);
+      },
+      E_DEPRECATED
+    );
+    try {
+      $subscriber->onResponse(new ResponseEvent(
+        $this->prophesize(KernelInterface::class)->reveal(),
+        $request_stack->getCurrentRequest(),
+        HttpKernelInterface::MAIN_REQUEST,
+        $response
+      ));
+    }
+    finally {
+      restore_error_handler();
+    }
+
+    $this->assertSame($content, $response->getContent());
   }
 
   /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Transliteration;
 
 use Drupal\Component\Utility\Random;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Transliteration\PhpTransliteration;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -32,15 +33,15 @@ class PhpTransliterationTest extends UnitTestCase {
    *   printable in the output.
    */
   #[DataProvider('providerTestPhpTransliterationWithAlter')]
-  public function testPhpTransliterationWithAlter($langcode, $original, $expected, $printable = NULL): void {
+  public function testPhpTransliterationWithAlter(string $langcode, string $original, string $expected, ?string $printable = NULL): void {
     if ($printable === NULL) {
       $printable = $original;
     }
 
     // Test each case both with a new instance of the transliteration class,
     // and with one that builds as it goes.
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $module_handler->expects($this->any())
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
+    $module_handler
       ->method('alter')
       ->willReturnCallback(function ($hook, &$overrides, $langcode): void {
         if ($langcode == 'zz') {
@@ -65,7 +66,7 @@ class PhpTransliterationTest extends UnitTestCase {
    * @return array
    *   An array of test data for testPhpTransliterationWithAlter.
    */
-  public static function providerTestPhpTransliterationWithAlter() {
+  public static function providerTestPhpTransliterationWithAlter(): array {
     $random_generator = new Random();
     $random = $random_generator->string(10);
     // Make some strings with two, three, and four-byte characters for testing.
@@ -79,7 +80,7 @@ class PhpTransliterationTest extends UnitTestCase {
     // Five-byte characters do not work in MySQL, so make a printable version.
     $five_byte_printable = '&#x10330;&#x10338;';
 
-    $cases = [
+    return [
       // Test the language override hook in the test module, which changes
       // the transliteration of Ä to Z and provides for the 5-byte characters.
       // cSpell:disable-next-line
@@ -87,8 +88,6 @@ class PhpTransliterationTest extends UnitTestCase {
       ['zz', $random, $random],
       ['zz', $five_byte, 'ATh', $five_byte_printable],
     ];
-
-    return $cases;
   }
 
 }

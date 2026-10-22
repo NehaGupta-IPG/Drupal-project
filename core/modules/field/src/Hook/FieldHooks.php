@@ -2,6 +2,7 @@
 
 namespace Drupal\field\Hook;
 
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field\EntityDisplayRebuilder;
@@ -11,7 +12,6 @@ use Drupal\field\ConfigImporterFieldPurger;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\DynamicallyFieldableEntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -30,7 +30,7 @@ class FieldHooks {
 
   public function __construct(
     #[Autowire(service: 'cache.memory')]
-    protected readonly CacheBackendInterface $memoryCache,
+    protected readonly MemoryCacheInterface $memoryCache,
   ) {
 
   }
@@ -171,16 +171,6 @@ class FieldHooks {
         return $output;
     }
     return NULL;
-  }
-
-  /**
-   * Implements hook_cron().
-   */
-  #[Hook('cron')]
-  public function cron(): void {
-    // Do a pass of purging on deleted Field API data, if any exists.
-    $limit = \Drupal::config('field.settings')->get('purge_batch_size');
-    field_purge_batch($limit);
   }
 
   /**
@@ -369,8 +359,9 @@ class FieldHooks {
       foreach ($field_storage->getBundles() as $bundle) {
         $field = FieldConfig::loadByName($field_storage->getTargetEntityTypeId(), $bundle, $field_storage->getName());
         // Reset the handler settings. This triggers
-        // field_field_config_presave(), which will take care of reassigning the
-        // handler to the correct derivative for the new target_type.
+        // \Drupal\field\Hook\FieldHooks::fieldConfigPresave(), which will take
+        // care of reassigning the handler to the correct derivative for the new
+        // target_type.
         $field->setSetting('handler_settings', []);
         $field->save();
       }
@@ -429,8 +420,8 @@ class FieldHooks {
     }
     // In case we removed all the target bundles allowed by the field in
     // EntityReferenceItem::onDependencyRemoval() or
-    // field_entity_bundle_delete() we have to log a critical message because
-    // the field will not function correctly anymore.
+    // \Drupal\field\Hook\FieldHooks::entityBundleDelete() we have to log a
+    // critical message because the field will not function correctly anymore.
     $handler_settings = $field->getSetting('handler_settings');
     if (isset($handler_settings['target_bundles']) && $handler_settings['target_bundles'] === []) {
       \Drupal::logger('entity_reference')->critical('The %field_name entity reference field (entity_type: %entity_type, bundle: %bundle) no longer has any valid bundle it can reference. The field is not working correctly anymore and has to be adjusted.', [

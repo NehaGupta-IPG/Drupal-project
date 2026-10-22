@@ -28,7 +28,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
   public function testConstructor(array $elements, ?string $expected_exception_message): void {
     if ($expected_exception_message !== NULL) {
       $this->expectException(\InvalidArgumentException::class);
-      $this->expectExceptionMessage($expected_exception_message);
+      $this->expectExceptionMessageIs($expected_exception_message);
     }
     $restrictions = new HTMLRestrictions($elements);
     $this->assertIsArray($restrictions->getAllowedElements(FALSE));
@@ -147,19 +147,19 @@ class HTMLRestrictionsTest extends UnitTestCase {
     // Invalid overrides of globally disallowed attributes.
     yield 'INVALID: <foo bar> when "bar" is globally disallowed' => [
       ['foo' => ['bar' => TRUE], '*' => ['bar' => FALSE, 'baz' => TRUE]],
-      'The attribute restrictions in "<foo bar>" are allowing attributes "bar" that are disallowed by the special "*" global attribute restrictions',
+      'The attribute restrictions in "<foo bar>" are allowing attributes "bar" that are disallowed by the special "*" global attribute restrictions.',
     ];
     yield 'INVALID: <foo style> when "style" is globally disallowed' => [
       ['foo' => ['style' => TRUE], '*' => ['bar' => FALSE, 'baz' => TRUE, 'style' => FALSE]],
-      'The attribute restrictions in "<foo style>" are allowing attributes "bar", "style" that are disallowed by the special "*" global attribute restrictions',
+      'The attribute restrictions in "<foo style>" are allowing attributes "bar", "style" that are disallowed by the special "*" global attribute restrictions.',
     ];
     yield 'INVALID: <foo on*> when "on*" is globally disallowed' => [
       ['foo' => ['on*' => TRUE], '*' => ['bar' => FALSE, 'baz' => TRUE, 'style' => FALSE, 'on*' => FALSE]],
-      'The attribute restrictions in "<foo on*>" are allowing attributes "bar", "style", "on*" that are disallowed by the special "*" global attribute restrictions',
+      'The attribute restrictions in "<foo on*>" are allowing attributes "bar", "style", "on*" that are disallowed by the special "*" global attribute restrictions.',
     ];
     yield 'INVALID: <foo ontouch> when "on" is globally disallowed' => [
       ['foo' => ['ontouch' => TRUE], '*' => ['bar' => FALSE, 'baz' => TRUE, 'style' => FALSE, 'on*' => FALSE]],
-      'The attribute restrictions in "<foo ontouch>" are allowing attributes "bar", "style", "on*" that are disallowed by the special "*" global attribute restrictions',
+      'The attribute restrictions in "<foo ontouch>" are allowing attributes "bar", "style", "on*" that are disallowed by the special "*" global attribute restrictions.',
     ];
   }
 
@@ -240,7 +240,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
    * @legacy-covers ::fromFilterPluginInstance
    */
   #[DataProvider('providerConvenienceConstructors')]
-  public function testConvenienceConstructors($input, array $expected, ?array $expected_raw = NULL): void {
+  public function testConvenienceConstructors(string $input, array $expected, ?array $expected_raw = NULL): void {
     $expected_raw = $expected_raw ?? $expected;
 
     // ::fromString()
@@ -348,7 +348,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
     ];
     yield 'tag with two attributes, spread across declarations' => [
       '<a target> <a class>',
-      ['a' => ['target' => TRUE, 'class' => TRUE]],
+      ['a' => ['class' => TRUE, 'target' => TRUE]],
     ];
     yield 'tag with conflicting attribute config, allow one attribute and forbid all attributes' => [
       '<a target> <a>',
@@ -360,7 +360,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
     ];
     yield 'tag attribute configuration spread across declarations' => [
       '<a target="_blank"> <a target="_self"> <a target="_*">',
-      ['a' => ['target' => ['_blank' => TRUE, '_self' => TRUE, '_*' => TRUE]]],
+      ['a' => ['target' => ['_*' => TRUE, '_blank' => TRUE, '_self' => TRUE]]],
     ];
     yield 'tag attribute configuration spread across declarations, allow all attributes values' => [
       '<a target> <a target="_blank"> <a target="_self"> <a target="_*">',
@@ -374,7 +374,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
     ];
     yield 'two tags (reverse order)' => [
       '<p> <a>',
-      ['p' => FALSE, 'a' => FALSE],
+      ['a' => FALSE, 'p' => FALSE],
     ];
 
     // Wildcard tag, attribute and attribute value.
@@ -398,10 +398,10 @@ class HTMLRestrictionsTest extends UnitTestCase {
       [
         '$text-container' => [
           'class' => [
-            'text-align-left' => TRUE,
             'text-align-center' => TRUE,
-            'text-align-right' => TRUE,
             'text-align-justify' => TRUE,
+            'text-align-left' => TRUE,
+            'text-align-right' => TRUE,
           ],
         ],
       ],
@@ -433,7 +433,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
     yield '$text-container + two concrete tag to resolve into' => [
       '<p> <$text-container class="text-align-left text-align-center text-align-right text-align-justify"> <div>',
       [
-        'p' => [
+        'div' => [
           'class' => [
             'text-align-left' => TRUE,
             'text-align-center' => TRUE,
@@ -441,7 +441,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
             'text-align-justify' => TRUE,
           ],
         ],
-        'div' => [
+        'p' => [
           'class' => [
             'text-align-left' => TRUE,
             'text-align-center' => TRUE,
@@ -451,8 +451,8 @@ class HTMLRestrictionsTest extends UnitTestCase {
         ],
       ],
       [
-        'p' => FALSE,
         'div' => FALSE,
+        'p' => FALSE,
         '$text-container' => [
           'class' => [
             'text-align-left' => TRUE,
@@ -673,8 +673,12 @@ class HTMLRestrictionsTest extends UnitTestCase {
 
     yield 'only tags' => [
       new HTMLRestrictions(['a' => FALSE, 'p' => FALSE, 'br' => FALSE]),
-      ['<a>', '<p>', '<br>'],
-      '<a> <p> <br>',
+      [
+        '<a>',
+        '<br>',
+        '<p>',
+      ],
+      '<a> <br> <p>',
       [
         ['name' => 'a'],
         ['name' => 'p'],
@@ -707,8 +711,13 @@ class HTMLRestrictionsTest extends UnitTestCase {
         'span' => FALSE,
         'p' => ['id' => TRUE],
       ]),
-      ['<$text-container class data-llama>', '<div>', '<span>', '<p id>'],
-      '<div class data-llama> <span> <p id class data-llama>',
+      [
+        '<$text-container class data-llama>',
+        '<div>',
+        '<p id>',
+        '<span>',
+      ],
+      '<div class data-llama> <p id class data-llama> <span>',
       [
         [
           'name' => 'div',
@@ -747,8 +756,12 @@ class HTMLRestrictionsTest extends UnitTestCase {
         'p' => ['data-*' => TRUE, 'class' => ['block' => TRUE]],
         'br' => FALSE,
       ]),
-      ['<a href hreflang="en fr">', '<p data-* class="block">', '<br>'],
-      '<a href hreflang="en fr"> <p data-* class="block"> <br>',
+      [
+        '<a href hreflang="en fr">',
+        '<br>',
+        '<p data-* class="block">',
+      ],
+      '<a href hreflang="en fr"> <br> <p data-* class="block">',
       [
         [
           'name' => 'a',
@@ -789,7 +802,10 @@ class HTMLRestrictionsTest extends UnitTestCase {
     // Wildcard tag, attribute and attribute value.
     yield '$text-container' => [
       new HTMLRestrictions(['p' => FALSE, '$text-container' => ['data-*' => TRUE]]),
-      ['<p>', '<$text-container data-*>'],
+      [
+        '<$text-container data-*>',
+        '<p>',
+      ],
       '<p data-*>',
       [
         [
@@ -918,7 +934,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
    * @legacy-covers ::merge
    */
   #[DataProvider('providerOperands')]
-  public function testOperations(HTMLRestrictions $a, HTMLRestrictions $b, $expected_diff, $expected_intersection, $expected_union): void {
+  public function testOperations(HTMLRestrictions $a, HTMLRestrictions $b, string|HTMLRestrictions $expected_diff, string|HTMLRestrictions $expected_intersection, string|HTMLRestrictions $expected_union): void {
     // This looks more complicated than it is: it applies the same processing to
     // all three of the expected operation results.
     foreach (['diff', 'intersection', 'union'] as $op) {

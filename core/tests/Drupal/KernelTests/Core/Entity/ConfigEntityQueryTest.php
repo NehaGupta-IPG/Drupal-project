@@ -33,13 +33,6 @@ class ConfigEntityQueryTest extends KernelTestBase {
   protected $queryResults;
 
   /**
-   * The query factory used to construct all queries in the test.
-   *
-   * @var \Drupal\Core\Config\Entity\Query\QueryFactory
-   */
-  protected $factory;
-
-  /**
    * The config entity storage used for testing.
    */
   protected ConfigEntityStorageInterface $entityStorage;
@@ -511,7 +504,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
 
     // Explicitly pass NULL for the range and sort.
     $this->queryResults = $this->entityStorage->getQuery()
-      ->range(NULL, NULL)
+      ->range()
       ->sort('id')
       ->execute();
     $this->assertSame(['1', '2', '3', '4', '5', '6', '7'], array_values($this->queryResults));

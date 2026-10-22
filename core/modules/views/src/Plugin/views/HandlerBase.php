@@ -7,6 +7,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Access\AccessException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
@@ -394,22 +395,6 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
   }
 
   /**
-   * Provide defaults for the handler.
-   *
-   * @param array $option
-   *   An array of options.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
-   *   This method is no longer used by Drupal core. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3486781
-   */
-  public function defineExtraOptions(&$option) {
-    @trigger_error('defineExtraOptions() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. This method is no longer in use and should not be called. See https://www.drupal.org/node/3486781', E_USER_DEPRECATED);
-  }
-
-  /**
    * Provide a form for setting options.
    *
    * @param array $form
@@ -569,14 +554,8 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    * {@inheritdoc}
    */
   public function access(AccountInterface $account) {
-    if (isset($this->definition['access callback']) && function_exists($this->definition['access callback'])) {
-      // @todo when this is removed return FALSE.
-      // See https://www.drupal.org/project/drupal/issues/3547724
-      @trigger_error('Passing the access callback using the array key is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3539918', E_USER_DEPRECATED);
-      if (isset($this->definition['access arguments']) && is_array($this->definition['access arguments'])) {
-        return call_user_func_array($this->definition['access callback'], [$account] + $this->definition['access arguments']);
-      }
-      return $this->definition['access callback']($account);
+    if (isset($this->definition['access callback'])) {
+      throw new AccessException("The 'access callback' key in Views handler definitions is no longer supported in drupal:12.0.0. Use a custom access method on the handler instead.");
     }
 
     return TRUE;
@@ -811,7 +790,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
         }
       }
 
-      $join = Views::pluginManager('join')->createInstance($id, $configuration);
+      $join = \Drupal::service('plugin.manager.views.join')->createInstance($id, $configuration);
 
       return $join;
     }
@@ -937,7 +916,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
 
     // Create a new handler and unpack the options from the form onto it. We
     // can use that for storage.
-    $handler = Views::handlerManager($handler_type)->getHandler($item, $override);
+    $handler = \Drupal::service('views.plugin_managers')->get($handler_type)->getHandler($item, $override);
     $handler->init($executable, $executable->display_handler, $item);
 
     // Add the incoming options to existing options because items using

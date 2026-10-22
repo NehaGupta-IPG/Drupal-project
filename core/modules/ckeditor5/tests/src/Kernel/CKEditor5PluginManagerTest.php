@@ -24,6 +24,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Yaml\Yaml;
 
 // cspell:ignore layercake everytextcontainer justheading
@@ -209,7 +210,7 @@ YAML,
       $this->expectException($expected_exception);
     }
     if ($expected_message) {
-      $this->expectExceptionMessage($expected_message);
+      $this->expectExceptionMessageIs($expected_message);
     }
     $container = $this->mockModuleInVfs('ckeditor5_invalid_plugin', $yaml, $additional_files);
     $pluginManager = $container->get('plugin.manager.ckeditor5.plugin');
@@ -1097,7 +1098,7 @@ PHP,
     // editor config entity is passed: only then can a subset be generated based
     // on configuration.
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage($expected_exception_message);
+    $this->expectExceptionMessageIs($expected_exception_message);
     $this->manager->getProvidedElements([$sneaky_plugin_id], $text_editor);
   }
 
@@ -1151,11 +1152,6 @@ PHP,
       'ckeditor5/internal.drupal.ckeditor5',
       'ckeditor5/internal.drupal.ckeditor5.emphasis',
       'ckeditor5/internal.drupal.ckeditor5.htmlEngine',
-      'core/ckeditor5.autoformat',
-      'core/ckeditor5.basic',
-      'core/ckeditor5.essentials',
-      'core/ckeditor5.htmlSupport',
-      'core/ckeditor5.pasteFromOffice',
     ];
     $this->assertSame($default_libraries, $this->manager->getEnabledLibraries($editor));
 
@@ -1235,7 +1231,6 @@ PHP,
       'ckeditor5/internal.drupal.ckeditor5.media',
       'ckeditor5/internal.drupal.ckeditor5.mediaAlign',
       'ckeditor5_test/layercake',
-      'core/ckeditor5.table',
     ]);
     sort($expected_libraries);
     $this->assertSame($expected_libraries, $this->manager->getEnabledLibraries($editor));
@@ -1251,10 +1246,6 @@ PHP,
     ]);
     sort($expected_plugins);
     $this->assertSame(array_values($expected_plugins), $plugin_ids);
-    $expected_libraries = array_merge($expected_libraries, [
-      'core/ckeditor5.alignment',
-    ]);
-    sort($expected_libraries);
     $this->assertSame($expected_libraries, $this->manager->getEnabledLibraries($editor));
 
     // Case 8: GHS is enabled for Full HTML (or any other text format that has
@@ -1277,11 +1268,6 @@ PHP,
       'ckeditor5/internal.drupal.ckeditor5',
       'ckeditor5/internal.drupal.ckeditor5.emphasis',
       'ckeditor5/internal.drupal.ckeditor5.htmlEngine',
-      'core/ckeditor5.autoformat',
-      'core/ckeditor5.basic',
-      'core/ckeditor5.essentials',
-      'core/ckeditor5.htmlSupport',
-      'core/ckeditor5.pasteFromOffice',
     ];
     $this->assertSame($default_libraries, $this->manager->getEnabledLibraries($editor));
   }
@@ -1325,7 +1311,7 @@ PHP,
     );
     // @todo Remove in https://www.drupal.org/project/drupal/issues/3361534, which moves this into ::assertConfigSchema()
     $this->assertSame([], array_map(
-      fn ($v) => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
+      fn (ConstraintViolationInterface $v): string => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
       iterator_to_array($this->typedConfig->createFromNameAndData($text_editor->getConfigDependencyName(), $text_editor->toArray())->validate())
     ));
 
@@ -1400,7 +1386,7 @@ PHP,
             'class' => $text_align_classes,
           ],
         ],
-        'expected_readable_string' => '<p class="text-align-left text-align-center text-align-right text-align-justify"> <h2 class="text-align-left text-align-center text-align-right text-align-justify"> <h3 class="text-align-left text-align-center text-align-right text-align-justify"> <h4 class="text-align-left text-align-center text-align-right text-align-justify"> <h5 class="text-align-left text-align-center text-align-right text-align-justify"> <h6 class="text-align-left text-align-center text-align-right text-align-justify">',
+        'expected_readable_string' => '<h2 class="text-align-left text-align-center text-align-right text-align-justify"> <h3 class="text-align-left text-align-center text-align-right text-align-justify"> <h4 class="text-align-left text-align-center text-align-right text-align-justify"> <h5 class="text-align-left text-align-center text-align-right text-align-justify"> <h6 class="text-align-left text-align-center text-align-right text-align-justify"> <p class="text-align-left text-align-center text-align-right text-align-justify">',
       ],
       'alignment and heading, but all class values allowed for headings' => [
         'plugins' => [
@@ -1437,7 +1423,7 @@ PHP,
             'class' => TRUE,
           ],
         ],
-        'expected_readable_string' => '<p class="text-align-left text-align-center text-align-right text-align-justify"> <h2 class> <h3 class> <h4 class> <h5 class> <h6 class> <h1 class>',
+        'expected_readable_string' => '<h1 class> <h2 class> <h3 class> <h4 class> <h5 class> <h6 class> <p class="text-align-left text-align-center text-align-right text-align-justify">',
       ],
       'heading text container combo' => [
         'plugins' => [
@@ -1460,7 +1446,7 @@ PHP,
             'data-everytextcontainer' => TRUE,
           ],
         ],
-        'expected_readable_string' => '<p data-everytextcontainer> <h1 data-justheading data-everytextcontainer>',
+        'expected_readable_string' => '<h1 data-justheading data-everytextcontainer> <p data-everytextcontainer>',
       ],
       'headings plus headings with attributes' => [
         'plugins' => [
@@ -1496,7 +1482,7 @@ PHP,
             'data-just-h1' => TRUE,
           ],
         ],
-        'expected_readable_string' => '<h2 class="additional-allowed-class"> <h3 data-just-h3 data-just-h3-limited="i-am-the-only-allowed-value"> <h4> <h5 data-just-h5-limited="first-allowed-value second-allowed-value"> <h6> <h1 data-just-h1>',
+        'expected_readable_string' => '<h1 data-just-h1> <h2 class="additional-allowed-class"> <h3 data-just-h3 data-just-h3-limited="i-am-the-only-allowed-value"> <h4> <h5 data-just-h5-limited="first-allowed-value second-allowed-value"> <h6>',
       ],
       'headings plus headings with attributes and alignment' => [
         'plugins' => [
@@ -1538,7 +1524,7 @@ PHP,
             'class' => $text_align_classes,
           ],
         ],
-        'expected_readable_string' => '<h2 class="additional-allowed-class text-align-left text-align-center text-align-right text-align-justify"> <h3 data-just-h3 data-just-h3-limited="i-am-the-only-allowed-value" class="text-align-left text-align-center text-align-right text-align-justify"> <h4 class="text-align-left text-align-center text-align-right text-align-justify"> <h5 data-just-h5-limited="first-allowed-value second-allowed-value" class="text-align-left text-align-center text-align-right text-align-justify"> <h6 class="text-align-left text-align-center text-align-right text-align-justify"> <h1 data-just-h1 class="text-align-left text-align-center text-align-right text-align-justify">',
+        'expected_readable_string' => '<h1 data-just-h1 class="text-align-left text-align-center text-align-right text-align-justify"> <h2 class="additional-allowed-class text-align-left text-align-center text-align-right text-align-justify"> <h3 data-just-h3 data-just-h3-limited="i-am-the-only-allowed-value" class="text-align-left text-align-center text-align-right text-align-justify"> <h4 class="text-align-left text-align-center text-align-right text-align-justify"> <h5 data-just-h5-limited="first-allowed-value second-allowed-value" class="text-align-left text-align-center text-align-right text-align-justify"> <h6 class="text-align-left text-align-center text-align-right text-align-justify">',
       ],
     ];
   }
@@ -1561,7 +1547,7 @@ PHP,
   /**
    * Provides use cases for findPluginSupportingElement().
    */
-  public static function providerTestPluginSupportingElement() {
+  public static function providerTestPluginSupportingElement(): array {
     return [
       'tag that belongs to a superset' => [
         'tag' => 'h2',
@@ -1609,7 +1595,7 @@ PHP,
    */
   public function testAutomaticLinkDecoratorsDisallowed(): void {
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The "ckeditor5_automatic_link_decorator_test_llamaClass" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
+    $this->expectExceptionMessageIs('The "ckeditor5_automatic_link_decorator_test_llamaClass" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
 
     $this->enableModules(['ckeditor5_automatic_link_decorator_test']);
 
@@ -1623,7 +1609,7 @@ PHP,
    */
   public function testExternalLinkAutomaticLinkDecoratorDisallowed(): void {
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The "ckeditor5_automatic_link_decorator_test_2_addTargetToExternalLinks" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
+    $this->expectExceptionMessageIs('The "ckeditor5_automatic_link_decorator_test_2_addTargetToExternalLinks" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
 
     $this->enableModules(['ckeditor5_automatic_link_decorator_test_2']);
 
@@ -1642,10 +1628,10 @@ PHP,
       $this->expectException($expected_exception);
     }
     if ($expected_message) {
-      $this->expectExceptionMessage($expected_message);
+      $this->expectExceptionMessageIs($expected_message);
     }
     if ($expected_deprecation_message) {
-      $this->expectDeprecation($expected_deprecation_message);
+      $this->expectUserDeprecationMessage($expected_deprecation_message);
     }
 
     $container = $this->mockModuleInVfs('ckeditor5_derived_plugin', $yaml, $additional_files);
@@ -2065,28 +2051,6 @@ PHP,
         ]),
       ],
     ];
-  }
-
-  /**
-   * Tests deprecation and backwards compatibility of icon names.
-   */
-  #[IgnoreDeprecations]
-  public function testDeprecatedIcons(): void {
-    $this->expectDeprecation('The icon configuration value "objectBlockLeft" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectLeft" instead. See https://www.drupal.org/node/3528806');
-    $this->expectDeprecation('The icon configuration value "objectBlockRight" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectRight" instead. See https://www.drupal.org/node/3528806');
-    $this->expectDeprecation('The icon configuration value "objectLeft" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectInlineLeft" instead. See https://www.drupal.org/node/3528806');
-    $this->expectDeprecation('The icon configuration value "objectRight" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectInlineRight" instead. See https://www.drupal.org/node/3528806');
-    $this->expectDeprecation('The icon configuration value "threeVerticalDots" in drupalElementStyles group threeVerticalDots for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconThreeVerticalDots" instead. See https://www.drupal.org/node/3528806');
-    \Drupal::service('module_installer')->install(['ckeditor5_icon_deprecation_test']);
-    $definitions = \Drupal::service('plugin.manager.ckeditor5.plugin')->getDefinitions();
-    $config = $definitions['ckeditor5_icon_deprecation_test_plugin']->toArray()['ckeditor5']['config']['drupalElementStyles'];
-    $this->assertSame('IconObjectCenter', $config['align'][0]['icon']);
-    $this->assertSame('IconObjectLeft', $config['align'][1]['icon']);
-    $this->assertSame('IconObjectRight', $config['align'][2]['icon']);
-    $this->assertSame('IconObjectInlineLeft', $config['align'][3]['icon']);
-    $this->assertSame('IconObjectInlineRight', $config['align'][4]['icon']);
-    $this->assertStringContainsString('<svg viewBox="0 0 20 20"', $config['svg'][0]['icon']);
-    $this->assertSame('IconThreeVerticalDots', $config['threeVerticalDots'][0]['icon']);
   }
 
 }

@@ -9,7 +9,6 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\Exception\ObsoleteExtensionException;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleInstaller;
-use Drupal\Core\Extension\ModuleUninstallValidatorInterface;
 use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\KernelTests\KernelTestBase;
@@ -122,9 +121,9 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    * @legacy-covers ::install
    */
   #[DataProvider('providerTestInvalidCoreInstall')]
-  public function testInvalidCoreInstall($module_name, $install_dependencies): void {
+  public function testInvalidCoreInstall(string $module_name, bool $install_dependencies): void {
     $this->expectException(MissingDependencyException::class);
-    $this->expectExceptionMessage("Unable to install modules: module '$module_name' is incompatible with this version of Drupal core.");
+    $this->expectExceptionMessageIs("Unable to install modules: module '$module_name' is incompatible with this version of Drupal core.");
     $this->container->get('module_installer')->install([$module_name], $install_dependencies);
   }
 
@@ -151,7 +150,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    */
   public function testDependencyInvalidCoreInstall(): void {
     $this->expectException(MissingDependencyException::class);
-    $this->expectExceptionMessage("Unable to install modules: module 'system_incompatible_core_version_dependencies_test'. Its dependency module 'system_core_incompatible_semver_test' is incompatible with this version of Drupal core.");
+    $this->expectExceptionMessageIs("Unable to install modules: module 'system_incompatible_core_version_dependencies_test'. Its dependency module 'system_core_incompatible_semver_test' is incompatible with this version of Drupal core.");
     $this->container->get('module_installer')->install(['system_incompatible_core_version_dependencies_test']);
   }
 
@@ -171,7 +170,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    */
   public function testObsoleteInstall(): void {
     $this->expectException(ObsoleteExtensionException::class);
-    $this->expectExceptionMessage("Unable to install modules: module 'system_status_obsolete_test' is obsolete.");
+    $this->expectExceptionMessageIs("Unable to install modules: module 'system_status_obsolete_test' is obsolete.");
     $this->container->get('module_installer')->install(['system_status_obsolete_test']);
   }
 
@@ -221,31 +220,9 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    */
   #[IgnoreDeprecations]
   public function testDeprecatedInstall(): void {
-    $this->expectDeprecation("The module 'deprecated_module' is deprecated. See http://example.com/deprecated");
+    $this->expectUserDeprecationMessage("The module 'deprecated_module' is deprecated. See http://example.com/deprecated");
     \Drupal::service('module_installer')->install(['deprecated_module']);
     $this->assertTrue(\Drupal::service('module_handler')->moduleExists('deprecated_module'));
-  }
-
-  /**
-   * Tests the BC layer for uninstall validators.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::addUninstallValidator
-   */
-  #[IgnoreDeprecations]
-  public function testUninstallValidatorsBC(): void {
-    $this->expectDeprecation('The "module_installer.uninstall_validators" service is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject "!tagged_iterator module_install.uninstall_validator" instead. See https://www.drupal.org/node/3432595');
-    $module_installer = new ModuleInstaller(
-      $this->container->getParameter('app.root'),
-      $this->container->get('module_handler'),
-      $this->container->get('kernel'),
-      $this->container->get('database'),
-      $this->container->get('update.update_hook_registry'),
-      $this->container->get('logger.channel.default'),
-    );
-
-    $this->expectDeprecation('Drupal\Core\Extension\ModuleInstaller::addUninstallValidator is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject the uninstall validators into the constructor instead. See https://www.drupal.org/node/3432595');
-    $module_installer->addUninstallValidator($this->createMock(ModuleUninstallValidatorInterface::class));
   }
 
   /**

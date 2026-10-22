@@ -9,6 +9,7 @@ use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 
 /**
@@ -20,11 +21,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * Error code for "Unable to open database file" error.
    */
   const DATABASE_NOT_FOUND = 14;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $statementWrapperClass = NULL;
 
   /**
    * A map of condition operators to SQLite operators.
@@ -76,8 +72,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * Constructs a \Drupal\sqlite\Driver\Database\sqlite\Connection object.
    */
-  public function __construct(\PDO $connection, array $connection_options) {
-    assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof SqliteConnection : TRUE);
+  public function __construct(SqliteConnection $connection, array $connection_options) {
     parent::__construct($connection, $connection_options);
 
     // Empty prefix means query the main database -- no need to attach anything.
@@ -96,7 +91,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(#[\SensitiveParameter] array &$connection_options = []) {
     // Allow PDO options to be overridden.
     $connection_options += [
       'pdo' => [],
@@ -108,13 +103,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     ];
 
     try {
-      if (\PHP_VERSION_ID >= 80400) {
-        // @phpstan-ignore new.noConstructor
-        $sqlite = new SqliteConnection('sqlite:' . $connection_options['database'], '', '', $connection_options['pdo']);
-      }
-      else {
-        $sqlite = new PDOConnection('sqlite:' . $connection_options['database'], '', '', $connection_options['pdo']);
-      }
+      $sqlite = new SqliteConnection('sqlite:' . $connection_options['database'], '', '', $connection_options['pdo']);
     }
     catch (\PDOException $e) {
       if ($e->getCode() == static::DATABASE_NOT_FOUND) {
@@ -126,56 +115,28 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
 
     // Create functions needed by SQLite.
-    if (\PHP_VERSION_ID >= 80400) {
-      // Use PHP 8.4+ createFunction with fast callable syntax.
-      $sqlite->createFunction('if', self::sqlFunctionIf(...));
-      $sqlite->createFunction('greatest', self::sqlFunctionGreatest(...));
-      $sqlite->createFunction('least', self::sqlFunctionLeast(...));
-      $sqlite->createFunction('pow', pow(...), 2);
-      $sqlite->createFunction('exp', exp(...), 1);
-      $sqlite->createFunction('length', strlen(...), 1);
-      $sqlite->createFunction('md5', md5(...), 1);
-      $sqlite->createFunction('concat', self::sqlFunctionConcat(...));
-      $sqlite->createFunction('concat_ws', self::sqlFunctionConcatWs(...));
-      $sqlite->createFunction('substring', self::sqlFunctionSubstring(...), 3);
-      $sqlite->createFunction('substring_index', self::sqlFunctionSubstringIndex(...), 3);
-      $sqlite->createFunction('rand', self::sqlFunctionRand(...));
-      $sqlite->createFunction('regexp', self::sqlFunctionRegexp(...));
+    $sqlite->createFunction('if', self::sqlFunctionIf(...));
+    $sqlite->createFunction('greatest', self::sqlFunctionGreatest(...));
+    $sqlite->createFunction('least', self::sqlFunctionLeast(...));
+    $sqlite->createFunction('pow', pow(...), 2);
+    $sqlite->createFunction('exp', exp(...), 1);
+    $sqlite->createFunction('length', strlen(...), 1);
+    $sqlite->createFunction('md5', md5(...), 1);
+    $sqlite->createFunction('concat', self::sqlFunctionConcat(...));
+    $sqlite->createFunction('concat_ws', self::sqlFunctionConcatWs(...));
+    $sqlite->createFunction('substring', self::sqlFunctionSubstring(...), 3);
+    $sqlite->createFunction('substring_index', self::sqlFunctionSubstringIndex(...), 3);
+    $sqlite->createFunction('rand', self::sqlFunctionRand(...));
+    $sqlite->createFunction('regexp', self::sqlFunctionRegexp(...));
 
-      // SQLite does not support the LIKE BINARY operator, so we overload the
-      // non-standard GLOB operator for case-sensitive matching. Another option
-      // would have been to override another non-standard operator, MATCH, but
-      // that does not support the NOT keyword prefix.
-      $sqlite->createFunction('glob', self::sqlFunctionLikeBinary(...));
+    // SQLite does not support the LIKE BINARY operator, so we overload the
+    // non-standard GLOB operator for case-sensitive matching. Another option
+    // would have been to override another non-standard operator, MATCH, but
+    // that does not support the NOT keyword prefix.
+    $sqlite->createFunction('glob', self::sqlFunctionLikeBinary(...));
 
-      // Create a user-space case-insensitive collation with UTF-8 support.
-      $sqlite->createCollation('NOCASE_UTF8', Unicode::strcasecmp(...));
-    }
-    else {
-      // Fallback for PHP < 8.4
-      $sqlite->sqliteCreateFunction('if', [__CLASS__, 'sqlFunctionIf']);
-      $sqlite->sqliteCreateFunction('greatest', [__CLASS__, 'sqlFunctionGreatest']);
-      $sqlite->sqliteCreateFunction('least', [__CLASS__, 'sqlFunctionLeast']);
-      $sqlite->sqliteCreateFunction('pow', 'pow', 2);
-      $sqlite->sqliteCreateFunction('exp', 'exp', 1);
-      $sqlite->sqliteCreateFunction('length', 'strlen', 1);
-      $sqlite->sqliteCreateFunction('md5', 'md5', 1);
-      $sqlite->sqliteCreateFunction('concat', [__CLASS__, 'sqlFunctionConcat']);
-      $sqlite->sqliteCreateFunction('concat_ws', [__CLASS__, 'sqlFunctionConcatWs']);
-      $sqlite->sqliteCreateFunction('substring', [__CLASS__, 'sqlFunctionSubstring'], 3);
-      $sqlite->sqliteCreateFunction('substring_index', [__CLASS__, 'sqlFunctionSubstringIndex'], 3);
-      $sqlite->sqliteCreateFunction('rand', [__CLASS__, 'sqlFunctionRand']);
-      $sqlite->sqliteCreateFunction('regexp', [__CLASS__, 'sqlFunctionRegexp']);
-
-      // SQLite does not support the LIKE BINARY operator, so we overload the
-      // non-standard GLOB operator for case-sensitive matching. Another option
-      // would have been to override another non-standard operator, MATCH, but
-      // that does not support the NOT keyword prefix.
-      $sqlite->sqliteCreateFunction('glob', [__CLASS__, 'sqlFunctionLikeBinary']);
-
-      // Create a user-space case-insensitive collation with UTF-8 support.
-      $sqlite->sqliteCreateCollation('NOCASE_UTF8', ['Drupal\Component\Utility\Unicode', 'strcasecmp']);
-    }
+    // Create a user-space case-insensitive collation with UTF-8 support.
+    $sqlite->createCollation('NOCASE_UTF8', Unicode::strcasecmp(...));
 
     // Set SQLite init_commands if not already defined. Enable the Write-Ahead
     // Logging (WAL) for SQLite. See https://www.drupal.org/node/2348137 and
@@ -402,7 +363,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function queryTemporary($query, array $args = [], array $options = []) {
-    $tablename = 'db_temporary_' . uniqid();
+    $tablename = 'db_temporary_' . bin2hex(random_bytes(12));
 
     $this->query('CREATE TEMPORARY TABLE ' . $tablename . ' AS ' . $query, $args, $options);
 
@@ -456,18 +417,20 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
     assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
-    if (isset($options['fetch']) && is_int($options['fetch'])) {
-      @trigger_error("Passing the 'fetch' key as an integer to \$options in prepareStatement() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
-    }
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to query() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     try {
-      $query = $this->preprocessStatement($query, $options);
-      $statement = new Statement($this->connection, $this, $query, $options['pdo'] ?? [], $allow_row_count);
+      return new Statement(
+        $this->connection,
+        $this,
+        $this->preprocessStatement($query, $options),
+        $options['pdo'] ?? [],
+        $allow_row_count,
+      );
     }
     catch (\Exception $e) {
       $this->exceptionHandler()->handleStatementException($e, $query, $options);
     }
-    return $statement;
   }
 
   /**
@@ -483,11 +446,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function createConnectionOptionsFromUrl($url, $root) {
-    if ($root !== NULL) {
-      @trigger_error("Passing the \$root value to " . __METHOD__ . "() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
-    }
-    $database = parent::createConnectionOptionsFromUrl($url, NULL);
+  public static function createConnectionOptionsFromUrl($url) {
+    $database = parent::createConnectionOptionsFromUrl($url);
 
     // A SQLite database path with two leading slashes indicates a system path.
     // Otherwise the path is relative to the Drupal root.

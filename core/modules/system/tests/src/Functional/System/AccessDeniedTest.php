@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,7 +23,7 @@ class AccessDeniedTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node', 'system_test'];
+  protected static $modules = ['block', 'node', 'path', 'system_test'];
 
   /**
    * {@inheritdoc}
@@ -54,8 +55,12 @@ class AccessDeniedTest extends BrowserTestBase {
     $this->adminUser->roles[] = 'administrator';
     $this->adminUser->save();
 
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access user profiles']);
-    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access user profiles']);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
+      'access user profiles',
+    ])->save();
+    Role::loadOverrideFree(RoleInterface::AUTHENTICATED_ID)->grantPermissions([
+      'access user profiles',
+    ])->save();
   }
 
   /**
@@ -155,6 +160,22 @@ class AccessDeniedTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(403);
     // Verify the access cacheability metadata for custom 403 is bubbled.
     $this->assertCacheContext('user.roles');
+
+    // Create a custom 403 page with a path alias.
+    $this->drupalCreateContentType(['type' => 'page']);
+    $this->drupalCreateNode([
+      'body' => "Dave, I'm afraid you can't do that.",
+      'path' => '/custom-access-denied',
+    ]);
+    $edit = ['site_403' => '/custom-access-denied'];
+    $this->drupalGet('admin/config/system/site-information');
+    $this->submitForm($edit, 'Save configuration');
+    $assert_session = $this->assertSession();
+    $assert_session->statusMessageContains('The configuration options have been saved.');
+    $this->assertSame('/custom-access-denied', $this->config('system.site')->get('page.403'));
+    $this->drupalGet('/system-test/always-denied');
+    $assert_session->statusCodeEquals(403);
+    $assert_session->pageTextContains("Dave, I'm afraid you can't do that.");
   }
 
 }

@@ -33,7 +33,7 @@ class DrupalDateTimeTest extends UnitTestCase {
    *   The expected result of the DrupalDateTime::diff operation.
    */
   #[DataProvider('providerTestDateDiff')]
-  public function testDateDiff($input1, $input2, $absolute, \DateInterval $expected): void {
+  public function testDateDiff(DrupalDateTime $input1, DrupalDateTime|\DateTime|bool $input2, bool $absolute, \DateInterval $expected): void {
     $interval = $input1->diff($input2, $absolute);
     $this->assertEquals($interval, $expected);
   }
@@ -49,9 +49,9 @@ class DrupalDateTimeTest extends UnitTestCase {
    *   Absolute flag for DateTimePlus::diff method.
    */
   #[DataProvider('providerTestInvalidDateDiff')]
-  public function testInvalidDateDiff($input1, $input2, $absolute): void {
+  public function testInvalidDateDiff(DrupalDateTime $input1, ?string $input2, bool $absolute): void {
     $this->expectException(\BadMethodCallException::class);
-    $this->expectExceptionMessage('Method Drupal\Component\Datetime\DateTimePlus::diff expects parameter 1 to be a \DateTime or \Drupal\Component\Datetime\DateTimePlus object');
+    $this->expectExceptionMessageIs('Method Drupal\Component\Datetime\DateTimePlus::diff expects parameter 1 to be a \DateTime or \Drupal\Component\Datetime\DateTimePlus object');
     $input1->diff($input2, $absolute);
   }
 
@@ -215,7 +215,7 @@ class DrupalDateTimeTest extends UnitTestCase {
    */
   public function testChainableNonCallable(): void {
     $this->expectException(\BadMethodCallException::class);
-    $this->expectExceptionMessage('Call to undefined method Drupal\Core\Datetime\DrupalDateTime::nonexistent()');
+    $this->expectExceptionMessageIs('Call to undefined method Drupal\Core\Datetime\DrupalDateTime::nonexistent()');
     $tz = new \DateTimeZone(date_default_timezone_get());
     $date = new DrupalDateTime('now', $tz, ['langcode' => 'en']);
     $date->setTimezone(new \DateTimeZone('America/New_York'))->nonexistent();
@@ -254,8 +254,8 @@ class DrupalDateTimeTest extends UnitTestCase {
    * @legacy-covers ::format
    */
   public function testRfc2822DateFormat(): void {
-    $language_manager = $this->createMock(LanguageManager::class);
-    $language_manager->expects($this->any())
+    $language_manager = $this->createStub(LanguageManager::class);
+    $language_manager
       ->method('getCurrentLanguage')
       ->willReturn(new Language(['id' => $this->randomMachineName(2)]));
     $container = new ContainerBuilder();

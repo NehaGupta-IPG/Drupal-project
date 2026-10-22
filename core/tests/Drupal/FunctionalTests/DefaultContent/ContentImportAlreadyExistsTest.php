@@ -72,7 +72,7 @@ class ContentImportAlreadyExistsTest extends BrowserTestBase {
 
     // Apply the recipe that sets up the fields and configuration for our
     // default content.
-    $fixtures_dir = $this->getDrupalRoot() . '/core/tests/fixtures';
+    $fixtures_dir = $this->root . '/core/tests/fixtures';
     $this->applyRecipe($fixtures_dir . '/recipes/default_content_base');
 
     $this->contentDir = $fixtures_dir . '/default_content';
@@ -99,7 +99,7 @@ class ContentImportAlreadyExistsTest extends BrowserTestBase {
 
     if ($existing === Existing::Error) {
       $this->expectException(ImportException::class);
-      $this->expectExceptionMessage('user 94503467-be7f-406c-9795-fc25baa22203 already exists.');
+      $this->expectExceptionMessageIs('user 94503467-be7f-406c-9795-fc25baa22203 already exists.');
     }
 
     $this->container->get(Importer::class)

@@ -28,8 +28,6 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
   /**
    * The typed config under test.
    *
-   * @var \Drupal\Core\TypedData\TraversableTypedDataInterface
-   *
    * @see \Drupal\Core\Config\TypedConfigManagerInterface::get()
    */
   protected TraversableTypedDataInterface $config;
@@ -241,7 +239,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
   public function testValidation(): void {
     // Create a data definition that specifies certain allowed keys.
     $definition = MapDataDefinition::create('mapping')
-      ->addConstraint('ValidKeys', ['north', 'south', 'west']);
+      ->addConstraint('ValidKeys', ['allowedKeys' => ['north', 'south', 'west']]);
     $definition['mapping'] = [
       'north' => ['type' => 'string', 'requiredKey' => FALSE],
       'east' => ['type' => 'string', 'requiredKey' => FALSE],
@@ -321,7 +319,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
     unset($value['south']);
     $violations = $typed_config->create(clone $definition, $value)->validate();
     $this->assertCount(0, $violations);
-    $definition->addConstraint('FullyValidatable', NULL);
+    $definition->addConstraint('FullyValidatable');
     $violations = $typed_config->create(clone $definition, $value)->validate();
     $this->assertCount(1, $violations);
     $this->assertSame("'south' is a required key.", (string) $violations->get(0)->getMessage());
@@ -339,7 +337,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
     $config = $this->container->get('config.typed')
       ->get('system.site');
     $config->getDataDefinition()
-      ->addConstraint('ValidKeys', '<infer>');
+      ->addConstraint('ValidKeys', ['allowedKeys' => '<infer>'],);
 
     $data = $config->getValue();
     $data['invalid-key'] = "There's a snake in my boots.";
@@ -351,8 +349,8 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
     // Ensure that ValidKeys will freak out if the option is not exactly
     // `<infer>`.
     $config->getDataDefinition()
-      ->addConstraint('ValidKeys', 'infer');
-    $this->expectExceptionMessage("'infer' is not a valid set of allowed keys.");
+      ->addConstraint('ValidKeys', ['allowedKeys' => 'infer']);
+    $this->expectExceptionMessageIs("'infer' is not a valid set of allowed keys.");
     $config->validate();
   }
 

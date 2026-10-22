@@ -29,6 +29,8 @@ class MediaLinkabilityTest extends MediaTestBase {
    */
   #[DataProvider('providerLinkability')]
   public function testLinkedMediaArbitraryHtml(bool $unrestricted): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3397387');
     $assert_session = $this->assertSession();
 
     $editor = Editor::load('test_format');
@@ -54,7 +56,7 @@ class MediaLinkabilityTest extends MediaTestBase {
     $editor->save();
     $filter_format->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(

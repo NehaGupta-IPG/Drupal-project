@@ -48,7 +48,10 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * The installation profile to install.
    *
-   * @var string
+   * If NULL, the installer will automatically choose a profile -- useful for
+   * testing distributions.
+   *
+   * @var string|null
    */
   protected $profile = 'testing';
 
@@ -82,7 +85,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $params = parent::installParameters();
     // Set the checkbox values to FALSE so that
     // \Drupal\Tests\BrowserTestBase::translatePostValues() does not remove
@@ -163,9 +166,6 @@ abstract class InstallerTestBase extends BrowserTestBase {
     // Select language.
     $this->setUpLanguage();
 
-    // Select profile.
-    $this->setUpProfile();
-
     // Address the requirements problem screen, if any.
     $this->setUpRequirementsProblem();
 
@@ -191,7 +191,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
       // BrowserTestBase::tearDown() will delete the entire test site directory.
       // Not using File API; a potential error must trigger a PHP warning.
       chmod($this->container->getParameter('app.root') . '/' . $this->siteDirectory, 0777);
-      $this->kernel = DrupalKernel::createFromRequest($request, $class_loader, 'prod', FALSE);
+      $this->kernel = DrupalKernel::createFromRequest($request, $class_loader, 'prod');
       $this->kernel->boot();
       $this->kernel->preHandle($request);
       $this->container = $this->kernel->getContainer();
@@ -218,16 +218,30 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function initFrontPage() {
+  protected function initFrontPage(): void {
     // We don't want to visit the front page with the installer when
     // initializing Mink, so we do nothing here.
   }
 
   /**
    * Visits the interactive installer.
+   *
+   * @param array $query
+   *   Query parameters to pass to install.php.
    */
-  protected function visitInstaller() {
-    $this->drupalGet($GLOBALS['base_url'] . '/core/install.php');
+  protected function visitInstaller(array $query = []): void {
+    $url = $GLOBALS['base_url'] . '/core/install.php';
+
+    // We must explicitly tell the installer which profile to use, or it will
+    // default to Standard.
+    // @see install_select_profile()
+    if (isset($this->profile)) {
+      $query['profile'] = (string) $this->profile;
+    }
+    if ($query) {
+      $url .= '?' . http_build_query($query);
+    }
+    $this->drupalGet($url);
   }
 
   /**
@@ -235,7 +249,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
    *
    * @see \Drupal\Core\Installer\Form\SelectLanguageForm
    */
-  protected function setUpLanguage() {
+  protected function setUpLanguage(): void {
     $edit = [
       'langcode' => $this->langcode,
     ];
@@ -244,19 +258,9 @@ abstract class InstallerTestBase extends BrowserTestBase {
   }
 
   /**
-   * Installer step: Select installation profile.
-   */
-  protected function setUpProfile() {
-    $edit = [
-      'profile' => $this->profile,
-    ];
-    $this->submitForm($edit, $this->translations['Save and continue']);
-  }
-
-  /**
    * Installer step: Configure settings.
    */
-  protected function setUpSettings() {
+  protected function setUpSettings(): void {
     $parameters = $this->parameters['forms']['install_settings_form'];
     $driver = $parameters['driver'];
     unset($parameters[$driver]['dependencies']);
@@ -272,7 +276,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
    *
    * @see \Drupal\system\Install\SystemRequirements
    */
-  protected function setUpRequirementsProblem() {
+  protected function setUpRequirementsProblem(): void {
     if (version_compare(phpversion(), PhpRequirements::getMinimumSupportedPhp()) < 0) {
       $this->continueOnExpectedWarnings(['PHP']);
     }
@@ -281,7 +285,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * Final installer step: Configure site.
    */
-  protected function setUpSite() {
+  protected function setUpSite(): void {
     $edit = $this->translatePostValues($this->parameters['forms']['install_configure_form']);
     $this->submitForm($edit, $this->translations['Save and continue']);
     // If we've got to this point the site is installed using the regular
@@ -295,7 +299,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
    * FunctionalTestSetupTrait::refreshVariables() tries to operate on persistent
    * storage, which is only available after the installer completed.
    */
-  protected function refreshVariables() {
+  protected function refreshVariables(): void {
     if ($this->isInstalled) {
       parent::refreshVariables();
     }

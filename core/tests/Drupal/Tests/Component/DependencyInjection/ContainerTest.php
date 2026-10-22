@@ -6,7 +6,6 @@ namespace Drupal\Tests\Component\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\Container;
 use Drupal\Component\Utility\Crypt;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +25,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 #[CoversClass(Container::class)]
 #[Group('DependencyInjection')]
 class ContainerTest extends TestCase {
-  use ExpectDeprecationTrait;
+
   use ProphecyTrait;
 
   /**
@@ -977,7 +976,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a service definition.
    */
-  protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+  protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): \stdClass|string {
     return (object) [
       'type' => 'service',
       'id' => $id,
@@ -988,7 +987,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a service closure definition.
    */
-  protected function getServiceClosureCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+  protected function getServiceClosureCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): \stdClass {
     return (object) [
       'type' => 'service_closure',
       'id' => $id,
@@ -999,7 +998,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a service iterator.
    */
-  protected function getIterator($iterator) {
+  protected function getIterator($iterator): \stdClass {
     return (object) [
       'type' => 'iterator',
       'value' => $iterator,
@@ -1009,7 +1008,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a parameter definition.
    */
-  protected function getParameterCall($name) {
+  protected function getParameterCall($name): \stdClass|string {
     return (object) [
       'type' => 'parameter',
       'name' => $name,
@@ -1019,7 +1018,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a private service definition.
    */
-  protected function getPrivateServiceCall($id, $service_definition, $shared = FALSE) {
+  protected function getPrivateServiceCall($id, $service_definition, $shared = FALSE): \stdClass {
     if (!$id) {
       $hash = Crypt::hashBase64(serialize($service_definition));
       $id = 'private__' . $hash;
@@ -1035,7 +1034,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a machine-optimized collection.
    */
-  protected function getCollection($collection, $resolve = TRUE) {
+  protected function getCollection($collection, $resolve = TRUE): \stdClass|array {
     return (object) [
       'type' => 'collection',
       'value' => $collection,
@@ -1046,7 +1045,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a raw value definition.
    */
-  protected function getRaw($value) {
+  protected function getRaw($value): \stdClass {
     return (object) [
       'type' => 'raw',
       'value' => $value,
@@ -1057,8 +1056,6 @@ class ContainerTest extends TestCase {
 
 /**
  * Helper interface to test Container::get() with configurator.
- *
- * @group DependencyInjection
  */
 interface MockConfiguratorInterface {
 
@@ -1068,22 +1065,20 @@ interface MockConfiguratorInterface {
    * @param object $service
    *   The service to configure.
    */
-  public function configureService($service);
+  public function configureService($service): null;
 
 }
 
 
 /**
  * Helper class to test Container::get() method for varying number of parameters.
- *
- * @group DependencyInjection
  */
 class MockInstantiationService {
 
   /**
    * @var mixed[]
    */
-  protected $arguments;
+  protected array $arguments;
 
   /**
    * Construct a mock instantiation service.
@@ -1098,7 +1093,7 @@ class MockInstantiationService {
    * @return mixed[]
    *   Return the passed arguments.
    */
-  public function getArguments() {
+  public function getArguments(): array {
     return $this->arguments;
   }
 
@@ -1107,8 +1102,6 @@ class MockInstantiationService {
 
 /**
  * Helper class to test Container::get() method.
- *
- * @group DependencyInjection
  */
 class MockService {
 
@@ -1133,7 +1126,7 @@ class MockService {
   protected $someOtherParameter;
 
   /**
-   * @var string
+   * A property.
    */
   public string $someProperty;
 
@@ -1226,9 +1219,8 @@ class MockService {
    */
   public static function getFactoryMethod($class, $arguments = []) {
     $r = new \ReflectionClass($class);
-    $service = ($r->getConstructor() === NULL) ? $r->newInstance() : $r->newInstanceArgs($arguments);
 
-    return $service;
+    return ($r->getConstructor() === NULL) ? $r->newInstance() : $r->newInstanceArgs($arguments);
   }
 
 }

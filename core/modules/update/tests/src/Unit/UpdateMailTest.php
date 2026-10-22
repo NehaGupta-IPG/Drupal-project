@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\update\Unit;
 
+use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Render\MetadataBubblingUrlGenerator;
+use Drupal\Core\Session\AccountProxy;
+use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\update\Hook\UpdateHooks;
 use Drupal\update\UpdateManagerInterface;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests text of update email.
@@ -29,30 +34,24 @@ class UpdateMailTest extends UnitTestCase {
   /**
    * The mocked current user service.
    *
-   * @var \Drupal\Core\Session\AccountProxy|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountProxy|\PHPUnit\Framework\MockObject\Stub
    */
   protected $currentUser;
 
   /**
    * Mocked language manager.
-   *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $languageManager;
+  protected ConfigurableLanguageManagerInterface&MockObject $languageManager;
 
   /**
    * Mocked config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactory|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $configFactory;
+  protected ConfigFactory&MockObject $configFactory;
 
   /**
    * Mocked URL generator.
-   *
-   * @var \Drupal\Core\Render\MetadataBubblingUrlGenerator|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $urlGenerator;
+  protected MetadataBubblingUrlGenerator&MockObject $urlGenerator;
 
   /**
    * {@inheritdoc}
@@ -67,7 +66,7 @@ class UpdateMailTest extends UnitTestCase {
     \Drupal::setContainer($this->container);
 
     // Get needed mocks.
-    $this->currentUser = $this->createMock('\Drupal\Core\Session\AccountProxy');
+    $this->currentUser = $this->createStub(AccountProxy::class);
     $this->languageManager = $this->createMock('Drupal\language\ConfigurableLanguageManagerInterface');
     $this->configFactory = $this->createMock('Drupal\Core\Config\ConfigFactory');
     $this->urlGenerator = $this->createMock('\Drupal\Core\Render\MetadataBubblingUrlGenerator');
@@ -77,7 +76,7 @@ class UpdateMailTest extends UnitTestCase {
    * Test the subject and body of update text.
    */
   #[DataProvider('providerTestUpdateEmail')]
-  public function testUpdateEmail($notification_threshold, $params, array $expected_body): void {
+  public function testUpdateEmail(string $notification_threshold, array $params, array $expected_body): void {
     $langcode = 'en';
     $available_updates_url = 'https://example.com/admin/reports/updates';
     $update_settings_url = 'https://example.com/admin/reports/updates/settings';

@@ -78,10 +78,10 @@ class FieldDefinitionListenerTest extends UnitTestCase {
   /**
    * Sets up the entity type manager to be tested.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
+   * @param array<\Prophecy\Prophecy\ProphecyInterface<\Drupal\Core\Entity\EntityTypeInterface>> $definitions
    *   (optional) An array of entity type definitions.
    */
-  protected function setUpEntityTypeManager($definitions = []): void {
+  protected function setUpEntityTypeManager(array $definitions = []): void {
     foreach ($definitions as $key => $entity_type) {
       // \Drupal\Core\Entity\EntityTypeInterface::getLinkTemplates() is called
       // by \Drupal\Core\Entity\EntityTypeManager::processDefinition() so it
@@ -92,7 +92,7 @@ class FieldDefinitionListenerTest extends UnitTestCase {
     }
 
     $this->entityTypeManager->getDefinition(Argument::cetera())
-      ->will(function ($args) use ($definitions) {
+      ->will(function (array $args) use ($definitions): EntityTypeInterface {
         $entity_type_id = $args[0];
         $exception_on_invalid = $args[1];
         if (isset($definitions[$entity_type_id])) {

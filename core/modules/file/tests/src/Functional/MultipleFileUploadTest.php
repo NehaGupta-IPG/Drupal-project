@@ -37,6 +37,10 @@ class MultipleFileUploadTest extends BrowserTestBase {
 
   /**
    * Tests multiple file field with all file extensions.
+   *
+   * When theme-settings.php deprecation is complete then convert
+   * test_theme_settings theme-settings.php then remove the IgnoreDeprecations
+   * attribute.
    */
   public function testMultipleFileFieldWithAllFileExtensions(): void {
     $theme = 'test_theme_settings';

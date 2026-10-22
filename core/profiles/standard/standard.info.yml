@@ -8,7 +8,6 @@ install:
   - breakpoint
   - ckeditor5
   - config
-  - comment
   - contextual
   - menu_link_content
   - datetime
@@ -24,9 +23,7 @@ install:
   - big_pipe
   - taxonomy
   - dblog
-  - search
-  - shortcut
-  - toolbar
+  - navigation
   - field_ui
   - file
   - views
@@ -34,5 +31,4 @@ install:
   - automated_cron
   - announcements_feed
 themes:
-  - olivero
-  - claro
+  - default_admin

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\options\Kernel;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\options\OptionsAllowedValuesInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -30,7 +30,7 @@ class OptionsDynamicValuesApiTest extends OptionsFieldUnitTestBase {
   /**
    * The created entity.
    */
-  protected EntityInterface $entity;
+  protected EntityTestRev $entity;
 
   /**
    * {@inheritdoc}
@@ -77,16 +77,17 @@ class OptionsDynamicValuesApiTest extends OptionsFieldUnitTestBase {
   }
 
   /**
-   * Tests options_allowed_values().
+   * Tests \Drupal\options\OptionsAllowedValuesInterface::allowedValues().
    *
    * @see \Drupal\options_test\OptionsAllowedValues::dynamicValues()
    */
   public function testOptionsAllowedValues(): void {
+    $options_allowed_values = $this->container->get(OptionsAllowedValuesInterface::class);
     // Test allowed values without passed $items.
-    $values = options_allowed_values($this->fieldStorage);
+    $values = $options_allowed_values->getAllowedValues($this->fieldStorage);
     $this->assertEquals([], $values);
 
-    $values = options_allowed_values($this->fieldStorage, $this->entity);
+    $values = $options_allowed_values->getAllowedValues($this->fieldStorage, $this->entity);
 
     $expected_values = [
       $this->entity->label(),

@@ -298,8 +298,7 @@ class BlockTest extends BlockTestBase {
   public function testBlockThemeSelector(): void {
     // Install all themes.
     $themes = [
-      'olivero',
-      'claro',
+      'default_admin',
       'stark',
     ];
     \Drupal::service('theme_installer')->install($themes);
@@ -391,7 +390,7 @@ class BlockTest extends BlockTestBase {
    *   The machine name of the theme region to move the block to, for example
    *   'header' or 'sidebar_first'.
    */
-  public function moveBlockToRegion(array $block, $region): void {
+  public function moveBlockToRegion(array $block, string $region): void {
     // Set the created block to a specific region.
     $block += ['theme' => $this->config('system.theme')->get('default')];
     $edit = [];
@@ -407,11 +406,11 @@ class BlockTest extends BlockTestBase {
     $this->assertSession()->pageTextContains($block['settings[label]']);
 
     $region_xpath = [
-      'header' => '//header[@role = "banner"]',
+      'header' => '//header',
       'sidebar_first' => '//aside[contains(@class, "layout-sidebar-first")]',
       'content' => '//div[contains(@class, "layout-content")]',
       'sidebar_second' => '//aside[contains(@class, "layout-sidebar-second")]',
-      'footer' => '//footer[@role = "contentinfo"]',
+      'footer' => '//footer',
     ];
 
     // Confirm that the content block was found at the proper region.
@@ -429,6 +428,7 @@ class BlockTest extends BlockTestBase {
    * - "block_plugin:<block plugin ID>"
    */
   public function testBlockCacheTags(): void {
+    \Drupal::service('module_installer')->install(['page_cache']);
     // The page cache only works for anonymous users.
     $this->drupalLogout();
 
@@ -555,14 +555,14 @@ class BlockTest extends BlockTestBase {
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = \Drupal::service('theme_installer');
 
-    $theme_installer->install(['claro']);
-    $this->config('system.theme')->set('default', 'claro')->save();
-    $block = $this->drupalPlaceBlock('system_powered_by_block', ['theme' => 'claro', 'region' => 'help']);
+    $theme_installer->install(['default_admin']);
+    $this->config('system.theme')->set('default', 'default_admin')->save();
+    $block = $this->drupalPlaceBlock('system_powered_by_block', ['theme' => 'default_admin', 'region' => 'help']);
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextContains('Powered by Drupal');
 
     $this->config('system.theme')->set('default', 'stark')->save();
-    $theme_installer->uninstall(['claro']);
+    $theme_installer->uninstall(['default_admin']);
 
     // Ensure that the block configuration does not exist anymore.
     $this->assertNull(Block::load($block->id()));
@@ -635,12 +635,31 @@ class BlockTest extends BlockTestBase {
     $this->submitForm($edit, 'Save block');
 
     // Ensure that the title is displayed as plain text.
-    $elements = $this->xpath('//table/tbody/tr//td[contains(@class, "block")]');
+    $elements = $this->getNodeElementsByXpath('//table/tbody/tr//td[contains(@class, "block")]');
     $this->assertEquals($title, $elements[0]->getText());
 
     $this->clickLink('Disable');
-    $elements = $this->xpath('//table/tbody/tr//td[contains(@class, "block")]');
+    $elements = $this->getNodeElementsByXpath('//table/tbody/tr//td[contains(@class, "block")]');
     $this->assertEquals("$title (disabled)", $elements[0]->getText());
+  }
+
+  /**
+   * Tests a combined page title, content, and messages block.
+   */
+  public function testTitleContentMessagesSingleBlock(): void {
+    // Place block which implements MainContentBlockPluginInterface,
+    // TitleBlockPluginInterface, and MessagesBlockPluginInterface.
+    $this->drupalPlaceBlock('test_title_content_message_block');
+    $this->drupalGet('');
+
+    // Ensure the block's setTitle function was called.
+    $this->assertSession()->pageTextContains('Page title has been placed in the block.');
+
+    // Ensure the block's setMainContent function was called.
+    $this->assertSession()->pageTextContains('Main content has been placed in the block.');
+
+    // Ensure the status message is shown.
+    $this->assertSession()->statusMessageContains('This is a status message.', 'status');
   }
 
 }

@@ -57,7 +57,7 @@ class FilterEntityReferenceWebTest extends UITestBase {
 
     $options = $this->getUiOptions();
     // Should be sorted by title ASC.
-    uasort($this->targetEntities, function (EntityInterface $a, EntityInterface $b) {
+    uasort($this->targetEntities, function (EntityInterface $a, EntityInterface $b): int {
       return strnatcasecmp($a->getTitle(), $b->getTitle());
     });
     $i = 0;
@@ -133,7 +133,7 @@ class FilterEntityReferenceWebTest extends UITestBase {
    */
   protected function getUiOptions(): array {
     /** @var \Behat\Mink\Element\TraversableElement[] $result */
-    $result = $this->xpath('//select[@name="options[value][]"]/option');
+    $result = $this->getNodeElementsByXpath('//select[@name="options[value][]"]/option');
     $this->assertNotEmpty($result, 'Options found');
 
     $options = [];

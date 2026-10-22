@@ -20,7 +20,6 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\media\Entity\Media;
 use Drupal\media\Entity\MediaType;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\shortcut\Entity\Shortcut;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -39,15 +38,11 @@ class EntityLinksTest extends KernelTestBase {
 
   /**
    * The entity_links filter.
-   *
-   * @var \Drupal\filter\Plugin\Filter\EntityLinks
    */
   protected EntityLinks $filter;
 
   /**
    * The test logger.
-   *
-   * @var \ColinODell\PsrTestLogger\TestLogger
    */
   protected TestLogger $logger;
 
@@ -71,8 +66,6 @@ class EntityLinksTest extends KernelTestBase {
     // @see ::testMenuLinkContentEntity
     'link',
     'menu_link_content',
-    // @see ::testShortcutEntity
-    'shortcut',
   ];
 
   /**
@@ -101,10 +94,6 @@ class EntityLinksTest extends KernelTestBase {
 
     // @see ::testMenuLinkContentEntity
     $this->installEntitySchema('menu_link_content');
-
-    // @see ::testShortcutEntity
-    $this->installEntitySchema('shortcut');
-    $this->installConfig(['shortcut']);
 
     // Add Swedish, Danish and Finnish.
     ConfigurableLanguage::createFromLangcode('sv')->save();
@@ -341,31 +330,19 @@ class EntityLinksTest extends KernelTestBase {
   }
 
   /**
-   * @legacy-covers ::getUrl
-   * @legacy-covers \Drupal\shortcut\Entity\ShortcutLinkTarget
+   * Tests that an unresolvable entity link does not throw a fatal error.
    */
-  public function testShortcutEntity(): void {
-    // cspell:disable-next-line
-    $path = '/user/logout?token=fzL0Ox4jS6qafdt6gzGzjWGb_hsR6kJ8L8E0D4hC5Mo';
-    $shortcut = Shortcut::create([
-      'shortcut_set' => 'default',
-      'title' => 'Comments',
-      'weight' => -20,
-      'link' => [
-        'uri' => "internal:$path",
-      ],
-    ]);
-    $shortcut->save();
+  public function testProcessLogsExceptionForUnresolvableEntityLink(): void {
+    $input = '<a data-entity-type="true" data-entity-uuid="not-a-real-uuid" href="/original">Link text</a>';
 
-    $this->assertFilterProcessResult(
-      sprintf('<a data-entity-type="shortcut" data-entity-uuid="%s" href="something?query=string#fragment">Link text</a>', $shortcut->uuid()),
-      'en',
-      (new FilterProcessResult())
-        ->setProcessedText(sprintf('<a href="%s?query=string#fragment">Link text</a>', $path))
-        ->setCacheTags(['config:shortcut.set.default'])
-        ->setCacheContexts([])
-        ->setCacheMaxAge(Cache::PERMANENT)
-    );
+    $result = $this->filter->process($input, 'en');
+
+    $this->assertInstanceOf(FilterProcessResult::class, $result);
+    $this->assertTrue($this->logger->hasRecords());
+    $processed = $result->getProcessedText();
+    $this->assertStringContainsString('data-entity-type="true"', $processed);
+    $this->assertStringContainsString('data-entity-uuid="not-a-real-uuid"', $processed);
+    $this->assertStringContainsString('href="/original"', $processed);
   }
 
   /**

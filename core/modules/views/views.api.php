@@ -595,7 +595,10 @@ function hook_field_views_data_alter(array &$data, FieldStorageConfigInterface $
 
   $data['file_managed'][$pseudo_field_name]['relationship'] = [
     'title' => t('@entity using @field', ['@entity' => $entity_type->getLabel(), '@field' => $label]),
-    'help' => t('Relate each @entity with a @field set to the image.', ['@entity' => $entity_type->getLabel(), '@field' => $label]),
+    'help' => t('Relate each @entity with a @field set to the image.', [
+      '@entity' => $entity_type->getLabel(),
+      '@field' => $label,
+    ]),
     'id' => 'entity_reverse',
     'field_name' => $field_name,
     'entity_type' => $entity_type_id,
@@ -652,7 +655,10 @@ function hook_field_views_data_views_data_alter(array &$data, FieldStorageConfig
   // Views data for this field is in $data[$data_key].
   $data[$data_key][$pseudo_field_name]['relationship'] = [
     'title' => t('@entity using @field', ['@entity' => $entity_type->getLabel(), '@field' => $label]),
-    'help' => t('Relate each @entity with a @field set to the term.', ['@entity' => $entity_type->getLabel(), '@field' => $label]),
+    'help' => t('Relate each @entity with a @field set to the term.', [
+      '@entity' => $entity_type->getLabel(),
+      '@field' => $label,
+    ]),
     'id' => 'entity_reverse',
     'field_name' => $field_name,
     'entity_type' => $entity_type_id,
@@ -961,7 +967,7 @@ function hook_views_preview_info_alter(array &$rows, ViewExecutable $view) {
  * This hook will fire whenever a view is enabled, disabled, created,
  * updated, or deleted.
  *
- * @see views_invalidate_cache()
+ * @see \Drupal\views\Views::invalidateCache()
  */
 function hook_views_invalidate_cache(): void {
   Cache::invalidateTags(['views']);
