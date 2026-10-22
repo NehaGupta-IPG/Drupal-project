@@ -141,10 +141,8 @@ class NodeTermData extends RelationshipPluginBase {
   public function calculateDependencies() {
     $dependencies = parent::calculateDependencies();
 
-    foreach ($this->options['vids'] as $vocabulary_id) {
-      if ($vocabulary = $this->vocabularyStorage->load($vocabulary_id)) {
-        $dependencies[$vocabulary->getConfigDependencyKey()][] = $vocabulary->getConfigDependencyName();
-      }
+    foreach ($this->vocabularyStorage->loadMultiple($this->options['vids']) as $vocabulary) {
+      $dependencies[$vocabulary->getConfigDependencyKey()][] = $vocabulary->getConfigDependencyName();
     }
 
     return $dependencies;

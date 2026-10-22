@@ -113,6 +113,8 @@ class HandlerFilterRolesTest extends UserKernelTestBase {
 
     $role = Role::create(['id' => 'test_user_role', 'label' => 'Test user role']);
     $role->save();
+    Role::create(['id' => 'other_role', 'label' => 'Other role'])->save();
+    Role::create(['id' => 'third_role', 'label' => 'Third role'])->save();
     /** @var \Drupal\views\Entity\View $view */
     $view = View::load('test_user_name');
     $display = &$view->getDisplay('default');
@@ -120,11 +122,14 @@ class HandlerFilterRolesTest extends UserKernelTestBase {
       'id' => 'roles_target_id',
       'table' => 'user__roles',
       'field' => 'roles_target_id',
-      'value' => ['test_user_role' => 'test_user_role'],
+      'value' => ['other_role', 'test_user_role', 'third_role'],
       'plugin_id' => 'user_roles',
     ];
     // Ensure no warning is triggered before the role is deleted.
-    $view->calculateDependencies();
+    $this->assertSame([
+      'config' => ['user.role.other_role', 'user.role.test_user_role', 'user.role.third_role'],
+      'module' => ['user'],
+    ], $view->calculateDependencies()->getDependencies());
     $role->delete();
 
     // Recalculate after role deletion.
@@ -136,7 +141,10 @@ class HandlerFilterRolesTest extends UserKernelTestBase {
         Argument::withEntry('%role', 'test_user_role'),
       )
     )->shouldBeCalled();
-    $view->calculateDependencies();
+    $this->assertSame([
+      'config' => ['user.role.other_role', 'user.role.third_role'],
+      'module' => ['user'],
+    ], $view->calculateDependencies()->getDependencies());
   }
 
 }

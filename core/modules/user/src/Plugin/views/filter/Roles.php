@@ -99,8 +99,9 @@ class Roles extends ManyToOne {
       return [];
     }
 
+    $roles = $this->roleStorage->loadMultiple((array) $this->value);
     foreach ((array) $this->value as $role_id) {
-      if ($role = $this->roleStorage->load($role_id)) {
+      if ($role = $roles[$role_id] ?? NULL) {
         $dependencies[$role->getConfigDependencyKey()][] = $role->getConfigDependencyName();
       }
       else {
