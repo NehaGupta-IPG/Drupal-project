@@ -114,7 +114,7 @@ class Rearrange extends ViewsFormBase {
       $form['fields'][$id]['name'] = ['#markup' => $markup];
 
       $form['fields'][$id]['weight'] = [
-        '#type' => 'textfield',
+        '#type' => 'weight',
         '#default_value' => ++$count,
         '#attributes' => ['class' => ['weight']],
         '#title' => $this->t('Weight for @title', ['@title' => $name]),
