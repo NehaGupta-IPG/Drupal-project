@@ -3,4 +3,4 @@ identity: drupal
 # overwritten during installation.
 # @see syslog_install().
 facility: 8
-format: '!base_url|!timestamp|!type|!ip|!request_uri|!referer|!uid|!link|!message'
+format: '!base_url|!timestamp|!type|!request_uri|!referer|!uid|!link|!message'

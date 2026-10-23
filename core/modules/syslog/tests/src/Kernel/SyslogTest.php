@@ -51,6 +51,11 @@ class SyslogTest extends KernelTestBase {
     $user->method('id')->willReturn(42);
     $this->container->set('current_user', $user);
 
+    /** @var \Drupal\Core\Config\Config $config */
+    $config = $this->container->get('config.factory')->getEditable('syslog.settings');
+    $config->set('format', '!base_url|!timestamp|!type|!ip|!request_uri|!referer|!uid|!link|!message');
+    $config->save();
+
     \Drupal::logger('my_module')->warning('My warning message.', ['link' => '/my-link']);
 
     $log_filename = $this->container->get('file_system')->realpath('public://syslog.log');
@@ -68,8 +73,6 @@ class SyslogTest extends KernelTestBase {
     $this->assertEquals('My warning message.', $log[8]);
 
     // Test that an empty format prevents writing to the syslog.
-    /** @var \Drupal\Core\Config\Config $config */
-    $config = $this->container->get('config.factory')->getEditable('syslog.settings');
     $config->set('format', '');
     $config->save();
     unlink($log_filename);
