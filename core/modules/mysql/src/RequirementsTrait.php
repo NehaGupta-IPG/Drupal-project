@@ -30,6 +30,12 @@ trait RequirementsTrait {
     $tables_missing_primary_key = [];
     $tables = $connection->schema()->findTables('%');
     foreach ($tables as $table) {
+      // Check if this is a view, not a table. Views cannot have primary keys.
+      $table_type = $connection->query("SELECT TABLE_TYPE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table", [':table' => $table])->fetchField();
+      if ($table_type === 'VIEW') {
+        continue;
+      }
+
       $primary_key_column = $connection->query("SHOW KEYS FROM {" . $table . "} WHERE Key_name = 'PRIMARY'")->fetchAllAssoc('Column_name');
       if (empty($primary_key_column)) {
         $tables_missing_primary_key[] = $table;
