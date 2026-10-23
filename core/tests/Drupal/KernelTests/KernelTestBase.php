@@ -144,9 +144,9 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   /**
    * The test container.
    *
-   * @var \Drupal\Core\DependencyInjection\ContainerBuilder
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface
    */
-  protected ?ContainerBuilder $container;
+  protected $container;
 
   /**
    * Modules to install.
