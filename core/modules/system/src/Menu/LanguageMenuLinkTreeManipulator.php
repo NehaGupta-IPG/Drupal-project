@@ -34,7 +34,7 @@ class LanguageMenuLinkTreeManipulator implements MenuLinkTreeContextualManipulat
   public function process(array $tree, mixed $context): array {
     $current_language = $this->getCurrentLanguage()->getId();
     foreach ($tree as $key => $link) {
-      if (!$link->link instanceof MenuLinkContent) {
+      if (!$link->link instanceof MenuLinkTranslationInterface) {
         continue;
       }
 
