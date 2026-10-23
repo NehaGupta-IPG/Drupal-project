@@ -241,7 +241,7 @@ if (Config::get('debug-discovery')) {
     $cliPrinter->testBinSequenceTable(
       (int) Config::get('ci-parallel-node-index'),
       $workAllocator->getSortedList(),
-      $workAllocator->getAllocatedList()
+      $workAllocator->getAllocatedList(),
     );
   }
   else {

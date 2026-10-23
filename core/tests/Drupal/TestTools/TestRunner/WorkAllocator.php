@@ -169,11 +169,12 @@ class WorkAllocator {
    * @return array<int,TestClassInfoList>
    *   An associative array of bins and the test class names in each bin.
    */
-  private function placeTestsIntoBins(array $tests): array {
+  private function placeTestsIntoBins(array &$tests): array {
     $bins = array_fill(0, $this->totalBins, []);
     $binWeights = array_fill(0, $this->totalBins, 0);
     foreach ($tests as $key => $test) {
       $bin = array_search(min($binWeights), $binWeights, TRUE);
+      $tests[$key]['bin'] = $bin + 1;
       $bins[$bin][$key] = $test;
       $binWeights[$bin] += $test['weight'];
     }

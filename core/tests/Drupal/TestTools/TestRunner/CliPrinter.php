@@ -154,6 +154,10 @@ class CliPrinter {
       'fg' => 'gray',
       'align' => 'right',
     ]);
+    $inactiveCenteredCellStyle = new TableCellStyle([
+      'fg' => 'gray',
+      'align' => 'center',
+    ]);
     $activeCellStyle = new TableCellStyle([
       'fg' => 'bright-white',
     ]);
@@ -161,16 +165,21 @@ class CliPrinter {
       'fg' => 'bright-white',
       'align' => 'right',
     ]);
+    $activeCenteredCellStyle = new TableCellStyle([
+      'fg' => 'bright-white',
+      'align' => 'center',
+    ]);
 
-    $this->io->writeln(" Tests marked *** will be executed in this PARALLEL BIN #{$bin}.");
+    $this->io->writeln(" Tests marked <bg=yellow;fg=black>*{$bin}*</> will be executed in this PARALLEL BIN #{$bin} of {$this->config->get('ci-parallel-node-total')}.");
 
     $rows = [];
     foreach ($allTests as $testInfo) {
       $inBin = isset($tests[$testInfo['name']]);
       $style = $inBin ? $activeCellStyle : $inactiveCellStyle;
       $rightAlignedStyle = $inBin ? $activeRightAlignedCellStyle : $inactiveRightAlignedCellStyle;
+      $centeredStyle = $inBin ? $activeCenteredCellStyle : $inactiveCenteredCellStyle;
       $rows[] = [
-        new TableCell($inBin ? "***" : '', ['style' => $style]),
+        new TableCell($inBin ? "<bg=yellow;fg=black>*{$bin}*</>" : (string) $testInfo['bin'], ['style' => $centeredStyle]),
         new TableCell((string) $testInfo['sorted_sequence'], ['style' => $rightAlignedStyle]),
         new TableCell($inBin ? (string) $tests[$testInfo['name']]['worker_sequence'] : '', ['style' => $rightAlignedStyle]),
         new TableCell(in_array('#slow', $testInfo['groups']) ? '#slow' : '', ['style' => $style]),
