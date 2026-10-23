@@ -12,7 +12,6 @@ use Drupal\Core\Menu\MenuLinkTranslationInterface;
 use Drupal\Core\Menu\MenuLinkTreeContextualManipulatorInterface;
 use Drupal\Core\Menu\OnlyShowTranslatedMenuLinksInterface;
 
-
 /**
  * Provides a menu link language manipulator.
  */
