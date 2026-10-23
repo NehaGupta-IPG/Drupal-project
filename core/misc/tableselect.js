@@ -132,6 +132,11 @@
         lastChecked = e.target;
       });
 
+    // Ensure the selected class is applied when the table is first loaded.
+    checkboxes.each(function () {
+      $(this).closest('tr').toggleClass('selected', this.checked);
+    });
+
     // If all checkboxes are checked on page load, make sure the select-all one
     // is checked too, otherwise keep unchecked.
     updateSelectAll(checkboxes.length === checkboxes.filter(':checked').length);
