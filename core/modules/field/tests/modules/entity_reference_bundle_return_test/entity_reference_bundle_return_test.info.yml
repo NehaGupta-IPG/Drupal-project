@@ -1,0 +1,7 @@
+name: Entity reference bundle return test
+type: module
+description: Provides a collection-only vocabulary definition for testing.
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:taxonomy

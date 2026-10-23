@@ -3,10 +3,13 @@
 namespace Drupal\Core\Entity\Plugin\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginBase;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -208,8 +211,10 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
           $bundle_entity_type_label = $bundle_entity_type->getSingularLabel();
           $add_link = '';
 
-          // Keep the field form's own destination when returning to it.
-          $query = \Drupal::request()->query->all();
+          // Build the return URL without Ajax request parameters.
+          $query = UrlHelper::filterQueryParameters(\Drupal::request()->query->all(), [
+            'ajax_form', '_wrapper_format', '_drupal_ajax', 'ajax_page_state', 'js',
+          ]);
           $destination = Url::fromRoute('<current>', [], ['query' => $query])->toString();
 
           // Prefer the add form; use the collection only if it is not defined.
@@ -226,6 +231,24 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
               $link_text = $rel === 'add-form'
                 ? $this->t('Add a new @entity_type.', ['@entity_type' => $bundle_entity_type_label])
                 : $this->t('Manage @bundles', ['@bundles' => $bundle_entity_type->getPluralLabel()]);
+              if ($rel === 'add-form') {
+                // Open another modal on top so the user can create a bundle.
+                $form['add_bundle'] = [
+                  '#type' => 'button',
+                  '#submit_button' => FALSE,
+                  '#value' => $link_text,
+                  '#name' => 'add_reference_bundle',
+                  '#limit_validation_errors' => [],
+                  '#dialog_submit' => [[static::class, 'bundleCreated']],
+                  '#url' => $url,
+                  '#attributes' => ['class' => ['link', 'js-show']],
+                  '#ajax' => [
+                    'callback' => 'form_ajax_response_builder:openDialog',
+                  ],
+                ];
+                // Keep the normal add link for browsers without JavaScript.
+                $url->setOption('attributes', ['class' => ['js-hide']]);
+              }
               $add_link = Link::fromTextAndUrl($link_text, $url)->toString();
             }
           }
@@ -562,6 +585,27 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     // Restore the tags and metadata.
     $query->alterTags = $old_tags;
     $query->alterMetaData = $old_metadata;
+  }
+
+  /**
+   * Selects the bundle created through the configuration form's add button.
+   *
+   * @param \Drupal\Core\Form\FormStateInterface $dialog_state
+   *   The successfully submitted bundle form state.
+   * @param array $element
+   *   The button that opened the bundle dialog.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The calling reference configuration form state.
+   */
+  public static function bundleCreated(FormStateInterface $dialog_state, array $element, FormStateInterface $form_state): void {
+    $form_object = $dialog_state->getFormObject();
+    if ($form_object instanceof EntityFormInterface) {
+      $bundle = $form_object->getEntity()->id();
+      $parents = $element['#parents'];
+      array_pop($parents);
+      $parents[] = 'target_bundles';
+      NestedArray::setValue($form_state->getUserInput(), $parents, [$bundle => $bundle]);
+    }
   }
 
 }
