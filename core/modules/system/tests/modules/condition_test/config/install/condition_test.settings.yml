@@ -3,7 +3,7 @@
 visibility:
   current_theme:
     id: current_theme
-    theme: stable
+    theme: stark
     negate: false
     context_mapping: {  }
   request_path:
