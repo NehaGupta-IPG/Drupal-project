@@ -50,7 +50,7 @@ display:
           id: id
           table: block_content_field_revision
           field: id
-          plugin_id: block_content_id
+          plugin_id: standard
           entity_type: block_content
           entity_field: id
       sorts:
@@ -59,7 +59,7 @@ display:
           table: block_content_field_revision
           field: revision_id
           order: ASC
-          plugin_id: field
+          plugin_id: standard
           entity_type: block_content
           entity_field: revision_id
       display_extenders: {  }

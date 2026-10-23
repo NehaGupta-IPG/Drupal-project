@@ -33,7 +33,7 @@ display:
           order: ASC
           relationship: none
           table: views_test_data
-          plugin_id: numeric
+          plugin_id: standard
       use_more: true
       use_more_always: true
       use_more_text: 'custom more text'

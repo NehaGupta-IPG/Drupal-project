@@ -33,20 +33,20 @@ display:
           id: name
           relationship: none
           table: views_test_data
-          plugin_id: string
+          plugin_id: standard
         job:
           field: job
           id: job
           relationship: none
           table: views_test_data
           element_label_colon: true
-          plugin_id: string
+          plugin_id: standard
         job_1:
           field: job
           id: job_1
           relationship: none
           table: views_test_data
-          plugin_id: string
+          plugin_id: standard
       pager:
         options:
           offset: 0
@@ -58,7 +58,7 @@ display:
           order: ASC
           relationship: none
           table: views_test_data
-          plugin_id: numeric
+          plugin_id: standard
       style:
         type: table
         options:

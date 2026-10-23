@@ -24,7 +24,7 @@ display:
           table: views_test_data
           field: name
           label: Name
-          plugin_id: string
+          plugin_id: field
         created:
           id: created
           table: views_test_data

@@ -52,7 +52,7 @@ display:
           table: entity_test
           field: id
           order: ASC
-          plugin_id: field
+          plugin_id: standard
           entity_type: entity_test
           entity_field: id
     display_plugin: default

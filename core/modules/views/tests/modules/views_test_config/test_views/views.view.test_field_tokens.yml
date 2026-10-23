@@ -26,22 +26,22 @@ display:
           id: name
           table: views_test_data
           field: name
-          plugin_id: string
+          plugin_id: standard
         name_1:
           id: name_1
           table: views_test_data
           field: name
-          plugin_id: string
+          plugin_id: standard
         name_2:
           id: name_2
           table: views_test_data
           field: name
-          plugin_id: string
+          plugin_id: standard
         job:
           id: job
           table: views_test_data
           field: job
-          plugin_id: string
+          plugin_id: standard
       style:
         type: default
       row:

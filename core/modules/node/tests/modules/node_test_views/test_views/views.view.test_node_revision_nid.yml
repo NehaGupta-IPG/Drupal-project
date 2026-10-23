@@ -19,7 +19,7 @@ display:
           table: node_field_revision
           field: nid
           required: true
-          plugin_id: field
+          plugin_id: standard
       fields:
         vid:
           id: vid
@@ -64,7 +64,7 @@ display:
           table: node_field_revision
           field: vid
           order: ASC
-          plugin_id: field
+          plugin_id: standard
           entity_type: node
           entity_field: vid
         langcode:

@@ -80,7 +80,7 @@ display:
           id: uid
           order: ASC
           table: users_field_data
-          plugin_id: field
+          plugin_id: standard
           entity_type: user
           entity_field: uid
       style:

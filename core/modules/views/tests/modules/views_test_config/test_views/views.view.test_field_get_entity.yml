@@ -42,7 +42,7 @@ display:
           id: uid
           table: users
           relationship: uid
-          plugin_id: user
+          plugin_id: field
           entity_type: user
           entity_field: uid
       filter_groups:

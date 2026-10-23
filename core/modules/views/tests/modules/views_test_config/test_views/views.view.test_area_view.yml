@@ -33,7 +33,7 @@ display:
           order: ASC
           relationship: none
           table: views_test_data
-          plugin_id: numeric
+          plugin_id: standard
       header:
         view:
           field: view

@@ -47,6 +47,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     'filter',
     'field',
     'text',
+    'search',
   ];
 
   /**
@@ -84,6 +85,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $this->installEntitySchema('node');
     $this->installEntitySchema('comment');
     $this->installSchema('comment', ['comment_entity_statistics']);
+    $this->installSchema('search', ['search_dataset', 'search_index', 'search_total']);
     $this->installConfig(['system', 'field', 'node', 'comment']);
 
     NodeType::create([
@@ -556,6 +558,8 @@ class ViewExecutableTest extends ViewsKernelTestBase {
       '{{ raw_arguments.uid_touch }}' => (string) $account->id(),
       '{{ arguments.uid }}' => $account->label(),
       '{{ raw_arguments.uid }}' => (string) $account->id(),
+      '{{ arguments.keys }}' => '1',
+      '{{ raw_arguments.keys }}' => '1',
     ];
     $this->assertEquals($expected, $view->build_info['substitutions']);
   }

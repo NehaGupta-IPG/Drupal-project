@@ -33,7 +33,7 @@ display:
           id: name
           relationship: none
           table: views_test_data
-          plugin_id: string
+          plugin_id: field
       pager:
         options:
           offset: 0
@@ -45,25 +45,25 @@ display:
           order: ASC
           relationship: none
           table: views_test_data
-          plugin_id: numeric
+          plugin_id: standard
         age:
           field: age
           id: standard
           order: ASC
           relationship: none
           table: views_test_data
-          plugin_id: numeric
+          plugin_id: standard
       filters:
         name:
           field: name
           id: string
           table: views_test_data
-          plugin_id: string
+          plugin_id: standard
         age:
           field: age
           id: numeric
           table: views_test_data
-          plugin_id: numeric
+          plugin_id: standard
     display_plugin: default
     display_title: Default
     id: default

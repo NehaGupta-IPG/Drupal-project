@@ -38,7 +38,7 @@ display:
           table: views_test_data
           field: name
           label: ''
-          plugin_id: string
+          plugin_id: standard
         nothing:
           id: nothing
           table: views
