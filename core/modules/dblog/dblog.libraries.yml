@@ -3,3 +3,12 @@ drupal.dblog:
   css:
     component:
       css/dblog.module.css: {}
+
+live_time:
+  version: 1.x
+  js:
+    js/dblog_live_time.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
