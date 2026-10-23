@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Menu\MenuLinkBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Utility\Error;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 
 /**
@@ -156,7 +157,12 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
     // translation based on the current language context. This can only happen
     // if the site is configured to be multilingual.
     if ($this->languageManager->isMultilingual()) {
-      return $this->getEntity()->getTitle();
+      try {
+        return $this->getEntity()->getTitle();
+      }
+      catch (\Throwable $exception) {
+        Error::logException(\Drupal::logger('menu_link_content'), $exception);
+      }
     }
     return $this->pluginDefinition['title'];
   }
@@ -169,7 +175,12 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
     // translation based on the current language context. This can only happen
     // if the site is configured to be multilingual.
     if ($this->languageManager->isMultilingual()) {
-      return $this->getEntity()->getDescription();
+      try {
+        return $this->getEntity()->getDescription();
+      }
+      catch (\Throwable $exception) {
+        Error::logException(\Drupal::logger('menu_link_content'), $exception);
+      }
     }
     return $this->pluginDefinition['description'];
   }
