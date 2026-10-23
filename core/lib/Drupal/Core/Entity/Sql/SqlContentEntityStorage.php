@@ -1356,8 +1356,6 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
     $results = $query->execute();
 
-    $is_not_null = fn($value) => !is_null($value);
-
     foreach ($results as $row) {
       $row = (array) $row;
       $value_key = $row[$base_id_key];
@@ -1390,11 +1388,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $langcode = $this->langcodeKey && empty($row[$this->defaultLangcodeKey]) && isset($default_langcodes[$value_key]) && $row[$base_langcode_alias] != $default_langcodes[$value_key] ? $row[$base_langcode_alias] : LanguageInterface::LANGCODE_DEFAULT;
 
       foreach ($single_cardinality_fields as $field_name => $storage_definition) {
-        $field_values = array_intersect_key($row, array_flip($field_columns[$field_name]));
-
         // If all the field values are null, then there was no result for this
         // field.
-        if (!array_any($field_values, $is_not_null)) {
+        if (!array_any($field_columns[$field_name], fn($column) => isset($row[$column]))) {
           continue;
         }
         if (!isset($values[$value_key][$field_name][$langcode])) {
