@@ -75,8 +75,9 @@ class WidgetUploadTest extends MediaLibraryTestBase {
 
     // Assert the upload form is visible for type_four.
     $this->switchToMediaType('Four');
-    $assert_session->fieldExists('Add files');
+    $assert_session->fieldExists('Image');
     $assert_session->pageTextContains('Maximum 2 files.');
+    $assert_session->pageTextContains('Type four media image field test description');
 
     // Create a user that can create media for all media types.
     $user = $this->drupalCreateUser([
@@ -100,11 +101,11 @@ class WidgetUploadTest extends MediaLibraryTestBase {
 
     // Assert the upload form is now visible for default tab type_three.
     $assert_session->elementExists('css', '.js-media-library-add-form');
-    $assert_session->fieldExists('Add files');
+    $assert_session->fieldExists('Image');
 
     // Assert we can upload a file to the default tab type_three.
     $assert_session->elementNotExists('css', '.js-media-library-add-form[data-input]');
-    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_image->uri));
+    $this->addMediaFileToField('Image', $this->container->get('file_system')->realpath($png_image->uri));
     $this->assertMediaAdded();
     $assert_session->elementExists('css', '.js-media-library-add-form[data-input]');
     // We do not have pre-selected items, so the container should not be added
@@ -155,7 +156,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->openMediaLibraryForField('field_twin_media');
     $this->switchToMediaType('Three');
     $png_uri_2 = $file_system->copy($png_image->uri, 'public://');
-    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_uri_2));
+    $this->addMediaFileToField('Image', $this->container->get('file_system')->realpath($png_uri_2));
     $this->waitForFieldExists('Alternative text')->setValue($this->randomString());
     $this->pressSaveButton();
     $this->pressInsertSelected('Added one media item.');
@@ -174,7 +175,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->pageTextContains('1 item selected');
     $assert_session->hiddenFieldValueEquals('current_selection', $selected_item_id);
     $png_uri_3 = $file_system->copy($png_image->uri, 'public://');
-    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_uri_3));
+    $this->addMediaFileToField('Image', $this->container->get('file_system')->realpath($png_uri_3));
     $this->waitForText('The media item has been created but has not yet been saved.');
     $page->fillField('Name', 'Unlimited Cardinality Image');
     $page->fillField('Alternative text', $this->randomString());
@@ -212,7 +213,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->openMediaLibraryForField('field_twin_media');
     $this->switchToMediaType('Four');
     // We set the multiple to FALSE if only one file can be uploaded.
-    $this->assertFalse($assert_session->fieldExists('Add file')->hasAttribute('multiple'));
+    $this->assertFalse($assert_session->fieldExists('Image')->hasAttribute('multiple'));
     $assert_session->pageTextContains('One file only.');
     $choose_files = $assert_session->elementExists('css', '.form-managed-file');
     $choose_files->hasButton('Choose file');
@@ -221,11 +222,11 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Assert media type four should only allow jpg files by trying a png file
     // first.
     $png_uri_4 = $file_system->copy($png_image->uri, 'public://');
-    $this->addMediaFileToField('Add file', $file_system->realpath($png_uri_4));
+    $this->addMediaFileToField('Image', $file_system->realpath($png_uri_4));
     $this->waitForText('Only files with the following extensions are allowed');
     // Assert that jpg files are accepted by type four.
     $jpg_uri_2 = $file_system->copy($jpg_image->uri, 'public://');
-    $this->addMediaFileToField('Add file', $file_system->realpath($jpg_uri_2));
+    $this->addMediaFileToField('Image', $file_system->realpath($jpg_uri_2));
     $this->waitForFieldExists('Alternative text')->setValue($this->randomString());
     // The type_four media type has another optional image field.
     $assert_session->pageTextContains('Extra Image');
@@ -253,9 +254,9 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $selected_item_id = $checkbox->getAttribute('value');
     $checkbox->click();
     $assert_session->hiddenFieldValueEquals('current_selection', $selected_item_id);
-    $this->assertTrue($assert_session->fieldExists('Add files')->hasAttribute('multiple'));
+    $this->assertTrue($assert_session->fieldExists('Image')->hasAttribute('multiple'));
     $png_uri_5 = $file_system->copy($png_image->uri, 'public://');
-    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_uri_5));
+    $this->addMediaFileToField('Image', $this->container->get('file_system')->realpath($png_uri_5));
     // assertWaitOnAjaxRequest() required for input "id" attributes to
     // consistently match their label's "for" attribute.
     $assert_session->assertWaitOnAjaxRequest();
@@ -278,7 +279,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Assert removing an uploaded media item before save works as expected.
     $this->openMediaLibraryForField('field_unlimited_media');
     $this->switchToMediaType('Three');
-    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_image->uri));
+    $this->addMediaFileToField('Image', $this->container->get('file_system')->realpath($png_image->uri));
     // Assert the media item fields are shown and the vertical tabs are no
     // longer shown.
     $this->waitForFieldExists('Alternative text');
@@ -300,7 +301,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $checkbox = $page->findField("Select $existing_media_name");
     $checkbox->click();
     // Assert we can add multiple files.
-    $this->assertTrue($assert_session->fieldExists('Add files')->hasAttribute('multiple'));
+    $this->assertTrue($assert_session->fieldExists('Image')->hasAttribute('multiple'));
     // Create a list of new files to upload.
     $filenames = [];
     $remote_paths = [];
@@ -309,7 +310,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
       $filenames[] = basename($path);
       $remote_paths[] = $driver->uploadFileAndGetRemoteFilePath($file_system->realpath($path));
     }
-    $page->findField('Add files')->setValue(implode("\n", $remote_paths));
+    $page->findField('Image')->setValue(implode("\n", $remote_paths));
     // Assert the media item fields are shown and the vertical tabs are no
     // longer shown.
     $this->assertMediaAdded();
@@ -421,7 +422,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
 
     // Assert the upload form is visible for type_four.
     $this->switchToMediaType('Four');
-    $assert_session->fieldExists('Add files');
+    $assert_session->fieldExists('Image');
     $assert_session->pageTextContains('Maximum 2 files.');
 
     // Create a user that can create media for all media types.
@@ -446,11 +447,11 @@ class WidgetUploadTest extends MediaLibraryTestBase {
 
     // Assert the upload form is now visible for default tab type_three.
     $assert_session->elementExists('css', '.js-media-library-add-form');
-    $assert_session->fieldExists('Add files');
+    $assert_session->fieldExists('Image');
 
     // Assert we can upload a file to the default tab type_three.
     $assert_session->elementNotExists('css', '.js-media-library-add-form[data-input]');
-    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_image->uri));
+    $this->addMediaFileToField('Image', $this->container->get('file_system')->realpath($png_image->uri));
     $this->assertMediaAdded();
     $assert_session->elementExists('css', '.js-media-library-add-form[data-input]');
     // We do not have a pre-selected items, so the container should not be added
@@ -501,7 +502,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->openMediaLibraryForField('field_twin_media');
     $this->switchToMediaType('Three');
     $png_uri_2 = $file_system->copy($png_image->uri, 'public://');
-    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_uri_2));
+    $this->addMediaFileToField('Image', $this->container->get('file_system')->realpath($png_uri_2));
     $this->waitForFieldExists('Alternative text')->setValue($this->randomString());
     // Assert we can also directly insert uploaded files in the widget.
     $this->saveAnd('insert');
@@ -522,7 +523,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->pageTextContains('1 item selected');
     $assert_session->hiddenFieldValueEquals('current_selection', $selected_item_id);
     $png_uri_3 = $file_system->copy($png_image->uri, 'public://');
-    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_uri_3));
+    $this->addMediaFileToField('Image', $this->container->get('file_system')->realpath($png_uri_3));
     $this->waitForText('The media item has been created but has not yet been saved.');
     $assert_session->checkboxChecked("Select $existing_media_name");
     $page->fillField('Name', 'Unlimited Cardinality Image');
@@ -563,7 +564,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->switchToMediaType('Four');
 
     // We set the multiple to FALSE if only one file can be uploaded.
-    $this->assertFalse($assert_session->fieldExists('Add file')->hasAttribute('multiple'));
+    $this->assertFalse($assert_session->fieldExists('Image')->hasAttribute('multiple'));
     $assert_session->pageTextContains('One file only.');
     $choose_files = $assert_session->elementExists('css', '.form-managed-file');
     $choose_files->hasButton('Choose file');
@@ -572,11 +573,11 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Assert media type four should only allow jpg files by trying a png file
     // first.
     $png_uri_4 = $file_system->copy($png_image->uri, 'public://');
-    $this->addMediaFileToField('Add file', $file_system->realpath($png_uri_4));
+    $this->addMediaFileToField('Image', $file_system->realpath($png_uri_4));
     $this->waitForText('Only files with the following extensions are allowed');
     // Assert that jpg files are accepted by type four.
     $jpg_uri_2 = $file_system->copy($jpg_image->uri, 'public://');
-    $this->addMediaFileToField('Add file', $file_system->realpath($jpg_uri_2));
+    $this->addMediaFileToField('Image', $file_system->realpath($jpg_uri_2));
     $this->waitForFieldExists('Alternative text')->setValue($this->randomString());
     // The type_four media type has another optional image field.
     $assert_session->pageTextContains('Extra Image');
@@ -609,7 +610,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Set the hidden field with the current selection via JavaScript and upload
     // a file.
     $this->getSession()->executeScript("jQuery('.js-media-library-add-form-current-selection').val('1,2,{$unpublished_media->id()}')");
-    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_uri_3));
+    $this->addMediaFileToField('Image', $this->container->get('file_system')->realpath($png_uri_3));
     $this->assertMediaAdded();
     // Assert the pre-selected items are shown.
     $this->getSelectionArea();
@@ -628,9 +629,9 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $selected_item_id = $checkbox->getAttribute('value');
     $checkbox->click();
     $assert_session->hiddenFieldValueEquals('current_selection', $selected_item_id);
-    $this->assertTrue($assert_session->fieldExists('Add files')->hasAttribute('multiple'));
+    $this->assertTrue($assert_session->fieldExists('Image')->hasAttribute('multiple'));
     $png_uri_5 = $file_system->copy($png_image->uri, 'public://');
-    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_uri_5));
+    $this->addMediaFileToField('Image', $this->container->get('file_system')->realpath($png_uri_5));
     $this->assertMediaAdded();
     $page->fillField('Alternative text', $this->randomString());
     // Assert the pre-selected items are shown.
@@ -660,7 +661,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Assert removing an uploaded media item before save works as expected.
     $this->openMediaLibraryForField('field_unlimited_media');
     $this->switchToMediaType('Three');
-    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($png_image->uri));
+    $this->addMediaFileToField('Image', $this->container->get('file_system')->realpath($png_image->uri));
     // Assert the media item fields are shown and the vertical tabs are no
     // longer shown.
     $this->assertMediaAdded();
@@ -679,7 +680,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $checkbox = $page->findField("Select $existing_media_name");
     $checkbox->click();
     // Assert we can add multiple files.
-    $this->assertTrue($assert_session->fieldExists('Add files')->hasAttribute('multiple'));
+    $this->assertTrue($assert_session->fieldExists('Image')->hasAttribute('multiple'));
     // Create a list of new files to upload.
     $filenames = [];
     $remote_paths = [];
@@ -688,7 +689,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
       $filenames[] = basename($path);
       $remote_paths[] = $driver->uploadFileAndGetRemoteFilePath($file_system->realpath($path));
     }
-    $page->findField('Add files')->setValue(implode("\n", $remote_paths));
+    $page->findField('Image')->setValue(implode("\n", $remote_paths));
     // Assert the media item fields are shown and the vertical tabs are no
     // longer shown.
     $this->assertMediaAdded();

@@ -11,7 +11,7 @@ field_name: field_media_test_image
 entity_type: media
 bundle: type_four
 label: Image
-description: ''
+description: 'Type four media image field test description'
 required: true
 translatable: true
 default_value: {  }

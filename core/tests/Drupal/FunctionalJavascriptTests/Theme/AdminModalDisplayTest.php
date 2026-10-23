@@ -86,7 +86,7 @@ class AdminModalDisplayTest extends MediaLibraryTestBase {
     $this->switchToMediaType('Four');
 
     // A file needs to be added for the unlimited field to appear in the form.
-    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($jpg_image->uri));
+    $this->addMediaFileToField('Image', $this->container->get('file_system')->realpath($jpg_image->uri));
 
     // Wait for the file upload to be completed.
     // Copied from \Drupal\Tests\media_library\FunctionalJavascript\MediaLibraryTestBase::assertMediaAdded.
