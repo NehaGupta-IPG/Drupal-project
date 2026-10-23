@@ -2,14 +2,17 @@
 
 namespace Drupal\comment\Plugin\Field\FieldType;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\comment\AnonymousContact;
 use Drupal\comment\CommentFieldItemList;
 use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentPreviewMode;
+use Drupal\comment\CommentTypeInterface;
 use Drupal\comment\Entity\CommentType;
 use Drupal\comment\FormLocation;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
@@ -201,9 +204,27 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
         ],
       ]);
       $access = $url->access(NULL, TRUE);
-      $add_link = $access->isAllowed()
-        ? Link::fromTextAndUrl($this->t('Add a new @entity_type.', ['@entity_type' => $comment_type_label]), $url)->toString()
-        : '';
+      $add_link = '';
+      if ($access->isAllowed()) {
+        $link_text = $this->t('Add a new @entity_type.', ['@entity_type' => $comment_type_label]);
+        $element['add_comment_type'] = [
+          '#type' => 'button',
+          '#submit_button' => FALSE,
+          '#value' => $link_text,
+          '#name' => 'add_comment_type',
+          '#limit_validation_errors' => [],
+          '#dialog_submit' => [[static::class, 'commentTypeCreated']],
+          '#target_entity_type_id' => $entity_type,
+          '#url' => $url,
+          '#attributes' => ['class' => ['link', 'js-show']],
+          '#ajax' => [
+            'callback' => 'form_ajax_response_builder:openDialog',
+          ],
+        ];
+        // Keep the normal add link for browsers without JavaScript.
+        $url->setOption('attributes', ['class' => ['js-hide']]);
+        $add_link = Link::fromTextAndUrl($link_text, $url)->toString();
+      }
 
       // Keep validation when displaying a notice instead of an empty selection.
       $element['comment_type'] += [
@@ -218,6 +239,29 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       CacheableMetadata::createFromObject($access)->applyTo($element['comment_type']);
     }
     return $element;
+  }
+
+  /**
+   * Selects the comment type created through the field settings dialog.
+   *
+   * @param \Drupal\Core\Form\FormStateInterface $dialog_state
+   *   The successfully submitted comment type form state.
+   * @param array $element
+   *   The button that opened the comment type dialog.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The calling field configuration form state.
+   *
+   * @internal
+   */
+  public static function commentTypeCreated(FormStateInterface $dialog_state, array $element, FormStateInterface $form_state): void {
+    $form_object = $dialog_state->getFormObject();
+    $comment_type = $form_object instanceof EntityFormInterface ? $form_object->getEntity() : NULL;
+    if ($comment_type instanceof CommentTypeInterface && $comment_type->getTargetEntityTypeId() === $element['#target_entity_type_id']) {
+      $parents = $element['#parents'];
+      array_pop($parents);
+      $parents[] = 'comment_type';
+      NestedArray::setValue($form_state->getUserInput(), $parents, $comment_type->id());
+    }
   }
 
   /**
