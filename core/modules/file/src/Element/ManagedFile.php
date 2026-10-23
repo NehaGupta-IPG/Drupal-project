@@ -205,6 +205,7 @@ class ManagedFile extends FormElementBase {
     }
 
     $status_messages = ['#type' => 'status_messages'];
+    $form['#prefix'] = ($form['#prefix'] ?? '');
     $form['#prefix'] .= $renderer->renderRoot($status_messages);
     $output = $renderer->renderRoot($form);
 
