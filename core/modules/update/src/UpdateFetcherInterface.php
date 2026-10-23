@@ -77,4 +77,21 @@ interface UpdateFetcherInterface {
    */
   public function buildFetchUrl(array $project, $site_key = '');
 
+  /**
+   * Sends the site data the site owner chose to share with Drupal.org.
+   *
+   * Nothing is sent to an update server other than the default one.
+   *
+   * @param array $project
+   *   The Drupal core project, as returned by
+   *   \Drupal\update\UpdateManagerInterface::getProjects().
+   * @param string $site_key
+   *   The site key.
+   * @param bool|null $share_domain
+   *   Whether to share the site domain name, or NULL while undecided.
+   * @param bool|null $share_site_mail
+   *   Whether to share the site email address, or NULL while undecided.
+   */
+  public function sendSiteData(array $project, string $site_key, ?bool $share_domain, ?bool $share_site_mail): void;
+
 }

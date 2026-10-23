@@ -30,6 +30,13 @@ final class DataSharing {
   }
 
   /**
+   * Returns the value in effect for a choice, or NULL while undecided.
+   */
+  public static function effectiveValue(string $key, Config $update_settings): ?bool {
+    return $update_settings->get("data_sharing.$key");
+  }
+
+  /**
    * Returns the hostname that would be shared.
    *
    * @param string $base_url

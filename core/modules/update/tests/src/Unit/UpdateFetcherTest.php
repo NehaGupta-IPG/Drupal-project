@@ -70,7 +70,10 @@ class UpdateFetcherTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->mockConfigFactory = $this->getConfigFactoryStub(['update.settings' => ['fetch_url' => 'http://www.example.com']]);
+    $this->mockConfigFactory = $this->getConfigFactoryStub([
+      'update.settings' => ['fetch_url' => 'http://www.example.com'],
+      'system.site' => ['mail' => 'admin@example.com'],
+    ]);
     $this->mockHttpClient = $this->createStub(ClientInterface::class);
     $this->logger = new TestLogger();
     $this->updateFetcher = new UpdateFetcher($this->mockConfigFactory, $this->mockHttpClient, $this->logger);
@@ -196,6 +199,48 @@ class UpdateFetcherTest extends UnitTestCase {
     $this->assertTrue($this->logger->hasErrorThatPasses(function (array $record): bool {
       return $record['context']['@message'] === "Server error: `GET https://www.example.com/update_test/current` resulted in a `500 Internal Server Error` response: HTTPS failed";
     }));
+  }
+
+  /**
+   * Tests sending the site data the site owner chose to share.
+   */
+  #[DataProvider('providerTestSendSiteData')]
+  public function testSendSiteData(array $project, ?bool $share_domain, ?bool $share_site_mail, ?string $expected): void {
+    $GLOBALS['base_url'] = 'https://example.com/subdirectory';
+    $this->mockClient(new Response(200));
+    $update_fetcher = new UpdateFetcher($this->mockConfigFactory, $this->mockHttpClient, $this->logger);
+
+    $update_fetcher->sendSiteData($project, 'site_key', $share_domain, $share_site_mail);
+    if ($expected === NULL) {
+      $this->assertCount(0, $this->history);
+    }
+    else {
+      $this->assertCount(1, $this->history);
+      $this->assertSame($expected, (string) $this->history[0]['request']->getUri());
+    }
+  }
+
+  /**
+   * Provides test data for testSendSiteData().
+   */
+  public static function providerTestSendSiteData(): array {
+    $project = [
+      'name' => 'drupal',
+      'project_type' => '',
+      'info' => ['version' => '12.0-dev'],
+      'includes' => ['system' => 'System'],
+    ];
+    $other_server = $project;
+    $other_server['info']['project status url'] = 'https://www.example.com';
+    $url = 'https://updates.drupal.org/site-data?site_key=site_key';
+    return [
+      'domain only' => [$project, TRUE, FALSE, "$url&domain=example.com"],
+      'site mail only' => [$project, FALSE, TRUE, "$url&site_mail=admin%40example.com"],
+      'domain and site mail' => [$project, TRUE, TRUE, "$url&domain=example.com&site_mail=admin%40example.com"],
+      'undecided' => [$project, NULL, NULL, NULL],
+      'declined' => [$project, FALSE, FALSE, NULL],
+      'non-default update server' => [$other_server, TRUE, TRUE, NULL],
+    ];
   }
 
 }
