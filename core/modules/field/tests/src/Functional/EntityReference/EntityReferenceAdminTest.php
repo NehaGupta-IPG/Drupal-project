@@ -9,6 +9,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\node\Entity\Node;
+use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
@@ -318,6 +319,66 @@ class EntityReferenceAdminTest extends BrowserTestBase {
   }
 
   /**
+   * Tests saving and using reference fields with bundleless targets.
+   */
+  public function testBundlelessTargetConfiguration(): void {
+    $field_name = 'field_' . $this->createEntityReferenceField('user');
+    $field = FieldConfig::loadByName('node', $this->type, $field_name);
+    $this->assertNull($field->getSetting('handler_settings')['target_bundles']);
+
+    // Saving the settings again must preserve the unrestricted configuration.
+    $this->drupalGet('admin/structure/types/manage/' . $this->type . '/fields/' . $field->id());
+    $this->submitForm([], 'Save settings');
+    $this->assertSession()->statusMessageContains('Saved ' . $field->label() . ' configuration.', MessengerInterface::TYPE_STATUS);
+    $field = \Drupal::entityTypeManager()->getStorage('field_config')->loadUnchanged($field->id());
+    $this->assertNull($field->getSetting('handler_settings')['target_bundles']);
+
+    $account = $this->drupalCreateUser();
+    $reference = $account->getAccountName() . ' (' . $account->id() . ')';
+    $this->drupalGet('node/add/' . $this->type);
+    $this->submitForm([
+      'title[0][value]' => $this->randomMachineName(),
+      $field_name . '[0][target_id]' => $reference,
+    ], 'Save');
+    $this->assertSession()->addressMatches('#/node/[0-9]+$#');
+    $this->drupalGet($this->getSession()->getCurrentUrl() . '/edit');
+    $this->assertSession()->fieldValueEquals($field_name . '[0][target_id]', $reference);
+  }
+
+  /**
+   * Tests unrestricted API configuration and required bundle selection in the UI.
+   */
+  public function testUnrestrictedTargetBundles(): void {
+    $field_name = 'field_' . $this->createEntityReferenceField('node', [$this->type]);
+    $field = FieldConfig::loadByName('node', $this->type, $field_name);
+    $settings = $field->getSetting('handler_settings');
+    $settings['target_bundles'] = NULL;
+    $field->setSetting('handler_settings', $settings)->save();
+
+    // The unrestricted field also accepts bundles created after configuration.
+    $other_type = $this->drupalCreateContentType();
+    foreach ([$this->type, $other_type->id()] as $bundle) {
+      $target = $this->drupalCreateNode(['type' => $bundle]);
+      $reference = $target->label() . ' (' . $target->id() . ')';
+      $this->drupalGet('node/add/' . $this->type);
+      $this->submitForm([
+        'title[0][value]' => $this->randomMachineName(),
+        $field_name . '[0][target_id]' => $reference,
+      ], 'Save');
+      $this->assertSession()->addressMatches('#/node/[0-9]+$#');
+      $this->drupalGet($this->getSession()->getCurrentUrl() . '/edit');
+      $this->assertSession()->fieldValueEquals($field_name . '[0][target_id]', $reference);
+    }
+
+    // The UI rejects even an unchanged submission of this API configuration.
+    $this->drupalGet('admin/structure/types/manage/' . $this->type . '/fields/' . $field->id());
+    $this->submitForm([], 'Save settings');
+    $this->assertSession()->pageTextContains('Content type field is required.');
+    $field = \Drupal::entityTypeManager()->getStorage('field_config')->loadUnchanged($field->id());
+    $this->assertSame($settings, $field->getSetting('handler_settings'));
+  }
+
+  /**
    * Tests field settings for an entity reference field.
    *
    * The tested entity reference field has multiple target bundles and is set
@@ -380,6 +441,28 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     $field_config = FieldConfig::load($field_id);
     $this->assertFalse($field_config->getSetting('handler_settings')['auto_create']);
     $this->assertFalse(isset($field_config->getSetting('handler_settings')['auto_create_bundle']));
+    $this->assertSame([], $field_config->getSetting('handler_settings')['target_bundles']);
+
+    // Deleting the last allowed bundle must not allow other or future bundles.
+    $other_vocabulary = Vocabulary::create([
+      'vid' => $this->randomMachineName(),
+      'name' => $this->randomString(),
+    ]);
+    $other_vocabulary->save();
+    $term = Term::create([
+      'vid' => $other_vocabulary->id(),
+      'name' => $this->randomMachineName(),
+    ]);
+    $term->save();
+    $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getSelectionHandler($field_config);
+    $this->assertSame([], $handler->validateReferenceableEntities([$term->id()]));
+
+    // An unchanged UI submission must not turn the empty restriction into NULL.
+    $this->drupalGet($path);
+    $this->submitForm([], 'Save settings');
+    $this->assertSession()->pageTextContains('Vocabulary field is required.');
+    $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->loadUnchanged($field_id);
+    $this->assertSame([], $field_config->getSetting('handler_settings')['target_bundles']);
   }
 
   /**
