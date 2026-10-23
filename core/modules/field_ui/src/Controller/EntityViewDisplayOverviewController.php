@@ -65,9 +65,7 @@ class EntityViewDisplayOverviewController extends ControllerBase {
     $view_modes = $this->entityDisplayRepository->getViewModes($entity_type_id);
 
     // Sort view modes by label for consistent ordering.
-    uasort($view_modes, function ($a, $b) {
-      return NaturalSort::strnatcasecmp((string) $a['label'], (string) $b['label']);
-    });
+    NaturalSort::sortByKeyString($view_modes, 'label');
 
     // Get all entity view displays for this bundle.
     $storage = $this->entityTypeManager->getStorage('entity_view_display');
