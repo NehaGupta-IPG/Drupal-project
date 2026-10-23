@@ -3,8 +3,8 @@
 namespace Drupal\layout_builder\Cache;
 
 use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
-use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
  * Provides a cache tag invalidator that clears the block cache.
@@ -17,10 +17,15 @@ class ExtraFieldBlockCacheTagInvalidator implements CacheTagsInvalidatorInterfac
   /**
    * Constructs a new ExtraFieldBlockCacheTagInvalidator.
    *
-   * @param \Drupal\Core\Block\BlockManagerInterface $blockManager
-   *   The block manager.
+   * @param \Closure $blockManager
+   *   A closure returning the block manager. This service is created together
+   *   with cache_tags.invalidator, and the block manager depends on the logger,
+   *   so loading it eagerly can cause a circular reference.
    */
-  public function __construct(protected BlockManagerInterface $blockManager) {
+  public function __construct(
+    #[AutowireServiceClosure('plugin.manager.block')]
+    protected \Closure $blockManager,
+  ) {
   }
 
   /**
@@ -28,8 +33,9 @@ class ExtraFieldBlockCacheTagInvalidator implements CacheTagsInvalidatorInterfac
    */
   public function invalidateTags(array $tags) {
     if (in_array('entity_field_info', $tags, TRUE)) {
-      if ($this->blockManager instanceof CachedDiscoveryInterface) {
-        $this->blockManager->clearCachedDefinitions();
+      $block_manager = ($this->blockManager)();
+      if ($block_manager instanceof CachedDiscoveryInterface) {
+        $block_manager->clearCachedDefinitions();
       }
     }
   }

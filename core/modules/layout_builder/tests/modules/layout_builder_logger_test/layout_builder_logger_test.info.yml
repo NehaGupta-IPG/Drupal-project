@@ -1,0 +1,5 @@
+name: 'Layout Builder logger test'
+type: module
+description: 'Provides a logger that depends on cache_tags.invalidator.'
+package: Testing
+version: VERSION
