@@ -2,7 +2,11 @@
 
 namespace Drupal\Core\Form;
 
+use Drupal\Core\Ajax\AjaxFormHelperTrait;
 use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\CloseDialogCommand;
+use Drupal\Core\Ajax\OpenModalDialogWithUrl;
+use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Ajax\UpdateBuildIdCommand;
 use Drupal\Core\Render\MainContent\MainContentRendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -17,6 +21,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  * commands to apply to the form, build a response object.
  */
 class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
+
+  use AjaxFormHelperTrait;
 
   public function __construct(
     protected MainContentRendererInterface $ajaxRenderer,
@@ -80,6 +86,119 @@ class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
       $response->addCommand($command, TRUE);
     }
     return $response;
+  }
+
+  /**
+   * Opens a routed form in a dialog, preserving the calling form.
+   *
+   * Set this as a button's #ajax callback and use #url for the route of the
+   * form to open. The optional #ajax['dialog'] settings configure the dialog.
+   *
+   * The opened form uses its own validation and submit handlers. Its submit
+   * buttons receive default #ajax settings unless they already have their own.
+   * Validation errors and multistep rebuilds are displayed within the dialog.
+   *
+   * After successful submission, the opening button's #dialog_submit callbacks
+   * can use the result to update the calling form state before rebuilding it.
+   * Each callback receives the dialog form state, the opening button, and the
+   * calling form state. Closing the dialog without submitting leaves the
+   * calling form unchanged.
+   *
+   * Both forms and their states are retained through the Form API cache. The
+   * request supplies only the calling form's build ID; callbacks and defaults
+   * are retrieved from the cached state.
+   *
+   * @param array $form
+   *   The calling form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The calling form state.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The current request.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The response opening the dialog.
+   */
+  public function openDialog(array &$form, FormStateInterface $form_state, Request $request): AjaxResponse {
+    $element = $form_state->getTriggeringElement();
+    $url = $element['#url'];
+    $options = $element['#ajax']['dialog'] ?? [];
+    // @todo Use scoped modals once
+    //   https://www.drupal.org/project/drupal/issues/2741877 is resolved.
+    $options += ['target' => 'drupal-dialog-' . $element['#id'], 'modal' => TRUE];
+
+    $form_builder = \Drupal::formBuilder();
+    if (!$parent_form = $form_builder->getCache($form['#build_id'], new FormState())) {
+      throw new HttpException(400, 'The calling form is no longer available.');
+    }
+
+    if (isset($form['#attached']['placeholders'][$form['#action']])) {
+      $parent_form['#action'] = $form_builder->renderPlaceholderFormAction()['#markup'];
+    }
+
+    $form_state->set('ajax_dialog', [
+      'input' => $form_state->getUserInput(),
+      'url' => $request->getUri(),
+      'element' => $element,
+      'selector' => '#' . ltrim($options['target'], '#'),
+    ]);
+    $form_state->set('form_defaults', [
+      '#ajax' => ['callback' => 'form_ajax_response_builder:ajaxSubmit'],
+    ]);
+    $form_builder->setCache($form['#build_id'], $parent_form, $form_state);
+
+    return (new AjaxResponse())->addCommand(new OpenModalDialogWithUrl($url->toString(), $options, [
+      'httpMethod' => 'POST',
+      'dialogType' => 'dialog',
+      'submit' => ['form_parent' => $form['#build_id']],
+    ]));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function successfulAjaxSubmit(array $form, FormStateInterface $form_state): AjaxResponse {
+    $parent_state = (new FormState())->setRequestMethod('POST');
+    $form_builder = \Drupal::formBuilder();
+    if (!$parent_form = $form_builder->getCache($form_state->get('form_parent'), $parent_state)) {
+      throw new HttpException(400, 'The calling form is no longer available.');
+    }
+
+    $dialog = $parent_state->get('ajax_dialog');
+    $parent_state->setUserInput($dialog['input']);
+
+    // Rebuild in the calling form's routing context so that its AJAX URLs
+    // still point to that form's route, not the route of the dialog form.
+    // @todo Revisit the routing context needed for AJAX URLs once
+    //   https://www.drupal.org/project/drupal/issues/2504115 respects #action.
+    // @todo Revisit caller reconstruction with dedicated form actions once
+    //   https://www.drupal.org/project/drupal/issues/2503429 is resolved.
+    $parent_state->setRebuild();
+    $parent_state->addRebuildInfo('copy', ['#action' => TRUE, '#build_id' => TRUE]);
+    $request = Request::create($dialog['url'], server: \Drupal::request()->server->all());
+    $request->setSession(\Drupal::request()->getSession());
+    $request->attributes->add(\Drupal::service('router')->matchRequest($request));
+    $request_stack = \Drupal::service('request_stack');
+    $request_stack->push($request);
+
+    try {
+      foreach ($dialog['element']['#dialog_submit'] ?? [] as $callback) {
+        $callback = $this->callableResolver->getCallableFromDefinition($parent_state->prepareCallback($callback));
+        $callback($form_state, $dialog['element'], $parent_state);
+      }
+
+      $parent_form = $form_builder->rebuildForm($parent_state->getBuildInfo()['form_id'], $parent_state, $parent_form);
+
+      // Replace only the form. Its surrounding wrappers are still in the DOM
+      // and must not be rendered again inside themselves.
+      unset($parent_form['#prefix'], $parent_form['#suffix']);
+      $selector = 'form:has(input[name="form_build_id"][value="' . $parent_form['#build_id'] . '"])';
+      return (new AjaxResponse())
+        ->addCommand(new CloseDialogCommand($dialog['selector']))
+        ->addCommand(new ReplaceCommand($selector, $parent_form));
+    }
+    finally {
+      $request_stack->pop();
+    }
   }
 
 }
