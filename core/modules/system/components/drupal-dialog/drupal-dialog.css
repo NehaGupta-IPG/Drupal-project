@@ -123,6 +123,7 @@ dialog::backdrop {
 .dialog--x-wide {
   --dialog-width: 95vw;
   --dialog-max-width: 95vw;
+
   min-height: min(75vh, var(--dialog-height-x-wide));
 }
 

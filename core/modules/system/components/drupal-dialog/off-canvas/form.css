@@ -13,6 +13,53 @@
  */
 
 #drupal-off-canvas-wrapper {
+  /**
+   * Variables for buttons in the off-canvas dialog.
+   */
+  --off-canvas-button-background-color: #777;
+  --off-canvas-button-background-color-hover: #999;
+  --off-canvas-button-text-color: #f5f5f5;
+  --off-canvas-button-text-color-hover: #fff;
+  --off-canvas-button-font-size: 0.875rem;
+  --off-canvas-button-padding: calc(var(--off-canvas-vertical-spacing-unit) / 2) 1.25rem;
+  --off-canvas-button-border-color: transparent;
+  --off-canvas-button-border-radius: 20em;
+  --off-canvas-button-font-weight: 600;
+  --off-canvas-primary-button-background-color: #277abd;
+  --off-canvas-primary-button-background-color-hover: #236aaf;
+  --off-canvas-primary-button-text-color: #fff;
+  --off-canvas-primary-button-text-color-hover: #fff;
+
+  /**
+   * Variables for summary and details in the off-canvas dialog.
+   */
+
+  --off-canvas-details-border-width: 0;
+  --off-canvas-details-border-color: none;
+  --off-canvas-details-background-color: #474747;
+  --off-canvas-details-text-color: #ddd;
+  --off-canvas-details-summary-border: none;
+  --off-canvas-details-summary-padding: 0.625rem 1.25rem;
+  --off-canvas-details-summary-font-size: 0.875rem;
+  --off-canvas-details-summary-background-color: #333;
+  --off-canvas-details-summary-background-color-hover: #222;
+  --off-canvas-details-summary-text-color: #eee;
+  --off-canvas-details-summary-text-color-hover: #fff;
+
+  /**
+   * Variables dropbuttons in the off-canvas dialog.
+   */
+  --off-canvas-dropbutton-height: 1.5rem;
+  --off-canvas-dropbutton-primary-background-color: var(--off-canvas-button-background-color);
+  --off-canvas-dropbutton-secondary-background-color: var(--off-canvas-button-hover-background-color);
+  --off-canvas-dropbutton-border-color: transparent;
+  --off-canvas-dropbutton-border-width: 1px;
+  --off-canvas-dropbutton-border-radius: 2px;
+  --off-canvas-dropbutton-focus-outline-color: var(--off-canvas-focus-outline-color);
+  --off-canvas-dropbutton-font-size: 0.75rem;
+  --off-canvas-dropbutton-text-color: var(--off-canvas-button-text-color); /* Minimum 4.5:1 contrast ratio against --off-canvas-dropbutton-primary-background-color and --off-canvas-dropbutton-secondary-background-color. */
+  --off-canvas-dropbutton-text-color-hover: var(--off-canvas-button-text-color-hover); /* Minimum 4.5:1 contrast ratio against --off-canvas-dropbutton-primary-background-color and --off-canvas-dropbutton-secondary-background-color. */
+
   & form {
     --drupal-off-canvas-input-padding: var(--off-canvas-vertical-spacing-unit);
     --drupal-off-canvas-input-background-color: #fff;
@@ -187,23 +234,6 @@
     display: none;
   }
 
-  /**
- * Visual styling for buttons in the off-canvas dialog.
- */
-  --off-canvas-button-background-color: #777;
-  --off-canvas-button-background-color-hover: #999;
-  --off-canvas-button-text-color: #f5f5f5;
-  --off-canvas-button-text-color-hover: #fff;
-  --off-canvas-button-font-size: 0.875rem;
-  --off-canvas-button-padding: calc(var(--off-canvas-vertical-spacing-unit) / 2) 1.25rem;
-  --off-canvas-button-border-color: transparent;
-  --off-canvas-button-border-radius: 20em;
-  --off-canvas-button-font-weight: 600;
-  --off-canvas-primary-button-background-color: #277abd;
-  --off-canvas-primary-button-background-color-hover: #236aaf;
-  --off-canvas-primary-button-text-color: #fff;
-  --off-canvas-primary-button-text-color-hover: #fff;
-
   & .button {
     display: inline-block;
     height: auto;
@@ -298,22 +328,6 @@
     font-size: 0.8125rem;
   }
 
-  /**
-   * Visual styling for summary and details in the off-canvas dialog.
-   */
-
-  --off-canvas-details-border-width: 0;
-  --off-canvas-details-border-color: none;
-  --off-canvas-details-background-color: #474747;
-  --off-canvas-details-text-color: #ddd;
-  --off-canvas-details-summary-border: none;
-  --off-canvas-details-summary-padding: 0.625rem 1.25rem;
-  --off-canvas-details-summary-font-size: 0.875rem;
-  --off-canvas-details-summary-background-color: #333;
-  --off-canvas-details-summary-background-color-hover: #222;
-  --off-canvas-details-summary-text-color: #eee;
-  --off-canvas-details-summary-text-color-hover: #fff;
-
   & details {
     margin: var(--off-canvas-vertical-spacing-unit) calc(-1 * var(--off-canvas-padding)); /* Cancel out the padding of the parent. */
     padding: 0 var(--off-canvas-padding);
@@ -355,20 +369,6 @@
   & .details-wrapper {
     padding: var(--off-canvas-vertical-spacing-unit) 0;
   }
-
-  /**
- * Styles for dropbuttons in the off-canvas dialog.
- */
-  --off-canvas-dropbutton-height: 1.5rem;
-  --off-canvas-dropbutton-primary-background-color: var(--off-canvas-button-background-color);
-  --off-canvas-dropbutton-secondary-background-color: var(--off-canvas-button-hover-background-color);
-  --off-canvas-dropbutton-border-color: transparent;
-  --off-canvas-dropbutton-border-width: 1px;
-  --off-canvas-dropbutton-border-radius: 2px;
-  --off-canvas-dropbutton-focus-outline-color: var(--off-canvas-focus-outline-color);
-  --off-canvas-dropbutton-font-size: 0.75rem;
-  --off-canvas-dropbutton-text-color: var(--off-canvas-button-text-color); /* Minimum 4.5:1 contrast ratio against --off-canvas-dropbutton-primary-background-color and --off-canvas-dropbutton-secondary-background-color. */
-  --off-canvas-dropbutton-text-color-hover: var(--off-canvas-button-text-color-hover); /* Minimum 4.5:1 contrast ratio against --off-canvas-dropbutton-primary-background-color and --off-canvas-dropbutton-secondary-background-color. */
 
   & .dropbutton-wrapper {
     margin-block: var(--off-canvas-vertical-spacing-unit);
