@@ -134,9 +134,20 @@ class Renderer implements RendererInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Renders an element in isolation from the main render context.
+   *
+   * @param array|null $elements
+   *   A renderable array or NULL. If NULL, the function will return an empty
+   *   string. This prevents TypeError exceptions when the renderer is invoked
+   *   with an uninitialised element.
+   *
+   * @return string
+   *   The rendered HTML of the element or an empty string.
    */
   public function renderInIsolation(&$elements) {
+    if (empty($elements)) {
+      return '';
+    }
     $context = new RenderContext();
     return Markup::create($this->executeInRenderContext($context, function () use (&$elements, $context) {
       return $this->doRenderRoot($elements, $context);
