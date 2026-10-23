@@ -468,15 +468,16 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
    */
   public function calculateDependencies() {
     $dependencies = [];
-    // Combine the view modes from both config parameters.
-    $view_modes = $this->settings['allowed_view_modes'] + [$this->settings['default_view_mode']];
-    $view_modes = array_unique(array_values($view_modes));
+    // Combine and qualify the configured view mode IDs.
+    $view_mode_ids = [];
+    foreach ([...$this->settings['allowed_view_modes'], $this->settings['default_view_mode']] as $view_mode) {
+      $view_mode_ids[] = 'media.' . $view_mode;
+    }
+    $view_mode_ids = array_unique($view_mode_ids);
     $dependencies += ['config' => []];
     $storage = $this->entityTypeManager->getStorage('entity_view_mode');
-    foreach ($view_modes as $view_mode) {
-      if ($entity_view_mode = $storage->load('media.' . $view_mode)) {
-        $dependencies[$entity_view_mode->getConfigDependencyKey()][] = $entity_view_mode->getConfigDependencyName();
-      }
+    foreach ($storage->loadMultiple($view_mode_ids) as $entity_view_mode) {
+      $dependencies[$entity_view_mode->getConfigDependencyKey()][] = $entity_view_mode->getConfigDependencyName();
     }
     return $dependencies;
   }

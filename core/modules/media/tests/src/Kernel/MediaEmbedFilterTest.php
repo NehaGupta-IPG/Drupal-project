@@ -524,6 +524,29 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
       'name' => 'Media embed dependencies test',
       'roles' => [$role_id],
     ]);
+    foreach (['bar', 'baz'] as $view_mode) {
+      EntityViewMode::create([
+        'id' => 'media.' . $view_mode,
+        'targetEntityType' => 'media',
+        'label' => $view_mode,
+      ])->save();
+    }
+    // Include the default view mode once, whether or not it is also allowed.
+    foreach ([['bar', 'baz', 'missing'], ['foobar', 'bar', 'baz', 'missing']] as $allowed_view_modes) {
+      $filter_format->setFilterConfig('media_embed', [
+        'settings' => [
+          'allowed_view_modes' => array_combine($allowed_view_modes, $allowed_view_modes),
+          'default_view_mode' => 'foobar',
+        ],
+      ]);
+      $filter_format->save();
+      $this->assertSame([
+        'core.entity_view_mode.media.bar',
+        'core.entity_view_mode.media.baz',
+        'core.entity_view_mode.media.foobar',
+      ], $filter_format->getDependencies()['config']);
+    }
+
     $filter_format->setFilterConfig('media_embed', [
       'settings' => [
         'allowed_view_modes' => ['foobar' => 'foobar'],
@@ -533,7 +556,7 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
     $filter_format->save();
     $this->assertSame('foobar', $filter_format->get('filters')['media_embed']['settings']['default_view_mode']);
     $this->assertSame(['foobar' => 'foobar'], $filter_format->get('filters')['media_embed']['settings']['allowed_view_modes']);
-    $this->assertTrue(in_array('core.entity_view_mode.media.foobar', $filter_format->getDependencies()['config']));
+    $this->assertSame(['core.entity_view_mode.media.foobar'], $filter_format->getDependencies()['config']);
 
     $role = Role::load($role_id);
     $this->assertContains($filter_format->getPermissionName(), $role->getPermissions());
