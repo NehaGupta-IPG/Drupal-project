@@ -178,7 +178,7 @@ class Views {
     }
 
     if (!empty($plugins)) {
-      NaturalSort::natcasesort($plugins);
+      asort($plugins);
     }
 
     return $plugins;
