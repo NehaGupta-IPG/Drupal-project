@@ -1678,9 +1678,9 @@
    */
   Drupal.tableDrag.prototype.row.prototype.markChanged = function () {
     const marker = Drupal.theme('tableDragChangedMarker');
-    const handle = $(this.element).find('td:first-of-type. .tabledrag-handle');
-    if (handle.find('abbr.tabledrag-changed').length === 0) {
-      handle.after(marker);
+    const cell = $(this.element).find('td:first-of-type');
+    if (cell.find('abbr.tabledrag-changed').length === 0) {
+      cell.find('.tabledrag-handle').after(marker);
     }
     Drupal.tableDrag[this.table.id].changedRowIds.add(this.element.id);
   };
