@@ -154,7 +154,10 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
     $view = $this->view;
     $exposed_data = $view->exposed_data ?? [];
     $sort_by = $exposed_data['sort_by'] ?? NULL;
-    if (!empty($sort_by)) {
+
+    // If the style plugin is a table with click sorting, we should not throw
+    // out the current orderby.
+    if (!empty($sort_by) && $view->style_plugin->buildSort()) {
       // Make sure the original order of sorts is preserved
       // (e.g. a sticky sort is often first)
       $view->query->orderby = [];
