@@ -59,6 +59,13 @@ class UpdateSettingsForm extends ConfigFormBase {
       '#type' => 'fieldset',
       '#title' => $this->t('Data sharing with Drupal.org'),
     ];
+    $ends = DataSharing::noticeEndsAt(\Drupal::state());
+    if ($ends && DataSharing::isUndecided($this->config('update.settings'))) {
+      $date = \Drupal::service('date.formatter')->format($ends, 'custom', 'Y-M-d');
+      $form['data_sharing']['#description'] = DataSharing::noticeEnded(\Drupal::state(), \Drupal::time())
+        ? $this->t('No choice has been saved. The settings shown have applied since @date.', ['@date' => $date])
+        : $this->t('No choice has been saved. The settings shown apply from @date.', ['@date' => $date]);
+    }
     $form['data_sharing']['update_share_domain'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Share the site domain name with Drupal.org'),

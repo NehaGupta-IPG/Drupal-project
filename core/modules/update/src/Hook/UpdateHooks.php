@@ -84,8 +84,15 @@ class UpdateHooks {
           $verbose = TRUE;
           break;
       }
-      if (\Drupal::currentUser()->hasPermission('administer site configuration') && DataSharing::isUndecided(\Drupal::config('update.settings'))) {
-        \Drupal::messenger()->addWarning($this->t('Choose what this site shares with Drupal.org on the <a href=":url">Update Status settings</a> page.', [':url' => Url::fromRoute('update.settings')->toString()]));
+      if (\Drupal::currentUser()->hasPermission('administer site configuration') && DataSharing::isUndecided(\Drupal::config('update.settings')) && !DataSharing::noticeEnded(\Drupal::state(), \Drupal::time())) {
+        $ends = DataSharing::noticeEndsAt(\Drupal::state());
+        $arguments = [
+          ':url' => Url::fromRoute('update.settings')->toString(),
+          '@date' => $ends ? \Drupal::service('date.formatter')->format($ends, 'custom', 'Y-M-d') : '',
+        ];
+        \Drupal::messenger()->addWarning($ends
+          ? $this->t('Choose what this site shares with Drupal.org on the <a href=":url">Update Status settings</a> page before @date, when the recommended settings apply.', $arguments)
+          : $this->t('Choose what this site shares with Drupal.org on the <a href=":url">Update Status settings</a> page.', $arguments));
       }
       if (!\Drupal::currentUser()->hasPermission('view update notifications')) {
         return;

@@ -182,7 +182,12 @@ class UpdateProcessor implements UpdateProcessorInterface {
     if (empty($this->failed[$fetch_url_base]) || $this->failed[$fetch_url_base] < $max_fetch_attempts) {
       $data = $this->updateFetcher->fetchProjectData($project, $site_key);
       if ($project_name === 'drupal') {
-        $this->updateFetcher->sendSiteData($project, $site_key, DataSharing::effectiveValue('domain', $this->updateSettings), DataSharing::effectiveValue('site_mail', $this->updateSettings));
+        $this->updateFetcher->sendSiteData(
+          $project,
+          $site_key,
+          DataSharing::effectiveValue('domain', $this->updateSettings, $this->stateStore, $this->time),
+          DataSharing::effectiveValue('site_mail', $this->updateSettings, $this->stateStore, $this->time),
+        );
       }
     }
     if (!empty($data)) {

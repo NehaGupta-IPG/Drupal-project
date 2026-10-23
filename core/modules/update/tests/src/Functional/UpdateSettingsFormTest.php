@@ -7,6 +7,7 @@ namespace Drupal\Tests\update\Functional;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\update\DataSharing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -123,14 +124,19 @@ class UpdateSettingsFormTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Data sharing with Drupal.org');
     $this->assertSession()->pageTextContains('Not yet reviewed');
 
-    $this->drupalGet('admin/reports/updates/settings');
-    $this->submitForm([], 'Save configuration');
-    $this->assertTrue($this->config('update.settings')->get('data_sharing.domain'));
-    $this->assertFalse($this->config('update.settings')->get('data_sharing.site_mail'));
+    \Drupal::state()->set(DataSharing::NOTICE_START_STATE_KEY, time() - DataSharing::NOTICE_PERIOD - 1);
     $this->drupalGet('admin/config/system/site-information');
     $this->assertSession()->statusMessageNotExists(MessengerInterface::TYPE_WARNING);
     $this->drupalGet('admin/reports/status');
-    $this->assertSession()->pageTextNotContains('Not yet reviewed');
+    $this->assertSession()->pageTextContains('Recommended settings in effect since');
+
+    $this->drupalGet('admin/reports/updates/settings');
+    $this->assertSession()->pageTextContains('The settings shown have applied since');
+    $this->submitForm([], 'Save configuration');
+    $this->assertTrue($this->config('update.settings')->get('data_sharing.domain'));
+    $this->assertFalse($this->config('update.settings')->get('data_sharing.site_mail'));
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->pageTextNotContains('Recommended settings in effect since');
   }
 
 }

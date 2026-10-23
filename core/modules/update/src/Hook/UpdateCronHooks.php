@@ -10,6 +10,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\State\StateInterface;
+use Drupal\update\DataSharing;
 use Drupal\update\MailHandler;
 use Drupal\update\UpdateManagerInterface;
 use Drupal\update\UpdateProcessorInterface;
@@ -53,6 +54,9 @@ class UpdateCronHooks {
     $interval = 60 * 60 * 24 * $frequency;
     $last_check = $this->state->get('update.last_check', 0);
     $request_time = $this->time->getRequestTime();
+    if ($this->state->get(DataSharing::NOTICE_START_STATE_KEY) === NULL && DataSharing::isUndecided($update_config)) {
+      $this->state->set(DataSharing::NOTICE_START_STATE_KEY, $request_time);
+    }
     if ($request_time - $last_check > $interval) {
       // If the configured update interval has elapsed, we want to invalidate
       // the data for all projects, attempt to re-fetch, and trigger any
