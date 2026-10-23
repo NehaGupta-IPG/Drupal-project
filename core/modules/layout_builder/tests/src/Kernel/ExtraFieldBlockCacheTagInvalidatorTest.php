@@ -6,6 +6,7 @@ namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper;
 use Drupal\Core\DependencyInjection\Container;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_builder\Cache\ExtraFieldBlockCacheTagInvalidator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -36,6 +37,7 @@ class ExtraFieldBlockCacheTagInvalidatorTest extends KernelTestBase {
   public function testNoCircularReference(): void {
     // Use a dumped container like a real site, starting with the default logger
     // channel.
+    $this->assertInstanceOf(ContainerBuilder::class, $this->container);
     $container = new Container((new OptimizedPhpArrayDumper($this->container))->getArray());
     $this->assertInstanceOf(LoggerInterface::class, $container->get('logger.channel.default'));
   }
