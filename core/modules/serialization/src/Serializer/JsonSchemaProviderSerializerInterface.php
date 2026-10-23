@@ -16,17 +16,15 @@ interface JsonSchemaProviderSerializerInterface {
    * method always returns a schema, even if it's empty.
    *
    * @param object $object
-   *   The object to get a schema for, such as a typed data object. To get a
-   *   schema without real data, pass a new object that has no values.
+   *   The object to get a schema for, such as a typed data object.
    * @param array $context
    *   Normalization context.
    *
    * @return array
    *   Schema.
    *
-   * @see https://www.drupal.org/project/drupal/issues/3632107
-   *
    * @todo Type $object as object before drupal:13.0.0.
+   *   https://www.drupal.org/project/drupal/issues/3632107
    */
   public function getJsonSchema(mixed $object, array $context): array;
 
