@@ -62,4 +62,4 @@ libraryOverrides:
   js:
     drupal-dialog.js: {}
   dependencies:
-  - core/drupal.displace
+    - core/drupal.displace
