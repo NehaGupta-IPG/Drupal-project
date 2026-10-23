@@ -33,6 +33,8 @@ class UpdateSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    global $base_url;
+
     $form['update_check_frequency'] = [
       '#type' => 'radios',
       '#title' => $this->t('Check for updates'),
@@ -51,6 +53,31 @@ class UpdateSettingsForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Check for updates of uninstalled modules and themes'),
       '#config_target' => 'update.settings:check.disabled_extensions',
+    ];
+
+    $form['data_sharing'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Data sharing with Drupal.org'),
+    ];
+    $form['data_sharing']['update_share_domain'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Share the site domain name with Drupal.org'),
+      '#description' => $this->t('The value that would be shared: @hostname', ['@hostname' => DataSharing::hostname($base_url)]),
+      '#config_target' => new ConfigTarget(
+        'update.settings',
+        'data_sharing.domain',
+        fromConfig: fn (?bool $value): bool => $value ?? DataSharing::DEFAULT_DOMAIN,
+      ),
+    ];
+    $form['data_sharing']['update_share_site_mail'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Share the site email address with the Drupal Association'),
+      '#description' => $this->t('The value that would be shared: @mail', ['@mail' => $this->config('system.site')->get('mail')]),
+      '#config_target' => new ConfigTarget(
+        'update.settings',
+        'data_sharing.site_mail',
+        fromConfig: fn (?bool $value): bool => $value ?? DataSharing::DEFAULT_SITE_MAIL,
+      ),
     ];
 
     $form['update_notify_emails'] = [

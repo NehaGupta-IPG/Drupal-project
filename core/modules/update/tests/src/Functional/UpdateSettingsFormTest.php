@@ -105,4 +105,20 @@ class UpdateSettingsFormTest extends BrowserTestBase {
 
   }
 
+  /**
+   * Tests the data sharing settings.
+   */
+  public function testDataSharing(): void {
+    $this->drupalLogin($this->drupalCreateUser(['administer site configuration']));
+    $this->drupalGet('admin/reports/updates/settings');
+    $this->assertSession()->checkboxChecked('update_share_domain');
+    $this->assertSession()->checkboxNotChecked('update_share_site_mail');
+    $this->assertSession()->elementTextContains('css', '#edit-update-share-domain--description', parse_url($this->baseUrl, PHP_URL_HOST));
+    $this->assertSession()->elementTextContains('css', '#edit-update-share-site-mail--description', 'simpletest@example.com');
+
+    $this->submitForm([], 'Save configuration');
+    $this->assertTrue($this->config('update.settings')->get('data_sharing.domain'));
+    $this->assertFalse($this->config('update.settings')->get('data_sharing.site_mail'));
+  }
+
 }
