@@ -36,7 +36,12 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
     $graph_object = new Graph($libraries_graph);
     $graph = $graph_object->searchAndSort();
 
-    uasort($graph, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+    uasort($graph, function ($a, $b) {
+      if ($a['weight'] == $b['weight']) {
+        return 0;
+      }
+      return ($a['weight'] < $b['weight']) ? 1 : -1;
+    });
 
     return array_keys($graph);
   }
