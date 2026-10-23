@@ -10,6 +10,8 @@ editor: ckeditor5
 settings:
   toolbar:
     items:
+      - accessibilityHelp
+      - '|'
       - bold
       - italic
       - '|'

@@ -12,6 +12,8 @@ ckeditor5_essentials:
     library: ckeditor5/internal.drupal.ckeditor5.htmlEngine
     admin_library: ckeditor5/internal.admin.essentials
     toolbar_items:
+      accessibilityHelp:
+        label: Accessibility help
       undo:
         label: Undo
       redo:

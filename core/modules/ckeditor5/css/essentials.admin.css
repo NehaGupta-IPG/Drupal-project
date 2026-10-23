@@ -6,6 +6,10 @@
   background-image: url(../icons/separator.svg);
 }
 
+.ckeditor5-toolbar-button-accessibilityHelp {
+  background-image: url(../icons/accessibility.svg);
+}
+
 .ckeditor5-toolbar-button-undo {
   background-image: url(../icons/undo.svg);
 }
