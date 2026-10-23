@@ -30,6 +30,8 @@ class TestingProfileInstallTest extends BrowserTestBase {
    */
   public function testUpdateModuleInstall(): void {
     $this->assertTrue(\Drupal::moduleHandler()->moduleExists('update'));
+    $this->assertNull($this->config('update.settings')->get('data_sharing.domain'));
+    $this->assertNull($this->config('update.settings')->get('data_sharing.site_mail'));
   }
 
   /**

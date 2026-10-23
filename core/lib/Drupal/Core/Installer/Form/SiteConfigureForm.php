@@ -2,12 +2,15 @@
 
 namespace Drupal\Core\Installer\Form;
 
+use Composer\Autoload\ClassLoader;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\update\DataSharing;
 use Drupal\user\UserInterface;
 use Drupal\user\UserNameValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,6 +37,10 @@ class SiteConfigureForm extends ConfigFormBase {
    *   The user validator.
    * @param bool $superUserAccessPolicy
    *   The value of the 'security.enable_super_user' container parameter.
+   * @param \Composer\Autoload\ClassLoader $classLoader
+   *   The class loader.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   *   The module extension list.
    */
   public function __construct(
     protected $root,
@@ -42,6 +49,8 @@ class SiteConfigureForm extends ConfigFormBase {
     protected ModuleInstallerInterface $moduleInstaller,
     protected UserNameValidator $userNameValidator,
     protected bool $superUserAccessPolicy,
+    protected ClassLoader $classLoader,
+    protected ModuleExtensionList $moduleExtensionList,
   ) {}
 
   /**
@@ -58,6 +67,8 @@ class SiteConfigureForm extends ConfigFormBase {
       // the container parameter is missing then the policy is enabled. See
       // \Drupal\Core\DependencyInjection\Compiler\SuperUserAccessPolicyPass.
       $container->getParameter('security.enable_super_user') ?? TRUE,
+      $container->get('class_loader'),
+      $container->get('extension.list.module'),
     );
   }
 
@@ -189,11 +200,13 @@ class SiteConfigureForm extends ConfigFormBase {
       '#access' => empty($install_state['config_install_path']),
     ];
 
+    // Update Status is not installed yet, so its classes are not autoloadable.
+    $this->classLoader->addPsr4('Drupal\\update\\', $this->root . '/' . $this->moduleExtensionList->getPath('update') . '/src');
     $form['update_notifications'] = [
       '#type' => 'fieldset',
       '#attributes' => ['class' => ['fieldgroup']],
       '#title' => $this->t('Update notifications'),
-      '#description' => $this->t('When checking for updates, your site automatically sends anonymous information to Drupal.org. See the <a href="@update-status-module-docs" target="_blank">Update Status module documentation</a> for details.', ['@update-status-module-docs' => 'https://www.drupal.org/node/178772']),
+      '#description' => $this->t('When checking for updates, your site sends a hashed site key and the list of installed modules and themes to Drupal.org. See the <a href="@update-status-module-docs" target="_blank">Update Status module documentation</a> for details.', ['@update-status-module-docs' => 'https://www.drupal.org/node/178772']),
       '#access' => empty($install_state['config_install_path']),
     ];
     $form['update_notifications']['enable_update_status_module'] = [
@@ -206,6 +219,28 @@ class SiteConfigureForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Receive email notifications'),
       '#default_value' => 1,
+      '#states' => [
+        'visible' => [
+          'input[name="enable_update_status_module"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#access' => empty($install_state['config_install_path']),
+    ];
+    $form['update_notifications']['share_domain'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Share the site domain name with Drupal.org'),
+      '#default_value' => DataSharing::DEFAULT_DOMAIN,
+      '#states' => [
+        'visible' => [
+          'input[name="enable_update_status_module"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#access' => empty($install_state['config_install_path']),
+    ];
+    $form['update_notifications']['share_site_mail'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Share the site email address with the Drupal Association'),
+      '#default_value' => DataSharing::DEFAULT_SITE_MAIL,
       '#states' => [
         'visible' => [
           'input[name="enable_update_status_module"]' => ['checked' => TRUE],
@@ -268,6 +303,12 @@ class SiteConfigureForm extends ConfigFormBase {
       if ($email_update_status_emails) {
         // Reset the configuration so it is updated with the new module.
         $this->config('update.settings')->set('notification.emails', [$account_values['mail']])->save();
+      }
+      if ($install_state['interactive']) {
+        $this->config('update.settings')
+          ->set('data_sharing.domain', (bool) $form_state->getValue('share_domain'))
+          ->set('data_sharing.site_mail', (bool) $form_state->getValue('share_site_mail'))
+          ->save();
       }
     }
 

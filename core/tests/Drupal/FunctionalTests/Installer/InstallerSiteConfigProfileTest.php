@@ -72,6 +72,8 @@ class InstallerSiteConfigProfileTest extends InstallerTestBase {
     $this->assertEquals(self::EXPECTED_SITE_MAIL, $this->config('system.site')->get('mail'));
     $this->assertEquals(self::EXPECTED_TIMEZONE, $this->config('system.date')->get('timezone.default'));
     $this->assertTrue(\Drupal::moduleHandler()->moduleExists('update'));
+    $this->assertTrue($this->config('update.settings')->get('data_sharing.domain'));
+    $this->assertFalse($this->config('update.settings')->get('data_sharing.site_mail'));
   }
 
 }
