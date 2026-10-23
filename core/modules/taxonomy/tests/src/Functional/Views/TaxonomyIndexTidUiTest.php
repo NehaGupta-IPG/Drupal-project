@@ -332,6 +332,19 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     $this->assertSession()->pageTextContains($nodes[0]->getTitle());
     $this->assertSession()->pageTextContains($nodes[2]->getTitle());
     $this->assertSession()->pageTextNotContains($nodes[1]->getTitle());
+
+    $this->drupalGet('/admin/structure/views/nojs/handler/test_taxonomy_exposed_grouped_filter/page_1/filter/field_views_testing_tags_target_id');
+    $edit = [
+      'options[group_info][multiple]' => 1,
+    ];
+    $this->submitForm($edit, 'Apply');
+    $this->submitForm([], 'Save');
+
+    $this->drupalGet('/test-taxonomy-exposed-grouped-filter');
+    $this->submitForm(['field_views_testing_tags_target_id[1]' => 1], 'Apply');
+    $this->assertSession()->pageTextContains($nodes[0]->getTitle());
+    $this->assertSession()->pageTextContains($nodes[1]->getTitle());
+    $this->assertSession()->pageTextNotContains($nodes[2]->getTitle());
   }
 
   /**
