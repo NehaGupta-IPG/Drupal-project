@@ -69,7 +69,8 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    */
   protected function installAllEntitySchemas(): void {
     // Install every entity type's schema that wasn't installed in ::setUp().
-    foreach (array_diff_key($this->entityTypeManager->getDefinitions(), array_flip(['user', 'entity_test', 'entity_test_update'])) as $entity_type_id => $entity_type) {
+    $already_installed = array_flip(['user', 'entity_test', 'entity_test_update']);
+    foreach (array_diff_key($this->entityTypeManager->getDefinitions(), $already_installed) as $entity_type_id => $entity_type) {
       $this->installEntitySchema($entity_type_id);
     }
   }
