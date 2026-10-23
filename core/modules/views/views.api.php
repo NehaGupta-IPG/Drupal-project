@@ -910,23 +910,13 @@ function hook_views_post_render(ViewExecutable $view, array &$output, CachePlugi
  * @see \Drupal\views\Plugin\views\query\Sql
  */
 function hook_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
-  // (Example assuming a view with an exposed filter on node title.)
-  // If the input for the title filter is a positive integer, filter against
-  // node ID instead of node title.
-  if ($view->id() == 'my_view' && is_numeric($view->exposed_raw_input['title']) && $view->exposed_raw_input['title'] > 0) {
-    // Traverse through the 'where' part of the query.
-    foreach ($query->where as &$condition_group) {
-      foreach ($condition_group['conditions'] as &$condition) {
-        // If this is the part of the query filtering on title, change the
-        // condition to filter on node ID.
-        if ($condition['field'] == 'node.title') {
-          $condition = [
-            'field' => 'node.nid',
-            'value' => $view->exposed_raw_input['title'],
-            'operator' => '=',
-          ];
-        }
-      }
+  // Check if the view ID matches and the exposed input is a positive integer.
+  if ($view->id() == 'my_view' && isset($view->exposed_raw_input['title']) && is_numeric($view->exposed_raw_input['title']) && $view->exposed_raw_input['title'] > 0) {
+    // Ensure we're working with a SQL query.
+    if ($query->getPluginId() == 'default') {
+      /** @var \Drupal\views\Plugin\views\query\Sql $query */
+      $query = $query;
+      $query->addWhereExpression(0, 'node.nid = :nid', [':nid' => $view->exposed_raw_input['title']]);
     }
   }
 }
