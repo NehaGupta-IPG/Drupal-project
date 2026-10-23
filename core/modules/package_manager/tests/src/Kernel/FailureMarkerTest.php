@@ -9,6 +9,7 @@ use Drupal\package_manager\Event\CollectPathsToExcludeEvent;
 use Drupal\package_manager\Exception\FailureMarkerExistsException;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PathLocator;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PhpTuf\ComposerStager\API\Path\Factory\PathFactoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[CoversClass(FailureMarker::class)]
 #[Group('package_manager')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FailureMarkerTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;

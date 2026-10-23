@@ -11,6 +11,7 @@ use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\RequestHandler;
 use Drupal\rest\ResourceResponse;
 use Drupal\rest\RestResourceConfigInterface;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -26,6 +27,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[CoversClass(RequestHandler::class)]
 #[Group('rest')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class RequestHandlerTest extends KernelTestBase {
 
   /**

@@ -11,6 +11,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Template\TwigEnvironment;
 use Drupal\Core\Template\TwigPhpStorageCache;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\Definition;
@@ -23,6 +24,7 @@ use Twig\Error\LoaderError;
  */
 #[Group('Twig')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class TwigEnvironmentTest extends KernelTestBase {
 
   /**

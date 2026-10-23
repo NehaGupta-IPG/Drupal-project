@@ -7,6 +7,7 @@ namespace Drupal\Tests\media\Kernel;
 use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\media\Plugin\Field\FieldFormatter\MediaThumbnailFormatter;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(MediaThumbnailFormatter::class)]
 #[Group('media')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MediaThumbnailFormatterTest extends MediaKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;

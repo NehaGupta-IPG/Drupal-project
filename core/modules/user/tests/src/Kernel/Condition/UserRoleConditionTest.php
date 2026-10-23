@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Kernel\Condition;
 
 use Drupal\Component\Utility\Html;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class UserRoleConditionTest extends KernelTestBase {
 
   /**

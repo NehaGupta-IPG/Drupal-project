@@ -7,6 +7,7 @@ namespace Drupal\Tests\field\Kernel\KernelString;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('field')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class UuidFormatterTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -29,13 +31,19 @@ class UuidFormatterTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->installConfig(['system', 'field']);
-    $this->installEntitySchema('entity_test');
-    $this->installEntitySchema('user');
     $this->setUpCurrentUser(permissions: [
       'view test entity',
     ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installConfig(['system', 'field']);
+    $this->installEntitySchema('entity_test');
+    $this->installEntitySchema('user');
   }
 
   /**

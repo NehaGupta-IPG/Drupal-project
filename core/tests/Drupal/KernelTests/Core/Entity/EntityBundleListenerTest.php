@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\EntityBundleListener;
 use Drupal\entity_test\EntityTestHelper;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(EntityBundleListener::class)]
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EntityBundleListenerTest extends EntityKernelTestBase {
 
   /**

@@ -16,6 +16,7 @@ use Drupal\node\Entity\Node;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workflows\Entity\Workflow;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -26,6 +27,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('content_moderation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ContentModerationStateTest extends KernelTestBase {
 
   use ContentModerationTestTrait;

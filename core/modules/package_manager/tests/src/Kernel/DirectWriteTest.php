@@ -19,6 +19,7 @@ use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager\StatusCheckTrait;
 use Drupal\package_manager\ValidationResult;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PhpTuf\ComposerStager\API\Core\BeginnerInterface;
 use PhpTuf\ComposerStager\API\Core\CommitterInterface;
 use PhpTuf\ComposerStager\API\Path\Factory\PathFactoryInterface;
@@ -38,6 +39,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 #[CoversClass(DirectWritePreconditionBypass::class)]
 #[CoversMethod(SandboxManagerBase::class, 'isDirectWrite')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DirectWriteTest extends PackageManagerKernelTestBase implements EventSubscriberInterface {
 
   use StatusCheckTrait;

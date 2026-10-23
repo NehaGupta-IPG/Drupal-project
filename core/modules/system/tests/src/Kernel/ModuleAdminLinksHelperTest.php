@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\ModuleAdminLinksHelper;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ModuleAdminLinksHelper::class)]
 #[Group('system')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ModuleAdminLinksHelperTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -41,6 +43,14 @@ class ModuleAdminLinksHelperTest extends KernelTestBase {
     $this->setUpCurrentUser([], [
       'access administration pages',
     ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('user');
     $this->installEntitySchema('menu_link_content');
   }
 

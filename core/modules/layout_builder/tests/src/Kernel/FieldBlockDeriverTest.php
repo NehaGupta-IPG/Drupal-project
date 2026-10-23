@@ -7,6 +7,7 @@ namespace Drupal\Tests\layout_builder\Kernel;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('layout_builder')]
 #[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FieldBlockDeriverTest extends EntityKernelTestBase {
 
   /**

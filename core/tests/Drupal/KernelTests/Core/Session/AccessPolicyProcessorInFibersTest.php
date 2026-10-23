@@ -11,6 +11,7 @@ use Drupal\Core\Session\AccessPolicyProcessor;
 use Drupal\Core\Session\UserSession;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(AccessPolicyProcessor::class)]
 #[Group('Session')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class AccessPolicyProcessorInFibersTest extends KernelTestBase {
 
   use UserCreationTrait;

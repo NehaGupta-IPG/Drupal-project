@@ -6,6 +6,7 @@ namespace Drupal\Tests\navigation\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('navigation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class NavigationContentLinksTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;

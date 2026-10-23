@@ -13,6 +13,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\Event\MigrateEvents;
 use Drupal\migrate\Event\MigrateIdMapMessageEvent;
 use Drupal\migrate\MigrateExecutable;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\Plugin\Validation\Constraint\UserNameConstraint;
@@ -25,6 +26,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('migrate')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MigrateEntityContentValidationTest extends KernelTestBase {
 
   /**

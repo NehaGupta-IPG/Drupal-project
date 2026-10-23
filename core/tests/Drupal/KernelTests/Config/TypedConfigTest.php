@@ -12,6 +12,7 @@ use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\Type\IntegerInterface;
 use Drupal\Core\TypedData\Type\StringInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -23,6 +24,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 #[Group('Config')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class TypedConfigTest extends KernelTestBase {
 
   /**

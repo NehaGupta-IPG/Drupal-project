@@ -8,6 +8,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\ComposerMinimumStabilityValidator;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('#slow')]
 #[CoversClass(ComposerMinimumStabilityValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ComposerMinimumStabilityValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;

@@ -6,6 +6,7 @@ namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\migrate\MigrateExecutable;
 use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('migrate')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MigrateRollbackEntityConfigTest extends MigrateTestBase {
 
   /**

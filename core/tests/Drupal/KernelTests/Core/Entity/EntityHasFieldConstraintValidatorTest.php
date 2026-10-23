@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Entity;
 use Drupal\Core\Entity\Plugin\Validation\Constraint\EntityHasFieldConstraintValidator;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Entity')]
 #[CoversClass(EntityHasFieldConstraintValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EntityHasFieldConstraintValidatorTest extends EntityKernelTestBase {
 
   /**

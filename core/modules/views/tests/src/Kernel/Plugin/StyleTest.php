@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Plugin\views\row\Fields;
 use Drupal\views\ResultRow;
 use Drupal\views\Views;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class StyleTest extends ViewsKernelTestBase {
 
   /**

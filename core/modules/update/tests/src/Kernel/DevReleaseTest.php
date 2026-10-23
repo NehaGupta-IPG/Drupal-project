@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\update\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
 use GuzzleHttp\Client;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('update')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class DevReleaseTest extends KernelTestBase {
 
   /**
@@ -37,14 +39,19 @@ class DevReleaseTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->setCoreVersion('8.1.0-dev');
+    $this->setReleaseMetadata(__DIR__ . '/../../fixtures/release-history/drupal.sec.8.1.0-dev.xml');
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     // The Update Status module's default configuration must be installed for
     // our fake release metadata to be fetched.
     $this->installConfig('update');
     $this->installConfig('update_test');
-    $this->setCoreVersion('8.1.0-dev');
-    $this->setReleaseMetadata(__DIR__ . '/../../fixtures/release-history/drupal.sec.8.1.0-dev.xml');
-
   }
 
   /**

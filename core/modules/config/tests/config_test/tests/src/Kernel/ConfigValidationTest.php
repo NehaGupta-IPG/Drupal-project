@@ -6,6 +6,7 @@ namespace Drupal\Tests\config_test\Kernel;
 
 use Drupal\config_test\ConfigValidation;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Validation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ConfigValidationTest extends KernelTestBase {
 
   /**
@@ -24,9 +26,8 @@ class ConfigValidationTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig('config_test');
   }
 

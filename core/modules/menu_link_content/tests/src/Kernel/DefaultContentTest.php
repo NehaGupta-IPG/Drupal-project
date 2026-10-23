@@ -14,6 +14,7 @@ use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\EventSubscriber\DefaultContentSubscriber;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -24,6 +25,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('menu_link_content')]
 #[CoversClass(DefaultContentSubscriber::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class DefaultContentTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -44,15 +46,21 @@ class DefaultContentTest extends KernelTestBase {
   ];
 
   /**
-   * Tests exporting of menu link content.
+   * {@inheritdoc}
    */
-  public function testExportMenuLinkContent(): void {
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig(['filter', 'system']);
     $this->installEntitySchema('menu_link_content');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
-
     $this->createContentType(['type' => 'page']);
+  }
+
+  /**
+   * Tests exporting of menu link content.
+   */
+  public function testExportMenuLinkContent(): void {
     $parent = $this->createNode(['type' => 'page']);
     $child = $this->createNode(['type' => 'page']);
     \Drupal::service(MenuLinkManagerInterface::class)->rebuild();

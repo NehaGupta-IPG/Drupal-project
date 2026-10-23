@@ -9,6 +9,7 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_builder\Plugin\DataType\SectionData;
 use Drupal\layout_builder\Section;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(SectionData::class)]
 #[Group('layout_builder')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class SectionDataTest extends KernelTestBase {
 
   /**

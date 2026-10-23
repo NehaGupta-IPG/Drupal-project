@@ -6,6 +6,7 @@ namespace Drupal\Tests\file\Kernel\Plugin\Validation\Constraint;
 
 use Drupal\file\Plugin\Validation\Constraint\FileSizeLimitConstraintValidator;
 use Drupal\Tests\file\Kernel\Validation\FileValidatorTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(FileSizeLimitConstraintValidator::class)]
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FileSizeLimitConstraintValidatorTest extends FileValidatorTestBase {
 
   /**

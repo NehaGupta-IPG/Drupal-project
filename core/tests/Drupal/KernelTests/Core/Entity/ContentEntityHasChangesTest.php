@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ContentEntityHasChangesTest extends KernelTestBase {
 
   /**
@@ -31,9 +33,8 @@ class ContentEntityHasChangesTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test_mulrev_changed_rev');
   }

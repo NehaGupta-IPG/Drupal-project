@@ -7,6 +7,7 @@ namespace Drupal\Tests\file\Kernel;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\file\Upload\FormFileUploader;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  */
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FileSaveUploadTest extends KernelTestBase {
 
   /**

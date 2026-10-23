@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Render;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,14 +14,14 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Render')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ElementInfoIntegrationTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->container->get('theme_installer')->install(['test_theme', 'starterkit_theme']);
   }
 

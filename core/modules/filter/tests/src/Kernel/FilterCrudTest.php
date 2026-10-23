@@ -7,6 +7,7 @@ namespace Drupal\Tests\filter\Kernel;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('filter')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FilterCrudTest extends KernelTestBase {
 
   /**

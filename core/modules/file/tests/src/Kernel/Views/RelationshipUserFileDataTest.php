@@ -10,6 +10,7 @@ use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Tests\ViewTestData;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class RelationshipUserFileDataTest extends ViewsKernelTestBase {
 
   use UserCreationTrait;

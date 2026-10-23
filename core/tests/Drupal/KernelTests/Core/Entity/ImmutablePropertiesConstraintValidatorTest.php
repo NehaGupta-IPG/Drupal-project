@@ -11,6 +11,7 @@ use Drupal\Core\Entity\Plugin\Validation\Constraint\ImmutablePropertiesConstrain
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -25,6 +26,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 #[CoversClass(ImmutablePropertiesConstraint::class)]
 #[CoversClass(ImmutablePropertiesConstraintValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
 
   /**

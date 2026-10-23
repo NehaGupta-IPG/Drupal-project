@@ -7,6 +7,7 @@ namespace Drupal\Tests\contextual\Kernel;
 use Drupal\contextual\ContextualLinksSerializer;
 use Drupal\contextual\Element\ContextualLinksPlaceholder;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('contextual')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ContextualUnitTest extends KernelTestBase {
 
   /**

@@ -6,6 +6,7 @@ namespace Drupal\Tests\taxonomy\Kernel;
 
 use Drupal\node\Entity\Node;
 use Drupal\Tests\taxonomy\Functional\TaxonomyTranslationTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('taxonomy')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class TermTranslationFieldViewTest extends TaxonomyTestBase {
 
   use TaxonomyTranslationTestTrait;

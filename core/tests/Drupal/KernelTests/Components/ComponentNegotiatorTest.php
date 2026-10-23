@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Components;
 
 use Drupal\Core\Theme\ComponentNegotiator;
 use Drupal\Core\Theme\ExtensionType;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ComponentNegotiator::class)]
 #[Group('sdc')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ComponentNegotiatorTest extends ComponentKernelTestBase {
 
   /**

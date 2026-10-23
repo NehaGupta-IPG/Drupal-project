@@ -7,6 +7,7 @@ namespace Drupal\Tests\taxonomy\Kernel;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Plugin\Validation\Constraint\TaxonomyTermHierarchyConstraintValidator;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(TaxonomyTermHierarchyConstraintValidator::class)]
 #[Group('taxonomy')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class TermHierarchyValidationTest extends EntityKernelTestBase {
 
   /**

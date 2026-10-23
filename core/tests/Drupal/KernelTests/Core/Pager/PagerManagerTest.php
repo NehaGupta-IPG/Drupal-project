@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Pager;
 
 use Drupal\Core\Pager\PagerManager;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 #[CoversClass(PagerManager::class)]
 #[Group('Pager')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class PagerManagerTest extends KernelTestBase {
 
   /**

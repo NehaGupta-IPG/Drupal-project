@@ -7,6 +7,7 @@ namespace Drupal\Tests\announcements_feed\Kernel;
 use Drupal\announcements_feed\AnnounceFetcher;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use GuzzleHttp\Psr7\Response;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(AnnounceFetcher::class)]
 #[Group('announcements_feed')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class AnnounceFetcherUserTest extends AnnounceTestBase {
 
   use UserCreationTrait;

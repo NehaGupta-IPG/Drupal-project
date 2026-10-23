@@ -10,6 +10,7 @@ use Drupal\migrate\Plugin\migrate\process\Route;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(Route::class)]
 #[Group('migrate')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class RouteTest extends KernelTestBase {
 
   use UserCreationTrait;

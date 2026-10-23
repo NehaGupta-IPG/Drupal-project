@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Extension\Command;
 use Drupal\Core\Command\Exception\UserAbortException;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Core\Extension\Command\ExtensionUninstallCommand;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[Group('Console')]
 #[RunTestsInSeparateProcesses]
 #[CoversClass(ExtensionUninstallCommand::class)]
+#[ShareEnvironment(FALSE)]
 class ExtensionUninstallCommandTest extends KernelTestBase {
 
   /**

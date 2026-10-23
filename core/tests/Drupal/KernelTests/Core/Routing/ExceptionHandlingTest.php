@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Routing;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 #[Group('Routing')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ExceptionHandlingTest extends KernelTestBase {
 
   /**

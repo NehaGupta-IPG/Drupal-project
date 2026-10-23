@@ -8,6 +8,7 @@ use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\media\Entity\MediaType;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('media')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ConfigActionsTest extends KernelTestBase {
 
   /**

@@ -8,6 +8,7 @@ use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('datetime')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EntityTypeWithoutViewsDataTest extends KernelTestBase {
 
   /**

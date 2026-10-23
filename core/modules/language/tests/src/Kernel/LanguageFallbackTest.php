@@ -6,6 +6,7 @@ namespace Drupal\Tests\language\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,14 +15,14 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('language')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class LanguageFallbackTest extends LanguageTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $i = 0;
     foreach (['af', 'am', 'ar'] as $langcode) {
       $language = ConfigurableLanguage::createFromLangcode($langcode);

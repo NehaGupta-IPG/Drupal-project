@@ -14,6 +14,7 @@ use Drupal\entity_test\EntityTestTypesFilter;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Entity')]
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EntityTranslationTest extends EntityLanguageTestBase {
 
   /**

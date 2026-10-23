@@ -13,6 +13,7 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -28,6 +29,7 @@ use Prophecy\Argument;
 #[Group('jsonapi')]
 #[Group('jsonapi_query')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FilterTest extends JsonapiKernelTestBase {
 
   use ImageFieldCreationTrait;
@@ -68,7 +70,16 @@ class FilterTest extends JsonapiKernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
+    $this->fieldResolver = $this->container->get('jsonapi.field_resolver');
+    $this->resourceTypeRepository = $this->container->get('jsonapi.resource_type.repository');
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->setUpSchemas();
 
     $this->savePaintingType();
@@ -82,10 +93,6 @@ class FilterTest extends JsonapiKernelTestBase {
       ['colors' => ['yellow'], 'shapes' => ['triangle'], 'title' => 'DO_NOT_FIND'],
       ['colors' => ['orange'], 'shapes' => ['square'], 'title' => 'DO_NOT_FIND'],
     ]);
-
-    $this->nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
-    $this->fieldResolver = $this->container->get('jsonapi.field_resolver');
-    $this->resourceTypeRepository = $this->container->get('jsonapi.resource_type.repository');
   }
 
   /**

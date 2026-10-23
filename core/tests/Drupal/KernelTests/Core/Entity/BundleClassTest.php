@@ -22,6 +22,7 @@ use Drupal\entity_test_bundle_class\Entity\EntityTestUserClass;
 use Drupal\entity_test_bundle_class\Entity\EntityTestVariant;
 use Drupal\entity_test_bundle_class\Entity\SharedEntityTestBundleClassA;
 use Drupal\entity_test_bundle_class\Entity\SharedEntityTestBundleClassB;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -31,6 +32,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class BundleClassTest extends EntityKernelTestBase {
 
   /**

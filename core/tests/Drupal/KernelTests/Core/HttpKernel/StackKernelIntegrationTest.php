@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\HttpKernel;
 
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 #[Group('Routing')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class StackKernelIntegrationTest extends KernelTestBase {
 
   /**

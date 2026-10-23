@@ -18,6 +18,7 @@ use Drupal\layout_builder\OverridesSectionStorageInterface;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
 use Drupal\layout_builder\SectionStorageInterface;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -30,6 +31,7 @@ use Prophecy\Argument;
 #[CoversClass(LayoutEntityHelperTrait::class)]
 #[Group('layout_builder')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LayoutEntityHelperTraitTest extends KernelTestBase {
 
   /**

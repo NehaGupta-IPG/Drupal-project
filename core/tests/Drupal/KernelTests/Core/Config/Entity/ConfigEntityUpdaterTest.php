@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Config\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ConfigEntityUpdater::class)]
 #[Group('config')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ConfigEntityUpdaterTest extends KernelTestBase {
 
   /**

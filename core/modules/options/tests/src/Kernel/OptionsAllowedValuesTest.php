@@ -7,6 +7,7 @@ namespace Drupal\Tests\options\Kernel;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\options\OptionsAllowedValuesInterface;
 use Drupal\options\Plugin\Field\FieldType\ListItemBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('options')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class OptionsAllowedValuesTest extends OptionsFieldUnitTestBase {
 
   /**

@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Plugin\Condition;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Tests\Routing\MockAliasManager;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  */
 #[Group('Plugin')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class RequestPathTest extends KernelTestBase {
 
   /**
@@ -59,9 +61,6 @@ class RequestPathTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->installConfig('system');
-
     $this->pluginManager = $this->container->get('plugin.manager.condition');
 
     // Set a mock alias manager in the container.
@@ -74,6 +73,14 @@ class RequestPathTest extends KernelTestBase {
 
     $this->currentPath = new CurrentPathStack($this->requestStack);
     $this->container->set('path.current', $this->currentPath);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installConfig('system');
   }
 
   /**

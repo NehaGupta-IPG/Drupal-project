@@ -11,6 +11,7 @@ use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(VersionHistoryController::class)]
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class RevisionVersionHistoryTest extends KernelTestBase {
 
   use UserCreationTrait {
@@ -40,12 +42,13 @@ class RevisionVersionHistoryTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('entity_test_rev');
     $this->installEntitySchema('entity_test_revlog');
+    $this->installEntitySchema('entity_test_mulrev');
     $this->installEntitySchema('user');
-    $this->installConfig(['system']);
+    $this->installConfig(['system', 'user']);
   }
 
   /**
@@ -133,7 +136,6 @@ class RevisionVersionHistoryTest extends KernelTestBase {
    * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionRevLogNullValues(): void {
-    $this->installConfig(['user']);
     $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
     $entity->setName('view all revisions')->save();
 
@@ -330,7 +332,6 @@ class RevisionVersionHistoryTest extends KernelTestBase {
    * Test revisions are paginated.
    */
   public function testRevisionsPagination(): void {
-    $this->installEntitySchema('entity_test_mulrev');
     /** @var \Drupal\entity_test\Entity\EntityTestMulRev $entity */
     $entity = EntityTestMulRev::create([
       'type' => 'entity_test_mulrev',

@@ -22,6 +22,7 @@ use Drupal\Core\TypedData\Type\UriInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -31,6 +32,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('TypedData')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class TypedDataTest extends KernelTestBase {
 
   use StringTranslationTrait;
@@ -52,9 +54,15 @@ class TypedDataTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->installEntitySchema('file');
     $this->typedDataManager = $this->container->get('typed_data_manager');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('file');
   }
 
   /**

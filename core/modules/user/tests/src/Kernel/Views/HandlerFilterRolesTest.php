@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Kernel\Views;
 
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
@@ -20,6 +21,7 @@ use Psr\Log\LoggerInterface;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class HandlerFilterRolesTest extends UserKernelTestBase {
 
   /**

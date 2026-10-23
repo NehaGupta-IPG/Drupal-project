@@ -8,6 +8,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\media\MediaAccessControlHandler;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('media')]
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MediaAccessControlHandlerCreateTest extends MediaKernelTestBase {
 
   use UserCreationTrait;

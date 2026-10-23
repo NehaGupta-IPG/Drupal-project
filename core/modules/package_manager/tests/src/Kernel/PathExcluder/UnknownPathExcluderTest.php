@@ -10,6 +10,7 @@ use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\package_manager\PathExcluder\UnknownPathExcluder;
 use Drupal\package_manager\PathLocator;
 use Drupal\Tests\package_manager\Kernel\PackageManagerKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -25,6 +26,7 @@ use Symfony\Component\Filesystem\Filesystem;
 #[Group('#slow')]
 #[CoversClass(UnknownPathExcluder::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
 
   /**

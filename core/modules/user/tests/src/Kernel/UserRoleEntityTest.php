@@ -7,6 +7,7 @@ namespace Drupal\Tests\user\Kernel;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,6 +20,7 @@ use Symfony\Component\ErrorHandler\BufferingLogger;
 #[CoversClass(Role::class)]
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class UserRoleEntityTest extends KernelTestBase {
 
   /**

@@ -12,6 +12,7 @@ use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\EnabledExtensionsValidator;
 use Drupal\Tests\package_manager\Traits\ComposerInstallersTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -26,6 +27,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('#slow')]
 #[CoversClass(EnabledExtensionsValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EnabledExtensionsValidatorTest extends PackageManagerKernelTestBase {
 
   use ComposerInstallersTrait;

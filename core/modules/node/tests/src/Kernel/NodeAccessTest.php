@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\node\NodeAccessRebuild;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('node')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class NodeAccessTest extends NodeAccessTestBase {
 
   /**

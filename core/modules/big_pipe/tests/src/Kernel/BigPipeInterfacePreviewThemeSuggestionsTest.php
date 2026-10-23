@@ -6,6 +6,7 @@ namespace Drupal\Tests\big_pipe\Kernel;
 
 use Drupal\block\Entity\Block;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('big_pipe')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class BigPipeInterfacePreviewThemeSuggestionsTest extends KernelTestBase {
 
   /**

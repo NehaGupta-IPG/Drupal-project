@@ -7,6 +7,7 @@ namespace Drupal\Tests\block_content\Kernel;
 use Drupal\block_content\BlockContentPermissions;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(BlockContentPermissions::class)]
 #[Group('block_content')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class BlockContentPermissionsTest extends KernelTestBase {
 
   /**
@@ -40,10 +42,16 @@ class BlockContentPermissionsTest extends KernelTestBase {
    */
   public function setUp(): void {
     parent::setUp();
+    $this->permissionHandler = $this->container->get('user.permissions');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
     $this->installEntitySchema('block_content');
-
-    $this->permissionHandler = $this->container->get('user.permissions');
   }
 
   /**

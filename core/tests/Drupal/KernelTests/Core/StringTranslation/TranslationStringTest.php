@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\StringTranslation;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('StringTranslation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class TranslationStringTest extends KernelTestBase {
 
   /**

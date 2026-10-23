@@ -8,6 +8,7 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\image\Entity\ImageStyle;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ViewsConfigDependenciesIntegrationTest extends ViewsKernelTestBase {
 
   /**

@@ -8,6 +8,7 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InsertCommand;
 use Drupal\Core\EventSubscriber\AjaxResponseSubscriber;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 #[Group('Ajax')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class CommandsTest extends KernelTestBase {
 
   /**

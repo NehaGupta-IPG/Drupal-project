@@ -11,6 +11,7 @@ use Drupal\console_test\Command\ConsoleExamplePrivateCommand;
 use Drupal\Core\DependencyInjection\Compiler\ConsoleCompilerPass;
 use Drupal\KernelTests\DrupalApplicationTesterTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -24,6 +25,7 @@ use Symfony\Component\Console\Command\LazyCommand;
 #[RunTestsInSeparateProcesses]
 #[CoversClass(ConsoleCompilerPass::class)]
 #[CoversClass(ConsoleExampleCommand::class)]
+#[ShareEnvironment(FALSE)]
 class ConsoleTest extends KernelTestBase {
   use DrupalApplicationTesterTrait;
 

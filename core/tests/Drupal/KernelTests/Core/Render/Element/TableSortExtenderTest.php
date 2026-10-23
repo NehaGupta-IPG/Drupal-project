@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Render\Element;
 
 use Drupal\Core\Utility\TableSort;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  */
 #[Group('Common')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class TableSortExtenderTest extends KernelTestBase {
 
   /**

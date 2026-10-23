@@ -11,6 +11,7 @@ use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PackageManagerUninstallValidator;
 use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager_bypass\LoggingCommitter;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PhpTuf\ComposerStager\API\Exception\ExceptionInterface;
 use PhpTuf\ComposerStager\API\Exception\InvalidArgumentException;
 use PhpTuf\ComposerStager\API\Exception\PreconditionException;
@@ -30,6 +31,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('#slow')]
 #[CoversClass(PackageManagerUninstallValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class StageCommitExceptionTest extends PackageManagerKernelTestBase {
 
   /**

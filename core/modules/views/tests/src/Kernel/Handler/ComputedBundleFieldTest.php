@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Kernel\Handler;
 use Drupal\entity_test\Entity\EntityTestComputedBundleField;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ComputedBundleFieldTest extends ViewsKernelTestBase {
 
   /**

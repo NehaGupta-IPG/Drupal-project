@@ -10,6 +10,7 @@ use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\HttpKernelUiHelperTrait;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('help')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class HelpTopicTest extends KernelTestBase {
 
   use AssertBreadcrumbTrait;

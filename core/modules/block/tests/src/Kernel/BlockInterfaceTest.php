@@ -7,6 +7,7 @@ namespace Drupal\Tests\block\Kernel;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('block')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class BlockInterfaceTest extends KernelTestBase {
 
   /**

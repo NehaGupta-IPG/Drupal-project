@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\workflows\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workflows\Entity\Workflow;
 use Drupal\workflows\Exception\RequiredStateMissingException;
 use Drupal\workflows\Plugin\WorkflowTypeBase;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(WorkflowTypeBase::class)]
 #[Group('workflows')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class RequiredStatesTest extends KernelTestBase {
 
   /**

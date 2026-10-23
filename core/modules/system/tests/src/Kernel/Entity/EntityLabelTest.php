@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Kernel\Entity;
 use Drupal\Core\Entity\Attribute\EntityType;
 use Drupal\Core\Plugin\Discovery\AttributeClassDiscovery;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class EntityLabelTest extends KernelTestBase {
 
   /**

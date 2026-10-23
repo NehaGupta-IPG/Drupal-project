@@ -11,6 +11,7 @@ use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\workspaces\Kernel\WorkspaceTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workflows\Entity\Workflow;
 use Drupal\workflows\WorkflowInterface;
 use Drupal\workspaces\WorkspacePublishException;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('content_moderation')]
 #[Group('workspaces')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
 
   use ContentModerationTestTrait {

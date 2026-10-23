@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Batch;
 
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[Group('Batch')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class BatchNegotiatorTest extends KernelTestBase {
 
   /**

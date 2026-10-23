@@ -8,6 +8,7 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\Render\FilteredMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\text\TextSummary;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('text')]
 #[RunTestsInSeparateProcesses]
 #[CoversMethod(TextSummary::class, 'generate')]
+#[ShareEnvironment]
 class TextSummaryTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -38,9 +40,8 @@ class TextSummaryTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig(['text']);
   }
 

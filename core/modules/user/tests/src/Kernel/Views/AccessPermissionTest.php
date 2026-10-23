@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Kernel\Views;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Plugin\views\access\Permission;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Tests\ViewTestData;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class AccessPermissionTest extends KernelTestBase {
 
   use UserCreationTrait;

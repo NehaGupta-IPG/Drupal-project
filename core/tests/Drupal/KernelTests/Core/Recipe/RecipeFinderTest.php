@@ -10,6 +10,7 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Recipe\Finder;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -23,6 +24,7 @@ use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 #[CoversClass(Finder::class)]
 #[Group('Recipe')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class RecipeFinderTest extends KernelTestBase {
 
   /**

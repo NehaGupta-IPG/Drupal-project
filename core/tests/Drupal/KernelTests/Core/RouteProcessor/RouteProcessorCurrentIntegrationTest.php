@@ -9,6 +9,7 @@ use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +24,7 @@ use Symfony\Component\Routing\Route;
  */
 #[Group('route_processor')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class RouteProcessorCurrentIntegrationTest extends KernelTestBase {
 
   /**

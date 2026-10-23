@@ -11,6 +11,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,6 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 #[Group('Update')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DbDumpTest extends DriverSpecificKernelTestBase {
 
   use PathAliasTestTrait;

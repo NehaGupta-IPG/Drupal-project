@@ -9,6 +9,7 @@ use Drupal\Core\Form\FormState;
 use Drupal\field_ui\Form\EntityDisplayFormBase;
 use Drupal\field_ui\Form\EntityViewDisplayEditForm;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(EntityDisplayFormBase::class)]
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class EntityDisplayFormBaseTest extends KernelTestBase {
 
   /**

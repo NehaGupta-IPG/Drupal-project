@@ -7,6 +7,7 @@ namespace Drupal\Tests\locale\Kernel;
 use Drupal\block\Entity\Block;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('locale')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LocaleConfigManagerTest extends KernelTestBase {
 
   /**

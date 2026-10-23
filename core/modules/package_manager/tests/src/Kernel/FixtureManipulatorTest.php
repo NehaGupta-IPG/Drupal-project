@@ -10,6 +10,7 @@ use Drupal\package_manager\ComposerInspector;
 use Drupal\package_manager\InstalledPackagesList;
 use Drupal\package_manager\PathLocator;
 use Drupal\Tests\package_manager\Traits\InstalledPackagesListTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('package_manager')]
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FixtureManipulatorTest extends PackageManagerKernelTestBase {
 
   use InstalledPackagesListTrait;

@@ -14,6 +14,7 @@ use Drupal\Core\Access\AccessResultNeutral;
 use Drupal\Core\Access\AccessResultReasonInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -27,6 +28,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(BlockContentAccessControlHandler::class)]
 #[Group('block_content')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class BlockContentAccessHandlerTest extends KernelTestBase {
 
   use UserCreationTrait;

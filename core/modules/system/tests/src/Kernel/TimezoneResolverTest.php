@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\TimeZoneResolver;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 #[CoversClass(TimeZoneResolver::class)]
 #[Group('system')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class TimezoneResolverTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -33,12 +35,18 @@ class TimezoneResolverTest extends KernelTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('user');
+    $this->installConfig(['system']);
+  }
+
+  /**
    * Tests time zone resolution.
    */
   public function testGetTimeZone(): void {
-    $this->installEntitySchema('user');
-    $this->installConfig(['system']);
-
     // Check the default test timezone.
     $this->assertEquals('Australia/Sydney', date_default_timezone_get());
 

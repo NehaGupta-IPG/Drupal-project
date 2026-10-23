@@ -16,6 +16,7 @@ use Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\layout_builder\SectionStorage\SectionStorageDefinition;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -27,6 +28,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(DefaultsSectionStorage::class)]
 #[Group('layout_builder')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DefaultsSectionStorageTest extends KernelTestBase {
 
   /**

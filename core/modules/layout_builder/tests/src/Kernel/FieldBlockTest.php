@@ -18,6 +18,7 @@ use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\layout_builder\Plugin\Block\FieldBlock;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -36,6 +37,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[CoversClass(FieldBlock::class)]
 #[Group('Field')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FieldBlockTest extends EntityKernelTestBase {
 
   /**

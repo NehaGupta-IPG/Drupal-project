@@ -10,6 +10,7 @@ use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,6 +23,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 #[CoversClass(HtmxRenderer::class)]
 #[Group('Htmx')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class HtmxRendererTest extends KernelTestBase {
 
   use UserCreationTrait;

@@ -7,6 +7,7 @@ namespace Drupal\Tests\workspaces\Kernel;
 use Drupal\Component\Utility\Crypt;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workspaces\Entity\Workspace;
 use Drupal\workspaces\Negotiator\QueryParameterWorkspaceNegotiator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(QueryParameterWorkspaceNegotiator::class)]
 #[Group('workspaces')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class WorkspaceQueryParameterNegotiatorTest extends KernelTestBase {
 
   use UserCreationTrait;

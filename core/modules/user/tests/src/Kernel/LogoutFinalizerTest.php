@@ -10,6 +10,7 @@ use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Session\SessionManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\LoginFinalizer;
 use Drupal\user\LogoutFinalizer;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LogoutFinalizerTest extends KernelTestBase {
 
   use UserCreationTrait;

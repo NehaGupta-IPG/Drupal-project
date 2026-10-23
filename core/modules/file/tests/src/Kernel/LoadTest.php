@@ -7,6 +7,7 @@ namespace Drupal\Tests\file\Kernel;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\file_test\FileTestHelper;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LoadTest extends FileManagedUnitTestBase {
 
   /**

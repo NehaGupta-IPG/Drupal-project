@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Hook;
 
 use Drupal\hook_loader_test\Hook\CircularDependencyHooks;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Hook')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class HookLoaderTest extends KernelTestBase {
 
   /**

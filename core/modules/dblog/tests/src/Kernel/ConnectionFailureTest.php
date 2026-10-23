@@ -6,6 +6,7 @@ namespace Drupal\Tests\dblog\Kernel;
 
 use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('dblog')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ConnectionFailureTest extends KernelTestBase {
 
   /**
@@ -22,11 +24,17 @@ class ConnectionFailureTest extends KernelTestBase {
   protected static $modules = ['dblog'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installSchema('dblog', ['watchdog']);
+  }
+
+  /**
    * Tests logging of connection failures.
    */
   public function testConnectionFailureLogging(): void {
-    $this->installSchema('dblog', ['watchdog']);
-
     // MySQL errors like "1153 - Got a packet bigger than 'max_allowed_packet'
     // bytes" or "1100 - Table 'xyz' was not locked with LOCK TABLES" lead to a
     // database connection unusable for further requests. All further request

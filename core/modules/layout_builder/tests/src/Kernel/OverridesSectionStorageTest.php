@@ -16,6 +16,7 @@ use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -27,6 +28,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(OverridesSectionStorage::class)]
 #[Group('layout_builder')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class OverridesSectionStorageTest extends KernelTestBase {
 
   use UserCreationTrait;

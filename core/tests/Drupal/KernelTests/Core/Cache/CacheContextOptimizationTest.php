@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Cache;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Render')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class CacheContextOptimizationTest extends KernelTestBase {
 
   use UserCreationTrait;

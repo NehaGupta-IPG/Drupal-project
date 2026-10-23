@@ -13,6 +13,7 @@ use Drupal\file_test\StreamWrapper\DummyRemoteReadOnlyStreamWrapper;
 use Drupal\file_test\StreamWrapper\DummyStreamWrapper;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('image')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
 
   /**

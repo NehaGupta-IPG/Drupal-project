@@ -9,6 +9,7 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\filter\InOperator;
 use Drupal\views\Plugin\views\filter\NumericFilter;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class HandlerAllTest extends ViewsKernelTestBase {
 
   use CommentTestTrait;

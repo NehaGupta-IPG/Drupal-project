@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Render\Element;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Render\Element\StatusReport;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ include_once \DRUPAL_ROOT . '/core/includes/install.inc';
  */
 #[Group('Render')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class StatusReportTest extends KernelTestBase {
 
   /**

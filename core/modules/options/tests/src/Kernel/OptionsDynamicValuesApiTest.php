@@ -8,6 +8,7 @@ use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\options\OptionsAllowedValuesInterface;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('options')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class OptionsDynamicValuesApiTest extends OptionsFieldUnitTestBase {
 
   /**

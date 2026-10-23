@@ -10,6 +10,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(DefaultTableMapping::class)]
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;

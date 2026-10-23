@@ -11,6 +11,7 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Routing\Route;
@@ -20,6 +21,7 @@ use Symfony\Component\Routing\Route;
  */
 #[Group('default_admin')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class BreadcrumbPreprocessTest extends KernelTestBase {
 
   /**
@@ -40,9 +42,8 @@ class BreadcrumbPreprocessTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installEntitySchema('entity_test');

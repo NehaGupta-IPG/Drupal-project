@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Access;
 
 use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[CoversClass(CsrfRequestHeaderAccessCheck::class)]
 #[Group('Access')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class CsrfRequestHeaderAccessCheckTest extends KernelTestBase {
 
   /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\ConfigFormTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\AccountSettingsForm;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class UserAdminSettingsFormTest extends ConfigFormTestBase {
 
   /**
@@ -26,8 +28,6 @@ class UserAdminSettingsFormTest extends ConfigFormTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->installConfig(['user']);
-
     $this->form = AccountSettingsForm::create($this->container);
     $this->values = [
       'anonymous' => [
@@ -91,6 +91,14 @@ class UserAdminSettingsFormTest extends ConfigFormTestBase {
         '#config_key' => 'status_canceled.subject',
       ],
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installConfig(['user']);
   }
 
 }

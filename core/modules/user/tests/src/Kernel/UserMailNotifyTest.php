@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Kernel;
 
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
@@ -20,6 +21,7 @@ use Psr\Log\LoggerInterface;
 #[Group('user')]
 #[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class UserMailNotifyTest extends EntityKernelTestBase {
 
   /**

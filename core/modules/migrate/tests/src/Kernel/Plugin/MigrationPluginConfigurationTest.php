@@ -6,6 +6,7 @@ namespace Drupal\Tests\migrate\Kernel\Plugin;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\Plugin\MigratePluginManager;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(MigratePluginManager::class)]
 #[Group('migrate')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class MigrationPluginConfigurationTest extends KernelTestBase {
 
   /**

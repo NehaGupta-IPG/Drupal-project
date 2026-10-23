@@ -9,6 +9,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Entity\Menu;
 use Drupal\system\MenuAccessControlHandler;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(MenuAccessControlHandler::class)]
 #[Group('system')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MenuAccessControlHandlerTest extends KernelTestBase {
 
   use UserCreationTrait {

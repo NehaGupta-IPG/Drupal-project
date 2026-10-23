@@ -9,6 +9,7 @@ use Drupal\package_manager\Exception\SandboxException;
 use Drupal\package_manager\Exception\SandboxOwnershipException;
 use Drupal\package_manager_test_validation\EventSubscriber\TestSubscriber;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('package_manager')]
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class StageOwnershipTest extends PackageManagerKernelTestBase {
 
   use UserCreationTrait;

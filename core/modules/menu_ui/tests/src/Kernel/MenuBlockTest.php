@@ -10,6 +10,7 @@ use Drupal\menu_ui\Hook\MenuUiHooks;
 use Drupal\system\Entity\Menu;
 use Drupal\system\MenuInterface;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('menu_ui')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MenuBlockTest extends KernelTestBase {
 
   use UserCreationTrait;

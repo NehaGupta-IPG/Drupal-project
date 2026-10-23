@@ -9,6 +9,7 @@ use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeAppliedEvent;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,6 +19,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 #[Group('Recipe')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class RecipeEventsTest extends KernelTestBase implements EventSubscriberInterface {
 
   /**

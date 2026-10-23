@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Kernel\Theme;
 
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Theme')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ThemeDeprecationTest extends KernelTestBase {
 
   /**

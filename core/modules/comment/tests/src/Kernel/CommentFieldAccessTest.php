@@ -14,6 +14,7 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\Tests\Traits\Core\GeneratePermutationsTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -25,6 +26,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('comment')]
 #[Group('Access')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class CommentFieldAccessTest extends EntityKernelTestBase {
 
   use CommentTestTrait;

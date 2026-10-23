@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\SelectExtender;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Database')]
 #[CoversClass(Select::class)]
 #[CoversClass(SelectExtender::class)]
+#[ShareEnvironment(FALSE)]
 final class SelectGetRangeTest extends DatabaseTestBase {
 
   /**

@@ -8,6 +8,7 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\update\Hook\UpdateThemeHooks;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(UpdateThemeHooks::class)]
 #[Group('update')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class UpdateReportTest extends KernelTestBase {
 
   use UserCreationTrait;

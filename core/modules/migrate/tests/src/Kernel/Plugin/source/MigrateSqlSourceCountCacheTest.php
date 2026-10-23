@@ -8,6 +8,7 @@ use Drupal\migrate\Plugin\migrate\source\SourcePluginBase;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
 use Drupal\migrate_sql_count_cache_test\Plugin\migrate\source\SqlCountCache;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversMethod(SqlBase::class, 'doCount')]
 #[CoversMethod(SourcePluginBase::class, 'count')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MigrateSqlSourceCountCacheTest extends MigrateSqlSourceTestBase {
 
   /**

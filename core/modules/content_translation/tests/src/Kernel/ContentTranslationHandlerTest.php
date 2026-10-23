@@ -8,6 +8,7 @@ use Drupal\content_translation\ContentTranslationHandler;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ContentTranslationHandler::class)]
 #[Group('content_translation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ContentTranslationHandlerTest extends KernelTestBase {
 
   /**
@@ -71,11 +73,16 @@ class ContentTranslationHandlerTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
     $this->state = $this->container->get('state');
     $this->entityTypeBundleInfo = $this->container->get('entity_type.bundle.info');
     $this->entityTypeManager = $this->container->get('entity_type.manager');
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema($this->entityTypeId);
     ConfigurableLanguage::createFromLangcode($this->translationLangcode)->save();
   }

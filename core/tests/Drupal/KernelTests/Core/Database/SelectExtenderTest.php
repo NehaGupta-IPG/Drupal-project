@@ -9,6 +9,7 @@ use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(Select::class)]
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class SelectExtenderTest extends KernelTestBase {
 
   /**

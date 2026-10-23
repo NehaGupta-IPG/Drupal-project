@@ -6,6 +6,7 @@ namespace Drupal\Tests\content_moderation\Kernel;
 
 use Drupal\content_moderation\Plugin\WorkflowType\ContentModeration;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workflows\Entity\Workflow;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ContentModeration::class)]
 #[Group('content_moderation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ContentModerationWorkflowTypeApiTest extends KernelTestBase {
 
   /**

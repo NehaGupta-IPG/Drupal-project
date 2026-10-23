@@ -8,6 +8,7 @@ use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Routing\Route;
@@ -17,6 +18,7 @@ use Symfony\Component\Routing\Route;
  */
 #[Group('menu_link_content')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class MenuLinkContentDeriverTest extends KernelTestBase {
 
   /**
@@ -33,9 +35,8 @@ class MenuLinkContentDeriverTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
     $this->installEntitySchema('menu_link_content');
   }

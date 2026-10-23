@@ -8,6 +8,7 @@ use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -21,6 +22,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 #[Group('ckeditor5')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LanguageTest extends KernelTestBase {
 
   /**

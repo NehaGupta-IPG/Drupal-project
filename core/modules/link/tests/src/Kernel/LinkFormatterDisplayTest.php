@@ -11,6 +11,7 @@ use Drupal\link\LinkItemInterface;
 use Drupal\link\LinkTitleVisibility;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\Tests\link\Traits\LinkInputValuesTraits;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('link')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LinkFormatterDisplayTest extends FieldKernelTestBase {
 
   use LinkInputValuesTraits;

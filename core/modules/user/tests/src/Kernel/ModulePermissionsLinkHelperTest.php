@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\ModulePermissionsLinkHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ModulePermissionsLinkHelper::class)]
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ModulePermissionsLinkHelperTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -38,6 +40,14 @@ class ModulePermissionsLinkHelperTest extends KernelTestBase {
     $this->setUpCurrentUser([], [
       'administer permissions',
     ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('user');
   }
 
   /**

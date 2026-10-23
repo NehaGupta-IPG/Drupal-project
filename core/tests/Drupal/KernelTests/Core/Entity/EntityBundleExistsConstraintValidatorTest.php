@@ -10,6 +10,7 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\EntityBundleExistsConstr
 use Drupal\Core\Validation\Plugin\Validation\Constraint\EntityBundleExistsConstraintValidator;
 use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -24,6 +25,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 #[CoversClass(EntityBundleExistsConstraint::class)]
 #[CoversClass(EntityBundleExistsConstraintValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EntityBundleExistsConstraintValidatorTest extends KernelTestBase {
 
   /**

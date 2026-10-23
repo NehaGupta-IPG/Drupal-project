@@ -38,6 +38,12 @@ namespace Drupal\TestTools\Attribute;
  *   its own, redeclares "KernelTestBase::INFRASTRUCTURE_TABLES" instead.
  * - "::setUpEnvironment()" must be deterministic. Random values in the
  *   environment may cause issues.
+ * - A test method must not change the module list either. The configuration,
+ *   key value data and cache entries that a module leaves behind would be
+ *   seen by the test methods that follow, without the module being enabled.
+ *   A test method that leaves the module list changed fails. Declare the
+ *   modules in "static::$modules" instead, or move the test method to a test
+ *   class of its own.
  * - Currently, the test methods share only database state. Every test method
  *   runs in its own process with its own virtual site directory, so a file
  *   written during "::setUpEnvironment()" does not exist when the next test

@@ -8,6 +8,7 @@ use Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\datetime\Kernel\Views\DateTimeHandlerTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('datetime')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FilterDateTest extends DateTimeHandlerTestBase {
 
   /**

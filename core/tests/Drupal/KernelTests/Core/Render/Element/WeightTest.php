@@ -10,6 +10,7 @@ use Drupal\Core\Render\Element\Select;
 use Drupal\Core\Render\Element\Weight;
 use Drupal\element_info_test\ElementInfoTestNumberBuilder;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(Weight::class)]
 #[Group('Render')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class WeightTest extends KernelTestBase {
 
   /**
@@ -30,8 +32,8 @@ class WeightTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig(['system']);
   }
 

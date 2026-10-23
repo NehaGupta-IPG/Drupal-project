@@ -10,6 +10,7 @@ use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\SymlinkValidator;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PhpTuf\ComposerStager\API\Environment\Service\EnvironmentInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
@@ -25,6 +26,7 @@ use Prophecy\Argument;
 #[Group('package_manager')]
 #[CoversClass(SymlinkValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class SymlinkValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;

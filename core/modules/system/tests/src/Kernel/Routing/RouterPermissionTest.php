@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Kernel\Routing;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Routing')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class RouterPermissionTest extends KernelTestBase {
 
   use UserCreationTrait {
@@ -28,8 +30,8 @@ class RouterPermissionTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
   }
 

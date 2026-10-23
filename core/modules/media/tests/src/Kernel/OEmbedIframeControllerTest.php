@@ -11,6 +11,7 @@ use Drupal\media\OEmbed\Resource;
 use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
 use Drupal\media\OEmbed\UrlResolverInterface;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -25,6 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 #[CoversClass(OEmbedIframeController::class)]
 #[Group('media')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class OEmbedIframeControllerTest extends MediaKernelTestBase {
 
   /**

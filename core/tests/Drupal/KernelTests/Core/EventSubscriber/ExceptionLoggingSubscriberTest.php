@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\EventSubscriber;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[Group('system')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ExceptionLoggingSubscriberTest extends KernelTestBase {
 
   /**

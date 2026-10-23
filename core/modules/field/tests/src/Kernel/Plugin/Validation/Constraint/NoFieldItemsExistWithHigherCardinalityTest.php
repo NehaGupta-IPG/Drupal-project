@@ -10,6 +10,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Plugin\Validation\Constraint\NoFieldItemsExistWithHigherCardinalityValidator;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(NoFieldItemsExistWithHigherCardinalityValidator::class)]
 #[Group('field')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class NoFieldItemsExistWithHigherCardinalityTest extends FieldKernelTestBase {
 
   /**

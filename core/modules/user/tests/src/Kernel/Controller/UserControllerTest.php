@@ -7,6 +7,7 @@ namespace Drupal\Tests\user\Kernel\Controller;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Controller\UserController;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(UserController::class)]
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class UserControllerTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -47,14 +49,19 @@ class UserControllerTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-
     parent::setUp();
-
     $this->userController = UserController::create(\Drupal::getContainer());
 
     // Create and log in a user.
     $this->user = $this->setUpCurrentUser();
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('user');
   }
 
   /**

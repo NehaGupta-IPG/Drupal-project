@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Session;
 
 use Drupal\Core\Session\UserSession;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Session')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class AccountSwitcherTest extends KernelTestBase {
 
   /**

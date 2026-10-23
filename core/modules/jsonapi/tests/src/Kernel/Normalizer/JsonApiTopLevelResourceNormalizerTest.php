@@ -27,6 +27,7 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
 use Drupal\Tests\jsonapi\Traits\JsonApiJsonSchemaTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
@@ -45,6 +46,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 #[CoversClass(JsonApiDocumentTopLevelNormalizer::class)]
 #[Group('jsonapi')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   use ImageFieldCreationTrait;

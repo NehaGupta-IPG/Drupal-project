@@ -8,6 +8,7 @@ use Drupal\field\Plugin\Validation\Constraint\FieldStorageIndexesConstraint;
 use Drupal\field\Plugin\Validation\Constraint\FieldStorageIndexesConstraintValidator;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\Test;
 #[RunTestsInSeparateProcesses]
 #[CoversClass(FieldStorageIndexesConstraint::class)]
 #[CoversClass(FieldStorageIndexesConstraintValidator::class)]
+#[ShareEnvironment(FALSE)]
 class FieldStorageIndexesValidationTest extends FieldKernelTestBase {
 
   /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\serialization\Kernel;
 
 use Drupal\Tests\system\Kernel\Module\GenericModuleTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,4 +14,5 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('serialization')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class GenericTest extends GenericModuleTestBase {}

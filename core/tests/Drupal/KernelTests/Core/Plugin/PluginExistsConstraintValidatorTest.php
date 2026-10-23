@@ -12,6 +12,7 @@ use Drupal\Core\Plugin\Plugin\Validation\Constraint\PluginExistsConstraintValida
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\MenuInterface;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -24,6 +25,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(PluginExistsConstraint::class)]
 #[CoversClass(PluginExistsConstraintValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class PluginExistsConstraintValidatorTest extends KernelTestBase {
 
   /**

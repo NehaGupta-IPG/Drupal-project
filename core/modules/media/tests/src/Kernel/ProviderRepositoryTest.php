@@ -6,6 +6,7 @@ namespace Drupal\Tests\media\Kernel;
 
 use Drupal\media\OEmbed\ProviderException;
 use Drupal\media\OEmbed\ProviderRepository;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('media')]
 #[CoversClass(ProviderRepository::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ProviderRepositoryTest extends MediaKernelTestBase {
 
   /**

@@ -6,6 +6,7 @@ namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('migrate')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MigrateStubTest extends MigrateTestBase {
   use ContentTypeCreationTrait;
 

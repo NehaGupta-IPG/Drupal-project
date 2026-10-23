@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Action;
 
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('action')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EmailActionTest extends KernelTestBase {
   use AssertMailTrait;
 

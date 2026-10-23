@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Render;
 
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('render')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class LazyBuilderPlaceholderTest extends KernelTestBase {
 
   /**
@@ -24,8 +26,8 @@ class LazyBuilderPlaceholderTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig(['system']);
   }
 

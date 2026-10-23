@@ -10,6 +10,7 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Utility')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LinkGenerationTest extends KernelTestBase {
 
   use StringTranslationTrait;

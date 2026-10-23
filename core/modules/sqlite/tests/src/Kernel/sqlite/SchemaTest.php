@@ -12,6 +12,7 @@ use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaException;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 use Drupal\sqlite\Driver\Database\sqlite\Schema;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -24,6 +25,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
 #[CoversClass(Schema::class)]
+#[ShareEnvironment(FALSE)]
 class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**

@@ -11,6 +11,7 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\EnumConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Component\Serialization\BackedEnumValue;
 use Drupal\Tests\Component\Serialization\EnumValue;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(EnumConstraintValidator::class)]
 #[Group('Validation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class EnumConstraintValidatorTest extends KernelTestBase {
 
   /**

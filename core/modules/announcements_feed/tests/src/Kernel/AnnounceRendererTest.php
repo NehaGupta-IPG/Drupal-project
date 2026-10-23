@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\announcements_feed\Kernel;
 
 use Drupal\announcements_feed\AnnounceRenderer;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(AnnounceRenderer::class)]
 #[Group('announcements_feed')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class AnnounceRendererTest extends AnnounceTestBase {
 
   /**

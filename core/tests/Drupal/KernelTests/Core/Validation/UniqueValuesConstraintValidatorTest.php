@@ -8,6 +8,7 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldValueValidato
 use Drupal\entity_test\Entity\EntityTestUniqueConstraint;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(UniqueFieldValueValidator::class)]
 #[Group('Validation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class UniqueValuesConstraintValidatorTest extends KernelTestBase {
   use UserCreationTrait;
 

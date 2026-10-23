@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Block;
 use Drupal\autowire_test\Plugin\Block\AutowireBlock;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
@@ -16,6 +17,7 @@ use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
  */
 #[Group('block')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class AutowireBlockTest extends KernelTestBase {
 
   /**

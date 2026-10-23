@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Validation;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\AtLeastOneOfConstraint;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Validation')]
 #[CoversClass(AtLeastOneOfConstraint::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class AtLeastOneOfConstraintValidatorTest extends KernelTestBase {
 
   /**

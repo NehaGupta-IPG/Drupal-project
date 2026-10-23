@@ -10,6 +10,7 @@ use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_builder\InlineBlockUsage;
 use Drupal\layout_builder\InlineBlockUsageInterface;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(InlineBlockUsage::class)]
 #[Group('layout_builder')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class InlineBlockUsageTest extends KernelTestBase {
 
   /**
@@ -53,11 +55,18 @@ class InlineBlockUsageTest extends KernelTestBase {
     parent::setUp();
     $this->database = $this->container->get('database');
     $this->inlineBlockUsage = $this->container->get('inline_block.usage');
+    $this->entity = EntityTest::create();
+    $this->entity->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installSchema('layout_builder', ['inline_block_usage']);
     EntityTestHelper::createBundle('bundle_with_extra_fields');
     $this->installEntitySchema('entity_test');
-    $this->entity = EntityTest::create();
-    $this->entity->save();
   }
 
   /**

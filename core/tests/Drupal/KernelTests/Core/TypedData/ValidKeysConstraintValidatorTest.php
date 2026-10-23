@@ -10,6 +10,7 @@ use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraint;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\ValidKeysConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -23,6 +24,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 #[CoversClass(ValidKeysConstraintValidator::class)]
 #[Group('Validation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ValidKeysConstraintValidatorTest extends KernelTestBase {
 
   /**

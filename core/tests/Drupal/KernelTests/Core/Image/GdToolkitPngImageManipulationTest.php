@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Image;
 
 use Drupal\Core\Image\ImageFactory;
 use Drupal\system\Plugin\ImageToolkit\GDToolkit;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Image')]
 #[RequiresPhpExtension('gd')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class GdToolkitPngImageManipulationTest extends GdToolkitImageManipulationTestBase {
 
   /**

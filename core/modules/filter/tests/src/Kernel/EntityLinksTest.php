@@ -21,6 +21,7 @@ use Drupal\media\Entity\Media;
 use Drupal\media\Entity\MediaType;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -32,6 +33,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('filter')]
 #[CoversClass(EntityLinks::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EntityLinksTest extends KernelTestBase {
 
   use PathAliasTestTrait;

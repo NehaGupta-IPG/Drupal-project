@@ -7,6 +7,7 @@ namespace Drupal\Tests\workspaces\Kernel;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\file\Kernel\FileItemTest;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workspaces\Entity\Workspace;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('workspaces')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class WorkspacesFileItemTest extends FileItemTest {
 
   use UserCreationTrait;

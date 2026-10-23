@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Kernel\Installer;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\module_test\PluginManagerCacheClearer;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Module')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class UninstallKernelTest extends KernelTestBase {
 
   /**

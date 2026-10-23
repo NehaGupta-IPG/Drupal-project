@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Theme\DesignToken;
 use Drupal\Core\Theme\DesignToken\DesignTokenPluginManager;
 use Drupal\Core\Theme\DesignToken\DesignTokenPluginManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(DesignTokenPluginManager::class)]
 #[Group('design_token')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class DesignTokenPluginManagerKernelTest extends KernelTestBase {
 
   /**

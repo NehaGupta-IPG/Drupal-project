@@ -9,6 +9,7 @@ use Drupal\filter\FilterFormatRepository;
 use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(FilterFormatRepository::class)]
 #[Group('filter')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class FilterFormatRepositoryTest extends KernelTestBase {
 
   use UserCreationTrait;

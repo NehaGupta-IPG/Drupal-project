@@ -13,6 +13,7 @@ use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager_bypass\LoggingBeginner;
 use Drupal\package_manager_bypass\LoggingCommitter;
 use Drupal\package_manager_bypass\NoOpStager;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PhpTuf\ComposerStager\API\Core\CommitterInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -28,6 +29,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('package_manager')]
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class SandboxManagerBaseFailureTest extends PackageManagerKernelTestBase {
 
   /**

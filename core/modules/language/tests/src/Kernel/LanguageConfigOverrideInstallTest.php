@@ -8,6 +8,7 @@ use Drupal\Core\Config\ConfigCollectionEvents;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Config\LanguageConfigOverrideEvents;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('language')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class LanguageConfigOverrideInstallTest extends KernelTestBase {
 
   /**

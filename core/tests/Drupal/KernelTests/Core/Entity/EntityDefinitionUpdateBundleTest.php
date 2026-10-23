@@ -11,6 +11,7 @@ use Drupal\Core\Field\FieldPurger;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(EntityDefinitionUpdateManager::class)]
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class EntityDefinitionUpdateBundleTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;

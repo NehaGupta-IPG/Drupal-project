@@ -18,6 +18,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\Core\Routing\RoutingFixtures;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -33,6 +34,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 #[Group('Routing')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class RouteProviderTest extends KernelTestBase {
 
   use PathAliasTestTrait;
@@ -105,9 +107,16 @@ class RouteProviderTest extends KernelTestBase {
     $this->cache = new MemoryBackend($time);
     $this->pathProcessor = \Drupal::service('path_processor_manager');
     $this->cacheTagsInvalidator = \Drupal::service('cache_tags.invalidator');
-    $this->installEntitySchema('path_alias');
 
     $this->logger = new TestLogger();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('path_alias');
   }
 
   /**

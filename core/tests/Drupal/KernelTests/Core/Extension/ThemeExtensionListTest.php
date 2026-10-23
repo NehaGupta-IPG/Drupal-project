@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Extension;
 
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ThemeExtensionList::class)]
 #[Group('Extension')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ThemeExtensionListTest extends KernelTestBase {
 
   /**

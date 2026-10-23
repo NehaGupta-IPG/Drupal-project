@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Field;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\entity_test_update\Entity\EntityTestUpdate;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Field')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MapBaseFieldTest extends EntityKernelTestBase {
 
   /**

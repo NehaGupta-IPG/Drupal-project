@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Test;
 
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(AssertMailTrait::class)]
 #[Group('Test')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class AssertMailTraitTest extends KernelTestBase {
   use AssertMailTrait;
 

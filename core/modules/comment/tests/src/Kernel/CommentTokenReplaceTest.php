@@ -9,6 +9,7 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\system\Kernel\Token\TokenReplaceKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('comment')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class CommentTokenReplaceTest extends TokenReplaceKernelTestBase {
 
   use CommentTestTrait;

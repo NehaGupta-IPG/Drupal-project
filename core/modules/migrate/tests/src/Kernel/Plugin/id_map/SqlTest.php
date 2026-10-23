@@ -9,6 +9,7 @@ use Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException;
 use Drupal\migrate\MigrateException;
 use Drupal\Tests\migrate\Kernel\MigrateTestBase;
 use Drupal\Tests\migrate\Unit\TestSqlIdMap;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 #[Group('migrate')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class SqlTest extends MigrateTestBase {
 
   /**

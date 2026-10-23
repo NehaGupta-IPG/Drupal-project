@@ -6,6 +6,7 @@ namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
 use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('KernelTests')]
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class KernelTestBaseTest extends DriverSpecificKernelTestBase {
 
   /**

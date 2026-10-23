@@ -15,6 +15,7 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('DependencyInjection')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class AutowireTest extends KernelTestBase {
 
   use FileSystemModuleDiscoveryDataProviderTrait;

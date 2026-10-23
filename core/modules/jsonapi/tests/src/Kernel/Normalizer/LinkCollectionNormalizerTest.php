@@ -15,6 +15,7 @@ use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -28,6 +29,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(LinkCollectionNormalizer::class)]
 #[Group('jsonapi')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class LinkCollectionNormalizerTest extends KernelTestBase {
 
   use UserCreationTrait;

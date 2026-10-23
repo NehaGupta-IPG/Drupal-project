@@ -7,6 +7,7 @@ namespace Drupal\Tests\comment\Kernel\Views;
 use Drupal\comment\Entity\Comment;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\views\Kernel\Handler\FieldFieldAccessTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('comment')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class CommentViewsFieldAccessTest extends FieldFieldAccessTestBase {
 
   /**

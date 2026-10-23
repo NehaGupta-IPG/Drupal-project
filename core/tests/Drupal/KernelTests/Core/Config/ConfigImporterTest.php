@@ -12,6 +12,7 @@ use Drupal\Core\Config\ConfigImporterException;
 use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('config')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ConfigImporterTest extends KernelTestBase {
 
   /**

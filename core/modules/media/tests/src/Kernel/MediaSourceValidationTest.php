@@ -11,6 +11,7 @@ use Drupal\media\Entity\Media;
 use Drupal\media\MediaTypeInterface;
 use Drupal\media_test_oembed\Hook\EntityBundleInfoAlter;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\MockHandler;
@@ -25,6 +26,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('media')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 final class MediaSourceValidationTest extends KernelTestBase {
 
   use MediaTypeCreationTrait;

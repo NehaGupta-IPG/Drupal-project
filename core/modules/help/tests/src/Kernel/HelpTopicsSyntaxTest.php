@@ -11,6 +11,7 @@ use Drupal\Core\Template\TwigNodeTrans;
 use Drupal\help\HelpTopicDiscovery;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\locale\LocaleXss;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -31,6 +32,7 @@ use Twig\NodeVisitor\NodeVisitorInterface;
 #[Group('help')]
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class HelpTopicsSyntaxTest extends KernelTestBase implements NodeVisitorInterface {
 
   /**

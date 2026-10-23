@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\taxonomy\Kernel\Views;
 
 use Drupal\field\Entity\FieldConfig;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[Group('taxonomy')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
 
   /**

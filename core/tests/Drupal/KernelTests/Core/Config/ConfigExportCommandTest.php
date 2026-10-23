@@ -11,6 +11,7 @@ use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\SyncFactory;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -31,6 +32,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[Group('config')]
 #[RunTestsInSeparateProcesses]
 #[CoversClass(ConfigExportCommand::class)]
+#[ShareEnvironment]
 class ConfigExportCommandTest extends KernelTestBase {
 
   /**
@@ -43,7 +45,6 @@ class ConfigExportCommandTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->installConfig(['system', 'config_test']);
     $this->config('system.site')
       ->set('name', 'dr config')
       ->set('slogan', 'dr config for export')
@@ -52,6 +53,14 @@ class ConfigExportCommandTest extends KernelTestBase {
     // Set up an override.
     // @see \Drupal\Tests\config\Functional\ConfigExportUITest::testExport()
     $GLOBALS['config']['system.maintenance']['message'] = 'Foo';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installConfig(['system', 'config_test']);
   }
 
   /**
@@ -180,6 +189,19 @@ class ConfigExportCommandTest extends KernelTestBase {
         // The same data can be read from both.
         static::assertEquals($expected_collection->read($name), $actual_collection->read($name), $message . ' ' . $name);
       }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function resetEnvironment(): void {
+    parent::resetEnvironment();
+
+    // The test class shares its environment, so the module list must be left
+    // as ::testExportCommand() found it.
+    if ($this->container->get('module_handler')->moduleExists('config_transformer_test')) {
+      $this->disableModules(['config_transformer_test']);
     }
   }
 

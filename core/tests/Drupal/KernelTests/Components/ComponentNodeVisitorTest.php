@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Components;
 
 use Drupal\Core\Template\ComponentNodeVisitor;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ComponentNodeVisitor::class)]
 #[Group('sdc')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ComponentNodeVisitorTest extends ComponentKernelTestBase {
 
   /**

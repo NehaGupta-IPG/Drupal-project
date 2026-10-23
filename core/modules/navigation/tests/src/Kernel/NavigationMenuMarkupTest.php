@@ -11,6 +11,7 @@ use Drupal\navigation\Plugin\Block\NavigationMenuBlock;
 use Drupal\system\Entity\Menu;
 use Drupal\system\Tests\Routing\MockRouteProvider;
 use Drupal\Tests\Core\Menu\MenuLinkMock;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Routing\Route;
@@ -24,6 +25,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 #[Group('navigation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class NavigationMenuMarkupTest extends KernelTestBase {
 
   /**

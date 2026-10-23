@@ -8,6 +8,7 @@ use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Hook\ThemeHookCollectorPass;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use Symfony\Component\DependencyInjection\Definition;
 #[CoversClass(ThemeHookCollectorPass::class)]
 #[Group('Hook')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ThemeHookCollectorPassTest extends KernelTestBase {
 
   /**

@@ -7,6 +7,7 @@ namespace Drupal\Tests\dblog\Kernel;
 use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\dblog\Functional\FakeLogEntries;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('dblog')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class DbLogTest extends KernelTestBase {
 
   use FakeLogEntries;
@@ -27,9 +29,8 @@ class DbLogTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installSchema('dblog', ['watchdog']);
     $this->installConfig(['system']);
   }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Plugin\Discovery;
 
 use Drupal\Component\Plugin\Discovery\StaticDiscovery;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Plugin')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class StaticDiscoveryTest extends DiscoveryTestBase {
 
   /**

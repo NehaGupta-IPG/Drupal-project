@@ -7,6 +7,7 @@ namespace Drupal\Tests\serialization\Kernel;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('TypedData')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class MapDataNormalizerTest extends KernelTestBase {
 
   /**

@@ -14,6 +14,7 @@ use Drupal\taxonomy\VocabularyInterface;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\ResultRow;
@@ -35,6 +36,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('default_admin')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ViewsViewFieldStatusTest extends ViewsKernelTestBase {
 
   use TaxonomyTestTrait;

@@ -6,6 +6,7 @@ namespace Drupal\Tests\path_alias\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\path_alias\PathAliasStorageSchema;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(PathAliasStorageSchema::class)]
 #[Group('path_alias')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class PathAliasStorageSchemaTest extends KernelTestBase {
 
   /**
@@ -26,8 +28,8 @@ class PathAliasStorageSchemaTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('path_alias');
   }
 

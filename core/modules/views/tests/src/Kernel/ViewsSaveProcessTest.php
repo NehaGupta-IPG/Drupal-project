@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Kernel;
 use Drupal\Core\Block\BlockManager;
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\node\Entity\NodeType;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ViewsSaveProcessTest extends ViewsKernelTestBase {
 
   /**

@@ -6,6 +6,7 @@ namespace Drupal\Tests\language\Kernel\Condition;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('language')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class LanguageConditionTest extends KernelTestBase {
 
   /**
@@ -33,12 +35,17 @@ class LanguageConditionTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->manager = $this->container->get('plugin.manager.condition');
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig(['language']);
     // Setup Italian.
     ConfigurableLanguage::createFromLangcode('it')->save();
-
-    $this->manager = $this->container->get('plugin.manager.condition');
   }
 
   /**

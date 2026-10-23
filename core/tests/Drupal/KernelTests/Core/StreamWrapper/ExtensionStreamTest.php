@@ -10,6 +10,7 @@ use Drupal\Core\StreamWrapper\ExtensionStreamBase;
 use Drupal\Core\StreamWrapper\ModuleStream;
 use Drupal\Core\StreamWrapper\ThemeStream;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -24,6 +25,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[CoversClass(ModuleStream::class)]
 #[CoversClass(ThemeStream::class)]
 #[CoversClass(ExtensionStreamBase::class)]
+#[ShareEnvironment(FALSE)]
 class ExtensionStreamTest extends KernelTestBase {
 
   /**

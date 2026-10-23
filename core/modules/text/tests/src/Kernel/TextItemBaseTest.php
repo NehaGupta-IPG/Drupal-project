@@ -10,6 +10,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\text\Plugin\Field\FieldType\TextItemBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(TextItemBase::class)]
 #[Group('text')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class TextItemBaseTest extends KernelTestBase {
 
   /**

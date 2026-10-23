@@ -114,4 +114,22 @@ class EntityViewDisplayValidationTest extends ConfigEntityValidationTestBase {
     ]);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function resetEnvironment(): void {
+    parent::resetEnvironment();
+
+    // The test class shares its environment, so remove what
+    // ::testLayoutSectionPluginIdIsValidated() added. Deleting the
+    // configuration rather than the entity: the entity class depends on the
+    // modules being disabled.
+    if ($this->container->get('module_handler')->moduleExists('layout_builder')) {
+      $this->container->get('config.factory')
+        ->getEditable('core.entity_view_display.user.user.default')
+        ->delete();
+      $this->disableModules(['layout_builder', 'layout_discovery']);
+    }
+  }
+
 }

@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Queue;
 use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestDeriverQueue;
 use Drupal\Core\Queue\InstantQueueRunnerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 #[Group('Queue')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class InstantQueueRunnerTest extends KernelTestBase {
 
   /**

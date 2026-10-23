@@ -11,6 +11,7 @@ use Drupal\package_manager\LoggingCommitter;
 use Drupal\package_manager\LoggingStager;
 use Drupal\package_manager\TranslatableStringFactory;
 use Drupal\Tests\package_manager\Traits\AssertPreconditionsTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PhpTuf\ComposerStager\API\Core\BeginnerInterface;
 use PhpTuf\ComposerStager\API\Core\CommitterInterface;
 use PhpTuf\ComposerStager\API\Core\StagerInterface;
@@ -26,6 +27,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('package_manager')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ServicesTest extends KernelTestBase {
 
   use AssertPreconditionsTrait;

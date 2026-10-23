@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Plugin;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Plugin\Context\EntityContext;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Context')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class EntityContextTypedDataTest extends KernelTestBase {
 
   /**

@@ -511,7 +511,10 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
 
     // If a new configurable language is created with a non-standard langcode,
     // it should be acceptable.
-    $this->enableModules(['language']);
+    $enable_language = !$this->container->get('module_handler')->moduleExists('language');
+    if ($enable_language) {
+      $this->enableModules(['language']);
+    }
     // The language doesn't exist yet, so it shouldn't be a valid choice.
     $this->entity->set('langcode', 'kthxbai');
     $this->assertValidationErrors([
@@ -530,6 +533,12 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
     // subclasses of this class may not install the schema of the entity types
     // those hooks touch.
     \Drupal::configFactory()->getEditable($language->getConfigDependencyName())->delete();
+    // A test class sharing its environment must not leave the module list
+    // changed. Enabling the module did not install anything, so disabling it
+    // restores the module list.
+    if ($enable_language) {
+      $this->disableModules(['language']);
+    }
   }
 
   /**

@@ -10,6 +10,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\FileReferenceResolver;
 use Drupal\file\FileReferenceUsage;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(FileReferenceResolver::class)]
 #[CoversMethod(FileReferenceResolver::class, 'isFileReferencedByField')]
 #[CoversMethod(FileReferenceResolver::class, 'getReferencingRevision')]
+#[ShareEnvironment(FALSE)]
 class FileReferenceResolverTest extends FileManagedUnitTestBase {
 
   /**

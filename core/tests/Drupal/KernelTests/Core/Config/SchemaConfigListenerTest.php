@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Traits\Core\Config\SchemaConfigListenerTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('config')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class SchemaConfigListenerTest extends KernelTestBase {
 
   use SchemaConfigListenerTestTrait;
@@ -26,8 +28,8 @@ class SchemaConfigListenerTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     // Install configuration provided by the module so that the order of the
     // config keys is the same as
     // \Drupal\FunctionalTests\Core\Config\SchemaConfigListenerTest.

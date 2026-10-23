@@ -6,6 +6,7 @@ namespace Drupal\Tests\locale\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\locale\LocaleTranslation;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(LocaleTranslation::class)]
 #[Group('locale')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class LocaleTranslationTest extends KernelTestBase {
 
   /**
@@ -28,9 +30,8 @@ class LocaleTranslationTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installSchema('locale', [
       'locales_location',
       'locales_source',

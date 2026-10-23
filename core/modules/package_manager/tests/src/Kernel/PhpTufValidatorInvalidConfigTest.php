@@ -13,6 +13,7 @@ use Drupal\package_manager\Event\PreRequireEvent;
 use Drupal\package_manager\Validator\PhpTufValidator;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\LockFileValidator;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -27,6 +28,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('package_manager')]
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class PhpTufValidatorInvalidConfigTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;

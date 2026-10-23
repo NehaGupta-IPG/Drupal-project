@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workspaces\Entity\Workspace;
 use Drupal\workspaces_test\Form\ActiveWorkspaceTestForm;
 use PHPUnit\Framework\Attributes\Group;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[Group('workspaces')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class WorkspaceFormPersistenceTest extends KernelTestBase {
 
   use UserCreationTrait;

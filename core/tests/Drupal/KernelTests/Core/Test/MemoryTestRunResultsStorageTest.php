@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Test;
 
 use Drupal\Core\Test\TestRun;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\TestTools\TestRunner\MemoryTestRunResultsStorage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(MemoryTestRunResultsStorage::class)]
 #[Group('Test')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class MemoryTestRunResultsStorageTest extends KernelTestBase {
 
   /**

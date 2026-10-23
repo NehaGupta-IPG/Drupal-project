@@ -7,6 +7,7 @@ namespace Drupal\Tests\pgsql\Kernel\pgsql;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
 #[CoversClass(Schema::class)]
+#[ShareEnvironment(FALSE)]
 class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**

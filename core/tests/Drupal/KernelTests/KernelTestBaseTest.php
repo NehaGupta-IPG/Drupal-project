@@ -6,6 +6,7 @@ namespace Drupal\KernelTests;
 
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Database\Database;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
@@ -26,6 +27,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 #[Group('Test')]
 #[Group('KernelTests')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class KernelTestBaseTest extends KernelTestBase {
 
   /**

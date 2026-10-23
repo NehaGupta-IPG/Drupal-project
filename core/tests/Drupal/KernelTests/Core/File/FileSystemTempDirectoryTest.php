@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\File;
 use Drupal\Component\FileSystem\FileSystem as FileSystemComponent;
 use Drupal\Core\File\FileSystem;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(\Drupal\Core\File\FileSystem::class)]
 #[Group('File')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FileSystemTempDirectoryTest extends KernelTestBase {
 
   /**

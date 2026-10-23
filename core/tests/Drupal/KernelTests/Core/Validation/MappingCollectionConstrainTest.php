@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Validation;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\MappingCollectionConstraint;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\MappingCollectionConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 #[CoversClass(MappingCollectionConstraint::class)]
 #[CoversClass(MappingCollectionConstraintValidator::class)]
+#[ShareEnvironment]
 class MappingCollectionConstrainTest extends KernelTestBase {
 
   /**

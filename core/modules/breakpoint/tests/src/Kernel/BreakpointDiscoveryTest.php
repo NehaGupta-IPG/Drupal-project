@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\breakpoint\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('breakpoint')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class BreakpointDiscoveryTest extends KernelTestBase {
 
   /**
@@ -26,8 +28,8 @@ class BreakpointDiscoveryTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     \Drupal::service('theme_installer')->install(['breakpoint_theme_test']);
   }
 

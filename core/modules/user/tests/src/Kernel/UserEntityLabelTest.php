@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class UserEntityLabelTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -29,12 +31,18 @@ class UserEntityLabelTest extends KernelTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installEntitySchema('user');
+    $this->installConfig(['user']);
+  }
+
+  /**
    * Tests label callback.
    */
   public function testLabelCallback(): void {
-    $this->installEntitySchema('user');
-    $this->installConfig(['user']);
-
     $account = $this->createUser();
     $anonymous = User::create(['uid' => 0]);
 

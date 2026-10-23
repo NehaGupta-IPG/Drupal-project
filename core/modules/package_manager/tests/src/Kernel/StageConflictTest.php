@@ -15,6 +15,7 @@ use Drupal\package_manager\Exception\SandboxException;
 use Drupal\package_manager\PackageManagerUninstallValidator;
 use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager_bypass\LoggingCommitter;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PhpTuf\ComposerStager\API\Exception\PreconditionException;
 use PhpTuf\ComposerStager\API\Precondition\Service\PreconditionInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -33,6 +34,7 @@ use Psr\Log\LogLevel;
 #[Group('#slow')]
 #[CoversClass(PackageManagerUninstallValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class StageConflictTest extends PackageManagerKernelTestBase {
 
   /**

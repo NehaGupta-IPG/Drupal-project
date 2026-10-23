@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Kernel;
 
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class UserAccountFormFieldsTest extends KernelTestBase {
 
   /**
@@ -27,6 +29,16 @@ class UserAccountFormFieldsTest extends KernelTestBase {
    * An user.
    */
   protected UserInterface $user;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    // Install default configuration; required for AccountFormController.
+    $this->installConfig(['user']);
+    $this->installEntitySchema('user');
+  }
 
   /**
    * Tests the root user account form section in the "Configure site" form.
@@ -54,9 +66,6 @@ class UserAccountFormFieldsTest extends KernelTestBase {
    * Tests the user registration form.
    */
   public function testUserRegistrationForm(): void {
-    // Install default configuration; required for AccountFormController.
-    $this->installConfig(['user']);
-
     // Disable email confirmation to unlock the password field.
     $this->config('user.settings')
       ->set('verify_mail', FALSE)
@@ -78,10 +87,6 @@ class UserAccountFormFieldsTest extends KernelTestBase {
    * Tests the user edit form.
    */
   public function testUserEditForm(): void {
-    // Install default configuration; required for AccountFormController.
-    $this->installConfig(['user']);
-    $this->installEntitySchema('user');
-
     $this->user = User::create(['name' => 'test']);
     $this->user->save();
 

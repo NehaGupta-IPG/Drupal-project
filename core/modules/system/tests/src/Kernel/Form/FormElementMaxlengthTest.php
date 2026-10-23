@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\CssSelector\CssSelectorConverter;
@@ -17,6 +18,7 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
  */
 #[Group('Form')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FormElementMaxlengthTest extends KernelTestBase implements FormInterface {
 
   /**

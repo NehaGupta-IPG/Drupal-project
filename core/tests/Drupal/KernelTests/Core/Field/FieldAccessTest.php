@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Field;
 use Drupal\Core\Access\AccessResult;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Entity')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FieldAccessTest extends KernelTestBase {
 
   /**
@@ -33,8 +35,8 @@ class FieldAccessTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     // Install field configuration.
     $this->installConfig(['field']);
 
@@ -48,6 +50,7 @@ class FieldAccessTest extends KernelTestBase {
 
     // The users table is needed for creating dummy user accounts.
     $this->installEntitySchema('user');
+
     // Register entity_test text field.
     $this->container->get('module_handler')->loadInclude('entity_test', 'install');
     entity_test_install();

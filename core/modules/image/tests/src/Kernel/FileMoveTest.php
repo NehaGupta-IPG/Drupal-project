@@ -10,6 +10,7 @@ use Drupal\file\FileRepository;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('image')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FileMoveTest extends KernelTestBase {
 
   use TestFileCreationTrait {
@@ -45,7 +47,14 @@ class FileMoveTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->fileRepository = $this->container->get('file.repository');
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installConfig(['system']);
     $this->installEntitySchema('file');
     $this->installEntitySchema('user');
@@ -55,8 +64,6 @@ class FileMoveTest extends KernelTestBase {
       'name' => 'main_style',
       'label' => 'Main',
     ])->save();
-
-    $this->fileRepository = $this->container->get('file.repository');
   }
 
   /**

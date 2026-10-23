@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests a subclass that does not share its environment.
  *
- * This class carries no ShareEnvironment attribute on purpose, and it assigns
+ * This class does not share its environment on purpose, and it assigns
  * ::$entity from ::setUp() after the parent method ran. Subclasses wrote their
  * fixture that way before the shared environment existed, and contrib
  * subclasses still do. Every test method of the base class runs here, against a
@@ -22,6 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('config')]
 #[Group('Validation')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ConfigEntityValidationTestBaseUnsharedTest extends ConfigEntityValidationTestBase {
 
   /**

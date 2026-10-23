@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Render;
 
 use Drupal\Core\Render\Element\Table;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('legacy')]
 #[RunTestsInSeparateProcesses]
 #[IgnoreDeprecations]
+#[ShareEnvironment]
 class RendererLegacyTest extends KernelTestBase {
 
   /**

@@ -14,6 +14,7 @@ use Drupal\media\Entity\MediaType;
 use Drupal\media_library\MediaLibraryState;
 use Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -24,6 +25,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(MediaLibraryWidget::class)]
 #[Group('media_library')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class MediaLibraryWidgetTest extends KernelTestBase {
 
   use UserCreationTrait;

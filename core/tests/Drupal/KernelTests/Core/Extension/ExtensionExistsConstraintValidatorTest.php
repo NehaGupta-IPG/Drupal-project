@@ -8,6 +8,7 @@ use Drupal\Core\Extension\Plugin\Validation\Constraint\ExtensionExistsConstraint
 use Drupal\Core\Extension\Plugin\Validation\Constraint\ExtensionExistsConstraintValidator;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ExtensionExistsConstraint::class)]
 #[CoversClass(ExtensionExistsConstraintValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
 
   /**

@@ -8,6 +8,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Routing\Exception\CacheableResourceNotFoundException;
 use Drupal\Core\Routing\Router;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Routing')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class RouterTest extends KernelTestBase {
 
   /**

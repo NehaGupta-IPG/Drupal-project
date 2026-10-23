@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Kernel\Plugin\Validation\Constraint;
 
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\Role;
 use Drupal\user\Plugin\Validation\Constraint\RoleExistsConstraint;
 use Drupal\user\Plugin\Validation\Constraint\RoleExistsConstraintValidator;
@@ -22,6 +23,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 #[CoversClass(RoleExistsConstraint::class)]
 #[CoversClass(RoleExistsConstraintValidator::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class RoleExistsConstraintValidatorTest extends KernelTestBase {
 
   /**

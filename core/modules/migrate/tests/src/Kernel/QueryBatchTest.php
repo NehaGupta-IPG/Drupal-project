@@ -9,6 +9,7 @@ use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('migrate')]
 #[CoversClass(\Drupal\migrate_query_batch_test\Plugin\migrate\source\QueryBatchTest::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class QueryBatchTest extends KernelTestBase {
 
   /**

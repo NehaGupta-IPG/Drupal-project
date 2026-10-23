@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Common;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleWeight;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Common')]
 #[CoversFunction('drupal_flush_all_caches')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class DrupalFlushAllCachesTest extends KernelTestBase {
 
   /**

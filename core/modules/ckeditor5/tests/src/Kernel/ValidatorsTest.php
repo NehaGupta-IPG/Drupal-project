@@ -18,6 +18,7 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\FilterFormatInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\SchemaCheckTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -38,6 +39,7 @@ use Symfony\Component\Yaml\Yaml;
 #[CoversClass(CKEditor5MediaAndFilterSettingsInSyncConstraintValidator::class)]
 #[CoversMethod(CKEditor5::class, 'validatePair')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ValidatorsTest extends KernelTestBase {
 
   use SchemaCheckTestTrait;

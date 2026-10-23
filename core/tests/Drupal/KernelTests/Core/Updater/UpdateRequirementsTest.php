@@ -8,6 +8,7 @@ use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Update\DatabaseUpdate;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Hooks')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class UpdateRequirementsTest extends KernelTestBase {
 
   use StringTranslationTrait;

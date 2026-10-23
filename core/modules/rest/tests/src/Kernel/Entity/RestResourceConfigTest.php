@@ -7,6 +7,7 @@ namespace Drupal\Tests\rest\Kernel\Entity;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\rest\Entity\RestResourceConfig;
 use Drupal\rest\RestResourceConfigInterface;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(RestResourceConfig::class)]
 #[Group('rest')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class RestResourceConfigTest extends KernelTestBase {
 
   /**

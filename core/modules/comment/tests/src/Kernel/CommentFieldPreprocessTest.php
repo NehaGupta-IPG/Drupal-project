@@ -6,6 +6,7 @@ namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\Core\Render\Markup;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[Group('comment')]
 #[Group('field')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class CommentFieldPreprocessTest extends KernelTestBase {
 
   /**

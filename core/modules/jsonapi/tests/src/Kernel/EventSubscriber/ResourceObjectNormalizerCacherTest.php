@@ -11,6 +11,7 @@ use Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
 use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -28,6 +29,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 #[CoversClass(ResourceObjectNormalizationCacher::class)]
 #[Group('jsonapi')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ResourceObjectNormalizerCacherTest extends KernelTestBase {
 
   /**
@@ -68,14 +70,21 @@ class ResourceObjectNormalizerCacherTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    // Add the entity schemas.
-    $this->installEntitySchema('user');
-    // Add the additional table schemas.
-    $this->installSchema('user', ['users_data']);
     $this->resourceTypeRepository = $this->container->get('jsonapi.resource_type.repository');
     $this->serializer = $this->container->get('jsonapi.serializer');
     $this->cacher = $this->container->get('jsonapi.normalization_cacher');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    // Add the entity schemas.
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('entity_test_computed_field');
+    // Add the additional table schemas.
+    $this->installSchema('user', ['users_data']);
   }
 
   /**
@@ -132,8 +141,6 @@ class ResourceObjectNormalizerCacherTest extends KernelTestBase {
    * expire in 50 minutes and not reset to 60 minutes.
    */
   public function testMaxAgeCorrection(): void {
-    $this->installEntitySchema('entity_test_computed_field');
-
     // Use EntityTestComputedField since ComputedTestCacheableStringItemList has
     // a max age of 800.
     $baseMaxAge = 800;
@@ -183,8 +190,6 @@ class ResourceObjectNormalizerCacherTest extends KernelTestBase {
    * Tests that when max-age is set to 0 the cacher does not cache the normalization.
    */
   public function testResourceObjectMaxAge0IsHandledByCacher(): void {
-    $this->installEntitySchema('entity_test_computed_field');
-
     // Use EntityTestComputedField since ComputedTestCacheableStringItemList has
     // a max age of 800.
     $entity = EntityTestComputedField::create([]);

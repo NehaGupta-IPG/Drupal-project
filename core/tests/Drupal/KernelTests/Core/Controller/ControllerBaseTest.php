@@ -10,6 +10,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\system_test\Controller\BrokenSystemTestController;
 use Drupal\system_test\Controller\OptionalServiceSystemTestController;
 use Drupal\system_test\Controller\SystemTestController;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 #[CoversClass(ControllerBase::class)]
 #[Group('Controller')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ControllerBaseTest extends KernelTestBase {
 
   /**

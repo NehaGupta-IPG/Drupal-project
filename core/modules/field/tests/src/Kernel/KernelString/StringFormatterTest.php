@@ -14,6 +14,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -24,6 +25,7 @@ use Symfony\Component\DomCrawler\Crawler;
  */
 #[Group('field')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class StringFormatterTest extends KernelTestBase {
 
   use UserCreationTrait;

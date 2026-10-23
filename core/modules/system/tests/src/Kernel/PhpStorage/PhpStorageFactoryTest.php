@@ -10,6 +10,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\PhpStorage\MockPhpStorage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('PhpStorage')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class PhpStorageFactoryTest extends KernelTestBase {
 
   /**

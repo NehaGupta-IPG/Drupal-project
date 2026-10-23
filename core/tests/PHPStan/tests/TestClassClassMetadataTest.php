@@ -80,6 +80,30 @@ class TestClassClassMetadataTest extends RuleTestCase {
           'Test class Drupal\Tests\Core\Foo\MissingRunTestsInSeparateProcesses must have attribute \PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses.',
           25,
         ],
+        [
+          'Kernel test class Drupal\Tests\Core\Foo\MissingRunTestsInSeparateProcesses must have attribute \Drupal\TestTools\Attribute\ShareEnvironment. Add #[ShareEnvironment], or #[ShareEnvironment(FALSE)] if the class cannot share its environment.',
+          25,
+        ],
+      ]
+    );
+
+    // A kernel test class states if it shares its environment. Opting in and
+    // opting out both count, and the rule does not apply to other test classes.
+    $this->analyse(
+      [__DIR__ . '/../fixtures/test-classes-share-environment.php'],
+      [
+        [
+          'Abstract test class Drupal\Tests\Core\Foo\AbstractSharingTest must not add attribute Drupal\TestTools\Attribute\ShareEnvironment. The attribute is not inherited, so each concrete test class declares it.',
+          15,
+        ],
+        [
+          'Kernel test class Drupal\Tests\Core\Foo\MissingShareEnvironment must have attribute \Drupal\TestTools\Attribute\ShareEnvironment. Add #[ShareEnvironment], or #[ShareEnvironment(FALSE)] if the class cannot share its environment.',
+          19,
+        ],
+        [
+          'Abstract test class Drupal\Tests\Core\Foo\AbstractNotSharingTest must not add attribute Drupal\TestTools\Attribute\ShareEnvironment. The attribute is not inherited, so each concrete test class declares it.',
+          41,
+        ],
       ]
     );
 

@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Kernel\Scripts;
 use Drupal\Core\Command\DbImportCommand;
 use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 #[Group('console')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class DbImportCommandTest extends KernelTestBase {
 
   /**

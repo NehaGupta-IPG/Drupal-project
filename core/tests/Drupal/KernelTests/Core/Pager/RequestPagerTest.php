@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Pager;
 
 use Drupal\Core\Pager\PagerParameters;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 #[CoversClass(PagerParameters::class)]
 #[Group('Pager')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class RequestPagerTest extends KernelTestBase {
 
   /**

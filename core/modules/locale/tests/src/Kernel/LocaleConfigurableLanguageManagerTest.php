@@ -7,6 +7,7 @@ namespace Drupal\Tests\locale\Kernel;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('locale')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class LocaleConfigurableLanguageManagerTest extends KernelTestBase {
 
   /**
@@ -25,10 +27,17 @@ class LocaleConfigurableLanguageManagerTest extends KernelTestBase {
   protected static $modules = ['language', 'locale'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
+    $this->installSchema('locale', ['locales_source', 'locales_target', 'locales_location']);
+  }
+
+  /**
    * Tests retrieving languages from the language manager.
    */
   public function testGetLanguages(): void {
-    $this->installSchema('locale', ['locales_source', 'locales_target', 'locales_location']);
     $default_language = ConfigurableLanguage::create([
       'label' => $this->randomMachineName(),
       'id' => 'default',

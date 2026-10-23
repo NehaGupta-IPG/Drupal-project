@@ -11,6 +11,7 @@ use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -25,6 +26,7 @@ use Psr\Http\Message\RequestInterface;
  */
 #[Group('Installer')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class InstallerTranslationDownloadTest extends KernelTestBase {
 
   /**

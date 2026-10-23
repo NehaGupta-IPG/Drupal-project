@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Routing;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('path')]
 #[Group('routing')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class PathEncodedTest extends KernelTestBase {
 
   use PathAliasTestTrait;

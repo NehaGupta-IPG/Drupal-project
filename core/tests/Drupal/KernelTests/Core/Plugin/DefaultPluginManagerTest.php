@@ -8,6 +8,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\plugin_test\Plugin\Annotation\PluginExample as AnnotationPluginExample;
 use Drupal\plugin_test\Plugin\Attribute\PluginExample as AttributePluginExample;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Plugin')]
 #[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class DefaultPluginManagerTest extends KernelTestBase {
 
   /**

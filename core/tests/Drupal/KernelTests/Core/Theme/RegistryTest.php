@@ -10,6 +10,7 @@ use Drupal\Core\Theme\Registry;
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Utility\ThemeRegistry;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  */
 #[Group('Theme')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class RegistryTest extends KernelTestBase {
 
   /**

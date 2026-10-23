@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Locale;
 
 use Drupal\Core\Locale\CountryManager;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('CountryManager')]
 #[CoversClass(CountryManager::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class CountryManagerTest extends KernelTestBase {
 
   /**

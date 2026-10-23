@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Components;
 
 use Drupal\Core\Render\Component\Exception\ComponentNotFoundException;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('sdc')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ComponentPluginManagerTest extends ComponentKernelTestBase {
 
   /**

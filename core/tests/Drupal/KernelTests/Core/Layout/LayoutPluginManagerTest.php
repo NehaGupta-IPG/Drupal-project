@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Layout;
 use Drupal\Core\Layout\LayoutDefinition;
 use Drupal\Core\Layout\LayoutPluginManager;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(LayoutPluginManager::class)]
 #[Group('Layout')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class LayoutPluginManagerTest extends KernelTestBase {
 
   /**

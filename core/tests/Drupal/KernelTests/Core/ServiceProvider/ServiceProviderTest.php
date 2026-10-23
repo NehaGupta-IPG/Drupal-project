@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\ServiceProvider;
 use Drupal\Core\Cache\CacheFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -17,6 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 #[Group('ServiceProvider')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class ServiceProviderTest extends KernelTestBase {
 
   /**

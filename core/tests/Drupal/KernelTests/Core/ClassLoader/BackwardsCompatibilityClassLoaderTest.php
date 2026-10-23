@@ -10,6 +10,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationWrapper;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\module_autoload_test\Foo;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(BackwardsCompatibilityClassLoader::class)]
 #[Group('ClassLoader')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class BackwardsCompatibilityClassLoaderTest extends KernelTestBase {
 
   /**

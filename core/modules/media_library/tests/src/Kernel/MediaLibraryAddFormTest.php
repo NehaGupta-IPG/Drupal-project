@@ -12,6 +12,7 @@ use Drupal\media_library\MediaLibraryState;
 use Drupal\media_library_form_overwrite_test\Form\TestAddForm;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('media_library')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class MediaLibraryAddFormTest extends KernelTestBase {
 
   use MediaTypeCreationTrait;
@@ -43,9 +45,8 @@ class MediaLibraryAddFormTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
     $this->installEntitySchema('file');
     $this->installSchema('file', 'file_usage');
@@ -155,6 +156,19 @@ class MediaLibraryAddFormTest extends KernelTestBase {
 
     // Assert the overwritten form class is set to the media source.
     $this->assertSame(TestAddForm::class, $image_source_definition['forms']['media_library_add']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function resetEnvironment(): void {
+    parent::resetEnvironment();
+
+    // The test class shares its environment, so the module list must be left
+    // as ::testDifferentAddForm() found it.
+    if ($this->container->get('module_handler')->moduleExists('media_library_form_overwrite_test')) {
+      $this->disableModules(['media_library_form_overwrite_test']);
+    }
   }
 
 }

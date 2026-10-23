@@ -16,6 +16,7 @@ use Drupal\Core\Hook\OrderOperation\BeforeOrAfter;
 use Drupal\Core\Hook\OrderOperation\FirstOrLast;
 use Drupal\ddd_hook_order_test\Hook\DHooks;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -36,6 +37,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[CoversClass(ReorderHook::class)]
 #[Group('Hook')]
 #[RunTestsInSeparateProcesses]
+#[ShareEnvironment(FALSE)]
 class HookOrderTest extends KernelTestBase {
 
   use HookOrderTestTrait;
