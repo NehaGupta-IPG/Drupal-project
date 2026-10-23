@@ -21,6 +21,18 @@ update.settings:
             # The options are daily and weekly.
             Choice:
               choices: [1, 7]
+    data_sharing:
+      type: mapping
+      label: 'Data sharing with Drupal.org'
+      mapping:
+        domain:
+          type: boolean
+          nullable: true
+          label: 'Share the site domain name'
+        site_mail:
+          type: boolean
+          nullable: true
+          label: 'Share the site email address'
     fetch:
       type: mapping
       label: 'Fetch settings'

@@ -1,6 +1,9 @@
 check:
   disabled_extensions: true
   interval_days: 1
+data_sharing:
+  domain: ~
+  site_mail: ~
 fetch:
   url: ~
   max_attempts: 2
