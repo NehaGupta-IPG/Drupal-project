@@ -51,8 +51,8 @@ abstract class TokenizeAreaPluginBase extends AreaPluginBase {
     $options = [];
     $optgroup_arguments = (string) $this->t('Arguments');
     $optgroup_fields = (string) $this->t('Fields');
-    foreach ($this->view->display_handler->getHandlers('field') as $field => $handler) {
-      $options[$optgroup_fields]["{{ $field }}"] = $handler->adminLabel();
+    foreach ($this->view->display_handler->getHandlers('field') as $handler) {
+      $options[$optgroup_fields][$handler->getFieldTokenPlaceholder()] = $handler->adminLabel();
     }
 
     foreach ($this->view->display_handler->getHandlers('argument') as $arg => $handler) {
