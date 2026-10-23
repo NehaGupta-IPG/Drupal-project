@@ -171,6 +171,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Remove permission from role'))]
   public function revokePermission($permission) {
     return $this->revokePermissions((array) $permission);
   }
