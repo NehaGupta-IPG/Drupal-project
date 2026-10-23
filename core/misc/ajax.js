@@ -318,7 +318,7 @@
         base: $linkElement.attr('id'),
         element: ajaxLink,
       };
-      const href = $linkElement.attr('href');
+      const href = $linkElement.attr('data-ajax-url') || $linkElement.attr('href');
       /**
        * For anchor tags, these will go to the target of the anchor rather than
        * the usual location.
