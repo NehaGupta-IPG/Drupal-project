@@ -29,6 +29,50 @@ class DialogTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
+   * Tests a normal multistep form returning to an unfinished calling form.
+   */
+  public function testDialogFormResult(): void {
+    $this->drupalGet('ajax-test/dialog-parent');
+    $page = $this->getSession()->getPage();
+    $assert = $this->assertSession();
+    $page->fillField('Draft', 'Unsaved draft');
+    $page->pressButton('Open dialog');
+    $dialog = $assert->waitForElementVisible('css', '.ui-dialog-content');
+    $this->assertNotNull($dialog);
+    $dialog->getParent()->find('css', '.ui-dialog-buttonpane')->pressButton('Continue');
+    $assert->assertWaitOnAjaxRequest();
+    $assert->elementsCount('css', '.ui-dialog-content [role="alert"]', 1);
+    $assert->fieldValueEquals('Draft', 'Unsaved draft');
+
+    $dialog->fillField('Dialog answer', 'Returned answer');
+    $dialog->getParent()->find('css', '.ui-dialog-buttonpane')->pressButton('Continue');
+    $assert->assertWaitOnAjaxRequest();
+    $this->assertNotNull($assert->waitForButton('Confirm answer'));
+    $this->assertNull(\Drupal::state()->get('ajax_dialog_child'));
+    $this->assertNull(\Drupal::state()->get('ajax_dialog_parent'));
+    $page->find('css', '.ui-dialog-buttonpane')->pressButton('Confirm answer');
+    $assert->assertWaitOnAjaxRequest();
+    $assert->waitForElementRemoved('css', '.ui-dialog-content');
+    $assert->fieldValueEquals('Answer', 'Returned answer');
+    $assert->fieldValueEquals('Draft', 'Unsaved draft');
+    $assert->fieldValueEquals('Required', '');
+    $assert->elementsCount('css', '#parent-form-wrapper', 1);
+    $assert->elementsCount('css', '#parent-form-wrapper form', 1);
+    $assert->addressEquals('/ajax-test/dialog-parent');
+    \Drupal::state()->resetCache();
+    $this->assertSame('Returned answer', \Drupal::state()->get('ajax_dialog_child'));
+    $this->assertNull(\Drupal::state()->get('ajax_dialog_parent'));
+
+    $page->fillField('Required', 'Completed later');
+    $page->pressButton('Save parent');
+    $this->assertNotEmpty($assert->waitForText('Parent saved.'));
+    \Drupal::state()->resetCache();
+    $saved = \Drupal::state()->get('ajax_dialog_parent');
+    $this->assertSame('Unsaved draft', $saved['draft']);
+    $this->assertSame('Returned answer', $saved['answer']);
+  }
+
+  /**
    * Tests sending non-JS and AJAX requests to open and manipulate modals.
    */
   public function testDialog(): void {
