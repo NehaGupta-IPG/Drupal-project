@@ -874,7 +874,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     }
 
     // Use the loaded revision instead of default one to check for data change.
-    if (!$entity->isNew() && !$entity->getOriginal() && !$entity->wasDefaultRevision()) {
+    if (!$entity->isNew()) {
       $original = $this->loadRevisionUnchanged($entity->getLoadedRevisionId());
       $entity->setOriginal($original);
     }
