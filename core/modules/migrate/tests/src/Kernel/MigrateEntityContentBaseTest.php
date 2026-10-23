@@ -186,6 +186,35 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
   }
 
   /**
+   * Tests mismatch translated entities.
+   */
+  public function testMismatchTranslated(): void {
+    // Create a destination.
+    $this->createDestination(['translations' => TRUE]);
+
+    // Create some pre-existing entities.
+    $this->storage->create(['id' => 2, 'langcode' => 'en'])->save();
+
+    // Pre-assert that things are as expected.
+    $this->assertNull($this->storage->load(1));
+    $this->assertTranslations(2, 'en');
+
+    // New translation.
+    $destination_row = ['id' => 2, 'langcode' => 'fr', 'action' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE];
+
+    // Import some rows.
+    $row = new Row();
+    foreach ($destination_row as $key => $value) {
+      $row->setDestinationProperty($key, $value);
+    }
+    // Import with mismatching old destination IDs.
+    $this->destination->import($row, [1, 'fr']);
+
+    $this->assertNull($this->storage->load(1));
+    $this->assertTranslations(2, 'en', ['fr']);
+  }
+
+  /**
    * Tests creation of ID columns table with definitions taken from entity type.
    */
   public function testEntityWithStringId(): void {

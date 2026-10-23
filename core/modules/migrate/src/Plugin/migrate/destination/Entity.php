@@ -165,8 +165,13 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    *   The entity we are importing into.
    */
   protected function getEntity(Row $row, array $old_destination_id_values) {
-    $entity_id = reset($old_destination_id_values) ?: $this->getEntityId($row);
-    if (!empty($entity_id) && ($entity = $this->storage->load($entity_id))) {
+    $entity_id = reset($old_destination_id_values);
+    $entity = $entity_id ? $this->storage->load($entity_id) : NULL;
+    if (empty($entity)) {
+      $entity_id = $this->getEntityId($row);
+      $entity = $entity_id ? $this->storage->load($entity_id) : NULL;
+    }
+    if (!empty($entity)) {
       // Allow updateEntity() to change the entity.
       $entity = $this->updateEntity($entity, $row) ?: $entity;
     }
