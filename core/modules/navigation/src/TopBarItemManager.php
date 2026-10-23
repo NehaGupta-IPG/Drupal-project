@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\navigation;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
@@ -49,9 +50,7 @@ final class TopBarItemManager extends DefaultPluginManager implements TopBarItem
     $definitions = parent::getDefinitions();
 
     // Sort definitions by weight.
-    uasort($definitions, function (array $a, array $b) {
-      return ($a['weight'] ?? 0) <=> ($b['weight'] ?? 0);
-    });
+    uasort($definitions, [SortArray::class, 'sortByWeightElement']);
 
     return $definitions;
   }

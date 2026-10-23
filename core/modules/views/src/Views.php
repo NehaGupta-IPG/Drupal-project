@@ -2,6 +2,8 @@
 
 namespace Drupal\views;
 
+use Drupal\Core\Utility\NaturalSort;
+
 /**
  * Static service container wrapper for views.
  */
@@ -176,9 +178,7 @@ class Views {
     }
 
     if (!empty($plugins)) {
-      uasort($plugins, static function ($a, $b) {
-        return strcmp((string) $a, (string) $b);
-      });
+      NaturalSort::natcasesort($plugins);
     }
 
     return $plugins;
