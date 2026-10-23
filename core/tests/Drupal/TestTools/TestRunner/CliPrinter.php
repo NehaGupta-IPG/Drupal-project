@@ -116,7 +116,7 @@ class CliPrinter {
         in_array('#slow', $testInfo['groups']) ? '#slow' : NULL,
         \trim_with_ellipsis($testInfo['group'], 15, \STR_PAD_RIGHT),
         $testInfo['tests_count'],
-        \trim_with_ellipsis($testInfo['name'], 60, \STR_PAD_LEFT),
+        \trim_with_ellipsis($testInfo['name'], 55, \STR_PAD_LEFT),
       ];
     }
 
@@ -172,7 +172,7 @@ class CliPrinter {
         new TableCell(in_array('#slow', $testInfo['groups']) ? '#slow' : '', ['style' => $style]),
         new TableCell(\trim_with_ellipsis($testInfo['group'], 15, \STR_PAD_RIGHT), ['style' => $style]),
         new TableCell((string) $testInfo['tests_count'], ['style' => $rightAlignedStyle]),
-        new TableCell(\trim_with_ellipsis($testInfo['name'], 60, \STR_PAD_LEFT), ['style' => $style]),
+        new TableCell(\trim_with_ellipsis($testInfo['name'], 55, \STR_PAD_LEFT), ['style' => $style]),
       ];
     }
 

@@ -101,6 +101,9 @@ catch (\RuntimeException $e) {
   exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
 }
 
+// Setup output coloring explicitly, GitLab lacks self-detection capabilities.
+$output->setDecorated(Config::get('color'));
+
 // Setup console printer.
 $cliPrinter = new CliPrinter($io, Config::instance());
 
