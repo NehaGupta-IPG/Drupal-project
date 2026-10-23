@@ -9,11 +9,13 @@ use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentPreviewMode;
 use Drupal\comment\Entity\CommentType;
 use Drupal\comment\FormLocation;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
@@ -180,16 +182,58 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
         $options[$comment_type->id()] = $comment_type->label();
       }
     }
-    $element['comment_type'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Comment type'),
-      '#options' => $options,
-      '#required' => TRUE,
-      '#description' => $this->t('Select the Comment type to use for this comment field. Manage the comment types from the <a href=":url">administration overview page</a>.', [':url' => Url::fromRoute('entity.comment_type.collection')->toString()]),
-      '#default_value' => $this->getSetting('comment_type'),
-      '#disabled' => $has_data,
-    ];
+    $element['comment_type']['#title'] = $this->t('Comment type');
+    if ($options) {
+      $element['comment_type'] += [
+        '#type' => 'select',
+        '#options' => $options,
+        '#required' => TRUE,
+        '#default_value' => $this->getSetting('comment_type'),
+        '#disabled' => $has_data,
+      ];
+    }
+    else {
+      $comment_type_label = \Drupal::entityTypeManager()->getDefinition('comment_type')->getSingularLabel();
+      $url = Url::fromRoute('entity.comment_type.add_form', [], [
+        'query' => [
+          'target_entity_type_id' => $entity_type,
+          'destination' => Url::fromRoute('<current>')->toString(),
+        ],
+      ]);
+      $access = $url->access(NULL, TRUE);
+      $add_link = $access->isAllowed()
+        ? Link::fromTextAndUrl($this->t('Add a new @entity_type.', ['@entity_type' => $comment_type_label]), $url)->toString()
+        : '';
+
+      // Keep validation when displaying a notice instead of an empty selection.
+      $element['comment_type'] += [
+        '#type' => 'item',
+        '#description' => $this->t('There is no @entity_type yet. @add_link', [
+          '@entity_type' => $comment_type_label,
+          '@add_link' => $add_link,
+        ]),
+        '#value' => '',
+        '#element_validate' => [[static::class, 'validateMissingCommentType']],
+      ];
+      CacheableMetadata::createFromObject($access)->applyTo($element['comment_type']);
+    }
     return $element;
+  }
+
+  /**
+   * Prevents saving a field when no matching comment type is available.
+   *
+   * @param array $element
+   *   The element explaining that no matching comment type is available.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   * @param array $complete_form
+   *   The complete form structure.
+   *
+   * @internal
+   */
+  public static function validateMissingCommentType(array &$element, FormStateInterface $form_state, array &$complete_form): void {
+    $form_state->setError($element, $element['#description']);
   }
 
   /**

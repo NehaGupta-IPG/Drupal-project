@@ -120,6 +120,32 @@ class CommentTypeTest extends CommentTestBase {
   }
 
   /**
+   * Tests that target defaults are valid and do not override user input.
+   */
+  public function testCommentTypeTargetDefault(): void {
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('admin/structure/comment/types/add', [
+      'query' => [
+        'target_entity_type_id' => 'not_an_entity_type',
+      ],
+    ]);
+    $this->assertSession()->fieldValueEquals('target_entity_type_id', '_none');
+
+    $this->drupalGet('admin/structure/comment/types/add', [
+      'query' => [
+        'target_entity_type_id' => 'user',
+      ],
+    ]);
+    $this->assertSession()->fieldValueEquals('target_entity_type_id', 'user');
+    $this->submitForm([
+      'id' => 'node_comments',
+      'label' => 'Node comments',
+      'target_entity_type_id' => 'node',
+    ], 'Save and manage fields');
+    $this->assertSame('node', CommentType::load('node_comments')->getTargetEntityTypeId());
+  }
+
+  /**
    * Tests editing a comment type using the UI.
    */
   public function testCommentTypeEditing(): void {

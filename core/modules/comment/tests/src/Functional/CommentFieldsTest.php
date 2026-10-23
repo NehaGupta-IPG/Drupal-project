@@ -8,6 +8,8 @@ use Drupal\comment\CommentingStatus;
 use Drupal\comment\Entity\CommentType;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +19,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('comment')]
 #[RunTestsInSeparateProcesses]
 class CommentFieldsTest extends CommentTestBase {
+
+  use MediaTypeCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -143,54 +147,83 @@ class CommentFieldsTest extends CommentTestBase {
   /**
    * Tests creating a comment field through the interface.
    */
-  public function testCommentFieldCreate(): void {
-    // Create user who can administer user fields.
+  #[DataProvider('providerCommentFieldCreate')]
+  public function testCommentFieldCreate(string $entity_type, string $field_ui_path): void {
+    if ($entity_type === 'media') {
+      $this->container->get('module_installer')->install(['media']);
+      $this->createMediaType('image', ['id' => 'image']);
+    }
+
     $user = $this->drupalCreateUser([
-      'administer user fields',
+      "administer $entity_type fields",
     ]);
     $this->drupalLogin($user);
 
-    // Create comment field in account settings.
+    // Create a comment field on the target entity type.
     $edit = [
-      'label' => 'User comment',
-      'field_name' => 'user_comment',
+      'label' => 'Test comment',
+      'field_name' => 'test_comment',
     ];
-    $this->drupalGet('admin/config/people/accounts/fields/add-field');
+    $this->drupalGet($field_ui_path . '/fields/add-field');
     $this->clickLink('Comments');
     $this->submitForm($edit, 'Continue');
 
-    // Try to save the comment field without selecting a comment type.
-    $edit = [];
-    $this->submitForm($edit, 'Update settings');
-    // We should get an error message.
-    $this->assertSession()->pageTextContains('The submitted value in the Comment type element is not allowed.');
+    // Comment types for nodes do not provide an option for this target type.
+    $message = 'There is no comment type yet.';
+    $this->assertSession()->fieldNotExists('field_storage[subform][settings][comment_type]');
+    $this->assertSession()->pageTextContains($message);
+    $this->assertSession()->linkNotExists('Add a new comment type.');
+    $this->submitForm([], 'Update settings');
+    $this->assertSession()->statusMessageContains($message, 'error');
+    $this->assertNull(FieldStorageConfig::loadByName($entity_type, 'field_test_comment'));
 
-    // Create a comment type for users.
-    $bundle = CommentType::create([
-      'id' => 'user_comment_type',
-      'label' => 'user_comment_type',
-      'description' => '',
-      'target_entity_type_id' => 'user',
-    ]);
-    $bundle->save();
+    // An administrator can create the missing type and return to the field.
+    $user->addRole($this->drupalCreateRole(['administer comment types']));
+    $user->save();
+    $this->drupalLogin($user);
+    $settings_path = $field_ui_path . '/add-field/' . $entity_type . '/field_test_comment';
+    $this->drupalGet($settings_path);
+    $this->clickLink('Add a new comment type.');
+    $this->assertSession()->fieldValueEquals('target_entity_type_id', $entity_type);
+    $this->submitForm([
+      'id' => 'test_comment_type',
+      'label' => 'Test comments',
+    ], 'Save and manage fields');
+    $this->assertSession()->addressEquals($settings_path);
+    $this->assertSame($entity_type, CommentType::load('test_comment_type')->getTargetEntityTypeId());
 
-    // Select a comment type and try to save again.
-    $edit = [
-      'field_storage[subform][settings][comment_type]' => 'user_comment_type',
-    ];
-    $this->drupalGet('admin/config/people/accounts/add-field/user/field_user_comment');
-    $this->submitForm($edit, 'Update settings');
-    // We shouldn't get an error message.
-    $this->assertSession()->pageTextNotContains('The submitted value in the Comment type element is not allowed.');
+    // Only the matching type is available after returning to the field settings.
+    $select = $this->assertSession()->selectExists('field_storage[subform][settings][comment_type]');
+    $this->assertSession()->pageTextNotContains('Select the Comment type to use for this comment field.');
+    $this->assertCount(1, $select->findAll('css', 'option'));
+    $this->assertSession()->optionExists('field_storage[subform][settings][comment_type]', 'test_comment_type');
+    $this->submitForm([
+      'field_storage[subform][settings][comment_type]' => 'test_comment_type',
+    ], 'Update settings');
 
     // Try to save the comment field with "Comments per page"
     // setting value as zero.
     $edit = [
       'settings[per_page]' => 0,
     ];
-    $this->drupalGet('admin/config/people/accounts/add-field/user/field_user_comment');
+    $this->drupalGet($settings_path);
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->statusMessageContains('Saved User comment configuration.', 'status');
+    $this->assertSession()->statusMessageContains('Saved Test comment configuration.', 'status');
+    $storage = FieldStorageConfig::loadByName($entity_type, 'field_test_comment');
+    $this->assertSame('test_comment_type', $storage->getSetting('comment_type'));
+  }
+
+  /**
+   * Provides entity types with no matching comment type.
+   *
+   * @return array<string, array{string, string}>
+   *   The target entity type and its field UI path.
+   */
+  public static function providerCommentFieldCreate(): array {
+    return [
+      'user' => ['user', 'admin/config/people/accounts'],
+      'media' => ['media', 'admin/structure/media/manage/image'],
+    ];
   }
 
 }
