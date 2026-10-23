@@ -116,9 +116,21 @@ class UpdateSettingsFormTest extends BrowserTestBase {
     $this->assertSession()->elementTextContains('css', '#edit-update-share-domain--description', parse_url($this->baseUrl, PHP_URL_HOST));
     $this->assertSession()->elementTextContains('css', '#edit-update-share-site-mail--description', 'simpletest@example.com');
 
+    $this->assertSession()->statusMessageNotExists(MessengerInterface::TYPE_WARNING);
+    $this->drupalGet('admin/config/system/site-information');
+    $this->assertSession()->statusMessageContains('Choose what this site shares with Drupal.org', MessengerInterface::TYPE_WARNING);
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->pageTextContains('Data sharing with Drupal.org');
+    $this->assertSession()->pageTextContains('Not yet reviewed');
+
+    $this->drupalGet('admin/reports/updates/settings');
     $this->submitForm([], 'Save configuration');
     $this->assertTrue($this->config('update.settings')->get('data_sharing.domain'));
     $this->assertFalse($this->config('update.settings')->get('data_sharing.site_mail'));
+    $this->drupalGet('admin/config/system/site-information');
+    $this->assertSession()->statusMessageNotExists(MessengerInterface::TYPE_WARNING);
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->pageTextNotContains('Not yet reviewed');
   }
 
 }

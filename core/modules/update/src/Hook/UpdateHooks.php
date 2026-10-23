@@ -6,6 +6,7 @@ use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\update\UpdateManagerInterface;
 use Drupal\Core\Url;
+use Drupal\update\DataSharing;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\update\UpdateMessageTrait;
@@ -27,9 +28,10 @@ class UpdateHooks {
       case 'help.page.update':
         $output = '';
         $output .= '<h2>' . $this->t('About') . '</h2>';
-        $output .= '<p>' . $this->t('The Update Status module periodically checks for new versions of your site\'s software (including contributed modules and themes), and alerts administrators to available updates. The Update Status system is also used by some other modules to manage updates and downloads; for example, the Interface Translation module uses the Update Status to download translations from the localization server. Note that whenever the Update Status system is used, anonymous usage statistics are sent to Drupal.org. If desired, you may uninstall the Update Status module from the <a href=":modules">Extend page</a>; if you do so, functionality that depends on the Update Status system will not work. For more information, see the <a href=":update">online documentation for the Update Status module</a>.', [
+        $output .= '<p>' . $this->t('The Update Status module periodically checks for new versions of your site\'s software (including contributed modules and themes), and alerts administrators to available updates. The Update Status system is also used by some other modules to manage updates and downloads; for example, the Interface Translation module uses the Update Status to download translations from the localization server. Note that whenever the Update Status system checks for updates, a hashed site key and the list of installed modules and themes are sent to Drupal.org. Sharing the site domain name and site email address is a separate choice made on the <a href=":settings">Update Status settings page</a>. If desired, you may uninstall the Update Status module from the <a href=":modules">Extend page</a>; if you do so, functionality that depends on the Update Status system will not work. For more information, see the <a href=":update">online documentation for the Update Status module</a>.', [
           ':update' => 'https://www.drupal.org/documentation/modules/update',
           ':modules' => Url::fromRoute('system.modules_list')->toString(),
+          ':settings' => Url::fromRoute('update.settings')->toString(),
         ]) . '</p>';
         $output .= '<h2>' . $this->t('Uses') . '</h2>';
         $output .= '<dl>';
@@ -61,7 +63,7 @@ class UpdateHooks {
     /** @var \Drupal\Core\Routing\AdminContext $admin_context */
     $admin_context = \Drupal::service('router.admin_context');
     $route_match = \Drupal::routeMatch();
-    if ($admin_context->isAdminRoute($route_match->getRouteObject()) && \Drupal::currentUser()->hasPermission('view update notifications')) {
+    if ($admin_context->isAdminRoute($route_match->getRouteObject())) {
       $route_name = \Drupal::routeMatch()->getRouteName();
       switch ($route_name) {
         // These pages don't need additional nagging.
@@ -81,6 +83,12 @@ class UpdateHooks {
         case 'system.modules_list':
           $verbose = TRUE;
           break;
+      }
+      if (\Drupal::currentUser()->hasPermission('administer site configuration') && DataSharing::isUndecided(\Drupal::config('update.settings'))) {
+        \Drupal::messenger()->addWarning($this->t('Choose what this site shares with Drupal.org on the <a href=":url">Update Status settings</a> page.', [':url' => Url::fromRoute('update.settings')->toString()]));
+      }
+      if (!\Drupal::currentUser()->hasPermission('view update notifications')) {
+        return;
       }
       $status = \Drupal::moduleHandler()->invoke('update', 'runtime_requirements');
       foreach (['core', 'contrib'] as $report_type) {

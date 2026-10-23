@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\update\Hook;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Drupal\update\DataSharing;
 use Drupal\update\ProjectSecurityData;
 use Drupal\update\ProjectSecurityRequirement;
 use Drupal\update\UpdateFetcherInterface;
@@ -27,6 +29,7 @@ class UpdateRequirements {
   public function __construct(
     protected readonly ModuleHandlerInterface $moduleHandler,
     protected readonly UpdateManagerInterface $updateManager,
+    protected readonly ConfigFactoryInterface $configFactory,
   ) {}
 
   /**
@@ -90,6 +93,14 @@ class UpdateRequirements {
       $requirements['update_core']['severity'] = RequirementSeverity::Warning;
       $requirements['update_core']['reason'] = UpdateFetcherInterface::UNKNOWN;
       $requirements['update_core']['description'] = $this->noData();
+    }
+    if (DataSharing::isUndecided($this->configFactory->get('update.settings'))) {
+      $requirements['update_data_sharing'] = [
+        'title' => $this->t('Data sharing with Drupal.org'),
+        'value' => $this->t('Not yet reviewed'),
+        'severity' => RequirementSeverity::Warning,
+        'description' => $this->t('Choose what this site shares with Drupal.org on the <a href=":url">Update Status settings</a> page.', [':url' => Url::fromRoute('update.settings')->toString()]),
+      ];
     }
     return $requirements;
   }

@@ -2,6 +2,8 @@
 
 namespace Drupal\update;
 
+use Drupal\Core\Config\Config;
+
 /**
  * Default choices for sharing site data with Drupal.org.
  *
@@ -19,6 +21,13 @@ final class DataSharing {
    * Default for sharing the site email address.
    */
   public const DEFAULT_SITE_MAIL = FALSE;
+
+  /**
+   * Returns TRUE if either choice has not been recorded.
+   */
+  public static function isUndecided(Config $update_settings): bool {
+    return $update_settings->get('data_sharing.domain') === NULL || $update_settings->get('data_sharing.site_mail') === NULL;
+  }
 
   /**
    * Returns the hostname that would be shared.
