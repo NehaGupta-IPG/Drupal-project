@@ -21,10 +21,17 @@ class InstallerTranslationAlreadyInstalledTest extends InstallerTranslationTest 
     $this->drupalGet('/core/install.php');
     $this->assertSession()->pageTextContains('Drupal already installed');
 
-    // Without the change in https://www.drupal.org/project/drupal/issues/3455853
+    // Without the change in:
+    // https://www.drupal.org/project/drupal/issues/3455853
     // 'Drupal already installed' would not be shown if the state gets
     // set to an earlier translation related install task.
     \Drupal::state()->set('install_task', 'install_import_translations');
+    $this->drupalGet('/core/install.php');
+    $this->assertSession()->pageTextContains('Drupal already installed');
+
+    // Also confirm for other pre-configuration tasks when the site is already
+    // installed.
+    \Drupal::state()->set('install_task', 'install_profile_modules');
     $this->drupalGet('/core/install.php');
     $this->assertSession()->pageTextContains('Drupal already installed');
   }

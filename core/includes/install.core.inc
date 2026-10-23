@@ -5,6 +5,7 @@
  * API functions for installing Drupal.
  */
 
+use Drupal\user\Entity\User;
 use Drupal\user\LoginFinalizer;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Batch\BatchBuilder;
@@ -50,7 +51,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
-use Drupal\user\Entity\User;
 
 /**
  * Do not run the task during the current installation request.
@@ -545,15 +545,17 @@ function install_begin_request($class_loader, &$install_state): void {
       $current_key !== FALSE
       && $install_configure_form_key !== FALSE
       && $current_key < $install_configure_form_key
-      && class_exists('\Drupal\user\Entity\User')
-      && $user1 = User::load(1)
+      && \Drupal::hasContainer()
+      && \Drupal::hasService('entity_type.manager')
+      && \Drupal::entityTypeManager()->hasDefinition('user')
+      && ($user1 = User::load(1))
     ) {
 
       // If the user does not complete the configuration page and refreshes,
       // the password will not yet be set. The user should still be able to
       // complete the install.
       if (!empty($user1->getPassword())) {
-        throw new AlreadyInstalledException(\Drupal::service('string_translation'));
+        throw new AlreadyInstalledException($container->get('string_translation'));
       }
     }
   }
