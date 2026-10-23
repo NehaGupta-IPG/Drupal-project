@@ -267,8 +267,13 @@ class BlockForm extends EntityForm {
 
     if (isset($form['user_role'])) {
       $form['user_role']['#title'] = $this->t('Roles');
-      unset($form['user_role']['roles']['#description']);
+      $form['user_role']['roles']['#description'] = $this->t('Show this block only if the user has at least one of the selected roles. If you select no roles, the block will show to all users.');
     }
+
+    if (isset($form['entity_bundle:node'])) {
+      $form['entity_bundle:node']['bundles']['#description'] = $this->t('Show this block only if the node is of the selected content type. If you select no types, there will be no type-specific limitation.');
+    }
+
     if (isset($form['request_path'])) {
       $form['request_path']['#title'] = $this->t('Pages');
       $form['request_path']['negate']['#type'] = 'radios';
