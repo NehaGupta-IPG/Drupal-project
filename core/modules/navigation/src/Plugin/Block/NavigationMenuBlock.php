@@ -33,13 +33,9 @@ final class NavigationMenuBlock extends SystemMenuBlock implements ContainerFact
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('navigation.menu_tree'),
-      $container->get('menu.active_trail'),
-    );
+    $instance = new static($configuration, $plugin_id, $plugin_definition);
+    $instance->setMenuTree($container->get('navigation.menu_tree'));
+    return $instance;
   }
 
   /**

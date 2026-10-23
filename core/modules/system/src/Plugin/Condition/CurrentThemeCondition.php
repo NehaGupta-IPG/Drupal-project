@@ -6,9 +6,9 @@ use Drupal\Core\Condition\Attribute\Condition;
 use Drupal\Core\Condition\ConditionPluginBase;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Provides a 'Current Theme' condition.
@@ -17,7 +17,7 @@ use Drupal\Core\Theme\ThemeManagerInterface;
   id: "current_theme",
   label: new TranslatableMarkup("Current Theme"),
 )]
-class CurrentThemeCondition extends ConditionPluginBase implements ContainerFactoryPluginInterface {
+class CurrentThemeCondition extends ConditionPluginBase {
 
   /**
    * The theme manager.
@@ -34,23 +34,19 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
   protected $themeHandler;
 
   /**
-   * Constructs a CurrentThemeCondition condition plugin.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
-   *   The theme manager.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
+   * phpcs:ignore Commenting.FunctionComment
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ThemeManagerInterface $theme_manager, ThemeHandlerInterface $theme_handler) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->themeManager = $theme_manager;
-    $this->themeHandler = $theme_handler;
+  #[Required]
+  public function setThemeManager(ThemeManagerInterface $themeManager): void {
+    $this->themeManager = $themeManager;
+  }
+
+  /**
+   * phpcs:ignore Commenting.FunctionComment
+   */
+  #[Required]
+  public function setThemeHandler(ThemeHandlerInterface $themeHandler): void {
+    $this->themeHandler = $themeHandler;
   }
 
   /**

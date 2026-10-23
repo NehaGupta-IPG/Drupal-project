@@ -7,13 +7,12 @@ namespace Drupal\system\Plugin\Condition;
 use Drupal\Core\Condition\Attribute\Condition;
 use Drupal\Core\Condition\ConditionPluginBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Provides a 'Response status' condition.
@@ -22,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
   id: "response_status",
   label: new TranslatableMarkup("Response status"),
 )]
-class ResponseStatus extends ConditionPluginBase implements ContainerFactoryPluginInterface {
+class ResponseStatus extends ConditionPluginBase {
 
   /**
    * The request stack.
@@ -30,17 +29,9 @@ class ResponseStatus extends ConditionPluginBase implements ContainerFactoryPlug
   protected RequestStack $requestStack;
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    $instance = new static($configuration, $plugin_id, $plugin_definition);
-    $instance->setRequestStack($container->get('request_stack'));
-    return $instance;
-  }
-
-  /**
    * Sets the request stack to the given input.
    */
+  #[Required]
   public function setRequestStack(RequestStack $requestStack): void {
     $this->requestStack = $requestStack;
   }

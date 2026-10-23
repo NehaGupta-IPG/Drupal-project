@@ -9,6 +9,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Provides a block to display the breadcrumbs.
@@ -44,8 +45,6 @@ class SystemBreadcrumbBlock extends BlockBase implements ContainerFactoryPluginI
    *   The plugin implementation definition.
    * @param \Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface $breadcrumb_manager
    *   The breadcrumb manager.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
    */
   public function __construct(
     array $configuration,
@@ -53,11 +52,17 @@ class SystemBreadcrumbBlock extends BlockBase implements ContainerFactoryPluginI
     $plugin_definition,
     #[Autowire(service: 'breadcrumb')]
     BreadcrumbBuilderInterface $breadcrumb_manager,
-    RouteMatchInterface $route_match,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->breadcrumbManager = $breadcrumb_manager;
-    $this->routeMatch = $route_match;
+  }
+
+  /**
+   * phpcs:ignore Commenting.FunctionComment
+   */
+  #[Required]
+  public function setRouteMatch(RouteMatchInterface $routeMatch): void {
+    $this->routeMatch = $routeMatch;
   }
 
   /**
