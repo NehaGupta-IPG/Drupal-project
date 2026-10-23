@@ -2,8 +2,6 @@
 
 namespace Drupal\views;
 
-use Drupal\Core\Utility\NaturalSort;
-
 /**
  * Static service container wrapper for views.
  */
