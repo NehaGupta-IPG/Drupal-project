@@ -176,7 +176,9 @@ class Views {
     }
 
     if (!empty($plugins)) {
-      asort($plugins);
+      uasort($plugins, static function ($a, $b) {
+        return strcmp((string) $a, (string) $b);
+      });
     }
 
     return $plugins;
