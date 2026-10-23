@@ -31,6 +31,7 @@ class FieldUIDeleteTest extends BrowserTestBase {
     'field_test',
     'block',
     'field_test_views',
+    'dblog',
   ];
 
   /**

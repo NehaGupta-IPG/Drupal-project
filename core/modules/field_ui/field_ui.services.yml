@@ -16,6 +16,9 @@ services:
     class: Drupal\field_ui\Access\FormModeAccessCheck
     tags:
       - { name: access_check, applies_to: _field_ui_form_mode_access }
+  logger.channel.field_ui:
+    parent: logger.channel_base
+    arguments: ['field_ui']
   access_check.field_ui.field_reuse:
     class: Drupal\field_ui\Access\FieldReuseAccessCheck
     tags:

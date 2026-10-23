@@ -97,6 +97,10 @@ class FieldConfigDeleteForm extends EntityDeleteForm {
         '%type' => $bundle_label,
         '%source_label' => $source_label,
       ]));
+      $this->logger('field_ui')->info($this->t('The field %field has been deleted from the %type content type.', [
+        '%field' => $this->entity->label(),
+        '%type' => $bundle_label,
+      ]));
     }
     else {
       $this->messenger()->addError($this->t('There was a problem removing the %field from the %type %source_label.', [

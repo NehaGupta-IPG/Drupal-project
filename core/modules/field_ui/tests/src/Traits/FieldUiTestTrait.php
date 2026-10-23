@@ -169,6 +169,17 @@ trait FieldUiTestTrait {
     $this->submitForm([], 'Delete');
     $this->assertSession()->pageTextContains("The field $label has been deleted from the $bundle_label $source_label");
 
+    // Verify this deletion is logged.
+    // @todo This can be refactored when a test logger is available rather than
+    //   the dblog module.
+    // @see https://www.drupal.org/project/drupal/issues/2862282
+    $query = \Drupal::database()->select('watchdog', 'w');
+    $query->fields('w', ['message'])
+      ->condition('type', 'field_ui')
+      ->condition('message', '%' . $bundle_label . '%', 'like');
+    $message = $query->execute()->fetchField();
+    $this->assertEquals(t('The field %label has been deleted from the %type content type.', ['%label' => $label, '%type' => $bundle_label]), $message);
+
     // Check that the field does not appear in the overview form.
     $xpath = $this->assertSession()->buildXPathQuery('//table[@id="field-overview"]//span[@class="label-field" and text()= :label]', [
       ':label' => $label,
