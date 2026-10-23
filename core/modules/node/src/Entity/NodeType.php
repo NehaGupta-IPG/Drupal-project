@@ -42,6 +42,7 @@ use Drupal\user\Entity\EntityPermissionsRouteProvider;
     'list_builder' => NodeTypeListBuilder::class,
   ],
   links: [
+    'add-form' => '/admin/structure/types/add',
     'edit-form' => '/admin/structure/types/manage/{node_type}',
     'delete-form' => '/admin/structure/types/manage/{node_type}/delete',
     'entity-permissions-form' => '/admin/structure/types/manage/{node_type}/permissions',
