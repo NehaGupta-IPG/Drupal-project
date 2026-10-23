@@ -170,11 +170,15 @@ class Image extends File {
    * {@inheritdoc}
    */
   public function shouldUpdateThumbnail(MediaInterface $media, bool $is_new = FALSE): bool {
-    return parent::shouldUpdateThumbnail($media) || ($media->getOriginal() && $this->hasAltTextChanged($media, $media->getOriginal()));
+    if (parent::shouldUpdateThumbnail($media, $is_new)) {
+      return TRUE;
+    }
+    $original = $media->getOriginal();
+    return $original && $this->hasAltTextChanged($media, $original);
   }
 
   /**
-   * Returns if the alt text value has changed.
+   * Checks if the image's alt text value has changed.
    *
    * @param \Drupal\media\MediaInterface $media
    *   The updated media entity.
@@ -190,14 +194,14 @@ class Image extends File {
       return FALSE;
     }
 
-    $items = $media->get($source_field);
-    $original_items = $original->get($source_field);
+    $item = $media->get($source_field)->first();
+    $original_item = $original->get($source_field)->first();
 
-    if ($items->isEmpty() || $original_items->isEmpty() || !isset($items->alt)) {
+    if (!$item || !$original_item || $item->isEmpty() || $original_item->isEmpty()) {
       return FALSE;
     }
 
-    return $items->alt !== $original_items->alt;
+    return $item->alt !== $original_item->alt;
   }
 
 }
