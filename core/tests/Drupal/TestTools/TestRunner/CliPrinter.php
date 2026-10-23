@@ -25,6 +25,8 @@ use Symfony\Component\Process\PhpExecutableFinder;
  */
 class CliPrinter {
 
+  protected const CLASS_NAME_LOG_LENGTH = 50;
+
   public function __construct(
     protected StyleInterface $io,
     protected Config $config,
@@ -116,14 +118,16 @@ class CliPrinter {
         in_array('#slow', $testInfo['groups']) ? '#slow' : NULL,
         \trim_with_ellipsis($testInfo['group'], 15, \STR_PAD_RIGHT),
         $testInfo['tests_count'],
-        \trim_with_ellipsis($testInfo['name'], 55, \STR_PAD_LEFT),
+        $testInfo['weight'],
+        \trim_with_ellipsis($testInfo['name'], static::CLASS_NAME_LOG_LENGTH, \STR_PAD_LEFT),
       ];
     }
 
     $this->io->createTable()
-      ->setHeaders(['Seq', 'Slow?', 'Group', 'Cnt', 'Class'])
+      ->setHeaders(['Seq', 'Slow?', 'Group', 'Cnt', 'Wt', 'Class'])
       ->setColumnStyle(0, $rightAligned)
       ->setColumnStyle(3, $rightAligned)
+      ->setColumnStyle(4, $rightAligned)
       ->setRows($rows)
       ->render();
   }
@@ -172,15 +176,17 @@ class CliPrinter {
         new TableCell(in_array('#slow', $testInfo['groups']) ? '#slow' : '', ['style' => $style]),
         new TableCell(\trim_with_ellipsis($testInfo['group'], 15, \STR_PAD_RIGHT), ['style' => $style]),
         new TableCell((string) $testInfo['tests_count'], ['style' => $rightAlignedStyle]),
-        new TableCell(\trim_with_ellipsis($testInfo['name'], 55, \STR_PAD_LEFT), ['style' => $style]),
+        new TableCell((string) $testInfo['weight'], ['style' => $rightAlignedStyle]),
+        new TableCell(\trim_with_ellipsis($testInfo['name'], static::CLASS_NAME_LOG_LENGTH, \STR_PAD_LEFT), ['style' => $style]),
       ];
     }
 
     $this->io->createTable()
-      ->setHeaders(['Bin', "Sort\nSeq", "Bin\nSeq", 'Slow?', 'Group', 'Cnt', 'Class'])
+      ->setHeaders(['Bin', "Sort\nSeq", "Bin\nSeq", 'Slow?', 'Group', 'Cnt', 'Wt', 'Class'])
       ->setColumnStyle(1, $rightAligned)
       ->setColumnStyle(2, $rightAligned)
       ->setColumnStyle(5, $rightAligned)
+      ->setColumnStyle(6, $rightAligned)
       ->setRows($rows)
       ->render();
   }
