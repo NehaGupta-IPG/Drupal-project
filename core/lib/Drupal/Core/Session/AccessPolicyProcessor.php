@@ -103,7 +103,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
     // copying half of the caching layer and that still allows us to use the
     // VariationCache for accounts other than the current user.
     $switch_account = FALSE;
-    if ($this->currentUser->id() !== $account->id()) {
+    if ($account->isAnonymous() ? array_diff($this->currentUser->getRoles(), $account->getRoles()) !== [] : $this->currentUser->id() != $account->id()) {
       foreach ($persistent_cache_contexts as $cache_context) {
         [$cache_context_root] = explode('.', $cache_context, 2);
         if ($cache_context_root === 'user') {
