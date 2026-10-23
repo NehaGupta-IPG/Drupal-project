@@ -180,6 +180,19 @@ class DrupalDateTime extends DateTimePlus {
   }
 
   /**
+   * Returns the current time in the specified format.
+   *
+   * @param string $format
+   *   The desired format for the current time. Defaults to 'Y-m-d\TH:i:s'.
+   *
+   * @return string
+   *   The current time formatted as per the given format.
+   */
+  public static function now(string $format = 'Y-m-d\TH:i:s') {
+    return (new static('now', new \DateTimeZone('UTC')))->format($format);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function __sleep(): array {

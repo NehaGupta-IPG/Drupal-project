@@ -292,4 +292,37 @@ class DrupalDateTimeTest extends UnitTestCase {
     $this->assertSame(12345678, $unserialized_date->getTimestamp());
   }
 
+  /**
+   * Tests the now method.
+   *
+   * @covers ::now
+   */
+  public function testNow(): void {
+    $language_manager = $this->createMock(LanguageManager::class);
+    $language_manager->expects($this->any())
+      ->method('getCurrentLanguage')
+      ->willReturn(new Language(['id' => 'en']));
+
+    $container = new ContainerBuilder();
+    $container->set('language_manager', $language_manager);
+    \Drupal::setContainer($container);
+
+    // Set PHP's timezone to UTC to match DrupalDateTime behavior.
+    date_default_timezone_set('UTC');
+    // Test the now() method.
+    $formatted_now = DrupalDateTime::now();
+
+    // Assertions to verify the behavior.
+    $this->assertIsString($formatted_now, 'The now() method should return a string.');
+    $this->assertMatchesRegularExpression('/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/', $formatted_now, 'Default format should match ISO 8601 format (Y-m-d\TH:i:s)');
+
+    // Validate the timestamp is within 1 second of current time
+    $now = time();
+    $test_time = strtotime($formatted_now);
+
+    $this->assertLessThanOrEqual(1, abs($now - $test_time),
+      'Generated timestamp should be within 1 second of current time'
+    );
+  }
+
 }
