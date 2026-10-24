@@ -16,7 +16,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   id: "default:comment",
   label: new TranslatableMarkup("Comment selection"),
   entity_types: ["comment"],
-  group: "default",
   weight: 1
 )]
 class CommentSelection extends DefaultSelection {

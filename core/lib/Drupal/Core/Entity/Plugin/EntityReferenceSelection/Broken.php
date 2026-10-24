@@ -16,7 +16,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[EntityReferenceSelection(
   id: "broken",
   label: new TranslatableMarkup("Broken/Missing"),
-  group: '',
   weight: -100,
 )]
 class Broken extends SelectionPluginBase {

@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity\EntityReferenceSelection;
 
 use Drupal\Component\Plugin\FallbackPluginManagerInterface;
+use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityInterface;
@@ -106,6 +107,29 @@ class SelectionPluginManager extends DefaultPluginManager implements SelectionPl
    */
   public function getFallbackPluginId($plugin_id, array $configuration = []) {
     return 'broken';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function processDefinition(&$definition, $plugin_id): void {
+    parent::processDefinition($definition, $plugin_id);
+
+    if (!empty($definition['group'])) {
+      @trigger_error("Setting the 'group' property on selection plugin '$plugin_id is deprecated in drupal:11.1.0 and will be removed in drupal:12.0.0. The property should be removed. See https://www.drupal.org/node/3473976", E_USER_DEPRECATED);
+    }
+
+    // Derive the group from the plugin ID.
+    if (str_contains($plugin_id, PluginBase::DERIVATIVE_SEPARATOR)) {
+      [$group] = explode(PluginBase::DERIVATIVE_SEPARATOR, $plugin_id);
+    }
+    else {
+      $group = $plugin_id;
+    }
+
+    if (empty($definition['group'])) {
+      $definition['group'] = $group;
+    }
   }
 
 }

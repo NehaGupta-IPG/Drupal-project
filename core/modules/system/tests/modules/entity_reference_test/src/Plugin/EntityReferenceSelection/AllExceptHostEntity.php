@@ -14,7 +14,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[EntityReferenceSelection(
   id: "entity_test_all_except_host",
   label: new TranslatableMarkup("All except host entity."),
-  group: "entity_test_all_except_host",
   weight: 0
 )]
 class AllExceptHostEntity extends DefaultSelection {

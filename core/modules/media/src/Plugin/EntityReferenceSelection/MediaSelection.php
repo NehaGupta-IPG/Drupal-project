@@ -13,7 +13,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   id: "default:media",
   label: new TranslatableMarkup("Media selection"),
   entity_types: ["media"],
-  group: "default",
   weight: 1
 )]
 class MediaSelection extends DefaultSelection {

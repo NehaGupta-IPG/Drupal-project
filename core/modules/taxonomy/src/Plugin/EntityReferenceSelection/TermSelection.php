@@ -16,7 +16,6 @@ use Drupal\taxonomy\Entity\Vocabulary;
   id: "default:taxonomy_term",
   label: new TranslatableMarkup("Taxonomy Term selection"),
   entity_types: ["taxonomy_term"],
-  group: "default",
   weight: 1
 )]
 class TermSelection extends DefaultSelection {

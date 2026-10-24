@@ -24,7 +24,6 @@ use Drupal\user\RoleInterface;
   id: "default:user",
   label: new TranslatableMarkup("User selection"),
   entity_types: ["user"],
-  group: "default",
   weight: 1
 )]
 class UserSelection extends DefaultSelection {

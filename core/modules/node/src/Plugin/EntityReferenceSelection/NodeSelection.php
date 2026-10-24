@@ -14,7 +14,6 @@ use Drupal\node\NodeInterface;
   id: "default:node",
   label: new TranslatableMarkup("Node selection"),
   entity_types: ["node"],
-  group: "default",
   weight: 1
 )]
 class NodeSelection extends DefaultSelection {

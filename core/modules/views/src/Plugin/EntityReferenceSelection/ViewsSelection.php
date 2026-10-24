@@ -24,7 +24,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 #[EntityReferenceSelection(
   id: "views",
   label: new TranslatableMarkup("Views: Filter by an entity reference view"),
-  group: "views",
   weight: 0
 )]
 class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPluginInterface {

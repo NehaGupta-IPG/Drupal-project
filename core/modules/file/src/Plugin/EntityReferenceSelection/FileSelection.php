@@ -14,7 +14,6 @@ use Drupal\file\FileInterface;
   id: "default:file",
   label: new TranslatableMarkup("File selection"),
   entity_types: ["file"],
-  group: "default",
   weight: 1
 )]
 class FileSelection extends DefaultSelection {

@@ -45,10 +45,11 @@ class EntityReferenceSelection extends Plugin {
    * The selection plugin group.
    *
    * @var string
-   * This property is used to allow selection plugins to target a specific
-   * entity type while also inheriting the code of an existing selection plugin.
-   * For example, if we want to override the NodeSelection from the 'default'
-   * selection type, we can define the annotation of a new plugin as follows:
+   * Deprecated in 11.1.0 and will be removed in 12.0.0. This property is used
+   * to allow selection plugins to target a specific entity type while also
+   * inheriting the code of an existing selection plugin. For example, if we
+   * want to override the NodeSelection from the 'default' selection type, we
+   * can define the annotation of a new plugin as follows:
    * @code
    * id = "default:node_advanced",
    * entity_types = {"node"},

@@ -17,7 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   id: "default:workspace",
   label: new TranslatableMarkup("Workspace selection"),
   entity_types: ["workspace"],
-  group: "default",
   weight: 1
 )]
 class WorkspaceSelection extends DefaultSelection {

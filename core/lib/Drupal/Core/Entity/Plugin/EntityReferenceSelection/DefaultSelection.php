@@ -37,7 +37,6 @@ use Drupal\user\EntityOwnerInterface;
 #[EntityReferenceSelection(
   id: "default",
   label: new TranslatableMarkup("Default"),
-  group: "default",
   weight: 0,
   deriver: DefaultSelectionDeriver::class,
 )]
