@@ -105,11 +105,11 @@ catch (\RuntimeException $e) {
 $output->setDecorated(Config::get('color'));
 
 // Setup console printer.
-$cliPrinter = new CliPrinter($io, Config::instance());
+$reporter = new CliPrinter($io, Config::instance());
 
 // If --help requested, show it and exit.
 if (Config::get('help')) {
-  $cliPrinter->help(Config::commandLineDefinition(), $script_basename, $io);
+  $reporter->help(Config::commandLineDefinition(), $script_basename, $io);
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
@@ -223,7 +223,7 @@ if (Config::get('clean')) {
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
-$cliPrinter->startTable();
+$reporter->startTable();
 
 // Discover tests and allocate them to worker bins.
 Timer::start('run-tests:discovery');
@@ -238,14 +238,14 @@ $test_list = array_keys($workAllocator->getAllocatedList());
 
 if (Config::get('debug-discovery')) {
   if ((int) Config::get('ci-parallel-node-total') > 1) {
-    $cliPrinter->testBinSequenceTable(
+    $reporter->testBinSequenceTable(
       (int) Config::get('ci-parallel-node-index'),
       $workAllocator->getSortedList(),
       $workAllocator->getAllocatedList(),
     );
   }
   else {
-    $cliPrinter->testSequenceTable($workAllocator->getAllocatedList());
+    $reporter->testSequenceTable($workAllocator->getAllocatedList());
   }
 }
 $tests_to_run = [];
@@ -299,7 +299,7 @@ if (!Config::get('keep-results')) {
 
 // Stop the timer.
 $end = Timer::stop('run-tests');
-$cliPrinter->summaryTable($end, $total_time ?? 0.0, $end_discovery, $overall_test_time ?? NULL);
+$reporter->summaryTable($end, $total_time ?? 0.0, $end_discovery, $overall_test_time ?? NULL);
 
 // Test complete, exit.
 exit($status);
@@ -868,7 +868,7 @@ function simpletest_script_format_result($result): void {
     $duration = sprintf("%9.3fs", $result->time);
   }
 
-  $summary = sprintf("%-9.9s %s %s\n", $results_map[$result->status], $duration, trim_with_ellipsis($result->function, 80, STR_PAD_LEFT));
+  $summary = sprintf("%-9.9s %s %s\n", $results_map[$result->status], $duration, CliPrinter::trimWithEllipsis($result->function, 80, STR_PAD_LEFT));
 
   simpletest_script_print($summary, simpletest_script_color_code($result->status));
 
@@ -1036,32 +1036,6 @@ function simpletest_script_load_messages_by_test_id(TestRunResultsStorageInterfa
   }
 
   return $results;
-}
-
-/**
- * Trims a string adding a leading or trailing ellipsis.
- *
- * @param string $input
- *   The input string.
- * @param int $length
- *   The exact trimmed string length.
- * @param int $side
- *   Leading or trailing ellipsis.
- *
- * @return string
- *   The trimmed string.
- */
-function trim_with_ellipsis(string $input, int $length, int $side): string {
-  if (strlen($input) < $length) {
-    return str_pad($input, $length, ' ', \STR_PAD_RIGHT);
-  }
-  elseif (strlen($input) > $length) {
-    return match ($side) {
-      \STR_PAD_RIGHT => substr($input, 0, $length - 1) . '…',
-      default => '…' . substr($input, -$length + 1),
-    };
-  }
-  return $input;
 }
 
 /**

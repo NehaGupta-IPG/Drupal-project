@@ -10,6 +10,7 @@ use Drupal\Component\Utility\Bytes;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Test\TestRun;
+use Drupal\TestTools\TestRunner\CliPrinter;
 use Drupal\TestTools\TestRunner\Configuration as Config;
 use Drupal\TestTools\TestRunner\Event\RunnerTestsExecutionFinished;
 use Drupal\TestTools\TestRunner\Event\RunnerTestsExecutionPoll;
@@ -117,11 +118,10 @@ class ExecutionProgress implements EventSubscriberInterface {
       $event->testRun->duration(),
     );
     if ($event->result['error_output']) {
-      $this->io->writeln('<error>ERROR: ' . implode("\n", $event->result['error_output']) . '</>');
+      $this->io->error(implode("\n", $event->result['error_output']));
     }
     if ($event->result['status'] && !in_array($event->result['status'], [\SIMPLETEST_SCRIPT_EXIT_FAILURE, \SIMPLETEST_SCRIPT_EXIT_ERROR])) {
-      $message = 'FATAL ' . $event->testRun->getTestClass() . ': test runner returned an unexpected error code (' . $event->result['status'] . ').';
-      $this->io->writeln('<error>' . $message . '</>');
+      $this->io->error('FATAL ' . $event->testRun->getTestClass() . ': test runner returned an unexpected error code (' . $event->result['status'] . ').');
       if ($this->config->get('die-on-fail')) {
         $this->io->writeln('Test database and files kept and test exited immediately on fail so should be reproducible if you change settings.php to use the database prefix ' . $event->testRun->getDatabasePrefix() . ' and config directories in ' . $event->result['test_directory']);
       }
@@ -168,7 +168,7 @@ class ExecutionProgress implements EventSubscriberInterface {
     // execution of the spawned process.
     $time = sprintf('%8.3fs', $duration);
 
-    $output = vsprintf('%s %s %s', [$time, \trim_with_ellipsis($class, 70, STR_PAD_LEFT), implode(', ', $summary)]);
+    $output = vsprintf('%s %s %s', [$time, CliPrinter::trimWithEllipsis($class, 70, STR_PAD_LEFT), implode(', ', $summary)]);
     $status = ($results['#fail'] || $results['#cli_fail'] || $results['#exception'] || $results['#error'] ? 'fail' : 'pass');
     $tag = \simpletest_script_color_console_tag($status);
     $this->io->writeln($tag ? $tag . $output ."</>" : $output);

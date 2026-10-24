@@ -116,10 +116,10 @@ class CliPrinter {
       $rows[] = [
         $testInfo['worker_sequence'],
         in_array('#slow', $testInfo['groups']) ? '#slow' : NULL,
-        \trim_with_ellipsis($testInfo['group'], 15, \STR_PAD_RIGHT),
+        static::trimWithEllipsis($testInfo['group'], 15, \STR_PAD_RIGHT),
         $testInfo['tests_count'],
         $testInfo['weight'],
-        \trim_with_ellipsis($testInfo['name'], static::CLASS_NAME_LOG_LENGTH, \STR_PAD_LEFT),
+        static::trimWithEllipsis($testInfo['name'], static::CLASS_NAME_LOG_LENGTH, \STR_PAD_LEFT),
       ];
     }
 
@@ -183,10 +183,10 @@ class CliPrinter {
         new TableCell((string) $testInfo['sorted_sequence'], ['style' => $rightAlignedStyle]),
         new TableCell($inBin ? (string) $tests[$testInfo['name']]['worker_sequence'] : '', ['style' => $rightAlignedStyle]),
         new TableCell(in_array('#slow', $testInfo['groups']) ? '#slow' : '', ['style' => $style]),
-        new TableCell(\trim_with_ellipsis($testInfo['group'], 15, \STR_PAD_RIGHT), ['style' => $style]),
+        new TableCell(static::trimWithEllipsis($testInfo['group'], 15, \STR_PAD_RIGHT), ['style' => $style]),
         new TableCell((string) $testInfo['tests_count'], ['style' => $rightAlignedStyle]),
         new TableCell((string) $testInfo['weight'], ['style' => $rightAlignedStyle]),
-        new TableCell(\trim_with_ellipsis($testInfo['name'], static::CLASS_NAME_LOG_LENGTH, \STR_PAD_LEFT), ['style' => $style]),
+        new TableCell(static::trimWithEllipsis($testInfo['name'], static::CLASS_NAME_LOG_LENGTH, \STR_PAD_LEFT), ['style' => $style]),
       ];
     }
 
@@ -265,6 +265,32 @@ sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$script_basename}
 
 EOF
     );
+  }
+
+  /**
+   * Trims a string adding a leading or trailing ellipsis.
+   *
+   * @param string $input
+   *   The input string.
+   * @param int $length
+   *   The exact trimmed string length.
+   * @param int $side
+   *   Leading or trailing ellipsis.
+   *
+   * @return string
+   *   The trimmed string.
+   */
+  public static function trimWithEllipsis(string $input, int $length, int $side): string {
+    if (strlen($input) < $length) {
+      return str_pad($input, $length, ' ', \STR_PAD_RIGHT);
+    }
+    elseif (strlen($input) > $length) {
+      return match ($side) {
+        \STR_PAD_RIGHT => substr($input, 0, $length - 1) . '…',
+        default => '…' . substr($input, -$length + 1),
+      };
+    }
+    return $input;
   }
 
 }
