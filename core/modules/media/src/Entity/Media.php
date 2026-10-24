@@ -117,7 +117,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    *
    * @var bool
    */
-  protected $forceMetadataUpdate = FALSE;
+  protected bool $forceMetadataUpdate = FALSE;
 
   /**
    * {@inheritdoc}
@@ -185,6 +185,11 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    */
   protected function updateThumbnail($from_queue = FALSE) {
     $thumbnail_uri = $this->getThumbnailUri($from_queue);
+    // An enforced update must not keep pointing at a thumbnail whose file has
+    // gone missing; fall back to the default thumbnail instead.
+    if ($this->forceMetadataUpdate && !empty($thumbnail_uri) && !file_exists($thumbnail_uri)) {
+      $thumbnail_uri = NULL;
+    }
     $this->thumbnail->target_id = $this->loadThumbnail($thumbnail_uri)->id();
     $this->thumbnail->width = $this->getThumbnailWidth($from_queue);
     $this->thumbnail->height = $this->getThumbnailHeight($from_queue);
@@ -406,11 +411,15 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
     foreach ($this->translations as $langcode => $data) {
       if ($this->hasTranslation($langcode)) {
         $translation = $this->getTranslation($langcode);
-        if ($translation->bundle->entity->thumbnailDownloadsAreQueued() && $translation->shouldUpdateThumbnail($is_new)) {
+        // An enforced update already replaced the thumbnail in prepareSave().
+        if (!$this->forceMetadataUpdate && $translation->bundle->entity->thumbnailDownloadsAreQueued() && $translation->shouldUpdateThumbnail($is_new)) {
           \Drupal::queue('media_entity_thumbnail')->createItem(['id' => $translation->id()]);
         }
+        $translation->forceMetadataUpdate = FALSE;
       }
     }
+    // The enforced update applies to this save only.
+    $this->forceMetadataUpdate = FALSE;
   }
 
   /**
@@ -460,6 +469,9 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
 
     foreach (array_keys($this->getTranslationLanguages()) as $langcode) {
       $translation = $this->getTranslation($langcode);
+      // Translation objects carry their own copy of the flag, which the
+      // thumbnail and source plugin code read.
+      $translation->forceMetadataUpdate = $this->forceMetadataUpdate;
 
       // Set fields provided by the media source and mapped in the media type
       // config.
@@ -480,7 +492,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
   /**
    * {@inheritdoc}
    */
-  public function enforceMetadataUpdate() {
+  public function enforceMetadataUpdate(): static {
     $this->forceMetadataUpdate = TRUE;
 
     return $this;
@@ -489,7 +501,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
   /**
    * {@inheritdoc}
    */
-  public function isMetadataUpdateEnforced() {
+  public function isMetadataUpdateEnforced(): bool {
     return $this->forceMetadataUpdate;
   }
 
@@ -536,7 +548,13 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
         }
       }
       if ($set_metadata) {
-        $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
+        $value = $media_source->getMetadata($translation, $metadata_attribute_name);
+        // Never let an enforced update erase a stored value because the source
+        // is missing or unavailable and returned nothing.
+        if ($overwrite_existing && $value === NULL && !$translation->get($entity_field_name)->isEmpty()) {
+          continue;
+        }
+        $translation->set($entity_field_name, $value);
       }
     }
   }

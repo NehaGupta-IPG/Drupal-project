@@ -24,3 +24,4 @@ services:
   media.config_subscriber:
     class: Drupal\media\EventSubscriber\MediaConfigSubscriber
   Drupal\media\EventSubscriber\DefaultContentSubscriber: ~
+  Drupal\media\MediaMetadataRefresher: ~

@@ -1,47 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\media\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\GeneratedUrl;
-use Drupal\Core\Url;
 use Drupal\media\MediaInterface;
+use Drupal\media\MediaMetadataRefresher;
+use Drupal\media\MediaSourceStatus;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Controller that triggers metadata updates on a given media item.
+ * Refreshes a media item's metadata and thumbnail from its source.
  *
  * @internal
  *   Controllers are internal.
  */
-class UpdateMetadataController extends ControllerBase {
+final class UpdateMetadataController extends ControllerBase {
+
+  public function __construct(
+    protected readonly MediaMetadataRefresher $refresher,
+  ) {}
 
   /**
-   * Updates metadata on a media entity and reloads the page.
+   * Refreshes the media item, or asks for confirmation if that is unsafe.
+   *
+   * The route is protected by a CSRF token, so this cannot be triggered from
+   * another site. When the source is missing or unavailable, nothing is
+   * changed and the user is sent to a confirmation form instead.
    *
    * @param \Drupal\media\MediaInterface $media
-   *   The media item for which to update metadata.
+   *   The media item to refresh.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The current request.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
-   *   A redirect response to return the user to the page they were on.
+   *   A redirect to the destination, or to the confirmation form.
    */
-  public function updateMetadata(MediaInterface $media) {
-    $media->enforceMetadataUpdate();
-    $this->entityTypeManager()->getStorage('media')->save($media);
-    $this->messenger()->addStatus($this->t('Updated metadata on media item %label', [
+  public function updateMetadata(MediaInterface $media, Request $request): RedirectResponse {
+    if ($this->refresher->check($media) !== MediaSourceStatus::Available) {
+      // Carry the destination on to the confirmation form; left in place, it
+      // would replace this redirect.
+      $options = [];
+      if ($request->query->has('destination')) {
+        $options['query']['destination'] = $request->query->get('destination');
+        $request->query->remove('destination');
+      }
+      return $this->redirect('media.update_metadata_confirm', ['media' => $media->id()], $options);
+    }
+
+    $this->refresher->refresh($media);
+    $this->messenger()->addStatus($this->t('Updated metadata on media item %label.', [
       '%label' => $media->label(),
     ]));
-    return new RedirectResponse($this->reloadPage());
-  }
-
-  /**
-   * Reloads the previous page or return to the media overview.
-   */
-  protected function reloadPage(): string|GeneratedUrl {
-    if ($destination = $this->getRedirectDestination()->get()) {
-      return $destination;
-    }
-    return Url::fromRoute('entity.media.collection')->toString();
+    return $this->redirect('entity.media.collection');
   }
 
 }

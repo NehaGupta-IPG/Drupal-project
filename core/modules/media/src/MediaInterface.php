@@ -65,18 +65,23 @@ interface MediaInterface extends ContentEntityInterface, EntityChangedInterface,
   public function getSource();
 
   /**
-   * Force metadata update in prepareSave().
+   * Refreshes metadata and the thumbnail from the source on the next save.
+   *
+   * Mapped fields are overwritten with the source's current values, except
+   * that a stored value is kept when the source returns nothing for it. The
+   * thumbnail is replaced immediately, even when the media type queues
+   * thumbnail downloads. The flag is cleared once the entity has been saved.
    *
    * @return $this
    */
-  public function enforceMetadataUpdate();
+  public function enforceMetadataUpdate(): static;
 
   /**
-   * Check whether the metadata update is enforced or not.
+   * Checks whether the next save refreshes metadata from the source.
    *
    * @return bool
    *   TRUE if the metadata update is enforced, FALSE if it's not.
    */
-  public function isMetadataUpdateEnforced();
+  public function isMetadataUpdateEnforced(): bool;
 
 }

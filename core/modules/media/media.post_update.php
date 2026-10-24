@@ -25,13 +25,13 @@ function media_removed_post_updates(): array {
 }
 
 /**
- * Install the 'Update metadata' action.
+ * Install the 'Refresh from source' media action.
  */
 function media_post_update_install_update_metadata_action(): void {
   if (!Action::load('media_update_metadata')) {
     Action::create([
       'id' => 'media_update_metadata',
-      'label' => 'Update metadata',
+      'label' => 'Refresh from source',
       'type' => 'media',
       'plugin' => 'media_update_metadata',
     ])

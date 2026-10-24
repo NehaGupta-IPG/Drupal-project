@@ -78,8 +78,8 @@ class MediaContextualLinksTest extends MediaJavascriptTestBase {
     // The "Edit" link is there.
     $this->assertSession()->elementTextContains('css', 'ul.contextual-links li:first-child a', 'Edit');
 
-    // The "Update metadata" link is there.
-    $this->assertSession()->elementTextContains('css', 'ul.contextual-links li:nth-child(2) a', 'Update metadata');
+    // The "Refresh" link is there.
+    $this->assertSession()->elementTextContains('css', 'ul.contextual-links li:nth-child(2) a', 'Refresh');
 
     // The "Delete" link is there.
     $this->assertSession()->elementTextContains('css', 'ul.contextual-links li:nth-child(3) a', 'Delete');

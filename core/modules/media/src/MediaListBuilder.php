@@ -9,8 +9,8 @@ use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a listing of media items.
@@ -168,7 +168,7 @@ class MediaListBuilder extends EntityListBuilder {
     $operations = parent::getDefaultOperations($entity, $cacheability);
     if ($entity->access('update')) {
       $operations['update_metadata'] = [
-        'title' => $this->t('Update metadata'),
+        'title' => $this->t('Refresh'),
         'url' => $this->ensureDestination(new Url('media.update_metadata', [
           'media' => $entity->id(),
         ])),

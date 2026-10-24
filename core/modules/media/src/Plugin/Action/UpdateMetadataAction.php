@@ -4,43 +4,33 @@ namespace Drupal\media\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Action\Attribute\Action;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\media\MediaMetadataRefresher;
+use Drupal\media\MediaSourceStatus;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Updates metadata (including the thumbnail) of a media entity.
+ * Refreshes metadata (including the thumbnail) of media items from source.
+ *
+ * Media items whose source is missing or unavailable are skipped and listed
+ * in a warning, so a bulk refresh never removes data without confirmation.
  */
 #[Action(
   id: 'media_update_metadata',
-  label: new TranslatableMarkup('Update metadata'),
+  label: new TranslatableMarkup('Refresh from source'),
+  type: 'media',
 )]
 class UpdateMetadataAction extends ActionBase implements ContainerFactoryPluginInterface {
 
-  /**
-   * The media entity storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $mediaStorage;
-
-  /**
-   * Creates a new UpdateMetadataAction plugin instance.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $entity_storage
-   *   The entity storage.
-   * @param array $configuration
-   *   The plugin configuration array.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   */
-  public function __construct(EntityStorageInterface $entity_storage, array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected readonly MediaMetadataRefresher $refresher,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->mediaStorage = $entity_storage;
   }
 
   /**
@@ -48,11 +38,31 @@ class UpdateMetadataAction extends ActionBase implements ContainerFactoryPluginI
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $container->get('entity_type.manager')->getStorage('media'),
       $configuration,
       $plugin_id,
-      $plugin_definition
+      $plugin_definition,
+      $container->get(MediaMetadataRefresher::class),
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function executeMultiple(array $entities): void {
+    $skipped = [];
+    foreach ($entities as $entity) {
+      if (!$this->refreshIfAvailable($entity)) {
+        $skipped[] = $entity->label();
+      }
+    }
+    if ($skipped) {
+      $this->messenger()->addWarning($this->formatPlural(
+        count($skipped),
+        'Skipped media item %labels: its source is missing or unavailable.',
+        'Skipped @count media items whose source is missing or unavailable: %labels.',
+        ['%labels' => implode(', ', $skipped)],
+      ));
+    }
   }
 
   /**
@@ -60,9 +70,7 @@ class UpdateMetadataAction extends ActionBase implements ContainerFactoryPluginI
    */
   public function execute($entity = NULL): void {
     if ($entity) {
-      /** @var \Drupal\media\MediaInterface $entity */
-      $entity->enforceMetadataUpdate();
-      $this->mediaStorage->save($entity);
+      $this->refreshIfAvailable($entity);
     }
   }
 
@@ -73,6 +81,23 @@ class UpdateMetadataAction extends ActionBase implements ContainerFactoryPluginI
     /** @var \Drupal\Core\Entity\EntityInterface $object */
     $result = $object->access('update', $account, TRUE);
     return $return_as_object ? $result : $result->isAllowed();
+  }
+
+  /**
+   * Refreshes a media item unless its source is missing or unavailable.
+   *
+   * @param \Drupal\media\MediaInterface $media
+   *   The media item.
+   *
+   * @return bool
+   *   TRUE if the media item was refreshed, FALSE if it was skipped.
+   */
+  protected function refreshIfAvailable($media): bool {
+    if ($this->refresher->check($media) !== MediaSourceStatus::Available) {
+      return FALSE;
+    }
+    $this->refresher->refresh($media);
+    return TRUE;
   }
 
 }
