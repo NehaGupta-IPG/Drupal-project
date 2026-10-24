@@ -121,6 +121,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       ],
       '#default_value' => (!$register ? $account->getAccountName() : ''),
       '#access' => $account->name->access('edit'),
+      '#weight' => -6,
     ];
 
     $form['account']['notify'] = [
@@ -137,6 +138,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
         '#type' => 'password_confirm',
         '#size' => 25,
         '#description' => $this->t('To change the current user password, enter the new password in both fields.'),
+        '#weight' => -4,
       ];
 
       // To skip the current password field, the user must have logged in via a
