@@ -99,6 +99,9 @@ class MessageCommandTest extends WebDriverTestBase {
     $page->pressButton('Make Warning Message');
     $this->assertSession()->statusMessageContainsAfterWait('I am a warning message in the default location.', 'warning');
 
+    $page->pressButton('Make Safe Message');
+    $this->assertSession()->statusMessageContainsAfterWait('I am a warning message with script tag. Click me!', 'warning');
+
     // Reload and test some negative assertions.
     $this->drupalGet('ajax-test/message');
 
@@ -113,6 +116,10 @@ class MessageCommandTest extends WebDriverTestBase {
     // Test partial match.
     $page->pressButton('Make Warning Message');
     $this->assertSession()->statusMessageContainsAfterWait('I am a warning');
+
+    // Test script tag.
+    $page->pressButton('Make Safe Message');
+    $this->assertSession()->statusMessageNotContainsAfterWait('I am a warning message with script tag. <button onclick="javascript:alert(\'xss\')">Click me!</button>');
 
     // One more reload to try with different arg combinations.
     $this->drupalGet('ajax-test/message');
