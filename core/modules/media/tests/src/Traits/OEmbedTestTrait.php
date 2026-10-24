@@ -36,7 +36,7 @@ trait OEmbedTestTrait {
   /**
    * Forces Media to use the provider database in the fixtures directory.
    */
-  protected function useFixtureProviders() {
+  protected function useFixtureProviders(): void {
     $this->config('media.settings')
       ->set('oembed_providers_url', $this->getFixturesUrl() . '/providers.json')
       ->save();
@@ -49,7 +49,7 @@ trait OEmbedTestTrait {
    * For example, after calling this method, a request for foobar.html will
    * actually request http://test-site/path/to/fixtures/foobar.html.
    */
-  protected function lockHttpClientToFixtures() {
+  protected function lockHttpClientToFixtures(): void {
     $this->writeSettings([
       'settings' => [
         'http_client_config' => [
@@ -74,7 +74,7 @@ trait OEmbedTestTrait {
    *
    * This requires the media_test_oembed module in order to work.
    */
-  protected function hijackProviderEndpoints() {
+  protected function hijackProviderEndpoints(): void {
     $providers = $this->getFixturesDirectory() . '/providers.json';
     $providers = file_get_contents($providers);
     $providers = Json::decode($providers);
