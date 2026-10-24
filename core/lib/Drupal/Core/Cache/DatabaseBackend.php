@@ -8,6 +8,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\TableVerifyTrait;
 
 /**
  * Defines a default cache implementation.
@@ -18,6 +19,8 @@ use Drupal\Core\Database\DatabaseException;
  * @ingroup cache
  */
 class DatabaseBackend implements CacheBackendInterface {
+
+  use TableVerifyTrait;
 
   /**
    * The default maximum number of rows that this cache bin table can store.
@@ -115,6 +118,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function getMultiple(&$cids, $allow_invalid = FALSE) {
+    $this->verifyTableInTransaction($this->bin);
     $cid_mapping = [];
     foreach ($cids as $cid) {
       $cid_mapping[$this->normalizeCid($cid)] = $cid;
@@ -217,6 +221,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function setMultiple(array $items) {
+    $this->verifyTableInTransaction($this->bin);
     $try_again = FALSE;
     try {
       // The bin might not yet exist.
@@ -320,6 +325,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function deleteMultiple(array $cids) {
+    $this->verifyTableInTransaction($this->bin);
     $cids = array_values(array_map([$this, 'normalizeCid'], $cids));
     try {
       // Delete in chunks when a large array is passed.
@@ -343,6 +349,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function deleteAll() {
+    $this->verifyTableInTransaction($this->bin);
     try {
       $this->connection->truncate($this->bin)->execute();
     }
@@ -367,6 +374,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function invalidateMultiple(array $cids) {
+    $this->verifyTableInTransaction($this->bin);
     $cids = array_values(array_map([$this, 'normalizeCid'], $cids));
     try {
       // Update in chunks when a large array is passed.
@@ -387,6 +395,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function garbageCollection() {
+    $this->verifyTableInTransaction($this->bin);
     try {
       // Bounded size cache bin, using FIFO.
       if ($this->maxRows !== static::MAXIMUM_NONE) {
@@ -420,6 +429,11 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function removeBin() {
+    unset($this->verifiedTables[$this->bin]);
+    if ($this->verifyTableRequired() && !$this->connection->schema()->tableExists($this->bin)) {
+      // Nothing to drop, and a failing drop would abort the transaction.
+      return;
+    }
     try {
       $this->connection->schema()->dropTable($this->bin);
     }

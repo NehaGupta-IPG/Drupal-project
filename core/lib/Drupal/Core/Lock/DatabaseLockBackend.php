@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
+use Drupal\Core\Database\TableVerifyTrait;
 
 /**
  * Defines the database lock backend. This is the default backend in Drupal.
@@ -13,6 +14,8 @@ use Drupal\Core\Database\IntegrityConstraintViolationException;
  * @ingroup lock
  */
 class DatabaseLockBackend extends LockBackendAbstract {
+
+  use TableVerifyTrait;
 
   /**
    * The database table name.
@@ -41,8 +44,18 @@ class DatabaseLockBackend extends LockBackendAbstract {
 
   /**
    * {@inheritdoc}
+   *
+   * The lock backends keep their connection in $this->database.
+   */
+  protected function verifyTableConnection(): Connection {
+    return $this->database;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function acquire($name, $timeout = 30.0) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     $name = $this->normalizeName($name);
 
     // Insure that the timeout is at least 1 ms.
@@ -109,6 +122,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
    * {@inheritdoc}
    */
   public function lockMayBeAvailable($name) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     $name = $this->normalizeName($name);
 
     try {
@@ -141,6 +155,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
    * {@inheritdoc}
    */
   public function release($name) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     $name = $this->normalizeName($name);
 
     unset($this->locks[$name]);

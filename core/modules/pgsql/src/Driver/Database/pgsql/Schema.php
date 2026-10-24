@@ -228,6 +228,7 @@ EOD;
    *   The non-prefixed name of the table.
    */
   protected function resetTableInformation($table) {
+    $this->tableInformationVersion++;
     $key = $this->defaultSchema . '.' . $this->connection->getPrefix() . $table;
     unset($this->tableInformation[$key]);
   }
