@@ -184,7 +184,7 @@ class EntityViewsDataTest extends KernelTestBase {
     $this->assertFalse(isset($data['entity_test']['table']['defaults']));
 
     $this->assertFalse(isset($data['entity_test_mul_property_data']));
-    $this->assertFalse(isset($data['revision_table']));
+    $this->assertFalse(isset($data['field_revision_table']));
     $this->assertFalse(isset($data['revision_data_table']));
   }
 
@@ -220,7 +220,7 @@ class EntityViewsDataTest extends KernelTestBase {
     // Ensure the join information is set up properly.
     $this->assertCount(1, $base_views_data['table']['join']);
     $this->assertEquals(['entity_test_mul_property_data' => ['left_field' => 'id', 'field' => 'id', 'type' => 'INNER']], $base_views_data['table']['join']);
-    $this->assertFalse(isset($data['revision_table']));
+    $this->assertFalse(isset($data['field_revision_table']));
     $this->assertFalse(isset($data['revision_data_table']));
   }
 
@@ -229,7 +229,7 @@ class EntityViewsDataTest extends KernelTestBase {
    */
   public function testRevisionTableWithoutDataTable(): void {
     $entity_type = $this->baseEntityType
-      ->set('revision_table', 'entity_test_mulrev_revision')
+      ->set('field_revision_table', 'entity_test_mulrev_revision')
       ->set('revision_data_table', NULL)
       ->set('id', 'entity_test_mulrev')
       ->setKey('revision', 'revision_id');
@@ -269,7 +269,7 @@ class EntityViewsDataTest extends KernelTestBase {
   public function testRevisionTableWithRevisionDataTableAndDataTable(): void {
     $entity_type = $this->baseEntityType
       ->set('data_table', 'entity_test_mul_property_data')
-      ->set('revision_table', 'entity_test_mulrev_revision')
+      ->set('field_revision_table', 'entity_test_mulrev_revision')
       ->set('revision_data_table', 'entity_test_mulrev_property_revision')
       ->set('id', 'entity_test_mulrev')
       ->set('translatable', TRUE)
@@ -326,7 +326,7 @@ class EntityViewsDataTest extends KernelTestBase {
    */
   public function testRevisionTableWithRevisionDataTable(): void {
     $entity_type = $this->baseEntityType
-      ->set('revision_table', 'entity_test_mulrev_revision')
+      ->set('field_revision_table', 'entity_test_mulrev_revision')
       ->set('revision_data_table', 'entity_test_mulrev_property_revision')
       ->set('id', 'entity_test_mulrev')
       ->set('translatable', TRUE)
@@ -556,7 +556,7 @@ class EntityViewsDataTest extends KernelTestBase {
     $entity_type = $this->baseEntityType
       ->set('id', 'entity_test_mulrev')
       ->set('base_table', 'entity_test_mulrev')
-      ->set('revision_table', 'entity_test_mulrev_revision')
+      ->set('field_revision_table', 'entity_test_mulrev_revision')
       ->set('data_table', 'entity_test_mulrev_property_data')
       ->set('revision_data_table', 'entity_test_mulrev_property_revision')
       ->set('translatable', TRUE);

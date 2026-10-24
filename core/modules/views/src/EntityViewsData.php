@@ -336,11 +336,11 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
         ];
 
         if ($revisionable) {
-          $revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage_definition);
+          $field_revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage_definition);
 
-          $data[$revision_table]['table']['group'] = $this->t('@entity_type revision', ['@entity_type' => $this->entityType->getLabel()]);
-          $data[$revision_table]['table']['provider'] = $this->entityType->getProvider();
-          $data[$revision_table]['table']['join'][$views_revision_base_table] = [
+          $data[$field_revision_table]['table']['group'] = $this->t('@entity_type revision', ['@entity_type' => $this->entityType->getLabel()]);
+          $data[$field_revision_table]['table']['provider'] = $this->entityType->getProvider();
+          $data[$field_revision_table]['table']['join'][$views_revision_base_table] = [
             'left_field' => $revision_field,
             'field' => 'entity_id',
             'extra' => [
