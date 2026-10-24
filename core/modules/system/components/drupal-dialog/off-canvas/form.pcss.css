@@ -66,6 +66,10 @@
 
     padding-block: var(--off-canvas-padding);
 
+    &.dialog__titlebar-form {
+      padding-block: unset;
+    }
+
     & > *:first-child {
       margin-top: 0;
       padding-top: 0;

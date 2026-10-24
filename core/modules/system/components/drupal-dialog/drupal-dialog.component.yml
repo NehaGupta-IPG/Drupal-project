@@ -31,13 +31,11 @@ props:
     position:
       type: string
       title: Dialog position
-      description: Only used by core for off-canvas which is currently always set to 'side'.
+      description: Only used by core for off-canvas, defaults to 'side'.
       enum:
-        - default
         - top
-        - bottom
         - side
-      default: default
+      default: side
     dialog_classes:
       type: array
       title: Extra classes for the dialog tag

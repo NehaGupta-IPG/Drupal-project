@@ -1370,9 +1370,14 @@ services:
       - { name: render.main_content_renderer, format: drupal_htmx_dialog.modal }
   main_content_renderer.htmx_off_canvas:
     class: Drupal\Core\Render\MainContent\HtmxOffCanvasRenderer
-    arguments: [ '@title_resolver', '@renderer', '@render_cache', '%renderer.config%' ]
+    arguments: [ '@title_resolver', '@renderer', '@render_cache', '%renderer.config%', 'side' ]
     tags:
       - { name: render.main_content_renderer, format: drupal_htmx_dialog.off-canvas }
+  main_content_renderer.htmx_off_canvas_top:
+    class: Drupal\Core\Render\MainContent\HtmxOffCanvasRenderer
+    arguments: [ '@title_resolver', '@renderer', '@render_cache', '%renderer.config%', 'top' ]
+    tags:
+      - { name: render.main_content_renderer, format: drupal_htmx_dialog.off-canvas-top }
   main_content_renderer.ajax:
     class: Drupal\Core\Render\MainContent\AjaxRenderer
     arguments: ['@element_info', '@renderer']

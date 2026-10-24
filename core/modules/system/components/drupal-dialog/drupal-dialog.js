@@ -21,9 +21,17 @@
    */
   class DrupalDialog extends HTMLElement {
     adjustForDisplacement(dialog, removed = false) {
-      // Add the attributes needed by Drupal.displace.
-      const edge = document.documentElement.dir === 'rtl' ? 'left' : 'right';
       const dimensions = dialog.getBoundingClientRect();
+      const position = dialog.classList.contains('dialog--position-top')
+        ? 'top'
+        : 'side';
+      if (position === 'top') {
+        // No specific adjustment needed for top-positioned dialogs.
+        // This is swapped into the DOM before the main canvas.
+        return;
+      }
+      // Add the attributes needed by Drupal.displace.
+      let edge = document.documentElement.dir === 'rtl' ? 'left' : 'right';
       const offset = removed ? 0 : dimensions.width;
       dialog.setAttribute(`data-offset-${edge}`, offset);
       // Signal the displacement and calculate the CSS variables used
@@ -79,6 +87,11 @@
                 return;
               }
               if (!this.hasAttribute('data-persist')) this.remove();
+              if (
+                document.body.classList.contains('js-off-canvas-dialog-open')
+              ) {
+                document.body.classList.remove('js-off-canvas-dialog-open');
+              }
             },
             { signal },
           );
@@ -135,6 +148,8 @@
               signal.addEventListener('abort', () => {
                 this._resizeObserver?.disconnect();
               });
+              // Set the expected body class.
+              document.body.classList.add('js-off-canvas-dialog-open');
               break;
             }
             default:

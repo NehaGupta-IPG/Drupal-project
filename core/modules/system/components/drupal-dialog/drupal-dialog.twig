@@ -1,6 +1,14 @@
 {# cspell:ignore closedby #}
 {# cspell:ignore closerequest #}
 
+{# Setup web component attributes #}
+{% set web_component_attributes = create_attribute({
+  class: [
+    ('drupal_dialog--' ~ (variant === 'off-canvas' ? (variant ~ '-' ~ position) : variant)),
+  ],
+})
+%}
+
 {# Setup base attributes #}
 {# Additional classes will be set by variant. #}
 {% set attributes = create_attribute({
@@ -15,7 +23,7 @@
   })
 %}
 
-<drupal-dialog id="{{ id }}">
+<drupal-dialog id="{{ id }}" {{ web_component_attributes }}>
   {% if variant === 'off-canvas' %}
   {# Off canvas dialogs are in the layout and use a wrapper <div> #}
   <div id="drupal-off-canvas-wrapper" role="dialog" aria-describedby="drupal-off-canvas" {{ attributes.addClass([
@@ -37,7 +45,7 @@
   {% endif %}
     <div class="dialog__titlebar">
       <h2 id="{{ id -}}-title" class="dialog__title">{{ title }}</h2>
-      <form method="dialog">
+      <form method="dialog" class="dialog__titlebar-form">
         <button class="dialog__titlebar-close" aria-label="Close">
           Close
         </button>

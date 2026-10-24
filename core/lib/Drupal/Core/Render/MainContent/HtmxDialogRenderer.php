@@ -38,6 +38,11 @@ use Symfony\Component\HttpFoundation\Request;
 class HtmxDialogRenderer implements MainContentRendererInterface {
 
   /**
+   * The default swap strategy is to insert the dialog after the target element.
+   */
+  protected string $swapStrategy = 'afterend';
+
+  /**
    * Constructs a new HtmxRenderer.
    */
   public function __construct(
@@ -77,7 +82,7 @@ class HtmxDialogRenderer implements MainContentRendererInterface {
 </head>
 <body>
   <hx-partial hx-target="{{ dialog_target }}" hx-swap="delete"></hx-partial>
-  <hx-partial hx-target="body" hx-swap="beforeend">
+  <hx-partial hx-target="[data-off-canvas-main-canvas]" hx-swap="{{ swap_strategy }}">
     {{ dialog }}
   </hx-partial>
 </body>
@@ -88,6 +93,7 @@ HTMX_RESPONSE,
         'dialog' => $dialog,
         'dialog_target' => '#' . $dialogId,
         'placeholder_token' => $token,
+        'swap_strategy' => $this->swapStrategy,
       ],
     ];
     // Create placeholder strings for these keys.

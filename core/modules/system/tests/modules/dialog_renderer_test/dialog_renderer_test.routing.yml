@@ -46,7 +46,7 @@ dialog_renderer_test.modal_form:
   requirements:
     _access: 'TRUE'
 
-dialog_renderer_test.htmx_links:
+dialog_renderer_test.htmx_markup:
   path: '/htmx-dialog-test-markup'
   defaults:
     _controller: '\Drupal\dialog_renderer_test\Controller\HtmxDialogController::testMarkup'

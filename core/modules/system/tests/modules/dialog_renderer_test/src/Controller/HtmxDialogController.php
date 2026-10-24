@@ -75,6 +75,11 @@ class HtmxDialogController {
    *   Render array with links.
    */
   public function testMarkup() {
+    $build['content'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#value' => 'Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.',
+    ];
     $modalUrl = Url::fromUri('base:/htmx/dialog/modal/htmx-dialog-content');
     $build['normal_modal'] = [
       '#title' => 'Normal Modal',
@@ -89,7 +94,7 @@ class HtmxDialogController {
       '#type' => 'checkbox',
     ];
     (new Htmx())->get($modalUrl)
-      ->vals(['class' => 'dialog--narrow'])
+      ->vals(['class' => 'dialog--wide'])
       ->applyTo($build['styled_modal_single_class']);
 
     $defaultUrl = Url::fromUri('base:/htmx/dialog/default/htmx-dialog-content');
@@ -107,6 +112,14 @@ class HtmxDialogController {
     ];
     (new Htmx())->get($offCanvasUrl)
       ->applyTo($build['normal_off_canvas']);
+
+    $offCanvasTopUrl = Url::fromUri('base:/htmx/dialog/off-canvas-top/htmx-dialog-content', ['query' => ['position' => 'top']]);
+    $build['top_off_canvas'] = [
+      '#title' => 'Off-canvas top',
+      '#type' => 'checkbox',
+    ];
+    (new Htmx())->get($offCanvasTopUrl)
+      ->applyTo($build['top_off_canvas']);
 
     return $build;
   }
