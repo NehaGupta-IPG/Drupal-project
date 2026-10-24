@@ -1,0 +1,9 @@
+.admin-toolbar,
+.admin-menu {
+  visibility: hidden;
+}
+
+.page-wrapper,
+.dialog-off-canvas-main-canvas {
+  margin: unset !important;
+}

@@ -12,6 +12,8 @@ internal.navigation:
     theme:
       css/base/fonts.css: {}
       css/base/variables.css: {}
+      css/base/print.css: { media: print }
+      css/components/toolbar-button.css: {}
       css/components/admin-toolbar.css: {}
       css/components/top-bar.css: {}
       css/components/admin-toolbar-control-bar.css: {}
