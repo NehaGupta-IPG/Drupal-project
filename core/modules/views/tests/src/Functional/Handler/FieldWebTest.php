@@ -153,7 +153,7 @@ class FieldWebTest extends ViewTestBase {
    *   A list of beatle ids.
    */
   protected function clickSortLoadIdsFromOutput(): array {
-    $fields = $this->xpath("//td[contains(@class, 'views-field-id')]");
+    $fields = $this->getNodeElementsByXpath("//td[contains(@class, 'views-field-id')]");
     $ids = [];
     foreach ($fields as $field) {
       $ids[] = (int) $field->getText();
@@ -204,9 +204,8 @@ class FieldWebTest extends ViewTestBase {
    */
   protected function parseContent($content): ?\SimpleXMLElement {
     $htmlDom = Html::load($content);
-    $elements = simplexml_import_dom($htmlDom);
 
-    return $elements;
+    return simplexml_import_dom($htmlDom);
   }
 
   /**

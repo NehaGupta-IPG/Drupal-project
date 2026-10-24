@@ -38,15 +38,11 @@ class EntityLinksTest extends KernelTestBase {
 
   /**
    * The entity_links filter.
-   *
-   * @var \Drupal\filter\Plugin\Filter\EntityLinks
    */
   protected EntityLinks $filter;
 
   /**
    * The test logger.
-   *
-   * @var \ColinODell\PsrTestLogger\TestLogger
    */
   protected TestLogger $logger;
 
@@ -331,6 +327,22 @@ class EntityLinksTest extends KernelTestBase {
         ->setCacheContexts([])
         ->setCacheMaxAge(Cache::PERMANENT)
     );
+  }
+
+  /**
+   * Tests that an unresolvable entity link does not throw a fatal error.
+   */
+  public function testProcessLogsExceptionForUnresolvableEntityLink(): void {
+    $input = '<a data-entity-type="true" data-entity-uuid="not-a-real-uuid" href="/original">Link text</a>';
+
+    $result = $this->filter->process($input, 'en');
+
+    $this->assertInstanceOf(FilterProcessResult::class, $result);
+    $this->assertTrue($this->logger->hasRecords());
+    $processed = $result->getProcessedText();
+    $this->assertStringContainsString('data-entity-type="true"', $processed);
+    $this->assertStringContainsString('data-entity-uuid="not-a-real-uuid"', $processed);
+    $this->assertStringContainsString('href="/original"', $processed);
   }
 
   /**

@@ -27,29 +27,21 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
 
   /**
    * The root directory of the test project.
-   *
-   * @var string
    */
   private string $dir;
 
   /**
    * The exception expected in ::tearDown() of this test.
-   *
-   * @var \Exception
    */
   private \Exception $expectedTearDownException;
 
   /**
    * The Composer inspector service.
-   *
-   * @var \Drupal\package_manager\ComposerInspector
    */
   private ComposerInspector $inspector;
 
   /**
    * The original fixture package list at the start of the test.
-   *
-   * @var \Drupal\package_manager\InstalledPackagesList
    */
   private InstalledPackagesList $originalFixturePackages;
 
@@ -212,7 +204,7 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
    */
   public function testActiveManipulatorNoCommitError(): void {
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('commitChanges() must be called.');
+    $this->expectExceptionMessageIs('commitChanges() must be called.');
     (new ActiveFixtureManipulator())
       ->setVersion('drupal/core', '1.2.3');
   }

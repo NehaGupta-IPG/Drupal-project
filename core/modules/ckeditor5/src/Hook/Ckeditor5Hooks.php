@@ -27,6 +27,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\editor\EditorInterface;
 
@@ -352,41 +353,14 @@ class Ckeditor5Hooks {
     $translations_library = 'core/ckeditor5.translations';
     if (in_array($translations_library, $this->libraryDependencyResolver->getLibrariesWithDependencies($assets->getLibraries()), TRUE)
       || in_array($translations_library, $this->libraryDependencyResolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries()), TRUE)) {
-
-      // This file is used to get a weight that will make it possible to
-      // aggregate all translation files in a single aggregate.
-      $ckeditor_umd_file = 'core/assets/vendor/ckeditor5/ckeditor5.umd.js';
-      // Use the placeholder file weight to set all the translations files
-      // weights so they can be aggregated together as expected. Account for
-      // requests where the library is not loaded such as when during an AJAX
-      // request when it was already loaded via the main request. In these cases
-      // it is unlikely that multiple JavaScript aggregates will be created
-      // anyway since AJAX requests generally result in very few libraries being
-      // loaded.
-      $default_weight = $javascript[$placeholder_file]['weight'] ?? 0;
-      if (isset($javascript[$ckeditor_umd_file])) {
-        $default_weight = $javascript[$ckeditor_umd_file]['weight'];
-      }
-
-      $ckeditor5_language = $this->languageMapper->getMapping($language->getId());
       // Remove all CKEditor 5 translations files that are not in the current
       // language.
-      foreach ($javascript as $index => &$item) {
-        // This is not a CKEditor 5 translation file, skip it.
-        if (empty($item['ckeditor5_langcode'])) {
-          continue;
-        }
-        // This file is the correct translation for this page.
-        if ($item['ckeditor5_langcode'] === $ckeditor5_language) {
-          // Set the weight for the translation file to be able to have the
-          // translation files aggregated.
-          $item['weight'] = $default_weight;
-        }
-        else {
-          // Remove files that don't match the language requested.
-          unset($javascript[$index]);
-        }
-      }
+      $ckeditor5_language = $this->languageMapper->getMapping($language->getId());
+      $javascript = array_filter($javascript, function ($item) use ($ckeditor5_language) {
+        // Skip files that are not CKEditor5 translation files. Remove files
+        // that don't match the language requested.
+        return empty($item['ckeditor5_langcode']) || $item['ckeditor5_langcode'] === $ckeditor5_language;
+      });
     }
     // The placeholder file is not a real file, remove it from the list.
     unset($javascript[$placeholder_file]);
@@ -406,6 +380,16 @@ class Ckeditor5Hooks {
     $definitions['ckeditor5_valid_pair__format_and_editor']['mapping']['filters'] = $definitions['filter.format.*']['mapping']['filters'];
     // @see @see editor.editor.*.image_upload
     $definitions['ckeditor5_valid_pair__format_and_editor']['mapping']['image_upload'] = $definitions['editor.editor.*']['mapping']['image_upload'];
+  }
+
+  /**
+   * Implements hook_config_action_alter().
+   */
+  #[Hook('config_action_alter')]
+  public function configActionAlter(array &$definitions): void {
+    // Create a pluralized alias for the `addItemToToolbar` action.
+    $definitions['editor:addItemsToToolbar'] = $definitions['editor:addItemToToolbar'];
+    $definitions['editor:addItemsToToolbar']['admin_label'] = new TranslatableMarkup('Add multiple items to a CKEditor 5 toolbar');
   }
 
   /**

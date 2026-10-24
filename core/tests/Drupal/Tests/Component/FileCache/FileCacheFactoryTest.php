@@ -8,6 +8,7 @@ use Drupal\Component\FileCache\FileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\FileCache\NullFileCache;
 use Drupal\Component\Utility\Random;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,6 +20,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(FileCacheFactory::class)]
 #[Group('FileCache')]
 class FileCacheFactoryTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * {@inheritdoc}
@@ -64,9 +67,10 @@ class FileCacheFactoryTest extends TestCase {
    * Tests get no prefix.
    */
   public function testGetNoPrefix(): void {
+    // @phpstan-ignore argument.type
     FileCacheFactory::setPrefix(NULL);
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Required prefix configuration is missing');
+    $this->expectExceptionMessageIs('Required prefix configuration is missing');
     FileCacheFactory::get('test_foo_settings', []);
   }
 
