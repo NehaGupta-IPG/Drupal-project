@@ -643,7 +643,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
         // implementation getting the entity label.
         $views_field['argument']['id'] = 'entity_target_id';
         $views_field['argument']['target_entity_type_id'] = $entity_type_id;
-        $views_field['filter']['id'] = 'numeric';
+        $views_field['filter']['id'] = 'entity_reference';
         $views_field['sort']['id'] = 'standard';
       }
       else {
