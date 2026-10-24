@@ -153,7 +153,29 @@ class Style extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
    * {@inheritdoc}
    */
   public function getElementsSubset(): array {
-    return array_column($this->configuration['styles'], 'element');
+    // Create an object from the configuration to generate output.
+    $r = HTMLRestrictions::fromString(
+      implode(array_column($this->configuration['styles'], 'element'))
+    );
+
+    // The configuration is likely to have many entries for the same element.
+    // So, compute a list of elements with the merged attributes and values.
+    // F.e.: <foo bar>, <foo baz>, <foo class="fizz">, <foo class="buzz">
+    // would result in <foo bar baz class="fizz buzz">
+    $elements = $r->toCKEditor5ElementsArray();
+
+    // Drupal needs the plain tags as well, so compute a list of plain tags.
+    // @see \Drupal\ckeditor5\Plugin\CKEditor5Plugin\SourceEditing::getElementsSubset()
+    $plain_tags = $r->extractPlainTagsSubset()->toCKEditor5ElementsArray();
+
+    // Return a unique union of the "tags only" list and the full list.
+    // @see \Drupal\ckeditor5\Plugin\CKEditor5Plugin\SourceEditing::getElementsSubset()
+    $subset = array_unique(array_merge(
+      $plain_tags,
+      $elements,
+    ));
+
+    return $subset;
   }
 
   /**
