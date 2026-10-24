@@ -21,12 +21,14 @@
 
     Drupal.behaviors.navigation = {
       attach(context) {
+        console.log('hello');
         /**
          * Sidebar element with the `.admin-toolbar` class.
          *
          * @type {HTMLElement}
          */
         once('navigation', '.admin-toolbar', context).forEach((sidebar) => {
+          console.log('hello');
           const backButton = sidebar.querySelector(
             '[data-toolbar-back-control]',
           );

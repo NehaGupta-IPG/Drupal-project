@@ -85,6 +85,32 @@ final class NavigationRenderer {
         'max-age' => CacheBackendInterface::CACHE_PERMANENT,
       ],
       '#lazy_builder' => ['navigation.renderer:doBuildNavigation', []],
+      '#lazy_builder_preview' => [
+        [
+          '#attached' => [
+            'library' => [
+              'navigation/internal.navigation',
+            ],
+          ],
+          '#type' => 'html_tag',
+          '#tag' => 'aside',
+          '#attributes' => [
+            'class' => ['admin-toolbar'],
+            'id' => 'admin-toolbar',
+            'data-drupal-admin-styles' => TRUE,
+            'role' =>  'presentation',
+          ],
+          'child' => [
+            '#type' => 'html_tag',
+            '#tag' => 'div',
+            '#attributes' => [
+              'class' => ['admin-toolbar__displace-placeholder'],
+            ],
+            '#value' => t('loading'),
+          ],
+        ],
+      ],
+
       '#create_placeholder' => TRUE,
       // Prevent this placeholder being handled by Big Pipe.
       // @todo remove in https://www.drupal.org/project/drupal/issues/3505610
@@ -99,6 +125,7 @@ final class NavigationRenderer {
    */
   #[TrustedCallback]
   public function doBuildNavigation(): array {
+    sleep(30);
     $build = [];
     $logo_settings = $this->configFactory->get('navigation.settings');
     $logo_provider = $logo_settings->get('logo.provider');
