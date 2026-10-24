@@ -350,6 +350,7 @@ ckeditor5.fullscreen:
     assets/vendor/ckeditor5/fullscreen/fullscreen.js: { minified: true }
   dependencies:
     - core/ckeditor5
+    - core/ckeditor5.translations
 
 drupal:
   aggregate_target:
