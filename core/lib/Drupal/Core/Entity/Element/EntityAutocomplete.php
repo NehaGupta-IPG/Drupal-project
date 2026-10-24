@@ -136,12 +136,7 @@ class EntityAutocomplete extends Textfield {
    * Adds entity autocomplete functionality to a form element.
    *
    * @param array $element
-   *   The form element to process. Properties used:
-   *   - #target_type: The ID of the target entity type.
-   *   - #selection_handler: The plugin ID of the entity reference selection
-   *     handler.
-   *   - #selection_settings: An array of settings that will be passed to the
-   *     selection handler.
+   *   The form element to process.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
@@ -198,6 +193,13 @@ class EntityAutocomplete extends Textfield {
 
   /**
    * Form element validation handler for entity_autocomplete elements.
+   *
+   * @param array $element
+   *   The form element to process.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   * @param array $complete_form
+   *   The complete form structure.
    */
   public static function validateEntityAutocomplete(array &$element, FormStateInterface $form_state, array &$complete_form) {
     $value = NULL;

@@ -28,6 +28,17 @@ use Drupal\user\EntityOwnerInterface;
  * Also serves as a base class for specific types of Entity Reference
  * Selection plugins.
  *
+ * Plugin configuration must contain a key 'handler_settings' referencing an
+ * array. This array in turn may contain the keys:
+ * - auto_create: (Optional) The setting used to auto-create entities that
+ *   do not exist.
+ * - auto_create_bundle: (Optional) The bundle name for auto-created entities
+ *   must be specified, if auto_create is TRUE.
+ * - sort: (Optional) Array with 'field' and 'direction' keys, determining how results
+ *   will be sorted. Defaults to '_none'.
+ * - target_bundles: (Optional) Array of bundles to allow (omit to allow all bundles).
+ *
+ * @see \Drupal\Core\Entity\Element\EntityAutocomplete
  * @see \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager
  * @see \Drupal\Core\Entity\Annotation\EntityReferenceSelection
  * @see \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface
