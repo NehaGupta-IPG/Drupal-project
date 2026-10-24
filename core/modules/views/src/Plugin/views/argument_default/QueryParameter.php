@@ -26,6 +26,7 @@ class QueryParameter extends ArgumentDefaultPluginBase implements CacheableDepen
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['query_param'] = ['default' => ''];
+    $options['encode_slash'] = ['default' => FALSE];
     $options['fallback'] = ['default' => ''];
     $options['multiple'] = ['default' => 'and'];
 
@@ -42,6 +43,12 @@ class QueryParameter extends ArgumentDefaultPluginBase implements CacheableDepen
       '#title' => $this->t('Query parameter'),
       '#description' => $this->t('The query parameter to use.'),
       '#default_value' => $this->options['query_param'],
+    ];
+    $form['encode_slash'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Encode slashes in query parameter'),
+      '#description' => $this->t('Prevent errors during the URL generation.'),
+      '#default_value' => $this->options['encode_slash'],
     ];
     $form['fallback'] = [
       '#type' => 'textfield',
@@ -75,6 +82,11 @@ class QueryParameter extends ArgumentDefaultPluginBase implements CacheableDepen
       if (is_array($param)) {
         $conjunction = ($this->options['multiple'] == 'and') ? ',' : '+';
         $param = implode($conjunction, $param);
+      }
+
+      // Encode slashes included in parameters.
+      if (!empty($this->options['encode_slash'])) {
+        $param = strtr($param, '/', '%2F');
       }
 
       return $param;
