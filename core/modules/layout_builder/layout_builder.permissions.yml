@@ -2,8 +2,12 @@ configure any layout:
   title: 'Configure any layout'
   restrict access: true
 create and edit custom blocks:
-  title: 'Create and edit content blocks'
+  title: 'Create and edit all content blocks'
   description: 'Manage the single-use blocks within the Layout Builder'
+  restrict access: true
+create and edit accessible custom blocks:
+  title: 'Create and edit accessible content blocks'
+  description: 'Manage the single-use blocks that the current user has access to within the Layout Builder'
 
 permission_callbacks:
   - \Drupal\layout_builder\LayoutBuilderOverridesPermissions::permissions

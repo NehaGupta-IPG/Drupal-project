@@ -224,4 +224,20 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
     ], TRUE);
   }
 
+  /**
+   * Get a contextual link with given CSS selector and operation.
+   *
+   * @param string $selector
+   *   The selector for the element that contains the contextual link.
+   * @param string $link_locator
+   *   The link id, title, or text.
+   *
+   * @return \Behat\Mink\Element\NodeElement|null
+   *   The link or NULL if not found.
+   */
+  protected function getContextualLink($selector, $link_locator): ?NodeElement {
+    $element = $this->getSession()->getPage()->find('css', $selector);
+    return $element->findLink($link_locator);
+  }
+
 }
