@@ -7,6 +7,8 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
+use Drupal\layout_builder\TranslatableSectionStorageInterface;
 
 /**
  * A widget to display the layout form.
@@ -18,7 +20,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   id: 'layout_builder_widget',
   label: new TranslatableMarkup('Layout Builder Widget'),
   description: new TranslatableMarkup('A field widget for Layout Builder.'),
-  field_types: ['layout_section'],
+  field_types: ['layout_section', 'layout_translation'],
   multiple_values: TRUE,
 )]
 class LayoutBuilderWidget extends WidgetBase {
@@ -44,7 +46,19 @@ class LayoutBuilderWidget extends WidgetBase {
       return;
     }
 
-    $items->setValue($this->getSectionStorage($form_state)->getSections());
+    $field_name = $this->fieldDefinition->getName();
+    $section_storage = $this->getSectionStorage($form_state);
+    if ($field_name === OverridesSectionStorage::FIELD_NAME) {
+      $items->setValue($section_storage->getSections());
+    }
+    elseif ($field_name === OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME && $section_storage instanceof TranslatableSectionStorageInterface) {
+      // The translated configuration is stored in single value field because it
+      // stores configuration for components in all sections.
+      $items->set(0, $section_storage->getTranslatedConfiguration());
+    }
+    else {
+      throw new \LogicException("Widget used with unexpected field, $field_name for section storage: " . $section_storage->getStorageType());
+    }
   }
 
   /**
