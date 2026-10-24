@@ -87,11 +87,11 @@ interface UpdateFetcherInterface {
    *   \Drupal\update\UpdateManagerInterface::getProjects().
    * @param string $site_key
    *   The site key.
-   * @param bool|null $share_domain
-   *   Whether to share the site domain name, or NULL while undecided.
-   * @param bool|null $share_site_mail
-   *   Whether to share the site email address, or NULL while undecided.
+   * @param string|null $domain
+   *   The site domain name to share, or NULL to share none.
+   * @param string|null $site_mail
+   *   The site email address to share, or NULL to share none.
    */
-  public function sendSiteData(array $project, string $site_key, ?bool $share_domain, ?bool $share_site_mail): void;
+  public function sendSiteData(array $project, string $site_key, ?string $domain, ?string $site_mail): void;
 
 }

@@ -62,18 +62,24 @@ class UpdateFetcher implements UpdateFetcherInterface {
   /**
    * {@inheritdoc}
    */
-  public function sendSiteData(array $project, string $site_key, ?bool $share_domain, ?bool $share_site_mail): void {
-    global $base_url;
-
+  public function sendSiteData(array $project, string $site_key, ?string $domain, ?string $site_mail): void {
     if ($this->getFetchBaseUrl($project) !== static::UPDATE_DEFAULT_URL) {
       return;
     }
-    $query = array_filter([
-      'domain' => $share_domain === TRUE ? DataSharing::hostname($base_url) : NULL,
-      'site_mail' => $share_site_mail === TRUE ? $this->configFactory->get('system.site')->get('mail') : NULL,
-    ]);
-    if ($query) {
-      $this->doRequest(static::SITE_DATA_URL . '?' . http_build_query(['site_key' => $site_key] + $query), []);
+    $query = array_filter(['domain' => $domain, 'site_mail' => $site_mail]);
+    if (!$query) {
+      return;
+    }
+    $url = static::SITE_DATA_URL . '?' . http_build_query(['site_key' => $site_key] + $query);
+    try {
+      $response = $this->httpClient->get($url, ['http_errors' => FALSE]);
+      if ($response->getStatusCode() >= 400) {
+        $this->logger->notice('Sharing site data with Drupal.org failed with HTTP @status.', ['@status' => $response->getStatusCode()]);
+      }
+    }
+    catch (ClientExceptionInterface $e) {
+      // Network failures are not actionable by the site owner.
+      $this->logger->notice('Sharing site data with Drupal.org failed: @message', ['@message' => $e->getMessage()]);
     }
   }
 

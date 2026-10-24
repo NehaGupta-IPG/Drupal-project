@@ -9,9 +9,11 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\update\UpdateFetcher;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -70,10 +72,7 @@ class UpdateFetcherTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->mockConfigFactory = $this->getConfigFactoryStub([
-      'update.settings' => ['fetch_url' => 'http://www.example.com'],
-      'system.site' => ['mail' => 'admin@example.com'],
-    ]);
+    $this->mockConfigFactory = $this->getConfigFactoryStub(['update.settings' => ['fetch_url' => 'http://www.example.com']]);
     $this->mockHttpClient = $this->createStub(ClientInterface::class);
     $this->logger = new TestLogger();
     $this->updateFetcher = new UpdateFetcher($this->mockConfigFactory, $this->mockHttpClient, $this->logger);
@@ -160,10 +159,10 @@ class UpdateFetcherTest extends UnitTestCase {
   /**
    * Mocks the HTTP client.
    *
-   * @param \GuzzleHttp\Psr7\Response ...$responses
-   *   Variable number of Response objects that the mocked client should return.
+   * @param \GuzzleHttp\Psr7\Response|\Throwable ...$responses
+   *   Responses or exceptions that the mocked client should return.
    */
-  protected function mockClient(Response ...$responses): void {
+  protected function mockClient(Response|\Throwable ...$responses): void {
     // Create a mock and queue responses.
     $mock_handler = new MockHandler($responses);
     $handler_stack = HandlerStack::create($mock_handler);
@@ -205,12 +204,11 @@ class UpdateFetcherTest extends UnitTestCase {
    * Tests sending the site data the site owner chose to share.
    */
   #[DataProvider('providerTestSendSiteData')]
-  public function testSendSiteData(array $project, ?bool $share_domain, ?bool $share_site_mail, ?string $expected): void {
-    $GLOBALS['base_url'] = 'https://example.com/subdirectory';
+  public function testSendSiteData(array $project, ?string $domain, ?string $site_mail, ?string $expected): void {
     $this->mockClient(new Response(200));
     $update_fetcher = new UpdateFetcher($this->mockConfigFactory, $this->mockHttpClient, $this->logger);
 
-    $update_fetcher->sendSiteData($project, 'site_key', $share_domain, $share_site_mail);
+    $update_fetcher->sendSiteData($project, 'site_key', $domain, $site_mail);
     if ($expected === NULL) {
       $this->assertCount(0, $this->history);
     }
@@ -234,12 +232,42 @@ class UpdateFetcherTest extends UnitTestCase {
     $other_server['info']['project status url'] = 'https://www.example.com';
     $url = 'https://updates.drupal.org/site-data?site_key=site_key';
     return [
-      'domain only' => [$project, TRUE, FALSE, "$url&domain=example.com"],
-      'site mail only' => [$project, FALSE, TRUE, "$url&site_mail=admin%40example.com"],
-      'domain and site mail' => [$project, TRUE, TRUE, "$url&domain=example.com&site_mail=admin%40example.com"],
-      'undecided' => [$project, NULL, NULL, NULL],
-      'declined' => [$project, FALSE, FALSE, NULL],
-      'non-default update server' => [$other_server, TRUE, TRUE, NULL],
+      'domain only' => [$project, 'example.com', NULL, "$url&domain=example.com"],
+      'site mail only' => [$project, NULL, 'admin@example.com', "$url&site_mail=admin%40example.com"],
+      'domain and site mail' => [
+        $project,
+        'example.com',
+        'admin@example.com',
+        "$url&domain=example.com&site_mail=admin%40example.com",
+      ],
+      'nothing shared' => [$project, NULL, NULL, NULL],
+      'non-default update server' => [$other_server, 'example.com', 'admin@example.com', NULL],
+    ];
+  }
+
+  /**
+   * Tests that a failed site data request is logged as a notice.
+   */
+  #[DataProvider('providerTestSendSiteDataFailure')]
+  public function testSendSiteDataFailure(Response|ConnectException $result): void {
+    $this->mockClient($result);
+    $update_fetcher = new UpdateFetcher($this->mockConfigFactory, $this->mockHttpClient, $this->logger);
+
+    $update_fetcher->sendSiteData(['name' => 'drupal', 'info' => []], 'site_key', 'example.com', NULL);
+    $this->assertCount(1, $this->history);
+    $this->assertTrue($this->logger->hasNoticeRecords());
+    $this->assertFalse($this->logger->hasErrorRecords());
+  }
+
+  /**
+   * Provides test data for testSendSiteDataFailure().
+   */
+  public static function providerTestSendSiteDataFailure(): array {
+    return [
+      'HTTP 404' => [new Response(404)],
+      'network failure' => [
+        new ConnectException('Connection refused', new Request('GET', UpdateFetcher::SITE_DATA_URL)),
+      ],
     ];
   }
 
