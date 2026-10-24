@@ -24,6 +24,13 @@ class View extends AreaPluginBase {
   protected $isEmpty;
 
   /**
+   * The render array of the embedded view.
+   *
+   * @var array|null
+   */
+  protected ?array $output = NULL;
+
+  /**
    * The view storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
@@ -101,6 +108,12 @@ class View extends AreaPluginBase {
    * {@inheritdoc}
    */
   public function render($empty = FALSE) {
+    // Built by isEmpty() already.
+    if (isset($this->output)) {
+      return $this->output;
+    }
+    // Empty unless the embedded view is built below.
+    $this->isEmpty = TRUE;
     if (!empty($this->options['view_to_insert'])) {
       [$view_name, $display_id] = explode(':', $this->options['view_to_insert']);
 
@@ -142,12 +155,11 @@ class View extends AreaPluginBase {
    * {@inheritdoc}
    */
   public function isEmpty() {
-    if (isset($this->isEmpty)) {
-      return $this->isEmpty;
+    // If isEmpty not set, render output, which sets it.
+    if (!isset($this->isEmpty)) {
+      $this->output = $this->render();
     }
-    else {
-      return parent::isEmpty();
-    }
+    return $this->isEmpty;
   }
 
   /**
