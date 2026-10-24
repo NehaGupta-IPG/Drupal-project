@@ -2,9 +2,12 @@
 
 namespace Drupal\Core\Database;
 
+use Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException;
+use Drupal\Core\Database\Exception\SchemaTableDoesNotExistException;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\SchemaObject;
 use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
 
 /**
@@ -46,6 +49,13 @@ abstract class Schema implements PlaceholderInterface {
    */
   protected $uniqueIdentifier;
 
+  /**
+   * The map of database objects in the schema.
+   *
+   * @var array{'Table'?,array<string,1>}
+   */
+  protected $objects;
+
   public function __construct($connection) {
     $this->uniqueIdentifier = bin2hex(random_bytes(12));
     $this->connection = $connection;
@@ -56,6 +66,77 @@ abstract class Schema implements PlaceholderInterface {
    */
   public function __clone() {
     $this->uniqueIdentifier = bin2hex(random_bytes(12));
+  }
+
+  /**
+   * Introspect the list of available database objects.
+   *
+   * The list is cached for the duration of the request. Schema operations
+   * adding/renaming/removing database objects adjust the list.
+   *
+   * @param bool $reload
+   *   If TRUE, reloads the objects from the database even if already cached.
+   */
+  protected function fetchObjects(bool $reload = FALSE): void {
+    if ($this->objects && !$reload) {
+      return;
+    }
+    // Load tables.
+    $this->objects[SchemaObject::Table->value] = $this->findTables('%');
+  }
+
+  /**
+   * Determines if a database object exists in the schema.
+   *
+   * @param string $name
+   *   The name of the object to find.
+   * @param ?SchemaObject $objectType
+   *   (Optional) The type of object to find, or NULL not to restrict.
+   *
+   * @return SchemaObject|false
+   *   The type of the object found, or FALSE if not found.
+   */
+  public function hasObject(string $name, ?SchemaObject $objectType = NULL): SchemaObject|false {
+    $this->fetchObjects();
+    if ($objectType) {
+      $matchable[$objectType->value] = $this->objects[$objectType->value] ?? [];
+    }
+    else {
+      $matchable = $this->objects;
+    }
+    foreach ($matchable as $type => $list) {
+      if (isset($list[$name])) {
+        return SchemaObject::from($type);
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Tracks that a database object is added to the schema.
+   *
+   * @param string $name
+   *   The name of the object to find.
+   * @param SchemaObject $objectType
+   *   The type of object to find, or NULL not to restrict.
+   */
+  protected function addObject(string $name, SchemaObject $objectType): void {
+    $this->objects[$objectType->value][$name] = 1;
+  }
+
+  /**
+   * Tracks that a database object is removed from the schema.
+   *
+   * @param string $name
+   *   The name of the object to find.
+   * @param ?SchemaObject $objectType
+   *   (Optional) The type of object to find, or NULL not to restrict.
+   */
+  protected function removeObject(string $name, ?SchemaObject $objectType = NULL): void {
+    $foundObjectType = $this->hasObject($name, $objectType);
+    if ($foundObjectType) {
+      unset($this->objects[$foundObjectType->value][$name]);
+    }
   }
 
   /**
@@ -308,9 +389,9 @@ abstract class Schema implements PlaceholderInterface {
    * @param string $new_name
    *   The new name for the table.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableDoesNotExistException
    *   If the specified table doesn't exist.
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException
    *   If a table with the specified new name already exists.
    */
   abstract public function renameTable($table, $new_name);
@@ -549,14 +630,14 @@ abstract class Schema implements PlaceholderInterface {
    *   A schema array with the following keys: 'primary key', 'unique keys' and
    *   'indexes', and values as arrays of database columns.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableDoesNotExistException
    *   If the specified table doesn't exist.
    * @throws \RuntimeException
    *   If the driver does not implement this method.
    */
   protected function introspectIndexSchema($table) {
     if (!$this->tableExists($table)) {
-      throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
+      throw new SchemaTableDoesNotExistException("The table $table doesn't exist.");
     }
     throw new \RuntimeException("The '{$this->connection->driver()}' database driver does not implement " . __METHOD__);
   }
@@ -636,14 +717,22 @@ abstract class Schema implements PlaceholderInterface {
    * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
    *   A Schema definition.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException
    *   If any of the specified tables already exists.
    * @throws \BadMethodCallException
    *   When concrete driver class is missing implementations.
    */
   final public function createSchemaFromDefinition(SchemaDefinition $schema): void {
     foreach ($schema->tables as $table) {
-      $this->createTableFromDefinition($schema->type, $schema->name, $table);
+      try {
+        if (!$this->hasObject($table->name, SchemaObject::Table)) {
+          $this->createTableFromDefinition($schema->type, $schema->name, $table);
+        }
+      }
+      catch (SchemaTableAlreadyExistsException) {
+        // If the table already exists, we are fine; reload database objects.
+        $this->fetchObjects(TRUE);
+      }
     }
   }
 
@@ -657,7 +746,7 @@ abstract class Schema implements PlaceholderInterface {
    * @param \Drupal\Core\Database\SchemaDefinition\Table $table
    *   The table definition.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException
    *   If the specified table already exists.
    * @throws \BadMethodCallException
    *   When concrete driver class is missing implementations.
@@ -674,19 +763,23 @@ abstract class Schema implements PlaceholderInterface {
    * @param array $table
    *   A Schema API table definition array.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws \Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException
    *   If the specified table already exists.
    * @throws \BadMethodCallException
    *   When ::createTableSql() is not implemented in the concrete driver class.
    */
   public function createTable($name, $table) {
     if ($this->tableExists($name)) {
-      throw new SchemaObjectExistsException("Table '$name' already exists.");
+      throw new SchemaTableAlreadyExistsException("Table '$name' already exists.");
     }
+    $this->fetchObjects();
+
     $statements = $this->createTableSql($name, $table);
     foreach ($statements as $statement) {
       $this->executeDdlStatement($statement);
     }
+
+    $this->addObject($name, SchemaObject::Table);
   }
 
   /**

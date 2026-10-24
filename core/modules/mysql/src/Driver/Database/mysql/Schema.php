@@ -3,9 +3,12 @@
 namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Database\Exception\SchemaTableAlreadyExistsException;
+use Drupal\Core\Database\Exception\SchemaTableDoesNotExistException;
 use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaDefinition\SchemaObject;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectExistsException;
@@ -389,26 +392,33 @@ class Schema extends DatabaseSchema {
    * {@inheritdoc}
    */
   public function renameTable($table, $new_name) {
+    $this->fetchObjects();
     if (!$this->tableExists($table)) {
-      throw new SchemaObjectDoesNotExistException("Cannot rename '$table' to '$new_name': table '$table' doesn't exist.");
+      throw new SchemaTableDoesNotExistException("Cannot rename '$table' to '$new_name': table '$table' doesn't exist.");
     }
     if ($this->tableExists($new_name)) {
-      throw new SchemaObjectExistsException("Cannot rename '$table' to '$new_name': table '$new_name' already exists.");
+      throw new SchemaTableAlreadyExistsException("Cannot rename '$table' to '$new_name': table '$new_name' already exists.");
     }
 
     $info = $this->getPrefixInfo($new_name);
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} RENAME TO [' . $info['table'] . ']');
+
+    $this->removeObject($table, SchemaObject::Table);
+    $this->addObject($info['table'], SchemaObject::Table);
   }
 
   /**
    * {@inheritdoc}
    */
   public function dropTable($table) {
+    $this->fetchObjects();
     if (!$this->tableExists($table)) {
       return FALSE;
     }
 
     $this->executeDdlStatement('DROP TABLE {' . $table . '}');
+
+    $this->removeObject($table, SchemaObject::Table);
     return TRUE;
   }
 
@@ -616,7 +626,7 @@ class Schema extends DatabaseSchema {
    */
   protected function introspectIndexSchema($table) {
     if (!$this->tableExists($table)) {
-      throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
+      throw new SchemaTableDoesNotExistException("The table $table doesn't exist.");
     }
 
     $index_schema = [

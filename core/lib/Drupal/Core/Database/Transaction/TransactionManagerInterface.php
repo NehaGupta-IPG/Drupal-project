@@ -107,8 +107,6 @@ interface TransactionManagerInterface {
    * @param string $id
    *   The id of the transaction.
    *
-   * @throws \Drupal\Core\Database\TransactionNoActiveException
-   *   If there is no active client connection.
    * @throws \Drupal\Core\Database\TransactionOutOfOrderException
    *   If the order of rollback is not in reverse sequence against the pushes
    *   to the stack.
