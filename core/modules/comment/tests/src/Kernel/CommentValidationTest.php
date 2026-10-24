@@ -96,8 +96,8 @@ class CommentValidationTest extends EntityKernelTestBase {
     $violations = $comment->validate();
     $this->assertCount(0, $violations, 'No violations when validating a default comment.');
 
-    $comment->set('subject', $this->randomString(65));
-    $this->assertLengthViolation($comment, 'subject', 64);
+    $comment->set('subject', $this->randomString(256));
+    $this->assertLengthViolation($comment, 'subject', 255);
 
     // Make the subject valid.
     $comment->set('subject', $this->randomString());

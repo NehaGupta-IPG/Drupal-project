@@ -262,7 +262,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
     $fields['subject'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Subject'))
       ->setTranslatable(TRUE)
-      ->setSetting('max_length', 64)
+      ->setSetting('max_length', 255)
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         // Default comment body field has weight 20.

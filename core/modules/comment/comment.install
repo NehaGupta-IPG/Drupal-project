@@ -132,3 +132,26 @@ function comment_schema(): Schema {
 function comment_update_last_removed(): int {
   return 10100;
 }
+
+/**
+ * Increase max length of comment subject field to 255.
+ */
+function comment_update_10200(&$sandbox = NULL): void {
+  $connection = \Drupal::database();
+  if ($connection->schema()->tableExists('comment_field_data')) {
+    $new = [
+      'type' => 'varchar',
+      'not null' => FALSE,
+      'default' => '',
+      'length' => 255,
+      'description' => 'The subject of the comment.',
+    ];
+    $connection->schema()->changeField('comment_field_data', 'subject', 'subject', $new);
+  }
+
+  $entityDefinitionUpdateManager = \Drupal::entityDefinitionUpdateManager();
+  $fieldStorageDefinition = $entityDefinitionUpdateManager->getFieldStorageDefinition('subject', 'comment');
+  $fieldStorageDefinition->setSetting('max_length', 255);
+  $entityDefinitionUpdateManager->updateFieldStorageDefinition($fieldStorageDefinition);
+
+}
