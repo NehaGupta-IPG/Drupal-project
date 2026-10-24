@@ -105,7 +105,7 @@ function system_post_update_implement_schema_for_hide_untranslated_menu_links(&$
 
   \Drupal::classResolver(ConfigEntityUpdater::class)
     ->update($sandbox, 'block', function (BlockInterface $block) {
-      if (strpos($block->getPluginId(), 'menu_block:') === 0) {
+      if (strpos($block->getPluginId(), 'system_menu_block:') === 0) {
         $block_settings = $block->get('settings');
         $block_settings['hide_untranslated_menu_links'] = (bool) $block_settings['hide_untranslated_menu_links'];
         $block->set('settings', $block_settings);
