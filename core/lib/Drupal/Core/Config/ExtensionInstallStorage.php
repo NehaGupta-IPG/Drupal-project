@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config;
 
+use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Extension\ExtensionDiscovery;
 
 /**
@@ -52,7 +53,9 @@ class ExtensionInstallStorage extends InstallStorage {
    *   The current installation profile.
    */
   public function __construct(StorageInterface $config_storage, $directory, $collection, $include_profile, $profile) {
-    parent::__construct($directory, $collection);
+    $this->directory = $directory;
+    $this->collection = $collection;
+    $this->fileCache = FileCacheFactory::get('extension_config');
     $this->configStorage = $config_storage;
     $this->includeProfile = $include_profile;
     $this->installProfile = $profile;
