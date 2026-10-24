@@ -22,6 +22,11 @@ class ScaleImageEffect extends ResizeImageEffect {
    * {@inheritdoc}
    */
   public function applyEffect(ImageInterface $image) {
+    // Prevent downscaling if only upscaling is allowed and the image is bigger
+    // than the minimal requirements.
+    if ($this->configuration['upscale_only'] && ((!empty($this->configuration['width']) && $this->configuration['width'] < $image->getWidth()) || (!empty($this->configuration['height']) && $this->configuration['height'] < $image->getHeight()))) {
+      return TRUE;
+    }
     if (!$image->scale($this->configuration['width'], $this->configuration['height'], $this->configuration['upscale'])) {
       $this->logger->error('Image scale failed using the %toolkit toolkit on %path (%mimetype, %dimensions)', [
         '%toolkit' => $image->getToolkitId(),
@@ -62,6 +67,7 @@ class ScaleImageEffect extends ResizeImageEffect {
   public function defaultConfiguration() {
     return parent::defaultConfiguration() + [
       'upscale' => FALSE,
+      'upscale_only' => FALSE,
     ];
   }
 
