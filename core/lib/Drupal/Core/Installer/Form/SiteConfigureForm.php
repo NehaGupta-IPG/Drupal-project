@@ -5,6 +5,7 @@ namespace Drupal\Core\Installer\Form;
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -38,6 +39,8 @@ class SiteConfigureForm extends ConfigFormBase {
    *   The value of the 'security.enable_super_user' container parameter.
    * @param \Composer\Autoload\ClassLoader $classLoader
    *   The class loader.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   *   The module extension list.
    */
   public function __construct(
     protected $root,
@@ -47,6 +50,7 @@ class SiteConfigureForm extends ConfigFormBase {
     protected UserNameValidator $userNameValidator,
     protected bool $superUserAccessPolicy,
     protected ClassLoader $classLoader,
+    protected ModuleExtensionList $moduleExtensionList,
   ) {}
 
   /**
@@ -64,6 +68,7 @@ class SiteConfigureForm extends ConfigFormBase {
       // \Drupal\Core\DependencyInjection\Compiler\SuperUserAccessPolicyPass.
       $container->getParameter('security.enable_super_user') ?? TRUE,
       $container->get('class_loader'),
+      $container->get('extension.list.module'),
     );
   }
 
@@ -196,7 +201,9 @@ class SiteConfigureForm extends ConfigFormBase {
     ];
 
     // Update Status is not installed yet, so its classes are not autoloadable.
-    $this->classLoader->addPsr4('Drupal\\update\\', $this->root . '/core/modules/update/src');
+    if (!isset($this->classLoader->getPrefixesPsr4()['Drupal\\update\\'])) {
+      $this->classLoader->addPsr4('Drupal\\update\\', $this->root . '/' . $this->moduleExtensionList->get('update')->getPath() . '/src');
+    }
     $form['update_notifications'] = [
       '#type' => 'fieldset',
       '#attributes' => ['class' => ['fieldgroup']],
