@@ -2,11 +2,17 @@
 
 namespace Drupal\update;
 
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\ConfigTarget;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configure update settings for this site.
@@ -14,6 +20,29 @@ use Drupal\Core\Form\FormStateInterface;
  * @internal
  */
 class UpdateSettingsForm extends ConfigFormBase {
+
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected StateInterface $state,
+    protected TimeInterface $time,
+    protected DateFormatterInterface $dateFormatter,
+    TypedConfigManagerInterface $typedConfigManager,
+  ) {
+    parent::__construct($config_factory, $typedConfigManager);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('state'),
+      $container->get('datetime.time'),
+      $container->get('date.formatter'),
+      $container->get('config.typed'),
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -33,8 +62,6 @@ class UpdateSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    global $base_url;
-
     $form['update_check_frequency'] = [
       '#type' => 'radios',
       '#title' => $this->t('Check for updates'),
@@ -58,18 +85,19 @@ class UpdateSettingsForm extends ConfigFormBase {
     $form['data_sharing'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Data sharing with Drupal.org'),
+      '#description_display' => 'before',
     ];
-    $ends = DataSharing::noticeEndsAt(\Drupal::state());
+    $ends = DataSharing::noticeEndsAt($this->state);
     if ($ends && DataSharing::isUndecided($this->config('update.settings'))) {
-      $date = \Drupal::service('date.formatter')->format($ends, 'custom', 'Y-M-d');
-      $form['data_sharing']['#description'] = DataSharing::noticeEnded(\Drupal::state(), \Drupal::time())
+      $date = $this->dateFormatter->format($ends, 'custom', 'Y-M-d');
+      $form['data_sharing']['#description'] = DataSharing::noticeEnded($this->state, $this->time)
         ? $this->t('No choice has been saved. The settings shown have applied since @date.', ['@date' => $date])
         : $this->t('No choice has been saved. The settings shown apply from @date.', ['@date' => $date]);
     }
     $form['data_sharing']['update_share_domain'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Share the site domain name with Drupal.org'),
-      '#description' => $this->t('The value that would be shared: @hostname', ['@hostname' => DataSharing::hostname($base_url)]),
+      '#description' => $this->t('The value that would be shared: @hostname', ['@hostname' => $this->getRequest()->getHost()]),
       '#config_target' => new ConfigTarget(
         'update.settings',
         'data_sharing.domain',

@@ -132,6 +132,8 @@ class UpdateSettingsFormTest extends BrowserTestBase {
 
     $this->drupalGet('admin/reports/updates/settings');
     $this->assertSession()->pageTextContains('The settings shown have applied since');
+    $fieldset = $this->assertSession()->elementExists('css', '#edit-data-sharing')->getHtml();
+    $this->assertLessThan(strpos($fieldset, 'edit-update-share-domain'), strpos($fieldset, 'edit-data-sharing--description'));
     $this->submitForm([], 'Save configuration');
     $this->assertTrue($this->config('update.settings')->get('data_sharing.domain'));
     $this->assertFalse($this->config('update.settings')->get('data_sharing.site_mail'));
