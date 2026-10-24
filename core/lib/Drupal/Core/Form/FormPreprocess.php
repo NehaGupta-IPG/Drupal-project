@@ -351,7 +351,6 @@ class FormPreprocess {
     $variables['attributes'] = $element['#attributes'];
     $variables['summary_attributes'] = new Attribute($element['#summary_attributes']);
     if (!empty($element['#title'])) {
-      $variables['summary_attributes']['role'] = 'button';
       if (!empty($element['#attributes']['id'])) {
         $variables['summary_attributes']['aria-controls'] = $element['#attributes']['id'];
       }
