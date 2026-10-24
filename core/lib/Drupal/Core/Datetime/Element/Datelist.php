@@ -264,6 +264,11 @@ class Datelist extends DateElementBase {
         '#error_no_message' => FALSE,
         '#empty_option' => $title,
       ];
+
+      // Allow `#title_display` override for parts.
+      if (!empty($element["#date_{$part}_part_title_display"])) {
+        $element[$part]['#title_display'] = $element["#date_{$part}_part_title_display"];
+      }
     }
 
     // Allows custom callbacks to alter the element.
