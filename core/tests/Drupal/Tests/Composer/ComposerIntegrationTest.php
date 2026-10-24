@@ -7,7 +7,7 @@ namespace Drupal\Tests\Composer;
 use Drupal\Composer\Plugin\VendorHardening\Config;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
-use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Finder\Finder;
@@ -16,7 +16,7 @@ use Symfony\Component\Finder\Finder;
  * Tests Composer integration.
  */
 #[Group('Composer')]
-#[CoversTrait(ComposerIntegrationTrait::class)]
+#[CoversNothing]
 class ComposerIntegrationTest extends UnitTestCase {
 
   use ComposerIntegrationTrait;

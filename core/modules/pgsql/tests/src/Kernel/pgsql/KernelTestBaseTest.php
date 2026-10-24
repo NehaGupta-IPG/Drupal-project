@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
 use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
-use Drupal\KernelTests\KernelTestBase;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\KernelTests\KernelTestBase.
  */
-#[CoversClass(KernelTestBase::class)]
+#[CoversNothing]
 #[Group('KernelTests')]
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]

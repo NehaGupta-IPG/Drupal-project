@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\migrate_high_water_test\Plugin\migrate\source\HighWaterTest;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the high water handling.
  */
-#[CoversClass(HighWaterTest::class)]
+#[CoversNothing]
 #[Group('migrate')]
 #[RunTestsInSeparateProcesses]
 class HighWaterNotJoinableTest extends MigrateSqlSourceTestBase {
@@ -23,6 +23,13 @@ class HighWaterNotJoinableTest extends MigrateSqlSourceTestBase {
   protected static $modules = [
     'migrate_high_water_test',
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getPluginClass(): string {
+    return HighWaterTest::class;
+  }
 
   /**
    * {@inheritdoc}

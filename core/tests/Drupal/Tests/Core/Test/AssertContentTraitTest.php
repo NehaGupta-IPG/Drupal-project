@@ -6,13 +6,13 @@ namespace Drupal\Tests\Core\Test;
 
 use Drupal\KernelTests\AssertContentTrait;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Drupal\KernelTests\AssertContentTrait.
  */
-#[CoversTrait(AssertContentTrait::class)]
+#[CoversNothing]
 #[Group('Test')]
 class AssertContentTraitTest extends UnitTestCase {
 

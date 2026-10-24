@@ -10,7 +10,7 @@ use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Exception\InvalidDeriverException;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -18,7 +18,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * Unit tests for the derivative discovery decorator.
  */
-#[CoversClass(DerivativeDiscoveryDecorator::class)]
+#[CoversNothing]
 #[Group('Plugin')]
 class DerivativeDiscoveryDecoratorTest extends UnitTestCase {
 
