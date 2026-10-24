@@ -6,6 +6,7 @@ use Drupal\Component\Datetime\DateTimePlus;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\PageCache\RequestPolicyInterface;
@@ -44,19 +45,16 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    */
   protected const string RESPONSE_HEADER_CACHE_ITEM_SEPARATOR = ' ';
 
-  /**
-   * A config object for the system performance configuration.
-   *
-   * @var \Drupal\Core\Config\Config
-   */
-  protected $config;
+  protected Config $config {
+    get => $this->configFactory->get('system.performance');
+  }
 
   /**
    * Constructs a FinishResponseSubscriber object.
    *
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager object for retrieving the correct language code.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   A config factory for retrieving required config objects.
    * @param \Drupal\Core\PageCache\RequestPolicyInterface $requestPolicy
    *   A policy rule determining the cacheability of a request.
@@ -71,15 +69,13 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    */
   public function __construct(
     protected LanguageManagerInterface $languageManager,
-    ConfigFactoryInterface $config_factory,
+    protected ConfigFactoryInterface $configFactory,
     protected RequestPolicyInterface $requestPolicy,
     protected ResponsePolicyInterface $responsePolicy,
     protected CacheContextsManager $cacheContextsManager,
     protected TimeInterface $time,
     protected bool $debugCacheabilityHeaders = FALSE,
-  ) {
-    $this->config = $config_factory->get('system.performance');
-  }
+  ) {}
 
   /**
    * Sets extra headers on any responses, also subrequest ones.
