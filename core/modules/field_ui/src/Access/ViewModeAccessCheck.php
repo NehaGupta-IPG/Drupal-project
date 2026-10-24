@@ -62,7 +62,11 @@ class ViewModeAccessCheck implements AccessInterface {
     if ($entity_type_id = $route->getDefault('entity_type_id')) {
       if (empty($bundle)) {
         $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
-        $bundle = $route_match->getRawParameter($entity_type->getBundleEntityType());
+        // Entity types with a bundle key but without a bundle entity type (for
+        // example menu_link_content) have no bundle route parameter.
+        if ($bundle_entity_type = $entity_type->getBundleEntityType()) {
+          $bundle = $route_match->getRawParameter($bundle_entity_type);
+        }
       }
 
       $visibility = FALSE;
