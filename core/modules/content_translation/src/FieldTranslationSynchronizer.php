@@ -219,7 +219,10 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
     // for each column.
     for ($delta = 0; $delta < $total; $delta++) {
       foreach (['old' => $unchanged_items, 'new' => $source_items] as $key => $items) {
-        if ($item_id = $this->itemHash($items, $delta, $properties)) {
+        // The item hash may be an empty string even if the item exists,  so we
+        // explicitly check that the item exists.
+        if (isset($items[$delta])) {
+          $item_id = $this->itemHash($items, $delta, $properties);
           $change_map[$item_id][$key][] = $delta;
         }
       }
@@ -252,7 +255,8 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
           $old_delta = NULL;
           $new_delta = NULL;
 
-          if ($item_id = $this->itemHash($source_items, $delta, $properties)) {
+          if (isset($source_items[$delta])) {
+            $item_id = $this->itemHash($source_items, $delta, $properties);
             if (!empty($change_map[$item_id]['old'])) {
               $old_delta = array_shift($change_map[$item_id]['old']);
             }
@@ -329,7 +333,9 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
    *   An array of column names to be synchronized.
    *
    * @return string
-   *   A hash code that can be used to identify the item.
+   *   A hash code that can be used to identify the item. This is an empty
+   *   string when the item does not exist, or when a single property is
+   *   synchronized and its value is empty.
    */
   protected function itemHash(array $items, $delta, array $properties) {
     $values = [];

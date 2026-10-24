@@ -6,6 +6,7 @@ namespace Drupal\Tests\content_translation\Kernel;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\field\Entity\FieldConfig;
@@ -456,6 +457,79 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
   }
 
   /**
+   * Checks that items are retained when synchronized properties are empty.
+   */
+  public function testFileFieldSynchronizationWithEmptyValues(): void {
+    $entity_type_id = 'entity_test_mulrev';
+    $file_field_name = 'file_field';
+
+    FieldStorageConfig::create([
+      'field_name' => $file_field_name,
+      'type' => 'file',
+      'entity_type' => $entity_type_id,
+      'cardinality' => 2,
+      'translatable' => 1,
+    ])->save();
+
+    $field_config = FieldConfig::create([
+      'entity_type' => $entity_type_id,
+      'field_name' => $file_field_name,
+      'bundle' => $entity_type_id,
+      'label' => 'Synchronized file field',
+      'translatable' => 1,
+    ]);
+    // Only the description is synchronized across translations.
+    $field_config->setThirdPartySetting('content_translation', 'translation_sync', [
+      'target_id' => 'target_id',
+      'display' => 'display',
+      'description' => 0,
+    ]);
+    $field_config->save();
+
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    $entity = EntityTestMulRev::create([
+      'uid' => 1,
+      'langcode' => 'en',
+      $file_field_name => [
+        ['target_id' => 1, 'description' => '', 'display' => 1],
+        ['target_id' => 2, 'description' => 'Description', 'display' => 1],
+      ],
+    ]);
+    $entity->save();
+
+    // Create a translation referencing different files.
+    $it_translation = $entity->addTranslation('it', $entity->toArray());
+    $it_translation->get($file_field_name)[0]->target_id = 3;
+    $it_translation->get($file_field_name)[1]->target_id = 4;
+    $metadata = $this->contentTranslationManager->getTranslationMetadata($it_translation);
+    $metadata->setSource('en');
+    $it_translation->save();
+
+    $entity = $this->storage->loadUnchanged($entity->id());
+    $this->assertFileFieldValues([1, 2], $entity->getTranslation('en')->get($file_field_name));
+    $this->assertFileFieldValues([3, 4], $entity->getTranslation('it')->get($file_field_name));
+
+    // Update the translation and check that the original items are retained.
+    $it_translation = $entity->getTranslation('it');
+    $it_translation->get($file_field_name)[0]->target_id = 5;
+    $it_translation->save();
+
+    $entity = $this->storage->loadUnchanged($entity->id());
+    $this->assertFileFieldValues([1, 2], $entity->getTranslation('en')->get($file_field_name));
+    $this->assertFileFieldValues([5, 4], $entity->getTranslation('it')->get($file_field_name));
+
+    // Swap the items in the original language and check that the translation
+    // items are reordered accordingly.
+    $en_translation = $entity->getTranslation('en');
+    $en_translation->set($file_field_name, array_reverse($en_translation->get($file_field_name)->getValue()));
+    $en_translation->save();
+
+    $entity = $this->storage->loadUnchanged($entity->id());
+    $this->assertFileFieldValues([2, 1], $entity->getTranslation('en')->get($file_field_name));
+    $this->assertFileFieldValues([4, 5], $entity->getTranslation('it')->get($file_field_name));
+  }
+
+  /**
    * Tests changing the default language of an entity.
    */
   public function testChangeDefaultLanguageNonTranslatableFieldsHidden(): void {
@@ -578,6 +652,20 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
       $this->assertEquals($target_id_it, $it_translation->get($this->fieldName)->target_id);
       $this->assertEquals($alt_it, $it_translation->get($this->fieldName)->alt);
     }
+  }
+
+  /**
+   * Asserts that a file field references the expected files.
+   *
+   * @param int[] $expected_target_ids
+   *   The expected file IDs, in delta order.
+   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   *   The file field items.
+   *
+   * @internal
+   */
+  protected function assertFileFieldValues(array $expected_target_ids, FieldItemListInterface $items): void {
+    $this->assertSame($expected_target_ids, array_map('intval', array_column($items->getValue(), 'target_id')));
   }
 
 }

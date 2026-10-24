@@ -6,6 +6,7 @@ namespace Drupal\Tests\content_translation\Kernel;
 
 use Drupal\content_translation\FieldTranslationSynchronizer;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -265,6 +266,59 @@ class ContentTranslationSyncUnitTest extends KernelTestBase {
         }
       }
     }
+  }
+
+  /**
+   * Tests that items with empty synchronized values are retained.
+   */
+  #[DataProvider('providerEmptySyncedValues')]
+  public function testEmptySyncedValues(mixed $empty_value): void {
+    $unchanged_values = [
+      'en' => [
+        ['sync1' => $empty_value, 'var1' => 'en-0'],
+        ['sync1' => 'value', 'var1' => 'en-1'],
+      ],
+      'it' => [
+        ['sync1' => $empty_value, 'var1' => 'it-0'],
+        ['sync1' => 'value', 'var1' => 'it-1'],
+      ],
+    ];
+
+    // Check that unchanged items are retained in all translations.
+    $field_values = $unchanged_values;
+    $this->synchronizer->synchronizeItems($field_values, $unchanged_values['it'], 'it', ['en', 'it'], ['sync1']);
+    ksort($field_values);
+    $this->assertSame($unchanged_values, $field_values);
+
+    // Check that reordered items are reordered in all translations.
+    $field_values = $unchanged_values;
+    $field_values['it'] = array_reverse($field_values['it']);
+    $this->synchronizer->synchronizeItems($field_values, $unchanged_values['it'], 'it', ['en', 'it'], ['sync1']);
+    ksort($field_values);
+    $this->assertSame(array_map('array_reverse', $unchanged_values), $field_values);
+
+    // Check that added items are copied to all translations.
+    $added_item = ['sync1' => $empty_value, 'var1' => 'it-2'];
+    $field_values = $unchanged_values;
+    $field_values['it'][] = $added_item;
+    $this->synchronizer->synchronizeItems($field_values, $unchanged_values['it'], 'it', ['en', 'it'], ['sync1']);
+    ksort($field_values);
+    $expected_values = $unchanged_values;
+    $expected_values['en'][] = $added_item;
+    $expected_values['it'][] = $added_item;
+    $this->assertSame($expected_values, $field_values);
+  }
+
+  /**
+   * Data provider for ::testEmptySyncedValues().
+   */
+  public static function providerEmptySyncedValues(): array {
+    return [
+      'empty string' => [''],
+      'zero string' => ['0'],
+      'zero integer' => [0],
+      'null' => [NULL],
+    ];
   }
 
 }
