@@ -205,19 +205,7 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
   }
 
   /**
-   * Normalizes a URI by making it syntactically correct.
-   *
-   * A stream is referenced as "scheme://target".
-   *
-   * The following actions are taken:
-   * - Remove trailing slashes from target
-   * - Trim erroneous leading slashes from target. e.g. ":///" becomes "://".
-   *
-   * @param string $uri
-   *   String reference containing the URI to normalize.
-   *
-   * @return string
-   *   The normalized URI.
+   * {@inheritdoc}
    */
   public function normalizeUri($uri) {
     $scheme = $this->getScheme($uri);
