@@ -464,7 +464,11 @@ class ThemePreprocess {
    *       constant. Themes may hide columns with one of these two classes on
    *       narrow viewports to save horizontal space.
    *     - Any HTML attributes, such as "colspan", to apply to the column header
-   *       cell.
+   *
+   *     Additionally, #header may be provided as an associative array with:
+   *     - cells: An array of header cells (same format as above).
+   *     - row_attributes: HTML attributes to apply to the header row <tr>.
+   *
    *   - rows: An array of table rows. Every row is an array of cells, or an
    *     associative array with the following keys:
    *     - data: An array of cells.
@@ -557,6 +561,13 @@ class ThemePreprocess {
 
     // Build an associative array of responsive classes keyed by column.
     $responsive_classes = [];
+
+    $header_row_attributes = [];
+    if (is_array($variables['header']) && isset($variables['header']['cells'])) {
+      $header_row_attributes = $variables['header']['row_attributes'] ?? [];
+      $variables['header'] = $variables['header']['cells'];
+    }
+    $variables['header_row_attributes'] = new Attribute($header_row_attributes);
 
     // Format the table header:
     $ts = [];
