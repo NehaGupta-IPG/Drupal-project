@@ -2,15 +2,12 @@
 
 namespace Drupal\Core\Installer\Form;
 
-use Composer\Autoload\ClassLoader;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Site\Settings;
-use Drupal\update\DataSharing;
 use Drupal\user\UserInterface;
 use Drupal\user\UserNameValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -37,10 +34,6 @@ class SiteConfigureForm extends ConfigFormBase {
    *   The user validator.
    * @param bool $superUserAccessPolicy
    *   The value of the 'security.enable_super_user' container parameter.
-   * @param \Composer\Autoload\ClassLoader $classLoader
-   *   The class loader.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
-   *   The module extension list.
    */
   public function __construct(
     protected $root,
@@ -49,8 +42,6 @@ class SiteConfigureForm extends ConfigFormBase {
     protected ModuleInstallerInterface $moduleInstaller,
     protected UserNameValidator $userNameValidator,
     protected bool $superUserAccessPolicy,
-    protected ClassLoader $classLoader,
-    protected ModuleExtensionList $moduleExtensionList,
   ) {}
 
   /**
@@ -67,8 +58,6 @@ class SiteConfigureForm extends ConfigFormBase {
       // the container parameter is missing then the policy is enabled. See
       // \Drupal\Core\DependencyInjection\Compiler\SuperUserAccessPolicyPass.
       $container->getParameter('security.enable_super_user') ?? TRUE,
-      $container->get('class_loader'),
-      $container->get('extension.list.module'),
     );
   }
 
@@ -200,10 +189,6 @@ class SiteConfigureForm extends ConfigFormBase {
       '#access' => empty($install_state['config_install_path']),
     ];
 
-    // Update Status is not installed yet, so its classes are not autoloadable.
-    if (!isset($this->classLoader->getPrefixesPsr4()['Drupal\\update\\'])) {
-      $this->classLoader->addPsr4('Drupal\\update\\', $this->root . '/' . $this->moduleExtensionList->get('update')->getPath() . '/src');
-    }
     $form['update_notifications'] = [
       '#type' => 'fieldset',
       '#attributes' => ['class' => ['fieldgroup']],
@@ -228,10 +213,14 @@ class SiteConfigureForm extends ConfigFormBase {
       ],
       '#access' => empty($install_state['config_install_path']),
     ];
+    // Mirrors \Drupal\update\DataSharing::DEFAULT_DOMAIN and
+    // ::DEFAULT_SITE_MAIL; the module is not installed yet, so its constants
+    // are not loadable here. InstallerSiteConfigProfileTest asserts the two
+    // stay equal.
     $form['update_notifications']['share_domain'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Share the site domain name with Drupal.org'),
-      '#default_value' => DataSharing::DEFAULT_DOMAIN,
+      '#default_value' => TRUE,
       '#states' => [
         'visible' => [
           'input[name="enable_update_status_module"]' => ['checked' => TRUE],
@@ -242,7 +231,7 @@ class SiteConfigureForm extends ConfigFormBase {
     $form['update_notifications']['share_site_mail'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Share the site email address with the Drupal Association'),
-      '#default_value' => DataSharing::DEFAULT_SITE_MAIL,
+      '#default_value' => FALSE,
       '#states' => [
         'visible' => [
           'input[name="enable_update_status_module"]' => ['checked' => TRUE],
@@ -299,19 +288,24 @@ class SiteConfigureForm extends ConfigFormBase {
       // properties dependent on the container need to be reset.
       $this->resetPropertiesFromContainer();
 
+      $update_settings = $this->config('update.settings');
       // Add the site maintenance account's email address to the list of
       // addresses to be notified when updates are available, if selected.
-      $email_update_status_emails = $form_state->getValue('enable_update_status_emails');
-      if ($email_update_status_emails) {
-        // Reset the configuration so it is updated with the new module.
-        $this->config('update.settings')->set('notification.emails', [$account_values['mail']])->save();
+      if ($form_state->getValue('enable_update_status_emails')) {
+        $update_settings->set('notification.emails', [$account_values['mail']]);
       }
-      if ($install_state['interactive']) {
-        $this->config('update.settings')
-          ->set('data_sharing.domain', (bool) $form_state->getValue('share_domain'))
-          ->set('data_sharing.site_mail', (bool) $form_state->getValue('share_site_mail'))
-          ->save();
+      $supplied = $install_state['forms']['install_configure_form'] ?? [];
+      foreach (['share_domain' => 'data_sharing.domain', 'share_site_mail' => 'data_sharing.site_mail'] as $element => $key) {
+        // An interactive install records the choice the person saw. An
+        // automated install submits this form with the checkbox defaults,
+        // which nobody saw, so it records a value only when the caller
+        // supplied one; otherwise the site starts undecided and Update Status
+        // prompts for the choice.
+        if ($install_state['interactive'] || array_key_exists($element, $supplied)) {
+          $update_settings->set($key, (bool) $form_state->getValue($element));
+        }
       }
+      $update_settings->save();
     }
 
     // We created user 1 with placeholder values. Let's save the real values.
