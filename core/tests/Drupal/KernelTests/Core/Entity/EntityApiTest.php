@@ -453,4 +453,25 @@ class EntityApiTest extends EntityKernelTestBase {
     $entity->save();
   }
 
+  /**
+   * Tests that resaving a deleted entity throws an exception.
+   */
+  public function testSavingDeletedEntity(): void {
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_test_mulrev');
+
+    // Create a new entity.
+    /** @var \Drupal\entity_test\Entity\EntityTestMulRev $entity */
+    $entity = $storage->create(['name' => 'revision_test']);
+    $entity->save();
+
+    // Delete the entity.
+    $entity->delete();
+
+    $this->expectException(EntityStorageException::class);
+    $this->expectExceptionMessage("The '{$entity->getEntityTypeId()}' entity with ID '{$entity->id()}' is deleted and therefore cannot be resaved.");
+
+    // Resave the deleted entity.
+    $entity->save();
+  }
+
 }

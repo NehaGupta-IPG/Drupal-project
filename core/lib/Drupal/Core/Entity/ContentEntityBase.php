@@ -970,6 +970,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $translation->enforceRevisionTranslationAffected = &$this->enforceRevisionTranslationAffected;
     $translation->isSyncing = &$this->isSyncing;
     $translation->originalEntity = &$this->originalEntity;
+    $translation->deleted = &$this->deleted;
 
     return $translation;
   }
@@ -1299,6 +1300,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
 
     $is_syncing = $this->isSyncing;
     $this->isSyncing = &$is_syncing;
+
+    $deleted = $this->deleted;
+    $this->deleted = &$deleted;
 
     foreach ($this->fields as $name => $fields_by_langcode) {
       $this->fields[$name] = [];

@@ -6,6 +6,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
+use Drupal\Core\Entity\Exception\EntityDeletedException;
 use Drupal\Core\Entity\Exception\UndefinedLinkTemplateException;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
@@ -46,6 +47,13 @@ abstract class EntityBase implements EntityInterface {
    * @var \WeakReference
    */
   protected $typedData;
+
+  /**
+   * Boolean indicating whether the entity is deleted.
+   *
+   * @var bool
+   */
+  protected $deleted = FALSE;
 
   /**
    * The original unchanged entity.
@@ -414,6 +422,10 @@ abstract class EntityBase implements EntityInterface {
    * {@inheritdoc}
    */
   public function preSave(EntityStorageInterface $storage) {
+    if ($this->deleted) {
+      throw new EntityDeletedException("The '{$this->entityTypeId}' entity with ID '{$this->id()}' is deleted and therefore cannot be resaved.");
+    }
+
     // Check if this is an entity bundle.
     if ($this->getEntityType()->getBundleOf()) {
       // Throw an exception if the bundle ID is longer than 32 characters.
@@ -452,6 +464,11 @@ abstract class EntityBase implements EntityInterface {
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    // Flag the entities as deleted.
+    foreach ($entities as $entity) {
+      $entity->deleted = TRUE;
+    }
+
     static::invalidateTagsOnDelete($storage->getEntityType(), $entities);
   }
 
