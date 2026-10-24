@@ -402,6 +402,15 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
         ],
       ];
     }
+    if ($this->entityType->hasLinkTemplate('version-history')) {
+      $data['revisions_' . $entity_type_id] = [
+        'field' => [
+          'title' => $this->t('Link to revisions page of @entity_type_label', $t_arguments),
+          'help' => $this->t('Provide a link to revisions of the @entity_type_label.', $t_arguments),
+          'id' => 'entity_link_revisions',
+        ],
+      ];
+    }
   }
 
   /**
