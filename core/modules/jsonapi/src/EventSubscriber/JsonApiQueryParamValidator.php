@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * @see https://www.drupal.org/project/drupal/issues/3032787
  * @see jsonapi.api.php
  */
-class JsonApiRequestValidator implements EventSubscriberInterface {
+class JsonApiQueryParamValidator implements EventSubscriberInterface {
 
   /**
    * Validates JSON:API requests.
