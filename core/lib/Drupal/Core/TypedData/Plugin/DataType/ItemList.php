@@ -135,11 +135,23 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
   /**
    * {@inheritdoc}
    */
-  public function removeItem($index) {
+  public function removeItem($index, $notify = TRUE) {
     if (isset($this->list) && array_key_exists($index, $this->list)) {
+      // Only notify the parent in the case a non-empty item has been removed,
+      // otherwise this cannot be considered a real change as on save empty
+      // items are filtered away.
+      if ($notify) {
+        $item = $this->list[$index];
+        if ($item instanceof ComplexDataInterface || $item instanceof ListInterface) {
+          $notify = $notify && !$item->isEmpty();
+        }
+      }
       // Remove the item, and reassign deltas.
       unset($this->list[$index]);
       $this->rekey($index);
+      if ($notify) {
+        $this->onChange($index);
+      }
     }
     else {
       throw new \InvalidArgumentException('Unable to remove item at non-existing index.');

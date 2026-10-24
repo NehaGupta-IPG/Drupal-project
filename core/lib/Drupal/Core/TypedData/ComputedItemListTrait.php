@@ -102,9 +102,9 @@ trait ComputedItemListTrait {
   /**
    * {@inheritdoc}
    */
-  public function removeItem($index) {
+  public function removeItem($index, $notify = TRUE) {
     $this->ensureComputedValue();
-    return parent::removeItem($index);
+    return parent::removeItem($index, $notify);
   }
 
   /**
