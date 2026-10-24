@@ -35,7 +35,7 @@ class HideUntranslatedMenuUpdateTest extends UpdatePathTestBase {
   public function testUpdate(): void {
     $blocks = Block::loadMultiple();
     foreach ($blocks as $block) {
-      if (strpos($block->getPluginId(), 'menu_block:') === 0) {
+      if (strpos($block->getPluginId(), 'system_menu_block:') === 0) {
         $block_settings = $block->get('settings');
         $this->assertFalse(array_key_exists('hide_untranslated_menu_links', $block_settings));
       }
@@ -45,7 +45,7 @@ class HideUntranslatedMenuUpdateTest extends UpdatePathTestBase {
 
     $blocks = Block::loadMultiple();
     foreach ($blocks as $block) {
-      if (strpos($block->getPluginId(), 'menu_block:') === 0) {
+      if (strpos($block->getPluginId(), 'system_menu_block:') === 0) {
         $block_settings = $block->get('settings');
         $this->assertTrue(array_key_exists('hide_untranslated_menu_links', $block_settings));
       }
