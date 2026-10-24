@@ -42,9 +42,19 @@ class KernelTestHttpRequestTest extends KernelTestBase {
    * Tests making a request.
    */
   public function testRequest(): void {
-    $this->drupalGet('/system-test/main-content-handling');
+    $this->drupalGet('/kernel-test-query-link');
     $this->assertEquals(Response::HTTP_OK, $this->getSession()->getStatusCode());
-    $this->assertSession()->pageTextContains('Content to test main content fallback');
+    $this->assertSession()->pageTextContains('This is a test page');
+
+    // Test reloading the current page using getUrl().
+    $this->drupalGet($this->getUrl());
+    $this->assertSession()->statusCodeEquals(Response::HTTP_OK);
+    $this->assertSession()->pageTextContains('This is a test page');
+
+    // Test clicking a link with a relative query.
+    $this->clickLink('Query link');
+    $this->assertSession()->statusCodeEquals(Response::HTTP_OK);
+    $this->assertSession()->pageTextContains('This is a test page');
 
     // Test drupalGet() with Url options.
     $this->drupalGet('/system-test/set-header', [
@@ -127,6 +137,29 @@ class KernelTestHttpRequestTest extends KernelTestBase {
   )]
   public function exampleRoute(): array {
     return ['#markup' => $this->testMarkup];
+  }
+
+  /**
+   * Route with a relative query link.
+   */
+  #[Route(
+    path: '/kernel-test-query-link',
+    name: 'kernel_test.query_link',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['_title' => 'Test route'],
+  )]
+  public function routeWithQueryLink(): array {
+    $build = [];
+
+    $build['test_message'] = ['#markup' => 'This is a test page.'];
+
+    $build['link'] = [
+      '#type' => 'link',
+      '#title' => 'Query link',
+      '#url' => Url::fromUri('internal:?query=cake'),
+    ];
+
+    return $build;
   }
 
 }

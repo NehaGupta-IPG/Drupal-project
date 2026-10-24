@@ -11,6 +11,7 @@ use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
 use Drupal\Core\Url;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
+use Uri\Rfc3986\Uri;
 
 /**
  * Provides UI helper methods using the HTTP kernel to make requests.
@@ -213,7 +214,8 @@ trait HttpKernelUiHelperTrait {
   protected function getDefaultDriverInstance(): DriverInterface {
     $http_kernel = $this->container->get('http_kernel');
     $browserkit_client = new HttpKernelBrowser($http_kernel);
-    return new BrowserKitDriver($browserkit_client);
+    $driver = new BrowserKitDriver($browserkit_client);
+    return $driver;
   }
 
   /**
@@ -259,10 +261,20 @@ trait HttpKernelUiHelperTrait {
   /**
    * Gets the current URL from the browser.
    *
+   * @return string
+   *   The current URL as a root-relative path, that is, with the scheme and
+   *   host omitted. This is so that it can be used with static::drupalGet().
+   *
    * @see \Drupal\Tests\UiHelperTrait::getUrl
    */
   protected function getUrl(): string {
-    return $this->getSession()->getCurrentUrl();
+    $url = $this->getSession()->getCurrentUrl();
+
+    // Strip the scheme and host.
+    $uri = new Uri($url);
+    $uri = $uri->withScheme(NULL)->withHost(NULL);
+
+    return $uri->toRawString();
   }
 
   /**
