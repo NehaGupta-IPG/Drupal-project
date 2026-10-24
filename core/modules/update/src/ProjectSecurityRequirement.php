@@ -239,6 +239,10 @@ final class ProjectSecurityRequirement {
       $translation_arguments = ['@date' => $formatted_end_date];
       $requirement['value'] = $this->t('Covered until @date', $translation_arguments);
       $requirement['severity'] = RequirementSeverity::Info;
+      // End date applies to the installed minor version only.
+      if (!empty($this->securityCoverageInfo['major_security_coverage_end_date'])) {
+        $requirement['value'] .= $this->t(', Drupal @major until @date', ['@major' => explode('.', $this->existingMajorMinorVersion)[0], '@date' => $this->securityCoverageInfo['major_security_coverage_end_date']]);
+      }
       // 'security_coverage_ending_warn_date' will always be in the format
       // 'Y-m-d'.
       $request_date = $date_formatter->format($time->getRequestTime(), 'custom', 'Y-m-d');

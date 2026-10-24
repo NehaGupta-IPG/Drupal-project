@@ -48,6 +48,14 @@ final class ProjectSecurityData {
 
   const SECURITY_COVERAGE_ENDING_WARN_DATE_9_5 = '2023-05-14';
 
+  const SECURITY_COVERAGE_END_DATE_10_5 = '2026-06-17';
+
+  const SECURITY_COVERAGE_ENDING_WARN_DATE_10_5 = '2025-12-10';
+
+  const SECURITY_COVERAGE_END_DATE_10_6 = '2026-12-09';
+
+  const SECURITY_COVERAGE_ENDING_WARN_DATE_10_6 = '2026-06-17';
+
   /**
    * The existing (currently installed) version of the project.
    *
@@ -141,6 +149,13 @@ final class ProjectSecurityData {
         defined("self::SECURITY_COVERAGE_ENDING_WARN_DATE_$version_suffix")
           ? constant("self::SECURITY_COVERAGE_ENDING_WARN_DATE_$version_suffix")
           : NULL;
+
+      // Expose major-version security coverage end date for clearer messaging.
+      // For Drupal 10, the major support window ends with the last supported
+      // minor (10.6).
+      if ($existing_release_version->getMajorVersion() === 10) {
+        $info['major_security_coverage_end_date'] = self::SECURITY_COVERAGE_END_DATE_10_6;
+      }
     }
     elseif ($security_coverage_until_version = $this->getSecurityCoverageUntilVersion()) {
       $info['security_coverage_end_version'] = $security_coverage_until_version;
