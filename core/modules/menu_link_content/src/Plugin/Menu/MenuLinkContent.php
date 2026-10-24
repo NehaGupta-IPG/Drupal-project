@@ -272,7 +272,7 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
   public function hasTranslation(string $langcode): bool {
     return ((!($this->isTranslatable()
     || ($this->getEntity()->language()->isLocked()
-    && !array_key_exists($this->getEntity()->language()->getId(), \Drupal::languageManager()->getDefaultLockedLanguages())))) || $entity->hasTranslation($langcode));
+    && !array_key_exists($this->getEntity()->language()->getId(), \Drupal::languageManager()->getDefaultLockedLanguages())))) || $this->getEntity()->hasTranslation($langcode));
   }
 
   /**
