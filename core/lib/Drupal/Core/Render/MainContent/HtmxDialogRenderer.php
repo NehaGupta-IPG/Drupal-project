@@ -165,7 +165,7 @@ HTMX_RESPONSE,
   protected function generateDialog(array $main_content, string $dialogId, mixed $title, Request $request): array {
     if ($request->query->has('class')) {
       $dialogClasses = $request->query->get('class');
-      $dialogClasses = is_array($dialogClasses) ? $dialogClasses : [$dialogClasses];
+      $dialogClasses = [$dialogClasses];
     }
     return [
       '#type' => 'component',

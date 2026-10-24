@@ -10,7 +10,7 @@ use Drupal\Core\Url;
 /**
  * Test controller to display dialog links and content.
  */
-class HtmxDialogController {
+class HtmxDialogTestController {
 
   /**
    * Return dialog content.
@@ -88,7 +88,6 @@ class HtmxDialogController {
     (new Htmx())->get($modalUrl)
       ->applyTo($build['normal_modal']);
 
-    $modalUrl = Url::fromUri('base:/htmx/dialog/modal/htmx-dialog-content');
     $build['styled_modal_single_class'] = [
       '#title' => 'Modal with single additional class',
       '#type' => 'checkbox',
