@@ -9,6 +9,7 @@ use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\inline_form_errors\FormErrorHandler;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -105,6 +106,24 @@ class FormErrorHandlerTest extends UnitTestCase {
       '#array_parents' => ['test6'],
       '#id' => 'edit-test6',
     ];
+    $this->testForm['table'] = [
+      '#type' => 'table',
+      '#title' => 'Table test',
+      '#parents' => ['table'],
+      '#array_parents' => ['table'],
+      '#id' => 'edit-table',
+      '#attributes' => [],
+    ];
+    $this->testForm['tableselect'] = [
+      '#type' => 'tableselect',
+      '#title' => 'Tableselect test',
+      '#parents' => ['tableselect'],
+      '#array_parents' => ['tableselect'],
+      '#id' => 'edit-tableselect',
+      '#options' => [],
+      '#header' => [],
+      '#attributes' => [],
+    ];
   }
 
   /**
@@ -159,6 +178,30 @@ class FormErrorHandlerTest extends UnitTestCase {
     $this->assertSame('no error message', $this->testForm['test4']['#errors']);
     $this->assertSame('no title given', $this->testForm['test5']['#errors']);
     $this->assertSame('element is invisible', $this->testForm['test6']['#errors']);
+  }
+
+  /**
+   * Tests that inline errors are shown for table and tableselect elements.
+   *
+   * @legacy-covers ::handleFormErrors
+   * @legacy-covers ::setTableElementInlineErrors
+   */
+  #[AllowMockObjectsWithoutExpectations]
+  public function testTableElementErrorsInline(): void {
+    $form_state = new FormState();
+    $form_state->setErrorByName('table', 'No items selected.');
+    $form_state->setErrorByName('tableselect', 'Please choose an option.');
+    $this->formErrorHandler->handleFormErrors($this->testForm, $form_state);
+
+    // The 'table' element shows the inline error message and is associated via
+    // aria-describedby.
+    $this->assertStringContainsString('No items selected.', $this->testForm['table']['#prefix']);
+    $this->assertStringContainsString('edit-table--error', $this->testForm['table']['#attributes']['aria-describedby']);
+
+    // The 'tableselect' element (a table form element) also shows the inline
+    // error message and is associated via aria-describedby.
+    $this->assertStringContainsString('Please choose an option.', $this->testForm['tableselect']['#prefix']);
+    $this->assertStringContainsString('edit-tableselect--error', $this->testForm['tableselect']['#attributes']['aria-describedby']);
   }
 
   /**
