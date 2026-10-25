@@ -13,6 +13,8 @@
  *                     each entry: { id, label }
  * - search_action:    URL for the search partial endpoint
  * - children_action:  URL for the children JSON endpoint
+ * - reorder_blocked:  whether reordering is off because a link has a pending
+ *                     revision
  */
 #}
 <div class="menu-tree-ui">
@@ -122,6 +124,12 @@
       {% if break_lock_url %}
         <a href="{{ break_lock_url }}">{{ 'Break lock'|t }}</a>
       {% endif %}
+    </div>
+  {% endif %}
+
+  {% if reorder_blocked %}
+    <div class="menu-tree-ui__pending-revisions messages messages--warning" role="alert">
+      {{ 'Reordering is off because links in this menu have pending revisions. Publish or discard those revisions to re-enable it.'|t }}
     </div>
   {% endif %}
 

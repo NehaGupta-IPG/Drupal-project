@@ -80,6 +80,7 @@ final class MenuTreeController extends ControllerBase {
     $top_level = array_slice($all_top_level, 0, MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE);
     $columns = $this->columnManager->getSortedColumns();
     $entity_map = $this->loadContentEntitiesForElements($top_level);
+    $reorder_blocked = $this->hasPendingRevisions($menu->id());
 
     $column_headers = [];
     foreach ($columns as $col_id => $column) {
@@ -103,7 +104,7 @@ final class MenuTreeController extends ControllerBase {
         '#depth' => 1,
         '#pos_in_set' => ++$i,
         '#set_size' => $set_size,
-        '#movable' => MenuLinkMovability::isMovable($element->link),
+        '#movable' => !$reorder_blocked && MenuLinkMovability::isMovable($element->link),
       ];
     }
 
@@ -128,6 +129,7 @@ final class MenuTreeController extends ControllerBase {
       '#page_size' => MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE,
       '#truncated' => $top_level_total > MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE,
       '#has_changes' => $has_changes,
+      '#reorder_blocked' => $reorder_blocked,
       '#locked' => $locked,
       '#lock_owner' => $lock_owner,
       '#lock_updated' => $lock_updated,
@@ -192,10 +194,11 @@ final class MenuTreeController extends ControllerBase {
       : $elements;
     $columns = $this->columnManager->getSortedColumns();
     $entity_map = $this->loadContentEntitiesForElements($page);
+    $reorder_blocked = $this->hasPendingRevisions($menu->id());
 
     $data = [];
     foreach ($page as $element) {
-      $data[] = $this->serializeElement($element, $entity_map, $columns, $parent_id ?? '');
+      $data[] = $this->serializeElement($element, $entity_map, $columns, $parent_id ?? '', $reorder_blocked);
     }
 
     $response = new CacheableJsonResponse([
@@ -277,6 +280,10 @@ final class MenuTreeController extends ControllerBase {
         );
       }
 
+      if ($this->hasPendingRevisions($menu_name)) {
+        return $this->pendingRevisionsResponse();
+      }
+
       // Validate against the live tree plus the pending moves, then record the
       // move in the working copy instead of writing it. Save validates the
       // recorded moves in order before it writes any of them.
@@ -321,6 +328,10 @@ final class MenuTreeController extends ControllerBase {
           ['ok' => FALSE, 'code' => 'locked', 'message' => $this->lockedMessage($menu_name)],
           409,
         );
+      }
+
+      if ($this->hasPendingRevisions($menu_name)) {
+        return $this->pendingRevisionsResponse();
       }
 
       $ops = $this->workingCopy->getOps($menu_name);
@@ -446,6 +457,39 @@ final class MenuTreeController extends ControllerBase {
   }
 
   /**
+   * Whether any content link in the menu has a pending (workspace) revision.
+   *
+   * Writing such a link through the menu link manager makes a new default
+   * revision that publishing the workspace later overwrites.
+   */
+  private function hasPendingRevisions(string $menu_name): bool {
+    /** @var \Drupal\menu_link_content\MenuLinkContentStorageInterface $storage */
+    $storage = $this->entityTypeManager()->getStorage('menu_link_content');
+    $pending_ids = $storage->getMenuLinkIdsWithPendingRevisions();
+    if ($pending_ids === []) {
+      return FALSE;
+    }
+    $ids = $storage->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('menu_name', $menu_name)
+      ->condition('id', $pending_ids, 'IN')
+      ->range(0, 1)
+      ->execute();
+    return $ids !== [];
+  }
+
+  /**
+   * Builds the 409 response for a reorder refused over pending revisions.
+   */
+  private function pendingRevisionsResponse(): JsonResponse {
+    return new JsonResponse([
+      'ok' => FALSE,
+      'code' => 'pending_revisions',
+      'message' => (string) $this->t('Links in this menu have pending revisions, so it cannot be reordered.'),
+    ], 409);
+  }
+
+  /**
    * Whether a link's title should render as a link to its destination.
    *
    * Mirrors the classic menu admin, which links each title to the menu link's
@@ -510,11 +554,13 @@ final class MenuTreeController extends ControllerBase {
    *   The active column plugins keyed by plugin ID.
    * @param string $parent_id
    *   The parent link plugin ID, or '' for the top level.
+   * @param bool $reorder_blocked
+   *   Whether reordering is off for the whole menu.
    *
    * @return array
    *   The serialized row, in the JSON shape consumed by <drupal-treegrid>.
    */
-  private function serializeElement(MenuLinkTreeElement $element, array $entity_map, array $columns, string $parent_id): array {
+  private function serializeElement(MenuLinkTreeElement $element, array $entity_map, array $columns, string $parent_id, bool $reorder_blocked): array {
     $link = $element->link;
 
     return [
@@ -527,7 +573,7 @@ final class MenuTreeController extends ControllerBase {
       'url' => $link->getUrlObject()->toString(),
       'linked' => $this->isLinked($link),
       'weight' => $link->getWeight(),
-      'movable' => MenuLinkMovability::isMovable($link),
+      'movable' => !$reorder_blocked && MenuLinkMovability::isMovable($link),
       'columns' => $this->buildColumnCells($element, $entity_map[$link->getPluginId()] ?? NULL, $columns),
     ];
   }

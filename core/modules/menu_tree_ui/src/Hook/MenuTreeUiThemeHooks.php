@@ -39,6 +39,9 @@ final class MenuTreeUiThemeHooks {
           'truncated' => FALSE,
           // Whether the menu has pending (unsaved) working-copy moves.
           'has_changes' => FALSE,
+          // Whether reordering is off because a link in the menu has a
+          // pending revision in a workspace.
+          'reorder_blocked' => FALSE,
           // Whether another user holds the working copy.
           'locked' => FALSE,
           // Display name of the user holding the working copy, when locked.
