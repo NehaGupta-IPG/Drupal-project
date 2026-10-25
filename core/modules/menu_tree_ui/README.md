@@ -68,10 +68,12 @@ convention (no bundler, no TypeScript, no ESM).
 
 The interactive element is `<drupal-treegrid>`, defined by the `treegrid`
 module — not by this one. Its `connectedCallback` fires automatically when the
-element enters the DOM (including htmx-swapped content), and it exposes
-lifecycle events (`treegrid:connected` / `treegrid:disconnect`) and an
-interaction-handler registry (`addClickHandler` / `addKeyHandler`). Menu tree UI
-attaches its own features to those hooks.
+element enters the DOM (including htmx-swapped content), and it exposes a ready
+signal (`element.ready`), lifecycle events (`treegrid:connected` /
+`treegrid:disconnected`) and an interaction-handler registry (`addClickHandler`
+/ `addKeyHandler`). Menu tree UI attaches its own features to those hooks, from
+a behavior that calls `Drupal.treegridReorder.attach()` and cleans up in
+`detach`.
 
 Generic behavior lives in the two upstream modules, under the `Drupal.treegrid`
 and `Drupal.treegridReorder` namespaces:
@@ -81,23 +83,30 @@ and `Drupal.treegridReorder` namespaces:
   `ExpandManager`), `windowing.js` (`IntersectionObserver` virtualization,
   `RowWindow`), `keyboard.js` (WAI-ARIA navigation keys), `cells.js` (the
   cell-renderer registry).
-- `treegrid_reorder/js/` — `controller.js` / `intent.js` / `indicator.js` /
-  `commit.js` (pointer drag), `move-mode.js` (keyboard grab/select), and
-  `reorder-keys.js` (Shift+Arrow). These are parameterized by a config object
-  so they carry no menu CSS knowledge of their own.
+- `treegrid_reorder/js/` — `attach.js` (the entry point), `controller.js` /
+  `intent.js` / `indicator.js` / `commit.js` (pointer drag), `move-mode.js`
+  (keyboard grab/select), `reorder-keys.js` (Shift+Arrow) and `request.js`
+  (the request helper and the needs-reload state). They find their parts by
+  marker attributes the row markup renders, so they carry no menu CSS
+  knowledge of their own.
 
 Menu tree UI's own JavaScript is a `Drupal.behaviors` attach (the element itself
 is generic), under the `Drupal.menuTreeUi` namespace:
 
-- `js/menu-tree.js` — the behaviors entry point: on each upgraded element, wires
-  reorder, the column controls, search jump-to, and the keyboard-help dialog
-  through the element's events and interaction registry.
-- `js/row-builder.js` — turns the children JSON into row DOM (`buildRow` /
-  `buildRows`) and registers the menu row renderer as a `<drupal-treegrid>`
-  provider.
+- `js/menu-tree.js` — the behaviors entry point: on each upgraded element, turns
+  reorder on and wires search jump-to and the keyboard-help dialog through the
+  element's events. The column controls are persisted by treegrid's
+  column-update client.
+- `js/row-builder.js` — turns the children JSON into row DOM (`buildRow`) and
+  registers the menu row renderer as a `<drupal-treegrid>` provider.
 - `js/search.js` — the htmx search panel behavior.
 - `js/jump-to.js` — document-level jump-from-search-result.
-- `js/working-copy.js` — the Save / Cancel action bar.
+- `js/working-copy.js` — the Save / Cancel action bar, the unsaved notice (it
+  follows the `dirty` flag the move, Save and Cancel responses carry) and the
+  needs-reload message with its Reload button. Save and Cancel go through the
+  reorder request helper, so they take their turn in the element's queue, and
+  a pending revision refused by the server puts the tree into the needs-reload
+  state with the reason `pending-revisions`.
 
 The element upgrades the server-rendered top level (from
 `templates/menu-tree-ui-page.html.twig`) rather than rebuilding from scratch:

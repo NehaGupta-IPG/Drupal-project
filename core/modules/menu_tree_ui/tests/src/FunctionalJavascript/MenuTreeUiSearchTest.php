@@ -104,4 +104,70 @@ final class MenuTreeUiSearchTest extends MenuTreeUiJavascriptTestBase {
     ));
   }
 
+  /**
+   * Escape empties the results and keeps the typed query.
+   */
+  public function testEscapeEmptiesResultsAndKeepsQuery(): void {
+    $this->searchFor('Ap');
+
+    $this->getSession()->executeScript(<<<'JS'
+      document.getElementById('menu-tree-ui-search-input').dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }),
+      );
+    JS);
+
+    $this->assertResultsDismissedWithQuery('Ap');
+  }
+
+  /**
+   * A click outside the search box empties the results.
+   */
+  public function testClickOutsideEmptiesResults(): void {
+    $this->searchFor('Ap');
+
+    $this->getSession()->executeScript(
+      "document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));",
+    );
+
+    $this->assertResultsDismissedWithQuery('Ap');
+  }
+
+  /**
+   * Activating a result empties the results.
+   */
+  public function testActivatingResultEmptiesResults(): void {
+    $this->searchFor('Apricot');
+
+    $this->getSession()->getPage()->find('css', '.menu-tree-ui-search-results__title')->click();
+
+    $this->assertResultsDismissedWithQuery('Apricot');
+  }
+
+  /**
+   * Types a query and waits for its results to show.
+   *
+   * @param string $query
+   *   The query to type.
+   */
+  private function searchFor(string $query): void {
+    $this->getSession()->getPage()->find('css', '#menu-tree-ui-search-input')->setValue($query);
+    $this->assertNotNull($this->assertSession()->waitForElementVisible('css', '.menu-tree-ui-search-results__title'));
+  }
+
+  /**
+   * Asserts the results container has no children and the query is kept.
+   *
+   * @param string $query
+   *   The query the input still holds.
+   */
+  private function assertResultsDismissedWithQuery(string $query): void {
+    $this->assertSession()->waitForElementRemoved('css', '#menu-tree-ui-search-results > *');
+    $this->assertSame(0, $this->getSession()->evaluateScript(
+      "return document.getElementById('menu-tree-ui-search-results').children.length;",
+    ));
+    $this->assertSame($query, $this->getSession()->evaluateScript(
+      "return document.getElementById('menu-tree-ui-search-input').value;",
+    ));
+  }
+
 }
