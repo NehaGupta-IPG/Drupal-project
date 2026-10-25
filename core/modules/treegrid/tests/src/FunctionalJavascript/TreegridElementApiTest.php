@@ -130,6 +130,85 @@ final class TreegridElementApiTest extends WebDriverTestBase {
     $this->assertNotNull($this->assertSession()->waitForElement('css', 'drupal-treegrid[data-test-setup]'));
   }
 
+  /**
+   * Units started together run in order and never overlap.
+   */
+  public function testUnitsRunInOrderWithoutOverlap(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const log = [];
+      const unit = (name, ms) => element.exclusive(async () => {
+        log.push('start:' + name);
+        await new Promise((resolve) => window.setTimeout(resolve, ms));
+        log.push('end:' + name);
+        return name;
+      });
+      return Promise.all([unit('a', 200), unit('b', 20), unit('c', 0)]).then((results) => ({ log, results }));
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertSame(['start:a', 'end:a', 'start:b', 'end:b', 'start:c', 'end:c'], $result['log']);
+    $this->assertSame(['a', 'b', 'c'], $result['results']);
+  }
+
+  /**
+   * A unit that throws does not stop the next one.
+   */
+  public function testThrowingUnitDoesNotStopTheQueue(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const first = element.exclusive(() => {
+        throw new Error('boom');
+      }).catch((error) => error.message);
+      const second = element.exclusive(async () => 'ok');
+      return Promise.all([first, second]);
+    JS);
+
+    $this->assertSame(['boom', 'ok'], $this->getSession()->evaluateScript('return window.apiTest.result;'));
+  }
+
+  /**
+   * A unit's own exclusive() runs at once instead of queueing behind it.
+   */
+  public function testUnitExclusiveRunsAtOnce(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      return element.exclusive((unit) => unit.exclusive((inner) => inner === unit));
+    JS);
+
+    $this->assertTrue($this->getSession()->evaluateScript('return window.apiTest.result;'));
+  }
+
+  /**
+   * A unit method called after its unit has settled throws.
+   */
+  public function testUnitMethodAfterSettleThrows(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      let saved;
+      return element.exclusive((unit) => {
+        saved = unit;
+      }).then(() => {
+        try {
+          saved.exclusive(() => 1);
+          return false;
+        } catch (error) {
+          return true;
+        }
+      });
+    JS);
+
+    $this->assertTrue($this->getSession()->evaluateScript('return window.apiTest.result;'));
+  }
+
   // Helpers.
 
   /**
@@ -148,6 +227,21 @@ final class TreegridElementApiTest extends WebDriverTestBase {
    */
   private function waitForReady(): void {
     $this->assertNotNull($this->assertSession()->waitForElement('css', 'drupal-treegrid[data-treegrid-ready]'));
+  }
+
+  /**
+   * Runs a script that returns a promise and stores its value in window.apiTest.
+   *
+   * @param string $script
+   *   The script body; it must return a promise.
+   */
+  private function runAsync(string $script): void {
+    $this->getSession()->executeScript(
+      'window.apiTest = { done: false, result: null };'
+      . '(function () {' . $script . '})().then(function (value) {'
+      . ' window.apiTest.result = value; window.apiTest.done = true; });',
+    );
+    $this->assertJsCondition('window.apiTest.done === true');
   }
 
   /**

@@ -3,6 +3,7 @@ treegrid:
   js:
     js/tree-nav.js: {}
     js/cells.js: {}
+    js/queue.js: {}
     js/keyboard.js: {}
     js/expand.js: {}
     js/windowing.js: {}

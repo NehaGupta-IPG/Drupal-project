@@ -128,6 +128,7 @@
         initialized: false,
         clickHandlers: [],
         keyHandlers: [],
+        queue: new Drupal.treegrid.Queue(),
         onClick: this.onClick.bind(this),
         onKeyDown: this.onKeyDown.bind(this),
       };
@@ -181,6 +182,23 @@
      */
     addKeyHandler(handler) {
       return register(internals.get(this).keyHandlers, handler);
+    }
+
+    /**
+     * Runs work through the element's request queue.
+     *
+     * Units run one at a time, first in first out. Calling the element's own
+     * queued methods from inside a unit waits behind that unit and never
+     * finishes; use the unit object's methods there.
+     *
+     * @param {function(object): *} fn
+     *   The work. Receives the unit object.
+     *
+     * @return {Promise<*>}
+     *   Settles with what fn returned or threw.
+     */
+    exclusive(fn) {
+      return internals.get(this).queue.run(fn);
     }
 
     /**
