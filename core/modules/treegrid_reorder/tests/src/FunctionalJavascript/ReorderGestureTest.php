@@ -211,7 +211,7 @@ final class ReorderGestureTest extends WebDriverTestBase {
   private function settle(): void {
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'drupal-treegrid[data-treegrid-moving="true"]\')',
+      '!document.querySelector(\'drupal-treegrid[data-treegrid-reorder-moving="true"]\')',
     );
   }
 
@@ -283,21 +283,21 @@ final class ReorderGestureTest extends WebDriverTestBase {
   /**
    * Steps the move-mode cursor until it reaches a drop position.
    *
-   * Move mode records the live drop position on the host as data-treegrid-drop
+   * Move mode records the live drop position on the host as data-treegrid-reorder-drop
    * ("kind:id"); walking to a wanted value is deterministic regardless of where
    * the cursor starts.
    *
    * @param string $grabbed_id
    *   The data-id of the grabbed (focused) row.
    * @param string $wanted
-   *   The wanted data-treegrid-drop value, "kind:id".
+   *   The wanted data-treegrid-reorder-drop value, "kind:id".
    * @param string $key
    *   The KeyboardEvent key value used to step the cursor.
    */
   private function stepToDrop(string $grabbed_id, string $wanted, string $key = 'ArrowDown'): void {
     for ($i = 0; $i < 10; $i++) {
       $drop = $this->getSession()->evaluateScript(
-        "return document.querySelector('drupal-treegrid').getAttribute('data-treegrid-drop');",
+        "return document.querySelector('drupal-treegrid').getAttribute('data-treegrid-reorder-drop');",
       );
       if ($drop === $wanted) {
         return;

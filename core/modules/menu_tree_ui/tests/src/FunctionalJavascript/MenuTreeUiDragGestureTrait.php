@@ -62,14 +62,14 @@ trait MenuTreeUiDragGestureTrait {
     JS;
 
     $this->getSession()->executeScript($script);
-    // commitMove flags the <drupal-treegrid> host with data-treegrid-moving
+    // commitMove flags the <drupal-treegrid> host with data-treegrid-reorder-moving
     // while the server-first POST + group refresh is in flight; wait for that to
     // clear before assertions run on the rebuilt DOM.
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'drupal-treegrid[data-treegrid-moving="true"]\')'
+      '!document.querySelector(\'drupal-treegrid[data-treegrid-reorder-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--dragging\')'
-      . ' && !document.querySelector(\'[data-loading="true"]\')',
+      . ' && !document.querySelector(\'[data-treegrid-loading]\')',
     );
   }
 

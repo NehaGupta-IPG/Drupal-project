@@ -2,10 +2,10 @@
  * @file
  * Lazy-load + expand/collapse for the treegrid.
  *
- * Collapse flags a row's descendant run with data-hidden (CSS hides them) and
+ * Collapse flags a row's descendant run with data-treegrid-hidden (CSS hides them) and
  * leaves the rows in the DOM; re-expand clears the flag. There are no nested
  * <ul role="group"> elements — children are sibling <tr>s right after their
- * parent. "Is this subtree already loaded" is tracked by row.dataset.loaded
+ * parent. "Is this subtree already loaded" is tracked by row.dataset.treegridLoaded
  * rather than the presence of a child <ul>.
  *
  * Hands off row construction to an injected renderer and visibility tracking to
@@ -136,7 +136,7 @@
         announceToggle(row);
       }
 
-      if (row.dataset.loaded === 'true') {
+      if (row.dataset.treegridLoaded === 'true') {
         // showSubtree re-observes each row it reveals; rows that stay collapsed
         // are left unobserved so the observer only ever tracks visible rows.
         this.showSubtree(row);
@@ -194,7 +194,7 @@
      */
     hideSubtree(row) {
       descendantRows(row).forEach((r) => {
-        r.dataset.hidden = 'true';
+        r.dataset.treegridHidden = 'true';
         // Stop tracking hidden rows: otherwise the observer's entry set grows
         // with every loaded row and never shrinks as sections are collapsed.
         this.rowWindow?.unobserve(r);
@@ -221,7 +221,7 @@
           break;
         }
         if (lvl <= hideBelow) {
-          delete n.dataset.hidden;
+          delete n.dataset.treegridHidden;
           this.rowWindow?.observe(n);
           hideBelow =
             n.dataset.hasChildren === 'true' &&
@@ -390,7 +390,7 @@
      *   Resolves once children are inserted (or the fetch failed).
      */
     async loadChildren(row, parentId) {
-      row.dataset.loading = 'true';
+      row.dataset.treegridLoading = 'loading';
       try {
         const items = await this.fetchChildren(parentId);
         if (items === null) {
@@ -402,7 +402,7 @@
         const inserted = Array.from(fragment.children);
         const anchor = lastDescendantRow(row) ?? row;
         anchor.after(fragment);
-        row.dataset.loaded = 'true';
+        row.dataset.treegridLoaded = 'true';
         inserted.forEach((r) => {
           if (Drupal.attachBehaviors) {
             Drupal.attachBehaviors(r);
@@ -419,7 +419,7 @@
           this.hideSubtree(row);
         }
       } finally {
-        delete row.dataset.loading;
+        delete row.dataset.treegridLoading;
       }
     }
   }

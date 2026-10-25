@@ -88,9 +88,9 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
     $this->tapHandle('C');
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'drupal-treegrid[data-treegrid-moving="true"]\')'
+      '!document.querySelector(\'drupal-treegrid[data-treegrid-reorder-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--grabbed\')'
-      . ' && !document.querySelector(\'[data-loading="true"]\')',
+      . ' && !document.querySelector(\'[data-treegrid-loading]\')',
     );
     $this->assertAdjacent('C', 'B', $this->childRowsSelector(NULL));
     $this->assertDepth('C', 1);

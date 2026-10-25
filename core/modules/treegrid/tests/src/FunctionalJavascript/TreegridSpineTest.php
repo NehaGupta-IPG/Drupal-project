@@ -82,7 +82,7 @@ final class TreegridSpineTest extends WebDriverTestBase {
     $this->assertJsCondition(
       'document.querySelector(\'tr[data-id="p1"]\').getAttribute("aria-expanded") === "false"',
     );
-    $this->assertSame('true', $this->row('c1a')->getAttribute('data-hidden'));
+    $this->assertSame('true', $this->row('c1a')->getAttribute('data-treegrid-hidden'));
   }
 
   /**

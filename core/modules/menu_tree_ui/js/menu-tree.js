@@ -90,7 +90,7 @@
         rowWindow?.unobserve(r);
         r.remove();
       });
-      delete row.dataset.loaded;
+      delete row.dataset.treegridLoaded;
     }
   }
 

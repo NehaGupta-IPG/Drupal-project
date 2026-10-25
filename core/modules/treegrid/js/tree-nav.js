@@ -10,7 +10,7 @@
  * replace the structural :scope > ul[role="group"] queries the nested-list tree
  * used.
  *
- * "Visible" means "in DOM and not flagged data-hidden by a collapsed ancestor"
+ * "Visible" means "in DOM and not flagged data-treegrid-hidden by a collapsed ancestor"
  * — not "in the viewport". Focus lives on the <tr>, which is the single roving
  * tab stop; the handle is a mouse and drag affordance only.
  *
@@ -159,7 +159,7 @@
   /**
    * Collects all visible rows in document order.
    *
-   * Visible = a body row not flagged data-hidden (collapse sets that flag on a
+   * Visible = a body row not flagged data-treegrid-hidden (collapse sets that flag on a
    * row's descendant run). O(n) over rows currently in DOM; because subtrees
    * only enter the DOM after an expand, the working set stays small.
    *
@@ -171,7 +171,7 @@
    */
   function visibleRows(tree) {
     return Array.from(tree.querySelectorAll(ROW)).filter(
-      (row) => row.dataset.hidden !== 'true',
+      (row) => row.dataset.treegridHidden !== 'true',
     );
   }
 

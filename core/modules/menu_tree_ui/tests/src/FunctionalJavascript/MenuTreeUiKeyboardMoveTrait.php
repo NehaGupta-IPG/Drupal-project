@@ -8,7 +8,7 @@ namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
  * Keyboard grab/select move drivers for menu_tree_ui tests.
  *
  * Dispatches keydown sequences at the grabbed row and walks the move cursor
- * deterministically via the host's data-treegrid-drop marker. Expects the using
+ * deterministically via the host's data-treegrid-reorder-drop marker. Expects the using
  * class to extend MenuTreeUiJavascriptTestBase (for $linkIds and settle()).
  */
 trait MenuTreeUiKeyboardMoveTrait {
@@ -29,14 +29,14 @@ trait MenuTreeUiKeyboardMoveTrait {
    * The cursor is two-dimensional: Up/Down move it one visual position and
    * Left/Right change the landing depth. This parks at the top, then for each
    * gap sweeps depth from shallowest (Left) to deepest (Right), checking the
-   * host's data-treegrid-drop after each press — deterministic regardless of
+   * host's data-treegrid-reorder-drop after each press — deterministic regardless of
    * where the grab began. Right may open a collapsed parent (the documented
    * behavior), which only adds reachable positions.
    *
    * @param string $source
    *   Label of the grabbed row (the node keydown events are dispatched on).
    * @param string $want
-   *   The wanted data-treegrid-drop value, "kind:pluginId".
+   *   The wanted data-treegrid-reorder-drop value, "kind:pluginId".
    * @param int $max
    *   Safety bound on the number of gaps / depths swept.
    */
@@ -68,7 +68,7 @@ trait MenuTreeUiKeyboardMoveTrait {
    */
   private function readDrop(): ?string {
     return $this->getSession()->evaluateScript(
-      "return document.querySelector('drupal-treegrid').getAttribute('data-treegrid-drop');",
+      "return document.querySelector('drupal-treegrid').getAttribute('data-treegrid-reorder-drop');",
     );
   }
 
@@ -143,7 +143,7 @@ trait MenuTreeUiKeyboardMoveTrait {
       return (function () {
         const row = document.querySelector('tr[role="row"][data-id="$id"]');
         if (!row) return 'missing';
-        if (row.dataset.hidden === 'true') return 'data-hidden';
+        if (row.dataset.treegridHidden === 'true') return 'data-treegrid-hidden';
         const visible = typeof row.checkVisibility === 'function'
           ? row.checkVisibility()
           : row.offsetParent !== null;

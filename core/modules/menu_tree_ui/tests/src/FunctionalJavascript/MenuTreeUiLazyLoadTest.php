@@ -54,7 +54,7 @@ final class MenuTreeUiLazyLoadTest extends MenuTreeUiJavascriptTestBase {
 
     // Wait for the in-flight load to settle and its rows to arrive in the DOM.
     $this->assertJsCondition(
-      "document.querySelector('tr[data-id=\"{$pid}\"]').dataset.loading === undefined",
+      "document.querySelector('tr[data-id=\"{$pid}\"]').dataset.treegridLoading === undefined",
     );
     $this->assertJsCondition(
       "document.querySelectorAll('tr[data-parent-id=\"{$pid}\"]').length > 0",
@@ -66,7 +66,7 @@ final class MenuTreeUiLazyLoadTest extends MenuTreeUiJavascriptTestBase {
     $visible_children = (int) $this->getSession()->evaluateScript(<<<JS
       (() => Array.from(
         document.querySelectorAll('tr[data-parent-id="{$pid}"]'),
-      ).filter((r) => r.dataset.hidden !== 'true').length)();
+      ).filter((r) => r.dataset.treegridHidden !== 'true').length)();
     JS);
     $this->assertSame(0, $visible_children, 'No children are visible under the collapsed parent.');
   }

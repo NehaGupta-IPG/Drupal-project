@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * the drag handle) picks up the focused row, Up/Down move it one visual
  * position, Left/Right change the landing depth, and Enter commits through the
  * SAME commitMove() path as drag. The cursor's prospective drop is mirrored on
- * the host as data-treegrid-drop ("kind:id"), which these tests walk to
+ * the host as data-treegrid-reorder-drop ("kind:id"), which these tests walk to
  * deterministically rather than counting keystrokes.
  *
  * The generic grab/step/drop lifecycle, Escape cancel with focus return, the

@@ -647,7 +647,7 @@
       this.insertUnit(ref, after);
       // The carried row must always be visible, even when it lands inside a
       // collapsed run (see request: "I should always be able to see it").
-      delete this.grabbed.dataset.hidden;
+      delete this.grabbed.dataset.treegridHidden;
       // Detaching the focused row dropped focus; put it back on the carried row
       // so the keyboard keeps driving the move.
       this.grabbed.focus();
@@ -656,7 +656,7 @@
       this.tree
         .closest('drupal-treegrid')
         ?.setAttribute(
-          'data-treegrid-drop',
+          'data-treegrid-reorder-drop',
           `${intent.kind}:${intent.target.dataset.id ?? ''}`,
         );
     }
@@ -806,7 +806,7 @@
       this.indicator.clear();
       this.tree
         .closest('drupal-treegrid')
-        ?.removeAttribute('data-treegrid-drop');
+        ?.removeAttribute('data-treegrid-reorder-drop');
       this.active = false;
       this.grabbed = null;
       this.block = [];

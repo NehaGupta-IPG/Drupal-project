@@ -119,9 +119,9 @@ final class MenuTreeUiDragGuardsTest extends MenuTreeUiJavascriptTestBase {
 
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'drupal-treegrid[data-treegrid-moving="true"]\')'
+      '!document.querySelector(\'drupal-treegrid[data-treegrid-reorder-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--dragging\')'
-      . ' && !document.querySelector(\'[data-loading="true"]\')',
+      . ' && !document.querySelector(\'[data-treegrid-loading]\')',
     );
     $this->assertSiblings(['Q', 'R', 'P'], $this->childRowsSelector(NULL));
   }

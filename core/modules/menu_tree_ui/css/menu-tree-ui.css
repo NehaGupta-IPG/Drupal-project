@@ -9,7 +9,7 @@
  * that do not define the token. Any theme can also override the bridge
  * variables on its own selectors.
  *
- * Virtualization: [data-virtualized="true"] is set by RowWindow
+ * Virtualization: [data-treegrid-virtualized="true"] is set by RowWindow
  * (IntersectionObserver, see treegrid/js/windowing.js) for rows deep
  * off-screen; the rule below hard-floors their cost via visibility:hidden +
  * fixed height.
@@ -422,11 +422,11 @@
  * Hard-floor virtualization: rows deep off-screen hide their content but
  * keep their height so the scrollbar stays accurate.
  */
-.menu-tree-ui-row[data-virtualized="true"] > .menu-tree-ui-row__cell {
+.menu-tree-ui-row[data-treegrid-virtualized="true"] > .menu-tree-ui-row__cell {
   visibility: hidden;
 }
 
-.menu-tree-ui-row[data-virtualized="true"] {
+.menu-tree-ui-row[data-treegrid-virtualized="true"] {
   height: 2.5rem;
 }
 

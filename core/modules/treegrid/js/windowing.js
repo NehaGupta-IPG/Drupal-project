@@ -3,7 +3,7 @@
  * IntersectionObserver-based row windowing for the treegrid.
  *
  * Strategy: every row is a normal DOM node, but rows far outside the viewport
- * get `data-virtualized="true"`, which the CSS uses to hide the row content
+ * get `data-treegrid-virtualized="true"`, which the CSS uses to hide the row content
  * (visibility:hidden) and reserve a fixed height. The tree is a real table, so
  * every row is laid out regardless — this layer skips the *paint* of far-off
  * rows, which is what keeps a level with thousands of siblings cheap to scroll.
@@ -28,9 +28,9 @@
     entries.forEach((entry) => {
       const row = entry.target;
       if (entry.isIntersecting) {
-        delete row.dataset.virtualized;
+        delete row.dataset.treegridVirtualized;
       } else {
-        row.dataset.virtualized = 'true';
+        row.dataset.treegridVirtualized = 'true';
       }
     });
   }
@@ -85,7 +85,7 @@
     /**
      * Starts tracking a row's visibility.
      *
-     * Deliberately does not pre-stamp `data-virtualized="true"`: the observer
+     * Deliberately does not pre-stamp `data-treegrid-virtualized="true"`: the observer
      * callback fires asynchronously (next layout pass), so a freshly-observed
      * row would otherwise spend ~1 frame with its content hidden — visible to
      * the user as an empty row, especially right after a drag-drop refresh
@@ -107,7 +107,7 @@
      */
     unobserve(row) {
       this.observer.unobserve(row);
-      delete row.dataset.virtualized;
+      delete row.dataset.treegridVirtualized;
     }
 
     /**

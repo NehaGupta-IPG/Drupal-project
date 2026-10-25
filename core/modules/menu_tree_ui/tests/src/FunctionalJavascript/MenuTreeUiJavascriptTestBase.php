@@ -190,9 +190,9 @@ abstract class MenuTreeUiJavascriptTestBase extends WebDriverTestBase {
   protected function settle(): void {
     $this->getSession()->wait(
       5000,
-      '!document.querySelector(\'drupal-treegrid[data-treegrid-moving="true"]\')'
+      '!document.querySelector(\'drupal-treegrid[data-treegrid-reorder-moving="true"]\')'
       . ' && !document.querySelector(\'.menu-tree-ui-row--grabbed\')'
-      . ' && !document.querySelector(\'[data-loading="true"]\')',
+      . ' && !document.querySelector(\'[data-treegrid-loading]\')',
     );
   }
 
@@ -362,7 +362,7 @@ abstract class MenuTreeUiJavascriptTestBase extends WebDriverTestBase {
    * Asserts no row currently in the test viewport is marked virtualized.
    *
    * The IntersectionObserver virtualization in windowing.js sets
-   * `data-virtualized="true"` to hide content of off-screen rows and reserve
+   * `data-treegrid-virtualized="true"` to hide content of off-screen rows and reserve
    * fixed height. When the move pipeline re-observes already-visible rows, they
    * can get stuck with that flag set — appearing as empty rows even though
    * they're in the viewport. This catches that. Our fixtures are small enough
@@ -374,15 +374,15 @@ abstract class MenuTreeUiJavascriptTestBase extends WebDriverTestBase {
     // rather than guessing a fixed delay that flakes on a loaded runner.
     $this->getSession()->wait(
       2000,
-      'Array.from(document.querySelectorAll(\'drupal-treegrid tr[role="row"][data-virtualized="true"]\')).length === 0',
+      'Array.from(document.querySelectorAll(\'drupal-treegrid tr[role="row"][data-treegrid-virtualized="true"]\')).length === 0',
     );
     $virtualized = $this->getSession()->evaluateScript(
-      'return Array.from(document.querySelectorAll(\'drupal-treegrid tr[role="row"][data-virtualized="true"]\')).map(r => r.dataset.id);',
+      'return Array.from(document.querySelectorAll(\'drupal-treegrid tr[role="row"][data-treegrid-virtualized="true"]\')).map(r => r.dataset.id);',
     );
     $this->assertSame(
       [],
       $virtualized,
-      'Rows stuck marked data-virtualized="true" after the move (will render as empty): '
+      'Rows stuck marked data-treegrid-virtualized="true" after the move (will render as empty): '
       . json_encode($virtualized),
     );
   }
