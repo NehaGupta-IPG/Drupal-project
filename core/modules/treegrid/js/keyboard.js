@@ -64,7 +64,7 @@
           break;
         }
         if (row.getAttribute('aria-expanded') === 'false') {
-          ctx.expand.expand(row, true);
+          ctx.expand.expandRow(row, true);
         } else {
           focusRow(ctx.tree, childRows(row)[0] ?? null);
         }
@@ -72,8 +72,11 @@
       }
       case 'ArrowLeft': {
         event.preventDefault();
+        if (ctx.expand.cancelWait(row)) {
+          break;
+        }
         if (row.getAttribute('aria-expanded') === 'true') {
-          ctx.expand.collapse(row, true);
+          ctx.expand.collapseRow(row, true);
         } else {
           focusRow(ctx.tree, findRow(ctx.tree, row.dataset.parentId));
         }

@@ -143,8 +143,8 @@
      *   The root treegrid element.
      * @param {string} moveUrl
      *   The move endpoint.
-     * @param {object} expand
-     *   The treegrid ExpandManager, for open/close and passed to commitMove.
+     * @param {HTMLElement} element
+     *   The <drupal-treegrid> element, for opening rows and passed to commitMove.
      * @param {Drupal.treegridReorder.DropIndicator} indicator
      *   The shared drop indicator (its announce() is reused for speech).
      * @param {function():(string|undefined)} getCsrfToken
@@ -155,10 +155,10 @@
      *   applyParentMetadata, onCommitted } — the consumer's CSS names and the
      *   commit callbacks.
      */
-    constructor(tree, moveUrl, expand, indicator, getCsrfToken, options) {
+    constructor(tree, moveUrl, element, indicator, getCsrfToken, options) {
       this.tree = tree;
       this.moveUrl = moveUrl;
-      this.expand = expand;
+      this.element = element;
       this.indicator = indicator;
       this.getCsrfToken = getCsrfToken;
       this.options = options;
@@ -546,17 +546,17 @@
      */
     async openInto(prev) {
       const seq = this.cursorSeq;
-      await this.expand.expand(prev);
+      const opened = await this.element.expandRow(prev);
       // The move may have been committed or canceled during the fetch, or the
       // editor may have moved the cursor on - in which case the open is done
       // (the section is now navigable) but the cursor must be left where it is.
       if (!this.active || !this.grabbed || this.cursorSeq !== seq) {
         return;
       }
-      // loadChildren() reverts aria-expanded to 'false' when the children fetch
-      // fails; announce that instead of a success that didn't happen, and leave
-      // the cursor where it is rather than re-placing it as if it opened.
-      if (prev.getAttribute('aria-expanded') !== 'true') {
+      // A failed or canceled load leaves the row closed; announce that instead
+      // of a success that didn't happen, and leave the cursor where it is
+      // rather than re-placing it as if it opened.
+      if (!opened) {
         announce(
           Drupal.t('Could not open @title.', {
             '@title': titleOf(prev, this.titleSelector),
@@ -773,7 +773,7 @@
         grabbed,
         intent,
         this.moveUrl,
-        this.expand,
+        this.element,
         this.getCsrfToken(),
         this.options,
       );

@@ -31,8 +31,8 @@
      *   The root treegrid element.
      * @param {string} moveUrl
      *   The move endpoint.
-     * @param {object} expand
-     *   The treegrid ExpandManager, for hover-to-expand and commit refreshes.
+     * @param {HTMLElement} element
+     *   The <drupal-treegrid> element, for hover-to-expand and commit refreshes.
      * @param {string} csrfToken
      *   The X-CSRF-Token value passed to commit, or ''.
      * @param {Drupal.treegridReorder.DropIndicator} indicator
@@ -51,7 +51,7 @@
     constructor(
       tree,
       moveUrl,
-      expand,
+      element,
       csrfToken,
       indicator,
       onGestureStart,
@@ -60,7 +60,7 @@
     ) {
       this.tree = tree;
       this.moveUrl = moveUrl;
-      this.expand = expand;
+      this.element = element;
       this.csrfToken = csrfToken;
       this.indicator = indicator;
       this.onGestureStart = onGestureStart;
@@ -191,7 +191,7 @@
           row,
           intent,
           this.moveUrl,
-          this.expand,
+          this.element,
           this.csrfToken,
           this.options,
         );
@@ -286,7 +286,7 @@
         this.hoverTarget = null;
         this.hoverTimer = null;
         if (row) {
-          this.expand.expand(row);
+          this.element.expandRow(row);
         }
       }, HOVER_EXPAND_MS);
     }

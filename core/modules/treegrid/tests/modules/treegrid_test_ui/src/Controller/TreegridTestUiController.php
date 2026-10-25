@@ -14,18 +14,30 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Serves a minimal treegrid for exercising the spine JS in isolation.
  *
- * A fixed two/three-level tree: page() server-renders the top level into a
- * <drupal-treegrid>, and children() feeds the lazy-expand engine one level at a
- * time. Each row carries a 'checkbox' and a 'markup' column cell so the client
- * cell-renderer registry is exercised on lazily-built rows. There is no write
- * path — this consumer only drives the read/navigate/expand spine.
+ * A two/three-level tree kept in State, so a test can change it: page()
+ * server-renders the top level into a <drupal-treegrid>, and children() feeds
+ * the lazy-expand engine one level at a time. Each row carries a 'checkbox' and
+ * a 'markup' column cell so the client cell-renderer registry is exercised on
+ * lazily-built rows. This consumer only drives the read/navigate/expand spine.
  */
 final class TreegridTestUiController extends ControllerBase {
 
   /**
-   * Child IDs keyed by parent ID ('' is the root).
+   * The State key holding the tree: child IDs keyed by parent ID.
+   *
+   * The key '' is the root. Without a value in State the tree is CHILDREN.
    */
-  private const CHILDREN = [
+  public const TREE_KEY = 'treegrid_test_ui.tree';
+
+  /**
+   * The State key holding the milliseconds the children endpoint waits.
+   */
+  public const CHILDREN_DELAY_KEY = 'treegrid_test_ui.children_delay';
+
+  /**
+   * The tree when State holds none.
+   */
+  public const CHILDREN = [
     '' => ['p1', 'p2', 'leaf1'],
     'p1' => ['c1a', 'c1b'],
     'c1b' => ['c1b1'],
@@ -33,38 +45,10 @@ final class TreegridTestUiController extends ControllerBase {
   ];
 
   /**
-   * Parent ID keyed by item ID.
-   */
-  private const PARENT = [
-    'p1' => '',
-    'p2' => '',
-    'leaf1' => '',
-    'c1a' => 'p1',
-    'c1b' => 'p1',
-    'c1b1' => 'c1b',
-    'c2a' => 'p2',
-    'c2b' => 'p2',
-  ];
-
-  /**
-   * Depth (1-based) keyed by item ID.
-   */
-  private const DEPTH = [
-    'p1' => 1,
-    'p2' => 1,
-    'leaf1' => 1,
-    'c1a' => 2,
-    'c1b' => 2,
-    'c1b1' => 3,
-    'c2a' => 2,
-    'c2b' => 2,
-  ];
-
-  /**
    * Renders the test page: the server-rendered top level of the tree.
    */
   public function page(): array {
-    $top = self::CHILDREN[''];
+    $top = $this->tree()[''] ?? [];
     $set_size = count($top);
     $rows = '';
     foreach ($top as $i => $id) {
@@ -89,10 +73,24 @@ final class TreegridTestUiController extends ControllerBase {
    * Returns one level of children as JSON for the lazy-expand engine.
    */
   public function children(Request $request): JsonResponse {
+    $delay = (int) $this->state()->get(self::CHILDREN_DELAY_KEY, 0);
+    if ($delay > 0) {
+      usleep($delay * 1000);
+    }
     $parent = (string) $request->query->get('parent', '');
-    $ids = self::CHILDREN[$parent] ?? [];
+    $ids = $this->tree()[$parent] ?? [];
     $items = array_map(fn(string $id): array => $this->item($id), $ids);
     return new JsonResponse(['parent' => $parent ?: NULL, 'items' => array_values($items)]);
+  }
+
+  /**
+   * The current tree: child IDs keyed by parent ID.
+   *
+   * @return array<string, string[]>
+   *   The tree.
+   */
+  private function tree(): array {
+    return $this->state()->get(self::TREE_KEY, self::CHILDREN);
   }
 
   /**
@@ -105,15 +103,27 @@ final class TreegridTestUiController extends ControllerBase {
    *   The item data, matching the JSON shape the spine consumes.
    */
   private function item(string $id): array {
+    $tree = $this->tree();
+    $parents = [];
+    foreach ($tree as $parent_id => $child_ids) {
+      foreach ($child_ids as $child_id) {
+        $parents[$child_id] = (string) $parent_id;
+      }
+    }
+    $parent = $parents[$id] ?? '';
+    $depth = 1;
+    for ($up = $parent; $up !== ''; $up = $parents[$up] ?? '') {
+      $depth++;
+    }
     // Checkbox value varies by ID so a test can assert the renderer reads it:
     // IDs containing "a" render unchecked, the rest checked.
     $checked = !str_contains($id, 'a');
     return [
       'id' => $id,
-      'parent_id' => self::PARENT[$id],
+      'parent_id' => $parent,
       'title' => 'Item ' . $id,
-      'has_children' => isset(self::CHILDREN[$id]),
-      'depth' => self::DEPTH[$id],
+      'has_children' => !empty($tree[$id]),
+      'depth' => $depth,
       'columns' => [
         'check' => [
           'type' => 'checkbox',

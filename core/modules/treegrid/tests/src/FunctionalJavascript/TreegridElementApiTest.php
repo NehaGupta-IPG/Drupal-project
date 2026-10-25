@@ -6,6 +6,7 @@ namespace Drupal\Tests\treegrid\FunctionalJavascript;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\treegrid_test_ui\Controller\TreegridTestUiController;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -209,6 +210,156 @@ final class TreegridElementApiTest extends WebDriverTestBase {
     $this->assertTrue($this->getSession()->evaluateScript('return window.apiTest.result;'));
   }
 
+  /**
+   * A unit can open a row and refresh a level without waiting for itself.
+   */
+  public function testUnitLoadsAndRefreshesInline(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="p1"]');
+      return element.exclusive(async (unit) => [
+        await unit.expandRow(row),
+        await unit.refreshLevel('p1'),
+      ]);
+    JS);
+
+    $this->assertSame([TRUE, TRUE], $this->getSession()->evaluateScript('return window.apiTest.result;'));
+    $this->assertCount(2, $this->getSession()->getPage()->findAll('css', 'tr[role="row"][data-parent-id="p1"]'));
+  }
+
+  /**
+   * An expand started behind a running unit loads only after it, as waiting.
+   */
+  public function testQueuedExpandWaitsBehindRunningUnit(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->countChildrenRequests();
+    $this->getSession()->executeScript(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="p1"]');
+      element.exclusive(() => new Promise((resolve) => window.setTimeout(resolve, 1000)));
+      const expanded = element.expandRow(row);
+      window.apiTest.waiting = {
+        loading: row.dataset.treegridLoading,
+        busy: row.getAttribute('aria-busy'),
+        expanded: row.getAttribute('aria-expanded'),
+        requests: window.apiTest.requests,
+      };
+      expanded.then((value) => {
+        window.apiTest.result = value;
+        window.apiTest.done = true;
+      });
+    JS);
+
+    $waiting = $this->getSession()->evaluateScript('return window.apiTest.waiting;');
+    $this->assertSame('waiting', $waiting['loading']);
+    $this->assertSame('true', $waiting['busy']);
+    $this->assertSame('false', $waiting['expanded']);
+    $this->assertSame(0, $waiting['requests']);
+
+    $this->assertJsCondition('window.apiTest.done === true');
+    $this->assertTrue($this->getSession()->evaluateScript('return window.apiTest.result;'));
+    $this->assertSame(1, $this->getSession()->evaluateScript('return window.apiTest.requests;'));
+    $row = $this->getSession()->getPage()->find('css', 'tr[data-id="p1"]');
+    $this->assertSame('true', $row->getAttribute('aria-expanded'));
+    $this->assertNull($row->getAttribute('data-treegrid-loading'));
+    $this->assertNull($row->getAttribute('aria-busy'));
+  }
+
+  /**
+   * A second expand while a load waits or runs returns the same promise.
+   */
+  public function testSecondExpandReturnsSamePromise(): void {
+    \Drupal::state()->set(TreegridTestUiController::CHILDREN_DELAY_KEY, 600);
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="p1"]');
+      const first = element.expandRow(row);
+      const whileWaiting = element.expandRow(row);
+      await new Promise((resolve) => window.setTimeout(resolve, 300));
+      const whileRunning = element.expandRow(row);
+      const results = [first === whileWaiting, first === whileRunning];
+      await first;
+      return results;
+    JS);
+
+    $this->assertSame([TRUE, TRUE], $this->getSession()->evaluateScript('return window.apiTest.result;'));
+  }
+
+  /**
+   * Collapsing a row whose load waits cancels the wait.
+   */
+  public function testCollapseCancelsWaitingLoad(): void {
+    $this->assertWaitCanceledBy("element.collapseRow(row);");
+  }
+
+  /**
+   * Pressing the toggle of a row whose load waits cancels the wait.
+   */
+  public function testToggleCancelsWaitingLoad(): void {
+    $this->assertWaitCanceledBy("row.querySelector('[data-treegrid-toggle]').click();");
+  }
+
+  /**
+   * Pressing Left on a row whose load waits cancels the wait.
+   */
+  public function testLeftKeyCancelsWaitingLoad(): void {
+    $this->assertWaitCanceledBy(
+      "row.focus(); row.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true }));",
+    );
+  }
+
+  /**
+   * A descendant marked keep-visible blocks the collapse.
+   */
+  public function testCollapseRowBlockedByKeepVisibleDescendant(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="p1"]');
+      await element.expandRow(row);
+      const child = element.tree.querySelector('tr[data-id="c1a"]');
+      child.dataset.treegridKeepVisible = 'true';
+      const blocked = element.collapseRow(row);
+      const stillOpen = row.getAttribute('aria-expanded');
+      delete child.dataset.treegridKeepVisible;
+      return [blocked, stillOpen, element.collapseRow(row)];
+    JS);
+
+    $this->assertSame([FALSE, 'true', TRUE], $this->getSession()->evaluateScript('return window.apiTest.result;'));
+  }
+
+  /**
+   * A refresh picks up a change made to the server's tree.
+   */
+  public function testRefreshLevelPicksUpServerChange(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      await element.expandRow(element.tree.querySelector('tr[data-id="p1"]'));
+      return true;
+    JS);
+    $tree = TreegridTestUiController::CHILDREN;
+    $tree['p1'] = ['c1b', 'c1c'];
+    \Drupal::state()->set(TreegridTestUiController::TREE_KEY, $tree);
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const refreshed = await element.refreshLevel('p1');
+      const ids = Array.from(element.tree.querySelectorAll('tr[data-parent-id="p1"]')).map((row) => row.dataset.id);
+      return { refreshed, ids };
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertTrue($result['refreshed']);
+    $this->assertSame(['c1b', 'c1c'], $result['ids']);
+  }
+
   // Helpers.
 
   /**
@@ -230,6 +381,53 @@ final class TreegridElementApiTest extends WebDriverTestBase {
   }
 
   /**
+   * Counts the children requests the page sends in window.apiTest.requests.
+   */
+  private function countChildrenRequests(): void {
+    $this->getSession()->executeScript(<<<'JS'
+      window.apiTest = { requests: 0, done: false, result: null };
+      const originalFetch = window.fetch;
+      window.fetch = function (url) {
+        if (String(url).includes('/treegrid-test-ui/children')) {
+          window.apiTest.requests += 1;
+        }
+        return originalFetch.apply(this, arguments);
+      };
+    JS);
+  }
+
+  /**
+   * Asserts an action cancels an expand waiting behind a running unit.
+   *
+   * @param string $action
+   *   Script that cancels the wait; `element` and `row` (p1) are in scope.
+   */
+  private function assertWaitCanceledBy(string $action): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->countChildrenRequests();
+    $this->getSession()->executeScript(<<<JS
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="p1"]');
+      element.exclusive(() => new Promise((resolve) => window.setTimeout(resolve, 800)));
+      const expanded = element.expandRow(row);
+      $action
+      expanded.then((value) => {
+        window.apiTest.result = value;
+        window.apiTest.done = true;
+      });
+    JS);
+
+    $this->assertJsCondition('window.apiTest.done === true');
+    $this->assertFalse($this->getSession()->evaluateScript('return window.apiTest.result;'));
+    $row = $this->getSession()->getPage()->find('css', 'tr[data-id="p1"]');
+    $this->assertNull($row->getAttribute('data-treegrid-loading'));
+    // Wait past the blocking unit; nothing may be fetched after it.
+    usleep(1200000);
+    $this->assertSame(0, $this->getSession()->evaluateScript('return window.apiTest.requests;'));
+  }
+
+  /**
    * Runs a script that returns a promise and stores its value in window.apiTest.
    *
    * @param string $script
@@ -238,7 +436,7 @@ final class TreegridElementApiTest extends WebDriverTestBase {
   private function runAsync(string $script): void {
     $this->getSession()->executeScript(
       'window.apiTest = { done: false, result: null };'
-      . '(function () {' . $script . '})().then(function (value) {'
+      . '(async function () {' . $script . '})().then(function (value) {'
       . ' window.apiTest.result = value; window.apiTest.done = true; });',
     );
     $this->assertJsCondition('window.apiTest.done === true');

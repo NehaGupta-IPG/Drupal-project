@@ -23,6 +23,7 @@
     constructor(extendUnit = () => ({})) {
       this.extendUnit = extendUnit;
       this.tail = Promise.resolve();
+      this.pending = 0;
     }
 
     /**
@@ -35,8 +36,17 @@
      *   Settles with what fn returned or threw, once its turn has come and gone.
      */
     run(fn) {
-      const result = this.tail.then(() => this.runUnit(fn));
-      this.tail = result.catch(() => {});
+      // With nothing ahead, the unit starts at once; its first step then runs
+      // before run() returns, so work started on idle never shows as waiting.
+      const result =
+        this.pending === 0
+          ? this.runUnit(fn)
+          : this.tail.then(() => this.runUnit(fn));
+      this.pending += 1;
+      const finished = () => {
+        this.pending -= 1;
+      };
+      this.tail = result.then(finished, finished);
       return result;
     }
 

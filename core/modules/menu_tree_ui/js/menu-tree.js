@@ -174,7 +174,7 @@
    *   The element, already initialized (element.ready has resolved).
    */
   function wireFeatures(element) {
-    const { tree, expand } = element;
+    const { tree } = element;
     const settings = drupalSettings.menuTreeUi ?? {};
     const { moveUrl, columnUpdateUrl } = settings;
     const container = element.closest('.menu-tree-ui');
@@ -209,7 +209,7 @@
       ? new rr.MoveModeController(
           tree,
           moveUrl,
-          expand,
+          element,
           indicator,
           getToken,
           REORDER_CONFIG,
@@ -339,7 +339,7 @@
       observeStickyOffset();
       document.addEventListener('mousedown', onOutsidePointer);
       // Search jump-to and dismiss.
-      jumpHandler = ns.attachJumpClickHandler({ tree, expand, moveMode });
+      jumpHandler = ns.attachJumpClickHandler({ tree, element, moveMode });
       detachSearchPanel = container ? ns.attachSearchPanel(container) : null;
       // Stream the rest of a truncated top level in as the editor scrolls.
       detachPaging = ns.attachTopLevelPaging(element);
@@ -388,7 +388,7 @@
         const drag = new rr.DragController(
           tree,
           moveUrl,
-          expand,
+          element,
           csrfToken,
           indicator,
           () => moveMode?.cancel(),

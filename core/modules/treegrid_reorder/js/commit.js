@@ -78,8 +78,8 @@
    *   The DropIntent.
    * @param {string} moveUrl
    *   The move endpoint.
-   * @param {object} expand
-   *   The treegrid ExpandManager, for destination auto-expand + group
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element, for destination auto-expand + group
    *   refreshes.
    * @param {?HTMLTableElement} tree
    *   The root treegrid element.
@@ -97,7 +97,7 @@
     row,
     intent,
     moveUrl,
-    expand,
+    element,
     tree,
     movedId,
     csrfToken,
@@ -112,8 +112,8 @@
       target.dataset.hasChildren === 'true' &&
       target.getAttribute('aria-expanded') !== 'true'
     ) {
-      await expand.expand(target);
-      if (target.getAttribute('aria-expanded') !== 'true') {
+      const opened = await element.expandRow(target);
+      if (!opened && target.dataset.treegridLoaded !== 'true') {
         announce(
           Drupal.t('Could not open the destination. Move canceled.'),
           'assertive',
@@ -165,10 +165,10 @@
     // Server confirmed. Re-fetch the visible state of both affected groups.
     // When from === to (sibling reorder under the same parent) the second
     // refresh is a no-op but harmless.
-    const okFrom = await expand.refresh(oldParentId);
+    const okFrom = await element.refreshLevel(oldParentId);
     let okTo = true;
     if (newParentId !== oldParentId) {
-      okTo = await expand.refresh(newParentId);
+      okTo = await element.refreshLevel(newParentId);
     }
     // A refresh whose fetch failed would leave the tree half-synced (a
     // duplicated row, or no tab stop). Reload so the tree resyncs from the
@@ -210,8 +210,8 @@
    *   The DropIntent.
    * @param {string} moveUrl
    *   The move endpoint.
-   * @param {object} expand
-   *   The treegrid ExpandManager.
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element.
    * @param {string} csrfToken
    *   The X-CSRF-Token value, or ''.
    * @param {object} options
@@ -220,7 +220,7 @@
    * @return {Promise<void>}
    *   Resolves once the commit completes.
    */
-  async function commitMove(row, intent, moveUrl, expand, csrfToken, options) {
+  async function commitMove(row, intent, moveUrl, element, csrfToken, options) {
     const movedId = row.dataset.id;
     if (!movedId) {
       return;
@@ -234,7 +234,7 @@
         row,
         intent,
         moveUrl,
-        expand,
+        element,
         tree,
         movedId,
         csrfToken,

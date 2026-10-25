@@ -126,12 +126,17 @@
       const state = {
         tree: null,
         initialized: false,
+        expand: null,
         clickHandlers: [],
         keyHandlers: [],
-        queue: new Drupal.treegrid.Queue(),
         onClick: this.onClick.bind(this),
         onKeyDown: this.onKeyDown.bind(this),
       };
+      // Inside a unit the loading methods run at once instead of queueing.
+      state.queue = new Drupal.treegrid.Queue(() => ({
+        expandRow: (row) => state.expand.expandInline(row),
+        refreshLevel: (parentId) => state.expand.refresh(parentId),
+      }));
       state.ready = new Promise((resolve) => {
         state.resolveReady = resolve;
       });
@@ -202,6 +207,57 @@
     }
 
     /**
+     * Opens a row, loading its children first if they are not loaded yet.
+     *
+     * The load waits its turn in the queue. Call the unit object's expandRow()
+     * instead when running inside a unit.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     *
+     * @return {Promise<boolean>}
+     *   True once the row is open and its level is in. False when the load
+     *   failed or was canceled, or the row has no children.
+     */
+    expandRow(row) {
+      return internals.get(this).expand.expandRow(row);
+    }
+
+    /**
+     * Collapses a row, hiding its loaded descendants.
+     *
+     * Never queued. Collapsing a row whose queued load is still waiting cancels
+     * the load.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     *
+     * @return {boolean}
+     *   False when a row marked data-treegrid-keep-visible blocks the collapse.
+     */
+    collapseRow(row) {
+      return internals.get(this).expand.collapseRow(row);
+    }
+
+    /**
+     * Reloads a level from the server and reconciles its rows.
+     *
+     * Runs through the queue. Call the unit object's refreshLevel() instead
+     * when running inside a unit.
+     *
+     * @param {string} parentId
+     *   The parent's id, or '' for the top level.
+     * @param {object} [options]
+     *   Reserved; no option is defined.
+     *
+     * @return {Promise<boolean>}
+     *   False when the fetch failed.
+     */
+    refreshLevel(parentId, options = {}) {
+      return this.exclusive((unit) => unit.refreshLevel(parentId, options));
+    }
+
+    /**
      * Validates the markup, then initializes, parks or resumes the element.
      */
     connectedCallback() {
@@ -244,12 +300,7 @@
       this.tree.querySelectorAll(ROW).forEach((row) => {
         this.rowWindow.observe(row);
       });
-      this.expand = new Drupal.treegrid.ExpandManager(
-        this.dataset.childrenUrl,
-        this.rowWindow,
-        this.tree,
-        provider,
-      );
+      state.expand = new Drupal.treegrid.ExpandManager(this, provider);
 
       this.addListeners();
 
@@ -348,7 +399,7 @@
         const row = toggle.closest(ROW);
         if (row && row.dataset.hasChildren === 'true') {
           event.preventDefault();
-          this.expand.toggle(row);
+          internals.get(this).expand.toggle(row);
         }
         return;
       }
@@ -374,7 +425,10 @@
       if (keyHandlers.some((entry) => entry.handler(event))) {
         return;
       }
-      handleKeyDown(event, { tree: this.tree, expand: this.expand });
+      handleKeyDown(event, {
+        tree: this.tree,
+        expand: internals.get(this).expand,
+      });
     }
 
     /**
@@ -398,7 +452,7 @@
       const topParents = topRows.filter(
         (row) => row.dataset.hasChildren === 'true',
       );
-      await Promise.all(topParents.map((row) => this.expand.expand(row)));
+      await Promise.all(topParents.map((row) => this.expandRow(row)));
 
       if (topRows.length === 1 && topParents.length === 1) {
         const children = childRows(topParents[0]);
@@ -406,7 +460,7 @@
           const childParents = children.filter(
             (row) => row.dataset.hasChildren === 'true',
           );
-          await Promise.all(childParents.map((row) => this.expand.expand(row)));
+          await Promise.all(childParents.map((row) => this.expandRow(row)));
         }
       }
     }

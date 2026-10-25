@@ -19,7 +19,7 @@
    * loading its children if needed), then scrolls and focuses the target.
    *
    * @param {object} ctx
-   *   Context: {tree: HTMLTableElement, expand: ExpandManager, moveMode?:
+   *   Context: {tree: HTMLTableElement, element: HTMLElement, moveMode?:
    *   MoveModeController}.
    * @param {string} targetId
    *   The link plugin ID to jump to.
@@ -44,7 +44,7 @@
       }
       if (row.getAttribute('aria-expanded') !== 'true') {
         // eslint-disable-next-line no-await-in-loop
-        await ctx.expand.expand(row);
+        await ctx.element.expandRow(row);
       }
     }
     const target = findRow(ctx.tree, targetId);
@@ -74,7 +74,8 @@
    * Wires document-level click handling for [data-mtu-jump-id].
    *
    * @param {object} ctx
-   *   Context: {tree: HTMLTableElement, expand: ExpandManager}.
+   *   Context: {tree: HTMLTableElement, element: HTMLElement, moveMode?:
+   *   MoveModeController}.
    *
    * @return {function(MouseEvent): void}
    *   The bound handler, so the caller can remove it on teardown.

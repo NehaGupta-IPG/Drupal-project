@@ -171,10 +171,10 @@
    * Wires the reorder gestures onto an upgraded <drupal-treegrid>.
    *
    * @param {HTMLElement} element
-   *   The connected element (element.tree / element.expand are set).
+   *   The initialized element (element.ready has resolved).
    */
   function wireFeatures(element) {
-    const { tree, expand } = element;
+    const { tree } = element;
     const { moveUrl } = drupalSettings.treegridReorderTest ?? {};
     if (!moveUrl) {
       return;
@@ -185,7 +185,7 @@
     const moveMode = new rr.MoveModeController(
       tree,
       moveUrl,
-      expand,
+      element,
       indicator,
       getToken,
       REORDER_CONFIG,
@@ -245,7 +245,7 @@
     const drag = new rr.DragController(
       tree,
       moveUrl,
-      expand,
+      element,
       '',
       indicator,
       () => moveMode.cancel(),

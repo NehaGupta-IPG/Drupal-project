@@ -73,12 +73,10 @@
 
   class ExpandManager {
     /**
-     * @param {string} childrenUrl
-     *   The endpoint returning one level of children as JSON.
-     * @param {?Drupal.treegrid.RowWindow} rowWindow
-     *   The windowing helper, or undefined when virtualization is off.
-     * @param {HTMLTableElement} tree
-     *   The root treegrid element.
+     * @param {HTMLElement} element
+     *   The <drupal-treegrid> element; its queue serializes level loads and
+     *   refreshes, and its rowWindow tracks visibility (rebuilt on reconnect,
+     *   so it is read late).
      * @param {object} rowBuilder
      *   The consumer's row renderer.
      * @param {function} rowBuilder.buildRows
@@ -86,20 +84,47 @@
      * @param {function} rowBuilder.buildRow
      *   Builds a single row element from one item.
      */
-    constructor(childrenUrl, rowWindow, tree, rowBuilder) {
-      this.childrenUrl = childrenUrl;
-      this.rowWindow = rowWindow;
-      this.tree = tree;
+    constructor(element, rowBuilder) {
+      this.element = element;
       // The row renderer is injected so the engine stays consumer-agnostic; the
       // consumer supplies how its items become DOM through the registered
       // provider. rowBuilder = { buildRows, buildRow }.
       this.buildRows = rowBuilder.buildRows;
       this.buildRow = rowBuilder.buildRow;
-      this.inFlight = new Map();
+      // Level loads waiting for or running in a queue unit, keyed by row id.
+      this.queued = new Map();
+      // Level loads running inline in a unit, keyed by row id.
+      this.loading = new Map();
     }
 
     /**
-     * Toggles a row between expanded and collapsed.
+     * @return {string}
+     *   The endpoint returning one level of children as JSON.
+     */
+    get childrenUrl() {
+      return this.element.dataset.childrenUrl;
+    }
+
+    /**
+     * @return {HTMLTableElement}
+     *   The root treegrid table.
+     */
+    get tree() {
+      return this.element.tree;
+    }
+
+    /**
+     * @return {?Drupal.treegrid.RowWindow}
+     *   The element's current windowing helper.
+     */
+    get rowWindow() {
+      return this.element.rowWindow;
+    }
+
+    /**
+     * Toggles a row between expanded and collapsed (a user's toggle).
+     *
+     * Toggling a row whose queued load is still waiting cancels the wait.
      *
      * @param {HTMLElement} row
      *   The parent row.
@@ -108,82 +133,213 @@
      *   Resolves once the toggle (and any fetch) is done.
      */
     async toggle(row) {
+      if (this.cancelWait(row)) {
+        return;
+      }
       if (row.getAttribute('aria-expanded') === 'true') {
-        this.collapse(row, true);
+        this.collapseRow(row, true);
       } else {
-        await this.expand(row, true);
+        await this.expandRow(row, true);
       }
     }
 
     /**
-     * Expands a row, lazy-loading its children on first open.
+     * Opens a row, loading its children through the element's queue first.
+     *
+     * A row whose children are already loaded opens at once. Otherwise the
+     * load waits its turn in the queue; until then the row carries
+     * data-treegrid-loading="waiting" and aria-busy, and a second call returns
+     * the same promise.
      *
      * @param {HTMLElement} row
      *   The parent row.
      * @param {boolean} [announce]
-     *   Whether to announce the new state by name (user-initiated toggles do).
+     *   Whether to announce the row by name (user-initiated toggles do).
      *
-     * @return {Promise<void>}
-     *   Resolves once children are present.
+     * @return {Promise<boolean>}
+     *   True once the row is open and its level is in. False when the load
+     *   failed or was canceled, or the row has no children.
      */
-    async expand(row, announce = false) {
+    expandRow(row, announce = false) {
       const { id } = row.dataset;
       if (!id) {
+        return Promise.resolve(false);
+      }
+      if (row.dataset.treegridLoaded === 'true') {
+        return Promise.resolve(this.openLoaded(row, announce));
+      }
+      const existing = this.queued.get(id);
+      if (existing) {
+        return existing.promise;
+      }
+
+      const entry = { row, announce, state: 'waiting', canceled: false };
+      entry.promise = new Promise((resolve) => {
+        entry.resolve = resolve;
+      });
+      this.queued.set(id, entry);
+      row.dataset.treegridLoading = 'waiting';
+      row.setAttribute('aria-busy', 'true');
+      this.element
+        .exclusive(() => this.runQueued(entry))
+        .catch(() => entry.resolve(false));
+      return entry.promise;
+    }
+
+    /**
+     * Runs a queued level load when its turn comes.
+     *
+     * @param {object} entry
+     *   The queued load: { row, announce, state, canceled, resolve }.
+     *
+     * @return {Promise<void>}
+     *   Resolves once the load has run (or was skipped as canceled).
+     */
+    async runQueued(entry) {
+      const { row } = entry;
+      const { id } = row.dataset;
+      if (entry.canceled) {
         return;
+      }
+      entry.state = 'running';
+      try {
+        // A unit that ran earlier may have loaded the row already; then there
+        // is only the showing left to do.
+        entry.resolve(await this.expandInline(row, entry.announce));
+      } finally {
+        if (this.queued.get(id) === entry) {
+          this.queued.delete(id);
+        }
+        entry.resolve(false);
+      }
+    }
+
+    /**
+     * Opens a row inside a running unit, loading its children at once.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     * @param {boolean} [announce]
+     *   Whether to announce the row by name.
+     *
+     * @return {Promise<boolean>}
+     *   True once the row is open and its level is in.
+     */
+    async expandInline(row, announce = false) {
+      const { id } = row.dataset;
+      if (!id) {
+        return false;
+      }
+      if (row.dataset.treegridLoaded === 'true') {
+        return this.openLoaded(row, announce);
+      }
+      const running = this.loading.get(id);
+      if (running) {
+        return running;
+      }
+      const promise = this.loadLevel(row, id, announce);
+      this.loading.set(id, promise);
+      try {
+        return await promise;
+      } finally {
+        this.loading.delete(id);
+      }
+    }
+
+    /**
+     * Opens a row whose children are already in the DOM.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     * @param {boolean} announce
+     *   Whether to announce the row by name.
+     *
+     * @return {boolean}
+     *   True if the row opened; false when its level has no rows.
+     */
+    openLoaded(row, announce) {
+      this.clearLoading(row);
+      if (descendantRows(row).length === 0) {
+        return false;
       }
       row.setAttribute('aria-expanded', 'true');
       if (announce) {
         announceToggle(row);
       }
+      // showSubtree re-observes each row it reveals; rows that stay collapsed
+      // are left unobserved so the observer only ever tracks visible rows.
+      this.showSubtree(row);
+      return true;
+    }
 
-      if (row.dataset.treegridLoaded === 'true') {
-        // showSubtree re-observes each row it reveals; rows that stay collapsed
-        // are left unobserved so the observer only ever tracks visible rows.
-        this.showSubtree(row);
-        return;
+    /**
+     * Cancels a queued level load that has not started.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     *
+     * @return {boolean}
+     *   True if a waiting load was canceled.
+     */
+    cancelWait(row) {
+      const { id } = row.dataset;
+      const entry = id ? this.queued.get(id) : null;
+      if (!entry || entry.state !== 'waiting') {
+        return false;
       }
+      entry.canceled = true;
+      this.queued.delete(id);
+      this.clearLoading(row);
+      entry.resolve(false);
+      return true;
+    }
 
-      // Avoid double-fetches if the user mashes the toggle.
-      const existing = this.inFlight.get(id);
-      if (existing) {
-        await existing;
-        return;
-      }
-      const promise = this.loadChildren(row, id);
-      this.inFlight.set(id, promise);
-      try {
-        await promise;
-      } finally {
-        this.inFlight.delete(id);
-      }
+    /**
+     * Removes the loading marks from a row.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     */
+    // eslint-disable-next-line class-methods-use-this
+    clearLoading(row) {
+      delete row.dataset.treegridLoading;
+      row.removeAttribute('aria-busy');
     }
 
     /**
      * Collapses a row, hiding its already-loaded descendant rows.
      *
+     * Collapsing a row whose queued load is still waiting cancels the wait.
+     * A row holding a descendant a feature asked to keep visible (e.g. a row
+     * being carried in move mode) stays open: the editor must be able to see
+     * it, and the cursor would be lost if it vanished. The feature marks such
+     * a row with data-treegrid-keep-visible for the duration.
+     *
      * @param {HTMLElement} row
      *   The parent row.
      * @param {boolean} [announce]
      *   Whether to announce the new state by name (user-initiated toggles do).
+     *
+     * @return {boolean}
+     *   False when a keep-visible descendant blocks the collapse.
      */
-    // eslint-disable-next-line class-methods-use-this
-    collapse(row, announce = false) {
-      // Never fold away a section that holds a row a feature has asked to keep
-      // visible (e.g. a row being carried in move mode): the editor must be able
-      // to see it, and the cursor would be lost if it vanished. The feature
-      // marks such a row with data-treegrid-keep-visible for the duration.
+    collapseRow(row, announce = false) {
+      if (this.cancelWait(row)) {
+        return true;
+      }
       if (
         descendantRows(row).some(
           (r) => r.dataset.treegridKeepVisible === 'true',
         )
       ) {
-        return;
+        return false;
       }
       row.setAttribute('aria-expanded', 'false');
       if (announce) {
         announceToggle(row);
       }
       this.hideSubtree(row);
+      return true;
     }
 
     /**
@@ -379,23 +535,36 @@
     }
 
     /**
-     * Loads and inserts a row's children on first expand.
+     * Loads and inserts a row's children, marking the row loaded.
      *
      * @param {HTMLElement} row
      *   The parent row.
      * @param {string} parentId
      *   The parent's plugin ID.
+     * @param {boolean} announce
+     *   Whether to announce the row by name.
      *
-     * @return {Promise<void>}
-     *   Resolves once children are inserted (or the fetch failed).
+     * @return {Promise<boolean>}
+     *   True if the row ended up open with its children in. False when the
+     *   fetch failed, the level has no rows, or the row was collapsed meanwhile.
      */
-    async loadChildren(row, parentId) {
+    async loadLevel(row, parentId, announce) {
+      const isParent = row.dataset.hasChildren === 'true';
       row.dataset.treegridLoading = 'loading';
+      row.setAttribute('aria-busy', 'true');
+      if (isParent) {
+        row.setAttribute('aria-expanded', 'true');
+        if (announce) {
+          announceToggle(row);
+        }
+      }
       try {
         const items = await this.fetchChildren(parentId);
         if (items === null) {
-          row.setAttribute('aria-expanded', 'false');
-          return;
+          if (isParent) {
+            row.setAttribute('aria-expanded', 'false');
+          }
+          return false;
         }
         const depth = levelOf(row) + 1;
         const fragment = this.buildRows(items, depth);
@@ -412,14 +581,26 @@
           setRowControlsActive(r, false);
           this.rowWindow?.observe(r);
         });
+        if (items.length === 0) {
+          // A level with no rows is a leaf: it counts as loaded but never open.
+          row.removeAttribute('aria-expanded');
+          return false;
+        }
+        row.dataset.hasChildren = 'true';
+        row.setAttribute(
+          'aria-expanded',
+          row.getAttribute('aria-expanded') ?? 'true',
+        );
         // The row may have been collapsed while this fetch was in flight, when
         // there were no child rows yet to hide. Hide the children that just
         // arrived so they do not show under a now-collapsed row.
         if (row.getAttribute('aria-expanded') !== 'true') {
           this.hideSubtree(row);
+          return false;
         }
+        return true;
       } finally {
-        delete row.dataset.treegridLoading;
+        this.clearLoading(row);
       }
     }
   }
