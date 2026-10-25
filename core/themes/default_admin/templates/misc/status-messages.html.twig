@@ -44,7 +44,7 @@
         set is_message_with_icon = type in ['error', 'status', 'warning']
       %}
 
-      <div role="{{ type in ['error', 'warning'] ? 'alert' : 'status' }}" {{ attributes.addClass(classes)|without('role', 'aria-label') }} data-drupal-message-set>
+      <div role="{{ type in ['error', 'warning'] ? 'alert' : 'status' }}" aria-labelledby="{{ title_ids[type] }}"{{ attributes.addClass(classes)|without('role', 'aria-label') }} data-drupal-message-set>
         {% if is_message_with_title or is_message_with_icon %}
           <div class="messages__header">
             {% if is_message_with_title %}

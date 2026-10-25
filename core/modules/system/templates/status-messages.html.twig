@@ -28,7 +28,7 @@
 #}
 <div data-drupal-messages>
 {% for type, messages in message_list %}
-  <div role="{{ type in ['error', 'warning'] ? 'alert' : 'status' }}" {{ attributes|without('role', 'aria-label') }} data-drupal-message-set>
+  <div role="{{ type in ['error', 'warning'] ? 'alert' : 'status' }}" aria-label="{{ status_headings[type] }}"{{ attributes|without('role', 'aria-label') }} data-drupal-message-set>
     {% if status_headings[type] %}
       <h2 class="visually-hidden">{{ status_headings[type] }}</h2>
     {% endif %}
