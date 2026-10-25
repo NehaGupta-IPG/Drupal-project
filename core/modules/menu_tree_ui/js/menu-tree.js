@@ -160,14 +160,18 @@
         addPageListeners();
       }
     };
-    // A level that came back empty turns its parent into a leaf, so the
-    // disclosure button goes.
+    // A level that came back empty turns a parent that had a disclosure button
+    // into a leaf, so the button goes. A leaf opened for a child drop has no
+    // button and is left alone.
     const onLevelLoaded = (event) => {
       const { parentId } = event.detail;
       const row = element.tree.querySelector(
         `${ROW}[data-id="${CSS.escape(parentId)}"]`,
       );
-      if (row?.dataset.hasChildren === 'false') {
+      const toggle = row?.querySelector(
+        '.menu-tree-ui-row__name > button.menu-tree-ui-row__toggle',
+      );
+      if (toggle && row.dataset.hasChildren === 'false') {
         applyParentMetadata(parentId);
       }
     };
