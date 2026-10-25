@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional\Views;
 
+use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -24,6 +25,16 @@ class RevisionLinkTest extends NodeTestBase {
    * @var array
    */
   public static $testViews = ['test_node_revision_links'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = [
+    'node',
+    'node_test_views',
+    'language',
+    'content_translation',
+  ];
 
   /**
    * {@inheritdoc}
@@ -106,6 +117,57 @@ class RevisionLinkTest extends NodeTestBase {
         }
       }
     }
+  }
+
+  /**
+   * Tests revision translation revert link.
+   */
+  public function testRevisionTranslationRevertLink(): void {
+    $this->drupalCreateContentType(['name' => 'page', 'type' => 'page']);
+    // Enable additional languages.
+    ConfigurableLanguage::createFromLangcode('it')->save();
+
+    // Enable translation for page nodes.
+    \Drupal::service('content_translation.manager')->setEnabled('node', 'page', TRUE);
+
+    // Create initial node.
+    $node = $this->createNode(['langcode' => 'en']);
+    $first_revision_id = $node->getRevisionId();
+    // Create revision because translation is attached right to it.
+    $node->setNewRevision(TRUE);
+    $node->save();
+    $second_revision_id = $node->getRevisionId();
+    // Create translation.
+    $translation = $node->addTranslation('it', ['title' => $this->randomMachineName()]);
+    $translation->save();
+    $translation_revision_id = $translation->getRevisionId();
+    // And create new revision again.
+    $node->setNewRevision(TRUE);
+    $node->save();
+
+    // Create and log in user.
+    $web_user = $this->drupalCreateUser(['revert all revisions']);
+
+    $this->drupalLogin($web_user);
+
+    $this->drupalGet('test-node-revision-links');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Check expected links.
+    $url = $node->toUrl()->toString();
+    $this->assertSession()->linkByHrefExists($url . '/revisions/' . $first_revision_id . '/revert/en', 0, 'Revert link to first revision exists.');
+    $this->assertSession()->linkByHrefExists($url . '/revisions/' . $second_revision_id . '/revert/en', 0, 'Revert link to second revision exists.');
+    $this->assertSession()->linkByHrefNotExists($url . '/revisions/' . $node->getRevisionId() . '/revert/en', 'Revert link to latest revision not exists.');
+    $this->assertSession()->linkByHrefExists($translation->toUrl()->toString() . '/revisions/' . $translation_revision_id . '/revert/it', 0, 'Revert link to translation exists.');
+    // There should a link for revert to first revision, but it should contain
+    // language, and there should not be any link to revert all translation.
+    $href = $url . '/revisions/' . $first_revision_id . '/revert';
+    $xpath = $this->assertSession()->buildXPathQuery('//a[contains(@href, :href) and not(contains(@href, :not_href))]', [
+      ':href' => $href,
+      ':not_href' => $href . '/en',
+    ]);
+    $links = $this->getSession()->getPage()->findAll('xpath', $xpath);
+    $this->assertEmpty($links, 'Link for reverting all translations not exists.');
   }
 
 }

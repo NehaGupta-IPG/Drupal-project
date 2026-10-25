@@ -23,10 +23,29 @@ class RevisionLinkRevert extends RevisionLink {
     if (!$node) {
       return NULL;
     }
-    return Url::fromRoute('node.revision_revert_confirm', [
-      'node' => $node->id(),
-      'node_revision' => $node->getRevisionId(),
-    ]);
+    $nid = $node->id();
+    $node_revision = $node->getRevisionId();
+    // Get language of current row.
+    /** @var \Drupal\node\NodeInterface $translation */
+    $translation = $this->getEntityTranslationByRelationship($node, $row);
+    $langcode = $translation->language()->getId();
+    // Detect if the latest version has any translation.
+    $original = $node->original;
+    $languages = $original->getTranslationLanguages();
+    $has_translations = (count($languages) > 1);
+
+    // When translations enabled default revision revert form will revert all
+    // translations, but revert translation form only for specific language.
+    return $has_translations ?
+      Url::fromRoute('node.revision_revert_translation_confirm', [
+        'node' => $nid,
+        'node_revision' => $node_revision,
+        'langcode' => $langcode,
+      ]) :
+      Url::fromRoute('node.revision_revert_confirm', [
+        'node' => $nid,
+        'node_revision' => $node_revision,
+      ]);
   }
 
   /**
