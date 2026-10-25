@@ -101,7 +101,7 @@ services:
       - { name: paramconverter }
   jsonapi.exception_subscriber:
     class: Drupal\jsonapi\EventSubscriber\DefaultExceptionSubscriber
-    arguments: ['@jsonapi.serializer', '%serializer.formats%']
+    arguments: ['@jsonapi.serializer', '%serializer.formats%', '@config.factory']
 
   logger.channel.jsonapi:
     parent: logger.channel_base

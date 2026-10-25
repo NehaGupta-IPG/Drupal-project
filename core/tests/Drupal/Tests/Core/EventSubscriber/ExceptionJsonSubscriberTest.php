@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\EventSubscriber;
 
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\EventSubscriber\ExceptionJsonSubscriber;
 use Drupal\Core\Http\Exception\CacheableMethodNotAllowedHttpException;
 use Drupal\Tests\UnitTestCase;
@@ -33,9 +34,11 @@ class ExceptionJsonSubscriberTest extends UnitTestCase {
   public function testOn4xx(HttpExceptionInterface $exception, string $expected_response_class): void {
     $kernel = $this->prophesize(HttpKernelInterface::class);
     $request = Request::create('/test');
+    $request->setRequestFormat('json');
     $event = new ExceptionEvent($kernel->reveal(), $request, HttpKernelInterface::MAIN_REQUEST, $exception);
-    $subscriber = new ExceptionJsonSubscriber();
-    $subscriber->on4xx($event);
+    $configFactory = $this->prophesize(ConfigFactoryInterface::class);
+    $subscriber = new ExceptionJsonSubscriber($configFactory->reveal());
+    $subscriber->onException($event);
     $response = $event->getResponse();
 
     $this->assertInstanceOf($expected_response_class, $response);

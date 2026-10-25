@@ -1517,6 +1517,8 @@ services:
     arguments: ['@database']
   exception.default_json:
     class: Drupal\Core\EventSubscriber\ExceptionJsonSubscriber
+    arguments:
+      - '@config.factory'
   exception.default_html:
     class: Drupal\Core\EventSubscriber\DefaultExceptionHtmlSubscriber
     arguments: ['@http_kernel', '@logger.channel.php', '@redirect.destination', '@router.no_access_checks']

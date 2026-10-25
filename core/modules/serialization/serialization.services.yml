@@ -104,7 +104,7 @@ services:
       - { name: entity_resolver}
   serialization.exception.default:
     class: Drupal\serialization\EventSubscriber\DefaultExceptionSubscriber
-    arguments: ['@serializer', '%serializer.formats%']
+    arguments: ['@serializer', '%serializer.formats%', '@config.factory']
   serialization.user_route_alter_subscriber:
     class: Drupal\serialization\EventSubscriber\UserRouteAlterSubscriber
     arguments: ['%serializer.formats%']
