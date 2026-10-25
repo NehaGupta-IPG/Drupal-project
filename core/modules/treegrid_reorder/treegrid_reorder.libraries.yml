@@ -8,6 +8,9 @@ treegrid_reorder:
     js/controller.js: {}
     js/move-mode.js: {}
     js/reorder-keys.js: {}
+  css:
+    component:
+      css/treegrid-reorder.css: {}
   dependencies:
     - core/drupal
     - treegrid/treegrid
