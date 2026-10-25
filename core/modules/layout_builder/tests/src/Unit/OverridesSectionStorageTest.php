@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\Unit;
 
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Entity\RevisionableEntityBundleInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Plugin\Context\ContextInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\SectionStorage\SectionStorageDefinition;
@@ -458,6 +463,93 @@ class OverridesSectionStorageTest extends UnitTestCase {
     $this->plugin->buildRoutes($collection);
     $this->assertEquals($expected, $collection->all());
     $this->assertSame(array_keys($expected), array_keys($collection->all()));
+  }
+
+  /**
+   * @covers ::save
+   *
+   * @dataProvider providerTestSave
+   */
+  public function testSave($is_revisionable, $has_bundle_entity_type, $is_revisionable_bundle, $should_create_revision, $should_save_revision): void {
+    $entity_type = $this->prophesize(EntityTypeInterface::class);
+    $entity_type->isRevisionable()->willReturn($is_revisionable);
+
+    $entity = $this->prophesize(ContentEntityInterface::class);
+    $entity->getEntityType()->willReturn($entity_type->reveal());
+    $entity->bundle()->willReturn('BUNDLE_NAME');
+
+    $context = $this->prophesize(ContextInterface::class);
+    $context->getContextValue()->willReturn($entity->reveal());
+    $this->plugin->setContext('entity', $context->reveal());
+
+    $entity_type->getBundleEntityType()->willReturn($has_bundle_entity_type ? 'BUNDLE_TYPE_ID' : NULL);
+    if ($is_revisionable) {
+      $entity_type->id()->willReturn('ENTITY_TYPE_ID');
+      $entity_storage = $this->prophesize(EntityStorageInterface::class);
+      if ($has_bundle_entity_type) {
+        $bundle_type_class = $is_revisionable_bundle ? RevisionableEntityBundleInterface::class : ContentEntityStorageInterface::class;
+        $entity_bundle_type = $this->prophesize($bundle_type_class);
+        $entity_storage->load('BUNDLE_NAME')->willReturn($entity_bundle_type->reveal());
+        if ($is_revisionable_bundle) {
+          $entity->getEntityTypeId()->willReturn('ENTITY_TYPE_ID');
+          $entity_bundle_type->shouldCreateNewRevision()->willReturn($should_create_revision);
+          $this->entityTypeManager->getStorage('BUNDLE_TYPE_ID')->willReturn($entity_storage->reveal());
+          if ($should_create_revision) {
+            $content_entity_storage = $this->prophesize(ContentEntityStorageInterface::class);
+            $revision = $this->prophesize(ContentEntityInterface::class);
+            $revision->save()->shouldBeCalled();
+            $content_entity_storage->createRevision($entity)->willReturn($revision->reveal())->shouldBeCalled();
+            $this->entityTypeManager->getStorage('ENTITY_TYPE_ID')->willReturn($content_entity_storage->reveal());
+          }
+
+        }
+      }
+    }
+    if (!$should_save_revision) {
+      $entity->save()->shouldBeCalled();
+    }
+    else {
+      $entity->save()->shouldNotBeCalled();
+    }
+    $this->plugin->save();
+  }
+
+  /**
+   * Provides data for ::testSave().
+   */
+  public static function providerTestSave(): array {
+    return [
+      // The only case in which a new revision should be created is all
+      // arguments to ::testSave() are TRUE.
+      'revisionable' => [
+        TRUE,
+        TRUE,
+        TRUE,
+        TRUE,
+        TRUE,
+      ],
+      'revisionable:no_new_revision' => [
+        TRUE,
+        TRUE,
+        TRUE,
+        FALSE,
+        FALSE,
+      ],
+      'revisionable:no_bundle' => [
+        TRUE,
+        FALSE,
+        NULL,
+        NULL,
+        FALSE,
+      ],
+      'non_revisionable' => [
+        FALSE,
+        FALSE,
+        NULL,
+        NULL,
+        FALSE,
+      ],
+    ];
   }
 
 }

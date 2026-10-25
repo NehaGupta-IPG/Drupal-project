@@ -23,6 +23,7 @@ use Drupal\layout_builder\LayoutEntityHelperTrait;
 use Drupal\layout_builder\OverridesSectionStorageInterface;
 use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
 use Symfony\Component\Routing\RouteCollection;
+use Drupal\Core\Entity\RevisionableEntityBundleInterface;
 
 /**
  * Defines the 'overrides' section storage type.
@@ -317,7 +318,57 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
    * {@inheritdoc}
    */
   public function save() {
-    return $this->getEntity()->save();
+    $entity = $this->getEntity();
+    // @todo Replace this specific implementation with calls to the generic API
+    //   from https://www.drupal.org/node/2942907.
+    if ($this->getNewRevisionDefault()) {
+      /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+      $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
+      $revision = $storage->createRevision($entity);
+      return $revision->save();
+    }
+    return $entity->save();
+  }
+
+  /**
+   * Should new revisions be created by default.
+   *
+   * @return bool
+   *   New revision on default.
+   *
+   * @todo Remove this method in https://www.drupal.org/node/2942907 when a
+   *   generic API is available. Currently this method copied from
+   *   \Drupal\Core\Entity\ContentEntityForm.
+   *
+   * @see \Drupal\Core\Entity\ContentEntityForm::getNewRevisionDefault()
+   */
+  protected function getNewRevisionDefault() {
+    $bundle_entity = $this->getBundleEntity();
+    if ($bundle_entity instanceof RevisionableEntityBundleInterface) {
+      // Always use the default revision setting.
+      return $bundle_entity->shouldCreateNewRevision();
+    }
+    return FALSE;
+  }
+
+  /**
+   * Returns the bundle entity of the entity, or NULL if there is none.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|null
+   *   The bundle entity.
+   *
+   * @todo Remove this method in https://www.drupal.org/node/2942907 when a
+   *   generic API is available. Currently this method copied from
+   *   \Drupal\Core\Entity\ContentEntityForm.
+   *
+   * @see \Drupal\Core\Entity\ContentEntityForm::getBundleEntity()
+   */
+  protected function getBundleEntity() {
+    $entity = $this->getEntity();
+    if ($bundle_entity_type = $entity->getEntityType()->getBundleEntityType()) {
+      return $this->entityTypeManager->getStorage($bundle_entity_type)->load($entity->bundle());
+    }
+    return NULL;
   }
 
   /**

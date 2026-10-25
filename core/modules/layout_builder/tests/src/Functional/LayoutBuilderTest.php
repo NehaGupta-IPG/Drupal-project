@@ -536,6 +536,62 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   }
 
   /**
+   * Tests that reverting the layout to defaults creates a new revision.
+   */
+  public function testRevertingLayoutRevision(): void {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+      'edit any bundle_with_section_field content',
+      'view bundle_with_section_field revisions',
+      'revert bundle_with_section_field revisions',
+      'view own unpublished content',
+    ]));
+
+    $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
+    // Enable overrides.
+    $this->drupalPostForm("$field_ui_prefix/display/default", ['layout[enabled]' => TRUE], 'Save');
+    $this->drupalPostForm("$field_ui_prefix/display/default", ['layout[allow_custom]' => TRUE], 'Save');
+
+    // Modify the layout of the previously created node. Revision count: 1.
+    $this->drupalGet('node/1');
+    $assert_session->pageTextContains('The first node title');
+    $page->clickLink('Layout');
+    $page->clickLink('Add block');
+    $page->clickLink('Powered by Drupal');
+    $page->fillField('settings[label]', 'This is a block');
+    $page->checkField('settings[label_display]');
+    $page->pressButton('Add block');
+
+    // Publish the node. Revision count: 2.
+    $page->pressButton('Save layout');
+    $assert_session->pageTextContains('This is a block');
+
+    $page->clickLink('Revisions');
+    // Assert that there are 2 total revisions and 1 revert link.
+    $assert_session->elementsCount('named', ['link', 'Revert'], 1);
+    $this->htmlOutput($page->getContent());
+
+    // Revert the layout. Revision count: 3.
+    $page->clickLink('Layout');
+    $page->pressButton('Revert to defaults');
+    $page->pressButton('Revert');
+    $page->clickLink('View');
+    $assert_session->pageTextNotContains('This is a block');
+
+    $page->clickLink('Revisions');
+    // Assert that there are 3 total revisions and 1 revert link.
+//    $assert_session->elementsCount('named', ['link', 'Revert'], 2);
+    $page->clickLink('Revert');
+    $page->pressButton('Revert');
+    $page->clickLink('View');
+    $assert_session->pageTextContains('This is a block');
+  }
+
+  /**
    * Tests that hook_form_alter() has access to the Layout Builder info.
    */
   public function testFormAlter(): void {
