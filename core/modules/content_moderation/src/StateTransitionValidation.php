@@ -44,6 +44,11 @@ class StateTransitionValidation implements StateTransitionValidationInterface {
     $workflow = $this->moderationInfo->getWorkflowForEntity($entity);
     $current_state = $entity->moderation_state->value ? $workflow->getTypePlugin()->getState($entity->moderation_state->value) : $workflow->getTypePlugin()->getInitialState($entity);
 
+    $admin_permission = $entity->getEntityType()->getAdminPermission();
+    if ($admin_permission !== FALSE && $user->hasPermission($admin_permission)) {
+      return $current_state->getTransitions();
+    }
+
     return array_filter($current_state->getTransitions(), function (Transition $transition) use ($workflow, $user) {
       return $user->hasPermission('use ' . $workflow->id() . ' transition ' . $transition->id());
     });
@@ -53,6 +58,11 @@ class StateTransitionValidation implements StateTransitionValidationInterface {
    * {@inheritdoc}
    */
   public function isTransitionValid(WorkflowInterface $workflow, StateInterface $original_state, StateInterface $new_state, AccountInterface $user, ContentEntityInterface $entity) {
+    $admin_permission = $entity->getEntityType()->getAdminPermission();
+    if ($admin_permission !== FALSE && $user->hasPermission($admin_permission)) {
+      return TRUE;
+    }
+    
     $transition = $workflow->getTypePlugin()->getTransitionFromStateToState($original_state->id(), $new_state->id());
     return $user->hasPermission('use ' . $workflow->id() . ' transition ' . $transition->id());
   }
