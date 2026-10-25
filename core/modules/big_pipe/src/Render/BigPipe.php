@@ -539,16 +539,19 @@ class BigPipe {
           // find the placeholders).
           $big_pipe_js_placeholder_id = Html::decodeEntities($placeholder_id);
           $ajax_response->addCommand(new ReplaceCommand(sprintf('[data-big-pipe-placeholder-id="%s"]', $big_pipe_js_placeholder_id), $elements['#markup']));
-          $ajax_response->setAttachments($elements['#attached']);
 
           // Delete all messages that were generated during the rendering of
           // this placeholder, to render them in a BigPipe-optimized way.
           $messages = $this->messenger->deleteAll();
+          if ($messages) {
+            $elements['#attached']['library'][] = 'core/drupal.message';
+          }
           foreach ($messages as $type => $type_messages) {
             foreach ($type_messages as $message) {
               $ajax_response->addCommand(new MessageCommand($message, NULL, ['type' => $type], FALSE));
             }
           }
+          $ajax_response->setAttachments($elements['#attached']);
 
           // Push a fake request with the asset libraries loaded so far and
           // dispatch KernelEvents::RESPONSE event. This results in the

@@ -13,4 +13,3 @@ big_pipe:
     - core/drupal.htmx
     - core/drupalSettings
     - core/loadjs
-    - core/drupal.message
