@@ -73,12 +73,12 @@ final class MenuTreeController extends ControllerBase {
    * Admin page for a single menu — server-renders the top level.
    */
   public function page(MenuInterface $menu): array {
-    $all_top_level = $this->loader->loadLevelForEditing($menu->id(), NULL);
-    $top_level_total = count($all_top_level);
     // Render only the first page on the server; the client fetches the rest as
     // the editor scrolls. Slicing before the entity load and cell build bounds
     // the cost that scales with width (see MenuTreeUiConstants).
-    $top_level = array_slice($all_top_level, 0, MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE);
+    $slice = $this->loader->loadLevelForEditing($menu->id(), NULL, 0, MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE);
+    $top_level = $slice->elements;
+    $top_level_total = $slice->total;
     $columns = $this->columnManager->getSortedColumns();
     $entity_map = $this->loadContentEntitiesForElements($top_level);
     $reorder_blocked = $this->hasPendingRevisions($menu->id());
@@ -188,13 +188,13 @@ final class MenuTreeController extends ControllerBase {
       }
     }
     $offset = max(0, (int) $request->query->get('offset', 0));
-    $elements = $this->loader->loadLevelForEditing($menu->id(), $parent_id);
-    $total = count($elements);
     // Only the top level is paged; deeper levels return all their children so
     // the expand path, which does not page, is unaffected.
-    $page = $parent_id === NULL
-      ? array_slice($elements, $offset, MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE)
-      : $elements;
+    $slice = $parent_id === NULL
+      ? $this->loader->loadLevelForEditing($menu->id(), NULL, $offset, MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE)
+      : $this->loader->loadLevelForEditing($menu->id(), $parent_id);
+    $page = $slice->elements;
+    $total = $slice->total;
     $columns = $this->columnManager->getSortedColumns();
     $entity_map = $this->loadContentEntitiesForElements($page);
     $reorder_blocked = $this->hasPendingRevisions($menu->id());

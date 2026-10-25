@@ -19,11 +19,12 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
- * Tests that loadLevelForEditing() overlays pending working-copy moves.
+ * Tests that loadLevelForEditing() applies pending working-copy moves.
  *
- * The overlay is a pure replay of recorded moves onto one lazily-loaded level:
- * it must reorder within a parent, drop a link that moved out, and surface a
- * link that moved in — without touching live storage (loadLevel()).
+ * The moves are replayed on one lazily-loaded level: they must reorder within
+ * a parent, drop a link that moved out, and surface a link that moved in,
+ * without touching live storage (loadLevel()). The result is counted and
+ * sliced.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
@@ -98,7 +99,7 @@ final class MenuTreeOverlayTest extends KernelTestBase {
    */
   public function testNoOverlayWhenEmpty(): void {
     $this->assertSame($this->ids, $this->idsOf($this->loader->loadLevel('test', NULL)));
-    $this->assertSame($this->ids, $this->idsOf($this->loader->loadLevelForEditing('test', NULL)));
+    $this->assertSame($this->ids, $this->idsOf($this->loader->loadLevelForEditing('test', NULL)->elements));
   }
 
   /**
@@ -114,7 +115,7 @@ final class MenuTreeOverlayTest extends KernelTestBase {
       'before_id' => $a,
     ]);
 
-    $this->assertSame([$c, $a, $b], $this->idsOf($this->loader->loadLevelForEditing('test', NULL)));
+    $this->assertSame([$c, $a, $b], $this->idsOf($this->loader->loadLevelForEditing('test', NULL)->elements));
     // Live storage is untouched.
     $this->assertSame([$a, $b, $c], $this->idsOf($this->loader->loadLevel('test', NULL)));
   }
@@ -133,9 +134,9 @@ final class MenuTreeOverlayTest extends KernelTestBase {
     ]);
 
     // C is gone from the top level.
-    $this->assertSame([$a, $b], $this->idsOf($this->loader->loadLevelForEditing('test', NULL)));
+    $this->assertSame([$a, $b], $this->idsOf($this->loader->loadLevelForEditing('test', NULL)->elements));
     // C is now a child of A, materialized from live storage.
-    $this->assertSame([$c], $this->idsOf($this->loader->loadLevelForEditing('test', $a)));
+    $this->assertSame([$c], $this->idsOf($this->loader->loadLevelForEditing('test', $a)->elements));
   }
 
   /**
@@ -155,9 +156,72 @@ final class MenuTreeOverlayTest extends KernelTestBase {
       'before_id' => NULL,
     ]);
 
-    $children = $this->loader->loadLevelForEditing('test', $a);
+    $children = $this->loader->loadLevelForEditing('test', $a)->elements;
     $this->assertCount(1, $children);
     $this->assertSame(2, $children[0]->depth);
+  }
+
+  /**
+   * The slice is cut from the whole overlaid level.
+   */
+  public function testSliceOfOverlaidLevel(): void {
+    [$a, $b, $c] = $this->ids;
+    $d = $this->createLink('D', 3)->getPluginId();
+    $e = $this->createLink('E', 4)->getPluginId();
+    $this->workingCopy->addOp('test', ['type' => 'move', 'id' => $c, 'new_parent' => '', 'before_id' => NULL]);
+
+    $slice = $this->loader->loadLevelForEditing('test', NULL, 2, 2);
+    $this->assertSame([$d, $e], $this->idsOf($slice->elements));
+    $this->assertSame(5, $slice->total);
+    $this->assertSame([$a, $b, $d, $e, $c], $slice->ids);
+    $this->assertSame($c, $slice->nextId);
+
+    $last = $this->loader->loadLevelForEditing('test', NULL, 4, 2);
+    $this->assertSame([$c], $this->idsOf($last->elements));
+    $this->assertNull($last->nextId);
+  }
+
+  /**
+   * A link moved in from a child level is counted and sits at its anchor.
+   */
+  public function testMovedInLinkIsCounted(): void {
+    [$a, $b, $c] = $this->ids;
+    $child = $this->createLink('Child', 0, $a)->getPluginId();
+    $this->workingCopy->addOp('test', ['type' => 'move', 'id' => $child, 'new_parent' => '', 'before_id' => $b]);
+
+    $slice = $this->loader->loadLevelForEditing('test', NULL, 0, 10);
+    $this->assertSame(4, $slice->total);
+    $this->assertSame([$a, $child, $b, $c], $slice->ids);
+    $this->assertSame([$a, $child, $b, $c], $this->idsOf($slice->elements));
+  }
+
+  /**
+   * A deleted moved-in link is dropped and a move anchored on it goes last.
+   */
+  public function testDeletedMovedInLink(): void {
+    [$a, $b, $c] = $this->ids;
+    $x = $this->createLink('X', 0, $a);
+    $y = $this->createLink('Y', 1, $a)->getPluginId();
+    $x_id = $x->getPluginId();
+    $this->workingCopy->addOp('test', ['type' => 'move', 'id' => $x_id, 'new_parent' => '', 'before_id' => $b]);
+    $this->workingCopy->addOp('test', ['type' => 'move', 'id' => $y, 'new_parent' => '', 'before_id' => $x_id]);
+    $x->delete();
+    $this->container->get('plugin.manager.menu.link')->removeDefinition($x_id, FALSE);
+
+    $slice = $this->loader->loadLevelForEditing('test', NULL);
+    $this->assertSame([$a, $b, $c, $y], $slice->ids);
+    $this->assertSame([$a, $b, $c, $y], $this->idsOf($slice->elements));
+    $this->assertSame(4, $slice->total);
+  }
+
+  /**
+   * An offset past the end returns no elements and the right total.
+   */
+  public function testOffsetPastEnd(): void {
+    $slice = $this->loader->loadLevelForEditing('test', NULL, 10, 2);
+    $this->assertSame([], $slice->elements);
+    $this->assertSame(3, $slice->total);
+    $this->assertNull($slice->nextId);
   }
 
   // Helpers.
@@ -179,14 +243,15 @@ final class MenuTreeOverlayTest extends KernelTestBase {
   }
 
   /**
-   * Creates and saves a top-level menu_link_content entity in the test menu.
+   * Creates and saves a menu_link_content entity in the test menu.
    */
-  private function createLink(string $title, int $weight): MenuLinkContentInterface {
+  private function createLink(string $title, int $weight, string $parent = ''): MenuLinkContentInterface {
     $entity = MenuLinkContent::create([
       'title' => $title,
       'link' => ['uri' => 'internal:/'],
       'menu_name' => 'test',
       'weight' => $weight,
+      'parent' => $parent,
     ]);
     $entity->save();
     return $entity;

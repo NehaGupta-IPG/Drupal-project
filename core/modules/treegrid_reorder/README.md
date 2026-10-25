@@ -57,6 +57,24 @@ written, so the caller can reconcile the working copy with storage.
 tempstore collection name unique to your module, so two consumers editing
 same-named trees do not collide.
 
+**To read a tree with its pending moves applied**, call
+`TreegridWorkingCopy::view($tree_id)`. It returns a
+`WorkingCopyViewInterface` over the recorded moves:
+- `levelIds(string $parent_id, array $live_ids, array $existing_ids): array`:
+  the ids the editor sees in one level, in order, including ids moved in
+  from other levels. `$live_ids` is the level's live ids and `$existing_ids`
+  the moved ids that still exist; a move of an id that is neither is skipped.
+- `pendingParent(string $id): ?string`: the parent the editor sees for a
+  link with a pending move (`''` for the top), or NULL when it has none.
+- `pendingIds(): array`: the ids of every link with a pending move.
+
+The view works on id lists, so a consumer slices and loads only what it shows.
+It is built on `MoveLogReplay`, a stateless `@api` helper you instantiate with
+`new` for the same replay without a working copy: `pendingParents($ops)`,
+`spliceBefore($order, $moved, $before_id)` and `replayLevel($parent_id,
+$live_ids, $ops, $existing_ids)`. In all of them a parent id of `''` means the
+top of the tree.
+
 ## The JavaScript surface
 
 Load the `treegrid_reorder/treegrid_reorder` library and call

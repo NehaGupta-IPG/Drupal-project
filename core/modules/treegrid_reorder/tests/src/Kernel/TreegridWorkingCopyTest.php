@@ -74,6 +74,33 @@ final class TreegridWorkingCopyTest extends KernelTestBase {
   }
 
   /**
+   * The view reflects recorded moves, and a cleared copy changes nothing.
+   */
+  public function testViewReflectsMoves(): void {
+    $this->workingCopy->addOp('alpha', ['type' => 'move', 'id' => 'c', 'new_parent' => '', 'before_id' => 'a']);
+
+    $view = $this->workingCopy->view('alpha');
+    $this->assertSame(['c', 'a', 'b'], $view->levelIds('', ['a', 'b', 'c'], ['c']));
+    $this->assertSame('', $view->pendingParent('c'));
+    $this->assertSame(['c'], $view->pendingIds());
+
+    $this->workingCopy->clear('alpha');
+    $view = $this->workingCopy->view('alpha');
+    $this->assertSame(['a', 'b', 'c'], $view->levelIds('', ['a', 'b', 'c'], []));
+    $this->assertNull($view->pendingParent('c'));
+  }
+
+  /**
+   * Views of different tree ids don't see each other's moves.
+   */
+  public function testViewsAreIsolated(): void {
+    $this->workingCopy->addOp('alpha', ['type' => 'move', 'id' => 'c', 'new_parent' => '', 'before_id' => 'a']);
+
+    $this->assertSame(['a', 'b', 'c'], $this->workingCopy->view('beta')->levelIds('', ['a', 'b', 'c'], []));
+    $this->assertNull($this->workingCopy->view('beta')->pendingParent('c'));
+  }
+
+  /**
    * Ids within a collection are independent of one another.
    */
   public function testIdsAreIsolated(): void {

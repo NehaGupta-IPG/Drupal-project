@@ -79,6 +79,16 @@ final class TreegridWorkingCopy {
   }
 
   /**
+   * Returns what the editor sees of a tree with its pending moves applied.
+   *
+   * @param string $id
+   *   The tree id.
+   */
+  public function view(string $id): WorkingCopyViewInterface {
+    return new LogWorkingCopyView($this->getOps($id), new MoveLogReplay());
+  }
+
+  /**
    * Appends a pending operation to a tree's working copy.
    *
    * Recording is atomic against a concurrent editor: an isLocked() check

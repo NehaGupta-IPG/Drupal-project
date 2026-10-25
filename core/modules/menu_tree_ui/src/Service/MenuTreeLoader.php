@@ -10,6 +10,7 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
+use Drupal\menu_tree_ui\LevelSlice;
 use Drupal\treegrid_reorder\MoveLogReplay;
 use Drupal\treegrid_reorder\TreegridWorkingCopy;
 
@@ -17,9 +18,9 @@ use Drupal\treegrid_reorder\TreegridWorkingCopy;
  * Loads slices of a menu tree for lazy-loaded admin UI consumption.
  *
  * Read paths come in two forms. loadLevel() returns the live tree.
- * loadLevelForEditing() returns the live tree with the menu's pending
- * working-copy moves overlaid (see TreegridWorkingCopy), so the UI reflects
- * unsaved reorders without writing them; the overlay is bounded by the number
+ * loadLevelForEditing() returns a slice of a level with the menu's pending
+ * working-copy moves applied (see TreegridWorkingCopy), so the UI reflects
+ * unsaved reorders without writing them; the replay is bounded by the number
  * of edits, never the menu size. search() is a thin orchestrator: it collects
  * from all tagged MenuTreeSearchProviderInterface services, deduplicates, and
  * fires hook_menu_tree_ui_search_results_alter() before returning.
@@ -96,28 +97,43 @@ final class MenuTreeLoader {
   }
 
   /**
-   * Loads a single level with the menu's pending working-copy moves applied.
+   * Loads a slice of a level with the menu's pending moves applied.
    *
-   * Same as loadLevel(), then overlays the recorded moves so the editing UI
-   * shows unsaved reorders. The overlay is a pure replay of the ops against
-   * this one level's membership and order, so its cost tracks the number of
-   * edits, not the size of the menu — preserving the lazy-load profile.
+   * The ids come from loadLevel(), so access filtering and the level hook
+   * behave as there. The recorded moves are replayed on those ids, so the cost
+   * tracks the number of edits, then the result is counted and sliced and
+   * elements are built for the slice only.
    *
    * @param string $menu_name
    *   Menu entity ID (e.g. 'main', 'admin').
    * @param string|null $parent_id
    *   Plugin ID of the parent to load children of, or NULL for the top level.
-   *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
-   *   Tree elements at one level, with pending moves applied.
+   * @param int $offset
+   *   The index of the slice's first link in the level.
+   * @param int|null $limit
+   *   The most links to return, or NULL for the rest of the level.
    */
-  public function loadLevelForEditing(string $menu_name, ?string $parent_id = NULL): array {
-    $elements = $this->loadLevel($menu_name, $parent_id);
-    $ops = $this->workingCopy->getOps($menu_name);
-    if ($ops === []) {
-      return $elements;
+  public function loadLevelForEditing(string $menu_name, ?string $parent_id = NULL, int $offset = 0, ?int $limit = NULL): LevelSlice {
+    $live = [];
+    foreach ($this->loadLevel($menu_name, $parent_id) as $element) {
+      $live[$element->link->getPluginId()] = $element;
     }
-    return $this->applyOverlay($elements, $ops, $parent_id ?? '');
+    $view = $this->workingCopy->view($menu_name);
+    $existing_ids = array_values(array_filter(
+      $view->pendingIds(),
+      fn(string $id): bool => $this->menuLinkManager->hasDefinition($id),
+    ));
+    $ids = array_map('strval', $view->levelIds($parent_id ?? '', array_map('strval', array_keys($live)), $existing_ids));
+
+    $slice_ids = array_slice($ids, $offset, $limit);
+    $elements = [];
+    foreach ($slice_ids as $id) {
+      $element = $live[$id] ?? $this->materializeElement($id, $parent_id ?? '');
+      if ($element !== NULL) {
+        $elements[] = $element;
+      }
+    }
+    return new LevelSlice($ids, $elements, count($ids), $ids[$offset + count($slice_ids)] ?? NULL);
   }
 
   /**
@@ -136,69 +152,6 @@ final class MenuTreeLoader {
    */
   public function getPendingParentMap(string $menu_name): array {
     return $this->replay->pendingParents($this->workingCopy->getOps($menu_name));
-  }
-
-  /**
-   * Replays pending move ops against one level's membership and order.
-   *
-   * Simulates the recorded moves sequentially on a working list that starts as
-   * the live children of $parent_id: a move whose destination is this level
-   * inserts (or repositions) the link before its before_id; a move of a link
-   * currently in this level to anywhere else removes it. A link moved in from
-   * elsewhere is materialized on demand.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $elements
-   *   The live elements at this level, in display order.
-   * @param array<int, array<string, mixed>> $ops
-   *   The menu's pending ops, in recorded order.
-   * @param string $parent_id
-   *   The level's parent plugin ID, or '' for the top level.
-   *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
-   *   The overlaid elements, in display order.
-   */
-  private function applyOverlay(array $elements, array $ops, string $parent_id): array {
-    $by_id = [];
-    $order = [];
-    foreach ($elements as $element) {
-      $id = $element->link->getPluginId();
-      $by_id[$id] = $element;
-      $order[] = $id;
-    }
-
-    foreach ($ops as $op) {
-      if (($op['type'] ?? '') !== 'move') {
-        continue;
-      }
-      $moved = (string) ($op['id'] ?? '');
-      $new_parent = (string) ($op['new_parent'] ?? '');
-      $before_id = $op['before_id'] ?? NULL;
-      $before_id = $before_id === NULL ? NULL : (string) $before_id;
-      $in_list = in_array($moved, $order, TRUE);
-
-      if ($new_parent === $parent_id) {
-        if (!$in_list) {
-          $element = $this->materializeElement($moved, $parent_id);
-          if ($element === NULL) {
-            continue;
-          }
-          $by_id[$moved] = $element;
-        }
-        $order = $this->replay->spliceBefore($order, $moved, $before_id);
-      }
-      elseif ($in_list) {
-        $order = array_values(array_filter($order, static fn(string $id): bool => $id !== $moved));
-        unset($by_id[$moved]);
-      }
-    }
-
-    $result = [];
-    foreach ($order as $id) {
-      if (isset($by_id[$id])) {
-        $result[] = $by_id[$id];
-      }
-    }
-    return $result;
   }
 
   /**
