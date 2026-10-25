@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Template;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeArray;
@@ -17,6 +18,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Twig\Environment;
 use Twig\Markup as TwigMarkup;
+
+// cspell:ignore dynsrc
 
 /**
  * Tests Drupal\Core\Template\Attribute.
@@ -580,6 +583,89 @@ class AttributeTest extends UnitTestCase {
     $attributes = new Attribute(['class' => ['example-class']]);
     $this->expectException(\TypeError::class);
     $attributes->merge('not an array');
+  }
+
+  /**
+   * Tests attributes containing URLs.
+   *
+   * @param array $attributes
+   *   An associative array of key-value pairs to be converted to attributes.
+   * @param string $expected_output
+   *   Expected rendered attributes.
+   */
+  #[DataProvider('providerTestAttributesWithUrls')]
+  public function testAttributesWithUrls(array $attributes, string $expected_output): void {
+    UrlHelper::setAllowedProtocols(['http', 'https', 'mailto']);
+    $attribute = new Attribute($attributes);
+
+    $this->assertEquals($expected_output, $attribute->__toString());
+  }
+
+  /**
+   * Provides tests data for testAttributesWithUrls().
+   */
+  public static function providerTestAttributesWithUrls(): array {
+    $already_escaped = '&lt;script defer&gt;alert(0)&lt;/script&gt;';
+    $escaped = Html::escape("alert('xss');");
+
+    return [
+      'normal-external-url' => [
+        ['href' => "http://example.com/foo"],
+        ' href="http://example.com/foo"',
+      ],
+      'url-with-query-string-fragment' => [
+        ['href' => "http://example.com/com?foo=bar#baz;&lt"],
+        ' href="http://example.com/com?foo=bar#baz;&amp;lt"',
+      ],
+      'data-value' => [
+        ['data-example' => 'http://example.com/foo'],
+        ' data-example="http://example.com/foo"',
+      ],
+      'data-xss-value' => [
+        ['data-example' => "javascript:alert('xss');"],
+        ' data-example="' . Html::escape("javascript:alert('xss');") . '"',
+      ],
+      'xss-scheme-href' => [
+        ['href' => "javascript:alert('xss');"],
+        ' href="' . $escaped . '"',
+      ],
+      'xss-scheme-src' => [
+        ['src' => "javascript:alert('xss');"],
+        ' src="' . $escaped . '"',
+      ],
+      'xss-scheme-dynsrc' => [
+        ['dynsrc' => "javascript:alert('xss');"],
+        ' dynsrc="' . $escaped . '"',
+      ],
+      'xss-scheme-background' => [
+        ['background' => "javascript:alert('xss');"],
+        ' background="' . $escaped . '"',
+      ],
+      'xss-scheme-src-case' => [
+        ['src' => "jaVaSCriPt:alert('xss');"],
+        ' src="' . $escaped . '"',
+      ],
+      'xss-already-escaped' => [
+        ['href' => $already_escaped],
+        ' href="' . Html::escape($already_escaped) . '"',
+      ],
+      // Removing dangerous URLs inside CSS is not the role of
+      // stripDangerousProtocols().
+      'xss-in-style' => [
+        ['style' => 'list-style-image: url(javascript:alert(0))'],
+        ' style="list-style-image: url(javascript:alert(0))"',
+      ],
+      // Ensure mailto: protocol passes through.
+      'mailto' => [
+        ['href' => 'mailto:me@example.com'],
+        ' href="mailto:me@example.com"',
+      ],
+      // Ensure people don't try to work around escaping quotes.
+      'javascript' => [
+        ['href' => 'javascript:alert(String.fromCharCode(88,83,83))'],
+        ' href="alert(String.fromCharCode(88,83,83))"',
+      ],
+    ];
   }
 
 }

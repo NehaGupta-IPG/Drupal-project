@@ -2,7 +2,11 @@
 
 namespace Drupal\Core\Template;
 
+use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\UrlHelper;
+use Drupal\Component\Utility\Xss;
 
 /**
  * A class that represents most standard HTML attributes.
@@ -25,7 +29,18 @@ class AttributeString extends AttributeValueBase {
    * Implements the magic __toString() method.
    */
   public function __toString() {
-    return Html::escape((string) $this->value);
+    // Allow specific attributes where filtering does not make sense
+    // and all data- attributes.
+    // @see Xss::attributes()
+    if ($this->value instanceof MarkupInterface) {
+      return Html::escape(PlainTextOutput::renderFromHtml($this->value));
+    }
+    elseif (!Xss::attributeHasProtocolsFiltered($this->name)) {
+      return Html::escape((string) $this->value);
+    }
+    else {
+      return Html::escape(UrlHelper::stripDangerousProtocols((string) $this->value));
+    }
   }
 
 }

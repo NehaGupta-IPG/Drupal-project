@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Template;
 
-use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Serialization\Attribute\JsonSchema;
@@ -150,9 +149,8 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
     }
     // As a development aid, we allow the value to be any Stringable object.
     elseif ($value instanceof \Stringable) {
-      // Attributes are not supposed to display HTML markup, so we just convert
-      // the value to plain text.
-      $value = PlainTextOutput::renderFromHtml($value);
+      // Attributes are not supposed to display HTML markup, but AttributeString
+      // will take care of escaping it.
       $value = new AttributeString($name, $value);
     }
     elseif (!is_object($value)) {
