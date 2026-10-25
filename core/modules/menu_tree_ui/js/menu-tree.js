@@ -171,20 +171,9 @@
    * Wires menu_tree_ui's features onto an upgraded <drupal-treegrid>.
    *
    * @param {HTMLElement} element
-   *   The element, already connected (element.tree / element.expand are set).
+   *   The element, already initialized (element.ready has resolved).
    */
   function wireFeatures(element) {
-    if (!element.expand) {
-      // The element has not finished initializing yet (its provider can
-      // register after this behavior runs). Wire once it announces it is ready
-      // via treegrid:connected, rather than silently doing nothing.
-      element.addEventListener(
-        'treegrid:connected',
-        () => wireFeatures(element),
-        { once: true },
-      );
-      return;
-    }
     const { tree, expand } = element;
     const settings = drupalSettings.menuTreeUi ?? {};
     const { moveUrl, columnUpdateUrl } = settings;
@@ -196,7 +185,10 @@
     // grows when the unsaved notice wraps above the buttons, so track it live.
     const actionBar = container?.querySelector('.menu-tree-ui__action-bar');
     let stickyObserver = null;
-    if (actionBar && container && 'ResizeObserver' in window) {
+    const observeStickyOffset = () => {
+      if (!actionBar || !container || !('ResizeObserver' in window)) {
+        return;
+      }
       const syncStickyOffset = () =>
         container.style.setProperty(
           '--mtu-sticky-offset',
@@ -205,10 +197,9 @@
       syncStickyOffset();
       stickyObserver = new ResizeObserver(syncStickyOffset);
       stickyObserver.observe(actionBar);
-    }
+    };
 
     let csrfToken;
-    let drag = null;
     const getToken = () => csrfToken;
 
     // One drop indicator, shared by pointer drag and keyboard move mode so the
@@ -324,16 +315,6 @@
         moveMode.cancel();
       }
     };
-    document.addEventListener('mousedown', onOutsidePointer);
-
-    // Search jump-to and dismiss.
-    const jumpHandler = ns.attachJumpClickHandler({ tree, expand, moveMode });
-    const detachSearchPanel = container
-      ? ns.attachSearchPanel(container)
-      : null;
-
-    // Stream the rest of a truncated top level in as the editor scrolls.
-    const detachPaging = ns.attachTopLevelPaging(element);
 
     // "Keyboard commands" dialog. Closing uses a native <form method="dialog">,
     // so only opening needs JS; degrades to a no-op without dialog.showModal.
@@ -346,8 +327,43 @@
       typeof helpDialog.showModal === 'function'
     ) {
       openHelp = () => helpDialog.showModal();
-      helpToggle.addEventListener('click', openHelp);
     }
+
+    // The listeners that live outside the element (document, the search panel,
+    // the action bar) come off when the element is disconnected and go back on
+    // when it is reconnected.
+    let jumpHandler = null;
+    let detachSearchPanel = null;
+    let detachPaging = null;
+    const addPageListeners = () => {
+      observeStickyOffset();
+      document.addEventListener('mousedown', onOutsidePointer);
+      // Search jump-to and dismiss.
+      jumpHandler = ns.attachJumpClickHandler({ tree, expand, moveMode });
+      detachSearchPanel = container ? ns.attachSearchPanel(container) : null;
+      // Stream the rest of a truncated top level in as the editor scrolls.
+      detachPaging = ns.attachTopLevelPaging(element);
+      if (openHelp) {
+        helpToggle.addEventListener('click', openHelp);
+      }
+    };
+    const removePageListeners = () => {
+      stickyObserver?.disconnect();
+      stickyObserver = null;
+      document.removeEventListener('mousedown', onOutsidePointer);
+      if (jumpHandler) {
+        document.removeEventListener('click', jumpHandler);
+        jumpHandler = null;
+      }
+      detachSearchPanel?.();
+      detachSearchPanel = null;
+      detachPaging?.();
+      detachPaging = null;
+      if (openHelp) {
+        helpToggle.removeEventListener('click', openHelp);
+      }
+    };
+    addPageListeners();
 
     // Drag needs the CSRF token; defer the controller until it resolves, keeping
     // the token out of URLs (and access logs). move-mode and the column toggle
@@ -369,7 +385,7 @@
           );
           return;
         }
-        drag = new rr.DragController(
+        const drag = new rr.DragController(
           tree,
           moveUrl,
           expand,
@@ -387,25 +403,15 @@
         element.dataset.treegridReorderReady = 'true';
       });
 
-    element.addEventListener(
-      'treegrid:disconnect',
-      () => {
-        moveMode?.cancel();
-        drag?.detach();
-        stickyObserver?.disconnect();
-        document.removeEventListener('mousedown', onOutsidePointer);
-        if (jumpHandler) {
-          document.removeEventListener('click', jumpHandler);
-        }
-        detachSearchPanel?.();
-        detachPaging?.();
-        if (helpToggle && openHelp) {
-          helpToggle.removeEventListener('click', openHelp);
-        }
-        indicator.destroy();
-      },
-      { once: true },
-    );
+    element.addEventListener('treegrid:disconnected', () => {
+      moveMode?.cancel();
+      removePageListeners();
+    });
+    element.addEventListener('treegrid:connected', (event) => {
+      if (event.detail.reconnected) {
+        addPageListeners();
+      }
+    });
   }
 
   Drupal.behaviors.menuTreeUi = {
@@ -414,7 +420,12 @@
         'menu-tree-ui',
         'drupal-treegrid[data-provider="menu_tree_ui"]',
         context,
-      ).forEach(wireFeatures);
+      ).forEach(async (element) => {
+        await element.ready;
+        if (element.isConnected) {
+          wireFeatures(element);
+        }
+      });
     },
   };
 })(Drupal, drupalSettings, once);

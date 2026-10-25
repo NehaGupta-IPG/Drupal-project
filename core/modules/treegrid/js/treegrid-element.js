@@ -15,11 +15,18 @@
  *
  * Features (reorder, columns, search, …) attach without the element knowing
  * about them, through:
+ *  - element.ready, a promise that resolves once the element has initialized
+ *    (data-treegrid-ready is set at the same moment).
  *  - lifecycle events dispatched on the element: treegrid:connected (detail
- *    { element, tree, expand, rowWindow }) and treegrid:disconnect ({ element }).
+ *    { element, tree, reconnected }, bubbles) after init and after each
+ *    reconnect, and treegrid:disconnected ({ element }).
  *  - an interaction-handler registry: addClickHandler(fn) / addKeyHandler(fn).
  *    Handlers run in registration order before the element's built-in
- *    navigation; a handler returns true to consume the event.
+ *    navigation; a handler returns true to consume the event. Each call
+ *    returns a function that removes the handler.
+ *
+ * An element initializes once. Moving it in the DOM pauses its listeners and
+ * windowing on disconnect and resumes them on reconnect.
  *
  * No Drupal.behaviors: connectedCallback fires automatically when the element
  * enters the DOM, including htmx-swapped content.
@@ -39,7 +46,7 @@
 ((Drupal) => {
   Drupal.treegrid = Drupal.treegrid || {};
   Drupal.treegrid.providers = Drupal.treegrid.providers || {};
-  const { rowOf, focusRow, initRovingTabindex, childRows } =
+  const { rowOf, focusRow, initRovingTabindex, childRows, visibleRows } =
     Drupal.treegrid.treeNav;
   const { handleKeyDown } = Drupal.treegrid;
 
@@ -88,13 +95,66 @@
     });
   };
 
+  // Per-element state kept out of the element's public surface.
+  const internals = new WeakMap();
+
+  /**
+   * Adds a handler to a list and returns a function that removes it.
+   *
+   * @param {Array<object>} list
+   *   The handler entries.
+   * @param {function} handler
+   *   The handler.
+   *
+   * @return {function(): void}
+   *   Removes this registration.
+   */
+  function register(list, handler) {
+    const entry = { handler };
+    list.push(entry);
+    return () => {
+      const index = list.indexOf(entry);
+      if (index !== -1) {
+        list.splice(index, 1);
+      }
+    };
+  }
+
   class TreegridElement extends HTMLElement {
     constructor() {
       super();
-      this.onClick = this.onClick.bind(this);
-      this.onKeyDown = this.onKeyDown.bind(this);
-      this.clickHandlers = [];
-      this.keyHandlers = [];
+      const state = {
+        tree: null,
+        initialized: false,
+        clickHandlers: [],
+        keyHandlers: [],
+        onClick: this.onClick.bind(this),
+        onKeyDown: this.onKeyDown.bind(this),
+      };
+      state.ready = new Promise((resolve) => {
+        state.resolveReady = resolve;
+      });
+      internals.set(this, state);
+    }
+
+    /**
+     * The <table role="treegrid"> inside the element.
+     *
+     * @return {?HTMLTableElement}
+     *   The table, or null before the element has connected.
+     */
+    get tree() {
+      return internals.get(this).tree;
+    }
+
+    /**
+     * Resolves once the element has its provider and has initialized.
+     *
+     * @return {Promise<void>}
+     *   The ready promise.
+     */
+    get ready() {
+      return internals.get(this).ready;
     }
 
     /**
@@ -102,9 +162,12 @@
      *
      * @param {function(MouseEvent): boolean} handler
      *   Returns true to consume the event (built-in nav is then skipped).
+     *
+     * @return {function(): void}
+     *   Removes the handler.
      */
     addClickHandler(handler) {
-      this.clickHandlers.push(handler);
+      return register(internals.get(this).clickHandlers, handler);
     }
 
     /**
@@ -112,15 +175,23 @@
      *
      * @param {function(KeyboardEvent): boolean} handler
      *   Returns true to consume the event.
+     *
+     * @return {function(): void}
+     *   Removes the handler.
      */
     addKeyHandler(handler) {
-      this.keyHandlers.push(handler);
+      return register(internals.get(this).keyHandlers, handler);
     }
 
     /**
-     * Validates the markup and initializes (or parks) the element on insert.
+     * Validates the markup, then initializes, parks or resumes the element.
      */
     connectedCallback() {
+      const state = internals.get(this);
+      if (state.initialized) {
+        this.resume();
+        return;
+      }
       const tree = this.querySelector(TREE);
       if (!tree) {
         // eslint-disable-next-line no-console
@@ -129,7 +200,7 @@
         );
         return;
       }
-      this.tree = tree;
+      state.tree = tree;
       if (!this.dataset.childrenUrl) {
         // eslint-disable-next-line no-console
         console.warn(
@@ -145,8 +216,12 @@
      *
      * @param {object} provider
      *   The renderer: { buildRows, buildRow }.
+     *
+     * @internal
      */
     init(provider) {
+      const state = internals.get(this);
+      state.initialized = true;
       this.rowWindow = new Drupal.treegrid.RowWindow(this);
       this.tree.querySelectorAll(ROW).forEach((row) => {
         this.rowWindow.observe(row);
@@ -158,8 +233,7 @@
         provider,
       );
 
-      this.tree.addEventListener('click', this.onClick);
-      this.tree.addEventListener('keydown', this.onKeyDown);
+      this.addListeners();
 
       // Upgrade server-rendered cell widgets (e.g. dropbuttons) so their
       // focusable controls exist before priming the roving tab order; otherwise
@@ -171,28 +245,68 @@
       initRovingTabindex(this.tree);
       this.autoExpandSmall();
 
+      this.setAttribute('data-treegrid-ready', '');
+      this.dispatchConnected(false);
+      state.resolveReady();
+    }
+
+    /**
+     * Resumes listeners and windowing after the element is moved in the DOM.
+     */
+    resume() {
+      const { tree } = internals.get(this);
+      this.rowWindow = new Drupal.treegrid.RowWindow(this);
+      visibleRows(tree).forEach((row) => {
+        this.rowWindow.observe(row);
+      });
+      this.addListeners();
+      this.dispatchConnected(true);
+    }
+
+    /**
+     * Adds the element's own delegated listeners to the tree.
+     */
+    addListeners() {
+      const state = internals.get(this);
+      state.tree.addEventListener('click', state.onClick);
+      state.tree.addEventListener('keydown', state.onKeyDown);
+    }
+
+    /**
+     * Removes the element's own delegated listeners from the tree.
+     */
+    removeListeners() {
+      const state = internals.get(this);
+      state.tree?.removeEventListener('click', state.onClick);
+      state.tree?.removeEventListener('keydown', state.onKeyDown);
+    }
+
+    /**
+     * Announces that the element is initialized or has been reconnected.
+     *
+     * @param {boolean} reconnected
+     *   Whether this follows a DOM move rather than the first init.
+     */
+    dispatchConnected(reconnected) {
       this.dispatchEvent(
         new CustomEvent('treegrid:connected', {
-          detail: {
-            element: this,
-            tree: this.tree,
-            expand: this.expand,
-            rowWindow: this.rowWindow,
-          },
+          bubbles: true,
+          detail: { element: this, tree: this.tree, reconnected },
         }),
       );
     }
 
     /**
-     * Tears down generic wiring when removed from the DOM.
+     * Pauses listeners and windowing when removed from the DOM.
      */
     disconnectedCallback() {
       pending.delete(this);
-      this.tree?.removeEventListener('click', this.onClick);
-      this.tree?.removeEventListener('keydown', this.onKeyDown);
-      this.rowWindow?.disconnect();
+      if (internals.get(this).initialized) {
+        this.removeListeners();
+        this.rowWindow?.disconnect();
+      }
       this.dispatchEvent(
-        new CustomEvent('treegrid:disconnect', { detail: { element: this } }),
+        new CustomEvent('treegrid:disconnected', { detail: { element: this } }),
       );
     }
 
@@ -207,7 +321,8 @@
       if (!(target instanceof Element)) {
         return;
       }
-      if (this.clickHandlers.some((handler) => handler(event))) {
+      const { clickHandlers } = internals.get(this);
+      if (clickHandlers.some((entry) => entry.handler(event))) {
         return;
       }
       const toggle = target.closest(TOGGLE);
@@ -237,7 +352,8 @@
      *   The keydown event.
      */
     onKeyDown(event) {
-      if (this.keyHandlers.some((handler) => handler(event))) {
+      const { keyHandlers } = internals.get(this);
+      if (keyHandlers.some((entry) => entry.handler(event))) {
         return;
       }
       handleKeyDown(event, { tree: this.tree, expand: this.expand });

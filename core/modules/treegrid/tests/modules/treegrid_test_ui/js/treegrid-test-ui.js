@@ -106,5 +106,19 @@
     return fragment;
   }
 
-  Drupal.treegrid.registerProvider('treegrid_test_ui', { buildRows, buildRow });
+  // ?delay_provider=<ms> registers the provider late, so a test can observe the
+  // element before it is ready.
+  const delay = Number(
+    new URLSearchParams(window.location.search).get('delay_provider'),
+  );
+  const registerProvider = () =>
+    Drupal.treegrid.registerProvider('treegrid_test_ui', {
+      buildRows,
+      buildRow,
+    });
+  if (delay > 0) {
+    window.setTimeout(registerProvider, delay);
+  } else {
+    registerProvider();
+  }
 })(Drupal);

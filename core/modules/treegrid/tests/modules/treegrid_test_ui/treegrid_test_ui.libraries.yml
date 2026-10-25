@@ -2,6 +2,7 @@ treegrid_test_ui:
   version: VERSION
   js:
     js/treegrid-test-ui.js: {}
+    js/treegrid-test-ui-consumer.js: {}
   css:
     component:
       css/treegrid-test-ui.css: {}

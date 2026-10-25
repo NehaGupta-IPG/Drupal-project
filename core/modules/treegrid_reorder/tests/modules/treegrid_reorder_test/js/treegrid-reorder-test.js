@@ -100,9 +100,6 @@
    */
   function wireFeatures(element) {
     const { tree, expand } = element;
-    if (!tree || !expand) {
-      return;
-    }
     const { moveUrl } = drupalSettings.treegridReorderTest ?? {};
     if (!moveUrl) {
       return;
@@ -182,15 +179,16 @@
     );
     drag.attach();
 
-    element.addEventListener(
-      'treegrid:disconnect',
-      () => {
-        moveMode.cancel();
-        drag.detach();
-        indicator.destroy();
-      },
-      { once: true },
-    );
+    element.addEventListener('treegrid:disconnected', () => {
+      moveMode.cancel();
+    });
+
+    // A key handler of the consumer's own, registered after the reorder ones,
+    // so a test can see which key events reach it.
+    element.addKeyHandler(() => {
+      window.reorderTestKeyEvents = (window.reorderTestKeyEvents ?? 0) + 1;
+      return false;
+    });
   }
 
   // Register the renderer before the behavior runs; registerProvider adopts the
@@ -206,7 +204,10 @@
         'treegrid-reorder-test',
         'drupal-treegrid[data-provider="treegrid_reorder_test"]',
         context,
-      ).forEach(wireFeatures);
+      ).forEach(async (element) => {
+        await element.ready;
+        wireFeatures(element);
+      });
     },
   };
 })(Drupal, drupalSettings, once);

@@ -125,6 +125,36 @@ final class ReorderGestureTest extends WebDriverTestBase {
     $this->assertPersistedOrder(['2', '1', '3', '4']);
   }
 
+  /**
+   * A moved element keeps working: one POST per move, handlers run once.
+   */
+  public function testKeyboardMoveAfterDomMove(): void {
+    $this->getSession()->executeScript(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const wrapper = document.createElement('div');
+      element.parentNode.appendChild(wrapper);
+      wrapper.appendChild(element);
+      window.moveTest = { posts: 0 };
+      window.reorderTestKeyEvents = 0;
+      const originalFetch = window.fetch;
+      window.fetch = function (url, options) {
+        if (options && options.method === 'POST') {
+          window.moveTest.posts += 1;
+        }
+        return originalFetch.apply(this, arguments);
+      };
+    JS);
+
+    // A plain arrow reaches the consumer's key handler exactly once.
+    $this->dispatchKey('3', 'ArrowDown');
+    $this->assertSame(1, $this->getSession()->evaluateScript('return window.reorderTestKeyEvents;'));
+
+    $this->dispatchKey('1', 'ArrowDown', shift: TRUE);
+    $this->assertRowOrder(['2', '1', '3', '4']);
+    $this->assertPersistedOrder(['2', '1', '3', '4']);
+    $this->assertSame(1, $this->getSession()->evaluateScript('return window.moveTest.posts;'));
+  }
+
   // Helpers.
 
   /**
