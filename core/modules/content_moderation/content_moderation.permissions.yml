@@ -1,5 +1,6 @@
 view any unpublished content:
   title: 'View any unpublished content'
+  description: 'Allow the selected user roles to view both unpublished content entities and unpublished node entities'
 
 view latest version:
   title: 'View the latest version'
