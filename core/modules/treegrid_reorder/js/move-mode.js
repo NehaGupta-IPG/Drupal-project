@@ -60,9 +60,10 @@
 
   const GRABBED = 'data-treegrid-reorder-grabbed';
   // Elements that keep working while a row is picked up, so the editor can open
-  // a parent or flip a control. Anything else in a row aims the move.
+  // a parent or flip a control. Anything else in a row, a link included, aims
+  // the move.
   const LIVE_DURING_MOVE =
-    '[data-treegrid-toggle], [data-treegrid-control]:not(a)';
+    '[data-treegrid-toggle], button, input, select, textarea';
 
   /**
    * Clamps a number to an inclusive range.

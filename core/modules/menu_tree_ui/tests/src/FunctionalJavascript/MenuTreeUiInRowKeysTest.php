@@ -123,6 +123,67 @@ final class MenuTreeUiInRowKeysTest extends WebDriverTestBase {
   }
 
   /**
+   * During a move a click on a title link aims there instead of navigating.
+   */
+  public function testTitleLinkAimsDuringMove(): void {
+    $this->pressKeyOnRow('B', ' ');
+    $this->assertTrue($this->row('B')->hasAttribute('data-treegrid-reorder-grabbed'));
+
+    $this->row('A')->find('css', 'a.menu-tree-ui-row__title')->click();
+    usleep(500000);
+
+    $this->assertStringContainsString('/admin/structure/menu/manage/test/tree', $this->getSession()->getCurrentUrl());
+    $this->assertTrue($this->row('B')->hasAttribute('data-treegrid-reorder-grabbed'), 'The move stays active.');
+    $this->assertSame('child:' . $this->linkIds['A'], $this->dropTarget());
+  }
+
+  /**
+   * During a move a click on an operations link aims instead of navigating.
+   */
+  public function testOperationsLinkAimsDuringMove(): void {
+    $this->pressKeyOnRow('B', ' ');
+    $this->assertTrue($this->row('B')->hasAttribute('data-treegrid-reorder-grabbed'));
+
+    $link = $this->row('A')->find('css', '.dropbutton-wrapper a');
+    $this->assertNotNull($link, 'Row A has an operations link.');
+    $link->click();
+    usleep(500000);
+
+    $this->assertStringContainsString('/admin/structure/menu/manage/test/tree', $this->getSession()->getCurrentUrl());
+    $this->assertTrue($this->row('B')->hasAttribute('data-treegrid-reorder-grabbed'), 'The move stays active.');
+  }
+
+  /**
+   * During a move the Enabled checkbox still toggles and the move stays on.
+   */
+  public function testEnabledCheckboxStaysLiveDuringMove(): void {
+    $this->pressKeyOnRow('B', ' ');
+    $checkbox = $this->row('A')->find('css', 'input.treegrid-cell-checkbox[data-column-id="enabled"]');
+    $this->assertNotNull($checkbox);
+    $this->assertTrue($checkbox->isChecked());
+
+    $checkbox->click();
+
+    $this->assertFalse($checkbox->isChecked());
+    $this->assertTrue($this->row('B')->hasAttribute('data-treegrid-reorder-grabbed'), 'The move stays active.');
+  }
+
+  /**
+   * During a move a parent's toggle still opens it.
+   */
+  public function testParentToggleOpensDuringMove(): void {
+    $this->collapseIfExpanded('A');
+    $this->pressKeyOnRow('B', ' ');
+    $this->assertTrue($this->row('B')->hasAttribute('data-treegrid-reorder-grabbed'));
+
+    $this->row('A')->find('css', 'button[data-treegrid-toggle]')->click();
+
+    $this->assertSession()->waitForElement('css', sprintf('tr[data-id="%s"][aria-expanded="true"]', $this->linkIds['A']));
+    $this->assertNotNull($this->assertSession()->waitForElement('css', sprintf('tr[data-parent-id="%s"]', $this->linkIds['A'])));
+    $this->assertTrue($this->row('B')->hasAttribute('data-treegrid-reorder-grabbed'), 'The move stays active.');
+  }
+
+  /**
    * Seeds a small menu with a leaf first and a linked parent second.
    *
    * Top level: B (leaf, movable), then A (linked, with child A1). B is
@@ -185,6 +246,15 @@ final class MenuTreeUiInRowKeysTest extends WebDriverTestBase {
       })();
     JS;
     return (bool) $this->getSession()->evaluateScript($script);
+  }
+
+  /**
+   * The move's current drop position ("kind:id"), if a move is active.
+   */
+  private function dropTarget(): ?string {
+    return $this->getSession()->evaluateScript(
+      "return document.querySelector('drupal-treegrid').getAttribute('data-treegrid-reorder-drop');",
+    );
   }
 
 }
