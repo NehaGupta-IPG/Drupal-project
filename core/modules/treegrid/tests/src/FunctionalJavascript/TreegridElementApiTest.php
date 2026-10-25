@@ -187,6 +187,35 @@ final class TreegridElementApiTest extends WebDriverTestBase {
   }
 
   /**
+   * A unit requested while a refresh starts waits for the refresh to finish.
+   */
+  public function testUnitRequestedDuringRefreshStartWaits(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $tree = TreegridTestUiController::CHILDREN;
+    $tree['p1'] = ['c1b'];
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      await element.expandRow(element.tree.querySelector('tr[data-id="p1"]'));
+      return true;
+    JS);
+    \Drupal::state()->set(TreegridTestUiController::TREE_KEY, $tree);
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      let inner;
+      element.addEventListener('treegrid:before-rows-change', () => {
+        inner = element.exclusive(() => ({
+          oldRowPresent: !!element.tree.querySelector('tr[data-id="c1a"]'),
+        }));
+      }, { once: true });
+      await element.refreshLevel('p1');
+      return inner;
+    JS);
+
+    $this->assertFalse($this->getSession()->evaluateScript('return window.apiTest.result.oldRowPresent;'));
+  }
+
+  /**
    * A unit method called after its unit has settled throws.
    */
   public function testUnitMethodAfterSettleThrows(): void {
@@ -278,9 +307,10 @@ final class TreegridElementApiTest extends WebDriverTestBase {
     $this->runAsync(<<<'JS'
       const element = document.querySelector('drupal-treegrid');
       const row = element.tree.querySelector('tr[data-id="p1"]');
+      element.exclusive(() => new Promise((resolve) => window.setTimeout(resolve, 200)));
       const first = element.expandRow(row);
       const whileWaiting = element.expandRow(row);
-      await new Promise((resolve) => window.setTimeout(resolve, 300));
+      await new Promise((resolve) => window.setTimeout(resolve, 500));
       const whileRunning = element.expandRow(row);
       const results = [first === whileWaiting, first === whileRunning];
       await first;

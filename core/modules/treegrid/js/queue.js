@@ -38,15 +38,24 @@
     run(fn) {
       // With nothing ahead, the unit starts at once; its first step then runs
       // before run() returns, so work started on idle never shows as waiting.
-      const result =
-        this.pending === 0
-          ? this.runUnit(fn)
-          : this.tail.then(() => this.runUnit(fn));
+      // The slot is taken first, so a call made in that first step queues
+      // behind the unit instead of starting beside it.
+      const idle = this.pending === 0;
       this.pending += 1;
+      let release;
+      const turn = new Promise((resolve) => {
+        release = resolve;
+      });
+      const previous = this.tail;
+      this.tail = turn;
+      const result = idle
+        ? this.runUnit(fn)
+        : previous.then(() => this.runUnit(fn));
       const finished = () => {
         this.pending -= 1;
+        release();
       };
-      this.tail = result.then(finished, finished);
+      result.then(finished, finished);
       return result;
     }
 
