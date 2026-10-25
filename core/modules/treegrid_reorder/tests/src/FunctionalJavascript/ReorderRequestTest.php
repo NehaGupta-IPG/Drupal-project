@@ -101,6 +101,14 @@ final class ReorderRequestTest extends WebDriverTestBase {
     \Drupal::state()->set(TreegridReorderTestController::PAGE_CSRF, TRUE);
     $this->drupalLogin($this->drupalCreateUser());
     $this->openPage();
+    $this->assertStringContainsString('BigPipe', (string) $this->getSession()->evaluateScript(<<<'JS'
+      return (() => {
+        const request = new XMLHttpRequest();
+        request.open('GET', window.location.href, false);
+        request.send();
+        return request.getResponseHeader('Surrogate-Control');
+      })();
+    JS), 'The page response is streamed by BigPipe.');
 
     $this->moveFirstItemDown();
     $this->assertTopLevelOrder(['2', '1', '3', '4']);
