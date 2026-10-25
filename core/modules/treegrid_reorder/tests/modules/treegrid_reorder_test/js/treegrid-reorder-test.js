@@ -143,14 +143,16 @@
    *
    * @param {HTMLElement} element
    *   The initialized element (element.ready has resolved).
+   * @param {string} csrfToken
+   *   The CSRF token the requests carry, or ''.
    */
-  function wireFeatures(element) {
+  function wireFeatures(element, csrfToken) {
     const { tree } = element;
     const { moveUrl } = drupalSettings.treegridReorderTest ?? {};
     if (!moveUrl) {
       return;
     }
-    const getToken = () => '';
+    const getToken = () => csrfToken;
 
     const indicator = new rr.DropIndicator(element, REORDER_CONFIG);
     const moveMode = new rr.MoveModeController(
@@ -203,7 +205,7 @@
         if (row) {
           rr.reorderSibling(row, event.key === 'ArrowUp' ? 'up' : 'down', {
             moveUrl,
-            csrfToken: '',
+            csrfToken,
             flashClass: REORDER_CONFIG.flashClass,
           });
           event.preventDefault();
@@ -217,7 +219,7 @@
       tree,
       moveUrl,
       element,
-      '',
+      csrfToken,
       indicator,
       () => moveMode.cancel(),
       (row) => onHandleTap(row),
@@ -249,7 +251,8 @@
         context,
       ).forEach(async (element) => {
         await element.ready;
-        wireFeatures(element);
+        wireFeatures(element, await Drupal.treegrid.csrfToken(element));
+        element.setAttribute('data-test-reorder-wired', '');
       });
     },
   };

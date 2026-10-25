@@ -2,3 +2,7 @@ services:
   plugin.manager.treegrid_column:
     class: Drupal\treegrid\TreegridColumnManager
     parent: default_plugin_manager
+
+  treegrid.csrf_token:
+    class: Drupal\treegrid\TreegridCsrfToken
+    arguments: ['@csrf_token', '@current_user']

@@ -361,14 +361,10 @@
     // Drag needs the CSRF token; defer the controller until it resolves, keeping
     // the token out of URLs (and access logs). move-mode and the column toggle
     // read it lazily through getToken().
-    const base = drupalSettings.path?.baseUrl ?? '/';
-    fetch(`${base}session/token`, { credentials: 'same-origin' })
-      .then((response) => response.text())
+    Drupal.treegrid
+      .csrfToken(element)
       .then((token) => {
         csrfToken = token;
-      })
-      .catch(() => {
-        csrfToken = undefined;
       })
       .finally(() => {
         if (!moveUrl) {

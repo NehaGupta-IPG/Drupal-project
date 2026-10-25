@@ -4,6 +4,7 @@ treegrid:
     js/tree-nav.js: {}
     js/cells.js: {}
     js/queue.js: {}
+    js/csrf-token.js: {}
     js/keyboard.js: {}
     js/expand.js: {}
     js/windowing.js: {}
@@ -13,4 +14,5 @@ treegrid:
       css/treegrid.css: {}
   dependencies:
     - core/drupal
+    - core/drupalSettings
     - core/drupal.announce

@@ -18,6 +18,7 @@ use Drupal\menu_tree_ui\MenuLinkMovability;
 use Drupal\menu_tree_ui\MenuTreeRowContext;
 use Drupal\menu_tree_ui\MenuTreeUiConstants;
 use Drupal\treegrid\TreegridColumnManager;
+use Drupal\treegrid\TreegridCsrfToken;
 use Drupal\menu_tree_ui\Service\MenuTreeLoader;
 use Drupal\menu_tree_ui\Service\MenuTreeMover;
 use Drupal\menu_tree_ui\Service\MenuTreeWorkingCopyLock;
@@ -120,7 +121,7 @@ final class MenuTreeController extends ControllerBase {
       $break_lock_url = Url::fromRoute('menu_tree_ui.break_lock', ['menu' => $menu_name])->toString();
     }
 
-    return [
+    $build = [
       '#theme' => 'menu_tree_ui_page',
       '#menu' => $menu,
       '#top_level' => $rendered_rows,
@@ -158,6 +159,8 @@ final class MenuTreeController extends ControllerBase {
         'max-age' => 0,
       ],
     ];
+    $build['#csrf_token'] = TreegridCsrfToken::addPlaceholder($build);
+    return $build;
   }
 
   /**

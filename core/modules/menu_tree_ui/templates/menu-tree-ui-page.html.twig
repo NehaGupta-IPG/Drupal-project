@@ -13,6 +13,8 @@
  *                     each entry: { id, label }
  * - search_action:    URL for the search partial endpoint
  * - children_action:  URL for the children JSON endpoint
+ * - csrf_token:       placeholder for the CSRF header token, replaced when the
+ *                     page is rendered
  * - reorder_blocked:  whether reordering is off because a link has a pending
  *                     revision
  */
@@ -179,6 +181,7 @@
     data-provider="menu_tree_ui"
     data-menu="{{ menu.id }}"
     data-children-url="{{ children_action }}"
+    data-treegrid-csrf-token="{{ csrf_token }}"
     data-treegrid-top-total="{{ total }}"
     data-treegrid-page-size="{{ page_size }}"
   >

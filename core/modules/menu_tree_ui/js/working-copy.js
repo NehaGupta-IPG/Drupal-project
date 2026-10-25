@@ -16,8 +16,6 @@
 ((Drupal, drupalSettings, once) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
 
-  let csrfToken;
-
   // Bound once for the page lifetime (see attach). A per-bar document listener
   // would accumulate: once() only guards re-wiring the same bar element, so an
   // htmx swap that injects a new action bar would add another permanent listener
@@ -40,48 +38,26 @@
   }
 
   /**
-   * Fetches (and caches) the CSRF token for the working-copy POSTs.
-   *
-   * @return {Promise<string>}
-   *   The token, or '' when it could not be fetched.
-   */
-  async function getToken() {
-    if (csrfToken !== undefined) {
-      return csrfToken;
-    }
-    const base = drupalSettings.path?.baseUrl ?? '/';
-    try {
-      const response = await fetch(`${base}session/token`, {
-        credentials: 'same-origin',
-      });
-      if (!response.ok) {
-        // Don't cache a failure: an error page body would otherwise become the
-        // "token" forever. Leave csrfToken undefined so the next Save/Cancel
-        // retries the fetch.
-        return '';
-      }
-      csrfToken = await response.text();
-    } catch (e) {
-      return '';
-    }
-    return csrfToken;
-  }
-
-  /**
    * POSTs to a working-copy endpoint with the CSRF header.
    *
    * @param {string} url
    *   The save or cancel URL.
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element, which knows the CSRF token.
    *
    * @return {Promise<object>}
    *   The decoded JSON response, or an error-shaped object.
    */
-  async function post(url) {
-    const token = await getToken();
+  async function post(url, element) {
+    const token = await Drupal.treegrid.csrfToken(element);
+    const headers = { Accept: 'application/json' };
+    if (token !== '') {
+      headers['X-CSRF-Token'] = token;
+    }
     try {
       const response = await fetch(url, {
         method: 'POST',
-        headers: { Accept: 'application/json', 'X-CSRF-Token': token ?? '' },
+        headers,
         credentials: 'same-origin',
       });
       return await response.json().catch(() => ({ ok: false }));
@@ -102,6 +78,7 @@
     // buttons; scope the lookups to the whole region so they are found wherever
     // in the bar they render.
     const region = bar.closest('.menu-tree-ui');
+    const element = region?.querySelector('drupal-treegrid');
     const notice = region?.querySelector('.menu-tree-ui__unsaved');
     const errorContainer = region?.querySelector('.menu-tree-ui__save-error');
     const messages = errorContainer ? new Drupal.Message(errorContainer) : null;
@@ -123,7 +100,7 @@
      *   Called when the server reports success.
      */
     async function submit(url, failureMessage, onSuccess) {
-      if (!url || inFlight) {
+      if (!url || !element || inFlight) {
         return;
       }
       inFlight = true;
@@ -132,7 +109,7 @@
       );
       messages?.clear();
       try {
-        const result = await post(url);
+        const result = await post(url, element);
         if (result.ok) {
           onSuccess();
         } else {

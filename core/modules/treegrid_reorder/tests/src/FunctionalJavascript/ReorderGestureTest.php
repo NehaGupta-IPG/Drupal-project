@@ -228,7 +228,7 @@ final class ReorderGestureTest extends WebDriverTestBase {
     $this->drupalGet('/treegrid-reorder-test');
     $this->assertSession()->waitForElement(
       'css',
-      'drupal-treegrid table[role="treegrid"] tbody tr[role="row"]',
+      'drupal-treegrid[data-test-reorder-wired] table[role="treegrid"] tbody tr[role="row"]',
     );
   }
 

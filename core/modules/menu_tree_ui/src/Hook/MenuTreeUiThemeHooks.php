@@ -25,6 +25,9 @@ final class MenuTreeUiThemeHooks {
           'top_level' => [],
           'search_action' => '',
           'children_action' => '',
+          // The placeholder for the CSRF header token; see
+          // \Drupal\treegrid\TreegridCsrfToken::addPlaceholder().
+          'csrf_token' => '',
           // URL of the "Add link" form for this menu, with a destination
           // back to this page.
           'add_link_url' => '',

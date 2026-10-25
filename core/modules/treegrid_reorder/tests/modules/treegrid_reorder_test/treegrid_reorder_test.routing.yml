@@ -20,6 +20,7 @@ treegrid_reorder_test.move:
   methods: [POST]
   requirements:
     _access: 'TRUE'
+    _csrf_request_header_token: 'TRUE'
 
 treegrid_reorder_test.echo:
   path: '/treegrid-reorder-test/echo'

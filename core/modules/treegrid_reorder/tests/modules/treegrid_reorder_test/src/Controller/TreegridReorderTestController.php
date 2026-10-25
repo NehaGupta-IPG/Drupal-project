@@ -8,6 +8,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
+use Drupal\treegrid\TreegridCsrfToken;
 use Drupal\treegrid_reorder\MoveIntent;
 use Drupal\treegrid_reorder\TreeReorderManager;
 use Drupal\treegrid_reorder_test\TestTreeMoveHandler;
@@ -95,6 +96,14 @@ final class TreegridReorderTestController extends ControllerBase {
    */
   public const PAGE_REVISION = 'treegrid_reorder_test.page_revision';
 
+  /**
+   * What the page renders into data-treegrid-csrf-token.
+   *
+   * NULL renders no attribute, TRUE renders the token placeholder, and a
+   * string is rendered as it is.
+   */
+  public const PAGE_CSRF = 'treegrid_reorder_test.page_csrf';
+
   private const REVISION_HEADER = 'X-Treegrid-Reorder-Revision';
 
   /**
@@ -115,14 +124,7 @@ final class TreegridReorderTestController extends ControllerBase {
     if ($revision !== NULL) {
       $attributes .= ' data-treegrid-reorder-revision="' . Html::escape((string) $revision) . '"';
     }
-    $html = '<div class="reorder-test-container">'
-      . '<input type="text" class="reorder-test-field" data-test-field="inside">'
-      . '<drupal-treegrid' . $attributes . '><table role="treegrid"><tbody>'
-      . $rows . '</tbody></table></drupal-treegrid></div>'
-      . '<input type="text" class="reorder-test-field" data-test-field="outside">';
-
-    return [
-      '#markup' => Markup::create($html),
+    $build = [
       '#attached' => [
         'library' => ['treegrid_reorder_test/treegrid_reorder_test'],
         'drupalSettings' => [
@@ -134,6 +136,21 @@ final class TreegridReorderTestController extends ControllerBase {
       // The tree is read from State, which page cache cannot express.
       '#cache' => ['max-age' => 0],
     ];
+    $csrf = $this->state()->get(self::PAGE_CSRF);
+    if ($csrf === TRUE) {
+      $attributes .= ' data-treegrid-csrf-token="' . TreegridCsrfToken::addPlaceholder($build) . '"';
+    }
+    elseif ($csrf !== NULL) {
+      $attributes .= ' data-treegrid-csrf-token="' . Html::escape((string) $csrf) . '"';
+    }
+    $html = '<div class="reorder-test-container">'
+      . '<input type="text" class="reorder-test-field" data-test-field="inside">'
+      . '<drupal-treegrid' . $attributes . '><table role="treegrid"><tbody>'
+      . $rows . '</tbody></table></drupal-treegrid></div>'
+      . '<input type="text" class="reorder-test-field" data-test-field="outside">';
+
+    $build['#markup'] = Markup::create($html);
+    return $build;
   }
 
   /**
