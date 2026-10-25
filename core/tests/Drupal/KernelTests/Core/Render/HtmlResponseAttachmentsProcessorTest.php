@@ -29,8 +29,6 @@ class HtmlResponseAttachmentsProcessorTest extends KernelTestBase {
    * If no library depends on core/drupalSettings, the window.drupalSettings
    * global is not created, leaving it open to being faked through DOM
    * clobbering.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/3591821
    */
   public function testDrupalSettingsAlwaysLoaded(): void {
     // Stark is a theme that does not depend on core/drupalSettings.
