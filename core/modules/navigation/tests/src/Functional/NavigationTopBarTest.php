@@ -197,4 +197,15 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
     $this->assertSame($expected, $labels, 'Top bar test plugins are rendered in the correct order.');
   }
 
+  /**
+   * Tests navigation tabs local tasks for url from user input.
+   *
+   * @see hook_menu_local_tasks_alter()
+   */
+  public function testTabsRendering(): void {
+    $this->drupalGet($this->node->toUrl());
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->linkByHrefExists('/custom/path');
+  }
+
 }
