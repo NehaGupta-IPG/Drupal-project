@@ -335,6 +335,15 @@ final class ReorderMoveQueueTest extends WebDriverTestBase {
     $this->assertSame('stale', $this->events()[3]['detail']['reason']);
   }
 
+  /**
+   * The flash state is present after a Shift+Arrow move, then goes.
+   */
+  public function testFlashStateIsPresentThenGone(): void {
+    $this->pressKey('1', 'ArrowDown', TRUE);
+    $this->assertJsCondition("document.querySelector('tr[data-id=\"1\"]').hasAttribute('data-treegrid-reorder-flash')", 3000);
+    $this->assertJsCondition("!document.querySelector('tr[data-id=\"1\"]').hasAttribute('data-treegrid-reorder-flash')", 6000);
+  }
+
   // Helpers.
 
   /**

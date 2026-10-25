@@ -397,10 +397,6 @@
   visibility: hidden;
 }
 
-.menu-tree-ui-row[data-treegrid-virtualized="true"] {
-  height: 2.5rem;
-}
-
 /* ─────────────────────────────────────────────────────── operations */
 
 .menu-tree-ui-row__operations {
@@ -485,4 +481,21 @@
  */
 .menu-tree-ui__paging-sentinel {
   height: 1px;
+}
+
+/*
+ * Forced colors remove the handle icon's background fill and the grabbed row's
+ * shadow. The handle icon is drawn in a system color, and the grabbed row gets
+ * a dashed outline with enough specificity to beat the admin theme's focus
+ * outline on the focused row.
+ */
+@media (forced-colors: active) {
+  .menu-tree-ui-row__handle-icon {
+    background-color: LinkText;
+  }
+
+  .menu-tree-ui .menu-tree-ui-row[data-treegrid-reorder-grabbed] {
+    outline: 2px dashed Highlight;
+    outline-offset: -2px;
+  }
 }

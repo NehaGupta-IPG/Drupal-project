@@ -27,6 +27,8 @@
   } = Drupal.treegridReorder;
 
   const ROW = 'tr[role="row"]';
+  const FLASH = 'data-treegrid-reorder-flash';
+  const FLASH_FALLBACK_MS = 2000;
 
   /**
    * The previous sibling row at the same level under the same parent.
@@ -97,6 +99,30 @@
       return Drupal.t('@title moved up.', { '@title': title });
     }
     return Drupal.t('@title moved down.', { '@title': title });
+  }
+
+  /**
+   * Flashes a row to show where it went.
+   *
+   * The flash state ends with the animation the module's stylesheet draws. A
+   * fallback timer ends it too, because with reduced motion there is no
+   * animation and so no animationend.
+   *
+   * @param {HTMLElement} row
+   *   The row to flash.
+   */
+  function flash(row) {
+    row.setAttribute(FLASH, 'true');
+    const end = (event) => {
+      if (event && event.target !== row) {
+        return;
+      }
+      window.clearTimeout(timer);
+      row.removeEventListener('animationend', end);
+      row.removeAttribute(FLASH);
+    };
+    const timer = window.setTimeout(end, FLASH_FALLBACK_MS);
+    row.addEventListener('animationend', end);
   }
 
   /**
@@ -173,10 +199,7 @@
     ) {
       row.focus();
     }
-    row.setAttribute('data-treegrid-reorder-flash', 'true');
-    window.setTimeout(() => {
-      row.removeAttribute('data-treegrid-reorder-flash');
-    }, 600);
+    flash(row);
 
     const result = await Drupal.treegridReorder.request(
       element,
