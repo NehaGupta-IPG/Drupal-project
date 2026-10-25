@@ -112,7 +112,6 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
       // would not exist on pages where no other library depends on
       // core/drupalSettings, leaving it open to being faked through DOM
       // clobbering.
-      // @see https://www.drupal.org/project/drupal/issues/3591821
       $attached['library'][] = 'core/drupalSettings';
 
       $assets = AttachedAssets::createFromRenderArray(['#attached' => $attached]);
