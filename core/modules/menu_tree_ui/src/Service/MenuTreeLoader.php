@@ -10,6 +10,7 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
+use Drupal\menu_link_content\Plugin\Menu\MenuLinkContent;
 use Drupal\menu_tree_ui\LevelSlice;
 use Drupal\treegrid_reorder\MoveLogReplay;
 use Drupal\treegrid_reorder\TreegridWorkingCopy;
@@ -49,6 +50,8 @@ final class MenuTreeLoader {
    *   The per-menu working copy of pending moves.
    * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
    *   The menu link manager, for materializing moved-in elements.
+   * @param \Drupal\menu_tree_ui\Service\MenuTreeTitleReader $titleReader
+   *   The reader of content link sort titles.
    */
   public function __construct(
     private readonly MenuLinkTreeInterface $menuTree,
@@ -57,6 +60,7 @@ final class MenuTreeLoader {
     private readonly iterable $searchProviders,
     private readonly TreegridWorkingCopy $workingCopy,
     private readonly MenuLinkManagerInterface $menuLinkManager,
+    private readonly MenuTreeTitleReader $titleReader,
   ) {
     $this->replay = new MoveLogReplay();
   }
@@ -134,6 +138,57 @@ final class MenuTreeLoader {
       }
     }
     return new LevelSlice($ids, $elements, count($ids), $ids[$offset + count($slice_ids)] ?? NULL);
+  }
+
+  /**
+   * Returns the plugin IDs of a level in core's display order.
+   *
+   * Reads the live level: every link in it, with no access step and no level
+   * hook, disabled links included. Content links are not instantiated, so their
+   * entities are not loaded; their titles come from the title reader. The order
+   * is the one core's generateIndexAndSort() gives.
+   *
+   * @param string $menu_name
+   *   Menu entity ID.
+   * @param string $parent_id
+   *   Plugin ID of the parent to read the children of, or '' for the top.
+   *
+   * @return list<string>
+   *   The plugin IDs, in order.
+   */
+  public function orderedChildIds(string $menu_name, string $parent_id): array {
+    $params = new MenuTreeParameters();
+    if ($parent_id !== '') {
+      $params->setRoot($parent_id)->excludeRoot();
+    }
+    $params->setMaxDepth(1);
+
+    $definitions = [];
+    $content_definitions = [];
+    foreach ($this->treeStorage->loadTreeData($menu_name, $params)['tree'] as $plugin_id => $item) {
+      $plugin_id = (string) $plugin_id;
+      $definitions[$plugin_id] = $item['definition'];
+      if (($item['definition']['class'] ?? '') === MenuLinkContent::class) {
+        $content_definitions[$plugin_id] = $item['definition'];
+      }
+    }
+    $content_titles = $this->titleReader->contentLinkTitles($content_definitions);
+
+    $keyed = [];
+    foreach ($definitions as $plugin_id => $definition) {
+      if (isset($content_definitions[$plugin_id])) {
+        $weight = (int) $definition['weight'];
+        $title = $content_titles[$plugin_id];
+      }
+      else {
+        $instance = $this->menuLinkManager->createInstance($plugin_id);
+        $weight = (int) $instance->getWeight();
+        $title = (string) $instance->getTitle();
+      }
+      $keyed[(50000 + $weight) . ' ' . $title . ' ' . $plugin_id] = $plugin_id;
+    }
+    ksort($keyed);
+    return array_values($keyed);
   }
 
   /**

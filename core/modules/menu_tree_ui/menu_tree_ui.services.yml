@@ -7,6 +7,14 @@ services:
       - 'menu_tree_ui.working_copy'
   Drupal\treegrid_reorder\TreegridWorkingCopy: '@menu_tree_ui.working_copy'
 
+  menu_tree_ui.title_reader:
+    class: Drupal\menu_tree_ui\Service\MenuTreeTitleReader
+    arguments:
+      - '@database'
+      - '@entity_type.manager'
+      - '@language_manager'
+  Drupal\menu_tree_ui\Service\MenuTreeTitleReader: '@menu_tree_ui.title_reader'
+
   menu_tree_ui.loader:
     class: Drupal\menu_tree_ui\Service\MenuTreeLoader
     arguments:
@@ -16,6 +24,7 @@ services:
       - !tagged_iterator menu_tree_ui.search_provider
       - '@menu_tree_ui.working_copy'
       - '@plugin.manager.menu.link'
+      - '@menu_tree_ui.title_reader'
   Drupal\menu_tree_ui\Service\MenuTreeLoader: '@menu_tree_ui.loader'
 
   menu_tree_ui.mover:

@@ -172,6 +172,7 @@ final class MenuTreeLoaderSearchTest extends KernelTestBase {
       $providers,
       $this->container->get('menu_tree_ui.working_copy'),
       $this->container->get('plugin.manager.menu.link'),
+      $this->container->get('menu_tree_ui.title_reader'),
     );
   }
 
