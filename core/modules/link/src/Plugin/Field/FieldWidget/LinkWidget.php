@@ -2,7 +2,9 @@
 
 namespace Drupal\link\Plugin\Field\FieldWidget;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Field\Attribute\FieldWidget;
+use Drupal\Core\Render\Element;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Entity\Element\EntityAutocomplete;
@@ -444,6 +446,53 @@ class LinkWidget extends WidgetBase {
       $value += ['options' => []];
     }
     return $values;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Keeps stored link attributes and edited link attributes.
+   * A widget edits an attribute by adding a child element to the form
+   * element ['options']['attributes']. The submitted value replaces the
+   * stored attribute. A stored attribute is removed when it has an element
+   * but no submitted value, for example when a widget's massageFormValues()
+   * drops an empty value. Stored attributes that have no element, such as
+   * those set in code or config, are kept.
+   */
+  public function extractFormValues(FieldItemListInterface $items, array $form, FormStateInterface $form_state): void {
+    parent::extractFormValues($items, $form, $form_state);
+
+    // The stored attributes are read from the built form, so the widget's
+    // place in the form is needed.
+    $field_state = static::getWidgetState($form['#parents'], $this->fieldDefinition->getName(), $form_state);
+    if (empty($field_state['array_parents'])) {
+      return;
+    }
+    $widget = NestedArray::getValue($form_state->getCompleteForm(), $field_state['array_parents']);
+    foreach ($items as $delta => $item) {
+      // The parent reorders items by weight and removes empty ones, so find
+      // each item's form element by its original delta.
+      $element = $widget[$field_state['original_deltas'][$delta] ?? $delta] ?? [];
+      // The attributes the item had when the form was built. This is a
+      // 'value' element, so the submitted input can't change it.
+      $attributes_stored = $element['attributes']['#value'] ?? [];
+      if (!$attributes_stored || !is_array($attributes_stored)) {
+        continue;
+      }
+      // A widget that edits attributes adds one child element per attribute.
+      $attribute_elements = $element['options']['attributes'] ?? [];
+      $options = $item->options ?? [];
+      $attributes_submitted = $options['attributes'] ?? [];
+      // An attribute with an element but no submitted value is cleared.
+      $attributes_removed = array_diff_key(array_flip(Element::children($attribute_elements)), $attributes_submitted);
+      // Submitted attributes replace stored ones. Stored attributes
+      // without an attribute element are kept in their stored order.
+      $attributes = array_diff_key(array_replace($attributes_stored, $attributes_submitted), $attributes_removed);
+      if ($attributes !== $attributes_submitted) {
+        $options['attributes'] = $attributes;
+        $item->options = $options;
+      }
+    }
   }
 
   /**
