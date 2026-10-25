@@ -281,7 +281,7 @@ class StringArgument extends ArgumentPluginBase {
    * {@inheritdoc}
    */
   public function summaryArgument($data) {
-    $value = $this->caseTransform($data->{$this->base_alias}, $this->options['path_case']);
+    $value = $this->caseTransform($data->{$this->base_alias} ?? '', $this->options['path_case']);
     if (!empty($this->options['transform_dash'])) {
       $value = strtr($value, ' ', '-');
     }
