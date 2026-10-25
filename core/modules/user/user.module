@@ -390,7 +390,7 @@ function user_role_revoke_permissions($rid, array $permissions = []): void {
 /**
  * Creates and sends a notification email following a change to a user account.
  *
- * @param string $op
+ * @param 'register_admin_created'|'register_no_approval_required'|'register_pending_approval'|'password_reset'|'status_activated'|'status_blocked'|'cancel_confirm'|'status_canceled' $op
  *   The operation being performed on the account. Possible values:
  *   - 'register_admin_created': Welcome message for user created by the admin.
  *   - 'register_no_approval_required': Welcome message when user
