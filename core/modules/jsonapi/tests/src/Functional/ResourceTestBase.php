@@ -1036,7 +1036,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $this->assertInstanceOf(CacheableResponseInterface::class, $cached_response);
       }
     }
-    $this->assertSame($this->generateDynamicPageCacheExpectedHeaderValue($this->getExpectedCacheContexts()) !== 'UNCACHEABLE (poor cacheability)' || $dynamic_cache_label_only !== 'UNCACHEABLE (poor cacheability)', $found_cached_200_response);
+    $this->assertSame($this->generateDynamicPageCacheExpectedHeaderValue($this->getExpectedCacheContexts()) !== 'UNCACHEABLE (poor cacheability)' || (!is_null($dynamic_cache_label_only) && $dynamic_cache_label_only !== 'UNCACHEABLE (poor cacheability)'), $found_cached_200_response);
     $this->assertTrue($other_cached_responses_are_4xx);
 
     // Not only assert the normalization, also assert deserialization of the
