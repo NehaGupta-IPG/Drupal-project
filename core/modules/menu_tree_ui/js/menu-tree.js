@@ -184,10 +184,6 @@
         const reorder = Drupal.treegridReorder.attach(element, {
           applyParentMetadata,
           container: element.closest('.menu-tree-ui'),
-          // Tell the working-copy action bar a change was recorded so it can
-          // reveal the unsaved notice (the bar lives outside the element).
-          onCommitted: () =>
-            document.dispatchEvent(new CustomEvent('menu-tree-ui:changed')),
         });
         features.set(element, { reorder, unwire: null });
         await element.ready;

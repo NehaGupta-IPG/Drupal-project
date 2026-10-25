@@ -63,7 +63,6 @@
       moveUrl: () =>
         options.moveUrl ?? element.dataset.treegridReorderMoveUrl ?? null,
       applyParentMetadata: options.applyParentMetadata,
-      onCommitted: options.onCommitted,
     };
     const indicator = new DropIndicator(element);
     const moveMode = new MoveModeController(element, indicator, context);

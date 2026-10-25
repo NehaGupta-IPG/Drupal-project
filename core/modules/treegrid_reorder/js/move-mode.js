@@ -137,7 +137,7 @@
      *   The shared drop indicator (its announce() is reused for speech).
      * @param {object} context
      *   The move context passed to commitMove: { element, moveUrl(),
-     *   applyParentMetadata, onCommitted }.
+     *   applyParentMetadata }.
      */
     constructor(element, indicator, context) {
       this.element = element;
@@ -759,7 +759,7 @@
       // Tear down before the async commit (commitMove re-finds and focuses the
       // landed row, and announces success or failure itself).
       this.end();
-      commitMove(grabbed, intent, this.context);
+      commitMove(grabbed, intent, this.context, 'move-mode');
     }
 
     /**

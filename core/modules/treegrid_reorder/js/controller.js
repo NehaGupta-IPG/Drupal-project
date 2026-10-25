@@ -36,7 +36,7 @@
      *   The shared drop indicator (owned by the host, also used by move mode).
      * @param {object} context
      *   The move context passed to commitMove: { element, moveUrl(),
-     *   applyParentMetadata, onCommitted }.
+     *   applyParentMetadata }.
      * @param {function()} onGestureStart
      *   Called when a drag arms, so the host can cancel any active keyboard
      *   move mode before the pointer gesture takes over the shared indicator.
@@ -174,7 +174,7 @@
         const { intent } = this;
         // Snapshot before cleanup, then commit asynchronously.
         this.cleanup();
-        commitMove(row, intent, this.context);
+        commitMove(row, intent, this.context, 'drag');
       } else {
         // A tap (press and release without crossing the drag threshold): pick
         // the row up into keyboard move mode rather than starting a drag. A

@@ -66,6 +66,35 @@ final class MenuTreeUiShiftReorderTest extends MenuTreeUiJavascriptTestBase {
   }
 
   /**
+   * The unsaved notice follows the move response's dirty flag.
+   */
+  public function testUnsavedNoticeFollowsDirtyFlag(): void {
+    $this->getSession()->executeScript(<<<'JS'
+      const originalFetch = window.fetch;
+      window.fetch = async function (url, options) {
+        const response = await originalFetch.apply(this, arguments);
+        if (options && options.method === 'POST' && String(url).includes('/move')) {
+          const body = await response.clone().json();
+          return new Response(JSON.stringify({ ...body, dirty: false }), {
+            status: response.status,
+            headers: response.headers,
+          });
+        }
+        return response;
+      };
+    JS);
+
+    $this->dispatchShiftArrow('A', 'ArrowDown');
+    $this->assertSiblings(['B', 'A'], $this->childRowsSelector(NULL));
+    $this->settle();
+
+    $this->assertTrue(
+      $this->getSession()->getPage()->find('css', '.menu-tree-ui__unsaved')->hasClass('js-hide'),
+      'A move response without changes pending leaves the notice hidden.',
+    );
+  }
+
+  /**
    * Shift+Arrow keeps every row's aria-setsize at the whole level's total.
    */
   public function testShiftArrowKeepsSetSizeAtLevelTotal(): void {

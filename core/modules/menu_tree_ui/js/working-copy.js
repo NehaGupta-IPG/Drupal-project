@@ -9,8 +9,9 @@
  *
  * It is a Drupal.behaviors attach rather than part of the <drupal-treegrid> custom
  * element because the action bar lives in the page template, outside the
- * element. It listens for the menu-tree-ui:changed event the move commit
- * dispatches, keeping the two decoupled.
+ * element. It listens for the treegrid-reorder:moved event, which bubbles to
+ * the document, keeping the two decoupled. A move's response says whether the
+ * working copy holds changes (dirty), and so do Save and Cancel's.
  */
 
 ((Drupal, drupalSettings, once) => {
@@ -20,15 +21,22 @@
   // would accumulate: once() only guards re-wiring the same bar element, so an
   // htmx swap that injects a new action bar would add another permanent listener
   // and retain the detached one's closure.
-  let changedListenerBound = false;
+  let movedListenerBound = false;
 
   /**
-   * Reveals the unsaved-changes notice and clears save errors on a change.
+   * Reveals the unsaved-changes notice and clears save errors after a move.
    *
+   * Only a move whose response says the working copy holds changes counts.
    * Queries the elements fresh rather than closing over them, so a single
    * listener serves whatever action bar is currently in the DOM.
+   *
+   * @param {CustomEvent} event
+   *   The treegrid-reorder:moved event.
    */
-  function handleChanged() {
+  function handleMoved(event) {
+    if (event.detail.result?.body?.dirty !== true) {
+      return;
+    }
     document
       .querySelectorAll('.menu-tree-ui__unsaved')
       .forEach((notice) => notice.classList.remove('js-hide'));
@@ -127,9 +135,9 @@
 
   Drupal.behaviors.menuTreeUiWorkingCopy = {
     attach(context) {
-      if (!changedListenerBound) {
-        document.addEventListener('menu-tree-ui:changed', handleChanged);
-        changedListenerBound = true;
+      if (!movedListenerBound) {
+        document.addEventListener('treegrid-reorder:moved', handleMoved);
+        movedListenerBound = true;
       }
       once('mtu-working-copy', '.menu-tree-ui__actions', context).forEach(
         setupActions,

@@ -17,7 +17,8 @@
   const { descendantRows, lastDescendantRow, nextSiblingRow } =
     Drupal.treegrid.treeNav;
   const { announce } = Drupal.treegrid;
-  const { rowTitle } = Drupal.treegridReorder;
+  const { rowTitle, dispatchMoveEvent, failureMessage, reportFailure } =
+    Drupal.treegridReorder;
 
   const ROW = 'tr[role="row"]';
 
@@ -98,43 +99,32 @@
   }
 
   /**
-   * Reorders a row among its siblings, persisting via the move POST.
+   * Swaps a row with its sibling inside a running unit and persists the swap.
    *
+   * The optimistic swap happens when the unit starts, so it never lands in the
+   * middle of a page load or refresh. A failed move puts the rows back.
+   *
+   * @param {object} unit
+   *   The unit the move runs in.
    * @param {HTMLElement} row
    *   The row to move.
    * @param {('up'|'down')} direction
    *   Which way to move it.
    * @param {object} context
-   *   The move context: { element, moveUrl(), onCommitted }. onCommitted is
-   *   the callback fired after a persisted move.
+   *   The move context: { element, moveUrl() }.
    *
-   * @return {Promise<boolean>}
-   *   True if the handler took the key (so the caller preventDefaults).
+   * @return {Promise<void>}
+   *   Resolves once the move is recorded or put back.
    */
-  async function reorderSibling(row, direction, context) {
-    const { element, onCommitted } = context;
-    const moveUrl = context.moveUrl();
-    if (!moveUrl) {
-      // eslint-disable-next-line no-console
-      console.warn('[treegrid-reorder] no move URL — move ignored.');
-      return false;
-    }
-    const movedId = row.dataset.id;
-    if (!movedId || row.dataset.movable !== 'true') {
-      return false;
-    }
-    if (movesInFlight.has(row)) {
-      // A previous Shift+Arrow on this row is still round-tripping; ignore the
-      // new key rather than stacking optimistic swaps on an unsettled DOM.
-      return false;
-    }
-
+  async function runSwap(unit, row, direction, context) {
+    const { element } = context;
     const sibling =
       direction === 'up' ? previousSiblingRow(row) : nextSiblingRow(row);
     if (!sibling) {
-      return false;
+      return;
     }
 
+    const movedId = row.dataset.id;
     const parentId = row.dataset.parentId ?? '';
     const block = descendantRows(row);
     // Snapshot the original position so a failed move can restore it: the row
@@ -168,7 +158,15 @@
       row.removeAttribute('data-treegrid-reorder-flash');
     }, 600);
 
-    const restore = () => {
+    const result = await Drupal.treegridReorder.request(
+      element,
+      context.moveUrl(),
+      {
+        body: { id: movedId, new_parent: parentId, before_id: beforeId },
+        unit,
+      },
+    );
+    if (!result.ok) {
       let anchor = row;
       row.parentNode.insertBefore(row, oldNext);
       block.forEach((r) => {
@@ -176,41 +174,68 @@
         anchor = r;
       });
       renumberSiblings(row);
-    };
+      reportFailure(
+        element,
+        { id: movedId, parentId, beforeId, gesture: 'shift-arrow' },
+        result,
+        failureMessage(
+          result,
+          Drupal.t('Move failed. Order restored.'),
+          Drupal.t('Network error. Order restored.'),
+        ),
+      );
+      return;
+    }
+    announce(movedMessage(rowTitle(row), direction), 'polite');
+    dispatchMoveEvent(element, 'treegrid-reorder:moved', {
+      id: movedId,
+      parentId,
+      beforeId,
+      previousParentId: parentId,
+      gesture: 'shift-arrow',
+      refreshed: true,
+      result,
+    });
+  }
+
+  /**
+   * Reorders a row among its siblings, persisting via the move POST.
+   *
+   * @param {HTMLElement} row
+   *   The row to move.
+   * @param {('up'|'down')} direction
+   *   Which way to move it.
+   * @param {object} context
+   *   The move context: { element, moveUrl() }.
+   *
+   * @return {Promise<boolean>}
+   *   True if the handler took the key (so the caller preventDefaults).
+   */
+  async function reorderSibling(row, direction, context) {
+    if (!context.moveUrl()) {
+      // eslint-disable-next-line no-console
+      console.warn('[treegrid-reorder] no move URL — move ignored.');
+      return false;
+    }
+    if (!row.dataset.id || row.dataset.movable !== 'true') {
+      return false;
+    }
+    if (movesInFlight.has(row)) {
+      // A previous Shift+Arrow on this row is still round-tripping; ignore the
+      // new key rather than stacking optimistic swaps on an unsettled DOM.
+      return false;
+    }
+    const sibling =
+      direction === 'up' ? previousSiblingRow(row) : nextSiblingRow(row);
+    if (!sibling) {
+      return false;
+    }
 
     movesInFlight.add(row);
     try {
-      const headers = {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      };
-      const token = await Drupal.treegrid.csrfToken(element);
-      if (token !== '') {
-        headers['X-CSRF-Token'] = token;
-      }
-      const response = await fetch(moveUrl, {
-        method: 'POST',
-        headers,
-        credentials: 'same-origin',
-        body: JSON.stringify({
-          id: movedId,
-          new_parent: parentId,
-          before_id: beforeId,
-        }),
-      });
-      const body = await response.json().catch(() => ({ ok: false }));
-      if (!response.ok || !body.ok) {
-        restore();
-        announce(Drupal.t('Move failed. Order restored.'), 'assertive');
-      } else {
-        onCommitted?.();
-        announce(movedMessage(rowTitle(row), direction), 'polite');
-      }
-    } catch (e) {
-      restore();
-      announce(Drupal.t('Network error. Order restored.'), 'assertive');
-      // eslint-disable-next-line no-console
-      console.error('[treegrid-reorder] reorder failed', e);
+      await context.element.exclusive((unit) =>
+        runSwap(unit, row, direction, context),
+      );
     } finally {
       movesInFlight.delete(row);
     }

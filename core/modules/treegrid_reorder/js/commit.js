@@ -15,11 +15,14 @@
  *
  * Per-row metadata that the children endpoint cannot express (e.g. whether a
  * parent now has children) is the consumer's concern: it is supplied as the
- * context's applyParentMetadata callback, and its onCommitted fires after a
- * successful move so the consumer can react (reveal an unsaved notice, etc.).
+ * context's applyParentMetadata callback.
  *
- * The context a move runs with is { element, moveUrl(), applyParentMetadata,
- * onCommitted }, built by attach().
+ * A move runs as one unit in the element's queue and sends through the request
+ * helper. A recorded move fires treegrid-reorder:moved on the element, a move
+ * that was not recorded fires treegrid-reorder:failed.
+ *
+ * The context a move runs with is { element, moveUrl(), applyParentMetadata },
+ * built by attach().
  *
  * Exposes Drupal.treegridReorder.commitMove.
  */
@@ -73,25 +76,103 @@
   }
 
   /**
-   * The inner commit pipeline (wrapped by commitMove for the in-flight flag).
+   * Dispatches a move event on the element.
    *
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element.
+   * @param {string} type
+   *   The event type, treegrid-reorder:moved or treegrid-reorder:failed.
+   * @param {object} detail
+   *   The event detail.
+   */
+  function dispatchMoveEvent(element, type, detail) {
+    element.dispatchEvent(new CustomEvent(type, { bubbles: true, detail }));
+  }
+
+  /**
+   * The message that tells an editor a move was not recorded.
+   *
+   * @param {object} result
+   *   The request helper's result.
+   * @param {string} failed
+   *   The message for a refused move with no message of its own.
+   * @param {string} network
+   *   The message for a request that never got an answer.
+   *
+   * @return {string}
+   *   The server's message, or the matching fallback.
+   */
+  function failureMessage(result, failed, network) {
+    if (result.message) {
+      return result.message;
+    }
+    return result.sent && result.status === 0 ? network : failed;
+  }
+
+  /**
+   * Reports a move that was not recorded: announces it and fires failed.
+   *
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element.
+   * @param {object} move
+   *   What was attempted: { id, parentId, beforeId, gesture }.
+   * @param {object} result
+   *   The request helper's result, or one built for a move never sent.
+   * @param {string} message
+   *   What to announce.
+   */
+  function reportFailure(element, move, result, message) {
+    announce(message, 'assertive');
+    dispatchMoveEvent(element, 'treegrid-reorder:failed', {
+      ...move,
+      status: result.status,
+      code: result.code,
+      message: result.message,
+      sent: result.sent,
+    });
+  }
+
+  /**
+   * The result of a move that never left the browser.
+   *
+   * @param {string} code
+   *   The module's code for why.
+   *
+   * @return {object}
+   *   A result shaped like the request helper's.
+   */
+  function unsentResult(code) {
+    return {
+      ok: false,
+      status: 0,
+      code,
+      message: null,
+      body: null,
+      sent: false,
+    };
+  }
+
+  /**
+   * Runs a drag or move-mode move inside its unit.
+   *
+   * @param {object} unit
+   *   The unit the move runs in.
    * @param {HTMLTableRowElement} row
    *   The moved row.
    * @param {object} intent
    *   The DropIntent.
    * @param {object} context
-   *   The move context: { element, moveUrl(), applyParentMetadata,
-   *   onCommitted }.
-   * @param {?HTMLTableElement} tree
-   *   The root treegrid element.
-   * @param {string} movedId
-   *   The moved row's id.
+   *   The move context: { element, moveUrl(), applyParentMetadata }.
+   * @param {string} gesture
+   *   'drag' or 'move-mode'.
    *
    * @return {Promise<void>}
    *   Resolves once the move is committed and refreshed (or bailed).
    */
-  async function runCommit(row, intent, context, tree, movedId) {
+  async function runMove(unit, row, intent, context, gesture) {
     const { element } = context;
+    const { tree } = element;
+    const movedId = row.dataset.id;
     const moveUrl = context.moveUrl();
     if (!moveUrl) {
       // eslint-disable-next-line no-console
@@ -101,6 +182,12 @@
     const oldParentId = row.dataset.parentId ?? '';
     const newParentId = resolveNewParentId(intent);
     const { target } = intent;
+    const move = {
+      id: movedId,
+      parentId: newParentId,
+      beforeId: null,
+      gesture,
+    };
 
     // A child drop opens an unloaded destination first, a leaf included: a
     // leaf's level comes back empty but loaded, which is enough to go ahead.
@@ -108,11 +195,13 @@
       intent.kind === 'child' &&
       target.getAttribute('aria-expanded') !== 'true'
     ) {
-      const opened = await element.expandRow(target);
+      const opened = await unit.expandRow(target);
       if (!opened && target.dataset.treegridLoaded !== 'true') {
-        announce(
+        reportFailure(
+          element,
+          move,
+          unsentResult('unavailable'),
           Drupal.t('Could not open the destination. Move canceled.'),
-          'assertive',
         );
         return;
       }
@@ -129,36 +218,23 @@
     if (beforeId === movedId) {
       beforeId = nextSiblingRow(row)?.dataset.id ?? null;
     }
+    move.beforeId = beforeId;
 
-    let body;
-    try {
-      const headers = {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      };
-      const token = await Drupal.treegrid.csrfToken(element);
-      if (token !== '') {
-        headers['X-CSRF-Token'] = token;
-      }
-      const response = await fetch(moveUrl, {
-        method: 'POST',
-        headers,
-        credentials: 'same-origin',
-        body: JSON.stringify({
-          id: movedId,
-          new_parent: newParentId,
-          before_id: beforeId,
-        }),
-      });
-      body = await response.json().catch(() => ({ ok: false }));
-      if (!response.ok || !body.ok) {
-        announce(body.message ?? Drupal.t('Move failed.'), 'assertive');
-        return;
-      }
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('[treegrid-reorder] move fetch failed', e);
-      announce(Drupal.t('Network error. Move canceled.'), 'assertive');
+    const result = await Drupal.treegridReorder.request(element, moveUrl, {
+      body: { id: movedId, new_parent: newParentId, before_id: beforeId },
+      unit,
+    });
+    if (!result.ok) {
+      reportFailure(
+        element,
+        move,
+        result,
+        failureMessage(
+          result,
+          Drupal.t('Move failed.'),
+          Drupal.t('Network error. Move canceled.'),
+        ),
+      );
       return;
     }
 
@@ -171,10 +247,10 @@
     // Server confirmed. Re-fetch the visible state of both affected groups.
     // When from === to (sibling reorder under the same parent) the second
     // refresh is a no-op but harmless.
-    const okFrom = await element.refreshLevel(oldParentId);
+    const okFrom = await unit.refreshLevel(oldParentId);
     let okTo = true;
     if (newParentId !== oldParentId) {
-      okTo = await element.refreshLevel(newParentId);
+      okTo = await unit.refreshLevel(newParentId);
     }
     // A refresh whose fetch failed would leave the tree half-synced (a
     // duplicated row, or no tab stop). Reload so the tree resyncs from the
@@ -201,42 +277,56 @@
     }
 
     announce(Drupal.t('Item moved.'), 'polite');
-    context.onCommitted?.();
+    dispatchMoveEvent(element, 'treegrid-reorder:moved', {
+      id: movedId,
+      parentId: newParentId,
+      beforeId,
+      previousParentId: oldParentId,
+      gesture,
+      refreshed: true,
+      result,
+    });
   }
 
   /**
-   * Commits a drag-and-drop move, flagging the host while in-flight.
+   * Commits a drag or move-mode move as one unit in the element's queue.
    *
-   * Tests wait on the data-treegrid-reorder-moving flag's absence to know all
-   * asynchronous refresh work is done; humans never see it.
+   * The host carries data-treegrid-reorder-moving from here until the unit
+   * ends, the time spent queued included. Tests wait on its absence to know
+   * all asynchronous refresh work is done; humans never see it.
    *
    * @param {HTMLTableRowElement} row
    *   The moved row.
    * @param {object} intent
    *   The DropIntent.
    * @param {object} context
-   *   The move context: { element, moveUrl(), applyParentMetadata,
-   *   onCommitted }.
+   *   The move context: { element, moveUrl(), applyParentMetadata }.
+   * @param {string} gesture
+   *   'drag' or 'move-mode'.
    *
    * @return {Promise<void>}
    *   Resolves once the commit completes.
    */
-  async function commitMove(row, intent, context) {
-    const movedId = row.dataset.id;
-    if (!movedId) {
+  async function commitMove(row, intent, context, gesture) {
+    if (!row.dataset.id) {
       return;
     }
-
     const { element } = context;
     element.setAttribute('data-treegrid-reorder-moving', 'true');
     try {
-      await runCommit(row, intent, context, element.tree, movedId);
+      await element.exclusive((unit) =>
+        runMove(unit, row, intent, context, gesture),
+      );
     } finally {
       element.removeAttribute('data-treegrid-reorder-moving');
     }
   }
 
   Drupal.treegridReorder.commitMove = commitMove;
+  Drupal.treegridReorder.dispatchMoveEvent = dispatchMoveEvent;
+  Drupal.treegridReorder.failureMessage = failureMessage;
+  Drupal.treegridReorder.reportFailure = reportFailure;
+  Drupal.treegridReorder.unsentResult = unsentResult;
   // Exported so keyboard move mode can resolve an intent to {new_parent,
   // before_id} for its no-op-drop guard, without duplicating the logic.
   Drupal.treegridReorder.resolveNewParentId = resolveNewParentId;
