@@ -75,13 +75,13 @@ final class MenuTreeMessageEscapingTest extends KernelTestBase {
    */
   public function testVetoReasonIsEscapedOnceInSaveMessage(): void {
     $this->createLinks('A', 'B');
-    \Drupal::state()->set(self::VETO_STATE, ['id' => $this->ids['A'], 'name' => "O'Brien"]);
+    \Drupal::state()->set(self::VETO_STATE, ['id' => $this->ids['A'], 'name' => "Tom's"]);
 
     $result = $this->container->get('menu_tree_ui.mover')->commitWorkingCopy('test', [
       ['type' => 'move', 'id' => $this->ids['A'], 'new_parent' => '', 'before_id' => NULL],
     ]);
 
-    $this->assertStringContainsString('O&#039;Brien', $result['message']);
+    $this->assertStringContainsString('Tom&#039;s', $result['message']);
     $this->assertStringNotContainsString('&amp;#039;', $result['message']);
   }
 
@@ -90,16 +90,30 @@ final class MenuTreeMessageEscapingTest extends KernelTestBase {
    */
   public function testVetoReasonIsEscapedOnceInPartialSaveMessage(): void {
     $this->createLinks('A', 'B');
-    \Drupal::state()->set(self::VETO_STATE, ['id' => $this->ids['B'], 'skip' => 1, 'name' => "O'Brien"]);
+    \Drupal::state()->set(self::VETO_STATE, [
+      'id' => $this->ids['B'],
+      'skip' => 1,
+      'name' => "Tom's",
+    ]);
     $working_copy = $this->container->get('menu_tree_ui.working_copy');
-    $working_copy->addOp('test', ['type' => 'move', 'id' => $this->ids['A'], 'new_parent' => $this->ids['B'], 'before_id' => NULL]);
-    $working_copy->addOp('test', ['type' => 'move', 'id' => $this->ids['B'], 'new_parent' => '', 'before_id' => NULL]);
+    $working_copy->addOp('test', [
+      'type' => 'move',
+      'id' => $this->ids['A'],
+      'new_parent' => $this->ids['B'],
+      'before_id' => NULL,
+    ]);
+    $working_copy->addOp('test', [
+      'type' => 'move',
+      'id' => $this->ids['B'],
+      'new_parent' => '',
+      'before_id' => NULL,
+    ]);
 
     $response = MenuTreeController::create($this->container)->save(Menu::load('test'));
 
     $result = json_decode((string) $response->getContent(), TRUE);
     $this->assertSame('vetoed', $result['code']);
-    $this->assertStringContainsString('O&#039;Brien', $result['message']);
+    $this->assertStringContainsString('Tom&#039;s', $result['message']);
     $this->assertStringNotContainsString('&amp;#039;', $result['message']);
   }
 
