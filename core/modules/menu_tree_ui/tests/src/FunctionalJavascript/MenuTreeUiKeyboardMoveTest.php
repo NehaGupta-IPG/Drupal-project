@@ -308,4 +308,16 @@ final class MenuTreeUiKeyboardMoveTest extends MenuTreeUiJavascriptTestBase {
     $this->assertAdjacent('C', 'B', $this->childRowsSelector(NULL));
   }
 
+  /**
+   * Detaching the page's behaviors removes the reorder handlers.
+   */
+  public function testDetachingBehaviorsRemovesReorderHandlers(): void {
+    $this->getSession()->executeScript("Drupal.detachBehaviors(document, drupalSettings, 'unload');");
+
+    $this->dispatchKeys('A', [' ']);
+
+    $this->assertNull($this->row('A')->getAttribute('aria-selected'));
+    $this->assertNull($this->row('A')->getAttribute('data-treegrid-reorder-grabbed'));
+  }
+
 }

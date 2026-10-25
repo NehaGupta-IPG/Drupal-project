@@ -19,8 +19,8 @@
    * loading its children if needed), then scrolls and focuses the target.
    *
    * @param {object} ctx
-   *   Context: {tree: HTMLTableElement, element: HTMLElement, moveMode?:
-   *   MoveModeController}.
+   *   Context: {tree: HTMLTableElement, element: HTMLElement, reorder?:
+   *   the object treegridReorder.attach() returned}.
    * @param {string} targetId
    *   The link plugin ID to jump to.
    * @param {string[]} pathIds
@@ -59,8 +59,8 @@
     target.scrollIntoView({ block: 'center', behavior: 'smooth' });
     // If a move is in progress, the editor searched for a destination: keep the
     // grab and re-aim the cursor at the jumped-to row instead of stealing focus.
-    if (ctx.moveMode?.isActive()) {
-      ctx.moveMode.aimAt(target);
+    if (ctx.reorder?.isActive()) {
+      ctx.reorder.aimAt(target);
     } else {
       focusRow(ctx.tree, target);
     }
@@ -74,8 +74,8 @@
    * Wires document-level click handling for [data-mtu-jump-id].
    *
    * @param {object} ctx
-   *   Context: {tree: HTMLTableElement, element: HTMLElement, moveMode?:
-   *   MoveModeController}.
+   *   Context: {tree: HTMLTableElement, element: HTMLElement, reorder?: the
+   *   object treegridReorder.attach() returned}.
    *
    * @return {function(MouseEvent): void}
    *   The bound handler, so the caller can remove it on teardown.

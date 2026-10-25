@@ -30,6 +30,8 @@ final class MenuTreeUiThemeHooks {
           'csrf_token' => '',
           // URL the column-update client posts checkbox changes to.
           'column_update_url' => '',
+          // URL the reorder feature posts moves to.
+          'move_url' => '',
           // URL of the "Add link" form for this menu, with a destination
           // back to this page.
           'add_link_url' => '',

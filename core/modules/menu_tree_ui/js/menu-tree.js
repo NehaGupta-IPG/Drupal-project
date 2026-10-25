@@ -13,10 +13,9 @@
  * The column switches are persisted by treegrid's column-update client.
  */
 
-((Drupal, drupalSettings, once) => {
+((Drupal, once) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const ns = Drupal.menuTreeUi;
-  const rr = Drupal.treegridReorder;
 
   const ROW = 'tr[role="row"]';
   /**
@@ -74,14 +73,17 @@
   }
 
   /**
-   * Wires menu_tree_ui's features onto an upgraded <drupal-treegrid>.
+   * Wires menu_tree_ui's page features onto an initialized <drupal-treegrid>.
    *
    * @param {HTMLElement} element
    *   The element, already initialized (element.ready has resolved).
+   * @param {object} reorder
+   *   What treegridReorder.attach() returned for the element.
+   *
+   * @return {function(): void}
+   *   Removes everything this wired.
    */
-  function wireFeatures(element) {
-    const settings = drupalSettings.menuTreeUi ?? {};
-    const { moveUrl } = settings;
+  function wireFeatures(element, reorder) {
     const container = element.closest('.menu-tree-ui');
 
     // Keep the keyboard cursor clear of the sticky action bar: when focusRow()
@@ -103,19 +105,6 @@
       stickyObserver = new ResizeObserver(syncStickyOffset);
       stickyObserver.observe(actionBar);
     };
-
-    // Reordering: drag, move mode, Shift+Arrow and the single-pointer path.
-    // A press outside the whole component cancels a move; searching for a
-    // destination keeps it.
-    const reorder = rr.attach(element, {
-      moveUrl,
-      applyParentMetadata,
-      container,
-      // Tell the working-copy action bar a change was recorded so it can
-      // reveal the unsaved notice (the bar lives outside the element).
-      onCommitted: () =>
-        document.dispatchEvent(new CustomEvent('menu-tree-ui:changed')),
-    });
 
     // "Keyboard commands" dialog. Closing uses a native <form method="dialog">,
     // so only opening needs JS; degrades to a no-op without dialog.showModal.
@@ -142,7 +131,7 @@
       jumpHandler = ns.attachJumpClickHandler({
         tree: element.tree,
         element,
-        moveMode: reorder,
+        reorder,
       });
       detachSearchPanel = container ? ns.attachSearchPanel(container) : null;
       // Stream the rest of a truncated top level in as the editor scrolls.
@@ -166,28 +155,59 @@
         helpToggle.removeEventListener('click', openHelp);
       }
     };
-    addPageListeners();
-
-    element.addEventListener('treegrid:disconnected', removePageListeners);
-    element.addEventListener('treegrid:connected', (event) => {
+    const onConnected = (event) => {
       if (event.detail.reconnected) {
         addPageListeners();
       }
-    });
+    };
+    addPageListeners();
+    element.addEventListener('treegrid:disconnected', removePageListeners);
+    element.addEventListener('treegrid:connected', onConnected);
+
+    return () => {
+      removePageListeners();
+      element.removeEventListener('treegrid:disconnected', removePageListeners);
+      element.removeEventListener('treegrid:connected', onConnected);
+    };
   }
+
+  const SELECTOR = 'drupal-treegrid[data-provider="menu_tree_ui"]';
+  // Per tree: the reorder feature and what wireFeatures() set up.
+  const features = new WeakMap();
 
   Drupal.behaviors.menuTreeUi = {
     attach(context) {
-      once(
-        'menu-tree-ui',
-        'drupal-treegrid[data-provider="menu_tree_ui"]',
-        context,
-      ).forEach(async (element) => {
+      once('menu-tree-ui', SELECTOR, context).forEach(async (element) => {
+        // Reordering registers its handlers at once, before this behavior or
+        // any other adds its own. A press outside the whole component cancels
+        // a move; searching for a destination keeps it.
+        const reorder = Drupal.treegridReorder.attach(element, {
+          applyParentMetadata,
+          container: element.closest('.menu-tree-ui'),
+          // Tell the working-copy action bar a change was recorded so it can
+          // reveal the unsaved notice (the bar lives outside the element).
+          onCommitted: () =>
+            document.dispatchEvent(new CustomEvent('menu-tree-ui:changed')),
+        });
+        features.set(element, { reorder, unwire: null });
         await element.ready;
-        if (element.isConnected) {
-          wireFeatures(element);
+        // The tree may have been detached while this waited.
+        if (!element.isConnected || !features.has(element)) {
+          return;
         }
+        features.get(element).unwire = wireFeatures(element, reorder);
+      });
+    },
+    detach(context, settings, trigger) {
+      if (trigger !== 'unload') {
+        return;
+      }
+      once.remove('menu-tree-ui', SELECTOR, context).forEach((element) => {
+        const feature = features.get(element);
+        feature?.reorder.detach();
+        feature?.unwire?.();
+        features.delete(element);
       });
     },
   };
-})(Drupal, drupalSettings, once);
+})(Drupal, once);

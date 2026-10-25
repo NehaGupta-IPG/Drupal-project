@@ -78,4 +78,30 @@ final class MenuTreeUiSearchTest extends MenuTreeUiJavascriptTestBase {
     $this->assertSame($apricot_id, $focused_id, 'The jumped-to row receives focus.');
   }
 
+  /**
+   * Picking a result while a row is held keeps the move and aims at the result.
+   */
+  public function testJumpWhileHoldingRowAimsAtResult(): void {
+    $cherry_id = $this->linkIds['Cherry'];
+    $this->getSession()->executeScript(<<<JS
+      const row = document.querySelector('tr[role="row"][data-id="$cherry_id"]');
+      row.tabIndex = 0;
+      row.focus();
+      row.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
+    JS);
+    $this->assertSame('true', $this->row('Cherry')->getAttribute('aria-selected'));
+
+    $page = $this->getSession()->getPage();
+    $page->find('css', '#menu-tree-ui-search-input')->setValue('Apricot');
+    $this->assertSession()->waitForElementVisible('css', '.menu-tree-ui-search-results__title');
+    $page->find('css', '.menu-tree-ui-search-results__title')->click();
+    $this->assertSession()->waitForElementVisible('css', sprintf('tr[role="row"][data-id="%s"]', $this->linkIds['Apricot']));
+
+    $this->assertSame('true', $this->row('Cherry')->getAttribute('aria-selected'), 'The move stays active.');
+    $this->assertJsCondition(sprintf(
+      "document.querySelector('drupal-treegrid').getAttribute('data-treegrid-reorder-drop') === 'child:%s'",
+      $this->linkIds['Banana'],
+    ));
+  }
+
 }

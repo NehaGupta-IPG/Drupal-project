@@ -16,6 +16,7 @@
  * - csrf_token:       placeholder for the CSRF header token, replaced when the
  *                     page is rendered
  * - column_update_url: URL the column-update client posts checkbox changes to
+ * - move_url:         URL the reorder feature posts moves to
  * - reorder_blocked:  whether reordering is off because a link has a pending
  *                     revision
  */
@@ -184,6 +185,7 @@
     data-children-url="{{ children_action }}"
     data-treegrid-csrf-token="{{ csrf_token }}"
     data-treegrid-column-update-url="{{ column_update_url }}"
+    data-treegrid-reorder-move-url="{{ move_url }}"
     data-treegrid-top-total="{{ total }}"
     data-treegrid-page-size="{{ page_size }}"
   >

@@ -29,6 +29,10 @@
   --mtu-color-focus-bg: var(--admin-color-bg-item, rgb(37, 99, 235, 0.08));
   --mtu-shadow-popover: var(--admin-shadow-2, 0 8px 24px rgb(0, 0, 0, 0.12));
 
+  /* The reorder feature draws its indicator and row states in these. */
+  --treegrid-reorder-color: var(--mtu-color-focus);
+  --treegrid-reorder-indicator-size: 3px;
+
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -323,43 +327,6 @@
   background-color: transparent;
   font-size: 0.6rem;
   mask-image: none;
-}
-
-.menu-tree-ui-row--dragging {
-  opacity: 0.4;
-}
-
-.menu-tree-ui-row--dragging .menu-tree-ui-row__handle {
-  cursor: grabbing;
-}
-
-/* Pointer drop-as-child target. */
-.menu-tree-ui-row--drop-as-child {
-  outline: 2px solid var(--mtu-color-focus);
-  outline-offset: -2px;
-  background-color: var(--mtu-color-focus-bg);
-}
-
-/*
- * The row currently picked up in keyboard move mode. Dashed (vs the solid
- * drop-as-child target outline) reads as "in hand, not yet placed".
- */
-.menu-tree-ui-row--grabbed {
-  outline: 2px dashed var(--mtu-color-focus);
-  outline-offset: -2px;
-  background-color: var(--mtu-color-focus-bg);
-}
-
-.menu-tree-ui-drop-indicator {
-  position: absolute;
-  z-index: 5;
-  display: none;
-  height: 3px;
-  margin-top: -1.5px;
-  pointer-events: none;
-  border-radius: 1.5px;
-  background: var(--mtu-color-focus);
-  box-shadow: -3px 0 0 var(--mtu-color-focus);
 }
 
 .menu-tree-ui-row__toggle {

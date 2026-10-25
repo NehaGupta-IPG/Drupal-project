@@ -143,11 +143,11 @@ final class MenuTreeController extends ControllerBase {
       '#search_action' => Url::fromRoute('menu_tree_ui.search', ['menu' => $menu_name])->toString(),
       '#children_action' => Url::fromRoute('menu_tree_ui.children', ['menu' => $menu_name])->toString(),
       '#column_update_url' => Url::fromRoute('menu_tree_ui.column_update', ['menu' => $menu_name])->toString(),
+      '#move_url' => Url::fromRoute('menu_tree_ui.move', ['menu' => $menu_name])->toString(),
       '#attached' => [
         'library' => ['menu_tree_ui/menu_tree_ui'],
         'drupalSettings' => [
           'menuTreeUi' => [
-            'moveUrl' => Url::fromRoute('menu_tree_ui.move', ['menu' => $menu_name])->toString(),
             'saveUrl' => Url::fromRoute('menu_tree_ui.save', ['menu' => $menu_name])->toString(),
             'cancelUrl' => Url::fromRoute('menu_tree_ui.cancel', ['menu' => $menu_name])->toString(),
           ],
