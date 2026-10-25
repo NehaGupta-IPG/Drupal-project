@@ -113,7 +113,9 @@ function hook_menu_tree_ui_row_operations_alter(array &$operations, MenuLinkTree
  *
  * To block the move, set $veto['veto'] = TRUE. Set $veto['message'] to a
  * translated string to give the editor a specific reason; otherwise a generic
- * "Move blocked by a module." message is shown.
+ * "Move blocked by a module." message is shown. The message is safe HTML: set
+ * a t() result, with @ placeholders for any user-supplied text. A plain
+ * string is escaped.
  *
  * @param array $veto
  *   Empty on entry. Set $veto['veto'] = TRUE to block the move, and

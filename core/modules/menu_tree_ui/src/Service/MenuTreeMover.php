@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Drupal\menu_tree_ui\Service;
 
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\menu_tree_ui\MenuLinkMovability;
@@ -167,7 +170,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
           'code' => $validation['code'] ?? 'commit_failed',
           'message' => (string) $this->t('Could not save the move of "@title": @reason', [
             '@title' => $this->linkTitle($intent->id),
-            '@reason' => $validation['message'] ?? $this->t('A pending change could not be saved.'),
+            '@reason' => Markup::create($validation['message'] ?? (string) $this->t('A pending change could not be saved.')),
           ]),
           'failed_op' => $index,
           'applied_ops' => [],
@@ -210,6 +213,22 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
   }
 
   /**
+   * Returns a veto's message as safe HTML.
+   *
+   * @param mixed $message
+   *   The message a hook set: markup is trusted, anything else is plain text.
+   */
+  private function vetoMessage(mixed $message): string {
+    if ($message instanceof MarkupInterface) {
+      return (string) $message;
+    }
+    if (is_string($message) && $message !== '') {
+      return Html::escape($message);
+    }
+    return (string) $this->t('Move blocked by a module.');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function validateConstraints(string $tree_id, MoveIntent $intent): array {
@@ -229,7 +248,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
       return [
         'ok' => FALSE,
         'code' => 'vetoed',
-        'message' => $veto['message'] ?? (string) $this->t('Move blocked by a module.'),
+        'message' => $this->vetoMessage($veto['message'] ?? NULL),
       ];
     }
 
