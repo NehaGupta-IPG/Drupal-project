@@ -47,9 +47,6 @@
       'refresh-failed': Drupal.t(
         'Your last move was saved, but the tree could not be redrawn. Reload the page to see the current order.',
       ),
-      'pending-revisions': Drupal.t(
-        'Links in this menu now have pending revisions, so it cannot be reordered. Reload the page to see which ones.',
-      ),
     };
     const message = messages[event.detail.reason] ?? '';
     area.querySelector('[data-mtu-needs-reload-message]').textContent = message;
@@ -60,22 +57,6 @@
       area.querySelector('[data-mtu-action="reload"]').focus();
     } else {
       Drupal.treegrid.announce(message, 'polite');
-    }
-  }
-
-  /**
-   * Puts the tree into the needs-reload state when a write was refused over
-   * pending revisions.
-   *
-   * @param {CustomEvent} event
-   *   The treegrid-reorder:failed event.
-   */
-  function handleFailed(event) {
-    if (event.detail.code === 'pending_revisions') {
-      Drupal.treegridReorder.enterNeedsReload(
-        event.target,
-        'pending-revisions',
-      );
     }
   }
 
@@ -165,12 +146,6 @@
           setUnsaved(result.body.dirty);
           onSuccess();
         } else {
-          if (result.code === 'pending_revisions') {
-            Drupal.treegridReorder.enterNeedsReload(
-              element,
-              'pending-revisions',
-            );
-          }
           messages?.add(result.message ?? failureMessage, { type: 'error' });
         }
       } finally {
@@ -202,7 +177,6 @@
     attach(context) {
       if (!movedListenerBound) {
         document.addEventListener('treegrid-reorder:moved', handleMoved);
-        document.addEventListener('treegrid-reorder:failed', handleFailed);
         document.addEventListener(
           'treegrid-reorder:needs-reload',
           handleNeedsReload,

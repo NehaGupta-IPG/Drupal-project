@@ -104,9 +104,7 @@ is generic), under the `Drupal.menuTreeUi` namespace:
 - `js/working-copy.js` — the Save / Cancel action bar, the unsaved notice (it
   follows the `dirty` flag the move, Save and Cancel responses carry) and the
   needs-reload message with its Reload button. Save and Cancel go through the
-  reorder request helper, so they take their turn in the element's queue, and
-  a pending revision refused by the server puts the tree into the needs-reload
-  state with the reason `pending-revisions`.
+  reorder request helper, so they take their turn in the element's queue.
 
 The element upgrades the server-rendered top level (from
 `templates/menu-tree-ui-page.html.twig`) rather than rebuilding from scratch:

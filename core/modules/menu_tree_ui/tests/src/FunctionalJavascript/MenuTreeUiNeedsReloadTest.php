@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
 
 use Drupal\Core\Url;
-use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\treegrid_reorder_test\Controller\TreegridReorderTestController;
-use Drupal\workspaces\Entity\Workspace;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -30,7 +28,6 @@ final class MenuTreeUiNeedsReloadTest extends MenuTreeUiJavascriptTestBase {
     'menu_link_content',
     'menu_tree_ui',
     'treegrid_reorder_test',
-    'workspaces',
   ];
 
   /**
@@ -104,42 +101,7 @@ final class MenuTreeUiNeedsReloadTest extends MenuTreeUiJavascriptTestBase {
     $this->assertJsCondition("document.querySelector('.menu-tree-ui__unsaved').classList.contains('js-hide')");
   }
 
-  /**
-   * A pending revision made after page load refuses a move and needs a reload.
-   */
-  public function testPendingRevisionRefusesMoveAndNeedsReload(): void {
-    $this->logRequests();
-    Workspace::create(['id' => 'stage', 'label' => 'Stage'])->save();
-    $link = $this->loadLinkByPluginId($this->linkIds['A']);
-    \Drupal::service('workspaces.manager')->executeInWorkspace('stage', static function () use ($link): void {
-      $stage_link = MenuLinkContent::load($link->id());
-      $stage_link->set('title', 'A in stage');
-      $stage_link->setNewRevision();
-      $stage_link->save();
-    });
-
-    $this->dispatchShiftArrow('B', 'ArrowDown');
-    $this->assertNotNull($this->assertSession()->waitForElementVisible('css', '[data-mtu-action="reload"]'));
-    $this->assertSame('pending-revisions', $this->needsReloadReason());
-    $this->assertSiblings(['A', 'B', 'C'], $this->childRowsSelector(NULL));
-
-    // The next move gesture is refused without a request.
-    $moves_before = $this->countRequests('move');
-    $this->dispatchShiftArrow('C', 'ArrowUp');
-    usleep(500000);
-    $this->assertSame($moves_before, $this->countRequests('move'));
-  }
-
   // Helpers.
-
-  /**
-   * Loads a menu link content entity by its plugin ID.
-   */
-  private function loadLinkByPluginId(string $plugin_id): MenuLinkContent {
-    $uuid = substr($plugin_id, strlen('menu_link_content:'));
-    $entities = \Drupal::entityTypeManager()->getStorage('menu_link_content')->loadByProperties(['uuid' => $uuid]);
-    return reset($entities);
-  }
 
   /**
    * Logs the move, Save and children requests in window.requestLog.
@@ -169,16 +131,6 @@ final class MenuTreeUiNeedsReloadTest extends MenuTreeUiJavascriptTestBase {
         return originalFetch.apply(this, arguments);
       };
     JS);
-  }
-
-  /**
-   * How many requests of a kind the page has logged.
-   */
-  private function countRequests(string $kind): int {
-    return count(array_filter(
-      $this->getSession()->evaluateScript('return window.requestLog;'),
-      static fn (string $request): bool => $request === $kind,
-    ));
   }
 
   /**

@@ -37,7 +37,6 @@
   // reason replaces another only when it ranks higher.
   const REASON_RANK = {
     'refresh-failed': 1,
-    'pending-revisions': 1,
     stale: 2,
   };
 
@@ -81,7 +80,7 @@
    *   The <drupal-treegrid> element.
    *
    * @return {?string}
-   *   'stale', 'refresh-failed' or 'pending-revisions', or null.
+   *   'stale' or 'refresh-failed', or null.
    *
    * @internal
    */
@@ -184,7 +183,7 @@
    * @param {HTMLElement} element
    *   The <drupal-treegrid> element.
    * @param {string} reason
-   *   'stale', 'refresh-failed' or 'pending-revisions'.
+   *   'stale' or 'refresh-failed'.
    *
    * @internal
    */

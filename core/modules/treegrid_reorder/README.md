@@ -149,8 +149,8 @@ The module finds its parts by attributes the consumer renders:
 
 The module writes `data-treegrid-reorder-ready`, `-moving` (from the moment a
 move is accepted until its unit ends), `-drop` (move mode's target as
-`kind:id`) and `-needs-reload` (`stale`, `refresh-failed` or
-`pending-revisions`) on the element, and `-dragging`, `-grabbed`,
+`kind:id`) and `-needs-reload` (`stale` or `refresh-failed`)
+on the element, and `-dragging`, `-grabbed`,
 `-drop-target="child"` and `-flash` on rows. It creates
 `.treegrid-reorder-indicator`. `aria-selected="true"` stays on the grabbed row
 for assistive technology, not as a styling hook.
