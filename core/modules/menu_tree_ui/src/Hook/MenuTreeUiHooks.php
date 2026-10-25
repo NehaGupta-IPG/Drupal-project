@@ -55,6 +55,9 @@ final class MenuTreeUiHooks {
    * "Edit links (no js)" action. The dropbutton ends up: "Edit links" (tree),
    * "Edit links (no js)" (classic), "Edit" (settings).
    *
+   * The tree is refused inside a workspace, so there the primary action stays
+   * on the classic list and no second action is added.
+   *
    * @param array $operations
    *   The merged operations array, keyed by operation ID.
    * @param \Drupal\Core\Entity\EntityInterface $entity
@@ -70,7 +73,13 @@ final class MenuTreeUiHooks {
     if (!isset($operations['edit-links'])) {
       return;
     }
-    $operations['edit-links']['url'] = Url::fromRoute('menu_tree_ui.edit', ['menu' => $entity->id()]);
+    $tree_url = Url::fromRoute('menu_tree_ui.edit', ['menu' => $entity->id()]);
+    $access = $tree_url->access(NULL, TRUE);
+    $cacheability->addCacheableDependency($access);
+    if (!$access->isAllowed()) {
+      return;
+    }
+    $operations['edit-links']['url'] = $tree_url;
     $operations['edit-links-no-js'] = [
       'title' => $this->t('Edit links (no js)'),
       'weight' => 5,

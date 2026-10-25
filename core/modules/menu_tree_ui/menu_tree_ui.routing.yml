@@ -5,6 +5,7 @@ menu_tree_ui.edit:
     _title_callback: '\Drupal\menu_tree_ui\Controller\MenuTreeController::pageTitle'
   requirements:
     _entity_access: 'menu.update'
+    _has_active_workspace: 'FALSE'
   options:
     _admin_route: true
     parameters:
@@ -42,6 +43,7 @@ menu_tree_ui.move:
   methods: [POST]
   requirements:
     _entity_access: 'menu.update'
+    _has_active_workspace: 'FALSE'
     _csrf_request_header_token: 'TRUE'
   options:
     _admin_route: true
@@ -57,6 +59,7 @@ menu_tree_ui.column_update:
   methods: [POST]
   requirements:
     _entity_access: 'menu.update'
+    _has_active_workspace: 'FALSE'
     _csrf_request_header_token: 'TRUE'
   options:
     _admin_route: true
@@ -72,6 +75,7 @@ menu_tree_ui.save:
   methods: [POST]
   requirements:
     _entity_access: 'menu.update'
+    _has_active_workspace: 'FALSE'
     _csrf_request_header_token: 'TRUE'
   options:
     _admin_route: true
@@ -87,6 +91,7 @@ menu_tree_ui.break_lock:
     _title: 'Break lock'
   requirements:
     _entity_access: 'menu.update'
+    _has_active_workspace: 'FALSE'
   options:
     _admin_route: true
     parameters:
@@ -100,6 +105,7 @@ menu_tree_ui.cancel:
   methods: [POST]
   requirements:
     _entity_access: 'menu.update'
+    _has_active_workspace: 'FALSE'
     _csrf_request_header_token: 'TRUE'
   options:
     _admin_route: true
