@@ -185,13 +185,13 @@
           applyParentMetadata,
           container: element.closest('.menu-tree-ui'),
         });
-        features.set(element, { reorder, unwire: null });
+        features.set(element, { reorder, teardown: null });
         await element.ready;
         // The tree may have been detached while this waited.
         if (!element.isConnected || !features.has(element)) {
           return;
         }
-        features.get(element).unwire = wireFeatures(element, reorder);
+        features.get(element).teardown = wireFeatures(element, reorder);
       });
     },
     detach(context, settings, trigger) {
@@ -201,7 +201,7 @@
       once.remove('menu-tree-ui', SELECTOR, context).forEach((element) => {
         const feature = features.get(element);
         feature?.reorder.detach();
-        feature?.unwire?.();
+        feature?.teardown?.();
         features.delete(element);
       });
     },

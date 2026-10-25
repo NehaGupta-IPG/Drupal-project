@@ -72,3 +72,8 @@
     box-shadow: none;
   }
 }
+
+/* A busy pointer on the handles while a move is unfinished. */
+:where([data-treegrid-reorder-moving] [data-treegrid-reorder-handle]) {
+  cursor: progress;
+}

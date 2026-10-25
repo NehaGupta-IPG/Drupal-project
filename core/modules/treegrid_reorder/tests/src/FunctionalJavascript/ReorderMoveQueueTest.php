@@ -184,6 +184,68 @@ final class ReorderMoveQueueTest extends WebDriverTestBase {
     $this->assertFirstChildAfterQueuedMove();
   }
 
+  /**
+   * The element is flagged as moving from acceptance until the unit ends.
+   */
+  public function testMovingFlagCoversTheRequest(): void {
+    \Drupal::state()->set(TreegridReorderTestController::MOVE_DELAY, 800);
+
+    $this->pressKey('1', 'ArrowDown', TRUE);
+    $this->assertJsCondition("!!document.querySelector('drupal-treegrid[data-treegrid-reorder-moving]')", 2000);
+    $this->assertJsCondition("!document.querySelector('drupal-treegrid[data-treegrid-reorder-moving]')", 15000);
+    $this->assertCount(1, $this->events());
+  }
+
+  /**
+   * A second Shift+Arrow during a move is refused, announced once and unsent.
+   */
+  public function testSecondShiftArrowIsRefused(): void {
+    \Drupal::state()->set(TreegridReorderTestController::MOVE_DELAY, 800);
+    $this->recordRequests();
+    $this->countAssertiveAnnouncements();
+
+    $this->pressKey('1', 'ArrowDown', TRUE);
+    // Holding the key repeats it on whatever row has focus.
+    for ($i = 0; $i < 5; $i++) {
+      $this->pressKey('3', 'ArrowDown', TRUE);
+    }
+    $this->waitForEvents(6);
+    $this->assertJsCondition("!document.querySelector('drupal-treegrid[data-treegrid-reorder-moving]')", 15000);
+
+    $moves = array_filter(
+      $this->getSession()->evaluateScript('return window.queueTest.requests;'),
+      static fn (string $request): bool => $request === 'move',
+    );
+    $this->assertCount(1, $moves, 'Only the first move is sent.');
+    $this->assertSame(['2', '1', '3', '4'], $this->topLevelOrder());
+    $this->assertSame(1, $this->getSession()->evaluateScript('return window.queueTest.assertive;'));
+    $codes = array_column(array_column($this->events(), 'detail'), 'code');
+    $this->assertCount(5, array_filter($codes, static fn ($code): bool => $code === 'refused'));
+  }
+
+  /**
+   * Space on another row and a drag during a move do nothing.
+   */
+  public function testPickUpAndDragAreRefusedDuringMove(): void {
+    \Drupal::state()->set(TreegridReorderTestController::MOVE_DELAY, 800);
+    $this->recordRequests();
+
+    $this->pressKey('1', 'ArrowDown', TRUE);
+    $this->pressKey('4', ' ');
+    $this->assertSame(0, $this->getSession()->evaluateScript(
+      "return document.querySelectorAll('tr[aria-selected], [data-treegrid-reorder-grabbed]').length;",
+    ));
+    $this->drag('4', '2', 0.1);
+    $this->assertJsCondition("!document.querySelector('drupal-treegrid[data-treegrid-reorder-moving]')", 15000);
+
+    $moves = array_filter(
+      $this->getSession()->evaluateScript('return window.queueTest.requests;'),
+      static fn (string $request): bool => $request === 'move',
+    );
+    $this->assertCount(1, $moves);
+    $this->assertSame(['2', '1', '3', '4'], $this->topLevelOrder());
+  }
+
   // Helpers.
 
   /**
@@ -246,6 +308,22 @@ final class ReorderMoveQueueTest extends WebDriverTestBase {
           window.queueTest.requests.push('children:' + (parent ?? ''));
         }
         return originalFetch.apply(this, arguments);
+      };
+    JS);
+  }
+
+  /**
+   * Counts the assertive Drupal.announce calls in window.queueTest.assertive.
+   */
+  private function countAssertiveAnnouncements(): void {
+    $this->getSession()->executeScript(<<<'JS'
+      window.queueTest.assertive = 0;
+      const originalAnnounce = Drupal.announce;
+      Drupal.announce = function (text, priority) {
+        if (priority === 'assertive') {
+          window.queueTest.assertive += 1;
+        }
+        return originalAnnounce.apply(this, arguments);
       };
     JS);
   }

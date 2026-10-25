@@ -733,6 +733,17 @@
       }
       const { grabbed, intent } = this;
       const movedId = grabbed.dataset.id;
+      // A drop refused while another change is in the way leaves the carry
+      // where it is, so the editor can drop again or press Escape.
+      if (Drupal.treegridReorder.isBusy(this.element)) {
+        Drupal.treegridReorder.refuseMove(this.element, {
+          id: movedId,
+          parentId: resolveNewParentId(intent),
+          beforeId: resolveBeforeId(intent),
+          gesture: 'move-mode',
+        });
+        return;
+      }
       this.restoreToOrigin();
 
       // No-op guard: resolve the intent the way commitMove will, and compare to

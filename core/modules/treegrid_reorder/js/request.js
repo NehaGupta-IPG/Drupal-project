@@ -14,8 +14,15 @@
  * rendering may no longer match the server, so every later write through the
  * helper resolves unsent and moves are refused. Reads still go out.
  *
+ * The helper also keeps count of the writes it has running or waiting, which,
+ * with the moves accepted and unfinished and the needs-reload state, decide
+ * whether another move may start: one move at a time, and none while a write
+ * such as Save is in flight. A refused gesture is announced once for as long as
+ * the element stays busy.
+ *
  * Exposes Drupal.treegridReorder.request and, as internals,
- * Drupal.treegridReorder.enterNeedsReload and needsReloadReason.
+ * Drupal.treegridReorder.enterNeedsReload, needsReloadReason and the move
+ * gate (isBusy, acceptMove, finishMove, announceRefusal).
  */
 
 ((Drupal) => {
@@ -34,6 +41,39 @@
     stale: 2,
   };
 
+  // Per element: moves accepted and unfinished, writes running or waiting, and
+  // whether the current busy period's refusal has been announced.
+  const activity = new WeakMap();
+
+  /**
+   * The activity record of an element.
+   *
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element.
+   *
+   * @return {{moves: number, writes: number, announced: boolean}}
+   *   The record.
+   */
+  function activityOf(element) {
+    if (!activity.has(element)) {
+      activity.set(element, { moves: 0, writes: 0, announced: false });
+    }
+    return activity.get(element);
+  }
+
+  /**
+   * Starts a new busy period's announcement once nothing is busy any more.
+   *
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element.
+   */
+  function resetAnnouncement(element) {
+    const record = activityOf(element);
+    if (record.moves === 0 && record.writes === 0) {
+      record.announced = false;
+    }
+  }
+
   /**
    * The reason a tree needs a reload, if it does.
    *
@@ -47,6 +87,91 @@
    */
   function needsReloadReason(element) {
     return element.getAttribute(RELOAD_ATTRIBUTE);
+  }
+
+  /**
+   * Whether a new move must be refused.
+   *
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element.
+   *
+   * @return {boolean}
+   *   True while a move is accepted and unfinished, a write is running or
+   *   waiting, or the tree needs a reload.
+   *
+   * @internal
+   */
+  function isBusy(element) {
+    const record = activityOf(element);
+    return (
+      record.moves > 0 ||
+      record.writes > 0 ||
+      needsReloadReason(element) !== null
+    );
+  }
+
+  /**
+   * Accepts a move if none is in the way, flagging the element as moving.
+   *
+   * The element carries data-treegrid-reorder-moving from here until
+   * finishMove(), the time the move spends queued included.
+   *
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element.
+   *
+   * @return {boolean}
+   *   False when the move must be refused.
+   *
+   * @internal
+   */
+  function acceptMove(element) {
+    if (isBusy(element)) {
+      return false;
+    }
+    activityOf(element).moves += 1;
+    element.setAttribute('data-treegrid-reorder-moving', 'true');
+    return true;
+  }
+
+  /**
+   * Ends an accepted move.
+   *
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element.
+   *
+   * @internal
+   */
+  function finishMove(element) {
+    const record = activityOf(element);
+    record.moves -= 1;
+    if (record.moves === 0) {
+      element.removeAttribute('data-treegrid-reorder-moving');
+    }
+    resetAnnouncement(element);
+  }
+
+  /**
+   * Announces a refused gesture, once for as long as the element stays busy.
+   *
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element.
+   *
+   * @internal
+   */
+  function announceRefusal(element) {
+    const record = activityOf(element);
+    if (record.announced) {
+      return;
+    }
+    record.announced = true;
+    Drupal.treegrid.announce(
+      needsReloadReason(element) !== null
+        ? Drupal.t('Reload the page before moving more items.')
+        : Drupal.t(
+            'A change is still being saved. Try again once it has finished.',
+          ),
+      'assertive',
+    );
   }
 
   /**
@@ -191,10 +316,26 @@
     url,
     { method = 'POST', body, unit } = {},
   ) => {
-    const run = () => send(element, url, method.toUpperCase(), body);
-    return unit ? run() : element.exclusive(run);
+    const upperMethod = method.toUpperCase();
+    const run = () => send(element, url, upperMethod, body);
+    if (!WRITE_METHODS.includes(upperMethod)) {
+      return unit ? run() : element.exclusive(run);
+    }
+    const record = activityOf(element);
+    record.writes += 1;
+    const finished = () => {
+      record.writes -= 1;
+      resetAnnouncement(element);
+    };
+    const result = unit ? run() : element.exclusive(run);
+    result.then(finished, finished);
+    return result;
   };
 
   Drupal.treegridReorder.needsReloadReason = needsReloadReason;
   Drupal.treegridReorder.enterNeedsReload = enterNeedsReload;
+  Drupal.treegridReorder.isBusy = isBusy;
+  Drupal.treegridReorder.acceptMove = acceptMove;
+  Drupal.treegridReorder.finishMove = finishMove;
+  Drupal.treegridReorder.announceRefusal = announceRefusal;
 })(Drupal);

@@ -26,6 +26,7 @@
   const { DragController, DropIndicator, MoveModeController, reorderSibling } =
     Drupal.treegridReorder;
   const { rowOf } = Drupal.treegrid.treeNav;
+  const { isBusy, announceRefusal } = Drupal.treegridReorder;
 
   const READY = 'data-treegrid-reorder-ready';
   // Elements that keep their own key behavior instead of the row's, e.g. Space
@@ -85,6 +86,10 @@
         }
         return;
       }
+      if (isBusy(element)) {
+        announceRefusal(element);
+        return;
+      }
       moveMode.tryGrab(row);
     };
 
@@ -129,6 +134,12 @@
       // Space grabs a movable row; if it cannot grab, fall through so treegrid
       // toggles expand on a parent (Space's pre-move-mode role).
       if (event.key === ' ') {
+        // Picking up is refused while another change is in the way.
+        if (row.dataset.movable === 'true' && isBusy(element)) {
+          announceRefusal(element);
+          event.preventDefault();
+          return true;
+        }
         if (moveMode.tryGrab(row)) {
           event.preventDefault();
           return true;

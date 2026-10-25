@@ -117,6 +117,11 @@
       if (!row || row.dataset.movable !== 'true') {
         return;
       }
+      // A drag can't start while another change is in the way.
+      if (Drupal.treegridReorder.isBusy(this.element)) {
+        Drupal.treegridReorder.announceRefusal(this.element);
+        return;
+      }
 
       this.moved = row;
       this.activeHandle = handle;

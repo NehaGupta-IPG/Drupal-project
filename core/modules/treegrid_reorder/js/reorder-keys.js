@@ -17,15 +17,15 @@
   const { descendantRows, lastDescendantRow, nextSiblingRow } =
     Drupal.treegrid.treeNav;
   const { announce } = Drupal.treegrid;
-  const { rowTitle, dispatchMoveEvent, failureMessage, reportFailure } =
-    Drupal.treegridReorder;
+  const {
+    rowTitle,
+    dispatchMoveEvent,
+    failureMessage,
+    reportFailure,
+    refuseMove,
+  } = Drupal.treegridReorder;
 
   const ROW = 'tr[role="row"]';
-
-  // Rows with a Shift+Arrow move currently round-tripping to the server.
-  // Guards against mashing the key firing overlapping optimistic swaps + POSTs,
-  // where a later failure would restore against a stale captured position.
-  const movesInFlight = new WeakSet();
 
   /**
    * The previous sibling row at the same level under the same parent.
@@ -220,24 +220,29 @@
     if (!row.dataset.id || row.dataset.movable !== 'true') {
       return false;
     }
-    if (movesInFlight.has(row)) {
-      // A previous Shift+Arrow on this row is still round-tripping; ignore the
-      // new key rather than stacking optimistic swaps on an unsettled DOM.
-      return false;
-    }
     const sibling =
       direction === 'up' ? previousSiblingRow(row) : nextSiblingRow(row);
     if (!sibling) {
       return false;
     }
 
-    movesInFlight.add(row);
+    // One move at a time: a key pressed while another move or a write is in
+    // the way is refused, not queued, since its swap would be worked out from a
+    // screen that is about to change.
+    const { element } = context;
+    if (!Drupal.treegridReorder.acceptMove(element)) {
+      refuseMove(element, {
+        id: row.dataset.id,
+        parentId: row.dataset.parentId ?? '',
+        beforeId: null,
+        gesture: 'shift-arrow',
+      });
+      return true;
+    }
     try {
-      await context.element.exclusive((unit) =>
-        runSwap(unit, row, direction, context),
-      );
+      await element.exclusive((unit) => runSwap(unit, row, direction, context));
     } finally {
-      movesInFlight.delete(row);
+      Drupal.treegridReorder.finishMove(element);
     }
     return true;
   }

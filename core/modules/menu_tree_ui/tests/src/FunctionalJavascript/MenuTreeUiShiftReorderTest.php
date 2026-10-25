@@ -95,6 +95,45 @@ final class MenuTreeUiShiftReorderTest extends MenuTreeUiJavascriptTestBase {
   }
 
   /**
+   * A Space or Shift+Arrow during a running Save is refused and sends nothing.
+   */
+  public function testMovesAreRefusedDuringSave(): void {
+    $this->wrapFetch(delay_save: 1500);
+
+    $this->getSession()->getPage()->find('css', '[data-mtu-action="save"]')->click();
+    $this->assertJsCondition("window.requestLog.includes('save:start')");
+    $this->dispatchShiftArrow('A', 'ArrowDown');
+    $b_id = $this->linkIds['B'];
+    $this->getSession()->executeScript(<<<JS
+      const row = document.querySelector('tr[role="row"][data-id="$b_id"]');
+      row.focus();
+      row.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
+    JS);
+
+    $this->assertSame(0, $this->getSession()->evaluateScript(
+      "return document.querySelectorAll('tr[aria-selected], [data-treegrid-reorder-grabbed]').length;",
+    ));
+    $this->assertJsCondition("window.requestLog.includes('save:end')");
+    $this->assertNotContains('move:start', $this->getSession()->evaluateScript('return window.requestLog;'));
+    $this->assertSiblings(['A', 'B'], $this->childRowsSelector(NULL));
+  }
+
+  /**
+   * A Save clicked during a move is sent after the move has finished.
+   */
+  public function testSaveWaitsForRunningMove(): void {
+    $this->wrapFetch(delay_move: 1000);
+
+    $this->dispatchShiftArrow('A', 'ArrowDown');
+    $this->assertJsCondition("window.requestLog.includes('move:start')");
+    $this->getSession()->getPage()->find('css', '[data-mtu-action="save"]')->click();
+    $this->assertJsCondition("window.requestLog.includes('save:end')");
+
+    $log = $this->getSession()->evaluateScript('return window.requestLog;');
+    $this->assertLessThan(array_search('save:start', $log, TRUE), array_search('move:end', $log, TRUE));
+  }
+
+  /**
    * Shift+Arrow keeps every row's aria-setsize at the whole level's total.
    */
   public function testShiftArrowKeepsSetSizeAtLevelTotal(): void {
@@ -117,6 +156,36 @@ final class MenuTreeUiShiftReorderTest extends MenuTreeUiJavascriptTestBase {
       "return Array.from(new Set(Array.from(document.querySelectorAll('tr[role=\"row\"][data-parent-id=\"\"]')).map((r) => r.getAttribute('aria-setsize'))));",
     );
     $this->assertSame([(string) $total], $sizes);
+  }
+
+  /**
+   * Logs the move and Save requests in window.requestLog, optionally slowed.
+   *
+   * @param int $delay_save
+   *   Milliseconds the Save request waits before it is passed on.
+   * @param int $delay_move
+   *   Milliseconds the move request waits before it is passed on.
+   */
+  private function wrapFetch(int $delay_save = 0, int $delay_move = 0): void {
+    $this->getSession()->executeScript(<<<JS
+      window.requestLog = [];
+      const originalFetch = window.fetch;
+      const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+      window.fetch = async function (url, options) {
+        const text = String(url);
+        const kind = options && options.method === 'POST'
+          ? (text.includes('/move') ? 'move' : (text.includes('/save') ? 'save' : null))
+          : null;
+        if (!kind) {
+          return originalFetch.apply(this, arguments);
+        }
+        window.requestLog.push(kind + ':start');
+        await wait(kind === 'save' ? $delay_save : $delay_move);
+        const response = await originalFetch.apply(this, arguments);
+        window.requestLog.push(kind + ':end');
+        return response;
+      };
+    JS);
   }
 
   /**

@@ -133,6 +133,27 @@
   }
 
   /**
+   * Reports a gesture refused because another change is in the way.
+   *
+   * Announces it once per busy period and fires failed with the code refused.
+   *
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element.
+   * @param {object} move
+   *   What was attempted: { id, parentId, beforeId, gesture }.
+   */
+  function refuseMove(element, move) {
+    Drupal.treegridReorder.announceRefusal(element);
+    dispatchMoveEvent(element, 'treegrid-reorder:failed', {
+      ...move,
+      status: 0,
+      code: 'refused',
+      message: null,
+      sent: false,
+    });
+  }
+
+  /**
    * The result of a move that never left the browser.
    *
    * @param {string} code
@@ -312,13 +333,21 @@
       return;
     }
     const { element } = context;
-    element.setAttribute('data-treegrid-reorder-moving', 'true');
+    if (!Drupal.treegridReorder.acceptMove(element)) {
+      refuseMove(element, {
+        id: row.dataset.id,
+        parentId: resolveNewParentId(intent),
+        beforeId: resolveBeforeId(intent),
+        gesture,
+      });
+      return;
+    }
     try {
       await element.exclusive((unit) =>
         runMove(unit, row, intent, context, gesture),
       );
     } finally {
-      element.removeAttribute('data-treegrid-reorder-moving');
+      Drupal.treegridReorder.finishMove(element);
     }
   }
 
@@ -326,6 +355,7 @@
   Drupal.treegridReorder.dispatchMoveEvent = dispatchMoveEvent;
   Drupal.treegridReorder.failureMessage = failureMessage;
   Drupal.treegridReorder.reportFailure = reportFailure;
+  Drupal.treegridReorder.refuseMove = refuseMove;
   Drupal.treegridReorder.unsentResult = unsentResult;
   // Exported so keyboard move mode can resolve an intent to {new_parent,
   // before_id} for its no-op-drop guard, without duplicating the logic.
