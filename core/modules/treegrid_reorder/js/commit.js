@@ -210,6 +210,18 @@
       gesture,
     };
 
+    // The moved row or the target can be gone by the time the unit starts, for
+    // instance after a refresh that ran ahead of it.
+    if (!row.isConnected || !target.isConnected) {
+      reportFailure(
+        element,
+        move,
+        unsentResult('unavailable'),
+        Drupal.t('That item is no longer there. Move canceled.'),
+      );
+      return;
+    }
+
     // A child drop opens an unloaded destination first, a leaf included: a
     // leaf's level comes back empty but loaded, which is enough to go ahead.
     if (
@@ -273,12 +285,26 @@
     if (newParentId !== oldParentId) {
       okTo = await unit.refreshLevel(newParentId);
     }
-    // A refresh whose fetch failed would leave the tree half-synced (a
-    // duplicated row, or no tab stop). Reload so the tree resyncs from the
-    // server rather than continuing from an inconsistent DOM.
+    // A refresh whose fetch failed leaves the tree out of step with a move
+    // that was recorded: the move is not a failure, but the tree no longer
+    // shows the truth, so further moves are refused until it is reloaded.
     if (!okFrom || !okTo) {
-      announce(Drupal.t('Could not refresh the tree. Reloading.'), 'assertive');
-      window.location.reload();
+      announce(
+        Drupal.t(
+          'The move was saved, but the tree could not be redrawn. Reload the page to see it.',
+        ),
+        'assertive',
+      );
+      dispatchMoveEvent(element, 'treegrid-reorder:moved', {
+        id: movedId,
+        parentId: newParentId,
+        beforeId,
+        previousParentId: oldParentId,
+        gesture,
+        refreshed: false,
+        result,
+      });
+      Drupal.treegridReorder.enterNeedsReload(element, 'refresh-failed');
       return;
     }
 

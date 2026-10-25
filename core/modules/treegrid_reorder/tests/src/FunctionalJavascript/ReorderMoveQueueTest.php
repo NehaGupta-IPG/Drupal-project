@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\treegrid_reorder\FunctionalJavascript;
 
+use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\treegrid_reorder_test\Controller\TreegridReorderTestController;
 use PHPUnit\Framework\Attributes\Group;
@@ -142,10 +143,13 @@ final class ReorderMoveQueueTest extends WebDriverTestBase {
     \Drupal::state()->set(TreegridReorderTestController::MOVE_FAIL, ['code' => 'stale', 'status' => 409]);
 
     $this->drag('3', '1', 0.1);
-    $this->waitForEvents(1);
+    // The helper puts the tree into the needs-reload state before the move
+    // reports its failure.
+    $this->waitForEvents(2);
 
-    $failed = $this->events()[0];
-    $this->assertSame('treegrid-reorder:failed', $failed['type']);
+    $types = array_column($this->events(), 'type');
+    $this->assertSame(['treegrid-reorder:needs-reload', 'treegrid-reorder:failed'], $types);
+    $failed = $this->events()[1];
     $this->assertSame('stale', $failed['detail']['code']);
     $this->assertSame('drag', $failed['detail']['gesture']);
   }
@@ -246,6 +250,91 @@ final class ReorderMoveQueueTest extends WebDriverTestBase {
     $this->assertSame(['2', '1', '3', '4'], $this->topLevelOrder());
   }
 
+  /**
+   * A Shift+Arrow row removed while its unit waits fails as unavailable.
+   */
+  public function testShiftArrowRowRemovedWhileWaitingIsUnavailable(): void {
+    $this->startSlowUnit(1200);
+
+    $this->pressKey('1', 'ArrowDown', TRUE);
+    $this->getSession()->executeScript(<<<'JS'
+      document.querySelector('tr[data-id="1"]').remove();
+      document.querySelector('[data-test-field="outside"]').focus();
+    JS);
+    $this->waitForEvents(1);
+
+    $failed = $this->events()[0];
+    $this->assertSame('treegrid-reorder:failed', $failed['type']);
+    $this->assertSame('unavailable', $failed['detail']['code']);
+    $this->assertSame(0, $failed['detail']['status']);
+    $this->assertFalse($failed['detail']['sent']);
+    $this->assertSame('outside', $this->getSession()->evaluateScript('return document.activeElement.dataset.testField;'));
+  }
+
+  /**
+   * A drop whose destination fails to open fails as unavailable, unsent.
+   */
+  public function testDropIntoDestinationThatFailsToOpenIsUnavailable(): void {
+    \Drupal::state()->set(TreegridReorderTestController::CHILDREN_HITS, 0);
+    \Drupal::state()->set(TreegridReorderTestController::CHILDREN_FAIL, ['after' => 0, 'count' => 1]);
+    $this->recordRequests();
+
+    $this->drag('1', '3', 0.5);
+    $this->waitForEvents(1);
+
+    $failed = $this->events()[0];
+    $this->assertSame('treegrid-reorder:failed', $failed['type']);
+    $this->assertSame('unavailable', $failed['detail']['code']);
+    $this->assertFalse($failed['detail']['sent']);
+    $this->assertNotContains('move', $this->getSession()->evaluateScript('return window.queueTest.requests;'));
+  }
+
+  /**
+   * A failed redraw reports the move, asks for a reload and refuses more moves.
+   */
+  public function testFailedRedrawEntersNeedsReload(): void {
+    \Drupal::state()->set(TreegridReorderTestController::CHILDREN_HITS, 0);
+    \Drupal::state()->set(TreegridReorderTestController::CHILDREN_FAIL, ['after' => 0, 'count' => NULL]);
+    $this->recordRequests();
+    $this->getSession()->executeScript('window.pageMarker = "survives";');
+
+    $this->drag('3', '1', 0.1);
+    $this->waitForEvents(2);
+
+    $events = $this->events();
+    $this->assertSame('treegrid-reorder:moved', $events[0]['type']);
+    $this->assertFalse($events[0]['detail']['refreshed']);
+    $this->assertSame('treegrid-reorder:needs-reload', $events[1]['type']);
+    $this->assertSame('refresh-failed', $events[1]['detail']['reason']);
+    $this->assertSame('refresh-failed', $this->getSession()->evaluateScript(
+      "return document.querySelector('drupal-treegrid').getAttribute('data-treegrid-reorder-needs-reload');",
+    ));
+    $this->assertSame('survives', $this->getSession()->evaluateScript('return window.pageMarker;'));
+
+    // A second move gesture is refused.
+    $this->pressKey('2', 'ArrowDown', TRUE);
+    $this->waitForEvents(3);
+    $this->assertSame('refused', $this->events()[2]['detail']['code']);
+
+    // Writes through the helper still go out.
+    $echo_url = Url::fromRoute('treegrid_reorder_test.echo')->toString();
+    $this->getSession()->executeScript(<<<JS
+      Drupal.treegridReorder.request(document.querySelector('drupal-treegrid'), '$echo_url', { body: {} })
+        .then((result) => { window.queueTest.echoResult = result; });
+    JS);
+    $this->assertJsCondition('!!window.queueTest.echoResult');
+    $this->assertTrue($this->getSession()->evaluateScript('return window.queueTest.echoResult.ok;'));
+
+    // A stale response afterwards makes the state stricter.
+    \Drupal::state()->set(TreegridReorderTestController::REVISION, 'theirs');
+    $this->getSession()->executeScript(<<<JS
+      Drupal.treegridReorder.request(document.querySelector('drupal-treegrid'), '$echo_url', { body: {} });
+    JS);
+    $this->waitForEvents(4);
+    $this->assertSame('treegrid-reorder:needs-reload', $this->events()[3]['type']);
+    $this->assertSame('stale', $this->events()[3]['detail']['reason']);
+  }
+
   // Helpers.
 
   /**
@@ -284,7 +373,7 @@ final class ReorderMoveQueueTest extends WebDriverTestBase {
     $this->getSession()->executeScript(<<<'JS'
       window.queueTest = { events: [], requests: [] };
       const element = document.querySelector('drupal-treegrid');
-      ['treegrid-reorder:moved', 'treegrid-reorder:failed'].forEach((type) => {
+      ['treegrid-reorder:moved', 'treegrid-reorder:failed', 'treegrid-reorder:needs-reload'].forEach((type) => {
         element.addEventListener(type, (event) => {
           window.queueTest.events.push({ type, detail: event.detail });
         });

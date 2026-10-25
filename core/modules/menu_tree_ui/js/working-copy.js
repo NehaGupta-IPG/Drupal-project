@@ -24,6 +24,58 @@
   let movedListenerBound = false;
 
   /**
+   * Shows the needs-reload message and its Reload button.
+   *
+   * The message names the reason. Focus moves to the Reload button only if it
+   * was in the tree (or nowhere, because a refresh removed the focused row).
+   *
+   * @param {CustomEvent} event
+   *   The treegrid-reorder:needs-reload event.
+   */
+  function handleNeedsReload(event) {
+    const element = event.target;
+    const region = element.closest('.menu-tree-ui');
+    const area = region?.querySelector('[data-mtu-needs-reload]');
+    if (!area) {
+      return;
+    }
+    const messages = {
+      stale: Drupal.t(
+        'Another editing session changed this menu, so changes can no longer be made from this page. Reload the page to continue.',
+      ),
+      'refresh-failed': Drupal.t(
+        'Your last move was saved, but the tree could not be redrawn. Reload the page to see the current order.',
+      ),
+      'pending-revisions': Drupal.t(
+        'Links in this menu now have pending revisions, so it cannot be reordered. Reload the page to see which ones.',
+      ),
+    };
+    area.querySelector('[data-mtu-needs-reload-message]').textContent =
+      messages[event.detail.reason] ?? '';
+    area.hidden = false;
+    const active = document.activeElement;
+    if (active === document.body || element.tree?.contains(active)) {
+      area.querySelector('[data-mtu-action="reload"]').focus();
+    }
+  }
+
+  /**
+   * Puts the tree into the needs-reload state when a write was refused over
+   * pending revisions.
+   *
+   * @param {CustomEvent} event
+   *   The treegrid-reorder:failed event.
+   */
+  function handleFailed(event) {
+    if (event.detail.code === 'pending_revisions') {
+      Drupal.treegridReorder.enterNeedsReload(
+        event.target,
+        'pending-revisions',
+      );
+    }
+  }
+
+  /**
    * Reveals the unsaved-changes notice and clears save errors after a move.
    *
    * Only a move whose response says the working copy holds changes counts.
@@ -63,6 +115,9 @@
     const messages = errorContainer ? new Drupal.Message(errorContainer) : null;
     const save = bar.querySelector('[data-mtu-action="save"]');
     const cancel = bar.querySelector('[data-mtu-action="cancel"]');
+    region
+      ?.querySelector('[data-mtu-action="reload"]')
+      ?.addEventListener('click', () => window.location.reload());
     let inFlight = false;
 
     /**
@@ -106,6 +161,12 @@
           setUnsaved(result.body.dirty);
           onSuccess();
         } else {
+          if (result.code === 'pending_revisions') {
+            Drupal.treegridReorder.enterNeedsReload(
+              element,
+              'pending-revisions',
+            );
+          }
           messages?.add(result.message ?? failureMessage, { type: 'error' });
         }
       } finally {
@@ -137,6 +198,11 @@
     attach(context) {
       if (!movedListenerBound) {
         document.addEventListener('treegrid-reorder:moved', handleMoved);
+        document.addEventListener('treegrid-reorder:failed', handleFailed);
+        document.addEventListener(
+          'treegrid-reorder:needs-reload',
+          handleNeedsReload,
+        );
         movedListenerBound = true;
       }
       once('mtu-working-copy', '.menu-tree-ui__actions', context).forEach(

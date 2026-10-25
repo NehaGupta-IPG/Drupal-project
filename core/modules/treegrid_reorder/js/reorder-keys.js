@@ -23,6 +23,7 @@
     failureMessage,
     reportFailure,
     refuseMove,
+    unsentResult,
   } = Drupal.treegridReorder;
 
   const ROW = 'tr[role="row"]';
@@ -118,14 +119,25 @@
    */
   async function runSwap(unit, row, direction, context) {
     const { element } = context;
-    const sibling =
-      direction === 'up' ? previousSiblingRow(row) : nextSiblingRow(row);
+    const movedId = row.dataset.id;
+    const parentId = row.dataset.parentId ?? '';
+    // The row can be gone, or have lost its sibling, by the time the unit
+    // starts, for instance after a refresh that ran ahead of it.
+    let sibling = null;
+    if (row.isConnected) {
+      sibling =
+        direction === 'up' ? previousSiblingRow(row) : nextSiblingRow(row);
+    }
     if (!sibling) {
+      reportFailure(
+        element,
+        { id: movedId, parentId, beforeId: null, gesture: 'shift-arrow' },
+        unsentResult('unavailable'),
+        Drupal.t('That item can no longer move there.'),
+      );
       return;
     }
 
-    const movedId = row.dataset.id;
-    const parentId = row.dataset.parentId ?? '';
     const block = descendantRows(row);
     // Snapshot the original position so a failed move can restore it: the row
     // currently sits before this node.
@@ -152,7 +164,15 @@
 
     const beforeId = nextSiblingRow(row)?.dataset.id ?? null;
 
-    row.focus();
+    // Pull focus to the row only if it is still in the tree, so an editor who
+    // has moved on keeps their place.
+    const { tree } = element;
+    if (
+      document.activeElement === document.body ||
+      tree.contains(document.activeElement)
+    ) {
+      row.focus();
+    }
     row.setAttribute('data-treegrid-reorder-flash', 'true');
     window.setTimeout(() => {
       row.removeAttribute('data-treegrid-reorder-flash');

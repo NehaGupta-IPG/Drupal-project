@@ -329,6 +329,10 @@
   mask-image: none;
 }
 
+.menu-tree-ui__needs-reload[hidden] {
+  display: none;
+}
+
 .menu-tree-ui-row__toggle {
   display: inline-flex;
   align-items: center;
