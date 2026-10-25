@@ -102,6 +102,8 @@ final class TreegridTestUiController extends ControllerBase {
 
   /**
    * Records a column update, or refuses it as State says.
+   *
+   * No column plugin is asked to apply the update.
    */
   public function columnUpdate(Request $request): JsonResponse {
     $delay = (int) $this->state()->get(self::COLUMN_UPDATE_DELAY_KEY, 0);
@@ -121,12 +123,6 @@ final class TreegridTestUiController extends ControllerBase {
       );
     }
 
-    $column_id = is_array($body) ? (string) ($body['column_id'] ?? '') : '';
-    $row_id = is_array($body) ? (string) ($body['row_id'] ?? '') : '';
-    $manager = \Drupal::service('plugin.manager.treegrid_column');
-    if ($manager->hasDefinition($column_id) && !$manager->createInstance($column_id)->handleUpdate($row_id, $body['value'] ?? NULL)) {
-      return new JsonResponse(['ok' => FALSE, 'code' => 'not_updatable'], 400);
-    }
     return new JsonResponse(['ok' => TRUE]);
   }
 
