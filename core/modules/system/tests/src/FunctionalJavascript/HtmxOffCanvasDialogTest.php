@@ -106,7 +106,7 @@ class HtmxOffCanvasDialogTest extends WebDriverTestBase {
 
     $this->getSession()->getPage()->find('css', '.dialog__titlebar-close')->click();
     // The dialog element is removed from the DOM.
-    $this->assertJsCondition("document.querySelector('drupal-dialog') === null");
+    $this->assertSession()->waitForElementRemoved('css', 'drupal-dialog-dialog-renderer-test-dot-dialog-content');
     // The main canvas right padding returns to 0.
     $this->assertJsCondition("parseFloat(getComputedStyle(document.querySelector('[data-off-canvas-main-canvas]')).paddingRight) === 0");
     $this->assertFalse((bool) $this->getSession()->evaluateScript("document.body.classList.contains('js-off-canvas-dialog-open')"));

@@ -83,7 +83,7 @@ class HtmxDialogTest extends WebDriverTestBase {
 
     $this->getSession()->getPage()->find('css', '.dialog__titlebar-close')->click();
     // The dialog element is removed from the DOM.
-    $this->assertSession()->waitForElementRemoved('css', '#drupal-dialog-dialog-renderer-testdialog-content');
+    $this->assertSession()->waitForElementRemoved('css', 'drupal-dialog-dialog-renderer-test-dot-dialog-content');
   }
 
   /**
@@ -95,7 +95,7 @@ class HtmxDialogTest extends WebDriverTestBase {
 
     $this->getSession()->getPage()->find('css', '.dialog__titlebar-close')->click();
     // The dialog element is removed from the DOM.
-    $this->assertSession()->waitForElementRemoved('css', '#drupal-dialog-dialog-renderer-testdialog-content');
+    $this->assertSession()->waitForElementRemoved('css', 'drupal-dialog-dialog-renderer-test-dot-dialog-content');
   }
 
   /**
