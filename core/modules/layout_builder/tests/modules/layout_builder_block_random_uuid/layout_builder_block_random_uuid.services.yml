@@ -1,0 +1,5 @@
+services:
+  layout_builder_block_random_uuid.block_random_uuid:
+    class: Drupal\layout_builder_block_random_uuid\EventSubscriber\BlockRandomUuid
+    tags:
+      - { name: event_subscriber }

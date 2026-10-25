@@ -19,6 +19,8 @@ use Drupal\Core\Plugin\PluginFormFactoryInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
 use Drupal\layout_builder\Context\LayoutBuilderContextTrait;
 use Drupal\layout_builder\Controller\LayoutRebuildTrait;
+use Drupal\layout_builder\LayoutBuilderBlockBuildTrait;
+use Drupal\layout_builder\LayoutBuilderHighlightTrait;
 use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\layout_builder\SectionStorageInterface;
@@ -34,7 +36,9 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
 
   use AjaxFormHelperTrait;
   use ContextAwarePluginAssignmentTrait;
+  use LayoutBuilderBlockBuildTrait;
   use LayoutBuilderContextTrait;
+  use LayoutBuilderHighlightTrait;
   use LayoutRebuildTrait;
   use WorkspaceSafeFormTrait;
 
@@ -285,6 +289,35 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
    */
   public function getCurrentComponent() {
     return $this->getCurrentSection()->getComponent($this->uuid);
+  }
+
+  /**
+   * Retrieves the build array for the current component.
+   *
+   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   *   The section storage.
+   *
+   * @return array
+   *   The component build array.
+   */
+  protected function getCurrentComponentBuild(SectionStorageInterface $section_storage) {
+    return $this->getCurrentComponent()->toRenderArray($this->getPopulatedContexts($section_storage), TRUE);
+  }
+
+  /**
+   * Retrieves the administrative block build array.
+   *
+   * @param $section_storage
+   *   The section storage.
+   * @param $delta
+   *   The section delta.
+   * @param $uuid
+   *   The block UUID.
+   *
+   * @return array
+   */
+  protected function getBlockBuild($section_storage, $delta, $uuid) {
+    return $this->buildAdministrativeBlock($this->getCurrentComponentBuild($section_storage), $section_storage, $this->getCurrentComponent()->getRegion(), $delta, $uuid);
   }
 
 }

@@ -2,6 +2,9 @@
 
 namespace Drupal\layout_builder\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\CloseDialogCommand;
+use Drupal\Core\Ajax\RemoveCommand;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\layout_builder\SectionStorageInterface;
 
@@ -68,6 +71,29 @@ class RemoveBlockForm extends LayoutRebuildConfirmFormBase {
    */
   protected function handleSectionStorage(SectionStorageInterface $section_storage, FormStateInterface $form_state) {
     $section_storage->getSection($this->delta)->removeComponent($this->uuid);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function rebuildAndClose(SectionStorageInterface $section_storage): AjaxResponse {
+    $response = $this->removeBlock($this->uuid);
+    $response->addCommand(new CloseDialogCommand('#drupal-off-canvas'));
+    return $response;
+  }
+
+  /**
+   * Removes the block.
+   *
+   * @param string $uuid
+   *   The block UUID.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   */
+  protected function removeBlock($uuid): AjaxResponse {
+    $response = new AjaxResponse();
+    $response->addCommand(new RemoveCommand("[data-layout-block-uuid=$uuid]"));
+    return $response;
   }
 
 }

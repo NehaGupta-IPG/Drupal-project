@@ -1,0 +1,5 @@
+name: 'Layout Builder Block Random UUID'
+type: module
+description: 'Support module for testing layout building.'
+package: Testing
+version: VERSION

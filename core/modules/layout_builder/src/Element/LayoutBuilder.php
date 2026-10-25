@@ -15,6 +15,7 @@ use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Url;
 use Drupal\layout_builder\Context\LayoutBuilderContextTrait;
 use Drupal\layout_builder\Event\PrepareLayoutEvent;
+use Drupal\layout_builder\LayoutBuilderBlockBuildTrait;
 use Drupal\layout_builder\LayoutBuilderEvents;
 use Drupal\layout_builder\LayoutBuilderHighlightTrait;
 use Drupal\layout_builder\SectionStorageInterface;
@@ -30,6 +31,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginInterface {
 
   use AjaxHelperTrait;
+  use LayoutBuilderBlockBuildTrait;
   use LayoutBuilderContextTrait;
   use LayoutBuilderHighlightTrait;
 
@@ -308,28 +310,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
     foreach ($layout_definition->getRegions() as $region => $info) {
       if (!empty($build[$region])) {
         foreach (Element::children($build[$region]) as $uuid) {
-          $build[$region][$uuid]['#attributes']['class'][] = 'js-layout-builder-block';
-          $build[$region][$uuid]['#attributes']['class'][] = 'layout-builder-block';
-          $build[$region][$uuid]['#attributes']['data-layout-block-uuid'] = $uuid;
-          $build[$region][$uuid]['#attributes']['data-layout-builder-highlight-id'] = $this->blockUpdateHighlightId($uuid);
-          $build[$region][$uuid]['#contextual_links'] = [
-            'layout_builder_block' => [
-              'route_parameters' => [
-                'section_storage_type' => $storage_type,
-                'section_storage' => $storage_id,
-                'delta' => $delta,
-                'region' => $region,
-                'uuid' => $uuid,
-              ],
-              // Add metadata about the current operations available in
-              // contextual links. This will invalidate the client-side cache of
-              // links that were cached before the 'move' link was added.
-              // @see layout_builder.links.contextual.yml
-              'metadata' => [
-                'operations' => 'move:update:remove',
-              ],
-            ],
-          ];
+          $build[$region][$uuid] = $this->buildAdministrativeBlock($build[$region][$uuid], $section_storage, $region, $delta, $uuid);
         }
       }
 
