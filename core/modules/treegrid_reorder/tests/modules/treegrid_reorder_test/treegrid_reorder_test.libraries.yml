@@ -7,7 +7,6 @@ treegrid_reorder_test:
       css/treegrid-reorder-test.css: {}
   dependencies:
     - core/drupal
-    - core/drupalSettings
     - core/once
     - treegrid/treegrid
     - treegrid_reorder/treegrid_reorder

@@ -100,7 +100,7 @@ final class MenuTreeUiInRowKeysTest extends WebDriverTestBase {
       'Space on the Enabled checkbox should not be preventDefault-ed by the row.',
     );
     $this->assertFalse(
-      $this->row('B')->hasClass('menu-tree-ui-row--grabbed'),
+      $this->row('B')->hasAttribute('data-treegrid-reorder-grabbed'),
       'Space on the Enabled checkbox should not grab the row into move mode.',
     );
   }

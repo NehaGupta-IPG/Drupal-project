@@ -1,36 +1,33 @@
 /**
  * @file
  * Visual feedback for drag intent: the line indicator (between drops) plus the
- * "as-child" outline highlight, with an aria-live announcement so screen
- * readers track what would happen on release.
+ * "as-child" highlight, with an aria-live announcement so screen readers track
+ * what would happen on release.
  *
- * The consumer supplies its own CSS class names and the row-title selector, so
- * this carries no domain-specific markup knowledge.
+ * The line is a div with the class treegrid-reorder-indicator, and the as-child
+ * target carries data-treegrid-reorder-drop-target="child"; the module's
+ * stylesheet draws both. The title read for announcements is the row's
+ * data-treegrid-reorder-title element, or else its aria-label.
  *
  * Exposes Drupal.treegridReorder.DropIndicator.
  */
 
 ((Drupal) => {
   Drupal.treegridReorder = Drupal.treegridReorder || {};
-  const { rowHeaderRect } = Drupal.treegridReorder;
+  const { rowHeaderRect, rowTitle } = Drupal.treegridReorder;
+
+  const DROP_TARGET = 'data-treegrid-reorder-drop-target';
 
   class DropIndicator {
     /**
      * @param {HTMLElement} host
      *   The element the indicator positions itself within.
-     * @param {object} options
-     *   { lineClass, dropAsChildClass, titleSelector } — the consumer's CSS
-     *   class for the drop line, the class toggled on an as-child target, and
-     *   the selector for a row's title text used in announcements.
      */
-    constructor(host, options) {
+    constructor(host) {
       this.host = host;
-      this.lineClass = options.lineClass;
-      this.dropAsChildClass = options.dropAsChildClass;
-      this.titleSelector = options.titleSelector;
       this.highlighted = null;
       this.line = document.createElement('div');
-      this.line.className = this.lineClass;
+      this.line.className = 'treegrid-reorder-indicator';
       this.line.setAttribute('aria-hidden', 'true');
       host.appendChild(this.line);
     }
@@ -39,6 +36,7 @@
      * Removes the indicator's DOM nodes.
      */
     destroy() {
+      this.clear();
       this.line.remove();
     }
 
@@ -53,7 +51,7 @@
         this.hideLine();
         if (this.highlighted !== intent.target) {
           this.clearChildHighlight();
-          intent.target.classList.add(this.dropAsChildClass);
+          intent.target.setAttribute(DROP_TARGET, 'child');
           this.highlighted = intent.target;
         }
         return;
@@ -82,10 +80,9 @@
      * @param {object} intent
      *   The DropIntent.
      */
+    // eslint-disable-next-line class-methods-use-this
     announce(intent) {
-      const title =
-        intent.target.querySelector(this.titleSelector)?.textContent?.trim() ??
-        '';
+      const title = rowTitle(intent.target);
       let message;
       if (intent.kind === 'child') {
         message = Drupal.t('Drop as child of @title', { '@title': title });
@@ -111,7 +108,7 @@
      */
     clearChildHighlight() {
       if (this.highlighted) {
-        this.highlighted.classList.remove(this.dropAsChildClass);
+        this.highlighted.removeAttribute(DROP_TARGET);
         this.highlighted = null;
       }
     }

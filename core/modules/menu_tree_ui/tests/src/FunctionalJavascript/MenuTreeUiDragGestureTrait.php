@@ -68,7 +68,7 @@ trait MenuTreeUiDragGestureTrait {
     $this->getSession()->wait(
       5000,
       '!document.querySelector(\'drupal-treegrid[data-treegrid-reorder-moving="true"]\')'
-      . ' && !document.querySelector(\'.menu-tree-ui-row--dragging\')'
+      . ' && !document.querySelector(\'[data-treegrid-reorder-dragging]\')'
       . ' && !document.querySelector(\'[data-treegrid-loading]\')',
     );
   }

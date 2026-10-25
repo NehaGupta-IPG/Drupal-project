@@ -17,6 +17,7 @@
   const { descendantRows, lastDescendantRow, nextSiblingRow } =
     Drupal.treegrid.treeNav;
   const { announce } = Drupal.treegrid;
+  const { rowTitle } = Drupal.treegridReorder;
 
   const ROW = 'tr[role="row"]';
 
@@ -76,21 +77,6 @@
   }
 
   /**
-   * Reads a row's own title text.
-   *
-   * @param {HTMLElement} row
-   *   The row.
-   * @param {string} titleSelector
-   *   The consumer's selector for a row's title.
-   *
-   * @return {string}
-   *   The trimmed title, or ''.
-   */
-  function titleOf(row, titleSelector) {
-    return row.querySelector(titleSelector)?.textContent?.trim() ?? '';
-  }
-
-  /**
    * The translated "moved" announcement for a completed reorder.
    *
    * Built as two full sentences (one per direction) rather than concatenating
@@ -118,19 +104,21 @@
    *   The row to move.
    * @param {('up'|'down')} direction
    *   Which way to move it.
-   * @param {object} options
-   *   { moveUrl, csrfToken, flashClass, onCommitted, titleSelector } — the move
-   *   endpoint, the X-CSRF-Token value (the move route requires it), the
-   *   consumer's brief-flash class, the callback fired after a persisted move
-   *   (reveals the unsaved-changes notice), and the consumer's row-title
-   *   selector (for the announcement).
+   * @param {object} context
+   *   The move context: { element, moveUrl(), onCommitted }. onCommitted is
+   *   the callback fired after a persisted move.
    *
    * @return {Promise<boolean>}
    *   True if the handler took the key (so the caller preventDefaults).
    */
-  async function reorderSibling(row, direction, options) {
-    const { moveUrl, csrfToken, flashClass, onCommitted, titleSelector } =
-      options;
+  async function reorderSibling(row, direction, context) {
+    const { element, onCommitted } = context;
+    const moveUrl = context.moveUrl();
+    if (!moveUrl) {
+      // eslint-disable-next-line no-console
+      console.warn('[treegrid-reorder] no move URL — move ignored.');
+      return false;
+    }
     const movedId = row.dataset.id;
     if (!movedId || row.dataset.movable !== 'true') {
       return false;
@@ -175,9 +163,9 @@
     const beforeId = nextSiblingRow(row)?.dataset.id ?? null;
 
     row.focus();
-    row.classList.add(flashClass);
+    row.setAttribute('data-treegrid-reorder-flash', 'true');
     window.setTimeout(() => {
-      row.classList.remove(flashClass);
+      row.removeAttribute('data-treegrid-reorder-flash');
     }, 600);
 
     const restore = () => {
@@ -192,13 +180,17 @@
 
     movesInFlight.add(row);
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      };
+      const token = await Drupal.treegrid.csrfToken(element);
+      if (token !== '') {
+        headers['X-CSRF-Token'] = token;
+      }
       const response = await fetch(moveUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          'X-CSRF-Token': csrfToken ?? '',
-        },
+        headers,
         credentials: 'same-origin',
         body: JSON.stringify({
           id: movedId,
@@ -212,10 +204,7 @@
         announce(Drupal.t('Move failed. Order restored.'), 'assertive');
       } else {
         onCommitted?.();
-        announce(
-          movedMessage(titleOf(row, titleSelector), direction),
-          'polite',
-        );
+        announce(movedMessage(rowTitle(row), direction), 'polite');
       }
     } catch (e) {
       restore();

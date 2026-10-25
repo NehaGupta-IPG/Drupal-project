@@ -50,6 +50,8 @@
   function buildHandle(item) {
     const handle = document.createElement('span');
     handle.setAttribute('aria-hidden', 'true');
+    // The reorder feature finds the drag handle by this hook.
+    handle.setAttribute('data-treegrid-reorder-handle', '');
 
     const icon = document.createElement('span');
     icon.className = 'menu-tree-ui-row__handle-icon';
@@ -130,6 +132,8 @@
     // pattern); route-less links (<nolink> etc.) stay plain text.
     const title = document.createElement(item.linked ? 'a' : 'span');
     title.className = 'menu-tree-ui-row__title';
+    // The reorder feature reads the row's visible name from this hook.
+    title.setAttribute('data-treegrid-reorder-title', '');
     if (item.linked) {
       title.href = item.url;
       // The title link joins the active row's roving tab order.

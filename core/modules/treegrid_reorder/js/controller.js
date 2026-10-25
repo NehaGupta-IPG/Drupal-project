@@ -10,8 +10,9 @@
  * Drag threshold of 5 px so a tap on the handle doesn't start a drag — this
  * matters more on touch (every tap has some pointer drift) than mouse.
  *
- * The consumer supplies its CSS class/selector names (handle, locked, dragging)
- * and the commit callbacks via the options object.
+ * A drag starts from an element marked data-treegrid-reorder-handle inside a
+ * row marked data-movable="true"; the dragged row carries
+ * data-treegrid-reorder-dragging while it moves.
  *
  * Exposes Drupal.treegridReorder.DragController.
  */
@@ -24,19 +25,18 @@
   const DRAG_THRESHOLD_PX = 5;
   const HOVER_EXPAND_MS = 1000;
   const ROW = 'tr[role="row"]';
+  const HANDLE = '[data-treegrid-reorder-handle]';
+  const DRAGGING = 'data-treegrid-reorder-dragging';
 
   class DragController {
     /**
-     * @param {HTMLTableElement} tree
-     *   The root treegrid element.
-     * @param {string} moveUrl
-     *   The move endpoint.
      * @param {HTMLElement} element
      *   The <drupal-treegrid> element, for hover-to-expand and commit refreshes.
-     * @param {string} csrfToken
-     *   The X-CSRF-Token value passed to commit, or ''.
      * @param {Drupal.treegridReorder.DropIndicator} indicator
      *   The shared drop indicator (owned by the host, also used by move mode).
+     * @param {object} context
+     *   The move context passed to commitMove: { element, moveUrl(),
+     *   applyParentMetadata, onCommitted }.
      * @param {function()} onGestureStart
      *   Called when a drag arms, so the host can cancel any active keyboard
      *   move mode before the pointer gesture takes over the shared indicator.
@@ -44,31 +44,13 @@
      *   Called when a handle is clicked without dragging, so a mouse user can
      *   pick a row up into keyboard move mode (click to pick up, click a
      *   destination, confirm with the keyboard).
-     * @param {object} options
-     *   { handleSelector, lockedClass, draggingClass, applyParentMetadata,
-     *   onCommitted } — the consumer's CSS names and the commit callbacks.
      */
-    constructor(
-      tree,
-      moveUrl,
-      element,
-      csrfToken,
-      indicator,
-      onGestureStart,
-      onTap,
-      options,
-    ) {
-      this.tree = tree;
-      this.moveUrl = moveUrl;
+    constructor(element, indicator, context, onGestureStart, onTap) {
       this.element = element;
-      this.csrfToken = csrfToken;
       this.indicator = indicator;
+      this.context = context;
       this.onGestureStart = onGestureStart;
       this.onTap = onTap;
-      this.options = options;
-      this.handleSelector = options.handleSelector;
-      this.lockedClass = options.lockedClass;
-      this.draggingClass = options.draggingClass;
 
       this.pointerId = null;
       this.moved = null;
@@ -84,6 +66,14 @@
       this.onPointerMove = this.onPointerMove.bind(this);
       this.onPointerUp = this.onPointerUp.bind(this);
       this.onPointerCancel = this.onPointerCancel.bind(this);
+    }
+
+    /**
+     * @return {HTMLTableElement}
+     *   The element's treegrid table.
+     */
+    get tree() {
+      return this.element.tree;
     }
 
     /**
@@ -104,7 +94,7 @@
     }
 
     /**
-     * Arms a drag gesture on pointerdown over an unlocked handle.
+     * Arms a drag gesture on pointerdown over a movable row's handle.
      *
      * @param {PointerEvent} event
      *   The pointerdown event.
@@ -122,12 +112,9 @@
       if (!(target instanceof Element)) {
         return;
       }
-      const handle = target.closest(this.handleSelector);
-      if (!handle || handle.classList.contains(this.lockedClass)) {
-        return;
-      }
-      const row = handle.closest(ROW);
-      if (!row) {
+      const handle = target.closest(HANDLE);
+      const row = handle?.closest(ROW);
+      if (!row || row.dataset.movable !== 'true') {
         return;
       }
 
@@ -167,7 +154,7 @@
         // mere press-and-release (a tap) never reaches here, so it can pick a
         // row up into move mode instead (see onPointerUp).
         this.onGestureStart?.();
-        this.moved.classList.add(this.draggingClass);
+        this.moved.setAttribute(DRAGGING, 'true');
       }
       this.updateIntent(event.clientX, event.clientY);
     }
@@ -187,14 +174,7 @@
         const { intent } = this;
         // Snapshot before cleanup, then commit asynchronously.
         this.cleanup();
-        commitMove(
-          row,
-          intent,
-          this.moveUrl,
-          this.element,
-          this.csrfToken,
-          this.options,
-        );
+        commitMove(row, intent, this.context);
       } else {
         // A tap (press and release without crossing the drag threshold): pick
         // the row up into keyboard move mode rather than starting a drag. A
@@ -321,7 +301,7 @@
           this.activeHandle.releasePointerCapture(this.pointerId);
         }
       }
-      this.moved?.classList.remove(this.draggingClass);
+      this.moved?.removeAttribute(DRAGGING);
       this.indicator.clear();
       this.moved = null;
       this.activeHandle = null;

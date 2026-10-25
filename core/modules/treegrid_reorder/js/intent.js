@@ -17,7 +17,8 @@
  *
  * A DropIntent is {kind: ('before'|'after'|'child'), target: HTMLElement}.
  *
- * Exposes Drupal.treegridReorder.{computeIntent, rowHeaderRect, sameIntent}.
+ * Exposes Drupal.treegridReorder.{computeIntent, rowHeaderRect, rowTitle,
+ * sameIntent}.
  */
 
 ((Drupal) => {
@@ -38,6 +39,25 @@
    */
   function rowHeaderRect(row) {
     return row.getBoundingClientRect();
+  }
+
+  /**
+   * The visible name of a row, for announcements.
+   *
+   * The text of the element marked data-treegrid-reorder-title, or else the
+   * row's aria-label.
+   *
+   * @param {HTMLElement} row
+   *   The row.
+   *
+   * @return {string}
+   *   The trimmed name, or ''.
+   */
+  function rowTitle(row) {
+    const title = row
+      .querySelector('[data-treegrid-reorder-title]')
+      ?.textContent?.trim();
+    return title || row.getAttribute('aria-label') || '';
   }
 
   /**
@@ -83,6 +103,7 @@
   }
 
   Drupal.treegridReorder.rowHeaderRect = rowHeaderRect;
+  Drupal.treegridReorder.rowTitle = rowTitle;
   Drupal.treegridReorder.computeIntent = computeIntent;
   Drupal.treegridReorder.sameIntent = sameIntent;
 })(Drupal);

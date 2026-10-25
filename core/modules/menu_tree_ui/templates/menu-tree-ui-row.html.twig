@@ -71,6 +71,7 @@
           class="menu-tree-ui-row__handle"
           title="{{ 'Drag to reorder, or click to pick up'|t }}"
           aria-hidden="true"
+          data-treegrid-reorder-handle
         >
           <span class="menu-tree-ui-row__handle-icon"></span>
         </span>
@@ -78,6 +79,7 @@
         <span
           class="menu-tree-ui-row__handle menu-tree-ui-row__handle--locked"
           aria-hidden="true"
+          data-treegrid-reorder-handle
         >
           <span class="menu-tree-ui-row__handle-icon">·</span>
         </span>
@@ -98,9 +100,9 @@
       {% endif %}
 
       {% if linked %}
-        <a href="{{ url }}" class="menu-tree-ui-row__title" data-treegrid-control>{{ title }}</a>
+        <a href="{{ url }}" class="menu-tree-ui-row__title" data-treegrid-control data-treegrid-reorder-title>{{ title }}</a>
       {% else %}
-        <span class="menu-tree-ui-row__title">{{ title }}</span>
+        <span class="menu-tree-ui-row__title" data-treegrid-reorder-title>{{ title }}</span>
       {% endif %}
     </div>
   </td>

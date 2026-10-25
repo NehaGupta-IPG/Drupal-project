@@ -11,12 +11,15 @@
  * Trade-off: a moved row's previously-expanded descendants collapse after the
  * refresh. Acceptable for v1 — replay-expansion can be added later.
  *
- * The move response shape is {ok: boolean, weight?, code?, message?}.
+ * The move response shape is {ok: boolean, code?, message?}.
  *
  * Per-row metadata that the children endpoint cannot express (e.g. whether a
  * parent now has children) is the consumer's concern: it is supplied as the
- * options.applyParentMetadata callback, and options.onCommitted fires after a
+ * context's applyParentMetadata callback, and its onCommitted fires after a
  * successful move so the consumer can react (reveal an unsaved notice, etc.).
+ *
+ * The context a move runs with is { element, moveUrl(), applyParentMetadata,
+ * onCommitted }, built by attach().
  *
  * Exposes Drupal.treegridReorder.commitMove.
  */
@@ -76,33 +79,25 @@
    *   The moved row.
    * @param {object} intent
    *   The DropIntent.
-   * @param {string} moveUrl
-   *   The move endpoint.
-   * @param {HTMLElement} element
-   *   The <drupal-treegrid> element, for destination auto-expand + group
-   *   refreshes.
+   * @param {object} context
+   *   The move context: { element, moveUrl(), applyParentMetadata,
+   *   onCommitted }.
    * @param {?HTMLTableElement} tree
    *   The root treegrid element.
    * @param {string} movedId
    *   The moved row's id.
-   * @param {string} csrfToken
-   *   The X-CSRF-Token value, or ''.
-   * @param {object} options
-   *   { applyParentMetadata, onCommitted } consumer callbacks.
    *
    * @return {Promise<void>}
    *   Resolves once the move is committed and refreshed (or bailed).
    */
-  async function runCommit(
-    row,
-    intent,
-    moveUrl,
-    element,
-    tree,
-    movedId,
-    csrfToken,
-    options,
-  ) {
+  async function runCommit(row, intent, context, tree, movedId) {
+    const { element } = context;
+    const moveUrl = context.moveUrl();
+    if (!moveUrl) {
+      // eslint-disable-next-line no-console
+      console.warn('[treegrid-reorder] no move URL — move ignored.');
+      return;
+    }
     const oldParentId = row.dataset.parentId ?? '';
     const newParentId = resolveNewParentId(intent);
     const { target } = intent;
@@ -137,13 +132,17 @@
 
     let body;
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      };
+      const token = await Drupal.treegrid.csrfToken(element);
+      if (token !== '') {
+        headers['X-CSRF-Token'] = token;
+      }
       const response = await fetch(moveUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          'X-CSRF-Token': csrfToken ?? '',
-        },
+        headers,
         credentials: 'same-origin',
         body: JSON.stringify({
           id: movedId,
@@ -186,8 +185,8 @@
       return;
     }
 
-    options.applyParentMetadata?.(oldParentId);
-    options.applyParentMetadata?.(newParentId);
+    context.applyParentMetadata?.(oldParentId);
+    context.applyParentMetadata?.(newParentId);
 
     // row and intent.target are detached after refresh — re-find by id. Only
     // pull focus back to the tree if it is still there (or on body because the
@@ -202,53 +201,38 @@
     }
 
     announce(Drupal.t('Item moved.'), 'polite');
-    options.onCommitted?.();
+    context.onCommitted?.();
   }
 
   /**
    * Commits a drag-and-drop move, flagging the host while in-flight.
    *
-   * Tests wait on the data-treegrid-reorder-moving flag's absence to know all asynchronous
-   * refresh work is done; humans never see it.
+   * Tests wait on the data-treegrid-reorder-moving flag's absence to know all
+   * asynchronous refresh work is done; humans never see it.
    *
    * @param {HTMLTableRowElement} row
    *   The moved row.
    * @param {object} intent
    *   The DropIntent.
-   * @param {string} moveUrl
-   *   The move endpoint.
-   * @param {HTMLElement} element
-   *   The <drupal-treegrid> element.
-   * @param {string} csrfToken
-   *   The X-CSRF-Token value, or ''.
-   * @param {object} options
-   *   { applyParentMetadata, onCommitted } consumer callbacks.
+   * @param {object} context
+   *   The move context: { element, moveUrl(), applyParentMetadata,
+   *   onCommitted }.
    *
    * @return {Promise<void>}
    *   Resolves once the commit completes.
    */
-  async function commitMove(row, intent, moveUrl, element, csrfToken, options) {
+  async function commitMove(row, intent, context) {
     const movedId = row.dataset.id;
     if (!movedId) {
       return;
     }
 
-    const tree = row.closest('table[role="treegrid"]');
-    const host = tree?.closest('drupal-treegrid') ?? null;
-    host?.setAttribute('data-treegrid-reorder-moving', 'true');
+    const { element } = context;
+    element.setAttribute('data-treegrid-reorder-moving', 'true');
     try {
-      await runCommit(
-        row,
-        intent,
-        moveUrl,
-        element,
-        tree,
-        movedId,
-        csrfToken,
-        options,
-      );
+      await runCommit(row, intent, context, element.tree, movedId);
     } finally {
-      host?.removeAttribute('data-treegrid-reorder-moving');
+      element.removeAttribute('data-treegrid-reorder-moving');
     }
   }
 

@@ -55,7 +55,7 @@ final class MenuTreeUiDragGuardsTest extends MenuTreeUiJavascriptTestBase {
     $this->assertSiblings(['C'], $this->childRowsSelector('P'));
 
     $grabbed = $this->getSession()->evaluateScript(
-      "return document.querySelector('.menu-tree-ui-row--grabbed') !== null;",
+      "return document.querySelector('[data-treegrid-reorder-grabbed]') !== null;",
     );
     $this->assertFalse(
       $grabbed,
@@ -120,7 +120,7 @@ final class MenuTreeUiDragGuardsTest extends MenuTreeUiJavascriptTestBase {
     $this->getSession()->wait(
       5000,
       '!document.querySelector(\'drupal-treegrid[data-treegrid-reorder-moving="true"]\')'
-      . ' && !document.querySelector(\'.menu-tree-ui-row--dragging\')'
+      . ' && !document.querySelector(\'[data-treegrid-reorder-dragging]\')'
       . ' && !document.querySelector(\'[data-treegrid-loading]\')',
     );
     $this->assertSiblings(['Q', 'R', 'P'], $this->childRowsSelector(NULL));

@@ -187,14 +187,14 @@ final class MenuTreeUiKeyboardMoveTest extends MenuTreeUiJavascriptTestBase {
   public function testMoveSurvivesSearchFieldFocus(): void {
     $this->dispatchKeys('B', [' ']);
     $this->assertTrue(
-      $this->row('B')->hasClass('menu-tree-ui-row--grabbed'),
+      $this->row('B')->hasAttribute('data-treegrid-reorder-grabbed'),
       'B should be grabbed.',
     );
 
     $this->getSession()->getPage()->find('css', '#menu-tree-ui-search-input')->click();
 
     $this->assertTrue(
-      $this->row('B')->hasClass('menu-tree-ui-row--grabbed'),
+      $this->row('B')->hasAttribute('data-treegrid-reorder-grabbed'),
       'The move should survive focusing the search field.',
     );
   }
@@ -292,7 +292,7 @@ final class MenuTreeUiKeyboardMoveTest extends MenuTreeUiJavascriptTestBase {
     $grabbed = $this->assertSession()->waitForElement(
       'css',
       sprintf(
-        'tr[role="row"][data-id="%s"].menu-tree-ui-row--grabbed',
+        'tr[role="row"][data-id="%s"][data-treegrid-reorder-grabbed]',
         $this->linkIds['B'],
       ),
     );

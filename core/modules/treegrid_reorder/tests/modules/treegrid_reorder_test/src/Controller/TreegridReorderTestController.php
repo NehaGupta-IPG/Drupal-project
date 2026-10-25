@@ -104,6 +104,11 @@ final class TreegridReorderTestController extends ControllerBase {
    */
   public const PAGE_CSRF = 'treegrid_reorder_test.page_csrf';
 
+  /**
+   * Whether the page renders data-treegrid-reorder-move-url (default TRUE).
+   */
+  public const PAGE_MOVE_URL = 'treegrid_reorder_test.page_move_url';
+
   private const REVISION_HEADER = 'X-Treegrid-Reorder-Revision';
 
   /**
@@ -120,6 +125,10 @@ final class TreegridReorderTestController extends ControllerBase {
 
     $children_url = Url::fromRoute('treegrid_reorder_test.children')->toString();
     $attributes = ' data-provider="treegrid_reorder_test" data-children-url="' . Html::escape($children_url) . '"';
+    if ($this->state()->get(self::PAGE_MOVE_URL, TRUE)) {
+      $move_url = Url::fromRoute('treegrid_reorder_test.move')->toString();
+      $attributes .= ' data-treegrid-reorder-move-url="' . Html::escape($move_url) . '"';
+    }
     $revision = $this->state()->get(self::PAGE_REVISION);
     if ($revision !== NULL) {
       $attributes .= ' data-treegrid-reorder-revision="' . Html::escape((string) $revision) . '"';
@@ -127,11 +136,6 @@ final class TreegridReorderTestController extends ControllerBase {
     $build = [
       '#attached' => [
         'library' => ['treegrid_reorder_test/treegrid_reorder_test'],
-        'drupalSettings' => [
-          'treegridReorderTest' => [
-            'moveUrl' => Url::fromRoute('treegrid_reorder_test.move')->toString(),
-          ],
-        ],
       ],
       // The tree is read from State, which page cache cannot express.
       '#cache' => ['max-age' => 0],
@@ -336,9 +340,9 @@ final class TreegridReorderTestController extends ControllerBase {
       . ' aria-level="' . $item['depth'] . '" aria-posinset="' . $pos_in_set
       . '" aria-setsize="' . $set_size . '"' . $expanded . ' tabindex="' . $tabindex . '">'
       . '<td role="gridcell" data-treegrid-name-cell>'
-      . '<span class="reorder-test-handle" role="button" tabindex="-1" title="Drag to reorder"></span>'
+      . '<span class="reorder-test-handle" data-treegrid-reorder-handle role="button" tabindex="-1" title="Drag to reorder"></span>'
       . $toggle
-      . '<span class="reorder-test-title">' . Html::escape('Item ' . $item['id']) . '</span>'
+      . '<span class="reorder-test-title" data-treegrid-reorder-title>' . Html::escape('Item ' . $item['id']) . '</span>'
       . '<input type="checkbox" class="reorder-test-control" data-treegrid-control>'
       . '</td></tr>';
   }

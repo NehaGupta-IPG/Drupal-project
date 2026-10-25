@@ -31,7 +31,8 @@
  * search: focus moving to the search field does not cancel it, and jumping to a
  * result re-aims the cursor at that row.
  *
- * The consumer supplies its CSS class/selector names via the options object.
+ * The picked-up row carries data-treegrid-reorder-grabbed, and the live drop
+ * position is recorded on the element as data-treegrid-reorder-drop.
  *
  * Exposes Drupal.treegridReorder.MoveModeController.
  */
@@ -44,6 +45,7 @@
     resolveNewParentId,
     resolveBeforeId,
     computeIntent,
+    rowTitle,
   } = Drupal.treegridReorder;
   const {
     descendantRows,
@@ -55,6 +57,12 @@
     setRowLevel,
   } = Drupal.treegrid.treeNav;
   const { announce } = Drupal.treegrid;
+
+  const GRABBED = 'data-treegrid-reorder-grabbed';
+  // Elements that keep working while a row is picked up, so the editor can open
+  // a parent or flip a control. Anything else in a row aims the move.
+  const LIVE_DURING_MOVE =
+    '[data-treegrid-toggle], [data-treegrid-control]:not(a)';
 
   /**
    * Clamps a number to an inclusive range.
@@ -74,21 +82,6 @@
   }
 
   /**
-   * Reads a row's own title text.
-   *
-   * @param {HTMLElement} row
-   *   The row.
-   * @param {string} titleSelector
-   *   The consumer's selector for a row's title.
-   *
-   * @return {string}
-   *   The trimmed title, or ''.
-   */
-  function titleOf(row, titleSelector) {
-    return row.querySelector(titleSelector)?.textContent?.trim() ?? '';
-  }
-
-  /**
    * The translated "picked up" announcement for a prospective drop.
    *
    * Built as three full sentences (one per drop kind) rather than concatenating
@@ -98,14 +91,12 @@
    *   The title of the picked-up item.
    * @param {object} intent
    *   The DropIntent.
-   * @param {string} titleSelector
-   *   The consumer's selector for a row's title.
    *
    * @return {string}
    *   The translated placement sentence.
    */
-  function placementMessage(item, intent, titleSelector) {
-    const target = titleOf(intent.target, titleSelector);
+  function placementMessage(item, intent) {
+    const target = rowTitle(intent.target);
     if (intent.kind === 'child') {
       return Drupal.t('Picked up @item. It will drop as a child of @target.', {
         '@item': item,
@@ -139,32 +130,18 @@
 
   class MoveModeController {
     /**
-     * @param {HTMLTableElement} tree
-     *   The root treegrid element.
-     * @param {string} moveUrl
-     *   The move endpoint.
      * @param {HTMLElement} element
-     *   The <drupal-treegrid> element, for opening rows and passed to commitMove.
+     *   The <drupal-treegrid> element, for opening rows.
      * @param {Drupal.treegridReorder.DropIndicator} indicator
      *   The shared drop indicator (its announce() is reused for speech).
-     * @param {function():(string|undefined)} getCsrfToken
-     *   Returns the current X-CSRF-Token. Read late because the token may
-     *   arrive after construction; keyboard users should not have to wait.
-     * @param {object} options
-     *   { grabbedClass, titleSelector, rowControlsSelector,
-     *   applyParentMetadata, onCommitted } — the consumer's CSS names and the
-     *   commit callbacks.
+     * @param {object} context
+     *   The move context passed to commitMove: { element, moveUrl(),
+     *   applyParentMetadata, onCommitted }.
      */
-    constructor(tree, moveUrl, element, indicator, getCsrfToken, options) {
-      this.tree = tree;
-      this.moveUrl = moveUrl;
+    constructor(element, indicator, context) {
       this.element = element;
       this.indicator = indicator;
-      this.getCsrfToken = getCsrfToken;
-      this.options = options;
-      this.grabbedClass = options.grabbedClass;
-      this.titleSelector = options.titleSelector;
-      this.rowControlsSelector = options.rowControlsSelector;
+      this.context = context;
 
       this.active = false;
       this.grabbed = null;
@@ -182,6 +159,14 @@
       // expand and bails on return if the cursor has moved since, so a slow
       // open never yanks the row back from where later keys put it.
       this.cursorSeq = 0;
+    }
+
+    /**
+     * @return {HTMLTableElement}
+     *   The element's treegrid table.
+     */
+    get tree() {
+      return this.element.tree;
     }
 
     /**
@@ -232,7 +217,7 @@
       }
 
       this.active = true;
-      row.classList.add(this.grabbedClass);
+      row.setAttribute(GRABBED, 'true');
       // Tell the treegrid to keep this row visible: its collapse guard refuses
       // to fold a section containing a data-treegrid-keep-visible row, so the
       // carried row never vanishes mid-move.
@@ -251,7 +236,7 @@
         'Use the Up and Down arrows to move it, Left and Right to change its indent, Enter to drop, or Escape to cancel.',
       );
       announce(
-        `${placementMessage(titleOf(row, this.titleSelector), this.intent, this.titleSelector)} ${instructions}`,
+        `${placementMessage(rowTitle(row), this.intent)} ${instructions}`,
         'assertive',
       );
       return true;
@@ -324,9 +309,9 @@
       if (!this.active || !(event.target instanceof Element)) {
         return false;
       }
-      // Leave row controls (toggle, column switch, operations) clickable so the
-      // editor can still expand a parent to aim inside it.
-      if (event.target.closest(this.rowControlsSelector)) {
+      // Leave the toggle and row controls clickable so the editor can still
+      // expand a parent to aim inside it.
+      if (event.target.closest(LIVE_DURING_MOVE)) {
         return false;
       }
       const row = event.target.closest('tr[role="row"]');
@@ -350,18 +335,22 @@
      *
      * @param {HTMLElement} row
      *   The jumped-to row.
+     *
+     * @return {boolean}
+     *   False when no move is active or the row can't be aimed at.
      */
     aimAt(row) {
       if (!this.active || row === this.grabbed || this.block.includes(row)) {
-        return;
+        return false;
       }
       const list = this.visibleList();
       const gap = list.indexOf(row);
       if (gap === -1) {
-        return;
+        return false;
       }
       const { min, max } = this.gapBounds(gap, list);
       this.setCursor(gap, clamp(this.depth, min, max), list);
+      return true;
     }
 
     /**
@@ -559,7 +548,7 @@
       if (!opened) {
         announce(
           Drupal.t('Could not open @title.', {
-            '@title': titleOf(prev, this.titleSelector),
+            '@title': rowTitle(prev),
           }),
           'assertive',
         );
@@ -567,7 +556,7 @@
       }
       announce(
         Drupal.t('Opened @title.', {
-          '@title': titleOf(prev, this.titleSelector),
+          '@title': rowTitle(prev),
         }),
       );
       const list = this.visibleList();
@@ -769,14 +758,7 @@
       // Tear down before the async commit (commitMove re-finds and focuses the
       // landed row, and announces success or failure itself).
       this.end();
-      commitMove(
-        grabbed,
-        intent,
-        this.moveUrl,
-        this.element,
-        this.getCsrfToken(),
-        this.options,
-      );
+      commitMove(grabbed, intent, this.context);
     }
 
     /**
@@ -797,7 +779,7 @@
      * Callers that end a carried move (commit, cancel) restore the row first.
      */
     end() {
-      this.grabbed?.classList.remove(this.grabbedClass);
+      this.grabbed?.removeAttribute(GRABBED);
       delete this.grabbed?.dataset.treegridKeepVisible;
       // The dropped (or restored) row stays the cursor and the single tab stop,
       // so leave its tabindex at 0; just clear the picked-up selection marker.

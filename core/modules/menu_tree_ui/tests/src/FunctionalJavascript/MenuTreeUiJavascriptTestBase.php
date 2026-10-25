@@ -191,7 +191,7 @@ abstract class MenuTreeUiJavascriptTestBase extends WebDriverTestBase {
     $this->getSession()->wait(
       5000,
       '!document.querySelector(\'drupal-treegrid[data-treegrid-reorder-moving="true"]\')'
-      . ' && !document.querySelector(\'.menu-tree-ui-row--grabbed\')'
+      . ' && !document.querySelector(\'[data-treegrid-reorder-grabbed]\')'
       . ' && !document.querySelector(\'[data-treegrid-loading]\')',
     );
   }

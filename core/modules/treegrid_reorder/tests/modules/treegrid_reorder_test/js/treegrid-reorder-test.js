@@ -1,33 +1,16 @@
 /**
  * @file
- * A minimal treegrid consumer that wires only the reorder gestures.
+ * A minimal treegrid consumer that turns on reordering.
  *
- * A minimal reorder consumer: it registers a row renderer as a
- * <drupal-treegrid> provider and, on each upgraded element, instantiates the
- * generic Drupal.treegridReorder controllers with this module's own CSS class
- * names. It exists so the reorder gesture JS is tested within treegrid_reorder
- * itself, with no other consuming module involved.
+ * It registers a row renderer as a <drupal-treegrid> provider and, from a
+ * behavior, calls Drupal.treegridReorder.attach() on each element, following
+ * the documented pattern. It exists so the reorder JS is tested within
+ * treegrid_reorder itself, with no other consuming module involved.
  */
 
-((Drupal, drupalSettings, once) => {
+((Drupal, once) => {
   const rr = Drupal.treegridReorder;
   const { rowOf, setRowLevel } = Drupal.treegrid.treeNav;
-
-  // This consumer's CSS class/selector names, handed to the generic gesture
-  // controllers so they carry no markup knowledge of their own.
-  const REORDER_CONFIG = {
-    handleSelector: '.reorder-test-handle',
-    lockedClass: 'reorder-test-locked',
-    draggingClass: 'reorder-test-dragging',
-    grabbedClass: 'reorder-test-grabbed',
-    lineClass: 'reorder-test-drop-indicator',
-    dropAsChildClass: 'reorder-test-drop-as-child',
-    titleSelector: '.reorder-test-title',
-    rowControlsSelector: '.reorder-test-control',
-    flashClass: 'reorder-test-flash',
-    applyParentMetadata: (parentId) => applyParentMetadata(parentId),
-    onCommitted: () => {},
-  };
 
   /**
    * Builds the expand toggle for a parent, or the spacer for a leaf.
@@ -83,10 +66,12 @@
     cell.dataset.treegridNameCell = '';
     const handle = document.createElement('span');
     handle.className = 'reorder-test-handle';
+    handle.setAttribute('data-treegrid-reorder-handle', '');
     handle.setAttribute('role', 'button');
     handle.tabIndex = -1;
     const title = document.createElement('span');
     title.className = 'reorder-test-title';
+    title.setAttribute('data-treegrid-reorder-title', '');
     title.textContent = item.title;
     const control = document.createElement('input');
     control.type = 'checkbox';
@@ -138,110 +123,20 @@
     }
   }
 
-  /**
-   * Wires the reorder gestures onto an upgraded <drupal-treegrid>.
-   *
-   * @param {HTMLElement} element
-   *   The initialized element (element.ready has resolved).
-   * @param {string} csrfToken
-   *   The CSRF token the requests carry, or ''.
-   */
-  function wireFeatures(element, csrfToken) {
-    const { tree } = element;
-    const { moveUrl } = drupalSettings.treegridReorderTest ?? {};
-    if (!moveUrl) {
-      return;
-    }
-    const getToken = () => csrfToken;
+  const reorders = new WeakMap();
 
-    const indicator = new rr.DropIndicator(element, REORDER_CONFIG);
-    const moveMode = new rr.MoveModeController(
-      tree,
-      moveUrl,
-      element,
-      indicator,
-      getToken,
-      REORDER_CONFIG,
-    );
-
-    const onHandleTap = (row) => {
-      if (moveMode.isActive()) {
-        if (moveMode.isGrabbed(row)) {
-          moveMode.commit();
-        }
-        return;
-      }
-      moveMode.tryGrab(row);
-    };
-
-    element.addClickHandler((event) => {
-      if (moveMode.isActive() && moveMode.handlePointer(event)) {
-        event.preventDefault();
-        return true;
-      }
-      return false;
-    });
-
-    element.addKeyHandler((event) => {
-      if (moveMode.isActive()) {
-        if (moveMode.handleKey(event)) {
-          event.preventDefault();
-        }
-        return true;
-      }
-      if (event.key === ' ') {
-        const row = rowOf(event.target);
-        if (row && moveMode.tryGrab(row)) {
-          event.preventDefault();
-          return true;
-        }
-        return false;
-      }
-      if (
-        event.shiftKey &&
-        (event.key === 'ArrowUp' || event.key === 'ArrowDown')
-      ) {
-        const row = rowOf(event.target);
-        if (row) {
-          rr.reorderSibling(row, event.key === 'ArrowUp' ? 'up' : 'down', {
-            moveUrl,
-            csrfToken,
-            flashClass: REORDER_CONFIG.flashClass,
-          });
-          event.preventDefault();
-          return true;
-        }
-      }
-      return false;
-    });
-
-    const drag = new rr.DragController(
-      tree,
-      moveUrl,
-      element,
-      csrfToken,
-      indicator,
-      () => moveMode.cancel(),
-      (row) => onHandleTap(row),
-      REORDER_CONFIG,
-    );
-    drag.attach();
-
-    element.addEventListener('treegrid:disconnected', () => {
-      moveMode.cancel();
-    });
-
-    // A key handler of the consumer's own, registered after the reorder ones,
-    // so a test can see which key events reach it.
-    element.addKeyHandler(() => {
-      window.reorderTestKeyEvents = (window.reorderTestKeyEvents ?? 0) + 1;
-      return false;
-    });
+  // ?delay_provider=<ms> registers the provider late, so a test can attach
+  // reordering to an element that is not ready yet.
+  const delay = Number(
+    new URLSearchParams(window.location.search).get('delay_provider'),
+  );
+  const registerProvider = () =>
+    Drupal.treegrid.registerProvider('treegrid_reorder_test', { buildRow });
+  if (delay > 0) {
+    window.setTimeout(registerProvider, delay);
+  } else {
+    registerProvider();
   }
-
-  // Register the renderer before the behavior runs; registerProvider adopts the
-  // already-connected element and initializes it.
-  Drupal.treegrid.registerProvider('treegrid_reorder_test', { buildRow });
 
   Drupal.behaviors.treegridReorderTest = {
     attach(context) {
@@ -250,10 +145,41 @@
         'drupal-treegrid[data-provider="treegrid_reorder_test"]',
         context,
       ).forEach(async (element) => {
+        reorders.set(
+          element,
+          Drupal.treegridReorder.attach(element, {
+            applyParentMetadata,
+            container: element.closest('.reorder-test-container'),
+          }),
+        );
+        // A key handler of the consumer's own, registered after attach(), so a
+        // test can see which key events reach it.
+        element.addKeyHandler(() => {
+          window.reorderTestKeyEvents = (window.reorderTestKeyEvents ?? 0) + 1;
+          return false;
+        });
         await element.ready;
-        wireFeatures(element, await Drupal.treegrid.csrfToken(element));
+        await Drupal.treegrid.csrfToken(element);
+        if (!element.isConnected || !reorders.has(element)) {
+          return;
+        }
         element.setAttribute('data-test-reorder-wired', '');
       });
     },
+    detach(context, settings, trigger) {
+      if (trigger !== 'unload') {
+        return;
+      }
+      once
+        .remove(
+          'treegrid-reorder-test',
+          'drupal-treegrid[data-provider="treegrid_reorder_test"]',
+          context,
+        )
+        .forEach((element) => {
+          reorders.get(element)?.detach();
+          reorders.delete(element);
+        });
+    },
   };
-})(Drupal, drupalSettings, once);
+})(Drupal, once);

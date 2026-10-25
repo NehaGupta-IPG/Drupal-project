@@ -6,31 +6,19 @@
  * roving-tabindex focus model — lives in the treegrid module's <drupal-treegrid>
  * element. The menu row renderer is registered as a provider in row-builder.js.
  * This file wires the menu-specific features onto an upgraded element:
- *  - reorder: pointer drag, the keyboard grab/select move mode, Shift+Arrow
- *    sibling reorder, and the single-pointer commit (tap the handle);
+ *  - reorder, through treegrid_reorder's attach();
  *  - search jump-to and dismiss;
  *  - the "Keyboard commands" dialog.
  *
- * Features attach through the element's interaction-handler registry
- * (addClickHandler / addKeyHandler) and its lifecycle. The handlers run ahead of
- * the element's built-in navigation and return true to consume an event, which
- * preserves the original dispatch order (move mode, then nav). The column
- * switches are persisted by treegrid's column-update client.
+ * The column switches are persisted by treegrid's column-update client.
  */
 
 ((Drupal, drupalSettings, once) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const ns = Drupal.menuTreeUi;
   const rr = Drupal.treegridReorder;
-  const { rowOf } = Drupal.treegrid.treeNav;
 
   const ROW = 'tr[role="row"]';
-  // Elements that must keep their native/authored key behavior instead of the
-  // row's, e.g. Enter on the title link or Space on the Enabled checkbox. The
-  // expand toggle is exempted: it is a <button> that legitimately takes focus
-  // on mouse click and must keep responding to Enter/Space.
-  const INTERACTIVE = 'a, button, input, select, textarea';
-
   /**
    * Syncs a parent row's "parent or leaf" attributes to its current children.
    *
@@ -85,26 +73,6 @@
     }
   }
 
-  // The menu's CSS class/selector names and commit callbacks, handed to the
-  // generic treegrid_reorder controllers so they carry no menu markup knowledge.
-  const REORDER_CONFIG = {
-    handleSelector: '.menu-tree-ui-row__handle',
-    lockedClass: 'menu-tree-ui-row__handle--locked',
-    draggingClass: 'menu-tree-ui-row--dragging',
-    grabbedClass: 'menu-tree-ui-row--grabbed',
-    lineClass: 'menu-tree-ui-drop-indicator',
-    dropAsChildClass: 'menu-tree-ui-row--drop-as-child',
-    titleSelector: '.menu-tree-ui-row__title',
-    rowControlsSelector:
-      '.menu-tree-ui-row__toggle, .menu-tree-ui-row__column, .menu-tree-ui-row__operations',
-    flashClass: 'menu-tree-ui-row--flash',
-    applyParentMetadata,
-    // Tell the working-copy action bar a change was recorded so it can reveal
-    // the unsaved notice (the bar lives outside the <drupal-treegrid> element).
-    onCommitted: () =>
-      document.dispatchEvent(new CustomEvent('menu-tree-ui:changed')),
-  };
-
   /**
    * Wires menu_tree_ui's features onto an upgraded <drupal-treegrid>.
    *
@@ -112,7 +80,6 @@
    *   The element, already initialized (element.ready has resolved).
    */
   function wireFeatures(element) {
-    const { tree } = element;
     const settings = drupalSettings.menuTreeUi ?? {};
     const { moveUrl } = settings;
     const container = element.closest('.menu-tree-ui');
@@ -137,116 +104,18 @@
       stickyObserver.observe(actionBar);
     };
 
-    let csrfToken;
-    const getToken = () => csrfToken;
-
-    // One drop indicator, shared by pointer drag and keyboard move mode so the
-    // two never render into separate live regions. The host owns its position.
-    const indicator = new rr.DropIndicator(element, REORDER_CONFIG);
-    const moveMode = moveUrl
-      ? new rr.MoveModeController(
-          tree,
-          moveUrl,
-          element,
-          indicator,
-          getToken,
-          REORDER_CONFIG,
-        )
-      : null;
-
-    /**
-     * Handles a tap (mouse, no drag) on a row's drag handle.
-     *
-     * Idle: picks the row up (the single-pointer counterpart to Space). During a
-     * move: tapping the carried item's handle drops it (the single-pointer
-     * commit, WCAG 2.5.7); taps on other rows' handles are ignored.
-     *
-     * @param {HTMLElement} row
-     *   The row whose handle was tapped.
-     */
-    const onHandleTap = (row) => {
-      if (!moveMode) {
-        return;
-      }
-      if (moveMode.isActive()) {
-        if (moveMode.isGrabbed(row)) {
-          moveMode.commit();
-        }
-        return;
-      }
-      moveMode.tryGrab(row);
-    };
-
-    // Move-mode pointer, ahead of the element's built-in nav.
-    element.addClickHandler((event) => {
-      if (moveMode?.isActive() && moveMode.handlePointer(event)) {
-        event.preventDefault();
-        return true;
-      }
-      return false;
+    // Reordering: drag, move mode, Shift+Arrow and the single-pointer path.
+    // A press outside the whole component cancels a move; searching for a
+    // destination keeps it.
+    const reorder = rr.attach(element, {
+      moveUrl,
+      applyParentMetadata,
+      container,
+      // Tell the working-copy action bar a change was recorded so it can
+      // reveal the unsaved notice (the bar lives outside the element).
+      onCommitted: () =>
+        document.dispatchEvent(new CustomEvent('menu-tree-ui:changed')),
     });
-
-    element.addKeyHandler((event) => {
-      // While a row is picked up, move mode owns every key, even one landing
-      // on a control — the carried row must keep taking Space/Enter (drop)
-      // and Escape (cancel) regardless of where focus sits.
-      if (moveMode?.isActive()) {
-        if (moveMode.handleKey(event)) {
-          event.preventDefault();
-        }
-        return true;
-      }
-
-      const row = rowOf(event.target);
-      if (!row) {
-        return false;
-      }
-      // Let a focused in-row control (title link, checkbox, operations
-      // button) handle its own keys instead of the row hijacking them.
-      const control = event.target !== row && event.target.closest(INTERACTIVE);
-      if (control && !control.closest('[data-treegrid-toggle]')) {
-        return false;
-      }
-
-      // Space grabs a movable row; if it cannot grab, fall through so the spine
-      // toggles expand on a parent (Space's pre-move-mode role).
-      if (event.key === ' ') {
-        if (moveMode && moveMode.tryGrab(row)) {
-          event.preventDefault();
-          return true;
-        }
-        return false;
-      }
-      if (
-        event.shiftKey &&
-        (event.key === 'ArrowUp' || event.key === 'ArrowDown')
-      ) {
-        if (moveUrl) {
-          rr.reorderSibling(row, event.key === 'ArrowUp' ? 'up' : 'down', {
-            moveUrl,
-            csrfToken,
-            flashClass: REORDER_CONFIG.flashClass,
-            onCommitted: REORDER_CONFIG.onCommitted,
-            titleSelector: REORDER_CONFIG.titleSelector,
-          });
-          event.preventDefault();
-          return true;
-        }
-      }
-      return false;
-    });
-
-    // A pointer press genuinely outside the component cancels an active move
-    // (focus leaving the tree must not — carrying a row blurs it, and searching
-    // moves focus to the search field).
-    const onOutsidePointer = (event) => {
-      if (!moveMode?.isActive() || !(event.target instanceof Node)) {
-        return;
-      }
-      if (container && !container.contains(event.target)) {
-        moveMode.cancel();
-      }
-    };
 
     // "Keyboard commands" dialog. Closing uses a native <form method="dialog">,
     // so only opening needs JS; degrades to a no-op without dialog.showModal.
@@ -269,9 +138,12 @@
     let detachPaging = null;
     const addPageListeners = () => {
       observeStickyOffset();
-      document.addEventListener('mousedown', onOutsidePointer);
       // Search jump-to and dismiss.
-      jumpHandler = ns.attachJumpClickHandler({ tree, element, moveMode });
+      jumpHandler = ns.attachJumpClickHandler({
+        tree: element.tree,
+        element,
+        moveMode: reorder,
+      });
       detachSearchPanel = container ? ns.attachSearchPanel(container) : null;
       // Stream the rest of a truncated top level in as the editor scrolls.
       detachPaging = ns.attachTopLevelPaging(element);
@@ -282,7 +154,6 @@
     const removePageListeners = () => {
       stickyObserver?.disconnect();
       stickyObserver = null;
-      document.removeEventListener('mousedown', onOutsidePointer);
       if (jumpHandler) {
         document.removeEventListener('click', jumpHandler);
         jumpHandler = null;
@@ -297,44 +168,7 @@
     };
     addPageListeners();
 
-    // Drag needs the CSRF token; defer the controller until it resolves, keeping
-    // the token out of URLs (and access logs). move-mode reads it lazily
-    // through getToken().
-    Drupal.treegrid
-      .csrfToken(element)
-      .then((token) => {
-        csrfToken = token;
-      })
-      .finally(() => {
-        if (!moveUrl) {
-          // eslint-disable-next-line no-console
-          console.warn(
-            '[menu-tree] drupalSettings.menuTreeUi.moveUrl missing — drag disabled.',
-          );
-          return;
-        }
-        const drag = new rr.DragController(
-          tree,
-          moveUrl,
-          element,
-          csrfToken,
-          indicator,
-          () => moveMode?.cancel(),
-          (row) => onHandleTap(row),
-          REORDER_CONFIG,
-        );
-        drag.attach();
-        // Reorder is now interactive: the CSRF token has resolved (keyboard and
-        // pointer commits need it) and the drag controller is listening. Tests
-        // wait on this before dispatching a move so they do not race the
-        // deferred wiring.
-        element.dataset.treegridReorderReady = 'true';
-      });
-
-    element.addEventListener('treegrid:disconnected', () => {
-      moveMode?.cancel();
-      removePageListeners();
-    });
+    element.addEventListener('treegrid:disconnected', removePageListeners);
     element.addEventListener('treegrid:connected', (event) => {
       if (event.detail.reconnected) {
         addPageListeners();
