@@ -118,10 +118,14 @@ class Schema extends DatabaseSchema {
     $sql .= 'ENGINE = ' . $table['mysql_engine'] . ' DEFAULT CHARACTER SET ' . $table['mysql_character_set'];
     // By default, MySQL uses the default collation for new tables, which is
     // 'utf8mb4_general_ci' (MySQL 5) or 'utf8mb4_0900_ai_ci' (MySQL 8) for
-    // utf8mb4. If an alternate collation has been set, it needs to be
+    // utf8mb4. If an alternate collation has been set in either
+    // the table schema or the connection options, it should be
     // explicitly specified.
     // @see \Drupal\mysql\Driver\Database\mysql\Schema
-    if (!empty($info['collation'])) {
+    if (!empty($table['collation'])) {
+      $sql .= ' COLLATE ' . $table['collation'];
+    }
+    elseif (!empty($info['collation'])) {
       $sql .= ' COLLATE ' . $info['collation'];
     }
 
