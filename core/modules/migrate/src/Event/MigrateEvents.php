@@ -110,6 +110,36 @@ final class MigrateEvents {
   const POST_ROW_SAVE = 'migrate.post_row_save';
 
   /**
+   * Name of the event fired when an item is skipped.
+   *
+   * This event allows modules to perform an action whenever a specific item has
+   * been skipped. The event listener method receives a
+   * \Drupal\migrate\Event\MigrateRowSkippedEvent instance.
+   *
+   * @Event
+   *
+   * @see \Drupal\migrate\Event\MigrateRowSkippedEvent
+   *
+   * @var string
+   */
+  const ROW_SKIPPED = 'migrate.row_skipped';
+
+  /**
+   * Name of the event fired when an import fails.
+   *
+   * This event allows modules to perform an action whenever a migration has
+   * failed. The event listener method
+   * receives a \Drupal\migrate\Event\MigrateImportFailedEvent instance.
+   *
+   * @Event
+   *
+   * @see \Drupal\migrate\Event\MigrateImportFailedEvent
+   *
+   * @var string
+   */
+  const IMPORT_FAILED = 'migrate.import_failed';
+
+  /**
    * Name of the event fired when beginning a migration rollback operation.
    *
    * This event allows modules to perform an action whenever a migration
