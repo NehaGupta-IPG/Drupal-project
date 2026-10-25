@@ -187,6 +187,15 @@ class FormTestDisabledElementsForm extends FormBase {
       '#test_hijack_value' => 'bar@example.com',
     ];
 
+    // Try to hijack the email field with valid email addresses.
+    $form['disabled_container']['disabled_container_emails'] = [
+      '#type' => 'email',
+      '#title' => 'emails',
+      '#multiple' => TRUE,
+      '#default_value' => 'foo@example.com,bar@example.com',
+      '#test_hijack_value' => 'bar@example.com,foo@example.com',
+    ];
+
     // Try to hijack the URL field with a valid URL.
     $form['disabled_container']['disabled_container_url'] = [
       '#type' => 'url',

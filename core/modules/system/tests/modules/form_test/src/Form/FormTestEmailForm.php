@@ -37,6 +37,12 @@ class FormTestEmailForm extends FormBase {
       '#required' => TRUE,
       '#description' => 'A required email address field.',
     ];
+    $form['email_multiple'] = [
+      '#type' => 'email',
+      '#title' => 'Addresses',
+      '#multiple' => TRUE,
+      '#description' => 'A comma-separated list of email addresses.',
+    ];
     $form['submit'] = [
       '#type' => 'submit',
       '#value' => 'Submit',

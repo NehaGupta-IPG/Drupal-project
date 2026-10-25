@@ -5,6 +5,7 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 
 /**
  * Provides a form input element for entering an email address.
@@ -13,14 +14,36 @@ use Drupal\Core\Render\Element;
  * - #default_value: An RFC-compliant email address.
  * - #size: The size of the input element in characters.
  * - #pattern: A string for the native HTML5 pattern attribute.
+ * - #multiple: (optional) If TRUE, the element accepts multiple email addresses
+ *   separated by commas. Defaults to FALSE.
+ * - #maxlength: (optional) The maximum length of the element in characters.
+ *   Defaults to 254 for one email according to RFC 3696 and Erratum 1690.
  *
  * Example usage:
  * @code
  * $form['email'] = [
  *   '#type' => 'email',
  *   '#title' => $this->t('Email'),
- *   '#pattern' => '*@example.com',
  * ];
+ * @endcode
+ *
+ * Element might use a native HTML5 pattern attribute:
+ * @code
+ *  $form['email'] = [
+ *    '#type' => 'email',
+ *    '#title' => $this->t('Email'),
+ *    '#pattern' => '*@example.com',
+ *  ];
+ * @endcode
+ *
+ * Element might use a native HTML5 multiple attribute:
+ * @code
+ *  $form['emails'] = [
+ *    '#type' => 'email',
+ *    '#title' => $this->t('Emails'),
+ *    '#multiple' => TRUE,
+ *    '#maxlength' => 1024,
+ *  ];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Textfield
@@ -49,6 +72,7 @@ class Email extends FormElementBase {
       '#input' => TRUE,
       '#size' => 60,
       '#maxlength' => self::EMAIL_MAX_LENGTH,
+      '#multiple' => FALSE,
       '#autocomplete_route_name' => FALSE,
       '#process' => [
         [static::class, 'processAutocomplete'],
@@ -73,11 +97,48 @@ class Email extends FormElementBase {
    * already.
    */
   public static function validateEmail(&$element, FormStateInterface $form_state, &$complete_form) {
-    $value = trim($element['#value']);
-    $form_state->setValueForElement($element, $value);
+    // Create an array of email addresses so each one can be validated
+    // individually. Email addresses can be only comma-separated.
+    // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/multiple#email_input
+    $multiple = $element['#multiple'];
+    $emails = $multiple
+      ? explode(',', $element['#value'])
+      : [$element['#value']];
 
-    if ($value !== '' && !\Drupal::service('email.validator')->isValid($value)) {
-      $form_state->setError($element, t('The email address %mail is not valid. Use the format user@example.com.', ['%mail' => $value]));
+    $emails = array_map('trim', $emails);
+
+    if (in_array('', $emails, TRUE)) {
+      // Skip validation if there is a single empty value.
+      if (count($emails) === 1) {
+        $form_state->setValueForElement($element, '');
+        return;
+      }
+      // Display an error when there are multiple empty email addresses.
+      $form_state->setError($element, t('All email addresses must be non-empty.'));
+      return;
+    }
+
+    // Validate each email address.
+    /** @var \Drupal\Component\Utility\EmailValidator $validator */
+    $validator = \Drupal::service('email.validator');
+    $invalid_emails = [];
+    foreach ($emails as $email) {
+      if (!$validator->isValid($email)) {
+        $invalid_emails[] = $email;
+      }
+    }
+
+    // Set trimmed and validated email address(es).
+    $form_state->setValueForElement($element, implode(',', $emails));
+
+    if ($invalid_emails) {
+      $multiple_error_suffix = $multiple ? ', and separate the addresses with a comma.' : '.';
+      $form_state->setError($element, new PluralTranslatableMarkup(
+        count($invalid_emails),
+        'The email address %mails is not valid. Use the format user@example.com' . $multiple_error_suffix,
+        'The email addresses %mails are not valid. Use the format user@example.com' . $multiple_error_suffix,
+        ['%mails' => implode(', ', $invalid_emails)],
+      ));
     }
   }
 
@@ -94,7 +155,15 @@ class Email extends FormElementBase {
    */
   public static function preRenderEmail($element) {
     $element['#attributes']['type'] = 'email';
-    Element::setAttributes($element, ['id', 'name', 'value', 'size', 'maxlength', 'placeholder']);
+    Element::setAttributes($element, [
+      'id',
+      'name',
+      'value',
+      'size',
+      'maxlength',
+      'placeholder',
+      'multiple',
+    ]);
     static::setAttributes($element, ['form-email']);
     return $element;
   }
