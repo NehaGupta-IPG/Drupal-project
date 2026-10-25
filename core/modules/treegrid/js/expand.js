@@ -59,6 +59,8 @@
    * aria-label, set by the consumer's row renderer) so the editor hears which
    * item changed. The state word is deliberately left out so the screen reader
    * does not speak it twice. Skipped when a consumer leaves rows unnamed.
+   * The aria-label is plain text and the announcer writes HTML, so the name is
+   * escaped here.
    *
    * @param {HTMLElement} row
    *   The toggled row.
@@ -68,7 +70,7 @@
     if (!name) {
       return;
     }
-    Drupal.treegrid.announce(name);
+    Drupal.treegrid.announce(Drupal.checkPlain(name));
   }
 
   class ExpandManager {

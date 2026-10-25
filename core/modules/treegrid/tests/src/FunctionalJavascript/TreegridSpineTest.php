@@ -177,6 +177,24 @@ final class TreegridSpineTest extends WebDriverTestBase {
   }
 
   /**
+   * A row name holding markup is announced as text when toggled by keyboard.
+   */
+  public function testToggleAnnouncementEscapesRowNameFromKeyboard(): void {
+    $this->setRowLabelToMarkup('p1');
+    $this->pressKeyOnRow('p1', 'ArrowRight');
+    $this->assertAnnouncementIsText();
+  }
+
+  /**
+   * A row name holding markup is announced as text when toggled by click.
+   */
+  public function testToggleAnnouncementEscapesRowNameFromClick(): void {
+    $this->setRowLabelToMarkup('p2');
+    $this->expand('p2');
+    $this->assertAnnouncementIsText();
+  }
+
+  /**
    * Child and sibling lookups ignore rows that are not items.
    */
   public function testSiblingAndChildHelpersSkipRowsWithoutId(): void {
@@ -207,6 +225,36 @@ final class TreegridSpineTest extends WebDriverTestBase {
   }
 
   // Helpers.
+
+  /**
+   * Gives a row an aria-label that is markup if it were read as HTML.
+   *
+   * @param string $id
+   *   The row ID.
+   */
+  private function setRowLabelToMarkup(string $id): void {
+    $this->getSession()->executeScript(<<<JS
+      document.querySelector('tr[role="row"][data-id="$id"]').setAttribute(
+        'aria-label',
+        '<img src=x onerror="window.__xss=1">',
+      );
+    JS);
+  }
+
+  /**
+   * Asserts the live region holds the announcement as text, not as markup.
+   */
+  private function assertAnnouncementIsText(): void {
+    $this->assertJsCondition(
+      "((document.getElementById('drupal-live-announce') || {}).innerHTML || '') !== ''",
+    );
+    // An onerror handler fires asynchronously, so give it the chance to run.
+    usleep(300000);
+    $this->assertNull($this->getSession()->evaluateScript('return window.__xss ?? null;'));
+    $this->assertSame(0, $this->getSession()->evaluateScript(
+      "return document.getElementById('drupal-live-announce').children.length;",
+    ));
+  }
 
   /**
    * Finds a row by its data-id.

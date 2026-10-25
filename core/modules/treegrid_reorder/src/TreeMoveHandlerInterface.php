@@ -28,6 +28,10 @@ interface TreeMoveHandlerInterface {
    * which items are movable, ownership/scope, depth limits, vetoes — and must
    * NOT re-implement the structural checks.
    *
+   * An error's message is safe HTML, escaped by the implementation (cast a
+   * t() string with @ placeholders), because the client announces and shows it
+   * without escaping.
+   *
    * @param string $tree_id
    *   The tree the move happens within.
    * @param \Drupal\treegrid_reorder\MoveIntent $intent

@@ -217,7 +217,8 @@ on the element.
 A row is `<tr role="row">` with `data-id`, `data-parent-id` (empty for the top
 level), `aria-level`, `data-has-children` (`true` or `false`),
 `aria-expanded` on open or closed parents, and `tabindex` (exactly one row
-`0`). `aria-label` is optional and announced on expand and collapse. Markers:
+`0`). `aria-label` is optional, plain text (not HTML), and announced on expand
+and collapse; the announcement escapes it. Markers:
 `data-treegrid-toggle` on the expand button, `data-treegrid-name-cell` on the
 element that indents (by `--treegrid-indent`, default `1.25rem` per level), and
 `data-treegrid-control` on controls that join the active row's tab order.
@@ -247,7 +248,8 @@ interactive `.treegrid-cell-checkbox` is POSTed there as
 `{ column_id, row_id, value }` with the CSRF token. The checkbox is disabled
 while the request is in flight. On a non-2xx status, `ok: false` or a network
 error the checkbox goes back to its earlier value and the failure is
-announced. The endpoint answers `{ ok, code?, message? }`. Without the
+announced. The endpoint answers `{ ok, code?, message? }`; `message` is safe
+HTML, escaped by the server, and the client announces it unchanged. Without the
 attribute a checkbox changes on screen only and nothing is sent. The checkbox
 markup is `<input type="checkbox" class="treegrid-cell-checkbox"
 aria-label="…" data-column-id="…" data-treegrid-control>`; a consumer that

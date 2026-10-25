@@ -21,6 +21,9 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  *     MUST be trusted server-rendered markup — it is written through |raw and
  *     innerHTML, so user-supplied input in a markup cell is an XSS vector.
  *
+ * A cell's 'label' is plain text (it becomes an aria-label). A column-update
+ * response's 'message' is safe HTML, escaped by the server, announced as is.
+ *
  * Read-only columns return FALSE from handleUpdate().
  *
  * @api

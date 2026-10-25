@@ -96,7 +96,7 @@
     toggle.tabIndex = -1;
     toggle.setAttribute(
       'aria-label',
-      Drupal.t('Toggle children of @title', { '@title': item.title }),
+      Drupal.t('Toggle children of !title', { '!title': item.title }),
     );
     const chevron = document.createElement('span');
     chevron.setAttribute('aria-hidden', 'true');
@@ -202,11 +202,13 @@
     // reordered. An explicit name keeps a screen reader from flattening the
     // in-row controls into one utterance; per-column state is announced by each
     // cell's control on Tab, so this stays column-agnostic (see the template).
+    // The label is plain text, so the title goes in through a `!` placeholder
+    // (no HTML escaping); the treegrid escapes it where it announces it.
     tr.setAttribute(
       'aria-label',
       item.movable
         ? item.title
-        : Drupal.t('@title (locked)', { '@title': item.title }),
+        : Drupal.t('!title (locked)', { '!title': item.title }),
     );
     // Lazy-loaded rows are never the initial tab stop; the active row is set as
     // the cursor moves (see treeNav.focusRow). aria-selected is added only while

@@ -34,7 +34,9 @@ user-facing UI of its own.
 - `validateConstraints(string $tree_id, MoveIntent $intent): array` — your
   rules (movability, scope, depth limits, vetoes), called after
   `TreeReorderManager`'s structural checks pass. Return
-  `['ok' => TRUE]` or `['ok' => FALSE, 'code' => …, 'message' => …]`.
+  `['ok' => TRUE]` or `['ok' => FALSE, 'code' => …, 'message' => …]`. The
+  `message` is safe HTML, escaped by the handler (a `t()` string with `@`
+  placeholders cast to a string), because the client shows it unchanged.
 - `getAncestorIds(string $tree_id, string $parent_id): array` — the root path
   of a prospective parent, for the manager's cycle check.
 - `applyMove(string $tree_id, MoveIntent $intent): void` — persist the move
@@ -219,7 +221,9 @@ Reads still go out. Other failures (409 `busy`, `locked`, `save_incomplete` or
 
 A move request is `POST { id, new_parent, before_id }` and the response is
 `{ ok, code?, message? }` plus whatever fields the consumer adds (menu_tree_ui
-adds `dirty`).
+adds `dirty`). A response `message` is safe HTML, escaped by the server; the
+client passes it through unchanged and escapes only text it takes from the DOM.
+A row's `aria-label` is plain text.
 
 ## No UI of its own
 
