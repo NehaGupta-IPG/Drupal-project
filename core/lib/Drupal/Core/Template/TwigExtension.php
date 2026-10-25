@@ -502,7 +502,7 @@ class TwigExtension extends AbstractExtension {
       if ($strategy == 'html') {
         return Html::escape($return);
       }
-      return $env->getRuntime(EscaperRuntime::class)->escape($arg, $strategy, $charset, $autoescape);
+      return $env->getRuntime(EscaperRuntime::class)->escape($return, $strategy, $charset, $autoescape);
     }
 
     // This is a normal render array, which is safe by definition, with
