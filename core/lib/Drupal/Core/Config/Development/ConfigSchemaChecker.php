@@ -93,7 +93,12 @@ class ConfigSchemaChecker implements EventSubscriberInterface {
       elseif (is_array($errors)) {
         $text_errors = [];
         foreach ($errors as $key => $error) {
-          $text_errors[] = new FormattableMarkup('@key @error', ['@key' => $key, '@error' => $error]);
+          [$error_config_name, $error_property] = explode(':', $key);
+          $text_errors[] = new FormattableMarkup('config @config-name, property @property: @error', [
+            '@config-name' => $error_config_name,
+            '@property' => $error_property,
+            '@error' => $error,
+          ]);
         }
         throw new SchemaIncompleteException("Schema errors for $name with the following errors: " . implode(', ', $text_errors));
       }
