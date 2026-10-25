@@ -50,7 +50,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * @see \Drupal\Core\Render\Element\Table
  */
 #[FormElement('tableselect')]
-class Tableselect extends Table {
+class Tableselect extends FormElementBase {
 
   /**
    * {@inheritdoc}
@@ -63,7 +63,6 @@ class Tableselect extends Table {
       '#responsive' => TRUE,
       '#sticky' => FALSE,
       '#pre_render' => [
-        [static::class, 'preRenderTable'],
         [static::class, 'preRenderTableselect'],
       ],
       '#process' => [

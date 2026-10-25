@@ -10,9 +10,6 @@ use Drupal\Component\Utility\Html as HtmlUtility;
 /**
  * Provides a render element for a table.
  *
- * Note: Although this extends FormElementBase, it can be used outside the
- * context of a form.
- *
  * Properties:
  * - #header: An array of table header labels.
  * - #rows: An array of the rows to be displayed. Each row is either an array
@@ -109,7 +106,7 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  * @see \Drupal\Core\Render\Element\Tableselect
  */
 #[FormElement('table')]
-class Table extends FormElementBase {
+class Table extends RenderElementBase {
 
   /**
    * The cache ID used for the tableDrag instance counter.
@@ -125,7 +122,7 @@ class Table extends FormElementBase {
       '#rows' => [],
       '#empty' => '',
       // Properties for tableselect support.
-      '#input' => TRUE,
+      '#input' => FALSE,
       '#tree' => TRUE,
       '#tableselect' => FALSE,
       '#sticky' => FALSE,
@@ -150,28 +147,6 @@ class Table extends FormElementBase {
       ],
       '#theme' => 'table',
     ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
-    // If #multiple is FALSE, the regular default value of radio buttons is
-    // used.
-    if (!empty($element['#tableselect']) && !empty($element['#multiple'])) {
-      // Contrary to #type 'checkboxes', the default value of checkboxes in a
-      // table is built from the array keys (instead of array values) of the
-      // #default_value property.
-      // @todo D8: Remove this inconsistency.
-      if ($input === FALSE) {
-        $element += ['#default_value' => []];
-        $value = array_keys(array_filter($element['#default_value']));
-        return array_combine($value, $value);
-      }
-      else {
-        return is_array($input) ? array_combine($input, $input) : [];
-      }
-    }
   }
 
   /**
