@@ -44,9 +44,9 @@
   /**
    * Sets a row's depth: its aria-level and the name cell's indent.
    *
-   * The one place the indent step (1.25rem per level) lives; row construction
-   * (row-builder), lazy-load rebasing (expand), and the keyboard carry
-   * (move-mode) all route through here.
+   * The one place the indent step lives (--treegrid-indent per level, 1.25rem
+   * by default); row construction (row-builder), lazy-load rebasing (expand),
+   * and the keyboard carry (move-mode) all route through here.
    *
    * @param {HTMLElement} row
    *   The row.
@@ -57,7 +57,7 @@
     row.setAttribute('aria-level', String(level));
     const name = row.querySelector('[data-treegrid-name-cell]');
     if (name) {
-      name.style.paddingInlineStart = `${(level - 1) * 1.25}rem`;
+      name.style.paddingInlineStart = `calc(${level - 1} * var(--treegrid-indent, 1.25rem))`;
     }
   }
 

@@ -65,7 +65,7 @@
     See \Drupal\menu_tree_ui\MenuLinkMovability.
   #}
   <td role="gridcell" class="menu-tree-ui-row__cell menu-tree-ui-row__cell--name">
-    <div class="menu-tree-ui-row__name" data-treegrid-name-cell style="padding-inline-start: {{ (depth - 1) * 1.25 }}rem;">
+    <div class="menu-tree-ui-row__name" data-treegrid-name-cell style="padding-inline-start: calc({{ depth - 1 }} * var(--treegrid-indent, 1.25rem));">
       {% if movable %}
         <span
           class="menu-tree-ui-row__handle"

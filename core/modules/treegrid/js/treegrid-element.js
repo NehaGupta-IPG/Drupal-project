@@ -9,8 +9,8 @@
  *
  * A consumer provides:
  *  - a renderer, registered with Drupal.treegrid.registerProvider(name, {
- *    buildRows, buildRow }) and selected via the element's data-provider
- *    attribute.
+ *    buildRow }) and selected via the element's data-provider attribute.
+ *    buildRow(item, depth) returns the row; treegrid sets its position.
  *  - data-children-url: the endpoint returning one level as { parent, items[] }.
  *
  * Features (reorder, columns, search, …) attach without the element knowing
@@ -84,7 +84,7 @@
    * @param {string} name
    *   The provider name, matched against an element's data-provider.
    * @param {object} provider
-   *   The renderer: { buildRows, buildRow }.
+   *   The renderer: { buildRow(item, depth) }.
    */
   Drupal.treegrid.registerProvider = (name, provider) => {
     Drupal.treegrid.providers[name] = provider;
@@ -301,7 +301,7 @@
      * Wires the spine once the renderer provider is available.
      *
      * @param {object} provider
-     *   The renderer: { buildRows, buildRow }.
+     *   The renderer: { buildRow(item, depth) }.
      *
      * @internal
      */

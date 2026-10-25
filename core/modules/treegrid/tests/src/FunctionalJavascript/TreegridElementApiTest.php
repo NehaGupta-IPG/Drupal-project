@@ -601,6 +601,49 @@ final class TreegridElementApiTest extends WebDriverTestBase {
     );
   }
 
+  /**
+   * Rows the provider builds carry treegrid's positions in their level.
+   */
+  public function testBuiltRowsCarryPositions(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      await element.expandRow(element.tree.querySelector('tr[data-id="p1"]'));
+      const read = (id) => {
+        const row = element.tree.querySelector('tr[data-id="' + id + '"]');
+        return [row.getAttribute('aria-posinset'), row.getAttribute('aria-setsize')];
+      };
+      return { c1a: read('c1a'), c1b: read('c1b') };
+    JS);
+
+    $this->assertEquals(
+      ['c1a' => ['1', '2'], 'c1b' => ['2', '2']],
+      $this->getSession()->evaluateScript('return window.apiTest.result;'),
+    );
+  }
+
+  /**
+   * A built row's indent follows --treegrid-indent.
+   */
+  public function testIndentFollowsCustomProperty(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      document.documentElement.style.setProperty('--treegrid-indent', '2rem');
+      const element = document.querySelector('drupal-treegrid');
+      await element.expandRow(element.tree.querySelector('tr[data-id="p1"]'));
+      await element.expandRow(element.tree.querySelector('tr[data-id="c1b"]'));
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      const indent = (id) => parseFloat(getComputedStyle(
+        element.tree.querySelector('tr[data-id="' + id + '"] [data-treegrid-name-cell]'),
+      ).paddingInlineStart) / rem;
+      return [indent('c1a'), indent('c1b1')];
+    JS);
+
+    $this->assertEquals([2, 4], $this->getSession()->evaluateScript('return window.apiTest.result;'));
+  }
+
   // Helpers.
 
   /**

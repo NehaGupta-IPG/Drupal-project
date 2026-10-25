@@ -60,15 +60,11 @@
    *   The child item.
    * @param {number} depth
    *   The 1-based depth.
-   * @param {number} posInSet
-   *   The 1-based position among siblings.
-   * @param {number} setSize
-   *   The number of siblings.
    *
    * @return {HTMLTableRowElement}
    *   The row element.
    */
-  function buildRow(item, depth, posInSet, setSize) {
+  function buildRow(item, depth) {
     const tr = document.createElement('tr');
     tr.setAttribute('role', 'row');
     tr.dataset.id = item.id;
@@ -77,8 +73,6 @@
     if (item.movable !== null && item.movable !== undefined) {
       tr.dataset.movable = String(item.movable);
     }
-    tr.setAttribute('aria-posinset', String(posInSet));
-    tr.setAttribute('aria-setsize', String(setSize));
     if (item.has_children) {
       tr.setAttribute('aria-expanded', 'false');
     }
@@ -142,26 +136,6 @@
       }
       row.closest('drupal-treegrid').clearChildren(row);
     }
-  }
-
-  /**
-   * Builds a fragment of sibling rows.
-   *
-   * @param {Array<object>} items
-   *   The child items.
-   * @param {number} depth
-   *   The depth to render at.
-   *
-   * @return {DocumentFragment}
-   *   The rows.
-   */
-  function buildRows(items, depth) {
-    const fragment = document.createDocumentFragment();
-    const setSize = items.length;
-    items.forEach((item, i) => {
-      fragment.appendChild(buildRow(item, depth, i + 1, setSize));
-    });
-    return fragment;
   }
 
   /**
@@ -265,10 +239,7 @@
 
   // Register the renderer before the behavior runs; registerProvider adopts the
   // already-connected element and initializes it.
-  Drupal.treegrid.registerProvider('treegrid_reorder_test', {
-    buildRows,
-    buildRow,
-  });
+  Drupal.treegrid.registerProvider('treegrid_reorder_test', { buildRow });
 
   Drupal.behaviors.treegridReorderTest = {
     attach(context) {

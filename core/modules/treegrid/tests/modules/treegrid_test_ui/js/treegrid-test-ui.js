@@ -21,22 +21,16 @@
    *   The child item.
    * @param {number} depth
    *   The 1-based depth.
-   * @param {number} posInSet
-   *   The 1-based position among siblings.
-   * @param {number} setSize
-   *   The number of siblings.
    *
    * @return {HTMLTableRowElement}
    *   The row element.
    */
-  function buildRow(item, depth, posInSet, setSize) {
+  function buildRow(item, depth) {
     const tr = document.createElement('tr');
     tr.setAttribute('role', 'row');
     tr.dataset.id = item.id;
     tr.dataset.parentId = item.parent_id ?? '';
     tr.dataset.hasChildren = String(item.has_children);
-    tr.setAttribute('aria-posinset', String(posInSet));
-    tr.setAttribute('aria-setsize', String(setSize));
     tr.setAttribute('aria-label', `Row ${item.id}`);
     if (item.has_children) {
       tr.setAttribute('aria-expanded', 'false');
@@ -86,36 +80,13 @@
     return tr;
   }
 
-  /**
-   * Builds a fragment of sibling rows.
-   *
-   * @param {Array<object>} items
-   *   The child items.
-   * @param {number} depth
-   *   The depth to render at.
-   *
-   * @return {DocumentFragment}
-   *   The rows.
-   */
-  function buildRows(items, depth) {
-    const fragment = document.createDocumentFragment();
-    const setSize = items.length;
-    items.forEach((item, i) => {
-      fragment.appendChild(buildRow(item, depth, i + 1, setSize));
-    });
-    return fragment;
-  }
-
   // ?delay_provider=<ms> registers the provider late, so a test can observe the
   // element before it is ready.
   const delay = Number(
     new URLSearchParams(window.location.search).get('delay_provider'),
   );
   const registerProvider = () =>
-    Drupal.treegrid.registerProvider('treegrid_test_ui', {
-      buildRows,
-      buildRow,
-    });
+    Drupal.treegrid.registerProvider('treegrid_test_ui', { buildRow });
   if (delay > 0) {
     window.setTimeout(registerProvider, delay);
   } else {

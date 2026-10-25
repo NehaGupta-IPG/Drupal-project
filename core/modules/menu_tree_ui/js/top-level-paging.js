@@ -94,12 +94,11 @@
         }
         const data = await response.json();
         const items = data.items ?? [];
-        const fragment = provider.buildRows(items, 1);
-        const built = Array.from(fragment.children);
-        tbody.appendChild(fragment);
+        const built = items.map((item) => provider.buildRow(item, 1));
+        tbody.append(...built);
         built.forEach((row, i) => {
-          // buildRows numbers within the page; renumber against the full level
-          // so a screen reader announces "row N of total", not "N of page".
+          // Number the rows against the full level, so a screen reader
+          // announces "row N of total", not "N of page".
           row.setAttribute('aria-posinset', String(offset + i + 1));
           row.setAttribute('aria-setsize', String(total));
           if (Drupal.attachBehaviors) {

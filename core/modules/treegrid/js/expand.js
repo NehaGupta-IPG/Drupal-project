@@ -79,17 +79,14 @@
      *   so it is read late).
      * @param {object} rowBuilder
      *   The consumer's row renderer.
-     * @param {function} rowBuilder.buildRows
-     *   Builds a DocumentFragment of sibling rows from items at a depth.
      * @param {function} rowBuilder.buildRow
-     *   Builds a single row element from one item.
+     *   Builds a single row element from one item and its depth.
      */
     constructor(element, rowBuilder) {
       this.element = element;
       // The row renderer is injected so the engine stays consumer-agnostic; the
       // consumer supplies how its items become DOM through the registered
-      // provider. rowBuilder = { buildRows, buildRow }.
-      this.buildRows = rowBuilder.buildRows;
+      // provider. rowBuilder = { buildRow }.
       this.buildRow = rowBuilder.buildRow;
       // Level loads waiting for or running in a queue unit, keyed by row id.
       this.queued = new Map();
@@ -119,6 +116,49 @@
      */
     get rowWindow() {
       return this.element.rowWindow;
+    }
+
+    /**
+     * Builds one level's rows, with their positions in the level.
+     *
+     * @param {Array<object>} items
+     *   The level's items, in order.
+     * @param {number} depth
+     *   The depth the rows render at.
+     *
+     * @return {DocumentFragment}
+     *   The sibling rows.
+     */
+    buildLevel(items, depth) {
+      const fragment = document.createDocumentFragment();
+      items.forEach((item, index) => {
+        fragment.appendChild(
+          this.buildPositioned(item, depth, index, items.length),
+        );
+      });
+      return fragment;
+    }
+
+    /**
+     * Builds one row and sets its position in its level.
+     *
+     * @param {object} item
+     *   The item.
+     * @param {number} depth
+     *   The depth the row renders at.
+     * @param {number} index
+     *   The 0-based index of the row in its level.
+     * @param {number} size
+     *   The number of rows in the level.
+     *
+     * @return {HTMLElement}
+     *   The row.
+     */
+    buildPositioned(item, depth, index, size) {
+      const row = this.buildRow(item, depth);
+      row.setAttribute('aria-posinset', String(index + 1));
+      row.setAttribute('aria-setsize', String(size));
+      return row;
     }
 
     /**
@@ -473,7 +513,7 @@
           result.push({ row: entry.row, block: entry.block, fresh: false });
         } else {
           result.push({
-            row: this.buildRow(item, childDepth, posInSet, setSize),
+            row: this.buildPositioned(item, childDepth, index, setSize),
             block: [],
             fresh: true,
           });
@@ -640,7 +680,7 @@
           false,
         );
         const depth = levelOf(row) + 1;
-        const fragment = this.buildRows(items, depth);
+        const fragment = this.buildLevel(items, depth);
         const inserted = Array.from(fragment.children);
         const anchor = lastDescendantRow(row) ?? row;
         anchor.after(fragment);

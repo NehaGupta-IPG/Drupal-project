@@ -180,23 +180,17 @@
    *   The ChildItem.
    * @param {number} depth
    *   The row's depth (1-based).
-   * @param {number} posInSet
-   *   The 1-based position among siblings.
-   * @param {number} setSize
-   *   The number of siblings.
    *
    * @return {HTMLTableRowElement}
    *   The row element.
    */
-  function buildRow(item, depth, posInSet, setSize) {
+  function buildRow(item, depth) {
     const tr = document.createElement('tr');
     tr.setAttribute('role', 'row');
     tr.dataset.id = item.id;
     tr.dataset.parentId = item.parent_id ?? '';
     tr.dataset.hasChildren = String(item.has_children);
     tr.dataset.movable = String(item.movable);
-    tr.setAttribute('aria-posinset', String(posInSet));
-    tr.setAttribute('aria-setsize', String(setSize));
     if (item.has_children) {
       tr.setAttribute('aria-expanded', 'false');
     }
@@ -232,34 +226,14 @@
     return tr;
   }
 
-  /**
-   * Builds a DocumentFragment of sibling rows from items.
-   *
-   * @param {Array<object>} items
-   *   The ChildItems.
-   * @param {number} depth
-   *   The depth at which to render the rows.
-   *
-   * @return {DocumentFragment}
-   *   The fragment of <tr> rows.
-   */
-  function buildRows(items, depth) {
-    const fragment = document.createDocumentFragment();
-    const setSize = items.length;
-    items.forEach((item, i) => {
-      fragment.appendChild(buildRow(item, depth, i + 1, setSize));
-    });
-    return fragment;
-  }
-
   // buildToggle is shared so menu-tree.js's applyParentMetadata can rebuild a
   // row's disclosure toggle after a move refresh without duplicating the markup
-  // (and its translated aria-label). buildRows/buildRow reach the spine through
-  // the registered provider object below, so they need no namespace export.
+  // (and its translated aria-label). buildRow reaches the spine through the
+  // registered provider object below, so it needs no namespace export.
   Drupal.menuTreeUi.buildToggle = buildToggle;
 
   // Register the menu renderer with the generic treegrid element. registerProvider
   // adopts any <drupal-treegrid data-provider="menu_tree_ui"> already connected
   // (the treegrid library loads, and the element upgrades, before this runs).
-  Drupal.treegrid.registerProvider('menu_tree_ui', { buildRows, buildRow });
+  Drupal.treegrid.registerProvider('menu_tree_ui', { buildRow });
 })(Drupal);
