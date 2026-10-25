@@ -403,15 +403,16 @@ final class MenuTreeController extends ControllerBase {
     }
 
     $column = $this->columnManager->createInstance($column_id);
-    if (!$column->handleUpdate($link_id, $value)) {
-      return new JsonResponse([
-        'ok' => FALSE,
-        'code' => 'not_updatable',
-        'message' => (string) $this->t('This value cannot be updated.'),
-      ], 400);
-    }
-
-    return new JsonResponse(['ok' => TRUE]);
+    return $this->withMenuLock($menu->id(), function () use ($column, $link_id, $value): JsonResponse {
+      if (!$column->handleUpdate($link_id, $value)) {
+        return new JsonResponse([
+          'ok' => FALSE,
+          'code' => 'not_updatable',
+          'message' => (string) $this->t('This value cannot be updated.'),
+        ], 400);
+      }
+      return new JsonResponse(['ok' => TRUE]);
+    });
   }
 
   // Private helpers.
@@ -419,12 +420,12 @@ final class MenuTreeController extends ControllerBase {
   /**
    * Runs an action while holding the menu's working-copy lock.
    *
-   * Serializes the actions that read or write a menu's working copy. Returns a
-   * 409 'busy' response without running the action when the lock cannot be
-   * acquired.
+   * Serializes the actions that read or write a menu's working copy, and the
+   * column updates that write its live links. Returns a 409 'busy' response
+   * without running the action when the lock cannot be acquired.
    *
    * @param string $menu_name
-   *   The menu whose working copy the action touches.
+   *   The menu whose links or working copy the action touches.
    * @param callable(): \Symfony\Component\HttpFoundation\JsonResponse $action
    *   The action to run.
    */

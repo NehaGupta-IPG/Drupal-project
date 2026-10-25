@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
- * Tests that record, Save and Cancel are serialized by the menu's lock.
+ * Tests that record, Save, Cancel and column updates share the menu's lock.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
@@ -142,6 +142,47 @@ final class MenuTreeControllerLockTest extends KernelTestBase {
     $this->assertTrue($result['ok'], $result['message'] ?? '');
     $this->assertSame($b, $plugin_manager->getDefinition($a)['parent']);
     $this->assertTrue($other_process->acquire(self::LOCK_NAME));
+  }
+
+  /**
+   * A column update is refused while another process holds the lock.
+   */
+  public function testColumnUpdateRefusesWhileLockHeld(): void {
+    [$a] = $this->ids;
+    $this->setCurrentUser($this->createUser(['administer menu', 'link to any page']));
+    $uuid = substr($a, strpos($a, ':') + 1);
+    $controller = MenuTreeController::create($this->container);
+    $menu = Menu::load('test');
+    $request = Request::create('/', 'POST', [], [], [], [], json_encode([
+      'column_id' => 'enabled',
+      'link_id' => $a,
+      'value' => FALSE,
+    ]));
+
+    $other_process = new DatabaseLockBackend($this->container->get('database'));
+    $this->assertTrue($other_process->acquire(self::LOCK_NAME));
+    $response = $controller->columnUpdate($menu, $request);
+    $this->assertSame(409, $response->getStatusCode());
+    $result = json_decode((string) $response->getContent(), TRUE);
+    $this->assertFalse($result['ok']);
+    $this->assertSame('busy', $result['code']);
+    $this->assertTrue((bool) $this->loadLink($uuid)->get('enabled')->value);
+
+    // Once the other process lets go, the update works and releases the lock.
+    $other_process->release(self::LOCK_NAME);
+    $result = json_decode((string) $controller->columnUpdate($menu, $request)->getContent(), TRUE);
+    $this->assertTrue($result['ok']);
+    $this->assertFalse((bool) $this->loadLink($uuid)->get('enabled')->value);
+    $this->assertTrue($other_process->acquire(self::LOCK_NAME));
+  }
+
+  /**
+   * Loads a fresh copy of a menu link content entity by UUID.
+   */
+  private function loadLink(string $uuid): MenuLinkContent {
+    $storage = $this->container->get('entity_type.manager')->getStorage('menu_link_content');
+    $storage->resetCache();
+    return array_values($storage->loadByProperties(['uuid' => $uuid]))[0];
   }
 
 }

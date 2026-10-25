@@ -7,10 +7,11 @@ namespace Drupal\menu_tree_ui\Service;
 use Drupal\Core\Lock\LockBackendInterface;
 
 /**
- * Serializes the requests that read or write a menu's working copy.
+ * Serializes working-copy requests and column updates for a menu.
  *
- * Recording a move, Save, Cancel and breaking the lock each hold this for the
- * menu while they run, so one cannot change the working copy under another.
+ * Recording a move, Save, Cancel, breaking the lock and column updates each
+ * hold this for the menu while they run, so one cannot change the working copy
+ * or the live links under another.
  *
  * @internal
  */
