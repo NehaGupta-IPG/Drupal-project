@@ -184,7 +184,12 @@ Events, all bubbling on the element:
 | `treegrid-reorder:needs-reload` | `{ reason }`; fired when the state is entered or gets stricter |
 
 A move whose redraw fails is recorded: `moved` fires with `refreshed: false`,
-then the tree enters the needs-reload state with the reason `refresh-failed`.
+then the tree enters the needs-reload state with the reason `refresh-failed`
+(the order is `moved`, then `needs-reload`). A stale refusal fires
+`needs-reload` with the reason `stale`, then `failed`.
+
+The element's row methods (`expandRow`, `collapseRow`, `refreshLevel` and the
+rest) need `element.ready` to have resolved; await it before calling them.
 The state only gets stricter: `stale` blocks every write and every move, the
 other reasons block moves only.
 

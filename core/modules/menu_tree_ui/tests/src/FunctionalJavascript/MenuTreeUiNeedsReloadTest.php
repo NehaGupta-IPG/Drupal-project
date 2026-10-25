@@ -69,6 +69,27 @@ final class MenuTreeUiNeedsReloadTest extends MenuTreeUiJavascriptTestBase {
   }
 
   /**
+   * The Reload button is described by the message.
+   */
+  public function testReloadButtonIsDescribedByTheMessage(): void {
+    \Drupal::state()->set(TreegridReorderTestController::REVISION, 'theirs');
+    $echo_url = Url::fromRoute('treegrid_reorder_test.echo')->toString();
+    $this->getSession()->executeScript(<<<JS
+      Drupal.treegridReorder.request(document.querySelector('drupal-treegrid'), '$echo_url', { body: {} });
+    JS);
+    $this->assertNotNull($this->assertSession()->waitForElementVisible('css', '[data-mtu-action="reload"]'));
+
+    $resolves = $this->getSession()->evaluateScript(<<<'JS'
+      (() => {
+        const button = document.querySelector('[data-mtu-action="reload"]');
+        return document.getElementById(button.getAttribute('aria-describedby'))
+          === document.querySelector('[data-mtu-needs-reload-message]');
+      })();
+    JS);
+    $this->assertTrue($resolves);
+  }
+
+  /**
    * A failed redraw shows the Reload control, and Save is still sent.
    */
   public function testRefreshFailureShowsReloadAndSaveStillSent(): void {

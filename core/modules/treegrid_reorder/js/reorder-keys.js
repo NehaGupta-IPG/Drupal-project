@@ -256,7 +256,6 @@
    */
   async function reorderSibling(row, direction, context) {
     if (!context.moveUrl()) {
-      // eslint-disable-next-line no-console
       console.warn('[treegrid-reorder] no move URL — move ignored.');
       return false;
     }

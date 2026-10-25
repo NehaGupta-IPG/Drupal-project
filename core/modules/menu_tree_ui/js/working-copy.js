@@ -27,7 +27,8 @@
    * Shows the needs-reload message and its Reload button.
    *
    * The message names the reason. Focus moves to the Reload button only if it
-   * was in the tree (or nowhere, because a refresh removed the focused row).
+   * was in the tree (or nowhere, because a refresh removed the focused row);
+   * otherwise the message is announced politely.
    *
    * @param {CustomEvent} event
    *   The treegrid-reorder:needs-reload event.
@@ -50,12 +51,15 @@
         'Links in this menu now have pending revisions, so it cannot be reordered. Reload the page to see which ones.',
       ),
     };
-    area.querySelector('[data-mtu-needs-reload-message]').textContent =
-      messages[event.detail.reason] ?? '';
+    const message = messages[event.detail.reason] ?? '';
+    area.querySelector('[data-mtu-needs-reload-message]').textContent = message;
     area.hidden = false;
     const active = document.activeElement;
     if (active === document.body || element.tree?.contains(active)) {
+      // The button's description (the message) is spoken with the focus.
       area.querySelector('[data-mtu-action="reload"]').focus();
+    } else {
+      Drupal.treegrid.announce(message, 'polite');
     }
   }
 

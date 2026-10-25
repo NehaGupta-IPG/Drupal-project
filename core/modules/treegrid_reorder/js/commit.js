@@ -196,7 +196,6 @@
     const movedId = row.dataset.id;
     const moveUrl = context.moveUrl();
     if (!moveUrl) {
-      // eslint-disable-next-line no-console
       console.warn('[treegrid-reorder] no move URL — move ignored.');
       return;
     }
@@ -339,8 +338,9 @@
    * Commits a drag or move-mode move as one unit in the element's queue.
    *
    * The host carries data-treegrid-reorder-moving from here until the unit
-   * ends, the time spent queued included. Tests wait on its absence to know
-   * all asynchronous refresh work is done; humans never see it.
+   * ends, the time spent queued included. The attribute is present while a
+   * move is queued, being sent or being followed by its level refreshes, and
+   * absent once all of that work is done.
    *
    * @param {HTMLTableRowElement} row
    *   The moved row.

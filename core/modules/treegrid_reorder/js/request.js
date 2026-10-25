@@ -256,7 +256,7 @@
         credentials: 'same-origin',
         body: body === undefined ? undefined : JSON.stringify(body),
       });
-    } catch (e) {
+    } catch {
       return {
         ok: false,
         status: 0,

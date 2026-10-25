@@ -9,8 +9,7 @@
  */
 
 ((Drupal, once) => {
-  const rr = Drupal.treegridReorder;
-  const { rowOf, setRowLevel } = Drupal.treegrid.treeNav;
+  const { setRowLevel } = Drupal.treegrid.treeNav;
 
   /**
    * Builds the expand toggle for a parent, or the spacer for a leaf.

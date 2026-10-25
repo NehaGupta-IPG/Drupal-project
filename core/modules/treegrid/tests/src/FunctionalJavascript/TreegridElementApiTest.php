@@ -699,7 +699,7 @@ final class TreegridElementApiTest extends WebDriverTestBase {
   }
 
   /**
-   * Clearing a row's children empties its level, and a later expand loads it again.
+   * Clearing a row's children empties its level; a later expand reloads it.
    */
   public function testClearChildrenForgetsLoadedLevel(): void {
     $this->openPage();
@@ -732,7 +732,7 @@ final class TreegridElementApiTest extends WebDriverTestBase {
   }
 
   /**
-   * Rows a refresh drops and rows a clear removes have their behaviors detached.
+   * Rows a refresh drops or a clear removes have their behaviors detached.
    */
   public function testRemovedRowsDetachTheirBehaviors(): void {
     $this->openPage();
@@ -915,7 +915,7 @@ final class TreegridElementApiTest extends WebDriverTestBase {
   }
 
   /**
-   * Runs a script that returns a promise and stores its value in window.apiTest.
+   * Runs a script returning a promise and stores its value on window.apiTest.
    *
    * @param string $script
    *   The script body; it must return a promise.

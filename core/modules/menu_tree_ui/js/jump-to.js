@@ -31,11 +31,9 @@
    */
   async function jumpTo(ctx, targetId, pathIds) {
     // Sequential expansion: each level must be open before the next is in DOM.
-    // eslint-disable-next-line no-restricted-syntax
     for (const ancestorId of pathIds) {
       const row = findRow(ctx.tree, ancestorId);
       if (!row) {
-        // eslint-disable-next-line no-console
         console.warn(
           '[menu-tree] jump aborted: ancestor not in DOM',
           ancestorId,
@@ -43,13 +41,11 @@
         return;
       }
       if (row.getAttribute('aria-expanded') !== 'true') {
-        // eslint-disable-next-line no-await-in-loop
         await ctx.element.expandRow(row);
       }
     }
     const target = findRow(ctx.tree, targetId);
     if (!target) {
-      // eslint-disable-next-line no-console
       console.warn(
         '[menu-tree] jump target not found after expansion',
         targetId,

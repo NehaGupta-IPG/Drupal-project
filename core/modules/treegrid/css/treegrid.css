@@ -13,7 +13,10 @@ drupal-treegrid {
   display: block;
 }
 
-/* Collapse marks a row's descendant run with data-treegrid-hidden; see expand.js. */
+/*
+ * Collapse marks a row's descendant run with data-treegrid-hidden; see
+ * expand.js.
+ */
 tr[role="row"][data-treegrid-hidden="true"] {
   display: none;
 }

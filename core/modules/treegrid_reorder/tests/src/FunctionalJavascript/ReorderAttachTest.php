@@ -80,7 +80,7 @@ final class ReorderAttachTest extends WebDriverTestBase {
   }
 
   /**
-   * Outside a move Space on the in-row checkbox toggles it and picks nothing up.
+   * Outside a move, Space on the in-row checkbox toggles it only.
    */
   public function testSpaceOnInRowControlTogglesIt(): void {
     $this->openPage();

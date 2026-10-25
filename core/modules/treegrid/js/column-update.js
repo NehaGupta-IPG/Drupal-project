@@ -59,7 +59,7 @@
         code: data?.code ?? null,
         message: data?.message ?? null,
       };
-    } catch (e) {
+    } catch {
       return { ok: false, status: 0, code: null, message: null };
     }
   }

@@ -6,6 +6,7 @@ namespace Drupal\menu_tree_ui\Service;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Sql\DefaultTableMapping;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -54,6 +55,10 @@ final class MenuTreeTitleReader {
       return $titles;
     }
     $mapping = $storage->getTableMapping();
+    // getDataTable() is not on TableMappingInterface.
+    if (!$mapping instanceof DefaultTableMapping) {
+      return $titles;
+    }
     $table = $mapping->getDataTable();
     if ($table === NULL) {
       return $titles;

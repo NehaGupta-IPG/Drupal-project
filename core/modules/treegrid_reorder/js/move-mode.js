@@ -402,7 +402,6 @@
      * @return {{prev: ?HTMLElement, min: number, max: number}}
      *   The row above the gap and the inclusive depth bounds.
      */
-    // eslint-disable-next-line class-methods-use-this
     gapBounds(gap, list) {
       const prev = list[gap - 1] ?? null;
       const next = list[gap] ?? null;
@@ -455,7 +454,6 @@
      * @return {?{gap: number, depth: number}}
      *   The cursor, or null when the target isn't a candidate row.
      */
-    // eslint-disable-next-line class-methods-use-this
     gapDepthForIntent(intent, list) {
       const i = list.indexOf(intent.target);
       if (i === -1) {

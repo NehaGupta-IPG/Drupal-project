@@ -3,16 +3,16 @@
  * Tree-walking and focus helpers for <drupal-treegrid>.
  *
  * The tree is a flat <table role="treegrid">: every row is a sibling <tr> in
- * one <tbody>, and hierarchy is read from aria-level (depth) plus data-parent-id
- * (linkage). The load-bearing primitive is descendantRows(): a row's descendants
- * are the contiguous run of <tr>s immediately after it, up to the first row at a
- * shallower-or-equal level. childRows()/lastDescendantRow() build on it. These
- * replace the structural :scope > ul[role="group"] queries the nested-list tree
- * used.
+ * one <tbody>, and hierarchy is read from aria-level (depth) plus
+ * data-parent-id (linkage). The load-bearing primitive is descendantRows(): a
+ * row's descendants are the contiguous run of <tr>s immediately after it, up to
+ * the first row at a shallower-or-equal level. childRows() and
+ * lastDescendantRow() build on it. These replace the structural
+ * :scope > ul[role="group"] queries the nested-list tree used.
  *
- * "Visible" means "in DOM and not flagged data-treegrid-hidden by a collapsed ancestor"
- * — not "in the viewport". Focus lives on the <tr>, which is the single roving
- * tab stop; the handle is a mouse and drag affordance only.
+ * "Visible" means "in DOM and not flagged data-treegrid-hidden by a collapsed
+ * ancestor" — not "in the viewport". Focus lives on the <tr>, which is the
+ * single roving tab stop; the handle is a mouse and drag affordance only.
  *
  * Exposes helpers on Drupal.treegrid.treeNav. No build step: this file is a
  * plain script loaded (in dependency order) by treegrid.libraries.yml.
@@ -167,9 +167,9 @@
   /**
    * Collects all visible rows in document order.
    *
-   * Visible = a body row not flagged data-treegrid-hidden (collapse sets that flag on a
-   * row's descendant run). O(n) over rows currently in DOM; because subtrees
-   * only enter the DOM after an expand, the working set stays small.
+   * Visible = a body row not flagged data-treegrid-hidden (collapse sets that
+   * flag on a row's descendant run). O(n) over rows currently in DOM; because
+   * subtrees only enter the DOM after an expand, the working set stays small.
    *
    * @param {HTMLTableElement} tree
    *   The root treegrid element.
@@ -327,8 +327,8 @@
    *
    * Focus goes on the <tr> itself, which carries the row's level, position, and
    * expanded state, so a screen reader announces the hierarchy. The previously
-   * focused row and its controls drop to tabindex="-1" while the new row and its
-   * controls become tabbable, so the tree stays one stop in the page's tab
+   * focused row and its controls drop to tabindex="-1" while the new row and
+   * its controls become tabbable, so the tree stays one stop in the page's tab
    * order. No-op on null so callers can pass null safely.
    *
    * @param {HTMLTableElement} tree

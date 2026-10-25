@@ -2,11 +2,11 @@
  * @file
  * Lazy-load + expand/collapse for the treegrid.
  *
- * Collapse flags a row's descendant run with data-treegrid-hidden (CSS hides them) and
- * leaves the rows in the DOM; re-expand clears the flag. There are no nested
- * <ul role="group"> elements — children are sibling <tr>s right after their
- * parent. "Is this subtree already loaded" is tracked by row.dataset.treegridLoaded
- * rather than the presence of a child <ul>.
+ * Collapse flags a row's descendant run with data-treegrid-hidden (CSS hides
+ * them) and leaves the rows in the DOM; re-expand clears the flag. There are no
+ * nested <ul role="group"> elements — children are sibling <tr>s right after
+ * their parent. "Is this subtree already loaded" is tracked by
+ * row.dataset.treegridLoaded rather than the presence of a child <ul>.
  *
  * Hands off row construction to an injected renderer and visibility tracking to
  * RowWindow. Exposes Drupal.treegrid.ExpandManager.
@@ -92,7 +92,8 @@
       this.buildRow = rowBuilder.buildRow;
       // Level loads waiting for or running in a queue unit, keyed by row id.
       this.queued = new Map();
-      // Level loads running inline in a unit, keyed by row id: { row, promise }.
+      // Level loads running inline in a unit, keyed by row id: the row and the
+      // load's promise.
       this.loading = new Map();
     }
 
@@ -379,7 +380,6 @@
      * @param {HTMLElement} row
      *   The parent row.
      */
-    // eslint-disable-next-line class-methods-use-this
     clearLoading(row) {
       delete row.dataset.treegridLoading;
       row.removeAttribute('aria-busy');
@@ -589,8 +589,9 @@
           if (Drupal.attachBehaviors) {
             Drupal.attachBehaviors(row);
           }
-          // Built rows are not the active row, so keep their controls out of the
-          // tab order (set after attachBehaviors, which upgrades the dropbutton).
+          // Built rows are not the active row, so keep their controls out of
+          // the tab order (set after attachBehaviors, which upgrades the
+          // dropbutton).
           setRowControlsActive(row, false);
           if (insertHidden) {
             row.dataset.treegridHidden = 'true';
@@ -667,14 +668,12 @@
           credentials: 'same-origin',
         });
         if (!response.ok) {
-          // eslint-disable-next-line no-console
           console.error('[treegrid] children fetch failed', response.status);
           return { items: null, status: response.status };
         }
         const data = await response.json();
         return { items: data.items, status: response.status };
       } catch (e) {
-        // eslint-disable-next-line no-console
         console.error('[treegrid] children fetch error', e);
         return { items: null, status: 0 };
       }
@@ -692,7 +691,8 @@
      *
      * @return {Promise<boolean>}
      *   True if the row ended up open with its children in. False when the
-     *   fetch failed, the level has no rows, or the row was collapsed meanwhile.
+     *   fetch failed, the level has no rows, or the row was collapsed
+     *   meanwhile.
      */
     async loadLevel(row, parentId, announce) {
       const isParent = row.dataset.hasChildren === 'true';
@@ -731,8 +731,9 @@
           if (Drupal.attachBehaviors) {
             Drupal.attachBehaviors(r);
           }
-          // Built rows are not the active row, so keep their controls out of the
-          // tab order (set after attachBehaviors, which upgrades the dropbutton).
+          // Built rows are not the active row, so keep their controls out of
+          // the tab order (set after attachBehaviors, which upgrades the
+          // dropbutton).
           setRowControlsActive(r, false);
           this.rowWindow?.observe(r);
         });

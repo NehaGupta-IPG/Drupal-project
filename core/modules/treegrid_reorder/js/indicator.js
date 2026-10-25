@@ -80,7 +80,6 @@
      * @param {object} intent
      *   The DropIntent.
      */
-    // eslint-disable-next-line class-methods-use-this
     announce(intent) {
       const title = rowTitle(intent.target);
       let message;

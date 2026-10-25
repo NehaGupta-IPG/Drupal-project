@@ -111,7 +111,7 @@
         if (!data.has_more) {
           teardown();
         }
-      } catch (e) {
+      } catch {
         teardown();
       } finally {
         loading = false;

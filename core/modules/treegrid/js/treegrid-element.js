@@ -280,7 +280,6 @@
       }
       const tree = this.querySelector(TREE);
       if (!tree) {
-        // eslint-disable-next-line no-console
         console.warn(
           '[drupal-treegrid] Missing <table role="treegrid"> — skipping upgrade.',
         );
@@ -288,7 +287,6 @@
       }
       state.tree = tree;
       if (!this.dataset.childrenUrl) {
-        // eslint-disable-next-line no-console
         console.warn(
           '[drupal-treegrid] Missing data-children-url — skipping upgrade.',
         );

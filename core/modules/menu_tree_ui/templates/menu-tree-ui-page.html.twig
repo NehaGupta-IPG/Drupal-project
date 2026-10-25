@@ -158,9 +158,9 @@
       role="status"
     >{{ 'You have unsaved changes.'|t }}</div>
     <div class="menu-tree-ui__save-error"></div>
-    <div class="menu-tree-ui__needs-reload messages messages--warning" role="alert" data-mtu-needs-reload hidden>
-      <span class="menu-tree-ui__needs-reload-message" data-mtu-needs-reload-message></span>
-      <button type="button" class="menu-tree-ui__reload button" data-mtu-action="reload">{{ 'Reload'|t }}</button>
+    <div class="menu-tree-ui__needs-reload messages messages--warning" data-mtu-needs-reload hidden>
+      <span class="menu-tree-ui__needs-reload-message" id="menu-tree-ui-needs-reload-message" data-mtu-needs-reload-message></span>
+      <button type="button" class="menu-tree-ui__reload button" aria-describedby="menu-tree-ui-needs-reload-message" data-mtu-action="reload">{{ 'Reload'|t }}</button>
     </div>
   </div>
 

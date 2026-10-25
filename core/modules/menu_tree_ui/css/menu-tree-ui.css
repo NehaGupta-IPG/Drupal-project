@@ -281,10 +281,13 @@
   justify-content: center;
   width: 1.875rem;
   height: 2.25rem;
-  cursor: grab;
   user-select: none;
   touch-action: none;
   color: var(--mtu-color-icon);
+}
+
+:where(.menu-tree-ui-row__handle) {
+  cursor: grab;
 }
 
 /*

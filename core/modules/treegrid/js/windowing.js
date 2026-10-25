@@ -3,10 +3,11 @@
  * IntersectionObserver-based row windowing for the treegrid.
  *
  * Strategy: every row is a normal DOM node, but rows far outside the viewport
- * get `data-treegrid-virtualized="true"`, which the CSS uses to hide the row content
- * (visibility:hidden) and reserve a fixed height. The tree is a real table, so
- * every row is laid out regardless — this layer skips the *paint* of far-off
- * rows, which is what keeps a level with thousands of siblings cheap to scroll.
+ * get `data-treegrid-virtualized="true"`, which the CSS uses to hide the row
+ * content (visibility:hidden) and reserve a fixed height. The tree is a real
+ * table, so every row is laid out regardless — this layer skips the *paint* of
+ * far-off rows, which is what keeps a level with thousands of siblings cheap to
+ * scroll.
  *
  * (An earlier version paired this with `content-visibility: auto` to also skip
  * off-screen layout, but containment is disallowed on table rows, so the table
@@ -85,12 +86,12 @@
     /**
      * Starts tracking a row's visibility.
      *
-     * Deliberately does not pre-stamp `data-treegrid-virtualized="true"`: the observer
-     * callback fires asynchronously (next layout pass), so a freshly-observed
-     * row would otherwise spend ~1 frame with its content hidden — visible to
-     * the user as an empty row, especially right after a drag-drop refresh
-     * re-observes every row in the affected groups. Let the observer be the
-     * single source of truth for the flag.
+     * Deliberately does not pre-stamp `data-treegrid-virtualized="true"`: the
+     * observer callback fires asynchronously (next layout pass), so a
+     * freshly-observed row would otherwise spend ~1 frame with its content
+     * hidden — visible to the user as an empty row, especially right after a
+     * drag-drop refresh re-observes every row in the affected groups. Let the
+     * observer be the single source of truth for the flag.
      *
      * @param {HTMLElement} row
      *   The row to observe.

@@ -66,6 +66,21 @@ final class MenuTreeUiShiftReorderTest extends MenuTreeUiJavascriptTestBase {
   }
 
   /**
+   * A move uses the token the page rendered and never fetches /session/token.
+   */
+  public function testMoveDoesNotFetchTheSessionToken(): void {
+    $this->dispatchShiftArrow('A', 'ArrowDown');
+    $this->assertJsCondition(
+      "!document.querySelector('.menu-tree-ui__unsaved').classList.contains('js-hide')",
+    );
+
+    $requests = $this->getSession()->evaluateScript(
+      "return performance.getEntriesByType('resource').filter((entry) => entry.name.includes('/session/token')).length;",
+    );
+    $this->assertSame(0, $requests);
+  }
+
+  /**
    * The unsaved notice follows the move response's dirty flag.
    */
   public function testUnsavedNoticeFollowsDirtyFlag(): void {

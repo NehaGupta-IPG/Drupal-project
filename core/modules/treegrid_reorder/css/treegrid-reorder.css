@@ -73,6 +73,11 @@
   }
 }
 
+/* A closed hand on the handle of the row being dragged. */
+:where(tr[data-treegrid-reorder-dragging] [data-treegrid-reorder-handle]) {
+  cursor: grabbing;
+}
+
 /* A busy pointer on the handles while a move is unfinished. */
 :where([data-treegrid-reorder-moving] [data-treegrid-reorder-handle]) {
   cursor: progress;
