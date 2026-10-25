@@ -39,3 +39,17 @@
 .reorder-test-flash {
   background: yellow;
 }
+
+.reorder-test-toggle,
+.reorder-test-spacer {
+  display: inline-block;
+  min-width: 1rem;
+  min-height: 1rem;
+  margin-inline-end: 0.5rem;
+  vertical-align: middle;
+}
+
+.reorder-test-field {
+  display: block;
+  margin-block: 0.5rem;
+}

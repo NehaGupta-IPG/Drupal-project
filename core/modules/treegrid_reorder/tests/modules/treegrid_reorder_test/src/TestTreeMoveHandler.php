@@ -9,28 +9,71 @@ use Drupal\treegrid_reorder\MoveIntent;
 use Drupal\treegrid_reorder\TreeMoveHandlerInterface;
 
 /**
- * A flat-tree move handler backing the reorder gesture test.
+ * A move handler for the nested tree that backs the reorder tests.
  *
- * The "tree" is a single flat list of item IDs kept in State, so there is no
- * ancestry and no domain constraint to enforce — the universal self-target and
- * cycle checks in TreeReorderManager are all that gate a move. applyMove()
- * rewrites the ordered list, which the page and children endpoints read back.
+ * The tree is an ordered list of items kept in State. Each item has an id, a
+ * parent id ('' for the top level) and a movable flag (TRUE, FALSE, or NULL for
+ * "no opinion"). The order of the list gives the order among siblings, so a
+ * level is the items with that parent, in list order. applyMove() rewrites the
+ * list, which the page and children endpoints read back.
  */
 final class TestTreeMoveHandler implements TreeMoveHandlerInterface {
 
   /**
-   * The State key holding the ordered list of item IDs.
+   * The State key holding the tree.
    */
-  public const STATE_KEY = 'treegrid_reorder_test.order';
+  public const STATE_KEY = 'treegrid_reorder_test.tree';
 
   /**
-   * The default ordered list when nothing has been moved yet.
+   * The tree when nothing has been moved yet.
    */
-  public const DEFAULT_ORDER = ['1', '2', '3', '4'];
+  public const DEFAULT_TREE = [
+    ['id' => '1', 'parent' => '', 'movable' => TRUE],
+    ['id' => '2', 'parent' => '', 'movable' => TRUE],
+    ['id' => '2a', 'parent' => '2', 'movable' => TRUE],
+    ['id' => '2b', 'parent' => '2', 'movable' => TRUE],
+    ['id' => '2b1', 'parent' => '2b', 'movable' => TRUE],
+    ['id' => '2b2', 'parent' => '2b', 'movable' => TRUE],
+    ['id' => '2c', 'parent' => '2', 'movable' => TRUE],
+    ['id' => '3', 'parent' => '', 'movable' => TRUE],
+    ['id' => '3a', 'parent' => '3', 'movable' => TRUE],
+    ['id' => '3b', 'parent' => '3', 'movable' => FALSE],
+    ['id' => '3c', 'parent' => '3', 'movable' => NULL],
+    ['id' => '4', 'parent' => '', 'movable' => TRUE],
+  ];
 
   public function __construct(
     private readonly StateInterface $state,
   ) {}
+
+  /**
+   * The whole tree as an ordered list of items.
+   *
+   * @return array<int, array{id: string, parent: string, movable: ?bool}>
+   *   The items.
+   */
+  public function items(): array {
+    return $this->state->get(self::STATE_KEY, self::DEFAULT_TREE);
+  }
+
+  /**
+   * The ids of one level, in order.
+   *
+   * @param string $parent_id
+   *   The parent id, or '' for the top level.
+   *
+   * @return string[]
+   *   The ids.
+   */
+  public function levelIds(string $parent_id): array {
+    $ids = [];
+    foreach ($this->items() as $item) {
+      if ($item['parent'] === $parent_id) {
+        $ids[] = $item['id'];
+      }
+    }
+    return $ids;
+  }
 
   /**
    * {@inheritdoc}
@@ -43,33 +86,49 @@ final class TestTreeMoveHandler implements TreeMoveHandlerInterface {
    * {@inheritdoc}
    */
   public function getAncestorIds(string $tree_id, string $parent_id): array {
-    return [];
+    $parents = [];
+    foreach ($this->items() as $item) {
+      $parents[$item['id']] = $item['parent'];
+    }
+    $ancestors = [];
+    $current = $parent_id;
+    while ($current !== '' && isset($parents[$current]) && !in_array($current, $ancestors, TRUE)) {
+      $ancestors[] = $current;
+      $current = $parents[$current];
+    }
+    return array_reverse($ancestors);
   }
 
   /**
    * {@inheritdoc}
    */
   public function applyMove(string $tree_id, MoveIntent $intent): void {
-    $order = $this->state->get(self::STATE_KEY, self::DEFAULT_ORDER);
-    $order = array_values(array_filter(
-      $order,
-      static fn(string $id): bool => $id !== $intent->id,
-    ));
-
-    if ($intent->beforeId === NULL) {
-      $order[] = $intent->id;
-    }
-    else {
-      $pos = array_search($intent->beforeId, $order, TRUE);
-      if ($pos === FALSE) {
-        $order[] = $intent->id;
+    $moved = NULL;
+    $rest = [];
+    foreach ($this->items() as $item) {
+      if ($item['id'] === $intent->id) {
+        $moved = $item;
       }
       else {
-        array_splice($order, $pos, 0, [$intent->id]);
+        $rest[] = $item;
       }
     }
+    if ($moved === NULL) {
+      return;
+    }
+    $moved['parent'] = $intent->newParent;
 
-    $this->state->set(self::STATE_KEY, $order);
+    $position = count($rest);
+    if ($intent->beforeId !== NULL) {
+      foreach ($rest as $index => $item) {
+        if ($item['id'] === $intent->beforeId && $item['parent'] === $intent->newParent) {
+          $position = $index;
+          break;
+        }
+      }
+    }
+    array_splice($rest, $position, 0, [$moved]);
+    $this->state->set(self::STATE_KEY, $rest);
   }
 
 }

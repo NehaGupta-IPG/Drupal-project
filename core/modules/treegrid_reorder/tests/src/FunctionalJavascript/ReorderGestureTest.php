@@ -13,9 +13,10 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Exercises the reorder gestures within treegrid_reorder itself.
  *
- * The treegrid_reorder_test module is a minimal consumer (a flat list of four
- * movable rows backed by State), so this covers the generic drag, keyboard
- * move-mode, and Shift+Arrow gesture code with no other consuming module.
+ * The treegrid_reorder_test module is a minimal consumer (a nested tree of
+ * movable rows backed by State, with four top-level rows), so this covers the
+ * generic drag, keyboard move-mode, and Shift+Arrow gesture code with no other
+ * consuming module.
  * Each gesture is checked for both its visible DOM effect and that the move
  * reached storage through TreeReorderManager + the test handler. The move-mode
  * lifecycle (grab, cancel, no-op drop) and a keyboard move to a boundary
@@ -338,26 +339,23 @@ final class ReorderGestureTest extends WebDriverTestBase {
   }
 
   /**
-   * Asserts the order persisted to State, polling for the async move POST.
+   * Asserts the top-level order persisted to State, polling for the move POST.
    *
    * @param string[] $expected
-   *   The expected ordered list of item IDs.
+   *   The expected ordered list of top-level item IDs.
    */
   private function assertPersistedOrder(array $expected): void {
     $state = \Drupal::state();
+    $handler = new TestTreeMoveHandler($state);
     for ($i = 0; $i < 50; $i++) {
       $state->resetCache();
-      if ($state->get(TestTreeMoveHandler::STATE_KEY, TestTreeMoveHandler::DEFAULT_ORDER) === $expected) {
+      if ($handler->levelIds('') === $expected) {
         return;
       }
       usleep(100000);
     }
     $state->resetCache();
-    $this->assertSame(
-      $expected,
-      $state->get(TestTreeMoveHandler::STATE_KEY, TestTreeMoveHandler::DEFAULT_ORDER),
-      'The reorder persisted to State.',
-    );
+    $this->assertSame($expected, $handler->levelIds(''), 'The reorder persisted to State.');
   }
 
 }
