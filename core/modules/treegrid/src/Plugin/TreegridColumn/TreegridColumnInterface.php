@@ -48,7 +48,6 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
    *   'value'       => bool,
    *   'label'       => string,   // aria-label for the control
    *   'interactive' => bool,     // FALSE → render disabled
-   *   'link_id'     => string,   // plugin ID sent back on update
    * ]
    * @endcode
    *
@@ -64,7 +63,7 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
   public function getCellData(object $context): array;
 
   /**
-   * Applies a value change to the row identified by $link_id.
+   * Applies a value change to the row identified by $row_id.
    *
    * Called by the consumer's column-update controller when the client POSTs an
    * interactive cell change. treegrid defines this contract but ships no route
@@ -74,10 +73,10 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
    * Implementations should also return FALSE when the row is not one this
    * column can update.
    *
-   * @param string $link_id
-   *   The row identifier, as reported in the cell's 'link_id' key. Its meaning
-   *   (e.g. an entity ID or plugin ID) is defined by the consumer module that
-   *   registers the column; treegrid passes it through opaquely.
+   * @param string $row_id
+   *   The row identifier, the row's data-id. Its meaning (e.g. an entity ID or
+   *   plugin ID) is defined by the consumer module that registers the column;
+   *   treegrid passes it through opaquely.
    * @param mixed $value
    *   The new value sent from the client (e.g. TRUE/FALSE for a toggle).
    *
@@ -85,6 +84,6 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
    *   TRUE if the update was applied, FALSE if this column is read-only or
    *   the row is not supported by this column.
    */
-  public function handleUpdate(string $link_id, mixed $value): bool;
+  public function handleUpdate(string $row_id, mixed $value): bool;
 
 }

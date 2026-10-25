@@ -351,6 +351,7 @@
       const state = internals.get(this);
       state.tree.addEventListener('click', state.onClick);
       state.tree.addEventListener('keydown', state.onKeyDown);
+      state.detachColumnUpdates = Drupal.treegrid.attachColumnUpdates(this);
     }
 
     /**
@@ -360,6 +361,8 @@
       const state = internals.get(this);
       state.tree?.removeEventListener('click', state.onClick);
       state.tree?.removeEventListener('keydown', state.onKeyDown);
+      state.detachColumnUpdates?.();
+      state.detachColumnUpdates = null;
     }
 
     /**

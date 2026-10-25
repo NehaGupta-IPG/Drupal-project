@@ -142,12 +142,12 @@ final class MenuTreeController extends ControllerBase {
       ])->toString(),
       '#search_action' => Url::fromRoute('menu_tree_ui.search', ['menu' => $menu_name])->toString(),
       '#children_action' => Url::fromRoute('menu_tree_ui.children', ['menu' => $menu_name])->toString(),
+      '#column_update_url' => Url::fromRoute('menu_tree_ui.column_update', ['menu' => $menu_name])->toString(),
       '#attached' => [
         'library' => ['menu_tree_ui/menu_tree_ui'],
         'drupalSettings' => [
           'menuTreeUi' => [
             'moveUrl' => Url::fromRoute('menu_tree_ui.move', ['menu' => $menu_name])->toString(),
-            'columnUpdateUrl' => Url::fromRoute('menu_tree_ui.column_update', ['menu' => $menu_name])->toString(),
             'saveUrl' => Url::fromRoute('menu_tree_ui.save', ['menu' => $menu_name])->toString(),
             'cancelUrl' => Url::fromRoute('menu_tree_ui.cancel', ['menu' => $menu_name])->toString(),
           ],
@@ -378,7 +378,8 @@ final class MenuTreeController extends ControllerBase {
   /**
    * Applies an interactive column update and returns the outcome as JSON.
    *
-   * Body shape: { column_id, link_id, value }.
+   * Body shape: { column_id, row_id, value }. The column and row IDs must be
+   * non-empty strings and the value a boolean.
    */
   public function columnUpdate(MenuInterface $menu, Request $request): JsonResponse {
     $payload = json_decode((string) $request->getContent(), TRUE);
@@ -390,15 +391,15 @@ final class MenuTreeController extends ControllerBase {
       ], 400);
     }
 
-    $column_id = (string) ($payload['column_id'] ?? '');
-    $link_id = (string) ($payload['link_id'] ?? '');
+    $column_id = $payload['column_id'] ?? NULL;
+    $row_id = $payload['row_id'] ?? NULL;
     $value = $payload['value'] ?? NULL;
 
-    if ($column_id === '' || $link_id === '') {
+    if (!is_string($column_id) || $column_id === '' || !is_string($row_id) || $row_id === '' || !is_bool($value)) {
       return new JsonResponse([
         'ok' => FALSE,
         'code' => 'bad_request',
-        'message' => (string) $this->t('Missing column_id or link_id.'),
+        'message' => (string) $this->t('Missing or invalid column_id, row_id or value.'),
       ], 400);
     }
     if (!$this->columnManager->hasDefinition($column_id)) {
@@ -409,7 +410,7 @@ final class MenuTreeController extends ControllerBase {
       ], 400);
     }
 
-    $link_definition = $this->menuLinkManager->getDefinition($link_id, FALSE);
+    $link_definition = $this->menuLinkManager->getDefinition($row_id, FALSE);
     if (!$link_definition || $link_definition['menu_name'] !== $menu->id()) {
       // Access is checked for the route's menu only; without this, a link ID
       // from another menu would let a column update reach it.
@@ -417,8 +418,8 @@ final class MenuTreeController extends ControllerBase {
     }
 
     $column = $this->columnManager->createInstance($column_id);
-    return $this->withMenuLock($menu->id(), function () use ($column, $link_id, $value): JsonResponse {
-      if (!$column->handleUpdate($link_id, $value)) {
+    return $this->withMenuLock($menu->id(), function () use ($column, $row_id, $value): JsonResponse {
+      if (!$column->handleUpdate($row_id, $value)) {
         return new JsonResponse([
           'ok' => FALSE,
           'code' => 'not_updatable',

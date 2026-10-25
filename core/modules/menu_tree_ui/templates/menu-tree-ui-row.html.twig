@@ -116,7 +116,6 @@
           {% if not cell.interactive %}disabled{% endif %}
           aria-label="{{ cell.label }}"
           data-column-id="{{ col_id }}"
-          data-link-id="{{ plugin_id }}"
           data-treegrid-control
         >
       {% elseif cell.type == 'markup' %}

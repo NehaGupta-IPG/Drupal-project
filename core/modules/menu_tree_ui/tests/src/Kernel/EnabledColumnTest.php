@@ -91,7 +91,6 @@ final class EnabledColumnTest extends KernelTestBase {
     $this->assertIsString($cell['label']);
     $this->assertNotEmpty($cell['label']);
     $this->assertTrue($cell['interactive']);
-    $this->assertStringStartsWith('menu_link_content:', $cell['link_id']);
   }
 
   /**
@@ -116,7 +115,6 @@ final class EnabledColumnTest extends KernelTestBase {
     $cell = $this->column->getCellData(new MenuTreeRowContext($element, NULL));
 
     $this->assertTrue($cell['interactive']);
-    $this->assertSame('user.logout', $cell['link_id']);
   }
 
   /**

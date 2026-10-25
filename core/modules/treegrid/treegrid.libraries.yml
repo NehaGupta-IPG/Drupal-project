@@ -5,6 +5,7 @@ treegrid:
     js/cells.js: {}
     js/queue.js: {}
     js/csrf-token.js: {}
+    js/column-update.js: {}
     js/keyboard.js: {}
     js/expand.js: {}
     js/windowing.js: {}

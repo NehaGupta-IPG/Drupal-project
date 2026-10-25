@@ -12,3 +12,12 @@ treegrid_test_ui.children:
     _controller: 'Drupal\treegrid_test_ui\Controller\TreegridTestUiController::children'
   requirements:
     _access: 'TRUE'
+
+treegrid_test_ui.column_update:
+  path: '/treegrid-test-ui/column-update'
+  defaults:
+    _controller: 'Drupal\treegrid_test_ui\Controller\TreegridTestUiController::columnUpdate'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+    _csrf_request_header_token: 'TRUE'

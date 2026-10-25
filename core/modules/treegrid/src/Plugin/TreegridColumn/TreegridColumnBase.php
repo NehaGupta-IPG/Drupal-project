@@ -37,7 +37,7 @@ abstract class TreegridColumnBase extends PluginBase implements TreegridColumnIn
    *
    * Read-only by default. Interactive columns must override this.
    */
-  public function handleUpdate(string $link_id, mixed $value): bool {
+  public function handleUpdate(string $row_id, mixed $value): bool {
     return FALSE;
   }
 

@@ -155,7 +155,7 @@ final class MenuTreeControllerLockTest extends KernelTestBase {
     $menu = Menu::load('test');
     $request = Request::create('/', 'POST', [], [], [], [], json_encode([
       'column_id' => 'enabled',
-      'link_id' => $a,
+      'row_id' => $a,
       'value' => FALSE,
     ]));
 

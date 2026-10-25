@@ -8,14 +8,14 @@
  * This file wires the menu-specific features onto an upgraded element:
  *  - reorder: pointer drag, the keyboard grab/select move mode, Shift+Arrow
  *    sibling reorder, and the single-pointer commit (tap the handle);
- *  - the column switches;
  *  - search jump-to and dismiss;
  *  - the "Keyboard commands" dialog.
  *
  * Features attach through the element's interaction-handler registry
  * (addClickHandler / addKeyHandler) and its lifecycle. The handlers run ahead of
  * the element's built-in navigation and return true to consume an event, which
- * preserves the original dispatch order (move mode, then columns, then nav).
+ * preserves the original dispatch order (move mode, then nav). The column
+ * switches are persisted by treegrid's column-update client.
  */
 
 ((Drupal, drupalSettings, once) => {
@@ -23,10 +23,8 @@
   const ns = Drupal.menuTreeUi;
   const rr = Drupal.treegridReorder;
   const { rowOf } = Drupal.treegrid.treeNav;
-  const { announce } = Drupal.treegrid;
 
   const ROW = 'tr[role="row"]';
-  const COLUMN_TOGGLE = '.treegrid-cell-checkbox';
   // Elements that must keep their native/authored key behavior instead of the
   // row's, e.g. Enter on the title link or Space on the Enabled checkbox. The
   // expand toggle is exempted: it is a <button> that legitimately takes focus
@@ -108,59 +106,6 @@
   };
 
   /**
-   * Persists a column checkbox change, reverting it if the server rejects it.
-   *
-   * The click is not prevented, so the browser has already flipped the checkbox
-   * by the time this runs; the new value is read from .checked and only rolled
-   * back on failure.
-   *
-   * @param {HTMLInputElement} checkbox
-   *   The toggled checkbox.
-   * @param {string} url
-   *   The column-update endpoint.
-   * @param {function(): (string|undefined)} getToken
-   *   Returns the current CSRF token.
-   *
-   * @return {Promise<void>}
-   *   Resolves once the update round-trips (or is reverted).
-   */
-  async function handleColumnToggle(checkbox, url, getToken) {
-    if (!url) {
-      return;
-    }
-    const { columnId, linkId } = checkbox.dataset;
-    if (!columnId || !linkId) {
-      return;
-    }
-
-    const newValue = checkbox.checked;
-
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': getToken() ?? '',
-        },
-        credentials: 'same-origin',
-        body: JSON.stringify({
-          column_id: columnId,
-          link_id: linkId,
-          value: newValue,
-        }),
-      });
-      const data = await response.json();
-      if (!data.ok) {
-        checkbox.checked = !newValue;
-        announce(data.message ?? Drupal.t('Update failed.'), 'assertive');
-      }
-    } catch (e) {
-      checkbox.checked = !newValue;
-      announce(Drupal.t('Update failed.'), 'assertive');
-    }
-  }
-
-  /**
    * Wires menu_tree_ui's features onto an upgraded <drupal-treegrid>.
    *
    * @param {HTMLElement} element
@@ -169,7 +114,7 @@
   function wireFeatures(element) {
     const { tree } = element;
     const settings = drupalSettings.menuTreeUi ?? {};
-    const { moveUrl, columnUpdateUrl } = settings;
+    const { moveUrl } = settings;
     const container = element.closest('.menu-tree-ui');
 
     // Keep the keyboard cursor clear of the sticky action bar: when focusRow()
@@ -232,16 +177,10 @@
       moveMode.tryGrab(row);
     };
 
-    // Move-mode pointer + column switch, ahead of the element's built-in nav.
+    // Move-mode pointer, ahead of the element's built-in nav.
     element.addClickHandler((event) => {
       if (moveMode?.isActive() && moveMode.handlePointer(event)) {
         event.preventDefault();
-        return true;
-      }
-      const columnToggle = event.target.closest(COLUMN_TOGGLE);
-      if (columnToggle) {
-        // Let the native checkbox flip (no preventDefault), then persist.
-        handleColumnToggle(columnToggle, columnUpdateUrl, getToken);
         return true;
       }
       return false;
@@ -359,8 +298,8 @@
     addPageListeners();
 
     // Drag needs the CSRF token; defer the controller until it resolves, keeping
-    // the token out of URLs (and access logs). move-mode and the column toggle
-    // read it lazily through getToken().
+    // the token out of URLs (and access logs). move-mode reads it lazily
+    // through getToken().
     Drupal.treegrid
       .csrfToken(element)
       .then((token) => {

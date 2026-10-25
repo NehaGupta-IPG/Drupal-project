@@ -149,10 +149,10 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
   }
 
   /**
-   * A valid JSON body with missing column_id/link_id must return 400.
+   * A valid JSON body with missing column_id/row_id must return 400.
    */
   public function testMissingFieldsReturns400(): void {
-    $request = $this->jsonRequest(['column_id' => '', 'link_id' => '', 'value' => TRUE]);
+    $request = $this->jsonRequest(['column_id' => '', 'row_id' => '', 'value' => TRUE]);
     $response = $this->controller->columnUpdate($this->menu, $request);
     $data = $this->decodeJson($response);
 
@@ -161,12 +161,43 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
   }
 
   /**
+   * Wrongly typed fields must return 400 and write nothing.
+   */
+  public function testWronglyTypedFieldsReturn400WithoutWriting(): void {
+    $entity = MenuLinkContent::create([
+      'title' => 'Test link',
+      'link' => ['uri' => 'internal:/'],
+      'menu_name' => 'main',
+      'enabled' => FALSE,
+    ]);
+    $entity->save();
+    $plugin_id = 'menu_link_content:' . $entity->uuid();
+
+    $bodies = [
+      'non-boolean value' => ['column_id' => 'enabled', 'row_id' => $plugin_id, 'value' => 'yes'],
+      'integer value' => ['column_id' => 'enabled', 'row_id' => $plugin_id, 'value' => 1],
+      'missing value' => ['column_id' => 'enabled', 'row_id' => $plugin_id],
+      'non-string column_id' => ['column_id' => 5, 'row_id' => $plugin_id, 'value' => TRUE],
+      'non-string row_id' => ['column_id' => 'enabled', 'row_id' => [$plugin_id], 'value' => TRUE],
+    ];
+    foreach ($bodies as $description => $body) {
+      $response = $this->controller->columnUpdate($this->menu, $this->jsonRequest($body));
+      $this->assertSame(400, $response->getStatusCode(), $description);
+      $this->assertSame('bad_request', $this->decodeJson($response)['code'], $description);
+    }
+
+    $storage = $this->container->get('entity_type.manager')->getStorage('menu_link_content');
+    $storage->resetCache([$entity->id()]);
+    $this->assertFalse((bool) $storage->load($entity->id())->get('enabled')->value);
+  }
+
+  /**
    * An unknown column ID must return 400 with code 'unknown_column'.
    */
   public function testUnknownColumnIdReturns400(): void {
     $request = $this->jsonRequest([
       'column_id' => 'nonexistent_column_xyz',
-      'link_id' => 'menu_link_content:some-uuid',
+      'row_id' => 'menu_link_content:some-uuid',
       'value' => TRUE,
     ]);
     $response = $this->controller->columnUpdate($this->menu, $request);
@@ -186,7 +217,7 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
     // 'system.admin' is a static link that belongs to the 'admin' menu.
     $request = $this->jsonRequest([
       'column_id' => 'enabled',
-      'link_id' => 'system.admin',
+      'row_id' => 'system.admin',
       'value' => TRUE,
     ]);
     $response = $this->controller->columnUpdate($this->menu, $request);
@@ -207,7 +238,7 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
 
     $request = $this->jsonRequest([
       'column_id' => 'enabled',
-      'link_id' => 'system.admin',
+      'row_id' => 'system.admin',
       'value' => FALSE,
     ]);
     $response = $this->controller->columnUpdate($this->menu, $request);
@@ -235,7 +266,7 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
 
     $request = $this->jsonRequest([
       'column_id' => 'enabled',
-      'link_id' => 'menu_link_content:' . $entity->uuid(),
+      'row_id' => 'menu_link_content:' . $entity->uuid(),
       'value' => FALSE,
     ]);
     $response = $this->controller->columnUpdate($this->menu, $request);
@@ -263,7 +294,7 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
 
     $request = $this->jsonRequest([
       'column_id' => 'enabled',
-      'link_id' => 'menu_link_content:' . $entity->uuid(),
+      'row_id' => 'menu_link_content:' . $entity->uuid(),
       'value' => FALSE,
     ]);
     $response = $this->controller->columnUpdate($this->menu, $request);
@@ -292,7 +323,7 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
     $plugin_id = 'menu_link_content:' . $entity->uuid();
     $request = $this->jsonRequest([
       'column_id' => 'enabled',
-      'link_id' => $plugin_id,
+      'row_id' => $plugin_id,
       'value' => TRUE,
     ]);
     $response = $this->controller->columnUpdate($this->menu, $request);
@@ -315,7 +346,7 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
   public function testUnknownUuidReturns404(): void {
     $request = $this->jsonRequest([
       'column_id' => 'enabled',
-      'link_id' => 'menu_link_content:00000000-0000-0000-0000-000000000000',
+      'row_id' => 'menu_link_content:00000000-0000-0000-0000-000000000000',
       'value' => TRUE,
     ]);
     $response = $this->controller->columnUpdate($this->menu, $request);

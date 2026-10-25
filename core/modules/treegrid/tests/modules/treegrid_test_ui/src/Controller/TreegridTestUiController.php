@@ -8,6 +8,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
+use Drupal\treegrid\TreegridCsrfToken;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -40,6 +41,26 @@ final class TreegridTestUiController extends ControllerBase {
   public const CHILDREN_FAIL_KEY = 'treegrid_test_ui.children_fail';
 
   /**
+   * The State key holding how a column update is refused, if it is.
+   *
+   * An array with 'code' and, optionally, 'status' (default 400).
+   */
+  public const COLUMN_UPDATE_FAIL_KEY = 'treegrid_test_ui.column_update_fail';
+
+  /**
+   * The State key holding the milliseconds the column-update endpoint waits.
+   */
+  public const COLUMN_UPDATE_DELAY_KEY = 'treegrid_test_ui.column_update_delay';
+
+  /**
+   * The State key holding the column updates received, oldest first.
+   *
+   * Each entry is an array with the decoded 'body' and a 'token' flag that is
+   * TRUE when the request carried the X-CSRF-Token header.
+   */
+  public const COLUMN_UPDATES_KEY = 'treegrid_test_ui.column_updates';
+
+  /**
    * The tree when State holds none.
    */
   public const CHILDREN = [
@@ -60,18 +81,52 @@ final class TreegridTestUiController extends ControllerBase {
       $rows .= $this->renderRow($this->item($id), $i + 1, $set_size);
     }
 
-    $children_url = Url::fromRoute('treegrid_test_ui.children')->toString();
-    $html = '<drupal-treegrid data-provider="treegrid_test_ui" data-children-url="'
-      . Html::escape($children_url) . '" data-auto-expand-threshold="0">'
-      . '<table role="treegrid"><tbody>' . $rows . '</tbody></table></drupal-treegrid>';
-
-    return [
-      '#markup' => Markup::create($html),
+    $build = [
       '#attached' => [
         'library' => ['treegrid_test_ui/treegrid_test_ui'],
       ],
       '#cache' => ['max-age' => 0],
     ];
+    $children_url = Url::fromRoute('treegrid_test_ui.children')->toString();
+    $update_url = Url::fromRoute('treegrid_test_ui.column_update')->toString();
+    $html = '<drupal-treegrid data-provider="treegrid_test_ui" data-children-url="'
+      . Html::escape($children_url) . '" data-auto-expand-threshold="0"'
+      . ' data-treegrid-column-update-url="' . Html::escape($update_url) . '"'
+      . ' data-treegrid-csrf-token="' . TreegridCsrfToken::addPlaceholder($build) . '">'
+      . '<table role="treegrid"><tbody>' . $rows . '</tbody></table></drupal-treegrid>';
+
+    $build['#markup'] = Markup::create($html);
+    return $build;
+  }
+
+  /**
+   * Records a column update, or refuses it as State says.
+   */
+  public function columnUpdate(Request $request): JsonResponse {
+    $delay = (int) $this->state()->get(self::COLUMN_UPDATE_DELAY_KEY, 0);
+    if ($delay > 0) {
+      usleep($delay * 1000);
+    }
+    $body = json_decode((string) $request->getContent(), TRUE);
+    $updates = $this->state()->get(self::COLUMN_UPDATES_KEY, []);
+    $updates[] = ['body' => $body, 'token' => $request->headers->has('X-CSRF-Token')];
+    $this->state()->set(self::COLUMN_UPDATES_KEY, $updates);
+
+    $fail = $this->state()->get(self::COLUMN_UPDATE_FAIL_KEY);
+    if (is_array($fail)) {
+      return new JsonResponse(
+        ['ok' => FALSE, 'code' => $fail['code'] ?? 'failed', 'message' => 'Update refused.'],
+        (int) ($fail['status'] ?? 400),
+      );
+    }
+
+    $column_id = is_array($body) ? (string) ($body['column_id'] ?? '') : '';
+    $row_id = is_array($body) ? (string) ($body['row_id'] ?? '') : '';
+    $manager = \Drupal::service('plugin.manager.treegrid_column');
+    if ($manager->hasDefinition($column_id) && !$manager->createInstance($column_id)->handleUpdate($row_id, $body['value'] ?? NULL)) {
+      return new JsonResponse(['ok' => FALSE, 'code' => 'not_updatable'], 400);
+    }
+    return new JsonResponse(['ok' => TRUE]);
   }
 
   /**
@@ -140,7 +195,6 @@ final class TreegridTestUiController extends ControllerBase {
           'value' => $checked,
           'label' => 'Toggle ' . $id,
           'interactive' => TRUE,
-          'link_id' => $id,
         ],
         'mark' => [
           'type' => 'markup',
@@ -174,7 +228,7 @@ final class TreegridTestUiController extends ControllerBase {
 
     $check = $item['columns']['check'];
     $checkbox = '<input type="checkbox" class="treegrid-cell-checkbox" aria-label="'
-      . Html::escape($check['label']) . '" data-column-id="check" data-link-id="' . $id . '"'
+      . Html::escape($check['label']) . '" data-column-id="check" data-treegrid-control'
       . ($check['value'] ? ' checked' : '') . '>';
     $markup = '<div class="treegrid-cell-markup">' . $item['columns']['mark']['html'] . '</div>';
 

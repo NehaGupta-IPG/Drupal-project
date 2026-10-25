@@ -10,9 +10,10 @@
  *
  * treegrid ships:
  *  - 'checkbox': a boolean control. Non-interactive cells render disabled;
- *    interactive ones carry data-column-id / data-link-id so the consumer's
- *    column-update endpoint can persist the change — treegrid ships the cell
- *    type, not the route or controller.
+ *    interactive ones carry data-column-id, and the column-update client (see
+ *    column-update.js) posts a change to the element's
+ *    data-treegrid-column-update-url — treegrid ships the cell type and the
+ *    client, not the route or controller.
  *  - 'markup': an opaque server-rendered HTML string, injected verbatim — the
  *    escape hatch for cells a client renderer cannot reproduce (e.g. a themed
  *    dropbutton). It MUST be trusted server-rendered markup: it is written via
@@ -58,9 +59,9 @@
   };
 
   // Boolean control. Native checkbox: the browser owns the checked state and
-  // its keyboard/AT behavior, so the consumer's handler only reads .checked
+  // its keyboard/AT behavior, so the column-update client only reads .checked
   // and persists.
-  Drupal.treegrid.registerCellRenderer('checkbox', (cell, { colId, rowId }) => {
+  Drupal.treegrid.registerCellRenderer('checkbox', (cell, { colId }) => {
     const input = document.createElement('input');
     input.type = 'checkbox';
     input.className = 'treegrid-cell-checkbox';
@@ -70,7 +71,6 @@
       input.disabled = true;
     }
     input.dataset.columnId = colId;
-    input.dataset.linkId = rowId;
     // An interactive cell control joins the active row's roving tab order.
     input.dataset.treegridControl = '';
     return input;

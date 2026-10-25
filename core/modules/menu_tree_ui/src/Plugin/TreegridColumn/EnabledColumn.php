@@ -73,28 +73,27 @@ final class EnabledColumn extends TreegridColumnBase implements ContainerFactory
       'value' => $link->isEnabled(),
       'label' => (string) $this->t('Enabled'),
       'interactive' => MenuLinkMovability::isMovable($link),
-      'link_id' => $link->getPluginId(),
     ];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function handleUpdate(string $link_id, mixed $value): bool {
-    if (!$this->menuLinkManager->hasDefinition($link_id)) {
+  public function handleUpdate(string $row_id, mixed $value): bool {
+    if (!$this->menuLinkManager->hasDefinition($row_id)) {
       return FALSE;
     }
 
-    if (MenuTreeUiConstants::isContentLink($link_id)) {
-      return $this->handleContentLinkUpdate($link_id, (bool) $value);
+    if (MenuTreeUiConstants::isContentLink($row_id)) {
+      return $this->handleContentLinkUpdate($row_id, (bool) $value);
     }
 
-    $link = $this->menuLinkManager->createInstance($link_id);
+    $link = $this->menuLinkManager->createInstance($row_id);
     if (!MenuLinkMovability::isMovable($link)) {
       return FALSE;
     }
 
-    $this->menuLinkManager->updateDefinition($link_id, ['enabled' => (bool) $value]);
+    $this->menuLinkManager->updateDefinition($row_id, ['enabled' => (bool) $value]);
     return TRUE;
   }
 
