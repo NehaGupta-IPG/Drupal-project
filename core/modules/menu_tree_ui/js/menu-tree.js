@@ -160,12 +160,25 @@
         addPageListeners();
       }
     };
+    // A level that came back empty turns its parent into a leaf, so the
+    // disclosure button goes.
+    const onLevelLoaded = (event) => {
+      const { parentId } = event.detail;
+      const row = element.tree.querySelector(
+        `${ROW}[data-id="${CSS.escape(parentId)}"]`,
+      );
+      if (row?.dataset.hasChildren === 'false') {
+        applyParentMetadata(parentId);
+      }
+    };
     addPageListeners();
     element.addEventListener('treegrid:disconnected', removePageListeners);
     element.addEventListener('treegrid:connected', onConnected);
+    element.addEventListener('treegrid:level-loaded', onLevelLoaded);
 
     return () => {
       removePageListeners();
+      element.removeEventListener('treegrid:level-loaded', onLevelLoaded);
       element.removeEventListener('treegrid:disconnected', removePageListeners);
       element.removeEventListener('treegrid:connected', onConnected);
     };

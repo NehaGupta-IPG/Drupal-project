@@ -321,6 +321,162 @@ final class TreegridElementApiTest extends WebDriverTestBase {
   }
 
   /**
+   * A queued expand is settled by an inline load and does not reopen the row.
+   */
+  public function testQueuedExpandSettledByInlineLoad(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="p1"]');
+      const first = element.exclusive(async (unit) => {
+        await new Promise((resolve) => window.setTimeout(resolve, 100));
+        await unit.expandRow(row);
+        element.collapseRow(row);
+      });
+      const queued = element.expandRow(row);
+      await first;
+      const queuedResult = await queued;
+      await element.exclusive(() => {});
+      return { queuedResult, expanded: row.getAttribute('aria-expanded') };
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertTrue($result['queuedResult']);
+    $this->assertSame('false', $result['expanded']);
+  }
+
+  /**
+   * A queued load for a row that is gone sends no request.
+   */
+  public function testQueuedLoadForRemovedRowSendsNothing(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $tree = TreegridTestUiController::CHILDREN;
+    $tree[''] = ['p2', 'leaf1'];
+    \Drupal::state()->set(TreegridTestUiController::TREE_KEY, $tree);
+    $this->countChildrenRequests();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="p1"]');
+      window.apiTest.levelLoaded = 0;
+      element.addEventListener('treegrid:level-loaded', () => {
+        window.apiTest.levelLoaded += 1;
+      });
+      const refresh = element.refreshLevel('');
+      const expanded = element.expandRow(row);
+      await refresh;
+      return {
+        expanded: await expanded,
+        connected: row.isConnected,
+        loading: row.dataset.treegridLoading ?? null,
+      };
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertFalse($result['expanded']);
+    $this->assertFalse($result['connected']);
+    $this->assertNull($result['loading']);
+    $this->assertSame(1, $this->getSession()->evaluateScript('return window.apiTest.requests;'), 'Only the refresh asked for a level.');
+    $this->assertSame(0, $this->getSession()->evaluateScript('return window.apiTest.levelLoaded;'));
+  }
+
+  /**
+   * A row cleared away while its load is in flight gets no rows or events.
+   */
+  public function testRowClearedDuringLoadGetsNothing(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const p1 = element.tree.querySelector('tr[data-id="p1"]');
+      await element.expandRow(p1);
+      return true;
+    JS);
+    \Drupal::state()->set(TreegridTestUiController::CHILDREN_DELAY_KEY, 600);
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const p1 = element.tree.querySelector('tr[data-id="p1"]');
+      const c1b = element.tree.querySelector('tr[data-id="c1b"]');
+      const attached = [];
+      Drupal.behaviors.apiTestAttach = {
+        attach(context) {
+          attached.push(context.dataset?.id);
+        },
+      };
+      let levelLoaded = 0;
+      element.addEventListener('treegrid:level-loaded', () => {
+        levelLoaded += 1;
+      });
+      const expanded = element.expandRow(c1b);
+      await new Promise((resolve) => window.setTimeout(resolve, 200));
+      element.clearChildren(p1);
+      const result = await expanded;
+      delete Drupal.behaviors.apiTestAttach;
+      return { result, attached, levelLoaded };
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertFalse($result['result']);
+    $this->assertSame([], $result['attached']);
+    $this->assertSame(0, $result['levelLoaded']);
+  }
+
+  /**
+   * A row recreated with the same ID does not reuse the old row's queued load.
+   */
+  public function testRecreatedRowDoesNotReuseStaleQueuedLoad(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const old = element.tree.querySelector('tr[data-id="p1"]');
+      const first = element.exclusive(() => new Promise((resolve) => window.setTimeout(resolve, 300)));
+      const oldExpand = element.expandRow(old);
+      const replacement = old.cloneNode(true);
+      old.replaceWith(replacement);
+      const newExpand = element.expandRow(replacement);
+      await first;
+      return {
+        sameResult: oldExpand === newExpand,
+        old: await oldExpand,
+        replaced: await newExpand,
+        children: element.tree.querySelectorAll('tr[data-parent-id="p1"]').length,
+        expanded: replacement.getAttribute('aria-expanded'),
+      };
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertFalse($result['sameResult']);
+    $this->assertFalse($result['old']);
+    $this->assertTrue($result['replaced']);
+    $this->assertSame(2, $result['children']);
+    $this->assertSame('true', $result['expanded']);
+  }
+
+  /**
+   * A level that comes back empty marks its row as having no children.
+   */
+  public function testEmptyLoadMarksRowWithoutChildren(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $tree = TreegridTestUiController::CHILDREN;
+    $tree['p1'] = [];
+    \Drupal::state()->set(TreegridTestUiController::TREE_KEY, $tree);
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="p1"]');
+      const opened = await element.expandRow(row);
+      return { opened, hasChildren: row.dataset.hasChildren, expanded: row.getAttribute('aria-expanded') };
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertFalse($result['opened']);
+    $this->assertSame('false', $result['hasChildren']);
+    $this->assertNull($result['expanded']);
+  }
+
+  /**
    * Collapsing a row whose load waits cancels the wait.
    */
   public function testCollapseCancelsWaitingLoad(): void {

@@ -31,6 +31,8 @@ final class MenuTreeUiLazyLoadTest extends MenuTreeUiJavascriptTestBase {
     // its children, and the collapse-during-first-load race never arises.
     $this->linkIds['Q'] = $this->createLink('Leaf Q', '', 1);
     $this->linkIds['R'] = $this->createLink('Leaf R', '', 2);
+    $this->linkIds['E'] = $this->createLink('Emptied E', '', 3);
+    $this->linkIds['E1'] = $this->createLink('Child E1', $this->linkIds['E'], 0);
   }
 
   /**
@@ -69,6 +71,22 @@ final class MenuTreeUiLazyLoadTest extends MenuTreeUiJavascriptTestBase {
       ).filter((r) => r.dataset.treegridHidden !== 'true').length)();
     JS);
     $this->assertSame(0, $visible_children, 'No children are visible under the collapsed parent.');
+  }
+
+  /**
+   * A parent whose children are gone loses its toggle once the level loads.
+   */
+  public function testEmptyLoadRemovesTheToggle(): void {
+    $uuid = substr($this->linkIds['E1'], strlen('menu_link_content:'));
+    \Drupal::service('entity.repository')->loadEntityByUuid('menu_link_content', $uuid)->delete();
+
+    $this->row('E')->find('css', '.menu-tree-ui-row__name button.menu-tree-ui-row__toggle')->click();
+
+    $this->assertJsCondition(sprintf(
+      "document.querySelector('tr[data-id=\"%s\"]').dataset.hasChildren === 'false'",
+      $this->linkIds['E'],
+    ));
+    $this->assertIsLeafRow('E');
   }
 
 }

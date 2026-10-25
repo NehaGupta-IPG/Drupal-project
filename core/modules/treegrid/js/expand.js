@@ -92,7 +92,7 @@
       this.buildRow = rowBuilder.buildRow;
       // Level loads waiting for or running in a queue unit, keyed by row id.
       this.queued = new Map();
-      // Level loads running inline in a unit, keyed by row id.
+      // Level loads running inline in a unit, keyed by row id: { row, promise }.
       this.loading = new Map();
     }
 
@@ -211,8 +211,13 @@
         return Promise.resolve(this.openLoaded(row, announce));
       }
       const existing = this.queued.get(id);
-      if (existing) {
+      if (existing?.row === row) {
         return existing.promise;
+      }
+      if (existing) {
+        // The entry belongs to a row that has since been replaced.
+        existing.canceled = true;
+        existing.resolve(false);
       }
 
       const entry = { row, announce, state: 'waiting', canceled: false };
@@ -245,6 +250,11 @@
       }
       entry.state = 'running';
       try {
+        if (!row.isConnected) {
+          this.clearLoading(row);
+          entry.resolve(false);
+          return;
+        }
         // A unit that ran earlier may have loaded the row already; then there
         // is only the showing left to do.
         entry.resolve(await this.expandInline(row, entry.announce));
@@ -276,16 +286,43 @@
         return this.openLoaded(row, announce);
       }
       const running = this.loading.get(id);
-      if (running) {
-        return running;
+      if (running?.row === row) {
+        return running.promise;
       }
       const promise = this.loadLevel(row, id, announce);
-      this.loading.set(id, promise);
+      const load = { row, promise };
+      this.loading.set(id, load);
       try {
-        return await promise;
+        const opened = await promise;
+        this.settleWaiting(row, opened);
+        return opened;
       } finally {
-        this.loading.delete(id);
+        if (this.loading.get(id) === load) {
+          this.loading.delete(id);
+        }
       }
+    }
+
+    /**
+     * Settles a waiting queued load of a row that was just loaded inline.
+     *
+     * The queued unit is marked canceled, so it does not reopen the row after
+     * the load's result has been handed over.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     * @param {boolean} opened
+     *   The result of the inline load.
+     */
+    settleWaiting(row, opened) {
+      const { id } = row.dataset;
+      const entry = this.queued.get(id);
+      if (entry?.row !== row || entry.state !== 'waiting') {
+        return;
+      }
+      entry.canceled = true;
+      this.queued.delete(id);
+      entry.resolve(opened);
     }
 
     /**
@@ -676,6 +713,9 @@
           this.dispatch('treegrid:level-load-failed', { parentId, status });
           return false;
         }
+        if (!row.isConnected) {
+          return false;
+        }
         this.dispatch(
           'treegrid:before-rows-change',
           { parentId, change: 'insert' },
@@ -699,6 +739,7 @@
         if (items.length === 0) {
           // A level with no rows is a leaf: it counts as loaded but never open.
           row.removeAttribute('aria-expanded');
+          row.dataset.hasChildren = 'false';
           this.dispatch('treegrid:level-loaded', { parentId });
           return false;
         }
