@@ -94,7 +94,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
   private function checkUrl(LanguageInterface $language, string $message): void {
     $options = ['language' => $language, 'script' => ''];
     $base_path = trim(base_path(), '/');
-    $rewritten_path = trim(str_replace($base_path, '', Url::fromRoute('<front>', [], $options)->toString()), '/');
+    $rewritten_path = trim(str_replace($base_path, '', (string) Url::fromRoute('<front>', [], $options)), '/');
     $segments = explode('/', $rewritten_path, 2);
     $prefix = $segments[0];
     $path = $segments[1] ?? $prefix;
@@ -139,7 +139,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
 
     // In case index.php is part of the URLs, we need to adapt the asserted
     // URLs as well.
-    $index_php = str_contains(Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString(), 'index.php');
+    $index_php = str_contains((string) Url::fromRoute('<front>', [], ['absolute' => TRUE]), 'index.php');
 
     $request = Request::createFromGlobals();
     $server = $request->server->all();
@@ -147,21 +147,21 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
 
     // Create an absolute French link.
     $language = \Drupal::languageManager()->getLanguage('fr');
-    $url = Url::fromRoute('<front>', [], [
+    $url = (string) Url::fromRoute('<front>', [], [
       'absolute' => TRUE,
       'language' => $language,
-    ])->toString();
+    ]);
 
     $expected = ($index_php ? 'http://example.fr:88/index.php' : 'http://example.fr:88') . rtrim(base_path(), '/') . '/';
 
     $this->assertEquals($expected, $url, 'The right port is used.');
 
     // If we set the port explicitly, it should not be overridden.
-    $url = Url::fromRoute('<front>', [], [
+    $url = (string) Url::fromRoute('<front>', [], [
       'absolute' => TRUE,
       'language' => $language,
       'base_url' => $request->getBaseUrl() . ':90',
-    ])->toString();
+    ]);
 
     $expected = $index_php ? 'http://example.fr:90/index.php' : 'http://example.fr:90' . rtrim(base_path(), '/') . '/';
 

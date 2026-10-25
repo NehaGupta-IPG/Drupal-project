@@ -498,7 +498,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
 
     // Check that the language switcher active link matches the given browser
     // language.
-    $href = Url::fromRoute('<front>')->toString() . $langcode_browser_fallback;
+    $href = (string) Url::fromRoute('<front>') . $langcode_browser_fallback;
     $this->assertSession()->elementTextEquals('xpath', "//div[@id='block-test-language-block']//a[@class='language-link is-active' and starts-with(@href, '$href')]", $languages[$langcode_browser_fallback]->getName());
 
     // Check that URLs are rewritten using the given browser language.
@@ -564,13 +564,13 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     // Test URL in another language: http://it.example.com/admin.
     // Base path gives problems on the testbot, so $correct_link is hard-coded.
     // @see UrlAlterFunctionalTest::assertUrlOutboundAlter (path.test).
-    $italian_url = Url::fromRoute('system.admin', [], ['language' => $languages['it']])->toString();
+    $italian_url = (string) Url::fromRoute('system.admin', [], ['language' => $languages['it']]);
     $url_scheme = \Drupal::request()->isSecure() ? 'https://' : 'http://';
     $correct_link = $url_scheme . $link;
     $this->assertEquals($correct_link, $italian_url, "The right URL ($italian_url) in accordance with the chosen language");
 
     // Test HTTPS via options.
-    $italian_url = Url::fromRoute('system.admin', [], ['https' => TRUE, 'language' => $languages['it']])->toString();
+    $italian_url = (string) Url::fromRoute('system.admin', [], ['https' => TRUE, 'language' => $languages['it']]);
     $correct_link = 'https://' . $link;
     $this->assertSame($correct_link, $italian_url, "The right HTTPS URL (via options) ($italian_url) in accordance with the chosen language");
 
@@ -578,7 +578,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     $request = Request::create('', 'GET', [], [], [], ['HTTPS' => 'on']);
     $request->setSession(new Session(new MockArraySessionStorage()));
     $this->container->get('request_stack')->push($request);
-    $italian_url = Url::fromRoute('system.admin', [], ['language' => $languages['it']])->toString();
+    $italian_url = (string) Url::fromRoute('system.admin', [], ['language' => $languages['it']]);
     $correct_link = 'https://' . $link;
     $this->assertSame($correct_link, $italian_url, "The right URL (via current URL scheme) ($italian_url) in accordance with the chosen language");
   }

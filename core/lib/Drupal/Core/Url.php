@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @see \Drupal\Core\Entity\EntityBase::toUrl()
  */
-class Url implements TrustedCallbackInterface {
+class Url implements TrustedCallbackInterface, \Stringable {
   use DependencySerializationTrait;
 
   /**
@@ -774,6 +774,13 @@ class Url implements TrustedCallbackInterface {
     }
 
     return $this->urlGenerator()->generateFromRoute($this->getRouteName(), $this->getRouteParameters(), $this->getOptions(), $collect_bubbleable_metadata);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __toString(): string {
+    return $this->toString();
   }
 
   /**

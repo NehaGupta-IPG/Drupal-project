@@ -94,7 +94,7 @@ class LanguageAddForm extends LanguageFormBase {
     if ($this->moduleHandler->moduleExists('block')) {
       // Tell the user they have the option to add a language switcher block
       // to their theme so they can switch between the languages.
-      $this->messenger()->addStatus($this->t('Use one of the language switcher blocks to allow site visitors to switch between languages. You can enable these blocks on the <a href=":block-admin">block administration page</a>.', [':block-admin' => Url::fromRoute('block.admin_display')->toString()]));
+      $this->messenger()->addStatus($this->t('Use one of the language switcher blocks to allow site visitors to switch between languages. You can enable these blocks on the <a href=":block-admin">block administration page</a>.', [':block-admin' => Url::fromRoute('block.admin_display')]));
     }
     $form_state->setRedirectUrl($this->entity->toUrl('collection'));
   }
