@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
 
+use Drupal\menu_tree_ui\MenuTreeUiConstants;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -62,6 +63,31 @@ final class MenuTreeUiShiftReorderTest extends MenuTreeUiJavascriptTestBase {
       $this->row('A')->getAttribute('aria-posinset'),
       'A should report position 2 after B passed it.',
     );
+  }
+
+  /**
+   * Shift+Arrow keeps every row's aria-setsize at the whole level's total.
+   */
+  public function testShiftArrowKeepsSetSizeAtLevelTotal(): void {
+    $extra = MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE;
+    for ($i = 1; $i <= $extra; $i++) {
+      $this->createLink(sprintf('Extra %03d', $i), '', $i + 1);
+    }
+    $total = $extra + 2;
+    $this->drupalGet('/admin/structure/menu/manage/test/tree');
+    $this->assertSession()->waitForElement(
+      'css',
+      'drupal-treegrid[data-treegrid-reorder-ready="true"] tbody tr[role="row"]',
+    );
+
+    $this->dispatchShiftArrow('A', 'ArrowDown');
+    $this->assertSiblings(['B', 'A'], 'tr[role="row"][data-parent-id=""][data-id="' . $this->linkIds['A'] . '"], tr[role="row"][data-parent-id=""][data-id="' . $this->linkIds['B'] . '"]');
+    $this->settle();
+
+    $sizes = $this->getSession()->evaluateScript(
+      "return Array.from(new Set(Array.from(document.querySelectorAll('tr[role=\"row\"][data-parent-id=\"\"]')).map((r) => r.getAttribute('aria-setsize'))));",
+    );
+    $this->assertSame([(string) $total], $sizes);
   }
 
   /**

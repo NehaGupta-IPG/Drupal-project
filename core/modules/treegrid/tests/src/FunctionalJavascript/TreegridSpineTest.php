@@ -176,6 +176,36 @@ final class TreegridSpineTest extends WebDriverTestBase {
     );
   }
 
+  /**
+   * Child and sibling lookups ignore rows that are not items.
+   */
+  public function testSiblingAndChildHelpersSkipRowsWithoutId(): void {
+    $this->expand('p1');
+    $script = <<<'JS'
+      const { childRows, nextSiblingRow } = Drupal.treegrid.treeNav;
+      const p1 = document.querySelector('tr[data-id="p1"]');
+      const p2 = document.querySelector('tr[data-id="p2"]');
+      const c1b = document.querySelector('tr[data-id="c1b"]');
+      const make = (level) => {
+        const tr = document.createElement('tr');
+        tr.setAttribute('role', 'row');
+        tr.setAttribute('aria-level', String(level));
+        tr.dataset.parentId = level === 1 ? '' : 'p1';
+        return tr;
+      };
+      p1.after(make(2));
+      c1b.after(make(1));
+      return {
+        children: childRows(p1).map((row) => row.dataset.id),
+        next: nextSiblingRow(p1)?.dataset.id ?? null,
+        expectedNext: p2.dataset.id,
+      };
+    JS;
+    $result = $this->getSession()->evaluateScript('return (function () {' . $script . '})();');
+    $this->assertSame(['c1a', 'c1b'], $result['children']);
+    $this->assertSame($result['expectedNext'], $result['next']);
+  }
+
   // Helpers.
 
   /**

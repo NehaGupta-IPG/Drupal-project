@@ -37,7 +37,7 @@
   function previousSiblingRow(row) {
     let prev = row.previousElementSibling;
     while (prev && prev.matches(ROW)) {
-      if (prev.dataset.parentId === row.dataset.parentId) {
+      if (prev.dataset.id && prev.dataset.parentId === row.dataset.parentId) {
         return prev;
       }
       prev = prev.previousElementSibling;
@@ -46,13 +46,15 @@
   }
 
   /**
-   * Renumbers aria-posinset/aria-setsize across a row's sibling group.
+   * Renumbers aria-posinset across a row's sibling group.
    *
    * The optimistic swap moves the row in the DOM ahead of the server's
-   * response, which leaves the affected siblings' position attributes stale
-   * (screen readers announce "item N of M" from these, not document order).
-   * Scoped to the row's own table so an unrelated tree on the page (there
-   * should only ever be one) can't be touched.
+   * response, which leaves the affected siblings' positions stale (screen
+   * readers announce "item N of M" from these, not document order). A swap
+   * keeps the number of siblings, so aria-setsize stays as it is: with a level
+   * only partly loaded the loaded rows are not the level's size. Only item rows
+   * (those with a data-id) are numbered. Scoped to the row's own table so an
+   * unrelated tree on the page can't be touched.
    *
    * @param {HTMLElement} row
    *   Any row in the affected sibling group.
@@ -64,11 +66,12 @@
     }
     const parentId = row.dataset.parentId ?? '';
     const siblings = Array.from(
-      tree.querySelectorAll(`${ROW}[data-parent-id="${CSS.escape(parentId)}"]`),
+      tree.querySelectorAll(
+        `${ROW}[data-parent-id="${CSS.escape(parentId)}"][data-id]`,
+      ),
     );
     siblings.forEach((sibling, index) => {
       sibling.setAttribute('aria-posinset', String(index + 1));
-      sibling.setAttribute('aria-setsize', String(siblings.length));
     });
   }
 

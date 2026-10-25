@@ -120,6 +120,8 @@
   /**
    * The direct child rows of a row (one level deeper).
    *
+   * Only item rows count: a row without a data-id is not a child.
+   *
    * @param {HTMLElement} row
    *   The parent row.
    *
@@ -128,14 +130,17 @@
    */
   function childRows(row) {
     const childLevel = levelOf(row) + 1;
-    return descendantRows(row).filter((r) => levelOf(r) === childLevel);
+    return descendantRows(row).filter(
+      (r) => levelOf(r) === childLevel && r.dataset.id,
+    );
   }
 
   /**
    * The next sibling row at the same level under the same parent.
    *
    * Skips the row's own descendant run, so for an expanded parent it returns
-   * the next sibling rather than the parent's first child.
+   * the next sibling rather than the parent's first child. Rows without a
+   * data-id are not items and are skipped.
    *
    * @param {HTMLElement} row
    *   The reference row.
@@ -145,7 +150,10 @@
    */
   function nextSiblingRow(row) {
     const last = lastDescendantRow(row) ?? row;
-    const next = last.nextElementSibling;
+    let next = last.nextElementSibling;
+    while (next && next.matches(ROW) && !next.dataset.id) {
+      next = next.nextElementSibling;
+    }
     if (
       next &&
       next.matches(ROW) &&
