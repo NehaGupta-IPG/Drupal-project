@@ -240,6 +240,18 @@
     }
 
     /**
+     * Removes a row's descendant rows and forgets that they were loaded.
+     *
+     * Detaches the behaviors of the removed rows. DOM only, never queued.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     */
+    clearChildren(row) {
+      internals.get(this).expand.clearChildren(row);
+    }
+
+    /**
      * Reloads a level from the server and reconciles its rows.
      *
      * Runs through the queue. Call the unit object's refreshLevel() instead

@@ -3,6 +3,7 @@ treegrid_test_ui:
   js:
     js/treegrid-test-ui.js: {}
     js/treegrid-test-ui-consumer.js: {}
+    js/treegrid-test-ui-detach.js: {}
   css:
     component:
       css/treegrid-test-ui.css: {}

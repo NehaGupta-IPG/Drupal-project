@@ -22,7 +22,7 @@
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const ns = Drupal.menuTreeUi;
   const rr = Drupal.treegridReorder;
-  const { rowOf, childRows, descendantRows } = Drupal.treegrid.treeNav;
+  const { rowOf } = Drupal.treegrid.treeNav;
   const { announce } = Drupal.treegrid;
 
   const ROW = 'tr[role="row"]';
@@ -56,8 +56,7 @@
     if (!row) {
       return;
     }
-    const hasChildrenNow = childRows(row).length > 0;
-    row.dataset.hasChildren = hasChildrenNow ? 'true' : 'false';
+    const hasChildrenNow = row.dataset.hasChildren === 'true';
 
     const name = row.querySelector('.menu-tree-ui-row__name');
     if (!name) {
@@ -83,14 +82,8 @@
       if (existing && existing.tagName.toLowerCase() === 'button') {
         existing.replaceWith(ns.buildToggle({ has_children: false }));
       }
-      // On becoming a leaf, remove any stale descendant rows left behind,
-      // unobserving each so the row window does not retain detached nodes.
-      const rowWindow = row.closest('drupal-treegrid')?.rowWindow;
-      descendantRows(row).forEach((r) => {
-        rowWindow?.unobserve(r);
-        r.remove();
-      });
-      delete row.dataset.treegridLoaded;
+      // On becoming a leaf, remove any stale descendant rows left behind.
+      row.closest('drupal-treegrid')?.clearChildren(row);
     }
   }
 

@@ -11,8 +11,7 @@
 
 ((Drupal, drupalSettings, once) => {
   const rr = Drupal.treegridReorder;
-  const { rowOf, setRowLevel, childRows, descendantRows } =
-    Drupal.treegrid.treeNav;
+  const { rowOf, setRowLevel } = Drupal.treegrid.treeNav;
 
   // This consumer's CSS class/selector names, handed to the generic gesture
   // controllers so they carry no markup knowledge of their own.
@@ -125,8 +124,7 @@
     if (!row) {
       return;
     }
-    const hasChildren = childRows(row).length > 0;
-    row.dataset.hasChildren = String(hasChildren);
+    const hasChildren = row.dataset.hasChildren === 'true';
     const cell = row.querySelector('[data-treegrid-name-cell]');
     const toggle = cell.querySelector(
       '.reorder-test-toggle, .reorder-test-spacer',
@@ -142,8 +140,7 @@
       if (isButton) {
         toggle.replaceWith(buildToggle(false));
       }
-      descendantRows(row).forEach((descendant) => descendant.remove());
-      delete row.dataset.treegridLoaded;
+      row.closest('drupal-treegrid').clearChildren(row);
     }
   }
 

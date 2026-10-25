@@ -360,6 +360,247 @@ final class TreegridElementApiTest extends WebDriverTestBase {
     $this->assertSame(['c1b', 'c1c'], $result['ids']);
   }
 
+  /**
+   * Expanding a parent fires one level-loaded event with its id.
+   */
+  public function testLevelLoadedFiresOncePerExpand(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const loaded = [];
+      element.addEventListener('treegrid:level-loaded', (event) => loaded.push(event.detail.parentId));
+      await element.expandRow(element.tree.querySelector('tr[data-id="p1"]'));
+      return loaded;
+    JS);
+
+    $this->assertSame(['p1'], $this->getSession()->evaluateScript('return window.apiTest.result;'));
+  }
+
+  /**
+   * A failing children request fires level-load-failed and leaves the row shut.
+   */
+  public function testFailedLoadFiresLevelLoadFailed(): void {
+    \Drupal::state()->set(TreegridTestUiController::CHILDREN_FAIL_KEY, 1);
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="p1"]');
+      const failures = [];
+      const loaded = [];
+      element.addEventListener('treegrid:level-load-failed', (event) => failures.push(event.detail));
+      element.addEventListener('treegrid:level-loaded', (event) => loaded.push(event.detail));
+      const opened = await element.expandRow(row);
+      return {
+        opened,
+        failures,
+        loaded,
+        expanded: row.getAttribute('aria-expanded'),
+        children: element.tree.querySelectorAll('tr[data-parent-id="p1"]').length,
+      };
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertFalse($result['opened']);
+    $this->assertEquals([['parentId' => 'p1', 'status' => 500]], $result['failures']);
+    $this->assertSame([], $result['loaded']);
+    $this->assertSame('false', $result['expanded']);
+    $this->assertSame(0, $result['children']);
+  }
+
+  /**
+   * The row-change event fires before any row is touched, with its change kind.
+   */
+  public function testBeforeRowsChangeFiresFirst(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const seen = [];
+      element.addEventListener('treegrid:before-rows-change', (event) => {
+        seen.push({
+          change: event.detail.change,
+          parentId: event.detail.parentId,
+          rows: element.tree.querySelectorAll('tr[data-id]').length,
+          hasRemoved: !!element.tree.querySelector('tr[data-id="c1a"]'),
+        });
+      });
+      await element.expandRow(element.tree.querySelector('tr[data-id="p1"]'));
+      return seen;
+    JS);
+    $inserted = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertEquals([['change' => 'insert', 'parentId' => 'p1', 'rows' => 3, 'hasRemoved' => FALSE]], $inserted);
+
+    $tree = TreegridTestUiController::CHILDREN;
+    $tree['p1'] = ['c1b'];
+    \Drupal::state()->set(TreegridTestUiController::TREE_KEY, $tree);
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const seen = [];
+      element.addEventListener('treegrid:before-rows-change', (event) => {
+        seen.push({
+          change: event.detail.change,
+          rows: element.tree.querySelectorAll('tr[data-id]').length,
+          hasRemoved: !!element.tree.querySelector('tr[data-id="c1a"]'),
+        });
+      });
+      await element.refreshLevel('p1');
+      return {
+        seen,
+        rowsAfter: element.tree.querySelectorAll('tr[data-id]').length,
+      };
+    JS);
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertEquals([['change' => 'reconcile', 'rows' => 5, 'hasRemoved' => TRUE]], $result['seen']);
+    $this->assertSame(4, $result['rowsAfter']);
+  }
+
+  /**
+   * A refresh of a level that was never opened only updates the parent row.
+   */
+  public function testRefreshOfUnloadedLevelOnlyUpdatesHasChildren(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $tree = TreegridTestUiController::CHILDREN;
+    $tree['p2'] = [];
+    $tree['leaf1'] = ['x1'];
+    \Drupal::state()->set(TreegridTestUiController::TREE_KEY, $tree);
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const state = (id) => {
+        const row = element.tree.querySelector('tr[data-id="' + id + '"]');
+        return {
+          hasChildren: row.dataset.hasChildren,
+          loaded: row.dataset.treegridLoaded ?? null,
+          children: element.tree.querySelectorAll('tr[data-parent-id="' + id + '"]').length,
+        };
+      };
+      await element.refreshLevel('p2');
+      await element.refreshLevel('leaf1');
+      return { p2: state('p2'), leaf1: state('leaf1') };
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertEquals(['hasChildren' => 'false', 'loaded' => NULL, 'children' => 0], $result['p2']);
+    $this->assertEquals(['hasChildren' => 'true', 'loaded' => NULL, 'children' => 0], $result['leaf1']);
+  }
+
+  /**
+   * A refresh of a collapsed loaded level inserts its new rows hidden.
+   */
+  public function testRefreshOfCollapsedLevelInsertsRowsHidden(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="p1"]');
+      await element.expandRow(row);
+      element.collapseRow(row);
+      return true;
+    JS);
+    $tree = TreegridTestUiController::CHILDREN;
+    $tree['p1'] = ['c1a', 'c1b', 'c1c'];
+    \Drupal::state()->set(TreegridTestUiController::TREE_KEY, $tree);
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      await element.refreshLevel('p1');
+      const added = element.tree.querySelector('tr[data-id="c1c"]');
+      return added ? added.dataset.treegridHidden : null;
+    JS);
+
+    $this->assertSame('true', $this->getSession()->evaluateScript('return window.apiTest.result;'));
+  }
+
+  /**
+   * Clearing a row's children empties its level, and a later expand loads it again.
+   */
+  public function testClearChildrenForgetsLoadedLevel(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->countChildrenRequests();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="p1"]');
+      await element.expandRow(row);
+      const afterFirst = window.apiTest.requests;
+      element.clearChildren(row);
+      const cleared = {
+        children: element.tree.querySelectorAll('tr[data-parent-id="p1"]').length,
+        loaded: row.dataset.treegridLoaded ?? null,
+      };
+      await element.expandRow(row);
+      return {
+        afterFirst,
+        cleared,
+        afterSecond: window.apiTest.requests,
+        children: element.tree.querySelectorAll('tr[data-parent-id="p1"]').length,
+      };
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertSame(1, $result['afterFirst']);
+    $this->assertEquals(['children' => 0, 'loaded' => NULL], $result['cleared']);
+    $this->assertSame(2, $result['afterSecond']);
+    $this->assertSame(2, $result['children']);
+  }
+
+  /**
+   * Rows a refresh drops and rows a clear removes have their behaviors detached.
+   */
+  public function testRemovedRowsDetachTheirBehaviors(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="p1"]');
+      await element.expandRow(row);
+      return window.treegridTestUiDetaches;
+    JS);
+    $before = $this->getSession()->evaluateScript('return window.apiTest.result;');
+
+    $tree = TreegridTestUiController::CHILDREN;
+    $tree['p1'] = ['c1b'];
+    \Drupal::state()->set(TreegridTestUiController::TREE_KEY, $tree);
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      await element.refreshLevel('p1');
+      return window.treegridTestUiDetaches;
+    JS);
+    $afterRefresh = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertSame($before + 1, $afterRefresh);
+
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      element.clearChildren(element.tree.querySelector('tr[data-id="p1"]'));
+      return window.treegridTestUiDetaches;
+    JS);
+    $afterClear = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertGreaterThan($afterRefresh, $afterClear);
+  }
+
+  /**
+   * Opening a leaf marks its level loaded and resolves false.
+   */
+  public function testExpandRowOnLeafResolvesFalse(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const row = element.tree.querySelector('tr[data-id="leaf1"]');
+      return {
+        opened: await element.expandRow(row),
+        loaded: row.dataset.treegridLoaded ?? null,
+        expanded: row.getAttribute('aria-expanded'),
+      };
+    JS);
+
+    $this->assertEquals(
+      ['opened' => FALSE, 'loaded' => 'true', 'expanded' => NULL],
+      $this->getSession()->evaluateScript('return window.apiTest.result;'),
+    );
+  }
+
   // Helpers.
 
   /**
@@ -435,7 +676,7 @@ final class TreegridElementApiTest extends WebDriverTestBase {
    */
   private function runAsync(string $script): void {
     $this->getSession()->executeScript(
-      'window.apiTest = { done: false, result: null };'
+      'window.apiTest = Object.assign(window.apiTest || {}, { done: false, result: null });'
       . '(async function () {' . $script . '})().then(function (value) {'
       . ' window.apiTest.result = value; window.apiTest.done = true; });',
     );

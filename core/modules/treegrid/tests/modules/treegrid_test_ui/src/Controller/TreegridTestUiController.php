@@ -35,6 +35,11 @@ final class TreegridTestUiController extends ControllerBase {
   public const CHILDREN_DELAY_KEY = 'treegrid_test_ui.children_delay';
 
   /**
+   * The State key holding how many children requests still fail with a 500.
+   */
+  public const CHILDREN_FAIL_KEY = 'treegrid_test_ui.children_fail';
+
+  /**
    * The tree when State holds none.
    */
   public const CHILDREN = [
@@ -76,6 +81,11 @@ final class TreegridTestUiController extends ControllerBase {
     $delay = (int) $this->state()->get(self::CHILDREN_DELAY_KEY, 0);
     if ($delay > 0) {
       usleep($delay * 1000);
+    }
+    $failing = (int) $this->state()->get(self::CHILDREN_FAIL_KEY, 0);
+    if ($failing > 0) {
+      $this->state()->set(self::CHILDREN_FAIL_KEY, $failing - 1);
+      return new JsonResponse(['ok' => FALSE], 500);
     }
     $parent = (string) $request->query->get('parent', '');
     $ids = $this->tree()[$parent] ?? [];

@@ -407,6 +407,13 @@
      *   false when the server fetch failed, so the caller can recover.
      */
     async refresh(parentId) {
+      // First thing: a listener (move mode giving up a carry) changes rows the
+      // snapshot below would otherwise already have captured.
+      this.dispatch(
+        'treegrid:before-rows-change',
+        { parentId, change: 'reconcile' },
+        false,
+      );
       const isRoot = parentId === '';
       const tbody = this.tree.querySelector('tbody');
       const parentRow = isRoot ? tbody : findRow(this.tree, parentId);
@@ -414,10 +421,26 @@
         return true;
       }
 
-      const items = await this.fetchChildren(parentId);
+      const { items } = await this.fetchChildren(parentId);
       if (items === null) {
         return false;
       }
+      if (!parentRow.isConnected) {
+        return true;
+      }
+      if (!isRoot) {
+        parentRow.dataset.hasChildren = items.length > 0 ? 'true' : 'false';
+        if (parentRow.dataset.treegridLoaded !== 'true') {
+          // Rows inserted under a parent that was never opened would leave a
+          // level that looks loaded but is not.
+          return true;
+        }
+      }
+      // Rows new to a collapsed (or hidden) parent come in hidden.
+      const insertHidden =
+        !isRoot &&
+        (parentRow.getAttribute('aria-expanded') !== 'true' ||
+          parentRow.dataset.treegridHidden === 'true');
 
       // Snapshot existing direct children with their descendant blocks BEFORE
       // any DOM change, so reused rows can carry their subtrees across.
@@ -457,16 +480,11 @@
         }
       });
 
-      // Remove orphan children (and their descendant blocks), unobserving each
-      // so the row window does not retain detached nodes.
+      // Remove orphan children (and their descendant blocks).
       blocks.forEach((entry, id) => {
         if (!kept.has(id)) {
-          entry.block.forEach((r) => {
-            this.rowWindow?.unobserve(r);
-            r.remove();
-          });
-          this.rowWindow?.unobserve(entry.row);
-          entry.row.remove();
+          entry.block.forEach((r) => this.removeRow(r));
+          this.removeRow(entry.row);
         }
       });
 
@@ -495,10 +513,58 @@
           // Built rows are not the active row, so keep their controls out of the
           // tab order (set after attachBehaviors, which upgrades the dropbutton).
           setRowControlsActive(row, false);
-          this.rowWindow?.observe(row);
+          if (insertHidden) {
+            row.dataset.treegridHidden = 'true';
+          } else {
+            this.rowWindow?.observe(row);
+          }
         }
       });
       return true;
+    }
+
+    /**
+     * Removes a row from the DOM, releasing what is attached to it.
+     *
+     * Detaches the row's behaviors and stops its windowing, so the row window
+     * does not retain a detached node.
+     *
+     * @param {HTMLElement} row
+     *   The row to remove.
+     */
+    removeRow(row) {
+      if (Drupal.detachBehaviors) {
+        Drupal.detachBehaviors(row);
+      }
+      this.rowWindow?.unobserve(row);
+      row.remove();
+    }
+
+    /**
+     * Removes a row's descendant rows and forgets that they were loaded.
+     *
+     * DOM only, never queued.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     */
+    clearChildren(row) {
+      descendantRows(row).forEach((r) => this.removeRow(r));
+      delete row.dataset.treegridLoaded;
+    }
+
+    /**
+     * Dispatches an event on the element.
+     *
+     * @param {string} type
+     *   The event type.
+     * @param {object} detail
+     *   The event detail.
+     * @param {boolean} [bubbles]
+     *   Whether the event bubbles.
+     */
+    dispatch(type, detail, bubbles = true) {
+      this.element.dispatchEvent(new CustomEvent(type, { bubbles, detail }));
     }
 
     /**
@@ -507,8 +573,9 @@
      * @param {string} parentId
      *   Plugin ID of the parent, or '' for the root level.
      *
-     * @return {Promise<?Array<object>>}
-     *   The child items, or null on transport failure.
+     * @return {Promise<{items: ?Array<object>, status: number}>}
+     *   The child items (null on failure) and the HTTP status (0 for a network
+     *   error).
      */
     async fetchChildren(parentId) {
       try {
@@ -523,14 +590,14 @@
         if (!response.ok) {
           // eslint-disable-next-line no-console
           console.error('[treegrid] children fetch failed', response.status);
-          return null;
+          return { items: null, status: response.status };
         }
         const data = await response.json();
-        return data.items;
+        return { items: data.items, status: response.status };
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error('[treegrid] children fetch error', e);
-        return null;
+        return { items: null, status: 0 };
       }
     }
 
@@ -559,13 +626,19 @@
         }
       }
       try {
-        const items = await this.fetchChildren(parentId);
+        const { items, status } = await this.fetchChildren(parentId);
         if (items === null) {
           if (isParent) {
             row.setAttribute('aria-expanded', 'false');
           }
+          this.dispatch('treegrid:level-load-failed', { parentId, status });
           return false;
         }
+        this.dispatch(
+          'treegrid:before-rows-change',
+          { parentId, change: 'insert' },
+          false,
+        );
         const depth = levelOf(row) + 1;
         const fragment = this.buildRows(items, depth);
         const inserted = Array.from(fragment.children);
@@ -584,6 +657,7 @@
         if (items.length === 0) {
           // A level with no rows is a leaf: it counts as loaded but never open.
           row.removeAttribute('aria-expanded');
+          this.dispatch('treegrid:level-loaded', { parentId });
           return false;
         }
         row.dataset.hasChildren = 'true';
@@ -594,11 +668,12 @@
         // The row may have been collapsed while this fetch was in flight, when
         // there were no child rows yet to hide. Hide the children that just
         // arrived so they do not show under a now-collapsed row.
-        if (row.getAttribute('aria-expanded') !== 'true') {
+        const open = row.getAttribute('aria-expanded') === 'true';
+        if (!open) {
           this.hideSubtree(row);
-          return false;
         }
-        return true;
+        this.dispatch('treegrid:level-loaded', { parentId });
+        return open;
       } finally {
         this.clearLoading(row);
       }

@@ -156,6 +156,41 @@ final class ReorderGestureTest extends WebDriverTestBase {
     $this->assertSame(1, $this->getSession()->evaluateScript('return window.moveTest.posts;'));
   }
 
+  /**
+   * Dropping a row onto a leaf as its child shows it there and opens the leaf.
+   */
+  public function testDropAsChildOfLeaf(): void {
+    $this->dragOnto('3', '1');
+    $this->settle();
+    $this->assertJsCondition(
+      "!!document.querySelector('tr[data-id=\"3\"][data-parent-id=\"1\"]')",
+    );
+
+    $moved = $this->row('3');
+    $this->assertNull($moved->getAttribute('data-treegrid-hidden'));
+    $this->assertSame('true', $this->row('1')->getAttribute('aria-expanded'));
+    $this->assertSame('true', $this->row('1')->getAttribute('data-has-children'));
+    $this->assertPersistedChildren('1', ['3']);
+
+    // Closing and opening the new parent again fetches nothing.
+    $this->getSession()->executeScript(<<<'JS'
+      window.childrenRequests = 0;
+      const originalFetch = window.fetch;
+      window.fetch = function (url) {
+        if (String(url).includes('/treegrid-reorder-test/children')) {
+          window.childrenRequests += 1;
+        }
+        return originalFetch.apply(this, arguments);
+      };
+      const toggle = document.querySelector('tr[data-id="1"] [data-treegrid-toggle]');
+      toggle.click();
+      toggle.click();
+    JS);
+    $this->assertSame('true', $this->row('1')->getAttribute('aria-expanded'));
+    $this->assertSame(0, $this->getSession()->evaluateScript('return window.childrenRequests;'));
+    $this->assertCount(1, $this->getSession()->getPage()->findAll('css', 'tr[role="row"][data-parent-id="1"]'));
+  }
+
   // Helpers.
 
   /**
@@ -247,16 +282,18 @@ final class ReorderGestureTest extends WebDriverTestBase {
   }
 
   /**
-   * Drags one row's handle into the "before" zone of another row.
+   * Drags one row's handle into a zone of another row.
    *
    * Fires a synthetic PointerEvent sequence against the live DragController.
    *
    * @param string $source_id
    *   The data-id of the row to move.
    * @param string $target_id
-   *   The data-id of the row to drop before.
+   *   The data-id of the row to drop on.
+   * @param float $ratio
+   *   The vertical position within the target row, 0 (top) to 1 (bottom).
    */
-  private function dragBefore(string $source_id, string $target_id): void {
+  private function dragToZone(string $source_id, string $target_id, float $ratio): void {
     $script = <<<JS
       const sourceRow = document.querySelector('tr[role="row"][data-id="$source_id"]');
       const targetRow = document.querySelector('tr[role="row"][data-id="$target_id"]');
@@ -269,7 +306,7 @@ final class ReorderGestureTest extends WebDriverTestBase {
       const startX = hRect.left + hRect.width / 2;
       const startY = hRect.top + hRect.height / 2;
       const endX = tRect.left + tRect.width / 2;
-      const endY = tRect.top + tRect.height * 0.1;
+      const endY = tRect.top + tRect.height * $ratio;
       function send(t, type, x, y) {
         t.dispatchEvent(new PointerEvent(type, {
           bubbles: true, cancelable: true, composed: true,
@@ -283,6 +320,20 @@ final class ReorderGestureTest extends WebDriverTestBase {
       send(handle, 'pointerup', endX, endY);
     JS;
     $this->getSession()->executeScript($script);
+  }
+
+  /**
+   * Drags one row's handle into the "before" zone of another row.
+   */
+  private function dragBefore(string $source_id, string $target_id): void {
+    $this->dragToZone($source_id, $target_id, 0.1);
+  }
+
+  /**
+   * Drags one row's handle onto the middle of another row, to drop as a child.
+   */
+  private function dragOnto(string $source_id, string $target_id): void {
+    $this->dragToZone($source_id, $target_id, 0.5);
   }
 
   /**
@@ -356,6 +407,28 @@ final class ReorderGestureTest extends WebDriverTestBase {
     }
     $state->resetCache();
     $this->assertSame($expected, $handler->levelIds(''), 'The reorder persisted to State.');
+  }
+
+  /**
+   * Asserts the persisted children of one parent, polling for the move POST.
+   *
+   * @param string $parent_id
+   *   The parent item ID.
+   * @param string[] $expected
+   *   The expected ordered list of child item IDs.
+   */
+  private function assertPersistedChildren(string $parent_id, array $expected): void {
+    $state = \Drupal::state();
+    $handler = new TestTreeMoveHandler($state);
+    for ($i = 0; $i < 50; $i++) {
+      $state->resetCache();
+      if ($handler->levelIds($parent_id) === $expected) {
+        return;
+      }
+      usleep(100000);
+    }
+    $state->resetCache();
+    $this->assertSame($expected, $handler->levelIds($parent_id), 'The children persisted to State.');
   }
 
 }

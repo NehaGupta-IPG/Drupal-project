@@ -107,9 +107,10 @@
     const newParentId = resolveNewParentId(intent);
     const { target } = intent;
 
+    // A child drop opens an unloaded destination first, a leaf included: a
+    // leaf's level comes back empty but loaded, which is enough to go ahead.
     if (
       intent.kind === 'child' &&
-      target.dataset.hasChildren === 'true' &&
       target.getAttribute('aria-expanded') !== 'true'
     ) {
       const opened = await element.expandRow(target);
@@ -160,6 +161,12 @@
       console.error('[treegrid-reorder] move fetch failed', e);
       announce(Drupal.t('Network error. Move canceled.'), 'assertive');
       return;
+    }
+
+    // The destination of a child drop is open from here on, so the moved row is
+    // inserted visible under it (a leaf is not marked open by its empty load).
+    if (intent.kind === 'child') {
+      target.setAttribute('aria-expanded', 'true');
     }
 
     // Server confirmed. Re-fetch the visible state of both affected groups.
