@@ -8,3 +8,5 @@ services:
     class: Drupal\entity_test\Cache\EntityTestViewGrantsCacheContext
     tags:
       - { name: cache.context }
+  entity_test.entity_field_default_value:
+    class: Drupal\entity_test\EntityTestEntityFieldDefaultValue

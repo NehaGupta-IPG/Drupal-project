@@ -439,7 +439,8 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   public function getDefaultValue(FieldableEntityInterface $entity) {
     // Allow custom default values function.
     if ($callback = $this->getDefaultValueCallback()) {
-      $value = call_user_func($callback, $entity, $this);
+      $callable = \Drupal::service('callable_resolver')->getCallableFromDefinition($callback);
+      $value = call_user_func($callable, $entity, $this);
     }
     else {
       $value = $this->getDefaultValueLiteral();

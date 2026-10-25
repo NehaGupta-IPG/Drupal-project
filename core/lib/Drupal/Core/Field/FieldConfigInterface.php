@@ -137,8 +137,11 @@ interface FieldConfigInterface extends FieldDefinitionInterface, ConfigEntityInt
    *
    * @param string|null $callback
    *   The callback to invoke for getting the default value (pass NULL to unset
-   *   a previously set callback). The callback will be invoked with the
-   *   following arguments:
+   *   a previously set callback). The value may be one of the following:
+   *   - A function name.
+   *   - A PHP static callable in the form CLASS_NAME::METHOD_NAME.
+   *   - A service callable in the form SERVICE_NAME:METHOD_NAME.
+   *   The callback will be invoked with the following arguments:
    *   - \Drupal\Core\Entity\FieldableEntityInterface $entity
    *     The entity being created.
    *   - \Drupal\Core\Field\FieldDefinitionInterface $definition
