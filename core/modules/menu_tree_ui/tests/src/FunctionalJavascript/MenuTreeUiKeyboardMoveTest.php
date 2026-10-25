@@ -31,7 +31,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  *
  * Depth-cap rejection is exercised at the service level in the MenuTreeMover
  * kernel test rather than re-driven here. Exact sibling order is owned by the
- * kernel overlay/mover tests and the spliceBefore unit table.
+ * kernel overlay/mover tests and the MoveLogReplay unit tests.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]

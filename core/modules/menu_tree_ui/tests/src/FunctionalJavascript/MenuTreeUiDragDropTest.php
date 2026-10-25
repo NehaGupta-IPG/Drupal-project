@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * level, it sits next to the row it was aimed at, and the affected groups'
  * row counts settle with no duplicate, blank, or virtualized rows left
  * behind. Exact sibling order is owned by the kernel overlay/mover tests and
- * the spliceBefore unit table, not re-asserted here.
+ * the MoveLogReplay unit tests, not re-asserted here.
  *
  * A drop records the move in a server-side working copy until saved, so
  * these tests assert the overlaid tree rather than the persisted entity.

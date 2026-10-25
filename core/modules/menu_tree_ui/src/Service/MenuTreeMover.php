@@ -13,6 +13,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\menu_tree_ui\MenuLinkMovability;
 use Drupal\treegrid_reorder\MoveIntent;
+use Drupal\treegrid_reorder\MoveLogReplay;
 use Drupal\treegrid_reorder\TreeMoveHandlerInterface;
 use Drupal\treegrid_reorder\TreeReorderManager;
 use Psr\Log\LoggerInterface;
@@ -57,6 +58,11 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
   private readonly TreeReorderManager $reorderManager;
 
   /**
+   * Replays recorded moves on id lists; stateless, so instantiated too.
+   */
+  private readonly MoveLogReplay $replay;
+
+  /**
    * Pending re-parents to overlay on live ancestry, or NULL for live-only.
    *
    * Set during a record-time validateMove() so the cycle and depth checks see
@@ -80,6 +86,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
   ) {
     $this->stringTranslation = $string_translation;
     $this->reorderManager = new TreeReorderManager();
+    $this->replay = new MoveLogReplay();
   }
 
   /**
@@ -152,7 +159,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
       $validation = $this->validateAgainstOverlay(
         $menu_name,
         $intent,
-        $this->loader->pendingParentMapFromOps(array_slice($ops, 0, $index, TRUE)),
+        $this->replay->pendingParents(array_slice($ops, 0, $index, TRUE)),
       );
       if (!$validation['ok']) {
         return [
@@ -486,9 +493,9 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
     }
 
     // Pluck the moved link out and splice it back in before $before_id (or at
-    // the end). Shared with MenuTreeLoader::spliceBefore() so the read overlay
-    // and this write-side re-weight produce the same order.
-    $reordered = MenuTreeLoader::spliceBefore($ordered, $moved_id, $before_id);
+    // the end). Shared with MoveLogReplay so the read overlay and this
+    // write-side re-weight produce the same order.
+    $reordered = $this->replay->spliceBefore($ordered, $moved_id, $before_id);
 
     $assigned_weight = 0;
     foreach ($reordered as $offset => $id) {

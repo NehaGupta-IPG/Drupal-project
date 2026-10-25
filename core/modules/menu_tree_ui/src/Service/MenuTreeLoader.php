@@ -10,6 +10,7 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
+use Drupal\treegrid_reorder\MoveLogReplay;
 use Drupal\treegrid_reorder\TreegridWorkingCopy;
 
 /**
@@ -26,6 +27,11 @@ use Drupal\treegrid_reorder\TreegridWorkingCopy;
  * @internal
  */
 final class MenuTreeLoader {
+
+  /**
+   * Stateless, so it is instantiated rather than injected.
+   */
+  private readonly MoveLogReplay $replay;
 
   /**
    * Constructs a MenuTreeLoader.
@@ -50,7 +56,9 @@ final class MenuTreeLoader {
     private readonly iterable $searchProviders,
     private readonly TreegridWorkingCopy $workingCopy,
     private readonly MenuLinkManagerInterface $menuLinkManager,
-  ) {}
+  ) {
+    $this->replay = new MoveLogReplay();
+  }
 
   /**
    * Loads a single level of a menu.
@@ -127,32 +135,7 @@ final class MenuTreeLoader {
    *   Plugin ID => pending new parent plugin ID ('' for the menu root).
    */
   public function getPendingParentMap(string $menu_name): array {
-    return $this->pendingParentMapFromOps($this->workingCopy->getOps($menu_name));
-  }
-
-  /**
-   * Collapses move ops into a map of link plugin ID to its new parent.
-   *
-   * The last move of a link wins. Non-move ops are ignored, and the root-level
-   * key ('') is never present.
-   *
-   * @param array<int, array<string, mixed>> $ops
-   *   The ops to collapse, in order.
-   *
-   * @return array<string, string>
-   *   Plugin ID => new parent plugin ID ('' for the menu root).
-   */
-  public function pendingParentMapFromOps(array $ops): array {
-    $map = [];
-    foreach ($ops as $op) {
-      if (($op['type'] ?? '') === 'move') {
-        $moved = (string) ($op['id'] ?? '');
-        if ($moved !== '') {
-          $map[$moved] = (string) ($op['new_parent'] ?? '');
-        }
-      }
-    }
-    return $map;
+    return $this->replay->pendingParents($this->workingCopy->getOps($menu_name));
   }
 
   /**
@@ -201,7 +184,7 @@ final class MenuTreeLoader {
           }
           $by_id[$moved] = $element;
         }
-        $order = self::spliceBefore($order, $moved, $before_id);
+        $order = $this->replay->spliceBefore($order, $moved, $before_id);
       }
       elseif ($in_list) {
         $order = array_values(array_filter($order, static fn(string $id): bool => $id !== $moved));
@@ -216,41 +199,6 @@ final class MenuTreeLoader {
       }
     }
     return $result;
-  }
-
-  /**
-   * Inserts a link id before another in an ordered list (or appends it).
-   *
-   * The moved id is removed if already present, then placed immediately before
-   * $before_id, or at the end when there is no anchor or the anchor is absent.
-   * Shared by the read-side overlay here and the write-side re-weight in
-   * MenuTreeMover::renumberSiblings() so both produce the same order.
-   *
-   * @param string[] $order
-   *   The current ordered ids.
-   * @param string $moved
-   *   The id to (re)place.
-   * @param string|null $before_id
-   *   The anchor id, or NULL to append.
-   *
-   * @return string[]
-   *   The new order.
-   */
-  public static function spliceBefore(array $order, string $moved, ?string $before_id): array {
-    $order = array_values(array_filter($order, static fn(string $id): bool => $id !== $moved));
-    $out = [];
-    $inserted = FALSE;
-    foreach ($order as $id) {
-      if (!$inserted && $before_id !== NULL && $id === $before_id) {
-        $out[] = $moved;
-        $inserted = TRUE;
-      }
-      $out[] = $id;
-    }
-    if (!$inserted) {
-      $out[] = $moved;
-    }
-    return $out;
   }
 
   /**
