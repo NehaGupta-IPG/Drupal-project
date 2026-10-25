@@ -56,7 +56,8 @@ final class TreegridReorderTestController extends ControllerBase {
   /**
    * Makes the move endpoint refuse a move.
    *
-   * An array with 'code' and, optionally, 'status' (default 400).
+   * An array with 'code' and, optionally, 'status' (default 400) and 'message'
+   * (safe HTML, sent as it is; default 'Move refused.').
    */
   public const MOVE_FAIL = 'treegrid_reorder_test.move_fail';
 
@@ -202,7 +203,7 @@ final class TreegridReorderTestController extends ControllerBase {
     $fail = $this->state()->get(self::MOVE_FAIL);
     if (is_array($fail)) {
       return new JsonResponse(
-        ['ok' => FALSE, 'code' => $fail['code'] ?? 'failed', 'message' => 'Move refused.'],
+        ['ok' => FALSE, 'code' => $fail['code'] ?? 'failed', 'message' => $fail['message'] ?? 'Move refused.'],
         (int) ($fail['status'] ?? 400),
         $revision_headers,
       );

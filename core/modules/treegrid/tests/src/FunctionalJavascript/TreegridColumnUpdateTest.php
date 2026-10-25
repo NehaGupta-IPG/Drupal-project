@@ -90,6 +90,18 @@ final class TreegridColumnUpdateTest extends WebDriverTestBase {
   }
 
   /**
+   * A refusal message with an escaped ampersand is announced once-escaped.
+   */
+  public function testRefusalMessageIsAnnouncedOnceEscaped(): void {
+    \Drupal::state()->set(TreegridTestUiController::COLUMN_UPDATE_FAIL_KEY, ['message' => 'Tom &amp; Jerry']);
+    $this->openPage();
+
+    $this->checkbox('p1')->click();
+
+    $this->assertJsCondition("document.getElementById('drupal-live-announce').textContent.includes('Tom & Jerry')");
+  }
+
+  /**
    * A busy refusal reverts the checkbox.
    */
   public function testBusyRefusalReverts(): void {

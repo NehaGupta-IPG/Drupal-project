@@ -114,6 +114,28 @@ final class ReorderMoveQueueTest extends WebDriverTestBase {
   }
 
   /**
+   * A server message with an escaped ampersand is announced once-escaped.
+   */
+  public function testShiftArrowFailureMessageIsAnnouncedOnceEscaped(): void {
+    \Drupal::state()->set(TreegridReorderTestController::MOVE_FAIL, ['message' => 'Tom &amp; Jerry']);
+
+    $this->pressKey('1', 'ArrowDown', TRUE);
+
+    $this->assertJsCondition("document.getElementById('drupal-live-announce').textContent.includes('Tom & Jerry')");
+  }
+
+  /**
+   * A drag failure announces the server message once-escaped.
+   */
+  public function testDragFailureMessageIsAnnouncedOnceEscaped(): void {
+    \Drupal::state()->set(TreegridReorderTestController::MOVE_FAIL, ['message' => 'Tom &amp; Jerry']);
+
+    $this->drag('3', '1', 0.1);
+
+    $this->assertJsCondition("document.getElementById('drupal-live-announce').textContent.includes('Tom & Jerry')");
+  }
+
+  /**
    * A request that never gets an answer fires failed with status 0.
    */
   public function testAbortedRequestFiresFailedWithStatusZero(): void {

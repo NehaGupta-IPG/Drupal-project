@@ -43,7 +43,8 @@ final class TreegridTestUiController extends ControllerBase {
   /**
    * The State key holding how a column update is refused, if it is.
    *
-   * An array with 'code' and, optionally, 'status' (default 400).
+   * An array with 'code' and, optionally, 'status' (default 400) and 'message'
+   * (safe HTML, sent as it is; default 'Update refused.').
    */
   public const COLUMN_UPDATE_FAIL_KEY = 'treegrid_test_ui.column_update_fail';
 
@@ -115,7 +116,7 @@ final class TreegridTestUiController extends ControllerBase {
     $fail = $this->state()->get(self::COLUMN_UPDATE_FAIL_KEY);
     if (is_array($fail)) {
       return new JsonResponse(
-        ['ok' => FALSE, 'code' => $fail['code'] ?? 'failed', 'message' => 'Update refused.'],
+        ['ok' => FALSE, 'code' => $fail['code'] ?? 'failed', 'message' => $fail['message'] ?? 'Update refused.'],
         (int) ($fail['status'] ?? 400),
       );
     }
