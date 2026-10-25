@@ -342,6 +342,9 @@ class EntityAccessControlHandlerTest extends EntityLanguageTestBase {
     $access_result = $entity->get('id')->access('edit', NULL, TRUE);
     $this->assertTrue($access_result->isForbidden());
     $this->assertEquals('The entity ID cannot be changed.', $access_result->getReason());
+
+    $this->expectException(\AssertionError::class);
+    $this->assertTrue($entity->get('id')->access('unknown_operation'));
   }
 
   /**

@@ -367,6 +367,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
     $this->moduleHandler()->alter('entity_field_access', $grants, $context);
 
     $result = $this->processAccessHookResults($grants);
+    assert($this->isFieldOperationRecognized($operation, $grants), 'Unrecognized field access operation: ' . $operation);
     return $return_as_object ? $result : $result->isAllowed();
   }
 
@@ -430,6 +431,34 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
       return $entity_bundle ? 'create:' . $entity_bundle : 'create';
     }
     return NULL;
+  }
+
+  /**
+   * Determines if the given field operation is recognized for access checks.
+   *
+   * This is used with assert() to warn developers if an unrecognized access
+   * check operation is being used (as such an access check will always return
+   * AccessResult::allowed()).
+   *
+   * @param string $operation
+   *   The field operation.
+   * @param array $grants
+   *   The access grants produced by hook_entity_field_access and _alter.
+   *
+   * @return bool
+   *   True if the operation is recognized.
+   */
+  protected function isFieldOperationRecognized(string $operation, array $grants): bool {
+    if (in_array($operation, ["view", "edit"])) {
+      $recognized = TRUE;
+    }
+    else {
+      // Check if any module has explicitly granted or denied access.
+      unset($grants[':default']);
+      $recognized = !$this->processAccessHookResults($grants)->isNeutral();
+    }
+
+    return $recognized;
   }
 
 }
