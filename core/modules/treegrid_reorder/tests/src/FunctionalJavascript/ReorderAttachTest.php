@@ -178,7 +178,137 @@ final class ReorderAttachTest extends WebDriverTestBase {
     $this->assertJsCondition("!document.querySelector('tr[aria-selected]')");
   }
 
+  /**
+   * A refresh of the carried row's level puts it back and ends the move.
+   */
+  public function testRefreshDuringCarryRestoresRowAndEndsMove(): void {
+    $this->openPage();
+    $this->pressKey('1', ' ');
+    $this->stepToDrop('1', 'after:3');
+    $this->assertSame(['2', '3', '1', '4'], $this->topLevelOrder());
+
+    $this->getSession()->executeScript("document.querySelector('drupal-treegrid').refreshLevel('');");
+    $this->assertJsCondition("!document.querySelector('tr[aria-selected]')");
+
+    $this->assertSame(['1', '2', '3', '4'], $this->topLevelOrder());
+    $this->assertSame(1, $this->getSession()->evaluateScript("return document.querySelectorAll('tr[data-id=\"1\"]').length;"));
+  }
+
+  /**
+   * Right onto a closed parent opens it and the carry continues as first child.
+   */
+  public function testRightOntoClosedParentOpensItAndCarryContinues(): void {
+    $this->openPage();
+    $this->expandRow('2');
+    $this->pressKey('2c', ' ');
+    $this->assertSame('after:2b', $this->dropTarget());
+
+    $this->pressKey('2c', 'ArrowRight');
+    $this->assertJsCondition("document.querySelectorAll('tr[data-parent-id=\"2b\"]').length === 2");
+
+    $this->assertSame('true', $this->rowAttribute('2b', 'aria-expanded'));
+    $this->assertSame('child:2b', $this->dropTarget());
+    $this->assertSame(['2b', '2c', '2b1', '2b2'], $this->rowOrderFrom('2b', 4));
+  }
+
+  /**
+   * Opening the previous sibling during a carry, then Escape, lands after it.
+   */
+  public function testEscapeAfterOpeningPreviousSiblingLandsAfterItsChildren(): void {
+    $this->openPage();
+    $this->expandRow('2');
+    $this->pressKey('2c', ' ');
+    $this->getSession()->executeScript("document.querySelector('tr[data-id=\"2b\"] [data-treegrid-toggle]').click();");
+    $this->assertJsCondition("document.querySelectorAll('tr[data-parent-id=\"2b\"]').length === 2");
+
+    $this->pressKey('2c', 'Escape');
+
+    $this->assertSame(['2b', '2b1', '2b2', '2c'], $this->rowOrderFrom('2b', 4));
+  }
+
+  /**
+   * Escape on a first child puts it back right after its parent.
+   */
+  public function testEscapeOnFirstChildLandsAfterParent(): void {
+    $this->openPage();
+    $this->expandRow('2');
+    $this->pressKey('2a', ' ');
+    $this->pressKey('2a', 'ArrowDown');
+    $this->pressKey('2a', 'ArrowDown');
+    $this->assertNotSame('before:2b', $this->dropTarget());
+    $this->pressKey('2a', 'Escape');
+
+    $this->assertSame(['2', '2a', '2b'], $this->rowOrderFrom('2', 3));
+  }
+
   // Helpers.
+
+  /**
+   * Opens a parent row with its toggle and waits for its children.
+   *
+   * @param string $id
+   *   The row's data-id.
+   */
+  private function expandRow(string $id): void {
+    $this->getSession()->executeScript(sprintf(
+      "document.querySelector('tr[data-id=\"%s\"] [data-treegrid-toggle]').click();",
+      $id,
+    ));
+    $this->assertJsCondition(sprintf(
+      "document.querySelectorAll('tr[data-parent-id=\"%s\"]').length > 0 && !document.querySelector('[data-treegrid-loading]')",
+      $id,
+    ));
+  }
+
+  /**
+   * The ids of the rows from one row on, in DOM order.
+   *
+   * @param string $id
+   *   The first row's data-id.
+   * @param int $count
+   *   How many rows to read.
+   *
+   * @return string[]
+   *   The ids.
+   */
+  private function rowOrderFrom(string $id, int $count): array {
+    $ids = $this->getSession()->evaluateScript(
+      "return Array.from(document.querySelectorAll('tr[role=\"row\"]')).map((row) => row.dataset.id);",
+    );
+    return array_slice($ids, array_search($id, $ids, TRUE), $count);
+  }
+
+  /**
+   * The top-level row order in the DOM.
+   *
+   * @return string[]
+   *   The row ids.
+   */
+  private function topLevelOrder(): array {
+    return $this->getSession()->evaluateScript(
+      "return Array.from(document.querySelectorAll('tr[data-parent-id=\"\"]')).map((row) => row.dataset.id);",
+    );
+  }
+
+  /**
+   * Steps the move cursor until it reaches a drop position.
+   *
+   * @param string $id
+   *   The grabbed row's data-id.
+   * @param string $wanted
+   *   The wanted data-treegrid-reorder-drop value, "kind:id".
+   * @param string $key
+   *   The key that steps the cursor.
+   */
+  private function stepToDrop(string $id, string $wanted, string $key = 'ArrowDown'): void {
+    for ($i = 0; $i < 12; $i++) {
+      if ($this->dropTarget() === $wanted) {
+        return;
+      }
+      $this->pressKey($id, $key);
+    }
+    $this->fail("Move cursor never reached '$wanted'.");
+  }
 
   /**
    * Loads the test page and waits for the consumer to be wired.

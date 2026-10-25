@@ -644,6 +644,23 @@ final class TreegridElementApiTest extends WebDriverTestBase {
     $this->assertEquals([2, 4], $this->getSession()->evaluateScript('return window.apiTest.result;'));
   }
 
+  /**
+   * After a DOM move, rows scrolled into view lose their virtualized flag.
+   */
+  public function testRowsLoseVirtualizedFlagAfterDomMove(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->getSession()->executeScript(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      element.tree.querySelector('tr[data-id="p2"]').dataset.treegridVirtualized = 'true';
+      const wrapper = document.createElement('div');
+      element.parentNode.appendChild(wrapper);
+      wrapper.appendChild(element);
+    JS);
+
+    $this->assertJsCondition("!document.querySelector('tr[data-id=\"p2\"]').hasAttribute('data-treegrid-virtualized')");
+  }
+
   // Helpers.
 
   /**

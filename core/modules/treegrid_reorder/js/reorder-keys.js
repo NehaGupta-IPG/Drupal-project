@@ -9,7 +9,7 @@
  * A row carries its descendant run as a block, so reordering moves the whole
  * subtree past the previous/next sibling block as a unit.
  *
- * Exposes Drupal.treegridReorder.reorderSibling.
+ * Exposes Drupal.treegridReorder.reorderSibling and previousSiblingRow.
  */
 
 ((Drupal) => {
@@ -268,4 +268,5 @@
   }
 
   Drupal.treegridReorder.reorderSibling = reorderSibling;
+  Drupal.treegridReorder.previousSiblingRow = previousSiblingRow;
 })(Drupal);

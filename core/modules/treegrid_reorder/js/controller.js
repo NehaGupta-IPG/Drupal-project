@@ -66,6 +66,7 @@
       this.onPointerMove = this.onPointerMove.bind(this);
       this.onPointerUp = this.onPointerUp.bind(this);
       this.onPointerCancel = this.onPointerCancel.bind(this);
+      this.onBeforeRowsChange = this.onBeforeRowsChange.bind(this);
     }
 
     /**
@@ -160,6 +161,10 @@
         // row up into move mode instead (see onPointerUp).
         this.onGestureStart?.();
         this.moved.setAttribute(DRAGGING, 'true');
+        this.element.addEventListener(
+          'treegrid:before-rows-change',
+          this.onBeforeRowsChange,
+        );
       }
       this.updateIntent(event.clientX, event.clientY);
     }
@@ -207,6 +212,25 @@
         return;
       }
       this.cleanup();
+    }
+
+    /**
+     * Drops the drag's target when a level is about to be reconciled.
+     *
+     * The rows the target and indicator point at may be rebuilt, so releasing
+     * does nothing until the pointer moves over a row again. Rows that are only
+     * being added leave the drag alone.
+     *
+     * @param {CustomEvent} event
+     *   The treegrid:before-rows-change event.
+     */
+    onBeforeRowsChange(event) {
+      if (event.detail.change !== 'reconcile') {
+        return;
+      }
+      this.intent = null;
+      this.indicator.clear();
+      this.clearHoverExpand();
     }
 
     /**
@@ -306,6 +330,10 @@
           this.activeHandle.releasePointerCapture(this.pointerId);
         }
       }
+      this.element.removeEventListener(
+        'treegrid:before-rows-change',
+        this.onBeforeRowsChange,
+      );
       this.moved?.removeAttribute(DRAGGING);
       this.indicator.clear();
       this.moved = null;

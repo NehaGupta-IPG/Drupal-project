@@ -149,8 +149,13 @@
       this.block = [];
       this.blockDelta = new Map();
       this.origLevel = 1;
-      this.originParent = null;
+      this.originPreviousId = null;
+      this.originParentId = '';
       this.originNext = null;
+      // Whether rows are about to be added to the tree.
+      this.insertPending = false;
+      this.onBeforeRowsChange = this.onBeforeRowsChange.bind(this);
+      this.onLevelLoaded = this.onLevelLoaded.bind(this);
       // The cursor: a slot index between visible rows, and the depth the row
       // would land at there.
       this.gap = 0;
@@ -218,6 +223,14 @@
       }
 
       this.active = true;
+      this.element.addEventListener(
+        'treegrid:before-rows-change',
+        this.onBeforeRowsChange,
+      );
+      this.element.addEventListener(
+        'treegrid:level-loaded',
+        this.onLevelLoaded,
+      );
       row.setAttribute(GRABBED, 'true');
       // Tell the treegrid to keep this row visible: its collapse guard refuses
       // to fold a section containing a data-treegrid-keep-visible row, so the
@@ -255,8 +268,16 @@
       const last = this.block.length
         ? this.block[this.block.length - 1]
         : this.grabbed;
-      this.originParent = this.grabbed.parentNode;
+      // The slot the cursor starts in; kept as a row only for that.
       this.originNext = last.nextElementSibling;
+      // Where the row goes back to: right after the previous item at its level
+      // and block, or right after its parent when it was the first child, or
+      // the start of the tree body when it was the first top-level row. Rows
+      // landing elsewhere during the carry don't move that spot.
+      this.originPreviousId =
+        Drupal.treegridReorder.previousSiblingRow(this.grabbed)?.dataset.id ??
+        null;
+      this.originParentId = this.grabbed.dataset.parentId ?? '';
     }
 
     /**
@@ -708,13 +729,17 @@
     restoreToOrigin() {
       this.detachUnit();
       this.setUnitLevel(this.origLevel);
-      const rows = this.unit();
-      if (this.originNext && this.originNext.parentNode === this.originParent) {
-        rows.forEach((row) =>
-          this.originParent.insertBefore(row, this.originNext),
-        );
+      const previous = this.originPreviousId
+        ? findRow(this.tree, this.originPreviousId)
+        : null;
+      const parent = findRow(this.tree, this.originParentId);
+      if (previous) {
+        this.insertUnit(lastDescendantRow(previous) ?? previous, true);
+      } else if (parent) {
+        this.insertUnit(parent, true);
       } else {
-        rows.forEach((row) => this.originParent.appendChild(row));
+        const body = this.tree.querySelector('tbody');
+        body.prepend(...this.unit());
       }
       this.grabbed.focus();
     }
@@ -774,6 +799,47 @@
     }
 
     /**
+     * Gives up the carry when the rows it moves among are about to change.
+     *
+     * A level that is reconciled may remove, reorder or rebuild rows, so the
+     * carried row goes back where it started and the move ends. Rows that are
+     * only being added leave the carry alone; the cursor is recomputed once
+     * they are in.
+     *
+     * @param {CustomEvent} event
+     *   The treegrid:before-rows-change event.
+     */
+    onBeforeRowsChange(event) {
+      if (!this.active) {
+        return;
+      }
+      if (event.detail.change === 'reconcile') {
+        this.restoreToOrigin();
+        announce(Drupal.t('Move canceled. The tree changed.'), 'assertive');
+        this.end();
+        return;
+      }
+      this.insertPending = true;
+    }
+
+    /**
+     * Re-places the carried row against its target once added rows are in.
+     */
+    onLevelLoaded() {
+      if (!this.active || !this.insertPending || !this.intent) {
+        return;
+      }
+      this.insertPending = false;
+      const list = this.visibleList();
+      const placed = this.gapDepthForIntent(this.intent, list);
+      if (placed) {
+        this.gap = placed.gap;
+        this.depth = placed.depth;
+      }
+      this.carryTo(this.intent);
+    }
+
+    /**
      * Cancels an in-progress move, restoring the row to where it started.
      */
     cancel() {
@@ -791,6 +857,15 @@
      * Callers that end a carried move (commit, cancel) restore the row first.
      */
     end() {
+      this.element.removeEventListener(
+        'treegrid:before-rows-change',
+        this.onBeforeRowsChange,
+      );
+      this.element.removeEventListener(
+        'treegrid:level-loaded',
+        this.onLevelLoaded,
+      );
+      this.insertPending = false;
       this.grabbed?.removeAttribute(GRABBED);
       delete this.grabbed?.dataset.treegridKeepVisible;
       // The dropped (or restored) row stays the cursor and the single tab stop,
