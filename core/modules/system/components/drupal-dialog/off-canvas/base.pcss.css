@@ -70,6 +70,14 @@
      */
     @media (max-width: 48rem) {
       width: 100%;
+
+      &:dir(ltr) {
+        left: 0;
+      }
+
+      &:dir(rtl) {
+        right: 0;
+      }
     }
   }
 
@@ -229,13 +237,29 @@ body.js-off-canvas-dialog-open {
 
 /* This is a page level content wrapper that shrinks when off-canvas is open. */
 .dialog-off-canvas-main-canvas {
-  padding-right: var(--drupal-displace-offset-right);
   transition:
     padding-right 0.7s ease,
     padding-left 0.7s ease,
     padding-top 0.3s ease;
 
+  &:dir(ltr) {
+    padding-right: var(--drupal-displace-offset-right, 0);
+  }
+
+  &:dir(rtl) {
+    padding-left: var(--drupal-displace-offset-left, 0);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     transition: none;
+  }
+
+  /* At this width the side dialog overlays the main canvas. */
+  @media (max-width: 48rem) {
+    &:dir(ltr),
+    &:dir(rtl) {
+      padding-right: 0;
+      padding-left: 0;
+    }
   }
 }
