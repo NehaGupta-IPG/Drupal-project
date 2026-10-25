@@ -202,7 +202,7 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
     parent::useCaches($use_caches);
     if (!$use_caches) {
       $this->handlers = [];
-      $this->container->get('entity.memory_cache')->reset();
+      $this->container->get('entity.memory_cache')->deleteAll();
     }
   }
 

@@ -3,6 +3,7 @@
 namespace Drupal\Core\Test;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 
 /**
  * Provides a method to refresh in-memory configuration and state information.
@@ -26,14 +27,12 @@ trait RefreshVariablesTrait {
     // Clear the tag cache.
     \Drupal::service('cache_tags.invalidator')->resetChecksums();
     foreach (Cache::getBins() as $backend) {
-      if (is_callable([$backend, 'reset'])) {
-        $backend->reset();
+      if ($backend instanceof MemoryCacheInterface) {
+        $backend->deleteAll();
       }
     }
     foreach (Cache::getMemoryBins() as $backend) {
-      if (is_callable([$backend, 'reset'])) {
-        $backend->reset();
-      }
+      $backend->deleteAll();
     }
 
     \Drupal::service('config.factory')->reset();

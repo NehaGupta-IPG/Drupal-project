@@ -213,8 +213,14 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    * Reset statically cached variables.
    *
    * This is only used by tests.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Cache\MemoryBackend::deleteAll() instead.
+   *
+   * @see https://www.drupal.org/node/3499940
    */
   public function reset() {
+    @trigger_error(__CLASS__ . "::" . __FUNCTION__ . " is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use " . __CLASS__ . "::deleteAll() instead. See https://www.drupal.org/node/3499940", E_USER_DEPRECATED);
     $this->cache = [];
   }
 
