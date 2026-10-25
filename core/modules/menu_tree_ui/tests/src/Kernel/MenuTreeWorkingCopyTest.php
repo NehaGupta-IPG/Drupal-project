@@ -313,6 +313,7 @@ final class MenuTreeWorkingCopyTest extends KernelTestBase {
     $result = $this->save();
 
     $this->assertFalse($result['ok']);
+    $this->assertArrayNotHasKey('dirty', $result);
     $this->assertSame([0], $result['applied_ops']);
     $this->assertStringContainsString('Saved 1 of 2', $result['message']);
     $this->assertSame($b_id, $this->parentOf($a_id));
@@ -322,6 +323,24 @@ final class MenuTreeWorkingCopyTest extends KernelTestBase {
     $remaining = $this->workingCopy->getOps('test');
     $this->assertCount(1, $remaining);
     $this->assertSame($c_id, $remaining[0]['id']);
+  }
+
+  /**
+   * Successful Save and Cancel responses say whether changes remain.
+   */
+  public function testSaveAndCancelReportWhetherChangesRemain(): void {
+    $a_id = $this->createLink('Pelican', 30)->getPluginId();
+    $b_id = $this->createLink('Heron', 31)->getPluginId();
+
+    $this->recordMove($a_id, $b_id);
+    $cancel = json_decode((string) MenuTreeController::create($this->container)->cancel(Menu::load('test'))->getContent(), TRUE);
+    $this->assertTrue($cancel['ok']);
+    $this->assertFalse($cancel['dirty']);
+
+    $this->recordMove($a_id, $b_id);
+    $result = $this->save();
+    $this->assertTrue($result['ok']);
+    $this->assertFalse($result['dirty']);
   }
 
   // Helpers.

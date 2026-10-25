@@ -128,6 +128,7 @@ final class MenuTreeControllerLockTest extends KernelTestBase {
       $result = json_decode((string) $response->getContent(), TRUE);
       $this->assertFalse($result['ok'], $action);
       $this->assertSame('busy', $result['code'], $action);
+      $this->assertArrayNotHasKey('dirty', $result, $action);
     }
 
     $plugin_manager = $this->container->get('plugin.manager.menu.link');
@@ -140,6 +141,7 @@ final class MenuTreeControllerLockTest extends KernelTestBase {
     $other_process->release(self::LOCK_NAME);
     $result = json_decode((string) $controller->save($menu)->getContent(), TRUE);
     $this->assertTrue($result['ok'], $result['message'] ?? '');
+    $this->assertFalse($result['dirty']);
     $this->assertSame($b, $plugin_manager->getDefinition($a)['parent']);
     $this->assertTrue($other_process->acquire(self::LOCK_NAME));
   }

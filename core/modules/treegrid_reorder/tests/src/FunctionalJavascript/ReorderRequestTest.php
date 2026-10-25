@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\treegrid_reorder\FunctionalJavascript;
 
+use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\treegrid_reorder_test\Controller\TreegridReorderTestController;
 use Drupal\treegrid_reorder_test\TestTreeMoveHandler;
@@ -106,7 +107,178 @@ final class ReorderRequestTest extends WebDriverTestBase {
     $this->assertSame(0, $this->sessionTokenRequests());
   }
 
+  /**
+   * A request carries the CSRF token and the attribute's revision.
+   */
+  public function testRequestSendsTokenAndRevision(): void {
+    \Drupal::state()->set(TreegridReorderTestController::PAGE_REVISION, 'abc');
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->openPage();
+
+    $result = $this->requestEcho();
+
+    $this->assertTrue($result['ok']);
+    $this->assertSame(200, $result['status']);
+    $this->assertTrue($result['sent']);
+    $this->assertSame('abc', $result['body']['received']['revision']);
+  }
+
+  /**
+   * Without the attribute no revision header is sent.
+   */
+  public function testNoRevisionHeaderWithoutAttribute(): void {
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->openPage();
+
+    $result = $this->requestEcho();
+
+    $this->assertTrue($result['ok']);
+    $this->assertNull($result['body']['received']['revision']);
+  }
+
+  /**
+   * A response's revision header replaces the attribute.
+   */
+  public function testResponseRevisionReplacesAttribute(): void {
+    \Drupal::state()->set(TreegridReorderTestController::PAGE_REVISION, 'one');
+    \Drupal::state()->set(TreegridReorderTestController::REVISION, 'one');
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->openPage();
+
+    $this->assertTrue($this->requestEcho()['ok']);
+
+    \Drupal::state()->resetCache();
+    $stored = \Drupal::state()->get(TreegridReorderTestController::REVISION);
+    $this->assertNotSame('one', $stored);
+    $this->assertSame($stored, $this->revisionAttribute());
+  }
+
+  /**
+   * A busy response leaves the revision and the tree's state alone.
+   */
+  public function testBusyResponseLeavesRevisionAlone(): void {
+    \Drupal::state()->set(TreegridReorderTestController::PAGE_REVISION, 'one');
+    \Drupal::state()->set(TreegridReorderTestController::BUSY, TRUE);
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->openPage();
+
+    $result = $this->requestEcho();
+
+    $this->assertFalse($result['ok']);
+    $this->assertSame(409, $result['status']);
+    $this->assertSame('busy', $result['code']);
+    $this->assertSame('one', $this->revisionAttribute());
+    $this->assertNull($this->needsReloadAttribute());
+  }
+
+  /**
+   * A stale response blocks later writes but not reads.
+   */
+  public function testStaleResponseBlocksWritesNotReads(): void {
+    \Drupal::state()->set(TreegridReorderTestController::PAGE_REVISION, 'mine');
+    \Drupal::state()->set(TreegridReorderTestController::REVISION, 'theirs');
+    \Drupal::state()->set(TreegridReorderTestController::ECHO_DELAY, 400);
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->openPage();
+
+    $echo_url = Url::fromRoute('treegrid_reorder_test.echo')->toString();
+    $children_url = Url::fromRoute('treegrid_reorder_test.children')->toString();
+    $this->runAsync(<<<JS
+      const element = document.querySelector('drupal-treegrid');
+      const reloads = [];
+      element.addEventListener('treegrid-reorder:needs-reload', (event) => reloads.push(event.detail.reason));
+      const first = Drupal.treegridReorder.request(element, '$echo_url', { body: {} });
+      const second = Drupal.treegridReorder.request(element, '$echo_url', { body: {} });
+      const results = await Promise.all([first, second]);
+      const read = await Drupal.treegridReorder.request(element, '$children_url', { method: 'GET' });
+      return { results, reloads, read: { ok: read.ok, sent: read.sent, status: read.status } };
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.requestTest.result;');
+    $this->assertSame(409, $result['results'][0]['status']);
+    $this->assertSame('stale', $result['results'][0]['code']);
+    $this->assertTrue($result['results'][0]['sent']);
+    $this->assertSame('stale', $result['results'][1]['code']);
+    $this->assertSame(0, $result['results'][1]['status']);
+    $this->assertFalse($result['results'][1]['sent']);
+    $this->assertSame(['stale'], $result['reloads']);
+    $this->assertSame('stale', $this->needsReloadAttribute());
+    // The children response has no ok flag, so only its delivery is checked.
+    $this->assertEquals(['ok' => FALSE, 'sent' => TRUE, 'status' => 200], $result['read']);
+    \Drupal::state()->resetCache();
+    $this->assertSame(1, \Drupal::state()->get(TreegridReorderTestController::ECHO_HITS));
+  }
+
+  /**
+   * A network error resolves with status 0 and the request marked sent.
+   */
+  public function testNetworkErrorResolvesSent(): void {
+    $this->drupalLogin($this->drupalCreateUser());
+    $this->openPage();
+
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      return Drupal.treegridReorder.request(element, 'http://127.0.0.1:1/unreachable', { body: {} });
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.requestTest.result;');
+    $this->assertEquals(
+      ['ok' => FALSE, 'status' => 0, 'code' => NULL, 'message' => NULL, 'body' => NULL, 'sent' => TRUE],
+      $result,
+    );
+  }
+
   // Helpers.
+
+  /**
+   * Sends a POST through the request helper to the echo route.
+   *
+   * @return array<string, mixed>
+   *   The helper's result.
+   */
+  private function requestEcho(): array {
+    $echo_url = Url::fromRoute('treegrid_reorder_test.echo')->toString();
+    $this->runAsync(<<<JS
+      const element = document.querySelector('drupal-treegrid');
+      return Drupal.treegridReorder.request(element, '$echo_url', { body: {} });
+    JS);
+    return $this->getSession()->evaluateScript('return window.requestTest.result;');
+  }
+
+  /**
+   * Runs a script that returns a promise and stores its value.
+   *
+   * The value lands in window.requestTest.result.
+   *
+   * @param string $script
+   *   The script body; it must return a promise.
+   */
+  private function runAsync(string $script): void {
+    $this->getSession()->executeScript(
+      'window.requestTest = Object.assign(window.requestTest || {}, { done: false, result: null });'
+      . '(async function () {' . $script . '})().then(function (value) {'
+      . ' window.requestTest.result = value; window.requestTest.done = true; });',
+    );
+    $this->assertJsCondition('window.requestTest.done === true');
+  }
+
+  /**
+   * The element's current revision attribute.
+   */
+  private function revisionAttribute(): ?string {
+    return $this->getSession()->evaluateScript(
+      "return document.querySelector('drupal-treegrid').getAttribute('data-treegrid-reorder-revision');",
+    );
+  }
+
+  /**
+   * The element's needs-reload attribute.
+   */
+  private function needsReloadAttribute(): ?string {
+    return $this->getSession()->evaluateScript(
+      "return document.querySelector('drupal-treegrid').getAttribute('data-treegrid-reorder-needs-reload');",
+    );
+  }
 
   /**
    * Loads the test page and waits for the consumer to be wired.

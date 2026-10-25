@@ -341,6 +341,7 @@ final class MenuTreeController extends ControllerBase {
       $result = $this->mover->commitWorkingCopy($menu_name, $ops);
       if (!empty($result['ok'])) {
         $this->workingCopy->clear($menu_name);
+        $result['dirty'] = $this->workingCopy->hasChanges($menu_name);
         return new JsonResponse($result);
       }
 
@@ -371,7 +372,7 @@ final class MenuTreeController extends ControllerBase {
         );
       }
       $this->workingCopy->clear($menu_name);
-      return new JsonResponse(['ok' => TRUE]);
+      return new JsonResponse(['ok' => TRUE, 'dirty' => $this->workingCopy->hasChanges($menu_name)]);
     });
   }
 

@@ -38,35 +38,6 @@
   }
 
   /**
-   * POSTs to a working-copy endpoint with the CSRF header.
-   *
-   * @param {string} url
-   *   The save or cancel URL.
-   * @param {HTMLElement} element
-   *   The <drupal-treegrid> element, which knows the CSRF token.
-   *
-   * @return {Promise<object>}
-   *   The decoded JSON response, or an error-shaped object.
-   */
-  async function post(url, element) {
-    const token = await Drupal.treegrid.csrfToken(element);
-    const headers = { Accept: 'application/json' };
-    if (token !== '') {
-      headers['X-CSRF-Token'] = token;
-    }
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers,
-        credentials: 'same-origin',
-      });
-      return await response.json().catch(() => ({ ok: false }));
-    } catch (e) {
-      return { ok: false };
-    }
-  }
-
-  /**
    * Wires one action bar's Save / Cancel buttons and unsaved notice.
    *
    * @param {HTMLElement} bar
@@ -85,6 +56,19 @@
     const save = bar.querySelector('[data-mtu-action="save"]');
     const cancel = bar.querySelector('[data-mtu-action="cancel"]');
     let inFlight = false;
+
+    /**
+     * Shows or hides the unsaved notice from a response's dirty flag.
+     *
+     * @param {boolean|undefined} dirty
+     *   Whether the working copy still holds changes. A response that does not
+     *   say leaves the notice as it is.
+     */
+    function setUnsaved(dirty) {
+      if (typeof dirty === 'boolean') {
+        notice?.classList.toggle('js-hide', !dirty);
+      }
+    }
 
     /**
      * Posts to a working-copy endpoint, one request at a time.
@@ -109,8 +93,9 @@
       );
       messages?.clear();
       try {
-        const result = await post(url, element);
+        const result = await Drupal.treegridReorder.request(element, url);
         if (result.ok) {
+          setUnsaved(result.body.dirty);
           onSuccess();
         } else {
           messages?.add(result.message ?? failureMessage, { type: 'error' });
@@ -128,8 +113,7 @@
         // The tree already shows the saved order (it was rendering the working
         // copy, which is now committed), so there is nothing to re-fetch. Don't
         // reload: that would collapse every expanded section and lose scroll
-        // position on large menus. Just retire the unsaved notice.
-        notice?.classList.add('js-hide');
+        // position on large menus.
         Drupal.treegrid.announce(Drupal.t('Changes saved.'), 'polite');
       }),
     );

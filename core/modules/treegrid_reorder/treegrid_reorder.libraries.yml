@@ -3,6 +3,7 @@ treegrid_reorder:
   js:
     js/intent.js: {}
     js/indicator.js: {}
+    js/request.js: {}
     js/commit.js: {}
     js/controller.js: {}
     js/move-mode.js: {}
