@@ -197,14 +197,27 @@ class ManyToOneHelper {
           $join = $this->getJoin();
           $join->type = 'LEFT';
           if (!empty($this->handler->view->many_to_one_tables[$field])) {
+            // Initialize exposed filter data.
+            $exposed_field_data = [];
+            // Check all filters for exposed data.
+            foreach ($this->handler->view->filter as $value) {
+              // Check current filter field in filter list.
+              if ($value->realField == $this->handler->realField) {
+                if (!empty($this->handler->view->exposed_data[$value->options['id']])) {
+                  $exposed_field_data[] = $this->handler->view->exposed_data[$value->options['id']];
+                }
+              }
+            }
             foreach ($this->handler->view->many_to_one_tables[$field] as $value) {
-              $join->extra = [
-                [
-                  'field' => $this->handler->realField,
-                  'operator' => '!=',
-                  'value' => $value,
-                  'numeric' => !empty($this->handler->definition['numeric']),
-                ],
+              // Skip if value is in current exposed data.
+              if (!empty($exposed_field_data) && in_array($value, $exposed_field_data)) {
+                continue;
+              }
+              $join->extra[] = [
+                'field' => $this->handler->realField,
+                'operator' => '!=',
+                'value' => $value,
+                'numeric' => !empty($this->handler->definition['numeric']),
               ];
             }
           }
