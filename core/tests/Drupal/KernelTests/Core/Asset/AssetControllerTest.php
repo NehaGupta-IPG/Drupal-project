@@ -16,9 +16,10 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Tests that the asset controllers reject invalid aggregate requests.
+ * Tests that the asset controllers reject invalid and unknown file requests.
  */
 #[Group('asset')]
 #[RunTestsInSeparateProcesses]
@@ -184,6 +185,36 @@ class AssetControllerTest extends KernelTestBase {
       'js_' . $hash . '.js',
       'The URL must have a scope query argument.',
     );
+  }
+
+  /**
+   * Tests that deliver() returns a 404 for requests without query arguments.
+   */
+  public function testDeliverNotFound(): void {
+    $hash = $this->randomMachineName();
+    $controllers = [
+      'css' => CssAssetController::create($this->container),
+      'js' => JsAssetController::create($this->container),
+    ];
+    foreach ($controllers as $type => $controller) {
+      foreach (["{$type}_$hash.$type", "{$type}_$hash.$type.map"] as $filename) {
+        try {
+          $controller->deliver(Request::create('/dummy'), $filename);
+          $this->fail("Expected NotFoundHttpException for $filename");
+        }
+        catch (NotFoundHttpException $e) {
+          $this->assertSame(404, $e->getStatusCode());
+        }
+      }
+
+      // Any query argument means the request is validated as an aggregate.
+      $this->assertDeliverThrows(
+        $controller,
+        Request::create('/dummy', 'GET', ['v' => '123']),
+        "{$type}_$hash.$type",
+        'The theme must be passed as a query argument',
+      );
+    }
   }
 
   /**
