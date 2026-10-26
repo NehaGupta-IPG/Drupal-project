@@ -366,8 +366,19 @@ class FieldConfigEditForm extends EntityForm {
 
     $field_storage_form = $this->entityTypeManager->getFormObject('field_storage_config', $this->operation);
     $field_storage_form->setEntity($this->entity->getFieldStorageDefinition());
-    $subform_state = SubformState::createForSubform($form['field_storage']['subform'], $form, $form_state, $field_storage_form);
-    $field_storage_form->validateForm($form['field_storage']['subform'], $subform_state);
+
+    if (isset($form['field_storage']['subform'])) {
+      $subform_state = SubformState::createForSubform(
+        $form['field_storage']['subform'],
+        $form,
+        $form_state,
+        $field_storage_form
+      );
+      $field_storage_form->validateForm(
+        $form['field_storage']['subform'],
+        $subform_state
+      );
+    }
 
     // Make sure that the default value form is validated using the field
     // configuration that was just submitted.
@@ -391,14 +402,26 @@ class FieldConfigEditForm extends EntityForm {
 
     $field_storage_form = $this->entityTypeManager->getFormObject('field_storage_config', $this->operation);
     $field_storage_form->setEntity($this->entity->getFieldStorageDefinition());
-    $subform_state = SubformState::createForSubform($form['field_storage']['subform'], $form, $form_state, $field_storage_form);
-    $field_storage_form->submitForm($form['field_storage']['subform'], $subform_state);
-    try {
-      $field_storage_form->save($form['field_storage']['subform'], $subform_state);
-    }
-    catch (EntityStorageException $exception) {
-      $this->handleEntityStorageException($form_state, $exception);
-      return;
+
+    if (isset($form['field_storage']['subform'])) {
+      $subform_state = SubformState::createForSubform(
+        $form['field_storage']['subform'],
+        $form,
+        $form_state,
+        $field_storage_form
+      );
+      $field_storage_form->submitForm(
+        $form['field_storage']['subform'],
+        $subform_state
+      );
+
+      try {
+        $field_storage_form->save($form['field_storage']['subform'], $subform_state);
+      }
+      catch (EntityStorageException $exception) {
+        $this->handleEntityStorageException($form_state, $exception);
+        return;
+      }
     }
 
     // Handle the default value.
