@@ -112,15 +112,15 @@ class ListElement implements ElementInterface {
   protected function getGroupTitle(DataDefinitionInterface $definition, array $group_build) {
     $title = '';
     if (isset($group_build['title']['source'])) {
-      $title = $group_build['title']['source']['#markup'];
+      $title = $group_build['title']['source']['#markup'] ?? '';
     }
     elseif (isset($group_build['label']['source'])) {
-      $title = $group_build['label']['source']['#markup'];
+      $title = $group_build['label']['source']['#markup'] ?? '';
     }
     else {
       foreach (array_keys($group_build) as $title_key) {
         if (isset($group_build[$title_key]['source']) && (str_contains($title_key, 'title') || str_contains($title_key, 'label'))) {
-          $title = $group_build[$title_key]['source']['#markup'];
+          $title = $group_build[$title_key]['source']['#markup'] ?? '';
           break;
         }
       }
