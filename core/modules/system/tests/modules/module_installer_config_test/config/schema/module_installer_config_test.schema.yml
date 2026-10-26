@@ -7,3 +7,11 @@ module_installer_config_test.type.*:
     name:
       type: label
       label: 'Name'
+
+module_installer_config_test.type.*.third_party.module_installer_config_test:
+  type: mapping
+  label: 'Schema for module_installer_config_test module additions to test entity type'
+  mapping:
+    foo:
+      type: string
+      label: 'Label for foo'
