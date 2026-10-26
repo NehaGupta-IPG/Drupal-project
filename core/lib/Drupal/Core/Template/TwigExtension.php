@@ -261,12 +261,19 @@ class TwigExtension extends AbstractExtension {
     assert(is_array($attributes) || $attributes instanceof Attribute, '$attributes, if set, must be an array or object of type \Drupal\Core\Template\Attribute');
 
     if (!$url instanceof Url) {
-      $url = Url::fromUri($url);
+      try {
+        $url = Url::fromUserInput($url);
+      }
+      catch (\InvalidArgumentException $e) {
+        $url = Url::fromUri($url);
+      }
     }
-    // The twig extension should not modify the original URL object, this
-    // ensures consistent rendering.
-    // @see https://www.drupal.org/node/2842399
-    $url = clone $url;
+    else {
+      // The twig extension should not modify the original URL object, this
+      // ensures consistent rendering.
+      // @see https://www.drupal.org/node/2842399
+      $url = clone $url;
+    }
     if ($attributes) {
       if ($attributes instanceof Attribute) {
         $attributes = $attributes->toArray();
