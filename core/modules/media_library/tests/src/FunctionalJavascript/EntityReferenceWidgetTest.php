@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the Media library entity reference widget.
  */
 #[Group('media_library')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class EntityReferenceWidgetTest extends MediaLibraryTestBase {
 
