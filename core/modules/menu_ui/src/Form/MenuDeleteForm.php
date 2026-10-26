@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Config\ConfigManagerInterface;
 
 /**
  * Defines a confirmation form for deletion of a custom menu.
@@ -30,16 +31,26 @@ class MenuDeleteForm extends EntityDeleteForm {
   protected $connection;
 
   /**
+   * The config manager service.
+   *
+   * @var \Drupal\Core\Config\ConfigManagerInterface
+   */
+  protected $configManager;
+
+  /**
    * Constructs a new MenuDeleteForm.
    *
    * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
    *   The menu link manager.
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
+   * @param Drupal\Core\Config\ConfigManagerInterface $config_manager
+   *   The config manager.
    */
-  public function __construct(MenuLinkManagerInterface $menu_link_manager, Connection $connection) {
+  public function __construct(MenuLinkManagerInterface $menu_link_manager, Connection $connection, ConfigManagerInterface $config_manager) {
     $this->menuLinkManager = $menu_link_manager;
     $this->connection = $connection;
+    $this->configManager = $config_manager;
   }
 
   /**
@@ -48,7 +59,8 @@ class MenuDeleteForm extends EntityDeleteForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('plugin.manager.menu.link'),
-      $container->get('database')
+      $container->get('database'),
+      $container->get('config.manager')
     );
   }
 
@@ -78,6 +90,24 @@ class MenuDeleteForm extends EntityDeleteForm {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Locked menus may not be deleted.
     if ($this->entity->isLocked()) {
+      return;
+    }
+    $menu_name = $this->entity->id();
+    $dependents = $this->configManager->findConfigEntityDependencies('config', ["system.menu.$menu_name"]);
+    $view_dependencies = [];
+    foreach ($dependents as $config_name => $dependency) {
+      if (str_starts_with($config_name, 'views.view.')) {
+        $view_dependencies[] = $config_name;
+      }
+    }
+    if (!empty($view_dependencies)) {
+      $this->messenger()->addError($this->t(
+        'Cannot delete the %menu menu because it is used by the following Views: %views. Remove the menu link from those Views first.',
+        [
+          '%menu' => $menu_name,
+          '%views' => implode(', ', $view_dependencies),
+        ]
+      ));
       return;
     }
 
