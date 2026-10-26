@@ -4,6 +4,7 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
+
 .node-preview-container {
   position: sticky;
   z-index: 501;
@@ -112,10 +113,8 @@
   }
 
   *:focus {
-    outline: none;
-    box-shadow:
-      0 0 0 1px var(--admin-color-focus-border),
-      0 0 0 4px var(--admin-color-focus);
+    outline: var(--focus-outline);
+    outline-offset: var(--outline-offset);
   }
 
   @supports (backdrop-filter: blur()) {
@@ -125,6 +124,7 @@
     backdrop-filter: blur(0.75rem);
   }
 }
+
 .node-preview-form-select {
   display: flex;
   flex-wrap: wrap;
