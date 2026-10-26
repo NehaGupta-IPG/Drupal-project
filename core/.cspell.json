@@ -16,6 +16,7 @@
       "lib/Drupal/Core/File/MimeType/ExtensionMimeTypeGuesser.php",
       "**/LICENSE.txt",
       "../**/LICENSE.txt",
+      "**/ProxyClass/*",
       "modules/**/Migrate*Test.php",
       "modules/ckeditor5/js/build/*",
       "modules/media/tests/fixtures/oembed/*",
