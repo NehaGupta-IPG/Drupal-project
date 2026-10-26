@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\Attribute\AttributeInterface;
 use Drupal\Component\Plugin\Attribute\Plugin;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\FileCache\FileCacheInterface;
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 
 /**
  * Defines a discovery mechanism to find plugins with attributes.
@@ -155,6 +156,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    *
    * @throws \ReflectionException
    * @throws \Error
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
   protected function parseClass(string $class, \SplFileInfo $fileinfo): array {
     // @todo Consider performance improvements over using reflection.
@@ -163,6 +165,9 @@ class AttributeClassDiscovery implements DiscoveryInterface {
 
     $id = $content = NULL;
     if ($attributes = $reflection_class->getAttributes($this->pluginDefinitionAttributeName, \ReflectionAttribute::IS_INSTANCEOF)) {
+      if (count($attributes) > 1) {
+        throw new InvalidPluginDefinitionException(sprintf('Only one instance of %s attribute is allowed on a plugin.', $this->pluginDefinitionAttributeName));
+      }
       /** @var \Drupal\Component\Plugin\Attribute\AttributeInterface $attribute */
       $attribute = $attributes[0]->newInstance();
       $this->prepareAttributeDefinition($attribute, $class);
