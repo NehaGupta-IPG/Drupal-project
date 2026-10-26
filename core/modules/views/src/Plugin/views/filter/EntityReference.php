@@ -628,8 +628,9 @@ class EntityReference extends ManyToOne {
     // Set the validated exposed input from the select list when not the all
     // value option.
     if ($this->options['widget'] == static::WIDGET_SELECT) {
-      if ($form_state->getValue($identifier) != static::ALL_VALUE) {
-        $this->validatedExposedInput = (array) $form_state->getValue($identifier);
+      $value = $form_state->getValue($identifier);
+      if ($value != static::ALL_VALUE) {
+        $this->validatedExposedInput = (array) $value;
       }
       return;
     }

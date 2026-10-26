@@ -70,8 +70,8 @@ class ViewsBlock extends ViewsBlockBase {
       }
 
       // Override the block title to match the view title.
-      if ($this->view->getTitle()) {
-        $output['#title'] = ['#markup' => $this->view->getTitle(), '#allowed_tags' => Xss::getHtmlTagList()];
+      if ($title = $this->view->getTitle()) {
+        $output['#title'] = ['#markup' => $title, '#allowed_tags' => Xss::getHtmlTagList()];
       }
 
       // When view_build is empty, the actual render array output for this View

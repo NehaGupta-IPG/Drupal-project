@@ -541,8 +541,9 @@ class Page extends PathPluginBase {
         break;
 
       case 'use_admin_theme':
-        if ($form_state->getValue('use_admin_theme')) {
-          $this->setOption('use_admin_theme', $form_state->getValue('use_admin_theme'));
+        $use_admin_theme = $form_state->getValue('use_admin_theme');
+        if ($use_admin_theme) {
+          $this->setOption('use_admin_theme', $use_admin_theme);
         }
         else {
           unset($this->options['use_admin_theme']);

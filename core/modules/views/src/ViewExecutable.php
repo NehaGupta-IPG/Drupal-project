@@ -755,8 +755,9 @@ class ViewExecutable {
         // multiple displays in the same view can share the same filters and
         // remember settings.
         $display_id = ($this->display_handler->isDefaulted('filters')) ? 'default' : $this->current_display;
-        if (!empty($session->get('views')[$this->storage->id()][$display_id])) {
-          $this->exposed_input = $session->get('views')[$this->storage->id()][$display_id];
+        $remembered_input = $session->get('views')[$this->storage->id()][$display_id] ?? [];
+        if (!empty($remembered_input)) {
+          $this->exposed_input = $remembered_input;
         }
       }
     }

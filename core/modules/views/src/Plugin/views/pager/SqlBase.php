@@ -405,8 +405,9 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
    * {@inheritdoc}
    */
   public function exposedFormValidate(&$form, FormStateInterface $form_state) {
-    if (!$form_state->isValueEmpty('offset') && trim($form_state->getValue('offset'))) {
-      if (!is_numeric($form_state->getValue('offset')) || $form_state->getValue('offset') < 0) {
+    $offset = $form_state->getValue('offset');
+    if (!$form_state->isValueEmpty('offset') && trim($offset)) {
+      if (!is_numeric($offset) || $offset < 0) {
         $form_state->setErrorByName('offset', $this->t('Offset must be a number greater than or equal to 0.'));
       }
     }

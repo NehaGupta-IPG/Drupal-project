@@ -150,8 +150,9 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
 
     // Views forms without view arguments return the same Base Form ID and
     // Form ID. Base form ID should only be added when different.
-    if ($this->getBaseFormId() !== $this->getFormId()) {
-      $form_state->addBuildInfo('base_form_id', $this->getBaseFormId());
+    $base_form_id = $this->getBaseFormId();
+    if ($base_form_id !== $this->getFormId()) {
+      $form_state->addBuildInfo('base_form_id', $base_form_id);
     }
 
     $form = [];
