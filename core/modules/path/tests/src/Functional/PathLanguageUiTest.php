@@ -135,4 +135,45 @@ class PathLanguageUiTest extends PathTestBase {
     $this->assertSession()->pageTextNotContains('The alias is already in use.');
   }
 
+  /**
+   * Tests same aliases for different node with different language.
+   */
+  public function testSpecifiedNode(): void {
+    // Common alias name.
+    $name = $this->getRandomGenerator()->word(8);
+
+    // Create a language-specified alias in the admin UI.
+    $node1 = $this->drupalCreateNode();
+    $edit = [
+      'path[0][value]' => '/node/' . $node1->id(),
+      'alias[0][value]' => '/' . $name,
+      'langcode[0][value]' => 'en',
+    ];
+    $this->drupalGet('admin/config/search/path/add');
+    $this->submitForm($edit, 'Save');
+
+    $this->drupalGet($node1->toUrl('edit-form'));
+    $this->assertSession()->fieldValueEquals('path[0][alias]', $edit['alias[0][value]']);
+    $this->submitForm([], 'Save');
+
+    // Create test without Language selected.
+    $node2 = $this->drupalCreateNode();
+    // Create a language-unspecified alias in the admin UI.
+    $edit = [
+      'path[0][value]' => '/node/' . $node2->id(),
+      'alias[0][value]' => '/' . $name,
+      'langcode[0][value]' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+    ];
+    $this->drupalGet('admin/config/search/path/add');
+
+    $this->submitForm($edit, 'Save');
+    $this->drupalGet($node2->toUrl('edit-form'));
+    $this->assertSession()->fieldValueEquals('path[0][alias]', $edit['alias[0][value]']);
+    $this->submitForm([], 'Save');
+
+    $this->drupalGet('admin/config/search/path');
+    $this->assertSession()->pageTextContains('English');
+    $this->assertSession()->pageTextContains('None');
+  }
+
 }

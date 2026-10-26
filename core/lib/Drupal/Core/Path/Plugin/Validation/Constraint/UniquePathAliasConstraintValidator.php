@@ -5,6 +5,7 @@ namespace Drupal\Core\Path\Plugin\Validation\Constraint;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -14,28 +15,22 @@ use Symfony\Component\Validator\ConstraintValidator;
 class UniquePathAliasConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * Creates a new UniquePathAliasConstraintValidator instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $currentRequest
+   *   The current request stack.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
-    $this->entityTypeManager = $entity_type_manager;
-  }
+  public function __construct(protected EntityTypeManagerInterface $entityTypeManager, protected RequestStack $currentRequest) {}
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('request_stack')
     );
   }
 
@@ -46,8 +41,9 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
     /** @var \Drupal\path_alias\PathAliasInterface $entity */
     $path = $entity->getPath();
     $alias = $entity->getAlias();
-    $langcode = $entity->language()->getId();
 
+    // If the language selector field is available, use the selected language.
+    $langcode = $this->currentRequest->getCurrentRequest()->request->all()['langcode'][0]['value'] ?? $entity->language()->getId();
     $storage = $this->entityTypeManager->getStorage('path_alias');
     $query = $storage->getQuery()
       ->accessCheck(FALSE)
