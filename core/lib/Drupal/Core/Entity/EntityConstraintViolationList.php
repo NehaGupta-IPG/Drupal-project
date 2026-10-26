@@ -226,4 +226,16 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
     $this->entityViolationOffsets = NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function addAll($otherList): void {
+    // Reset violation offset caches.
+    $this->violationOffsetsByField = NULL;
+    $this->entityViolationOffsets = NULL;
+
+    // Call the parent method to add all violations.
+    parent::addAll($otherList);
+  }
+
 }

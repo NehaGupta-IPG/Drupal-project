@@ -200,4 +200,44 @@ class EntityConstraintViolationListTest extends UnitTestCase {
     return new EntityConstraintViolationList($entity, $violations);
   }
 
+  /**
+   * @covers ::addAll
+   */
+  public function testAddAll(): void {
+    $entity = $this->createMock(FieldableEntityInterface::class);
+
+    // Create two separate violation lists.
+    $originalViolations = [
+      new ConstraintViolation('Original violation 1', '', [], '', 'name', 'invalid'),
+      new ConstraintViolation('Original violation 2', '', [], '', 'type', 'invalid'),
+    ];
+    $additionalViolations = [
+      new ConstraintViolation('Additional violation 1', '', [], '', 'email', 'invalid'),
+      new ConstraintViolation('Additional violation 2', '', [], '', 'phone', 'invalid'),
+    ];
+
+    $originalList = new EntityConstraintViolationList($entity, $originalViolations);
+    $additionalList = new EntityConstraintViolationList($entity, $additionalViolations);
+
+    // Call addAll to merge violations.
+    $originalList->addAll($additionalList);
+
+    // Assert that the original list now contains all violations.
+    $this->assertCount(4, $originalList);
+    $combinedViolations = iterator_to_array($originalList);
+    $this->assertEquals(
+      array_merge($originalViolations, $additionalViolations),
+      $combinedViolations
+    );
+
+    // Ensure violation caches are reset after the operation.
+    $violationOffsetsByField = new \ReflectionProperty(EntityConstraintViolationList::class, 'violationOffsetsByField');
+    $violationOffsetsByField->setAccessible(TRUE);
+    $this->assertNull($violationOffsetsByField->getValue($originalList));
+
+    $entityViolationOffsets = new \ReflectionProperty(EntityConstraintViolationList::class, 'entityViolationOffsets');
+    $entityViolationOffsets->setAccessible(TRUE);
+    $this->assertNull($entityViolationOffsets->getValue($originalList));
+  }
+
 }
