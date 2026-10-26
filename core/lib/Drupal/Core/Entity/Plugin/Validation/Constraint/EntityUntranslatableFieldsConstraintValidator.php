@@ -48,9 +48,8 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
    */
   public function validate($entity, Constraint $constraint): void {
     if (!isset($entity)) {
-      // When an empty map that was explicitly given a value is validated, the
-      // validator recurses into its properties. An entity property not present
-      // in the map's values is instantiated with NULL, so guard against that.
+      // A map's entity property that was not given a value is NULL, and the
+      // validator still recurses into it.
       return;
     }
 
