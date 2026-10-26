@@ -36,8 +36,13 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
    * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $decorated
    *   The parent object implementing DiscoveryInterface that is being
    *   decorated.
+   * @param string $separator
+   *   The character to use as a separator for plugin ids.
    */
-  public function __construct(DiscoveryInterface $decorated, protected string $separator = ':') {
+  public function __construct(
+    DiscoveryInterface $decorated,
+    protected string $separator = ':'
+  ) {
     $this->decorated = $decorated;
   }
 
