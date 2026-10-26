@@ -182,7 +182,7 @@ class SiteConfigureForm extends ConfigFormBase {
     $form['regional_settings']['date_default_timezone'] = [
       '#type' => 'select',
       '#title' => $this->t('Default time zone'),
-      '#default_value' => $default_timezone,
+      '#default_value' => $form_state->getValue('date_default_timezone') ?: $default_timezone,
       '#options' => TimeZoneFormHelper::getOptionsListByRegion(),
       '#weight' => 5,
       '#attributes' => ['class' => ['timezone-detect']],
