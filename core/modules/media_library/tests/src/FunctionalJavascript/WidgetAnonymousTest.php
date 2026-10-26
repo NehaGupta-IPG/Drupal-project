@@ -85,8 +85,8 @@ class WidgetAnonymousTest extends MediaLibraryTestBase {
     $assert_session->elementExists('css', '.js-media-library-widget-toggle-weight')->click();
     $this->submitForm([
       'title[0][value]' => 'My page',
-      'field_unlimited_media[selection][0][weight]' => '0',
-      'field_unlimited_media[selection][1][weight]' => '1',
+      'field_unlimited_media[selection][0][_weight]' => '0',
+      'field_unlimited_media[selection][1][_weight]' => '1',
     ], 'Save');
     $assert_session->pageTextContains('Basic Page My page has been created');
     $assert_session->pageTextContains('Dog');
