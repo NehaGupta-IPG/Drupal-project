@@ -14,6 +14,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   label: new TranslatableMarkup('Generic file'),
   field_types: [
     'file',
+    'image',
   ],
 )]
 class GenericFileFormatter extends DescriptionAwareFileFormatterBase {
