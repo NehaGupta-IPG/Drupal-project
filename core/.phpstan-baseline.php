@@ -19042,12 +19042,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityConfigBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$config might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityConfigBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
 	'identifier' => 'drupal.entityStorageDirectInjection',
 	'count' => 1,
@@ -19466,6 +19460,12 @@ $ignoreErrors[] = [
 	'identifier' => 'dependencySerializationTraitProperty.unsupportedPrivateProperty',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate/tests/src/Unit/Plugin/migrate/destination/EntityRevisionTest.php',
+];
+$ignoreErrors[] = [
+  'message' => '#^Storing entity storage as a class property is not recommended\\. Call Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getStorage\\(\\) at the call\\-site instead\\.$#',
+	'identifier' => 'drupal.entityStoragePropertyAssignment',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/tests/src/Unit/destination/EntityConfigBaseTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Unit\\\\destination\\\\TestPerComponentEntityDisplay\\:\\:getTestValues\\(\\) has no return type specified\\.$#',

@@ -165,7 +165,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    *   The entity we are importing into.
    */
   protected function getEntity(Row $row, array $old_destination_id_values) {
-    $entity_id = reset($old_destination_id_values) ?: $this->getEntityId($row);
+    $entity_id = $this->getEntityIdFromRowOrDestination($row, $old_destination_id_values);
     if (!empty($entity_id) && ($entity = $this->storage->load($entity_id))) {
       // Allow updateEntity() to change the entity.
       $entity = $this->updateEntity($entity, $row) ?: $entity;
@@ -184,6 +184,24 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
       $entity->enforceIsNew();
     }
     return $entity;
+  }
+
+  /**
+   * Gets the entity ID from the previous destination with fallback to the row.
+   *
+   * This ID is used to load the entity to be updated or know that the process
+   * needs to create a new one.
+   *
+   * @param \Drupal\migrate\Row $row
+   *   The row of data.
+   * @param array $old_destination_id_values
+   *   The previous destination ID values, if any.
+   *
+   * @return string
+   *   The entity ID for the row that we are importing.
+   */
+  protected function getEntityIdFromRowOrDestination(Row $row, array $old_destination_id_values) {
+    return reset($old_destination_id_values) ?: $this->getEntityId($row);
   }
 
   /**

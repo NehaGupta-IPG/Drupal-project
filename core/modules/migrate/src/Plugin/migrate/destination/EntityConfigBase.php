@@ -135,7 +135,6 @@ class EntityConfigBase extends Entity {
       // Ids is keyed by the key name so grab the keys.
       $id_keys = array_keys($ids);
       if (!$row->getDestinationProperty($id_key)) {
-        // Set the ID into the destination in for form "val1.val2.val3".
         $row->setDestinationProperty($id_key, $this->generateId($row, $id_keys));
       }
     }
@@ -204,12 +203,12 @@ class EntityConfigBase extends Entity {
     // This is a translation if the language in the active config does not
     // match the language of this row.
     $translation = FALSE;
-    if ($this->isTranslationDestination() && $row->hasDestinationProperty('langcode') && $this->languageManager instanceof ConfigurableLanguageManager) {
-      $config = $entity->getConfigDependencyName();
-      $langcode = $this->configFactory->get('langcode');
-      if ($langcode != $row->getDestinationProperty('langcode')) {
-        $translation = TRUE;
-      }
+    if ($this->isTranslationDestination()
+      && $row->hasDestinationProperty('langcode')
+      && $this->languageManager instanceof ConfigurableLanguageManager
+      && $row->getDestinationProperty('langcode') !== $entity->language()->getId()
+    ) {
+      $translation = TRUE;
     }
 
     if ($translation) {
@@ -219,7 +218,7 @@ class EntityConfigBase extends Entity {
       if (!$row->hasDestinationProperty('translation')) {
         throw new \LogicException('The "translation" property is required');
       }
-      $config_override = $this->languageManager->getLanguageConfigOverride($row->getDestinationProperty('langcode'), $config);
+      $config_override = $this->languageManager->getLanguageConfigOverride($row->getDestinationProperty('langcode'), $entity->getConfigDependencyName());
       $config_override->set(str_replace(Row::PROPERTY_SEPARATOR, '.', $row->getDestinationProperty('property')), $row->getDestinationProperty('translation'));
       $config_override->save();
     }
@@ -274,6 +273,19 @@ class EntityConfigBase extends Entity {
       }
       $id_values[] = $row->getDestinationProperty($id);
     }
+    return static::buildId($id_values);
+  }
+
+  /**
+   * Builds the entity ID from the passed ID parts.
+   *
+   * @param array $id_values
+   *   The ID parts to join.
+   *
+   * @return string
+   *   Entity ID that can be passed to the storage handler.
+   */
+  protected static function buildId(array $id_values) {
     return implode('.', $id_values);
   }
 
@@ -290,7 +302,7 @@ class EntityConfigBase extends Entity {
         }
         $id_values[] = $value;
       }
-      $entity_id = implode('.', $id_values);
+      $entity_id = static::buildId($id_values);
       $language = $destination_identifier['langcode'];
 
       $config = $this->storage->load($entity_id)->getConfigDependencyName();
@@ -299,9 +311,36 @@ class EntityConfigBase extends Entity {
       $config_override->delete();
     }
     else {
-      $destination_identifier = implode('.', $destination_identifier);
+      $destination_identifier = static::buildId($destination_identifier);
       parent::rollback([$destination_identifier]);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEntityIdFromRowOrDestination(Row $row, array $old_destination_id_values) {
+    return $old_destination_id_values
+      ? static::buildId($old_destination_id_values)
+      : $this->getEntityId($row);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEntityId(Row $row) {
+    $destination_id_key = $this->getKey('id');
+    $destination_id = $row->getDestinationProperty($destination_id_key);
+
+    if (!empty($destination_id)) {
+      return $destination_id;
+    }
+
+    $ids = $this->getIds();
+    // IDs are keyed by the key name so grab the keys.
+    $id_keys = array_keys($ids);
+    // Set the ID into the destination in the form "val1.val2.val3".
+    return $this->generateId($row, $id_keys);
   }
 
 }
