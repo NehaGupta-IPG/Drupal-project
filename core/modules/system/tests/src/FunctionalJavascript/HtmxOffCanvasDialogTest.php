@@ -134,6 +134,9 @@ class HtmxOffCanvasDialogTest extends WebDriverTestBase {
     $this->assertJsCondition("parseFloat(getComputedStyle(document.querySelector('[data-off-canvas-main-canvas]')).paddingRight) === 0");
   }
 
+  /**
+   * Tests that forms render in off-canvas dialogs.
+   */
   public function testFormOffCanvas(): void {
     $this->drupalGet('/htmx-dialog-test-markup');
     $this->openOffCanvas('side_off_canvas_form');
