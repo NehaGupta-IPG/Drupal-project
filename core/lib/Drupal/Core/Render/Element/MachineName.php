@@ -246,37 +246,45 @@ class MachineName extends Textfield {
    * - Cannot be changed after creation (via #disabled).
    */
   public static function validateMachineName(&$element, FormStateInterface $form_state, &$complete_form) {
+    $isValid = TRUE;
     // Verify that the machine name not only consists of replacement tokens.
     if (preg_match('@^' . $element['#machine_name']['replace'] . '+$@', $element['#value'])) {
       $form_state->setError($element, t('The machine-readable name must contain unique characters.'));
+      $isValid = FALSE;
     }
 
     // Verify that the machine name contains no disallowed characters.
     if (preg_match('@' . $element['#machine_name']['replace_pattern'] . '@', $element['#value'])) {
-      if (!isset($element['#machine_name']['error'])) {
+      if ($isValid) {
         // Since a hyphen is the most common alternative replacement character,
         // a corresponding validation error message is supported here.
         if ($element['#machine_name']['replace'] == '-') {
           $form_state->setError($element, t('The machine-readable name must contain only lowercase letters, numbers, and hyphens.'));
+          $isValid = FALSE;
         }
         // Otherwise, we assume the default (underscore).
         else {
-          $form_state->setError($element, t('The machine-readable name must contain only lowercase letters, numbers, and underscores.'));
+          $form_state->setError($element, t('The machine-readable name must contain only ASCII lowercase letters, numbers, and underscores.'));
+          $isValid = FALSE;
         }
       }
       else {
         $form_state->setError($element, $element['#machine_name']['error']);
+        $isValid = FALSE;
       }
     }
 
     // Verify that the machine name is unique. If the value matches the initial
     // default value then it does not need to be validated as the machine name
     // element assumes the form is editing the existing value.
-    $initial_values = $form_state->get('machine_name.initial_values') ?: [];
-    if (!array_key_exists($element['#name'], $initial_values) || $initial_values[$element['#name']] !== $element['#value']) {
-      $function = $element['#machine_name']['exists'];
-      if (call_user_func($function, $element['#value'], $element, $form_state)) {
-        $form_state->setError($element, t('The machine-readable name is already in use. It must be unique.'));
+    if ($isValid) {
+      $initial_values = $form_state->get('machine_name.initial_values') ?: [];
+      if (!array_key_exists($element['#name'], $initial_values) || $initial_values[$element['#name']] !== $element['#value']) {
+        $function = $element['#machine_name']['exists'];
+        if (call_user_func($function, $element['#value'], $element, $form_state)) {
+          $form_state->setError($element, t('The machine-readable name is already in use. It must be unique.'));
+          $isValid = FALSE;
+        }
       }
     }
   }
