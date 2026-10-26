@@ -6,6 +6,8 @@
 
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Utility\Error;
+use Drupal\options\Annotation\PredefinedOptions;
 
 /**
  * Returns the array of allowed values for a list field.
@@ -39,12 +41,30 @@ function options_allowed_values(FieldStorageDefinitionInterface $definition, ?Fi
   $cache_id = implode(':', $cache_keys);
 
   if (!isset($allowed_values[$cache_id])) {
-    $function = $definition->getSetting('allowed_values_function');
     // If $cacheable is FALSE, then the allowed values are not statically
     // cached. See OptionsAllowedValues::dynamicValues() for an example of
     // generating dynamic and uncached values.
     $cacheable = TRUE;
-    if (!empty($function)) {
+    if (!empty($plugin_id = $definition->getSetting('predefined_options_plugin'))) {
+      try {
+        /** @var \Drupal\options\Plugin\PredefinedOptionsPluginManager $manager */
+        $manager = \Drupal::service('plugin.manager.options.predefined_options');
+        /** @var \Drupal\options\Plugin\PredefinedOptionsPluginInterface $plugin */
+        $plugin = $manager->createInstance($plugin_id);
+        $values = $plugin->getAllowedValues($definition, $entity, $cacheable);
+      }
+      catch (\Exception $e) {
+        // Fail silently if the plugin does not exists or cannot be instantiated.
+        Error::logException(\Drupal::logger('options'), $e);
+        return [];
+      }
+    }
+    // @todo To be removed once the predefined options plugin feature is completed.
+    elseif (is_callable($definition->getSetting('allowed_values_function'))) {
+      Error::logException(\Drupal::logger('options'), new \RuntimeException(t("The use of 'allowed_values_function' is deprecated, use :class plugins instead", [
+        ':class' => PredefinedOptions::class,
+      ])));
+      $function = $definition->getSetting('allowed_values_function');
       $values = $function($definition, $entity, $cacheable);
     }
     else {

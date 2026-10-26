@@ -63,6 +63,13 @@ class OptionsFieldUITest extends FieldTestBase {
   protected $adminPath;
 
   /**
+   * The plugin manager service.
+   *
+   * @var \Drupal\options\Plugin\PredefinedOptionsPluginManager
+   */
+  protected $pluginManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -86,6 +93,7 @@ class OptionsFieldUITest extends FieldTestBase {
     $this->typeName = 'test_' . $this->randomMachineName();
     $type = $this->drupalCreateContentType(['name' => $this->typeName, 'type' => $this->typeName]);
     $this->type = $type->id();
+    $this->pluginManager = $this->container->get('plugin.manager.options.predefined_options');
   }
 
   /**
@@ -331,6 +339,17 @@ class OptionsFieldUITest extends FieldTestBase {
   }
 
   /**
+   * Options (text) : test 'predefined_options_plugin' selection.
+   */
+  public function testOptionsPredefinedOptionsPlugin() {
+    $this->fieldName = 'field_options_predefined_options';
+    $this->createOptionsField('list_string');
+    $plugin_id = 'timezones';
+    $expected = system_time_zones();
+    $this->assertPredefinedOptionsInput($plugin_id, $expected, 'The plugin is loaded and selected.');
+  }
+
+  /**
    * Helper function to create list field of a given type.
    *
    * @param string $type
@@ -387,6 +406,35 @@ class OptionsFieldUITest extends FieldTestBase {
     else {
       $field_storage = FieldStorageConfig::loadByName('node', $this->fieldName);
       $this->assertSame($field_storage->getSetting('allowed_values'), $result, $message);
+    }
+  }
+
+  /**
+   * Tests a plugin selection for 'predefined_options_plugin' form element.
+   *
+   * @param string $plugin_id
+   *   The plugin id.
+   * @param string|array $result
+   *   Either an expected resulting array options_allowed_values(), or an
+   *   expected error message.
+   * @param string $message
+   *   Message to display.
+   */
+  public function assertPredefinedOptionsInput($plugin_id, $result, $message) {
+    $edit = ['settings[predefined_options_plugin]' => $plugin_id];
+    $this->drupalGet($this->adminPath);
+    $this->submitForm($edit, t('Save field settings'));
+    $this->assertSession()->responseNotContains('&amp;lt;');
+
+    if (is_string($result)) {
+      $this->assertText($result, $message);
+    }
+    else {
+      $field_storage = FieldStorageConfig::loadByName('node', $this->fieldName);
+      $configured_plugin_id = $field_storage->getSetting('predefined_options_plugin');
+      /** @var \Drupal\options\Plugin\PredefinedOptionsPluginInterface $plugin */
+      $plugin = $this->pluginManager->createInstance($configured_plugin_id);
+      self::assertEquals($plugin->getAllowedValues($field_storage), $result, $message);
     }
   }
 

@@ -19,6 +19,9 @@ field.storage_settings.list_integer:
           label:
             type: label
             label: 'Label'
+    predefined_options_plugin:
+      type: string
+      label: 'Predefined options plugin'
     allowed_values_function:
       type: string
       label: 'Allowed values function'
@@ -50,6 +53,9 @@ field.storage_settings.list_float:
           label:
             type: label
             label: 'Label'
+    predefined_options_plugin:
+      type: string
+      label: 'Predefined options plugin'
     allowed_values_function:
       type: string
       label: 'Allowed values function'
@@ -81,6 +87,9 @@ field.storage_settings.list_string:
           label:
             type: label
             label: 'Label'
+    predefined_options_plugin:
+      type: string
+      label: 'Predefined options plugin'
     allowed_values_function:
       type: string
       label: 'Allowed values function'

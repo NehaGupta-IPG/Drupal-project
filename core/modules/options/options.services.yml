@@ -1,2 +1,6 @@
 parameters:
   options.skip_procedural_hook_scan: true
+services:
+  plugin.manager.options.predefined_options:
+    class: Drupal\options\Plugin\PredefinedOptionsPluginManager
+    parent: default_plugin_manager
