@@ -113,7 +113,7 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
    */
   protected function splitPluginIdByConstant(string $plugin_id): array {
     if (static::DERIVATIVE_SEPARATOR !== self::DERIVATIVE_SEPARATOR) {
-      @trigger_error('Overriding the DERIVATIVE_SEPARATOR constant is deprecated in drupal:12.0.1 and removed in 13.0.0. There is no replacement. See https://www.drupal.org/node/3633174.', E_USER_DEPRECATED);
+      @trigger_error('Overriding the DERIVATIVE_SEPARATOR constant is deprecated in drupal:12.0.1 and removed in drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3633174.', E_USER_DEPRECATED);
       if (strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
         return explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
       }
