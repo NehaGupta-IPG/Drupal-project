@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
   description: 'Import configuration',
   aliases: ['cim'],
 )]
-final class ConfigImportCommand extends Command {
+class ConfigImportCommand extends Command {
 
   use StringTranslationTrait;
   use ConfigCommandTrait;
