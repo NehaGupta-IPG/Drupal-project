@@ -37,7 +37,7 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
    *   The parent object implementing DiscoveryInterface that is being
    *   decorated.
    */
-  public function __construct(DiscoveryInterface $decorated) {
+  public function __construct(DiscoveryInterface $decorated, protected string $separator = ':') {
     $this->decorated = $decorated;
   }
 
@@ -69,6 +69,7 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
         else {
           $plugin_definition = $derivative_plugin_definition;
         }
+        $plugin_definition['derivative_separator'] = $this->separator;
       }
     }
 
@@ -115,6 +116,9 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
         $plugin_definitions[$base_plugin_id] = $plugin_definition;
       }
     }
+    foreach ($plugin_definitions as $plugin_id => $plugin_definition) {
+      $plugin_definitions[$plugin_id]['derivative_separator'] = $this->separator;
+    }
 
     return $plugin_definitions;
   }
@@ -133,8 +137,8 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
     // Try and split the passed plugin definition into a plugin and a
     // derivative id. We don't need to check for !== FALSE because a leading
     // colon would break the derivative system and doesn't make sense.
-    if (strpos($plugin_id, ':')) {
-      return explode(':', $plugin_id, 2);
+    if (strpos($plugin_id, $this->separator)) {
+      return explode($this->separator, $plugin_id, 2);
     }
 
     return [$plugin_id, ''];
@@ -153,7 +157,7 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
    */
   protected function encodePluginId($base_plugin_id, $derivative_id) {
     if ($derivative_id) {
-      return "$base_plugin_id:$derivative_id";
+      return "$base_plugin_id$this->separator$derivative_id";
     }
 
     // By returning the unmerged plugin_id, we are able to support derivative

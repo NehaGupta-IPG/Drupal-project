@@ -341,8 +341,9 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    */
   public function __construct($definition) {
     // Throw an exception if the entity type ID is longer than 32 characters.
-    if (str_contains($definition['id'], PluginBase::DERIVATIVE_SEPARATOR)) {
-      [$entity_type_id, $bundle] = explode(PluginBase::DERIVATIVE_SEPARATOR, $definition['id']);
+    $separator = PluginBase::getSeparator($definition);
+    if (str_contains($definition['id'], $separator)) {
+      [$entity_type_id, $bundle] = explode($separator, $definition['id']);
       if (mb_strlen($bundle) > static::BUNDLE_MAX_LENGTH) {
         throw new EntityTypeIdLengthException('Attempt to create an entity type bundle class with an ID longer than ' . static::BUNDLE_MAX_LENGTH . " characters: $bundle.");
       }

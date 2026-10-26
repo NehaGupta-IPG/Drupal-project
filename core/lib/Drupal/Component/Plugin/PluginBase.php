@@ -9,6 +9,8 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
 
   /**
    * A string which is used to separate base plugin IDs from the derivative ID.
+   *
+   * @final
    */
   const DERIVATIVE_SEPARATOR = ':';
 
@@ -73,10 +75,10 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
    */
   public function getBaseId() {
     $plugin_id = $this->getPluginId();
-    if (strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
-      [$plugin_id] = explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
+    if ($parts = $this->splitPluginIdByConstant($plugin_id)) {
+      return $parts[0];
     }
-    return $plugin_id;
+    return explode(static::getSeparator($this->pluginDefinition), $plugin_id, 2)[0];
   }
 
   /**
@@ -84,11 +86,24 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
    */
   public function getDerivativeId() {
     $plugin_id = $this->getPluginId();
-    $derivative_id = NULL;
-    if (strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
-      [, $derivative_id] = explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
+    if ($parts = $this->splitPluginIdByConstant($plugin_id)) {
+      return $parts[1];
     }
-    return $derivative_id;
+    return explode(static::getSeparator($this->pluginDefinition), $plugin_id, 2)[1];
+  }
+
+  public static function getSeparator(array $plugin_definition) {
+    return $plugin_definition['derivative_separator'] ?? self::DERIVATIVE_SEPARATOR;
+  }
+
+  protected function splitPluginIdByConstant(string $plugin_id): array {
+    if (static::DERIVATIVE_SEPARATOR !== self::DERIVATIVE_SEPARATOR) {
+      @trigger_error('Overriding the DERIVATIVE_SEPARATOR constant is deprecated etc', E_USER_DEPRECATED);
+      if (strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
+        return explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
+      }
+    }
+    return [];
   }
 
   /**
