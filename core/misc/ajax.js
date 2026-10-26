@@ -13,6 +13,22 @@
  * included to provide Ajax capabilities.
  */
 
+/**
+ * Get the index of an element with a specific selector in the list of elements matching that selector.
+ *
+ * @param {HTMLElement} element
+ * @param {string} selector
+ * @returns {number} The index of the element in the list of all elements matching the selector or 0 if that element is not found.
+ */
+function getIndexInAllElements(element, selector) {
+  return Math.max(
+    [...document.querySelectorAll(selector)].findIndex(
+      (otherElement) => otherElement === element,
+    ),
+    0,
+  );
+}
+
 (function (
   $,
   window,
@@ -452,6 +468,37 @@
     this.preCommandsFocusedElementSelector = null;
 
     /**
+     * The selectionStart property of the last focused element.
+     *
+     * @type {number|null}
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/selectionStart
+     */
+    this.preCommandsFocusedElementSelectionStart = null;
+
+    /**
+     * The selectionEnd property of the last focused element.
+     *
+     * @type {number|null}
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/selectionEnd
+     */
+    this.preCommandsFocusedElementSelectionEnd = null;
+
+    /**
+     * The selectionDirection property of the last focused element.
+     *
+     * @type {'forward'|'backward'|'none'|undefined}
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/selectionDirection
+     */
+    this.preCommandsFocusedElementSelectionDirection = undefined;
+
+    /**
+     * The last focused element index right before processing ajax response.
+     *
+     * @type {number}
+     */
+    this.preCommandsFocusedElementIndex = 0;
+
+    /**
      * @type {Drupal.Ajax~elementSettings}
      */
     this.elementSettings = elementSettings;
@@ -543,6 +590,10 @@
       beforeSubmit(formValues, elementSettings, options) {
         ajax.ajaxing = true;
         ajax.preCommandsFocusedElementSelector = null;
+        ajax.preCommandsFocusedElementSelectionStart = null;
+        ajax.preCommandsFocusedElementSelectionEnd = null;
+        ajax.preCommandsFocusedElementSelectionDirection = undefined;
+        ajax.preCommandsFocusedElementIndex = 0;
         return ajax.beforeSubmit(formValues, elementSettings, options);
       },
       beforeSend(xmlhttprequest, options) {
@@ -552,6 +603,19 @@
       success(response, status, xmlhttprequest) {
         ajax.preCommandsFocusedElementSelector =
           document.activeElement.getAttribute('data-drupal-selector');
+        ajax.preCommandsFocusedElementSelectionStart =
+          document.activeElement.selectionStart ?? null;
+        ajax.preCommandsFocusedElementSelectionEnd =
+          document.activeElement.selectionEnd ?? null;
+        ajax.preCommandsFocusedElementSelectionDirection =
+          document.activeElement.selectionDirection;
+        if (ajax.preCommandsFocusedElementSelector) {
+          // Find the index of the active element in all elements with the same data-drupal-selector. Clamp it to 0 if none are found.
+          ajax.preCommandsFocusedElementIndex = getIndexInAllElements(
+            document.activeElement,
+            `[data-drupal-selector="${ajax.preCommandsFocusedElementSelector}"]`,
+          );
+        }
 
         // Sanity check for browser support (object expected).
         // When using iFrame uploads, responses must be returned as a string.
@@ -1076,14 +1140,31 @@
     }
     $(this.element).prop('disabled', false);
 
+    /**
+     * @typedef {object} ElementWithIndex
+     * @prop {HTMLElement} element
+     * @prop {number} index
+     */
+
+    /** @type {ElementWithIndex[]} */
     // Save element's ancestors tree so if the element is removed from the dom
     // we can try to refocus one of its parents. Using addBack reverse the
     // result array, meaning that index 0 is the highest parent in the hierarchy
     // in this situation it is usually a <form> element.
-    const elementParents = $(this.element)
+    const elementParentsWithIndex = $(this.element)
       .parents('[data-drupal-selector]')
       .addBack()
-      .toArray();
+      .toArray()
+      .map((element) => ({
+        element,
+        index: getIndexInAllElements(
+          element,
+          `[data-drupal-selector="${element.getAttribute('data-drupal-selector')}"]`,
+        ),
+      }));
+    let selectionStart = this.element.selectionStart ?? null;
+    let selectionEnd = this.element.selectionEnd ?? null;
+    let selectionDirection = this.element.selectionDirection;
 
     // Track if any command is altering the focus so we can avoid changing the
     // focus set by the Ajax command.
@@ -1109,26 +1190,37 @@
                 $(this.element).data('refocus-blur') &&
                 this.preCommandsFocusedElementSelector
               ) {
-                target = document.querySelector(
+                target = document.querySelectorAll(
                   `[data-drupal-selector="${this.preCommandsFocusedElementSelector}"]`,
-                );
+                )[this.preCommandsFocusedElementIndex];
+                selectionStart = this.preCommandsFocusedElementSelectionStart;
+                selectionEnd = this.preCommandsFocusedElementSelectionEnd;
+                selectionDirection =
+                  this.preCommandsFocusedElementSelectionDirection;
               }
               if (!target && !$(this.element).data('disable-refocus')) {
                 for (
-                  let n = elementParents.length - 1;
+                  let n = elementParentsWithIndex.length - 1;
                   !target && n >= 0;
                   n--
                 ) {
-                  target = document.querySelector(
-                    `[data-drupal-selector="${elementParents[n].getAttribute(
-                      'data-drupal-selector',
-                    )}"]`,
-                  );
+                  target = document.querySelectorAll(
+                    `[data-drupal-selector="${elementParentsWithIndex[
+                      n
+                    ].element.getAttribute('data-drupal-selector')}"]`,
+                  )[elementParentsWithIndex[n].index];
                 }
               }
             }
             if (target) {
               $(target).trigger('focus');
+              if (typeof target.setSelectionRange === 'function') {
+                target.setSelectionRange(
+                  selectionStart,
+                  selectionEnd,
+                  selectionDirection,
+                );
+              }
             }
           }
           // Reattach behaviors, if they were detached in beforeSerialize(). The
