@@ -1,0 +1,22 @@
+_meta:
+  version: '1.0'
+  entity_type: entity_test_mul
+  uuid: b7e1c3a5-9f2d-4e6b-a8c0-d1e2f3a4b5c6
+  bundle: entity_test_mul
+  default_langcode: de
+default:
+  name:
+    -
+      value: 'Written in German'
+  field_only_in_original:
+    -
+      value: 'Only in German'
+translations:
+  fr:
+    name:
+      -
+        value: 'Written in French'
+  es:
+    name:
+      -
+        value: 'Written in Spanish'
