@@ -152,6 +152,7 @@ class ExtensionDiscovery {
    *   An associative array of Extension objects, keyed by extension name.
    */
   public function scan($type, $include_tests = NULL) {
+    $legacy_directories = [];
     // Determine the installation profile directories to scan for extensions,
     // unless explicit profile directories have been set. Exclude profiles as we
     // cannot have profiles within profiles.
@@ -164,6 +165,7 @@ class ExtensionDiscovery {
 
     // Search the legacy sites/all directory.
     $search_dirs[static::ORIGIN_SITES_ALL] = 'sites/all';
+    $legacy_directories[static::ORIGIN_SITES_ALL] = TRUE;
 
     // Search for contributed and custom extensions in top-level directories.
     // The scan uses a list of extension types to limit recursion to the
@@ -179,6 +181,7 @@ class ExtensionDiscovery {
     // @see \Drupal\Core\Test\FunctionalTestSetupTrait::prepareSettings().
     if ($parent_site = Settings::get('test_parent_site')) {
       $search_dirs[static::ORIGIN_PARENT_SITE] = $parent_site;
+      $legacy_directories[static::ORIGIN_PARENT_SITE] = TRUE;
     }
 
     // Find the site-specific directory to search. Since we are using this
@@ -191,6 +194,7 @@ class ExtensionDiscovery {
     else {
       $search_dirs[static::ORIGIN_SITE] = $this->sitePath ?: DrupalKernel::findSitePath(Request::createFromGlobals());
     }
+    $legacy_directories[static::ORIGIN_SITE] = TRUE;
 
     // Unless an explicit value has been passed, manually check whether we are
     // in a test environment, in which case test extensions must be included.
@@ -201,10 +205,13 @@ class ExtensionDiscovery {
     }
 
     $files = [];
-    foreach ($search_dirs as $dir) {
+    foreach ($search_dirs as $key => $dir) {
       // Discover all extensions in the directory, unless we did already.
       if (!isset(static::$files[$this->root][$dir][$include_tests])) {
         static::$files[$this->root][$dir][$include_tests] = $this->scanDirectory($dir, $include_tests);
+        if (isset($legacy_directories[$key]) && !empty(static::$files[$this->root][$dir][$include_tests])) {
+          @trigger_error('Placing extensions in the sites directory is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3587130', E_USER_DEPRECATED);
+        }
       }
       // Only return extensions of the requested type.
       if (isset(static::$files[$this->root][$dir][$include_tests][$type])) {
