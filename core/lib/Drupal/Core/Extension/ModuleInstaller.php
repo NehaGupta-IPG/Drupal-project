@@ -238,6 +238,9 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $extension_config = \Drupal::configFactory()->getEditable('core.extension');
       $installed_modules = $extension_config->get('module') ?: [];
     }
+
+    $this->moduleHandler->invokeAll('modules_installed', [$module_list, $sync_status]);
+
     if (!InstallerKernel::installationAttempted()) {
       // If the container was rebuilt during hook_install() it might not have
       // the 'router.route_provider.old' service.
@@ -260,7 +263,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
     }
 
-    $this->moduleHandler->invokeAll('modules_installed', [$module_list, $sync_status]);
     return TRUE;
   }
 
