@@ -1329,6 +1329,10 @@
       const $wrapper = response.selector
         ? $(response.selector)
         : $(ajax.wrapper);
+      // In case the wrapper couldn't be determined, we cannot insert anything.
+      if ($wrapper.length === 0) {
+        return;
+      }
       const method = response.method || ajax.method;
       const effect = ajax.getEffect(response);
 
