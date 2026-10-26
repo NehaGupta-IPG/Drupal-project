@@ -83,7 +83,12 @@ class WorkAllocator {
     $tests = array_merge(...array_values($this->groupedTestClassInfoList));
     $slowTests = $this->groupedTestClassInfoList['#slow'] ?? [];
     foreach ($tests as $class => &$test) {
-      $test['weight'] = $test['tests_count'] * (isset($slowTests[$class]) ? self::SLOW_TEST_WEIGHT : 1);
+      // Tests in the #slow group tend to have slower individual methods the
+      // less total methods they have. e.g. a test with a single, 90 second
+      // method is more likely to be put in the group than a test with ten
+      // 9 second methods. So add self::SLOW_TEST_WEIGHT to all #slow tests, and
+      // then add it again, divided by the number of methods.
+      $test['weight'] = $test['tests_count'] * (isset($slowTests[$class]) ? self::SLOW_TEST_WEIGHT + self::SLOW_TEST_WEIGHT / $test['tests_count'] : 1);
     }
     unset($test);
 
