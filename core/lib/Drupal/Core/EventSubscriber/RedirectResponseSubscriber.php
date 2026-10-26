@@ -4,7 +4,7 @@ namespace Drupal\Core\EventSubscriber;
 
 use Drupal\Component\HttpFoundation\SecuredRedirectResponse;
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Routing\LocalRedirectResponse;
+use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
@@ -74,9 +74,9 @@ class RedirectResponseSubscriber implements EventSubscriberInterface {
       if (!($response instanceof SecuredRedirectResponse)) {
         try {
           // SecuredRedirectResponse is an abstract class that requires a
-          // concrete implementation. Default to LocalRedirectResponse, which
-          // considers only redirects to within the same site as safe.
-          $safe_response = LocalRedirectResponse::createFromRedirectResponse($response);
+          // concrete implementation. Default to TrustedRedirectResponse, which
+          // allows external redirects.
+          $safe_response = TrustedRedirectResponse::createFromRedirectResponse($response);
           $safe_response->setRequestContext($this->requestContext);
         }
         catch (\InvalidArgumentException) {
