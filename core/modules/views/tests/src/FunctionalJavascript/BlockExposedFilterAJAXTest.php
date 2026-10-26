@@ -31,7 +31,11 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
    *
    * @var string[]
    */
-  public static $testViews = ['test_block_exposed_ajax', 'test_block_exposed_ajax_with_page'];
+  public static $testViews = [
+    'test_block_exposed_ajax',
+    'test_block_exposed_ajax_with_page',
+    'test_argument_exposed_filter',
+  ];
 
   /**
    * {@inheritdoc}
@@ -100,6 +104,43 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
     $this->assertSession()->waitForElementRemoved('xpath', '//*[text()="Article A"]');
     $this->submitForm([], 'Reset');
     $this->assertSession()->addressEquals('some-path');
+  }
+
+  /**
+   * Tests that when block's exposed filter is set, "More" links adopts that.
+   */
+  public function testMoreLinkQueryParameters(): void {
+    $article = $this->createNode(['type' => 'article']);
+    $basic_page = $this->createNode();
+    $this->drupalPlaceBlock('views_block:test_argument_exposed_filter-block_1');
+    $this->drupalGet('<front>');
+
+    $assert = $this->assertSession();
+    $assert->elementTextContains('css', '.test-argument-exposed-filter-block', $article->getTitle());
+    $assert->linkByHrefExists('/test-argument-exposed-filter');
+
+    $this->submitForm(['type' => 'article'], 'Apply');
+    $assert->waitForElementRemoved('xpath', "//*[text()='{$basic_page->getTitle()}']");
+
+    // Verify that only the article nodes are present.
+    $html = $this->getSession()->getPage()->getHtml();
+    $this->assertStringContainsString($article->getTitle(), $html);
+    $assert->linkByHrefExists('test-argument-exposed-filter?type=article');
+
+    // Place another block where "more" link points to custom path.
+    $this->drupalPlaceBlock('views_block:test_argument_exposed_filter-block_2');
+    $this->drupalGet('<front>');
+
+    // Assert that custom "more" link URL is present on the page.
+    $assert->elementTextContains('css', '.test-argument-exposed-filter-block-custom-url', $article->getTitle());
+    $assert->linkByHrefExists('/test-example-url');
+
+    $this->submitForm(['type' => 'article'], 'Apply');
+    $assert->waitForElementRemoved('xpath', "//*[text()='{$basic_page->getTitle()}']");
+
+    $html = $this->getSession()->getPage()->getHtml();
+    $this->assertStringContainsString($article->getTitle(), $html);
+    $assert->linkByHrefExists('test-example-url?type=article');
   }
 
 }

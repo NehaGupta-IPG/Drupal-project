@@ -2136,36 +2136,39 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    * @return \Drupal\Core\Url
    *   The more link as Url object.
    */
-  protected function getMoreUrl() {
+  protected function getMoreUrl(): Url {
     $path = $this->getOption('link_url');
 
-    // Return the display URL if there is no custom URL.
+    // Create the display URL from view if there is no custom URL.
     if ($this->getOption('link_display') !== 'custom_url' || empty($path)) {
-      return $this->view->getUrl(NULL, $this->display['id']);
+      $url = $this->view->getUrl(NULL, $this->display['id']);
     }
-
-    $parts = UrlHelper::parse($path);
-    $options = $parts;
-    $tokens = $this->getArgumentsTokens();
-
-    // If there are no tokens there is nothing else to do.
-    if (!empty($tokens)) {
-      $parts['path'] = $this->viewsTokenReplace($parts['path'], $tokens);
-      $parts['fragment'] = $this->viewsTokenReplace($parts['fragment'], $tokens);
-
-      // Handle query parameters where the key is part of an array.
-      // For example, f[0] for facets or field_name[id]=id for exposed filters.
-      $parts['query'] = $this->recursiveReplaceTokens($parts['query'], $tokens);
+    else {
+      // Take the configured path in view's setting, replace token if any and
+      // create the url object from the path.
+      $parts = UrlHelper::parse($path);
       $options = $parts;
+      $tokens = $this->getArgumentsTokens();
+
+      // If there are no tokens there is nothing else to do.
+      if (!empty($tokens)) {
+        $parts['path'] = $this->viewsTokenReplace($parts['path'], $tokens);
+        $parts['fragment'] = $this->viewsTokenReplace($parts['fragment'], $tokens);
+
+        // Handle query parameters where the key is part of an array.
+        // For example, f[0] for facets or field_name[id]=id for exposed filters.
+        $parts['query'] = $this->recursiveReplaceTokens($parts['query'], $tokens);
+        $options = $parts;
+      }
+
+      $path = $options['path'];
+      unset($options['path']);
+
+      // Create URL.
+      // @todo Views should expect and store a leading /. See:
+      //   https://www.drupal.org/node/2423913
+      $url = UrlHelper::isExternal($path) ? Url::fromUri($path, $options) : Url::fromUserInput('/' . ltrim($path, '/'), $options);
     }
-
-    $path = $options['path'];
-    unset($options['path']);
-
-    // Create URL.
-    // @todo Views should expect and store a leading /. See:
-    //   https://www.drupal.org/node/2423913
-    $url = UrlHelper::isExternal($path) ? Url::fromUri($path, $options) : Url::fromUserInput('/' . ltrim($path, '/'), $options);
 
     // Merge the exposed query parameters.
     if (!empty($this->view->exposed_raw_input)) {
