@@ -42,6 +42,19 @@ class FilterHtml extends FilterBase {
   protected $restrictions;
 
   /**
+   * The summary delimiter as defined (i.e. hard coded) by the text core module.
+   */
+  const SUMMARY_DELIMITER = '<!--break-->';
+
+  /**
+   * Summary delimiter HTML tag name.
+   *
+   * A pseudo HTML tag name that we use internally to temporarily replace the
+   * summary delimiter during the filtering process.
+   */
+  const SUMMARY_DELIMITER_HTML_TAG_NAME = 'drupalsummarydelimiter';
+
+  /**
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
@@ -117,7 +130,12 @@ class FilterHtml extends FilterBase {
     // we rely on the well-tested Xss::filter() code. Since there is no '*' tag
     // that needs to be removed from the list.
     unset($restrictions['allowed']['*']);
+
+    $text = $this->protectSummaryDelimiter($text);
+    $this->addSummaryDelimiterToRestrictions($restrictions);
     $text = Xss::filter($text, array_keys($restrictions['allowed']));
+    $text = $this->unprotectSummaryDelimiter($text);
+
     // After we've done tag filtering, we do attribute and attribute value
     // filtering as the second part.
     return new FilterProcessResult($this->filterAttributes($text));
@@ -297,10 +315,9 @@ class FilterHtml extends FilterBase {
     $parser = new class($scanner, $events) extends Tokenizer {
 
       /**
-       * phpcs:ignore Drupal.Commenting.FunctionComment.Missing
-       * @phpstan-ignore-next-line
+       * An empty callback function.
        */
-      public function setTextMode($textMode, $untilTag = NULL) {
+      public function setTextMode($textMode, $untilTag = NULL): void {
         // Do nothing, we never enter text mode.
       }
 
@@ -558,6 +575,69 @@ class FilterHtml extends FilterBase {
     ];
     $output .= \Drupal::service('renderer')->render($table);
     return $output;
+  }
+
+  /**
+   * Protect the summary delimiter from getting stripped by Xss::filter().
+   *
+   * Xss::filter() strips out all HTML comments. This helper function protects
+   * the summary delimiter - which is expected to be an HTML comment - from
+   * getting stripped by temporarily turning it into a pseudo HTML tag.
+   *
+   * @param string $text
+   *   The HTML text string to be filtered.
+   *
+   * @return string
+   *   The HTML text string with all occurrences of the summary delimiter
+   *   replaced by a pseudo HTML tag.
+   */
+  private function protectSummaryDelimiter(string $text): string {
+    $summary_delimiter = self::SUMMARY_DELIMITER;
+    $summary_delimiter_html_tag = $this->getSummaryDelimiterHtmlTag();
+
+    return str_replace($summary_delimiter, $summary_delimiter_html_tag, $text);
+  }
+
+  /**
+   * Unprotect the summary delimiter after processing by Xss::filter().
+   *
+   * This is the counterpart to protectSummaryDelimiter(). This helper function
+   * turns the summary delimiter pseudo HTML tag back into the original summary
+   * delimiter HTML comment.
+   *
+   * @param string $text
+   *   The HTML text string to be filtered.
+   *
+   * @return string
+   *   The HTML text string with all occurrences of the summary delimiter pseudo
+   *   HTML tag replaced by the original summary delimiter HTML comment.
+   */
+  private function unprotectSummaryDelimiter(string $text): string {
+    $summary_delimiter = self::SUMMARY_DELIMITER;
+    $summary_delimiter_html_tag = $this->getSummaryDelimiterHtmlTag();
+
+    return str_replace($summary_delimiter_html_tag, $summary_delimiter, $text);
+  }
+
+  /**
+   * Add the summary delimiter pseudo HTML tag name to the list of allowed tags.
+   *
+   * @param array $restrictions
+   *   A restrictions array in the format returned by getHtmlRestrictions().
+   */
+  private function addSummaryDelimiterToRestrictions(array &$restrictions): void {
+    // FALSE means that no attributes are allowed.
+    $restrictions['allowed'][self::SUMMARY_DELIMITER_HTML_TAG_NAME] = FALSE;
+  }
+
+  /**
+   * Return the summary delimiter pseudo HTML tag.
+   *
+   * @return string
+   *   Returns summary delimiter pseudo HTML tag.
+   */
+  private function getSummaryDelimiterHtmlTag(): string {
+    return '<' . self::SUMMARY_DELIMITER_HTML_TAG_NAME . '>';
   }
 
 }
