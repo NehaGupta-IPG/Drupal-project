@@ -11,6 +11,7 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -302,7 +303,15 @@ abstract class ConfigFormBase extends FormBase {
     }
     // We use \Drupal\Core\Render\Markup::create() here as it is safe,
     // rather than use t() because all input has been escaped by t().
-    return Markup::create(implode("\n", $transformed_message_parts));
+     $compiled_message = implode("\n", $transformed_message_parts);
+     $final_message = Markup::create($compiled_message);
+ 
+     // Ensure compatibility with Stringable return type.
+     if ($final_message instanceof Stringable) {
+         return $final_message;
+     } else {
+         return new TranslatableMarkup((string) $final_message);
+     }
   }
 
   /**
