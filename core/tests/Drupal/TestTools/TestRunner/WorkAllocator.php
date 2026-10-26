@@ -22,7 +22,7 @@ class WorkAllocator {
    * take several times longer per test case than other tests, so their weight
    * is multiplied by this value.
    */
-  const SLOW_TEST_WEIGHT = 5;
+  const SLOW_TEST_WEIGHT = 20;
 
   /**
    * The sorted tests list, prior to allocation.
@@ -88,7 +88,7 @@ class WorkAllocator {
       // method is more likely to be put in the group than a test with ten
       // 9 second methods. So add self::SLOW_TEST_WEIGHT to all #slow tests, and
       // then add it again, divided by the number of methods.
-      $test['weight'] = $test['tests_count'] * (isset($slowTests[$class]) ? self::SLOW_TEST_WEIGHT + self::SLOW_TEST_WEIGHT / $test['tests_count'] : 1);
+      $test['weight'] = ceil($test['tests_count'] + (isset($slowTests[$class]) ? self::SLOW_TEST_WEIGHT + self::SLOW_TEST_WEIGHT / $test['tests_count'] : 1));
     }
     unset($test);
 
