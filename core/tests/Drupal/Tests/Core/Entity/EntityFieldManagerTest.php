@@ -667,7 +667,7 @@ class EntityFieldManagerTest extends UnitTestCase {
     $this->cacheTagsInvalidator->invalidateTags(['entity_field_info'])->shouldBeCalled();
     $this->container->get('cache_tags.invalidator')->willReturn($this->cacheTagsInvalidator->reveal())->shouldBeCalled();
 
-    $this->typedDataManager->clearCachedDefinitions()->shouldBeCalled();
+    $this->typedDataManager->clearCachedPrototypes()->shouldBeCalled();
 
     $this->entityFieldManager->clearCachedFieldDefinitions();
   }

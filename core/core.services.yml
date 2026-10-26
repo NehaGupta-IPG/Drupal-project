@@ -801,7 +801,7 @@ services:
   Drupal\Core\Entity\EntityFieldManagerInterface: '@entity_field.manager'
   entity_type.listener:
     class: Drupal\Core\Entity\EntityTypeListener
-    arguments: ['@entity_type.manager', '@entity_field.manager', '@event_dispatcher', '@entity.last_installed_schema.repository']
+    arguments: ['@entity_type.manager', '@entity_field.manager', '@event_dispatcher', '@entity.last_installed_schema.repository', '@typed_data_manager']
   Drupal\Core\Entity\EntityTypeListenerInterface: '@entity_type.listener'
   entity_bundle.listener:
     class: Drupal\Core\Entity\EntityBundleListener
@@ -812,7 +812,7 @@ services:
     arguments: ['@entity_type.manager']
   entity.definition_update_manager:
     class: Drupal\Core\Entity\EntityDefinitionUpdateManager
-    arguments: ['@entity_type.manager', '@entity.last_installed_schema.repository', '@entity_field.manager', '@entity_type.listener', '@field_storage_definition.listener']
+    arguments: ['@entity_type.manager', '@entity.last_installed_schema.repository', '@entity_field.manager', '@entity_type.listener', '@field_storage_definition.listener', '@typed_data_manager']
   Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface: '@entity.definition_update_manager'
   entity.last_installed_schema.repository:
     class: Drupal\Core\Entity\EntityLastInstalledSchemaRepository

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -50,12 +51,18 @@ class EntityTypeListener implements EntityTypeListenerInterface {
    *   The event dispatcher.
    * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
    *   The entity last installed schema repository.
+   * @param \Drupal\Core\TypedData\TypedDataManagerInterface|null $typedDataManager
+   *   The typed data manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EventDispatcherInterface $event_dispatcher, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EventDispatcherInterface $event_dispatcher, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, protected ?TypedDataManagerInterface $typedDataManager = NULL) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;
     $this->eventDispatcher = $event_dispatcher;
     $this->entityLastInstalledSchemaRepository = $entity_last_installed_schema_repository;
+    if (!$this->typedDataManager) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $typedDataManager argument is deprecated in drupal:12.1.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3XXXXXX', E_USER_DEPRECATED);
+      $this->typedDataManager = \Drupal::service('typed_data_manager');
+    }
   }
 
   /**
@@ -176,6 +183,8 @@ class EntityTypeListener implements EntityTypeListenerInterface {
   protected function clearCachedDefinitions() {
     $this->entityTypeManager->clearCachedDefinitions();
     $this->entityFieldManager->clearCachedFieldDefinitions();
+    // Entity types are exposed as data types, clear those as well.
+    $this->typedDataManager->clearCachedDefinitions();
   }
 
 }

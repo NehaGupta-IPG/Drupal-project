@@ -8,6 +8,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionListenerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\TypedData\TypedDataManagerInterface;
 
 /**
  * Manages entity definition updates.
@@ -63,13 +64,19 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
    *   The entity type listener interface.
    * @param \Drupal\Core\Field\FieldStorageDefinitionListenerInterface $field_storage_definition_listener
    *   The field storage definition listener service.
+   * @param \Drupal\Core\TypedData\TypedDataManagerInterface|null $typedDataManager
+   *   The typed data manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, EntityFieldManagerInterface $entity_field_manager, EntityTypeListenerInterface $entity_type_listener, FieldStorageDefinitionListenerInterface $field_storage_definition_listener) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, EntityFieldManagerInterface $entity_field_manager, EntityTypeListenerInterface $entity_type_listener, FieldStorageDefinitionListenerInterface $field_storage_definition_listener, protected ?TypedDataManagerInterface $typedDataManager = NULL) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityLastInstalledSchemaRepository = $entity_last_installed_schema_repository;
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeListener = $entity_type_listener;
     $this->fieldStorageDefinitionListener = $field_storage_definition_listener;
+    if (!$this->typedDataManager) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $typedDataManager argument is deprecated in drupal:12.1.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3XXXXXX', E_USER_DEPRECATED);
+      $this->typedDataManager = \Drupal::service('typed_data_manager');
+    }
   }
 
   /**
@@ -362,6 +369,8 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
   protected function clearCachedDefinitions() {
     $this->entityTypeManager->clearCachedDefinitions();
     $this->entityFieldManager->clearCachedFieldDefinitions();
+    // Entity types are exposed as data types, clear those as well.
+    $this->typedDataManager->clearCachedDefinitions();
   }
 
 }
