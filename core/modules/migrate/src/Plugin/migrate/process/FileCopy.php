@@ -29,6 +29,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Available configuration keys:
  * - move: (optional) Boolean, if TRUE, move the file, otherwise copy the file.
  *   Defaults to FALSE.
+ * - source_exception: (optional) Error behavior when the source file cannot be
+ *   found:
+ *   - 'error': (default) Raise an error and stop the migration.
+ *   - 'skip process': Prevents further processing of the input property.
+ *   - 'skip row': Skips the entire row.
  * - file_exists: (optional) Replace behavior when the destination file already
  *   exists:
  *   - 'replace' - (default) Replace the existing file.
@@ -132,7 +137,12 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
 
     // Ensure the source file exists, if it's a local URI or path.
     if (!file_exists($source)) {
-      throw new MigrateException("File '$source' does not exist");
+      if ($this->configuration['source_exception'] === 'skip process') {
+        $this->stopPipeline = TRUE;
+        return NULL;
+      }
+      $exception_class = $this->configuration['source_exception'];
+      throw new $exception_class("File '$source' does not exist");
     }
 
     // If the start and end file is exactly the same, there is nothing to do.
