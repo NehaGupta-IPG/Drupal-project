@@ -61,19 +61,3 @@ dialog_renderer_test.dialog_content:
     _title: 'Thing 1'
   requirements:
     _access: 'TRUE'
-
-dialog_renderer_test.dialog_content_link:
-  path: '/htmx-dialog-content-link'
-  defaults:
-    _controller: '\Drupal\dialog_renderer_test\Controller\HtmxDialogTestController::dialogContentLink'
-    _title: 'Thing 2'
-  requirements:
-    _access: 'TRUE'
-
-dialog_renderer_test.dialog_content_input:
-  path: '/htmx-dialog-content-input'
-  defaults:
-    _controller: '\Drupal\dialog_renderer_test\Controller\HtmxDialogTestController::dialogContentInput'
-    _title: 'Thing 3'
-  requirements:
-    _access: 'TRUE'

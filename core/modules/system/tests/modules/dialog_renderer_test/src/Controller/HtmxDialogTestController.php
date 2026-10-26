@@ -26,53 +26,10 @@ class HtmxDialogTestController {
   }
 
   /**
-   * Return dialog content with link.
+   * Displays test elements that will open in a dialog.
    *
    * @return array
-   *   Render array for display in dialog.
-   */
-  public function dialogContentLink() {
-    return [
-      '#type' => 'container',
-      'text' => [
-        '#type' => 'markup',
-        '#markup' => 'Look at me in a dialog!<br><a href="#">And a link!</a>',
-      ],
-      'input' => [
-        '#type' => 'textfield',
-        '#size' => 60,
-      ],
-    ];
-  }
-
-  /**
-   * Return dialog content with autofocus input.
-   *
-   * @return array
-   *   Render array for display in dialog.
-   */
-  public function dialogContentInput() {
-    return [
-      '#type' => 'container',
-      'text' => [
-        '#type' => 'markup',
-        '#markup' => 'Look at me in a dialog!<br><a href="#">And a link!</a>',
-      ],
-      'input' => [
-        '#type' => 'textfield',
-        '#size' => 60,
-        '#attributes' => [
-          'autofocus' => TRUE,
-        ],
-      ],
-    ];
-  }
-
-  /**
-   * Displays test links that will open in a dialog.
-   *
-   * @return array
-   *   Render array with links.
+   *   Render array.
    */
   public function testMarkup() {
     $build['content'] = [
@@ -88,6 +45,15 @@ class HtmxDialogTestController {
     ];
     (new Htmx())->get($modalUrl)
       ->applyTo($build['normal_modal']);
+
+    $modalFormUrl = Url::fromUri('base:/htmx/dialog/modal/dialog_renderer-form');
+    $build['modal_form'] = [
+      '#title' => 'Form in a modal',
+      '#type' => 'checkbox',
+      '#name' => 'modal_form',
+    ];
+    (new Htmx())->get($modalFormUrl)
+      ->applyTo($build['modal_form']);
 
     $build['styled_modal_single_class'] = [
       '#title' => 'Modal with single additional class',
@@ -116,6 +82,15 @@ class HtmxDialogTestController {
     (new Htmx())->get($offCanvasUrl)
       ->applyTo($build['side_off_canvas']);
 
+    $offCanvasFormUrl = Url::fromUri('base:/htmx/dialog/off-canvas/dialog_renderer-form');
+    $build['side_off_canvas_form'] = [
+      '#title' => 'Form in an off-canvas side',
+      '#type' => 'checkbox',
+      '#name' => 'side_off_canvas_form',
+    ];
+    (new Htmx())->get($offCanvasFormUrl)
+      ->applyTo($build['side_off_canvas_form']);
+
     $offCanvasTopUrl = Url::fromUri('base:/htmx/dialog/off-canvas-top/htmx-dialog-content', ['query' => ['position' => 'top']]);
     $build['top_off_canvas'] = [
       '#title' => 'Off-canvas top',
@@ -126,41 +101,6 @@ class HtmxDialogTestController {
       ->applyTo($build['top_off_canvas']);
 
     return $build;
-  }
-
-  /**
-   * Displays a dropbutton with a link that opens in a modal dialog.
-   *
-   * @return array
-   *   Render array with links.
-   */
-  public function collapsedOpener() {
-    return [
-      '#markup' => '<h2>Honk</h2>',
-      'dropbutton' => [
-        '#type' => 'dropbutton',
-        '#dropbutton_type' => 'small',
-        '#links' => [
-          'front' => [
-            'title' => 'front!',
-            'url' => Url::fromRoute('<front>'),
-          ],
-          'in a dropbutton' => [
-            'title' => 'inside a dropbutton',
-            'url' => Url::fromRoute('dialog_renderer_test.dialog_content'),
-            'attributes' => [
-              'class' => ['use-ajax'],
-              'data-dialog-type' => 'modal',
-            ],
-          ],
-        ],
-      ],
-      '#attached' => [
-        'library' => [
-          'core/drupal.ajax',
-        ],
-      ],
-    ];
   }
 
 }

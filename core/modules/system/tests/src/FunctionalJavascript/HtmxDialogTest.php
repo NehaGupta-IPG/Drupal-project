@@ -65,6 +65,18 @@ class HtmxDialogTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests that a form opens in a dialog.
+   */
+  public function testForm(): void {
+    $this->drupalGet('/htmx-dialog-test-markup');
+    $this->openDialog('modal_form');
+    // Verify the form.
+    $this->assertSession()->elementExists('css', '#drupal-dialog-dialog-renderer-test-dot-modal-form');
+    $this->assertSession()->elementExists('css', 'drupal-dialog dialog form[data-drupal-selector="dialog-renderer-test-form"]');
+    $this->assertSession()->elementExists('css', 'drupal-dialog dialog form[data-drupal-selector="dialog-renderer-test-form"] input[data-drupal-selector="edit-submit-1"]');
+     }
+
+  /**
    * Tests that an additional class is added to a modal dialog.
    */
   public function testModalDialogAdditionalClass(): void {
@@ -118,7 +130,7 @@ class HtmxDialogTest extends WebDriverTestBase {
    */
   private function openDialog(string $name): void {
     $this->getCheckbox($name)->click();
-    $this->assertSession()->waitForElementVisible('css', 'drupal-dialog dialog[open]');
+    $this->assertSession()->assertWaitOnAjaxRequest();
   }
 
   /**

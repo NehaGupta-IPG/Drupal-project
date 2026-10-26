@@ -134,6 +134,17 @@ class HtmxOffCanvasDialogTest extends WebDriverTestBase {
     $this->assertJsCondition("parseFloat(getComputedStyle(document.querySelector('[data-off-canvas-main-canvas]')).paddingRight) === 0");
   }
 
+  public function testFormOffCanvas(): void {
+    $this->drupalGet('/htmx-dialog-test-markup');
+    $this->openOffCanvas('side_off_canvas_form');
+
+    // Verify the form.
+    $this->assertSession()->elementExists('css', '#drupal-dialog-dialog-renderer-test-dot-modal-form');
+    $this->assertSession()->elementExists('css', 'drupal-dialog #drupal-off-canvas-wrapper form[data-drupal-selector="dialog-renderer-test-form"]');
+    $this->assertSession()->elementExists('css', 'drupal-dialog #drupal-off-canvas-wrapper form[data-drupal-selector="dialog-renderer-test-form"] input[data-drupal-selector="edit-submit-1"]');
+
+  }
+
   /**
    * Opens an off-canvas dialog from the test fixture.
    *
@@ -142,7 +153,7 @@ class HtmxOffCanvasDialogTest extends WebDriverTestBase {
    */
   private function openOffCanvas(string $name): void {
     $this->getCheckbox($name)->click();
-    $this->assertSession()->waitForElementVisible('css', 'drupal-dialog #drupal-off-canvas-wrapper');
+    $this->assertSession()->assertWaitOnAjaxRequest();
   }
 
   /**
