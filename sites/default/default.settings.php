@@ -711,7 +711,10 @@ $settings['update_free_access'] = FALSE;
 /**
  * Load services definition file.
  */
-$settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
+$services_file = $app_root . '/' . $site_path . '/services.yml';
+if (file_exists($services_file)) {
+  $settings['container_yamls'][] = $services_file;
+}
 
 /**
  * Override the default service container class.
