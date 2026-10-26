@@ -71,7 +71,7 @@ class HtmxDialogTest extends WebDriverTestBase {
     $this->drupalGet('/htmx-dialog-test-markup');
     $this->openDialog('modal_form');
     // Verify the form.
-    $this->assertSession()->elementExists('css', '#drupal-dialog-dialog-renderer-test-dot-modal-form');
+    $this->assertSession()->waitForElement('css', '#drupal-dialog-dialog-renderer-test-dot-modal-form');
     $this->assertSession()->elementExists('css', 'drupal-dialog dialog form[data-drupal-selector="dialog-renderer-test-form"]');
     $this->assertSession()->elementExists('css', 'drupal-dialog dialog form[data-drupal-selector="dialog-renderer-test-form"] input[data-drupal-selector="edit-submit-1"]');
   }

@@ -142,7 +142,7 @@ class HtmxOffCanvasDialogTest extends WebDriverTestBase {
     $this->openOffCanvas('side_off_canvas_form');
 
     // Verify the form.
-    $this->assertSession()->elementExists('css', '#drupal-dialog-dialog-renderer-test-dot-modal-form');
+    $this->assertSession()->waitForElement('css', '#drupal-dialog-dialog-renderer-test-dot-modal-form');
     $this->assertSession()->elementExists('css', 'drupal-dialog #drupal-off-canvas-wrapper form[data-drupal-selector="dialog-renderer-test-form"]');
     $this->assertSession()->elementExists('css', 'drupal-dialog #drupal-off-canvas-wrapper form[data-drupal-selector="dialog-renderer-test-form"] input[data-drupal-selector="edit-submit-1"]');
 
