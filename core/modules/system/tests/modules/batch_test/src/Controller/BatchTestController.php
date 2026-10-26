@@ -9,12 +9,21 @@ use Drupal\batch_test\BatchTestCallbacks;
 use Drupal\batch_test\BatchTestDefinitions;
 use Drupal\batch_test\BatchTestHelper;
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Batch\BatchManagerInterface;
+use Drupal\Core\DependencyInjection\AutowireTrait;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Form\FormState;
 
 /**
  * Controller routines for batch tests.
  */
-class BatchTestController {
+class BatchTestController implements ContainerInjectionInterface {
+
+  use AutowireTrait;
+
+  public function __construct(
+    protected readonly BatchManagerInterface $batchManager,
+  ) {}
 
   /**
    * Redirects successfully.
@@ -42,8 +51,8 @@ class BatchTestController {
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
 
-    batch_set($batch_test_definitions->batch5());
-    return batch_process('batch-test/redirect');
+    $this->batchManager->addBatch($batch_test_definitions->batch5());
+    return $this->batchManager->process('batch-test/redirect');
   }
 
   /**
@@ -61,8 +70,8 @@ class BatchTestController {
     // Set the batch and process it.
     $batch_builder = (new BatchBuilder())
       ->addOperation([$batch_test_helper, 'nestedDrupalFormSubmitCallback'], [$value]);
-    batch_set($batch_builder->toArray());
-    return batch_process('batch-test/redirect');
+    $this->batchManager->addBatch($batch_builder);
+    return $this->batchManager->process('batch-test/redirect');
   }
 
   /**
@@ -76,9 +85,8 @@ class BatchTestController {
     $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
-    batch_set($batch_test_definitions->batch1());
-    return batch_process('batch-test/redirect');
-
+    $this->batchManager->addBatch($batch_test_definitions->batch1());
+    return $this->batchManager->process('batch-test/redirect');
   }
 
   /**
@@ -94,8 +102,8 @@ class BatchTestController {
     $batch_test_helper->stack(NULL, TRUE);
     $batch = $batch_test_definitions->batch1();
     $batch['finished'] = BatchTestCallbacks::class . ':finished1Finished';
-    batch_set($batch);
-    return batch_process('batch-test/redirect');
+    $this->batchManager->addBatch($batch);
+    return $this->batchManager->process('batch-test/redirect');
   }
 
   /**
@@ -135,8 +143,8 @@ class BatchTestController {
     $batch = [
       'operations' => [[BatchInjectionCallbacks::class . ':themeCallback', []]],
     ];
-    batch_set($batch);
-    return batch_process('batch-test/redirect');
+    $this->batchManager->addBatch($batch);
+    return $this->batchManager->process('batch-test/redirect');
   }
 
   /**
@@ -153,8 +161,8 @@ class BatchTestController {
       'title' => 'Batch Test',
       'operations' => [[BatchInjectionCallbacks::class . ':titleCallback', []]],
     ];
-    batch_set($batch);
-    return batch_process('batch-test/redirect');
+    $this->batchManager->addBatch($batch);
+    return $this->batchManager->process('batch-test/redirect');
   }
 
 }
