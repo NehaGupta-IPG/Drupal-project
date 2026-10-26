@@ -79,11 +79,26 @@
 
     const term = autocomplete.extractLastTerm(event.target.value);
     // Abort search if the first character is in firstCharacterDenyList.
-    if (term.length > 0 && options.firstCharacterDenyList.includes(term[0])) {
+    if (term.length > 0 && options.getFirstCharacterDenyList(event).includes(term[0])) {
       return false;
     }
     // Only search when the term is at least the minimum length.
     return term.length >= options.minLength;
+  }
+
+  /**
+   * Gets the first-character deny list for an autocomplete field.
+   *
+   * @param {jQuery.Event} event
+   *   The event triggered by the autocomplete field.
+   *
+   * @return {string}
+   *   The characters that should prevent an autocomplete search.
+   */
+  function getFirstCharacterDenyList(event) {
+    return $(event.target).attr(
+      'data-autocomplete-first-character-denylist',
+    ) || '';
   }
 
   /**
@@ -218,7 +233,7 @@
             firstCharacterDenyList: denyList,
           });
           // Use jQuery UI Autocomplete on the textfield.
-          $autocomplete.autocomplete(autocomplete.options).each(function () {
+          $autocomplete.autocomplete(denyList).each(function () {
             $(this).data('ui-autocomplete')._renderItem =
               autocomplete.options.renderItem;
           });
@@ -264,6 +279,7 @@
       focus: focusHandler,
       search: searchHandler,
       select: selectHandler,
+      getFirstCharacterDenyList,
       renderItem,
       minLength: 1,
       // Custom options, used by Drupal.autocomplete.
