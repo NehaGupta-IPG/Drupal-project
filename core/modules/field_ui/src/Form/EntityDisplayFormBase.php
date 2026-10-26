@@ -428,7 +428,11 @@ abstract class EntityDisplayFormBase extends EntityForm {
 
         // Check selected plugin settings to display edit link or not.
         $settings_form = $plugin->settingsForm($form, $form_state);
-        $third_party_settings_form = $this->thirdPartySettingsForm($plugin, $field_definition, $form, $form_state);
+        // If the plugin has no settings form, check whether there are any third party settings to show in a form.
+        if (empty($settings_form)) {
+          $third_party_settings_form = $this->thirdPartySettingsForm($plugin, $field_definition, $form, $form_state);
+        }
+
         if (!empty($settings_form) || !empty($third_party_settings_form)) {
           $field_row['settings_edit'] = $base_button + [
             '#type' => 'image_button',
