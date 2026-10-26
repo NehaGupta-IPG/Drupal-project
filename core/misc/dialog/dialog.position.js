@@ -144,6 +144,11 @@
         eventData,
         autoResize,
       );
+      $(".ui-dialog summary[role='button']").on('click', function () {
+        setTimeout(() => {
+          $(window).trigger('resize.dialogResize');
+        }, 0);
+      });
     }
   });
 
@@ -155,5 +160,6 @@
     $(e.target).data('drupalAutoResize')?.cancel();
     $(window).off('.dialogResize');
     $(document).off('.dialogResize');
+    $(".ui-dialog summary[role='button']").off('click');
   });
 })(jQuery, Drupal, drupalSettings, Drupal.debounce, Drupal.displace);
