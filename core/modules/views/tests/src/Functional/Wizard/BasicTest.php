@@ -136,6 +136,12 @@ class BasicTest extends WizardTestBase {
     $this->drupalGet($view3['page[path]']);
     $this->assertSession()->statusCodeEquals(200);
 
+    // Make content view have exposed form block to test label on block layout.
+    $view = Views::getView('content');
+    $view->setDisplay('page_1');
+    $view->display_handler->setOption('exposed_block', TRUE);
+    $view->save();
+
     // Make sure the view only displays the node we expect.
     $this->assertSession()->addressEquals($view3['page[path]']);
     $this->assertSession()->pageTextContains($view3['page[title]']);
@@ -155,6 +161,9 @@ class BasicTest extends WizardTestBase {
     $this->drupalGet('admin/structure/block/list/' . $this->config('system.theme')->get('default'));
     $this->clickLink('Place block');
     $this->assertSession()->pageTextContains($view3['label']);
+
+    // Random assertion to check human-friendly exposed block label.
+    $this->assertSession()->pageTextContains('Exposed form: Content: Page');
 
     // Place the block.
     $this->drupalPlaceBlock("views_block:{$view3['id']}-block_1");
