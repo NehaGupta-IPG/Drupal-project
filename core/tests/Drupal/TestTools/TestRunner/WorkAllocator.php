@@ -22,7 +22,7 @@ class WorkAllocator {
    * take several times longer per test case than other tests, so their weight
    * is multiplied by this value.
    */
-  const SLOW_TEST_WEIGHT = 40;
+  const SLOW_TEST_WEIGHT = 50;
 
   /**
    * The sorted tests list, prior to allocation.
