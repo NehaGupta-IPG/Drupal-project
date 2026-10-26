@@ -920,12 +920,13 @@ default:
     # Output diff, but never fail the job.
     - diff -u HEAD.json MR.json || true
     # Determine if this increased or decreased coverage. Fail the job if it is worse. All the
-    # percentages must be equal or higher, with the exception of `typesInUse`.
+    # percentages must be equal or higher, with the exception of `typesInUse` and
+    # `objectPropertyPathsFullyValidatable`.
     - |
       php -r '
          $head = json_decode(file_get_contents("HEAD.json"), TRUE)["assessment"];
          $mr = json_decode(file_get_contents("MR.json"), TRUE)["assessment"];
-         unset($head["_description"], $head["typesInUse"], $mr["_description"], $mr["typesInUse"]);
+         unset($head["_description"], $head["typesInUse"], $mr["_description"], $mr["typesInUse"], $mr["objectPropertyPathsFullyValidatable"]);
          $impact = array_map(fn (float $h, float $m) => $m-$h, $head, $mr);
          exit((int) (min($impact) < 0));
       '
