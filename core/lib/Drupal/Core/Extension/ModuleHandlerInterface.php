@@ -90,7 +90,6 @@ interface ModuleHandlerInterface {
    *   - required_by: An array with the keys being the modules that will not
    *     work without this module.
    *
-   *
    * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is
    *   no replacement.
    *

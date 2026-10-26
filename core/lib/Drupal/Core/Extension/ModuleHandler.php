@@ -113,7 +113,6 @@ class ModuleHandler implements ModuleHandlerInterface {
     protected readonly KeyValueFactoryInterface $keyValueFactory,
     protected readonly CallableResolver $callableResolver,
     protected readonly CacheBackendInterface $cache,
-    protected readonly ModuleExtensionList $moduleExtensionList,
   ) {
     $this->moduleList = [];
     foreach ($module_list as $name => $module) {
