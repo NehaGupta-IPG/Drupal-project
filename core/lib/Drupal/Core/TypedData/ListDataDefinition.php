@@ -8,6 +8,11 @@ namespace Drupal\Core\TypedData;
 class ListDataDefinition extends DataDefinition implements ListDataDefinitionInterface {
 
   /**
+   * A constant with the list type.
+   */
+  private const THIS_TYPE = 'list';
+
+  /**
    * The data definition of a list item.
    *
    * @var \Drupal\Core\TypedData\DataDefinitionInterface
@@ -50,21 +55,24 @@ class ListDataDefinition extends DataDefinition implements ListDataDefinitionInt
   public function __construct(array $values = [], ?DataDefinitionInterface $item_definition = NULL) {
     $this->definition = $values;
     $this->itemDefinition = $item_definition;
+
+    // @see https://www.drupal.org/project/drupal/issues/3254831
+    $this->definition['type'] = self::THIS_TYPE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDataType() {
-    return 'list';
+    return self::THIS_TYPE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setDataType($type) {
-    if ($type != 'list') {
-      throw new \LogicException('Lists must always be of data type "list".');
+    if ($type != self::THIS_TYPE) {
+      throw new \LogicException('Lists must always be of data type "' . self::THIS_TYPE . '".');
     }
   }
 
