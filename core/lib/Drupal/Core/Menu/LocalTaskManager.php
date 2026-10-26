@@ -34,8 +34,14 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
     'route_name' => '',
     // Parameters for route variables when generating a link.
     'route_parameters' => [],
-    // The static title for the local task.
+    // The static title for the contextual link. Placeholders can be specified
+    // like on any translatable string and the values in title_arguments.
     'title' => '',
+    // The values for the local task placeholders.
+    'title_arguments' => [],
+    // A context for the title string.
+    // @see \Drupal\Core\StringTranslation\TranslationInterface::translate()
+    'title_context' => '',
     // The route name where the root tab appears.
     'base_route' => '',
     // The plugin ID of the parent tab (or NULL for the top-level tab).

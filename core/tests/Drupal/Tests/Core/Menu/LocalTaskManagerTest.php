@@ -325,6 +325,8 @@ class LocalTaskManagerTest extends UnitTestCase {
         'weight' => 0,
         'options' => [],
         'class' => 'Drupal\Core\Menu\LocalTaskDefault',
+        'title_context' => '',
+        'title_arguments' => [],
       ];
     }
     return $definitions;

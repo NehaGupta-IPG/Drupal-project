@@ -32,8 +32,14 @@ class LocalActionManager extends DefaultPluginManager implements LocalActionMana
   protected $defaults = [
     // The plugin id. Set by the plugin system based on the top-level YAML key.
     'id' => NULL,
-    // The static title for the local action.
+    // The static title for the contextual link. Placeholders can be specified
+    // like on any translatable string and the values in title_arguments.
     'title' => '',
+    // The values for the local action placeholders.
+    'title_arguments' => [],
+    // A context for the title string.
+    // @see \Drupal\Core\StringTranslation\TranslationInterface::translate()
+    'title_context' => '',
     // The weight of the local action.
     'weight' => NULL,
     // (Required) the route name used to generate a link.

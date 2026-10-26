@@ -32,8 +32,14 @@ class ContextualLinkManager extends DefaultPluginManager implements ContextualLi
     'route_name' => '',
     // (required) The contextual links group.
     'group' => '',
-    // The static title text for the link.
+    // The static title for the contextual link. Placeholders can be specified
+    // like on any translatable string and the values in title_arguments.
     'title' => '',
+    // The values for the contextual link placeholders.
+    'title_arguments' => [],
+    // A context for the title string.
+    // @see \Drupal\Core\StringTranslation\TranslationInterface::translate()
+    'title_context' => '',
     // The default link options.
     'options' => [],
     // The weight of the link.
