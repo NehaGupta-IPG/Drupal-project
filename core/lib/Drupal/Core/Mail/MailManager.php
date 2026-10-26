@@ -141,7 +141,7 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
    * @return \Drupal\Core\Mail\MailInterface
    *   A mail plugin instance.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function getInstance(array $options) {
     $module = $options['module'];
@@ -223,6 +223,8 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
    *   success indicator of the email, failure being already written to the
    *   watchdog. (Success means nothing more than the message being accepted at
    *   php-level, which still doesn't guarantee it to be delivered.)
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    *
    * @see \Drupal\Core\Mail\MailManagerInterface::mail()
    */
