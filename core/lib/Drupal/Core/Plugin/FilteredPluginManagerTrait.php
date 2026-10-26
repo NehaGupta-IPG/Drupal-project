@@ -16,7 +16,7 @@ trait FilteredPluginManagerTrait {
   /**
    * Implements \Drupal\Core\Plugin\FilteredPluginManagerInterface::getFilteredDefinitions().
    */
-  public function getFilteredDefinitions($consumer, $contexts = NULL, array $extra = []) {
+  public function getFilteredDefinitions($consumer = NULL, $contexts = NULL, array $extra = []) {
     if (!is_null($contexts)) {
       $definitions = $this->getDefinitionsForContexts($contexts);
     }
@@ -27,9 +27,13 @@ trait FilteredPluginManagerTrait {
     $type = $this->getType();
     $hooks = [];
     $hooks[] = "plugin_filter_{$type}";
-    $hooks[] = "plugin_filter_{$type}__{$consumer}";
+    if ($consumer !== NULL) {
+      $hooks[] = "plugin_filter_{$type}__{$consumer}";
+    }
+
     $this->moduleHandler()->alter($hooks, $definitions, $extra, $consumer);
     $this->themeManager()->alter($hooks, $definitions, $extra, $consumer);
+
     return $definitions;
   }
 

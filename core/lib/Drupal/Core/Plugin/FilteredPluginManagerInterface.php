@@ -16,8 +16,10 @@ interface FilteredPluginManagerInterface extends PluginManagerInterface {
    * which is useful for tasks like hiding specific plugins from a particular
    * user interface.
    *
-   * @param string $consumer
-   *   A string identifying the consumer of these plugin definitions.
+   * @param string|null $consumer
+   *   (optional) A string identifying the consumer of these plugin definitions.
+   *   If no consumer is provided, generic plugin definitions will be filtered
+   *   without applying consumer-specific hooks.
    * @param \Drupal\Component\Plugin\Context\ContextInterface[]|null $contexts
    *   (optional) Either an array of contexts to use for filtering, or NULL to
    *   not filter by contexts.
@@ -31,6 +33,6 @@ interface FilteredPluginManagerInterface extends PluginManagerInterface {
    * @see hook_plugin_filter_TYPE_alter()
    * @see hook_plugin_filter_TYPE__CONSUMER_alter()
    */
-  public function getFilteredDefinitions($consumer, $contexts = NULL, array $extra = []);
+  public function getFilteredDefinitions($consumer = NULL, $contexts = NULL, array $extra = []);
 
 }
