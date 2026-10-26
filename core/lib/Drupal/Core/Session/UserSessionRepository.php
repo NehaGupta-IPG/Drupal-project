@@ -18,6 +18,17 @@ readonly class UserSessionRepository implements UserSessionRepositoryInterface {
    * {@inheritdoc}
    */
   public function deleteAll(int $uid): void {
+    // A driver that does not create tables lazily aborts the enclosing
+    // transaction with the failed delete query below. When the table does not
+    // exist there are no sessions to delete. The result is not memoized
+    // because this class is read-only, and deleting the sessions of a user
+    // inside a transaction is rare enough that the extra lookup does not
+    // matter.
+    if (!$this->connection->supportsLazyTableCreation()
+      && $this->connection->inTransaction()
+      && !$this->connection->schema()->tableExists('sessions')) {
+      return;
+    }
     try {
       // Delete session data.
       $this->connection->delete('sessions')

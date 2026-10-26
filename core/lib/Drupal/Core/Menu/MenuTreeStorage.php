@@ -11,6 +11,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Statement\FetchAs;
+use Drupal\Core\Database\TableVerifyTrait;
 
 // cspell:ignore mlid
 
@@ -20,6 +21,7 @@ use Drupal\Core\Database\Statement\FetchAs;
 class MenuTreeStorage implements MenuTreeStorageInterface {
 
   use MenuLinkFieldDefinitions;
+  use TableVerifyTrait;
 
   /**
    * The maximum depth of a menu links tree.
@@ -235,6 +237,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   failed.
    */
   protected function safeExecuteSelect(SelectInterface $query) {
+    $this->verifyTableInTransaction($this->table);
     try {
       return $query->execute();
     }

@@ -83,24 +83,11 @@ class Upsert extends QueryUpsert {
     // Re-initialize the values array so that we can re-use this query.
     $this->insertValues = [];
 
-    // Create a savepoint so we can rollback a failed query. This is so we can
-    // mimic MySQL and SQLite transactions which don't fail if a single query
-    // fails. This is important for tables that are created on demand. For
-    // example, \Drupal\Core\Cache\DatabaseBackend.
-    if ($this->connection->inTransaction()) {
-      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
-    }
     try {
       $stmt->execute(NULL, $options);
-      if (isset($savepoint)) {
-        $savepoint->commitOrRelease();
-      }
       return $stmt->rowCount();
     }
     catch (\Exception $e) {
-      if (isset($savepoint)) {
-        $savepoint->rollback();
-      }
       $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, [], $options);
     }
   }

@@ -139,29 +139,6 @@ class Select extends QuerySelect {
     return $alias;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function execute() {
-    if ($this->connection->inTransaction()) {
-      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
-    }
-    try {
-      $result = parent::execute();
-    }
-    catch (\Exception $e) {
-      if (isset($savepoint)) {
-        $savepoint->rollback();
-      }
-      throw $e;
-    }
-    if (isset($savepoint)) {
-      $savepoint->commitOrRelease();
-    }
-
-    return $result;
-  }
-
 }
 
 /**
