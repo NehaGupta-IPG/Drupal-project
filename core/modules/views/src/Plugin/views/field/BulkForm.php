@@ -445,9 +445,15 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
       else {
         // Don't display the message unless there are some elements affected and
         // there is no confirmation form.
-        $this->messenger->addStatus($this->formatPlural($count, '%action was applied to @count item.', '%action was applied to @count items.', [
-          '%action' => $action->label(),
-        ]));
+        if($action->id() == 'comment_publish_action') {
+          $this->messenger->addStatus($this->formatPlural($count, '@count comment is approved successfully.', '@count comments are approved successfully.', [
+            '%action' => $action->label(),
+          ]));
+        } else {
+          $this->messenger->addStatus($this->formatPlural($count, '%action was applied to @count item.', '%action was applied to @count items.', [
+            '%action' => $action->label(),
+          ]));
+        }
       }
     }
   }
