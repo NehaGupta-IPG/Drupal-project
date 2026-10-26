@@ -427,13 +427,14 @@ window.Drupal = { behaviors: {}, locale: {} };
     // Always use browser-derived absolute URLs in the comparison, to avoid
     // attempts to break out of the base path using directory traversal.
     let absoluteUrl = Drupal.url.toAbsolute(url);
-    let { protocol } = window.location;
-
+    const { origin: requestOrigin } = new URL(absoluteUrl);
+    const { origin, protocol: currentProtocol } = window.location;
+    // Check if the origin of the request has the same origin as the current page.
+    const isSameOrigin = requestOrigin === origin;
     // Consider URLs that match this site's base URL but use HTTPS instead of HTTP
     // as local as well.
-    if (protocol === 'http:' && absoluteUrl.startsWith('https:')) {
-      protocol = 'https:';
-    }
+    const isHTTPS = currentProtocol === 'http:' && absoluteUrl.startsWith('https:');
+    const protocol = isHTTPS ? 'https:' : currentProtocol;
     let baseUrl = `${protocol}//${
       window.location.host
     }${drupalSettings.path.baseUrl.slice(0, -1)}`;
@@ -452,7 +453,11 @@ window.Drupal = { behaviors: {}, locale: {} };
 
     // The given URL matches the site's base URL, or has a path under the site's
     // base URL.
-    return absoluteUrl === baseUrl || absoluteUrl.startsWith(`${baseUrl}/`);
+    return (
+      absoluteUrl === baseUrl ||
+      absoluteUrl.startsWith(`${baseUrl}/`) ||
+      isSameOrigin
+    );
   };
 
   /**
