@@ -69,11 +69,7 @@ class NavigationHooks {
     if (!$route_match->getRouteObject()->getOption('_layout_builder') || !str_starts_with($route_name, $configuration_route)) {
       return $this->moduleHandler->invoke('layout_builder', 'help', [$route_name, $route_match]);
     }
-    if (str_starts_with($route_name, $configuration_route)) {
-      $output = '<p>' . $this->t('This layout builder tool allows you to configure the blocks in the navigation toolbar.') . '</p>';
-      $output .= '<p>' . $this->t('Forms and links inside the content of the layout builder tool are disabled in Edit mode.') . '</p>';
-      return $output;
-    }
+
     return NULL;
   }
 

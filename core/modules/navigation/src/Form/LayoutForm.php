@@ -90,6 +90,12 @@ final class LayoutForm extends FormBase {
     ];
     $form['#attached']['library'][] = 'navigation/navigation.layoutBuilder';
 
+    $form['content'] = [
+      '#type' => 'markup',
+      '#weight' => -1,
+      '#markup' => $this->t('This layout builder tool allows you to configure the blocks in the navigation toolbar.')
+    ];
+
     $form['actions'] = [
       'enable_edit_mode' => [
         '#type' => 'submit',
@@ -108,6 +114,11 @@ final class LayoutForm extends FormBase {
       ],
     ] + $this->buildActionsElement([]);
 
+    // Adjust the layout overall items will sort by to keep this information remain readible.
+    $form['actions']['#weight'] = 1;
+    $form['actions']['preview_toggle']['toggle_content_preview']['#description'] = $this->t('Forms and links inside the content of the layout builder tool have been disabled.');
+    $form['actions']['preview_toggle']['#weight'] = -1;
+    
     $this->handleFormElementsVisibility($form, FALSE);
 
     return $form;
