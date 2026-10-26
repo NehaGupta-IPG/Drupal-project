@@ -44,7 +44,7 @@
     <dialog open aria-labelledby="{{ id -}}-title" closedby="{{ close }}" {% if variant === 'modal' %} data-modal{% endif %} {{ attributes.addClass(dialog_classes) }}>
   {% endif %}
     <div class="dialog__titlebar">
-      <h2 id="{{ id -}}-title" class="dialog__title">{{ title }}</h2>
+      <{% if variant === 'off-canvas' %}h2{% else %}h1{% endif %} id="{{ id -}}-title" class="dialog__title">{{ title }}</{% if variant === 'off-canvas' %}h2{% else %}h1{% endif %}>
       <form method="dialog" class="dialog__titlebar-form">
         <button class="dialog__titlebar-close" aria-label="Close">
           Close
