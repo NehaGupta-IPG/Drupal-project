@@ -203,6 +203,12 @@ class FileWidget extends WidgetBase {
       ];
     }
 
+    foreach ($elements as $element_Index => $element) {
+      if (empty($element['#default_value']['fid']) && $element['#default_image']['fid']) {
+        $elements[$element_Index]['#default_value']['fids'][] = $element['#default_image']['fid'];
+      }
+    }
+
     return $elements;
   }
 
