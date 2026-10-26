@@ -47,9 +47,14 @@ class JsonApiRelationshipTest extends JsonApiFunctionalTestBase {
   protected string $fieldName = 'field_child';
 
   /**
-   * The field name for the entity reference with meta field.
+   * The field name for the to-many entity reference with meta field.
    */
   protected string $fieldNameWithMeta = 'field_ref_with_meta';
+
+  /**
+   * The field name for the to-one entity reference with meta field.
+   */
+  protected string $fieldNameWithMetaSingle = 'field_ref_with_meta_single';
 
   /**
    * {@inheritdoc}
@@ -79,6 +84,7 @@ class JsonApiRelationshipTest extends JsonApiFunctionalTestBase {
       ],
     ])->save();
 
+    // To-many field for PATCH and POST tests.
     FieldStorageConfig::create([
       'field_name' => $this->fieldNameWithMeta,
       'type' => 'jsonapi_test_field_type_entity_reference_with_meta',
@@ -90,6 +96,27 @@ class JsonApiRelationshipTest extends JsonApiFunctionalTestBase {
     ])->save();
     FieldConfig::create([
       'field_name' => $this->fieldNameWithMeta,
+      'entity_type' => $this->entityTypeId,
+      'bundle' => $this->bundle,
+      'label' => $this->randomString(),
+      'settings' => [
+        'handler' => 'default',
+        'handler_settings' => [],
+      ],
+    ])->save();
+
+    // To-one field for PATCH single-value test.
+    FieldStorageConfig::create([
+      'field_name' => $this->fieldNameWithMetaSingle,
+      'type' => 'jsonapi_test_field_type_entity_reference_with_meta',
+      'entity_type' => $this->entityTypeId,
+      'cardinality' => 1,
+      'settings' => [
+        'target_type' => $this->entityTypeId,
+      ],
+    ])->save();
+    FieldConfig::create([
+      'field_name' => $this->fieldNameWithMetaSingle,
       'entity_type' => $this->entityTypeId,
       'bundle' => $this->bundle,
       'label' => $this->randomString(),
@@ -183,16 +210,14 @@ class JsonApiRelationshipTest extends JsonApiFunctionalTestBase {
   }
 
   /**
-   * Test that meta.data in relationship PATCH does not allow object injection.
+   * PATCH to a to-many relationship does not allow object injection.
    *
    * A field type combining EntityReferenceItem lineage with
    * serialized_property_names exposes a code path where user-supplied data
    * in meta.data is passed to unserialize(). This test confirms that a gadget
    * chain payload does not result in object instantiation.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/XXXXXXX
    */
-  public function testRelationshipPatchMetaDataDoesNotAllowObjectInjection(): void {
+  public function testMultiValueRelationshipPatchDoesNotAllowObjectInjection(): void {
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
     $user = $this->drupalCreateUser([
       'view test entity',
@@ -238,7 +263,116 @@ class JsonApiRelationshipTest extends JsonApiFunctionalTestBase {
       ],
     ]);
 
-    // $this->assertSame(204, $response->getStatusCode(), (string) $response->getBody());
+    $this->assertStringNotContainsString(
+      'JSONAPI_TEST_GADGET_WAKEUP_CALLED',
+      (string) $response->getBody(),
+      'Object injection succeeded: TestGadget::__wakeup() was called.',
+    );
+  }
+
+  /**
+   * PATCH to a to-one relationship does not allow object injection.
+   */
+  public function testSingleValueRelationshipPatchDoesNotAllowObjectInjection(): void {
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $user = $this->drupalCreateUser([
+      'view test entity',
+      'edit own entity_test content',
+    ]);
+
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage($this->entityTypeId);
+
+    $parentEntity = $storage->create([
+      'type' => $this->bundle,
+      'user_id' => $user->id(),
+    ]);
+    $parentEntity->save();
+
+    $targetEntity = $storage->create(['type' => $this->bundle]);
+    $targetEntity->save();
+
+    $url = Url::fromUri(sprintf(
+      'internal:/jsonapi/%s/%s/%s/relationships/%s',
+      $this->entityTypeId,
+      $this->bundle,
+      $parentEntity->uuid(),
+      $this->fieldNameWithMetaSingle,
+    ));
+
+    $response = $this->request('PATCH', $url, [
+      RequestOptions::HEADERS => [
+        'Content-Type' => 'application/vnd.api+json',
+        'Accept' => 'application/vnd.api+json',
+      ],
+      RequestOptions::AUTH => [$user->getAccountName(), $user->pass_raw],
+      RequestOptions::JSON => [
+        'data' => [
+          'id' => $targetEntity->uuid(),
+          'type' => sprintf('%s--%s', $this->entityTypeId, $this->bundle),
+          'meta' => [
+            'data' => serialize(new TestGadget()),
+          ],
+        ],
+      ],
+    ]);
+
+    $this->assertStringNotContainsString(
+      'JSONAPI_TEST_GADGET_WAKEUP_CALLED',
+      (string) $response->getBody(),
+      'Object injection succeeded: TestGadget::__wakeup() was called.',
+    );
+  }
+
+  /**
+   * POST to a to-many relationship does not allow object injection.
+   */
+  public function testMultiValueRelationshipPostDoesNotAllowObjectInjection(): void {
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $user = $this->drupalCreateUser([
+      'view test entity',
+      'edit own entity_test content',
+    ]);
+
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage($this->entityTypeId);
+
+    $parentEntity = $storage->create([
+      'type' => $this->bundle,
+      'user_id' => $user->id(),
+    ]);
+    $parentEntity->save();
+
+    $targetEntity = $storage->create(['type' => $this->bundle]);
+    $targetEntity->save();
+
+    $url = Url::fromUri(sprintf(
+      'internal:/jsonapi/%s/%s/%s/relationships/%s',
+      $this->entityTypeId,
+      $this->bundle,
+      $parentEntity->uuid(),
+      $this->fieldNameWithMeta,
+    ));
+
+    $response = $this->request('POST', $url, [
+      RequestOptions::HEADERS => [
+        'Content-Type' => 'application/vnd.api+json',
+        'Accept' => 'application/vnd.api+json',
+      ],
+      RequestOptions::AUTH => [$user->getAccountName(), $user->pass_raw],
+      RequestOptions::JSON => [
+        'data' => [
+          [
+            'id' => $targetEntity->uuid(),
+            'type' => sprintf('%s--%s', $this->entityTypeId, $this->bundle),
+            'meta' => [
+              'data' => serialize(new TestGadget()),
+            ],
+          ],
+        ],
+      ],
+    ]);
+
     $this->assertStringNotContainsString(
       'JSONAPI_TEST_GADGET_WAKEUP_CALLED',
       (string) $response->getBody(),
