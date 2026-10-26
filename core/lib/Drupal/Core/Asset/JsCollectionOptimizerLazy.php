@@ -8,6 +8,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,6 +19,20 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterface {
 
   use AssetGroupSetHashTrait;
+
+  /**
+   * An asset dumper.
+   *
+   * @var \Drupal\Core\Asset\AssetDumper
+   */
+  protected $dumper;
+
+  /**
+   * The state key/value store.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  protected $state;
 
   /**
    * Constructs a JsCollectionOptimizerLazy.
@@ -54,7 +69,12 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
     protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
     protected readonly TimeInterface $time,
     protected readonly LanguageManagerInterface $languageManager,
-  ) {}
+    AssetDumperInterface $dumper,
+    StateInterface $state
+  ) {
+    $this->dumper = $dumper;
+    $this->state = $state;
+  }
 
   /**
    * {@inheritdoc}
@@ -86,10 +106,47 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
             $js_assets[$order]['data'] = $uri;
           }
           else {
-            // To reproduce the full context of assets outside of the request,
-            // we must know the entire set of libraries used to generate all CSS
-            // groups, whether or not files in a group are from a particular
-            // library or not.
+            $key = $this->generateHash($js_group);
+            $uri = '';
+            if (isset($map[$key])) {
+              $uri = $map[$key];
+            }
+            if (empty($uri) || !file_exists($uri)) {
+              // Concatenate each asset within the group.
+              $data = '';
+              $current_license = FALSE;
+              foreach ($js_group['items'] as $js_asset) {
+                // Ensure license information is available as a comment after
+                // optimization.
+                if ($js_asset['license'] !== $current_license) {
+                  $data .= "/* @license " . $js_asset['license']['name'] . " " . $js_asset['license']['url'] . " */\n";
+                }
+                $current_license = $js_asset['license'];
+                // Optimize this JS file, but only if it's not yet minified.
+                if (isset($js_asset['minified']) && $js_asset['minified']) {
+                  $data .= file_get_contents($js_asset['data']);
+                }
+                else {
+                  $data .= $this->optimizer->optimize($js_asset);
+                }
+                // Append a ';' and a newline after each JS file to prevent them
+                // from running together.
+                $data .= ";\n";
+              }
+              // Remove unwanted JS code that cause issues.
+              $data = $this->optimizer->clean($data);
+              // Dump the optimized JS for this group into an aggregate file.
+              $uri = $this->dumper->dump($data, 'js');
+              // Set the URI for this group's aggregate file.
+              $js_assets[$order]['data'] = $uri;
+              // Persist the URI for this aggregate file.
+              $map[$key] = $uri;
+              $this->state->set('system.js_cache_files', $map);
+            }
+            else {
+              // Use the persisted URI for the optimized JS file.
+              $js_assets[$order]['data'] = $uri;
+            }
             $js_assets[$order]['preprocessed'] = TRUE;
           }
           break;
@@ -119,23 +176,6 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
       $already_loaded = isset($ajax_page_state['libraries']) ? explode(',', $ajax_page_state['libraries']) : [];
       if ($already_loaded) {
         $query_args['exclude'] = UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($already_loaded)));
-      }
-
-      // Generate a URL for the group, but do not process it inline, this is
-      // done by \Drupal\system\controller\JsAssetController.
-      foreach ($js_assets as $order => $js_asset) {
-        if (!empty($js_asset['preprocessed'])) {
-          $query = [
-            'scope' => $js_asset['scope'] === 'header' ? 'header' : 'footer',
-            'delta' => "$order",
-          ] + $query_args;
-          // Add a filename prefix to mitigate ad blockers which can block
-          // any script beginning with 'ad'.
-          $filename = 'js_' . $this->generateHash($js_asset) . '.js';
-          $uri = 'assets://js/' . $filename;
-          $js_assets[$order]['data'] = $this->fileUrlGenerator->generateString($uri) . '?' . UrlHelper::buildQuery($query);
-        }
-        unset($js_assets[$order]['items']);
       }
     }
 
