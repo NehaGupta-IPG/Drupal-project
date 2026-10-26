@@ -14,7 +14,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\content_moderation\Entity\Handler\BlockContentModerationHandler;
@@ -95,17 +94,14 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    *   Entity type manager.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
    *   Bundle information service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   Current user.
    * @param \Drupal\content_moderation\StateTransitionValidationInterface $validator
    *   State transition validator.
    */
-  public function __construct(TranslationInterface $translation, ModerationInformationInterface $moderation_information, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info, AccountInterface $current_user, StateTransitionValidationInterface $validator) {
+  public function __construct(TranslationInterface $translation, ModerationInformationInterface $moderation_information, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info, StateTransitionValidationInterface $validator) {
     $this->stringTranslation = $translation;
     $this->moderationInfo = $moderation_information;
     $this->entityTypeManager = $entity_type_manager;
     $this->bundleInfo = $bundle_info;
-    $this->currentUser = $current_user;
     $this->validator = $validator;
   }
 
@@ -118,7 +114,6 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       $container->get('content_moderation.moderation_information'),
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
-      $container->get('current_user'),
       $container->get('content_moderation.state_transition_validation')
     );
   }
