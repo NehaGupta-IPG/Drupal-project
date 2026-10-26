@@ -3,6 +3,7 @@
 namespace Drupal\Core\Form;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -547,7 +548,7 @@ class FormState implements FormStateInterface {
   public function setCached($cache = TRUE) {
     // Persisting $form_state is a side-effect disallowed during a "safe" HTTP
     // method.
-    if ($cache && $this->isRequestMethodSafe()) {
+    if ($cache && $this->isRequestMethodSafe() && !Settings::get('form_cache_safe_request_method')) {
       throw new \LogicException(sprintf('Form state caching on %s requests is not allowed.', $this->requestMethod));
     }
 
