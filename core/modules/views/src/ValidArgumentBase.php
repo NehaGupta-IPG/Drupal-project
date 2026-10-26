@@ -51,8 +51,9 @@ abstract class ValidArgumentBase {
    * Gets the arguments to check from the route.
    *
    * @param \Symfony\Component\Routing\Route $route
+   *   The route to get the arguments from.
    *
-   * @return []
+   * @return array
    *   The arguments to check.
    */
   abstract protected function getArgumentsToCheck(Route $route): array;
@@ -141,8 +142,8 @@ abstract class ValidArgumentBase {
       }
 
       $argument_options = $argument->options ?? [];
-      $requires_value = self::requiresValue($argument_options);
-      $requires_validation = self::requiresValidation($argument_options);
+      $requires_value = static::requiresValue($argument_options);
+      $requires_validation = static::requiresValidation($argument_options);
       if (!$requires_value && !$requires_validation) {
         continue;
       }

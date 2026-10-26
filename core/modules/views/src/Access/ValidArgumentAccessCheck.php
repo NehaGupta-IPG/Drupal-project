@@ -79,7 +79,7 @@ class ValidArgumentAccessCheck extends ValidArgumentBase implements AccessInterf
    * {@inheritdoc}
    */
   protected function handleValidValues(CacheableMetadata $cacheability): AccessResultInterface {
-    AccessResult::allowed()->addCacheableDependency($cacheability);
+    return AccessResult::allowed()->addCacheableDependency($cacheability);
   }
 
   /**
