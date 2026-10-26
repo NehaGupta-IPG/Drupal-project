@@ -66,6 +66,10 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
       // the label and other data of the deleted translation.
       $untranslated_entity = clone $entity->getUntranslated();
       $untranslated_entity->removeTranslation($entity->language()->getId());
+      if ($untranslated_entity instanceof RevisionLogInterface) {
+        $message = t('Deleted translation in %language', ['%language' => $entity->language()->getName()]);
+        $untranslated_entity->setRevisionLogMessage($message);
+      }
       $untranslated_entity->save();
       $form_state->setRedirectUrl($untranslated_entity->toUrl('canonical'));
     }
