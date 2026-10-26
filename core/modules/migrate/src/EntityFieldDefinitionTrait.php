@@ -26,7 +26,7 @@ trait EntityFieldDefinitionTrait {
    */
   protected function getDefinitionFromEntity($key) {
     $plugin_id = $this->getPluginId();
-    $entity_type_id = $this->getEntityTypeId($plugin_id);
+    $entity_type_id = $this->entityType->id();
     /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface[] $definitions */
     $definitions = $this->entityFieldManager->getBaseFieldDefinitions($entity_type_id);
     $field_definition = $definitions[$key];
@@ -34,23 +34,6 @@ trait EntityFieldDefinitionTrait {
     return [
       'type' => $field_definition->getType(),
     ] + $field_definition->getSettings();
-  }
-
-  /**
-   * Finds the entity type from configuration or plugin ID.
-   *
-   * @param string $plugin_id
-   *   The plugin ID.
-   *
-   * @return string
-   *   The entity type.
-   */
-  protected static function getEntityTypeId($plugin_id) {
-    $entity_type_id = NULL;
-    if (strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
-      [, $entity_type_id] = explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
-    }
-    return $entity_type_id;
   }
 
 }
