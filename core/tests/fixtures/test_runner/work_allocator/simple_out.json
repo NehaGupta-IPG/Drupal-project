@@ -11,7 +11,7 @@
     "description": "Tests validation of block entities.",
     "file": "/Users/foo/Dev/drupal/core/modules/block/tests/src/Kernel/BlockValidationTest.php",
     "tests_count": 37,
-    "weight": 120.0,
+    "weight": 99.0,
     "sorted_sequence": 1,
     "worker_sequence": 1
   },
