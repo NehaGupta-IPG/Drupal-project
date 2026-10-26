@@ -68,6 +68,12 @@ class ProcessedText extends RenderElementBase {
     $text = $element['#text'];
     $langcode = $element['#langcode'];
 
+    // If the string is blank there's no point in spending time processing it.
+    if ($element['#text'] == '') {
+      $element['#markup'] = '';
+      return $element;
+    }
+
     if (!isset($format_id)) {
       $filter_settings = static::configFactory()->get('filter.settings');
       $format_id = $filter_settings->get('fallback_format');
@@ -112,6 +118,12 @@ class ProcessedText extends RenderElementBase {
     foreach ($filters as $filter) {
       if ($filter_must_be_applied($filter)) {
         $text = $filter->prepare($text, $langcode);
+
+        // If the output ends up empty then return the empty string.
+        if ($text == '') {
+          $element['#markup'] = '';
+          break;
+        }
       }
     }
 
@@ -122,6 +134,12 @@ class ProcessedText extends RenderElementBase {
         $result = $filter->process($text, $langcode);
         $metadata = $metadata->merge($result);
         $text = $result->getProcessedText();
+
+        // If the output ends up empty then return the empty string.
+        if ($text == '') {
+          $element['#markup'] = '';
+          break;
+        }
       }
     }
 
@@ -130,7 +148,12 @@ class ProcessedText extends RenderElementBase {
     // safe, but it has been passed through the filter system and checked with
     // a text format, so it must be printed as is. (See the note about security
     // in the method documentation above.)
-    $element['#markup'] = FilteredMarkup::create($text);
+    if ($text != '') {
+      $element['#markup'] = FilteredMarkup::create($text);
+    }
+    else {
+      $element['#markup'] = '';
+    }
 
     // Set the updated bubbleable rendering metadata and the text format's
     // cache tag.
