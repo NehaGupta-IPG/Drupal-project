@@ -16,3 +16,11 @@ services:
     class: Drupal\logger_aware_test\LoggerAwareStub
     calls:
       - [setLogger, ['@logger.channel.logger_stub']]
+
+  logger_aware_test.logger_aware_decorated:
+    class: Drupal\logger_aware_test\LoggerAwareStub
+
+  logger_aware_test.logger_aware_decorator:
+    class: Drupal\logger_aware_test\LoggerAwareStubDecorator
+    decorates: logger_aware_test.logger_aware_decorated
+    arguments: ['@.inner']
