@@ -1207,7 +1207,7 @@ class SystemRequirementsHooks {
       if (!\Drupal::moduleHandler()->moduleExists('update')) {
         $requirements['update status'] = [
           'value' => $this->t('Not enabled'),
-          'severity' => RequirementSeverity::Warning,
+          'severity' => RequirementSeverity::Info,
           'description' => $this->t('Update notifications are not enabled. It is <strong>highly recommended</strong> that you install the Update Status module from the <a href=":module">module administration page</a> in order to stay up-to-date on new releases. For more information, <a href=":update">Update status handbook page</a>.', [
             ':update' => 'https://www.drupal.org/documentation/modules/update',
             ':module' => Url::fromRoute('system.modules_list')->toString(),
