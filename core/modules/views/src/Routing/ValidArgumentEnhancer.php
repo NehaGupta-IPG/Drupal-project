@@ -8,6 +8,7 @@ use Drupal\Core\Routing\EnhancerInterface;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\views\ValidArgumentBase;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
@@ -87,7 +88,10 @@ class ValidArgumentEnhancer extends ValidArgumentBase implements EnhancerInterfa
   public function enhance(array $defaults, Request $request) {
     $route = $defaults[RouteObjectInterface::ROUTE_OBJECT];
     assert($route instanceof Route);
-    $route_match = RouteMatch::createFromRequest($request);
+
+    $raw = $defaults['_raw_variables'];
+    assert($raw instanceof InputBag);
+
     $view_id = $route->getDefault('view_id');
     $display_id = $route->getDefault('display_id');
 
@@ -95,6 +99,7 @@ class ValidArgumentEnhancer extends ValidArgumentBase implements EnhancerInterfa
     // actual converting. Any exceptions short-circuit the logic, so we can
     // always return the defaults otherwise.
     if (is_string($view_id) && is_string($display_id)) {
+      $route_match = new RouteMatch($defaults[RouteObjectInterface::ROUTE_NAME], $route, $defaults, $raw->all());
       $this->runValidation($route, $route_match, $view_id, $display_id);
     }
     return $defaults;

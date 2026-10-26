@@ -131,7 +131,7 @@ services:
   route_enhancer.valid_argument:
     class: Drupal\views\Routing\ValidArgumentEnhancer
     tags:
-      - { name: route_enhancer, priority: 5001 }
+      - { name: route_enhancer }
   access_check.views.valid_argument:
     class: Drupal\views\Access\ValidArgumentAccessCheck
     tags:
