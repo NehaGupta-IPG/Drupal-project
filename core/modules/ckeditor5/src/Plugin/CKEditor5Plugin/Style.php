@@ -153,7 +153,16 @@ class Style extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
    * {@inheritdoc}
    */
   public function getElementsSubset(): array {
-    return array_column($this->configuration['styles'], 'element');
+    $elements = array_column($this->configuration['styles'], 'element');
+
+    // Add a creatable element for each tag used in styles.
+    $ghs_config = HTMLRestrictions::fromString(implode($elements))->toGeneralHtmlSupportConfig();
+    $tags = array_column($ghs_config, 'name');
+    foreach ($tags as $tag) {
+      $elements[] = "<{$tag}>";
+    }
+
+    return $elements;
   }
 
   /**
