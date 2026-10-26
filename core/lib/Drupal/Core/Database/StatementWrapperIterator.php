@@ -7,8 +7,15 @@ use Drupal\Core\Database\Statement\PdoResult;
 use Drupal\Core\Database\Statement\PdoTrait;
 use Drupal\Core\Database\Statement\StatementBase;
 
+@trigger_error('\\Drupal\\Core\\Database\\StatementWrapperIterator is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Extend from \\Drupal\\Core\\Database\\Statement\\StatementBase instead. See https://www.drupal.org/node/3633349', E_USER_DEPRECATED);
+
 /**
  * StatementInterface iterator implementation.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Extend from
+ *   \Drupal\Core\Database\Statement\StatementBase instead.
+ *
+ * @see https://www.drupal.org/node/3633349
  */
 class StatementWrapperIterator extends StatementBase {
 
@@ -35,6 +42,7 @@ class StatementWrapperIterator extends StatementBase {
     array $options,
     bool $rowCountEnabled = FALSE,
   ) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Extend from \\Drupal\\Core\\Database\\Statement\\StatementBase instead. See https://www.drupal.org/node/3633349', E_USER_DEPRECATED);
     parent::__construct($connection, $clientConnection, $query, $rowCountEnabled);
     $this->clientStatement = $this->clientConnection->prepare($query, $options);
     $this->setFetchMode(FetchAs::Object);

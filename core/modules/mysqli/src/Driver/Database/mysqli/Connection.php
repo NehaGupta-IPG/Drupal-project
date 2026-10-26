@@ -19,6 +19,9 @@ class Connection extends BaseMySqlConnection {
 
   /**
    * {@inheritdoc}
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Open
+   *   StatementInterface objects directly instead.
    */
   protected $statementWrapperClass = Statement::class;
 
