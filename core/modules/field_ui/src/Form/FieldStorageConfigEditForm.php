@@ -126,6 +126,10 @@ class FieldStorageConfigEditForm extends EntityForm {
     }
     $item = $items->first() ?: $items->appendItem();
     $form['settings'] += $item->storageSettingsForm($form, $form_state, $this->entity->hasData());
+    $form['third_party_settings'] = [
+      '#tree' => TRUE,
+      '#weight' => 11,
+    ];
 
     return $form;
   }
