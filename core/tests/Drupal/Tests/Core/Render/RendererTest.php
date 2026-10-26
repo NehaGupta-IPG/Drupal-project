@@ -21,7 +21,6 @@ use Drupal\Core\Theme\ThemeManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 // cspell:ignore fooalert
@@ -1217,15 +1216,26 @@ class RendererTest extends RendererTestBase {
     $this->assertEquals(Markup::create('foo'), $return);
   }
 
-  #[IgnoreDeprecations]
   public function testDeprecatedAccess(): void {
     $build = [
       '#markup' => 'foo',
       '#access' => 'bar',
     ];
 
-    $this->expectUserDeprecationMessage('Using a #access value other than a boolean or an AccessResultInterface object is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3549344');
+    // PHPUnit cannot expect warnings, so we have to catch them ourselves.
+    $messages = [];
+    set_error_handler(function (int $errno, string $errstr) use (&$messages): bool {
+      $messages[] = [$errno, $errstr];
+
+      return TRUE;
+    });
+
     $this->renderer->renderRoot($build);
+
+    restore_error_handler();
+    $this->assertCount(1, $messages);
+    $this->assertSame(E_USER_WARNING, $messages[0][0]);
+    $this->assertSame('Using a #access value other than a boolean or an AccessResultInterface object is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3549344', $messages[0][1]);
   }
 
 }
