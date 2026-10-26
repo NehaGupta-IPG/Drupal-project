@@ -4,7 +4,6 @@ namespace Drupal\taxonomy\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\EntityListBuilder;
-use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
 use Drupal\Core\Entity\Form\RevisionRevertForm;
 use Drupal\Core\Entity\Form\RevisionDeleteForm;
@@ -14,6 +13,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\taxonomy\Form\TermDeleteForm;
+use Drupal\taxonomy\TaxonomyTermViewBuilder;
 use Drupal\taxonomy\TermAccessControlHandler;
 use Drupal\taxonomy\TermForm;
 use Drupal\taxonomy\TermInterface;
@@ -44,7 +44,7 @@ use Drupal\user\StatusItem;
   handlers: [
     'storage' => TermStorage::class,
     'storage_schema' => TermStorageSchema::class,
-    'view_builder' => EntityViewBuilder::class,
+    'view_builder' => TaxonomyTermViewBuilder::class,
     'list_builder' => EntityListBuilder::class,
     'access' => TermAccessControlHandler::class,
     'views_data' => TermViewsData::class,
