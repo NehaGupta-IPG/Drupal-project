@@ -85,4 +85,43 @@ class ViewsFormTest extends ViewTestBase {
     $this->assertSame('/custom-bulk-form', $action);
   }
 
+  /**
+   * Tests a Views form submits on a display with a custom link display URL.
+   */
+  public function testFormSubmitWithCustomLinkDisplayPath(): void {
+    // Link the block to the view's page display, as a "more" link would.
+    $view = View::load('test_bulk_form');
+    $displays = $view->get('display');
+    $displays['block_1']['display_options']['link_display'] = 'custom_url';
+    $displays['block_1']['display_options']['link_url'] = '/test_bulk_form';
+    $displays['block_1']['display_options']['defaults']['link_display'] = FALSE;
+    $displays['block_1']['display_options']['defaults']['link_url'] = FALSE;
+    $view->set('display', $displays);
+    $view->save();
+
+    $this->drupalCreateContentType(['type' => 'article']);
+    $node = $this->drupalCreateNode(['type' => 'article', 'sticky' => FALSE]);
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer nodes',
+      'edit any article content',
+    ]));
+    $this->drupalPlaceBlock('views_block:test_bulk_form-block_1', [
+      'region' => 'content',
+      'visibility' => [
+        'request_path' => [
+          'pages' => '/node/*',
+        ],
+      ],
+    ]);
+
+    $this->drupalGet('node/' . $node->id());
+    $this->submitForm([
+      'node_bulk_form[0]' => TRUE,
+      'action' => 'node_make_sticky_action',
+    ], 'Apply to selected items');
+
+    $this->assertSession()->pageTextContains('Make content sticky was applied to 1 item.');
+    $this->assertTrue($this->container->get('entity_type.manager')->getStorage('node')->loadUnchanged($node->id())->isSticky());
+  }
+
 }
