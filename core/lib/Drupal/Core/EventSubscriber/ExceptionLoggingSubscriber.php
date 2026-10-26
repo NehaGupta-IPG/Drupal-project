@@ -4,7 +4,6 @@ namespace Drupal\Core\EventSubscriber;
 
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Utility\Error;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -12,14 +11,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Log exceptions without further handling.
  */
-class ExceptionLoggingSubscriber implements EventSubscriberInterface {
-
-  /**
-   * The logger channel factory.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
-   */
-  protected $logger;
+class ExceptionLoggingSubscriber implements ExceptionLoggingSubscriberInterface {
 
   /**
    * Constructs a new ExceptionLoggingSubscriber.
@@ -27,9 +19,7 @@ class ExceptionLoggingSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger
    *   The logger channel factory.
    */
-  public function __construct(LoggerChannelFactoryInterface $logger) {
-    $this->logger = $logger;
-  }
+  public function __construct(protected LoggerChannelFactoryInterface $logger) {}
 
   /**
    * Log 403 errors.
@@ -98,7 +88,7 @@ class ExceptionLoggingSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
    *   The event to process.
    */
-  public function onException(ExceptionEvent $event) {
+  public function onException(ExceptionEvent $event): void {
     $exception = $event->getThrowable();
 
     $method = 'onError';

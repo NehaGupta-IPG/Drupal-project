@@ -593,6 +593,9 @@ services:
     abstract: true
     class: Drupal\Core\Logger\LoggerChannel
     factory: ['@logger.factory', 'get']
+  logger.channel.client_errors:
+    parent: logger.channel_base
+    arguments: [ 'client_errors' ]
   logger.channel.default:
     parent: logger.channel_base
     arguments: ['system']

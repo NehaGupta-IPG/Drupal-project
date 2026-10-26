@@ -206,3 +206,9 @@ services:
     public: false
     tags:
       - { name: route_enhancer }
+  jsonapi.exception.logger:
+    class: Drupal\jsonapi\EventSubscriber\JsonapiExceptionLoggingSubscriber
+    decorates: 'exception.logger'
+    arguments:
+      - '@jsonapi.exception.logger.inner'
+      - '@logger.channel.client_errors'
