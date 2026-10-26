@@ -66,6 +66,7 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
    */
   protected function waitForText($text, int $timeout = 10000) {
     $result = $this->assertSession()->waitForText($text, $timeout);
+    print_r($result);
     $this->assertNotEmpty($result, "\"$text\" not found");
   }
 

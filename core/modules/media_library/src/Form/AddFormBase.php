@@ -532,11 +532,19 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *   An unsaved media entity.
    */
   protected function createMediaFromValue(MediaTypeInterface $media_type, EntityStorageInterface $media_storage, $source_field_name, $source_field_value) {
+    /** @var \Drupal\media\MediaInterface $media */
     $media = $media_storage->create([
       'bundle' => $media_type->id(),
       $source_field_name => $source_field_value,
     ]);
-    $media->setName($media->getName());
+
+    // Set a default name for the media item if mapped in the media source.
+    $media_source = $media_type->getSource();
+    $name_attribute = array_search('name', $media_type->getFieldMap(), TRUE);
+    if ($name_attribute !== FALSE) {
+      $media->setName($media_source->getMetadata($media, $name_attribute));
+    }
+
     return $media;
   }
 

@@ -763,4 +763,61 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->fieldValueEquals('Alternative text', $filenames[0], $media_item_one);
   }
 
+  /**
+   * Tests that the name field is automatically mapped as expected.
+   */
+  public function testWidgetUploadSetName(): void {
+    $assert_session = $this->assertSession();
+    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    $file_system = $this->container->get('file_system');
+
+    $image = $this->getTestFiles('image')[0];
+    if (is_null($image)) {
+      $this->fail('Expected test files not present.');
+    }
+
+    // Create a user that can only add media of type four.
+    $user = $this->drupalCreateUser([
+      'access administration pages',
+      'access content',
+      'create basic_page content',
+      'create type_four media',
+      'view media',
+    ]);
+    $admin = $this->drupalCreateUser([
+      'access administration pages',
+      'administer media types',
+    ]);
+
+    // Visit a node create page and open the media library.
+    $this->drupalLogin($user);
+    $this->drupalGet('node/add/basic_page');
+    $this->openMediaLibraryForField('field_twin_media');
+
+    // Upload the test image file.
+    $this->switchToMediaType('Four');
+    $image_uri = $file_system->copy($image->uri, 'public://');
+    $this->addMediaFileToField('Add file', $file_system->realpath($image_uri));
+    $this->waitForFieldExists('Name');
+    // Test that the name field has been pre-filled with the filename.
+    $assert_session->fieldValueEquals('Name', $image->name);
+
+    // Remove the field map for name.
+    $this->drupalLogin($admin);
+    $this->drupalGet('admin/structure/media/manage/type_four');
+    $edit = [
+      'field_map[name]' => '_none',
+    ];
+    $this->submitForm($edit, 'Save');
+
+    $this->drupalLogin($user);
+    $this->drupalGet('node/add/basic_page');
+    $this->openMediaLibraryForField('field_twin_media');
+    $this->switchToMediaType('Four');
+    $this->addMediaFileToField('Add file', $file_system->realpath($image_uri));
+    $this->waitForFieldExists('Name');
+    // Test that the name field has not been pre-filled.
+    $assert_session->fieldValueEquals('Name', '');
+  }
+
 }
