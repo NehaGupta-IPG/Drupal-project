@@ -87,8 +87,16 @@ class RoleListBuilder extends DraggableListBuilder {
     if ($entity->hasLinkTemplate('edit-permissions-form')) {
       $operations['permissions'] = [
         'title' => $this->t('Edit permissions'),
-        'weight' => 20,
+        'weight' => 0,
         'url' => $entity->toUrl('edit-permissions-form'),
+      ];
+    }
+
+    if ($entity->hasLinkTemplate('edit-form')) {
+      $operations['edit'] = [
+        'title' => $this->t('Edit role'),
+        'weight' => 1,
+        'url' => $entity->toUrl('edit-form'),
       ];
     }
     return $operations;
