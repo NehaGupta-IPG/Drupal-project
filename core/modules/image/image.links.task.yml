@@ -4,6 +4,6 @@ entity.image_style.edit_form:
   base_route: entity.image_style.edit_form
 
 entity.image_style.collection:
-  title: List
+  title: Image Styles
   route_name: entity.image_style.collection
   base_route: entity.image_style.collection
