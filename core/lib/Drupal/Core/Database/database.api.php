@@ -608,6 +608,24 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  * only; foreign keys are not created in the database, nor are they enforced by
  * Drupal.
  *
+ * Besides regular Index objects, the 'indexes' property of a Table accepts
+ * specialized index definitions provided by database drivers, like GinIndex
+ * and GistIndex. Drivers that cannot create an index with the specified
+ * technology skip its creation. Use an AlternativeIndexes object to list
+ * definitions for the same logical index in order of preference; the driver
+ * creates the first index it supports and ignores the others:
+ * @code
+ * indexes: [
+ *   new AlternativeIndexes(
+ *     name: 'ages',
+ *     indexes: [
+ *       new GinIndex(name: 'ages', columns: ['age']),
+ *       new Index(name: 'ages', columns: ['age']),
+ *     ],
+ *   ),
+ * ],
+ * @endcode
+ *
  * @return \Drupal\Core\Database\SchemaDefinition\Schema
  *   A schema definition.
  *

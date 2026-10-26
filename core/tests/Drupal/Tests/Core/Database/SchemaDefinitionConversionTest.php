@@ -4,20 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Database;
 
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
+use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\ForeignKey;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnExpression;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
-use Drupal\Core\Database\SchemaDefinition\ForeignKey;
+use Drupal\Core\Database\SchemaDefinition\GinIndex;
+use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\KeyColumn;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
-use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 use Drupal\Tests\UnitTestCase;
@@ -266,6 +270,74 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
     );
 
     $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
+  }
+
+  /**
+   * Tests Table::toArray() with specialized and alternative indexes.
+   *
+   * The legacy array-based specifications cannot describe specialized
+   * indexes: GIN and GiST indexes are skipped, and alternative indexes are
+   * resolved to their regular Index definition, if any.
+   */
+  public function testConvertTableDefinitionWithSpecializedIndexes(): void {
+    $arraySpecification = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'age' => [
+          'type' => 'int',
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => [
+        'ages' => ['age'],
+      ],
+    ];
+
+    $schemaDefinition = new Table(
+      name: 'test',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      indexes: [
+        new Index(name: 'ages', columns: ['age']),
+        new GinIndex(name: 'gin_ages', columns: ['age']),
+        new GistIndex(name: 'gist_ages', columns: ['age']),
+        new AlternativeIndexes(
+          name: 'alternative_ages',
+          indexes: [
+            new GinIndex(name: 'alternative_ages', columns: ['age']),
+            new Index(name: 'alternative_ages', columns: ['age']),
+          ],
+        ),
+      ],
+    );
+
+    $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
+  }
+
+  /**
+   * Tests AlternativeIndexes::toArray().
+   */
+  public function testAlternativeIndexesToArray(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessageIs('The \'ages\' AlternativeIndexes cannot be converted to legacy array-based specifications');
+    $ginIndex = new GinIndex(name: 'ages', columns: ['age']);
+    $index = new Index(name: 'ages', columns: ['age']);
+    $alternativeIndexes = new AlternativeIndexes(
+      name: 'ages',
+      indexes: [$ginIndex, $index],
+    );
+    $alternativeIndexes->toArray();
   }
 
 }

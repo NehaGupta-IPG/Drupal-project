@@ -7,7 +7,7 @@ namespace Drupal\Core\Database\SchemaDefinition;
 /**
  * Describes a database index.
  */
-final class Index extends KeyBase {
+final class Index extends KeyBase implements IndexInterface {
 
   /**
    * Constructor.
