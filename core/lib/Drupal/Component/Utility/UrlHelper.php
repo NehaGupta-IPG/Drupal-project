@@ -102,9 +102,9 @@ class UrlHelper {
    */
   public static function uncompressQueryParameter(string $compressed): string {
     // Because this comes from user data, suppress the PHP warning that
-    // gzcompress() throws if the base64-encoded string is invalid. Additionally
-    // set a 10000 limit to avoid implausibly large compressed strings being
-    // sent.
+    // gzcompress() throws if the base64-encoded string is invalid.
+    // Additionally, set a 10000 limit to avoid implausibly large compressed
+    // strings being sent.
     $return = @gzuncompress(base64_decode(str_replace(['-', '_'], ['+', '/'], $compressed)), 10000);
 
     // If we failed to uncompress the query parameter, it may be a stale link
