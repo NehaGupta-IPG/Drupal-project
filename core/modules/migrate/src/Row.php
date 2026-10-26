@@ -206,7 +206,11 @@ class Row {
    * @return static
    */
   public function cloneWithoutDestination() {
-    return (new static($this->getSource(), $this->sourceIds, $this->isStub()))->freezeSource();
+    $row = new static($this->getSource(), $this->sourceIds, $this->isStub());
+    $row->idMap = $this->idMap;
+    $row->freezeSource();
+
+    return $row;
   }
 
   /**
