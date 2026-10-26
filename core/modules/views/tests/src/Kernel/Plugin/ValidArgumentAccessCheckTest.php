@@ -13,11 +13,11 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the ArgumentAccessCheck route access checker.
+ * Tests the ValidArgumentAccessCheck route access checker.
  */
 #[Group("views")]
 #[RunTestsInSeparateProcesses]
-class ArgumentAccessCheckTest extends ViewsKernelTestBase {
+class ValidArgumentAccessCheckTest extends ViewsKernelTestBase {
 
   use UserCreationTrait;
   use NodeCreationTrait;

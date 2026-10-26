@@ -10,9 +10,10 @@ use Drupal\Core\Routing\RouteCompiler;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Url;
-use Drupal\views\Access\ArgumentAccessCheck;
+use Drupal\views\Access\ValidArgumentAccessCheck;
 use Drupal\views\PostSaveProcess;
 use Drupal\views\PostSaveViewInterface;
+use Drupal\views\Routing\ValidArgumentEnhancer;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Route;
@@ -193,15 +194,22 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
 
     // If a NULL or invalid argument could lead to a 403 response, we need to
     // make sure the route checks the argument and does the same. We do not
-    // check for 404 responses as access checks are not fit for that.
-    $arguments_to_check = [];
+    // check for 404 responses as access checks are not fit for that, but we can
+    // enforce this from route enhancers.
+    $arguments_to_check_403 = $arguments_to_check_404 = [];
     foreach ((array) $this->getOption('arguments') as $name => $argument) {
-      if (ArgumentAccessCheck::requiresValue($argument) || ArgumentAccessCheck::requiresValidation($argument)) {
-        $arguments_to_check[] = $name;
+      if (ValidArgumentAccessCheck::requiresValue($argument) || ValidArgumentAccessCheck::requiresValidation($argument)) {
+        $arguments_to_check_403[] = $name;
+      }
+      if (ValidArgumentEnhancer::requiresValue($argument) || ValidArgumentEnhancer::requiresValidation($argument)) {
+        $arguments_to_check_404[] = $name;
       }
     }
-    if ($arguments_to_check) {
-      $route->setRequirement('_views_argument_access', implode(',', $arguments_to_check));
+    if ($arguments_to_check_403) {
+      $route->setRequirement('_views_argument_access', implode(',', $arguments_to_check_403));
+    }
+    if ($arguments_to_check_404) {
+      $route->setOption('_views_argument_enhancer', implode(',', $arguments_to_check_404));
     }
 
     // Set the argument map, in order to support named parameters.
