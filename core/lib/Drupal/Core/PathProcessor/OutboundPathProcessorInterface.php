@@ -15,7 +15,16 @@ interface OutboundPathProcessorInterface {
    *
    * @param string $path
    *   The path to process, with a leading slash.
-   * @param array $options
+   * @param array{
+   *   query?: mixed[],
+   *   fragment?: string,
+   *   absolute?: bool,
+   *   language?: ?\Drupal\Core\Language\LanguageInterface,
+   *   https?: bool,
+   *   base_url?: string,
+   *   prefix?: string,
+   *   route?: \Symfony\Component\Routing\Route,
+   * } $options
    *   (optional) An associative array of additional options, with the following
    *   elements:
    *   - 'query': An array of query key/value-pairs (without any URL-encoding)
