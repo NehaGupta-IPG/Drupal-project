@@ -1,0 +1,7 @@
+name: 'JS Sizzle deprecation test'
+description: 'Provides a page that exercises Drupal.deprecateSizzleSelector for tests.'
+type: module
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:js_testing_log_test

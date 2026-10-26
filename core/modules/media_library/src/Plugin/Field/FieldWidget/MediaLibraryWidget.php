@@ -741,7 +741,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
           break;
         }
       }
-      $response->addCommand(new InvokeCommand("#$wrapper_id [data-media-library-item-delta=$delta_to_focus]", 'focus'));
+      $response->addCommand(new InvokeCommand("#$wrapper_id [data-media-library-item-delta=\"$delta_to_focus\"]", 'focus'));
     }
     // Shift focus to the open button if the user removed the last selected
     // item, or when the user has added items to the selection and is allowed to
