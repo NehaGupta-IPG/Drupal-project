@@ -48,7 +48,7 @@ class DrScriptTest extends BuildTestBase {
     $web = $this->getWorkspaceDirectory() . '/web';
     $fs = new Filesystem();
     foreach (['dr', 'drupal'] as $file) {
-      $fs->copy($this->getDrupalRoot() . "/core/scripts/$file", "$web/core/scripts/$file");
+      $fs->copy($this->root . "/core/scripts/$file", "$web/core/scripts/$file");
     }
     $fs->dumpFile("$web/autoload.php", "<?php\n\nreturn require '$vendor/autoload.php';\n");
     $fs->dumpFile("$web/autoload_runtime.php", "<?php\n\n\$_ENV['APP_RUNTIME'] ??= \\Drupal\\Core\\Runtime\\DrupalRuntime::class;\nreturn require '$vendor/autoload_runtime.php';\n");
