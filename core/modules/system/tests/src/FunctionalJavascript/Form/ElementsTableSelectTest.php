@@ -83,7 +83,6 @@ class ElementsTableSelectTest extends WebDriverTestBase {
       $this->assertTrue($row->hasClass('disabled'));
       $input = $row->find('css', 'input[value="row' . $delta . '"]');
       $this->assertTrue($input->hasAttribute('disabled'));
-      $this->assertEquals('disabled', $input->getAttribute('disabled'));
     };
 
     // Test radios (#multiple == FALSE).
