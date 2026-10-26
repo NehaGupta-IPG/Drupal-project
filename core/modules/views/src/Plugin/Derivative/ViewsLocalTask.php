@@ -79,7 +79,7 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
       $menu = $executable->display_handler->getOption('menu');
       if (in_array($menu['type'], ['tab', 'default tab'])) {
         $plugin_id = 'view.' . $executable->storage->id() . '.' . $display_id;
-        $route_name = $view_route_names[$executable->storage->id() . '.' . $display_id];
+        $route_name = $view_route_names[$executable->storage->id() . '.' . $display_id] ?? '';
 
         // Don't add a local task for views which override existing routes.
         // @todo Alternative it could just change the existing entry.
@@ -119,7 +119,7 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
       // We already have set the base_route for default tabs.
       if (in_array($menu['type'], ['tab'])) {
         $plugin_id = 'view.' . $executable->storage->id() . '.' . $display_id;
-        $view_route_name = $view_route_names[$executable->storage->id() . '.' . $display_id];
+        $view_route_name = $view_route_names[$executable->storage->id() . '.' . $display_id] ?? '';
 
         // Don't add a local task for views which override existing routes.
         if ($view_route_name != $plugin_id) {
