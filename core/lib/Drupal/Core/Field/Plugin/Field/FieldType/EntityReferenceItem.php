@@ -357,8 +357,6 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
 
     $manager = \Drupal::service('plugin.manager.entity_reference_selection');
 
-    // Instead of calling $manager->getSelectionHandler($field_definition)
-    // replicate the behavior to be able to override the sorting settings.
     $options = [
       'target_type' => $field_definition->getFieldStorageDefinition()->getSetting('target_type'),
       'handler' => $field_definition->getSetting('handler'),
@@ -366,13 +364,9 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     ] + $field_definition->getSetting('handler_settings') ?: [];
 
     $entity_type = \Drupal::entityTypeManager()->getDefinition($options['target_type']);
-    $options['sort'] = [
-      'field' => $entity_type->getKey('id'),
-      'direction' => 'DESC',
-    ];
     $selection_handler = $manager->getInstance($options);
 
-    // Select a random number of references between the last 50 referenceable
+    // Select a random number of references between the 50 referenceable
     // entities created.
     if ($referenceable = $selection_handler->getReferenceableEntities(NULL, 'CONTAINS', 50)) {
       $group = array_rand($referenceable);
