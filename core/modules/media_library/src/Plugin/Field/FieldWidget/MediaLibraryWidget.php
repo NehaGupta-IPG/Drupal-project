@@ -589,7 +589,56 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       '#limit_validation_errors' => !empty($referenced_entities) ? $limit_validation_errors : [],
     ];
 
+    // Add a button to remove all media items from the widget.
+    if (!empty($referenced_entities)) {
+      $element['remove_all_button'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Remove all'),
+        '#name' => $field_name . '-media-library-remove-all' . $id_suffix,
+        '#ajax' => [
+          'callback' => [static::class, 'updateWidget'], // The wrapper id is used to update the widget.
+          'wrapper' => $wrapper_id,
+          'progress' => [
+            'type' => 'throbber',
+            'message' => $this->t('Removing all media items.'),
+          ],
+        ],
+        '#submit' => [[static::class, 'removeAllItems']], // Callback to update the widget.
+        '#limit_validation_errors' => $limit_validation_errors,
+      ];
+    }
+
     return $element;
+  }
+
+  public static function removeAllItems(array $form, FormStateInterface $form_state) {
+
+    $triggering_element = $form_state->getTriggeringElement();
+    // Slice off the button part (e.g., 'remove_button' or 'remove_all_button')
+    $parents = array_slice($triggering_element['#array_parents'], 0, -1);
+    // This gets you to the widget part (field_property_images > widget)
+    $element = NestedArray::getValue($form, $parents);
+    // Target the actual field widget.
+    $widget_element = $element['widget'];
+    // Get the correct values path.
+    $path = $element['#parents'];
+    $values = NestedArray::getValue($form_state->getValues(), $path);
+    $field_state = static::getFieldState($element, $form_state);
+    $selection_items = $element['selection'];
+
+    foreach ($selection_items as $delta => $media_item) {
+      // Skip non-numeric keys (like "#type", "#attributes", etc.)
+      if (!is_int($delta)) {
+        continue;
+      }
+      $field_state['removed_item_weight'] = $values['selection'][$delta]['weight'];
+      $field_state['removed_item_id'] = $media_item['target_id']['#value'];
+      unset($values['selection'][$delta]);
+      $field_state['items'] = $values['selection'];
+      static::setFieldState($element, $form_state, $field_state);
+     
+    }
+    $form_state->setRebuild();
   }
 
   /**
@@ -931,6 +980,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $ids = explode(',', $value['media_library_selection']);
       $ids = array_filter($ids, 'is_numeric');
       if (!empty($ids)) {
+        /** @var \Drupal\media\MediaInterface[] $media */
         return Media::loadMultiple($ids);
       }
     }
