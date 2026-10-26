@@ -41,7 +41,7 @@ entity.workflow.edit_transition_form:
 entity.workflow.delete_transition_form:
   path: '/admin/config/workflow/workflows/manage/{workflow}/transition/{workflow_transition}/delete'
   defaults:
-    _form: '\Drupal\workflows\Form\WorkflowTransitionDeleteForm'
+    _entity_form: 'workflow.delete-transition'
     _title: 'Delete transition'
   requirements:
     _workflow_access: 'delete-transition'
