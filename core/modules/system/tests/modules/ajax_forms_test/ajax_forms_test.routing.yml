@@ -53,3 +53,11 @@ ajax_forms_test.dialog_form_link:
     _controller: '\Drupal\ajax_forms_test\Controller\DialogFormLink::makeDialogFormLink'
   requirements:
     _access: 'TRUE'
+
+ajax_forms_test.duplicate_forms:
+  path: '/ajax_forms_test_duplicate_forms'
+  defaults:
+    _title: 'AJAX forms duplicate forms test'
+    _controller: '\Drupal\ajax_forms_test\Controller\DuplicateForms::makeDuplicateForms'
+  requirements:
+    _access: 'TRUE'
