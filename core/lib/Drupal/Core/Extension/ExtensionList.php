@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Extension;
 
+use Drupal\Component\Graph\Graph;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
@@ -627,4 +628,40 @@ abstract class ExtensionList {
     return strcasecmp($a->info['name'], $b->info['name']);
   }
 
+  /**
+   * Determines which modules require and are required by each module.
+   *
+   * @param array<string, \Drupal\Core\Extension\Extension> $modules
+   *   An array of module objects keyed by module name. Each object contains
+   *   information discovered during a Drupal\Core\Extension\ExtensionDiscovery
+   *   scan.
+   *
+   * @return array<string, \Drupal\Core\Extension\Extension>
+   *   The same array with the new keys for each module:
+   *   - requires: An array with the keys being the modules that this module
+   *     requires.
+   *   - required_by: An array with the keys being the modules that will not
+   *     work without this module.
+   *
+   * @see \Drupal\Core\Extension\ExtensionDiscovery
+   */
+  public function buildModuleDependencies(array $modules) {
+    foreach ($modules as $module) {
+      $graph[$module->getName()]['edges'] = [];
+      if (isset($module->info['dependencies']) && is_array($module->info['dependencies'])) {
+        foreach ($module->info['dependencies'] as $dependency) {
+          $dependency_data = Dependency::createFromString($dependency);
+          $graph[$module->getName()]['edges'][$dependency_data->getName()] = $dependency_data;
+        }
+      }
+    }
+    $graph_object = new Graph($graph ?? []);
+    $graph = $graph_object->searchAndSort();
+    foreach ($graph as $module_name => $data) {
+      $modules[$module_name]->required_by = $data['reverse_paths'] ?? [];
+      $modules[$module_name]->requires = $data['paths'] ?? [];
+      $modules[$module_name]->sort = $data['weight'];
+    }
+    return $modules;
+  }
 }
