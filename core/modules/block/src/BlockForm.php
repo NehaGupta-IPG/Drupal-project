@@ -402,8 +402,8 @@ class BlockForm extends EntityForm {
    * @param \Drupal\Core\Block\BlockPluginInterface $block
    *   The block plugin.
    *
-   * @return \Drupal\Core\Plugin\PluginFormInterface
-   *   The plugin form for the block.
+   * @return \Drupal\Core\Plugin\PluginFormInterface|\Drupal\Core\Block\BlockPluginInterface
+   *   The plugin form for the block or block plugin.
    */
   protected function getPluginForm(BlockPluginInterface $block) {
     if ($block instanceof PluginWithFormsInterface) {
