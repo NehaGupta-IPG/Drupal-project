@@ -174,7 +174,7 @@ class BooleanFieldTest extends BrowserTestBase {
 
     $this->submitForm([], $field_name . "_settings_edit");
     $this->assertSession()->pageTextContains('Use field label instead of the "On" label as the label.');
-    $this->getSession()->getPage()->hasCheckedField('fields[' . $field_name . '][settings_edit_form][settings][display_label]');
+    $this->assertSession()->checkboxChecked('fields[' . $field_name . '][settings_edit_form][settings][display_label]');
 
     // Test the boolean field settings.
     $this->drupalGet('entity_test/structure/entity_test/fields/entity_test.entity_test.' . $field_name);

@@ -77,7 +77,7 @@ trait WorkspaceTestUtilities {
       'parent' => $parent,
     ], 'Save and switch');
 
-    $this->getSession()->getPage()->hasContent("$label ($id)");
+    $this->assertSession()->pageTextContains("$label ($id)");
 
     // Keep the test runner in sync with the system under test.
     $workspace = Workspace::load($id);
