@@ -158,6 +158,25 @@ class FileUploadForm extends AddFormBase {
       '#type' => 'container',
     ];
 
+    // @todo: This is just a quickfix to hide the form and show a message
+    // for media items with multi-valued file fields!
+    // @see https://www.drupal.org/project/drupal/issues/3477339
+    if ($slots != 1) {
+      $form['container']['no-upload'] = [
+        '#plain_text' => $this->t('The selected media type has an upload field with multiplicity > 1, which isn\'nt currently supported for direct upload.<br>Create and select the media entity instead:'),
+      ];
+      $form['container']['upload-link'] = [
+        '#type' => 'link',
+        '#url' => Url::fromUserInput($this->entityTypeManager->getDefinition('media')->getLinkTemplate('add-page') . '/' . $media_type->id()),
+        '#title' => $this->t('%type_name: Create new media', ['%type_name' => $media_type->label()]),
+        '#attributes' => [
+          'target' => '_blank',
+        ]
+      ];
+
+      return $form;
+    }
+
     $process = (array) $this->elementInfo->getInfoProperty('managed_file', '#process', []);
     $form['container']['upload'] = [
       '#type' => 'managed_file',
