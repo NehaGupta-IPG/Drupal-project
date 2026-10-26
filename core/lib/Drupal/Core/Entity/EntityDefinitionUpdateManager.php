@@ -74,6 +74,8 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
     $this->entityTypeListener = $entity_type_listener;
     $this->fieldStorageDefinitionListener = $field_storage_definition_listener;
     if (!$this->typedDataManager) {
+      // @todo Replace the change record placeholder before commit.
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorSeeUrlFormat
       @trigger_error('Calling ' . __METHOD__ . '() without the $typedDataManager argument is deprecated in drupal:12.1.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3XXXXXX', E_USER_DEPRECATED);
       $this->typedDataManager = \Drupal::service('typed_data_manager');
     }
