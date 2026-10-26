@@ -368,7 +368,7 @@ class ContentTranslationController extends ControllerBase {
    */
   public function add(LanguageInterface $source, LanguageInterface $target, RouteMatchInterface $route_match, $entity_type_id = NULL) {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $route_match->getParameter($entity_type_id);
+    $entity = clone $route_match->getParameter($entity_type_id);
 
     // In case of a pending revision, make sure we load the latest
     // translation-affecting revision for the source language, otherwise the

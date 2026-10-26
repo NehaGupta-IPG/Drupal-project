@@ -2,6 +2,7 @@
 
 namespace Drupal\content_translation\Access;
 
+use Drupal\content_translation\ContentTranslationManager;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -93,6 +94,18 @@ class ContentTranslationManageAccessCheck implements AccessInterface {
 
       if ($account->hasPermission('translate any entity')) {
         return AccessResult::allowed()->cachePerPermissions();
+      }
+
+      // The route parameter holds the "active" revision, which may still have
+      // translations which have since been removed.
+      $use_latest_revisions = $entity_type->isRevisionable() && ContentTranslationManager::isPendingRevisionSupportEnabled($entity_type_id, $entity->bundle());
+      if ($use_latest_revisions) {
+        /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+        $storage = $this->entityTypeManager->getStorage($entity_type_id);
+        $latest_revision_id = $storage->getLatestRevisionId($entity->id());
+        if ($latest_revision_id != $entity->getRevisionId()) {
+          $entity = $storage->loadRevision($latest_revision_id);
+        }
       }
 
       switch ($operation) {
