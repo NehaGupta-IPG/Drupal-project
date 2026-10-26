@@ -645,7 +645,7 @@ abstract class ExtensionList {
    *
    * @see \Drupal\Core\Extension\ExtensionDiscovery
    */
-  public function buildModuleDependencies(array $modules) {
+  protected function buildModuleDependencies(array $modules) {
     foreach ($modules as $module) {
       $graph[$module->getName()]['edges'] = [];
       if (isset($module->info['dependencies']) && is_array($module->info['dependencies'])) {

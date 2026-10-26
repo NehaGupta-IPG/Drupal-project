@@ -91,8 +91,8 @@ interface ModuleHandlerInterface {
    *     work without this module.
    *
    *
-   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
-   *   ExtensionList::buildModuleDependencies() instead.
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is
+   *   no replacement.
    *
    * @see https://www.drupal.org/node/3017020
    * @see \Drupal\Core\Extension\ExtensionDiscovery

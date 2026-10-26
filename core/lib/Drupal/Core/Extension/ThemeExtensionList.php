@@ -76,7 +76,6 @@ class ThemeExtensionList extends ExtensionList {
     #[Autowire(service: 'cache.bootstrap')]
     CacheBackendInterface $cache,
     InfoParserInterface $info_parser,
-    ModuleHandlerInterface $module_handler,
     StateInterface $state,
     ConfigFactoryInterface $config_factory,
     #[Autowire(param: 'install_profile')]
