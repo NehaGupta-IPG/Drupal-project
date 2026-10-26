@@ -62,7 +62,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'css_input_without_import.css',
         ],
         file_get_contents($absolute_path . 'css_input_without_import.css.optimized.css'),
-        0,
       ],
       [
         [
@@ -76,7 +75,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'css_input_simple.css',
         ],
         file_get_contents($absolute_path . 'css_input_simple_with_media.css.optimized.css'),
-        0,
       ],
       // File. Tests:
       // - Proper URLs in imported files. (https://www.drupal.org/node/265719)
@@ -99,7 +97,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'css_input_with_import.css',
         ],
         str_replace("url('import1.css')", 'url(generated-relative-url:' . $path . 'import1.css)', str_replace('url(images/icon.png)', 'url(generated-relative-url:' . $path . 'images/icon.png)', file_get_contents($absolute_path . 'css_input_with_import.css.optimized.css'))),
-        4,
       ],
       // File. Tests:
       // - Retain comment hacks.
@@ -114,7 +111,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'comment_hacks.css',
         ],
         file_get_contents($absolute_path . 'comment_hacks.css.optimized.css'),
-        0,
       ],
       // File in subfolder. Tests:
       // - CSS import path is properly interpreted.
@@ -131,7 +127,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'css_input_with_import.css',
         ],
         str_replace('url(../images/icon.png)', 'url(generated-relative-url:' . $path . 'images/icon.png)', file_get_contents($absolute_path . 'css_subfolder/css_input_with_import.css.optimized.css')),
-        1,
       ],
       // File. Tests:
       // - Any @charset declaration at the beginning of a file should be
@@ -147,7 +142,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'charset_same_line.css',
         ],
         file_get_contents($absolute_path . 'charset.css.optimized.css'),
-        0,
       ],
       [
         [
@@ -160,7 +154,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'charset_newline.css',
         ],
         file_get_contents($absolute_path . 'charset.css.optimized.css'),
-        0,
       ],
       [
         [
@@ -173,7 +166,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'css_input_with_bom.css',
         ],
         '.byte-order-mark-test{content:"☃";}' . "\n",
-        0,
       ],
       [
         [
@@ -186,7 +178,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'css_input_with_charset.css',
         ],
         '.charset-test{content:"€";}' . "\n",
-        0,
       ],
       [
         [
@@ -199,7 +190,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'css_input_with_bom_and_charset.css',
         ],
         '.byte-order-mark-charset-test{content:"☃";}' . "\n",
-        0,
       ],
       [
         [
@@ -212,7 +202,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'css_input_with_utf16_bom.css',
         ],
         '.utf16-byte-order-mark-test{content:"☃";}' . "\n",
-        0,
       ],
       [
         [
@@ -225,7 +214,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'quotes.css',
         ],
         file_get_contents($absolute_path . 'quotes.css.optimized.css'),
-        0,
       ],
       [
         [
@@ -238,7 +226,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'basename' => 'import3.css',
         ],
         file_get_contents($absolute_path . 'import3.css.optimized.css'),
-        0,
       ],
     ];
   }
