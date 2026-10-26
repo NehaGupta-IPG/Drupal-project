@@ -689,7 +689,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     foreach ($this->view->storage->get('display') as $display_id => $display) {
       if (isset($display['display_options']['displays'])) {
         $displays = $display['display_options']['displays'];
-        if (isset($displays[$current_display_id])) {
+        if (isset($displays[$current_display_id]) && !empty($displays[$current_display_id])) {
           $attached_displays[] = $display_id;
         }
       }
