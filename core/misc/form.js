@@ -130,7 +130,10 @@
         ).toString();
         const previousValues = $form.attr('data-drupal-form-submit-last');
         if (previousValues === formValues) {
-          e.preventDefault();
+          if ($form.attr('method').toUpperCase() !== 'GET') {
+            // Do not submit forms with other methods then GET.
+            e.preventDefault();
+          }
         } else {
           $form.attr('data-drupal-form-submit-last', formValues);
         }
@@ -138,7 +141,7 @@
 
       $(once('form-single-submit', 'body')).on(
         'submit.singleSubmit',
-        'form:not([method~="GET"])',
+        'form',
         onFormSubmit,
       );
     },
