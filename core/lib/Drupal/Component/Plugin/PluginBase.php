@@ -97,8 +97,11 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
    *
    * @param array $plugin_definition
    *   The plugin definition to get the derivative_separator from.
+   *
+   * @return string
+   *   The separator string for plugin ids.
    */
-  public static function getSeparator(array $plugin_definition) {
+  public static function getSeparator(array $plugin_definition): string {
     return $plugin_definition['derivative_separator'] ?? self::DERIVATIVE_SEPARATOR;
   }
 
