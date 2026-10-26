@@ -75,13 +75,25 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   public function __construct(SqliteConnection $connection, array $connection_options) {
     parent::__construct($connection, $connection_options);
 
-    // Empty prefix means query the main database -- no need to attach anything.
+    $database_name = $this->connectionOptions['database_name'] ?? '';
     $prefix = $this->connectionOptions['prefix'] ?? '';
-    if ($prefix !== '') {
-      $this->attachDatabase($prefix);
-      // Add a ., so queries become prefix.table, which is proper syntax for
-      // querying an attached database.
-      $prefix .= '.';
+
+    if (!$database_name && ($this->connectionOptions['database'] ?? '') === ':memory:') {
+      // Handle the in memory database specially for backwards compatibility
+      // purposes.
+      $database_name = $prefix;
+      $prefix = '';
+    }
+
+    // Empty database name means query the main database -- no need to attach
+    // anything.
+    if (!empty($database_name)) {
+      $this->attachDatabase($database_name);
+      // Add a ., so queries become database_name.table, which is proper syntax
+      // for querying an attached database.
+      $database_name .= '.';
+      // Add the database name prefix.
+      $prefix = "{$database_name}{$prefix}";
     }
 
     // Regenerate the prefix.
