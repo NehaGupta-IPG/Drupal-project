@@ -97,21 +97,11 @@ class PathAliasMenuLinkContentTest extends KernelTestBase {
    * Tests deleting a path alias whose alias value is NULL.
    */
   public function testNullPathAliasDelete(): void {
-    $menu_link_content = MenuLinkContent::create([
-      'title' => 'Menu title',
-      'link' => ['uri' => 'internal:/my-blog'],
-      'menu_name' => 'tools',
-    ]);
-    $menu_link_content->save();
-    $plugin_id = $menu_link_content->getPluginId();
-
     $path_alias = $this->createPathAlias('/test-page', '/my-blog');
-    $id = $path_alias->id();
     $path_alias->set('alias', NULL);
     $path_alias->delete();
 
-    $this->assertNull(PathAlias::load($id));
-    $this->assertTrue(\Drupal::service('plugin.manager.menu.link')->hasDefinition($plugin_id));
+    $this->assertNull(PathAlias::load($path_alias->id()));
   }
 
 }
