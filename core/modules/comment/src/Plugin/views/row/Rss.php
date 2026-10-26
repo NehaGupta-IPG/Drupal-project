@@ -111,6 +111,8 @@ class Rss extends RssPluginBase {
     // $comment->rss_elements and $comment->rss_namespaces.
     $build = $this->entityTypeManager->getViewBuilder('comment')->view($comment, $view_mode);
     unset($build['#theme']);
+    // Add rss key to cache to differentiate this from other caches.
+    $build['#cache']['keys'][] = 'view_rss';
 
     if (!empty($comment->rss_namespaces)) {
       $this->view->style_plugin->namespaces = array_merge($this->view->style_plugin->namespaces, $comment->rss_namespaces);
