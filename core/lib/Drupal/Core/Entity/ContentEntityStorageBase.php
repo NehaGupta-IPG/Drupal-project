@@ -1217,7 +1217,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   Array of entities from the persistent cache.
    */
   protected function getFromPersistentCache(?array &$ids = NULL) {
-    if (!$this->entityType->isPersistentlyCacheable() || empty($ids)) {
+    if ($this->isCachingDisabled() || !$this->entityType->isPersistentlyCacheable() || empty($ids)) {
       return [];
     }
     $entities = [];
@@ -1251,7 +1251,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   Array of entities from the persistent cache.
    */
   protected function getFromPersistentRevisionCache(array &$ids): array {
-    if (!$this->entityType->isPersistentlyCacheable() || empty($ids)) {
+    if ($this->isCachingDisabled() || !$this->entityType->isPersistentlyCacheable() || empty($ids)) {
       return [];
     }
     $entities = [];
@@ -1281,7 +1281,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   Entities to store in the cache.
    */
   protected function setPersistentCache($entities) {
-    if (!$this->entityType->isPersistentlyCacheable()) {
+    if ($this->isCachingDisabled() || !$this->entityType->isPersistentlyCacheable()) {
       return;
     }
 
@@ -1302,7 +1302,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   Entities to store in the cache.
    */
   protected function setPersistentRevisionCache(array $entities): void {
-    if (!$this->entityType->isPersistentlyCacheable()) {
+    if ($this->isCachingDisabled() || !$this->entityType->isPersistentlyCacheable()) {
       return;
     }
     $items = [];

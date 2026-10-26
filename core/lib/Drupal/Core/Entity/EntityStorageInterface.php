@@ -184,6 +184,21 @@ interface EntityStorageInterface {
   public function getAggregateQuery($conjunction = 'AND');
 
   /**
+   * Executes the given callback while caching is disabled.
+   *
+   * Both the static (memory) cache and, for storages that have one, the
+   * persistent cache are disabled for the duration of the callback. Calls
+   * can be nested; caching stays disabled until the outermost call returns.
+   *
+   * @param callable $callback
+   *   A callback accepting this entity storage as its only argument.
+   *
+   * @return mixed
+   *   The return value of the callback.
+   */
+  public function executeWithoutCaching(callable $callback): mixed;
+
+  /**
    * Gets the entity type ID.
    *
    * @return string

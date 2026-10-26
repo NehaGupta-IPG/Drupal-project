@@ -101,6 +101,11 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   protected array $entityIdsToLoad = [];
 
   /**
+   * The nesting depth of ::executeWithoutCaching() calls.
+   */
+  protected int $cachingDisabledDepth = 0;
+
+  /**
    * Constructs an EntityStorageBase instance.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -179,6 +184,29 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   /**
    * {@inheritdoc}
    */
+  public function executeWithoutCaching(callable $callback): mixed {
+    $this->cachingDisabledDepth++;
+    try {
+      return $callback($this);
+    }
+    finally {
+      $this->cachingDisabledDepth--;
+    }
+  }
+
+  /**
+   * Determines if the static and persistent entity caches are disabled.
+   *
+   * @return bool
+   *   TRUE if caching has been disabled via ::executeWithoutCaching().
+   */
+  protected function isCachingDisabled(): bool {
+    return $this->cachingDisabledDepth > 0;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function resetCache(?array $ids = NULL) {
     if ($this->entityType->isStaticallyCacheable() && isset($ids)) {
       // It's not possible to generate the uuid cache ID from the entity ID
@@ -205,6 +233,9 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    *   Array of not found entity IDs.
    */
   protected function getNotFoundFromStaticCache(array $ids): array {
+    if ($this->isCachingDisabled()) {
+      return [];
+    }
     $not_found = [];
     foreach ($ids as $id) {
       if ($this->memoryCache->get($this->buildNotFoundCacheId($id))) {
@@ -221,6 +252,9 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    *   Not found entity IDs to store in the cache.
    */
   protected function setNotFoundStaticCache(array $remaining_ids): void {
+    if ($this->isCachingDisabled()) {
+      return;
+    }
     if ($this->entityType->isStaticallyCacheable()) {
       foreach ($remaining_ids as $id) {
         $this->memoryCache->set($this->buildNotFoundCacheId($id), FALSE, MemoryCacheInterface::CACHE_PERMANENT, [$this->memoryCacheTag]);
@@ -238,6 +272,9 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    *   Array of entities from the entity cache, keyed by entity ID.
    */
   protected function getFromStaticCache(array $ids) {
+    if ($this->isCachingDisabled()) {
+      return [];
+    }
     $entities = [];
     // Load any available entities from the internal cache.
     foreach ($ids as $id) {
@@ -255,6 +292,9 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    *   Entities to store in the cache.
    */
   protected function setStaticCache(array $entities) {
+    if ($this->isCachingDisabled()) {
+      return;
+    }
     $has_uuid = $this->entityType->hasKey('uuid');
     if ($this->entityType->isStaticallyCacheable()) {
       foreach ($entities as $id => $entity) {
@@ -713,7 +753,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    */
   public function loadByProperties(array $values = []) {
     $cid = NULL;
-    if ($this->entityType->isStaticallyCacheable() && \array_keys($values) === ['uuid'] && \is_string($values['uuid'])) {
+    if (!$this->isCachingDisabled() && $this->entityType->isStaticallyCacheable() && \array_keys($values) === ['uuid'] && \is_string($values['uuid'])) {
       // Check if we have already loaded or queried this entity by its UUID.
       // @see ::setStaticCache
       $cid = \sprintf('uuid_lookup:%s:%s', $this->entityTypeId, $values['uuid']);
