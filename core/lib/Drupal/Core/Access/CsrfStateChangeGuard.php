@@ -8,22 +8,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Prevents state changes made by unprotected GET requests.
+ * Deprecates state changes made by unprotected safe requests.
  *
  * @internal
  */
 class CsrfStateChangeGuard {
 
-  /**
-   * Constructs a CSRF state change guard.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   *   The request stack.
-   */
   public function __construct(protected RequestStack $requestStack) {}
 
   /**
-   * Ensures that the current request can make a state change.
+   * Deprecates writes during unprotected safe requests.
    */
   public function check(): void {
     $request = $this->requestStack->getMainRequest();
@@ -31,7 +25,7 @@ class CsrfStateChangeGuard {
       return;
     }
 
-    throw new \LogicException('Configuration and entity writes cannot be performed during an unprotected GET request.');
+    @trigger_error('Performing configuration and entity writes during an unprotected safe request is deprecated in drupal:12.0.0 and will throw a LogicException in drupal:13.0.0. Add a _csrf_token route requirement. See https://www.drupal.org/project/drupal/issues/3508087', E_USER_DEPRECATED);
   }
 
 }

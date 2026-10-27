@@ -11,17 +11,17 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 
 /**
- * Marks unprotected GET requests before their controller is invoked.
+ * Marks unprotected safe requests before their controller is invoked.
  *
  * @internal
  */
 class CsrfStateChangeRequestSubscriber implements EventSubscriberInterface {
 
   /**
-   * Marks an unprotected GET request.
+   * Marks an unprotected safe request.
    */
   public function onController(ControllerEvent $event): void {
-    if (!$event->isMainRequest() || !$event->getRequest()->isMethod('GET')) {
+    if (!$event->isMainRequest() || !$event->getRequest()->isMethodSafe()) {
       return;
     }
 

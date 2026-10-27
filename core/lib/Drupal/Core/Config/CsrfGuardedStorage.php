@@ -5,23 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Core\Config;
 
 use Drupal\Core\Access\CsrfStateChangeGuard;
+use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 
 /**
- * Guards active configuration storage writes against unprotected GET requests.
+ * Guards active configuration storage writes against unprotected safe requests.
  *
  * @internal
  */
 class CsrfGuardedStorage implements StorageInterface {
 
-  /**
-   * Constructs a guarded configuration storage.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $storage
-   *   The decorated storage.
-   * @param \Drupal\Core\Access\CsrfStateChangeGuard $guard
-   *   The state change guard.
-   */
   public function __construct(
+    #[AutowireDecorated]
     protected StorageInterface $storage,
     protected CsrfStateChangeGuard $guard,
   ) {}

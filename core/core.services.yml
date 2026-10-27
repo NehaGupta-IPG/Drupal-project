@@ -449,13 +449,17 @@ services:
   csrf_state_change.config_storage:
     class: Drupal\Core\Config\CsrfGuardedStorage
     decorates: config.storage
-    arguments: ['@csrf_state_change.config_storage.inner', '@csrf_state_change.guard']
+    autowire: true
+    autoconfigure: false
+    public: false
   csrf_state_change.guard:
     class: Drupal\Core\Access\CsrfStateChangeGuard
-    arguments: ['@request_stack']
+    autowire: true
+    public: false
   Drupal\Core\Access\CsrfStateChangeGuard: '@csrf_state_change.guard'
-  csrf_state_change.request_subscriber:
-    class: Drupal\Core\Access\CsrfStateChangeRequestSubscriber
+  Drupal\Core\Access\CsrfStateChangeRequestSubscriber:
+    autoconfigure: false
+    public: false
   config.storage.active:
     class: Drupal\Core\Config\DatabaseStorage
     arguments: ['@database', 'config']
@@ -971,6 +975,9 @@ services:
   Drupal\Core\Routing\RouteMatchInterface: '@current_route_match'
   event_dispatcher:
     class: Symfony\Component\EventDispatcher\EventDispatcher
+    # Register directly so the private subscriber survives service removal.
+    calls:
+      - [addSubscriber, ['@Drupal\Core\Access\CsrfStateChangeRequestSubscriber']]
   Psr\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   Symfony\Contracts\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   Symfony\Component\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'

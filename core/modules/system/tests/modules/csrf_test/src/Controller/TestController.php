@@ -28,7 +28,7 @@ class TestController {
   #[Route(
     path: '/csrf/unprotected-config-write',
     name: 'csrf_test.unprotected_config_write',
-    methods: ['GET'],
+    methods: ['GET', 'POST'],
     requirements: ['_access' => 'TRUE'],
   )]
   public function writeConfig(): Response {
@@ -62,6 +62,21 @@ class TestController {
   public function writeEntity(): Response {
     \Drupal::entityTypeManager()->getStorage('entity_test')->create(['name' => 'Created by GET request'])->save();
     return new Response('Entity created.');
+  }
+
+  /**
+   * Deletes an entity.
+   */
+  #[Route(
+    path: '/csrf/unprotected-entity-delete',
+    name: 'csrf_test.unprotected_entity_delete',
+    methods: ['GET'],
+    requirements: ['_access' => 'TRUE'],
+  )]
+  public function deleteEntity(): Response {
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_test');
+    $storage->delete($storage->loadMultiple());
+    return new Response('Entity deleted.');
   }
 
 }
