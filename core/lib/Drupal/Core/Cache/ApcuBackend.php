@@ -183,6 +183,65 @@ class ApcuBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function set($cid, $data, $expire = CacheBackendInterface::CACHE_PERMANENT, array $tags = []) {
+    // Construct the necessary keys based on the cache ID.
+    $key = $this->getApcuKey($cid);
+    $lock_key = $key . ':apcu_update_lock';
+
+    // Attempt to fetch the existing lock value from APCu.
+    $results = apcu_fetch([$lock_key]);
+    $old_lock_value = $results[$lock_key] ?? FALSE;
+
+    // If the lock doesn't exist, initialize it with a random value.
+    if ($old_lock_value === FALSE) {
+      $old_lock_value = mt_rand(0, 2147483647);
+      apcu_add($lock_key, $old_lock_value);
+    }
+
+    do {
+      $lock_value = mt_rand(0, 2147483647);
+    } while ($old_lock_value === $lock_value);
+
+    // Attempt to acquire the lock.
+    if (apcu_cas($lock_key, $old_lock_value, $lock_value)) {
+      $this->setWithoutLock($cid, $data, $expire, $tags);
+    }
+  }
+
+  /**
+   * Stores data in the persistent cache.
+   *
+   * Core cache implementations set the created time on cache item with
+   * microtime(TRUE) rather than REQUEST_TIME_FLOAT, because the created time
+   * of cache items should match when they are created, not when the request
+   * started. Apart from being more accurate, this increases the chance an
+   * item will legitimately be considered valid.
+   *
+   * @param string $cid
+   *   The cache ID of the data to store.
+   * @param mixed $data
+   *   The data to store in the cache.
+   *   Some storage engines only allow objects up to a maximum of 1MB in size to
+   *   be stored by default. When caching large arrays or similar, take care to
+   *   ensure $data does not exceed this size.
+   * @param int $expire
+   *   One of the following values:
+   *   - CacheBackendInterface::CACHE_PERMANENT: Indicates that the item should
+   *     not be removed unless it is deleted explicitly.
+   *   - A Unix timestamp: Indicates that the item will be considered invalid
+   *     after this time, i.e. it will not be returned by get() unless
+   *     $allow_invalid has been set to TRUE. When the item has expired, it may
+   *     be permanently deleted by the garbage collector at any time.
+   * @param array $tags
+   *   An array of tags to be stored with the cache item. These should normally
+   *   identify objects used to build the cache item, which should trigger
+   *   cache invalidation when updated. For example if a cached item represents
+   *   a node, both the node ID and the author's user ID might be passed in as
+   *   tags. For example ['node:123', 'node:456', 'user:789'].
+   *
+   * @see \Drupal\Core\Cache\CacheBackendInterface::get()
+   * @see \Drupal\Core\Cache\CacheBackendInterface::getMultiple()
+   */
+  public function setWithoutLock($cid, $data, $expire = CacheBackendInterface::CACHE_PERMANENT, array $tags = []) {
     assert(Inspector::assertAllStrings($tags), 'Cache tags must be strings.');
     $tags = array_unique($tags);
     $cache = new \stdClass();
