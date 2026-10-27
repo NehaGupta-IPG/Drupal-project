@@ -7,9 +7,9 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseAccessDeniedException;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
-use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Pdo\Pgsql;
 
@@ -48,6 +48,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Open
    *   StatementInterface objects directly instead.
+   *
+   * @see https://www.drupal.org/node/3633349
    */
   protected $statementWrapperClass = StatementWrapperIterator::class;
 
@@ -264,8 +266,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
-    // PostgreSQL doesn't automatically cast fields to the right type for the
+  public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): Statement {
+    assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to query() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
+
+      // PostgreSQL doesn't automatically cast fields to the right type for the
     // (I)LIKE and regex operators. Query builder queries get a '::text'
     // type-cast when their conditions are compiled (see
     // static::$postgresqlConditionOperatorMap), but queries passed as raw SQL
@@ -280,7 +285,19 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
         $query = $rewritten;
       }
     }
-    return parent::prepareStatement($query, $options, $allow_row_count);
+
+    try {
+      return new Statement(
+        $this,
+        $this->connection,
+        $this->preprocessStatement($query, $options),
+        $options['pdo'] ?? [],
+        $allow_row_count,
+      );
+    }
+    catch (\Exception $e) {
+      $this->exceptionHandler()->handleStatementException($e, $query, $options);
+    }
   }
 
   /**
