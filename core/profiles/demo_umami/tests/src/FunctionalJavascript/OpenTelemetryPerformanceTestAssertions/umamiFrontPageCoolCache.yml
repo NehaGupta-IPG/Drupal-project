@@ -78,6 +78,7 @@ CacheTagGroupedLookups:
     - 'media:19'
     - 'config:system.menu.main'
     - 'config:views.view.recipe_collections'
+    - 'config:views.view.taxonomy_term'
     - 'taxonomy_term:1'
     - 'taxonomy_term:10'
     - 'taxonomy_term:11'
