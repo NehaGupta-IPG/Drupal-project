@@ -264,6 +264,16 @@ class DialogTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests a Form API AJAX callback using the GET HTTP method.
+   */
+  public function testFormHttpMethod(): void {
+    $this->drupalGet('/ajax-test/get-form');
+    $this->getSession()->getPage()->pressButton('GET request');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->pageTextContains('GET');
+  }
+
+  /**
    * Tests that closing a dialog cancels a resize that is already scheduled.
    *
    * Dialog resizing is debounced by 20ms. Closing a dialog removes its element
