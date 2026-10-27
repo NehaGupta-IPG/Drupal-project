@@ -8,6 +8,17 @@ use Drupal\Core\Render\Element;
 
 /**
  * Provides a form element for a submit button with an image.
+ *
+ * Properties:
+ * - #src: Relative path to the image used in the button.
+ *
+ * Usage Example:
+ * @code
+ * $form['actions']['add'] = [
+ *   '#type' => 'image_button',
+ *   '#src' => 'my_theme/images/my_image.png',
+ * ];
+ * @endcode
  */
 #[FormElement('image_button')]
 class ImageButton extends Submit {

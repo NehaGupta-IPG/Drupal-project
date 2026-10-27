@@ -12,6 +12,16 @@ use Drupal\Core\Render\Attribute\FormElement;
  * the default language. It is then extended by Language module via
  * language_element_info_alter() to provide a proper language selector.
  *
+ * Usage Example:
+ * @code
+ * $form['langcode'] = [
+ *   '#type' => 'language_select',
+ *   '#title' => $this->t('Menu language'),
+ *   '#languages' => LanguageInterface::STATE_ALL,
+ *   '#default_value' => $menu->language()->getId(),
+ * ];
+ * @endcode
+ *
  * @see language_element_info_alter()
  */
 #[FormElement('language_select')]

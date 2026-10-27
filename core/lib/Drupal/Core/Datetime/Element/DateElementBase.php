@@ -8,6 +8,48 @@ use Drupal\Core\Render\Element\FormElementBase;
 
 /**
  * Provides a base class for date elements.
+ *
+ * Date elements are a subset of render elements, representing elements for
+ * HTML forms, which can be referenced in form arrays. See the
+ *
+ * @link theme_render Render API topic @endlink for an overview of render
+ * arrays and render elements, and the @link form_api Form API topic @endlink
+ * for an overview of forms and form arrays.
+ *
+ * This is a list of the properties that are available for all date elements.
+ * Properties specific to a particular element are documented on that element's
+ * class.
+ *
+ * List of properties that are used during the rendering and form processing of
+ * date elements,
+ * - #default_value: A DrupalDateTime object, adjusted to the proper local
+ *   timezone. Converting a date stored in the database from UTC to the local
+ *   zone and converting it back to UTC before storing it is not handled here.
+ *   This element accepts a date as the default value, and then converts the
+ *   user input strings back into a new date object on submission. No timezone
+ *   adjustment is performed.
+ * - #date_date_callbacks: (optional) Array of optional callbacks for the date
+ *   element.
+ * - #date_year_range: A description of the range of years to allow, like
+ *   '1900:2050', '-3:+3' or '2000:+3', where the first value describes the
+ *   earliest year and the second the latest year in the range. A year in either
+ *   position means that specific year. A +/- value describes a dynamic value
+ *   that is that many years earlier or later than the current year at the time
+ *   the form is displayed. Used in HTML5 min/max date settings. Defaults to
+ *   '1900:2050'.
+ * - #date_increment: (optional) The interval (step) to use when incrementing or
+ *   decrementing time, in seconds. For example, if this value is set to 30,
+ *   time increases (or decreases) in steps of 30 seconds (00:00:00, 00:00:30,
+ *   00:01:00, and so on.) If this value is a multiple of 60, the
+ *   "seconds"-component will not be shown in the input. Used for HTML5 step
+ *   values. Defaults to 1 to show every second.
+ * - #date_timezone: (optional) The Time Zone Identifier (TZID) to use when
+ *   displaying or interpreting dates, i.e: 'Asia/Kolkata'. Defaults to the
+ *   value returned by date_default_timezone_get().
+ *
+ * @see \Drupal\Core\Render\Element\RenderElementBase()
+ * @see \Drupal\Core\Datetime\Element\Datelist()
+ * @see \Drupal\Core\Datetime\Element\Datetime()
  */
 abstract class DateElementBase extends FormElementBase {
 

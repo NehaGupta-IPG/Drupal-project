@@ -12,7 +12,76 @@ use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Security\StaticTrustedCallbackHelper;
 
 /**
- * Provides a datetime element.
+ * Provides a date and time element.
+ *
+ * Properties:
+ * - #default_value: A DrupalDateTime object, adjusted to the proper local
+ *   timezone. Converting a date stored in the database from UTC to the local
+ *   zone and converting it back to UTC before storing it is not handled here.
+ *   This element accepts a date as the default value, and then converts the
+ *   user input strings back into a new date object on submission. No timezone
+ *   adjustment is performed.
+ * - #date_date_format:  A date format string that describes the
+ *   format that should be displayed to the end user for the date. When using
+ *   HTML5 elements the format MUST use the appropriate HTML5 format for that
+ *   element, no other format will work. See the
+ *   DateFormatterInterface::format() function for a list of the possible
+ *   formats and HTML5 standards for the HTML5 requirements. Defaults to the
+ *   right HTML5 format for the chosen element if an HTML5 element is used,
+ *   otherwise defaults to DateFormat::load('html_date')->getPattern().
+ * - #date_date_element: (optional) The date element. Options are:
+ *   - datetime: Use the HTML5 datetime element type.
+ *   - datetime-local: Use the HTML5 datetime-local element type.
+ *   - date: Use the HTML5 date element type.
+ *   - text: No HTML5 element, use a normal text field.
+ *   - none: Do not display a date element.
+ * - #date_date_callbacks: (optional) Array of optional callbacks for the date
+ *   element.
+ * - #date_time_element: (optional)The time element. Options are:
+ *   - time: Use an HTML5 time element type.
+ *   - text: No HTML5 element, use a normal text field.
+ *   - none: Do not display a time element.
+ * - #date_time_format: (optional)A date format string that describes the format
+ *   that should be displayed to the end user for the time. When using HTML5
+ *   elements the format MUST use the appropriate HTML5 format for that element,
+ *   no other format will work. See the DateFormatterInterface::format()
+ *   function for a list of the possible formats and HTML5 standards for the
+ *   HTML5 requirements. Defaults to the right HTML5 format for the chosen
+ *   element if an HTML5 element is used, otherwise defaults to
+ *   DateFormat::load('html_time')->getPattern().
+ * - #date_time_callbacks: (optional) An array of callbacks for the time
+ *   element. Can be used to add a jQuery timepicker or an 'All day' checkbox.
+ * - #date_year_range: (optional) A description of the range of years to allow,
+ *   like '1900:2050', '-3:+3' or '2000:+3', where the first value describes the
+ *   earliest year and the second the latest year in the range. A year in either
+ *   position means that specific year. A +/- value describes a dynamic value
+ *   that is that many years earlier or later than the current year at the time
+ *   the form is displayed. Used in HTML5 min/max date settings. Defaults to
+ *   '1900:2050'.
+ * - #date_increment: (optional)The interval (step) to use when incrementing or
+ *   decrementing time, in seconds. For example, if this value is set to 30,
+ *   time increases (or decreases) in steps of 30 seconds (00:00:00, 00:00:30,
+ *   00:01:00, and so on.) If this value is a multiple of 60, the
+ *   "seconds"-component will not be shown in the input. Used for HTML5 step
+ *   values. Defaults to 1 to show every second.
+ * - #date_timezone: (optional)The Time Zone Identifier (TZID) to use when
+ *   displaying or interpreting dates, i.e: 'Asia/Kolkata'. Defaults to the
+ *   value returned by date_default_timezone_get().
+ *
+ * Example usage:
+ *
+ * @code
+ * $form = [
+ *   '#type' => 'datetime',
+ *   '#default_value' => new DrupalDateTime('2000-01-01 00:00:00'),
+ *   '#date_date_element' => 'date',
+ *   '#date_time_element' => 'none',
+ *   '#date_year_range' => '2010:+3',
+ *   '#date_timezone' => 'Asia/Kolkata',
+ * ];
+ * @endcode
+ *
+ * @see \Drupal\Core\Datetime\Element\Datelist()
  */
 #[FormElement('datetime')]
 class Datetime extends DateElementBase {
@@ -120,91 +189,6 @@ class Datetime extends DateElementBase {
 
   /**
    * Expands a datetime element type into date and/or time elements.
-   *
-   * All form elements are designed to have sane defaults so any or all can be
-   * omitted. Both the date and time components are configurable so they can be
-   * output as HTML5 datetime elements or not, as desired.
-   *
-   * Examples of possible configurations include:
-   *   HTML5 date and time:
-   *     #date_date_element = 'date';
-   *     #date_time_element = 'time';
-   *   HTML5 datetime:
-   *     #date_date_element = 'datetime';
-   *     #date_time_element = 'none';
-   *   HTML5 time only:
-   *     #date_date_element = 'none';
-   *     #date_time_element = 'time'
-   *   Non-HTML5:
-   *     #date_date_element = 'text';
-   *     #date_time_element = 'text';
-   *
-   * Required settings:
-   *   - #default_value: A DrupalDateTime object, adjusted to the proper local
-   *     timezone. Converting a date stored in the database from UTC to the
-   *     local zone and converting it back to UTC before storing it is not
-   *     handled here. This element accepts a date as the default value, and
-   *     then converts the user input strings back into a new date object on
-   *     submission. No timezone adjustment is performed.
-   * Optional properties include:
-   *   - #date_date_format: A date format string that describes the format that
-   *     should be displayed to the end user for the date. When using HTML5
-   *     elements the format MUST use the appropriate HTML5 format for that
-   *     element, no other format will work. See the
-   *     DateFormatterInterface::format() function for a list of the possible
-   *     formats and HTML5 standards for the HTML5 requirements. Defaults to the
-   *     right HTML5 format for the chosen element if an HTML5 element is used,
-   *     otherwise defaults to DateFormat::load('html_date')->getPattern().
-   *   - #date_date_element: The date element. Options are:
-   *     - datetime: Use the HTML5 datetime element type.
-   *     - datetime-local: Use the HTML5 datetime-local element type.
-   *     - date: Use the HTML5 date element type.
-   *     - text: No HTML5 element, use a normal text field.
-   *     - none: Do not display a date element.
-   *   - #date_date_callbacks: Array of optional callbacks for the date element.
-   *   - #date_time_element: The time element. Options are:
-   *     - time: Use an HTML5 time element type.
-   *     - text: No HTML5 element, use a normal text field.
-   *     - none: Do not display a time element.
-   *   - #date_time_format: A date format string that describes the format that
-   *     should be displayed to the end user for the time. When using HTML5
-   *     elements the format MUST use the appropriate HTML5 format for that
-   *     element, no other format will work. See the
-   *     DateFormatterInterface::format() function for a list of the possible
-   *     formats and HTML5 standards for the HTML5 requirements. Defaults to the
-   *     right HTML5 format for the chosen element if an HTML5 element is used,
-   *     otherwise defaults to DateFormat::load('html_time')->getPattern().
-   *   - #date_time_callbacks: An array of optional callbacks for the time
-   *     element. Can be used to add a jQuery timepicker or an 'All day'
-   *     checkbox.
-   *   - #date_year_range: A description of the range of years to allow, like
-   *     '1900:2050', '-3:+3' or '2000:+3', where the first value describes the
-   *     earliest year and the second the latest year in the range. A year
-   *     in either position means that specific year. A +/- value describes a
-   *     dynamic value that is that many years earlier or later than the current
-   *     year at the time the form is displayed. Used in HTML5 min/max date
-   *     settings. Defaults to '1900:2050'.
-   *   - #date_increment: The interval (step) to use when incrementing or
-   *     decrementing time, in seconds. For example, if this value is set to 30,
-   *     time increases (or decreases) in steps of 30 seconds (00:00:00,
-   *     00:00:30, 00:01:00, and so on.) If this value is a multiple of 60, the
-   *     "seconds"-component will not be shown in the input. Used for HTML5 step
-   *     values. Defaults to 1 to show every second.
-   *   - #date_timezone: The Time Zone Identifier (TZID) to use when displaying
-   *     or interpreting dates, i.e: 'Asia/Kolkata'. Defaults to the value
-   *     returned by date_default_timezone_get().
-   *
-   * Example usage:
-   * @code
-   *   $form = [
-   *     '#type' => 'datetime',
-   *     '#default_value' => new DrupalDateTime('2000-01-01 00:00:00'),
-   *     '#date_date_element' => 'date',
-   *     '#date_time_element' => 'none',
-   *     '#date_year_range' => '2010:+3',
-   *     '#date_timezone' => 'Asia/Kolkata',
-   *   ];
-   * @endcode
    *
    * @param array $element
    *   The form element whose value is being processed.

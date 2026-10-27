@@ -12,6 +12,9 @@ use Drupal\language\Entity\ContentLanguageSettings;
 
 /**
  * Defines an element for language configuration for a single field.
+ *
+ * An internal element used to specify a specialized selection of the default
+ * language behavior of an entity.
  */
 #[FormElement('language_configuration')]
 class LanguageConfiguration extends FormElementBase {

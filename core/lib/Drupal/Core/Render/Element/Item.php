@@ -10,6 +10,21 @@ use Drupal\Core\Render\Attribute\FormElement;
  * Note: since this is a read-only field, setting the #required property will do
  * nothing except theme the form element to look as if it were actually required
  * (i.e. by placing a red star next to the #title).
+ *
+ * Properties:
+ * - #markup: The data to be display.
+ * - #title: Title of the form element.
+ * - #description: Description of the element.
+ *
+ * Usage Example:
+ * @code
+ * $form['item_number'] = [
+ *   '#type' => 'item',
+ *   '#title' => $this->t('Priority'),
+ *   '#markup' => $this->t('Important'),
+ *   '#description' => $this->t('The priority of this task'),
+ * ];
+ * @endcode
  */
 #[FormElement('item')]
 class Item extends FormElementBase {
