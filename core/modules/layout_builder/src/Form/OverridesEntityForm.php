@@ -3,6 +3,8 @@
 namespace Drupal\layout_builder\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\OpenModalDialogWithUrl;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityInterface;
@@ -174,16 +176,97 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
     $actions = $this->buildActions($actions);
     $actions['delete']['#access'] = FALSE;
 
-    $actions['discard_changes']['#limit_validation_errors'] = [];
+    $actions['discard_changes'] = [
+      '#type'   => 'submit',
+      '#value'  => $this->t('Discard changes'),
+      '#ajax'   => [
+        'callback' => [$this, 'ajaxCallbackDiscardChanges'],
+      ],
+      '#submit' => [
+        [$this, 'submitDiscardChanges'],
+      ],
+      '#limit_validation_errors' => [],
+    ];
     // @todo This button should be conditionally displayed, see
     //   https://www.drupal.org/node/2917777.
     $actions['revert'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Revert to defaults'),
-      '#submit' => ['::redirectOnSubmit'],
-      '#redirect' => 'revert',
+      '#type'   => 'submit',
+      '#value'  => $this->t('Revert to defaults'),
+      '#ajax'   => [
+        'callback' => [$this, 'ajaxCallbackRevertDefaults'],
+      ],
+      '#submit'  => [
+        [$this, 'submitRevertDefaults'],
+      ],
     ];
+
     return $actions;
+  }
+
+  /**
+   * Ajax callback to cancel discard changes.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   An ajax response object.
+   */
+  public function ajaxCallbackDiscardChanges(): AjaxResponse {
+    $response = new AjaxResponse();
+    $url = $this->sectionStorage->getLayoutBuilderUrl('discard_changes');
+    $settings = [
+      'title'     => $this->t('Discard changes'),
+      'modal'     => TRUE,
+      'resizable' => TRUE,
+    ];
+    $command = new OpenModalDialogWithUrl($url->toString(),
+      $settings);
+    $response->addCommand($command);
+
+    return $response;
+  }
+
+  /**
+   * Non Ajax redirect to discard changes form.
+   */
+  public function submitDiscardChanges(array $form, FormStateInterface $form_state): void {
+    // Generate the URL using the sectionStorage's getLayoutBuilderUrl method.
+    $url = $this->sectionStorage->getLayoutBuilderUrl('discard_changes');
+
+    // Set the redirect to the generated "Discard changes" page.
+    $form_state->setRedirectUrl($url);
+  }
+
+  /**
+   * Ajax callback to Revert defaults .
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   An ajax response object.
+   */
+  public function ajaxCallbackRevertDefaults(): AjaxResponse {
+    $response = new AjaxResponse();
+    $url = $this->sectionStorage->getLayoutBuilderUrl('revert');
+    $settings = [
+      'title'     => $this->t('Revert to defaults'),
+      'modal'     => TRUE,
+      'resizable' => TRUE,
+    ];
+    $command = new OpenModalDialogWithUrl($url->toString(),
+      $settings);
+    $response->addCommand($command);
+
+    return $response;
+  }
+
+  /**
+   * Non Ajax redirect to "Revert defaults" form.
+   *
+   * We need this one if our javascript doesn't work for some reason.
+   */
+  public function submitRevertDefaults(array $form, FormStateInterface $form_state): void {
+    // Generate the URL using the sectionStorage's getLayoutBuilderUrl method.
+    $url = $this->sectionStorage->getLayoutBuilderUrl('revert');
+
+    // Set the redirect to the generated "Discard changes" page.
+    $form_state->setRedirectUrl($url);
   }
 
 }
