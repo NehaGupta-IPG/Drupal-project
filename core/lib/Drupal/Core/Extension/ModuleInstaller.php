@@ -900,7 +900,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
       switch ($hook) {
         case 'update_last_removed':
           return $class_name::getLastRemoved();
-          break;
       }
     }
 
