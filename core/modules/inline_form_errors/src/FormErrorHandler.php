@@ -86,8 +86,9 @@ class FormErrorHandler extends CoreFormErrorHandler {
       // Only show links for elements that have a title themselves or have
       // children with a title.
       $has_title = !empty($title);
-      // Only show links for elements with an ID.
-      $has_id = !empty($form_element['#id']);
+      // Prefer the id that will actually appear in the rendered HTML.
+      $id = $form_element['#attributes']['id'] ?? $form_element['#id'] ?? NULL;
+      $has_id = !empty($id);
 
       // Do not show links to elements with suppressed messages. Most often
       // their parent element is used for inline errors.
@@ -95,7 +96,7 @@ class FormErrorHandler extends CoreFormErrorHandler {
         unset($errors[$name]);
       }
       elseif ($is_visible_element && $has_title && $has_id) {
-        $url = Url::fromRoute('<none>', [], ['fragment' => $form_element['#id'], 'external' => TRUE]);
+        $url = Url::fromRoute('<none>', [], ['fragment' => $id, 'external' => TRUE]);
         $error_links[] = Link::fromTextAndUrl($title, $url)->toRenderable();
         unset($errors[$name]);
       }

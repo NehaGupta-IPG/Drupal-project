@@ -162,6 +162,64 @@ class FormErrorHandlerTest extends UnitTestCase {
   }
 
   /**
+   * Tests the anchor fragment is built from the id that will render.
+   */
+  public function testSummaryLinkFragmentUsesAttributesId(): void {
+    $form = [
+      '#parents' => [],
+      '#form_id' => 'test_fragment_form',
+      '#array_parents' => [],
+    ];
+    // Only #attribute ID set.
+    $form['test1'] = [
+      '#type' => 'fieldset',
+      '#title' => 'Test1',
+      '#parents' => ['test1'],
+      '#array_parents' => ['test1'],
+      '#attributes' => ['id' => 'edit-test1-actual-dom-id'],
+    ];
+    // #ID is set but not attribute.
+    $form['test2'] = [
+      '#type' => 'textfield',
+      '#title' => 'Test2',
+      '#parents' => ['test2'],
+      '#array_parents' => ['test2'],
+      '#id' => 'edit-test2',
+    ];
+    // Both are set.
+    $form['test3'] = [
+      '#type' => 'textfield',
+      '#title' => 'Test3',
+      '#parents' => ['test3'],
+      '#array_parents' => ['test3'],
+      '#id' => 'edit-test3-internal',
+      '#attributes' => ['id' => 'edit-test3-actual-dom-id'],
+    ];
+
+    $captured_fragments = [];
+    $this->renderer->expects($this->once())
+      ->method('renderInIsolation')
+      ->willReturnCallback(function ($render_array) use (&$captured_fragments): string {
+        foreach ($render_array[1]['#items'] as $item) {
+          $captured_fragments[(string) $item['#title']] = $item['#url']->getOption('fragment');
+        }
+        return '';
+      });
+
+    $this->messenger->expects($this->once())->method('addError');
+
+    $form_state = new FormState();
+    $form_state->setErrorByName('test1', 'invalid');
+    $form_state->setErrorByName('test2', 'invalid');
+    $form_state->setErrorByName('test3', 'invalid');
+    $this->formErrorHandler->handleFormErrors($form, $form_state);
+
+    $this->assertSame('edit-test1-actual-dom-id', $captured_fragments['Test1']);
+    $this->assertSame('edit-test2', $captured_fragments['Test2']);
+    $this->assertSame('edit-test3-actual-dom-id', $captured_fragments['Test3']);
+  }
+
+  /**
    * Tests that opting out of Inline Form Errors works.
    */
   public function testErrorMessagesNotInline(): void {
