@@ -28,7 +28,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 trait PerformanceTestTrait {
 
   /**
-   * List of assets regular expressions to exclude from network date check.
+   * List of regular expressions of asset paths to exclude from network check.
    *
    * @var list<string>
    */
