@@ -13,6 +13,7 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -63,16 +64,18 @@ class RouteProcessorCsrfTest extends UnitTestCase {
   }
 
   /**
-   * Tests the processOutbound() method with no _csrf_token route requirement.
+   * Tests routes that do not require a CSRF token.
    */
-  public function testProcessOutboundNoRequirement(): void {
+  #[TestWith([NULL])]
+  #[TestWith(['FALSE'])]
+  public function testProcessOutboundNoRequirement(?string $requirement): void {
     // Override the token generator so we can set expectations.
     $csrfToken = $this->createMock(CsrfTokenGenerator::class);
     $csrfToken->expects($this->never())
       ->method('get');
     $this->processor = new RouteProcessorCsrf($csrfToken, $this->requestStack);
 
-    $route = new Route('/test-path');
+    $route = new Route('/test-path', [], $requirement === NULL ? [] : ['_csrf_token' => $requirement]);
     $parameters = [];
 
     $bubbleable_metadata = new BubbleableMetadata();
@@ -85,10 +88,12 @@ class RouteProcessorCsrfTest extends UnitTestCase {
   }
 
   /**
-   * Tests the processOutbound() method with a _csrf_token route requirement.
+   * Tests requirements other than an explicit CSRF opt-out.
    */
-  public function testProcessOutbound(): void {
-    $route = new Route('/test-path', [], ['_csrf_token' => 'TRUE']);
+  #[TestWith(['TRUE'])]
+  #[TestWith(['unexpected'])]
+  public function testProcessOutbound(string $requirement): void {
+    $route = new Route('/test-path', [], ['_csrf_token' => $requirement]);
     $parameters = [];
 
     $bubbleable_metadata = new BubbleableMetadata();
