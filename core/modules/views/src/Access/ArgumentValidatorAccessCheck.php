@@ -104,7 +104,7 @@ class ArgumentValidatorAccessCheck implements AccessInterface {
       }
 
       $parameter_name = $argument_map[$argument_id];
-      $argument_value = $route_match->getRawParameter($parameter_name) ?: $route_match->getParameter($parameter_name);
+      $argument_value = $route_match->getRawParameter($parameter_name);
 
       if ($requires_value && $argument_value === NULL) {
         if ($argument_options['default_action'] === 'not found') {
