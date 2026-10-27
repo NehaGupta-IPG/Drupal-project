@@ -82,6 +82,7 @@ class FilterUITest extends UITestBase {
 
     // Tests that we can create a new filter group from UI.
     $this->drupalGet('admin/structure/views/nojs/rearrange-filter/test_filter_groups/page');
+    $this->assertSession()->responseContains('/core/modules/views_ui/css/views_ui.admin.theme.css');
     $this->assertSession()->elementNotExists('xpath', '//span[text()="Group 3"]');
 
     // Create 2 new groups.

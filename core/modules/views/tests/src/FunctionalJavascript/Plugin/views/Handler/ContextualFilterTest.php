@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\FunctionalJavascript\Plugin\views\Handler;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\views_ui\Traits\NoAjaxFormTestTrait;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +17,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
 class ContextualFilterTest extends WebDriverTestBase {
+
+  use NoAjaxFormTestTrait;
 
   /**
    * {@inheritdoc}
@@ -58,7 +62,8 @@ class ContextualFilterTest extends WebDriverTestBase {
   /**
    * Tests adding a contextual filter handler through the UI.
    */
-  public function testAddContextualFilterUI(): void {
+  #[DataProvider('providerDialogModes')]
+  public function testAddContextualFilterUI(bool $new_window): void {
     $this->drupalGet('/admin/structure/views/view/test_field_body');
 
     $web_assert = $this->assertSession();
@@ -89,10 +94,17 @@ class ContextualFilterTest extends WebDriverTestBase {
 
     $page->pressButton('edit-actions-submit');
 
-    $page->clickLink('Content: ID');
-    // Check that the dialog opens.
+    $link = $page->findLink('Content: ID');
+    if ($new_window) {
+      $this->openDialogLinkInNewWindow($link);
+    }
+    else {
+      $link->click();
+    }
     $field_action = $web_assert->waitForField('options[default_action]');
     $this->assertNotEmpty($field_action);
+    $this->assertTrue($web_assert->fieldExists('options[default_argument_type]')->isVisible());
+    $this->assertFieldHidden('options[summary][format]');
   }
 
 }

@@ -8,7 +8,9 @@ use Drupal\block\Entity\Block;
 use Drupal\Core\Url;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\views\Entity\View;
 use Drupal\views\Tests\ViewTestData;
+use Drupal\views_ui\ViewUI;
 use Drupal\views_ui\Hook\ViewsUiHooks;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -66,6 +68,12 @@ class ViewsBlockTest extends ViewsKernelTestBase {
 
     $this->setUpCurrentUser(['uid' => 1], ['administer views']);
 
+    $operations = $viewsUiEntityOperation->entityOperation($block);
+    $parameters = $operations['view-edit']['url']->getRouteParameters();
+    $view = new ViewUI(View::load($parameters['view']));
+    $form = $this->container->get('entity.form_builder')->getForm($view, 'edit', ['display_id' => $parameters['display_id']]);
+    $this->assertContains('views_ui/admin.styling', $form['#attached']['library'] ?? []);
+
     // The admin user does have the "administer block" permission.
     $this->assertEquals([
       'view-edit' => [
@@ -76,7 +84,7 @@ class ViewsBlockTest extends ViewsKernelTestBase {
         ]),
         'weight' => 50,
       ],
-    ], $viewsUiEntityOperation->entityOperation($block));
+    ], $operations);
   }
 
 }
