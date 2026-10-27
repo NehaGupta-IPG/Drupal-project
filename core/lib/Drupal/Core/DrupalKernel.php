@@ -7,6 +7,7 @@ use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\PhpSerialize;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
@@ -518,7 +519,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     FileCacheFactory::setConfiguration($configuration);
     FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
 
-    $this->bootstrapContainer = new $this->bootstrapContainerClass(Settings::get('bootstrap_container_definition', $this->defaultBootstrapContainerDefinition));
+    $this->bootstrapContainer = new $this->bootstrapContainerClass(NestedArray::mergeDeep($this->defaultBootstrapContainerDefinition, Settings::get('bootstrap_container_definition', [])));
 
     // Initialize the container.
     $this->initializeContainer();
