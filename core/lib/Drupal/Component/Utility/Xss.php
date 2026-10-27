@@ -262,7 +262,7 @@ class Xss {
     $xhtml_slash = $count ? ' /' : '';
 
     // Clean up attributes.
-    $attr2 = implode(' ', $class::attributes($attributes));
+    $attr2 = implode(' ', $class::attributes($attributes, $elem));
     $attr2 = preg_replace('/[<>]/', '', $attr2);
     $attr2 = strlen($attr2) ? ' ' . $attr2 : '';
 
@@ -274,11 +274,13 @@ class Xss {
    *
    * @param string $attributes
    *   The html attribute to process.
+   * @param ?string $element
+   *   The html element.
    *
    * @return array
    *   Cleaned up version of the HTML attributes.
    */
-  protected static function attributes($attributes) {
+  protected static function attributes($attributes, ?string $element) {
     $attributes_array = [];
     $mode = 0;
     $attribute_name = '';
@@ -353,7 +355,16 @@ class Xss {
           $working = 1;
           // Attribute value, a URL after href= for instance.
           if (preg_match('/^"([^"]*)"(\s+|$)/', $attributes, $match)) {
-            $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            // The "data" URL scheme syntax.
+            // @see https://www.rfc-editor.org/rfc/rfc2397#section-3
+            // Media types are case-insensitive.
+            // @see https://datatracker.ietf.org/doc/html/rfc6838#section-4.2
+            if ($element === 'img' && preg_match('/^data:image\/(?!svg\+xml;base64,)[^;]+;base64,/i', $match[1]) === 1) {
+              $value = $match[1];
+            }
+            else {
+              $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            }
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name=\"$value\"";

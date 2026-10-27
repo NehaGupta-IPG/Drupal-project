@@ -117,6 +117,12 @@ class XssTest extends TestCase {
         'Custom element with dashes in tag name.',
         ['test-element'],
       ],
+      [
+        '<img src="data:image/gif;base64,foo">',
+        '<img src="data:image/gif;base64,foo">',
+        'Inline image with data uri that references a GIF image',
+        ['img'],
+      ],
     ];
   }
 
@@ -417,6 +423,18 @@ class XssTest extends TestCase {
         '<img src="nosuchscheme:notice(0)">',
         'nosuchscheme',
         'HTML scheme clearing evasion -- unknown scheme.',
+        ['img'],
+      ],
+      [
+        '<img src="data:image/svg+xml;base64,foo">',
+        '<img src="data:image/svg+xml;base64,foo">',
+        'Inline image with data uri that references an SVG',
+        ['img'],
+      ],
+      [
+        '<img src="data:image/SVG+XML;base64,foo">',
+        '<img src="data:image/svg+xml;base64,foo">',
+        'Inline image with data uri that references an SVG (uppercase version)',
         ['img'],
       ],
       // Netscape 4.x javascript entities.
