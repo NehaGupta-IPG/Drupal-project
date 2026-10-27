@@ -45,7 +45,7 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
   public array $statementIdsInExecution = [];
 
   public function __construct(
-    #[Autowire(service: 'keyvalue')]
+    #[Autowire(service: 'database_test.memory.keyvalue')]
     protected KeyValueFactoryInterface $keyValue,
   ) {
   }
