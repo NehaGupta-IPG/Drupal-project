@@ -685,9 +685,34 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         // client connection remains active.
         try {
           if (!$this->rollbackClientSavepoint($name)) {
+            if ($this->connection->isEventEnabled(TransactionRollbackToSavepointFailureEvent::class)) {
+              $this->connection->dispatchEvent(new TransactionRollbackToSavepointFailureEvent(
+                $this->connection->getKey(),
+                $this->connection->getTarget(),
+                $id,
+                $name,
+                $this->getConnectionTransactionState(),
+                $this->stackItemsAsArray(),
+                get_class($e),
+                $e->getMessage(),
+              ));
+            }
             throw new TransactionException("Rollback to savepoint $name failed");
           }
           if (!$this->releaseClientSavepoint($name)) {
+            if ($this->connection->isEventEnabled(TransactionReleaseSavepointFailureEvent::class)) {
+              $this->connection->dispatchEvent(new TransactionReleaseSavepointFailureEvent(
+                $this->connection->getKey(),
+                $this->connection->getTarget(),
+                $id,
+                $name,
+                $this->getConnectionTransactionState(),
+                $this->stackItemsAsArray(),
+                get_class($e),
+                $e->getMessage(),
+                $commitType,
+              ));
+            }
             throw new TransactionException("Release savepoint $name failed");
           }
           // The Transaction object remains open, and when it will get
@@ -707,18 +732,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         catch (TransactionException $e) {
           $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
           $this->voidClientTransaction();
-          if ($this->connection->isEventEnabled(TransactionRollbackToSavepointFailureEvent::class)) {
-            $this->connection->dispatchEvent(new TransactionRollbackToSavepointFailureEvent(
-              $this->connection->getKey(),
-              $this->connection->getTarget(),
-              $id,
-              $name,
-              $this->getConnectionTransactionState(),
-              $this->stackItemsAsArray(),
-              get_class($e),
-              $e->getMessage(),
-            ));
-          }
           throw $e;
         }
       }
@@ -755,25 +768,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
               $e->getMessage(),
             ));
           }
-          throw $e;
-        }
-        catch (TransactionException $e) {
-          $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
-          $this->voidClientTransaction();
-          throw $e;
-        }
-      }
-      elseif ($this->stackDepth() === 1 && $this->stack()[$id]->type === StackItemType::Root) {
-        // If this was the root Drupal transaction, we can rollback the client
-        // transaction. The transaction is closed.
-        try {
-          $this->processRootRollback();
-          // The Transaction object remains open, and when it will get
-          // destructed no commit should happen. Void the stack item.
-          $this->voidStackItem($id);
-        }
-        catch (TransactionException $e) {
-          $this->voidClientTransaction();
           throw $e;
         }
       }

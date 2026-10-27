@@ -25,7 +25,6 @@ use Drupal\Core\Database\TransactionException;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Tests\Core\Database\Stub\EventSubscriber\StubTransactionEventSubscriber;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
-use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -51,7 +50,7 @@ class TransactionEventTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->connection = new StubConnection($this->createStub(StubPDO::class), []);
+    $this->connection = new StubConnection($this->createStub(\PDO::class), []);
     $this->connection->enableEvents(TransactionEvent::all());
 
     $container = new Container();
@@ -80,7 +79,7 @@ class TransactionEventTest extends UnitTestCase {
   public function testTransactionStartFailure(): void {
     $this->connection->transactionManager()->success = FALSE;
     try {
-      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
       $tx = $this->connection->startTransaction();
     }
     catch (TransactionException) {
@@ -110,11 +109,11 @@ class TransactionEventTest extends UnitTestCase {
    * Tests failure when starting a savepoint.
    */
   public function testSavepointStartFailure(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
     $this->connection->transactionManager()->success = FALSE;
     try {
-      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
       $savepoint = $this->connection->startTransaction('foo');
     }
     catch (TransactionException) {
