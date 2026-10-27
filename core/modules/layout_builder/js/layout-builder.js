@@ -362,7 +362,11 @@
             const $element = $(element);
 
             // Hide everything in block that isn't contextual link related.
-            $element.children(':not([data-contextual-id])').hide(0);
+            $element
+              .children(':not([data-contextual-id])')
+              .each((index, child) => {
+                $(child).hide().attr('data-hidden-by-layout-builder', 'true');
+              });
 
             const contentPreviewPlaceholderText = $element.attr(
               'data-layout-content-preview-placeholder-label',
@@ -396,7 +400,13 @@
         // Iterate over all blocks.
         $('[data-layout-content-preview-placeholder-label]').each(
           (i, element) => {
-            $(element).children().show();
+            const $element = $(element);
+            // Show children that were hidden by the layout builder.
+            $element
+              .children('[data-hidden-by-layout-builder="true"]')
+              .each((index, child) => {
+                $(child).show().removeAttr('data-hidden-by-layout-builder');
+              });
           },
         );
       };

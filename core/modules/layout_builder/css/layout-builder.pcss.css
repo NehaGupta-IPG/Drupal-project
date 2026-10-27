@@ -166,3 +166,7 @@
 .layout-builder-components-table .tabledrag-changed-warning {
   display: none !important;
 }
+
+.layout-builder .toolbar-block__title-tooltip {
+  display: none !important;
+}
