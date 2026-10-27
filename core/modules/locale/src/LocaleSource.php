@@ -46,6 +46,9 @@ class LocaleSource {
    * @return \Drupal\locale\LocaleTranslationSource[][]
    *   Array of source objects. Keyed with <project name>:<language code>.
    *
+   * @throws \Drupal\locale\LocaleProjectNotFoundException
+   *   Thrown if a project is not a tracked translatable project.
+   *
    * @see sourceBuild()
    */
   public function loadSources(?array $projects = NULL, ?array $langcodes = NULL): array {
@@ -64,7 +67,14 @@ class LocaleSource {
     foreach ($projects as $project_name) {
       foreach ($langcodes as $langcode) {
         if (!isset($sources[$project_name][$langcode])) {
-          $project = $this->localeProjectRepository->getMultiple([$project_name])[$project_name];
+          $project = $this->localeProjectRepository->getMultiple([$project_name])[$project_name] ?? NULL;
+          if (!$project instanceof LocaleTranslatableProject) {
+            // The project name is no longer tracked, for example because the
+            // module was uninstalled after this task was queued. Callers that
+            // may run against stale project names (such as the
+            // locale_translation queue worker) are expected to catch this.
+            throw new LocaleProjectNotFoundException("The project '$project_name' is not a tracked translatable project.");
+          }
           $sources[$project_name][$langcode] = $this->sourceBuild($project, $langcode);
         }
       }
@@ -82,6 +92,9 @@ class LocaleSource {
    *
    * @return \Drupal\locale\LocaleTranslationSource
    *   The source object.
+   *
+   * @throws \Drupal\locale\LocaleProjectNotFoundException
+   *   Thrown if the project is not a tracked translatable project.
    */
   public function loadSource(string $project_name, string $langcode): LocaleTranslationSource {
     return $this->loadSources([$project_name], [$langcode])[$project_name][$langcode];
