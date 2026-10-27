@@ -14,6 +14,7 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\system_mail_failure_test\Plugin\Mail\TestPhpMailFailure;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -138,14 +139,15 @@ class MailTest extends KernelTestBase {
    * Checks the From: and Reply-to: headers.
    */
   public function testFromAndReplyToHeader(): void {
-    $language = \Drupal::languageManager()->getCurrentLanguage();
+    $mail_service = \Drupal::service('plugin.manager.mail');
+    $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
 
     // Reset the state variable that holds sent messages.
     \Drupal::state()->set('system.test_mail_collector', []);
     // Send an email with a reply-to address specified.
     $from_email = 'Drupal <mailtest@example.com>';
     $reply_email = 'someone_else@example.com';
-    \Drupal::service('plugin.manager.mail')->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $language, [], $reply_email);
+    $mail_service->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $langcode, [], $reply_email);
     // Test that the reply-to email is just the email and not the site name
     // and default sender email.
     $captured_emails = \Drupal::state()->get('system.test_mail_collector');
@@ -161,7 +163,7 @@ class MailTest extends KernelTestBase {
     // works as expected.
     $this->config('system.site')->set('name', 'Drépal this is a very long test sentence to test what happens with very long site names')->save();
     // Send an email and check that the From-header contains the site name.
-    \Drupal::service('plugin.manager.mail')->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $language);
+    $mail_service->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $langcode);
     $captured_emails = \Drupal::state()->get('system.test_mail_collector');
     $sent_message = end($captured_emails);
     // From header is correctly encoded.
@@ -175,7 +177,7 @@ class MailTest extends KernelTestBase {
     // Test that From names containing commas work as expected.
     $this->config('system.site')->set('name', 'Foo, Bar, and Baz')->save();
     // Send an email and check that the From-header contains the site name.
-    \Drupal::service('plugin.manager.mail')->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $language);
+    $mail_service->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $langcode);
     $captured_emails = \Drupal::state()->get('system.test_mail_collector');
     $sent_message = end($captured_emails);
     // From header contains the quoted site name with commas.
@@ -191,7 +193,7 @@ class MailTest extends KernelTestBase {
     $this->config('system.site')->set('name', $site_name)->save();
     // Send an email and check that the From-header contains the site name
     // within double-quotes. Also make sure double-quotes and "\" are escaped.
-    \Drupal::service('plugin.manager.mail')->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $language);
+    $mail_service->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $langcode);
     $captured_emails = \Drupal::state()->get('system.test_mail_collector');
     $sent_message = end($captured_emails);
     $escaped_site_name = str_replace(['\\', '"'], ['\\\\', '\\"'], $site_name);
@@ -202,7 +204,7 @@ class MailTest extends KernelTestBase {
     $site_name = 'Drépal, "si\te"';
     $this->config('system.site')->set('name', $site_name)->save();
     // Send an email and check that the From-header contains the site name.
-    \Drupal::service('plugin.manager.mail')->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $language);
+    $mail_service->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $langcode);
     $captured_emails = \Drupal::state()->get('system.test_mail_collector');
     $sent_message = end($captured_emails);
     // From header is correctly encoded.
@@ -387,6 +389,33 @@ class MailTest extends KernelTestBase {
       $expected_html = MailFormatHelper::wrapMail($expected_html);
       $this->assertSame($expected_html, $sent_message['body']);
     }
+  }
+
+  /**
+   * Tests email language.
+   */
+  public function testEmailLanguage(): void {
+    // Set default (English) site name.
+    $this->config('system.site')
+      ->set('mail', 'mailtest@example.com')
+      ->set('name', 'My site')
+      ->save();
+
+    // Add the French language and provide a translated site name for it.
+    \Drupal::service('module_installer')->install(['language']);
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    \Drupal::languageManager()
+      ->getLanguageConfigOverride('fr', 'system.site')
+      ->set('name', 'Mon site')
+      ->save();
+
+    \Drupal::state()->set('system.test_mail_collector', []);
+    \Drupal::service('plugin.manager.mail')->mail('mail_cancel_test', 'from_test', 'to@example.com', 'fr');
+    $captured_emails = \Drupal::state()->get('system.test_mail_collector');
+    $sent_message = end($captured_emails);
+
+    // The From header must use the FR site name, not the EN one.
+    $this->assertSame('Mon site <mailtest@example.com>', $sent_message['headers']['From']);
   }
 
   /**
