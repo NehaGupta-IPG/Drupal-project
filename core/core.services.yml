@@ -2044,6 +2044,7 @@ services:
       - '@file_system'
       - '@Drupal\Core\Theme\Component\SchemaCompatibilityChecker'
       - '@Drupal\Core\Theme\Component\ComponentValidator'
+      - '@service_container'
       - '%app.root%'
   Drupal\Core\Theme\ComponentPluginManager: '@plugin.manager.sdc'
   Drupal\Core\Template\Loader\ComponentLoader:

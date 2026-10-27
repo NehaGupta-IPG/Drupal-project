@@ -21,6 +21,7 @@ use Drupal\Core\Plugin\Component;
 use Drupal\Core\Render\Component\Exception\ComponentNotFoundException;
 use Drupal\Core\Render\Component\Exception\IncompatibleComponentSchema;
 use Drupal\Core\Plugin\Discovery\DirectoryWithMetadataPluginDiscovery;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a plugin manager to deal with components.
@@ -62,6 +63,8 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
    *   The compatibility checker.
    * @param \Drupal\Core\Theme\Component\ComponentValidator $componentValidator
    *   The component validator.
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The container.
    * @param string $appRoot
    *   The application root.
    */
@@ -75,6 +78,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     protected FileSystemInterface $fileSystem,
     protected SchemaCompatibilityChecker $compatibilityChecker,
     protected ComponentValidator $componentValidator,
+    protected ContainerInterface $container,
     protected string $appRoot,
   ) {
     // We are skipping the call to the parent constructor to avoid initializing
@@ -122,6 +126,21 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
       );
       throw new ComponentNotFoundException($message, $e->getCode(), $e);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinitions(): array {
+    $twig_config = $this->container->getParameter('twig.config');
+    $twig_debug = $twig_config['debug'] ?? NULL;
+    $twig_cache = $twig_config['cache'] ?? NULL;
+    if ($twig_debug === TRUE || $twig_cache === FALSE) {
+      $this->definitions = $this->findDefinitions();
+      return $this->definitions;
+    }
+
+    return parent::getDefinitions();
   }
 
   /**
