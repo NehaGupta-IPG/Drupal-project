@@ -34,6 +34,13 @@ class FieldTimeIntervalTest extends ViewsKernelTestBase {
 
   /**
    * Ages dataset.
+   *
+   * This array contains information about different time durations.
+   *
+   * Each element in the array is an array with three values:
+   *  - Index 0: Represents the time duration in seconds.
+   *  - Index 1: Human-readable string as the formatted version of the age.
+   *  - Index 2: Integer indicating the level of precision formatting the time.
    */
   protected array $ages = [
     [0, '0 sec', 2],
