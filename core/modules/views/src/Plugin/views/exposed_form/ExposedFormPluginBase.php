@@ -109,6 +109,12 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
    * {@inheritdoc}
    */
   public function renderExposedForm($block = FALSE) {
+    $has_exposed_block = !$this->view->display_handler->displaysExposed() || (!$block && $this->view->display_handler->getOption('exposed_block'));
+    if ($has_exposed_block) {
+      // Return an empty array since the exposed form is rendered as a block.
+      return [];
+    }
+
     // Deal with any exposed filters we may have, before building.
     $form_state = (new FormState())
       ->setStorage([
@@ -123,7 +129,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
     // Some types of displays (eg. attachments) may wish to use the exposed
     // filters of their parent displays instead of showing an additional
     // exposed filter form for the attachment as well as that for the parent.
-    if (!$this->view->display_handler->displaysExposed() || (!$block && $this->view->display_handler->getOption('exposed_block'))) {
+    if ($has_exposed_block) {
       $form_state->set('rerender', NULL);
     }
 
@@ -139,12 +145,12 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       $this->view->build_info['abort'] = TRUE;
     }
 
-    if (!$this->view->display_handler->displaysExposed() || (!$block && $this->view->display_handler->getOption('exposed_block'))) {
+    if ($has_exposed_block) {
+      // Return an empty array since the exposed form is rendered as a block.
       return [];
     }
-    else {
-      return $form;
-    }
+
+    return $form;
   }
 
   /**
