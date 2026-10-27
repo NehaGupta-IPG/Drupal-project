@@ -37,9 +37,9 @@ class AggregationAjaxTest extends WebDriverTestBase {
   public static $testViews = ['test_content_ajax'];
 
   /**
-   * The message Drupal shows on the page for an unhandled AJAX error.
+   * The start of every message Drupal shows for an unhandled AJAX error.
    */
-  protected const AJAX_ERROR_MESSAGE = "Oops, something went wrong. Check your browser's developer console for more details.";
+  protected const AJAX_ERROR_MESSAGE = 'Something went wrong';
 
   /**
    * {@inheritdoc}

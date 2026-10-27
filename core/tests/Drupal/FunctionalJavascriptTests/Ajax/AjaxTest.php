@@ -430,7 +430,7 @@ JS);
     // The AJAX request should fail because the URL is not trusted.
     $this->failOnJavascriptConsoleErrors = FALSE;
     $this->assertSession()
-      ->statusMessageContainsAfterWait("Oops, something went wrong. Check your browser's developer console for more details.", 'error');
+      ->statusMessageContainsAfterWait('Something went wrong. Try again later.', 'error');
 
     // This is needed to avoid an unfinished AJAX request error from tearDown()
     // because this test intentionally does not complete all AJAX requests.
