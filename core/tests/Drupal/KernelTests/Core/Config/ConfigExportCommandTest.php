@@ -158,6 +158,47 @@ class ConfigExportCommandTest extends KernelTestBase {
   }
 
   /**
+   * Tests the --diff option of the export command.
+   */
+  public function testExportDiff(): void {
+    $sync = $this->container->get('config.storage.sync');
+
+    // Nothing is exported yet, so all configuration is shown as created.
+    $tester = $this->commandTester();
+    $code = $tester->execute(['--yes' => TRUE, '--diff' => TRUE]);
+    self::assertSame(Command::SUCCESS, $code);
+    $display = $tester->getDisplay();
+    self::assertStringContainsString("--- /dev/null\n+++ active/system.site\n@@ -0,0 +1,", $display);
+    self::assertStringContainsString("+name: 'dr config'\n", $display);
+    // The table is not shown.
+    self::assertStringNotContainsString('Operation', $display);
+
+    // Change the active configuration and delete something from it.
+    $this->config('system.site')->set('name', 'dr diff')->save();
+    $sync->write('config_test.dynamic.diff_only', ['id' => 'diff_only']);
+    // Reset the export storage so that it reads the active storage again.
+    (function () {
+      unset($this->storage);
+    })->call($this->container->get('config.storage.export'));
+
+    $tester = $this->commandTester();
+    $tester->setInputs(['no']);
+    try {
+      $tester->execute(['--diff' => TRUE], ['interactive' => TRUE]);
+      $this->fail('Expected a UserAbortException to be thrown.');
+    }
+    catch (UserAbortException) {
+      // Expected.
+    }
+    $display = $tester->getDisplay();
+    self::assertStringContainsString("--- sync/system.site\n+++ active/system.site\n", $display);
+    self::assertStringContainsString("-name: 'dr config'\n+name: 'dr diff'\n", $display);
+    self::assertStringContainsString("--- sync/config_test.dynamic.diff_only\n+++ /dev/null\n@@ -1,1 +0,0 @@\n-id: diff_only\n", $display);
+    // Unchanged configuration is not shown.
+    self::assertStringNotContainsString('system.performance', $display);
+  }
+
+  /**
    * Asserts that two config storage objects have the same content.
    *
    * @param \Drupal\Core\Config\StorageInterface $expected

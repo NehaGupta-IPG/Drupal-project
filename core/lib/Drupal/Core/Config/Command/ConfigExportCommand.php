@@ -47,6 +47,8 @@ final class ConfigExportCommand extends Command {
    *   The symfony style.
    * @param bool $yes
    *   The command option to skip the confirmation question.
+   * @param bool $diff
+   *   The command option to show the changes as a diff.
    *
    * @return int
    *   The command result.
@@ -55,6 +57,8 @@ final class ConfigExportCommand extends Command {
     SymfonyStyle $io,
     #[Option(description: 'Answer the confirmation question with yes.', shortcut: 'y')]
     bool $yes = FALSE,
+    #[Option(description: 'Show the configuration changes as a diff.')]
+    bool $diff = FALSE,
   ): int {
     // Resolve the sync storage here rather than in the constructor: the
     // factory throws when no sync directory is configured, and a throwing
@@ -75,7 +79,12 @@ final class ConfigExportCommand extends Command {
       return self::SUCCESS;
     }
 
-    $this->renderTable($comparer, $io);
+    if ($diff) {
+      $this->renderDiff($comparer, $io, 'active', 'sync');
+    }
+    else {
+      $this->renderTable($comparer, $io);
+    }
 
     if (!$yes && !$io->confirm((string) $this->t('Do you want to export the configuration?'))) {
       throw new UserAbortException('Cancelled');

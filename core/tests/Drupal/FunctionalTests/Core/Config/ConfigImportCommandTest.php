@@ -403,6 +403,36 @@ class ConfigImportCommandTest extends BrowserTestBase {
   }
 
   /**
+   * Tests the --diff option of the import command.
+   */
+  public function testImportDiff(): void {
+    $active_name = $this->config('system.site')->get('name');
+    $this->prepareSiteNameUpdate('Config import diff');
+
+    $tester = $this->commandTester();
+    $tester->setInputs(['no']);
+    try {
+      $tester->execute(['--diff' => TRUE], ['interactive' => TRUE]);
+      $this->fail('Expected a UserAbortException to be thrown.');
+    }
+    catch (UserAbortException) {
+      // Expected.
+    }
+    $display = $tester->getDisplay();
+    self::assertStringContainsString("--- active/system.site\n+++ sync/system.site\n", $display);
+    self::assertStringContainsString("-name: $active_name\n+name: 'Config import diff'\n", $display);
+    // The table is not shown.
+    self::assertStringNotContainsString('Operation', $display);
+    // Nothing was imported.
+    self::assertSame($active_name, $this->config('system.site')->get('name'));
+
+    $tester = $this->commandTester();
+    $code = $tester->execute(['--yes' => TRUE, '--diff' => TRUE]);
+    self::assertSame(Command::SUCCESS, $code);
+    self::assertSame('Config import diff', $this->config('system.site')->get('name'));
+  }
+
+  /**
    * Prepares a site name update by modifying the synchronized configuration.
    *
    * @see \Drupal\Tests\config\Functional\ConfigImportUITest::prepareSiteNameUpdate()
