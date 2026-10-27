@@ -5,6 +5,7 @@ namespace Drupal\locale;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\Config\StorableConfigBase;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\language\Config\LanguageConfigOverrideCrudEvent;
@@ -37,7 +38,13 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
     protected ConfigFactoryInterface $configFactory,
     protected LocaleConfigManager $localeConfigManager,
     protected readonly LocaleLanguages $localeLanguages,
-  ) {}
+    protected ?ConfigInstallerInterface $configInstaller = NULL,
+  ) {
+    if ($this->configInstaller === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $configInstaller argument is deprecated in drupal:12.1.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
+      $this->configInstaller = \Drupal::service(ConfigInstallerInterface::class);
+    }
+  }
 
   /**
    * {@inheritdoc}
@@ -65,8 +72,9 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
       // Configuration created by the ConfigInstaller might have had the
       // langcode updated to something other than 'en' (see
       // \Drupal\Core\Config\ConfigInstaller::createConfiguration()). In this
-      // case, do not feed back any changes to locale.
-      if (empty($original) && $config->get('_core.default_config_hash') !== NULL) {
+      // case, do not feed back any changes to locale. Configuration created by
+      // a configuration import is fed back.
+      if (empty($original) && !$this->configInstaller->isSyncing() && $config->get('_core.default_config_hash') !== NULL) {
         return;
       }
 
