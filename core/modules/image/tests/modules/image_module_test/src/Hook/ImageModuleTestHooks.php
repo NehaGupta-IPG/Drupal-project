@@ -57,7 +57,7 @@ class ImageModuleTestHooks {
     if ($default_uri == $uri) {
       return ['X-Image-Owned-By' => 'image_module_test'];
     }
-    // When we have custom stream wrapper is enabled, do the validation based
+    // When we have a custom stream wrapper enabled, do the validation based
     // on state variable to allow it.
     if (str_starts_with($uri, 'image-test-dummy://')) {
       if (\Drupal::state()->get('image_module_test.allow_image_test_dummy', FALSE)) {
