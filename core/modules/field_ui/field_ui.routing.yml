@@ -4,7 +4,7 @@ entity.field_storage_config.collection:
     _entity_list: 'field_storage_config'
     _title: 'Field list'
   requirements:
-    _permission: 'administer content types'
+    _permission: 'access site reports'
 
 field_ui.display_mode:
   path: '/admin/structure/display-modes'

@@ -84,6 +84,7 @@ abstract class ManageFieldsFunctionalTestBase extends BrowserTestBase {
       'access content',
       'administer content types',
       'bypass node access',
+      'access site reports',
       'administer node fields',
       'administer node form display',
       'administer node display',
