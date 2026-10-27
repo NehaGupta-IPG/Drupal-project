@@ -102,4 +102,4 @@
       }
     },
   };
-})(jQuery, Drupal, Drupal.debounce, once);
+})(jQuery, Drupal, once);

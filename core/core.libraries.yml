@@ -461,6 +461,18 @@ drupal.htmx:
       theme_token: null
     ajaxTrustedUrl: {}
 
+drupal.list-filter:
+  version: VERSION
+  js:
+    misc/list-filter/list-filter.js: {}
+    misc/list-filter/drupal-list-filter.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.announce
+    - core/drupal.debounce
+    - core/once
+    - core/transliteration
+
 drupal.item-list:
   version: VERSION
   css:

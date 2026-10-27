@@ -1,0 +1,6 @@
+list_filter_test:
+  js:
+    js/list-filter-library-override.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
