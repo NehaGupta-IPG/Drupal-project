@@ -46,8 +46,8 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
     // Ensure that batching in
-    // DefaultLangcodeConfigUpdaterDecorator::translateUpdatedConfigOperation()
-    // is tested.
+    // DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation() is
+    // tested.
     $settings['settings']['entity_update_batch_size'] = (object) [
       'value' => 1,
       'required' => TRUE,
@@ -377,6 +377,40 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
     $this->assertSame('Another string', $config->get('test_multiple.another_string'));
     $this->assertSame('After a string', $config->get('test_after_multiple.string'));
     $this->assertSame('After another string', $config->get('test_after_multiple.another_string'));
+  }
+
+  /**
+   * Tests switching to English with no English override.
+   */
+  public function testDefaultLanguageChangeToEnglishWithNoOverride(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    \Drupal::service(LocaleConfigManager::class)
+      ->getStringTranslation('locale_test.translation', 'fr', 'English test', '')
+      ->setString('French test')
+      ->setCustomized(FALSE)
+      ->save();
+
+    $admin_user = $this->drupalCreateUser(['administer languages']);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
+    $this->rebuildContainer();
+    $this->assertSame('French test', $this->config('locale_test.translation')->get('test'));
+
+    // Remove the English override, as on a site installed in French.
+    \Drupal::service('config.storage')
+      ->createCollection('language.en')
+      ->delete('locale_test.translation');
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'en'], 'Save configuration');
+    $this->rebuildContainer();
+
+    $this->assertSame('en', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('English test', $this->config('locale_test.translation')->get('test'));
+    $this->assertNoTranslation('locale_test.translation', 'en');
   }
 
   /**

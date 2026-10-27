@@ -504,22 +504,12 @@ class LocaleConfigManager {
    * @param array $langcodes
    *   (optional) Array of language codes to update. Defaults to all
    *   configurable languages.
-   * @param array $untranslated_keys
-   *   (optional) Keyed by configuration name, a nested array in the shape
-   *   \Drupal\language\DefaultLangcodeConfigUpdater::extractUntranslatedKeys()
-   *   produces. The translatable key paths whose active value is known to
-   *   still be content from some other language, and so must fall back to
-   *   the English source rather than keep whatever the active langcode's
-   *   real translation search finds (or does not find). A name absent from
-   *   this array is treated the normal way: a translatable key with no real
-   *   translation simply keeps whatever the active configuration already
-   *   has. Only the default langcode change reconciliation passes this.
    *
    * @return int
    *   Total number of configuration override and active configuration objects
    *   updated (saved or removed).
    */
-  public function updateConfigTranslations(array $names, array $langcodes = [], array $untranslated_keys = []) {
+  public function updateConfigTranslations(array $names, array $langcodes = []) {
     $langcodes = $langcodes ?: array_keys($this->languageManager->getLanguages());
     $count = 0;
     foreach ($names as $name) {
@@ -562,17 +552,7 @@ class LocaleConfigManager {
           // If the language code is the active storage language, we should
           // update. If it is English, we should only update if English is also
           // translatable.
-          if (empty($untranslated_keys[$name])) {
-            $data = NestedArray::mergeDeepArray([$active, $processed], TRUE);
-          }
-          else {
-            // These specific key paths are known to still hold content from
-            // some other language, fall back to the English source. A real
-            // translation, if one is found above, still wins over the source
-            // fallback.
-            $source = $this->getSourceStrings($active, $translatable, $untranslated_keys[$name]);
-            $data = NestedArray::mergeDeepArray([$active, $source, $processed], TRUE);
-          }
+          $data = NestedArray::mergeDeepArray([$active, $processed], TRUE);
           if ($data !== $active) {
             $this->saveTranslationActive($name, $data);
             $count++;
@@ -616,6 +596,33 @@ class LocaleConfigManager {
       }
     }
     return $filtered_data;
+  }
+
+  /**
+   * Translates configuration data into the active configuration langcode.
+   *
+   * @param string $name
+   *   The configuration name.
+   * @param array $data
+   *   The configuration data.
+   * @param string $langcode
+   *   The langcode the configuration data will be saved with.
+   * @param array $untranslated_keys
+   *   (optional) A nested array of the translatable key paths that hold
+   *   content in another language. These fall back to the English source
+   *   string when there is no translation.
+   *
+   * @return array
+   *   The translated configuration data.
+   */
+  public function getTranslatedActiveData(string $name, array $data, string $langcode, array $untranslated_keys = []): array {
+    $translatable = $this->getTranslatableDefaultConfig($name);
+    if (empty($translatable)) {
+      return $data;
+    }
+    $source = $this->getSourceStrings($data, $translatable, $untranslated_keys);
+    $processed = $this->localeLanguages->isTranslatable($langcode) ? $this->processTranslatableData($name, $data, $translatable, $langcode) : [];
+    return NestedArray::mergeDeepArray([$data, $source, $processed], TRUE);
   }
 
   /**

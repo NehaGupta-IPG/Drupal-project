@@ -10,12 +10,12 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\language\Config\LanguageConfigOverride;
+use Drupal\language\Event\DefaultLangcodeConfigReconcileEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -30,7 +30,6 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
     protected readonly EventDispatcherInterface $eventDispatcher,
     #[Autowire(service: 'config.storage')]
     protected readonly StorageInterface $configStorage,
-    protected readonly ModuleHandlerInterface $moduleHandler,
   ) {}
 
   /**
@@ -49,8 +48,7 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
    */
   public function reconcileConfigLangcodeOperation(string $old_langcode, string $new_langcode, &$context): void {
     if (!isset($context['sandbox']['names'])) {
-      $preserved = $this->moduleHandler->invokeAll('language_preserve_config_langcode', [$old_langcode, $new_langcode]);
-      $context['sandbox']['names'] = array_values(array_diff($this->configFactory->listAll(), $preserved));
+      $context['sandbox']['names'] = $this->configFactory->listAll();
       $context['sandbox']['max'] = count($context['sandbox']['names']);
     }
 
@@ -77,6 +75,23 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
       }
       if ($data['langcode'] === $old_langcode) {
         $translatable_data = static::extractTranslatableData($typed_config);
+        $override = $this->getRawLanguageConfigOverride($new_override_storage, $name);
+        $override_data = $override->isNew() ? [] : $override->get();
+
+        // Merge the override for the new default langcode into the data to
+        // save. The new default langcode cannot have an override.
+        $event = new DefaultLangcodeConfigReconcileEvent(
+          $name,
+          $old_langcode,
+          $new_langcode,
+          NestedArray::mergeDeepArray([$data, $override_data], TRUE),
+          static::extractUntranslatedKeys($translatable_data, $override_data),
+        );
+        $this->eventDispatcher->dispatch($event);
+        if ($event->isSkipped()) {
+          continue;
+        }
+
         if ($translatable_data !== []) {
           // Preserve the translations for the old langcode in a new config
           // override.
@@ -84,35 +99,13 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
             ->setData($translatable_data)
             ->save();
         }
-
-        $override = $this->getRawLanguageConfigOverride($new_override_storage, $name);
-        $had_override = !$override->isNew();
-        $override_data = $had_override ? $override->get() : [];
-        if ($had_override) {
-          // Merge the override data into the default configuration to ensure
-          // the default configuration has the correct translations.
-          $config->setData(NestedArray::mergeDeepArray([$data, $override_data], TRUE));
-        }
-        $config->set('langcode', $new_langcode)->save();
-        if ($had_override) {
-          // Remove the override for the new default language. Its values have
-          // been merged into the default collection configuration.
+        $config->setData($event->getData())
+          ->set('langcode', $new_langcode)
+          ->save();
+        if (!$override->isNew()) {
           $override->delete();
         }
-        // Record which names were actually updated to the new default, so
-        // other batch operations know what to act on.
         $context['results']['updated_names'][] = $name;
-
-        // The override may not have existed at all, or it may only have
-        // translated some of the translatable keys. Record the translatable
-        // keys not covered by the override separately, so a subscriber
-        // reconciling actual translation content (for example, the locale
-        // module) knows which keys are still in the original language and which
-        // have been translated.
-        $untranslated_keys = static::extractUntranslatedKeys($translatable_data, $override_data);
-        if (!empty($untranslated_keys)) {
-          $context['results']['untranslated_keys'][$name] = $untranslated_keys;
-        }
       }
     }
 

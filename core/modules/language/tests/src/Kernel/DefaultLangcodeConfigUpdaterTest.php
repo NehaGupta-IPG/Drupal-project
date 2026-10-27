@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Kernel;
 
-use Drupal\config_test\Hook\ConfigTestHooks;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\DefaultLangcodeConfigUpdater;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\language\Event\DefaultLangcodeConfigReconcileEvent;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -81,29 +81,58 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
   }
 
   /**
-   * Tests hook_language_preserve_config_langcode() can protect config.
-   *
-   * @see \Drupal\config_test\Hook\ConfigTestHooks::languagePreserveConfigLangcode()
+   * Tests a subscriber can skip configuration.
    */
-  public function testPreserveHookProtectsConfiguration(): void {
+  public function testEventSkipsConfiguration(): void {
     $this->config('config_test.langcode_test')
       ->set('optional_translatable_value', 'Hello')
       ->save();
-
-    \Drupal::keyValue(ConfigTestHooks::class)->set('config_test.language_preserve_config_langcode', ['config_test.langcode_test']);
+    $listener = function (DefaultLangcodeConfigReconcileEvent $event): void {
+      if ($event->name === 'config_test.langcode_test') {
+        $event->skip();
+      }
+    };
+    \Drupal::service('event_dispatcher')->addListener(DefaultLangcodeConfigReconcileEvent::class, $listener);
 
     $context = $this->reconcile('en', 'fr');
 
-    // The protected configuration keeps its old langcode and is not
-    // reported as updated.
     $this->assertSame('en', $this->config('config_test.langcode_test')->get('langcode'));
     $this->assertNotContains('config_test.langcode_test', $context['results']['updated_names'] ?? []);
+    // No override is saved for skipped configuration.
+    $override = \Drupal::languageManager()->getLanguageConfigOverride('en', 'config_test.langcode_test');
+    $this->assertTrue($override->isNew());
 
-    // Remove the protection and re-run.
-    \Drupal::keyValue(ConfigTestHooks::class)->delete('config_test.language_preserve_config_langcode');
+    \Drupal::service('event_dispatcher')->removeListener(DefaultLangcodeConfigReconcileEvent::class, $listener);
     $context = $this->reconcile('en', 'fr');
     $this->assertSame('fr', $this->config('config_test.langcode_test')->get('langcode'));
     $this->assertContains('config_test.langcode_test', $context['results']['updated_names'] ?? []);
+  }
+
+  /**
+   * Tests a subscriber can change the data to save.
+   */
+  public function testEventChangesData(): void {
+    $this->config('config_test.langcode_test')
+      ->set('optional_translatable_value', 'Hello')
+      ->save();
+    \Drupal::service('event_dispatcher')->addListener(DefaultLangcodeConfigReconcileEvent::class, function (DefaultLangcodeConfigReconcileEvent $event): void {
+      if ($event->name === 'config_test.langcode_test') {
+        $this->assertSame(['optional_translatable_value' => 'Hello'], $event->untranslatedKeys);
+        $data = $event->getData();
+        $data['optional_translatable_value'] = 'Bonjour';
+        $data['langcode'] = 'de';
+        $event->setData($data);
+      }
+    });
+
+    $this->reconcile('en', 'fr');
+
+    $config = $this->config('config_test.langcode_test');
+    $this->assertSame('fr', $config->get('langcode'));
+    $this->assertSame('Bonjour', $config->get('optional_translatable_value'));
+    // The override for the old langcode has the data before the change.
+    $override = \Drupal::languageManager()->getLanguageConfigOverride('en', 'config_test.langcode_test');
+    $this->assertSame('Hello', $override->get('optional_translatable_value'));
   }
 
   /**
