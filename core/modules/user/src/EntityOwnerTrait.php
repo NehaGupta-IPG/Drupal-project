@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Exception\UnsupportedEntityTypeDefinitionException;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\user\Entity\User;
 
 /**
  * Provides a trait for entities that have an owner.
@@ -64,7 +65,8 @@ trait EntityOwnerTrait {
    */
   public function getOwner() {
     $key = $this->getEntityType()->getKey('owner');
-    return $this->get($key)->entity;
+    $user = $this->get($key)->entity ?? User::getAnonymousUser();
+    return $user;
   }
 
   /**
