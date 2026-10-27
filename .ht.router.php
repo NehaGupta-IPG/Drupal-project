@@ -31,7 +31,7 @@ if (PHP_SAPI !== 'cli-server') {
 }
 
 $url = parse_url($_SERVER['REQUEST_URI']);
-if (file_exists(__DIR__ . $url['path'])) {
+if (file_exists(__DIR__ . urldecode($url['path']))) {
   // Serve the requested resource as-is.
   return FALSE;
 }
