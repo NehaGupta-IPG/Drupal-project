@@ -1092,6 +1092,7 @@
       return (
         command === 'focusFirst' ||
         command === 'openDialog' ||
+        command === 'scrollTop' ||
         (command === 'invoke' && method === 'focus')
       );
     });
