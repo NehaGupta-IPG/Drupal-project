@@ -973,6 +973,7 @@ services:
   event_dispatcher:
     class: Symfony\Component\EventDispatcher\EventDispatcher
     # Register directly so the private subscriber survives service removal.
+    # @todo Use autoconfiguration once https://www.drupal.org/node/3442353 is fixed.
     calls:
       - [addSubscriber, ['@Drupal\Core\Access\CsrfStateChangeRequestSubscriber']]
   Psr\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
