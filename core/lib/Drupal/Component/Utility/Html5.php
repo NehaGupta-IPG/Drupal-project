@@ -50,6 +50,7 @@ class Html5 {
    *   The document containing the HTML snippet.
    */
   public static function load(string|\Stringable $html): HTMLDocument {
+    // cspell:ignore NOERROR
     return HTMLDocument::createFromString('<body>' . $html, LIBXML_NOERROR, 'UTF-8');
   }
 
