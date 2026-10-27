@@ -140,6 +140,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
         if ($existingFile) {
           $file->fid = $existingFile->id();
           $file->setOriginalId($existingFile->id());
+          $file->set('uuid', $existingFile->uuid());
         }
       }
 
