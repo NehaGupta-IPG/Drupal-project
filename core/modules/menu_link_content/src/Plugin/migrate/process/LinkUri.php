@@ -2,6 +2,7 @@
 
 namespace Drupal\menu_link_content\Plugin\migrate\process;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
@@ -79,6 +80,7 @@ class LinkUri extends ProcessPluginBase implements ContainerFactoryPluginInterfa
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
 
     $path = ltrim($value, '/');
+    $options = UrlHelper::parse($path);
 
     if (parse_url($path, PHP_URL_SCHEME) === NULL) {
       if ($path == '<front>') {
@@ -109,6 +111,9 @@ class LinkUri extends ProcessPluginBase implements ContainerFactoryPluginInterfa
         // other processing. If this is the case, the "validate_route"
         // configuration option can be set to FALSE to return the URI.
         if (!$this->configuration['validate_route']) {
+          if ($options['query']) {
+            return $url->getUri() . (isset($options['query']) ? '?' . UrlHelper::buildQuery($options['query']) : '');
+          }
           return $url->getUri();
         }
         else {
