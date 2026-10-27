@@ -175,6 +175,12 @@ services:
     tags:
       - { name: cache.context }
 
+  # Pseudo cache context, not intended for direct use.
+  cache_context.pseudo:
+    class: Drupal\Core\Cache\Context\PseudoCacheContext
+    tags:
+      - { name: cache.context }
+
   # Complex cache contexts, that depend on the routing system.
   cache_context.route:
     class: Drupal\Core\Cache\Context\RouteCacheContext

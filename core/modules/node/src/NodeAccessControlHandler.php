@@ -216,7 +216,14 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
       return NULL;
     }
 
+    // Due to the check below, it is not possible to rely only on account
+    // permissions to determine whether the 'view own unpublished content'
+    // permission can be checked, instead we also need to check if the user has
+    // the authenticated role. Just in case anonymous and authenticated users
+    // are both granted the 'view own unpublished content' permission and also
+    // have otherwise identical permissions.
     $cacheability->addCacheContexts(['user.roles:authenticated']);
+
     // The "view own unpublished content" permission must not be granted
     // to anonymous users for security reasons.
     if (!$account->isAuthenticated()) {
