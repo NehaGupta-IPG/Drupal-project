@@ -26,15 +26,15 @@ class NumberTest extends TestCase {
   /**
    * Tests Number::validStep() without offset.
    *
-   * @param numeric $value
+   * @param int|float|string $value
    *   The value argument for Number::validStep().
-   * @param numeric $step
+   * @param int|float|string $step
    *   The step argument for Number::validStep().
    * @param bool $expected
    *   Expected return value from Number::validStep().
    */
   #[DataProvider('providerTestValidStep')]
-  public function testValidStep($value, $step, $expected): void {
+  public function testValidStep(int|float|string $value, int|float|string $step, bool $expected): void {
     $return = Number::validStep($value, $step);
     $this->assertEquals($expected, $return);
   }
@@ -42,17 +42,17 @@ class NumberTest extends TestCase {
   /**
    * Tests Number::validStep() with offset.
    *
-   * @param numeric $value
+   * @param int|float|string $value
    *   The value argument for Number::validStep().
-   * @param numeric $step
+   * @param int|float|string $step
    *   The step argument for Number::validStep().
-   * @param numeric $offset
+   * @param float $offset
    *   The offset argument for Number::validStep().
    * @param bool $expected
    *   Expected return value from Number::validStep().
    */
   #[DataProvider('providerTestValidStepOffset')]
-  public function testValidStepOffset($value, $step, $offset, $expected): void {
+  public function testValidStepOffset(int|float|string $value, int|float|string $step, float $offset, bool $expected): void {
     $return = Number::validStep($value, $step, $offset);
     $this->assertEquals($expected, $return);
   }
@@ -75,23 +75,55 @@ class NumberTest extends TestCase {
       [42, 10.5, TRUE],
       [1, 1 / 3, TRUE],
       [-100, 100 / 7, TRUE],
-      [1000, -10, TRUE],
 
       // Valid and very small float steps.
-      [1000.12345, 1e-10, TRUE],
-      [3.9999999999999, 1e-13, TRUE],
+      [1936.5, 3.0E-8, TRUE],
+      [1000.12345, 1.0E-10, TRUE],
+      [3.9999999999999, 1.0E-13, TRUE],
 
       // Invalid integer steps.
       [100, 30, FALSE],
       [-10, 4, FALSE],
+      [1000, -10, FALSE],
 
       // Invalid float steps.
       [6, 5 / 7, FALSE],
       [10.3, 10.25, FALSE],
+      [1000, -10.0, FALSE],
 
       // Step mismatches very close to being valid.
-      [70 + 9e-7, 10 + 9e-7, FALSE],
-      [1936.5, 3e-8, FALSE],
+      [70 + 9.0E-7, 10 + 9.0E-7, FALSE],
+
+      // Values that are strings that need to cast to numeric floats.
+      ['0.00003', '0.00001', TRUE],
+      ['0.00100001', '0.00100001', TRUE],
+      ['0.00100001', '0.00000001', TRUE],
+
+      // These floats are valid but might fail due to precision (rounding)
+      // errors that are inherent to floating point numbers.
+      [3333333, 0.01, TRUE],
+      [4444444, 0.01, TRUE],
+      [9990009888.96, 0.01, TRUE],
+      [9990009888.99, 0.01, TRUE],
+      [990088999.0096, 0.0001, TRUE],
+      [990088999.0099, 0.0001, TRUE],
+      [4031239412.52, 0.01, TRUE],
+      [90000000000.00, 0.01, TRUE],
+      [9999999999.99, 0.01, TRUE],
+      [-3.1933172, 0.0000001, TRUE],
+      [1109.87, 0.01, TRUE],
+      [70000000, 0.01, TRUE],
+      [70000000.00, 0.01, TRUE],
+      [13517282.20, 0.01, TRUE],
+      [13517282.21, 0.01, TRUE],
+
+      // The precision of the value is higher than that of the step.
+      [990088999.0099, 0.001, FALSE],
+      [990088999.0099, 0.01, FALSE],
+
+      // Ensure floats with more significant decimals that the guaranteed
+      // minimum is normalized.
+      [0.0000000000000900009, 0.0000000000000100001, TRUE],
     ];
   }
 
@@ -131,7 +163,7 @@ class NumberTest extends TestCase {
    * @legacy-covers ::alphadecimalToInt
    */
   #[DataProvider('providerTestConversions')]
-  public function testConversions($value, $expected): void {
+  public function testConversions(int $value, string $expected): void {
     $this->assertSame(Number::intToAlphadecimal($value), $expected);
     $this->assertSame($value, Number::alphadecimalToInt($expected));
   }
