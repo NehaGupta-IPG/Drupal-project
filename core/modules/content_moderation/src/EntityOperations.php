@@ -4,6 +4,7 @@ namespace Drupal\content_moderation;
 
 use Drupal\content_moderation\Entity\ContentModerationState as ContentModerationStateEntity;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -245,6 +246,7 @@ class EntityOperations implements ContainerInjectionInterface {
           ->deleteRevision($content_moderation_state->getRevisionId());
       }
     }
+    Cache::invalidateTags($entity->getCacheTagsToInvalidate());
   }
 
   /**
