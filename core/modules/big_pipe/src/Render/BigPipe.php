@@ -417,7 +417,7 @@ class BigPipe {
       // - the HTML to load the CSS can be rendered.
       // - the HTML to load the JS (at the top) can be rendered.
       $fake_request = $this->requestStack->getMainRequest()->duplicate();
-      $fake_request->attributes->set('ajax_page_state', ['libraries' => implode(',', $cumulative_assets->getAlreadyLoadedLibraries())]);
+      $fake_request->attributes->set('ajax_page_state', ['libraries' => implode(',', \array_unique($cumulative_assets->getAlreadyLoadedLibraries()))]);
       try {
         $html_response = $this->filterEmbeddedResponse($fake_request, $html_response);
       }
