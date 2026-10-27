@@ -2,6 +2,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -325,8 +326,33 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
         $field->setValue($values);
       }
     }
-    foreach ($empty_destinations as $field_name) {
-      $entity->$field_name = NULL;
+
+    foreach ($empty_destinations as $destination) {
+      // $destination can be either a field name, [field name]/[property]
+      // or [field name]/[delta]/[property].
+      $parts = explode(Row::PROPERTY_SEPARATOR, $destination);
+      $field_name = array_shift($parts);
+
+      if (empty($parts)) {
+        $entity->$field_name = NULL;
+        continue;
+      }
+
+      // Get the field.
+      $field = $entity->$field_name;
+      if (!$field instanceof TypedDataInterface) {
+        continue;
+      }
+
+      // Assume 0 if the delta ain't specified in the destination.
+      if (!ctype_digit(reset($parts))) {
+        array_unshift($parts, 0);
+      }
+
+      // Set the field value.
+      $values = $field->getValue();
+      NestedArray::setValue($values, $parts, NULL);
+      $field->setValue($values);
     }
 
     $this->setRollbackAction($row->getIdMap(), $rollback_action);
