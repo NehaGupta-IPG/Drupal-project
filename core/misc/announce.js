@@ -39,7 +39,15 @@
         liveElement.className = 'visually-hidden';
         liveElement.setAttribute('aria-live', 'polite');
         liveElement.setAttribute('aria-busy', 'false');
-        document.body.appendChild(liveElement);
+        // Add the aria-atomic attribute for WCAG compliance
+        liveElement.setAttribute('aria-atomic', 'true');
+        // Check to see if <main> element exists, as aria-live region should be appended to a landmark. If it exists, append aria-live element to it. If not, append it to <body> element
+        const main = document.getElementsByTagName('main');
+        if (main.length !== 0) {
+          main[0].appendChild(liveElement);
+        } else {
+          document.body.appendChild(liveElement);
+        }
       }
     },
   };
@@ -51,6 +59,7 @@
     const text = [];
     let priority = 'polite';
     let announcement;
+    let atomic = 'true';
 
     // Create an array of announcement strings to be joined and appended to the
     // aria live region.
@@ -62,6 +71,11 @@
       // of joined announcements will have this priority.
       if (announcement.priority === 'assertive') {
         priority = 'assertive';
+      }
+      // If any announcements have atomic set to false,
+      // the group of joined announcements will be set to false.
+      if (announcement.atomic === 'false') {
+        atomic = 'false';
       }
     }
 
@@ -77,6 +91,8 @@
       liveElement.innerHTML = text.join('\n');
       // The live text area is updated. Allow the AT to announce the text.
       liveElement.setAttribute('aria-busy', 'false');
+      // Set the aria-atomic attribute to default, or received setting
+      liveElement.setAttribute('aria-atomic', atomic);
     }
   }
 
@@ -96,18 +112,21 @@
    * @param {string} [priority='polite']
    *   A string to indicate the priority of the message. Can be either
    *   'polite' or 'assertive'.
-   *
+   * @param {string} [atomic='true']
+   *  A string to indicate whether the aria-atomic attribute should be
+   *  true or false
    * @return {function}
    *   The return of the call to debounce.
    *
    * @see https://www.w3.org/WAI/PF/aria-practices/#liveprops
    */
-  Drupal.announce = function (text, priority) {
+  Drupal.announce = function (text, priority, atomic) {
     // Save the text and priority into a closure variable. Multiple simultaneous
     // announcements will be concatenated and read in sequence.
     announcements.push({
       text,
       priority,
+      atomic,
     });
     // Immediately invoke the function that debounce returns. 200 ms is right at
     // the cusp where humans notice a pause, so we will wait
