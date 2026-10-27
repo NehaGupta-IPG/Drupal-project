@@ -2,7 +2,6 @@
 
 namespace Drupal\config\Form;
 
-use Drupal\Core\Archiver\ArchiveTar;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\File\FileSystemInterface;
@@ -81,17 +80,26 @@ class ConfigImportForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     if ($path = $form_state->getValue('import_tarball')) {
       $this->configStorage->deleteAll();
+      // PharData requires a recognized file extension to determine the archive
+      // format. Copy the uploaded temp file to a path with .tar.gz extension.
+      $tar_gz_path = $path . '.tar.gz';
+      copy($path, $tar_gz_path);
       try {
-        $archiver = new ArchiveTar($path, 'gz');
+        // Use the canonical absolute path so that the phar:// URI prefix
+        // produced by getPathname() can be reliably stripped.
+        $canonical_path = realpath($tar_gz_path) ?: $tar_gz_path;
+        $archiver = new \PharData($canonical_path);
+        $phar_prefix = 'phar://' . $canonical_path . '/';
         $files = [];
-        foreach ($archiver->listContent() as $file) {
-          if (str_ends_with($file['filename'], '.yml')) {
-            $files[] = $file['filename'];
+        foreach (new \RecursiveIteratorIterator($archiver) as $file) {
+          if (str_ends_with($file->getFilename(), '.yml')) {
+            $files[] = substr($file->getPathname(), strlen($phar_prefix));
           }
         }
-        $archiver->extractList($files, $this->settings->get('config_sync_directory'), '', FALSE, FALSE);
+        $destination = $this->settings->get('config_sync_directory');
+        $archiver->extractTo($destination, $files, TRUE);
         foreach ($files as $file) {
-          $this->fileSystem->chmod($this->settings->get('config_sync_directory') . DIRECTORY_SEPARATOR . $file);
+          $this->fileSystem->chmod($destination . DIRECTORY_SEPARATOR . $file);
         }
         $this->messenger()->addStatus($this->t('Your configuration files were successfully uploaded and are ready for import.'));
         $form_state->setRedirect('config.sync');
@@ -99,6 +107,7 @@ class ConfigImportForm extends FormBase {
       catch (\Exception $e) {
         $this->messenger()->addError($this->t('Could not extract the contents of the tar file. The error message is <em>@message</em>', ['@message' => $e->getMessage()]));
       }
+      @unlink($tar_gz_path);
       $this->fileSystem->unlink($path);
     }
   }
