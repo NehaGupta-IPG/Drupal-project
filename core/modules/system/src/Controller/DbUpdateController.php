@@ -163,7 +163,7 @@ class DbUpdateController extends ControllerBase {
   /**
    * Returns a database update page.
    *
-   * @param string $op
+   * @param string $operation
    *   The update operation to perform. Can be any of the below:
    *    - "info".
    *    - "selection".
@@ -175,7 +175,7 @@ class DbUpdateController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\Response
    *   A response object.
    */
-  public function handle($op, Request $request) {
+  public function handle($operation, Request $request) {
     require_once $this->root . '/core/includes/install.inc';
     require_once $this->root . '/core/includes/update.inc';
 
@@ -193,7 +193,7 @@ class DbUpdateController extends ControllerBase {
       $output = $this->requirements($severity, $requirements, $request);
     }
     else {
-      switch ($op) {
+      switch ($operation) {
         case 'selection':
           $regions['sidebar_first'] = $this->updateTasksList('selection');
           $output = $this->selection($request);
@@ -212,6 +212,13 @@ class DbUpdateController extends ControllerBase {
         case 'results':
           $regions['sidebar_first'] = $this->updateTasksList('results');
           $output = $this->results($request);
+          break;
+
+        case 'op':
+          @trigger_error('op is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Rename $op to $operation arguments with BC usage in update.php. See https://www.drupal.org/node/1025928', E_USER_DEPRECATED);
+          require_once $this->root . '/core/includes/batch.inc';
+          $regions['sidebar_first'] = $this->updateTasksList('run');
+          $output = _batch_page($request);
           break;
 
         // Regular batch ops : defer to batch processing API.

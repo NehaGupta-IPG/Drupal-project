@@ -156,9 +156,10 @@ class UpdateKernel extends DrupalKernel {
 
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'system.db_update');
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, $this->getContainer()->get('router.route_provider')->getRouteByName('system.db_update'));
-    $op = $args[0] ?: 'info';
+    $op = $operation = $args[0] ?: 'info';
     $request->attributes->set('op', $op);
-    $request->attributes->set('_raw_variables', new InputBag(['op' => $op]));
+    $request->attributes->set('operation', $operation);
+    $request->attributes->set('_raw_variables', new InputBag(['op' => $op, 'operation' => $operation]));
   }
 
   /**
