@@ -7,3 +7,10 @@ delete own files:
 delete any file:
   title: 'Delete any file'
   restrict access: true
+
+edit own file:
+  title: 'Edit own file'
+
+edit any file:
+  title: 'Edit any file'
+  restrict access: true

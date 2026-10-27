@@ -47,11 +47,13 @@ class AccessTest extends KernelTestBase {
 
     $user_any = $this->createUser([
       'delete any file',
+      'edit any file',
     ]);
     $this->assertGreaterThan(1, (int) $user_any->id());
 
     $user_own = $this->createUser([
       'delete own files',
+      'edit own file',
     ]);
 
     $test_files = $this->getTestFiles('text');
@@ -63,11 +65,11 @@ class AccessTest extends KernelTestBase {
     $file2->save();
 
     // User with "* any file" permissions should delete all files and update
-    // their own.
+    // all files.
     $this->assertTrue($file1->access('delete', $user_any));
     $this->assertTrue($file1->access('update', $user_any));
     $this->assertTrue($file2->access('delete', $user_any));
-    $this->assertFalse($file2->access('update', $user_any));
+    $this->assertTrue($file2->access('update', $user_any));
 
     // User with "* own files" permissions should access only own files.
     $this->assertFalse($file1->access('delete', $user_own));
@@ -86,15 +88,15 @@ class AccessTest extends KernelTestBase {
     $this->assertSame(['file:2'], $access->getCacheTags());
     /** @var \Drupal\Core\Access\AccessResult $access */
     $access = $file2->access('update', $user_any, TRUE);
-    $this->assertSame([], $access->getCacheContexts());
+    $this->assertSame(['user.permissions'], $access->getCacheContexts());
     $this->assertSame([], $access->getCacheTags());
     /** @var \Drupal\Core\Access\AccessResult $access */
     $access = $file2->access('update', $user_own, TRUE);
-    $this->assertSame([], $access->getCacheContexts());
-    $this->assertSame([], $access->getCacheTags());
+    $this->assertSame(['user.permissions', 'user'], $access->getCacheContexts());
+    $this->assertSame(['file:2'], $access->getCacheTags());
 
-    // User without permissions should not be able to delete files even if they
-    // are the owner.
+    // User without permissions should not be able to delete or update files
+    // even if they are the owner.
     $user_none = $this->createUser();
     $file3 = File::create([
       'uid' => $user_none->id(),
@@ -102,7 +104,7 @@ class AccessTest extends KernelTestBase {
       'filemime' => 'text/plain',
     ]);
     $this->assertFalse($file3->access('delete', $user_none));
-    $this->assertTrue($file3->access('update', $user_none));
+    $this->assertFalse($file3->access('update', $user_none));
 
     // Create a file with no user entity.
     $file4 = File::create([
@@ -112,7 +114,7 @@ class AccessTest extends KernelTestBase {
     $this->assertFalse($file4->access('delete', $user_own));
     $this->assertFalse($file4->access('update', $user_own));
     $this->assertTrue($file4->access('delete', $user_any));
-    $this->assertFalse($file4->access('update', $user_any));
+    $this->assertTrue($file4->access('update', $user_any));
   }
 
   /**

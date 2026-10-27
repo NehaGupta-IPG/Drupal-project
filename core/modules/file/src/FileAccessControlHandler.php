@@ -74,13 +74,11 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
       }
     }
     elseif ($operation == 'update') {
-      $account = $this->prepareUser($account);
-      $file_uid = $entity->get('uid')->getValue();
-      // Only the file owner can update the file entity.
-      if (isset($file_uid[0]['target_id']) && $account->id() == $file_uid[0]['target_id']) {
-        return AccessResult::allowed();
+      $access = AccessResult::allowedIfHasPermission($account, 'edit any file');
+      if (!$access->isAllowed() && $account->hasPermission('edit own file')) {
+        $access = $access->orIf(AccessResult::allowedIf($account->id() == $entity->getOwnerId()))->cachePerUser()->addCacheableDependency($entity);
       }
-      return AccessResult::forbidden('Only the file owner can update the file entity.');
+      return $access;
     }
     elseif ($operation == 'delete') {
       $access = AccessResult::allowedIfHasPermission($account, 'delete any file');

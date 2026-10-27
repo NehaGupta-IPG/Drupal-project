@@ -67,11 +67,8 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
         break;
 
       case 'PATCH':
-        // \Drupal\file\FileAccessControlHandler::checkAccess() grants 'update'
-        // access only to the user that owns the file. So there is no permission
-        // to grant: instead, the file owner must be changed from its default
-        // (user 1) to the current user.
         $this->makeCurrentUserFileOwner();
+        $this->grantPermissionsToTestedRole(['edit own file']);
         return;
 
       case 'DELETE':
@@ -219,7 +216,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   protected function getExpectedUnauthorizedAccessMessage($method): string {
     return match ($method) {
       'GET' => "The 'access content' permission is required.",
-      'PATCH' => "Only the file owner can update the file entity.",
+      'PATCH' => "The 'edit any file' permission is required.",
       'DELETE' => "The 'delete any file' permission is required.",
       default =>  parent::getExpectedUnauthorizedAccessMessage($method),
     };
