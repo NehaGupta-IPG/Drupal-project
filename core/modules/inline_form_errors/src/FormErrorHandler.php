@@ -2,6 +2,7 @@
 
 namespace Drupal\inline_form_errors;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormElementHelper;
 use Drupal\Core\Form\FormErrorHandler as CoreFormErrorHandler;
 use Drupal\Core\Form\FormStateInterface;
@@ -86,16 +87,17 @@ class FormErrorHandler extends CoreFormErrorHandler {
       // Only show links for elements that have a title themselves or have
       // children with a title.
       $has_title = !empty($title);
-      // Only show links for elements with an ID.
-      $has_id = !empty($form_element['#id']);
+      // Only show links for elements with an ID that is actually rendered in
+      // the DOM, so that the resulting anchor is functional.
+      $id = $this->getErrorElementId($form, $form_element);
 
       // Do not show links to elements with suppressed messages. Most often
       // their parent element is used for inline errors.
       if (!empty($form_element['#error_no_message'])) {
         unset($errors[$name]);
       }
-      elseif ($is_visible_element && $has_title && $has_id) {
-        $url = Url::fromRoute('<none>', [], ['fragment' => $form_element['#id'], 'external' => TRUE]);
+      elseif ($is_visible_element && $has_title && $id !== NULL) {
+        $url = Url::fromRoute('<none>', [], ['fragment' => $id, 'external' => TRUE]);
         $error_links[] = Link::fromTextAndUrl($title, $url)->toRenderable();
         unset($errors[$name]);
       }
@@ -120,6 +122,40 @@ class FormErrorHandler extends CoreFormErrorHandler {
       $message = $this->renderer->renderInIsolation($render_array);
       $this->messenger->addError($message);
     }
+  }
+
+  /**
+   * Gets the ID of the element to use as the error message link target.
+   *
+   * A field widget does not render its own #id, so linking to it gives a
+   * broken anchor. Its wrapper element (the widget's parent) is always
+   * rendered, so for field widgets the wrapper #id is used. Other elements use
+   * their own #id.
+   *
+   * @param array $form
+   *   The complete form structure.
+   * @param array $element
+   *   The form element an error is associated with.
+   *
+   * @return string|null
+   *   The ID to use as the link fragment, or NULL when none could be found.
+   */
+  protected function getErrorElementId(array $form, array $element): ?string {
+    // For a field widget, link to the field wrapper element (the widget's
+    // parent), which is always rendered.
+    if (isset($element['#field_name'], $element['#array_parents'])) {
+      $wrapper = NestedArray::getValue($form, array_slice($element['#array_parents'], 0, -1));
+      if (!empty($wrapper['#id'])) {
+        return $wrapper['#id'];
+      }
+    }
+
+    // For all other elements the #id is rendered and can be linked to directly.
+    if (!empty($element['#id']) && Element::isVisibleElement($element)) {
+      return $element['#id'];
+    }
+
+    return NULL;
   }
 
 }
