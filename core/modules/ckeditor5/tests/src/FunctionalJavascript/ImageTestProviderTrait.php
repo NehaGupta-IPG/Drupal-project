@@ -64,7 +64,7 @@ trait ImageTestProviderTrait {
 
     // Ensure that the missing alt text error is not added to decorative images.
     $this->assertNotEmpty($decorative_button = $this->getBalloonButton('Decorative image'));
-    $assert_session->elementExists('css', '.ck-balloon-panel .ck-text-alternative-form input[type=text]');
+    $assert_session->elementExists('css', '.ck-balloon-panel .ck-text-alternative-form textarea');
     $decorative_button->click();
     $assert_session->elementExists('css', '.ck-content .ck-widget.image .image-alternative-text-missing.ck-hidden');
     $assert_session->elementExists('css', ".ck-content .ck-widget.image-inline .image-alternative-text-missing-wrapper");
@@ -91,7 +91,7 @@ trait ImageTestProviderTrait {
     $this->assertNotEmpty($save_button = $this->getBalloonButton('Save'));
     $this->assertTrue($save_button->hasClass('ck-disabled'));
 
-    $this->assertNotEmpty($alt_override_input = $page->find('css', '.ck-balloon-panel .ck-text-alternative-form input[type=text]'));
+    $this->assertNotEmpty($alt_override_input = $page->find('css', '.ck-balloon-panel .ck-text-alternative-form textarea'));
     $alt_override_input->setValue('There is now alt text');
     $this->assertTrue($assert_session->waitForElementRemoved('css', '.ck-balloon-panel .ck-text-alternative-form .ck-disabled'));
     $this->assertFalse($save_button->hasClass('ck-disabled'));
