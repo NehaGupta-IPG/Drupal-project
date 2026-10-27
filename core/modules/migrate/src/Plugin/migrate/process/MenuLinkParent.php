@@ -195,6 +195,13 @@ class MenuLinkParent extends ProcessPluginBase implements ContainerFactoryPlugin
       return $link->getPluginId();
     }
 
+    // Check if the parent menu item is already in the system, i.e. it was
+    // manually created e.g. using default content.
+    $link = $this->menuLinkStorage->load($parent_id);
+    if (!empty($link)) {
+      return $link->getPluginId();
+    }
+
     // Parent could not be determined by ID, so we try to determine by the
     // combination of the menu name and parent link path.
     if (isset($value[1])) {
