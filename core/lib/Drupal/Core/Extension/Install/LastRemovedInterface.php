@@ -17,8 +17,8 @@ interface LastRemovedInterface {
    * should notify Drupal of those missing functions. This way, Drupal can
    * ensure that no update is accidentally skipped.
    *
-   * Implementations of this hook should be placed in a my_module.install file in
-   * the same directory as my_module.module.
+   * Implementations of this hook should be placed in a my_module.install file
+   * in the same directory as my_module.module.
    *
    * @return int
    *   An integer, corresponding to hook_update_N() which has been removed from
