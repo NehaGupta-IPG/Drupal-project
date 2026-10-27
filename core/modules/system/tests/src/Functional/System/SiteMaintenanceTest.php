@@ -45,6 +45,13 @@ class SiteMaintenanceTest extends BrowserTestBase {
   protected User $user;
 
   /**
+   * User not allowed to access site in maintenance mode.
+   *
+   * @var \Drupal\user\Entity\User
+   */
+  protected User $notAllowedUser;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -59,6 +66,8 @@ class SiteMaintenanceTest extends BrowserTestBase {
 
     // Create a user allowed to access site in maintenance mode.
     $this->user = $this->drupalCreateUser(['access site in maintenance mode']);
+    // Create a user not allowed to access site in maintenance mode.
+    $this->notAllowedUser = $this->drupalCreateUser();
     // Create an administrative user.
     $this->adminUser = $this->drupalCreateUser([
       'administer site configuration',
@@ -178,6 +187,15 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->drupalLogout();
     $this->drupalGet('');
     $this->assertEquals('Site under maintenance', $this->cssSelect('main h1')[0]->getText());
+
+    /*
+     * Check if an user without the "access site in maintenance mode" permission
+     * sees the maintenance page.
+     */
+    $this->drupalLogin($this->notAllowedUser);
+    $this->drupalGet('');
+    $this->assertEquals('Site under maintenance', $this->cssSelect('main h1')[0]->getText());
+    $this->assertTrue($this->drupalUserIsLoggedIn($this->notAllowedUser));
 
     $this->drupalLogin($this->adminUser);
 
