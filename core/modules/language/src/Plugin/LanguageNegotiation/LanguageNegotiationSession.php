@@ -74,7 +74,7 @@ class LanguageNegotiationSession extends LanguageNegotiationMethodBase implement
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
+    return new self(
       $container->get('request_stack')
     );
   }
@@ -142,13 +142,18 @@ class LanguageNegotiationSession extends LanguageNegotiationMethodBase implement
           // Cached URLs that have been processed by this outbound path
           // processor must be:
           $bubbleable_metadata
-            // - invalidated when the language negotiation config changes, since
-            //   another query parameter may be used to determine the language.
+          // - invalidated when the language negotiation config changes, since
+          //   another query parameter may be used to determine the language.
             ->addCacheTags($this->config->get('language.negotiation')->getCacheTags())
-            // - varied by the configured query parameter.
+          // - varied by the configured query parameter.
             ->addCacheContexts(['url.query_args:' . $this->queryParam]);
         }
       }
+    }
+    // To avoid page cache duplicates, remove the language query if the default
+    // language is set.
+    if ($this->currentUser->isAnonymous() && isset($options['query'][$this->queryParam])) {
+      unset($options['query'][$this->queryParam]);
     }
     return $path;
   }
@@ -179,7 +184,12 @@ class LanguageNegotiationSession extends LanguageNegotiationMethodBase implement
         $links[$langcode]['query'][$param] = $langcode;
       }
       else {
-        $links[$langcode]['attributes']['class'][] = 'session-active';
+        if ($langcode == $language_query) {
+          $links[$langcode]['attributes']['class'][] = 'session-active';
+        }
+        // Always set the language query parameter. It may be removed in
+        // LanguageNegotiationSession::processOutbound().
+        $links[$langcode]['query'][$param] = $langcode;
       }
     }
 
