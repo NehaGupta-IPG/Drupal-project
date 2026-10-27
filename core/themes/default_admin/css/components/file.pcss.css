@@ -27,44 +27,44 @@
 
 .file--general,
 .file--application-octet-stream {
-  background-image: url(../../images/icons/files/application-octet-stream.svg);
+  background-image: url(../../images/file-types/application-octet-stream.svg);
 }
 .file--package-x-generic {
-  background-image: url(../../images/icons/files/package-x-generic.svg);
+  background-image: url(../../images/file-types/package-x-generic.svg);
 }
 .file--x-office-spreadsheet {
-  background-image: url(../../images/icons/files/x-office-spreadsheet.svg);
+  background-image: url(../../images/file-types/x-office-spreadsheet.svg);
 }
 .file--x-office-document {
-  background-image: url(../../images/icons/files/x-office-document.svg);
+  background-image: url(../../images/file-types/x-office-document.svg);
 }
 .file--x-office-presentation {
-  background-image: url(../../images/icons/files/x-office-presentation.svg);
+  background-image: url(../../images/file-types/x-office-presentation.svg);
 }
 .file--text-x-script {
-  background-image: url(../../images/icons/files/text-x-script.svg);
+  background-image: url(../../images/file-types/text-x-script.svg);
 }
 .file--text-html {
-  background-image: url(../../images/icons/files/text-html.svg);
+  background-image: url(../../images/file-types/text-html.svg);
 }
 .file--text-plain {
-  background-image: url(../../images/icons/files/text-plain.svg);
+  background-image: url(../../images/file-types/text-plain.svg);
 }
 .file--application-pdf {
-  background-image: url(../../images/icons/files/application-pdf.svg);
+  background-image: url(../../images/file-types/application-pdf.svg);
 }
 .file--application-x-executable {
-  background-image: url(../../images/icons/files/application-x-executable.svg);
+  background-image: url(../../images/file-types/application-x-executable.svg);
 }
 .file--audio {
-  background-image: url(../../images/icons/files/audio-x-generic.svg);
+  background-image: url(../../images/file-types/audio-x-generic.svg);
 }
 .file--video {
-  background-image: url(../../images/icons/files/video-x-generic.svg);
+  background-image: url(../../images/file-types/video-x-generic.svg);
 }
 .file--text {
-  background-image: url(../../images/icons/files/text-x-generic.svg);
+  background-image: url(../../images/file-types/text-x-generic.svg);
 }
 .file--image {
-  background-image: url(../../images/icons/files/image-x-generic.svg);
+  background-image: url(../../images/file-types/image-x-generic.svg);
 }

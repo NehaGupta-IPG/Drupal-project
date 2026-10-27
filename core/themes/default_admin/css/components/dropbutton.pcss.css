@@ -296,8 +296,11 @@
     height: 0.5625rem;
     content: "";
     transform: translate(50%, -50%) rotate(0);
-    background: url(../../images/icons/000f33/chevron-down.svg) no-repeat center;
-    background-size: contain;
+    background-color: var(--admin-color-primary);
+    mask-image: var(--admin-icon-drop);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: 12px 12px;
   }
 
   /* Toggler states. */
@@ -316,6 +319,11 @@
     background-color: var(--button--active-bg-color);
   }
 
+  &:hover::before,
+  &:active::before {
+    background-color: var(--admin-color-text-on-primary);
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     transition: var(--admin-transition);
   }
@@ -326,22 +334,6 @@
 
   @media (forced-colors: active) {
     border-width: 0 !important;
-  }
-
-  @media not (forced-colors: active) {
-    &::before {
-      background-color: var(--admin-color-primary);
-      background-image: none;
-      mask-image: var(--admin-icon-drop);
-      mask-repeat: no-repeat;
-      mask-position: center center;
-      mask-size: 12px 12px;
-    }
-
-    &:hover::before,
-    &:active::before {
-      background-color: var(--admin-color-text-on-primary);
-    }
   }
 }
 
@@ -382,6 +374,7 @@
     border-width: 0.125rem 0.125rem 0 0;
     border-style: solid;
     background: none;
+    mask-image: none;
 
     .dropbutton-wrapper.open & {
       margin-top: calc(0.5625rem / (2 * 1.41429));

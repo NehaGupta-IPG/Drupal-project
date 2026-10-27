@@ -5,19 +5,16 @@
 
 .form-element--type-select {
   padding-inline-end: calc(var(--admin-space-xs) + var(--admin-space-xl) - 1px);
-  background-image: url(../../images/icons/545560/chevron-down.svg);
+  background-image: var(--admin-icon-chevron-down);
   background-repeat: no-repeat;
   background-position: 100% 50%;
-  background-size: 2.75rem 0.5625rem; /* w: 14px + (2 * 15px), h: 9px */
+  background-size: 2.75rem 1.25rem; /* w: 14px + (2 * 15px); 20px square icon draws a ~13x7px chevron */
 
   /**
    * Select states.
    */
-  &:focus {
-    background-image: url(../../images/icons/003ecc/chevron-down.svg);
-  }
   &[disabled] {
-    background-image: url(../../images/icons/8e929c/chevron-down.svg);
+    background-image: var(--admin-icon-chevron-down-disabled);
   }
 
   &:dir(rtl) {
@@ -25,7 +22,7 @@
   }
 
   .dark-mode & {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 9'%3E%3Cpath fill='none' stroke-width='1.5' d='M1 1L7 7L13 1' stroke='%23ffffff'/%3E%3C/svg%3E%0A");
+    background-image: var(--admin-icon-chevron-down-inverse);
   }
 
   .no-touchevents & {
@@ -33,7 +30,7 @@
     &[name$="][_weight]"] {
       min-height: 1.75rem;
       padding-inline-end: calc(1.5rem - var(--input-border-size));
-      background-size: 1.75rem 0.4375rem; /* w: 14px + (2 * 7px), h: 7px */
+      background-size: 1.75rem 1rem; /* w: 14px + (2 * 7px); 16px square icon draws a ~11x5px chevron */
       font-size: var(--admin-font-size-s);
       line-height: 1.5;
     }

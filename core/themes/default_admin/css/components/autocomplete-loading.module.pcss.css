@@ -48,12 +48,13 @@
 .form-autocomplete {
   margin-inline-end: calc(var(--input-border-size) - 1.5 * var(--input-padding-horizontal));
   padding-inline-end: 36px;
-  background-image: url(../../images/icons/868686/magnifier.svg);
+  background-image: var(--admin-icon-search-muted);
   background-repeat: no-repeat;
   background-position: 100% 50%;
+  background-size: 1rem 1rem;
 
   &:dir(rtl) {
-    background-image: url(../../images/icons/868686/magnifier-rtl.svg);
+    background-image: var(--admin-icon-search-muted-rtl);
     background-position: 0 50%;
   }
 }

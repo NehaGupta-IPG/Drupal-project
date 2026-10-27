@@ -303,8 +303,11 @@
     height: 0.5625rem;
     content: "";
     transform: translate(50%, -50%) rotate(0);
-    background: url("data:image/svg+xml,%3csvg width='14' height='9' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M.238 1.938L1.647.517 7 5.819 12.354.517l1.408 1.421L7 8.636z' fill='%23000f33'/%3e%3c/svg%3e") no-repeat center;
-    background-size: contain;
+    background-color: var(--admin-color-primary);
+    mask-image: var(--admin-icon-drop);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: 0.75rem 0.75rem;
   }
 
   /* Toggler states. */
@@ -323,6 +326,11 @@
     background-color: var(--button--active-bg-color);
   }
 
+  &:hover::before,
+  &:active::before {
+    background-color: var(--admin-color-text-on-primary);
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     transition: var(--admin-transition);
   }
@@ -333,22 +341,6 @@
 
   @media (forced-colors: active) {
     border-width: 0 !important;
-  }
-
-  @media not (forced-colors: active) {
-    &::before {
-      background-color: var(--admin-color-primary);
-      background-image: none;
-      mask-image: var(--admin-icon-drop);
-      mask-repeat: no-repeat;
-      mask-position: center center;
-      mask-size: 0.75rem 0.75rem;
-    }
-
-    &:hover::before,
-    &:active::before {
-      background-color: var(--admin-color-text-on-primary);
-    }
   }
 }
 
@@ -389,6 +381,7 @@
     border-width: 0.125rem 0.125rem 0 0;
     border-style: solid;
     background: none;
+    mask-image: none;
 
     .dropbutton-wrapper.open & {
       margin-top: calc(0.5625rem / (2 * 1.41429));

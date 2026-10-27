@@ -144,8 +144,15 @@ td.module-list__description {
     content: "";
     cursor: pointer;
     vertical-align: text-top;
-    background: url(../../images/icons/545560/plus.svg) no-repeat center;
-    background-size: contain;
+    background-color: var(--admin-color-icon);
+    mask-image: var(--admin-icon-add);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+
+    @media (forced-colors: active) {
+      background-color: ButtonText;
+    }
   }
 
   &:hover {
@@ -153,7 +160,11 @@ td.module-list__description {
     background-color: var(--admin-color-bg-item-hover);
 
     &::before {
-      background-image: url(../../images/icons/0036b1/plus.svg);
+      background-color: var(--admin-color-link-hover);
+
+      @media (forced-colors: active) {
+        background-color: ButtonText;
+      }
     }
   }
 }

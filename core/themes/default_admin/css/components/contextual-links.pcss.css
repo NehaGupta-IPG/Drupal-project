@@ -36,9 +36,10 @@
       content: "";
       background: var(--admin-color-primary);
       inset: 0;
-      mask-image: url("../../images/icons/currentColor/media-edit.svg");
-      mask-size: var(--admin-space-s);
-      mask-position: 100% 100%;
+      mask-image: var(--admin-icon-edit);
+      mask-repeat: no-repeat;
+      mask-size: contain;
+      mask-position: center;
     }
 
     &:hover {

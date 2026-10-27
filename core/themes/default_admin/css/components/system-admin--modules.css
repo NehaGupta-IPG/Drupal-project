@@ -151,8 +151,15 @@ td.module-list__description {
     content: "";
     cursor: pointer;
     vertical-align: text-top;
-    background: url("data:image/svg+xml,%3csvg height='16' stroke='%23545560' stroke-width='2' width='16' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M3 8h10M8 3v10'/%3e%3c/svg%3e") no-repeat center;
-    background-size: contain;
+    background-color: var(--admin-color-icon);
+    mask-image: var(--admin-icon-add);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+
+    @media (forced-colors: active) {
+      background-color: ButtonText;
+    }
   }
 
   &:hover {
@@ -160,7 +167,11 @@ td.module-list__description {
     background-color: var(--admin-color-bg-item-hover);
 
     &::before {
-      background-image: url("data:image/svg+xml,%3csvg height='16' stroke='%230036b1' stroke-width='2' width='16' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M3 8h10M8 3v10'/%3e%3c/svg%3e");
+      background-color: var(--admin-color-link-hover);
+
+      @media (forced-colors: active) {
+        background-color: ButtonText;
+      }
     }
   }
 }

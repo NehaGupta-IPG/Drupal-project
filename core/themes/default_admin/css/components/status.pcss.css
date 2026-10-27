@@ -41,7 +41,7 @@
 
 .admin-status--success .admin-status-icon {
   background-color: currentColor;
-  mask-image: url("../../migration/media/icons/messages/status.svg");
+  mask-image: var(--admin-icon-status);
 }
 
 .admin-status--warning,
@@ -53,7 +53,7 @@
 .admin-status--warning .admin-status-icon,
 :is(#extra-specificity-hack, .admin--core-navigation [data-drupal-admin-styles]) .toolbar-badge--warning .admin-status-icon {
   background-color: currentColor;
-  mask-image: url("../../migration/media/icons/messages/warning.svg");
+  mask-image: var(--admin-icon-warning);
 }
 
 .admin-status--danger,
@@ -65,7 +65,7 @@
 .admin-status--danger .admin-status-icon,
 :is(#extra-specificity-hack, .admin--core-navigation [data-drupal-admin-styles]) .toolbar-badge--danger .admin-status-icon {
   background-color: currentColor;
-  mask-image: url("../../migration/media/icons/messages/error.svg");
+  mask-image: var(--admin-icon-error);
 }
 
 .admin-status {
@@ -76,4 +76,8 @@
 
 .admin-status-icon {
   margin-inline-start: -0.5em;
+
+  @media (forced-colors: active) {
+    background-color: CanvasText;
+  }
 }

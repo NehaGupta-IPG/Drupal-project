@@ -124,7 +124,7 @@
     transform: rotate(90deg);
     text-align: center;
     background: var(--admin-color-text);
-    mask-image: url("../../migration/media/icons/general/handle.svg");
+    mask-image: var(--admin-icon-handle);
     mask-repeat: no-repeat;
     mask-position: center center;
     mask-size: 100% 100%;
@@ -346,9 +346,15 @@
   margin-inline: 0.3em;
   content: "";
   vertical-align: super;
-  background-image: url(../../images/icons/ee0000/required.svg);
-  background-repeat: no-repeat;
-  background-size: 0.4375rem 0.4375rem;
+  background-color: var(--admin-color-error);
+  mask-image: var(--admin-icon-asterisk);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+
+  @media (forced-colors: active) {
+    background-color: CanvasText;
+  }
 }
 
 .details.details--package-listing,

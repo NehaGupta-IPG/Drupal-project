@@ -25,7 +25,7 @@
     height: 100%;
     content: "";
     background-color: var(--admin-color-icon);
-    mask-image: url("../../migration/media/icons/toolbar/help.svg");
+    mask-image: var(--admin-icon-help);
     mask-repeat: no-repeat;
     mask-position: center center;
     mask-size: 100% 100%;
@@ -49,6 +49,18 @@
     position: absolute;
     inset-inline-end: calc(var(--admin-space-xs) * -1);
     inset-block-start: var(--admin-space-m);
+  }
+
+  @media (forced-colors: active) {
+    &::before,
+    &:hover::before {
+      background-color: ButtonText;
+    }
+
+    &:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
   }
 }
 

@@ -124,7 +124,7 @@ body[data-meta-sidebar="open"] {
     background-color: var(--admin-color-icon);
     mask-repeat: no-repeat;
     mask-position: center center;
-    mask-image: url("../../migration/media/icons/general/sidebar.svg");
+    mask-image: var(--admin-icon-sidebar);
     mask-size: var(--admin-icon-size-sidebar-toggle) var(--admin-icon-size-sidebar-toggle);
   }
 
@@ -168,7 +168,7 @@ body[data-meta-sidebar="open"] {
   inset-inline-end: var(--admin-space-m);
 
   &::before {
-    mask-image: url("../../migration/media/icons/general/close.svg");
+    mask-image: var(--admin-icon-close);
     mask-size: 16px 16px;
   }
 
