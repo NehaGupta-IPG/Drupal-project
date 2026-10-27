@@ -13,6 +13,13 @@
 (
   (Drupal, once) => {
     /**
+     * Constant for the "toolbar-active-url" event name.
+     *
+     * @type {string}
+     */
+    const TOOLBAR_ACTIVE_URL = 'toolbar-active-url';
+
+    /**
      * Constant for the "toolbar-menu-set-toggle" event name.
      *
      * @type {string}
@@ -99,8 +106,22 @@
      *
      * When current url it adds classes and dispatch event to popover.
      */
-    Drupal.behaviors.navigationProcessToolbarMenuLinks = {
+    Drupal.behaviors.navigationProcessActiveUrl = {
       attach: (context) => {
+        once('toolbar-menu-active-url', '.toolbar-menu', context).forEach(
+          (menu) => {
+            menu.addEventListener(TOOLBAR_ACTIVE_URL, () => {
+              menu.previousElementSibling?.dispatchEvent(
+                new CustomEvent(TOOLBAR_MENU_SET_TOGGLE, {
+                  detail: {
+                    state: true,
+                  },
+                }),
+              );
+            });
+          },
+        );
+
         once(
           'toolbar-menu-link',
           'a.toolbar-menu__link, a.toolbar-button',
@@ -111,22 +132,10 @@
             link.classList.add('current', 'is-active');
 
             link.dispatchEvent(
-              new CustomEvent('toolbar-active-url', {
+              new CustomEvent(TOOLBAR_ACTIVE_URL, {
                 bubbles: true,
               }),
             );
-
-            // We also want to open all parent menus.
-            const menu = link.closest('.toolbar-menu');
-            if (menu) {
-              menu.previousElementSibling.dispatchEvent(
-                new CustomEvent(TOOLBAR_MENU_SET_TOGGLE, {
-                  detail: {
-                    state: true,
-                  },
-                }),
-              );
-            }
           }
         });
       },

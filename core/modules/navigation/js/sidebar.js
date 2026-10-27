@@ -112,7 +112,6 @@
           // When any popover opened we close all others.
           sidebar.addEventListener('toolbar-popover-toggled', (e) => {
             if (e.detail.state) {
-              closeButtons();
               closePopovers(e.target);
             }
           });
