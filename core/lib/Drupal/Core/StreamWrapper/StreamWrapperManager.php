@@ -96,7 +96,10 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
    * {@inheritdoc}
    */
   public function getViaScheme($scheme) {
-    return $this->getWrapper($scheme, $scheme . '://');
+    if ($this->container->has($scheme)) {
+      return $this->container->get($scheme);
+    }
+    return FALSE;
   }
 
   /**
