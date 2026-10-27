@@ -36,11 +36,13 @@ class MenuUiTest extends BrowserTestBase {
   protected static $modules = [
     'block',
     'contextual',
+    'dblog',
     'help',
     'menu_link_content',
     'menu_ui',
     'node',
     'path',
+    'search',
     'test_page_test',
   ];
 
@@ -107,6 +109,21 @@ class MenuUiTest extends BrowserTestBase {
       'create article content',
     ]);
     $this->authenticatedUser = $this->drupalCreateUser([]);
+  }
+
+  /**
+   * Tests editing menu link that is created dynamically.
+   */
+  public function testEditDynamicMenuLink(): void {
+    // Log in the user.
+    $this->drupalLogin($this->adminUser);
+
+    // Edit the Top search phrases menu link
+    // which is created by the dblog module dynamically.
+    $this->drupalGet('admin/structure/menu/link/dblog.search/edit');
+    $this->submitForm(['enable' => 1], 'Save');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('The menu link has been saved.');
   }
 
   /**
