@@ -19,16 +19,7 @@ use PHPUnit\Framework\TestCase;
 class Html5Test extends TestCase {
 
   /**
-   * Tests snippet normalization using native HTML5 parsing and serialization.
-   */
-  #[TestWith(['', ''])]
-  #[TestWith(['<p>Drupal © &amp; →', '<p>Drupal © &amp; →</p>'])]
-  public function testNormalize(string $html, string $expected): void {
-    $this->assertSame($expected, Html5::normalize($html));
-  }
-
-  /**
-   * Tests snippet serialization with native HTML5 parsing and escaping rules.
+   * Tests snippet normalization and serialization with native HTML5 rules.
    */
   #[TestWith(['', ''])]
   #[TestWith(['<p>Drupal © &amp; →', '<p>Drupal © &amp; →</p>'])]
@@ -38,7 +29,8 @@ class Html5Test extends TestCase {
     '<span data-caption="foo <em>bar</em>"></span>',
   ])]
   #[TestWith(["line1\r\nline2&#13;line3", "line1\nline2\nline3"])]
-  public function testSerialize(string $html, string $expected): void {
+  public function testNormalize(string $html, string $expected): void {
+    $this->assertSame($expected, Html5::normalize($html));
     $this->assertSame($expected, Html5::serialize(Html5::load($html)));
   }
 
