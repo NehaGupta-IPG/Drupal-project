@@ -153,6 +153,16 @@ $databases = [];
  * ];
  * @endcode
  *
+ * For MySQL, MariaDB or equivalent databases the 'row_format' option can
+ * be set if you need to fine tune how InnoDB physically stores tables. For more
+ * info:
+ * https://dev.mysql.com/doc/refman/5.7/en/innodb-row-format.html
+ *
+ * On your settings.php, change the row format:
+ * @code
+ * $databases['default']['default']['row_format'] = 'DYNAMIC';
+ * @endcode
+ *
  * You can optionally set a prefix for all database table names by using the
  * 'prefix' setting. If a prefix is specified, the table name will be prepended
  * with its value. Be sure to use valid database characters only, usually

@@ -130,6 +130,12 @@ class Schema extends DatabaseSchema {
       $sql .= ' COLLATE ' . $info['collation'];
     }
 
+    // You can explicitly define a ROW_FORMAT (i.e. "REDUNDANT", "COMPACT",
+    // "COMPRESSED", or "DYNAMIC"). InnoDB's default is DYNAMIC.
+    if (!empty($info['row_format'])) {
+      $sql .= ' ROW_FORMAT ' . $info['row_format'];
+    }
+
     // Add table comment.
     if (!empty($table['description'])) {
       $sql .= ' COMMENT ' . $this->prepareComment($table['description'], self::COMMENT_MAX_TABLE);
