@@ -742,6 +742,27 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function hasDedicatedTable() {
+    return !empty($this->definition['dedicated_table']);
+  }
+
+  /**
+   * Sets the dedicated table property for this field.
+   *
+   * @param bool $dedicated_table
+   *   Pass TRUE if a dedicated database table should be used for this field,
+   *   FALSE otherwise.
+   *
+   * @return $this
+   */
+  public function setDedicatedTable($dedicated_table) {
+    $this->definition['dedicated_table'] = $dedicated_table;
+    return $this;
+  }
+
+  /**
    * Sets the storage behavior for this field.
    *
    * @param bool $custom_storage

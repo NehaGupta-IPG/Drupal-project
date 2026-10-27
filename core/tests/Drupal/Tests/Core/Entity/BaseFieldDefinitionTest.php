@@ -343,6 +343,18 @@ class BaseFieldDefinitionTest extends UnitTestCase {
   }
 
   /**
+   * Tests dedicated table.
+   */
+  public function testDedicatedTable(): void {
+    $definition = BaseFieldDefinition::create($this->fieldType);
+    $this->assertFalse($definition->hasDedicatedTable());
+    $definition->setDedicatedTable(TRUE);
+    $this->assertTrue($definition->hasDedicatedTable());
+    $definition->setDedicatedTable(FALSE);
+    $this->assertFalse($definition->hasDedicatedTable());
+  }
+
+  /**
    * Tests default value callbacks.
    *
    * @legacy-covers ::setDefaultValueCallback

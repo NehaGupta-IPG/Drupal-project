@@ -518,6 +518,13 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   /**
    * {@inheritdoc}
    */
+  public function hasDedicatedTable() {
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getColumns() {
     $schema = $this->getSchema();
     return $schema['columns'];

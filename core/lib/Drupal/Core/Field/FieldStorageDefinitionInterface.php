@@ -323,6 +323,17 @@ interface FieldStorageDefinitionInterface extends CacheableDependencyInterface {
   public function isBaseField();
 
   /**
+   * Determines whether the field should be stored in a dedicated table.
+   *
+   * This allows certain single-value base fields to be stored in dedicated
+   * database tables, instead of adding them to a shared table.
+   *
+   * @return bool
+   *   Whether the field should be stored in a dedicated table.
+   */
+  public function hasDedicatedTable();
+
+  /**
    * Returns a unique identifier for the field storage.
    *
    * @return string
