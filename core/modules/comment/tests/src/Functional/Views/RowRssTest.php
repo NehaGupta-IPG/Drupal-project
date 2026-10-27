@@ -40,6 +40,8 @@ class RowRssTest extends CommentTestBase {
     $this->assertCount(1, $result, 'Just one comment was found in the rss output.');
 
     $this->assertEquals(gmdate('r', $this->comment->getCreatedTime()), $result[0]->find('xpath', '//pubDate')->getHtml(), 'The right pubDate appears in the rss output.');
+
+    $this->assertEquals($this->comment->getOwner()->getDisplayName(), $result[0]->find('xpath', '//dc:creator')->getHtml(), 'The right creator name appears in the rss output.');
   }
 
 }
