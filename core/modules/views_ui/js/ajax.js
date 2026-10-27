@@ -42,15 +42,13 @@
   ) {
     const $form = $('.js-views-ui-dialog form');
     // Identify the button that was clicked so that .ajaxSubmit() can use it.
-    // We need to do this for both .click() and .mousedown() since JavaScript
-    // code might trigger either behavior.
     const $submitButtons = $(
       once(
         'views-ajax-submit',
         $form.find('input[type=submit].js-form-submit, button.js-form-submit'),
       ),
     );
-    $submitButtons.on('click mousedown', function () {
+    $submitButtons.on('click', function () {
       this.form.clk = this;
     });
     once('views-ajax-submit', $form).forEach((form) => {

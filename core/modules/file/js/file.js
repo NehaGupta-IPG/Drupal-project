@@ -93,22 +93,20 @@
   Drupal.behaviors.fileButtons = {
     attach(context) {
       const $context = $(context);
-      $context
-        .find('.js-form-submit')
-        .on('mousedown', Drupal.file.disableFields);
+      $context.find('.js-form-submit').on('click', Drupal.file.disableFields);
       $context
         .find('.js-form-managed-file .js-form-submit')
-        .on('mousedown', Drupal.file.progressBar);
+        .on('click', Drupal.file.progressBar);
     },
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
         const $context = $(context);
         $context
           .find('.js-form-submit')
-          .off('mousedown', Drupal.file.disableFields);
+          .off('click', Drupal.file.disableFields);
         $context
           .find('.js-form-managed-file .js-form-submit')
-          .off('mousedown', Drupal.file.progressBar);
+          .off('click', Drupal.file.progressBar);
       }
     },
   };
@@ -198,7 +196,7 @@
       $(event.target)
         .closest('.js-form-managed-file')
         .find('.js-form-submit[data-drupal-selector$="upload-button"]')
-        .trigger('mousedown');
+        .trigger('click');
     },
 
     /**
@@ -207,7 +205,7 @@
      * @name Drupal.file.disableFields
      *
      * @param {jQuery.Event} event
-     *   The event triggered, most likely a `mousedown` event.
+     *   The event triggered, most likely a `click` event.
      */
     disableFields(event) {
       const $clickedButton = $(this);
@@ -225,7 +223,7 @@
       // working with. Filter out fields that are already disabled so that they
       // do not get enabled when we re-enable these fields at the end of
       // behavior processing. Re-enable in a setTimeout set to a relatively
-      // short amount of time (1 second). All the other mousedown handlers
+      // short amount of time (1 second). All the other click handlers
       // (like Drupal's Ajax behaviors) are executed before any timeout
       // functions are called, so we don't have to worry about the fields being
       // re-enabled too soon. @todo If the previous sentence is true, why not
@@ -247,7 +245,7 @@
      * @name Drupal.file.progressBar
      *
      * @param {jQuery.Event} event
-     *   The event triggered, most likely a `mousedown` event.
+     *   The event triggered, most likely a `click` event.
      */
     progressBar(event) {
       const $clickedButton = $(this);
