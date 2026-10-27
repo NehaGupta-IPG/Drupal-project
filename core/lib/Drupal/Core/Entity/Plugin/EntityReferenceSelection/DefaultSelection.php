@@ -17,6 +17,8 @@ use Drupal\Core\Entity\Plugin\Derivative\DefaultSelectionDeriver;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -86,6 +88,13 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
   protected $currentUser;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Constructs a new DefaultSelection object.
    *
    * @param array $configuration
@@ -106,8 +115,10 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
    *   The entity type bundle info service.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   Language manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityRepositoryInterface $entity_repository) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityRepositoryInterface $entity_repository, ?LanguageManagerInterface $language_manager = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
@@ -116,6 +127,25 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityRepository = $entity_repository;
+    $this->languageManager = $language_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager'),
+      $container->get('module_handler'),
+      $container->get('current_user'),
+      $container->get('entity_field.manager'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('entity.repository'),
+      $container->get('language_manager')
+    );
   }
 
   /**
@@ -140,6 +170,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       ],
       'auto_create' => FALSE,
       'auto_create_bundle' => NULL,
+      'language_restriction' => '',
     ] + parent::defaultConfiguration();
   }
 
@@ -306,7 +337,72 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       ];
     }
 
+    $form['language_restriction'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Restrict available items by language'),
+      '#options' => $this->getLanguageRestrictionOptions(),
+      '#default_value' => $configuration['language_restriction'],
+    ];
     return $form;
+  }
+
+  /**
+   * Get language_restriction options list.
+   *
+   * @return array
+   *   Options list.
+   */
+  protected function getLanguageRestrictionOptions() {
+
+    $options = [
+      '' => $this->t('No restrictions'),
+      LanguageInterface::LANGCODE_SITE_DEFAULT => $this->t("Site's default language (@language)", ['@language' => $this->languageManager->getDefaultLanguage()->getName()]),
+      'current_interface' => $this->t('Interface text language selected for page'),
+      'authors_default' => $this->t("Author's preferred language"),
+    ];
+
+    $languages = $this->languageManager->getLanguages(LanguageInterface::STATE_ALL);
+    foreach ($languages as $langcode => $language) {
+      $options[$langcode] = $language->isLocked() ? $this->t('- @name -', ['@name' => $language->getName()]) : $language->getName();
+    }
+
+    return $options;
+  }
+
+  /**
+   * Return language restriction settings for current field instance.
+   *
+   * @return string
+   *   Language restriction settings.
+   */
+  protected function getLanguageRestriction() {
+    $configuration = $this->getConfiguration();
+    $language = '';
+
+    if ($configuration['language_restriction']) {
+      $language_interface = $this->languageManager->getCurrentLanguage();
+      switch ($configuration['language_restriction']) {
+
+        case LanguageInterface::LANGCODE_SITE_DEFAULT:
+          $language = $this->languageManager->getDefaultLanguage()->getId();
+          break;
+
+        case 'current_interface':
+          $language = $language_interface->getId();
+          break;
+
+        case 'authors_default':
+          $language_code = $this->currentUser->getPreferredLangcode();
+          $language = $language_code ? $language_code : $language_interface->getId();
+          break;
+
+        default:
+          $language = $configuration['language_restriction'];
+          break;
+      }
+    }
+
+    return $language;
   }
 
   /**
@@ -487,6 +583,9 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     // Add the sort option.
     if ($configuration['sort']['field'] !== '_none') {
       $query->sort($configuration['sort']['field'], $configuration['sort']['direction']);
+    }
+    if (($langcode = $this->getLanguageRestriction()) && ($langcode_key = $entity_type->getKey('langcode'))) {
+      $query->condition($langcode_key, $langcode);
     }
 
     return $query;
