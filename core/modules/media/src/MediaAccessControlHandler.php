@@ -52,7 +52,8 @@ class MediaAccessControlHandler extends EntityAccessControlHandler implements En
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\media\MediaInterface $entity */
     // Allow admin permission to override all operations.
-    if ($account->hasPermission($this->entityType->getAdminPermission())) {
+    $permission = $this->entityType->getAdminPermission();
+    if (is_string($permission) && $account->hasPermission($permission)) {
       return AccessResult::allowed()->cachePerPermissions();
     }
 
