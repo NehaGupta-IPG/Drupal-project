@@ -30,6 +30,19 @@ core.extension:
       sequence:
         type: weight
         label: 'Weight'
+    feature_flag:
+      type: sequence
+      label: 'Enabled feature flags'
+      constraints:
+        ValidSequenceKeys:
+          constraints:
+            NotBlank: []
+            ExtensionName: []
+            ExtensionAvailable:
+              type: feature_flag
+      sequence:
+        type: weight
+        label: 'Weight'
     profile:
       type: string
       # Before Drupal is installed the profile is NULL. This allows all install

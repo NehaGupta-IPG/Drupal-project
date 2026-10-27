@@ -19,4 +19,5 @@ module:
   minimal: 1000
 theme:
   stark: 0
+feature_flag: {}
 profile: minimal

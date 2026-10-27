@@ -23,9 +23,7 @@ abstract class ExtensionList {
   /**
    * The type of the extension.
    *
-   * Possible values: "module", "theme", "profile" or "database_driver".
-   *
-   * @var string
+   * @var "module"|"theme"|"profile"|"database_driver"|"feature_flag"
    */
   protected $type;
 

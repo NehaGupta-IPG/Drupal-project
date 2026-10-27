@@ -40,6 +40,7 @@ class ExtensionAvailableConstraint extends SymfonyConstraint {
     public string $moduleNotExistsMessage = "Module '@name' is not available.",
     public string $themeNotExistsMessage = "Theme '@name' is not available.",
     public string $profileNotExistsMessage = "Profile '@name' is not available.",
+    public string $flagNotExistsMessage = "Feature flag '@name' is not available.",
     public string $couldNotLoadProfileToCheckExtension = "Profile '@profile' could not be loaded to check if the extension '@extension' is available.",
     ?array $groups = NULL,
     mixed $payload = NULL,

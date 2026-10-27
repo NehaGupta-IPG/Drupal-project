@@ -740,6 +740,8 @@ services:
     class: Drupal\Core\Extension\DatabaseDriverList
     arguments: ['%app.root%', 'database_driver', '@cache.default']
   Drupal\Core\Extension\DatabaseDriverList: '@extension.list.database_driver'
+  Drupal\Core\Extension\FeatureFlagExtensionList:
+    arguments: ['%app.root%', 'feature_flag', '@cache.default', '@info_parser', '@module_handler', '@state', '@config.factory', '%install_profile%']
   extension.path.resolver:
     class: Drupal\Core\Extension\ExtensionPathResolver
     arguments: ['@extension.list.module', '@extension.list.profile', '@extension.list.theme']
@@ -767,6 +769,9 @@ services:
     class: Drupal\Core\Extension\ThemeInstaller
     autowire: true
   Drupal\Core\Extension\ThemeInstallerInterface: '@theme_installer'
+  Drupal\Core\Extension\FeatureFlagInstaller:
+    autowire: true
+  Drupal\Core\Extension\FeatureFlagInstallerInterface: '@Drupal\Core\Extension\FeatureFlagInstaller'
   entity.memory_cache:
     class: Drupal\Core\Cache\MemoryCache\LruMemoryCache
     arguments: ['@datetime.time', '%entity.memory_cache.slots%']
