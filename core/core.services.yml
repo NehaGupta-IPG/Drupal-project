@@ -449,7 +449,6 @@ services:
   Drupal\Core\Config\CsrfGuardedStorage:
     decorates: config.storage.active
     autowire: true
-    autoconfigure: false
     public: false
   Drupal\Core\Access\CsrfStateChangeGuard:
     autowire: true
