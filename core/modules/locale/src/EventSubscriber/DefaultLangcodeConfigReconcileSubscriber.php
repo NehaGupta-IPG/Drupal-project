@@ -23,7 +23,7 @@ class DefaultLangcodeConfigReconcileSubscriber implements EventSubscriberInterfa
    *   The event.
    */
   public function onReconcile(DefaultLangcodeConfigReconcileEvent $event): void {
-    $event->setData($this->localeConfigManager->getTranslatedActiveData(
+    $event->setData($this->localeConfigManager->getDataForDefaultLangcodeChange(
       $event->name,
       $event->getData(),
       $event->newLangcode,

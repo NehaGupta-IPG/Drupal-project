@@ -599,7 +599,7 @@ class LocaleConfigManager {
   }
 
   /**
-   * Translates configuration data into the active configuration langcode.
+   * Translates configuration data when the default langcode changes.
    *
    * @param string $name
    *   The configuration name.
@@ -615,7 +615,7 @@ class LocaleConfigManager {
    * @return array
    *   The translated configuration data.
    */
-  public function getTranslatedActiveData(string $name, array $data, string $langcode, array $untranslated_keys = []): array {
+  public function getDataForDefaultLangcodeChange(string $name, array $data, string $langcode, array $untranslated_keys = []): array {
     $translatable = $this->getTranslatableDefaultConfig($name);
     if (empty($translatable)) {
       return $data;
