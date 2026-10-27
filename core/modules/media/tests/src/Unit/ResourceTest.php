@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Unit;
 
+use Drupal\media\OEmbed\Provider;
 use Drupal\media\OEmbed\Resource;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -89,6 +90,82 @@ class ResourceTest extends UnitTestCase {
     $resource = Resource::$factory('foo', $width, $height);
     $this->assertSame($expected_width ?: $width, $resource->getWidth());
     $this->assertSame($expected_height ?: $height, $resource->getHeight());
+  }
+
+  /**
+   * Tests thumbnail dimension conditional logic.
+   *
+   * @covers ::setThumbnailDimensions
+   */
+  public function testThumbnailDimensionsConditional(): void {
+    // Mock provider
+    $provider = $this->createMock(Provider::class);
+
+    // Case 1: Both dimensions provided.
+    $resource1 = Resource::photo(
+      'https://example.com/photo1.jpg',
+      800,
+      600,
+      $provider,
+      'Photo with Thumbnail',
+      '',
+      '',
+      3600,
+      'https://example.com/thumb1.jpg',
+      150,
+      150
+    );
+    $this->assertSame(150, $resource1->getThumbnailWidth());
+    $this->assertSame(150, $resource1->getThumbnailHeight());
+
+    // Case 2: One dimension missing.
+    $resource2 = Resource::photo(
+      'https://example.com/photo2.jpg',
+      800,
+      600,
+      $provider,
+      'Photo without Thumbnail',
+      '',
+      '',
+      3600,
+      'https://example.com/thumb2.jpg',
+      NULL,
+      150
+    );
+    $this->assertNull($resource2->getThumbnailWidth());
+    $this->assertNull($resource2->getThumbnailHeight());
+
+    // Case 3: Zero dimensions.
+    $resource3 = Resource::photo(
+      'https://example.com/photo3.jpg',
+      800,
+      600,
+      $provider,
+      'Photo with Zero Dimensions',
+      '',
+      '',
+      3600,
+      'https://example.com/thumb3.jpg',
+      0,
+      0
+    );
+    $this->assertNull($resource3->getThumbnailWidth());
+    $this->assertNull($resource3->getThumbnailHeight());
+
+    // Case 4: Both dimensions missing.
+    $resource2 = Resource::photo(
+      'https://example.com/photo2.jpg',
+      800,
+      600,
+      $provider,
+      'Photo without Thumbnail',
+      '',
+      '',
+      3600,
+      'https://example.com/thumb2.jpg'
+    );
+    $this->assertNull($resource2->getThumbnailWidth());
+    $this->assertNull($resource2->getThumbnailHeight());
   }
 
 }

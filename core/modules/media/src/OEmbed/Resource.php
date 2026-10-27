@@ -188,7 +188,9 @@ class Resource implements CacheableDependencyInterface {
 
     if ($thumbnail_url) {
       $this->thumbnailUrl = $thumbnail_url;
-      $this->setThumbnailDimensions($thumbnail_width, $thumbnail_height);
+      if ($thumbnail_width && $thumbnail_height) {
+        $this->setThumbnailDimensions($thumbnail_width, $thumbnail_height);
+      }
     }
   }
 
