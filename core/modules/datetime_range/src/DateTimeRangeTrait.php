@@ -4,11 +4,73 @@ namespace Drupal\datetime_range;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
  * Provides friendly methods for datetime range.
  */
 trait DateTimeRangeTrait {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function buildDate(DrupalDateTime $date, $all_day = FALSE) {
+    $this->setTimeZone($date);
+
+    $build = [
+      '#markup' => $this->formatDate($date, $all_day),
+      '#cache' => [
+        'contexts' => [
+          'timezone',
+        ],
+      ],
+    ];
+
+    return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function buildDateWithIsoAttribute(DrupalDateTime $date, $all_day = FALSE) {
+    // Create the ISO date in Universal Time.
+    $iso_date = $date->format("Y-m-d\TH:i:s") . 'Z';
+
+    $this->setTimeZone($date);
+
+    $build = [
+      '#theme' => 'time',
+      '#text' => $this->formatDate($date, $all_day),
+      '#html' => FALSE,
+      '#attributes' => [
+        'datetime' => $iso_date,
+      ],
+      '#cache' => [
+        'contexts' => [
+          'timezone',
+        ],
+      ],
+    ];
+
+    return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function formatDate($date, $all_day = FALSE) {
+    if ($all_day) {
+      $format_type = $this->getSetting('all_day_format_type');
+      $timezone = (new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE))->getName();
+    }
+    else {
+      $format_type = $this->getSetting('format_type');
+      $timezone = $this->getSetting('timezone_override') ?: $date->getTimezone()->getName();
+    }
+
+    return $this->dateFormatter->format($date->getTimestamp(), $format_type, '', $timezone != '' ? $timezone : NULL);
+  }
+
 
   /**
    * Get the default settings for a date and time range display.
@@ -19,6 +81,7 @@ trait DateTimeRangeTrait {
   protected static function dateTimeRangeDefaultSettings(): array {
     return [
       'from_to' => DateTimeRangeDisplayOptions::Both->value,
+      'all_day_format_type' => 'short',
       'separator' => '-',
     ];
   }
@@ -36,12 +99,14 @@ trait DateTimeRangeTrait {
         $start_date = $item->start_date;
         /** @var \Drupal\Core\Datetime\DrupalDateTime $end_date */
         $end_date = $item->end_date;
+        /** @var \Drupal\Core\Datetime\DrupalDateTime $all_day */
+        $all_day = $item->all_day;
 
         if ($start_date->getTimestamp() !== $end_date->getTimestamp()) {
-          $elements[$delta] = $this->renderStartEndWithIsoAttribute($start_date, $separator, $end_date);
+          $elements[$delta] = $this->renderStartEndWithIsoAttribute($start_date, $separator, $end_date, $all_day);
         }
         else {
-          $elements[$delta] = $this->buildDateWithIsoAttribute($start_date);
+          $elements[$delta] = $this->buildDateWithIsoAttribute($start_date, $all_day);
 
           if (!empty($item->_attributes)) {
             $elements[$delta]['#attributes'] += $item->_attributes;
@@ -74,6 +139,14 @@ trait DateTimeRangeTrait {
       '#default_value' => $this->getSetting('from_to'),
     ];
 
+    $allow_all_day = $this->fieldDefinition->getSetting('allow_all_day');
+    $form['all_day_format_type'] = [
+      '#title' => $this->t('All day date format'),
+      '#description' => $this->t("Choose a format for displaying the all day date. Be sure to set a format omitting time."),
+      '#default_value' => $this->getSetting('all_day_format_type'),
+      '#access' => (bool) $allow_all_day,
+    ] + $form['format_type'];
+
     $field_name = $this->fieldDefinition->getName();
     $form['separator'] = [
       '#type' => 'textfield',
@@ -103,6 +176,11 @@ trait DateTimeRangeTrait {
       if (isset($from_to_options[$from_to])) {
         $summary[] = $from_to_options[$from_to];
       }
+    }
+
+    if ($this->fieldDefinition->getSetting('allow_all_day')) {
+      $date = new DrupalDateTime();
+      $summary[] = $this->t('All day format: @display', ['@display' => $this->formatDate($date, TRUE)]);
     }
 
     if (($separator = $this->getSetting('separator')) && $this->getSetting('from_to') === DateTimeRangeDisplayOptions::Both->value) {
@@ -198,16 +276,16 @@ trait DateTimeRangeTrait {
    * @return array
    *   A renderable array for a single date time range.
    */
-  protected function renderStartEndWithIsoAttribute(DrupalDateTime $start_date, string $separator, DrupalDateTime $end_date): array {
+  protected function renderStartEndWithIsoAttribute(DrupalDateTime $start_date, string $separator, DrupalDateTime $end_date, $all_day): array {
     $element = [];
     if ($this->startDateIsDisplayed()) {
-      $element[DateTimeRangeDisplayOptions::StartDate->value] = $this->buildDateWithIsoAttribute($start_date);
+      $element[DateTimeRangeDisplayOptions::StartDate->value] = $this->buildDateWithIsoAttribute($start_date, $all_day);
     }
     if ($this->startDateIsDisplayed() && $this->endDateIsDisplayed()) {
       $element['separator'] = ['#plain_text' => ' ' . $separator . ' '];
     }
     if ($this->endDateIsDisplayed()) {
-      $element[DateTimeRangeDisplayOptions::EndDate->value] = $this->buildDateWithIsoAttribute($end_date);
+      $element[DateTimeRangeDisplayOptions::EndDate->value] = $this->buildDateWithIsoAttribute($end_date, $all_day);
     }
     return $element;
   }

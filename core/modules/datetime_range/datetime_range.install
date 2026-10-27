@@ -1,0 +1,71 @@
+<?php
+
+/**
+ * @file
+ * Installation functions for Datetime Range module.
+ */
+
+use Drupal\Core\Database\Database;
+use Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem;
+
+/**
+ * Adds database column for all day toggle.
+ */
+function datetime_range_update_10001() {
+  $spec = [
+    'description' => 'Flag indicating all day dates.',
+    'type' => 'int',
+    'size' => 'tiny',
+    'unsigned' => TRUE,
+    'not null' => FALSE,
+  ];
+
+  $database = \Drupal::database();
+  // Find fields that use datetime_range.
+  $datetime_range_fields = $database
+    ->select('config', 'c')
+    ->fields('c', ['name'])
+    ->condition('data', '%datetime_range%', 'LIKE')
+    ->condition('name', 'field.field.%', 'LIKE')
+    ->execute()
+    ->fetchCol();
+
+  $schema = Database::getConnection()->schema();
+  $entity_field_manager = \Drupal::service('entity_field.manager');
+  foreach($datetime_range_fields as $datetime_range_field) {
+    [, , $entity_type_id, , $field_name] = explode('.', $datetime_range_field);
+
+    $table_names = [
+      "{$entity_type_id}__{$field_name}" => [
+        'entity_type_id' => $entity_type_id,
+        'field_name' => $field_name,
+        ],
+      "{$entity_type_id}_revision__{$field_name}" => [
+        'entity_type_id' => $entity_type_id,
+        'field_name' => $field_name,
+      ],
+    ];
+    $column_name = "{$field_name}_all_day";
+
+    foreach ($table_names as $table_name => $entity_type_data) {
+      if (!$schema->tableExists($table_name) || $schema->fieldExists($table_name, $column_name)) {
+        continue;
+      }
+
+      // Add new column for all day property.
+      $schema->addField($table_name, $column_name, $spec);
+
+      // For datetime fields set all day as disabled for existing content.
+      $field_storage_definitions = $entity_field_manager
+        ->getFieldStorageDefinitions($entity_type_data['entity_type_id']);
+      if (isset($field_storage_definitions[$entity_type_data['field_name']])
+        && $field_storage_definitions[$entity_type_data['field_name']]->getSetting('datetime_type') === DateRangeItem::DATETIME_TYPE_DATETIME
+      ) {
+        $database
+          ->update($table_name)
+          ->fields([$column_name => 0])
+          ->execute();
+      }
+    }
+  }
+}

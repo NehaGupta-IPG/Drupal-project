@@ -7,6 +7,14 @@ field.storage_settings.daterange:
   type: field.storage_settings.datetime
   label: 'Date range settings'
 
+field.field_settings.daterange:
+  type: mapping
+  label: 'Date range field settings'
+  mapping:
+    allow_all_day:
+      type: boolean
+      label: 'Allow all day'
+
 field.value.daterange:
   type: mapping
   label: 'Default value'
@@ -23,6 +31,9 @@ field.value.daterange:
     default_end_date:
       type: string
       label: 'Default end date value'
+    default_all_day:
+      type: string
+      label: 'Default all-day value'
 
 field.formatter.settings.daterange_default:
   type: field.formatter.settings.datetime_default
@@ -41,6 +52,9 @@ field.formatter.settings.daterange_default:
       type: label
       label: 'Separator'
       translation context: 'Date range separator'
+    all_day_format_type:
+      type: string
+      label: 'Date format'
 
 field.formatter.settings.daterange_plain:
   type: field.formatter.settings.datetime_plain

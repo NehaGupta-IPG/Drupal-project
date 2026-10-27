@@ -51,6 +51,23 @@ class DateRangeFieldItemList extends DateTimeFieldItemList {
         ],
       ];
 
+      // All day property is applicable only to date type "Date and time".
+      $date_type = $this->getFieldDefinition()->getFieldStorageDefinition()->getSetting('datetime_type');
+      if ($date_type === DateRangeItem::DATETIME_TYPE_DATETIME) {
+        $element['default_all_day'] = [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Default all day'),
+          '#description' => $this->t('Set a default value for the all day option.'),
+          '#default_value' => $default_value[0]['default_all_day'] ?? NULL,
+          '#attributes' => ['class' => ['check_group']],
+          '#states' => [
+            'visible' => [
+              [':input[name="settings[allow_all_day]"]' => ['checked' => TRUE]],
+            ],
+          ],
+        ];
+      }
+
       return $element;
     }
   }
@@ -79,15 +96,25 @@ class DateRangeFieldItemList extends DateTimeFieldItemList {
    */
   public function defaultValuesFormSubmit(array $element, array &$form, FormStateInterface $form_state) {
     if ($form_state->getValue(['default_value_input', 'default_date_type'])
-      || $form_state->getValue(['default_value_input', 'default_end_date_type'])) {
+      || $form_state->getValue(['default_value_input', 'default_end_date_type'])
+      || $form_state->getValue(['default_value_input', 'default_all_day']) !== NULL
+    ) {
       if ($form_state->getValue(['default_value_input', 'default_date_type']) == static::DEFAULT_VALUE_NOW) {
         $form_state->setValueForElement($element['default_date'], static::DEFAULT_VALUE_NOW);
       }
       if ($form_state->getValue(['default_value_input', 'default_end_date_type']) == static::DEFAULT_VALUE_NOW) {
         $form_state->setValueForElement($element['default_end_date'], static::DEFAULT_VALUE_NOW);
       }
+      $date_type = $this->getFieldDefinition()->getFieldStorageDefinition()->getSetting('datetime_type');
+      if ($form_state->getValue(['settings', 'allow_all_day']) !== 1
+        || $date_type !== DateRangeItem::DATETIME_TYPE_DATETIME
+        && $form_state->getValue(['default_value_input', 'default_all_day']) !== NULL
+      ) {
+        $form_state->unsetValue(['default_value_input', 'default_all_day']);
+      }
       return [$form_state->getValue('default_value_input')];
     }
+
     return [];
   }
 
@@ -101,7 +128,10 @@ class DateRangeFieldItemList extends DateTimeFieldItemList {
 
     // Allow either the start or end date to have a default, but not require
     // defaults for both.
-    if (!empty($default_value[0]['default_date_type']) || !empty($default_value[0]['default_end_date_type'])) {
+    if (!empty($default_value[0]['default_date_type'])
+      || !empty($default_value[0]['default_end_date_type'])
+      || isset($default_value[0]['default_all_day'])
+    ) {
       // A default value should be in the format and timezone used for date
       // storage. All-day ranges are stored the same as date+time ranges.  We
       // only provide a default value for the first item, as do all fields.
@@ -122,6 +152,10 @@ class DateRangeFieldItemList extends DateTimeFieldItemList {
         $end_value = $end_date->format($storage_format);
         $default_values[0]['end_value'] = $end_value;
         $default_values[0]['end_date'] = $end_date;
+      }
+
+      if (isset($default_value[0]['default_all_day'])) {
+        $default_values[0]['all_day'] = $default_value[0]['default_all_day'];
       }
 
       $default_value = $default_values;
