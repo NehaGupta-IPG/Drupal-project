@@ -160,16 +160,12 @@ class TaxonomyTermViewTest extends TaxonomyTestBase {
     // Clear permissions for anonymous users to check access for default views.
     Role::load(RoleInterface::ANONYMOUS_ID)->revokePermission('access content')->save();
 
-    // Test the default views disclose no data by default. You'd expect a 403
-    // below because of "access content" permission being required, but because
-    // the view also has argument validation, the ValidArgumentEnhancer runs
-    // first and fails to validate because the argument validate_options have
-    // "access: true" and the anonymous user does not have access to the term.
+    // Test the default views disclose no data by default.
     $this->drupalLogout();
     $this->drupalGet('taxonomy/term/' . $term->id());
-    $this->assertSession()->statusCodeEquals(404);
+    $this->assertSession()->statusCodeEquals(403);
     $this->drupalGet('taxonomy/term/' . $term->id() . '/feed');
-    $this->assertSession()->statusCodeEquals(404);
+    $this->assertSession()->statusCodeEquals(403);
   }
 
 }
