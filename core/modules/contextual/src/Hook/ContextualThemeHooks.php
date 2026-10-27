@@ -2,7 +2,8 @@
 
 namespace Drupal\contextual\Hook;
 
-use Drupal\Core\Hook\Attribute\Preprocess;
+use Drupal\contextual\ContextualLinksSerializer;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -12,6 +13,7 @@ class ContextualThemeHooks {
 
   public function __construct(
     protected readonly AccountInterface $currentUser,
+    protected ContextualLinksSerializer $serializer,
   ) {}
 
   /**
@@ -21,7 +23,7 @@ class ContextualThemeHooks {
    * @see contextual_page_attachments()
    * @see \Drupal\contextual\ContextualController::render()
    */
-  #[Preprocess]
+  #[Hook('preprocess')]
   public function preprocess(&$variables, $hook, $info): void {
     // Determine the primary theme function argument.
     if (!empty($info['variables'])) {
@@ -50,7 +52,7 @@ class ContextualThemeHooks {
         // permission.
         $variables['title_suffix']['contextual_links'] = [
           '#type' => 'contextual_links_placeholder',
-          '#id' => _contextual_links_to_id($element['#contextual_links']),
+          '#id' => $this->serializer->linksToId($element['#contextual_links']),
         ];
       }
     }

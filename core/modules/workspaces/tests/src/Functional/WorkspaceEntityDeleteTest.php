@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Functional;
 
+use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests entity deletions with workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceEntityDeleteTest extends BrowserTestBase {
 
   use WorkspaceTestUtilities;
@@ -56,17 +58,32 @@ class WorkspaceEntityDeleteTest extends BrowserTestBase {
     $this->drupalLogin($editor);
 
     // Create a Dev workspace as a child of Stage.
-    $stage = Workspace::load('stage');
+    $stage = $this->createWorkspaceThroughUi('Stage', 'stage');
     $dev = $this->createWorkspaceThroughUi('Dev', 'dev', 'stage');
 
     // Create a published and an unpublished node in Live.
-    $published_live = $this->createNodeThroughUi('Test 1 published - live', 'article');
-    $unpublished_live = $this->createNodeThroughUi('Test 2 unpublished - live', 'article', FALSE);
-
+    $published_live = $this->drupalCreateNode([
+      'title' => 'Test 1 published - live',
+      'type' => 'article',
+      'status' => NodeInterface::PUBLISHED,
+    ]);
+    $unpublished_live = $this->drupalCreateNode([
+      'title' => 'Test 2 unpublished - live',
+      'type' => 'article',
+      'status' => NodeInterface::NOT_PUBLISHED,
+    ]);
     // Create a published and an unpublished node in Stage.
     $this->switchToWorkspace($stage);
-    $published_stage = $this->createNodeThroughUi('Test 3 published - stage', 'article');
-    $unpublished_stage = $this->createNodeThroughUi('Test 4 unpublished - stage', 'article', FALSE);
+    $published_stage = $this->drupalCreateNode([
+      'title' => 'Test 3 published - stage',
+      'type' => 'article',
+      'status' => NodeInterface::PUBLISHED,
+    ]);
+    $unpublished_stage = $this->drupalCreateNode([
+      'title' => 'Test 4 published - live',
+      'type' => 'article',
+      'status' => NodeInterface::NOT_PUBLISHED,
+    ]);
 
     // Check that the Live nodes (both published and unpublished) can not be
     // deleted, while the Stage nodes can be.
@@ -139,10 +156,13 @@ class WorkspaceEntityDeleteTest extends BrowserTestBase {
     $this->drupalLogin($editor);
 
     // Create a published node in Live.
-    $published_live = $this->createNodeThroughUi('Test 1 published - live', 'article');
+    $published_live = $this->drupalCreateNode([
+      'title' => 'Test 1 published - live',
+      'type' => 'article',
+      'status' => NodeInterface::PUBLISHED,
+    ]);
 
-    $stage = Workspace::load('stage');
-    $this->switchToWorkspace($stage);
+    $this->createAndActivateWorkspaceThroughUi('Stage', 'stage');
 
     // A user with the 'bypass node access' permission will be able to see the
     // 'Delete' operation button, but it shouldn't be able to perform the

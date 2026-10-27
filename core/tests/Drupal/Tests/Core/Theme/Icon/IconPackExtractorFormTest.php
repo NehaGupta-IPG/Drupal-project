@@ -6,36 +6,35 @@ namespace Drupal\Tests\Core\Theme\Icon;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
-use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Theme\Icon\IconPackExtractorForm;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
- * @coversDefaultClass \Drupal\Core\Theme\Icon\IconPackExtractorForm
- *
- * @group icon
+ * Tests Drupal\Core\Theme\Icon\IconPackExtractorForm.
  */
+#[CoversClass(IconPackExtractorForm::class)]
+#[Group('icon')]
 class IconPackExtractorFormTest extends UnitTestCase {
 
   /**
    * The icon pack form.
-   *
-   * @var \Drupal\Core\Theme\Icon\IconPackExtractorForm
    */
   private IconPackExtractorForm $iconPackForm;
 
   /**
    * The plugin form.
-   *
-   * @var \Drupal\Core\Plugin\PluginWithFormsInterface
    */
   private PluginWithFormsInterface $plugin;
 
   /**
    * The form state.
    *
-   * @var \Drupal\Core\Form\FormStateInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var \Prophecy\Prophecy\ObjectProphecy<\Drupal\Core\Form\FormStateInterface>
    */
-  private $formState;
+  private ObjectProphecy $formState;
 
   /**
    * {@inheritdoc}

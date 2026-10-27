@@ -6,13 +6,15 @@ namespace Drupal\Tests\Core\Utility;
 
 use Drupal\Core\Utility\PhpRequirements;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the \Drupal\Core\Utility\PhpRequirements class.
- *
- * @coversDefaultClass \Drupal\Core\Utility\PhpRequirements
- * @group Utility
  */
+#[CoversClass(PhpRequirements::class)]
+#[Group('Utility')]
 class PhpRequirementsTest extends UnitTestCase {
 
   /**
@@ -24,6 +26,7 @@ class PhpRequirementsTest extends UnitTestCase {
   public function testPhpEolDates(): void {
     $reflected = new \ReflectionClass(PhpRequirements::class);
     $php_eol_dates = $reflected->getStaticPropertyValue('phpEolDates');
+    $this->assertArrayHasKey(PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION, $php_eol_dates, 'The current PHP version end of life is known.');
 
     foreach ($php_eol_dates as $version => $eol_date) {
       // Ensure that all of the version numbers are defined in a superset of
@@ -39,7 +42,7 @@ class PhpRequirementsTest extends UnitTestCase {
     // Ensure that the EOL list is sorted in an ascending order by the date. If
     // there are multiple versions EOL on the same day, sort by the PHP
     // version.
-    uksort($php_eol_dates, function ($a, $b) use ($php_eol_dates) {
+    uksort($php_eol_dates, function ($a, $b) use ($php_eol_dates): int {
       $a_date = strtotime($php_eol_dates[$a]);
       $b_date = strtotime($php_eol_dates[$b]);
       if ($a_date === $b_date) {
@@ -47,7 +50,7 @@ class PhpRequirementsTest extends UnitTestCase {
       }
       return $a_date <=> $b_date;
     });
-    $this->assertSame($php_eol_dates, $reflected->getStaticPropertyValue('phpEolDates'));
+    $this->assertEquals($php_eol_dates, $reflected->getStaticPropertyValue('phpEolDates'));
   }
 
   /**
@@ -65,10 +68,9 @@ class PhpRequirementsTest extends UnitTestCase {
    * @param string $expected_php_version
    *   The PHP version the test should recommend.
    *
-   * @covers ::getMinimumSupportedPhp
-   *
-   * @dataProvider providerMinimumSupportedPhp
+   * @legacy-covers ::getMinimumSupportedPhp
    */
+  #[DataProvider('providerMinimumSupportedPhp')]
   public function testMinimumSupportedPhp(string $date_string, string $drupal_minimum_php, array $php_eol_dates, string $expected_php_version): void {
     $reflected = new \ReflectionClass(PhpRequirements::class);
     $reflected->setStaticPropertyValue('drupalMinimumPhp', $drupal_minimum_php);

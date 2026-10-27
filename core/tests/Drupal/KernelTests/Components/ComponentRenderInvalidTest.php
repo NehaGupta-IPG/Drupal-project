@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Components;
 
 use Drupal\Core\Render\Component\Exception\InvalidComponentException;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests invalid render options for components.
- *
- * @group sdc
  */
+#[Group('sdc')]
+#[RunTestsInSeparateProcesses]
 class ComponentRenderInvalidTest extends ComponentKernelTestBase {
 
   /**
@@ -31,7 +33,7 @@ class ComponentRenderInvalidTest extends ComponentKernelTestBase {
    */
   public function testInvalidDefinitionModule(): void {
     $this->expectException(InvalidComponentException::class);
-    $this->expectExceptionMessage('The component "sdc_test_invalid:my-card-no-schema" does not provide schema information. Schema definitions are mandatory for components declared in modules. For components declared in themes, schema definitions are only mandatory if the "enforce_prop_schemas" key is set to "true" in the theme info file.');
+    $this->expectExceptionMessageIs('The component "sdc_test_invalid:my-card-no-schema" does not provide schema information. Schema definitions are mandatory for components declared in modules. For components declared in themes, schema definitions are only mandatory if the "enforce_prop_schemas" key is set to "true" in the theme info file.');
     $this->manager->getDefinitions();
   }
 

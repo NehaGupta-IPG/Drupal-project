@@ -7,16 +7,16 @@ namespace Drupal\Tests\views\Unit\Plugin\views\query;
 use Drupal\Core\Database\Connection;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\query\SqliteDateSql;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore unixepoch
-
 /**
  * Tests the MySQL-specific date query handler.
- *
- * @coversDefaultClass \Drupal\views\Plugin\views\query\SqliteDateSql
- *
- * @group views
  */
+#[CoversClass(SqliteDateSql::class)]
+#[Group('views')]
 class SqliteDateSqlTest extends UnitTestCase {
 
   /**
@@ -31,13 +31,11 @@ class SqliteDateSqlTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->database = $this->prophesize(Connection::class)->reveal();
+    $this->database = $this->createStub(Connection::class);
   }
 
   /**
    * Tests the getDateField method.
-   *
-   * @covers ::getDateField
    */
   public function testGetDateField(): void {
     $date_sql = new SqliteDateSql($this->database);
@@ -51,12 +49,9 @@ class SqliteDateSqlTest extends UnitTestCase {
 
   /**
    * Tests date formatting replacement.
-   *
-   * @covers ::getDateFormat
-   *
-   * @dataProvider providerTestGetDateFormat
    */
-  public function testGetDateFormat($field, $format, $expected): void {
+  #[DataProvider('providerTestGetDateFormat')]
+  public function testGetDateFormat(string $field, string $format, string $expected): void {
     $date_sql = new SqliteDateSql($this->database);
 
     $this->assertEquals($expected, $date_sql->getDateFormat($field, $format));
@@ -65,7 +60,7 @@ class SqliteDateSqlTest extends UnitTestCase {
   /**
    * Provider for date formatting test.
    */
-  public static function providerTestGetDateFormat() {
+  public static function providerTestGetDateFormat(): array {
     return [
       [
         'foo.field',
@@ -92,8 +87,6 @@ class SqliteDateSqlTest extends UnitTestCase {
 
   /**
    * Tests timezone offset formatting.
-   *
-   * @covers ::setFieldTimezoneOffset
    */
   public function testSetFieldTimezoneOffset(): void {
     $date_sql = new SqliteDateSql($this->database);
@@ -105,13 +98,11 @@ class SqliteDateSqlTest extends UnitTestCase {
 
   /**
    * Tests setting the database offset.
-   *
-   * @covers ::setTimezoneOffset
    */
   public function testSetTimezoneOffset(): void {
-    $database = $this->prophesize(Connection::class);
-    $database->query()->shouldNotBeCalled();
-    $date_sql = new SqliteDateSql($database->reveal());
+    $database = $this->createMock(Connection::class);
+    $database->expects($this->never())->method('query');
+    $date_sql = new SqliteDateSql($database);
     $date_sql->setTimezoneOffset(42);
   }
 

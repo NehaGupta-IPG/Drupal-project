@@ -31,7 +31,7 @@ abstract class BaseFieldOverrideResourceTestBase extends ConfigEntityResourceTes
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer node fields']);
   }
 
@@ -49,7 +49,7 @@ abstract class BaseFieldOverrideResourceTestBase extends ConfigEntityResourceTes
       'field_name' => 'promote',
       'entity_type' => 'node',
       'bundle' => 'camelids',
-      'label' => 'Promote to front page',
+      'label' => 'Promoted',
     ]);
     $entity->save();
 
@@ -74,7 +74,7 @@ abstract class BaseFieldOverrideResourceTestBase extends ConfigEntityResourceTes
       'field_name' => 'promote',
       'field_type' => 'boolean',
       'id' => 'node.camelids.promote',
-      'label' => 'Promote to front page',
+      'label' => 'Promoted',
       'langcode' => 'en',
       'required' => FALSE,
       'settings' => [

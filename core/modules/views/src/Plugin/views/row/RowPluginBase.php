@@ -4,6 +4,7 @@ namespace Drupal\views\Plugin\views\row;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Plugin\views\PluginBase;
+use Drupal\views\ResultRow;
 use Drupal\views\Views;
 
 /**
@@ -52,13 +53,13 @@ abstract class RowPluginBase extends PluginBase {
   /**
    * The actual field used.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $base_field;
 
   /**
    * The field alias.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $field_alias;
 
   /**
@@ -97,7 +98,7 @@ abstract class RowPluginBase extends PluginBase {
       $relationship_options = [];
 
       foreach ($relationships as $relationship) {
-        $relationship_handler = Views::handlerManager('relationship')->getHandler($relationship);
+        $relationship_handler = \Drupal::service('plugin.manager.views.relationship')->getHandler($relationship);
 
         // If this relationship is valid for this type, add it to the list.
         $data = Views::viewsData()->get($relationship['table']);
@@ -168,18 +169,18 @@ abstract class RowPluginBase extends PluginBase {
   public function preRender($result) {}
 
   /**
-   * Renders a row object.
+   * Creates a render array for a row object.
    *
    * This usually passes through to a theme template of some form, but not
    * always.
    *
-   * @param object $row
+   * @param \Drupal\views\ResultRow $row
    *   A single row of the query result, so an element of $view->result.
    *
-   * @return string
-   *   The rendered output of a single row, used by the style plugin.
+   * @return array
+   *   The render array for a single row, used by the style plugin.
    */
-  public function render($row) {
+  public function render(ResultRow $row) {
     return [
       '#theme' => $this->themeFunctions(),
       '#view' => $this->view,

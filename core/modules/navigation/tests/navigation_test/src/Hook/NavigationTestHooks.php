@@ -31,7 +31,6 @@ class NavigationTestHooks {
   public function blockAlter(&$definitions): void {
     if ($this->state->get('navigation_safe_alter')) {
       $definitions['navigation_link']['allow_in_navigation'] = TRUE;
-      $definitions['navigation_shortcuts']['allow_in_navigation'] = FALSE;
     }
   }
 
@@ -97,7 +96,7 @@ class NavigationTestHooks {
         unset($tree[$key]);
       }
 
-      // Updates title for items in menu2
+      // Updates title for items in menu2.
       if ($menu_name == 'menu2') {
         $item->link->updateLink(['title' => 'New Link Title'], FALSE);
       }

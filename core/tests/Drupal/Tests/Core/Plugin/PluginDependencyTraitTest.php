@@ -12,20 +12,23 @@ use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Plugin\Definition\DependentPluginDefinitionInterface;
 use Drupal\Core\Plugin\PluginDependencyTrait;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Prophecy\ProphecyInterface;
 use Prophecy\Prophet;
 
 /**
- * @coversDefaultClass \Drupal\Core\Plugin\PluginDependencyTrait
- * @group Plugin
+ * Tests Drupal\Core\Plugin\PluginDependencyTrait.
  */
+#[CoversClass(PluginDependencyTrait::class)]
+#[Group('Plugin')]
 class PluginDependencyTraitTest extends UnitTestCase {
 
   /**
-   * @covers ::getPluginDependencies
-   *
-   * @dataProvider providerTestPluginDependencies
+   * Tests get plugin dependencies.
    */
+  #[DataProvider('providerTestPluginDependencies')]
   public function testGetPluginDependencies(ProphecyInterface $plugin, $definition, array $expected): void {
     $test_class = new TestPluginDependency();
 
@@ -47,9 +50,7 @@ class PluginDependencyTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::calculatePluginDependencies
-   *
-   * @dataProvider providerTestPluginDependencies
+   * Tests calculate plugin dependencies.
    *
    * @param \Prophecy\Prophecy\ProphecyInterface $plugin
    *   A prophecy of a plugin instance.
@@ -58,6 +59,7 @@ class PluginDependencyTraitTest extends UnitTestCase {
    * @param array $expected
    *   The expected dependencies.
    */
+  #[DataProvider('providerTestPluginDependencies')]
   public function testCalculatePluginDependencies(ProphecyInterface $plugin, $definition, array $expected): void {
     $test_class = new TestPluginDependency();
 
@@ -80,7 +82,7 @@ class PluginDependencyTraitTest extends UnitTestCase {
   /**
    * Provides test data for plugin dependencies.
    */
-  public static function providerTestPluginDependencies() {
+  public static function providerTestPluginDependencies(): array {
     $prophet = new Prophet();
     $data = [];
 
@@ -182,17 +184,13 @@ class TestPluginDependency {
 
   /**
    * The module handler.
-   *
-   * @var Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * The theme handler.
-   *
-   * @var Drupal\Core\Extension\ThemeHandlerInterface
    */
-  protected $themeHandler;
+  protected ThemeHandlerInterface $themeHandler;
 
   public function setModuleHandler(ModuleHandlerInterface $module_handler): void {
     $this->moduleHandler = $module_handler;
@@ -202,11 +200,11 @@ class TestPluginDependency {
     $this->themeHandler = $theme_handler;
   }
 
-  protected function moduleHandler() {
+  protected function moduleHandler(): ModuleHandlerInterface {
     return $this->moduleHandler;
   }
 
-  protected function themeHandler() {
+  protected function themeHandler(): ThemeHandlerInterface {
     return $this->themeHandler;
   }
 
@@ -214,7 +212,7 @@ class TestPluginDependency {
    * @return array[]
    *   The dependencies.
    */
-  public function getDependencies() {
+  public function getDependencies(): array {
     return $this->dependencies;
   }
 

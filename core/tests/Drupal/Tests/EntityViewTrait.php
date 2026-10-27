@@ -37,7 +37,7 @@ trait EntityViewTrait {
    * @see \Drupal\Core\Render\RendererInterface::render()
    */
   protected function buildEntityView(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
-    $ensure_fully_built = function (&$elements) use (&$ensure_fully_built) {
+    $ensure_fully_built = function (&$elements): void {
       // If the default values for this element have not been loaded yet,
       // populate them.
       if (isset($elements['#type']) && empty($elements['#defaults_loaded'])) {
@@ -56,13 +56,22 @@ trait EntityViewTrait {
       // And recurse.
       $children = Element::children($elements, TRUE);
       foreach ($children as $key) {
-        $ensure_fully_built($elements[$key]);
+        \Closure::getCurrent()($elements[$key]);
       }
     };
 
     $render_controller = $this->container->get('entity_type.manager')->getViewBuilder($entity->getEntityTypeId());
     $build = $render_controller->view($entity, $view_mode, $langcode);
     $ensure_fully_built($build);
+
+    // EntityViewBuilder adds a #pre_render hook that tracks entity render array
+    // to prevent recursive rendering. Since the #pre_render hooks were called
+    // manually here without rendering actually taking place, unset the tracking
+    // for the render array so that when it is rendered, it does not trigger
+    // the recursive protection.
+    if (method_exists($render_controller, 'unsetRecursiveRenderProtection')) {
+      $render_controller->unsetRecursiveRenderProtection('', $build);
+    }
 
     return $build;
   }

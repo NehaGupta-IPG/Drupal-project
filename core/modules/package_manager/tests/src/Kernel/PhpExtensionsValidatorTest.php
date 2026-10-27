@@ -8,12 +8,21 @@ use Drupal\package_manager\Event\PostCreateEvent;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\PhpExtensionsValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\package_manager\Validator\PhpExtensionsValidator
- * @group package_manager
+ * Tests Php Extensions Validator.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[Group('#slow')]
+#[CoversClass(PhpExtensionsValidator::class)]
+#[RunTestsInSeparateProcesses]
 class PhpExtensionsValidatorTest extends PackageManagerKernelTestBase {
 
   /**
@@ -63,9 +72,8 @@ class PhpExtensionsValidatorTest extends PackageManagerKernelTestBase {
    *   The expected validation results during the status check event.
    * @param \Drupal\package_manager\ValidationResult[] $expected_life_cycle_results
    *   The expected validation results during pre-create and pre-apply event.
-   *
-   * @dataProvider providerPhpExtensionsValidation
    */
+  #[DataProvider('providerPhpExtensionsValidation')]
   public function testPhpExtensionsValidation(array $loaded_extensions, array $expected_status_check_results, array $expected_life_cycle_results): void {
     $state = $this->container->get('state');
     // @see \Drupal\package_manager\Validator\PhpExtensionsValidator::isExtensionLoaded()
@@ -78,7 +86,7 @@ class PhpExtensionsValidatorTest extends PackageManagerKernelTestBase {
     $state->delete('package_manager_loaded_php_extensions');
     // On post-create set the loaded extensions in state so that the pre-apply
     // event will have the expected validation error.
-    $this->addEventTestListener(function () use ($state, $loaded_extensions) {
+    $this->addEventTestListener(function () use ($state, $loaded_extensions): void {
       $state->set('package_manager_loaded_php_extensions', $loaded_extensions);
     }, PostCreateEvent::class);
     $this->assertResults($expected_life_cycle_results, PreApplyEvent::class);

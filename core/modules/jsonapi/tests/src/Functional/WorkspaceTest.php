@@ -10,12 +10,15 @@ use Drupal\Core\Url;
 use Drupal\jsonapi\JsonApiSpec;
 use Drupal\user\Entity\User;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "Workspace" content entity type.
- *
- * @group jsonapi
  */
+#[Group('jsonapi')]
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceTest extends ResourceTestBase {
 
   /**
@@ -141,8 +144,9 @@ class WorkspaceTest extends ResourceTestBase {
           'created' => '1973-11-29T21:33:09+00:00',
           'changed' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'label' => 'Campaign',
+          'provider' => 'default',
           'drupal_internal__id' => 'campaign',
-          'drupal_internal__revision_id' => 2,
+          'drupal_internal__revision_id' => 1,
         ],
         'relationships' => [
           'parent' => [

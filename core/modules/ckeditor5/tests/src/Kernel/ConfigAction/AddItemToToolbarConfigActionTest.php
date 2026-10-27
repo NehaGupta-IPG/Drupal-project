@@ -4,18 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\Kernel\ConfigAction;
 
+use Drupal\ckeditor5\Plugin\ConfigAction\AddItemToToolbar;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Recipe\InvalidConfigException;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\editor\Entity\Editor;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
- * @covers \Drupal\ckeditor5\Plugin\ConfigAction\AddItemToToolbar
- * @group ckeditor5
- * @group Recipe
+ * Tests add item to toolbar config action.
  */
+#[CoversClass(AddItemToToolbar::class)]
+#[Group('ckeditor5')]
+#[Group('Recipe')]
+#[RunTestsInSeparateProcesses]
 class AddItemToToolbarConfigActionTest extends KernelTestBase {
 
   use RecipeTestTrait;
@@ -34,7 +41,7 @@ class AddItemToToolbarConfigActionTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $configSchemaCheckerExclusions = [
+  protected static array $configSchemaCheckerExclusions = [
     // This test must be allowed to save invalid config, we can confirm that
     // any invalid stuff is validated by the config actions system.
     'editor.editor.filter_test',
@@ -60,18 +67,22 @@ class AddItemToToolbarConfigActionTest extends KernelTestBase {
   }
 
   /**
+   * Tests add item to toolbar.
+   *
    * @param string|array<string, mixed> $action
    *   The value to pass to the config action.
    * @param string[] $expected_toolbar_items
    *   The items which should be in the editor toolbar, in the expected order.
-   *
-   * @testWith ["sourceEditing", ["heading", "bold", "italic", "sourceEditing"]]
-   *   [{"item_name": "sourceEditing"}, ["heading", "bold", "italic", "sourceEditing"]]
-   *   [{"item_name": "sourceEditing", "position": 1}, ["heading", "sourceEditing", "bold", "italic"]]
-   *   [{"item_name": "sourceEditing", "position": 1, "replace": true}, ["heading", "sourceEditing", "italic"]]
-   *   [{"item_name": "bold"}, ["heading", "bold", "italic"]]
-   *   [{"item_name": "bold", "allow_duplicate": true}, ["heading", "bold", "italic", "bold"]]
    */
+  #[TestWith(["sourceEditing", ["heading", "bold", "italic", "sourceEditing"]])]
+  #[TestWith([["item_name" => "sourceEditing"], ["heading", "bold", "italic", "sourceEditing"]])]
+  #[TestWith([["item_name" => "sourceEditing", "position" => 1], ["heading", "sourceEditing", "bold", "italic"]])]
+  #[TestWith([
+    ["item_name" => "sourceEditing", "position" => 1, "replace" => TRUE],
+    ["heading", "sourceEditing", "italic"],
+  ])]
+  #[TestWith([["item_name" => "bold"], ["heading", "bold", "italic"]])]
+  #[TestWith([["item_name" => "bold", "allow_duplicate" => TRUE], ["heading", "bold", "italic", "bold"]])]
   public function testAddItemToToolbar(string|array $action, array $expected_toolbar_items): void {
     $recipe = $this->createRecipe([
       'name' => 'CKEditor 5 toolbar item test',
@@ -96,6 +107,68 @@ class AddItemToToolbarConfigActionTest extends KernelTestBase {
   }
 
   /**
+   * Tests adding multiple items to an editor toolbar.
+   */
+  public function testAddMultipleItemsToToolbar(): void {
+    $recipe = $this->createRecipe([
+      'name' => 'CKEditor 5 multiple toolbar items test',
+      'config' => [
+        'actions' => [
+          'editor.editor.filter_test' => [
+            'addItemsToToolbar' => [
+              'sourceEditing',
+              [
+                'item_name' => 'italic',
+                'allow_duplicate' => TRUE,
+                'position' => 0,
+              ],
+            ],
+          ],
+        ],
+      ],
+    ]);
+    RecipeRunner::processRecipe($recipe);
+
+    /** @var array{toolbar: array{items: string[]}, plugins: array<string, array<mixed>>} $settings */
+    $settings = Editor::load('filter_test')?->getSettings();
+    // The `sourceEditing` item should have been appended to the initial
+    // toolbar, and a duplicate `italic` item inserted at the beginning.
+    $this->assertSame(['italic', 'heading', 'bold', 'italic', 'sourceEditing'], $settings['toolbar']['items']);
+    // The plugin's default settings should have been added.
+    $this->assertSame([], $settings['plugins']['ckeditor5_sourceEditing']['allowed_tags']);
+  }
+
+  /**
+   * Tests that an empty list of toolbar items is rejected.
+   */
+  public function testEmptyItemListIsRejected(): void {
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessageIs('The editor:addItemsToToolbar config action requires one or more toolbar items.');
+    $this->container->get('plugin.manager.config_action')
+      ->applyAction('editor:addItemsToToolbar', 'editor.editor.filter_test', []);
+  }
+
+  /**
+   * Tests that a toolbar item which is not a string or array is rejected.
+   */
+  public function testInvalidItemTypeIsRejected(): void {
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessageIs('The editor:addItemsToToolbar config action requires each toolbar item to be a string or an array of options.');
+    $this->container->get('plugin.manager.config_action')
+      ->applyAction('editor:addItemsToToolbar', 'editor.editor.filter_test', [123]);
+  }
+
+  /**
+   * Tests that a toolbar item without an item name is rejected.
+   */
+  public function testMissingItemNameIsRejected(): void {
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessageIs("The editor:addItemsToToolbar config action requires each toolbar item to define an 'item_name' string.");
+    $this->container->get('plugin.manager.config_action')
+      ->applyAction('editor:addItemsToToolbar', 'editor.editor.filter_test', [['position' => 0]]);
+  }
+
+  /**
    * Tests that adding non-existent toolbar item to CKEditor triggers an error.
    */
   public function testAddNonExistentItem(): void {
@@ -111,7 +184,7 @@ class AddItemToToolbarConfigActionTest extends KernelTestBase {
     ]);
 
     $this->expectException(InvalidConfigException::class);
-    $this->expectExceptionMessage("There were validation errors in editor.editor.filter_test:\n- settings.toolbar.items.3: The provided toolbar item <em class=\"placeholder\">bogus_item</em> is not valid.");
+    $this->expectExceptionMessageIs("There were validation errors in editor.editor.filter_test:\n- settings.toolbar.items.3: The provided toolbar item <em class=\"placeholder\">bogus_item</em> is not valid.");
     RecipeRunner::processRecipe($recipe);
   }
 
@@ -131,7 +204,7 @@ config:
 YAML;
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage('The editor:addItemToToolbar config action only works with editors that use CKEditor 5.');
+    $this->expectExceptionMessageIs('The editor:addItemToToolbar config action only works with editors that use CKEditor 5.');
     RecipeRunner::processRecipe($this->createRecipe($recipe));
   }
 

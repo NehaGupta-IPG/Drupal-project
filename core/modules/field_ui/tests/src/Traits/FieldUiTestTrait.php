@@ -11,10 +11,12 @@ use Behat\Mink\Exception\ElementNotFoundException;
  */
 trait FieldUiTestTrait {
 
+  use FieldUiAssertTrait;
+
   /**
    * Creates a new field through the Field UI.
    *
-   * @param string $bundle_path
+   * @param string|null $bundle_path
    *   Admin path of the bundle that the new field is to be attached to.
    * @param string $field_name
    *   The field name of the new field storage.
@@ -33,7 +35,7 @@ trait FieldUiTestTrait {
    *   (optional) Parameter for conditional execution of second and third step
    *   (Saving the storage settings and field settings). Defaults to 'TRUE'.
    */
-  public function fieldUIAddNewField($bundle_path, $field_name, $label = NULL, $field_type = 'test_field', array $storage_edit = [], array $field_edit = [], bool $save_settings = TRUE) {
+  public function fieldUIAddNewField($bundle_path, $field_name, $label = NULL, $field_type = 'test_field', array $storage_edit = [], array $field_edit = [], bool $save_settings = TRUE): void {
     // Generate a label containing only letters and numbers to prevent random
     // test failure.
     // See https://www.drupal.org/project/drupal/issues/3030902
@@ -118,7 +120,7 @@ trait FieldUiTestTrait {
    *   (optional) $edit parameter for submitForm() on the second step
    *   ('Field settings' form).
    */
-  public function fieldUIAddExistingField($bundle_path, $existing_storage_name, $label = NULL, array $field_edit = []) {
+  public function fieldUIAddExistingField($bundle_path, $existing_storage_name, $label = NULL, array $field_edit = []): void {
     $label = $label ?: $this->randomMachineName();
     $field_edit['edit-label'] = $label;
 
@@ -141,10 +143,7 @@ trait FieldUiTestTrait {
     $this->assertSession()->pageTextContains("Saved $label configuration.");
 
     // Check that the field appears in the overview form.
-    $xpath = $this->assertSession()->buildXPathQuery("//table[@id=\"field-overview\"]//tr/td[1 and text() = :label]", [
-      ':label' => $label,
-    ]);
-    $this->assertSession()->elementExists('xpath', $xpath);
+    $this->assertFieldExistsOnOverview($label);
   }
 
   /**
@@ -161,7 +160,7 @@ trait FieldUiTestTrait {
    * @param string $source_label
    *   (optional) The label of the source entity type bundle.
    */
-  public function fieldUIDeleteField($bundle_path, $field_name, $label, $bundle_label, string $source_label = '') {
+  public function fieldUIDeleteField($bundle_path, $field_name, $label, $bundle_label, string $source_label = ''): void {
     // Display confirmation form.
     $this->drupalGet("$bundle_path/fields/$field_name/delete");
     $this->assertSession()->pageTextContains("Are you sure you want to delete the field $label");
@@ -175,79 +174,6 @@ trait FieldUiTestTrait {
       ':label' => $label,
     ]);
     $this->assertSession()->elementNotExists('xpath', $xpath);
-  }
-
-  /**
-   * Helper function that returns the name of the group that a field is in.
-   *
-   * @param string $field_type
-   *   The name of the field type.
-   *
-   * @return string|null
-   *   Group name
-   */
-  public function getFieldFromGroup($field_type) {
-    /** @var \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_plugin_manager */
-    $field_type_plugin_manager = \Drupal::service('plugin.manager.field.field_type');
-    $grouped_field_types = $field_type_plugin_manager->getGroupedDefinitions($field_type_plugin_manager->getUiDefinitions());
-    foreach ($grouped_field_types as $group => $field_types) {
-      if (array_key_exists($field_type, $field_types)) {
-        return $group;
-      }
-    }
-    return NULL;
-  }
-
-  /**
-   * Asserts that the field appears on the overview form.
-   *
-   * @param string $label
-   *   The field label.
-   *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
-   */
-  protected function assertFieldExistsOnOverview(string $label) {
-    $xpath = $this->assertSession()
-      ->buildXPathQuery("//table[@id=\"field-overview\"]//tr/td[1 and text() = :label]", [
-        ':label' => $label,
-      ]);
-    $element = $this->getSession()->getPage()->find('xpath', $xpath);
-    if ($element === NULL) {
-      throw new ElementNotFoundException($this->getSession()->getDriver(), 'form field', 'label', $label);
-    }
-  }
-
-  /**
-   * Asserts that the field does not appear on the overview form.
-   *
-   * @param string $label
-   *   The field label.
-   */
-  protected function assertFieldDoesNotExistOnOverview(string $label) {
-    $xpath = $this->assertSession()
-      ->buildXPathQuery("//table[@id=\"field-overview\"]//tr/td[1 and text() = :label]", [
-        ':label' => $label,
-      ]);
-    $element = $this->getSession()->getPage()->find('xpath', $xpath);
-    $this->assertSession()->assert($element === NULL, sprintf('A field "%s" appears on this page, but it should not.', $label));
-  }
-
-  /**
-   * Asserts that a header cell appears on a table.
-   *
-   * @param string $table_id
-   *   The HTML attribute value to target a given table.
-   * @param string $label
-   *   The cell label.
-   */
-  protected function assertTableHeaderExistsByLabel(string $table_id, string $label): void {
-    $expression = '//table[@id=:id]//tr//th[1 and text() = :label]';
-    $xpath = $this->assertSession()->buildXPathQuery($expression, [
-      ':id' => $table_id,
-      ':label' => $label,
-    ]);
-    $element = $this->getSession()->getPage()->find('xpath', $xpath);
-    $this->assertSession()->assert($element !== NULL, sprintf('Table header not found by label: "%s".', $label));
   }
 
 }

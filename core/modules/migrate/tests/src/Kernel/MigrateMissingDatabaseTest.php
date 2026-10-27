@@ -9,12 +9,14 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that a SQL migration can be instantiated without a database connection.
- *
- * @group migrate
  */
+#[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class MigrateMissingDatabaseTest extends KernelTestBase {
 
   /**
@@ -57,7 +59,7 @@ class MigrateMissingDatabaseTest extends KernelTestBase {
     $this->assertInstanceOf(MigrationInterface::class, $migration);
     $this->assertInstanceOf(MigrateIdMapInterface::class, $migration->getIdMap());
     $this->expectException(RequirementsException::class);
-    $this->expectExceptionMessage('No database connection available for source plugin migrate_missing_database_test');
+    $this->expectExceptionMessageIs('No database connection available for source plugin migrate_missing_database_test');
     $migration->checkRequirements();
   }
 

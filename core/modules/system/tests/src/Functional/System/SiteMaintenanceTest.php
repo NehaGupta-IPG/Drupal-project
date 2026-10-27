@@ -8,12 +8,14 @@ use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests access to site while in maintenance mode.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class SiteMaintenanceTest extends BrowserTestBase {
 
   use AssertMailTrait {
@@ -23,7 +25,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node'];
+  protected static $modules = ['node', 'dblog'];
 
   /**
    * {@inheritdoc}
@@ -39,8 +41,6 @@ class SiteMaintenanceTest extends BrowserTestBase {
 
   /**
    * User allowed to access site in maintenance mode.
-   *
-   * @var \Drupal\user\Entity\User
    */
   protected User $user;
 
@@ -63,6 +63,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->adminUser = $this->drupalCreateUser([
       'administer site configuration',
       'access site in maintenance mode',
+      'access site reports',
     ]);
     $this->drupalLogin($this->adminUser);
   }
@@ -103,6 +104,11 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->assertSession()->linkExists('Go online.');
     $this->assertSession()->linkByHrefExists(Url::fromRoute('system.site_maintenance_mode')->toString());
 
+    // Verify that the change to maintenance mode is logged.
+    $this->drupalGet(Url::fromRoute('dblog.overview'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContainsOnce('Maintenance mode enabled.');
+
     // Logout and verify that offline message is displayed.
     $this->drupalLogout();
     $this->drupalGet('');
@@ -136,7 +142,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->drupalGet('admin/config/development/maintenance');
     $this->assertSession()->pageTextNotContains($admin_message);
 
-    $offline_message = 'Sorry, not online.';
+    $offline_message = 'Not online.';
     $edit = [
       'maintenance_mode_message' => $offline_message,
     ];
@@ -168,14 +174,32 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->submitForm([], 'Log in');
     $this->assertSession()->pageTextContains($user_message);
 
-    // Check if title displays in Olivero on maintenance page.
-    \Drupal::service('theme_installer')->install(['olivero']);
-    $this->config('system.theme')->set('default', 'olivero')->save();
-
-    // Logout and verify that offline message is displayed in Olivero.
+    // Logout and verify that offline message is displayed.
     $this->drupalLogout();
     $this->drupalGet('');
     $this->assertEquals('Site under maintenance', $this->cssSelect('main h1')[0]->getText());
+
+    $this->drupalLogin($this->adminUser);
+
+    // Re-save the form with maintenance mode on to ensure another log message is
+    // not added.
+    $edit = [
+      'maintenance_mode' => 1,
+    ];
+    $this->drupalGet('admin/config/development/maintenance');
+    $this->submitForm($edit, 'Save configuration');
+    $this->drupalGet(Url::fromRoute('dblog.overview'));
+    $this->assertSession()->pageTextContainsOnce('Maintenance mode enabled.');
+    $this->assertSession()->pageTextNotContains('Maintenance mode disabled.');
+
+    // Turn off maintenance mode.
+    $edit = [
+      'maintenance_mode' => 0,
+    ];
+    $this->drupalGet('admin/config/development/maintenance');
+    $this->submitForm($edit, 'Save configuration');
+    $this->drupalGet(Url::fromRoute('dblog.overview'));
+    $this->assertSession()->pageTextContainsOnce('Maintenance mode disabled.');
   }
 
   /**
@@ -189,7 +213,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
       $this->drupalGet('<front>', ['query' => ['_format' => $format]]);
       $this->assertSession()->statusCodeEquals(503);
       $this->assertSession()->pageTextContains('Drupal is currently under maintenance. We should be back shortly. Thank you for your patience.');
-      $this->assertSession()->responseHeaderEquals('Content-Type', 'text/plain; charset=UTF-8');
+      $this->assertSession()->responseHeaderEquals('Content-Type', 'text/plain; charset=utf-8');
     }
   }
 

@@ -8,13 +8,15 @@ use Drupal\Core\Database\Query\Upsert;
 
 /**
  * A stub of core Upsert for testing purposes.
+ *
+ * @internal
  */
 class StubUpsert extends Upsert {
 
   /**
    * {@inheritdoc}
    */
-  public function __toString() {
+  public function __toString(): string {
     throw new \BadMethodCallException('Upsert not implemented');
   }
 

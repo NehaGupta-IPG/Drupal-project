@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\update\Hook;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -13,6 +14,7 @@ use Drupal\update\ProjectSecurityData;
 use Drupal\update\ProjectSecurityRequirement;
 use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
+use Drupal\update\UpdateMessageTrait;
 
 /**
  * Requirements for the update module.
@@ -20,9 +22,11 @@ use Drupal\update\UpdateManagerInterface;
 class UpdateRequirements {
 
   use StringTranslationTrait;
+  use UpdateMessageTrait;
 
   public function __construct(
     protected readonly ModuleHandlerInterface $moduleHandler,
+    protected readonly UpdateManagerInterface $updateManager,
   ) {}
 
   /**
@@ -38,20 +42,19 @@ class UpdateRequirements {
    * attribute, which is an integer constant to indicate why the given status
    * is being returned (UPDATE_NOT_SECURE, UPDATE_NOT_CURRENT, or
    * UPDATE_UNKNOWN). This is used for generating the appropriate email
-   * notification messages during update_cron(), and might be useful for other
-   * modules that invoke update_runtime_requirements() to find out if the site
-   * is up to date or not.
+   * notification messages during cron runs, and might be useful for other
+   * modules to find out if the site is up to date or not.
    *
-   * @see _update_message_text()
-   * @see _update_cron_notify()
+   * @see \Drupal\update\UpdateMessageTrait::getText()
+   * @see \Drupal\update\Hook\UpdateCronHooks::notify()
    * @see \Drupal\update\UpdateManagerInterface
    */
   #[Hook('runtime_requirements')]
   public function runtime(): array {
     $requirements = [];
-    if ($available = update_get_available(FALSE)) {
+    if ($available = $this->updateManager->getAvailable(FALSE)) {
       $this->moduleHandler->loadInclude('update', 'inc', 'update.compare');
-      $data = update_calculate_project_data($available);
+      $data = $this->updateManager->calculateProjectData($available);
       // First, populate the requirements for core:
       $requirements['update_core'] = $this->requirementCheck($data['drupal'], 'core');
       if (!empty($available['drupal']['releases'])) {
@@ -68,7 +71,15 @@ class UpdateRequirements {
         // status constants are numbered in the right order of precedence, so
         // we just need to make sure the projects are sorted in ascending
         // order of status, and we can look at the first project we find.
-        uasort($data, '_update_project_status_sort');
+        uasort($data, function ($a, $b) {
+          // The status constants are numerically in the right order, so we can
+          // usually subtract the two to compare in the order we want. However,
+          // negative status values should be treated as if they are huge,
+          // since we always want them at the bottom of the list.
+          $a_status = $a['status'] > 0 ? $a['status'] : (-10 * $a['status']);
+          $b_status = $b['status'] > 0 ? $b['status'] : (-10 * $b['status']);
+          return $a_status - $b_status;
+        });
         $first_project = reset($data);
         $requirements['update_contrib'] = $this->requirementCheck($first_project, 'contrib');
       }
@@ -76,9 +87,9 @@ class UpdateRequirements {
     else {
       $requirements['update_core']['title'] = $this->t('Drupal core update status');
       $requirements['update_core']['value'] = $this->t('No update data available');
-      $requirements['update_core']['severity'] = REQUIREMENT_WARNING;
+      $requirements['update_core']['severity'] = RequirementSeverity::Warning;
       $requirements['update_core']['reason'] = UpdateFetcherInterface::UNKNOWN;
-      $requirements['update_core']['description'] = _update_no_data();
+      $requirements['update_core']['description'] = $this->noData();
     }
     return $requirements;
   }
@@ -91,7 +102,7 @@ class UpdateRequirements {
    *
    * @param array $project
    *   Array of information about the project we're testing as returned by
-   *   update_calculate_project_data().
+   *   \Drupal\update\UpdateManagerInterface::calculateProjectData().
    * @param string $type
    *   What kind of project this is ('core' or 'contrib').
    *
@@ -99,8 +110,8 @@ class UpdateRequirements {
    *   An array to be included in the nested $requirements array.
    *
    * @see hook_requirements()
-   * @see update_requirements()
-   * @see update_calculate_project_data()
+   * @see Drupal\update\Hook\UpdateRequirements::runtime()
+   * @see \Drupal\update\UpdateManagerInterface::calculateProjectData()
    */
   protected function requirementCheck($project, $type): array {
     $requirement = [];
@@ -113,13 +124,25 @@ class UpdateRequirements {
     $status = $project['status'];
     if ($status != UpdateManagerInterface::CURRENT) {
       $requirement['reason'] = $status;
-      $requirement['severity'] = REQUIREMENT_ERROR;
-      // When updates are available, append the available updates link to the
-      // message from _update_message_text(), and format the two translated
-      // strings together in a single paragraph.
-      $requirement['description'][] = ['#markup' => _update_message_text($type, $status)];
-      if (!in_array($status, [UpdateFetcherInterface::UNKNOWN, UpdateFetcherInterface::NOT_CHECKED, UpdateFetcherInterface::NOT_FETCHED, UpdateFetcherInterface::FETCH_PENDING])) {
-        $requirement['description'][] = ['#prefix' => ' ', '#markup' => $this->t('See the <a href=":available_updates">available updates</a> page for more information.', [':available_updates' => Url::fromRoute('update.status')->toString()])];
+      $requirement['severity'] = RequirementSeverity::Error;
+      $requirement['description'][] = ['#markup' => $this->getText($type, $status)];
+      if (!in_array($status, [
+        UpdateFetcherInterface::UNKNOWN,
+        UpdateFetcherInterface::NOT_CHECKED,
+        UpdateFetcherInterface::NOT_FETCHED,
+        UpdateFetcherInterface::FETCH_PENDING,
+      ])) {
+        $url = Url::fromRoute('update.status');
+        // When updates are available, if the current user has access to the
+        // available updates report, append the available updates link to the
+        // message from \Drupal\update\UpdateMessageTrait::getText(), and
+        // format the two translated strings together in a single paragraph.
+        if ($url->access()) {
+          $requirement['description'][] = [
+            '#prefix' => ' ',
+            '#markup' => $this->t('See the <a href=":available_updates">available updates</a> page for more information.', [':available_updates' => $url->toString()]),
+          ];
+        }
       }
     }
     switch ($status) {
@@ -137,7 +160,7 @@ class UpdateRequirements {
 
       case UpdateManagerInterface::NOT_CURRENT:
         $requirement_label = $this->t('Out of date');
-        $requirement['severity'] = REQUIREMENT_WARNING;
+        $requirement['severity'] = RequirementSeverity::Warning;
         break;
 
       case UpdateFetcherInterface::UNKNOWN:
@@ -145,7 +168,7 @@ class UpdateRequirements {
       case UpdateFetcherInterface::NOT_FETCHED:
       case UpdateFetcherInterface::FETCH_PENDING:
         $requirement_label = $project['reason'] ?? $this->t('Can not determine status');
-        $requirement['severity'] = REQUIREMENT_WARNING;
+        $requirement['severity'] = RequirementSeverity::Warning;
         break;
 
       default:
