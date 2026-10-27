@@ -20,6 +20,7 @@ use Drupal\Core\Url;
  * -specific validation logic. To do that, override copyFormValuesToConfig().
  */
 abstract class ConfigFormBase extends FormBase {
+
   use ConfigFormBaseTrait;
 
   /**
@@ -54,12 +55,15 @@ abstract class ConfigFormBase extends FormBase {
    *
    * @return \Drupal\Core\Config\TypedConfigManagerInterface
    *   The typed config manager service.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   $this->typedConfigManager instead.
+   *
+   * @see https://www.drupal.org/node/3515066
    */
-  protected function typedConfigManager(): TypedConfigManagerInterface {
-    if ($this->typedConfigManager instanceof TypedConfigManagerInterface) {
-      return $this->typedConfigManager;
-    }
-    return \Drupal::service('config.typed');
+  protected function typedConfigManager() {
+    @trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use $this->typedConfigManager instead. See https://www.drupal.org/node/3515066', E_USER_DEPRECATED);
+    return $this->typedConfigManager;
   }
 
   /**
@@ -210,7 +214,7 @@ abstract class ConfigFormBase extends FormBase {
     foreach (array_keys($map) as $config_name) {
       $config = $this->configFactory()->getEditable($config_name);
       static::copyFormValuesToConfig($config, $form_state, $form);
-      $typed_config = $this->typedConfigManager()->createFromNameAndData($config_name, $config->getRawData());
+      $typed_config = $this->typedConfigManager->createFromNameAndData($config_name, $config->getRawData());
 
       $violations = $typed_config->validate();
       // Rather than immediately applying all violation messages to the
