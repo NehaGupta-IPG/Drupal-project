@@ -10,6 +10,7 @@ use Drupal\Core\Config\StorableConfigBase;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\language\Config\LanguageConfigOverrideCrudEvent;
 use Drupal\language\Config\LanguageConfigOverrideEvents;
+use Drupal\language\DefaultLangcodeConfigUpdaterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -39,10 +40,15 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
     protected LocaleConfigManager $localeConfigManager,
     protected readonly LocaleLanguages $localeLanguages,
     protected ?ConfigInstallerInterface $configInstaller = NULL,
+    protected ?DefaultLangcodeConfigUpdaterInterface $defaultLangcodeConfigUpdater = NULL,
   ) {
     if ($this->configInstaller === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $configInstaller argument is deprecated in drupal:12.1.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
       $this->configInstaller = \Drupal::service(ConfigInstallerInterface::class);
+    }
+    if ($this->defaultLangcodeConfigUpdater === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $defaultLangcodeConfigUpdater argument is deprecated in drupal:12.1.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
+      $this->defaultLangcodeConfigUpdater = \Drupal::service(DefaultLangcodeConfigUpdaterInterface::class);
     }
   }
 
@@ -64,8 +70,9 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
    */
   public function onConfigSave(ConfigCrudEvent $event) {
     // Only attempt to feed back configuration translation changes to locale if
-    // the update itself was not initiated by locale data changes.
-    if (!InstallerKernel::installationAttempted() && !$this->localeConfigManager->isUpdatingTranslationsFromLocale()) {
+    // the update itself was not initiated by locale data changes or a default
+    // langcode change.
+    if (!InstallerKernel::installationAttempted() && !$this->localeConfigManager->isUpdatingTranslationsFromLocale() && !$this->defaultLangcodeConfigUpdater->isReconciling()) {
       $config = $event->getConfig();
       $original = $config->getOriginal();
 
@@ -99,8 +106,9 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
    */
   public function onOverrideChange(LanguageConfigOverrideCrudEvent $event) {
     // Only attempt to feed back configuration override changes to locale if
-    // the update itself was not initiated by locale data changes.
-    if (!InstallerKernel::installationAttempted() && !$this->localeConfigManager->isUpdatingTranslationsFromLocale()) {
+    // the update itself was not initiated by locale data changes or a default
+    // langcode change.
+    if (!InstallerKernel::installationAttempted() && !$this->localeConfigManager->isUpdatingTranslationsFromLocale() && !$this->defaultLangcodeConfigUpdater->isReconciling()) {
       $translation_config = $event->getLanguageConfigOverride();
       $langcode = $translation_config->getLangcode();
       $reference_config = $this->configFactory->getEditable($translation_config->getName())->get();

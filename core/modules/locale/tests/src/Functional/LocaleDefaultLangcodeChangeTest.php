@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests that changing the site default language retranslates configuration.
  *
  * @see \Drupal\language\DefaultLangcodeConfigUpdater
- * @see \Drupal\locale\DefaultLangcodeConfigUpdaterDecorator
+ * @see \Drupal\locale\EventSubscriber\DefaultLangcodeConfigReconcileSubscriber
  */
 #[Group('locale')]
 #[RunTestsInSeparateProcesses]

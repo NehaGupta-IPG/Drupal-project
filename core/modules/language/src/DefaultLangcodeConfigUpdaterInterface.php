@@ -54,4 +54,13 @@ interface DefaultLangcodeConfigUpdaterInterface {
    */
   public function reconcileConfigLangcodeOperation(string $old_langcode, string $new_langcode, &$context): void;
 
+  /**
+   * Determines if configuration is being reconciled.
+   *
+   * @return bool
+   *   TRUE while self::reconcileConfigLangcodeOperation() saves configuration,
+   *   FALSE if not.
+   */
+  public function isReconciling(): bool;
+
 }

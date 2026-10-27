@@ -707,30 +707,4 @@ class LocaleConfigManager {
     $this->isUpdatingFromLocale = FALSE;
   }
 
-  /**
-   * Runs a callback with isUpdatingTranslationsFromLocale() set to TRUE.
-   *
-   * Suppresses changes to locale storage when active configuration or overrides
-   * are saved.
-   *
-   * @param callable $callback
-   *   The callback to run.
-   *
-   * @return mixed
-   *   The callback's return value.
-   *
-   * @see self::isUpdatingTranslationsFromLocale()
-   */
-  public function executeWithUpdatingTranslationsFromLocale(callable $callback) {
-    $previous = $this->isUpdatingFromLocale;
-    $this->isUpdatingFromLocale = TRUE;
-    try {
-      $result = $callback();
-    }
-    finally {
-      $this->isUpdatingFromLocale = $previous;
-    }
-    return $result;
-  }
-
 }

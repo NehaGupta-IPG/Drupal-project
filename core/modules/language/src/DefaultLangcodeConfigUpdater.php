@@ -24,6 +24,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterface {
 
+  /**
+   * Whether configuration is being reconciled.
+   */
+  protected bool $reconciling = FALSE;
+
   public function __construct(
     protected readonly ConfigFactoryInterface $configFactory,
     protected readonly TypedConfigManagerInterface $typedConfigManager,
@@ -55,62 +60,75 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
     $old_override_storage = $this->configStorage->createCollection('language.' . $old_langcode);
     $new_override_storage = $this->configStorage->createCollection('language.' . $new_langcode);
     $names = array_splice($context['sandbox']['names'], 0, Settings::get('entity_update_batch_size', 50));
-    foreach ($names as $name) {
-      if (!$this->typedConfigManager->hasConfigSchema($name)) {
-        continue;
-      }
-
-      $config = $this->configFactory->getEditable($name);
-      $data = $config->getRawData();
-      if (!array_key_exists('langcode', $data)) {
-        // The configuration does not have a langcode, so it is not
-        // translatable.
-        continue;
-      }
-      $typed_config = $this->typedConfigManager->createFromNameAndData($name, $data);
-      if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
-        // The configuration schema does not have a langcode, so it is not
-        // translatable.
-        continue;
-      }
-      if ($data['langcode'] === $old_langcode) {
-        $translatable_data = static::extractTranslatableData($typed_config);
-        $override = $this->getRawLanguageConfigOverride($new_override_storage, $name);
-        $override_data = $override->isNew() ? [] : $override->get();
-
-        // Merge the override for the new default langcode into the data to
-        // save. The new default langcode cannot have an override.
-        $event = new DefaultLangcodeConfigReconcileEvent(
-          $name,
-          $old_langcode,
-          $new_langcode,
-          NestedArray::mergeDeepArray([$data, $override_data], TRUE),
-          static::extractUntranslatedKeys($translatable_data, $override_data),
-        );
-        $this->eventDispatcher->dispatch($event);
-        if ($event->isSkipped()) {
+    $this->reconciling = TRUE;
+    try {
+      foreach ($names as $name) {
+        if (!$this->typedConfigManager->hasConfigSchema($name)) {
           continue;
         }
 
-        if ($translatable_data !== []) {
-          // Preserve the translations for the old langcode in a new config
-          // override.
-          $this->getRawLanguageConfigOverride($old_override_storage, $name)
-            ->setData($translatable_data)
+        $config = $this->configFactory->getEditable($name);
+        $data = $config->getRawData();
+        if (!array_key_exists('langcode', $data)) {
+          // The configuration does not have a langcode, so it is not
+          // translatable.
+          continue;
+        }
+        $typed_config = $this->typedConfigManager->createFromNameAndData($name, $data);
+        if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
+          // The configuration schema does not have a langcode, so it is not
+          // translatable.
+          continue;
+        }
+        if ($data['langcode'] === $old_langcode) {
+          $translatable_data = static::extractTranslatableData($typed_config);
+          $override = $this->getRawLanguageConfigOverride($new_override_storage, $name);
+          $override_data = $override->isNew() ? [] : $override->get();
+
+          // Merge the override for the new default langcode into the data to
+          // save. The new default langcode cannot have an override.
+          $event = new DefaultLangcodeConfigReconcileEvent(
+            $name,
+            $old_langcode,
+            $new_langcode,
+            NestedArray::mergeDeepArray([$data, $override_data], TRUE),
+            static::extractUntranslatedKeys($translatable_data, $override_data),
+          );
+          $this->eventDispatcher->dispatch($event);
+          if ($event->isSkipped()) {
+            continue;
+          }
+
+          if ($translatable_data !== []) {
+            // Preserve the translations for the old langcode in a new config
+            // override.
+            $this->getRawLanguageConfigOverride($old_override_storage, $name)
+              ->setData($translatable_data)
+              ->save();
+          }
+          $config->setData($event->getData())
+            ->set('langcode', $new_langcode)
             ->save();
+          if (!$override->isNew()) {
+            $override->delete();
+          }
+          $context['results']['updated_names'][] = $name;
         }
-        $config->setData($event->getData())
-          ->set('langcode', $new_langcode)
-          ->save();
-        if (!$override->isNew()) {
-          $override->delete();
-        }
-        $context['results']['updated_names'][] = $name;
       }
+    }
+    finally {
+      $this->reconciling = FALSE;
     }
 
     $context['sandbox']['progress'] = ($context['sandbox']['progress'] ?? 0) + count($names);
     $context['finished'] = empty($context['sandbox']['max']) ? 1 : $context['sandbox']['progress'] / $context['sandbox']['max'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isReconciling(): bool {
+    return $this->reconciling;
   }
 
   /**
