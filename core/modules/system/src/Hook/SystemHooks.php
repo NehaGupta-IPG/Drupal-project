@@ -258,10 +258,10 @@ class SystemHooks {
   }
 
   /**
-   * Implements hook_system_info_alter().
+   * Implements hook_extension_info_alter().
    */
-  #[Hook('system_info_alter')]
-  public function systemInfoAlter(&$info, Extension $file, $type): void {
+  #[Hook('extension_info_alter')]
+  public function extensionInfoAlter(&$info, Extension $file, $type): void {
     // Remove page-top and page-bottom from the blocks UI since they are
     // reserved for
     // modules to populate from outside the blocks system.
@@ -309,7 +309,7 @@ class SystemHooks {
     }
 
     // Do a pass of purging on deleted entity field data, if any exists.
-    if (!$config_purge_batch_size = \Drupal::config('field.field_settings')->get('purge_batch_size')) {
+    if (!$config_purge_batch_size = \Drupal::config('field.settings')->get('purge_batch_size')) {
       $config_purge_batch_size = Settings::get('field_purge_batch_size', 50);
     }
     \Drupal::service(FieldPurger::class)->purgeBatch($config_purge_batch_size);
