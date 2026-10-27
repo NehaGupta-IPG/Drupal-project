@@ -58,7 +58,7 @@ class EntityTestHooks {
       }
     }
     // Allow entity_test_rev tests to override the entity type definition.
-    $entity_test_rev_definition = $state->get('entity_test_rev.entity_type', $entity_types['entity_test_rev']);
+    $entity_test_rev_definition = $state->get('entity_test_rev.entity_type', $entity_types['entity_test_rev'] ?? NULL);
     // Simulate deletion if state value is not an entity type object.
     if ($entity_test_rev_definition instanceof EntityTypeInterface) {
       $entity_types['entity_test_rev'] = $entity_test_rev_definition;
@@ -66,7 +66,15 @@ class EntityTestHooks {
     else {
       unset($entity_types['entity_test_rev']);
     }
-    $entity_types['entity_test_revpub'] = $state->get('entity_test_revpub.entity_type', $entity_types['entity_test_revpub']);
+    // Allow entity_test_revpub tests to override the entity type definition.
+    $entity_test_rev_definition = $state->get('entity_test_revpub.entity_type', $entity_types['entity_test_revpub'] ?? NULL);
+    // Simulate deletion if state value is not an entity type object.
+    if ($entity_test_rev_definition instanceof EntityTypeInterface) {
+      $entity_types['entity_test_revpub'] = $entity_test_rev_definition;
+    }
+    else {
+      unset($entity_types['entity_test_revpub']);
+    }
     // Enable the entity_test_new only when needed.
     if (!$state->get('entity_test_new')) {
       unset($entity_types['entity_test_new']);
@@ -75,10 +83,14 @@ class EntityTestHooks {
       // Allow tests to override the entity type definition.
       $entity_types['entity_test_new'] = \Drupal::state()->get('entity_test_new.entity_type', $entity_types['entity_test_new']);
     }
-    $entity_test_definition = $entity_types['entity_test'];
-    $entity_test_definition->set('entity_keys', $state->get('entity_test.entity_keys', []) + $entity_test_definition->getKeys());
-    // Allow tests to alter the permission granularity of entity_test_mul.
-    $entity_types['entity_test_mul']->set('permission_granularity', \Drupal::state()->get('entity_test_mul.permission_granularity', 'entity_type'));
+    if (isset($entity_types['entity_test'])) {
+      $entity_test_definition = $entity_types['entity_test'];
+      $entity_test_definition->set('entity_keys', $state->get('entity_test.entity_keys', []) + $entity_test_definition->getKeys());
+    }
+    if (isset($entity_types['entity_test_mul'])) {
+      // Allow tests to alter the permission granularity of entity_test_mul.
+      $entity_types['entity_test_mul']->set('permission_granularity', \Drupal::state()->get('entity_test_mul.permission_granularity', 'entity_type'));
+    }
   }
 
   /**

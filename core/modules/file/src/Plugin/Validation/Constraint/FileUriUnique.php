@@ -20,11 +20,12 @@ class FileUriUnique extends UniqueFieldConstraint {
     mixed $options = NULL,
     ?bool $caseSensitive = NULL,
     $message = 'The file %value already exists. Enter a unique file URI.',
+    public $bundle = NULL,
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
     $this->caseSensitive = $caseSensitive ?? TRUE;
-    parent::__construct($options, $caseSensitive, $message, $groups, $payload);
+    parent::__construct($options, $caseSensitive, $message, $bundle, $groups, $payload);
 
   }
 

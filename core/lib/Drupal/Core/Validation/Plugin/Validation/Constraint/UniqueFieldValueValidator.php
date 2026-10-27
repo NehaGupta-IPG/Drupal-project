@@ -70,6 +70,10 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
       $query->condition($id_key, $entity_id, '<>');
     }
 
+    if ($constraint->bundle && $entity->bundle() === $constraint->bundle) {
+      $query->condition($entity_type->getKey('bundle'), $constraint->bundle);
+    }
+
     if ($constraint->caseSensitive) {
       $query->condition($field_name, $item_values, 'IN');
     }
