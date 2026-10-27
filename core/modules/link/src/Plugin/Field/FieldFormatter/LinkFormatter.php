@@ -68,6 +68,7 @@ class LinkFormatter extends FormatterBase {
       'url_plain' => '',
       'rel' => '',
       'target' => '',
+      'noreferrer' => '',
     ] + parent::defaultSettings();
   }
 
@@ -119,6 +120,13 @@ class LinkFormatter extends FormatterBase {
       '#return_value' => '_blank',
       '#default_value' => $this->getSetting('target'),
     ];
+    $elements['noreferrer'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Add rel="noreferrer" to links'),
+      '#description' => $this->t('Recommended on untrusted links.'),
+      '#return_value' => 'noreferrer',
+      '#default_value' => $this->getSetting('noreferrer'),
+    ];
 
     return $elements;
   }
@@ -149,6 +157,9 @@ class LinkFormatter extends FormatterBase {
     }
     if (!empty($settings['target'])) {
       $summary[] = $this->t('Open link in new window');
+    }
+    if (!empty($settings['noreferrer'])) {
+      $summary[] = $this->t('Add rel="noreferrer" to links');
     }
 
     return $summary;
@@ -237,9 +248,15 @@ class LinkFormatter extends FormatterBase {
     $options = $item->options ?? [];
     $options += $url->getOptions();
 
-    // Add optional 'rel' attribute to link options.
-    if (!empty($settings['rel'])) {
-      $options['attributes']['rel'] = $settings['rel'];
+    // Add optional 'rel' attributes to link options.
+    if (
+      !empty($settings['rel'])
+      || !empty($settings['noreferrer'])
+    ) {
+      $options['attributes']['rel'] = [
+        $settings['rel'],
+        $settings['noreferrer'],
+      ];
     }
     // Add optional 'target' attribute to link options.
     if (!empty($settings['target'])) {
