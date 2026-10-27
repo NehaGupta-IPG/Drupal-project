@@ -32,3 +32,9 @@
     }
   }
 }
+
+.layout-builder {
+  .toolbar-block__title-tooltip {
+    display: none !important;
+  }
+}
