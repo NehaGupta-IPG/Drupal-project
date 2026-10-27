@@ -257,6 +257,59 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
   }
 
   /**
+   * Tests autocreation when every bundle of the target type is referenceable.
+   *
+   * An entity reference field can be configured to allow references to all
+   * bundles by leaving `target_bundles` unset (NULL). When autocreate is
+   * enabled, the auto-created entity must be stored in the configured
+   * `auto_create_bundle` and not in a bundle derived from the target entity
+   * type ID.
+   *
+   * @see \Drupal\Core\Field\Plugin\Field\FieldWidget\EntityReferenceAutocompleteWidget::getAutocreateBundle()
+   */
+  public function testUnrestrictedTargetBundles(): void {
+    $vocabulary = Vocabulary::create([
+      'name' => $this->randomMachineName(),
+      'vid' => $this->randomMachineName(),
+    ]);
+    $vocabulary->save();
+
+    // Create a taxonomy term reference field that allows references to every
+    // vocabulary (target_bundles = NULL) while still storing auto-created
+    // terms in the configured vocabulary.
+    $field_name = $this->randomMachineName();
+    $handler_settings = [
+      'target_bundles' => NULL,
+      'auto_create' => TRUE,
+      'auto_create_bundle' => $vocabulary->id(),
+    ];
+    $this->createEntityReferenceField('node', $this->referencingType, $field_name, $this->randomString(), 'taxonomy_term', 'default', $handler_settings);
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay('node', $this->referencingType)
+      ->setComponent($field_name, ['type' => 'entity_reference_autocomplete'])
+      ->save();
+
+    $term_name = $this->randomString();
+    $edit = [
+      $field_name . '[0][target_id]' => $term_name,
+      'title[0][value]' => $this->randomString(),
+    ];
+
+    $this->drupalGet('node/add/' . $this->referencingType);
+    $this->submitForm($edit, 'Save');
+
+    $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    /** @var \Drupal\taxonomy\Entity\Term $term */
+    $term = $term_storage->loadByProperties(['name' => $term_name]);
+    $term = reset($term);
+
+    // The auto-created term must be stored in the configured vocabulary, not
+    // in a vocabulary whose ID matches the target entity type.
+    $this->assertNotEmpty($term, 'The auto-created term was saved.');
+    $this->assertEquals($vocabulary->id(), $term->bundle(), 'The auto-created term was stored in the configured vocabulary.');
+  }
+
+  /**
    * Tests autocreation for an entity that has no bundles.
    */
   public function testNoBundles(): void {

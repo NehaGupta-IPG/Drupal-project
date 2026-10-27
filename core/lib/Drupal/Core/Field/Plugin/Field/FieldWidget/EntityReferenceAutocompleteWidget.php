@@ -2,7 +2,9 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\Attribute\FieldWidget;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -20,6 +22,34 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
   field_types: ['entity_reference'],
 )]
 class EntityReferenceAutocompleteWidget extends WidgetBase {
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * Constructs a new EntityReferenceAutocompleteWidget object.
+   *
+   * @param string $plugin_id
+   *   The plugin ID for the widget instance.
+   * @param mixed $plugin_definition
+   *   The widget plugin definition.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition.
+   * @param array $settings
+   *   The widget settings.
+   * @param array $third_party_settings
+   *   Third party settings.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   */
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+    $this->entityTypeManager = $entity_type_manager;
+  }
 
   /**
    * {@inheritdoc}
@@ -168,16 +198,19 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
     $bundle = NULL;
     if ($this->getSelectionHandlerSetting('auto_create')) {
       $target_bundles = $this->getSelectionHandlerSetting('target_bundles');
-      // If there's no target bundle at all, use the target_type. It's the
-      // default for bundleless entity types.
-      if (empty($target_bundles)) {
+      // If there's no target bundle at all and the target entity type is
+      // bundleless, use the target_type. For a bundleless entity type, the
+      // entity type ID doubles as the bundle.
+      $entity_type = $this->entityTypeManager->getDefinition($this->getFieldSetting('target_type'));
+      if (empty($target_bundles) && $entity_type->getBundleEntityType() === NULL) {
         $bundle = $this->getFieldSetting('target_type');
       }
       // If there's only one target bundle, use it.
-      elseif (count($target_bundles) == 1) {
+      elseif (is_array($target_bundles) && count($target_bundles) == 1) {
         $bundle = reset($target_bundles);
       }
-      // If there's more than one target bundle, use the autocreate bundle
+      // If there's more than one target bundle, or the field allows references
+      // to every bundle of a bundleable entity type, use the autocreate bundle
       // stored in selection handler settings.
       elseif (!$bundle = $this->getSelectionHandlerSetting('auto_create_bundle')) {
         // If no bundle has been set as auto create target means that there is
