@@ -6,6 +6,7 @@ use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityNullStorage;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -113,6 +114,8 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     $raw_fields = $this->getAllFieldNames($entity_type, $bundle);
     $internalize_resource_type = $entity_type->isInternal();
     $fields = static::getFields($raw_fields, $entity_type, $bundle);
+    $is_translatable = $entity_type->isTranslatable() && $entity_type->entityClassImplements(ContentEntityInterface::class);
+
     if (!$internalize_resource_type) {
       $event = ResourceTypeBuildEvent::createFromEntityTypeAndBundle($entity_type, $bundle, $fields);
       $this->eventDispatcher->dispatch($event, ResourceTypeBuildEvents::BUILD);
@@ -129,7 +132,8 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
       static::isMutableResourceType($entity_type, $bundle),
       static::isVersionableResourceType($entity_type),
       $fields,
-      $type_name
+      $type_name,
+      $is_translatable
     );
   }
 

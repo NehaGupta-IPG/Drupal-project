@@ -1,0 +1,17 @@
+services:
+  _defaults:
+    autoconfigure: true
+  jsonapi_translation.route_subscriber:
+    class: Drupal\jsonapi_translation\Routing\RouteSubscriber
+    arguments: ['@jsonapi.resource_type.repository']
+  jsonapi_translation.response_subscriber:
+    class: Drupal\jsonapi_translation\EventSubscriber\ResponseSubscriber
+  # Controller.
+  jsonapi_translation.entity_resource:
+    class: Drupal\jsonapi_translation\Controller\EntityResource
+    parent: jsonapi.entity_resource
+    calls:
+      -
+        method: 'setLanguageManager'
+        arguments: ['@language_manager']
+  Drupal\jsonapi_translation\Controller\EntityResource: '@jsonapi_translation.entity_resource'
