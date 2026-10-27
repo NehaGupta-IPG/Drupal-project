@@ -162,7 +162,7 @@ class ConstraintManager extends DefaultPluginManager {
   public function getDefinitionsByType($type) {
     $definitions = [];
     foreach ($this->getDefinitions() as $plugin_id => $definition) {
-      if ($definition['type'] === FALSE || in_array($type, $definition['type'])) {
+      if ($definition['type'] === FALSE || in_array($type, (array) $definition['type'])) {
         $definitions[$plugin_id] = $definition;
       }
     }
