@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Event\TransactionEvent;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -55,6 +56,7 @@ class TransactionEventTest extends DatabaseTestBase {
   /**
    * Tests implicitly committing a transaction via object destruction.
    */
+  #[IgnoreDeprecations]
   public function testTransactionImplicitCommit(): void {
     $tx = $this->connection->startTransaction();
     unset($tx);
@@ -169,7 +171,8 @@ class TransactionEventTest extends DatabaseTestBase {
     $savepoint = $this->connection->startTransaction('foo');
     $savepoint->commitOrRelease();
     $this->assertMatchesRegularExpression("/^.*TransactionReleaseSavepointEvent default default .*\\\\foo stack: .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
-    unset($tx);
+    $tx->commitOrRelease();
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction commit-type: Explicit$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
   }
 
   /**
@@ -189,7 +192,8 @@ class TransactionEventTest extends DatabaseTestBase {
     $savepoint = $this->connection->startTransaction('foo');
     $savepoint->rollback();
     $this->assertMatchesRegularExpression("/^.*TransactionRollbackToSavepointEvent default default .*\\\\foo stack: .*\\\\drupal_transaction$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
-    unset($tx);
+    $tx->commitOrRelease();
+    $this->assertMatchesRegularExpression("/^.*TransactionCommitEvent default default .*\\\\drupal_transaction commit-type: Explicit$/", \Drupal::keyValue('TransactionEventTest')->get('event_data'));
   }
 
 }
