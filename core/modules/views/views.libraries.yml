@@ -14,7 +14,6 @@ views.ajax:
     - core/drupal
     - core/drupalSettings
     - core/once
-    - core/internal.jquery.form
     - core/drupal.ajax
 
 views.responsive-grid:

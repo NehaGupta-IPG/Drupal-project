@@ -760,6 +760,81 @@
       $(element).trigger(ajax.elementSettings.event);
     }
   };
+  /**
+   * Submits a form via Ajax.
+   *
+   * This function implements a similar, but reduced, API as the jQuery Form
+   * plugin's ajaxSubmit() function.
+   *
+   * @param form
+   * @param options
+   */
+  function submitForm(form, options) {
+    const $form = $(form);
+
+   // @todo Keep for BC with the jQuery Form plugin, or remove it?
+    const veto = {};
+    $form.trigger('form-pre-serialize', [$form, options, veto]);
+    if (veto.veto) {
+      return;
+    }
+
+    // Invoke beforeSerialize(), which can:
+    // - Return false to abort the submission.
+    // - Set options.data with data to submit in addition to the form elements.
+    if (options.beforeSerialize) {
+      const proceed = options.beforeSerialize($form, options);
+      if (proceed === false) {
+        return;
+      }
+    }
+    if (options.data) {
+      options.extraData = options.data;
+      delete options.data;
+    }
+
+    // Invoke beforeSubmit(), which can:
+    // - Return false to abort the submission.
+    // - Modify the form values to submit.
+    //
+    // For BC with the jQuery Form plugin, the form data is converted to an
+    // array of objects with 'name' and 'value' properties.
+    //
+    // @todo If/when we're willing to break the BC of beforeSubmit(), we can
+    //   simplify this to pass the FormData object instead of converting to an
+    //   array and then having to convert it back to a FormData object later in
+    //   this function.
+    const originalFormData = new FormData(form, form.clk);
+    const map = ([name, value]) => ({ name, value });
+    const formValues = Array.from(originalFormData.entries(), map);
+    if (options.beforeSubmit) {
+      const proceed = options.beforeSubmit(formValues, $form, options);
+      if (proceed === false) {
+        return;
+      }
+    }
+
+    // @todo Keep for BC with the jQuery Form plugin, or remove it?
+    $form.trigger('form-submit-validate', [formValues, $form, options, veto]);
+    if (veto.veto) {
+      return;
+    }
+
+    // Convert the possibly modified formValues back to a FormData object.
+    const formData = new FormData();
+    formValues.forEach(({ name, value }) => formData.append(name, value));
+    if (options.extraData) {
+      const entries = Object.entries(options.extraData);
+      entries.forEach(([name, value]) => formData.append(name, value));
+    }
+
+    // Send the request.
+    options.data = formData;
+    $.ajax(options);
+
+    // @todo Keep for BC with the jQuery Form plugin, or remove it?
+    $form.trigger('form-submit-notify', [$form, options]);
+  }
 
   /**
    * Handle an event that triggers an Ajax response.
@@ -798,7 +873,17 @@
           element.form.clk = element;
         }
 
-        ajax.$form.ajaxSubmit(ajax.options);
+        // The jQuery Form plugin (which adds the ajaxSubmit() function) is no
+        // longer maintained and has a lot of code for handling old browsers and
+        // uncommon options. The submitForm() function provides a more
+        // streamlined implementation. In case there are Drupal modules/sites
+        // that require jQuery Form's full implementation, use it if it's there
+        // (i.e., if that library has been added to the page).
+        if (ajax.$form.ajaxSubmit) {
+          ajax.$form.ajaxSubmit(ajax.options);
+        } else {
+          submitForm(element.form, ajax.options);
+        }
       } else {
         ajax.beforeSerialize(ajax.element, ajax.options);
         $.ajax(ajax.options);
