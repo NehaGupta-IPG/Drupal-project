@@ -10,6 +10,7 @@ use Drupal\Core\Config\Schema\ConfigSchemaAlterException;
 use Drupal\Core\Config\Schema\Ignore;
 use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Config\Schema\Undefined;
+use Drupal\Core\Config\UnsupportedSequenceSortConfigException;
 use Drupal\Core\TypedData\Plugin\DataType\StringData;
 use Drupal\Core\TypedData\Type\IntegerInterface;
 use Drupal\Core\TypedData\Type\StringInterface;
@@ -571,6 +572,228 @@ class ConfigSchemaTest extends KernelTestBase {
     $this->assertSame([['foo' => '1', 'bar' => '1'], ['foo' => '2', 'bar' => '2']], $this->config('config_schema_test.schema_sequence_sort')->get('complex_sort_value'));
     $this->assertSame([['foo' => 'b', 'bar' => 'b'], ['foo' => 'a', 'bar' => 'a']], $this->config('config_schema_test.schema_sequence_sort')->get('complex_sort_key'));
 
+  }
+
+  /**
+   * Tests config missing a required sort key.
+   */
+  public function testConfigSaveWithBadKeySorting() {
+    $config = 'config_schema_test.schema_sequence_sort';
+    $schema = 'bad_key_sort';
+    $data = [
+      'name' => 'foo',
+      'weight' => 0,
+      'sub_array' => [
+        'string_data' => 'bar',
+        'int_data' => 0,
+      ],
+    ];
+    $this->expectException(UnsupportedSequenceSortConfigException::class);
+    $this->expectExceptionMessage("Sequence $config:$schema could not be sorted because one of the elements did not contain the requested sort key.");
+    $this->config($config)
+      ->setData([$schema => [$data]])
+      ->save();
+  }
+
+  /**
+   * Tests configuration sequence sorting using schemas.
+   *
+   * @param mixed[] $data
+   *   The sequence data to sort.
+   * @param string $schema
+   *   The schema key to sort by in the test module.
+   * @param mixed[] $expected
+   *   The expected sorted data.
+   *
+   * @dataProvider configSaveWithAdvancedSortingDataProvider
+   */
+  public function testConfigSaveWithAdvancedSorting(array $data, string $schema, array $expected): void {
+    $this->config('config_schema_test.schema_sequence_sort')
+      ->setData([$schema => $data])
+      ->save();
+    $this->assertSame($expected, $this->config('config_schema_test.schema_sequence_sort')->get($schema));
+  }
+
+  /**
+   * Provides data for testConfigSaveWithAdvancedSorting().
+   *
+   * @return array[]
+   *   The test cases for sorting.
+   */
+  public static function configSaveWithAdvancedSortingDataProvider(): array {
+    // Final sort is by value, so item 2 will come before item 1 if the
+    // requested sort is otherwise not deterministic between item 1 and item 2,
+    // as arrays are sorted item by item, and will end up essentially sorting by
+    // 'weight' for these specific arrays.
+    $item1 = [
+      'name' => 'thing1',
+      'weight' => 4,
+      'sub_array' => [
+        'string_data' => 'String3',
+        'int_data' => 1,
+      ],
+    ];
+    $item2 = [
+      'name' => 'thing1',
+      'weight' => 2,
+      'sub_array' => [
+        'string_data' => 'String111',
+        'int_data' => 1,
+      ],
+    ];
+    $item3 = [
+      'name' => 'Thing2',
+      'weight' => 1,
+      'sub_array' => [
+        'string_data' => 'String10',
+        'int_data' => 10,
+      ],
+    ];
+    $item4 = [
+      'name' => 'Thing10',
+      'weight' => 3,
+      'sub_array' => [
+        'string_data' => 'string2',
+        'int_data' => 2,
+      ],
+    ];
+    $sort_data = [
+      $item1,
+      $item2,
+      $item3,
+      $item4,
+    ];
+    return [
+      // Default: sort by value, preserve string keys.
+      'weight sort' => [
+        'data' => $sort_data,
+        'schema' => 'weight_sort',
+        'expected' => [
+          $item3,
+          $item2,
+          $item4,
+          $item1,
+        ],
+      ],
+      // Sort by ascii code, uppercase comes first, numbers are not sorted
+      // naturally
+      'name sort' => [
+        'data' => $sort_data,
+        'schema' => 'name_sort_regular',
+        'expected' => [
+          $item4,
+          $item3,
+          $item2,
+          $item1,
+        ],
+      ],
+      // Because name sort is not deterministic between item 1 and item 2, this
+      // is not exactly reverse order from the case above. item 2 will always be
+      // above item 1 unless a sort is requested that can differentiate them.
+      'name sort descending' => [
+        'data' => $sort_data,
+        'schema' => 'name_sort_desc',
+        'expected' => [
+          $item2,
+          $item1,
+          $item3,
+          $item4,
+        ],
+      ],
+      // Numbers are sorted naturally, but uppercase letters are still sorted
+      // before lower case letters.
+      'name sort natural' => [
+        'data' => $sort_data,
+        'schema' => 'name_sort_nat',
+        'expected' => [
+          $item3,
+          $item4,
+          $item2,
+          $item1,
+        ],
+      ],
+      // Full case-insensitive natural sort, as a human would sort things.
+      'name sort natural - case insensitive' => [
+        'data' => $sort_data,
+        'schema' => 'name_sort_nat_no_case',
+        'expected' => [
+          $item2,
+          $item1,
+          $item3,
+          $item4,
+        ],
+      ],
+      // Sort by multiple facets in order.
+      'multi sort name then weight' => [
+        'data' => $sort_data,
+        'schema' => 'multisort_name_then_weight',
+        'expected' => [
+          $item4,
+          $item3,
+          $item2,
+          $item1,
+        ],
+      ],
+      'multi sort name then weight desc' => [
+        'data' => $sort_data,
+        'schema' => 'multisort_name_then_weight_desc',
+        'expected' => [
+          $item4,
+          $item3,
+          $item1,
+          $item2,
+        ],
+      ],
+      // Sort by deeper items in the array
+      'subkey sort string' => [
+        'data' => $sort_data,
+        'schema' => 'subkey_sort_string',
+        'expected' => [
+          $item3,
+          $item2,
+          $item1,
+          $item4,
+        ],
+      ],
+      'subkey sort int' => [
+        'data' => $sort_data,
+        'schema' => 'subkey_sort_int',
+        'expected' => [
+          $item2,
+          $item1,
+          $item4,
+          $item3,
+        ],
+      ],
+      // Multi-facet sort with deeper subkeys.
+      'subkey sort int then natural string' => [
+        'data' => $sort_data,
+        'schema' => 'subkey_sort_int_then_nat_string',
+        'expected' => [
+          $item1,
+          $item2,
+          $item4,
+          $item3,
+        ],
+      ],
+      // Preserve string keys.
+      'sort weight and preserve keys' => [
+        'data' => [
+          'item1' => $item1,
+          'item2' => $item2,
+          'item3' => $item3,
+          'item4' => $item4,
+        ],
+        'schema' => 'weight_sort',
+        'expected' => [
+          'item3' => $item3,
+          'item2' => $item2,
+          'item4' => $item4,
+          'item1' => $item1,
+
+        ],
+      ],
+    ];
   }
 
   /**

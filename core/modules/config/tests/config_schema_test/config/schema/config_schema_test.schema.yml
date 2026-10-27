@@ -330,7 +330,82 @@ config_schema_test.schema_sequence_sort:
             type: string
           bar:
             type: string
-
+    weight_sort:
+      type: sequence
+      orderby: weight
+      sequence:
+        type: sort_test_item
+    name_sort_regular:
+      type: sequence
+      orderby: name
+      sequence:
+        type: sort_test_item
+    name_sort_desc:
+      type: sequence
+      orderby:
+        -
+          sort_by: name
+          sort_order: SORT_DESC
+      sequence:
+        type: sort_test_item
+    name_sort_nat:
+      type: sequence
+      orderby:
+        -
+          sort_by: name
+          sort_flags: SORT_NATURAL
+      sequence:
+        type: sort_test_item
+    name_sort_nat_no_case:
+      type: sequence
+      orderby:
+        -
+          sort_by: name
+          sort_flags:
+            - SORT_NATURAL
+            - SORT_FLAG_CASE
+      sequence:
+        type: sort_test_item
+    multisort_name_then_weight:
+      type: sequence
+      orderby:
+        - name
+        - weight
+      sequence:
+        type: sort_test_item
+    multisort_name_then_weight_desc:
+      type: sequence
+      orderby:
+        - name
+        -
+          sort_by: weight
+          sort_order: SORT_DESC
+      sequence:
+        type: sort_test_item
+    subkey_sort_string:
+      type: sequence
+      orderby: sub_array/string_data
+      sequence:
+        type: sort_test_item
+    subkey_sort_int:
+      type: sequence
+      orderby: sub_array/int_data
+      sequence:
+        type: sort_test_item
+    subkey_sort_int_then_nat_string:
+      type: sequence
+      orderby:
+        - sub_array/int_data
+        -
+          sort_by: sub_array/string_data
+          sort_flags: SORT_NATURAL
+      sequence:
+        type: sort_test_item
+    bad_key_sort:
+      type: sequence
+      orderby: non_existent_key
+      sequence:
+        type: sort_test_item
 config_schema_test.schema_mapping_sort:
   type: config_object
   mapping:
@@ -345,3 +420,18 @@ config_schema_test.schema_mapping_sort:
           type: string
         sub_bar:
           type: string
+
+sort_test_item:
+  type: mapping
+  mapping:
+    name:
+      type: string
+    weight:
+      type: integer
+    sub_array:
+      type: mapping
+      mapping:
+        string_data:
+          type: string
+        int_data:
+          type: integer

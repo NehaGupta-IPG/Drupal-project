@@ -27,6 +27,11 @@ use Drupal\Core\Config\Schema\Undefined;
 abstract class StorableConfigBase extends ConfigBase {
 
   /**
+   * Sequence ordering level separator.
+   */
+  const string PROPERTY_SEPARATOR = '/';
+
+  /**
    * The storage used to load and save this configuration object.
    *
    * @var \Drupal\Core\Config\StorageInterface
@@ -275,12 +280,13 @@ abstract class StorableConfigBase extends ConfigBase {
         $data_definition = $element->getDataDefinition();
         if ($data_definition instanceof SequenceDataDefinition) {
           // Apply any sorting defined on the schema.
-          switch ($data_definition->getOrderBy()) {
-            case 'key':
+          $order_by = $data_definition->getOrderBy();
+          if (!is_array($order_by)) {
+            if ($order_by === 'key') {
               ksort($value);
-              break;
-
-            case 'value':
+              return $value;
+            }
+            if ($order_by === 'value') {
               // The PHP documentation notes that "Be careful when sorting
               // arrays with mixed types values because sort() can produce
               // unpredictable results". There is no risk here because
@@ -288,9 +294,53 @@ abstract class StorableConfigBase extends ConfigBase {
               // already cast all values to the same type using the
               // configuration schema.
               sort($value);
-              break;
-
+              return $value;
+            }
+            if (is_null($order_by)) {
+              // @todo Throw exception here in
+              // https://www.drupal.org/project/drupal/issues/2855675
+              return $value;
+            }
+            $order_by = [$order_by];
           }
+          // Build an argument array for array_multisort().
+          $args = [];
+          foreach ($order_by as $order) {
+            if (!is_array($order)) {
+              $order = [
+                'sort_by' => $order,
+              ];
+            }
+            $sort_array = [];
+            foreach ($value as $sequence_key => $sequence_element) {
+              $sort_array[$sequence_key] = NestedArray::getValue($sequence_element, explode(static::PROPERTY_SEPARATOR, $order['sort_by']), $key_exists);
+              if (!$key_exists) {
+                throw new UnsupportedSequenceSortConfigException("Sequence {$this->getName()}:$key could not be sorted because one of the elements did not contain the requested sort key.");
+              }
+            }
+
+            $args[] = $sort_array;
+
+            // Postpone this on
+            // https://www.drupal.org/project/drupal/issues/2951046 ?
+            if (isset($order['sort_order'])) {
+              $args[] = constant($order['sort_order']);
+            }
+            if (isset($order['sort_flags'])) {
+              if (!is_array($order['sort_flags'])) {
+                $args[] = constant($order['sort_flags']);
+              }
+              else {
+                $sort_flags = 0;
+                foreach ($order['sort_flags'] as $flag) {
+                  $sort_flags |= constant($flag);
+                }
+                $args[] = $sort_flags;
+              }
+            }
+          }
+          $args[] = &$value;
+          array_multisort(...$args);
         }
       }
     }
