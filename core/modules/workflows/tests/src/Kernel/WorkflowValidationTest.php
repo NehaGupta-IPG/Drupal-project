@@ -5,13 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\workflows\Kernel;
 
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\workflows\Entity\Workflow;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of workflow entities.
- *
- * @group workflows
  */
+#[Group('workflows')]
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class WorkflowValidationTest extends ConfigEntityValidationTestBase {
 
   /**
@@ -22,8 +28,8 @@ class WorkflowValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
 
     $this->entity = Workflow::create([
       'id' => 'test',

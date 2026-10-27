@@ -8,12 +8,14 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Create a node and test saving it.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeCreationTest extends NodeTestBase {
 
   use ContentTypeCreationTrait;
@@ -113,7 +115,7 @@ class NodeCreationTest extends NodeTestBase {
     ]);
     $this->drupalLogin($admin_user);
     $this->drupalGet('node/add/page');
-    $this->assertSession()->fieldNotExists('edit-revision', NULL);
+    $this->assertSession()->fieldNotExists('edit-revision');
 
     // Check that a user with administer content types permission is not
     // allowed to create content.

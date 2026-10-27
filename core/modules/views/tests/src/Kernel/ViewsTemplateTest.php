@@ -6,14 +6,16 @@ namespace Drupal\Tests\views\Kernel;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the template retrieval of views.
  *
- * @group views
- *
  * @see \Drupal\views_test_data\Plugin\views\style\StyleTemplateTest
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewsTemplateTest extends ViewsKernelTestBase {
 
   /**
@@ -45,8 +47,11 @@ class ViewsTemplateTest extends ViewsKernelTestBase {
   }
 
   /**
-   * @covers \Drupal\views\Hook\ViewsHooks::themeSuggestionsContainerAlter
+   * Tests theme suggestions container alter.
+   *
    * @throws \Exception
+   *
+   * @legacy-covers \Drupal\views\Hook\ViewsHooks::themeSuggestionsContainerAlter
    */
   public function testThemeSuggestionsContainerAlter(): void {
     $build = [
@@ -58,13 +63,13 @@ class ViewsTemplateTest extends ViewsKernelTestBase {
 
     $output = $this->render($build);
     $extension = '.html.twig';
-    $expected = '<!-- FILE NAME SUGGESTIONS:' . PHP_EOL
+    $expected = '<!--' . PHP_EOL . 'FILE NAME SUGGESTIONS:' . PHP_EOL
       . '   ▪️ container--more-link--test-page-display--default' . $extension . PHP_EOL
       . '   ▪️ container--more-link--default' . $extension . PHP_EOL
       . '   ▪️ container--more-link--test-page-display' . $extension . PHP_EOL
       . '   ▪️ container--more-link' . $extension . PHP_EOL
       . '   ✅ container' . $extension . PHP_EOL
-      . '-->' . PHP_EOL;
+      . '-->';
     $this->assertStringContainsString($expected, $output, 'Views more link container suggestions found in Twig debug output');
   }
 

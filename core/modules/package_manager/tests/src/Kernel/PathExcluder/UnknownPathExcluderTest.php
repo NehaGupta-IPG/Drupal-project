@@ -7,15 +7,24 @@ namespace Drupal\Tests\package_manager\Kernel\PathExcluder;
 use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\Component\FileSystem\FileSystem as DrupalFileSystem;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\package_manager\PathExcluder\UnknownPathExcluder;
 use Drupal\package_manager\PathLocator;
 use Drupal\Tests\package_manager\Kernel\PackageManagerKernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @covers \Drupal\package_manager\PathExcluder\UnknownPathExcluder
- * @group package_manager
+ * Tests Unknown Path Excluder.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[Group('#slow')]
+#[CoversClass(UnknownPathExcluder::class)]
+#[RunTestsInSeparateProcesses]
 class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
 
   /**
@@ -86,7 +95,7 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
    * @return mixed[][]
    *   The test cases.
    */
-  public static function providerTestUnknownPath() {
+  public static function providerTestUnknownPath(): array {
     return [
       'unknown file where web and project root same' => [
         FALSE,
@@ -140,9 +149,8 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
    *   The path of unknown directory to test or NULL none should be tested.
    * @param string[] $unknown_files
    *   The list of unknown files.
-   *
-   * @dataProvider providerTestUnknownPath
    */
+  #[DataProvider('providerTestUnknownPath')]
   public function testUnknownPath(bool $use_nested_webroot, ?string $unknown_dir, array $unknown_files): void {
     $this->createTestProjectForTemplate($use_nested_webroot);
 

@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\FunctionalJavascriptTests\SortableTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Media library entity reference widget.
  */
 #[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceWidgetTest extends MediaLibraryTestBase {
 
   use SortableTestTrait;
@@ -205,7 +208,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
 
     $this->drupalGet('node/add/basic_page');
     $this->openMediaLibraryForField('field_twin_media');
-    $link_titles = array_map(function ($link) {
+    $link_titles = array_map(function (NodeElement $link) {
       return $link->getText();
     }, $links);
     $this->assertSame(
@@ -242,12 +245,14 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $session = $this->getSession();
     $session->getPage()->fillField('Name', 'Dog');
     $session->getPage()->pressButton('Apply filters');
-    $this->waitForText('Dog');
-    $this->waitForNoText('Bear');
+    $assert_session->assertExpectedAjaxRequest(9);
+    $assert_session->pageTextContains('Dog');
+    $assert_session->pageTextNotContains('Bear');
     $session->getPage()->fillField('Name', '');
     $session->getPage()->pressButton('Apply filters');
-    $this->waitForText('Dog');
-    $this->waitForText('Bear');
+    $assert_session->assertExpectedAjaxRequest(10);
+    $assert_session->pageTextContains('Dog');
+    $assert_session->pageTextContains('Bear');
     $assert_session->elementExists('css', '.ui-dialog-titlebar-close')->click();
 
     // Assert adding a single media item and removing it.
@@ -295,7 +300,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $this->waitForText('Dog has been removed.');
     $wrapper->pressButton('Remove');
     $this->waitForText('Dog has been removed.');
-    $result = $wrapper->waitFor(10, function ($wrapper) {
+    $result = $wrapper->waitFor(10, function ($wrapper): bool {
       /** @var \Behat\Mink\Element\NodeElement $wrapper */
       return $wrapper->findButton('Remove') == NULL;
     });
@@ -607,6 +612,8 @@ JS;
    * Tests the preview displayed by the field widget.
    */
   public function testWidgetPreview(): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3569225');
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

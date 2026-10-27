@@ -10,12 +10,14 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the timestamp formatters.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class TimestampFormatterTest extends KernelTestBase {
 
   /**
@@ -24,7 +26,6 @@ class TimestampFormatterTest extends KernelTestBase {
   protected static $modules = [
     'system',
     'field',
-    'text',
     'entity_test',
     'user',
   ];
@@ -97,10 +98,9 @@ class TimestampFormatterTest extends KernelTestBase {
    * @return string
    *   The rendered entity fields.
    */
-  protected function renderEntityFields(FieldableEntityInterface $entity, EntityViewDisplayInterface $display) {
+  protected function renderEntityFields(FieldableEntityInterface $entity, EntityViewDisplayInterface $display): string {
     $content = $display->build($entity);
-    $content = $this->render($content);
-    return $content;
+    return $this->render($content);
   }
 
   /**

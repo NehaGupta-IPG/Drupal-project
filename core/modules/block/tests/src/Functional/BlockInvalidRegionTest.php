@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Functional;
 
-use Drupal\Tests\BrowserTestBase;
 use Drupal\block\Entity\Block;
+use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that blocks assigned to invalid regions are disabled with a warning.
- *
- * @group block
  */
+#[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockInvalidRegionTest extends BrowserTestBase {
 
   /**
@@ -72,7 +74,6 @@ class BlockInvalidRegionTest extends BrowserTestBase {
 
     // Place disabled test block in the invalid region of the default theme.
     \Drupal::configFactory()->getEditable('block.block.' . $block->id())->set('region', 'invalid_region')->save();
-    $block = Block::load($block->id());
 
     // Clear the cache to check if the warning message is not triggered.
     $this->drupalGet('admin/config/development/performance');

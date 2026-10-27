@@ -6,13 +6,16 @@ namespace Drupal\Tests\user\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the user admin listing if views is not enabled.
  *
- * @group user
  * @see user_admin_account()
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserAdminListingTest extends BrowserTestBase {
 
   /**
@@ -67,7 +70,7 @@ class UserAdminListingTest extends BrowserTestBase {
     $this->drupalGet('admin/people');
     $this->assertSession()->statusCodeEquals(200);
 
-    $result = $this->xpath('//table[contains(@class, "responsive-enabled")]/tbody/tr');
+    $result = $this->getNodeElementsByXpath('//table[contains(@class, "responsive-enabled")]/tbody/tr');
     $result_accounts = [];
     foreach ($result as $account) {
       $account_columns = $account->findAll('css', 'td');
@@ -84,7 +87,7 @@ class UserAdminListingTest extends BrowserTestBase {
         'name' => $name,
         'status' => $account_columns[1]->getText(),
         'roles' => $roles,
-        'member_for' => $account_columns[3]->getText(),
+        'created' => $account_columns[3]->getText(),
         'last_access' => $account_columns[4]->getText(),
       ];
     }
@@ -97,7 +100,7 @@ class UserAdminListingTest extends BrowserTestBase {
     $expected_roles = ['custom_role_1', 'custom_role_2'];
     $this->assertEquals($expected_roles, $result_accounts[$role_account_name]['roles'], 'Ensure roles are listed properly.');
 
-    $this->assertEquals(\Drupal::service('date.formatter')->formatTimeDiffSince($accounts[$timestamp_user]->created->value), $result_accounts[$timestamp_user]['member_for'], 'Ensure the right member time is displayed.');
+    $this->assertEquals(\Drupal::service('date.formatter')->formatTimeDiffSince($accounts[$timestamp_user]->created->value), $result_accounts[$timestamp_user]['created'], 'Ensure the right member time is displayed.');
 
     $this->assertEquals('never', $result_accounts[$timestamp_user]['last_access'], 'Ensure the last access time is "never".');
   }

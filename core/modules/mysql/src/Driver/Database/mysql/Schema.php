@@ -2,12 +2,13 @@
 
 namespace Drupal\mysql\Driver\Database\mysql;
 
-use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
-use Drupal\Core\Database\SchemaException;
-use Drupal\Core\Database\SchemaObjectExistsException;
-use Drupal\Core\Database\SchemaObjectDoesNotExistException;
-use Drupal\Core\Database\Schema as DatabaseSchema;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
+use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaException;
+use Drupal\Core\Database\SchemaObjectDoesNotExistException;
+use Drupal\Core\Database\SchemaObjectExistsException;
 
 // cspell:ignore gipk
 
@@ -104,7 +105,12 @@ class Schema extends DatabaseSchema {
 
     // Process keys & indexes.
     if (!empty($table['primary key']) && is_array($table['primary key'])) {
-      $this->ensureNotNullPrimaryKey($table['primary key'], $table['fields']);
+      $this->validatePrimaryKeySchema($table['primary key'], $table['fields']);
+    }
+    if (!empty($table['unique keys'])) {
+      foreach ($table['unique keys'] as $key_fields) {
+        $this->validateUniqueKeySchema($key_fields);
+      }
     }
     $keys = $this->createKeysSql($table);
     if (count($keys)) {
@@ -162,8 +168,18 @@ class Schema extends DatabaseSchema {
       $sql .= '(' . $spec['precision'] . ', ' . $spec['scale'] . ')';
     }
 
+    // MySQL treats 'unsigned' as part of the data type, so it has to come
+    // before the generated column clause.
     if (!empty($spec['unsigned'])) {
       $sql .= ' unsigned';
+    }
+
+    if (isset($spec['generated'])) {
+      $sql .= ' GENERATED ALWAYS AS (' . $spec['generated']->generatedExpression->expression . ') ';
+      $sql .= match ($spec['generated']->generatedStorage) {
+        GeneratedColumnStorage::Virtual => 'VIRTUAL',
+        GeneratedColumnStorage::Stored => 'STORED',
+      };
     }
 
     if (isset($spec['not null'])) {
@@ -184,7 +200,7 @@ class Schema extends DatabaseSchema {
       $sql .= ' DEFAULT ' . $this->escapeDefaultValue($spec['default']);
     }
 
-    if (empty($spec['not null']) && !isset($spec['default'])) {
+    if (empty($spec['not null']) && !isset($spec['default']) && !isset($spec['generated'])) {
       $sql .= ' DEFAULT NULL';
     }
 
@@ -413,9 +429,15 @@ class Schema extends DatabaseSchema {
     }
 
     // Fields that are part of a PRIMARY KEY must be added as NOT NULL.
-    $is_primary_key = isset($keys_new['primary key']) && in_array($field, $keys_new['primary key'], TRUE);
+    $is_primary_key = isset($keys_new['primary key']) && in_array($field, $this->fieldNames($keys_new['primary key']), TRUE);
     if ($is_primary_key) {
-      $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field => $spec]);
+      $this->validatePrimaryKeySchema($keys_new['primary key'], [$field => $spec]);
+    }
+
+    if (!empty($keys_new['unique keys'])) {
+      foreach ($keys_new['unique keys'] as $key_fields) {
+        $this->validateUniqueKeySchema($key_fields);
+      }
     }
 
     $fix_null = FALSE;
@@ -518,7 +540,7 @@ class Schema extends DatabaseSchema {
     if ($this->indexExists($table, 'PRIMARY')) {
       throw new SchemaObjectExistsException("Cannot add primary key to table '$table': primary key already exists.");
     }
-
+    $this->validatePrimaryKeySchema($fields);
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD PRIMARY KEY (' . $this->createKeySql($fields) . ')');
   }
 
@@ -555,7 +577,7 @@ class Schema extends DatabaseSchema {
     if ($this->indexExists($table, $name)) {
       throw new SchemaObjectExistsException("Cannot add unique key '$name' to table '$table': unique key already exists.");
     }
-
+    $this->validateUniqueKeySchema($fields);
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD UNIQUE KEY [' . $name . '] (' . $this->createKeySql($fields) . ')');
   }
 
@@ -640,8 +662,13 @@ class Schema extends DatabaseSchema {
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
       throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
     }
-    if (isset($keys_new['primary key']) && in_array($field_new, $keys_new['primary key'], TRUE)) {
-      $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field_new => $spec]);
+    if (!empty($keys_new['primary key'])) {
+      $this->validatePrimaryKeySchema($keys_new['primary key'], [$field_new => $spec]);
+    }
+    if (!empty($keys_new['unique keys'])) {
+      foreach ($keys_new['unique keys'] as $key_fields) {
+        $this->validateUniqueKeySchema($key_fields);
+      }
     }
 
     $sql = 'ALTER TABLE {' . $table . '} CHANGE [' . $field . '] ' . $this->createFieldSql($field_new, $this->processField($spec));
@@ -671,21 +698,33 @@ class Schema extends DatabaseSchema {
   }
 
   /**
-   * Retrieve a table or column comment.
+   * Retrieves a table or column comment.
+   *
+   * @param string $table
+   *   The table name.
+   * @param string|null $column
+   *   (optional) The column name.
+   *
+   * @return string|false
+   *   The table or column comment. FALSE if the table or column does not exist.
    */
   public function getComment($table, $column = NULL) {
     $condition = $this->buildTableNameCondition($table);
     if (isset($column)) {
+      if (!$this->tableExists($table)) {
+        // If the table is a view it will be present in
+        // information_schema.columns so we need to check if the table exists.
+        return FALSE;
+      }
       $condition->condition('column_name', $column);
       $condition->compile($this->connection, $this);
       // Don't use {} around information_schema.columns table.
       return $this->connection->query("SELECT column_comment AS column_comment FROM information_schema.columns WHERE " . (string) $condition, $condition->arguments())->fetchField();
     }
+    $condition->condition('table_type', 'BASE TABLE');
     $condition->compile($this->connection, $this);
     // Don't use {} around information_schema.tables table.
-    $comment = $this->connection->query("SELECT table_comment AS table_comment FROM information_schema.tables WHERE " . (string) $condition, $condition->arguments())->fetchField();
-    // Work-around for MySQL 5.0 bug http://bugs.mysql.com/bug.php?id=11379
-    return preg_replace('/; InnoDB free:.*$/', '', $comment);
+    return $this->connection->query("SELECT table_comment AS table_comment FROM information_schema.tables WHERE " . (string) $condition, $condition->arguments())->fetchField();
   }
 
 }

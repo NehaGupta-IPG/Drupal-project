@@ -6,33 +6,34 @@ namespace Drupal\Tests\Core\Theme\Component;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Plugin\Component;
+use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\Component\ComponentValidator;
-use Drupal\Core\Render\Component\Exception\InvalidComponentException;
-use Drupal\Core\Plugin\Component;
-use Drupal\Tests\UnitTestCaseTest;
+use Drupal\Tests\UnitTestCase;
 use JsonSchema\ConstraintError;
 use JsonSchema\Constraints\Factory;
 use JsonSchema\Constraints\FormatConstraint;
 use JsonSchema\Entity\JsonPointer;
 use JsonSchema\Validator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Yaml\Yaml;
 
 /**
  * Unit tests for the component validation.
- *
- * @coversDefaultClass \Drupal\Core\Theme\Component\ComponentValidator
- * @group sdc
  */
-class ComponentValidatorTest extends UnitTestCaseTest {
+#[CoversClass(ComponentValidator::class)]
+#[Group('sdc')]
+class ComponentValidatorTest extends UnitTestCase {
 
   /**
    * Tests that valid component definitions don't cause errors.
    *
-   * @dataProvider dataProviderValidateDefinitionValid
-   *
    * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
    */
+  #[DataProvider('dataProviderValidateDefinitionValid')]
   public function testValidateDefinitionValid(array $definition): void {
     $component_validator = new ComponentValidator();
     $component_validator->setValidator();
@@ -48,20 +49,32 @@ class ComponentValidatorTest extends UnitTestCaseTest {
    * @return array
    *   The data.
    */
-  public static function dataProviderValidateDefinitionValid(): array {
-    return [
-      array_map(
-        [static::class, 'loadComponentDefinitionFromFs'],
-        ['my-banner', 'my-button', 'my-cta'],
-      ),
+  public static function dataProviderValidateDefinitionValid(): \Generator {
+    $data = array_map(
+      [static::class, 'loadComponentDefinitionFromFs'],
+      ['my-banner', 'my-button', 'my-cta'],
+    );
+    foreach ($data as $definition) {
+      yield [$definition];
+    }
+
+    // Variant names may contain dashes because they are used as string values
+    // (e.g. CSS modifiers) and are never converted to Twig variable or block
+    // names, unlike props and slots.
+    $cta_with_dashed_variant = static::loadComponentDefinitionFromFs('my-cta');
+    $cta_with_dashed_variant['variants'] = [
+      'my-variant' => [
+        'title' => 'My variant',
+        'description' => 'Variant names with dashes are valid.',
+      ],
     ];
+    yield 'variant name with dashes is valid' => [$cta_with_dashed_variant];
   }
 
   /**
    * Tests invalid component definitions.
-   *
-   * @dataProvider dataProviderValidateDefinitionInvalid
    */
+  #[DataProvider('dataProviderValidateDefinitionInvalid')]
   public function testValidateDefinitionInvalid(array $definition): void {
     $this->expectException(InvalidComponentException::class);
     $component_validator = new ComponentValidator();
@@ -139,6 +152,38 @@ class ComponentValidatorTest extends UnitTestCaseTest {
     ];
     yield 'invalid slot (name with spaces)' => [$cta_with_invalid_slot_name];
 
+    $cta_with_dashed_slot_name = $valid_cta;
+    $cta_with_dashed_slot_name['slots'] = [
+      'invalid-slot' => [
+        'title' => 'Invalid slot',
+        'description' => 'Slot name cannot contain dashes because Twig disallows them in variable names.',
+      ],
+    ];
+    yield 'invalid slot (name with dashes)' => [$cta_with_dashed_slot_name];
+
+    $cta_with_dashed_prop_name = $valid_cta;
+    $cta_with_dashed_prop_name['props']['properties']['my-prop'] = [
+      'type' => 'string',
+      'title' => 'My prop',
+    ];
+    yield 'invalid prop (name with dashes)' => [$cta_with_dashed_prop_name];
+
+    $cta_with_leading_digit_prop_name = $valid_cta;
+    $cta_with_leading_digit_prop_name['props']['properties']['1prop'] = [
+      'type' => 'string',
+      'title' => '1prop',
+    ];
+    yield 'invalid prop (name starts with digit)' => [$cta_with_leading_digit_prop_name];
+
+    $cta_with_leading_digit_slot_name = $valid_cta;
+    $cta_with_leading_digit_slot_name['slots'] = [
+      '1slot' => [
+        'title' => 'Invalid slot',
+        'description' => 'Slot name cannot start with a digit because Twig identifiers must start with a letter or underscore.',
+      ],
+    ];
+    yield 'invalid slot (name starts with digit)' => [$cta_with_leading_digit_slot_name];
+
     $cta_with_invalid_variant_title_type = $valid_cta;
     $cta_with_invalid_variant_title_type['variants'] = [
       'valid_variant' => [
@@ -187,10 +232,9 @@ class ComponentValidatorTest extends UnitTestCaseTest {
   /**
    * Tests that valid props are handled properly.
    *
-   * @dataProvider dataProviderValidatePropsValid
-   *
    * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
    */
+  #[DataProvider('dataProviderValidatePropsValid')]
   public function testValidatePropsValid(array $context, string $component_id, array $definition): void {
     $translation = $this->getStringTranslationStub();
     $container = new ContainerBuilder();
@@ -272,10 +316,9 @@ class ComponentValidatorTest extends UnitTestCaseTest {
   /**
    * Tests that invalid props are handled properly.
    *
-   * @dataProvider dataProviderValidatePropsInvalid
-   *
    * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
    */
+  #[DataProvider('dataProviderValidatePropsInvalid')]
   public function testValidatePropsInvalid(array $context, string $component_id, array $definition, string $expected_exception_message): void {
     $translation = $this->getStringTranslationStub();
     $container = new ContainerBuilder();
@@ -288,7 +331,7 @@ class ComponentValidatorTest extends UnitTestCaseTest {
       $definition
     );
     $this->expectException(InvalidComponentException::class);
-    $this->expectExceptionMessage($expected_exception_message);
+    $this->expectExceptionMessageIs($expected_exception_message);
     $component_validator = new ComponentValidator();
     $component_validator->setValidator();
     $component_validator->validateProps($context, $component);

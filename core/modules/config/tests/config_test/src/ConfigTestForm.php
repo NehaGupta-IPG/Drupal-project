@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\config_test;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\image\ImageDerivativeUtilities;
 
 /**
  * Form controller for the test config edit forms.
@@ -52,7 +52,7 @@ class ConfigTestForm extends EntityForm {
     ];
     if ($this->moduleHandler->moduleExists('image')) {
       $form['style']['#access'] = TRUE;
-      $form['style']['#options'] = image_style_options();
+      $form['style']['#options'] = \Drupal::service(ImageDerivativeUtilities::class)->styleOptions();
     }
 
     // The main premise of entity forms is that we get to work with an entity
@@ -129,7 +129,7 @@ class ConfigTestForm extends EntityForm {
   /**
    * Element submit handler for non-JS testing.
    */
-  public static function changeSize(array $form, FormStateInterface $form_state) {
+  public static function changeSize(array $form, FormStateInterface $form_state): void {
     $form_state->setRebuild();
   }
 
@@ -139,12 +139,12 @@ class ConfigTestForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $entity = $this->entity;
     $status = $entity->save();
-
+    $label = $entity->label();
     if ($status === SAVED_UPDATED) {
-      $this->messenger()->addStatus(new FormattableMarkup('%label configuration has been updated.', ['%label' => $entity->label()]));
+      $this->messenger()->addStatus("$label configuration has been updated.");
     }
     else {
-      $this->messenger()->addStatus(new FormattableMarkup('%label configuration has been created.', ['%label' => $entity->label()]));
+      $this->messenger()->addStatus("$label configuration has been created.");
     }
 
     $form_state->setRedirectUrl($this->entity->toUrl('collection'));

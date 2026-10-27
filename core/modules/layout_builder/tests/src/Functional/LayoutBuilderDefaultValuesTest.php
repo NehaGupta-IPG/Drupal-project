@@ -14,14 +14,15 @@ use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore blocknodetest typefield
-
 /**
  * Tests rendering default field values in Layout Builder.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderDefaultValuesTest extends BrowserTestBase {
 
   use ImageFieldCreationTrait;
@@ -373,7 +374,7 @@ class LayoutBuilderDefaultValuesTest extends BrowserTestBase {
   /**
    * Sample 'default value' callback.
    */
-  public static function defaultValueCallback(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
+  public static function defaultValueCallback(FieldableEntityInterface $entity, FieldDefinitionInterface $definition): array {
     return [['value' => 'This is from my default value callback']];
   }
 

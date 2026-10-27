@@ -11,7 +11,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsDisplay;
 use Drupal\views\Plugin\Block\ViewsBlock;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\views\PostSaveProcess;
+use Drupal\views\PostSaveViewInterface;
 
 /**
  * The plugin that handles a block.
@@ -31,7 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   uses_hook_block: TRUE,
   contextual_links_locations: ["block"]
 )]
-class Block extends DisplayPluginBase {
+class Block extends DisplayPluginBase implements PostSaveViewInterface {
 
   /**
    * Whether the display allows attachments.
@@ -73,19 +74,6 @@ class Block extends DisplayPluginBase {
 
     $this->entityTypeManager = $entity_type_manager;
     $this->blockManager = $block_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager'),
-      $container->get('plugin.manager.block')
-    );
   }
 
   /**
@@ -308,6 +296,9 @@ class Block extends DisplayPluginBase {
               4 => 4,
               5 => 5,
               6 => 6,
+              7 => 7,
+              8 => 8,
+              9 => 9,
               10 => 10,
               12 => 12,
               20 => 20,
@@ -393,6 +384,15 @@ class Block extends DisplayPluginBase {
     }
     if ($this->blockManager instanceof CachedDiscoveryInterface) {
       $this->blockManager->clearCachedDefinitions();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSaveView(PostSaveProcess $postSaveProcess, ?DisplayPluginInterface $original_display = NULL): void {
+    if ($this->blockManager instanceof CachedDiscoveryInterface) {
+      $postSaveProcess->addDiscoveryToClear($this->blockManager);
     }
   }
 

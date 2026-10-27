@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\EmailValidator;
-use Egulias\EmailValidator\Validation\RFCValidation;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
+use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -17,8 +18,10 @@ use PHPUnit\Framework\TestCase;
 #[Group('Utility')]
 class EmailValidatorTest extends TestCase {
 
+  use ForwardCompatibilityTrait;
+
   /**
-   * @legacy-covers ::isValid
+   * Tests is valid.
    */
   public function testIsValid(): void {
     // Note that \Drupal\Component\Utility\EmailValidator wraps
@@ -29,16 +32,17 @@ class EmailValidatorTest extends TestCase {
     $this->assertTrue($validator->isValid('example@example.com'));
     $this->assertFalse($validator->isValid('example@example.com@'));
     $this->assertFalse($validator->isValid('example@example .com'));
+    $this->assertFalse($validator->isValid('example @example.com'));
   }
 
   /**
-   * @legacy-covers ::isValid
+   * Tests is valid exception.
    */
   public function testIsValidException(): void {
     $validator = new EmailValidator();
     $this->expectException(\BadMethodCallException::class);
-    $this->expectExceptionMessage('Calling \Drupal\Component\Utility\EmailValidator::isValid() with the second argument is not supported. See https://www.drupal.org/node/2997196');
-    $validator->isValid('example@example.com', (new RFCValidation()));
+    $this->expectExceptionMessageIs('Calling \Drupal\Component\Utility\EmailValidator::isValid() with the second argument is not supported. See https://www.drupal.org/node/2997196');
+    $validator->isValid('example@example.com', (new NoRFCWarningsValidation()));
   }
 
 }

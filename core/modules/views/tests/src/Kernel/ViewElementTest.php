@@ -6,12 +6,14 @@ namespace Drupal\Tests\views\Kernel;
 
 use Drupal\views\Exception\ViewRenderElementException;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the view render element.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewElementTest extends ViewsKernelTestBase {
 
   /**
@@ -35,11 +37,11 @@ class ViewElementTest extends ViewsKernelTestBase {
     $this->assertFalse($render['#embed']);
     $this->setRawContent($renderer->renderRoot($render));
 
-    $xpath = $this->xpath('//div[@class="views-element-container"]');
+    $xpath = $this->getSimpleXmlElementsByXpath('//div[@class="views-element-container"]');
     $this->assertNotEmpty($xpath, 'The view container has been found in the rendered output.');
 
     // There should be 5 rows in the results.
-    $xpath = $this->xpath('//div[@class="views-row"]');
+    $xpath = $this->getSimpleXmlElementsByXpath('//div[@class="views-row"]');
     $this->assertCount(5, $xpath);
 
     // Add an argument and save the view.
@@ -67,7 +69,7 @@ class ViewElementTest extends ViewsKernelTestBase {
     $render = $view->buildRenderable(NULL, [25]);
     $this->setRawContent($renderer->renderRoot($render));
     // There should be 1 row in the results, 'John' arg 25.
-    $xpath = $this->xpath('//div[@class="views-row"]');
+    $xpath = $this->getSimpleXmlElementsByXpath('//div[@class="views-row"]');
     $this->assertCount(1, $xpath);
   }
 
@@ -87,11 +89,11 @@ class ViewElementTest extends ViewsKernelTestBase {
     // Ensure that the render array can be serialized.
     serialize($render);
 
-    $xpath = $this->xpath('//div[@class="views-element-container"]');
+    $xpath = $this->getSimpleXmlElementsByXpath('//div[@class="views-element-container"]');
     $this->assertNotEmpty($xpath, 'The view container has been found in the rendered output.');
 
     // There should be 5 rows in the results.
-    $xpath = $this->xpath('//div[@class="views-row"]');
+    $xpath = $this->getSimpleXmlElementsByXpath('//div[@class="views-row"]');
     $this->assertCount(5, $xpath);
 
     // Add an argument and save the view.
@@ -119,7 +121,7 @@ class ViewElementTest extends ViewsKernelTestBase {
     $render = $view->buildRenderable('embed_1', [25]);
     $this->setRawContent($renderer->renderRoot($render));
     // There should be 1 row in the results, 'John' arg 25.
-    $xpath = $this->xpath('//div[@class="views-row"]');
+    $xpath = $this->getSimpleXmlElementsByXpath('//div[@class="views-row"]');
     $this->assertCount(1, $xpath);
 
     // Tests the render array with an exposed filter.
@@ -128,7 +130,7 @@ class ViewElementTest extends ViewsKernelTestBase {
     $this->setRawContent($renderer->renderRoot($render));
 
     // Ensure that the exposed form is rendered.
-    $this->assertCount(1, $this->xpath('//form[@class="views-exposed-form"]'));
+    $this->assertCount(1, $this->getSimpleXmlElementsByXpath('//form[@class="views-exposed-form"]'));
   }
 
   /**
@@ -142,7 +144,7 @@ class ViewElementTest extends ViewsKernelTestBase {
       '#embed' => FALSE,
     ];
     $this->expectException(ViewRenderElementException::class);
-    $this->expectExceptionMessage("Invalid View name ({$render_element['#name']}) given.");
+    $this->expectExceptionMessageIs("Invalid View name ({$render_element['#name']}) given.");
     $renderer->renderRoot($render_element);
   }
 

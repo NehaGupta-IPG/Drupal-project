@@ -7,13 +7,15 @@ namespace Drupal\Tests\system\Unit\Event;
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Drupal\system\EventSubscriber\SecurityFileUploadEventSubscriber;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * SecurityFileUploadEventSubscriber tests.
- *
- * @group system
- * @coversDefaultClass \Drupal\system\EventSubscriber\SecurityFileUploadEventSubscriber
  */
+#[CoversClass(SecurityFileUploadEventSubscriber::class)]
+#[Group('system')]
 class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
 
   /**
@@ -27,11 +29,8 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    *   The expected filename if 'allow_insecure_uploads' is set to FALSE.
    * @param string|null $expected_filename_with_insecure_uploads
    *   The expected filename if 'allow_insecure_uploads' is set to TRUE.
-   *
-   * @dataProvider provideFilenames
-   *
-   * @covers ::sanitizeName
    */
+  #[DataProvider('provideFilenames')]
   public function testSanitizeName(string $filename, string $allowed_extensions, string $expected_filename, ?string $expected_filename_with_insecure_uploads = NULL): void {
     // Configure insecure uploads to be renamed.
     $config_factory = $this->getConfigFactoryStub([
@@ -72,7 +71,7 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    *   Arrays with original name, allowed extensions, expected name and
    *   (optional) expected name 'allow_insecure_uploads' is set to TRUE.
    */
-  public static function provideFilenames() {
+  public static function provideFilenames(): array {
     return [
       'All extensions allowed filename not munged' => ['foo.txt', '', 'foo.txt'],
       'All extensions allowed with .php file' => ['foo.php', '', 'foo.php_.txt', 'foo.php'],
@@ -96,6 +95,28 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
       '.phtml, .txt extension allowed with .phtml file' => ['foo.phtml', 'phtml txt', 'foo.phtml_.txt', 'foo.phtml'],
       'All extensions allowed with .phtml file' => ['foo.phtml', '', 'foo.phtml_.txt', 'foo.phtml'],
       'dot files are renamed even if allowed and not in security list' => ['.git', 'git', 'git'],
+      // Characters that are never safe are replaced regardless of the
+      // filename_sanitization settings in file.settings.
+      'Carriage return is replaced' => ["a\rb.txt", 'txt', 'a_b.txt'],
+      'Tab is replaced' => ["a\tb.txt", 'txt', 'a_b.txt'],
+      'Delete is replaced' => ["a\x7Fb.txt", 'txt', 'a_b.txt'],
+      'Shell meta-characters are replaced' => ['a;b|c&d.txt', 'txt', 'a_b_c_d.txt'],
+      'Backtick and dollar are replaced' => ['a`b$c.txt', 'txt', 'a_b_c.txt'],
+      'Quotes are replaced' => ['a\'b"c.txt', 'txt', 'a_b_c.txt'],
+      'Bidirectional override is replaced' => ["photo_\u{202E}gnp.txt", 'txt', 'photo__gnp.txt'],
+      'Zero width space is replaced' => ["photo\u{200B}graph.txt", 'txt', 'photo_graph.txt'],
+      'An ampersand is replaced, not dropped' => ['Love&War.pdf', 'pdf', 'Love_War.pdf'],
+      'A name of only unsafe characters keeps its extension' => ['<>|.txt', 'txt', '___.txt'],
+      'A name of only unsafe characters is not emptied' => ['<>|', '', '___'],
+      'Leading dashes are stripped' => ['--opt.txt', 'txt', 'opt.txt'],
+      'Leading dashes do not expose a dot file' => ['---.txt', 'txt', 'unnamed.txt'],
+      'A name of only dots falls back' => ['...', '', 'unnamed'],
+      'The fallback name is not itself disturbed' => ['unnamed', '', 'unnamed'],
+      // The extension is still munged after the replacements.
+      'Unsafe characters with a disallowed insecure extension' => ["a\rb.php", 'txt', 'a_b.php'],
+      'Unsafe characters with an insecure extension' => ["a\rb.php", '', 'a_b.php_.txt', 'a_b.php'],
+      'An ordinary filename is untouched' => ['holiday-photo.jpg', 'jpg', 'holiday-photo.jpg'],
+      'Spaces are left to the sanitization settings' => ['drupal rocks.txt', 'txt', 'drupal rocks.txt'],
     ];
   }
 
@@ -106,11 +127,8 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    *   The original filename.
    * @param string $allowed_extensions
    *   The allowed extensions.
-   *
-   * @dataProvider provideFilenamesNoMunge
-   *
-   * @covers ::sanitizeName
    */
+  #[DataProvider('provideFilenamesNoMunge')]
   public function testSanitizeNameNoMunge(string $filename, string $allowed_extensions): void {
     $config_factory = $this->getConfigFactoryStub([
       'system.file' => [
@@ -147,7 +165,7 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    * @return array
    *   Arrays with original name and allowed extensions.
    */
-  public static function provideFilenamesNoMunge() {
+  public static function provideFilenamesNoMunge(): array {
     return [
       // The following filename would be rejected by 'FileExtension' constraint
       // and therefore remains unchanged.

@@ -6,12 +6,14 @@ namespace Drupal\Tests\mysql\Functional;
 
 use Drupal\Core\Database\Database;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests isolation level warning when the config is set in settings.php.
- *
- * @group mysql
  */
+#[Group('mysql')]
+#[RunTestsInSeparateProcesses]
 class RequirementsTest extends BrowserTestBase {
 
   /**
@@ -53,7 +55,7 @@ class RequirementsTest extends BrowserTestBase {
 
     // Check the message is not a warning.
     $this->drupalGet('admin/reports/status');
-    $elements = $this->xpath('//details[@class="system-status-report__entry"]//div[contains(text(), "REPEATABLE-READ")]');
+    $elements = $this->getNodeElementsByXpath('//details[@class="system-status-report__entry"]//div[contains(text(), "REPEATABLE-READ")]');
     $this->assertCount(1, $elements);
     // Ensure it is a warning.
     $this->assertStringContainsString('warning', $elements[0]->getParent()->getParent()->find('css', 'summary')->getAttribute('class'));
@@ -63,7 +65,7 @@ class RequirementsTest extends BrowserTestBase {
 
     // Check the message is not a warning.
     $this->drupalGet('admin/reports/status');
-    $elements = $this->xpath('//details[@class="system-status-report__entry"]//div[contains(text(), "READ-COMMITTED")]');
+    $elements = $this->getNodeElementsByXpath('//details[@class="system-status-report__entry"]//div[contains(text(), "READ-COMMITTED")]');
     $this->assertCount(1, $elements);
     // Ensure it is a not a warning.
     $this->assertStringNotContainsString('warning', $elements[0]->getParent()->getParent()->find('css', 'summary')->getAttribute('class'));
@@ -84,7 +86,7 @@ class RequirementsTest extends BrowserTestBase {
 
     // Check the message is not a warning.
     $this->drupalGet('admin/reports/status');
-    $elements = $this->xpath('//details[@class="system-status-report__entry"]//div[contains(text(), :text)]', [
+    $elements = $this->getNodeElementsByXpath('//details[@class="system-status-report__entry"]//div[contains(text(), :text)]', [
       ':text' => 'The recommended level for Drupal is "READ COMMITTED". For this to work correctly, all tables must have a primary key. The following table(s) do not have a primary key: test_table_without_primary_key.',
     ]);
     $this->assertCount(1, $elements);
@@ -97,7 +99,7 @@ class RequirementsTest extends BrowserTestBase {
 
     // Check the message is not a warning.
     $this->drupalGet('admin/reports/status');
-    $elements = $this->xpath('//details[@class="system-status-report__entry"]//div[contains(text(), :text)]', [
+    $elements = $this->getNodeElementsByXpath('//details[@class="system-status-report__entry"]//div[contains(text(), :text)]', [
       ':text' => 'For this to work correctly, all tables must have a primary key. The following table(s) do not have a primary key: test_table_without_primary_key.',
     ]);
     $this->assertCount(1, $elements);

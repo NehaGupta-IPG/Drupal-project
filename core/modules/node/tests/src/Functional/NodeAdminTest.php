@@ -10,12 +10,16 @@ use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\user\RoleInterface;
+use Drupal\node\NodeAccessRebuild;
+use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests node administration page functionality.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeAdminTest extends NodeTestBase {
 
   use NodeAccessTrait;
@@ -67,7 +71,9 @@ class NodeAdminTest extends NodeTestBase {
     // Remove the "view own unpublished content" permission which is set
     // by default for authenticated users so we can test this permission
     // correctly.
-    user_role_revoke_permissions(RoleInterface::AUTHENTICATED_ID, ['view own unpublished content']);
+    Role::loadOverrideFree(RoleInterface::AUTHENTICATED_ID)->revokePermissions([
+      'view own unpublished content',
+    ])->save();
 
     $this->adminUser = $this->drupalCreateUser([
       'access administration pages',
@@ -154,14 +160,24 @@ class NodeAdminTest extends NodeTestBase {
     $time = time();
     $nodes['published_page'] = $this->drupalCreateNode(['type' => 'page', 'changed' => $time--]);
     $nodes['published_article'] = $this->drupalCreateNode(['type' => 'article', 'changed' => $time--]);
-    $nodes['unpublished_page_1'] = $this->drupalCreateNode(['type' => 'page', 'changed' => $time--, 'uid' => $this->baseUser1->id(), 'status' => 0]);
-    $nodes['unpublished_page_2'] = $this->drupalCreateNode(['type' => 'page', 'changed' => $time, 'uid' => $this->baseUser2->id(), 'status' => 0]);
+    $nodes['unpublished_page_1'] = $this->drupalCreateNode([
+      'type' => 'page',
+      'changed' => $time--,
+      'uid' => $this->baseUser1->id(),
+      'status' => 0,
+    ]);
+    $nodes['unpublished_page_2'] = $this->drupalCreateNode([
+      'type' => 'page',
+      'changed' => $time,
+      'uid' => $this->baseUser2->id(),
+      'status' => 0,
+    ]);
 
     // Verify view, edit, and delete links for any content.
     $this->drupalGet('admin/content');
     $this->assertSession()->statusCodeEquals(200);
 
-    $node_type_labels = $this->xpath('//td[contains(@class, "views-field-type")]');
+    $node_type_labels = $this->getNodeElementsByXpath('//td[contains(@class, "views-field-type")]');
     $delta = 0;
     foreach ($nodes as $node) {
       $this->assertSession()->linkByHrefExists('node/' . $node->id());
@@ -246,7 +262,7 @@ class NodeAdminTest extends NodeTestBase {
   public function testContentAdminPageWithLimitedContentViewer(): void {
     \Drupal::service('module_installer')->install(['node_access_test']);
     $this->addPrivateField(NodeType::load('page'));
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
     $role_id = $this->drupalCreateRole([
       'access content overview',
@@ -257,13 +273,48 @@ class NodeAdminTest extends NodeTestBase {
     // Create published and unpublished content authored by an administrator and
     // the viewer user.
     $nodes_visible = [];
-    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $this->adminUser->id(), 'title' => 'Published page by admin']);
-    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $viewer_user->id(), 'title' => 'Published own page']);
-    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $this->adminUser->id(), 'title' => 'Published private page by admin', 'private' => ['value' => 1]]);
-    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $viewer_user->id(), 'title' => 'Published own private page', 'private' => ['value' => 1]]);
-    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $viewer_user->id(), 'title' => 'Unpublished own page', 'status' => NodeInterface::NOT_PUBLISHED]);
-    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $viewer_user->id(), 'title' => 'Unpublished own private page', 'status' => NodeInterface::NOT_PUBLISHED, 'private' => ['value' => 1]]);
-    $nodes_visible[] = $this->drupalCreateNode(['type' => 'page', 'uid' => $this->adminUser->id(), 'title' => 'Unpublished private page by admin', 'status' => NodeInterface::NOT_PUBLISHED, 'private' => ['value' => 1]]);
+    $nodes_visible[] = $this->drupalCreateNode([
+      'type' => 'page',
+      'uid' => $this->adminUser->id(),
+      'title' => 'Published page by admin',
+    ]);
+    $nodes_visible[] = $this->drupalCreateNode([
+      'type' => 'page',
+      'uid' => $viewer_user->id(),
+      'title' => 'Published own page',
+    ]);
+    $nodes_visible[] = $this->drupalCreateNode([
+      'type' => 'page',
+      'uid' => $this->adminUser->id(),
+      'title' => 'Published private page by admin',
+      'private' => ['value' => 1],
+    ]);
+    $nodes_visible[] = $this->drupalCreateNode([
+      'type' => 'page',
+      'uid' => $viewer_user->id(),
+      'title' => 'Published own private page',
+      'private' => ['value' => 1],
+    ]);
+    $nodes_visible[] = $this->drupalCreateNode([
+      'type' => 'page',
+      'uid' => $viewer_user->id(),
+      'title' => 'Unpublished own page',
+      'status' => NodeInterface::NOT_PUBLISHED,
+    ]);
+    $nodes_visible[] = $this->drupalCreateNode([
+      'type' => 'page',
+      'uid' => $viewer_user->id(),
+      'title' => 'Unpublished own private page',
+      'status' => NodeInterface::NOT_PUBLISHED,
+      'private' => ['value' => 1],
+    ]);
+    $nodes_visible[] = $this->drupalCreateNode([
+      'type' => 'page',
+      'uid' => $this->adminUser->id(),
+      'title' => 'Unpublished private page by admin',
+      'status' => NodeInterface::NOT_PUBLISHED,
+      'private' => ['value' => 1],
+    ]);
 
     $this->drupalLogin($viewer_user);
     // Confirm the current user has limited privileges.
@@ -288,7 +339,12 @@ class NodeAdminTest extends NodeTestBase {
         ]),
       ],
     ]));
-    $unpublished_node_by_admin = $this->drupalCreateNode(['type' => 'page', 'uid' => $this->adminUser->id(), 'title' => 'Unpublished page by admin', 'status' => 0]);
+    $unpublished_node_by_admin = $this->drupalCreateNode([
+      'type' => 'page',
+      'uid' => $this->adminUser->id(),
+      'title' => 'Unpublished page by admin',
+      'status' => 0,
+    ]);
     self::assertFalse($unpublished_node_by_admin->access('view'));
     $this->drupalGet('admin/content');
     $this->assertSession()->linkByHrefNotExists('node/' . $unpublished_node_by_admin->id());

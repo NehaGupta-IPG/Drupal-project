@@ -8,26 +8,29 @@ use Drupal\rest\Plugin\views\display\RestExport;
 use Drupal\rest\Plugin\views\style\Serializer;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\ViewExecutable;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * @coversDefaultClass \Drupal\rest\Plugin\views\style\Serializer
- * @group rest
+ * Tests Drupal\rest\Plugin\views\style\Serializer.
  */
+#[CoversClass(Serializer::class)]
+#[Group('rest')]
 class SerializerTest extends UnitTestCase {
 
   /**
    * The View instance.
    *
-   * @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\Stub
    */
   protected $view;
 
   /**
    * The RestExport display handler.
    *
-   * @var \Drupal\rest\Plugin\views\display\RestExport|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\rest\Plugin\views\display\RestExport|\PHPUnit\Framework\MockObject\Stub
    */
   protected $displayHandler;
 
@@ -37,19 +40,14 @@ class SerializerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->view = $this->getMockBuilder(ViewExecutable::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->view = $this->createStub(ViewExecutable::class);
 
     // Make the view result empty so we don't have to mock the row plugin render
     // call.
     $this->view->result = [];
 
-    $this->displayHandler = $this->getMockBuilder(RestExport::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $this->displayHandler->expects($this->any())
+    $this->displayHandler = $this->createStub(RestExport::class);
+    $this->displayHandler
       ->method('getContentType')
       ->willReturn('json');
   }
@@ -57,14 +55,14 @@ class SerializerTest extends UnitTestCase {
   /**
    * Tests that the symfony serializer receives style plugin from the render() method.
    *
-   * @covers ::render
+   * @legacy-covers ::render
    */
   public function testSerializerReceivesOptions(): void {
     $mock_serializer = $this->prophesize(SerializerInterface::class);
 
     // This is the main expectation of the test. We want to make sure the
     // serializer options are passed to the SerializerInterface object.
-    $mock_serializer->serialize([], 'json', Argument::that(function ($argument) {
+    $mock_serializer->serialize([], 'json', Argument::that(function (array $argument): bool {
       return isset($argument['views_style_plugin'])
         && $argument['views_style_plugin'] instanceof Serializer;
     }))

@@ -6,11 +6,13 @@ namespace Drupal\FunctionalTests\Routing;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Lazy Route Provider Install.
  */
 #[Group('routing')]
+#[RunTestsInSeparateProcesses]
 class LazyRouteProviderInstallTest extends BrowserTestBase {
 
   /**
@@ -36,7 +38,7 @@ class LazyRouteProviderInstallTest extends BrowserTestBase {
     // 'lazy_route_provider_install_test_menu_links_discovered_alter' will be
     // set.
     // @see lazy_route_provider_install_test_menu_links_discovered_alter().
-    $this->assertEquals('success', \Drupal::state()->get('lazy_route_provider_install_test_menu_links_discovered_alter', NULL));
+    $this->assertEquals('success', \Drupal::state()->get('lazy_route_provider_install_test_menu_links_discovered_alter'));
   }
 
 }

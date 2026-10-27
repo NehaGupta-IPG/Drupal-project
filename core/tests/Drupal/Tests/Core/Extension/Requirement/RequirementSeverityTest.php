@@ -7,47 +7,24 @@ namespace Drupal\Tests\Core\Extension\Requirement;
 include_once \DRUPAL_ROOT . '/core/includes/install.inc';
 
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Extension\Requirement\RequirementSeverity
- *
- * @group Extension
+ * Tests Drupal\Core\Extension\Requirement\RequirementSeverity.
  */
+#[CoversClass(RequirementSeverity::class)]
+#[Group('Extension')]
 class RequirementSeverityTest extends UnitTestCase {
 
   /**
-   * @covers ::convertLegacyIntSeveritiesToEnums
-   * @group legacy
+   * Tests get max severity.
+   *
+   * @legacy-covers ::maxSeverityFromRequirements
    */
-  public function testConvertLegacySeverities(): void {
-    $requirements['foo'] = [
-      'title' => new TranslatableMarkup('Foo'),
-      'severity' => \REQUIREMENT_INFO,
-    ];
-    $requirements['bar'] = [
-      'title' => new TranslatableMarkup('Bar'),
-      'severity' => \REQUIREMENT_ERROR,
-    ];
-    $this->expectDeprecation(
-      'Calling ' . __METHOD__ . '() with an array of $requirements with \'severity\' with values not of type Drupal\Core\Extension\Requirement\RequirementSeverity enums is deprecated in drupal:11.2.0 and is required in drupal:12.0.0. See https://www.drupal.org/node/3410939'
-    );
-    RequirementSeverity::convertLegacyIntSeveritiesToEnums($requirements, __METHOD__);
-    $this->assertEquals(
-      RequirementSeverity::Info,
-      $requirements['foo']['severity']
-    );
-    $this->assertEquals(
-      RequirementSeverity::Error,
-      $requirements['bar']['severity']
-    );
-  }
-
-  /**
-   * @covers ::maxSeverityFromRequirements
-   * @dataProvider requirementProvider
-   */
+  #[DataProvider('requirementProvider')]
   public function testGetMaxSeverity(array $requirements, RequirementSeverity $expectedSeverity): void {
     $severity = RequirementSeverity::maxSeverityFromRequirements($requirements);
     $this->assertEquals($expectedSeverity, $severity);

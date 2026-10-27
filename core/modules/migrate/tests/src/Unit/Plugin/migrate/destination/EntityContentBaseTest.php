@@ -12,20 +12,19 @@ use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\destination\EntityContentBase;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Row;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
  * Tests base entity migration destination functionality.
- *
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\destination\EntityContentBase
- * @group migrate
  */
+#[CoversClass(EntityContentBase::class)]
+#[Group('migrate')]
 class EntityContentBaseTest extends EntityTestBase {
 
   /**
    * Tests basic entity save.
-   *
-   * @covers ::import
    */
   public function testImport(): void {
     $bundles = [];
@@ -59,8 +58,6 @@ class EntityContentBaseTest extends EntityTestBase {
 
   /**
    * Tests row skipping when we can't get an entity to save.
-   *
-   * @covers ::import
    */
   public function testImportEntityLoadFailure(): void {
     $bundles = [];
@@ -75,7 +72,7 @@ class EntityContentBaseTest extends EntityTestBase {
     );
     $destination->setEntity(FALSE);
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('Unable to get entity');
+    $this->expectExceptionMessageIs('Unable to get entity');
     $destination->import(new Row());
   }
 
@@ -102,7 +99,7 @@ class EntityContentBaseTest extends EntityTestBase {
       $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal(),
     );
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('The "foo" entity type does not support translations.');
+    $this->expectExceptionMessageIs('The "foo" entity type does not support translations.');
     $destination->getIds();
   }
 
@@ -120,7 +117,7 @@ class EntityTestDestination extends EntityContentBase {
    *
    * @var \Drupal\migrate\Plugin\migrate\destination\EntityContentBase|null
    */
-  private $entity = NULL;
+  private $entity;
 
   /**
    * Sets the test entity.
@@ -139,7 +136,7 @@ class EntityTestDestination extends EntityContentBase {
   /**
    * Gets the test entity ID.
    */
-  public static function getEntityTypeId($plugin_id) {
+  public static function getEntityTypeId($plugin_id): string {
     return 'foo';
   }
 

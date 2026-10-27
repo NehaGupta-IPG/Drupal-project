@@ -33,7 +33,6 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
   public static function getConnection(): Connection {
     // Check whether there is a test runner connection.
     // @see run-tests.sh
-    // @todo Convert Simpletest UI runner to create + use this connection, too.
     try {
       $connection = Database::getConnection('default', 'test-runner');
     }
@@ -249,6 +248,12 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
           'not null' => TRUE,
           'default' => 0,
           'description' => 'Time elapsed for the execution of the test.',
+        ],
+        'exit_code' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'The exit code of the test executed.',
         ],
       ],
       'primary key' => ['message_id'],

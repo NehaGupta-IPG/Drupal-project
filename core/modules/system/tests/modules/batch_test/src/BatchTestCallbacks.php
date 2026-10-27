@@ -18,38 +18,6 @@ class BatchTestCallbacks {
   /**
    * Implements callback_batch_operation().
    *
-   * Tests the progress page theme.
-   */
-  public function themeCallback(): void {
-    $batch_test_helper = new BatchTestHelper();
-    // Because drupalGet() steps through the full progressive batch before
-    // returning control to the test function, we cannot test that the correct
-    // theme is being used on the batch processing page by viewing that page
-    // directly. Instead, we save the theme being used in a variable here, so
-    // that it can be loaded and inspected in the thread running the test.
-    $theme = \Drupal::theme()->getActiveTheme()->getName();
-    $batch_test_helper->stack($theme);
-  }
-
-  /**
-   * Tests the title on the progress page by performing a batch callback.
-   */
-  public function titleCallback(): void {
-    $batch_test_helper = new BatchTestHelper();
-    // Because drupalGet() steps through the full progressive batch before
-    // returning control to the test function, we cannot test that the correct
-    // title is being used on the batch processing page by viewing that page
-    // directly. Instead, we save the title being used in a variable here, so
-    // that it can be loaded and inspected in the thread running the test.
-    $request = \Drupal::request();
-    $route_match = \Drupal::routeMatch();
-    $title = \Drupal::service('title_resolver')->getTitle($request, $route_match->getRouteObject());
-    $batch_test_helper->stack($title);
-  }
-
-  /**
-   * Implements callback_batch_operation().
-   *
    * Performs a simple batch operation.
    */
   public function callback1($id, $sleep, &$context): void {
@@ -157,6 +125,24 @@ class BatchTestCallbacks {
     if ($throw_exception) {
       throw new \Exception('Exception in batch');
     }
+  }
+
+  /**
+   * Implements callback_batch_operation().
+   *
+   * Performs a simple batch operation.
+   */
+  public function callback9(array &$context): void {
+    if (!isset($context['sandbox']['count'])) {
+      $context['sandbox']['count'] = 0;
+    }
+    // No-op, but ensure the batch takes a couple iterations.
+    // Batch needs time to run for the test, so sleep a bit.
+    usleep(500);
+
+    $context['sandbox']['count']++;
+    $context['finished'] = $context['sandbox']['count'] / 5;
+    $context['results'][] = \Drupal::request()->getUri();
   }
 
   /**
@@ -298,6 +284,31 @@ class BatchTestCallbacks {
    */
   public function finished7($success, $results, $operations, $elapsed): void {
     $this->finishedHelper(7, $success, $results, $operations, $elapsed);
+  }
+
+  /**
+   * Implements callback_batch_finished().
+   *
+   * Triggers 'finished' callback for batch 9.
+   */
+  public function finished9($success, $results, $operations, $elapsed): void {
+    // Use item list template to render the messages.
+    $message = [
+      '#type' => 'inline_template',
+      '#template' => 'Finished Url: <span class="batch-finished-url">{{ finished_url }}</span><br/ >Batch URLs: {{ urls }}',
+      '#context' => [
+        'finished_url' => \Drupal::request()->getUri(),
+        'urls' => [
+          '#theme' => 'item_list',
+          '#items' => $results,
+          '#attributes' => [
+            'class' => ['batch-urls'],
+          ],
+        ],
+      ],
+    ];
+
+    \Drupal::messenger()->addStatus(\Drupal::service('renderer')->renderInIsolation($message));
   }
 
 }

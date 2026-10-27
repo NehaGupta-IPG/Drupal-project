@@ -13,6 +13,8 @@ use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\image\ImageDerivativeUtilities;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
  * Hook implementations for image.
@@ -20,6 +22,11 @@ use Drupal\Core\Hook\Attribute\Hook;
 class ImageHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    #[AutowireServiceClosure(ImageDerivativeUtilities::class)]
+    protected readonly \Closure $imageDerivativeUtilitiesClosure,
+  ) {}
 
   /**
    * Implements hook_help().
@@ -76,94 +83,6 @@ class ImageHooks {
         return isset($effect_definition['description']) ? '<p>' . $effect_definition['description'] . '</p>' : NULL;
     }
     return NULL;
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-          // Theme functions in image.module.
-      'image_style' => [
-      // HTML 4 and XHTML 1.0 always require an alt attribute. The HTML 5 draft
-      // allows the alt attribute to be omitted in some cases. Therefore,
-      // default the alt attribute to an empty string, but allow code using
-      // '#theme' => 'image_style' to pass explicit NULL for it to be omitted.
-      // Usually, neither omission nor an empty string satisfies accessibility
-      // requirements, so it is strongly encouraged for code using '#theme' =>
-      // 'image_style' to pass a meaningful value for the alt variable.
-      // - https://www.w3.org/TR/REC-html40/struct/objects.html#h-13.8
-      // - https://www.w3.org/TR/xhtml1/dtds.html
-      // - http://dev.w3.org/html5/spec/Overview.html#alt
-      // The title attribute is optional in all cases, so it is omitted by
-      // default.
-        'variables' => [
-          'style_name' => NULL,
-          'uri' => NULL,
-          'width' => NULL,
-          'height' => NULL,
-          'alt' => '',
-          'title' => NULL,
-          'attributes' => [],
-        ],
-      ],
-          // Theme functions in image.admin.inc.
-      'image_style_preview' => [
-        'variables' => [
-          'style' => NULL,
-        ],
-        'file' => 'image.admin.inc',
-      ],
-      'image_anchor' => [
-        'render element' => 'element',
-        'file' => 'image.admin.inc',
-      ],
-      'image_resize_summary' => [
-        'variables' => [
-          'data' => NULL,
-          'effect' => [],
-        ],
-      ],
-      'image_scale_summary' => [
-        'variables' => [
-          'data' => NULL,
-          'effect' => [],
-        ],
-      ],
-      'image_crop_summary' => [
-        'variables' => [
-          'data' => NULL,
-          'effect' => [],
-        ],
-      ],
-      'image_scale_and_crop_summary' => [
-        'variables' => [
-          'data' => NULL,
-          'effect' => [],
-        ],
-      ],
-      'image_rotate_summary' => [
-        'variables' => [
-          'data' => NULL,
-          'effect' => [],
-        ],
-      ],
-          // Theme functions in image.field.inc.
-      'image_widget' => [
-        'render element' => 'element',
-        'file' => 'image.field.inc',
-      ],
-      'image_formatter' => [
-        'variables' => [
-          'item' => NULL,
-          'item_attributes' => NULL,
-          'url' => NULL,
-          'image_style' => NULL,
-        ],
-        'file' => 'image.field.inc',
-      ],
-    ];
   }
 
   /**
@@ -227,8 +146,9 @@ class ImageHooks {
    */
   #[Hook('file_move')]
   public function fileMove(FileInterface $file, FileInterface $source): void {
+    $imageDerivativeUtilities = ($this->imageDerivativeUtilitiesClosure)();
     // Delete any image derivatives at the original image path.
-    image_path_flush($source->getFileUri());
+    $imageDerivativeUtilities->pathFlush($source->getFileUri());
   }
 
   /**
@@ -236,8 +156,9 @@ class ImageHooks {
    */
   #[Hook('file_predelete')]
   public function filePredelete(FileInterface $file): void {
+    $imageDerivativeUtilities = ($this->imageDerivativeUtilitiesClosure)();
     // Delete any image derivatives of this image.
-    image_path_flush($file->getFileUri());
+    $imageDerivativeUtilities->pathFlush($file->getFileUri());
   }
 
   /**

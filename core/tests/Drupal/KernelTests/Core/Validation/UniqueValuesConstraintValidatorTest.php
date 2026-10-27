@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Validation;
 
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldValueValidator;
 use Drupal\entity_test\Entity\EntityTestUniqueConstraint;
+use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the unique field value validation constraint.
- *
- * @coversDefaultClass \Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldValueValidator
- *
- * @group Validation
  */
+#[CoversClass(UniqueFieldValueValidator::class)]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
 class UniqueValuesConstraintValidatorTest extends KernelTestBase {
   use UserCreationTrait;
 
@@ -30,7 +33,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
   /**
    * Tests cases where the validation passes for entities with string IDs.
    *
-   * @covers ::validate
+   * @legacy-covers ::validate
    */
   protected function setUp(): void {
     parent::setUp();
@@ -46,12 +49,12 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    *
-   * @covers ::validate
+   * @legacy-covers ::validate
    */
   public function testValidation(): void {
     // Create entity with two values for the testing field.
     $definition = [
-      'id' => (int) rand(0, getrandmax()),
+      'id' => rand(0, getrandmax()),
       'user_id' => 0,
       'field_test_text' => [
         'text1',
@@ -67,7 +70,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
 
     // Create another entity with two values for the testing field.
     $definition = [
-      'id' => (int) rand(0, getrandmax()),
+      'id' => rand(0, getrandmax()),
       'user_id' => 0,
       'field_test_text' => [
         'text3',
@@ -91,7 +94,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
 
     // Create another entity with two values, but one value is existing.
     $definition = [
-      'id' => (int) rand(0, getrandmax()),
+      'id' => rand(0, getrandmax()),
       'user_id' => 0,
       'field_test_text' => [
         'text5',
@@ -114,7 +117,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    *
-   * @covers ::validate
+   * @legacy-covers ::validate
    */
   public function testValidationReference(): void {
 
@@ -190,7 +193,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    *
-   * @covers ::validate
+   * @legacy-covers ::validate
    */
   public function testValidationOwn(): void {
     // Create new entity with two identical values for the testing field.
@@ -239,7 +242,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    *
-   * @covers ::validate
+   * @legacy-covers ::validate
    */
   public function testValidationMultiple(): void {
     // Create entity with two different values for the testing field.
@@ -302,12 +305,12 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    *
-   * @covers ::validate
+   * @legacy-covers ::validate
    */
   public function testValidationCaseInsensitive(): void {
     // Create entity with two values for the testing field.
     $definition = [
-      'id' => (int) rand(0, getrandmax()),
+      'id' => rand(0, getrandmax()),
       'user_id' => 0,
       'field_test_text' => [
         'text1',
@@ -321,7 +324,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
     // identical to other value, but with different capitalization which should
     // still trigger a validation error.
     $definition = [
-      'id' => (int) rand(0, getrandmax()),
+      'id' => rand(0, getrandmax()),
       'user_id' => 0,
       'field_test_text' => [
         'Text1',

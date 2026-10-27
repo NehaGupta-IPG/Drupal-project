@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Tests\Composer\Plugin\Scaffold\Functional;
 
 use Composer\Util\Filesystem;
-use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
-use Drupal\Tests\Composer\Plugin\Scaffold\AssertUtilsTrait;
 use Drupal\Tests\Composer\Plugin\ExecTrait;
+use Drupal\Tests\Composer\Plugin\Scaffold\AssertUtilsTrait;
+use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,9 +17,8 @@ use PHPUnit\Framework\TestCase;
  * The purpose of this test file is to run a scaffold operation and
  * confirm that the files that were scaffolded are added to the
  * repository's .gitignore file.
- *
- * @group Scaffold
  */
+#[Group('Scaffold')]
 class ManageGitIgnoreTest extends TestCase {
   use ExecTrait;
   use AssertUtilsTrait;
@@ -82,7 +82,7 @@ class ManageGitIgnoreTest extends TestCase {
    * @return string
    *   The path to the fixture directory.
    */
-  protected function createSutWithGit($fixture_name): string {
+  protected function createSutWithGit(string $fixture_name): string {
     $this->fixturesDir = $this->fixtures->tmpDir($this->name());
     $sut = $this->fixturesDir . '/' . $fixture_name;
     $replacements = ['SYMLINK' => 'false', 'PROJECT_ROOT' => $this->projectRoot];
@@ -115,13 +115,11 @@ class ManageGitIgnoreTest extends TestCase {
     $this->assertFileExists($sut . '/docroot/index.php');
     $expected = <<<EOT
 /build
-/.csslintrc
 /.editorconfig
-/.eslintignore
-/.eslintrc.json
 /.gitattributes
 /.ht.router.php
 /autoload.php
+/autoload_runtime.php
 /index.php
 /robots.txt
 /update.php
@@ -225,10 +223,7 @@ SH;
 
     $expected = <<<EOT
 Scaffolding files for fixtures/drupal-assets-fixture:
-  - Copy [web-root]/.csslintrc from assets/.csslintrc
   - Copy [web-root]/.editorconfig from assets/.editorconfig
-  - Copy [web-root]/.eslintignore from assets/.eslintignore
-  - Copy [web-root]/.eslintrc.json from assets/.eslintrc.json
   - Copy [web-root]/.gitattributes from assets/.gitattributes
   - Copy [web-root]/.ht.router.php from assets/.ht.router.php
   - Skip [web-root]/.htaccess: overridden in fixtures/drupal-composer-drupal-project

@@ -82,7 +82,7 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
     $response = $event->getResponse();
 
     // Only care about HTML responses.
-    if (stripos($response->headers->get('Content-Type', ''), 'text/html') === FALSE) {
+    if (stripos($response->headers->get('Content-Type') ?? '', 'text/html') === FALSE) {
       return;
     }
 
@@ -198,7 +198,8 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
 
       // The language of an active link is equal to the current language.
       if ($add_active && $url_language) {
-        if ($node->hasAttribute('hreflang') && $node->getAttribute('hreflang') !== $url_language) {
+        $attribute = $node->nodeName === 'a' ? 'hreflang' : 'data-drupal-language';
+        if ($node->hasAttribute($attribute) && $node->getAttribute($attribute) !== $url_language) {
           $add_active = FALSE;
         }
       }

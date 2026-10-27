@@ -2,15 +2,15 @@
 
 namespace Drupal\Core\Access;
 
+use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\SessionConfigurationInterface;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Access protection against CSRF attacks.
  */
-class CsrfRequestHeaderAccessCheck implements AccessCheckInterface {
+class CsrfRequestHeaderAccessCheck implements AccessInterface {
 
   /**
    * A string key that will used to designate the token used by this class.
@@ -45,28 +45,6 @@ class CsrfRequestHeaderAccessCheck implements AccessCheckInterface {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function applies(Route $route) {
-    $requirements = $route->getRequirements();
-    if (array_key_exists('_csrf_request_header_token', $requirements)) {
-      if (isset($requirements['_method'])) {
-        // There could be more than one method requirement separated with '|'.
-        $methods = explode('|', $requirements['_method']);
-        // CSRF protection only applies to write operations, so we can filter
-        // out any routes that require reading methods only.
-        $write_methods = array_diff($methods, ['GET', 'HEAD', 'OPTIONS', 'TRACE']);
-        if (empty($write_methods)) {
-          return FALSE;
-        }
-      }
-      // No method requirement given, so we run this access check to be on the
-      // safe side.
-      return TRUE;
-    }
-  }
-
-  /**
    * Checks access.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -95,10 +73,7 @@ class CsrfRequestHeaderAccessCheck implements AccessCheckInterface {
         return AccessResult::forbidden()->setReason('X-CSRF-Token request header is missing')->setCacheMaxAge(0);
       }
       $csrf_token = $request->headers->get('X-CSRF-Token');
-      // @todo Remove validate call using 'rest' in 8.3.
-      //   Kept here for sessions active during update.
-      if (!$this->csrfToken->validate($csrf_token, self::TOKEN_KEY)
-        && !$this->csrfToken->validate($csrf_token, 'rest')) {
+      if (!$this->csrfToken->validate($csrf_token, self::TOKEN_KEY)) {
         return AccessResult::forbidden()->setReason('X-CSRF-Token request header is invalid')->setCacheMaxAge(0);
       }
     }

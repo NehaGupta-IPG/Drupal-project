@@ -12,12 +12,15 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\UntrustedCallbackException;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests DatetimeElement functionality.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class DatetimeElementFormTest extends KernelTestBase implements FormInterface, TrustedCallbackInterface {
 
   /**
@@ -28,7 +31,17 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function setUp(): void {
+    parent::setUp();
+
+    $this->installEntitySchema('date_format');
+    $this->installConfig(['system']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormId(): string {
     return 'test_datetime_element';
   }
 
@@ -75,7 +88,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, string $date_callback = 'datetimeDateCallbackTrusted', string $time_callback = 'datetimeTimeCallbackTrusted') {
+  public function buildForm(array $form, FormStateInterface $form_state, string $date_callback = 'datetimeDateCallbackTrusted', string $time_callback = 'datetimeTimeCallbackTrusted'): array {
 
     $form['datetime_element'] = [
       '#title' => 'datelist test',
@@ -97,6 +110,17 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
       '#date_time_format' => 'H:i:s',
       '#date_date_element' => 'HTML Date',
       '#date_time_element' => 'HTML Time',
+    ];
+
+    // Element with a year range.
+    $form['range_datetime_element'] = [
+      '#title' => 'range_datetime_element',
+      '#type' => 'datetime',
+      '#date_date_format' => 'Y-m-d',
+      '#date_time_format' => 'H:i:s',
+      '#date_date_element' => 'HTML Date',
+      '#date_time_element' => 'HTML Time',
+      '#date_year_range' => '1850:3000',
     ];
 
     // Element with #required_error.
@@ -133,7 +157,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
+  public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * Form validation handler.
@@ -143,7 +167,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
+  public function validateForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * Tests that default handlers are added even if custom are specified.
@@ -169,14 +193,12 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
    * @param string|null $expected_exception
    *   The expected exception message if an exception should be thrown, or
    *   NULL if otherwise.
-   *
-   * @dataProvider providerUntrusted
-   * @group legacy
    */
+  #[DataProvider('providerUntrusted')]
   public function testDatetimeElementUntrustedCallbacks(string $date_callback = 'datetimeDateCallbackTrusted', string $time_callback = 'datetimeTimeCallbackTrusted', ?string $expected_exception = NULL) : void {
     if ($expected_exception) {
       $this->expectException(UntrustedCallbackException::class);
-      $this->expectExceptionMessage($expected_exception);
+      $this->expectExceptionMessageIs($expected_exception);
     }
     $form = \Drupal::formBuilder()->getForm($this, $date_callback, $time_callback);
     $this->render($form);
@@ -196,12 +218,18 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
       'untrusted date' => [
         'datetimeDateCallback',
         'datetimeTimeCallbackTrusted',
-        sprintf('DateTime element #date_date_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966', Variable::callableToString([static::class, 'datetimeDateCallback'])),
+        sprintf(
+          'DateTime element #date_date_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966',
+          Variable::callableToString([static::class, 'datetimeDateCallback']),
+        ),
       ],
       'untrusted time' => [
         'datetimeDateCallbackTrusted',
         'datetimeTimeCallback',
-        sprintf('DateTime element #date_time_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966', Variable::callableToString([static::class, 'datetimeTimeCallback'])),
+        sprintf(
+          'DateTime element #date_time_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966',
+          Variable::callableToString([static::class, 'datetimeTimeCallback']),
+        ),
       ],
     ];
   }
@@ -224,9 +252,54 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   }
 
   /**
+   * Tests that year range is validated.
+   */
+  public function testRangeValidate(): void {
+    // Tests with a date after maximum.
+    $formState = new FormState();
+    $formState->setValue(['range_datetime_element', 'date'], '4000-01-01');
+    $formState->setValue(['range_datetime_element', 'time'], '10:10');
+    $form = \Drupal::formBuilder()->getForm($this);
+    \Drupal::formBuilder()->submitForm($this, $formState);
+    $this->assertEquals(
+      'The range_datetime_element date is invalid. Date should be in the 1850-3000 year range.',
+      $formState->getError($form['range_datetime_element'])
+    );
+
+    // Tests with a date before minimum.
+    $formState = new FormState();
+    $formState->setValue(['range_datetime_element', 'date'], '1000-01-01');
+    $formState->setValue(['range_datetime_element', 'time'], '10:10');
+    $form = \Drupal::formBuilder()->getForm($this);
+    \Drupal::formBuilder()->submitForm($this, $formState);
+    $this->assertEquals(
+      'The range_datetime_element date is invalid. Date should be in the 1850-3000 year range.',
+      $formState->getError($form['range_datetime_element'])
+    );
+
+    // Tests with a date barely outside range.
+    $formState = new FormState();
+    $formState->setValue(['range_datetime_element', 'date'], '3001-01-01');
+    $formState->setValue(['range_datetime_element', 'time'], '00:00');
+    $form = \Drupal::formBuilder()->getForm($this);
+    \Drupal::formBuilder()->submitForm($this, $formState);
+    $this->assertEquals(
+      'The range_datetime_element date is invalid. Date should be in the 1850-3000 year range.',
+      $formState->getError($form['range_datetime_element'])
+    );
+
+    // Tests with a date inside range.
+    $formState = new FormState();
+    $formState->setValue(['range_datetime_element', 'date'], '2000-01-01');
+    $formState->setValue(['range_datetime_element', 'time'], '10:10');
+    \Drupal::formBuilder()->submitForm($this, $formState);
+    $this->assertEmpty($formState->getError($form['range_datetime_element']));
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return [
       'datetimeDateCallbackTrusted',
       'datetimeTimeCallbackTrusted',

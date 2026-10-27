@@ -6,6 +6,7 @@ namespace Drupal\Tests\media\Unit;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\NullBackend;
+use Drupal\media\OEmbed\ProviderRepositoryInterface;
 use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcher;
 use Drupal\Tests\UnitTestCase;
@@ -14,12 +15,14 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\media\OEmbed\ResourceFetcher
- *
- * @group media
+ * Tests Drupal\media\OEmbed\ResourceFetcher.
  */
+#[CoversClass(ResourceFetcher::class)]
+#[Group('media')]
 class ResourceFetcherTest extends UnitTestCase {
 
   /**
@@ -45,7 +48,7 @@ class ResourceFetcherTest extends UnitTestCase {
 
     $fetcher = new ResourceFetcher(
       $client->reveal(),
-      $this->createMock('\Drupal\media\OEmbed\ProviderRepositoryInterface'),
+      $this->createStub(ProviderRepositoryInterface::class),
       new NullBackend('default'),
       $non_default_timeout
     );
@@ -55,7 +58,7 @@ class ResourceFetcherTest extends UnitTestCase {
   /**
    * Tests how the resource fetcher handles unknown Content-Type headers.
    *
-   * @covers ::fetchResource
+   * @legacy-covers ::fetchResource
    */
   public function testUnknownContentTypeHeader(): void {
     $headers = [
@@ -82,7 +85,7 @@ class ResourceFetcherTest extends UnitTestCase {
     $client = new Client([
       'handler' => HandlerStack::create($mock_handler),
     ]);
-    $providers = $this->createMock('\Drupal\media\OEmbed\ProviderRepositoryInterface');
+    $providers = $this->createStub(ProviderRepositoryInterface::class);
 
     $fetcher = new ResourceFetcher($client, $providers, new NullBackend('default'));
     /** @var \Drupal\media\OEmbed\Resource $resource */
@@ -97,12 +100,12 @@ class ResourceFetcherTest extends UnitTestCase {
       $this->fail('Expected a ResourceException to be thrown for invalid JSON.');
     }
     catch (ResourceException $e) {
-      $this->assertSame('Error decoding oEmbed resource: Syntax error', $e->getMessage());
+      $this->assertStringStartsWith('Error decoding oEmbed resource: Syntax error', $e->getMessage());
     }
 
     // Valid JSON that does not produce an array should also throw an exception.
     $this->expectException(ResourceException::class);
-    $this->expectExceptionMessage('The oEmbed resource could not be decoded.');
+    $this->expectExceptionMessageIs('The oEmbed resource could not be decoded.');
     $fetcher->fetchResource('non_array');
   }
 

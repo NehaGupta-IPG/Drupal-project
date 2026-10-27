@@ -6,15 +6,20 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
+use Drupal\layout_builder\Section;
+use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore blocknodebundle testbody
 /**
  * Tests toggling of content preview.
  */
 #[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class ContentPreviewToggleTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;
@@ -124,6 +129,41 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests that block labels are properly escaped in preview.
+   */
+  public function testBlockLabelXss(): void {
+    $page = $this->getSession()->getPage();
+    $node = $this->createNode([
+      'type' => 'bundle_for_this_particular_test',
+    ]);
+
+    $section = new Section('layout_onecol');
+    $component = new SectionComponent(
+      \Drupal::service('uuid')->generate(),
+      'content',
+      [
+        'id' => 'user_login_block',
+        'label' => '<img src="x" onerror="document.querySelector(\'body\').innerHTML = \'XSS has been triggered\';">',
+      ]
+    );
+    $section->appendComponent($component);
+    $node->get(OverridesSectionStorage::FIELD_NAME)->appendSection($section);
+    $node->save();
+
+    $this->drupalGet('node/1/layout');
+    $page->uncheckField('layout-builder-content-preview');
+    $this->assertNotEmpty($this->assertSession()->waitForElementVisible('css', '.layout-builder-block__content-preview-placeholder-label'));
+    // Add a micro-sleep here to give the browser a moment to try
+    // trigger the XSS.
+    usleep(100000);
+
+    // If this is still present after the preview has been enabled, then
+    // the XSS has not been triggered.
+    $this->assertSession()->elementExists('css', '.layout-builder-block__content-preview-placeholder-label');
+
+  }
+
+  /**
    * Checks if contextual links are working properly.
    *
    * @internal
@@ -154,7 +194,7 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
     $blocks = $page->findAll('css', '[data-layout-content-preview-placeholder-label]');
 
     // Filter will only return value if block contains expected text.
-    $blocks_with_expected_text = array_filter($blocks, function ($block, $key) use ($items) {
+    $blocks_with_expected_text = array_filter($blocks, function ($block, $key) use ($items): bool {
       $block_text = $block->getText();
       return str_contains($block_text, $items[$key]);
     }, ARRAY_FILTER_USE_BOTH);

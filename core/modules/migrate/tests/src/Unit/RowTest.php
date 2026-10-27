@@ -7,11 +7,15 @@ namespace Drupal\Tests\migrate\Unit;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Row;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\migrate\Row
- * @group migrate
+ * Tests Drupal\migrate\Row.
  */
+#[CoversClass(Row::class)]
+#[Group('migrate')]
 class RowTest extends UnitTestCase {
 
   /**
@@ -143,7 +147,7 @@ class RowTest extends UnitTestCase {
     $row = new Row($this->testValues, $this->testSourceIds);
     $row->freezeSource();
     $this->expectException(\Exception::class);
-    $this->expectExceptionMessage("The source is frozen and can't be changed any more");
+    $this->expectExceptionMessageIs("The source is frozen and can't be changed any more");
     $row->setSourceProperty('title', 'new title');
   }
 
@@ -210,8 +214,8 @@ class RowTest extends UnitTestCase {
   /**
    * Tests getting/setting the ID Map.
    *
-   * @covers ::setIdMap
-   * @covers ::getIdMap
+   * @legacy-covers ::setIdMap
+   * @legacy-covers ::getIdMap
    */
   public function testGetSetIdMap(): void {
     $row = new Row($this->testValues, $this->testSourceIds);
@@ -267,8 +271,6 @@ class RowTest extends UnitTestCase {
 
   /**
    * Tests getting the source property.
-   *
-   * @covers ::getSourceProperty
    */
   public function testGetSourceProperty(): void {
     $row = new Row($this->testValues, $this->testSourceIds);
@@ -294,8 +296,8 @@ class RowTest extends UnitTestCase {
   /**
    * Tests checking for and removing destination properties that may be empty.
    *
-   * @covers ::hasEmptyDestinationProperty
-   * @covers ::removeEmptyDestinationProperty
+   * @legacy-covers ::hasEmptyDestinationProperty
+   * @legacy-covers ::removeEmptyDestinationProperty
    */
   public function testDestinationOrEmptyProperty(): void {
     $row = new Row($this->testValues, $this->testSourceIds);
@@ -355,11 +357,9 @@ class RowTest extends UnitTestCase {
    *   The key to look up.
    * @param string $expected_value
    *   The expected value.
-   *
-   * @dataProvider getDataProvider
-   * @covers ::get
    */
-  public function testGet($key, $expected_value): void {
+  #[DataProvider('getDataProvider')]
+  public function testGet(string $key, ?string $expected_value): void {
     $row = $this->createRowWithDestinationProperties($this->testGetSourceProperties, $this->testGetSourceIds, $this->testGetDestinationProperties);
     $this->assertSame($expected_value, $row->get($key));
   }
@@ -370,7 +370,7 @@ class RowTest extends UnitTestCase {
    * @return array
    *   The keys and expected values.
    */
-  public static function getDataProvider() {
+  public static function getDataProvider(): array {
     return [
       ['source_key_1', 'source_value_1'],
       ['source_key_2', 'source_value_2'],
@@ -399,10 +399,8 @@ class RowTest extends UnitTestCase {
    *   An array of keys to look up.
    * @param array $expected_values
    *   An array of expected values.
-   *
-   * @covers ::getMultiple
-   * @dataProvider getMultipleDataProvider
    */
+  #[DataProvider('getMultipleDataProvider')]
   public function testGetMultiple(array $keys, array $expected_values): void {
     $row = $this->createRowWithDestinationProperties($this->testGetSourceProperties, $this->testGetSourceIds, $this->testGetDestinationProperties);
     $this->assertEquals(array_combine($keys, $expected_values), $row->getMultiple($keys));
@@ -414,7 +412,7 @@ class RowTest extends UnitTestCase {
    * @return array
    *   The keys and expected values.
    */
-  public static function getMultipleDataProvider() {
+  public static function getMultipleDataProvider(): array {
     return [
       'Single Key' => [
         'keys' => ['source_key_1'],
@@ -482,7 +480,7 @@ class RowTest extends UnitTestCase {
    * @return \Drupal\migrate\Row
    *   The row, populated with destination properties.
    */
-  protected function createRowWithDestinationProperties(array $source_properties, array $source_ids, array $destination_properties, $is_stub = FALSE) {
+  protected function createRowWithDestinationProperties(array $source_properties, array $source_ids, array $destination_properties, $is_stub = FALSE): Row {
     $row = new Row($source_properties, $source_ids, $is_stub);
     foreach ($destination_properties as $key => $property) {
       $row->setDestinationProperty($key, $property);

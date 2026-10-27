@@ -6,12 +6,14 @@ namespace Drupal\Tests\image\Functional;
 
 use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests flushing of image styles.
- *
- * @group image
  */
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageStyleFlushTest extends ImageFieldTestBase {
 
   use TestFileCreationTrait {
@@ -27,7 +29,7 @@ class ImageStyleFlushTest extends ImageFieldTestBase {
   /**
    * Given an image style and a wrapper, generate an image.
    */
-  public function createSampleImage($style, $wrapper) {
+  public function createSampleImage($style, string $wrapper) {
     static $file;
 
     if (!isset($file)) {
@@ -47,7 +49,7 @@ class ImageStyleFlushTest extends ImageFieldTestBase {
   /**
    * Count the number of images currently created for a style in a wrapper.
    */
-  public function getImageCount($style, $wrapper) {
+  public function getImageCount($style, string $wrapper): int {
     $count = 0;
     if (is_dir($wrapper . '://styles/' . $style->id())) {
       $count = count(\Drupal::service('file_system')->scanDirectory($wrapper . '://styles/' . $style->id(), '/.*/'));
@@ -89,9 +91,7 @@ class ImageStyleFlushTest extends ImageFieldTestBase {
       // Add the effect.
       $this->drupalGet($style_path);
       $this->submitForm(['new' => $effect], 'Add');
-      if (!empty($edit)) {
-        $this->submitForm($edit, 'Add effect');
-      }
+      $this->submitForm($edit, 'Add effect');
     }
 
     // Load the saved image style.

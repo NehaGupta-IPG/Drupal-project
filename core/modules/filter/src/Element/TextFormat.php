@@ -6,21 +6,17 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Url;
+use Drupal\filter\FilterFormatRepositoryInterface;
 
 /**
  * Provides a text format render element.
  *
  * Properties:
- *
- * @property $base_type
- *   The form element #type to use for the 'value' element.
+ * - #base_type: The form element #type to use for the 'value' element.
  *   'textarea' by default.
- * @property $format
- *   (optional) The text format ID to preselect. If omitted, the
+ * - #format: (optional) The text format ID to preselect. If omitted, the
  *   default format for the current user will be used.
- * @property $allowed_formats
- *   (optional) An array of text format IDs that are available
+ * - #allowed_formats: (optional) An array of text format IDs that are available
  *   for this element. If omitted, all text formats that the current user has
  *   access to will be allowed.
  *
@@ -97,6 +93,9 @@ class TextFormat extends RenderElementBase {
       '#process',
       // Ensure #pre_render functions will be run.
       '#pre_render',
+      // Do not copy #config_target to prevent multiple elements targeting the
+      // same property.
+      '#config_target',
       // Description is handled by theme_text_format_wrapper().
       '#description',
       // Ensure proper ordering of children.
@@ -133,8 +132,9 @@ class TextFormat extends RenderElementBase {
       '#attributes' => ['class' => ['js-filter-wrapper']],
     ];
 
+    $format_repository = \Drupal::service(FilterFormatRepositoryInterface::class);
     // Get a list of formats that the current user has access to.
-    $formats = filter_formats($user);
+    $formats = $format_repository->getFormatsForAccount($user);
 
     // Allow the list of formats to be restricted.
     if (isset($element['#allowed_formats'])) {
@@ -202,24 +202,10 @@ class TextFormat extends RenderElementBase {
       '#parents' => array_merge($element['#parents'], ['format']),
     ];
 
-    $element['format']['help'] = [
-      '#type' => 'container',
-      '#theme_wrappers' => [
-        'container__text_format_filter_help',
-      ],
-      'about' => [
-        '#type' => 'link',
-        '#title' => t('About text formats'),
-        '#url' => new Url('filter.tips_all'),
-        '#attributes' => ['target' => '_blank'],
-      ],
-      '#weight' => 0,
-    ];
-
-    $all_formats = filter_formats();
-    $format_exists = isset($all_formats[$element['#format']]);
+    $all_formats = $format_repository->getAllFormats();
+    $format_exists = isset($element['#format'], $all_formats[$element['#format']]);
     $format_allowed = !isset($element['#allowed_formats']) || in_array($element['#format'], $element['#allowed_formats']);
-    $user_has_access = isset($formats[$element['#format']]);
+    $user_has_access = isset($element['#format'], $formats[$element['#format']]);
     $user_is_admin = $user->hasPermission('administer filters');
 
     // If the stored format does not exist or if it is not among the allowed

@@ -54,8 +54,7 @@ trait ImageTestProviderTrait {
 
     // Add alt text to the block image.
     $image_block->find('css', '.image-alternative-text-missing button')->click();
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-balloon-panel'));
-    $this->assertVisibleBalloon('.ck-text-alternative-form');
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-balloon-panel .ck-text-alternative-form'));
 
     // Ensure that the missing alt text warning is hidden when the alternative
     // text form is open.
@@ -185,7 +184,7 @@ trait ImageTestProviderTrait {
   /**
    * Data provider for testAlignment().
    */
-  public static function providerAlignment() {
+  public static function providerAlignment(): array {
     return [
       'Block image' => ['block'],
       'Inline image' => ['inline'],
@@ -213,7 +212,7 @@ trait ImageTestProviderTrait {
     }
 
     // Add image to the host body.
-    $this->host->body->value = sprintf('<img data-foo="bar" alt="drupalimage test image" ' . $this->imageAttributesAsString() . ' width="%s" />', $width);
+    $this->host->body->value = sprintf('<img data-foo="bar" alt="drupalimage test image" width="%s" ' . $this->imageAttributesAsString() . ' />', $width);
     $this->host->save();
 
     $this->drupalGet($this->host->toUrl('edit-form'));

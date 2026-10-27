@@ -6,12 +6,18 @@ namespace Drupal\Tests\language\Kernel;
 
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\TestTools\Attribute\ShareEnvironment;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of configurable_language entities.
- *
- * @group language
  */
+#[Group('language')]
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ConfigurableLanguageValidationTest extends ConfigEntityValidationTestBase {
 
   /**
@@ -22,8 +28,8 @@ class ConfigurableLanguageValidationTest extends ConfigEntityValidationTestBase 
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
 
     $this->entity = ConfigurableLanguage::createFromLangcode('fr');
     $this->entity->save();
