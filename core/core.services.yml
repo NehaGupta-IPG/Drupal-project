@@ -446,17 +446,14 @@ services:
     class: Drupal\Core\Config\CachedStorage
     arguments: ['@config.storage.active', '@cache.config']
   Drupal\Core\Config\StorageCacheInterface: '@config.storage'
-  csrf_state_change.config_storage:
-    class: Drupal\Core\Config\CsrfGuardedStorage
+  Drupal\Core\Config\CsrfGuardedStorage:
     decorates: config.storage.active
     autowire: true
     autoconfigure: false
     public: false
-  csrf_state_change.guard:
-    class: Drupal\Core\Access\CsrfStateChangeGuard
+  Drupal\Core\Access\CsrfStateChangeGuard:
     autowire: true
     public: false
-  Drupal\Core\Access\CsrfStateChangeGuard: '@csrf_state_change.guard'
   Drupal\Core\Access\CsrfStateChangeRequestSubscriber:
     autoconfigure: false
     public: false

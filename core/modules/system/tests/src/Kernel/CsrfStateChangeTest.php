@@ -6,10 +6,10 @@ namespace Drupal\Tests\system\Kernel;
 
 use Drupal\Core\Config\StorageCacheInterface;
 use Drupal\KernelTests\KernelTestBase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -35,41 +35,52 @@ class CsrfStateChangeTest extends KernelTestBase {
   }
 
   /**
-   * Tests that safe requests deprecate writes but still complete them.
+   * Tests that safe requests deprecate configuration writes but complete them.
    */
-  #[DataProvider('safeMethods')]
+  #[TestWith(['GET'])]
+  #[TestWith(['HEAD'])]
   #[IgnoreDeprecations]
-  public function testUnprotectedWrite(string $method, string $operation): void {
-    if ($operation !== 'config') {
-      $this->installEntitySchema('entity_test');
-    }
+  public function testUnprotectedConfigWrite(string $method): void {
     // Configuration writes before controller dispatch must remain possible.
     $this->config('system.site')->set('name', 'Before dispatch')->save();
-    if ($operation === 'entity-delete') {
-      $this->container->get('entity_type.manager')->getStorage('entity_test')->create(['name' => 'Before dispatch'])->save();
-    }
     $this->expectUserDeprecationMessage('Performing configuration and entity writes during an unprotected safe request is deprecated in drupal:12.0.0 and will throw a LogicException in drupal:13.0.0. Add a _csrf_token route requirement. See https://www.drupal.org/project/drupal/issues/3508087');
-    $request = Request::create('/csrf/unprotected-' . ($operation === 'entity-delete' ? $operation : $operation . '-write'), $method);
+    $request = Request::create('/csrf/unprotected-config-write', $method);
     $response = $this->container->get('http_kernel')->handle($request);
     $this->assertSame(200, $response->getStatusCode());
-    if ($operation === 'config') {
-      $this->assertSame('Updated by GET request', $this->container->get('config.storage')->read('system.site')['name']);
-    }
-    else {
-      $storage = $this->container->get('entity_type.manager')->getStorage('entity_test');
-      $entities = $storage->loadMultiple();
-      $this->assertCount($operation === 'entity-delete' ? 0 : 1, $entities);
-      // Outside HTTP dispatch deletion is allowed without a deprecation.
-      $storage->delete($entities);
-      $this->assertCount(0, $storage->loadMultiple());
-    }
+    $this->assertSame('Updated by GET request', $this->container->get('config.storage')->read('system.site')['name']);
   }
 
   /**
-   * Provides safe methods and write operations.
+   * Tests that safe requests deprecate entity writes but complete them.
    */
-  public static function safeMethods(): array {
-    return [['GET', 'config'], ['HEAD', 'config'], ['GET', 'entity'], ['GET', 'entity-delete']];
+  #[IgnoreDeprecations]
+  public function testUnprotectedEntityWrite(): void {
+    $this->installEntitySchema('entity_test');
+    $this->expectUserDeprecationMessage('Performing configuration and entity writes during an unprotected safe request is deprecated in drupal:12.0.0 and will throw a LogicException in drupal:13.0.0. Add a _csrf_token route requirement. See https://www.drupal.org/project/drupal/issues/3508087');
+    $request = Request::create('/csrf/unprotected-entity-write');
+    $response = $this->container->get('http_kernel')->handle($request);
+    $this->assertSame(200, $response->getStatusCode());
+    $storage = $this->container->get('entity_type.manager')->getStorage('entity_test');
+    $entities = $storage->loadMultiple();
+    $this->assertCount(1, $entities);
+    // Outside HTTP dispatch deletion is allowed without a deprecation.
+    $storage->delete($entities);
+    $this->assertCount(0, $storage->loadMultiple());
+  }
+
+  /**
+   * Tests that safe requests deprecate entity deletion but complete it.
+   */
+  #[IgnoreDeprecations]
+  public function testUnprotectedEntityDelete(): void {
+    $this->installEntitySchema('entity_test');
+    $storage = $this->container->get('entity_type.manager')->getStorage('entity_test');
+    $storage->create(['name' => 'Before dispatch'])->save();
+    $this->expectUserDeprecationMessage('Performing configuration and entity writes during an unprotected safe request is deprecated in drupal:12.0.0 and will throw a LogicException in drupal:13.0.0. Add a _csrf_token route requirement. See https://www.drupal.org/project/drupal/issues/3508087');
+    $request = Request::create('/csrf/unprotected-entity-delete');
+    $response = $this->container->get('http_kernel')->handle($request);
+    $this->assertSame(200, $response->getStatusCode());
+    $this->assertCount(0, $storage->loadMultiple());
   }
 
   /**
