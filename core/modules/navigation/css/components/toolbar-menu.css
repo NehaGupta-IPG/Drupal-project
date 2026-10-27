@@ -155,7 +155,7 @@
       rotate: -90deg;
 
       [dir="rtl"] & {
-        rotate: none;
+        rotate: 270deg;
       }
     }
   }
