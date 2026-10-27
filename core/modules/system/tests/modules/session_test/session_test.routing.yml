@@ -179,3 +179,13 @@ session_test.trigger_write_exception:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
+
+session_test.write_on_destruct:
+  path: '/session-test/write-on-destruct'
+  defaults:
+    _title: 'Write to the session after the response has been sent'
+    _controller: '\Drupal\session_test\Controller\SessionTestController::writeOnDestruct'
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'
