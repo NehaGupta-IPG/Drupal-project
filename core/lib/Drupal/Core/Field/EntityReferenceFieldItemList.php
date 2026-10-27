@@ -55,15 +55,16 @@ class EntityReferenceFieldItemList extends FieldItemList implements EntityRefere
       return [];
     }
 
-    // Collect the IDs of existing entities to load, and directly grab the
-    // "autocreate" entities that are already populated in $item->entity.
+    // Directly grab entities that are already populated in $item->entity
+    // and collect the IDs of existing entities to load.
     $target_entities = $ids = [];
     foreach ($this->list as $delta => $item) {
-      if ($item->target_id !== NULL) {
-        $ids[$delta] = $item->target_id;
+      $value = $item->getValue();
+      if (isset($value['entity'])) {
+        $target_entities[$delta] = $value['entity'];
       }
-      elseif ($item->hasNewEntity()) {
-        $target_entities[$delta] = $item->entity;
+      elseif (isset($value['target_id'])) {
+        $ids[$delta] = $value['target_id'];
       }
     }
 
