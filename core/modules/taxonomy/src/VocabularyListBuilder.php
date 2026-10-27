@@ -167,14 +167,14 @@ class VocabularyListBuilder extends DraggableListBuilder {
    */
   public function render() {
     $entities = $this->load();
-    // If there are not multiple vocabularies, disable dragging by unsetting the
-    // weight key.
+    // If there are not multiple vocabularies, disable dragging by setting the
+    // weight key to FALSE.
     if (count($entities) <= 1) {
-      unset($this->weightKey);
+      $this->weightKey = FALSE;
     }
     $build = parent::render();
 
-    // If the weight key was unset then the table is in the 'table' key,
+    // If the weight key was set to FALSE then the table is in the 'table' key,
     // otherwise in vocabularies. The empty message is only needed if the table
     // is possibly empty, so there is no need to support the vocabularies key
     // here.

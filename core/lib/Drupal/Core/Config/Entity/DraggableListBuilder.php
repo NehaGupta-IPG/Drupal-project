@@ -19,6 +19,20 @@ abstract class DraggableListBuilder extends ConfigEntityListBuilder implements F
   use DraggableListBuilderTrait;
 
   /**
+   * Name of the entity's weight field or FALSE if no field is provided.
+   *
+   * @var string|false
+   */
+  protected string|false $weightKey = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getWeightKey(): string|false {
+    return $this->weightKey;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage) {
