@@ -15,6 +15,14 @@ system.cron_settings:
   requirements:
     _permission: 'administer site configuration'
 
+system.feature_flags:
+  path: /admin/config/system/feature-flags
+  defaults:
+    _title: Feature flags
+    _form: '\Drupal\system\Form\FeatureFlagsForm'
+  requirements:
+    _permission: administer site configuration
+
 system.logging_settings:
   path: '/admin/config/development/logging'
   defaults:

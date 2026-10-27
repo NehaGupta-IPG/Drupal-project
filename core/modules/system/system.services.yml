@@ -70,3 +70,6 @@ services:
     arguments: ['@menu.link_tree', '@cache.memory']
   system.access_route_alter_subscriber:
     class: Drupal\system\EventSubscriber\AccessRouteAlterSubscriber
+  plugin.manager.system_feature_flag:
+    class: Drupal\system\FeatureFlagManager
+    arguments: ['@cache.discovery', '@module_handler']

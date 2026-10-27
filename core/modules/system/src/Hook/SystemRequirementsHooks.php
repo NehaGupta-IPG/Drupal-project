@@ -1619,4 +1619,25 @@ class SystemRequirementsHooks {
     ];
   }
 
+  /**
+   * Implements hook_update_requirements().
+   */
+  #[Hook('update_requirements')]
+  public function checkUpdateFeatureFlags() {
+    // TODO: Check config and feature flag plugins.
+    // FAIL if a feature flag is not in removal state and has no plugin.
+    return [];
+  }
+
+  /**
+   * Implements hook_runtime_requirements().
+   */
+  #[Hook('runtime_requirements')]
+  public function checkRuntimeFeatureFlags() {
+    // TODO: Check config and feature flag plugins.
+    // Warn about feature flags not in their final state.
+    // CRITICAL about feature flags not in removal state but with no plugin.
+    return [];
+  }
+
 }
