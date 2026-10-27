@@ -221,6 +221,7 @@ abstract class ConfigFormBase extends FormBase {
       // @see \Drupal\Core\Config\Schema\Sequence
       // @see \Drupal\Core\Config\Schema\SequenceDataDefinition
       $violations_per_form_element = [];
+      $config_targets_per_form_element = [];
       /** @var \Symfony\Component\Validator\ConstraintViolationInterface $violation */
       foreach ($violations as $violation) {
         $property_path = $violation->getPropertyPath();
@@ -239,6 +240,7 @@ abstract class ConfigFormBase extends FormBase {
         if (isset($map[$config_name][$property_path])) {
           $config_target = ConfigTarget::fromForm($map[$config_name][$property_path], $form);
           $form_element_name = implode('][', $config_target->elementParents);
+          $config_targets_per_form_element[$form_element_name] ??= $config_target;
         }
         else {
           // We cannot determine where to place the violation. The only option
@@ -253,6 +255,15 @@ abstract class ConfigFormBase extends FormBase {
       // only allows a single validation error message per form element.
       // @see \Drupal\Core\Form\FormState::setErrorByName()
       foreach ($violations_per_form_element as $form_element_name => $violations) {
+        // If the element's ConfigTarget has a formatter, use it.
+        if (!empty($config_targets_per_form_element[$form_element_name]->formatViolations)) {
+          $form_state->setErrorByName(
+            $form_element_name,
+            ($config_targets_per_form_element[$form_element_name]->formatViolations)($form_element_name, $violations)
+          );
+          continue;
+        }
+
         // When only a single message exists, just set it.
         if (count($violations) === 1) {
           $form_state->setErrorByName($form_element_name, reset($violations)->getMessage());

@@ -52,6 +52,13 @@ final class ConfigTarget {
   public readonly mixed $toConfig;
 
   /**
+   * Format an error message for a set of violations.
+   *
+   * @var callable|null
+   */
+  public readonly mixed $formatViolations;
+
+  /**
    * Constructs a ConfigTarget object.
    *
    * @param string $configName
@@ -79,15 +86,24 @@ final class ConfigTarget {
    *   - ToConfig::DeleteKey to indicate that the targeted property path should
    *     be deleted from config.
    *   Defaults to NULL.
+   * @param callable|null $formatViolations
+   *   (optional) A callback which should format an error message for a set of
+   *   constraint violations.
+   *   The callback will receive a
+   *   \Symfony\Component\Validator\ConstraintViolationInterface object or an
+   *   array of \Symfony\Component\Validator\ConstraintViolationInterface objects.
+   *   The callback must return a string or \Stringable value.
    */
   public function __construct(
     public readonly string $configName,
     string|array $propertyPath,
     ?callable $fromConfig = NULL,
     ?callable $toConfig = NULL,
+    ?callable $formatViolations = NULL,
   ) {
     $this->fromConfig = $fromConfig;
     $this->toConfig = $toConfig;
+    $this->formatViolations = $formatViolations;
 
     if (is_string($propertyPath)) {
       $propertyPath = [$propertyPath];
