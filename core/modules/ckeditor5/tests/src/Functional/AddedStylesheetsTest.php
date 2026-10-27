@@ -36,15 +36,11 @@ class AddedStylesheetsTest extends BrowserTestBase {
 
   /**
    * The editor user.
-   *
-   * @var \Drupal\editor\Entity\Editor
    */
   protected Editor $editor;
 
   /**
    * The admin user.
-   *
-   * @var \Drupal\user\Entity\User
    */
   protected User $adminUser;
 
@@ -75,7 +71,7 @@ class AddedStylesheetsTest extends BrowserTestBase {
     ]);
     $this->editor->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair($this->editor, $filtered_html_format))
@@ -104,8 +100,8 @@ class AddedStylesheetsTest extends BrowserTestBase {
 
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = \Drupal::service('theme_installer');
-    $theme_installer->install(['test_ckeditor_stylesheets_relative', 'claro']);
-    $this->config('system.theme')->set('admin', 'claro')->save();
+    $theme_installer->install(['test_ckeditor_stylesheets_relative', 'default_admin']);
+    $this->config('system.theme')->set('admin', 'default_admin')->save();
 
     $this->drupalGet('node/add/article');
     $assert_session->responseNotContains('test_ckeditor_stylesheets_relative/css/yokotsoko.css');

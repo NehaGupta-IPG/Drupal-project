@@ -180,6 +180,19 @@ class FilterStringTest extends ViewsKernelTestBase {
     ];
 
     $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
+
+    // Test that leading and trailing whitespace in non-grouped exposed input is
+    // trimmed before filtering.
+    $view->destroy();
+    $filters['name']['is_grouped'] = FALSE;
+    $filters['name']['operator'] = '=';
+    $view = $this->getBasicPageView();
+    $view->setExposedInput(['name' => ' Ringo ']);
+    $view->setDisplay('page_1');
+    $view->displayHandlers->get('page_1')->overrideOption('filters', $filters);
+    $view->save();
+    $this->executeView($view);
+    $this->assertIdenticalResultset($view, [['name' => 'Ringo']], $this->columnMap);
   }
 
   /**
@@ -967,7 +980,7 @@ class FilterStringTest extends ViewsKernelTestBase {
    * Returns a set of grouped exposed filters.
    */
   protected function getGroupedExposedFilters(): array {
-    $filters = [
+    return [
       'name' => [
         'id' => 'name',
         'plugin_id' => 'string',
@@ -1076,7 +1089,6 @@ class FilterStringTest extends ViewsKernelTestBase {
         ],
       ],
     ];
-    return $filters;
   }
 
 }

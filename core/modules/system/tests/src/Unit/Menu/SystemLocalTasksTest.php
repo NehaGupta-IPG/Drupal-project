@@ -7,9 +7,11 @@ namespace Drupal\Tests\system\Unit\Menu;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests existence of system local tasks.
@@ -19,10 +21,8 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
    * The mocked theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
-  protected $themeHandler;
+  protected ThemeHandlerInterface&MockObject $themeHandler;
 
   /**
    * {@inheritdoc}
@@ -36,17 +36,17 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
 
     $this->themeHandler = $this->createMock('Drupal\Core\Extension\ThemeHandlerInterface');
 
-    $theme = new Extension($this->root, 'theme', 'core/themes/olivero', 'olivero.info.yml');
+    $theme = new Extension($this->root, 'theme', 'core/themes/stark', 'stark.info.yml');
     $theme->status = 1;
-    $theme->info = ['name' => 'olivero'];
+    $theme->info = ['name' => 'stark'];
     $this->themeHandler->expects($this->once())
       ->method('listInfo')
       ->willReturn([
-        'olivero' => $theme,
+        'stark' => $theme,
       ]);
     $this->themeHandler->expects($this->once())
       ->method('hasUi')
-      ->with('olivero')
+      ->with('stark')
       ->willReturn(TRUE);
     $this->container->set('theme_handler', $this->themeHandler);
 
@@ -69,21 +69,21 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
    * Tests local task existence.
    */
   #[DataProvider('getSystemAdminRoutes')]
-  public function testSystemAdminLocalTasks($route, $expected): void {
+  public function testSystemAdminLocalTasks(string $route, array $expected): void {
     $this->assertLocalTasks($route, $expected);
   }
 
   /**
    * Provides a list of routes to test.
    */
-  public static function getSystemAdminRoutes() {
+  public static function getSystemAdminRoutes(): array {
     return [
       ['system.admin_content', [['system.admin_content']]],
       [
         'system.theme_settings_theme',
         [
           ['system.themes_page', 'system.theme_settings'],
-          ['system.theme_settings_global', 'system.theme_settings_theme:olivero'],
+          ['system.theme_settings_global', 'system.theme_settings_theme:stark'],
         ],
       ],
       [

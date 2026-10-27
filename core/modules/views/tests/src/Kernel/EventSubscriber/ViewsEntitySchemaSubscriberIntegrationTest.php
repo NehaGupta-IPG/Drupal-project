@@ -16,17 +16,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests \Drupal\views\EventSubscriber\ViewsEntitySchemaSubscriber.
  */
 #[Group('Views')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
   use EntityDefinitionTestTrait;
-
-  /**
-   * The entity definition update manager.
-   *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
-   */
-  protected $entityDefinitionUpdateManager;
 
   /**
    * {@inheritdoc}
@@ -62,13 +56,6 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
-
-  /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
 
   /**
    * {@inheritdoc}

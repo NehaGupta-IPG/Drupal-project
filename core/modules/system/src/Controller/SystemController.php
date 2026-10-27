@@ -13,12 +13,13 @@ use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\Core\Routing\Attribute\Route;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\ThemeAccessCheck;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\system\SystemManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpFoundation\Cookie;
 
 /**
  * Returns responses for System routes.
@@ -53,6 +54,15 @@ class SystemController extends ControllerBase {
    * @return array
    *   A renderable array of the administration overview page.
    */
+  #[Route(
+    path: '/admin/config',
+    name: 'system.admin_config',
+    title: new TranslatableMarkup('Configuration'),
+    requirements: ['_permission' => 'access administration pages'],
+    defaults: [
+      'link_id' => 'system.admin_config',
+    ],
+  )]
   public function overview($link_id) {
     // Check for status report errors.
     if ($this->currentUser()->hasPermission('administer site configuration') && $this->systemManager->checkRequirements()) {
@@ -109,28 +119,86 @@ class SystemController extends ControllerBase {
   }
 
   /**
-   * Sets whether the admin menu is in compact mode or not.
-   *
-   * @param string $mode
-   *   Valid values are 'on' and 'off'.
-   *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
-   *   A redirect response to the front page.
-   */
-  public function compactPage($mode) {
-    $response = $this->redirect('<front>');
-    if ($mode === 'on') {
-      $response->headers->setCookie(new Cookie('Drupal.visitor.admin_compact_mode', '1', $this->time->getRequestTime() + 31536000));
-    }
-    else {
-      $response->headers->clearCookie('Drupal.visitor.admin_compact_mode');
-    }
-    return $response;
-  }
-
-  /**
    * Provides a single block from the administration menu as a page.
    */
+  #[Route(
+    path: '/admin',
+    name: 'system.admin',
+    title: new TranslatableMarkup('Administration'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/structure',
+    name: 'system.admin_structure',
+    title: new TranslatableMarkup('Structure'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/reports',
+    name: 'system.admin_reports',
+    title: new TranslatableMarkup('Reports'),
+    requirements: ['_permission' => 'access site reports'],
+  )]
+  #[Route(
+    path: '/admin/config/media',
+    name: 'system.admin_config_media',
+    title: new TranslatableMarkup('Media'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/services',
+    name: 'system.admin_config_services',
+    title: new TranslatableMarkup('Web services'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/development',
+    name: 'system.admin_config_development',
+    title: new TranslatableMarkup('Development'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/regional',
+    name: 'system.admin_config_regional',
+    title: new TranslatableMarkup('Region and language'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/search',
+    name: 'system.admin_config_search',
+    title: new TranslatableMarkup('Search and metadata'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/system',
+    name: 'system.admin_config_system',
+    title: new TranslatableMarkup('System'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/user-interface',
+    name: 'system.admin_config_ui',
+    title: new TranslatableMarkup('User interface'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/workflow',
+    name: 'system.admin_config_workflow',
+    title: new TranslatableMarkup('Workflow'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/content',
+    name: 'system.admin_config_content',
+    title: new TranslatableMarkup('Content authoring'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/content',
+    name: 'system.admin_content',
+    title: new TranslatableMarkup('Content'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
   public function systemAdminMenuBlockPage() {
     return $this->systemManager->getBlockContents();
   }
@@ -143,10 +211,16 @@ class SystemController extends ControllerBase {
    *
    * @todo Move into ThemeController.
    */
+  #[Route(
+    path: '/admin/appearance',
+    name: 'system.themes_page',
+    title: new TranslatableMarkup('Appearance'),
+    requirements: ['_permission' => 'administer themes'],
+  )]
   public function themesPage() {
     $config = $this->config('system.theme');
     // Get all available themes.
-    $themes = $this->themeExtensionList->reset()->getList();
+    $themes = $this->themeExtensionList->getList(TRUE);
 
     // Remove obsolete themes.
     $themes = array_filter($themes, function ($theme) {
@@ -332,7 +406,17 @@ class SystemController extends ControllerBase {
       $theme_group_titles['uninstalled'] = $this->formatPlural(count($theme_groups['uninstalled']), 'Uninstalled theme', 'Uninstalled themes');
     }
 
-    uasort($theme_groups['installed'], 'system_sort_themes');
+    $sortThemes = static function ($a, $b) {
+      if ($a->is_default) {
+        return -1;
+      }
+      if ($b->is_default) {
+        return 1;
+      }
+      return strcasecmp($a->info['name'], $b->info['name']);
+    };
+
+    uasort($theme_groups['installed'], $sortThemes);
     $this->moduleHandler()->alter('system_themes_page', $theme_groups);
 
     $build = [];

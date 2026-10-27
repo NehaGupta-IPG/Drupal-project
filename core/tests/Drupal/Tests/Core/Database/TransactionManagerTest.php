@@ -9,7 +9,6 @@ use Drupal\Core\Database\Transaction\TransactionManagerBase;
 use Drupal\Core\Database\TransactionCommitFailedException;
 use Drupal\Core\Database\TransactionException;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
-use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -31,18 +30,21 @@ class TransactionManagerTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->connection = new StubConnection($this->createStub(StubPDO::class), []);
+    $this->connection = new StubConnection($this->createStub(\PDO::class), []);
   }
 
   /**
    * Tests starting a transaction.
    */
   public function testStartTransaction(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
     $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
     $this->assertTrue($this->connection->transactionManager()->has('drupal_transaction'));
     $this->assertTrue($this->connection->inTransaction());
+    $tx->commitOrRelease();
+    $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
+    $this->assertFalse($this->connection->transactionManager()->has('drupal_transaction'));
+    $this->assertFalse($this->connection->inTransaction());
   }
 
   /**
@@ -52,7 +54,7 @@ class TransactionManagerTest extends UnitTestCase {
     $this->connection->transactionManager()->success = FALSE;
     $this->expectException(TransactionException::class);
     $this->expectExceptionMessage('Failed start of transaction');
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
   }
 
@@ -62,7 +64,7 @@ class TransactionManagerTest extends UnitTestCase {
   public function testStateAfterStartTransactionFailure(): void {
     try {
       $this->connection->transactionManager()->success = FALSE;
-      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
       $tx = $this->connection->startTransaction();
     }
     catch (TransactionException) {
@@ -77,25 +79,28 @@ class TransactionManagerTest extends UnitTestCase {
    * Tests starting a savepoint.
    */
   public function testStartSavepoint(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $savepoint = $this->connection->startTransaction('foo');
     $this->assertSame(2, $this->connection->transactionManager()->stackDepth());
     $this->assertTrue($this->connection->transactionManager()->has('foo'));
     $this->assertTrue($this->connection->inTransaction());
+    $savepoint->commitOrRelease();
+    $tx->commitOrRelease();
+    $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
+    $this->assertFalse($this->connection->transactionManager()->has('foo'));
+    $this->assertFalse($this->connection->inTransaction());
   }
 
   /**
    * Tests failing to start a savepoint.
    */
   public function testStartSavepointFailure(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
     $this->connection->transactionManager()->success = FALSE;
     $this->expectException(TransactionException::class);
     $this->expectExceptionMessage('Failed start of savepoint foo');
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
     $savepoint = $this->connection->startTransaction('foo');
   }
 
@@ -103,11 +108,11 @@ class TransactionManagerTest extends UnitTestCase {
    * Checks TransactionManager after failing to start a savepoint.
    */
   public function testStateAfterStartSavepointFailure(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
     try {
       $this->connection->transactionManager()->success = FALSE;
-      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
       $savepoint = $this->connection->startTransaction('foo');
     }
     catch (TransactionException) {
@@ -176,7 +181,7 @@ class TransactionManagerTest extends UnitTestCase {
    * Tests a transaction release savepoint failure.
    */
   public function testTransactionReleaseSavepointFailure(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
     $savepoint = $this->connection->startTransaction('foo');
     $this->connection->transactionManager()->success = FALSE;
@@ -190,7 +195,7 @@ class TransactionManagerTest extends UnitTestCase {
    */
   public function testStateAfterTransactionReleaseSavepointFailure(): void {
     try {
-      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
       $tx = $this->connection->startTransaction();
       $savepoint = $this->connection->startTransaction('foo');
       $this->connection->transactionManager()->success = FALSE;
@@ -248,7 +253,6 @@ class TransactionManagerTest extends UnitTestCase {
    * Tests rolling back a transaction to a savepoint.
    */
   public function testTransactionRollbackToSavepoint(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
     $savepoint = $this->connection->startTransaction('foo');
     $savepoint->rollback();
@@ -256,13 +260,18 @@ class TransactionManagerTest extends UnitTestCase {
     $this->assertFalse($this->connection->transactionManager()->has('foo'));
     $this->assertTrue($this->connection->transactionManager()->has('drupal_transaction'));
     $this->assertTrue($this->connection->inTransaction());
+    $tx->commitOrRelease();
+    $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
+    $this->assertFalse($this->connection->transactionManager()->has('foo'));
+    $this->assertFalse($this->connection->transactionManager()->has('drupal_transaction'));
+    $this->assertFalse($this->connection->inTransaction());
   }
 
   /**
    * Tests failure when rolling back a transaction to a savepoint.
    */
   public function testTransactionRollbackToSavepointFailure(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
     $savepoint = $this->connection->startTransaction('foo');
     $this->connection->transactionManager()->success = FALSE;
@@ -276,7 +285,7 @@ class TransactionManagerTest extends UnitTestCase {
    */
   public function testStateAfterTransactionRollbackToSavepointFailure(): void {
     try {
-      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
       $tx = $this->connection->startTransaction();
       $savepoint = $this->connection->startTransaction('foo');
       $this->connection->transactionManager()->success = FALSE;

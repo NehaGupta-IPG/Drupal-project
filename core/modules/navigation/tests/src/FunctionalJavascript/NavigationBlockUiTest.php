@@ -47,8 +47,6 @@ class NavigationBlockUiTest extends WebDriverTestBase {
 
   /**
    * An administrative user to configure the test environment.
-   *
-   * @var \Drupal\user\UserInterface
    */
   protected UserInterface $adminUser;
 
@@ -115,7 +113,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
    * @todo move this from into a trait from
    *   \Drupal\Tests\layout_builder\FunctionalJavascript\LayoutBuilderTest
    */
-  private function openAddBlockForm($block_title): void {
+  private function openAddBlockForm(string $block_title): void {
     $this->assertSession()->linkExists('Add block');
     $this->clickLink('Add block');
     $this->assertSession()->assertWaitOnAjaxRequest();

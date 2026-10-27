@@ -127,7 +127,7 @@ class SqlBaseTest extends MigrateTestBase {
     $sql_base->setConfiguration([]);
     Database::renameConnection('migrate', 'fallback_connection');
     $this->expectException(RequirementsException::class);
-    $this->expectExceptionMessage('No database connection configured for source plugin');
+    $this->expectExceptionMessageIs('No database connection configured for source plugin sql_base');
     $sql_base->getDatabase();
   }
 
@@ -152,7 +152,7 @@ class SqlBaseTest extends MigrateTestBase {
     // Call checkRequirements(): it will call getDatabase() and convert the
     // exception to a RequirementsException.
     $this->expectException(RequirementsException::class);
-    $this->expectExceptionMessage('No database connection available for source plugin sql_base');
+    $this->expectExceptionMessageIs('No database connection available for source plugin sql_base');
     $sql_base->checkRequirements();
   }
 
@@ -165,7 +165,7 @@ class SqlBaseTest extends MigrateTestBase {
    *   (optional) The expected query results.
    */
   #[DataProvider('highWaterDataProvider')]
-  public function testHighWater($high_water = NULL, array $query_result = []): void {
+  public function testHighWater(?int $high_water = NULL, array $query_result = []): void {
     $configuration = [
       'high_water_property' => [
         'name' => 'order',
@@ -196,7 +196,7 @@ class SqlBaseTest extends MigrateTestBase {
    * @return array
    *   The scenarios to test.
    */
-  public static function highWaterDataProvider() {
+  public static function highWaterDataProvider(): array {
     return [
       'no high-water value set' => [],
       'high-water value set' => [33],
@@ -298,14 +298,14 @@ class TestSqlBase extends SqlBase {
   /**
    * {@inheritdoc}
    */
-  public function getIds() {
+  public function getIds(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function fields() {
+  public function fields(): never {
     throw new \RuntimeException(__METHOD__ . " not implemented for " . __CLASS__);
   }
 

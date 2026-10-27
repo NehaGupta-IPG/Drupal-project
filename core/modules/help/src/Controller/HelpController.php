@@ -72,6 +72,7 @@ class HelpController extends ControllerBase {
       $plugin = $this->helpManager->createInstance($plugin_id);
       $this_output = [
         '#theme' => 'help_section',
+        '#plugin_id' => $plugin_id,
         '#title' => $plugin->getTitle(),
         '#description' => $plugin->getDescription(),
         '#empty' => $this->t('There is currently nothing in this section.'),
@@ -112,7 +113,7 @@ class HelpController extends ControllerBase {
 
       $info = $this->moduleExtensionList->getExtensionInfo($name);
       if ($info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::EXPERIMENTAL) {
-        $this->messenger()->addWarning($this->t('This module is experimental. <a href=":url">Experimental modules</a> are provided for testing purposes only. Use at your own risk.', [':url' => 'https://www.drupal.org/core/experimental']));
+        $this->messenger()->addMessage($this->t('This module is experimental. <a href=":url">Experimental modules</a> are provided for testing purposes only. Use at your own risk.', [':url' => 'https://www.drupal.org/core/experimental']));
       }
 
       $temp = $this->moduleHandler()->invoke($name, 'help', ["help.page.$name", $this->routeMatch]);

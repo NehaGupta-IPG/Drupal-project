@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Unit\EventSubscriber;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteBuildEvent;
+use Drupal\Core\State\StateInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\DisplayPluginCollection;
 use Drupal\views\Entity\View;
@@ -14,6 +15,7 @@ use Drupal\views\EventSubscriber\RouteSubscriber;
 use Drupal\views\ViewExecutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -26,10 +28,8 @@ class RouteSubscriberTest extends UnitTestCase {
 
   /**
    * The mocked entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&MockObject $entityTypeManager;
 
   /**
    * The mocked config entity storage.
@@ -47,10 +47,8 @@ class RouteSubscriberTest extends UnitTestCase {
 
   /**
    * The mocked key value storage.
-   *
-   * @var \Drupal\Core\State\StateInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $state;
+  protected StateInterface&MockObject $state;
 
   /**
    * {@inheritdoc}
@@ -111,7 +109,7 @@ class RouteSubscriberTest extends UnitTestCase {
     // should only call the second display.
     $display_1->expects($this->once())
       ->method('collectRoutes')
-      ->willReturnCallback(function () use ($collection) {
+      ->willReturnCallback(function () use ($collection): array {
         $collection->add('views.test_id.page_1', new Route('test_route', ['_controller' => 'Drupal\views\Routing\ViewPageController']));
         return ['test_id.page_1' => 'views.test_id.page_1'];
       });
@@ -121,7 +119,7 @@ class RouteSubscriberTest extends UnitTestCase {
 
     $display_2->expects($this->once())
       ->method('collectRoutes')
-      ->willReturnCallback(function () use ($collection) {
+      ->willReturnCallback(function () use ($collection): array {
         $collection->add('views.test_id.page_2', new Route('test_route', ['_controller' => 'Drupal\views\Routing\ViewPageController']));
         return ['test_id.page_2' => 'views.test_id.page_2'];
       });

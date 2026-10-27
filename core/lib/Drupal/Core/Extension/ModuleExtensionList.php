@@ -78,7 +78,7 @@ class ModuleExtensionList extends ExtensionList {
 
     // Use the information from the container. This is an optimization.
     foreach ($container_modules_info as $module_name => $info) {
-      $this->setPathname($module_name, $info['pathname']);
+      $this->addedPathNames[$module_name] = $info['pathname'];
     }
   }
 
@@ -154,7 +154,8 @@ class ModuleExtensionList extends ExtensionList {
     // Find modules.
     $extensions = parent::doList();
     // It is possible that a module was marked as required by
-    // hook_system_info_alter() and modules that it depends on are not required.
+    // hook_extension_info_alter() and modules that it depends on are not
+    // required.
     foreach ($extensions as $extension) {
       $this->ensureRequiredDependencies($extension, $extensions);
     }

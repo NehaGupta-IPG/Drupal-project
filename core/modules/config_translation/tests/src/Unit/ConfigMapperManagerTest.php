@@ -7,6 +7,7 @@ namespace Drupal\Tests\config_translation\Unit;
 use Drupal\config_translation\ConfigMapperManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\Schema\Mapping;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\Language;
@@ -16,6 +17,7 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Prophecy\Prophet;
 
 /**
@@ -33,10 +35,8 @@ class ConfigMapperManagerTest extends UnitTestCase {
 
   /**
    * The typed configuration manager used for testing.
-   *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $typedConfigManager;
+  protected TypedConfigManagerInterface&MockObject $typedConfigManager;
 
   /**
    * {@inheritdoc}
@@ -72,7 +72,7 @@ class ConfigMapperManagerTest extends UnitTestCase {
    *   The expected return value of ConfigMapperManager::hasTranslatable().
    */
   #[DataProvider('providerTestHasTranslatable')]
-  public function testHasTranslatable(TypedDataInterface $element, $expected): void {
+  public function testHasTranslatable(TypedDataInterface $element, bool $expected): void {
     $this->typedConfigManager
       ->expects($this->once())
       ->method('get')
@@ -91,7 +91,7 @@ class ConfigMapperManagerTest extends UnitTestCase {
    *   to test as the first key and the expected result of
    *   ConfigMapperManager::hasTranslatable() as the second key.
    */
-  public static function providerTestHasTranslatable() {
+  public static function providerTestHasTranslatable(): array {
     return [
       [static::getElement([]), FALSE],
       [static::getElement(['aaa' => 'bbb']), FALSE],

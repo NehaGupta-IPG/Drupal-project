@@ -189,7 +189,7 @@ abstract class CastedIntFieldJoinTestBase extends DriverSpecificKernelTestBase {
    *   \Drupal\Core\Database\Query\Select::$tables for more information on the
    *   structure of the array.
    */
-  protected function buildJoin(ViewExecutable $view, $configuration, $table_alias) {
+  protected function buildJoin(ViewExecutable $view, array $configuration, $table_alias) {
     // Build the actual join values and read them back from the query object.
     $query = \Drupal::database()->select('node');
 
@@ -200,8 +200,7 @@ abstract class CastedIntFieldJoinTestBase extends DriverSpecificKernelTestBase {
     $join->buildJoin($query, $table, $view->query);
 
     $tables = $query->getTables();
-    $join_info = $tables[$table['alias']];
-    return $join_info;
+    return $tables[$table['alias']];
   }
 
 }

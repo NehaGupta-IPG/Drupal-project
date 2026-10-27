@@ -101,7 +101,7 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
     $editorial_2_values['type_settings']['states']['archived']['default_revision'] = FALSE;
 
     $editorial_2 = Workflow::create($editorial_2_values);
-    $this->workspaceManager->executeOutsideWorkspace(function () use ($editorial_2) {
+    $this->workspaceManager->executeOutsideWorkspace(function () use ($editorial_2): void {
       $editorial_2->save();
     });
 
@@ -211,7 +211,7 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
     $type_settings = $editorial->get('type_settings');
     $type_settings['states']['draft']['default_revision'] = FALSE;
     $type_settings['states']['archived']['default_revision'] = FALSE;
-    $this->workspaceManager->executeOutsideWorkspace(function () use ($editorial) {
+    $this->workspaceManager->executeOutsideWorkspace(function () use ($editorial): void {
       $editorial->save();
     });
     // Create an node bundle 'note' that uses non-default workflow.
@@ -293,7 +293,7 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
   /**
    * Test cases for basic moderation test.
    */
-  public static function basicModerationTestCases() {
+  public static function basicModerationTestCases(): array {
     return [
       'Nodes' => [
         'node',
@@ -317,29 +317,25 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
    * {@inheritdoc}
    */
   protected function createEntity($entity_type_id, $moderation_state = 'published', $create_workflow = TRUE) {
-    $entity = $this->workspaceManager->executeOutsideWorkspace(function () use ($entity_type_id, $moderation_state, $create_workflow) {
+    return $this->workspaceManager->executeOutsideWorkspace(function () use ($entity_type_id, $moderation_state, $create_workflow) {
       return parent::createEntity($entity_type_id, $moderation_state, $create_workflow);
     });
-
-    return $entity;
   }
 
   /**
    * {@inheritdoc}
    */
   protected function createEditorialWorkflow() {
-    $workflow = $this->workspaceManager->executeOutsideWorkspace(function () {
+    return $this->workspaceManager->executeOutsideWorkspace(function () {
       return $this->traitCreateEditorialWorkflow();
     });
-
-    return $workflow;
   }
 
   /**
    * {@inheritdoc}
    */
   protected function addEntityTypeAndBundleToWorkflow(WorkflowInterface $workflow, $entity_type_id, $bundle): void {
-    $this->workspaceManager->executeOutsideWorkspace(function () use ($workflow, $entity_type_id, $bundle) {
+    $this->workspaceManager->executeOutsideWorkspace(function () use ($workflow, $entity_type_id, $bundle): void {
       $this->traitAddEntityTypeAndBundleToWorkflow($workflow, $entity_type_id, $bundle);
     });
   }
@@ -348,11 +344,9 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
    * {@inheritdoc}
    */
   protected function createContentType(array $values = [], bool $create_body = TRUE) {
-    $note_type = $this->workspaceManager->executeOutsideWorkspace(function () use ($values, $create_body) {
+    return $this->workspaceManager->executeOutsideWorkspace(function () use ($values, $create_body) {
       return $this->traitCreateContentType($values, $create_body);
     });
-
-    return $note_type;
   }
 
   /**

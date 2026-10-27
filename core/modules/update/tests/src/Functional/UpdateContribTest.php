@@ -75,7 +75,7 @@ class UpdateContribTest extends UpdateTestBase {
     $this->assertSession()->linkNotExists('AAA Update test');
     $this->assertSession()->linkByHrefNotExists('https://example.com/project/aaa_update_test');
 
-    $available = update_get_available();
+    $available = \Drupal::service('update.manager')->getAvailable();
     $this->assertFalse(isset($available['aaa_update_test']['fetch_status']), 'Results are cached even if no releases are available.');
   }
 
@@ -605,7 +605,7 @@ class UpdateContribTest extends UpdateTestBase {
    * @param string $fixture
    *   The fixture file to use.
    */
-  protected function doTestSecurityUpdateAvailability($module_version, array $expected_security_releases, $expected_update_message_type, $fixture): void {
+  protected function doTestSecurityUpdateAvailability($module_version, array $expected_security_releases, string $expected_update_message_type, $fixture): void {
     $this->mockInstalledExtensionsInfo([
       'aaa_update_test' => [
         'project' => 'aaa_update_test',
@@ -648,7 +648,7 @@ class UpdateContribTest extends UpdateTestBase {
    *   - 8.x-1.1
    *   - 8.x-1.0
    */
-  public static function securityUpdateAvailabilityProvider() {
+  public static function securityUpdateAvailabilityProvider(): array {
     return [
       // Security releases available for module major release 1.
       // No releases for next major.

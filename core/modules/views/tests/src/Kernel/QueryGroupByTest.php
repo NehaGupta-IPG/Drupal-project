@@ -28,6 +28,8 @@ class QueryGroupByTest extends ViewsKernelTestBase {
     'test_group_by_in_filters',
     'test_aggregate_count',
     'test_aggregate_count_function',
+    'test_aggregate_count_numeric',
+    'test_aggregate_decimal',
     'test_group_by_count',
     'test_group_by_count_multicardinality',
     'test_group_by_field_not_within_bundle',
@@ -99,6 +101,74 @@ class QueryGroupByTest extends ViewsKernelTestBase {
   }
 
   /**
+   * Tests aggregate count feature with a numeric field.
+   */
+  public function testAggregateCountNumeric(): void {
+    // Create 4 entities with one timestamp.
+    for ($i = 0; $i < 4; $i++) {
+      $this->storage->create([
+        'name' => $this->randomMachineName(),
+        // Tue, 8 Apr 2025 - 10:45.
+        'created' => '1744073136',
+      ])->save();
+    }
+    // Create 3 entities with another timestamp.
+    for ($i = 0; $i < 3; $i++) {
+      $this->storage->create([
+        'name' => $this->randomMachineName(),
+        // Tue, 1 Apr 2025 - 10:46.
+        'created' => '1743464778',
+      ])->save();
+    }
+
+    $view = Views::getView('test_aggregate_count_numeric');
+    $this->executeView($view);
+
+    $this->assertCount(2, $view->result);
+    $this->assertEquals('4', $view->getStyle()->getField(0, 'created_count'));
+    $this->assertEquals('Tue, 8 Apr 2025 - 10:45', $view->getStyle()->getField(0, 'created_group'));
+    $this->assertEquals('3', $view->getStyle()->getField(1, 'created_count'));
+    $this->assertEquals('Tue, 1 Apr 2025 - 10:46', $view->getStyle()->getField(1, 'created_group'));
+  }
+
+  /**
+   * Tests formatted output for an aggregated decimal field.
+   */
+  public function testAggregateDecimalOutput(): void {
+    FieldStorageConfig::create([
+      'field_name' => 'field_decimal',
+      'entity_type' => 'entity_test',
+      'type' => 'decimal',
+      'settings' => [
+        'precision' => 10,
+        'scale' => 3,
+      ],
+    ])->save();
+    FieldConfig::create([
+      'field_name' => 'field_decimal',
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+    ])->save();
+
+    // The test view rounds the sum, 5.789, to two decimal places and uses a
+    // comma as the decimal point, resulting in "5,79".
+    $this->storage->create([
+      'name' => $this->randomMachineName(),
+      'field_decimal' => '1.234',
+    ])->save();
+    $this->storage->create([
+      'name' => $this->randomMachineName(),
+      'field_decimal' => '4.555',
+    ])->save();
+
+    $view = Views::getView('test_aggregate_decimal');
+    $this->executeView($view);
+
+    $this->assertCount(1, $view->result);
+    $this->assertEquals('5,79', $view->getStyle()->getField(0, 'field_decimal'));
+  }
+
+  /**
    * Provides a test helper which runs a view with some aggregation function.
    *
    * @param string|null $aggregation_function
@@ -107,7 +177,7 @@ class QueryGroupByTest extends ViewsKernelTestBase {
    * @param array $values
    *   The expected views result.
    */
-  public function groupByTestHelper($aggregation_function, $values): void {
+  public function groupByTestHelper($aggregation_function, array $values): void {
     $this->setupTestEntities();
 
     $view = Views::getView('test_group_by_count');

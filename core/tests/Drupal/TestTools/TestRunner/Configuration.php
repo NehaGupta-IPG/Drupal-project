@@ -70,6 +70,14 @@ final class Configuration {
 
     $input = new ArgvInput($arguments, self::commandLineDefinition());
 
+    if ($input->getOption('directory') && ($input->getOption('file') || $input->getOption('class'))) {
+      throw new \RuntimeException("--directory cannot be specified together with the --class or --file options.");
+    }
+
+    if ($input->getOption('results-on-installed-db') && $input->getOption('sqlite') !== NULL) {
+      throw new \RuntimeException("--sqlite and --results-on-installed-db options are mutually incompatible.");
+    }
+
     $concurrency = $input->getOption('concurrency');
     if (!is_numeric($concurrency) || $concurrency <= 0) {
       throw new \RuntimeException("--concurrency must be a strictly positive integer.");
@@ -149,7 +157,16 @@ final class Configuration {
       'sqlite',
       NULL,
       InputOption::VALUE_REQUIRED,
-      "A pathname to use for the SQLite database of the test runner. Required unless this script is executed with a working Drupal installation.\nA relative pathname is interpreted relative to the Drupal root directory.",
+      "Save test results to the SQLite database created at the path indicated by [SQLITE].\n" .
+      "A relative pathname is interpreted relative to the Drupal root directory.\n" .
+      "Do not use this option if --results-on-installed-db is specified.",
+    ));
+    $inputDefinition->addOption(new InputOption(
+      'results-on-installed-db',
+      NULL,
+      InputOption::VALUE_NONE,
+      "Save test results in the installed Drupal database.\n" .
+      "Do not use this option if --sqlite is specified.",
     ));
     $inputDefinition->addOption(new InputOption(
       'dburl',
@@ -247,7 +264,7 @@ final class Configuration {
       'suppress-deprecations',
       NULL,
       InputOption::VALUE_NONE,
-      "Stops tests from failing if deprecation errors are triggered.\nIf this is not set the value specified in the SYMFONY_DEPRECATIONS_HELPER environment variable, or the value specified in core/phpunit.xml (if it exists) will be used.\nThe default is that any unexpected silenced deprecation error will fail tests.",
+      "Stops tests from failing if deprecation errors are triggered.\nThe default is that any unexpected silenced deprecation error will fail tests.",
     ));
     $inputDefinition->addOption(new InputOption(
       'xml',

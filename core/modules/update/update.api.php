@@ -27,13 +27,14 @@ use Drupal\update\UpdateFetcherInterface;
  *
  * @param array $projects
  *   Reference to an array of the projects installed on the system. This
- *   includes all the metadata documented in the comments below for each project
- *   (either module or theme) that is currently installed. The array is
- *   initially populated inside \Drupal\update\UpdateManager::getProjects() with
- *   the help of \Drupal\Core\Utility\ProjectInfo->processInfoList(), so look
- *   there for examples of how to populate the array with real values.
+ *   includes all the metadata documented in the comments below for each
+ *   project (either module or theme) that is currently installed. The array is
+ *   initially populated inside
+ *   \Drupal\update\UpdateManagerInterface::getProjects() with the help of
+ *   \Drupal\Core\Utility\ProjectInfo->processInfoList(), so look there for
+ *    examples of how to populate the array with real values.
  *
- * @see \Drupal\update\UpdateManager::getProjects()
+ * @see \Drupal\update\UpdateManagerInterface::getProjects()
  * @see \Drupal\Core\Utility\ProjectInfo::processInfoList()
  */
 function hook_update_projects_alter(&$projects) {
@@ -82,7 +83,7 @@ function hook_update_projects_alter(&$projects) {
  *   Reference to an array of information about available updates to each
  *   project installed on the system.
  *
- * @see update_calculate_project_data()
+ * @see \Drupal\update\UpdateManagerInterface::calculateProjectData()
  */
 function hook_update_status_alter(&$projects) {
   $settings = \Drupal::config('update_advanced.settings')->get('projects');

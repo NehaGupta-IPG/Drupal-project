@@ -20,8 +20,6 @@ class AnnounceFetcherUnitTest extends UnitTestCase {
 
   /**
    * The Fetcher service object.
-   *
-   * @var \Drupal\announcements_feed\AnnounceFetcher
    */
   protected AnnounceFetcher $fetcher;
 
@@ -53,7 +51,7 @@ class AnnounceFetcherUnitTest extends UnitTestCase {
    * @legacy-covers \Drupal\announcements_feed\AnnounceFetcher::validateUrl
    */
   #[DataProvider('urlProvider')]
-  public function testValidateUrl($url, $isValid): void {
+  public function testValidateUrl(string $url, bool $isValid): void {
     $this->assertEquals($isValid, $this->fetcher->validateUrl($url));
   }
 

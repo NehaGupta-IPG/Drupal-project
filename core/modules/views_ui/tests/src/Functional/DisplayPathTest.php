@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views_ui\Functional;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\SchemaCheckTestTrait;
@@ -184,7 +185,7 @@ class DisplayPathTest extends UITestBase {
     $this->drupalGet('admin/structure/views/nojs/display/test_page_display_menu/page_5/menu');
     $this->assertSession()->statusCodeEquals(200);
     $menu_options = $this->assertSession()->selectExists('edit-menu-parent')->findAll('css', 'option');
-    $menu_options = array_map(function ($element) {
+    $menu_options = array_map(function (NodeElement $element) {
       return $element->getText();
     }, $menu_options);
 
@@ -208,7 +209,7 @@ class DisplayPathTest extends UITestBase {
    * Tests the regression in https://www.drupal.org/node/2532490.
    */
   public function testDefaultMenuTabRegression(): void {
-    $this->container->get('module_installer')->install(['menu_link_content', 'toolbar', 'system']);
+    $this->container->get('module_installer')->install(['menu_link_content', 'system']);
     $this->resetAll();
     $admin_user = $this->drupalCreateUser([
       'administer views',
@@ -219,7 +220,6 @@ class DisplayPathTest extends UITestBase {
       'administer permissions',
       'administer menu',
       'link to any page',
-      'access toolbar',
       'access administration pages',
     ]);
     $this->drupalLogin($admin_user);

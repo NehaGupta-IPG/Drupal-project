@@ -98,7 +98,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(#[\SensitiveParameter] array &$connection_options = []) {
     // The DSN should use either a socket or a host/port.
     if (isset($connection_options['unix_socket'])) {
       $dsn = 'mysql:unix_socket=' . $connection_options['unix_socket'];
@@ -235,7 +235,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function queryTemporary($query, array $args = [], array $options = []) {
-    $tablename = 'db_temporary_' . uniqid();
+    $tablename = 'db_temporary_' . bin2hex(random_bytes(12));
     $this->query('CREATE TEMPORARY TABLE {' . $tablename . '} Engine=MEMORY ' . $query, $args, $options);
     return $tablename;
   }

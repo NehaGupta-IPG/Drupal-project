@@ -85,8 +85,6 @@ class EntityResourceTest extends JsonapiKernelTestBase {
 
   /**
    * A node with related nodes.
-   *
-   * @var \Drupal\node\Entity\Node
    */
   protected Node $node4;
 
@@ -166,7 +164,7 @@ class EntityResourceTest extends JsonapiKernelTestBase {
 
     // Give anonymous users permission to view user profiles, so that we can
     // verify the cache tags of cached versions of user profile pages.
-    array_map(function ($role_id) {
+    array_map(function (string $role_id): void {
       Role::create([
         'id' => $role_id,
         'permissions' => [
@@ -186,7 +184,7 @@ class EntityResourceTest extends JsonapiKernelTestBase {
    * @return \Drupal\jsonapi\Controller\EntityResource
    *   An EntityResource instance.
    */
-  protected function createEntityResource() {
+  protected function createEntityResource(): ?object {
     return $this->container->get('jsonapi.entity_resource');
   }
 

@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Database\Query;
 
-use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Connection;
 
 /**
@@ -71,7 +70,7 @@ abstract class Query implements PlaceholderInterface {
    *   Array of query options.
    */
   public function __construct(Connection $connection, $options) {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = bin2hex(random_bytes(12));
 
     $this->connection = $connection;
     $this->connectionKey = $this->connection->getKey();
@@ -81,35 +80,29 @@ abstract class Query implements PlaceholderInterface {
   }
 
   /**
-   * Implements the magic __sleep function to disconnect from the database.
+   * Prevents serialization of query objects.
+   *
+   * @throws \LogicException
    */
-  public function __sleep(): array {
-    $keys = get_object_vars($this);
-    unset($keys['connection']);
-    return array_keys($keys);
+  public function __serialize(): array {
+    throw new \LogicException('Database query objects are not serializable. This probably means you are serializing an object that has a reference to a query object. Adjust your code so that is not necessary, for example by storing the query arguments or results instead.');
   }
 
   /**
-   * Implements the magic __wakeup function to reconnect to the database.
+   * Prevents unserialization of query objects.
+   *
+   * @throws \LogicException
    */
-  public function __wakeup(): void {
-    $this->connection = Database::getConnection($this->connectionTarget, $this->connectionKey);
+  public function __unserialize(array $data): void {
+    throw new \LogicException('Database query objects cannot be unserialized.');
   }
 
   /**
    * Implements the magic __clone function.
    */
   public function __clone() {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = bin2hex(random_bytes(12));
   }
-
-  /**
-   * Runs the query against the database.
-   *
-   * @return \Drupal\Core\Database\StatementInterface|null
-   *   A prepared statement, or NULL if the query is not valid.
-   */
-  abstract protected function execute();
 
   /**
    * Implements PHP magic __toString method to convert the query to a string.

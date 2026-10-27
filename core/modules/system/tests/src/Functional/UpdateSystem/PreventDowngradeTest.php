@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Functional\UpdateSystem;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Update')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class PreventDowngradeTest extends UpdatePathTestBase {
 
   /**
@@ -28,7 +30,6 @@ class PreventDowngradeTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-11.3.0.filled.standard.php.gz';
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/install-mysqli.php';
   }
 
   /**

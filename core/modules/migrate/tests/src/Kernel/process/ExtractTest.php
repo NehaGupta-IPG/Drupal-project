@@ -29,7 +29,7 @@ class ExtractTest extends KernelTestBase {
    * @return array
    *   The test migration definition.
    */
-  public function getDefinition() {
+  public function getDefinition(): array {
     return [
       'source' => [
         'plugin' => 'embedded_data',
@@ -85,8 +85,8 @@ class ExtractTest extends KernelTestBase {
   /**
    * Provides multiple source data for "extract" process plugin test.
    */
-  public static function multipleValueProviderSource() {
-    $tests = [
+  public static function multipleValueProviderSource(): array {
+    return [
       [
         'source_data' => [
           'id' => '1',
@@ -110,8 +110,6 @@ class ExtractTest extends KernelTestBase {
         ],
       ],
     ];
-
-    return $tests;
   }
 
 }

@@ -18,6 +18,7 @@ use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Field\FieldPurger;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -257,10 +258,10 @@ class SystemHooks {
   }
 
   /**
-   * Implements hook_system_info_alter().
+   * Implements hook_extension_info_alter().
    */
-  #[Hook('system_info_alter')]
-  public function systemInfoAlter(&$info, Extension $file, $type): void {
+  #[Hook('extension_info_alter')]
+  public function extensionInfoAlter(&$info, Extension $file, $type): void {
     // Remove page-top and page-bottom from the blocks UI since they are
     // reserved for
     // modules to populate from outside the blocks system.
@@ -306,6 +307,12 @@ class SystemHooks {
       $fetcher = \Drupal::service('system.sa_fetcher');
       $fetcher->getSecurityAdvisories();
     }
+
+    // Do a pass of purging on deleted entity field data, if any exists.
+    if (!$config_purge_batch_size = \Drupal::config('field.settings')->get('purge_batch_size')) {
+      $config_purge_batch_size = Settings::get('field_purge_batch_size', 50);
+    }
+    \Drupal::service(FieldPurger::class)->purgeBatch($config_purge_batch_size);
   }
 
   /**

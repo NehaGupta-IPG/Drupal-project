@@ -12,7 +12,6 @@ enum ClientConnectionTransactionState {
   // Initial state, prior to any transaction started.
   case Idle;
 
-  // Transaction states.
   case Active;
   case RolledBack;
   case RollbackFailed;

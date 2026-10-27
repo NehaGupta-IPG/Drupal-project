@@ -20,7 +20,7 @@ class MenuAccessTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'filter', 'toolbar', 'menu_ui'];
+  protected static $modules = ['block', 'filter', 'menu_ui'];
 
   /**
    * {@inheritdoc}
@@ -415,7 +415,7 @@ class MenuAccessTest extends BrowserTestBase {
 
       }
     }
-    $debug = fn($accessibleRoutes, $inaccessibleRoutes) => "\nAccessible routes: " . implode(', ', $accessibleRoutes) . "\nInaccessible routes: " . implode(', ', $inaccessibleRoutes);
+    $debug = fn($accessibleRoutes, $inaccessibleRoutes): string => "\nAccessible routes: " . implode(', ', $accessibleRoutes) . "\nInaccessible routes: " . implode(', ', $inaccessibleRoutes);
     $expected = $debug($expectedAccessibleRoutes, $expectedInaccessibleRoutes);
     $actual = $debug($actualAccessibleRoutes, $actualInaccessibleRoutes);
     $this->assertSession()->assert($expected === $actual, "Routes do not match. \nExpected routes:$expected\nActual routes: $actual");

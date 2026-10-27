@@ -18,6 +18,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\migrate\Plugin\Migration.
@@ -46,7 +47,7 @@ class MigrationTest extends UnitTestCase {
     $id_map_plugin_manager = $this->createStub(MigratePluginManagerInterface::class);
 
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage("Invalid migration dependencies configuration for migration test_migration");
+    $this->expectExceptionMessageIs("Invalid migration dependencies configuration for migration test_migration");
     new Migration($configuration, $plugin_id, [], $migration_plugin_manager, $source_plugin_manager, $process_plugin_manager, $destination_plugin_manager, $id_map_plugin_manager);
   }
 
@@ -68,7 +69,7 @@ class MigrationTest extends UnitTestCase {
     $migration->setDestinationPlugin($destination_plugin);
 
     $this->expectException(RequirementsException::class);
-    $this->expectExceptionMessage('Missing source requirement');
+    $this->expectExceptionMessageIs('Missing source requirement');
     $migration->checkRequirements();
   }
 
@@ -90,7 +91,7 @@ class MigrationTest extends UnitTestCase {
     $migration->setDestinationPlugin($destination_plugin);
 
     $this->expectException(RequirementsException::class);
-    $this->expectExceptionMessage('Missing destination requirement');
+    $this->expectExceptionMessageIs('Missing destination requirement');
     $migration->checkRequirements();
   }
 
@@ -135,7 +136,7 @@ class MigrationTest extends UnitTestCase {
       ->willReturn(['test_b' => $migration_b, 'test_c' => $migration_c, 'test_d' => $migration_d]);
 
     $this->expectException(RequirementsException::class);
-    $this->expectExceptionMessage('Missing migrations test_a, test_c');
+    $this->expectExceptionMessageIs('Missing migrations test_a, test_c.');
     $migration->checkRequirements();
   }
 
@@ -165,7 +166,7 @@ class MigrationTest extends UnitTestCase {
    * @legacy-covers ::getMigrationDependencies
    */
   #[DataProvider('getValidMigrationDependenciesProvider')]
-  public function testMigrationDependenciesWithValidConfig($source, array $expected_value): void {
+  public function testMigrationDependenciesWithValidConfig(?array $source, array $expected_value): void {
     $migration = new TestMigration();
 
     // Set the plugin manager to support getMigrationDependencies().
@@ -201,14 +202,14 @@ class MigrationTest extends UnitTestCase {
     $migration->set('migration_dependencies', $dependencies);
 
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage("Invalid migration dependencies configuration for migration {$plugin_id}");
+    $this->expectExceptionMessageIs("Invalid migration dependencies configuration for migration {$plugin_id}");
     $migration->getMigrationDependencies();
   }
 
   /**
    * Provides data for valid migration configuration test.
    */
-  public static function getValidMigrationDependenciesProvider() {
+  public static function getValidMigrationDependenciesProvider(): array {
     return [
       [
         'source' => NULL,
@@ -236,7 +237,7 @@ class MigrationTest extends UnitTestCase {
   /**
    * Provides invalid migration dependencies.
    */
-  public static function getInvalidMigrationDependenciesProvider() {
+  public static function getInvalidMigrationDependenciesProvider(): array {
     return [
       'invalid key' => [
         'dependencies' => ['bogus' => []],
@@ -426,7 +427,7 @@ class MigrationTest extends UnitTestCase {
    * @return \Drupal\migrate\Plugin\MigrationPluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    *   A configured MigrationPluginManager test mock.
    */
-  public function getMockPluginManager() {
+  public function getMockPluginManager(): MockObject {
     $plugin_manager = $this->createMock('Drupal\migrate\Plugin\MigrationPluginManagerInterface');
     $plugin_manager->expects($this->exactly(2))
       ->method('expandPluginIds')

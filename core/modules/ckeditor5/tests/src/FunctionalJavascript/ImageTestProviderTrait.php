@@ -54,8 +54,7 @@ trait ImageTestProviderTrait {
 
     // Add alt text to the block image.
     $image_block->find('css', '.image-alternative-text-missing button')->click();
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-balloon-panel'));
-    $this->assertVisibleBalloon('.ck-text-alternative-form');
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-balloon-panel .ck-text-alternative-form'));
 
     // Ensure that the missing alt text warning is hidden when the alternative
     // text form is open.
@@ -185,7 +184,7 @@ trait ImageTestProviderTrait {
   /**
    * Data provider for testAlignment().
    */
-  public static function providerAlignment() {
+  public static function providerAlignment(): array {
     return [
       'Block image' => ['block'],
       'Inline image' => ['inline'],
