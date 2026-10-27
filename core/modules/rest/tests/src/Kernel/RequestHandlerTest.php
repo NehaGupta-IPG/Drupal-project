@@ -48,6 +48,10 @@ class RequestHandlerTest extends KernelTestBase {
     $serializer->decode(Json::encode(['this is an array']), 'json', Argument::type('array'))
       ->willReturn(['this is an array']);
     $this->requestHandler = new RequestHandler($serializer->reveal());
+
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = \Drupal::service('renderer');
+    $this->requestHandler = new RequestHandler($serializer->reveal(), $renderer);
   }
 
   /**

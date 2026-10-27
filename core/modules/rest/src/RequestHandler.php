@@ -6,6 +6,9 @@ use Drupal\Component\Utility\ArgumentsResolver;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Render\AttachmentsInterface;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\rest\Plugin\ResourceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -31,13 +34,23 @@ class RequestHandler implements ContainerInjectionInterface {
   protected $serializer;
 
   /**
+   * The renderer.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
    * Creates a new RequestHandler instance.
    *
    * @param \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Encoder\DecoderInterface $serializer
    *   The serializer.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer.
    */
-  public function __construct(SerializerInterface $serializer) {
+  public function __construct(SerializerInterface $serializer, RendererInterface $renderer) {
     $this->serializer = $serializer;
+    $this->renderer = $renderer;
   }
 
   /**
@@ -45,7 +58,8 @@ class RequestHandler implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('serializer')
+      $container->get('serializer'),
+      $container->get('renderer')
     );
   }
 
@@ -216,7 +230,23 @@ class RequestHandler implements ContainerInjectionInterface {
     $arguments = $argument_resolver->getArguments([$resource, $method]);
 
     // Invoke the operation on the resource plugin.
-    return call_user_func_array([$resource, $method], $arguments);
+    $context = new RenderContext();
+    $response = $this->renderer->executeInRenderContext($context, function () use ($resource, $method, $arguments) {
+      return call_user_func_array([$resource, $method], $arguments);
+    });
+
+    if (!$context->isEmpty()) {
+      /** @var \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata */
+      $bubbleable_metadata = $context->pop();
+      if ($response instanceof CacheableResponseInterface) {
+        $response->addCacheableDependency($bubbleable_metadata);
+      }
+      if ($response instanceof AttachmentsInterface) {
+        $response->addAttachments($bubbleable_metadata->getAttachments());
+      }
+    }
+
+    return $response;
   }
 
   /**
