@@ -1777,6 +1777,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
           '#title' => $this->t('Custom URL'),
           '#default_value' => $this->getOption('link_url'),
           '#description' => $description,
+          '#maxlength' => 1024,
           '#states' => [
             'visible' => [
               ':input[name="link_display"]' => ['value' => 'custom_url'],
