@@ -91,3 +91,12 @@ function system_post_update_clear_admin_compact_mode_config(): void {
   $config->clear('admin_compact_mode');
   $config->save();
 }
+
+/**
+ * Populate the cached requirements error status.
+ */
+function system_post_update_cache_requirements_status(): void {
+  /** @var \Drupal\system\SystemManager $system_manager */
+  $system_manager = \Drupal::service('system.manager');
+  $system_manager->listRequirements();
+}
