@@ -317,7 +317,9 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
         if ($data_table && ($table === $base_table || $table === $revision_table) && in_array($field_name, $duplicate_fields)) {
           continue;
         }
-        $this->mapFieldDefinition($table, $field_name, $field_definitions[$field_name], $table_mapping, $data[$table]);
+        if (!empty($field_definitions[$field_name])) {
+          $this->mapFieldDefinition($table, $field_name, $field_definitions[$field_name], $table_mapping, $data[$table]);
+        }
       }
     }
 
