@@ -210,6 +210,7 @@ class Entity extends ArgumentValidatorPluginBase {
       return FALSE;
     }
 
+    $this->argument->validated_title = $entity->label();
     return TRUE;
   }
 
