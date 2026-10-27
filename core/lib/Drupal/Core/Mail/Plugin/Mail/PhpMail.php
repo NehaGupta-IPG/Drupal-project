@@ -83,16 +83,6 @@ class PhpMail implements MailInterface {
    * @see \Drupal\Core\Mail\MailManagerInterface::mail()
    */
   public function mail(array $message) {
-    // If 'Return-Path' isn't already set in php.ini, we pass it separately
-    // as an additional parameter instead of in the header.
-    if (isset($message['headers']['Return-Path'])) {
-      $return_path_set = strpos(ini_get('sendmail_path'), ' -f');
-      if (!$return_path_set) {
-        $message['Return-Path'] = $message['headers']['Return-Path'];
-        unset($message['headers']['Return-Path']);
-      }
-    }
-
     $headers = new Headers();
     foreach ($message['headers'] as $name => $value) {
       if (in_array(strtolower($name), self::MAILBOX_LIST_HEADERS, TRUE)) {
@@ -114,12 +104,12 @@ class PhpMail implements MailInterface {
 
     if (!$this->request->server->has('WINDIR') && !str_contains($this->request->server->get('SERVER_SOFTWARE', ''), 'Win32')) {
       // On most non-Windows systems, the "-f" option to the sendmail command
-      // is used to set the Return-Path. There is no space between -f and
-      // the value of the return path.
-      // We validate the return path, unless it is equal to the site mail, which
-      // we assume to be safe.
+      // is used to set the envelope sender. There is no space between -f and
+      // the value of the envelope sender.
+      // We validate the envelope sender, unless it is equal to the site mail,
+      // which we assume to be safe.
       $site_mail = $this->configFactory->get('system.site')->get('mail');
-      $additional_params = isset($message['Return-Path']) && ($site_mail === $message['Return-Path'] || static::_isShellSafe($message['Return-Path'])) ? '-f' . $message['Return-Path'] : '';
+      $additional_params = ($site_mail === $message['From'] || static::_isShellSafe($message['From'])) ? '-f' . $message['From'] : '';
       $mail_result = $this->doMail(
         $message['to'],
         $mail_subject,
@@ -129,10 +119,10 @@ class PhpMail implements MailInterface {
       );
     }
     else {
-      // On Windows, PHP will use the value of sendmail_from for the
-      // Return-Path header.
+      // On Windows, PHP will use the value of sendmail_from for the envelope
+      // sender.
       $old_from = ini_get('sendmail_from');
-      ini_set('sendmail_from', $message['Return-Path']);
+      ini_set('sendmail_from', $message['From']);
       $mail_result = $this->doMail(
         $message['to'],
         $mail_subject,

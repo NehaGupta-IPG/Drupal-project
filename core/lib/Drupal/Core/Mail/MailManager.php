@@ -252,10 +252,9 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
       'Content-Transfer-Encoding' => '8Bit',
       'X-Mailer' => 'Drupal',
     ];
-    // To prevent email from looking like spam, the addresses in the Sender and
-    // Return-Path headers should have a domain authorized to use the
-    // originating SMTP server.
-    $headers['From'] = $headers['Sender'] = $headers['Return-Path'] = $site_mail;
+    // To prevent email from looking like spam, the address in the Sender header
+    // should have a domain authorized to use the originating SMTP server.
+    $headers['From'] = $headers['Sender'] = $site_mail;
     // Make sure the site-name is a RFC-2822 compliant 'display-name'.
     if ($site_mail) {
       $mailbox = new MailboxHeader('From', new Address($site_mail, $site_config->get('name') ?: ''));

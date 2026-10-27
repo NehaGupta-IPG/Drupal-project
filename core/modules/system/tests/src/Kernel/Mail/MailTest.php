@@ -212,6 +212,30 @@ class MailTest extends KernelTestBase {
   }
 
   /**
+   * Checks the Return-path: header.
+   */
+  public function testReturnPathHeader() {
+    $language = \Drupal::languageManager()->getCurrentLanguage();
+
+    // Set required site configuration.
+    $this->config('system.site')
+      ->set('mail', 'mailtest@example.com')
+      ->set('name', 'Drupal')
+      ->save();
+
+    // Reset the state variable that holds sent messages.
+    \Drupal::state()->set('system.test_mail_collector', []);
+    \Drupal::service('plugin.manager.mail')
+      ->mail('mail_cancel_test', 'from_test', 'from_test@example.com', $language);
+
+    $captured_emails = \Drupal::state()->get('system.test_mail_collector');
+    $sent_message = end($captured_emails);
+
+    // Check absence of Return-path: header as per RFC 5321.
+    $this->assertFalse(isset(array_change_key_case($sent_message['headers'])['return-path']));
+  }
+
+  /**
    * Checks that relative paths in mails are converted into absolute URLs.
    */
   public function testConvertRelativeUrlsIntoAbsolute(): void {
