@@ -895,7 +895,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   function does not exist.
    */
   protected function invoke(Extension $extension, string $hook, string $directory_search = '', array $args = []): mixed {
-    if ($directory_search) {
+    if ($directory_search != '') {
       $class_name = install_get_fixed_class_name($extension, $directory_search);
       if (class_exists($class_name) && is_subclass_of($class_name, LastRemovedInterface::class)) {
         switch ($hook) {
