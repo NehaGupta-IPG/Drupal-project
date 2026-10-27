@@ -1,3 +1,18 @@
 .ui-dialog ~ .ck-body-wrapper {
   --ck-z-panel: 1261;
 }
+
+html.ck-fullscreen,
+body.ck-fullscreen {
+  --jui-dialog-z-index: calc(var(--ck-z-fullscreen) + 2);
+}
+
+html.ck-fullscreen .ui-widget-overlay,
+body.ck-fullscreen .ui-widget-overlay {
+  z-index: calc(var(--ck-z-fullscreen) + 1) !important;
+}
+
+html.ck-fullscreen .ui-dialog,
+body.ck-fullscreen .ui-dialog {
+  z-index: calc(var(--ck-z-fullscreen) + 2) !important;
+}
