@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the field_rebuild_a_test module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\node\Entity\NodeType;
+
+/**
+ * Implements hook_uninstall().
+ */
+function field_rebuild_a_test_uninstall(): void {
+  if ($node_type = NodeType::load('field_rebuild_a_test')) {
+    $node_type->delete();
+  }
+
+  $configs_to_delete = [
+    'core.entity_form_display.node.field_rebuild_a_test.default',
+    'core.entity_form_display.node.field_rebuild_b_test.default',
+    'core.entity_view_display.node.field_rebuild_a_test.default',
+    'core.entity_view_display.node.field_rebuild_a_test.teaser',
+    'node.type.field_rebuild_a_test',
+  ];
+
+  foreach ($configs_to_delete as $config_id) {
+    \Drupal::configFactory()->getEditable($config_id)->delete();
+  }
+
+  $field_configs = \Drupal::entityTypeManager()
+    ->getStorage('field_config')
+    ->loadByProperties([
+      'entity_type' => 'node',
+      'bundle' => 'field_rebuild_a_test',
+    ]);
+
+  foreach ($field_configs as $field_config) {
+    $field_config->delete();
+  }
+}

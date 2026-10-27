@@ -1,0 +1,8 @@
+core.entity_form_display.*.*.*.third_party.language:
+  type: mapping
+  label: 'Entity Display Rebuild Test form display settings'
+
+  mapping:
+    label:
+      type: label
+      label: 'Label'

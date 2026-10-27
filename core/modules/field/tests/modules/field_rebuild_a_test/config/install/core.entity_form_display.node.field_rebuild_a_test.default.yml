@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.field_rebuild_a_test
+  module:
+    - text
+id: node.field_rebuild_a_test.default
+targetEntityType: node
+bundle: field_rebuild_a_test
+mode: default
+third_party_settings:
+  language:
+    label: 'Field Rebuild Entity Display Test - English Label'
+hidden: { }
