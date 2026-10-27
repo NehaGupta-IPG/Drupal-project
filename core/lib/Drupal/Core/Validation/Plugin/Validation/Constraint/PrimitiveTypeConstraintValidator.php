@@ -58,7 +58,10 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
     // - That it contains a scheme (parse_url(, PHP_URL_SCHEME) returns NULL if
     //   not).
     if ($typed_data instanceof UriInterface && in_array(parse_url($value, PHP_URL_SCHEME), [NULL, FALSE], TRUE)) {
-      $valid = FALSE;
+      // Ignore telephone links because parse_url fails on three digit numbers like 911.
+      if (!str_starts_with($value, 'tel:')) {
+        $valid = FALSE;
+      }
     }
     // @todo Move those to separate constraint validators.
     try {

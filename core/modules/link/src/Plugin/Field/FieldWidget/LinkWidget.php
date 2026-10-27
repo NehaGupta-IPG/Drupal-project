@@ -121,7 +121,8 @@ class LinkWidget extends WidgetBase {
       $uri = 'route:' . $string;
     }
     // Detect a schemeless string, map to 'internal:' URI.
-    elseif (!empty($string) && parse_url($string, PHP_URL_SCHEME) === NULL) {
+    // Ignore telephone links because parse_url fails on three digit numbers like 911.
+    elseif (!empty($string) && parse_url($string, PHP_URL_SCHEME) === NULL && !str_starts_with($string, 'tel:')) {
       // @todo '<front>' is valid input for BC reasons, may be removed by
       //   https://www.drupal.org/node/2421941
       // - '<front>' -> '/'
