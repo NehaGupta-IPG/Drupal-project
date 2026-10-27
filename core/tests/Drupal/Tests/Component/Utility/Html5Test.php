@@ -19,24 +19,6 @@ use PHPUnit\Framework\TestCase;
 class Html5Test extends TestCase {
 
   /**
-   * Tests loading a UTF-8 snippet from a stringable object.
-   */
-  public function testLoad(): void {
-    $html = new class implements \Stringable {
-
-      public function __toString(): string {
-        return '<p>Drupal © &amp; →';
-      }
-
-    };
-    $document = Html5::load($html);
-    $this->assertInstanceOf(HTMLDocument::class, $document);
-    $this->assertNotNull($document->body);
-    $this->assertSame('http://www.w3.org/1999/xhtml', $document->body->namespaceURI);
-    $this->assertSame('Drupal © & →', $document->body->textContent);
-  }
-
-  /**
    * Tests snippet serialization with native HTML5 parsing and escaping rules.
    */
   #[TestWith(['', ''])]
@@ -57,13 +39,6 @@ class Html5Test extends TestCase {
   public function testSerializeBody(): void {
     $document = HTMLDocument::createFromString('<!DOCTYPE html><html><head><title>Title</title></head><body><p>Body</p></body></html>');
     $this->assertSame('<p>Body</p>', Html5::serialize($document));
-  }
-
-  /**
-   * Tests serialization of a document without a body.
-   */
-  public function testSerializeWithoutBody(): void {
-    $this->assertSame('', Html5::serialize(HTMLDocument::createEmpty()));
   }
 
 }

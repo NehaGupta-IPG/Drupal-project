@@ -7,7 +7,8 @@ use Dom\HTMLDocument;
 /**
  * Provides helpers for PHP's native HTML5 parser and DOM API.
  *
- * Unlike Html, this class uses \Dom\HTMLDocument rather than \DOMDocument.
+ * Unlike \Drupal\Component\Utility\Html, this class uses \Dom\HTMLDocument rather
+ * than \DOMDocument.
  * The two APIs differ in their handling of malformed HTML and serialization.
  * These helpers do not sanitize HTML or make untrusted markup safe to render.
  *
@@ -37,10 +38,11 @@ class Html5 {
    * Serializes a native HTML5 document's body as an HTML snippet.
    *
    * Uses PHP's native serialization rules, with newlines normalized to LF.
-   * Unlike Html::serialize(), this can emit literal angle brackets in attribute
-   * values, which Xss::filter() does not support. Do not use this method as a
-   * drop-in replacement in existing XSS filtering workflows. Serialization does
-   * not sanitize HTML.
+   * Unlike \Drupal\Component\Utility\Html::serialize(), this can emit literal
+   * angle brackets in attribute values, which
+   * \Drupal\Component\Utility\Xss::filter() does not support. Do not use this
+   * method as a drop-in replacement in existing XSS filtering workflows.
+   * Serialization does not sanitize HTML.
    *
    * @param \Dom\HTMLDocument $document
    *   The document to serialize. Only the body's children are included.
