@@ -82,6 +82,7 @@
             .before(tabList);
 
           // Transform each details into a tab.
+          let checkFocus = true;
           $details.each(function () {
             const $that = $(this);
             const $summary = $that.find('> summary');
@@ -100,8 +101,15 @@
               .removeAttr('open')
               .addClass('vertical-tabs__pane')
               .data('verticalTab', verticalTab);
-            if (this.id === focusID) {
-              tabFocus = $that;
+
+            // Check if this tab needs to be focussed.
+            if (checkFocus) {
+              if ($('.error', this).length) {
+                tabFocus = $that;
+                checkFocus = false;
+              } else if (this.id === focusID) {
+                tabFocus = $that;
+              }
             }
           });
 
@@ -123,21 +131,6 @@
           }
         },
       );
-
-      // If a validation error is within a vertical tab, open that tab.
-      context.querySelectorAll('details .form-item .error').forEach((item) => {
-        const details = item.closest('details');
-
-        if (details.style.display === 'none') {
-          const tabSelect = document.querySelector(
-            "[href='#".concat(details.id, "']"),
-          );
-
-          if (tabSelect) {
-            tabSelect.click();
-          }
-        }
-      });
     },
   };
 
