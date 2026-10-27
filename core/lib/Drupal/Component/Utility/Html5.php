@@ -17,6 +17,25 @@ use Dom\HTMLDocument;
 class Html5 {
 
   /**
+   * Normalizes an HTML snippet using native HTML5 parsing and serialization.
+   *
+   * Invalid markup is corrected and newlines are normalized to LF.
+   * This method does not sanitize HTML. The serialization differences described
+   * in self::serialize() also apply here; do not use this as a drop-in
+   * replacement for \Drupal\Component\Utility\Html::normalize() in existing
+   * XSS filtering workflows.
+   *
+   * @param string|\Stringable $html
+   *   The HTML snippet to normalize.
+   *
+   * @return string
+   *   The normalized HTML snippet.
+   */
+  public static function normalize(string|\Stringable $html): string {
+    return static::serialize(static::load($html));
+  }
+
+  /**
    * Parses an HTML snippet using PHP's native HTML5 parser.
    *
    * The snippet is loaded inside the body of a full document using UTF-8.
