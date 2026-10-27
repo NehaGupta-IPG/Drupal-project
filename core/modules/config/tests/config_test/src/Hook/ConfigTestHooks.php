@@ -68,12 +68,4 @@ class ConfigTestHooks {
     $query->condition('id', '7', '<>');
   }
 
-  /**
-   * Implements hook_language_preserve_config_langcode().
-   */
-  #[Hook('language_preserve_config_langcode')]
-  public function languagePreserveConfigLangcode(string $old_langcode, string $new_langcode): array {
-    return \Drupal::keyValue(static::class)->get('config_test.language_preserve_config_langcode', []);
-  }
-
 }

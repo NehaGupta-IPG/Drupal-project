@@ -39,10 +39,9 @@ interface DefaultLangcodeConfigUpdaterInterface {
    * is merged into the configuration being updated, then removed. The new
    * default language can no longer have an override of its own.
    *
-   * Before the first batch step reads the full configuration list, modules
-   * can list configuration names to preserve via
-   * hook_language_preserve_config_langcode(). Listed configuration keeps its
-   * current langcode regardless of the new default.
+   * Before each configuration object is saved, a
+   * \Drupal\language\Event\DefaultLangcodeConfigReconcileEvent is dispatched.
+   * Subscribers can change the data to save, or skip the configuration.
    *
    * @param string $old_langcode
    *   The previous default langcode.
@@ -51,7 +50,7 @@ interface DefaultLangcodeConfigUpdaterInterface {
    * @param array|\ArrayAccess $context
    *   The batch context.
    *
-   * @see hook_language_preserve_config_langcode()
+   * @see \Drupal\language\Event\DefaultLangcodeConfigReconcileEvent
    */
   public function reconcileConfigLangcodeOperation(string $old_langcode, string $new_langcode, &$context): void;
 

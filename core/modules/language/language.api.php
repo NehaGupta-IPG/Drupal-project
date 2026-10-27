@@ -112,33 +112,5 @@ function hook_language_fallback_candidates_OPERATION_alter(array &$candidates, a
 }
 
 /**
- * Lists configuration whose langcode is preserved on a default language change.
- *
- * When the site's default language changes,
- * \Drupal\language\DefaultLangcodeConfigUpdater updates every configuration
- * object whose langcode currently matches the previous default to the new
- * one. Configuration objects named in the returned list are skipped. They keep
- * their current langcode, whatever the new default becomes.
- *
- * @param string $old_langcode
- *   The previous default langcode.
- * @param string $new_langcode
- *   The new default langcode.
- *
- * @return string[]
- *   The names of the configuration objects to preserve the langcode for.
- *
- * @see \Drupal\language\DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation()
- */
-function hook_language_preserve_config_langcode(string $old_langcode, string $new_langcode): array {
-  // Keep a specific piece of configuration in its current language,
-  // regardless of the site's new default.
-  if ($old_langcode === 'en') {
-    return ['my_module.settings'];
-  }
-  return [];
-}
-
-/**
  * @} End of "addtogroup hooks".
  */
