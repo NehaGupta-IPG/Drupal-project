@@ -1347,7 +1347,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         // value. Avoid image buttons (which come with garbage value), so we
         // only get value for the button actually clicked.
         if (!isset($element['#value']) && empty($element['#has_garbage_value'])) {
-          $element['#value'] = $element['#default_value'] ?? '';
+          $element['#value'] = $element['#default_value'] ?? NULL;
         }
       }
     }
@@ -1386,7 +1386,11 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
     // Set the element's value in $form_state->getValues(), but only, if its key
     // does not exist yet (a #value_callback may have already populated it).
-    if (!NestedArray::keyExists($form_state->getValues(), $element['#parents'])) {
+    // Don't set NULL values.
+    if (
+      !NestedArray::keyExists($form_state->getValues(), $element['#parents']) &&
+      $element['#value'] !== NULL
+    ) {
       $form_state->setValueForElement($element, $element['#value']);
     }
   }
