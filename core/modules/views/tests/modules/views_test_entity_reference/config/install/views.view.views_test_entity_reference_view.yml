@@ -4,8 +4,8 @@ dependencies:
   module:
     - node
     - user
-id: test_entity_reference
-label: 'Test Entity Reference'
+id: views_test_entity_reference_view
+label: 'Views Test Entity Reference View'
 module: views
 description: ''
 tag: ''
