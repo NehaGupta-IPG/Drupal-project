@@ -17,7 +17,7 @@ system.site:
       type: email
       label: 'Email address'
     slogan:
-      type: label
+      type: text
       label: 'Slogan'
     page:
       type: mapping

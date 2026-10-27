@@ -157,7 +157,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     // Assert that the language configuration does not leak outside of the
     // translation form into the actual site name and slogan.
     $this->assertSession()->pageTextNotContains('FR ' . $site_name);
-    $this->assertSession()->pageTextNotContains('FR ' . $site_slogan);
+    $this->assertSession()->elementTextNotContains('css', '#edit-source-config-names-systemsite-slogan', 'FR ' . $site_slogan);
     $edit = [
       'translation[config_names][system.site][name]' => $site_name,
       'translation[config_names][system.site][slogan]' => 'FR ' . $site_slogan,
@@ -172,7 +172,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
 
     // Case 3: Keep default value for site name and slogan.
     $this->drupalGet("$translation_base_url/fr/edit");
-    $this->assertSession()->pageTextNotContains('FR ' . $site_slogan);
+    $this->assertSession()->elementTextNotContains('css', '#edit-source-config-names-systemsite-slogan', 'FR ' . $site_slogan);
     $edit = [
       'translation[config_names][system.site][name]' => $site_name,
       'translation[config_names][system.site][slogan]' => $site_slogan,
@@ -196,6 +196,35 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
 
     // Check 'Add' link for French.
     $this->assertSession()->linkByHrefExists("$translation_base_url/fr/add");
+  }
+
+  /**
+   * Tests the Translated site slogan has the correct maxlength.
+   */
+  public function testTranslatedSloganSize() {
+    $this->drupalLogin($this->adminUser);
+    // Test slogan size.
+    $edit = [
+      'site_slogan'  => $this->randomMachineName(255),
+    ];
+    // First we will test the defult slogan field maxlength.
+    $this->drupalGet("admin/config/system/site-information");
+    $this->submitForm($edit, 'Save configuration');
+    $config = $this->config('system.site');
+    $this->assertSession()->fieldValueEquals('site_slogan', $config->get('slogan'));
+
+    // Test slogan size.
+    $edit = [
+      'translation[config_names][system.site][slogan]'  => $this->randomMachineName(255),
+    ];
+    $translation_base_url = 'admin/config/system/site-information/translate';
+    // Second we will test the translation slogan field maxlength.
+    $this->drupalGet("{$translation_base_url}/fr/add");
+    $this->submitForm($edit, 'Save translation');
+    // Check translation saved proper.
+    $this->drupalGet("$translation_base_url/fr/edit");
+    $override = \Drupal::languageManager()->getLanguageConfigOverride('fr', 'system.site');
+    $this->assertSession()->fieldValueEquals('translation[config_names][system.site][slogan]', $override->get('slogan'));
   }
 
 }
