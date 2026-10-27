@@ -182,6 +182,14 @@ class ContentModerationConfigureEntityTypesForm extends FormBase {
     foreach ($form_state->getValue('bundles') as $bundle_id => $checked) {
       if ($checked) {
         $this->workflow->getTypePlugin()->addEntityTypeAndBundle($this->entityType->id(), $bundle_id);
+        // Add the content_moderation_control extra field to the default view
+        // display of this bundle.
+        $display = \Drupal::service('entity_display.repository')->getViewDisplay($this->entityType->id(), $bundle_id, 'default');
+        if (empty($display->getComponent('content_moderation_control'))) {
+          $display->setComponent('content_moderation_control', [
+            'weight' => -20,
+          ])->save();
+        }
       }
       else {
         $this->workflow->getTypePlugin()->removeEntityTypeAndBundle($this->entityType->id(), $bundle_id);

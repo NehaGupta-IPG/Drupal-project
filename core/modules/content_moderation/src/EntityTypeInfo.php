@@ -215,7 +215,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
         'label' => $this->t('Moderation control'),
         'description' => $this->t("Status listing and form for the entity's moderation state."),
         'weight' => -20,
-        'visible' => TRUE,
+        'visible' => FALSE,
       ];
     }
 
