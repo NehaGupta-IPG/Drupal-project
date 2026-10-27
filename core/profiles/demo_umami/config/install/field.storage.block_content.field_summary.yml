@@ -9,6 +9,7 @@ entity_type: block_content
 type: string_long
 settings:
   case_sensitive: false
+  max_length: 4048
 module: core
 locked: false
 cardinality: 1

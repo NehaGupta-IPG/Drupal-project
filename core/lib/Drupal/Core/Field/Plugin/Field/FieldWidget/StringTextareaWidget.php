@@ -14,7 +14,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[FieldWidget(
   id: 'string_textarea',
   label: new TranslatableMarkup('Text area (multiple rows)'),
-  field_types: ['string_long'],
+  field_types: ['string', 'string_long'],
 )]
 class StringTextareaWidget extends WidgetBase {
 
@@ -74,6 +74,10 @@ class StringTextareaWidget extends WidgetBase {
       '#placeholder' => $this->getSetting('placeholder'),
       '#attributes' => ['class' => ['js-text-full', 'text-full']],
     ];
+
+    if ($max_length = $this->getFieldSetting('max_length')) {
+      $element['value']['#maxlength'] = $max_length;
+    }
 
     return $element;
   }
