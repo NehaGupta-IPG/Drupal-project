@@ -60,6 +60,22 @@
     margin-block: var(--admin-space-xs);
     margin-inline: 0 var(--admin-space-m);
   }
+
+  &:has(+ .ajax-progress--throbber) {
+    anchor-name: --dropbutton-wrapper;
+  }
+
+  /* Use anchor positioning on throbber to prevent layout shifts. */
+  + .ajax-progress--throbber {
+    position-anchor: --dropbutton-wrapper;
+    position: fixed;
+    inset-area: center end;
+    position-area: center end;
+
+    @supports not (position-area: center) {
+      position: static;
+    }
+  }
 }
 
 /* <div> that is parent of <ul> */
@@ -78,7 +94,7 @@
   border: 2px solid var(--admin-color-primary);
   border-radius: var(--dropbutton-border-radius-size);
   box-shadow: 0 1px 2px var(--admin-color-primary-soft);
-  anchor-name: --dropbutton-anchor;
+  anchor-name: --dropbutton;
   anchor-scope: all;
 
   .dark-mode & {
@@ -117,7 +133,7 @@
   font-size: var(--dropbutton-font-size);
 
   .dropbutton-wrapper.open & {
-    position-anchor: --dropbutton-anchor;
+    position-anchor: --dropbutton;
     inset-area: bottom span-x-end;
     position-area: bottom span-x-end;
     position-try-fallbacks:
@@ -173,7 +189,7 @@
 
   @media (scripting: none) {
     .dropbutton-wrapper:is(:hover, :focus-within) & {
-      position-anchor: --dropbutton-anchor;
+      position-anchor: --dropbutton;
       inset-area: bottom span-x-end;
       position-area: bottom span-x-end;
       position-try-fallbacks:
