@@ -39,11 +39,9 @@ class BigPipePlaceholderTestCases {
     // Define the two types of cacheability that we expect to see. These will be
     // used in the expectations.
     $cacheability_depends_on_session_only = [
-      'max-age' => 0,
       'contexts' => ['session.exists'],
     ];
     $cacheability_depends_on_session_and_nojs_cookie = [
-      'max-age' => 0,
       'contexts' => ['session.exists', 'cookies:big_pipe_nojs'],
     ];
 

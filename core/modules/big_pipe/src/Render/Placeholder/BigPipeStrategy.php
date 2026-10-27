@@ -228,7 +228,6 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       'interface_preview' => $interface_preview,
       '#suffix' => '</span>',
       '#cache' => [
-        'max-age' => 0,
         'contexts' => [
           'session.exists',
         ],
@@ -273,7 +272,6 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
     return [
       '#markup' => $big_pipe_placeholder,
       '#cache' => [
-        'max-age' => 0,
         'contexts' => [
           'session.exists',
         ],
