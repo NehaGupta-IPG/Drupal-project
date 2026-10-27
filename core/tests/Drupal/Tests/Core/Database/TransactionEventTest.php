@@ -27,6 +27,7 @@ use Drupal\Tests\Core\Database\Stub\EventSubscriber\StubTransactionEventSubscrib
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -141,6 +142,7 @@ class TransactionEventTest extends UnitTestCase {
   /**
    * Tests committing a transaction via object destruction.
    */
+  #[IgnoreDeprecations]
   public function testTransactionCommitOnDestruct(): void {
     $tx = $this->connection->startTransaction();
     unset($tx);
@@ -182,7 +184,7 @@ class TransactionEventTest extends UnitTestCase {
     $this->assertSame(ClientConnectionTransactionState::Active, $this->subscriber->lastEvent->transactionState);
     $this->assertSame(CommitType::Explicit, $this->subscriber->lastEvent->type);
     $this->assertCount(1, $this->subscriber->lastEvent->stackItems);
-    unset($tx);
+    $tx->commitOrRelease();
   }
 
   /**
@@ -247,7 +249,7 @@ class TransactionEventTest extends UnitTestCase {
     $this->assertSame('foo', $this->subscriber->lastEvent->name);
     $this->assertSame(ClientConnectionTransactionState::Active, $this->subscriber->lastEvent->transactionState);
     $this->assertCount(1, $this->subscriber->lastEvent->stackItems);
-    unset($tx);
+    $tx->commitOrRelease();
   }
 
   /**

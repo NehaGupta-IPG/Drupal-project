@@ -684,37 +684,8 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         // transaction is not a root one. Then, release the savepoint too. The
         // client connection remains active.
         try {
-          if (!$this->rollbackClientSavepoint($name)) {
-            if ($this->connection->isEventEnabled(TransactionRollbackToSavepointFailureEvent::class)) {
-              $this->connection->dispatchEvent(new TransactionRollbackToSavepointFailureEvent(
-                $this->connection->getKey(),
-                $this->connection->getTarget(),
-                $id,
-                $name,
-                $this->getConnectionTransactionState(),
-                $this->stackItemsAsArray(),
-                get_class($e),
-                $e->getMessage(),
-              ));
-            }
-            throw new TransactionException("Rollback to savepoint $name failed");
-          }
-          if (!$this->releaseClientSavepoint($name)) {
-            if ($this->connection->isEventEnabled(TransactionReleaseSavepointFailureEvent::class)) {
-              $this->connection->dispatchEvent(new TransactionReleaseSavepointFailureEvent(
-                $this->connection->getKey(),
-                $this->connection->getTarget(),
-                $id,
-                $name,
-                $this->getConnectionTransactionState(),
-                $this->stackItemsAsArray(),
-                get_class($e),
-                $e->getMessage(),
-                $commitType,
-              ));
-            }
-            throw new TransactionException("Release savepoint $name failed");
-          }
+          $this->rollbackClientSavepoint($name);
+          $this->releaseClientSavepoint($name);
           // The Transaction object remains open, and when it will get
           // destructed no commit should happen. Void the stack item.
           $this->voidStackItem($id);
@@ -729,9 +700,39 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             ));
           }
         }
+        catch (TransactionCommitFailedException $e) {
+          $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
+          $this->voidClientTransaction();
+          if ($this->connection->isEventEnabled(TransactionReleaseSavepointFailureEvent::class)) {
+            $this->connection->dispatchEvent(new TransactionReleaseSavepointFailureEvent(
+              $this->connection->getKey(),
+              $this->connection->getTarget(),
+              $id,
+              $name,
+              $this->getConnectionTransactionState(),
+              $this->stackItemsAsArray(),
+              get_class($e),
+              $e->getMessage(),
+              CommitType::Explicit,
+            ));
+          }
+          throw $e;
+        }
         catch (TransactionException $e) {
           $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
           $this->voidClientTransaction();
+          if ($this->connection->isEventEnabled(TransactionRollbackToSavepointFailureEvent::class)) {
+            $this->connection->dispatchEvent(new TransactionRollbackToSavepointFailureEvent(
+              $this->connection->getKey(),
+              $this->connection->getTarget(),
+              $id,
+              $name,
+              $this->getConnectionTransactionState(),
+              $this->stackItemsAsArray(),
+              get_class($e),
+              $e->getMessage(),
+            ));
+          }
           throw $e;
         }
       }
