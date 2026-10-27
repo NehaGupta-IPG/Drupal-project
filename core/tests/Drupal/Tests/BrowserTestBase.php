@@ -326,6 +326,9 @@ abstract class BrowserTestBase extends DrupalTestCase {
     // Set up the browser test output file.
     $this->initBrowserOutputFile();
 
+    // Reset the visit count to detect risky tests that are not really
+    // functional tests.
+    $this->visitCount = 0;
   }
 
   /**
@@ -338,6 +341,13 @@ abstract class BrowserTestBase extends DrupalTestCase {
    */
   protected function setUpAppRoot(): void {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Access $this->root directly. See https://www.drupal.org/node/3574112', E_USER_DEPRECATED);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function assertPostConditions(): void {
+    $this->assertGreaterThan(0, $this->visitCount, 'Test should visit at least one URL.');
   }
 
   /**

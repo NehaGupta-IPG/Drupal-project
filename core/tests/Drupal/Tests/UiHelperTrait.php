@@ -49,6 +49,11 @@ trait UiHelperTrait {
   protected $metaRefreshCount = 0;
 
   /**
+   * The number of URLs visited.
+   */
+  protected int $visitCount = 0;
+
+  /**
    * Fills and submits a form.
    *
    * @param array $edit
@@ -271,6 +276,7 @@ trait UiHelperTrait {
     }
 
     $session->visit($url);
+    $this->visitCount++;
     $out = $session->getPage()->getContent();
 
     // Ensure that any changes to variables in the other thread are picked up.

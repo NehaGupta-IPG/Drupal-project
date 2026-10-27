@@ -47,6 +47,7 @@ trait ApiRequestTrait {
       unset($request_options['body']);
     }
     $this->refreshVariables();
+    $this->visitCount++;
     $request_options[RequestOptions::HTTP_ERRORS] = FALSE;
     $request_options[RequestOptions::ALLOW_REDIRECTS] = FALSE;
     $request_options = $this->decorateWithXdebugCookie($request_options);
