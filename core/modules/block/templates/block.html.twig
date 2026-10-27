@@ -28,13 +28,19 @@
  * @ingroup themeable
  */
 #}
-<div{{ attributes }}>
+{% if not wrapper_element %}
+  {% set wrapper_element = label ? 'section' : 'div' %}
+{% endif %}
+{% if label and not title_element %}
+  {% set title_element = 'h2' %}
+{% endif %}
+<{{ wrapper_element }}{{ attributes }}>
   {{ title_prefix }}
   {% if label %}
-    <h2{{ title_attributes }}>{{ label }}</h2>
+    <{{ title_element }}{{ title_attributes }}>{{ label }}</{{ title_element }}>
   {% endif %}
   {{ title_suffix }}
   {% block content %}
     {{ content }}
   {% endblock %}
-</div>
+</{{ wrapper_element }}>
