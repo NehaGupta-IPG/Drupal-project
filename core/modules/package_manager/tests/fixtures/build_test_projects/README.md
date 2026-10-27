@@ -9,3 +9,14 @@ The test updates from one version to the next, and verifies the updated module's
 
 # Why do we need the `alpha` fixtures?
 To be able to test that `php-tuf/composer-stager` indeed only updates the package for which an update was requested (even though more updates are available), no fixture manipulation is allowed to occur. This requires updating a `path` composer package repository to first serve contain one version of a package, and then another. That is what these fixtures are used for.
+
+## Dependency Management
+
+Package Manager only supports dependencies that are managed by Composer
+(i.e., declared in your project's composer.json). Any external dependencies
+present in your project but managed outside of Composer — such as libraries
+added manually or via an alternative package manager — are not supported and
+will not be handled by Package Manager.
+
+To ensure full compatibility, verify that all project dependencies are
+tracked in composer.json before using Package Manager.
