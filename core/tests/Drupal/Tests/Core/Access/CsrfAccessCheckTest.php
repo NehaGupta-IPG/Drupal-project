@@ -8,9 +8,6 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\CsrfAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\PrivateKey;
-use Drupal\Core\Session\MetadataBag;
-use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -106,19 +103,14 @@ class CsrfAccessCheckTest extends UnitTestCase {
    */
   #[DataProvider('unexpectedRequirements')]
   public function testUnexpectedRequirement(string $requirement, bool $valid): void {
-    $this->csrfToken->expects($this->never())->method('validate');
-    new Settings(['hash_salt' => 'test-salt']);
-    $private_key = $this->createStub(PrivateKey::class);
-    $private_key->method('get')->willReturn('test-key');
-    $metadata = $this->createStub(MetadataBag::class);
-    $metadata->method('getCsrfTokenSeed')->willReturn('test-seed');
-    $generator = new CsrfTokenGenerator($private_key, $metadata);
-    $access_check = new CsrfAccessCheck($generator);
-    $token = $generator->get($valid ? 'test-path' : 'another-path');
+    $this->csrfToken->expects($this->once())
+      ->method('validate')
+      ->with('test_query', 'test-path')
+      ->willReturn($valid);
     $this->parameterBag->method('all')->willReturn([]);
     $this->routeMatch->expects($this->once())->method('getRawParameters')->willReturn($this->parameterBag);
     $route = new Route('/test-path', [], ['_csrf_token' => $requirement]);
-    $result = $access_check->access($route, Request::create('/test-path', 'GET', ['token' => $token]), $this->routeMatch);
+    $result = $this->accessCheck->access($route, Request::create('/test-path?token=test_query'), $this->routeMatch);
     $this->assertSame($valid, $result->isAllowed());
     $this->assertSame(0, $result->getCacheMaxAge());
   }

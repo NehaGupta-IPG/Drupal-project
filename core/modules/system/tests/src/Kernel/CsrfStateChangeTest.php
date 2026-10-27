@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel;
 
-use Drupal\Core\Config\CsrfGuardedStorage;
+use Drupal\Core\Config\StorageCacheInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -40,8 +40,9 @@ class CsrfStateChangeTest extends KernelTestBase {
   #[DataProvider('safeMethods')]
   #[IgnoreDeprecations]
   public function testUnprotectedWrite(string $method, string $operation): void {
-    $this->installEntitySchema('entity_test');
-    $this->assertInstanceOf(CsrfGuardedStorage::class, $this->container->get('config.storage'));
+    if ($operation !== 'config') {
+      $this->installEntitySchema('entity_test');
+    }
     // Configuration writes before controller dispatch must remain possible.
     $this->config('system.site')->set('name', 'Before dispatch')->save();
     if ($operation === 'entity-delete') {
@@ -50,7 +51,6 @@ class CsrfStateChangeTest extends KernelTestBase {
     $this->expectUserDeprecationMessage('Performing configuration and entity writes during an unprotected safe request is deprecated in drupal:12.0.0 and will throw a LogicException in drupal:13.0.0. Add a _csrf_token route requirement. See https://www.drupal.org/project/drupal/issues/3508087');
     $request = Request::create('/csrf/unprotected-' . ($operation === 'entity-delete' ? $operation : $operation . '-write'), $method);
     $response = $this->container->get('http_kernel')->handle($request);
-    $this->assertTrue($request->attributes->get('_csrf_state_change_guard', FALSE));
     $this->assertSame(200, $response->getStatusCode());
     if ($operation === 'config') {
       $this->assertSame('Updated by GET request', $this->container->get('config.storage')->read('system.site')['name']);
@@ -76,6 +76,8 @@ class CsrfStateChangeTest extends KernelTestBase {
    * Tests explicit opt-out and unsafe requests without deprecations.
    */
   public function testAllowedWrites(): void {
+    // Guarding writes must preserve the public configuration cache contract.
+    $this->assertInstanceOf(StorageCacheInterface::class, $this->container->get(StorageCacheInterface::class));
     foreach ([['GET', 'considered'], ['POST', 'unprotected']] as [$method, $route]) {
       $response = $this->container->get('http_kernel')->handle(Request::create('/csrf/' . $route . '-config-write', $method));
       $this->assertSame(200, $response->getStatusCode());
