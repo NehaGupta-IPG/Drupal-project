@@ -36,7 +36,7 @@ class CategoryAutocompleteTest extends UnitTestCase {
     $block_manager = $this->createStub(BlockManagerInterface::class);
     $block_manager
       ->method('getCategories')
-      ->willReturn(['Comment', 'Node', 'None & Such', 'User']);
+      ->willReturn(['Comment', 'Node', 'None & Such', 'User', '']);
 
     $this->autocompleteController = new CategoryAutocompleteController($block_manager);
   }
@@ -56,8 +56,10 @@ class CategoryAutocompleteTest extends UnitTestCase {
     $suggestions = array_map(function (string $suggestion): array {
       return ['value' => $suggestion, 'label' => Html::escape($suggestion)];
     }, $suggestions);
-    $result = $this->autocompleteController->autocomplete(new Request(['q' => $string]));
-    $this->assertSame($suggestions, json_decode($result->getContent(), TRUE));
+    if (!empty($string)) {
+      $result = $this->autocompleteController->autocomplete(new Request(['q' => $string]));
+      $this->assertSame($suggestions, json_decode($result->getContent(), TRUE));
+    }
   }
 
   /**
@@ -90,6 +92,10 @@ class CategoryAutocompleteTest extends UnitTestCase {
     ];
     $test_parameters[] = [
       'string' => 'Banana',
+      'suggestions' => [],
+    ];
+    $test_parameters[] = [
+      'string' => '',
       'suggestions' => [],
     ];
     return $test_parameters;
