@@ -144,11 +144,13 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     $header = [$this->t('Revision'), $this->t('Operations')];
 
     $rows = [];
+    $all_revisions = [];
     $current_revision_displayed = FALSE;
 
     foreach ($this->getRevisionIds($node, $node_storage) as $vid) {
       /** @var \Drupal\node\NodeInterface $revision */
       $revision = $node_storage->loadRevision($vid);
+      $all_revisions[$vid] = $revision;
       $username = [
         '#theme' => 'username',
         '#account' => $revision->getRevisionUser(),
@@ -241,7 +243,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
       }
     }
 
-    $build['node_revisions_table'] = [
+    $build['entity_revisions_table'] = [
       '#theme' => 'table',
       '#rows' => $rows,
       '#header' => $header,
@@ -252,6 +254,11 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     ];
 
     $build['pager'] = ['#type' => 'pager'];
+
+    $context = [
+      'all_revisions' => $all_revisions,
+    ];
+    $this->moduleHandler()->alter(['entity_revision_overview', 'entity_node_revision_overview'], $build, $node, $context);
 
     return $build;
   }
