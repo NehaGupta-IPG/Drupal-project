@@ -364,10 +364,10 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $this->assertTrue($checkboxes[3]->hasAttribute('disabled'));
     // Select the items.
     $this->pressInsertSelected('Added 2 media items.');
-    // Assert the open button is disabled.
-    $open_button = $this->assertElementExistsAfterWait('css', '.js-media-library-open-button[name^="field_twin_media"]');
-    $this->assertTrue($open_button->hasAttribute('data-disabled-focus'));
-    $this->assertTrue($open_button->hasAttribute('disabled'));
+    // Assert the open button is disabled. The widget's JavaScript disables it
+    // shortly after the AJAX insert, so wait for both attributes.
+    // @see Drupal.behaviors.MediaLibraryWidgetDisableButton
+    $this->assertElementExistsAfterWait('css', '.js-media-library-open-button[name^="field_twin_media"][data-disabled-focus][disabled]');
     $this->assertJsCondition('jQuery("#field_twin_media-media-library-wrapper .js-media-library-open-button").is(":disabled")');
 
     // Ensure that the selection completed successfully.
@@ -400,9 +400,8 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $assert_session->elementTextNotContains('css', '#field_twin_media-media-library-wrapper', 'Cat');
     $assert_session->elementTextContains('css', '#field_twin_media-media-library-wrapper', 'Turtle');
     $assert_session->elementTextNotContains('css', '#field_twin_media-media-library-wrapper', 'Snake');
-    // Assert the open button is disabled.
-    $this->assertTrue($assert_session->elementExists('css', '.js-media-library-open-button[name^="field_twin_media"]')->hasAttribute('data-disabled-focus'));
-    $this->assertTrue($assert_session->elementExists('css', '.js-media-library-open-button[name^="field_twin_media"]')->hasAttribute('disabled'));
+    // Assert the open button is disabled, waiting for the JavaScript to do so.
+    $this->assertElementExistsAfterWait('css', '.js-media-library-open-button[name^="field_twin_media"][data-disabled-focus][disabled]');
     $this->assertJsCondition('jQuery("#field_twin_media-media-library-wrapper .js-media-library-open-button").is(":disabled")');
 
     // Assert the selection is cleared when the modal is closed.
