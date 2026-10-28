@@ -51,6 +51,9 @@ update.settings:
           sequence:
             type: email
             label: 'Email'
+          constraints:
+            MultipleUniqueValue:
+              message: "Add an unique email address per line."  
         threshold:
           type: string
           label: 'Email notification threshold'
