@@ -1326,7 +1326,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
       $options['link_display'] = [
         'category' => 'pager',
-        'title' => $this->t('Link display'),
+        'title' => $this->t('Destination'),
         'value' => $link_display,
         'desc' => $this->t('Specify which display or custom URL this display will link to.'),
       ];

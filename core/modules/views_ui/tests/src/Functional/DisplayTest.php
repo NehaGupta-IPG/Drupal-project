@@ -161,6 +161,8 @@ class DisplayTest extends UITestBase {
 
     // Test the link text displays 'None' and not 'Block 1'.
     $this->drupalGet($path);
+    // Test pager link display label.
+    $this->assertSession()->elementTextContains('css', '.pager .views-display-setting:last-child span.label', 'Destination');
     $this->assertSession()->elementTextEquals('xpath', "//a[contains(@href, '{$link_display_path}')]", 'None');
 
     $this->drupalGet($link_display_path);
