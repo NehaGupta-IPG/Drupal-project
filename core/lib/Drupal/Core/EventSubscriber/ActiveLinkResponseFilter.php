@@ -21,7 +21,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Only for anonymous users; for authenticated users, the active-link asset
  * library is loaded.
  *
+ * A link is active if its path and language match the current request and its
+ * query parameters are a subset of the current query. See ::isQuerySubset() for
+ * the matching rules. The JavaScript implementation must behave the same.
+ *
  * @see system_page_attachments()
+ * @see core/misc/active-link.js
  */
 class ActiveLinkResponseFilter implements EventSubscriberInterface {
 
@@ -206,17 +211,8 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
       // The query parameters of an active link are equal to the current
       // parameters.
       if ($add_active && $node->hasAttribute('data-drupal-link-query')) {
-        $query_match = FALSE;
         $link_query = Json::decode($node->getAttribute('data-drupal-link-query'));
-        if (is_array($link_query)) {
-          $query_match = empty(array_filter(
-            $link_query,
-            fn ($value, $key) => $value !== ($query[$key] ?? NULL),
-            ARRAY_FILTER_USE_BOTH
-          ));
-        }
-
-        if (!$query_match) {
+        if (!is_array($link_query) || !static::isQuerySubset($link_query, $query)) {
           $add_active = FALSE;
         }
       }
@@ -248,6 +244,65 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
     }
 
     return $html_markup;
+  }
+
+  /**
+   * Determines whether all parameters of a link query are in the current query.
+   *
+   * The matching rules are:
+   * - A link without a query matches any current query.
+   * - Every parameter of the link query must be present in the current query.
+   *   The current query may contain additional parameters.
+   * - Scalar values are compared as strings, so 3 matches '3', and '0' and ''
+   *   are valid values.
+   * - A NULL value in the link query matches a parameter that is not present.
+   * - Array values must have the same keys and matching values. Parameter
+   *   order does not matter, list order does.
+   *
+   * @param array $link_query
+   *   The decoded 'data-drupal-link-query' attribute of the link.
+   * @param array $query
+   *   The query string for the current URL.
+   *
+   * @return bool
+   *   TRUE if the link query is a subset of the current query.
+   *
+   * @see \Drupal\Core\EventSubscriber\ActiveLinkResponseFilter::isQueryValueMatch()
+   * @see core/misc/active-link.js
+   */
+  protected static function isQuerySubset(array $link_query, array $query): bool {
+    foreach ($link_query as $key => $value) {
+      if (!static::isQueryValueMatch($value, $query[$key] ?? NULL)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * Determines whether a link query value matches a current query value.
+   *
+   * @param mixed $link_value
+   *   The value from the link query.
+   * @param mixed $current_value
+   *   The value from the current query, or NULL if not present.
+   *
+   * @return bool
+   *   TRUE if the values match.
+   *
+   * @see \Drupal\Core\EventSubscriber\ActiveLinkResponseFilter::isQuerySubset()
+   * @see core/misc/active-link.js
+   */
+  protected static function isQueryValueMatch(mixed $link_value, mixed $current_value): bool {
+    if (is_array($link_value)) {
+      return is_array($current_value)
+        && count($link_value) === count($current_value)
+        && static::isQuerySubset($link_value, $current_value);
+    }
+    if ($link_value === NULL) {
+      return $current_value === NULL;
+    }
+    return is_scalar($current_value) && (string) $link_value === (string) $current_value;
   }
 
   /**

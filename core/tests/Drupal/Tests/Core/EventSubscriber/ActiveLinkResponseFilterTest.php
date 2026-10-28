@@ -684,8 +684,44 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
       'attributes' => $attributes + ['aria-current' => 'page'],
     ];
 
-    // Subset query matching cases from issue #2845319.
+    // Cases where the link query must be a subset of the current query.
     $subset_cases = [
+      // Integer values in the link query match string values in the request.
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => ['page' => '3']],
+        TRUE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['page' => 3]),
+        ],
+      ],
+      // The order of the parameters does not matter.
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => ['a' => '1', 'b' => '2']],
+        TRUE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['b' => '2', 'a' => '1']),
+        ],
+      ],
+      // A NULL value in the link query matches a missing parameter.
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => []],
+        TRUE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['a' => NULL]),
+        ],
+      ],
+      // An array in the link query does not match a partial array.
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => ['f' => ['1']]],
+        FALSE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['f' => ['1', '2']]),
+        ],
+      ],
       [
         ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => []],
         TRUE,
@@ -770,11 +806,11 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
         ],
       ],
     ];
-    foreach ($subset_cases as [$context, $is_active, $attributes]) {
+    foreach ($subset_cases as [$context, $is_active, $link_attributes]) {
       $situations[] = [
         'context' => $context,
         'is active' => $is_active,
-        'attributes' => $attributes + ($is_active ? ['aria-current' => 'page'] : []),
+        'attributes' => $link_attributes + ($is_active ? ['aria-current' => 'page'] : []),
       ];
     }
 

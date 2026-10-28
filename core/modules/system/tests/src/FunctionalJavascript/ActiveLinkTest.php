@@ -70,6 +70,46 @@ class ActiveLinkTest extends WebDriverTestBase {
       '//a[@href = :href and not(contains(@class, "is-active"))]',
       [':href' => $other_query_href],
     ));
+
+    // Same key as the current query but a different value.
+    $other_value_href = Url::fromRoute('common_test.l_active_class', [], [
+      'query' => ['foo' => 'baz'],
+    ])->toString();
+    $this->assertSession()->elementExists('xpath', $this->assertSession()->buildXPathQuery(
+      '//a[@href = :href and not(contains(@class, "is-active"))]',
+      [':href' => $other_value_href],
+    ));
+  }
+
+  /**
+   * Tests that array query values are matched in JavaScript.
+   */
+  public function testArrayQueryValues(): void {
+    $user = $this->createUser();
+    $this->drupalLogin($user);
+
+    $path = 'common-test/type-link-active-class';
+    $array_href = Url::fromRoute('common_test.l_active_class', [], [
+      'query' => ['f' => ['1', '2']],
+    ])->toString();
+
+    $this->drupalGet($path, ['query' => ['f' => ['1', '2'], 'page' => '3']]);
+    $this->assertSession()->elementExists('xpath', $this->assertSession()->buildXPathQuery(
+      '//a[@href = :href and contains(@class, "is-active")]',
+      [':href' => $array_href],
+    ));
+
+    $this->drupalGet($path, ['query' => ['f' => ['2', '1']]]);
+    $this->assertSession()->elementExists('xpath', $this->assertSession()->buildXPathQuery(
+      '//a[@href = :href and not(contains(@class, "is-active"))]',
+      [':href' => $array_href],
+    ));
+
+    $this->drupalGet($path, ['query' => ['f' => ['1']]]);
+    $this->assertSession()->elementExists('xpath', $this->assertSession()->buildXPathQuery(
+      '//a[@href = :href and not(contains(@class, "is-active"))]',
+      [':href' => $array_href],
+    ));
   }
 
   /**
