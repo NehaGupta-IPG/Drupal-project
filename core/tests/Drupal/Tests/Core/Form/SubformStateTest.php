@@ -77,6 +77,7 @@ class SubformStateTest extends UnitTestCase {
     $parent_form_state->setValues(static::$formStateValues);
 
     $subform = NestedArray::getValue($this->parentForm, $parents);
+    $subform['#tree'] = TRUE;
     $subform_state = SubformState::createForSubform($subform, $this->parentForm, $parent_form_state);
     $subform_state_values = &$subform_state->getValues();
     $this->assertSame($expected, $subform_state_values);
@@ -143,6 +144,7 @@ class SubformStateTest extends UnitTestCase {
     $parent_form_state->setValues(static::$formStateValues);
 
     $subform = NestedArray::getValue($this->parentForm, $parents);
+    $subform['#tree'] = TRUE;
     $subform_state = SubformState::createForSubform($subform, $this->parentForm, $parent_form_state);
     $subform_state_value = &$subform_state->getValue($key, $default);
     $this->assertSame($expected, $subform_state_value);
@@ -199,6 +201,7 @@ class SubformStateTest extends UnitTestCase {
     $parent_form_state->setValues(static::$formStateValues);
 
     $subform = NestedArray::getValue($this->parentForm, $parents);
+    $subform['#tree'] = TRUE;
     $subform_state = SubformState::createForSubform($subform, $this->parentForm, $parent_form_state);
     $this->assertSame($subform_state, $subform_state->setValues($new_values));
     $this->assertSame($expected, $parent_form_state->getValues());
@@ -250,6 +253,7 @@ class SubformStateTest extends UnitTestCase {
    */
   public function testGetCompleteFormStateWithParentCompleteForm(): void {
     $parent_form_state = $this->prophesize(FormStateInterface::class);
+    $this->parentForm['dog']['#tree'] = TRUE;
     $subform_state = SubformState::createForSubform($this->parentForm['dog'], $this->parentForm, $parent_form_state->reveal());
     $this->assertSame($parent_form_state->reveal(), $subform_state->getCompleteFormState());
   }
@@ -263,6 +267,7 @@ class SubformStateTest extends UnitTestCase {
     $parent_form_state->getCompleteFormState()
       ->willReturn($complete_form_state->reveal())
       ->shouldBeCalled();
+    $this->parentForm['dog']['#tree'] = TRUE;
     $subform_state = SubformState::createForSubform($this->parentForm['dog'], $this->parentForm, $parent_form_state->reveal());
     $this->assertSame($complete_form_state->reveal(), $subform_state->getCompleteFormState());
   }
@@ -278,6 +283,7 @@ class SubformStateTest extends UnitTestCase {
     $parent_form_state->setLimitValidationErrors($parent_limit_validation_errors)
       ->shouldBeCalled();
 
+    $this->parentForm['dog']['#tree'] = TRUE;
     $subform_state = SubformState::createForSubform($this->parentForm['dog'], $this->parentForm, $parent_form_state->reveal());
     $this->assertSame($subform_state, $subform_state->setLimitValidationErrors($limit_validation_errors));
   }
@@ -294,6 +300,7 @@ class SubformStateTest extends UnitTestCase {
       ->willReturn($parent_limit_validation_errors)
       ->shouldBeCalled();
 
+    $this->parentForm['dog']['#tree'] = TRUE;
     $subform_state = SubformState::createForSubform($this->parentForm['dog'], $this->parentForm, $parent_form_state->reveal());
     $this->assertSame($limit_validation_errors, $subform_state->getLimitValidationErrors());
   }
@@ -311,6 +318,7 @@ class SubformStateTest extends UnitTestCase {
     $parent_form_state->setErrorByName($parent_form_error_name, $message)
       ->shouldBeCalled();
 
+    $this->parentForm['dog']['#tree'] = TRUE;
     $subform_state = SubformState::createForSubform($this->parentForm['dog'], $this->parentForm, $parent_form_state->reveal());
     $this->assertSame($subform_state, $subform_state->setErrorByName($subform_error_name, $message));
   }
@@ -326,9 +334,23 @@ class SubformStateTest extends UnitTestCase {
     $parent_form_state->getFormObject()->willReturn($parent_form_object)->shouldBeCalledOnce();
 
     $subform_form_object = $this->prophesize(FormInterface::class)->reveal();
+    $this->parentForm['dog']['#tree'] = TRUE;
     $subform_state = SubformState::createForSubform($this->parentForm['dog'], $this->parentForm, $parent_form_state->reveal(), $subform_form_object);
     $this->assertSame($subform_form_object, $subform_state->getFormObject());
     $this->assertSame($parent_form_object, $subform_state->getCompleteFormState()->getFormObject());
+  }
+
+  /**
+   * Tests an exception is thrown if the subform does not have #tree = TRUE.
+   */
+  public function testMissingTree(): void {
+    $parent_form_state = new FormState();
+    $parent_form_state->setValues(static::$formStateValues);
+
+    $subform = NestedArray::getValue($this->parentForm, ['dog']);
+
+    $this->expectException(\Exception::class);
+    SubformState::createForSubform($subform, $this->parentForm, $parent_form_state);
   }
 
 }

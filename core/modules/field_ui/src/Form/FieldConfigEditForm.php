@@ -157,6 +157,7 @@ class FieldConfigEditForm extends EntityForm {
     ];
     $form['field_storage']['subform'] = [
       '#parents' => ['field_storage', 'subform'],
+      '#tree' => TRUE,
     ];
     $form['field_storage']['subform']['field_storage_submit'] = [
       '#type' => 'submit',

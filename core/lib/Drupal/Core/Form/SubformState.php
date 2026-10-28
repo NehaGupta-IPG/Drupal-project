@@ -56,8 +56,20 @@ class SubformState extends FormStateDecoratorBase implements SubformStateInterfa
    *   The subform form object when it's not the same as the parent form.
    *
    * @return static
+   *
+   * @throws \Exception
+   *   Exception is thrown when the #tree property of the subform
+   *   is not set, as it is required for this class to work properly.
    */
   public static function createForSubform(array &$subform, array &$parent_form, FormStateInterface $parent_form_state, ?FormInterface $subform_form_object = NULL) {
+    // In case of non empty subforms, the #tree property of the subform must be
+    // set. Without it, the subform's form values are the top of the values
+    // array, and SubformState::getValues() won't find them.
+    if (!empty($subform)) {
+      if (!isset($subform['#tree']) || !$subform['#tree']) {
+        throw new \Exception("The #tree attribute of the subform is not set");
+      }
+    }
     return new static($subform, $parent_form, $parent_form_state, $subform_form_object);
   }
 
