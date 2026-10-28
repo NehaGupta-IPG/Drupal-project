@@ -44,6 +44,16 @@ class Permissions {
           ],
         ];
       }
+      foreach ($workflow->getTypePlugin()->getStates() as $state) {
+        $args = [
+          '%workflow' => $workflow->label(),
+          '%state' => $state->label(),
+        ];
+        $permissions['revert ' . $workflow->id() . ' revisions to ' . $state->id()] = [
+          'title' => $this->t('%workflow workflow: Revert revisions to %state state', $args),
+          'description' => $this->t('For supported entity types assigned to the %workflow workflow, allows users to revert <em>any</em> content revision to the %state state. Reverting revisions will not consider any existing transition based permissions.', $args),
+        ];
+      }
     }
 
     return $permissions;
