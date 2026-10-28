@@ -203,6 +203,11 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
       setcookie($session_name, '', $this->time->getRequestTime() - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
       $cookies->remove($session_name);
     }
+    
+    // Invalidate session.
+    if ($this->requestStack->getCurrentRequest()->hasSession()) {
+      $this->requestStack->getCurrentRequest()->getSession()->invalidate(0);
+    }
   }
 
   /**
