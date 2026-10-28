@@ -393,9 +393,9 @@ abstract class ConfigFormBase extends FormBase {
             ],
           ],
           '#status_headings' => [
-            'status' => t('Status message'),
-            'error' => t('Error message'),
-            'warning' => t('Warning message'),
+            'status' => $this->t('Status message'),
+            'error' => $this->t('Error message'),
+            'warning' => $this->t('Warning message'),
           ],
         ],
         // Ensure that the status message is at the top of the form.
