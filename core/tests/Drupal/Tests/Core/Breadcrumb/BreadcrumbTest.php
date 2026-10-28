@@ -20,14 +20,12 @@ class BreadcrumbTest extends UnitTestCase {
 
   /**
    * Tests set links.
-   *
-   * @legacy-covers ::setLinks
    */
   public function testSetLinks(): void {
     $breadcrumb = new Breadcrumb();
     $breadcrumb->setLinks([new Link('Home', Url::fromRoute('<front>'))]);
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Once breadcrumb links are set, only additional breadcrumb links can be added.');
+    $this->expectExceptionMessageIs('Once breadcrumb links are set, only additional breadcrumb links can be added.');
     $breadcrumb->setLinks([new Link('None', Url::fromRoute('<none>'))]);
   }
 

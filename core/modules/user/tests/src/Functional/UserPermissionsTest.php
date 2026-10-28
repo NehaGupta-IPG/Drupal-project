@@ -9,11 +9,13 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies role permissions can be added and removed via the permissions page.
  */
 #[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserPermissionsTest extends BrowserTestBase {
 
   use CommentTestTrait;
@@ -182,7 +184,7 @@ class UserPermissionsTest extends BrowserTestBase {
   }
 
   /**
-   * Verify proper permission changes by user_role_change_permissions().
+   * Verify proper permission changes by RoleInterface::changePermissions().
    */
   public function testUserRoleChangePermissions(): void {
     $permissions_hash_generator = $this->container->get('user_permissions_hash_generator');
@@ -201,7 +203,7 @@ class UserPermissionsTest extends BrowserTestBase {
       'administer users' => 1,
       'access user profiles' => 0,
     ];
-    user_role_change_permissions($rid, $permissions);
+    Role::loadOverrideFree($rid)->changePermissions($permissions)->save();
 
     // Verify proper permission changes.
     $this->assertTrue($account->hasPermission('administer users'), 'User now has "administer users" permission.');
@@ -222,14 +224,14 @@ class UserPermissionsTest extends BrowserTestBase {
     // When Node is not installed the 'access content' permission is listed next
     // to 'access site reports'.
     $this->drupalGet('admin/people/permissions');
-    $next_row = $this->xpath('//tr[@data-drupal-selector=\'edit-permissions-access-content\']/following-sibling::tr[1]');
+    $next_row = $this->getNodeElementsByXpath('//tr[@data-drupal-selector=\'edit-permissions-access-content\']/following-sibling::tr[1]');
     $this->assertEquals('edit-permissions-access-site-reports', $next_row[0]->getAttribute('data-drupal-selector'));
 
     // When Node is installed the 'access content' permission is listed next to
     // to 'view own unpublished content'.
     \Drupal::service('module_installer')->install(['node']);
     $this->drupalGet('admin/people/permissions');
-    $next_row = $this->xpath('//tr[@data-drupal-selector=\'edit-permissions-access-content\']/following-sibling::tr[1]');
+    $next_row = $this->getNodeElementsByXpath('//tr[@data-drupal-selector=\'edit-permissions-access-content\']/following-sibling::tr[1]');
     $this->assertEquals('edit-permissions-view-own-unpublished-content', $next_row[0]->getAttribute('data-drupal-selector'));
   }
 
@@ -273,18 +275,18 @@ class UserPermissionsTest extends BrowserTestBase {
   public function testAccessBundlePermission(): void {
     $this->drupalLogin($this->adminUser);
 
-    \Drupal::service('module_installer')->install(['contact', 'taxonomy']);
-    $this->grantPermissions(Role::load($this->rid), ['administer contact forms', 'administer taxonomy']);
+    \Drupal::service('module_installer')->install(['comment', 'taxonomy']);
+    $this->grantPermissions(Role::load($this->rid), ['administer comment types', 'administer taxonomy']);
 
     // Bundles that do not have permissions have no permissions pages.
     $edit = [];
-    $edit['label'] = 'Test contact type';
-    $edit['id'] = 'test_contact_type';
-    $edit['recipients'] = 'webmaster@example.com';
-    $this->drupalGet('admin/structure/contact/add');
+    $edit['label'] = 'Test bundle type';
+    $edit['id'] = 'test_bundle_type';
+    $edit['target_entity_type_id'] = 'taxonomy_term';
+    $this->drupalGet('admin/structure/comment/types/add');
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->pageTextContains('Contact form ' . $edit['label'] . ' has been added.');
-    $this->drupalGet('admin/structure/contact/manage/test_contact_type/permissions');
+    $this->assertSession()->pageTextContains('Comment type ' . $edit['label'] . ' has been added.');
+    $this->drupalGet('admin/structure/comment/manage/test_bundle_type/permissions');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('No permissions found.');
 
@@ -310,7 +312,7 @@ class UserPermissionsTest extends BrowserTestBase {
     $this->drupalLogout();
     $this->drupalGet('admin/structure/taxonomy/manage/test_vocabulary/overview/permissions');
     $this->assertSession()->statusCodeEquals(403);
-    $this->drupalGet('admin/structure/contact/manage/test_contact_type/permissions');
+    $this->drupalGet('admin/structure/comment/manage/test_bundle_type/permissions');
     $this->assertSession()->statusCodeEquals(403);
   }
 
@@ -370,7 +372,7 @@ class UserPermissionsTest extends BrowserTestBase {
     // Verify that if a permission has the same name as a module, that its
     // table cells aren't combined into the module's header row. The header row
     // should have a single cell in that case.
-    $header_row = $this->xpath('//tr[@data-drupal-selector=\'edit-permissions-module-user-permissions-test\'][count(td)=1]');
+    $header_row = $this->getNodeElementsByXpath('//tr[@data-drupal-selector=\'edit-permissions-module-user-permissions-test\'][count(td)=1]');
     $this->assertNotEmpty($header_row);
   }
 

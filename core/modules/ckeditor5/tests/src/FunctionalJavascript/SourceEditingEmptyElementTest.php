@@ -6,23 +6,28 @@ namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
 use Drupal\ckeditor5\HTMLRestrictions;
 use Drupal\ckeditor5\Plugin\CKEditor5Plugin\SourceEditing;
+use Drupal\ckeditor5\Plugin\CKEditor5PluginManager;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 // cspell:ignore sourceediting
+
 /**
  * Tests Drupal\ckeditor5\Plugin\CKEditor5Plugin\SourceEditing.
  *
  * @internal
- * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::getCKEditor5PluginConfig
  */
-#[CoversClass(SourceEditing::class)]
 #[Group('ckeditor5')]
+#[CoversClass(SourceEditing::class)]
+#[CoversMethod(CKEditor5PluginManager::class, 'getCKEditor5PluginConfig')]
+#[RunTestsInSeparateProcesses]
 class SourceEditingEmptyElementTest extends SourceEditingTestBase {
 
   /**
@@ -94,7 +99,7 @@ class SourceEditingEmptyElementTest extends SourceEditingTestBase {
 
       // Verify the text format and editor are still a valid pair.
       $this->assertSame([], array_map(
-        function (ConstraintViolationInterface $v) {
+        function (ConstraintViolationInterface $v): string {
           return (string) $v->getMessage();
         },
         iterator_to_array(CKEditor5::validatePair(
@@ -119,7 +124,7 @@ class SourceEditingEmptyElementTest extends SourceEditingTestBase {
 
     // Verify the text format and editor are still a valid pair.
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(

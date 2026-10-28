@@ -7,12 +7,14 @@ namespace Drupal\Tests\system\Functional\ParamConverter;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore deutscher titel
 /**
  * Tests upcasting of URL arguments to entities.
  */
 #[Group('ParamConverter')]
+#[RunTestsInSeparateProcesses]
 class UpcastingTest extends BrowserTestBase {
 
   /**
@@ -91,6 +93,19 @@ class UpcastingTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains("English label");
     $this->drupalGet("paramconverter_test/node/" . $node->id() . "/test_language", ['language' => $language]);
     $this->assertSession()->pageTextContains("Deutscher Titel");
+  }
+
+  /**
+   * Tests that non-ASCII config entity IDs in routes return 404.
+   *
+   * Config entity routes get regex requirements derived from their schema
+   * constraints (e.g. machine_name pattern). Non-ASCII characters do not
+   * match these patterns, so the router rejects them with a 404.
+   */
+  public function testNonAsciiConfigEntityRoute(): void {
+    // No login needed: the router rejects the URL before access checking.
+    $this->drupalGet('node/add/öüä');
+    $this->assertSession()->statusCodeEquals(404);
   }
 
 }

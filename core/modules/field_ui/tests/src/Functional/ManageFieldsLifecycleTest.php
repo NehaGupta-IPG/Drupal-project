@@ -8,11 +8,13 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Field UI "Manage fields" screen.
  */
 #[Group('field_ui')]
+#[RunTestsInSeparateProcesses]
 class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
 
   /**
@@ -42,7 +44,7 @@ class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
     $type = empty($type) ? $this->contentType : $type;
     $this->drupalGet('admin/structure/types/manage/' . $type . '/fields');
     // Check all table columns.
-    $table_headers = ['Label', 'Machine name', 'Field type', 'Operations'];
+    $table_headers = ['Field', 'Field type', 'Operations'];
     foreach ($table_headers as $table_header) {
       // We check that the label appear in the table headings.
       $this->assertSession()->responseContains($table_header . '</th>');
@@ -54,7 +56,7 @@ class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
     // Assert entity operations for all fields.
     $number_of_links = 2;
     $number_of_links_found = 0;
-    $operation_links = $this->xpath('//ul[@class = "dropbutton"]/li/a');
+    $operation_links = $this->getNodeElementsByXpath('//ul[@class = "dropbutton"]/li/a');
     $url = base_path() . "admin/structure/types/manage/$type/fields/node.$type.body";
 
     foreach ($operation_links as $link) {
@@ -174,7 +176,12 @@ class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
     $this->assertSession()->pageTextContains("There is 1 entity with 2 or more values in this field");
 
     // Create a second entity with three values.
-    $edit = ['title[0][value]' => 'Cardinality 3', 'body[0][value]' => 'Body 1', 'body[1][value]' => 'Body 2', 'body[2][value]' => 'Body 3'];
+    $edit = [
+      'title[0][value]' => 'Cardinality 3',
+      'body[0][value]' => 'Body 1',
+      'body[1][value]' => 'Body 2',
+      'body[2][value]' => 'Body 3',
+    ];
     $this->drupalGet('node/add/article');
     $this->submitForm($edit, 'Save');
 

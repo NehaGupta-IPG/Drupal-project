@@ -19,8 +19,6 @@ final class FilterImageLazyLoadTest extends UnitTestCase {
 
   /**
    * The lazy load image filter.
-   *
-   * @var \Drupal\filter\Plugin\Filter\FilterImageLazyLoad
    */
   protected FilterImageLazyLoad $filter;
 
@@ -39,8 +37,6 @@ final class FilterImageLazyLoadTest extends UnitTestCase {
    *   Input HTML.
    * @param string $expected
    *   The expected output string.
-   *
-   * @legacy-covers ::process
    */
   #[DataProvider('providerHtml')]
   public function testProcess(string $html, string $expected): void {

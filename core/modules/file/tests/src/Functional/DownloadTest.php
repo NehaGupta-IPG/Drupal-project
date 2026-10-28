@@ -8,11 +8,13 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\file_test\FileTestHelper;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for download/file transfer functions.
  */
 #[Group('file')]
+#[RunTestsInSeparateProcesses]
 class DownloadTest extends FileManagedTestBase {
 
   /**
@@ -197,7 +199,7 @@ class DownloadTest extends FileManagedTestBase {
    * @param string $expected_url
    *   The expected URL.
    */
-  private function checkUrl($scheme, $directory, $filename, $expected_url): void {
+  private function checkUrl(string $scheme, string $directory, string $filename, string $expected_url): void {
     // Convert $filename to a valid filename, i.e. strip characters not
     // supported by the filesystem, and create the file in the specified
     // directory.

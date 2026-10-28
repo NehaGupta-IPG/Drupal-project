@@ -8,17 +8,14 @@ use Drupal\Core\Extension\InfoParserException;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the behavior of a theme when base_theme info key is missing.
  */
 #[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class BaseThemeMissingTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * The theme installer.
@@ -48,7 +45,7 @@ class BaseThemeMissingTest extends KernelTestBase {
    */
   public function testMissingBaseThemeException(): void {
     $this->expectException(InfoParserException::class);
-    $this->expectExceptionMessage('Missing required key ("base theme") in core/tests/fixtures/test_missing_base_theme/test_missing_base_theme.info.yml, see https://www.drupal.org/node/3066038');
+    $this->expectExceptionMessageIs('Missing required key ("base theme") in core/tests/fixtures/test_missing_base_theme/test_missing_base_theme.info.yml, see https://www.drupal.org/node/3066038');
     $this->themeInstaller->install(['test_missing_base_theme']);
   }
 

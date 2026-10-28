@@ -10,11 +10,13 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures that node type functions work correctly.
  */
 #[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeTypeTest extends NodeTestBase {
 
   use AssertBreadcrumbTrait;
@@ -175,7 +177,7 @@ class NodeTypeTest extends NodeTestBase {
     $node = $this->drupalCreateNode(['type' => $type->id()]);
     // Attempt to delete the content type, which should not be allowed.
     $this->drupalGet('admin/structure/types/manage/' . $type->label() . '/delete');
-    $this->assertSession()->pageTextContains("{$type->label()} is used by 1 piece of content on your site. You can not remove this content type until you have removed all of the {$type->label()} content.");
+    $this->assertSession()->pageTextContains("{$type->label()} is used by 1 content item on your site. You may not remove this content type until you have removed all of the {$type->label()} content items.");
     $this->assertSession()->pageTextNotContains('This action cannot be undone.');
 
     // Delete the node.

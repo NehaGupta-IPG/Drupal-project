@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Theme\Icon\Plugin;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException;
 use Drupal\Core\Theme\Icon\IconDefinition;
@@ -54,10 +55,7 @@ class ExtractorTest extends UnitTestCase {
       [],
     );
 
-    $form_state = $this->getMockBuilder('Drupal\Core\Form\FormState')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $result = $extractorPlugin->buildConfigurationForm([], $form_state);
+    $result = $extractorPlugin->buildConfigurationForm([], $this->createStub(FormStateInterface::class));
     $this->assertEmpty($result);
 
     // Test with settings.
@@ -73,9 +71,8 @@ class ExtractorTest extends UnitTestCase {
       [],
     );
 
-    $subform_state = $this->createMock(SubformStateInterface::class);
-    $form_state = $this->createMock(SubformStateInterface::class);
-    $form_state->method('getCompleteFormState')->willReturn($subform_state);
+    $form_state = $this->createStub(SubformStateInterface::class);
+    $form_state->method('getCompleteFormState')->willReturn($this->createStub(SubformStateInterface::class));
     $result = $extractorPlugin->buildConfigurationForm([], $form_state);
 
     $expected = [
@@ -143,7 +140,7 @@ class ExtractorTest extends UnitTestCase {
     );
 
     $this->expectException(IconPackConfigErrorException::class);
-    $this->expectExceptionMessage('Missing `template` in your definition, extractor test_extractor requires this value.');
+    $this->expectExceptionMessageIs('Missing `template` in your definition, extractor test_extractor requires this value.');
     $extractorPlugin->createIcon('foo');
   }
 
@@ -196,11 +193,11 @@ class ExtractorTest extends UnitTestCase {
       [],
       $this->pluginId,
       [],
-      $this->createMock(IconFinder::class),
+      $this->createStub(IconFinder::class),
     );
 
     $this->expectException(IconPackConfigErrorException::class);
-    $this->expectExceptionMessage('Missing or invalid `config: sources` in your definition, extractor test_extractor requires this value as array.');
+    $this->expectExceptionMessageIs('Missing or invalid `config: sources` in your definition, extractor test_extractor requires this value as array.');
     $extractorPlugin->discoverIcons();
   }
 
@@ -214,11 +211,11 @@ class ExtractorTest extends UnitTestCase {
       ],
       $this->pluginId,
       [],
-      $this->createMock(IconFinder::class),
+      $this->createStub(IconFinder::class),
     );
 
     $this->expectException(IconPackConfigErrorException::class);
-    $this->expectExceptionMessage('Missing or invalid `config: sources` in your definition, extractor test_extractor requires this value as array.');
+    $this->expectExceptionMessageIs('Missing or invalid `config: sources` in your definition, extractor test_extractor requires this value as array.');
     $pathExtractorPlugin->discoverIcons();
   }
 
@@ -235,11 +232,11 @@ class ExtractorTest extends UnitTestCase {
         'label' => 'Test',
         'description' => 'Test description',
       ],
-      $this->createMock(IconFinder::class),
+      $this->createStub(IconFinder::class),
     );
 
     $this->expectException(IconPackConfigErrorException::class);
-    $this->expectExceptionMessage('Empty relative path for extractor test_extractor.');
+    $this->expectExceptionMessageIs('Empty relative path for extractor test_extractor.');
     $pathExtractorPlugin->discoverIcons();
   }
 

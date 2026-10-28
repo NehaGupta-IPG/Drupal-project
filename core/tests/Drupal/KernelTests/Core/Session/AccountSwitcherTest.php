@@ -7,11 +7,13 @@ namespace Drupal\KernelTests\Core\Session;
 use Drupal\Core\Session\UserSession;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test case for account switching.
  */
 #[Group('Session')]
+#[RunTestsInSeparateProcesses]
 class AccountSwitcherTest extends KernelTestBase {
 
   /**
@@ -56,7 +58,7 @@ class AccountSwitcherTest extends KernelTestBase {
     // Verify that AccountSwitcherInterface::switchBack() will throw
     // an exception if there are no accounts left in the stack.
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('No more accounts to revert to.');
+    $this->expectExceptionMessageIs('No more accounts to revert to.');
     $switcher->switchBack();
   }
 

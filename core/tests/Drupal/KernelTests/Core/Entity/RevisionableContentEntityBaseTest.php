@@ -14,6 +14,7 @@ use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the revision system.
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(RevisionableContentEntityBase::class)]
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
 
   /**
@@ -156,7 +158,7 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
 
     // Check that the "revision_default" flag cannot be changed once set.
     $this->expectException(EntityStorageException::class);
-    $this->expectExceptionMessage("An existing default revision of the 'entity_test_mul_revlog' entity type can not be changed to a non-default revision.");
+    $this->expectExceptionMessageIs("An existing default revision of the 'entity_test_mul_revlog' entity type can not be changed to a non-default revision.");
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $entity2 */
     $entity2 = EntityTestMulWithRevisionLog::create([
       'type' => $entity_type_id,

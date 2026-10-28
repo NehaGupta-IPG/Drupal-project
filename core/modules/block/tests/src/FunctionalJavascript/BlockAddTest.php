@@ -6,11 +6,13 @@ namespace Drupal\Tests\block\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the JS functionality in the block add form.
  */
 #[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockAddTest extends WebDriverTestBase {
 
   /**
@@ -30,7 +32,7 @@ class BlockAddTest extends WebDriverTestBase {
    * Tests the AJAX for the theme selector.
    */
   public function testBlockAddThemeSelector(): void {
-    \Drupal::service('theme_installer')->install(['claro']);
+    \Drupal::service('theme_installer')->install(['default_admin']);
 
     $this->drupalLogin($this->drupalCreateUser([
       'administer blocks',
@@ -39,7 +41,7 @@ class BlockAddTest extends WebDriverTestBase {
     $this->drupalGet('admin/structure/block/add/system_powered_by_block');
     $assert_session = $this->assertSession();
     // Pick a theme with a region that does not exist in another theme.
-    $assert_session->selectExists('Theme')->selectOption('claro');
+    $assert_session->selectExists('Theme')->selectOption('default_admin');
     $assert_session->assertWaitOnAjaxRequest();
     $assert_session->selectExists('Region')->selectOption('pre_content');
     // Switch to a theme that doesn't contain the region selected above.

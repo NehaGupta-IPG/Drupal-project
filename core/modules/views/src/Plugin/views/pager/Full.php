@@ -70,9 +70,15 @@ class Full extends SqlBase {
    */
   public function summaryTitle() {
     if (!empty($this->options['offset'])) {
-      return $this->formatPlural($this->options['items_per_page'], '@count item, skip @skip', 'Paged, @count items, skip @skip', ['@count' => $this->options['items_per_page'], '@skip' => $this->options['offset']]);
+      return $this->formatPlural($this->options['items_per_page'],
+        'Paged, @count item, skip @skip',
+        'Paged, @count items, skip @skip',
+        [
+          '@count' => $this->options['items_per_page'],
+          '@skip' => $this->options['offset'],
+        ]);
     }
-    return $this->formatPlural($this->options['items_per_page'], '@count item', 'Paged, @count items', ['@count' => $this->options['items_per_page']]);
+    return $this->formatPlural($this->options['items_per_page'], 'Paged, @count item', 'Paged, @count items', ['@count' => $this->options['items_per_page']]);
   }
 
   /**

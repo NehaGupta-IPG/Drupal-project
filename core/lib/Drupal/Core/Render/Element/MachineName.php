@@ -39,7 +39,8 @@ use Drupal\Core\Render\Attribute\FormElement;
  *     name').
  *   - replace_pattern: (optional) A regular expression (without delimiters)
  *     matching disallowed characters in the machine name. Defaults to
- *     '[^a-z0-9_]+'.
+ *     '[^a-z0-9_]+'. If a different replace_pattern is used, the machine
+ *      name element's '#description' should be updated accordingly.
  *   - replace: (optional) A character to replace disallowed characters in the
  *     machine name via JavaScript. Defaults to '_' (underscore). When using a
  *     different character, 'replace_pattern' needs to be set accordingly.
@@ -289,7 +290,9 @@ class MachineName extends Textfield {
    * @see \Drupal\Core\Transliteration\PhpTransliteration::readLanguageOverrides()
    */
   private static function getTransliterationLanguageOverrides(LanguageInterface $language) {
-    $overrides = &drupal_static(__CLASS__ . '_' . __METHOD__, []);
+    $cid = __CLASS__ . '_' . __METHOD__;
+    $cached = \Drupal::cache('memory')->get($cid);
+    $overrides = $cached->data ?? [];
     $langcode = $language->getId();
 
     if (isset($overrides[$langcode])) {
@@ -305,6 +308,7 @@ class MachineName extends Textfield {
 
     \Drupal::moduleHandler()->alter('transliteration_overrides', $overrides[$langcode], $langcode);
 
+    \Drupal::cache('memory')->set($cid, $overrides);
     return [$langcode => $overrides[$langcode]];
   }
 

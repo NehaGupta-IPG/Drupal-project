@@ -6,21 +6,25 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\Plugin\Validation\Constraint\ImmutablePropertiesConstraint;
+use Drupal\Core\Entity\Plugin\Validation\Constraint\ImmutablePropertiesConstraintValidator;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Tests Immutable Properties Constraint Validator.
- *
- * @legacy-covers \Drupal\Core\Entity\Plugin\Validation\Constraint\ImmutablePropertiesConstraint
- * @legacy-covers \Drupal\Core\Entity\Plugin\Validation\Constraint\ImmutablePropertiesConstraintValidator
  */
 #[Group('Entity')]
 #[Group('Validation')]
+#[CoversClass(ImmutablePropertiesConstraint::class)]
+#[CoversClass(ImmutablePropertiesConstraintValidator::class)]
+#[RunTestsInSeparateProcesses]
 class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
 
   /**
@@ -33,11 +37,11 @@ class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
    */
   public function testValidatorRequiresAConfigEntity(): void {
     $definition = DataDefinition::createFromDataType('any')
-      ->addConstraint('ImmutableProperties', ['read_only']);
+      ->addConstraint('ImmutableProperties', ['properties' => ['read_only']]);
     $data = $this->container->get(TypedDataManagerInterface::class)
       ->create($definition, 39);
     $this->expectException(UnexpectedValueException::class);
-    $this->expectExceptionMessage('Expected argument of type "' . ConfigEntityInterface::class . '", "int" given');
+    $this->expectExceptionMessageIs('Expected argument of type "' . ConfigEntityInterface::class . '", "int" given');
     $data->validate();
   }
 
@@ -54,10 +58,10 @@ class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
     $this->assertFalse(property_exists($entity, 'non_existent'));
 
     $definition = DataDefinition::createFromDataType('entity:block_content_type')
-      ->addConstraint('ImmutableProperties', ['non_existent']);
+      ->addConstraint('ImmutableProperties', ['properties' => ['non_existent']]);
 
     $this->expectException(LogicException::class);
-    $this->expectExceptionMessage("The entity does not have a 'non_existent' property.");
+    $this->expectExceptionMessageIs("The entity does not have a 'non_existent' property.");
     $this->container->get(TypedDataManagerInterface::class)
       ->create($definition, $entity)
       ->validate();
@@ -73,11 +77,11 @@ class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
     $entity->id()->shouldBeCalled();
 
     $definition = DataDefinition::createFromDataType('any')
-      ->addConstraint('ImmutableProperties', ['read_only']);
+      ->addConstraint('ImmutableProperties', ['properties' => ['read_only']]);
     $data = $this->container->get(TypedDataManagerInterface::class)
       ->create($definition, $entity->reveal());
     $this->expectException(LogicException::class);
-    $this->expectExceptionMessage('The entity does not have an ID.');
+    $this->expectExceptionMessageIs('The entity does not have an ID.');
     $data->validate();
   }
 
@@ -93,7 +97,7 @@ class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
     $entity->save();
 
     $definition = DataDefinition::createFromDataType('entity:block_content_type')
-      ->addConstraint('ImmutableProperties', ['id', 'description']);
+      ->addConstraint('ImmutableProperties', ['properties' => ['id', 'description']]);
 
     /** @var \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data_manager */
     $typed_data_manager = $this->container->get(TypedDataManagerInterface::class);

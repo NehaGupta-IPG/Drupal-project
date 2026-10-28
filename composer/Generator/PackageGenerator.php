@@ -4,7 +4,6 @@ namespace Drupal\Composer\Generator;
 
 use Drupal\Composer\Generator\Builder\DrupalCoreRecommendedBuilder;
 use Drupal\Composer\Generator\Builder\DrupalDevDependenciesBuilder;
-use Drupal\Composer\Generator\Builder\DrupalPinnedDevDependenciesBuilder;
 use Drupal\Composer\Generator\Util\DrupalCoreComposer;
 use Composer\Util\Filesystem;
 use Composer\IO\IOInterface;
@@ -70,7 +69,6 @@ class PackageGenerator {
     return [
       DrupalCoreRecommendedBuilder::class,
       DrupalDevDependenciesBuilder::class,
-      DrupalPinnedDevDependenciesBuilder::class,
     ];
   }
 
@@ -101,7 +99,7 @@ class PackageGenerator {
       return FALSE;
     }
 
-    // Warn the user that a metapackage file has been updated..
+    // Warn the user that a metapackage file has been updated.
     $io->write("Updated metapackage file <info>composer/Metapackage/$relative_path</info>.");
 
     // Write the composer.json file back to disk.

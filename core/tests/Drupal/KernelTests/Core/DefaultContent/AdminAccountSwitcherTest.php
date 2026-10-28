@@ -11,14 +11,16 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Admin Account Switcher.
- *
- * @legacy-covers \Drupal\Core\DefaultContent\AdminAccountSwitcher
  */
 #[Group('DefaultContent')]
+#[CoversClass(AdminAccountSwitcher::class)]
+#[RunTestsInSeparateProcesses]
 class AdminAccountSwitcherTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -64,7 +66,7 @@ class AdminAccountSwitcherTest extends KernelTestBase {
     $this->assertSame(1, (int) $account->id());
 
     $this->expectException(AccessException::class);
-    $this->expectExceptionMessage("There are no user accounts with administrative roles.");
+    $this->expectExceptionMessageIs("There are no user accounts with administrative roles.");
     $this->container->get(AdminAccountSwitcher::class)->switchToAdministrator();
   }
 

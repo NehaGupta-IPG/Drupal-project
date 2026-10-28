@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Functional\Condition;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that condition plugins basic form handling is working.
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
  * validate correctly.
  */
 #[Group('Condition')]
+#[RunTestsInSeparateProcesses]
 class ConditionFormTest extends BrowserTestBase {
 
   /**
@@ -53,10 +55,10 @@ class ConditionFormTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('The current theme is stark');
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = $this->container->get('theme_installer');
-    $theme_installer->install(['olivero']);
+    $theme_installer->install(['test_theme']);
     $this->drupalGet('condition_test');
-    $this->submitForm(['current_theme[theme]' => 'olivero', 'current_theme[negate]' => TRUE], 'Submit');
-    $this->assertSession()->pageTextContains('The current theme is not olivero');
+    $this->submitForm(['current_theme[theme]' => 'test_theme', 'current_theme[negate]' => TRUE], 'Submit');
+    $this->assertSession()->pageTextContains('The current theme is not test_theme');
   }
 
 }

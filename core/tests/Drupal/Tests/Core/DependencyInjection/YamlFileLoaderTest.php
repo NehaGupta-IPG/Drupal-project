@@ -41,7 +41,7 @@ services:
   example_private_service:
     class: \Drupal\Core\ExampleClass
     public: false
-  Drupal\Core\ExampleClass: ~
+  Drupal\Tests\Core\DependencyInjection\YamlFileLoaderTest: ~
   example_tagged_iterator:
     class: \Drupal\Core\ExampleClass
     arguments: [!tagged_iterator foo.bar]
@@ -72,8 +72,8 @@ YAML;
     $builder->compile();
     $this->assertTrue($builder->has('example_service_1'));
     $this->assertFalse($builder->has('example_private_service'));
-    $this->assertTrue($builder->has('Drupal\Core\ExampleClass'));
-    $this->assertSame('Drupal\Core\ExampleClass', $builder->getDefinition('Drupal\Core\ExampleClass')->getClass());
+    $this->assertTrue($builder->has('Drupal\Tests\Core\DependencyInjection\YamlFileLoaderTest'));
+    $this->assertSame('Drupal\Tests\Core\DependencyInjection\YamlFileLoaderTest', $builder->getDefinition('Drupal\Tests\Core\DependencyInjection\YamlFileLoaderTest')->getClass());
     $this->assertInstanceOf(TaggedIteratorArgument::class, $builder->getDefinition('example_tagged_iterator')->getArgument(0));
 
     // Test service closures.
@@ -94,7 +94,7 @@ YAML;
  * Tests exceptions.
  */
   #[DataProvider('providerTestExceptions')]
-  public function testExceptions($yml, $message): void {
+  public function testExceptions(string $yml, string $message): void {
     vfsStream::setup('drupal', NULL, [
       'modules' => [
         'example' => [
@@ -107,11 +107,11 @@ YAML;
     $yaml_file_loader = new YamlFileLoader($builder);
 
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage($message);
+    $this->expectExceptionMessageIs($message);
     $yaml_file_loader->load('vfs://drupal/modules/example/example.yml');
   }
 
-  public static function providerTestExceptions() {
+  public static function providerTestExceptions(): array {
     return [
       '_defaults must be an array' => [<<<YAML
 services:
@@ -206,7 +206,7 @@ YAML,
    do not:
       do: this: for the love of Foo Bar!
 YAML,
-        'The file "vfs://drupal/modules/example/example.yml" does not contain valid YAML',
+        'The file "vfs://drupal/modules/example/example.yml" does not contain valid YAML: Unable to parse at line 1 (near "   do not:").',
       ],
       'YAML must have expected keys' => [<<<YAML
       "do not":

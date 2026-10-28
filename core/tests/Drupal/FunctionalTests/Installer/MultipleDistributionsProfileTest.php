@@ -6,11 +6,13 @@ namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Component\Serialization\Yaml;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests multiple distribution profile support.
  */
 #[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class MultipleDistributionsProfileTest extends InstallerTestBase {
 
   /**
@@ -39,7 +41,7 @@ class MultipleDistributionsProfileTest extends InstallerTestBase {
         'distribution' => [
           'name' => $name,
           'install' => [
-            'theme' => 'claro',
+            'theme' => 'default_admin',
           ],
         ],
       ];
@@ -59,18 +61,11 @@ class MultipleDistributionsProfileTest extends InstallerTestBase {
     // Verify that the distribution name appears.
     $this->assertSession()->pageTextContains('distribution_one');
     // Verify that the requested theme is used.
-    $this->assertSession()->responseContains('claro');
+    $this->assertSession()->responseContains('default_admin');
     // Verify that the "Choose profile" step does not appear.
     $this->assertSession()->pageTextNotContains('profile');
 
     parent::setUpLanguage();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUpProfile(): void {
-    // This step is skipped, because there is a distribution profile.
   }
 
   /**

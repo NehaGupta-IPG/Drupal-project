@@ -6,7 +6,9 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
@@ -14,13 +16,16 @@ use PHPUnit\Framework\Attributes\TestWith;
  */
 #[Group('Entity')]
 #[Group('Validation')]
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class DateFormatValidationTest extends ConfigEntityValidationTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
 
     $this->entity = DateFormat::create([
       'id' => 'test',

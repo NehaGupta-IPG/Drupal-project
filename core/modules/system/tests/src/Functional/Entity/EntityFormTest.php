@@ -12,11 +12,13 @@ use Drupal\entity_test\EntityTestTypesFilter;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity form.
  */
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityFormTest extends BrowserTestBase {
 
   /**
@@ -135,7 +137,7 @@ class EntityFormTest extends BrowserTestBase {
    * @param string $entity_type
    *   The entity type to run the tests with.
    */
-  protected function doTestFormCRUD($entity_type): void {
+  protected function doTestFormCRUD(string $entity_type): void {
     $name1 = $this->randomMachineName(8);
     $name2 = $this->randomMachineName(10);
 
@@ -171,7 +173,7 @@ class EntityFormTest extends BrowserTestBase {
    * @param string $entity_type_id
    *   The ID of entity type to run the tests with.
    */
-  protected function doTestMultilingualFormCRUD($entity_type_id): void {
+  protected function doTestMultilingualFormCRUD(string $entity_type_id): void {
     $name1 = $this->randomMachineName(8);
     $name1_ro = $this->randomMachineName(9);
     $name2_ro = $this->randomMachineName(11);

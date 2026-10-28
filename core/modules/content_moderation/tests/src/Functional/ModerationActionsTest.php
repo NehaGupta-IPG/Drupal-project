@@ -10,11 +10,13 @@ use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the content moderation actions.
  */
 #[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ModerationActionsTest extends BrowserTestBase {
 
   use ContentTypeCreationTrait;
@@ -61,7 +63,7 @@ class ModerationActionsTest extends BrowserTestBase {
    * Tests the node status actions report moderation status to users correctly.
    */
   #[DataProvider('nodeStatusActionsTestCases')]
-  public function testNodeStatusActions($action, $bundle, $warning_appears, $starting_status, $final_status): void {
+  public function testNodeStatusActions(string $action, string $bundle, bool $warning_appears, bool $starting_status, bool $final_status): void {
     // Create and run an action on a node.
     $node = Node::create([
       'type' => $bundle,
@@ -103,7 +105,7 @@ class ModerationActionsTest extends BrowserTestBase {
    * @return array
    *   An array of test cases.
    */
-  public static function nodeStatusActionsTestCases() {
+  public static function nodeStatusActionsTestCases(): array {
     return [
       'Moderated bundle shows warning (publish action)' => [
         'node_publish_action',

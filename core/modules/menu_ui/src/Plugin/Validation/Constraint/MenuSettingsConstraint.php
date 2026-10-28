@@ -8,6 +8,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
  * Validation constraint for changing the menu settings in pending revisions.
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Menu
+ *   settings validation is now handled as a form validation callback in
+ *   \Drupal\menu_ui\Hook\MenuUiHooks::formNodeFormValidate().
+ *
+ * @see https://www.drupal.org/node/3606616
  */
 #[Constraint(
   id: 'MenuSettings',
@@ -15,32 +21,15 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class MenuSettingsConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'You can only change the menu settings for the <em>published</em> version of this content.';
-
-  /**
-   * The violation message when the weight cannot be changed.
-   *
-   * @var string
-   */
-  public $messageWeight = 'You can only change the menu link weight for the <em>published</em> version of this content.';
-
-  /**
-   * The violation message when changing the parent for a unpublished content.
-   *
-   * @var string
-   */
-  public $messageParent = 'You can only change the parent menu link for the <em>published</em> version of this content.';
-
-  /**
-   * The violation message when removing a menu link for unpublished content.
-   *
-   * @var string
-   */
-  public $messageRemove = 'You can only remove the menu link in the <em>published</em> version of this content.';
+  public function __construct(
+    public $message = 'You can only change the menu settings for the <em>published</em> version of this content.',
+    public $messageWeight = 'You can only change the menu link weight for the <em>published</em> version of this content.',
+    public $messageParent = 'You can only change the parent menu link for the <em>published</em> version of this content.',
+    public $messageRemove = 'You can only remove the menu link in the <em>published</em> version of this content.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

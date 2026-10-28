@@ -8,6 +8,7 @@ use Drupal\Component\FileCache\FileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\FileCache\NullFileCache;
 use Drupal\Component\Utility\Random;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,6 +20,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(FileCacheFactory::class)]
 #[Group('FileCache')]
 class FileCacheFactoryTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * {@inheritdoc}
@@ -40,7 +43,7 @@ class FileCacheFactoryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::get
+   * Tests get.
    */
   public function testGet(): void {
     $file_cache = FileCacheFactory::get('test_foo_settings', []);
@@ -61,17 +64,18 @@ class FileCacheFactoryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::get
+   * Tests get no prefix.
    */
   public function testGetNoPrefix(): void {
+    // @phpstan-ignore argument.type
     FileCacheFactory::setPrefix(NULL);
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Required prefix configuration is missing');
+    $this->expectExceptionMessageIs('Required prefix configuration is missing');
     FileCacheFactory::get('test_foo_settings', []);
   }
 
   /**
-   * @legacy-covers ::get
+   * Tests get disabled file cache.
    */
   public function testGetDisabledFileCache(): void {
     // Ensure the returned FileCache is an instance of FileCache::class.
@@ -88,10 +92,10 @@ class FileCacheFactoryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::get
+   * Tests get configuration overrides.
    */
   #[DataProvider('configurationDataProvider')]
-  public function testGetConfigurationOverrides($configuration, $arguments, $class): void {
+  public function testGetConfigurationOverrides($configuration, $arguments, string $class): void {
     FileCacheFactory::setConfiguration($configuration);
 
     $file_cache = FileCacheFactory::get('test_foo_settings', $arguments);
@@ -101,7 +105,7 @@ class FileCacheFactoryTest extends TestCase {
   /**
    * Data provider for testGetConfigurationOverrides().
    */
-  public static function configurationDataProvider() {
+  public static function configurationDataProvider(): array {
     $data = [];
 
     // Test fallback configuration.

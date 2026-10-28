@@ -4,5 +4,4 @@ parameters:
 services:
   _defaults:
     autoconfigure: true
-  workspaces_ui.route_subscriber:
-    class: Drupal\workspaces_ui\Routing\RouteSubscriber
+    autowire: true

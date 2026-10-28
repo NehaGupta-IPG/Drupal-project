@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
+use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the node access grants cache context service.
  */
 #[Group('node')]
 #[Group('Cache')]
+#[RunTestsInSeparateProcesses]
 class NodeAccessCacheRedirectWarningTest extends NodeTestBase {
 
   /**
@@ -29,7 +32,7 @@ class NodeAccessCacheRedirectWarningTest extends NodeTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
   }
 
   /**

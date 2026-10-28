@@ -8,11 +8,13 @@ use Behat\Mink\Element\NodeElement;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests pager functionality.
  */
 #[Group('Pager')]
+#[RunTestsInSeparateProcesses]
 class PagerTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -223,7 +225,7 @@ class PagerTest extends BrowserTestBase {
    * @internal
    */
   protected function assertPagerItems(int $current_page): void {
-    $elements = $this->xpath('//ul[contains(@class, :class)]/li', [':class' => 'pager__items']);
+    $elements = $this->getNodeElementsByXpath('//ul[contains(@class, :class)]/li', [':class' => 'pager__items']);
     $this->assertNotEmpty($elements, 'Pager found.');
 
     // Make current page 1-based.

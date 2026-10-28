@@ -3,8 +3,7 @@
 /* cspell:ignore imagetextalternative insertdrupalmedia */
 /* cspell:ignore insertdrupalmediacommand mediaimagetextalternative */
 
-import { Plugin } from 'ckeditor5/src/core';
-import { toWidget, Widget } from 'ckeditor5/src/widget';
+import { Plugin, toWidget, Widget } from 'ckeditor5';
 
 import InsertDrupalMediaCommand from './insertdrupalmedia';
 import { getPreviewContainer, isDrupalMedia } from './utils';
@@ -36,6 +35,9 @@ export default class DrupalMediaEditing extends Plugin {
       drupalMediaAlt: 'alt',
       drupalMediaEntityType: 'data-entity-type',
       drupalMediaEntityUuid: 'data-entity-uuid',
+      drupalLinkEntityUuid: 'data-link-entity-uuid',
+      drupalLinkEntityType: 'data-link-entity-type',
+      drupalLinkEntityMetadata: 'data-link-entity-metadata',
     };
     this.converterAttributes = [
       'drupalMediaEntityUuid',
@@ -77,7 +79,7 @@ export default class DrupalMediaEditing extends Plugin {
   /**
    * Upcast `drupalMediaIsImage` from Drupal Media metadata.
    *
-   * @param {module:engine/model/node~Node} modelElement
+   * @param {module:engine/model/node~ModelNode} modelElement
    *   The `drupalMedia` model element.
    *
    * @see module:drupalMedia/drupalmediametadatarepository~DrupalMediaMetadataRepository
@@ -126,7 +128,7 @@ export default class DrupalMediaEditing extends Plugin {
   /**
    * Upcast `drupalMediaType` from Drupal Media metadata.
    *
-   * @param {module:engine/model/node~Node} modelElement
+   * @param {module:engine/model/node~ModelNode} modelElement
    *   The `drupalMedia` model element.
    *
    * @see module:drupalMedia/drupalmediametadatarepository~DrupalMediaMetadataRepository
@@ -170,7 +172,7 @@ export default class DrupalMediaEditing extends Plugin {
   /**
    * Fetches preview from the server.
    *
-   * @param {module:engine/model/element~Element} modelElement
+   * @param {module:engine/model/element~ModelElement} modelElement
    *   The model element which preview should be loaded.
    * @return {Promise<{preview: string, label: string}>}
    *   A promise that returns an object.
@@ -467,7 +469,7 @@ export default class DrupalMediaEditing extends Plugin {
    *
    * Not previewing data-caption since it does not get updated by new changes.
    *
-   * @param {module:engine/model/element~Element} modelElement
+   * @param {module:engine/model/element~ModelElement} modelElement
    *   The drupalMedia model element to be converted.
    * @return {string}
    *   The model element converted into HTML.

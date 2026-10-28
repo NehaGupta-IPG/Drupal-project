@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\update\Functional;
 
 use Drupal\Tests\Traits\Core\CronRunTrait;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Common setup and utility methods to test projects that use semver releases.
@@ -13,7 +12,6 @@ use PHPUnit\Framework\Attributes\Group;
  * For classes that extend this class, the XML fixtures they use will start with
  * ::$projectTitle.
  */
-#[Group('update')]
 abstract class UpdateSemverTestBase extends UpdateTestBase {
 
   use CronRunTrait;
@@ -52,7 +50,7 @@ abstract class UpdateSemverTestBase extends UpdateTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function refreshUpdateStatus($xml_map, $url = 'update-test') {
+  protected function refreshUpdateStatus(array $xml_map, string $url = 'update-test') {
     if (!isset($xml_map['drupal'])) {
       $xml_map['drupal'] = '8.0.0';
     }

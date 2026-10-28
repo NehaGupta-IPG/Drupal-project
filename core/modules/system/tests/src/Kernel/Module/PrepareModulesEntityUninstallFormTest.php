@@ -7,13 +7,15 @@ namespace Drupal\Tests\system\Kernel\Module;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests PrepareModulesEntityUninstallForm.
- *
- * @group Module
  */
+#[Group('Module')]
+#[RunTestsInSeparateProcesses]
 class PrepareModulesEntityUninstallFormTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -43,7 +45,7 @@ class PrepareModulesEntityUninstallFormTest extends KernelTestBase {
     // Simulate matching.
     $request->attributes->set('entity_type_id', $not_an_entity_type);
     $this->expectException(PluginNotFoundException::class);
-    (string) $title_resolver->getTitle($request, $route);
+    $title_resolver->getTitle($request, $route);
   }
 
 }

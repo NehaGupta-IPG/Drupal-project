@@ -11,13 +11,14 @@ use Drupal\entity_test\Entity\EntityTestRevPub;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests deleting a revision with revision delete form.
  */
 #[CoversClass(RevisionDeleteForm::class)]
 #[Group('Entity')]
-#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class RevisionDeleteFormTest extends BrowserTestBase {
 
   /**

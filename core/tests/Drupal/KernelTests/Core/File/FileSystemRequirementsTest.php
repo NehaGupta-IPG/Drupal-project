@@ -6,11 +6,13 @@ namespace Drupal\KernelTests\Core\File;
 
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests File System Requirements.
  */
 #[Group('File')]
+#[RunTestsInSeparateProcesses]
 class FileSystemRequirementsTest extends KernelTestBase {
 
   /**
@@ -21,7 +23,7 @@ class FileSystemRequirementsTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $strictConfigSchema = FALSE;
+  protected bool $strictConfigSchema = FALSE;
 
   /**
    * {@inheritdoc}

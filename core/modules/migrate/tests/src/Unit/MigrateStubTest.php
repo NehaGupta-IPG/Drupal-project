@@ -41,8 +41,6 @@ class MigrateStubTest extends UnitTestCase {
 
   /**
    * Tests stubbing.
-   *
-   * @legacy-covers ::createStub
    */
   public function testCreateStub(): void {
     $destination_plugin = $this->prophesize(MigrateDestinationInterface::class);
@@ -74,7 +72,7 @@ class MigrateStubTest extends UnitTestCase {
   public function testExceptionOnPluginNotFound(): void {
     $this->migrationPluginManager->createInstances(['test_migration'])->willReturn([]);
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage("Plugin ID 'test_migration' was not found.");
+    $this->expectExceptionMessageIs("Plugin ID 'test_migration' was not found.");
     $stub = new MigrateStub($this->migrationPluginManager->reveal());
     $stub->createStub('test_migration', [1]);
   }
@@ -88,7 +86,7 @@ class MigrateStubTest extends UnitTestCase {
       'test_migration:d2' => $this->prophesize(MigrationInterface::class)->reveal(),
     ]);
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Cannot stub derivable migration "test_migration".  You must specify the id of a specific derivative to stub.');
+    $this->expectExceptionMessageIs('Cannot stub derivable migration "test_migration".  You must specify the id of a specific derivative to stub.');
     $stub = new MigrateStub($this->migrationPluginManager->reveal());
     $stub->createStub('test_migration', [1]);
   }

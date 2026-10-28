@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Functional;
 
+use Drupal\language\Form\ContentLanguageSettingsForm;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the content translation settings language selector options.
- *
- * @legacy-covers \Drupal\language\Form\ContentLanguageSettingsForm
  */
 #[Group('language')]
+#[CoversClass(ContentLanguageSettingsForm::class)]
+#[RunTestsInSeparateProcesses]
 class LanguageSelectorTranslatableTest extends BrowserTestBase {
 
   use LanguageTestTrait;
@@ -57,7 +60,7 @@ class LanguageSelectorTranslatableTest extends BrowserTestBase {
   /**
    * Returns an array of permissions needed for the translator.
    */
-  protected function getAdministratorPermissions() {
+  protected function getAdministratorPermissions(): array {
     return array_filter(
       ['translate interface',
         'administer content translation',

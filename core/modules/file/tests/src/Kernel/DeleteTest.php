@@ -7,12 +7,14 @@ namespace Drupal\Tests\file\Kernel;
 use Drupal\Core\Database\Database;
 use Drupal\file\Entity\File;
 use Drupal\file_test\FileTestHelper;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the file delete function.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class DeleteTest extends FileManagedUnitTestBase {
 
   /**

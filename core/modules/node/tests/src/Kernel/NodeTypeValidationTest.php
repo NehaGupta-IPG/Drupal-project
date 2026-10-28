@@ -4,17 +4,23 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
-use Drupal\node\NodePreviewMode;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use Drupal\node\NodePreviewMode;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use Drupal\TestTools\Attribute\ShareEnvironment;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests validation of node_type entities.
- *
- * @group node
- * @group #slow
  */
+#[Group('node')]
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
 
   use ContentTypeCreationTrait;
@@ -33,13 +39,18 @@ class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
   ];
 
   /**
+   * The state key toggling the `FullyValidatable` constraint on menu_ui.
+   */
+  private const string MENU_UI_VALIDATABLE_STATE = 'config_schema_test_menu_ui_third_party_settings_fully_validatable';
+
+  /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('node');
     $this->installConfig('node');
-    $this->entity = $this->createContentType();
+    $this->entity = $this->createContentType(['type' => 'test']);
   }
 
   /**
@@ -47,7 +58,7 @@ class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
    */
   #[IgnoreDeprecations]
   public function testPreviewModeValidation(): void {
-    $this->expectDeprecation('Calling Drupal\node\Entity\NodeType::setPreviewMode with an integer $preview_mode parameter is deprecated in drupal:11.3.0 and is removed in drupal:13.0.0. Use the \Drupal\node\NodePreviewMode enum instead. See https://www.drupal.org/node/3538666');
+    $this->expectUserDeprecationMessage('Calling Drupal\node\Entity\NodeType::setPreviewMode with an integer $preview_mode parameter is deprecated in drupal:11.3.0 and is removed in drupal:13.0.0. Use the \Drupal\node\NodePreviewMode enum instead. See https://www.drupal.org/node/3538666');
     $this->entity->setPreviewMode(38);
     $this->assertValidationErrors(['preview_mode' => 'The value you selected is not a valid choice.']);
 
@@ -81,24 +92,33 @@ class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
   }
 
   /**
-   * @testWith [true, {"third_party_settings.menu_ui": "'parent' is a required key."}]
-   *           [false, {}]
+   * Tests third party settings menu UI.
    */
+  #[TestWith([TRUE, ["third_party_settings.menu_ui" => "'parent' is a required key."]])]
+  #[TestWith([FALSE, []])]
   public function testThirdPartySettingsMenuUi(bool $third_party_settings_menu_ui_fully_validatable, array $expected_validation_errors): void {
     $this->enableModules(['menu_ui']);
 
     // Set or unset the `FullyValidatable` constraint on
     // `node.type.*.third_party.menu_ui`.
     $this->enableModules(['config_schema_test']);
-    \Drupal::state()->set('config_schema_test_menu_ui_third_party_settings_fully_validatable', $third_party_settings_menu_ui_fully_validatable);
+    \Drupal::state()->set(self::MENU_UI_VALIDATABLE_STATE, $third_party_settings_menu_ui_fully_validatable);
     $this->container->get('kernel')->rebuildContainer();
-    $this->entity = $this->createContentType();
 
     // @see system.menu.main.yml
     $this->installConfig(['system']);
     $this->entity->setThirdPartySetting('menu_ui', 'available_menus', ['main']);
 
     $this->assertValidationErrors($expected_validation_errors);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function resetEnvironment(): void {
+    parent::resetEnvironment();
+
+    $this->container->get('state')->delete(self::MENU_UI_VALIDATABLE_STATE);
   }
 
 }

@@ -7,11 +7,13 @@ namespace Drupal\Tests\language\Functional;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\SchemaCheckTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures the language config schema is correct.
  */
 #[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LanguageConfigSchemaTest extends BrowserTestBase {
 
   use SchemaCheckTestTrait;
@@ -49,8 +51,7 @@ class LanguageConfigSchemaTest extends BrowserTestBase {
    */
   public function testValidLanguageConfigSchema(): void {
     // Make sure no language configuration available by default.
-    $config_data = $this->config('language.settings')->get();
-    $this->assertEmpty($config_data);
+    $this->assertTrue($this->config('language.content_settings.menu_link_content.menu_link_content')->isNew());
 
     $settings_path = 'admin/config/regional/content-language';
 

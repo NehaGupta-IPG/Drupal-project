@@ -6,11 +6,13 @@ namespace Drupal\Tests\block\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the block administration page for a non-default theme.
  */
 #[Group('block')]
+#[RunTestsInSeparateProcesses]
 class NonDefaultBlockAdminTest extends BrowserTestBase {
 
   /**
@@ -41,11 +43,11 @@ class NonDefaultBlockAdminTest extends BrowserTestBase {
       'administer themes',
     ]);
     $this->drupalLogin($admin_user);
-    $new_theme = 'olivero';
+    $new_theme = 'test_theme';
     \Drupal::service('theme_installer')->install([$new_theme]);
-    // Ensure that the Olivero tab is shown.
+    // Ensure that the Test theme tab is shown.
     $this->drupalGet('admin/structure/block/list/' . $new_theme);
-    $this->assertSession()->pageTextContains('Olivero');
+    $this->assertSession()->pageTextContains('Test theme');
   }
 
 }

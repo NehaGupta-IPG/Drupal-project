@@ -15,6 +15,7 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\WaitTerminateTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore funciona
 /**
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\Group;
  * Uses different negotiators for content and interface.
  */
 #[Group('language')]
+#[RunTestsInSeparateProcesses]
 class ConfigurableLanguageManagerTest extends BrowserTestBase {
 
   use WaitTerminateTestTrait;
@@ -56,7 +58,6 @@ class ConfigurableLanguageManagerTest extends BrowserTestBase {
     // for Drupal to perform its termination work before continuing.
     $this->setWaitForTerminate();
 
-    /** @var \Drupal\user\UserInterface $user */
     $user = $this->createUser([], '', TRUE);
     $this->drupalLogin($user);
     ConfigurableLanguage::createFromLangcode('es')->save();

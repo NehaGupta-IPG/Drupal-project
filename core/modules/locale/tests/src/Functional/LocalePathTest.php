@@ -7,17 +7,21 @@ namespace Drupal\Tests\locale\Functional;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests you can configure a language for individual URL aliases.
  */
 #[Group('locale')]
 #[Group('path')]
+#[RunTestsInSeparateProcesses]
 class LocalePathTest extends BrowserTestBase {
 
   use PathAliasTestTrait;
+  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -34,6 +38,8 @@ class LocalePathTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+
+    $this->enablePromotedContentView();
 
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
     $this->config('system.site')->set('page.front', '/node')->save();
@@ -78,7 +84,7 @@ class LocalePathTest extends BrowserTestBase {
     // Check that the "xx" front page is readily available because path prefix
     // negotiation is pre-configured.
     $this->drupalGet($prefix);
-    $this->assertSession()->pageTextContains('Welcome!');
+    $this->assertSession()->pageTextContains('No promoted content has been created yet.');
 
     // Create a node.
     $node = $this->drupalCreateNode(['type' => 'page']);
@@ -126,7 +132,11 @@ class LocalePathTest extends BrowserTestBase {
 
     // Create language nodes to check priority of aliases.
     $first_node = $this->drupalCreateNode(['type' => 'page', 'promote' => 1, 'langcode' => 'en']);
-    $second_node = $this->drupalCreateNode(['type' => 'page', 'promote' => 1, 'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED]);
+    $second_node = $this->drupalCreateNode([
+      'type' => 'page',
+      'promote' => 1,
+      'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+    ]);
 
     // Assign a custom path alias to the first node with the English language.
     $this->createPathAlias('/node/' . $first_node->id(), '/' . $custom_path, $first_node->language()->getId());

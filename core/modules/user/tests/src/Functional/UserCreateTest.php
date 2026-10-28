@@ -9,11 +9,13 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the create user administration page.
  */
 #[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserCreateTest extends BrowserTestBase {
 
   use AssertMailTrait {
@@ -118,7 +120,10 @@ class UserCreateTest extends BrowserTestBase {
 
       $this->drupalGet('admin/people');
       $this->assertSession()->pageTextContains($edit['name']);
-      $user = user_load_by_name($name);
+      $users = \Drupal::entityTypeManager()
+        ->getStorage('user')
+        ->loadByProperties(['name' => $name]);
+      $user = reset($users);
       $this->assertTrue($user->isActive(), 'User is not blocked');
     }
 
@@ -136,6 +141,63 @@ class UserCreateTest extends BrowserTestBase {
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->pageTextContains("Created a new user account for $name. No email has been sent");
     $this->assertSession()->pageTextNotContains('Password field is required');
+  }
+
+  /**
+   * Tests that the password is discarded when notify is enabled.
+   */
+  public function testUserAddPasswordWithNotify(): void {
+    $admin = $this->drupalCreateUser(['administer users']);
+    $this->drupalLogin($admin);
+
+    $password_checker = \Drupal::service('password');
+    $typed_pass = 'known_password_for_testing';
+
+    // Create a user with notify enabled and a password filled in.
+    // The typed password should be discarded.
+    $name_notify = $this->randomMachineName();
+    $edit = [
+      'name' => $name_notify,
+      'mail' => $this->randomMachineName() . '@example.com',
+      'pass[pass1]' => $typed_pass,
+      'pass[pass2]' => $typed_pass,
+      'notify' => TRUE,
+    ];
+    $this->drupalGet('admin/people/create');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains('A welcome message with further instructions has been emailed to the new user ' . $name_notify . '.');
+
+    $users = \Drupal::entityTypeManager()
+      ->getStorage('user')
+      ->loadByProperties(['name' => $name_notify]);
+    $user_notify = reset($users);
+
+    // The stored password should not match the typed password.
+    $this->assertFalse($password_checker->check($typed_pass, $user_notify->getPassword()), 'Typed password is not used when notify is enabled.');
+    // The stored password should not be a hash of an empty string.
+    $this->assertFalse($password_checker->check('', $user_notify->getPassword()), 'Password is not a hash of an empty string when notify is enabled.');
+
+    // Create a user with notify disabled and a password filled in.
+    // The typed password should be used.
+    $name_no_notify = $this->randomMachineName();
+    $edit = [
+      'name' => $name_no_notify,
+      'mail' => $this->randomMachineName() . '@example.com',
+      'pass[pass1]' => $typed_pass,
+      'pass[pass2]' => $typed_pass,
+      'notify' => FALSE,
+    ];
+    $this->drupalGet('admin/people/create');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains('Created a new user account for ' . $name_no_notify . '. No email has been sent.');
+
+    $users = \Drupal::entityTypeManager()
+      ->getStorage('user')
+      ->loadByProperties(['name' => $name_no_notify]);
+    $user_no_notify = reset($users);
+
+    // The stored password should match the typed password.
+    $this->assertTrue($password_checker->check($typed_pass, $user_no_notify->getPassword()), 'Typed password is used when notify is disabled.');
   }
 
 }

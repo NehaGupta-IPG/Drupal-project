@@ -7,11 +7,13 @@ namespace Drupal\Tests\file\Functional;
 use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
 use Drupal\Tests\rest\Functional\FileUploadResourceTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests File Upload Json Cookie.
  */
 #[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileUploadJsonCookieTest extends FileUploadResourceTestBase {
 
   use CookieResourceTestTrait;
@@ -38,8 +40,6 @@ class FileUploadJsonCookieTest extends FileUploadResourceTestBase {
 
   /**
    * Entity type ID for this storage.
-   *
-   * @var string
    */
   protected static string $entityTypeId;
 

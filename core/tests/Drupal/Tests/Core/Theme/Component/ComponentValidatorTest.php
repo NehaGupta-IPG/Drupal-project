@@ -10,7 +10,7 @@ use Drupal\Core\Plugin\Component;
 use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\Component\ComponentValidator;
-use Drupal\Tests\UnitTestCaseTest;
+use Drupal\Tests\UnitTestCase;
 use JsonSchema\ConstraintError;
 use JsonSchema\Constraints\Factory;
 use JsonSchema\Constraints\FormatConstraint;
@@ -26,7 +26,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 #[CoversClass(ComponentValidator::class)]
 #[Group('sdc')]
-class ComponentValidatorTest extends UnitTestCaseTest {
+class ComponentValidatorTest extends UnitTestCase {
 
   /**
    * Tests that valid component definitions don't cause errors.
@@ -49,13 +49,26 @@ class ComponentValidatorTest extends UnitTestCaseTest {
    * @return array
    *   The data.
    */
-  public static function dataProviderValidateDefinitionValid(): array {
-    return [
-      array_map(
-        [static::class, 'loadComponentDefinitionFromFs'],
-        ['my-banner', 'my-button', 'my-cta'],
-      ),
+  public static function dataProviderValidateDefinitionValid(): \Generator {
+    $data = array_map(
+      [static::class, 'loadComponentDefinitionFromFs'],
+      ['my-banner', 'my-button', 'my-cta'],
+    );
+    foreach ($data as $definition) {
+      yield [$definition];
+    }
+
+    // Variant names may contain dashes because they are used as string values
+    // (e.g. CSS modifiers) and are never converted to Twig variable or block
+    // names, unlike props and slots.
+    $cta_with_dashed_variant = static::loadComponentDefinitionFromFs('my-cta');
+    $cta_with_dashed_variant['variants'] = [
+      'my-variant' => [
+        'title' => 'My variant',
+        'description' => 'Variant names with dashes are valid.',
+      ],
     ];
+    yield 'variant name with dashes is valid' => [$cta_with_dashed_variant];
   }
 
   /**
@@ -138,6 +151,38 @@ class ComponentValidatorTest extends UnitTestCaseTest {
       ],
     ];
     yield 'invalid slot (name with spaces)' => [$cta_with_invalid_slot_name];
+
+    $cta_with_dashed_slot_name = $valid_cta;
+    $cta_with_dashed_slot_name['slots'] = [
+      'invalid-slot' => [
+        'title' => 'Invalid slot',
+        'description' => 'Slot name cannot contain dashes because Twig disallows them in variable names.',
+      ],
+    ];
+    yield 'invalid slot (name with dashes)' => [$cta_with_dashed_slot_name];
+
+    $cta_with_dashed_prop_name = $valid_cta;
+    $cta_with_dashed_prop_name['props']['properties']['my-prop'] = [
+      'type' => 'string',
+      'title' => 'My prop',
+    ];
+    yield 'invalid prop (name with dashes)' => [$cta_with_dashed_prop_name];
+
+    $cta_with_leading_digit_prop_name = $valid_cta;
+    $cta_with_leading_digit_prop_name['props']['properties']['1prop'] = [
+      'type' => 'string',
+      'title' => '1prop',
+    ];
+    yield 'invalid prop (name starts with digit)' => [$cta_with_leading_digit_prop_name];
+
+    $cta_with_leading_digit_slot_name = $valid_cta;
+    $cta_with_leading_digit_slot_name['slots'] = [
+      '1slot' => [
+        'title' => 'Invalid slot',
+        'description' => 'Slot name cannot start with a digit because Twig identifiers must start with a letter or underscore.',
+      ],
+    ];
+    yield 'invalid slot (name starts with digit)' => [$cta_with_leading_digit_slot_name];
 
     $cta_with_invalid_variant_title_type = $valid_cta;
     $cta_with_invalid_variant_title_type['variants'] = [
@@ -286,7 +331,7 @@ class ComponentValidatorTest extends UnitTestCaseTest {
       $definition
     );
     $this->expectException(InvalidComponentException::class);
-    $this->expectExceptionMessage($expected_exception_message);
+    $this->expectExceptionMessageIs($expected_exception_message);
     $component_validator = new ComponentValidator();
     $component_validator->setValidator();
     $component_validator->validateProps($context, $component);

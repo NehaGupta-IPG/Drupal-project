@@ -9,12 +9,15 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiJSTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore onewidgetfield
 /**
  * Tests the Field UI "Manage display" and "Manage form display" screens.
  */
 #[Group('field_ui')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ManageDisplayTest extends WebDriverTestBase {
 
   use FieldUiJSTestTrait;
@@ -91,7 +94,7 @@ class ManageDisplayTest extends WebDriverTestBase {
    */
   public function testFormatterUI(): void {
     $manage_fields = 'admin/structure/types/manage/' . $this->type;
-    $manage_display = $manage_fields . '/display';
+    $manage_display = $manage_fields . '/display/default';
 
     // Create a field, and a node with some data for the field.
     $this->fieldUIAddNewFieldJS($manage_fields, 'test', 'Test field');
@@ -178,7 +181,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     // Submit the form and assert that
     // hook_field_formatter_settings_summary_alter() is called.
     $button_save->click();
-    $assert_session->responseContains('field_test_field_formatter_settings_summary_alter');
+    $assert_session->waitForText('field_test_field_formatter_settings_summary_alter');
 
     // Open the settings form for the test field.
     $field_test_settings->click();
@@ -348,7 +351,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     $this->assertEquals($current_setting_value, $setting_value, 'The setting was updated.');
 
     // Assert that hook_field_widget_settings_summary_alter() is called.
-    $assert_session->responseContains('field_test_field_widget_settings_summary_alter');
+    $assert_session->waitForText('field_test_field_widget_settings_summary_alter');
 
     $field_test_settings->click();
     $assert_session->assertExpectedAjaxRequest(1);
@@ -480,7 +483,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     $manage_fields = 'admin/structure/types/manage/' . $this->type;
 
     $this->fieldUIAddNewFieldJS($manage_fields, 'test', 'Test field');
-    $manage_display = 'admin/structure/types/manage/' . $this->type . '/display';
+    $manage_display = 'admin/structure/types/manage/' . $this->type . '/display/default';
     $manage_form = 'admin/structure/types/manage/' . $this->type . '/form-display';
 
     // Form display, change widget type.

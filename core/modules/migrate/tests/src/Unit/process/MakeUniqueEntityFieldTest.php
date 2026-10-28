@@ -22,14 +22,14 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
   /**
    * The mock entity query.
    *
-   * @var \Drupal\Core\Entity\Query\QueryInterface
+   * @var \Drupal\Core\Entity\Query\QueryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $entityQuery;
 
   /**
    * The mocked entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $entityTypeManager;
 
@@ -49,18 +49,17 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
     $this->entityQuery = $this->getMockBuilder('Drupal\Core\Entity\Query\QueryInterface')
       ->disableOriginalConstructor()
       ->getMock();
-    $this->entityQuery->expects($this->any())
+    $this->entityQuery
       ->method('accessCheck')
       ->willReturnSelf();
-    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
+    $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
 
-    $storage = $this->createMock(EntityStorageInterface::class);
-    $storage->expects($this->any())
+    $storage = $this->createStub(EntityStorageInterface::class);
+    $storage
       ->method('getQuery')
       ->willReturn($this->entityQuery);
-    $this->entityTypeManager->expects($this->any())
+    $this->entityTypeManager
       ->method('getStorage')
-      ->with('test_entity_type')
       ->willReturn($storage);
     parent::setUp();
   }
@@ -69,7 +68,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
    * Tests making an entity field value unique.
    */
   #[DataProvider('providerTestMakeUniqueEntityField')]
-  public function testMakeUniqueEntityField($count, $postfix = '', $start = NULL, $length = NULL): void {
+  public function testMakeUniqueEntityField(int $count, ?string $postfix = '', ?int $start = NULL, ?int $length = NULL): void {
     $configuration = [
       'entity_type' => 'test_entity_type',
       'field' => 'test_field',
@@ -92,6 +91,8 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
    * Tests that invalid start position throws an exception.
    */
   public function testMakeUniqueEntityFieldEntityInvalidStart(): void {
+    $this->entityQuery->expects($this->never())
+      ->method('execute');
     $configuration = [
       'entity_type' => 'test_entity_type',
       'field' => 'test_field',
@@ -99,7 +100,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
     ];
     $plugin = new MakeUniqueEntityField($configuration, 'make_unique', [], $this->getMigration(), $this->entityTypeManager);
     $this->expectException('Drupal\migrate\MigrateException');
-    $this->expectExceptionMessage('The start position configuration key should be an integer. Omit this key to capture from the beginning of the string.');
+    $this->expectExceptionMessageIs('The start position configuration key should be an integer. Omit this key to capture from the beginning of the string.');
     $plugin->transform('test_start', $this->migrateExecutable, $this->row, 'foo');
   }
 
@@ -107,6 +108,8 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
    * Tests that invalid length option throws an exception.
    */
   public function testMakeUniqueEntityFieldEntityInvalidLength(): void {
+    $this->entityQuery->expects($this->never())
+      ->method('execute');
     $configuration = [
       'entity_type' => 'test_entity_type',
       'field' => 'test_field',
@@ -114,14 +117,14 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
     ];
     $plugin = new MakeUniqueEntityField($configuration, 'make_unique', [], $this->getMigration(), $this->entityTypeManager);
     $this->expectException('Drupal\migrate\MigrateException');
-    $this->expectExceptionMessage('The character length configuration key should be an integer. Omit this key to capture the entire string.');
+    $this->expectExceptionMessageIs('The character length configuration key should be an integer. Omit this key to capture the entire string.');
     $plugin->transform('test_length', $this->migrateExecutable, $this->row, 'foo');
   }
 
   /**
    * Data provider for testMakeUniqueEntityField().
    */
-  public static function providerTestMakeUniqueEntityField() {
+  public static function providerTestMakeUniqueEntityField(): array {
     return [
       // Tests no duplication.
       [0],
@@ -173,7 +176,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
       ->willReturn($this->entityQuery);
     $this->entityQuery->expects($this->exactly($count + 1))
       ->method('execute')
-      ->willReturnCallback(function () use (&$count) {
+      ->willReturnCallback(function () use (&$count): int {
         return $count--;
       });
   }
@@ -182,6 +185,8 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
    * Tests making an entity field value unique only for migrated entities.
    */
   public function testMakeUniqueEntityFieldMigrated(): void {
+    $this->entityQuery->expects($this->never())
+      ->method('execute');
     $configuration = [
       'entity_type' => 'test_entity_type',
       'field' => 'test_field',

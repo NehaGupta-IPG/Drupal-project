@@ -9,11 +9,13 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests administration of text editors.
  */
 #[Group('editor')]
+#[RunTestsInSeparateProcesses]
 class EditorAdminTest extends BrowserTestBase {
 
   /**
@@ -236,7 +238,7 @@ class EditorAdminTest extends BrowserTestBase {
    * @param bool $ponies_too
    *   The expected value of the ponies_too setting.
    */
-  protected function verifyUnicornEditorConfiguration($format_id, $ponies_too = TRUE): void {
+  protected function verifyUnicornEditorConfiguration(string $format_id, $ponies_too = TRUE): void {
     $editor = \Drupal::entityTypeManager()->getStorage('editor')->load($format_id);
     $settings = $editor->getSettings();
     $this->assertSame('unicorn', $editor->getEditor(), 'The text editor is configured correctly.');

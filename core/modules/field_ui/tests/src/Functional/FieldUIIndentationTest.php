@@ -6,11 +6,13 @@ namespace Drupal\Tests\field_ui\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests indentation on Field UI.
  */
 #[Group('field_ui')]
+#[RunTestsInSeparateProcesses]
 class FieldUIIndentationTest extends BrowserTestBase {
 
   /**
@@ -46,7 +48,7 @@ class FieldUIIndentationTest extends BrowserTestBase {
    * Tests that the indentation classes are present in the content type display settings.
    */
   public function testIndentation(): void {
-    $this->drupalGet('admin/structure/types/manage/page/display');
+    $this->drupalGet('admin/structure/types/manage/page/display/default');
     $this->assertSession()->responseContains('js-indentation indentation');
   }
 

@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Functional\Handler;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the plugin base of the area handler.
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\views_test\Plugin\views\area\TestExample
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AreaTest extends ViewTestBase {
 
   /**
@@ -141,7 +143,9 @@ class AreaTest extends ViewTestBase {
    * Tests overriding the view title using the area title handler.
    */
   public function testTitleArea(): void {
-    $view = Views::getView('frontpage');
+    // Enable the promoted_content view since it's disabled by default.
+    $view = Views::getView('promoted_content');
+    $view->storage->enable()->save();
     $view->initDisplay('page_1');
 
     // Add the title area handler to the empty area.
@@ -157,8 +161,8 @@ class AreaTest extends ViewTestBase {
       ],
     ]);
 
-    $view->storage->enable()->save();
-
+    $view->storage->save();
+    \Drupal::service('router.builder')->rebuild();
     $this->drupalGet('node');
     $this->assertSession()->pageTextContains('Overridden title');
   }

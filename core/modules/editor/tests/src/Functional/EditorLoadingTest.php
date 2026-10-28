@@ -10,11 +10,13 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests loading of text editors.
  */
 #[Group('editor')]
+#[RunTestsInSeparateProcesses]
 class EditorLoadingTest extends BrowserTestBase {
 
   /**
@@ -305,7 +307,7 @@ class EditorLoadingTest extends BrowserTestBase {
   /**
    * Gets the information to check for the given field.
    */
-  protected function getThingsToCheck($field_name, $type = 'textarea'): array {
+  protected function getThingsToCheck(string $field_name, string $type = 'textarea'): array {
     $settings = $this->getDrupalSettings();
     return [
       // JavaScript settings.

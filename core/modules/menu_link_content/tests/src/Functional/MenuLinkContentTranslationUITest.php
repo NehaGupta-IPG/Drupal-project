@@ -7,17 +7,27 @@ namespace Drupal\Tests\menu_link_content\Functional;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the menu link content translation UI.
  */
 #[Group('Menu')]
+#[RunTestsInSeparateProcesses]
 class MenuLinkContentTranslationUITest extends ContentTranslationUITestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultCacheContexts = ['languages:language_interface', 'session', 'theme', 'url.path', 'url.query_args', 'user.permissions', 'user.roles:authenticated'];
+  protected $defaultCacheContexts = [
+    'languages:language_interface',
+    'session',
+    'theme',
+    'url.path',
+    'url.query_args',
+    'user.permissions',
+    'user.roles:authenticated',
+  ];
 
   /**
    * {@inheritdoc}
@@ -94,17 +104,17 @@ class MenuLinkContentTranslationUITest extends ContentTranslationUITestBase {
     $entityId = $this->createEntity([], 'en');
 
     // Set up the default admin theme to test.
-    $this->container->get('theme_installer')->install(['claro']);
+    $this->container->get('theme_installer')->install(['default_admin']);
     $edit = [];
-    $edit['admin_theme'] = 'claro';
+    $edit['admin_theme'] = 'default_admin';
     $this->drupalGet('admin/appearance');
     $this->submitForm($edit, 'Save configuration');
     // Check that edit uses the admin theme.
     $this->drupalGet('admin/structure/menu/item/' . $entityId . '/edit');
-    $this->assertSession()->responseContains('core/themes/claro/css/base/elements.css');
+    $this->assertSession()->responseContains('core/themes/default_admin/css/base/elements.css');
     // Check that translation uses admin theme as well.
     $this->drupalGet('admin/structure/menu/item/' . $entityId . '/edit/translations');
-    $this->assertSession()->responseContains('core/themes/claro/css/base/elements.css');
+    $this->assertSession()->responseContains('core/themes/default_admin/css/base/elements.css');
   }
 
   /**

@@ -6,17 +6,22 @@ namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests form storage from cached pages.
  */
 #[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class FormStoragePageCacheTest extends BrowserTestBase {
 
   /**
    * @var array
    */
-  protected static $modules = ['form_test'];
+  protected static $modules = [
+    'form_test',
+    'page_cache',
+  ];
 
   /**
    * {@inheritdoc}

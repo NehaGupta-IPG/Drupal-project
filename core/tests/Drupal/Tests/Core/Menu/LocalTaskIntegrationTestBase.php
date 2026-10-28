@@ -4,11 +4,26 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Menu;
 
+use Drupal\Component\Plugin\Factory\FactoryInterface;
+use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\MemoryCache\MemoryCache;
+use Drupal\Component\Datetime\Time;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Lock\NullLockBackend;
+use Drupal\Core\Menu\LocalTaskManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
-use Drupal\Core\Plugin\Discovery\YamlDiscovery;
+use Drupal\Core\Plugin\Discovery\YamlCacheCollectorDiscovery;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Utility\YamlCacheCollector;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 
 /**
  * Defines a base unit test for testing existence of local tasks.
@@ -56,43 +71,37 @@ abstract class LocalTaskIntegrationTestBase extends UnitTestCase {
   /**
    * Sets up the local task manager for the test.
    */
-  protected function getLocalTaskManager($module_dirs, $route_name, $route_params) {
-    $manager = $this
-      ->getMockBuilder('Drupal\Core\Menu\LocalTaskManager')
-      ->disableOriginalConstructor()
-      ->onlyMethods([])
-      ->getMock();
-
-    $argumentResolver = $this->createMock('Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface');
-    $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'argumentResolver');
-    $property->setValue($manager, $argumentResolver);
-
-    // @todo Mock a request with a route.
-    $request_stack = new RequestStack();
-    $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'requestStack');
-    $property->setValue($manager, $request_stack);
-
-    $accessManager = $this->createMock('Drupal\Core\Access\AccessManagerInterface');
-    $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'accessManager');
-    $property->setValue($manager, $accessManager);
-
-    $route_provider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
-    $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'routeProvider');
-    $property->setValue($manager, $route_provider);
-
-    $module_handler = $this->getMockBuilder('Drupal\Core\Extension\ModuleHandlerInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'moduleHandler');
-    $property->setValue($manager, $module_handler);
+  protected function getLocalTaskManager(array $module_dirs, string $route_name, array $route_params): LocalTaskManager {
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
     // Set all the modules as being existent.
-    $module_handler->expects($this->any())
+    $module_handler
       ->method('moduleExists')
-      ->willReturnCallback(function ($module) use ($module_dirs) {
+      ->willReturnCallback(function ($module) use ($module_dirs): bool {
         return isset($module_dirs[$module]);
       });
 
-    $pluginDiscovery = new YamlDiscovery('links.task', $module_dirs);
+    $language = $this->createStub(LanguageInterface::class);
+    $language->method('getId')
+      ->willReturn('en');
+    $language_manager = $this->createStub(LanguageManagerInterface::class);
+    $language_manager->method('getCurrentLanguage')
+      ->willReturn($language);
+
+    $yaml_cache_collector = new YamlCacheCollector('test', new MemoryCache(new Time()), new NullLockBackend(), new Time());
+    $manager = new LocalTaskManager(
+      $this->createStub(ArgumentResolverInterface::class),
+      new RequestStack(),
+      $this->createStub(RouteMatchInterface::class),
+      $this->createStub(RouteProviderInterface::class),
+      $module_handler,
+      $this->createStub(CacheBackendInterface::class),
+      $language_manager,
+      $this->createStub(AccessManagerInterface::class),
+      $this->createStub(AccountInterface::class),
+      $yaml_cache_collector,
+    );
+
+    $pluginDiscovery = new YamlCacheCollectorDiscovery('links.task', $module_dirs, $yaml_cache_collector);
     $pluginDiscovery = new ContainerDerivativeDiscoveryDecorator($pluginDiscovery);
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'discovery');
     $property->setValue($manager, $pluginDiscovery);
@@ -100,16 +109,12 @@ abstract class LocalTaskIntegrationTestBase extends UnitTestCase {
     $method = new \ReflectionMethod('Drupal\Core\Menu\LocalTaskManager', 'alterInfo');
     $method->invoke($manager, 'local_tasks');
 
-    $plugin_stub = $this->createMock('Drupal\Core\Menu\LocalTaskInterface');
-    $factory = $this->createMock('Drupal\Component\Plugin\Factory\FactoryInterface');
-    $factory->expects($this->any())
+    $factory = $this->createStub(FactoryInterface::class);
+    $factory
       ->method('createInstance')
-      ->willReturn($plugin_stub);
+      ->willReturn($this->createStub('Drupal\Core\Menu\LocalTaskInterface'));
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'factory');
     $property->setValue($manager, $factory);
-
-    $cache_backend = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
-    $manager->setCacheBackend($cache_backend, 'local_task.en', ['local_task']);
 
     return $manager;
   }
@@ -124,7 +129,7 @@ abstract class LocalTaskIntegrationTestBase extends UnitTestCase {
    * @param array $route_params
    *   (optional) A list of route parameters used to resolve tasks.
    */
-  protected function assertLocalTasks($route_name, $expected_tasks, $route_params = []) {
+  protected function assertLocalTasks(string $route_name, array $expected_tasks, array $route_params = []): void {
 
     $directory_list = [];
     foreach ($this->directoryList as $key => $value) {

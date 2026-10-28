@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\EventSubscriber;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\EventSubscriber\ModuleRouteSubscriber;
 use Drupal\Core\Routing\RouteBuildEvent;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -21,11 +23,9 @@ use Symfony\Component\Routing\RouteCollection;
 class ModuleRouteSubscriberTest extends UnitTestCase {
 
   /**
-   * The mock module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The module handler.
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
    * {@inheritdoc}
@@ -33,14 +33,14 @@ class ModuleRouteSubscriberTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
 
     $value_map = [
       ['enabled', TRUE],
       ['disabled', FALSE],
     ];
 
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler
       ->method('moduleExists')
       ->willReturnMap($value_map);
   }
@@ -58,7 +58,7 @@ class ModuleRouteSubscriberTest extends UnitTestCase {
    * @legacy-covers ::onAlterRoutes
    */
   #[DataProvider('providerTestRemoveRoute')]
-  public function testRemoveRoute($route_name, array $requirements, $removed): void {
+  public function testRemoveRoute(string $route_name, array $requirements, bool $removed): void {
     $collection = new RouteCollection();
     $route = new Route('', [], $requirements);
     $collection->add($route_name, $route);
@@ -78,7 +78,7 @@ class ModuleRouteSubscriberTest extends UnitTestCase {
   /**
    * Data provider for testRemoveRoute().
    */
-  public static function providerTestRemoveRoute() {
+  public static function providerTestRemoveRoute(): array {
     return [
       ['enabled', ['_module_dependencies' => 'enabled'], FALSE],
       ['disabled', ['_module_dependencies' => 'disabled'], TRUE],

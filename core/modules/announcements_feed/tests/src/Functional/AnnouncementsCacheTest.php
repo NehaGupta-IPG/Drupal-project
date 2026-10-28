@@ -7,11 +7,13 @@ namespace Drupal\Tests\announcements_feed\Functional;
 use Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Defines a class for testing pages are still cacheable with dynamic page cache.
  */
 #[Group('announcements_feed')]
+#[RunTestsInSeparateProcesses]
 final class AnnouncementsCacheTest extends BrowserTestBase {
 
   /**
@@ -26,7 +28,6 @@ final class AnnouncementsCacheTest extends BrowserTestBase {
     'announcements_feed',
     'dynamic_page_cache',
     'node',
-    'toolbar',
   ];
 
   /**
@@ -36,14 +37,12 @@ final class AnnouncementsCacheTest extends BrowserTestBase {
     $node_type = $this->drupalCreateContentType();
     $node = $this->drupalCreateNode(['type' => $node_type->id()]);
     $this->drupalLogin($this->drupalCreateUser([
-      'access toolbar',
       'access announcements',
     ]));
     $this->drupalGet($node->toUrl());
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'MISS');
     // Reload the page, it should be cached now.
     $this->drupalGet($node->toUrl());
-    $this->assertSession()->elementExists('css', '[data-drupal-announce-trigger]');
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
   }
 

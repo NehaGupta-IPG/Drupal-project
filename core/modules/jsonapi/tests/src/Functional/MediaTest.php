@@ -13,11 +13,13 @@ use Drupal\media\Entity\MediaType;
 use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "Media" content entity type.
  */
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class MediaTest extends ResourceTestBase {
 
   use CommonCollectionFilterAccessTestPatternsTrait;
@@ -322,7 +324,7 @@ class MediaTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessMessage($method) {
+  protected function getExpectedUnauthorizedAccessMessage($method): string {
     switch ($method) {
       case 'GET':
         return "The 'view media' permission is required when the media item is published.";
