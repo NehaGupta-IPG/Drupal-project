@@ -43,4 +43,15 @@ class ComposerTest extends UnitTestCase {
     $this->assertEquals($composer_core_json['require']['php'], '>=' . $composer_json['config']['platform']['php'], 'The config.platform.php configured version in the root composer.json file should always be exactly the same as the minimum php version configured in core/composer.json.');
   }
 
+  /**
+   * Ensure that the minimum php version in core/install.php is up to date.
+   *
+   * The installer hardcodes the version because it checks it before the
+   * autoloader and \Drupal are available.
+   */
+  public function testInstallerPhpVersion(): void {
+    $install_php = file_get_contents($this->root . '/core/install.php');
+    $this->assertStringContainsString("version_compare(PHP_VERSION, '" . \Drupal::MINIMUM_PHP . "')", $install_php, 'The minimum php version in core/install.php should always be exactly the same as \Drupal::MINIMUM_PHP.');
+  }
+
 }
