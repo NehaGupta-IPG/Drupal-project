@@ -16,6 +16,7 @@ use Drupal\Core\Extension\Exception\ObsoleteExtensionException;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\Install\InstallInterface;
 use Drupal\Core\Extension\Install\LastRemovedInterface;
+use Drupal\Core\Extension\Install\UninstallInterface;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent;
@@ -608,7 +609,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
 
       // Uninstall the module.
       $this->moduleHandler->loadInclude($module, 'install');
-      $this->invoke($module_filenames[$module], 'uninstall', '', [$sync_status]);
+      $this->invoke($module_filenames[$module], 'uninstall', 'Install/Uninstaller', [$sync_status]);
 
       // Remove all configuration belonging to the module.
       \Drupal::service('config.manager')->uninstall('module', $module);
@@ -902,12 +903,22 @@ class ModuleInstaller implements ModuleInstallerInterface {
         switch ($hook) {
           case 'install':
             if (is_subclass_of($class_name, InstallInterface::class)) {
-              return $class_name::doInstall();
+              /** @var \Drupal\Core\Extension\Install\InstallInterface $class_name */
+              $class_name->doInstall(...$args);
+              return NULL;
+            }
+            break;
+          case 'uninstall':
+            /** @var \Drupal\Core\Extension\Install\UninstallInterface $class_name */
+            if (is_subclass_of($class_name, UninstallInterface::class)) {
+              $class_name->doUninstall(...$args);
+              return NULL;
             }
             break;
           case 'update_last_removed':
             if (is_subclass_of($class_name, LastRemovedInterface::class)) {
-              return $class_name::getLastRemoved();
+              /** @var \Drupal\Core\Extension\Install\LastRemovedInterface $class_name */
+              return $class_name->getLastRemoved();
             }
             break;
         }
