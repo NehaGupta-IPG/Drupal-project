@@ -153,8 +153,17 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
           0 => $create_link_element('generated-relative-url:public://css/file-all?', 'all', $custom_attributes),
         ],
       ],
-      // 31 file CSS assets: expect 31 link elements.
+      // Single file CSS asset with custom attributes and rel preload.
       3 => [
+        [
+          0 => ['group' => 0, 'type' => 'file', 'media' => 'all', 'preprocess' => TRUE, 'data' => 'public://css/file-all', 'attributes' => ['rel' => 'preload', 'as' => 'style'] + $custom_attributes],
+        ],
+        [
+          0 => $create_link_element('generated-relative-url:public://css/file-all' . '?', 'all', ['rel' => 'preload', 'as' => 'style'] + $custom_attributes),
+        ],
+      ],
+      // 31 file CSS assets: expect 31 link elements.
+      4 => [
         [
           0 => $create_file_css_asset('public://css/1.css'),
           1 => $create_file_css_asset('public://css/2.css'),
@@ -224,7 +233,7 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
       ],
       // 32 file CSS assets with the same properties, except for the 10th and
       // 20th files, they have different 'media' properties.
-      4 => [
+      5 => [
         [
           0 => $create_file_css_asset('public://css/1.css'),
           1 => $create_file_css_asset('public://css/2.css'),

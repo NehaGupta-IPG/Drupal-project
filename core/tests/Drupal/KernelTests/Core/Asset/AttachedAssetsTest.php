@@ -93,6 +93,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $css = $this->assetResolver->getCssAssets($assets, FALSE, \Drupal::languageManager()->getCurrentLanguage());
     $js = $this->assetResolver->getJsAssets($assets, FALSE, \Drupal::languageManager()->getCurrentLanguage())[1];
     $this->assertArrayHasKey('core/modules/system/tests/modules/common_test/bar.css', $css);
+    $this->assertArrayHasKey('core/modules/system/tests/modules/common_test/preload.css', $css);
     $this->assertArrayHasKey('core/modules/system/tests/modules/common_test/foo.js', $js);
 
     $css_render_array = \Drupal::service('asset.css.collection_renderer')->render($css);
@@ -101,6 +102,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
     $query_string = $this->container->get('asset.query_string')->get();
     $this->assertStringContainsString('<link rel="stylesheet" media="all" href="' . $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/bar.css') . '?' . $query_string . '" />', $rendered_css, 'Rendering an external CSS file.');
+    $this->assertStringContainsString('<link rel="preload" media="all" href="' . $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/preload.css') . '?' . $query_string . '" as="style" />', $rendered_css, 'Rendering an external CSS file.');
     $this->assertStringContainsString('<script src="' . $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/foo.js') . '?' . $query_string . '"></script>', $rendered_js, 'Rendering an external JavaScript file.');
   }
 

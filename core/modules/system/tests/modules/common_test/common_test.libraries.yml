@@ -10,6 +10,7 @@ files:
   css:
     theme:
       bar.css: {}
+      preload.css: { attributes: { rel: preload, as: style } }
 
 # Library to test CSS and JS file assets excluded from aggregation.
 no-preprocess:
