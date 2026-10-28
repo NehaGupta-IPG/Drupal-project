@@ -933,7 +933,11 @@ class ModuleInstaller implements ModuleInstallerInterface {
     }
 
     $function = $extension->getName() . '_' . $hook;
-    return function_exists($function) ? $function(... $args) : NULL;
+    if (function_exists($function)) {
+      @trigger_error("Procedural hook_{$hook}() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use the class replacements instead. See https://www.drupal.org/node/3633696', E_USER_DEPRECATED);
+      return $function(...$args);
+    }
+    return NULL;
   }
 
 }
