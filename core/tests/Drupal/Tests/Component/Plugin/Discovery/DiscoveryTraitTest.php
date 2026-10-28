@@ -118,6 +118,16 @@ class DiscoveryTraitTest extends TestCase {
   }
 
   /**
+   * Tests getDefinition() with a null plugin ID.
+   */
+  public function testGetDefinitionNullPluginId(): void {
+    $trait = new DiscoveryTraitMockableClass();
+    $this->assertNull($trait->getDefinition(NULL, FALSE));
+    $this->expectException(PluginNotFoundException::class);
+    $trait->getDefinition(NULL, TRUE);
+  }
+
+  /**
    * Data provider for testHasDefinition().
    *
    * @return array
