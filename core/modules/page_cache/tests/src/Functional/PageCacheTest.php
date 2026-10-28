@@ -141,21 +141,13 @@ class PageCacheTest extends BrowserTestBase {
     $this->assertSession()->responseContains('<p>oh hai this is html.</p>');
 
     $this->drupalGet($accept_header_cache_url_with_json);
-    // Verify that JSON response was not yet cached.
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
-    $this->drupalGet($accept_header_cache_url_with_json);
-    // Verify that JSON response was cached.
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
-    // Verify that the correct JSON response was returned.
+    // Verify that JSON response are not cached.
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'UNCACHEABLE (request policy)');
     $this->assertSession()->responseContains('{"content":"oh hai this is json"}');
 
     $this->drupalGet($accept_header_cache_url_with_ajax);
-    // Verify that AJAX response was not yet cached.
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
-    $this->drupalGet($accept_header_cache_url_with_ajax);
-    // Verify that AJAX response was cached.
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
-    // Verify that the correct AJAX response was returned.
+    // Verify that AJAX response are not yet cached.
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'UNCACHEABLE (request policy)');
     $this->assertSession()->responseContains('{"content":"oh hai this is ajax"}');
   }
 

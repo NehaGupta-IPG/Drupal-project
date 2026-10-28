@@ -80,8 +80,9 @@ class PageCache implements HttpKernelInterface {
    * {@inheritdoc}
    */
   public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = TRUE): Response {
-    // Only allow page caching on master request.
-    if ($type === static::MAIN_REQUEST && $this->requestPolicy->check($request) === RequestPolicyInterface::ALLOW) {
+    // Only allow page caching on master request when there are no query
+    // parameters.
+    if ($type === static::MAIN_REQUEST && $request->query->all() === [] && $this->requestPolicy->check($request) === RequestPolicyInterface::ALLOW) {
       $response = $this->lookup($request, $type, $catch);
     }
     else {
