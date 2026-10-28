@@ -3170,6 +3170,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/ImportStorageTransformer.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Command\\\\ConfigExportCommand\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Command/ConfigExportCommand.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Importer\\\\ConfigImporterBatch\\:\\:finish\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3875,12 +3881,6 @@ $ignoreErrors[] = [
 	'message' => '#^Variable \\$container might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$container_definition might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
 ];
 $ignoreErrors[] = [
@@ -14482,12 +14482,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/filter/src/Form/FilterDisableForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$logger of static method Drupal\\\\Core\\\\Utility\\\\Error\\:\\:logException\\(\\) expects Psr\\\\Log\\\\LoggerInterface, string given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/EntityLinks.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\filter\\\\Plugin\\\\Filter\\\\FilterHtml\\:\\:filterElementAttributes\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17640,12 +17634,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media/src/Controller/OEmbedIframeController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\media\\\\Entity\\\\Media\\:\\:getRequestTime\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Entity/Media.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\media\\\\Entity\\\\Media\\:\\:postSave\\(\\) has no return type specified\\.$#',
@@ -22144,10 +22132,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/default_format_test/src/DefaultFormatTestController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to deprecated function deprecation_test_function\\(\\)\\:
+	'message' => '#^Call to deprecated method testDeprecation\\(\\) of class Drupal\\\\deprecation_test\\\\DeprecatedController\\:
 in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
-  the deprecation message for deprecated_test_function\\(\\)\\.$#',
-	'identifier' => 'function.deprecated',
+  the deprecation message for testDeprecation\\(\\)\\.$#',
+	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/deprecation_test/src/DeprecatedController.php',
 ];
