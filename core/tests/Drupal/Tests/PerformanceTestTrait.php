@@ -32,7 +32,7 @@ trait PerformanceTestTrait {
    *
    * @var list<string>
    */
-  protected array $excludedAssetsPaths = [];
+  protected array $excludedAssetsPathRegexps = [];
 
   /**
    * Helper for ::setUp().
@@ -904,7 +904,7 @@ trait PerformanceTestTrait {
    */
   private function getBytesSize(string $url, bool $strip_base_path = FALSE): int {
     if (array_any(
-      $this->excludedAssetsPaths,
+      $this->excludedAssetsPathRegexps,
       fn(string $pattern): bool => preg_match($pattern, $url) === 1,
     )) {
       return 0;
