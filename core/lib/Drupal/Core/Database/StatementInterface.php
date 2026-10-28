@@ -151,11 +151,14 @@ interface StatementInterface extends \Traversable {
    * @param array|null $constructor_arguments
    *   (Optional) If $mode is FetchAs::ClassObject, the arguments to pass to
    *   the constructor.
+   * @param \Drupal\Core\Database\Statement\FetchAs|null $additional_mode
+   *   (Optional) Specifies additional fetch preferences that can be combined
+   *   with the primary fetch mode using the bitwise OR operator (|).
    *
    * @return array
    *   An array of results.
    */
-  public function fetchAll(?FetchAs $mode = NULL, ?int $column_index = NULL, ?array $constructor_arguments = NULL);
+  public function fetchAll(?FetchAs $mode = NULL, ?int $column_index = NULL, ?array $constructor_arguments = NULL, ?FetchAs $additional_mode = NULL);
 
   /**
    * Returns an entire single column of a result set as an indexed array.

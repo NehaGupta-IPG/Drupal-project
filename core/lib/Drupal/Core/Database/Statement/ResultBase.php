@@ -70,7 +70,7 @@ abstract class ResultBase {
    *
    * @param \Drupal\Core\Database\Statement\FetchAs $mode
    *   One of the cases of the FetchAs enum.
-   * @param array{class?: class-string, constructor_args?: list<mixed>, column?: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
+   * @param array{class?: class-string, constructor_args?: list<mixed>, column?: int, cursor_orientation?: int, cursor_offset?: int, additional_mode?: FetchAs} $fetchOptions
    *   An array of fetch options.
    *
    * @return array

@@ -295,13 +295,16 @@ abstract class StatementBase implements \Iterator, StatementInterface {
   /**
    * {@inheritdoc}
    */
-  public function fetchAll(?FetchAs $mode = NULL, ?int $columnIndex = NULL, ?array $constructorArguments = NULL) {
+  public function fetchAll(?FetchAs $mode = NULL, ?int $columnIndex = NULL, ?array $constructorArguments = NULL, ?FetchAs $additionalMode = NULL) {
     $fetchMode = $mode ?? $this->fetchMode;
     if (isset($columnIndex)) {
       $this->fetchOptions['column'] = $columnIndex;
     }
     if (isset($constructorArguments)) {
       $this->fetchOptions['constructor_args'] = $constructorArguments;
+    }
+    if (isset($additionalMode)) {
+      $this->fetchOptions['additional_mode'] = $additionalMode;
     }
 
     $return = $this->result->fetchAll($fetchMode, $this->fetchOptions);

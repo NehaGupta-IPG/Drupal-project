@@ -28,4 +28,7 @@ enum FetchAs {
   // Returns a single column from the next row of a result set.
   case Column;
 
+  // Group return by values.
+  case Group;
+
 }

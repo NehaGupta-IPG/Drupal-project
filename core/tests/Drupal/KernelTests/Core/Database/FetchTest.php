@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\RowCountException;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\StatementInterface;
+use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Tests\system\Functional\Database\FakeRecord;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -169,6 +170,68 @@ class FetchTest extends DatabaseTestBase {
 
     $expected_result = ['George', 'John', 'Paul', 'Ringo'];
     $this->assertEquals($expected_result, $query_result, 'Returned the correct result.');
+  }
+
+  /**
+   * Confirms that FetchAs::Column can be combined with FetchAs::Group.
+   */
+  public function testQueryFetchAllColumnGroup(): void {
+    $query = $this->connection->select('test');
+    $query->addField('test', 'job');
+    $query->orderBy('job');
+    $statement = $query->execute();
+    $this->skipUnlessPdoResultBackedStatement($statement);
+    $query_result = $statement->fetchAll(FetchAs::Column, additionalMode: FetchAs::Group);
+
+    $expected_result = [
+      'Drummer' => ['Drummer'],
+      'Singer' => ['Singer', 'Singer'],
+      'Songwriter' => ['Songwriter'],
+    ];
+    $this->assertEquals($expected_result, $query_result, 'Returned the correct grouped result.');
+  }
+
+  /**
+   * Confirms that FetchAs::Associative can be combined with FetchAs::Group.
+   */
+  public function testQueryFetchAllAssocGroup(): void {
+    $query = $this->connection->select('test');
+    $query->addField('test', 'job');
+    $query->addField('test', 'name');
+    $query->orderBy('job');
+    $query->orderBy('name');
+    $statement = $query->execute();
+    $this->skipUnlessPdoResultBackedStatement($statement);
+    $query_result = $statement->fetchAll(FetchAs::Associative, additionalMode: FetchAs::Group);
+
+    $expected_result = [
+      'Drummer' => [['name' => 'Ringo']],
+      'Singer' => [['name' => 'George'], ['name' => 'John']],
+      'Songwriter' => [['name' => 'Paul']],
+    ];
+    $this->assertEquals($expected_result, $query_result, 'Returned the correct grouped result.');
+  }
+
+  /**
+   * Skips the test unless the statement routes fetchAll() through PdoResult.
+   *
+   * FetchAs::Group as an additional fetch mode relies on
+   * \Drupal\Core\Database\Statement\PdoTrait::clientFetchAll(), which is only
+   * reached when the statement's result object is a
+   * \Drupal\Core\Database\Statement\PdoResult, i.e. when the statement class
+   * is \Drupal\Core\Database\StatementWrapperIterator (core's "mysql" PDO and
+   * "pgsql" drivers). Other statement classes use
+   * \Drupal\Core\Database\Statement\ResultBase::fetchAll() instead (for
+   * example \Drupal\Core\Database\StatementPrefetchIterator, used by
+   * "sqlite", and mysqli's own Result class), which has no grouping logic at
+   * all, so the combination silently returns ungrouped data.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3546916
+   */
+  protected function skipUnlessPdoResultBackedStatement(StatementInterface $statement): void {
+    if (!$statement instanceof StatementWrapperIterator) {
+      $this->markTestSkipped('FetchAs::Group as an additional fetch mode is only supported by statements backed by \Drupal\Core\Database\Statement\PdoResult.');
+    }
   }
 
   /**

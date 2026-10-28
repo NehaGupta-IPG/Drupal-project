@@ -81,7 +81,7 @@ class PdoResult extends ResultBase {
         $fetchOptions['constructor_args'] ?? NULL,
       ],
       default => [],
-    });
+    }, additionalMode: $fetchOptions['additional_mode'] ?? NULL);
   }
 
 }
