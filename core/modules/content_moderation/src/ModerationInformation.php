@@ -218,7 +218,7 @@ class ModerationInformation implements ModerationInformationInterface {
       /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
       $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
       /** @var \Drupal\Core\Entity\ContentEntityInterface $original_entity */
-      $original_entity = $storage->loadRevision($entity->getLoadedRevisionId());
+      $original_entity = $storage->loadRevisionUnchanged($entity->getLoadedRevisionId());
       if (!$entity->isDefaultTranslation() && $original_entity->hasTranslation($entity->language()->getId())) {
         $original_entity = $original_entity->getTranslation($entity->language()->getId());
       }
