@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\filter\Plugin\Filter\FilterNull;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use Drupal\Component\Utility\Xss;
 
 /**
  * Provides a base form for a filter format.
@@ -235,6 +236,13 @@ abstract class FilterFormatFormBase extends EntityForm {
       foreach ($form_state->getValue('roles') as $rid => $enabled) {
         Role::loadOverrideFree($rid)->changePermissions([$permission => $enabled])->save();
       }
+    }
+
+    // Display warning for insecure HTML tags.
+    $allowed_html = $form_state->getValue('filters')['filter_html']['settings']['allowed_html'];
+    $xss_filtered_html = Xss::filterAdmin($allowed_html);
+    if (strcasecmp($allowed_html, $xss_filtered_html)) {
+      $this->messenger()->addWarning($this->t('You have insecure HTML tags in your filter format. Review documentation on <a href="@link">configuring text formats for security</a>.', ['@link' => 'https://www.drupal.org/node/224921']));
     }
 
     return $this->entity;
