@@ -342,8 +342,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $entity_id = $entity->id();
     // Some entity types are not stored, hence they cannot be reloaded.
     if ($entity_id !== NULL) {
-      $reloaded_entity = $this->entityLoadUnchanged($entity_id);
-      $entity = $reloaded_entity;
+      $entity = $this->entityStorage->loadUnchanged($entity_id);
       // Set a default value on the fields.
       $entity->set('field_rest_test', ['value' => 'All the faith he had had had had no effect on the outcome of his life.']);
       $entity->set('field_jsonapi_test_entity_ref', ['user' => $account->id()]);
@@ -2143,7 +2142,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertFalse($response->hasHeader('X-Drupal-Cache'));
     // If the entity is stored, perform extra checks.
     if (get_class($this->entityStorage) !== ContentEntityNullStorage::class) {
-      $created_entity = $this->entityLoadUnchanged(static::$firstCreatedEntityId);
+      $created_entity = $this->entityStorage->loadUnchanged(static::$firstCreatedEntityId);
       $uuid = $created_entity->uuid();
       // @todo Remove line below in favor of commented line in https://www.drupal.org/project/drupal/issues/2878463.
       $location = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $uuid]);
@@ -2250,7 +2249,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->markTestSkipped('PATCHing config entities is not yet supported.');
     }
 
-    $prior_revision_id = (int) $this->entityLoadUnchanged($this->entity->id())->getRevisionId();
+    $prior_revision_id = (int) $this->entityStorage->loadUnchanged($this->entity->id())->getRevisionId();
 
     // Patch testing requires that another entity of the same type exists.
     $this->anotherEntity = $this->createAnotherEntity('dupe');
@@ -2391,7 +2390,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $request_options[RequestOptions::BODY] = Json::encode($valid_request_body);
     $response = $this->request('PATCH', $url, $request_options);
     $this->assertResourceResponse(200, FALSE, $response);
-    $updated_entity = $this->entityLoadUnchanged($this->entity->id());
+    $updated_entity = $this->entityStorage->loadUnchanged($this->entity->id());
     $this->assertSame(static::$newRevisionsShouldBeAutomatic, $prior_revision_id < (int) $updated_entity->getRevisionId());
     $prior_revision_id = (int) $updated_entity->getRevisionId();
 
@@ -2410,7 +2409,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertFalse($response->hasHeader('X-Drupal-Cache'));
     // Assert that the entity was indeed updated, and that the response body
     // contains the serialized updated entity.
-    $updated_entity = $this->entityLoadUnchanged($this->entity->id());
+    $updated_entity = $this->entityStorage->loadUnchanged($this->entity->id());
     $this->assertSame(static::$newRevisionsShouldBeAutomatic, $prior_revision_id < (int) $updated_entity->getRevisionId());
     if ($this->entity instanceof RevisionLogInterface) {
       if (static::$newRevisionsShouldBeAutomatic) {
@@ -2460,7 +2459,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $request_options[RequestOptions::BODY] = Json::encode($doc_remove_item);
     $response = $this->request('PATCH', $url, $request_options);
     $this->assertResourceResponse(200, FALSE, $response);
-    $updated_entity = $this->entityLoadUnchanged($this->entity->id());
+    $updated_entity = $this->entityStorage->loadUnchanged($this->entity->id());
     $this->assertSame([0 => ['value' => 'Two']], $updated_entity->get('field_rest_test_multivalue')->getValue());
     $this->assertSame(static::$newRevisionsShouldBeAutomatic, $prior_revision_id < (int) $updated_entity->getRevisionId());
     $prior_revision_id = (int) $updated_entity->getRevisionId();
@@ -2476,7 +2475,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       1 => ['value' => 'Two'],
       2 => ['value' => 'Three'],
     ];
-    $updated_entity = $this->entityLoadUnchanged($this->entity->id());
+    $updated_entity = $this->entityStorage->loadUnchanged($this->entity->id());
     $this->assertSame($expected_document, $updated_entity->get('field_rest_test_multivalue')->getValue());
     $this->assertSame(static::$newRevisionsShouldBeAutomatic, $prior_revision_id < (int) $updated_entity->getRevisionId());
     $prior_revision_id = (int) $updated_entity->getRevisionId();
@@ -2508,7 +2507,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       1 => ['value' => 'Two'],
       2 => ['value' => '3'],
     ];
-    $updated_entity = $this->entityLoadUnchanged($this->entity->id());
+    $updated_entity = $this->entityStorage->loadUnchanged($this->entity->id());
     $this->assertSame($expected_document, $updated_entity->get('field_rest_test_multivalue')->getValue());
     if ($this->entity->getEntityType()->hasHandlerClass('moderation')) {
       $this->assertLessThan((int) $updated_entity->getRevisionId(), $prior_revision_id);
@@ -2875,7 +2874,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     ])->setLabel('Revisionable text field')->setTranslatable(FALSE)->save();
 
     // Reload entity so that it has the new field.
-    $entity = $this->entityLoadUnchanged($this->entity->id());
+    $entity = $this->entityStorage->loadUnchanged($this->entity->id());
 
     // Set up test data.
     /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
@@ -3591,23 +3590,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // Always grant access to 'view' the test entity reference field.
     $flattened_permissions[] = 'field_jsonapi_test_entity_ref view access';
     $this->grantPermissionsToTestedRole($flattened_permissions);
-  }
-
-  /**
-   * Loads an entity in the test container, ignoring the static cache.
-   *
-   * @param int $id
-   *   The entity ID.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface|null
-   *   The loaded entity.
-   *
-   * @todo Remove this after https://www.drupal.org/project/drupal/issues/3038706 lands.
-   */
-  protected function entityLoadUnchanged($id) {
-    $entity_storage = \Drupal::service('entity_type.manager')->getStorage(static::$entityTypeId);
-    $entity_storage->resetCache();
-    return $entity_storage->loadUnchanged($id);
   }
 
   /**
