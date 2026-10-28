@@ -2,7 +2,7 @@
 
 namespace Drupal\Core\Extension\Install;
 
-use Drupal\Core\Database\Schema;
+use Drupal\Core\Database\SchemaDefinition\Schema;
 
 /**
  * Method for identifying the data.base schema for a module or profile.
