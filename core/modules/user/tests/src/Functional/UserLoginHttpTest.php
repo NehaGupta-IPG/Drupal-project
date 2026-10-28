@@ -114,6 +114,34 @@ class UserLoginHttpTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that non-string credential values return a 400 response.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3591991
+   */
+  public function testLoginNonStringCredentials(): void {
+    $url = Url::fromRoute('user.login.http')
+      ->setRouteParameter('_format', 'json')
+      ->setAbsolute()
+      ->toString();
+
+    $response = \Drupal::httpClient()->post($url, [
+      'body' => json_encode(['name' => [1, 2, 3], 'pass' => 'secret']),
+      'headers' => ['Accept' => 'application/json'],
+      'http_errors' => FALSE,
+      'cookies' => $this->cookies,
+    ]);
+    $this->assertHttpResponseWithMessage($response, 400, 'credentials.name must be a string.');
+
+    $response = \Drupal::httpClient()->post($url, [
+      'body' => json_encode(['name' => 'username', 'pass' => 123]),
+      'headers' => ['Accept' => 'application/json'],
+      'http_errors' => FALSE,
+      'cookies' => $this->cookies,
+    ]);
+    $this->assertHttpResponseWithMessage($response, 400, 'credentials.pass must be a string.');
+  }
+
+  /**
    * Do login testing for a given serialization format.
    *
    * @param string $format
