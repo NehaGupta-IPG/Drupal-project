@@ -610,6 +610,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
 
       // Uninstall the module.
       $this->moduleHandler->loadInclude($module, 'install');
+      if (!isset($module_filenames[$module])) {
+        $module_path = \Drupal::service('extension.list.module')
+          ->getPath($module);
+        $pathname = "$module_path/$module.info.yml";
+        $filename = file_exists($module_path . "/$module.module") ? "$module.module" : NULL;
+        $module_filenames[$module] = new Extension($this->root, 'module', $pathname, $filename);
+      }
       $this->invoke($module_filenames[$module], 'uninstall', 'Install/Uninstaller', [$sync_status]);
 
       // Remove all configuration belonging to the module.
