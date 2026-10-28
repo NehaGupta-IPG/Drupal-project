@@ -8,6 +8,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,6 +19,20 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterface {
 
   use AssetGroupSetHashTrait;
+
+  /**
+   * An asset dumper.
+   *
+   * @var \Drupal\Core\Asset\AssetDumper
+   */
+  protected $dumper;
+
+  /**
+   * The state key/value store.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  protected $state;
 
   /**
    * Constructs a CssCollectionOptimizerLazy.
@@ -54,7 +69,11 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
     protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
     protected readonly TimeInterface $time,
     protected readonly LanguageManagerInterface $languageManager,
-  ) {}
+    AssetDumperInterface $dumper,
+    StateInterface $state
+  ) {
+    $this->dumper = $dumper;
+    $this->state = $state;}
 
   /**
    * {@inheritdoc}
@@ -89,7 +108,49 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
           // we must know the entire set of libraries used to generate all CSS
           // groups, whether or not files in a group are from a particular
           // library or not.
-          $css_assets[$order]['preprocessed'] = TRUE;
+          $key = $this->generateHash($css_group);
+            $uri = '';
+            if (isset($map[$key])) {
+              $uri = $map[$key];
+            }
+            if (empty($uri) || !file_exists($uri)) {
+              // Optimize each asset within the group.
+              $data = '';
+              $current_license = FALSE;
+              foreach ($css_group['items'] as $css_asset) {
+                // Ensure license information is available as a comment after
+                // optimization.
+                if ($css_asset['license'] !== $current_license) {
+                  $data .= "/* @license " . $css_asset['license']['name'] . " " . $css_asset['license']['url'] . " */\n";
+                }
+                $current_license = $css_asset['license'];
+                $data .= $this->optimizer->optimize($css_asset);
+              }
+              // Per the W3C specification at
+              // http://www.w3.org/TR/REC-CSS2/cascade.html#at-import, @import
+              // rules must precede any other style, so we move those to the
+              // top. The regular expression is expressed in NOWDOC since it is
+              // detecting backslashes as well as single and double quotes. It
+              // is difficult to read when represented as a quoted string.
+              $regexp = <<<'REGEXP'
+/@import\s*(?:'(?:\\'|.)*'|"(?:\\"|.)*"|url\(\s*(?:\\[\)\'\"]|[^'")])*\s*\)|url\(\s*'(?:\'|.)*'\s*\)|url\(\s*"(?:\"|.)*"\s*\)).*;/iU
+REGEXP;
+              preg_match_all($regexp, $data, $matches);
+              $data = preg_replace($regexp, '', $data);
+              $data = implode('', $matches[0]) . (!empty($matches[0]) ? "\n" : '') . $data;
+              // Dump the optimized CSS for this group into an aggregate file.
+              $uri = $this->dumper->dump($data, 'css');
+              // Set the URI for this group's aggregate file.
+              $css_assets[$order]['data'] = $uri;
+              // Persist the URI for this aggregate file.
+              $map[$key] = $uri;
+              $this->state->set('drupal_css_cache_files', $map);
+            }
+            else {
+              // Use the persisted URI for the optimized CSS file.
+              $css_assets[$order]['data'] = $uri;
+            }
+            $css_assets[$order]['preprocessed'] = TRUE;
         }
       }
       if ($css_group['type'] === 'external') {
@@ -111,18 +172,6 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
     $already_loaded = isset($ajax_page_state['libraries']) ? explode(',', $ajax_page_state['libraries']) : [];
     if ($already_loaded) {
       $query_args['exclude'] = UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($already_loaded)));
-    }
-
-    // Generate a URL for each group of assets, but do not process them inline,
-    // this is done using optimizeGroup() when the asset path is requested.
-    foreach ($css_assets as $order => $css_asset) {
-      if (!empty($css_asset['preprocessed'])) {
-        $query = ['delta' => "$order"] + $query_args;
-        $filename = 'css_' . $this->generateHash($css_asset) . '.css';
-        $uri = 'assets://css/' . $filename;
-        $css_assets[$order]['data'] = $this->fileUrlGenerator->generateString($uri) . '?' . UrlHelper::buildQuery($query);
-      }
-      unset($css_assets[$order]['items']);
     }
 
     return $css_assets;
