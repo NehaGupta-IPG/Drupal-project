@@ -454,7 +454,9 @@
           });
 
           const isOffCanvas = element.closest('#drupal-off-canvas');
-          const isInsideTabledrag = element.closest('table.draggable-table');
+          const isInsideTabledrag = element.closest(
+            'table.draggable-table, table.field-multiple-table',
+          );
 
           if (isOffCanvas) {
             offCanvasCss(element);

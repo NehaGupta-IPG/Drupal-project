@@ -43,3 +43,7 @@
     flex-wrap: wrap;
   }
 }
+
+table.field-multiple-table td.has-multiple-fields-remove-button {
+  max-width: 0 !important;
+}
