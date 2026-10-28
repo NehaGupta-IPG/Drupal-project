@@ -642,7 +642,7 @@ class FormState implements FormStateInterface {
    * {@inheritdoc}
    */
   public function isMethodType($method_type) {
-    return $this->method === strtoupper($method_type);
+    return strtoupper($this->method) === strtoupper($method_type);
   }
 
   /**

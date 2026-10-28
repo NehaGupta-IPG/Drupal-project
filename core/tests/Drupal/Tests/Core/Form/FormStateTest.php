@@ -325,6 +325,10 @@ class FormStateTest extends UnitTestCase {
     $form_state = (new FormState())
       ->setMethod($set_method_type);
     $this->assertSame($expected, $form_state->isMethodType($input));
+
+    // Verifying output while using setFormState method.
+    $form_state->setFormState(['method' => $set_method_type]);
+    $this->assertSame($expected, $form_state->isMethodType($input));
   }
 
   /**
