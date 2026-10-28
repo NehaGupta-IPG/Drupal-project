@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\views\Tests\ViewTestData;
@@ -27,6 +29,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
   protected static $modules = [
     'node',
     'views',
+    'taxonomy',
     'views_test_modal',
     'user_test_views',
   ];
@@ -271,6 +274,143 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $this->submitForm(['uid' => $name], 'Apply');
     $this->assertSession()->waitForElement('css', 'div[aria-label="Error message"]');
     $this->assertSession()->pageTextContainsOnce(sprintf('There are no users matching "%s"', $name));
+  }
+
+  /**
+   * Tests that multi-select exposed filters properly replace URL parameters.
+   *
+   * This test validates that when changing selections in a multi-select
+   * exposed filter (like taxonomy entity reference), old URL array parameters
+   * are properly removed and replaced with new ones, rather than accumulating.
+   */
+  public function testMultiSelectExposedFilterUrlParameters(): void {
+    // Create a taxonomy vocabulary.
+    $vocabulary = Vocabulary::create([
+      'name' => 'Tags',
+      'vid' => 'tags',
+    ]);
+    $vocabulary->save();
+
+    // Create taxonomy terms.
+    $term1 = Term::create([
+      'name' => 'Term 1',
+      'vid' => 'tags',
+    ]);
+    $term1->save();
+
+    $term2 = Term::create([
+      'name' => 'Term 2',
+      'vid' => 'tags',
+    ]);
+    $term2->save();
+
+    // Add taxonomy reference field to the page content type.
+    $field_storage = \Drupal::entityTypeManager()
+      ->getStorage('field_storage_config')
+      ->create([
+        'field_name' => 'field_tags',
+        'entity_type' => 'node',
+        'type' => 'entity_reference',
+        'settings' => [
+          'target_type' => 'taxonomy_term',
+        ],
+      ]);
+    $field_storage->save();
+
+    $field = \Drupal::entityTypeManager()
+      ->getStorage('field_config')
+      ->create([
+        'field_storage' => $field_storage,
+        'bundle' => 'page',
+        'label' => 'Tags',
+        'settings' => [
+          'handler' => 'default:taxonomy_term',
+          'handler_settings' => [
+            'target_bundles' => ['tags' => 'tags'],
+          ],
+        ],
+      ]);
+    $field->save();
+
+    // Create nodes with different tags.
+    $this->createNode([
+      'title' => 'Node with Term 1',
+      'type' => 'page',
+      'field_tags' => [$term1->id()],
+    ]);
+
+    $this->createNode([
+      'title' => 'Node with Term 2',
+      'type' => 'page',
+      'field_tags' => [$term2->id()],
+    ]);
+
+    // Add exposed taxonomy filter to the admin/content view.
+    $view = \Drupal::service('entity_type.manager')->getStorage('view')->load('content');
+    $display = &$view->getDisplay('default');
+    $display['display_options']['filters']['field_tags_target_id'] = [
+      'id' => 'field_tags_target_id',
+      'table' => 'node__field_tags',
+      'field' => 'field_tags_target_id',
+      'relationship' => 'none',
+      'exposed' => TRUE,
+      'expose' => [
+        'identifier' => 'field_tags_target_id',
+        'label' => 'Tags',
+        'multiple' => TRUE,
+      ],
+      'type' => 'select',
+      'vid' => 'tags',
+      'plugin_id' => 'taxonomy_index_tid',
+    ];
+    $view->save();
+
+    // Need admin permission to see taxonomy filter.
+    $user = $this->drupalCreateUser([
+      'access content overview',
+      'administer nodes',
+      'administer taxonomy',
+    ]);
+    $this->drupalLogin($user);
+
+    $this->drupalGet('admin/content');
+    $session = $this->getSession();
+
+    // Ensure both nodes are initially visible.
+    $this->assertSession()->pageTextContains('Node with Term 1');
+    $this->assertSession()->pageTextContains('Node with Term 2');
+    $this->assertSession()->addressEquals('admin/content');
+
+    // Select Term 1 and apply filter.
+    $page = $session->getPage();
+    $page->selectFieldOption('field_tags_target_id[]', $term1->id());
+    $page->pressButton('Filter');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+
+    // Verify only Node with Term 1 is visible and URL has correct parameter.
+    $this->assertSession()->pageTextContains('Node with Term 1');
+    $this->assertSession()->pageTextNotContains('Node with Term 2');
+    $current_url = $this->getSession()->getCurrentUrl();
+    $this->assertStringContainsString('field_tags_target_id', $current_url);
+    $this->assertStringContainsString((string) $term1->id(), $current_url);
+
+    // Now change selection: deselect Term 1 and select Term 2.
+    $page->selectFieldOption('field_tags_target_id[]', $term2->id());
+    $page->pressButton('Filter');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+
+    // Verify only Node with Term 2 is visible.
+    $this->assertSession()->pageTextContains('Node with Term 2');
+    $this->assertSession()->pageTextNotContains('Node with Term 1');
+
+    // Critical assertion: URL should only contain Term 2 parameter, not Term 1.
+    // This is the bug fix validation - without the fix, both term IDs would
+    // appear in the URL.
+    $current_url = $this->getSession()->getCurrentUrl();
+    $this->assertStringContainsString('field_tags_target_id', $current_url);
+    $this->assertStringContainsString((string) $term2->id(), $current_url);
+    // This assertion would fail without the fix.
+    $this->assertStringNotContainsString((string) $term1->id(), $current_url);
   }
 
 }
