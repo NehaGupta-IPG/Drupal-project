@@ -38,6 +38,7 @@ use Drupal\system\MenuStorage;
     'description',
     'locked',
   ],
+  langcode_configurable: TRUE,
 )]
 class Menu extends ConfigEntityBase implements MenuInterface {
 

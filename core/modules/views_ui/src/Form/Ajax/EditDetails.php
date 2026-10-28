@@ -31,6 +31,11 @@ class EditDetails extends ViewsFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $view = $form_state->get('view');
+    $show_langcode = TRUE;
+
+    if (\Drupal::moduleHandler()->moduleExists('language')) {
+      $show_langcode = \Drupal::service('language.config_entity_langcode_config')->showLangcode('view');
+    }
 
     $form['#title'] = $this->t('Name and description');
     $form['#section'] = 'details';
@@ -44,12 +49,14 @@ class EditDetails extends ViewsFormBase {
       '#title' => $this->t('Administrative name'),
       '#default_value' => $view->label(),
     ];
-    $form['details']['langcode'] = [
-      '#type' => 'language_select',
-      '#title' => $this->t('View language'),
-      '#description' => $this->t('Language of labels and other textual elements in this view.'),
-      '#default_value' => $view->get('langcode'),
-    ];
+    if ($show_langcode) {
+      $form['details']['langcode'] = [
+        '#type' => 'language_select',
+        '#title' => $this->t('View language'),
+        '#description' => $this->t('Language of labels and other textual elements in this view.'),
+        '#default_value' => $view->get('langcode'),
+      ];
+    }
     $form['details']['description'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Administrative description'),

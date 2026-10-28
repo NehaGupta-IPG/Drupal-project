@@ -26,3 +26,6 @@ services:
     class: Drupal\language\LanguageConverter
     tags:
       - { name: paramconverter }
+  language.config_entity_langcode_config:
+    class: Drupal\language\ConfigEntityLangcodeConfig
+  Drupal\language\ConfigEntityLangcodeConfig: '@language.config_entity_langcode_config'

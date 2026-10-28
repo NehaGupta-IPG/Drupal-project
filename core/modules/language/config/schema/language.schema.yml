@@ -152,6 +152,16 @@ language.content_settings.*.*:
       type: boolean
       label: 'Allow to alter the language'
 
+language.config_type_settings:
+  type: config_object
+  label: 'Configuration language settings'
+  mapping:
+    show_langcode:
+      type: sequence
+      label: 'Entity types with visible langcode selectors'
+      sequence:
+        type: boolean
+
 condition.plugin.language:
   type: condition.plugin
   mapping:

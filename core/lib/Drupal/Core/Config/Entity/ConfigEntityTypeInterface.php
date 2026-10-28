@@ -82,4 +82,13 @@ interface ConfigEntityTypeInterface extends EntityTypeInterface {
    */
   public function getLookupKeys();
 
+  /**
+   * Indicates whether langcode can be configured on entity edit forms.
+   *
+   * @return bool
+   *   TRUE if the langcode selector can be made configurable for this entity
+   *   type, FALSE otherwise.
+   */
+  public function isLangcodeConfigurable();
+
 }

@@ -85,3 +85,11 @@ language.content_settings_page:
     _form: '\Drupal\language\Form\ContentLanguageSettingsForm'
   requirements:
     _permission: 'administer languages'
+
+language.config_settings_page:
+  path: '/admin/config/regional/config-language'
+  defaults:
+    _form: '\Drupal\language\Form\ConfigLanguageSettingsForm'
+    _title: 'Configuration language settings'
+  requirements:
+    _permission: 'administer languages'

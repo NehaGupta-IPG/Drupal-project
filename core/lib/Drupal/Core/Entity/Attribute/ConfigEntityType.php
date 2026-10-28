@@ -59,6 +59,7 @@ class ConfigEntityType extends EntityType {
     public readonly array $additional = [],
     public readonly array $lookup_keys = [],
     public readonly array $config_export = [],
+    public readonly bool $langcode_configurable = FALSE,
   ) {
     // @phpstan-ignore property.deprecated
     if ($this->uri_callback !== NULL) {

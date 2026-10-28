@@ -4,6 +4,7 @@ namespace Drupal\language\Hook;
 
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\language\ConfigEntityLangcodeConfig;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrlFallback;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
@@ -13,6 +14,9 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Entity\ContentEntityFormInterface;
+use Drupal\Core\Entity\EntityFormInterface;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\FileStorage;
@@ -31,6 +35,17 @@ use Drupal\Core\Render\Element\Select;
 class LanguageHooks {
 
   use StringTranslationTrait;
+
+  /**
+   * Constructs a new LanguageHooks object.
+   *
+   * @param \Drupal\language\ConfigEntityLangcodeConfig $configEntityLangcodeConfig
+   *   Config entity language selector visibility manager.
+   */
+  public function __construct(
+    protected ConfigEntityLangcodeConfig $configEntityLangcodeConfig,
+  ) {
+  }
 
   /**
    * Implements hook_help().
@@ -271,6 +286,38 @@ class LanguageHooks {
         $language_configuration = ContentLanguageSettings::loadByEntityTypeBundle($entity->getEntityTypeId(), $entity->bundle());
         $form[$langcode_key]['#access'] = $language_configuration->isLanguageAlterable();
       }
+    }
+
+    // Configuration entity forms may also use a langcode field. But
+    // configuration language settings should decide if it should be exposed or
+    // not in the forms.
+    if (!$form_object instanceof EntityFormInterface) {
+      return;
+    }
+    $entity = $form_object->getEntity();
+    if (!$entity instanceof ConfigEntityInterface) {
+      return;
+    }
+    // Only configuration entities that are langcode configurable should be
+    // processed.
+    $entity_type = $entity->getEntityType();
+    if (!$entity_type instanceof ConfigEntityTypeInterface || !$entity_type->isLangcodeConfigurable()) {
+      return;
+    }
+    // Check if the langcode field should be shown for this entity type
+    // and if the form has a langcode field. Some entities like views
+    // have a langcode field but it is not shown this way in the form.
+    // We can't automate the hiding of those fields, such entity types
+    // should add explicit support.
+    $show_langcode = $this->configEntityLangcodeConfig->showLangcode($entity_type->id());
+    if ($show_langcode || !isset($form['langcode'])) {
+      return;
+    }
+
+    // Hide the field and force the language value for new entities.
+    $form['langcode']['#access'] = FALSE;
+    if ($entity->isNew()) {
+      $form['langcode']['#default_value'] = \Drupal::languageManager()->getDefaultLanguage()->getId();
     }
   }
 

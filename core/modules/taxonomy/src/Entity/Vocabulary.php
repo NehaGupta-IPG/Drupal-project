@@ -70,6 +70,7 @@ use Drupal\user\Entity\EntityPermissionsRouteProvider;
     'weight',
     'new_revision',
   ],
+  langcode_configurable: TRUE,
 )]
 class Vocabulary extends ConfigEntityBundleBase implements VocabularyInterface {
 
