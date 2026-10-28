@@ -13,11 +13,18 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
  */
 class WorkspaceProviderCollector {
 
+  /**
+   * The workspace providers.
+   *
+   * @var array<string,\Drupal\workspaces\Provider\WorkspaceProviderInterface>
+   */
+  protected array $providers;
+
   public function __construct(
     #[AutowireIterator(tag: 'workspace_provider', defaultIndexMethod: 'getId')]
-    protected iterable $providers,
+    iterable $providers,
   ) {
-    $this->providers = iterator_to_array($this->providers);
+    $this->providers = iterator_to_array($providers);
   }
 
   /**
@@ -35,6 +42,16 @@ class WorkspaceProviderCollector {
     }
 
     return $this->providers[$id];
+  }
+
+  /**
+   * Return providers, keyed by ID.
+   *
+   * @return array<string,\Drupal\workspaces\Provider\WorkspaceProviderInterface>
+   *   The providers.
+   */
+  public function getProviders(): array {
+    return $this->providers;
   }
 
 }

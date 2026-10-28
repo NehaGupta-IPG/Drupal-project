@@ -35,6 +35,7 @@ use Drupal\workspaces\WorkspaceInterface;
     'label' => 'label',
     'uid' => 'uid',
     'owner' => 'uid',
+    'bundle' => 'provider',
   ],
   handlers: [
     'access' => WorkspaceAccessControlHandler::class,
@@ -119,6 +120,14 @@ class Workspace extends ContentEntityBase implements WorkspaceInterface {
       ->setDescription(new TranslatableMarkup('The time that the workspace was created.'));
 
     return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(array $values = []): self {
+    // Provide default value for ::create calls w/o bundle.
+    return parent::create($values + ['provider' => DefaultWorkspaceProvider::getId()]);
   }
 
   /**

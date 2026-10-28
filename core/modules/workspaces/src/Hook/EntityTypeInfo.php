@@ -12,6 +12,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\workspaces\Entity\Handler\BlockContentWorkspaceHandler;
 use Drupal\workspaces\Entity\Handler\DefaultWorkspaceHandler;
 use Drupal\workspaces\Entity\Handler\IgnoredWorkspaceHandler;
+use Drupal\workspaces\Provider\WorkspaceProviderCollector;
 use Drupal\workspaces\WorkspaceInformationInterface;
 
 /**
@@ -24,6 +25,7 @@ class EntityTypeInfo {
 
   public function __construct(
     protected WorkspaceInformationInterface $workspaceInfo,
+    protected WorkspaceProviderCollector $collector,
   ) {}
 
   /**
@@ -122,6 +124,20 @@ class EntityTypeInfo {
       return $fields;
     }
     return [];
+  }
+
+  /**
+   * Implements hook_entity_bundle_info().
+   */
+  #[Hook('entity_bundle_info')]
+  public function entityBundleInfo(): array {
+    $bundles = [];
+    foreach ($this->collector->getProviders() as $id => $provider) {
+      $bundles['workspace'][$id] = [
+        'label' => $id,
+      ];
+    }
+    return $bundles;
   }
 
 }
