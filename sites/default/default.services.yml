@@ -3,6 +3,11 @@ parameters:
   # with the Administrator role, it is advised to set this to false. This allows
   # you to make user 1 a regular user, strengthening the security of your site.
   security.enable_super_user: true
+  # Provides autoconfigure and autowire defaults to all services. Defaults from
+  # the _defaults key from *.services.yml file are overriding these values.
+  service_defaults:
+    autoconfigure: false
+    autowire: false
   session.storage.options:
     # Default ini options for sessions.
     #

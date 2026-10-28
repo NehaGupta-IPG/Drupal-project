@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Yaml\Tag\TaggedValue;
@@ -151,15 +152,23 @@ class YamlFileLoader
      */
     private function parseDefaults(array &$content, string $file): array
     {
-        if (!\array_key_exists('_defaults', $content['services'])) {
-            return [];
+        // Site-wide defaults.
+        try {
+            $defaults = $this->container->getParameter('service_defaults');
         }
-        $defaults = $content['services']['_defaults'];
-        unset($content['services']['_defaults']);
+        catch (ParameterNotFoundException) {
+            $defaults = [];
+        }
 
-        if (!\is_array($defaults)) {
-            throw new InvalidArgumentException(sprintf('Service "_defaults" key must be an array, "%s" given in "%s".', \gettype($defaults), $file));
+        if (!\array_key_exists('_defaults', $content['services'])) {
+            return $defaults;
         }
+        if (!\is_array($content['services']['_defaults'])) {
+            throw new InvalidArgumentException(sprintf('Service "_defaults" key must be an array, "%s" given in "%s".', \gettype($content['services']['_defaults']), $file));
+        }
+        // Defaults from *.services.yml are taking precedence.
+        $defaults = $content['services']['_defaults'] + $defaults;
+        unset($content['services']['_defaults']);
 
         foreach ($defaults as $key => $default) {
             if (!isset(self::DEFAULTS_KEYWORDS[$key])) {
