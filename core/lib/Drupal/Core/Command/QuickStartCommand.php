@@ -61,12 +61,18 @@ class QuickStartCommand {
   ): int {
     $command = $application->find('install');
 
+    if (!extension_loaded('pdo_sqlite')) {
+      $output->writeln('<error>You must have the pdo_sqlite PHP extension installed. See core/INSTALL.sqlite.txt for instructions.</error>');
+      return 1;
+    }
+
     $arguments = [
       'command' => 'install',
       'install-profile-or-recipe' => $install_profile_or_recipe,
       '--langcode' => $langcode,
       '--password' => $password,
       '--site-name' => $site_name,
+      '--db-url' => 'sqlite://' . $this->getSitePath() . '/.sqlite',
     ];
 
     $installInput = new ArrayInput($arguments);
@@ -86,6 +92,19 @@ class QuickStartCommand {
       $returnCode = $command->run($serverInput, $output);
     }
     return $returnCode;
+  }
+
+  /**
+   * Gets the site path.
+   *
+   * Defaults to 'sites/default'. For testing purposes this can be overridden
+   * using the DRUPAL_DEV_SITE_PATH environment variable.
+   *
+   * @return string
+   *   The site path to use.
+   */
+  protected function getSitePath() {
+    return getenv('DRUPAL_DEV_SITE_PATH') ?: 'sites/default';
   }
 
 }

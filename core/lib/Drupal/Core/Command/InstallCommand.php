@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Core\Command;
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Cache\NullBackend;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\Extension\DatabaseDriverList;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\InfoParserDynamic;
 use Drupal\Core\Site\Settings;
@@ -53,14 +56,15 @@ class InstallCommand extends Command {
   protected function configure(): void {
     $this->setName('install')
       ->setDescription('Install Drupal using an install profile or recipe.')
-      ->setHelp('This is not meant for production and might be too simple for custom development. It is a quick and easy way to get Drupal running.')
       ->addArgument('install-profile-or-recipe', InputArgument::OPTIONAL, 'Install profile or recipe directory from which to install the site.')
       ->addOption('langcode', NULL, InputOption::VALUE_OPTIONAL, 'The language to install the site in.', 'en')
       ->addOption('password', NULL, InputOption::VALUE_OPTIONAL, 'The password to use for the site. Defaults to random password.')
       ->addOption('site-name', NULL, InputOption::VALUE_OPTIONAL, 'Set the site name.', 'Drupal')
+      ->addOption('db-url', NULL, InputOption::VALUE_REQUIRED, 'Sets the database URL.', 'sqlite://sites/default/files/.sqlite')
       ->addUsage('demo_umami --langcode fr')
       ->addUsage('standard --site-name QuickInstall')
-      ->addUsage('core/recipes/standard --site-name RecipeBuiltSite');
+      ->addUsage('core/recipes/standard --site-name RecipeBuiltSite')
+      ->addUsage('standard --db-url mysql://db:db@db:3306/db --site-name "My Awesome Web Site"');
 
     parent::configure();
   }
@@ -70,10 +74,6 @@ class InstallCommand extends Command {
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
     $io = new SymfonyStyle($input, $output);
-    if (!extension_loaded('pdo_sqlite')) {
-      $io->getErrorStyle()->error('You must have the pdo_sqlite PHP extension installed. See core/INSTALL.sqlite.txt for instructions.');
-      return 1;
-    }
 
     // Change the directory to the Drupal root.
     chdir(dirname(__DIR__, 5));
@@ -122,7 +122,9 @@ class InstallCommand extends Command {
       return 1;
     }
 
-    return $this->install($this->classLoader, $io, $install_profile ?? '', $input->getOption('langcode'), $this->getSitePath(), $input->getOption('site-name'), $recipe ?? '', $input->getOption('password'));
+    $connection_info = Connection::createConnectionOptionsFromUrl($input->getOption('db-url'));
+
+    return $this->install($this->classLoader, $io, $install_profile ?? '', $input->getOption('langcode'), $this->getSitePath(), $input->getOption('site-name'), $recipe ?? '', $input->getOption('password'), $connection_info);
   }
 
   /**
@@ -164,6 +166,8 @@ class InstallCommand extends Command {
    *   The recipe to use for installing.
    * @param string|null $password
    *   The password to use for installing.
+   * @param array $connection_options
+   *   The database connection options.
    *
    * @throws \Exception
    *   Thrown when failing to create the $site_path directory or settings.php.
@@ -171,9 +175,22 @@ class InstallCommand extends Command {
    * @return int
    *   The command exit status.
    */
-  protected function install($class_loader, SymfonyStyle $io, $profile, $langcode, $site_path, $site_name, string $recipe, #[\SensitiveParameter] ?string $password = NULL) {
-    $sqliteDriverNamespace = 'Drupal\\sqlite\\Driver\\Database\\sqlite';
+  protected function install($class_loader, SymfonyStyle $io, $profile, $langcode, $site_path, $site_name, string $recipe, #[\SensitiveParameter] ?string $password = NULL, array $connection_options = []) {
     $password ??= Crypt::randomBytesBase64(12);
+
+    $driver_name = $connection_options['driver'];
+    $namespace = NULL;
+    $databaseDriverList = new DatabaseDriverList(DRUPAL_ROOT, 'database_driver', new NullBackend('database_driver'));
+    foreach ($databaseDriverList->getInstallableList() as $driver) {
+      if ($driver->getDriverName() === $driver_name) {
+        $namespace = $driver->getNamespace();
+      }
+    }
+
+    if (!$namespace) {
+      $io->error("The namespace for the specified database driver name '{$driver_name}' is not found");
+    }
+
     $parameters = [
       'interactive' => FALSE,
       'site_path' => $site_path,
@@ -183,9 +200,14 @@ class InstallCommand extends Command {
       ],
       'forms' => [
         'install_settings_form' => [
-          'driver' => $sqliteDriverNamespace,
-          $sqliteDriverNamespace => [
-            'database' => $site_path . '/files/.sqlite',
+          'driver' => $namespace,
+          "$namespace" => [
+            'username' => $connection_options['username'],
+            'password' => $connection_options['password'],
+            'database' => $connection_options['database'],
+            'host' => $connection_options['host'],
+            'port' => $connection_options['port'] ?? '',
+            'prefix' => $connection_options['prefix'] ?? '',
           ],
         ],
         'install_configure_form' => [
