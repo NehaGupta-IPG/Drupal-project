@@ -303,7 +303,7 @@ default:
 
 '🖱️️️ PHPUnit Functional Javascript':
   <<: [ *with-composer, *test-setup ]
-  parallel: 3
+  parallel: 2
   variables:
     TESTSUITE: functional-javascript
     CONCURRENCY: "12"
@@ -317,7 +317,7 @@ default:
 
 '🌐️️ PHPUnit Functional':
   <<: [ *with-composer, *test-setup ]
-  parallel: 8
+  parallel: 6
   variables:
     TESTSUITE: functional
     CONCURRENCY: "15"
