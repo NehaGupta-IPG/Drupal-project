@@ -703,6 +703,8 @@ class RendererTest extends RendererTestBase {
     $this->renderer->renderInIsolation($build);
 
     $this->assertEqualsCanonicalizing(['languages:language_interface', 'theme', 'user'], $build['#cache']['contexts']);
+    // Test the constants for the #cache keys
+    $this->assertEquals($build['#cache'][Cache::CONTEXTS], $build['#cache']['contexts'], 'The cache contexts constant is valid.');
   }
 
   /**

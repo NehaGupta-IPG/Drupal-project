@@ -17,6 +17,21 @@ class Cache {
   const PERMANENT = CacheBackendInterface::CACHE_PERMANENT;
 
   /**
+   * Use this inside a #cache array to add cache contexts.
+   */
+  const CONTEXTS = 'contexts';
+
+  /**
+   * Use this inside a #cache array to specify cache max age.
+   */
+  const MAX_AGE = 'max-age';
+
+  /**
+   * Use this inside a #cache array to add cache tags.
+   */
+  const TAGS = 'tags';
+
+  /**
    * Merges lists of cache contexts and removes duplicates.
    *
    * @param list<string> ...$cache_contexts

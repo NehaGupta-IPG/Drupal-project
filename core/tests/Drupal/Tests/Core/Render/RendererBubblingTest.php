@@ -488,6 +488,9 @@ class RendererBubblingTest extends RendererTestBase {
     $this->assertEquals('Cache context!Cache tag!Asset!Placeholder!barstoolNested!Cached nested!', trim($output), 'Expected HTML generated.');
     $this->assertEquals(['child.cache_context'], $test_element['#cache']['contexts'], 'Expected cache contexts found.');
     $this->assertEquals(['child:cache_tag'], $test_element['#cache']['tags'], 'Expected cache tags found.');
+    // Test the constants for the #cache keys
+    $this->assertEquals($test_element['#cache']['tags'], $test_element['#cache'][Cache::TAGS], 'The cache tags constant is valid.');
+
     $expected_attached = [
       'drupalSettings' => ['foo' => 'bar'],
       'placeholders' => [],

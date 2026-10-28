@@ -134,9 +134,9 @@ class CacheableMetadata implements RefinableCacheableDependencyInterface {
    *   A render array.
    */
   public function applyTo(array &$build) {
-    $build['#cache']['contexts'] = $this->cacheContexts;
-    $build['#cache']['tags'] = $this->cacheTags;
-    $build['#cache']['max-age'] = $this->cacheMaxAge;
+    $build['#cache'][Cache::CONTEXTS] = $this->cacheContexts;
+    $build['#cache'][Cache::TAGS] = $this->cacheTags;
+    $build['#cache'][Cache::MAX_AGE] = $this->cacheMaxAge;
   }
 
   /**
@@ -149,9 +149,9 @@ class CacheableMetadata implements RefinableCacheableDependencyInterface {
    */
   public static function createFromRenderArray(array $build) {
     $meta = new static();
-    $meta->cacheContexts = (isset($build['#cache']['contexts'])) ? $build['#cache']['contexts'] : [];
-    $meta->cacheTags = (isset($build['#cache']['tags'])) ? $build['#cache']['tags'] : [];
-    $meta->cacheMaxAge = (isset($build['#cache']['max-age'])) ? $build['#cache']['max-age'] : Cache::PERMANENT;
+    $meta->cacheContexts = (isset($build['#cache'][Cache::CONTEXTS])) ? $build['#cache'][Cache::CONTEXTS] : [];
+    $meta->cacheTags = (isset($build['#cache'][Cache::TAGS])) ? $build['#cache'][Cache::TAGS] : [];
+    $meta->cacheMaxAge = (isset($build['#cache'][Cache::MAX_AGE])) ? $build['#cache'][Cache::MAX_AGE] : Cache::PERMANENT;
     return $meta;
   }
 
