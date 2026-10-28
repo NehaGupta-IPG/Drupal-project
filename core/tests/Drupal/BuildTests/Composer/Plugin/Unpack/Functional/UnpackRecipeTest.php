@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\BuildTests\Composer\Plugin\Unpack\Functional;
 
 use Composer\InstalledVersions;
+use Composer\Semver\VersionParser;
 use Composer\Util\Filesystem;
 use Drupal\BuildTests\Framework\BuildTestBase;
 use Drupal\Tests\Composer\Plugin\ExecTrait;
@@ -687,13 +688,13 @@ class UnpackRecipeTest extends BuildTestBase {
     $this->assertFileExists($root_project_path . '/recipes/recipe-a/recipe.yml');
     $this->assertFileExists($root_project_path . '/recipes/recipe-b/recipe.yml');
 
-    // A version should have been written to each recipe's `composer.json`.
-    $this->assertNotEmpty(
-      $this->getFileContents($root_project_path . '/recipes/recipe-a/composer.json')['version'],
-    );
-    $this->assertNotEmpty(
-      $this->getFileContents($root_project_path . '/recipes/recipe-b/composer.json')['version'],
-    );
+    // Valid versions should have been written to a catalog file.
+    $catalog = $root_project_path . '/vendor/composer/recipe-unpack.json';
+    $this->assertFileExists($catalog);
+    $catalog = $this->getFileContents($catalog);
+    $version_parser = new VersionParser();
+    $version_parser->normalize($catalog['fixtures/recipe-a']);
+    $version_parser->normalize($catalog['fixtures/recipe-b']);
 
     // Ensure composer.lock is ordered correctly.
     $root_composer_lock = $this->getFileContents($root_project_path . '/composer.lock');
