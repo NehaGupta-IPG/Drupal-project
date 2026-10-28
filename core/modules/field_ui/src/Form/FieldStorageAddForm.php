@@ -104,7 +104,7 @@ class FieldStorageAddForm extends FormBase {
       '#weight' => -20,
     ];
 
-    $field_prefix = $this->configFactory->get('field_ui.settings')->get('field_prefix');
+    $field_prefix = $this->configFactory->get('field_ui.settings')->get('field_prefix') ?? 'field_';
     $form['field_name'] = [
       '#type' => 'machine_name',
       '#field_prefix' => $field_prefix,
