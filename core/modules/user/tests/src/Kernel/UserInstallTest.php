@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Kernel;
 
+use Drupal\Core\Extension\Extension;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -27,7 +28,15 @@ class UserInstallTest extends KernelTestBase {
     parent::setUp();
     $this->container->get('module_handler')->loadInclude('user', 'install');
     $this->installEntitySchema('user');
-    user_install();
+    $name = 'user';
+    $module_path = \Drupal::service('extension.list.module')
+      ->getPath($name);
+    $pathname = "$module_path/$name.info.yml";
+    $extension = new Extension($this->root, 'module', $pathname, NULL);
+    $class_name = install_get_fixed_class_name($extension, 'Install/Installer');
+    $install_class = \Drupal::classResolver($class_name);
+    /** @var \Drupal\Core\Extension\Install\InstallInterface $install_class */
+    $install_class->doInstall(FALSE);
   }
 
   /**

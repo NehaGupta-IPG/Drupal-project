@@ -908,34 +908,35 @@ class ModuleInstaller implements ModuleInstallerInterface {
     if ($directory_search != '') {
       $class_name = install_get_fixed_class_name($extension, $directory_search);
       if (class_exists($class_name)) {
+        $install_class = \Drupal::classResolver($class_name);
         switch ($hook) {
           case 'install':
             if (is_subclass_of($class_name, InstallInterface::class)) {
-              /** @var \Drupal\Core\Extension\Install\InstallInterface $class_name */
-              $class_name->doInstall(...$args);
+              /** @var \Drupal\Core\Extension\Install\InstallInterface $install_class */
+              $install_class->doInstall(...$args);
               return NULL;
             }
             break;
 
           case 'schema':
             if (is_subclass_of($class_name, SchemaInterface::class)) {
-              /** @var \Drupal\Core\Extension\Install\SchemaInterface $class_name */
-              return $class_name->getSchema();
+              /** @var \Drupal\Core\Extension\Install\SchemaInterface $install_class */
+              return $install_class->getSchema();
             }
             break;
 
           case 'uninstall':
-            /** @var \Drupal\Core\Extension\Install\UninstallInterface $class_name */
+            /** @var \Drupal\Core\Extension\Install\UninstallInterface $install_class */
             if (is_subclass_of($class_name, UninstallInterface::class)) {
-              $class_name->doUninstall(...$args);
+              $install_class->doUninstall(...$args);
               return NULL;
             }
             break;
 
           case 'update_last_removed':
             if (is_subclass_of($class_name, LastRemovedInterface::class)) {
-              /** @var \Drupal\Core\Extension\Install\LastRemovedInterface $class_name */
-              return $class_name->getLastRemoved();
+              /** @var \Drupal\Core\Extension\Install\LastRemovedInterface $install_class */
+              return $install_class->getLastRemoved();
             }
             break;
 
