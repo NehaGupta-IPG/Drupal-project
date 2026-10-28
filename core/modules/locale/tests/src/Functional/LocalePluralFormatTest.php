@@ -383,6 +383,36 @@ class LocalePluralFormatTest extends BrowserTestBase {
   }
 
   /**
+   * Tests the import of a plural translation without text.
+   */
+  public function testEmptyPluralTranslationFallback(): void {
+    $po = fn (string $singular, string $plural) => <<<EOF
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\\n"
+
+msgid "One apple"
+msgid_plural "@count apples"
+msgstr[0] "$singular"
+msgstr[1] "$plural"
+EOF;
+    $this->importPoFile($po('One apple FR', '@count apples FR'), ['langcode' => 'fr']);
+    // Without text, the import removes the translation.
+    $this->importPoFile($po('', ''), [
+      'langcode' => 'fr',
+      'overwrite_options[not_customized]' => TRUE,
+    ]);
+    $translation = \Drupal::service('locale.storage')->findTranslation([
+      'source' => 'One apple' . PoItem::DELIMITER . '@count apples',
+      'language' => 'fr',
+    ]);
+    $this->assertFalse($translation->isTranslation());
+    $this->assertSame('One apple', (string) \Drupal::translation()->formatPlural(1, 'One apple', '@count apples', [], ['langcode' => 'fr']));
+    $this->assertSame('2 apples', (string) \Drupal::translation()->formatPlural(2, 'One apple', '@count apples', [], ['langcode' => 'fr']));
+  }
+
+  /**
    * Imports a standalone .po file in a given language.
    *
    * @param string $contents

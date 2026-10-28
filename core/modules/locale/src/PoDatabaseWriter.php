@@ -241,7 +241,8 @@ class PoDatabaseWriter implements PoWriterInterface {
     ]);
     $string = reset($strings);
 
-    if (!empty($translation)) {
+    // A plural translation without text has only the delimiters.
+    if (!empty(str_replace(PoItem::DELIMITER, '', $translation))) {
       // Skip this string unless it passes a check for dangerous code.
       if (!LocaleXss::stringIsSafe($translation)) {
         \Drupal::logger('locale')->error('Import of string "%string" was skipped because of disallowed or malformed HTML.', ['%string' => $translation]);

@@ -5,9 +5,11 @@
  * Post-update functions for Locale module.
  */
 
+use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\locale\LocaleJs;
 use Drupal\locale\LocaleSource;
 
 /**
@@ -45,4 +47,25 @@ function locale_post_update_clear_translation_path_config(): ?TranslatableMarkup
  */
 function locale_post_update_clear_sources(): void {
   \Drupal::service(LocaleSource::class)->clearSources();
+}
+
+/**
+ * Deletes plural translations without text.
+ */
+function locale_post_update_delete_empty_plural_translations(): void {
+  $storage = \Drupal::service('locale.storage');
+  $lids = [];
+  foreach ($storage->getTranslations(['translated' => TRUE], ['filters' => ['translation' => PoItem::DELIMITER]]) as $string) {
+    if (str_replace(PoItem::DELIMITER, '', $string->getString()) === '') {
+      $lids[$string->language][] = $string->lid;
+    }
+  }
+  $locale_config_manager = \Drupal::service('locale.config_manager');
+  foreach ($lids as $langcode => $language_lids) {
+    $storage->deleteTranslations(['lid' => $language_lids, 'language' => $langcode]);
+    \Drupal::service(LocaleJs::class)->refreshTranslations([$langcode], $language_lids);
+    if ($names = $locale_config_manager->getStringNames($language_lids)) {
+      $locale_config_manager->updateConfigTranslations($names, [$langcode]);
+    }
+  }
 }
