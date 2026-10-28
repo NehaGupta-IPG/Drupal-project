@@ -52,7 +52,7 @@ class NodeTranslationHandler extends ContentTranslationHandler {
   protected function entityFormTitle(EntityInterface $entity) {
     return $this->t('<em>Edit @type</em> @title', [
       '@type' => $entity->getBundleEntity()->label(),
-      '@title' => $entity->label(),
+      '@title' => $entity->label() ?? $entity->id(),
     ]);
   }
 
