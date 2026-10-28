@@ -485,4 +485,43 @@ class AttributeTest extends TestCase {
     $this->assertSame($expected, $attributes->hasAttribute($test_attribute));
   }
 
+  /**
+   * Provides tests data for testMergeAttribute.
+   *
+   * @return array
+   *   An array of test data each containing an initial Attribute object, an
+   *   Attribute object to be merged, and the expected result.
+   */
+  public static function providerTestMergeAttribute(): array {
+    return [
+      [
+        new Attribute([]),
+        new Attribute(['class' => ['class1']]),
+        new Attribute(['class' => ['class1']]),
+      ],
+      [
+        new Attribute(['class' => ['example-class']]),
+        new Attribute(['class' => ['class1']]),
+        new Attribute(['class' => ['example-class', 'class1']]),
+      ],
+      [
+        new Attribute(['class' => ['example-class']]),
+        new Attribute(['id' => 'foo', 'href' => 'bar']),
+        new Attribute([
+          'class' => ['example-class'],
+          'id' => 'foo',
+          'href' => 'bar',
+        ]),
+      ],
+    ];
+  }
+
+  /**
+   * Tests mergeAttribute.
+   */
+  #[DataProvider('providerTestMergeAttribute')]
+  public function testMergeAttribute(Attribute $original, Attribute $merge, Attribute $expected): void {
+    $this->assertEquals($expected, $original->mergeAttribute($merge));
+  }
+
 }

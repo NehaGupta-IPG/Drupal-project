@@ -223,6 +223,15 @@ class AttributeTest extends UnitTestCase {
   }
 
   /**
+   * Tests that mergeAttribute() cannot be used on the Core class.
+   */
+  public function testMergeAttributeException(): void {
+    $attributes = new Attribute(['class' => ['example-class']]);
+    $this->expectException(\BadMethodCallException::class);
+    $attributes->mergeAttribute(new ComponentAttribute(['id' => 'foo']));
+  }
+
+  /**
    * Tests merge with attachments.
    *
    * @legacy-covers ::merge

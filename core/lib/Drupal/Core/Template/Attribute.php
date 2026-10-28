@@ -4,7 +4,6 @@ namespace Drupal\Core\Template;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\HtmlAttribute\Attribute as ComponentAttribute;
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Render\AttachmentsInterface;
@@ -86,14 +85,21 @@ class Attribute extends ComponentAttribute implements MarkupInterface, Attachmen
    * @return $this
    */
   public function merge(Attribute $collection) {
-    $merged_attributes = NestedArray::mergeDeep($this->toArray(), $collection->toArray());
-    foreach ($merged_attributes as $name => $value) {
-      $this->storage[$name] = $this->createAttributeValue($name, $value);
-    }
+    parent::mergeAttribute($collection);
 
     // Merge attachments.
     $this->addAttachments($collection->getAttachments());
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @throws \BadMethodCallException
+   *   Always. Use ::merge() instead, so attachments are merged too.
+   */
+  public function mergeAttribute(ComponentAttribute $collection) {
+    throw new \BadMethodCallException('Use ' . static::class . '::merge() instead.');
   }
 
   /**

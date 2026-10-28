@@ -3,6 +3,7 @@
 namespace Drupal\Component\Utility\HtmlAttribute;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\NestedArray;
 
 /**
  * Collects, sanitizes, and renders HTML attributes.
@@ -350,6 +351,22 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, \Stringable {
     }
 
     return $return;
+  }
+
+  /**
+   * Merges an Attribute object into the current storage.
+   *
+   * @param \Drupal\Component\Utility\HtmlAttribute\Attribute $collection
+   *   The Attribute object to merge.
+   *
+   * @return $this
+   */
+  public function mergeAttribute(Attribute $collection) {
+    $merged_attributes = NestedArray::mergeDeep($this->toArray(), $collection->toArray());
+    foreach ($merged_attributes as $name => $value) {
+      $this->storage[$name] = $this->createAttributeValue($name, $value);
+    }
+    return $this;
   }
 
   /**
