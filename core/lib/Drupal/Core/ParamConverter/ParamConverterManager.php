@@ -100,7 +100,7 @@ class ParamConverterManager implements ParamConverterManagerInterface {
       }
 
       // If a converter returns NULL it means that the parameter could not be
-      // converted.
+      // converted and no cacheable metadata was provided.
       $value = $defaults[$name];
       $defaults[$name] = $this->getConverter($definition['converter'])->convert($value, $definition, $name, $defaults);
       if (!isset($defaults[$name])) {

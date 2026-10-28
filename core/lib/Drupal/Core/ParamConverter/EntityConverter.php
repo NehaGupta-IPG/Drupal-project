@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\ParamConverter;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -147,7 +148,11 @@ class EntityConverter implements ParamConverterInterface, ParamConverterRouteReq
         $entity instanceof EntityInterface &&
         !in_array($entity->bundle(), $definition['bundle'], TRUE)
       ) {
-        return NULL;
+        throw new ParamNotConvertedException(
+          sprintf('Entity latest revision of type "%s" with ID "%s" and bundle "%s" did not match the required bundle "%s"', $entity_type_id, $entity->id(), $entity->bundle(), $definition['bundle']),
+          // Entities cannot change bundle, so this does not expire.
+          cacheability: new CacheableMetadata(),
+        );
       }
       return $entity;
     }
@@ -160,7 +165,11 @@ class EntityConverter implements ParamConverterInterface, ParamConverterRouteReq
       $entity instanceof EntityInterface &&
       !in_array($entity->bundle(), $definition['bundle'], TRUE)
     ) {
-      return NULL;
+      throw new ParamNotConvertedException(
+        sprintf('Entity of type "%s" with ID "%s" and bundle "%s" did not match the required bundle "%s"', $entity_type_id, $entity->id(), $entity->bundle(), $definition['bundle']),
+        // Entities cannot change bundle, so this does not expire.
+        cacheability: new CacheableMetadata(),
+      );
     }
 
     return $entity;
