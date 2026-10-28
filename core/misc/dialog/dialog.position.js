@@ -1,10 +1,16 @@
 /**
  * @file
- * Positioning extensions for dialogs.
+ * Extends dialog sizing and positioning.
+ *
+ * Converts sizes and sets fixed positioning before opening. Updates percentage
+ * heights and non-modal positions on viewport or displacement changes.
  */
 
 /**
- * Triggers when content inside a dialog changes.
+ * Signals that dialog content dimensions may have changed.
+ *
+ * Bubbles from the dialog content element after opening or automatic size or
+ * position updates when autoResize is enabled.
  *
  * @event dialogContentResize
  */
@@ -41,6 +47,21 @@
         sizes = getSizeOptions(settings, this.uiDialog);
       }
       Object.assign(this.options, sizes);
+      this._super();
+    },
+    open() {
+      if (this.options.autoResize && !this.options.modal && !this._isOpen) {
+        resetPosition(this.options);
+      }
+      // Set fixed positioning before jQuery UI calculates the coordinates.
+      // Explicitly reposition already open dialogs because open() skips them.
+      const style = this.uiDialog[0].style;
+      if (this.options.autoResize && style.position !== 'fixed') {
+        style.position = 'fixed';
+        if (this._isOpen) {
+          this._position();
+        }
+      }
       this._super();
     },
   });
@@ -116,6 +137,8 @@
   /**
    * Position the dialog's center at the center of displace.offsets boundaries.
    *
+   * Other position options, including collision handling, are preserved.
+   *
    * @function Drupal.dialog~resetPosition
    *
    * @param {object} options
@@ -136,6 +159,9 @@
       (top > 0 ? '+' : '-') + Math.abs(Math.round(top / 2))
     }px`;
     options.position = {
+      ...$.ui.dialog.prototype.options.position,
+      ...options.position,
+      at: 'center',
       my: `center${left !== 0 ? leftString : ''} center${
         top !== 0 ? topString : ''
       }`,
@@ -183,7 +209,17 @@
     }
     event.data.$element.dialog('option', adjustedOptions);
 
-    event.data.$element
+    dispatchContentResize(event.data.$element);
+  }
+
+  /**
+   * Notifies listeners that the dialog content size may have changed.
+   *
+   * @param {jQuery} $element
+   *   The dialog element.
+   */
+  function dispatchContentResize($element) {
+    $element
       ?.get(0)
       ?.dispatchEvent(
         new CustomEvent('dialogContentResize', { bubbles: true }),
@@ -196,21 +232,19 @@
     const { settings } = e;
     const eventData = { settings, $element };
 
-    if (settings.autoResize === true || settings.autoResize === 'true') {
-      const uiDialog = $element
-        .dialog('option', { resizable: false, draggable: false })
-        .dialog('widget');
-      uiDialog[0].style.position = 'fixed';
+    if (settings.autoResize) {
+      $element.dialog('option', { resizable: false, draggable: false });
       // Keep a reference so that a scheduled call can be cancelled on close.
       $element.data('drupalAutoResize', autoResize);
+      // prettier-ignore
       $(window)
-        .on('resize.dialogResize scroll.dialogResize', eventData, autoResize)
-        .trigger('resize.dialogResize');
+        .on('resize.dialogResize scroll.dialogResize', eventData, autoResize);
       $(document).on(
         'drupalViewportOffsetChange.dialogResize',
         eventData,
         autoResize,
       );
+      dispatchContentResize($element);
     }
   });
 
