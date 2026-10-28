@@ -19,6 +19,7 @@ use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -1118,6 +1119,28 @@ class FormBuilderTest extends FormTestBase {
     $triggeringElement = $form_state->getTriggeringElement();
     $this->assertIsArray($triggeringElement);
     $this->assertSame('op', $triggeringElement['#name']);
+  }
+
+  /**
+   * Tests adding an explanation of the asterisk in forms to indicate required fields.
+   *
+   * @legacy-covers ::addAsteriskExplanation
+   */
+  public function testAddAsteriskExplanation(): void {
+    $form_id = 'test_form_id';
+
+    // Tests without a required field.
+    $form = self::buildTestFormStructure();
+    $this->formBuilder->addAsteriskExplanation($form_id, $form);
+    $this->assertArrayNotHasKey('test_form_id_required_fields_note', $form);
+
+    // Tests with a required field.
+    $form = self::buildTestFormStructure();
+    $form['test']['#required'] = TRUE;
+    $this->formBuilder->addAsteriskExplanation($form_id, $form);
+    $this->assertEquals('container', $form['test_form_id_required_fields_note']['#type']);
+    $this->assertEquals(-1000, $form['test_form_id_required_fields_note']['#weight']);
+    $this->assertInstanceOf(TranslatableMarkup::class, $form['test_form_id_required_fields_note']['#markup']);
   }
 
 }

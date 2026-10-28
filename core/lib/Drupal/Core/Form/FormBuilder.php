@@ -21,6 +21,7 @@ use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -157,6 +158,22 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     'Drupal\Core\Render\Element\Token::valueCallback',
     'Drupal\Core\Render\Element\Url::valueCallback',
     'Drupal\Core\Render\Element\Weight::valueCallback',
+  ];
+
+  /**
+   * Element types that are used for grouping elements.
+   *
+   * @var string[]
+   */
+  protected array $complexElementTypes = [
+    'actions',
+    'container',
+    'details',
+    'dropbutton',
+    'fieldgroup',
+    'fieldset',
+    'form',
+    'operations',
   ];
 
   public function __construct(
@@ -301,6 +318,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       }
 
       $form = $this->retrieveForm($form_id, $form_state);
+      $this->addAsteriskExplanation($form_id, $form);
       $this->prepareForm($form_id, $form, $form_state);
 
       // self::setCache() removes uncacheable $form_state keys (see properties
@@ -671,6 +689,60 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     if (!$form_state->isRebuilding() && $form_state->isCached()) {
       $this->setCache($form['#build_id'], $unprocessed_form, $form_state);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addAsteriskExplanation(string $form_id, array &$form): void {
+
+    $form_note_identifier = $form_id . '_required_fields_note';
+
+    foreach ($form as $form_key => $form_item) {
+      if (str_starts_with($form_key, '#')) {
+        // We'll skip over the special fields.
+        continue;
+      }
+      else {
+        // Check if type is primitive.
+        if (isset($form_item['#type']) && $this->isComplexElement($form_item['#type'])) {
+          $this->addAsteriskExplanation($form_id, $form_item);
+          if (isset($form_item[$form_note_identifier])) {
+            $form[$form_note_identifier] = $form_item[$form_note_identifier];
+            unset($form_item[$form_note_identifier]);
+            return;
+          }
+        }
+        else {
+          if (isset($form_item['#required']) && (bool) $form_item['#required'] === TRUE) {
+            $form[$form_note_identifier] = [
+              '#type' => 'container',
+              '#attributes' => ['class' => ['asterisk-explanation']],
+              '#markup' => new TranslatableMarkup('<strong>@strong-markup: </strong><label>@label-markup *.</label>', [
+                '@strong-markup' => new TranslatableMarkup('Note'),
+                '@label-markup' => new TranslatableMarkup('Required fields are marked with an asterisk'),
+              ]),
+              '#weight' => -1000,
+            ];
+
+            return;
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Checks to see if a specified type is used for grouping elements.
+   *
+   * @param string $type
+   *   String representation of the type.
+   *
+   * @return bool
+   *   Whether the type is in the list of targeted tags.
+   */
+  public function isComplexElement(string $type): bool {
+    return in_array($type, $this->complexElementTypes);
   }
 
   /**
