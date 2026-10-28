@@ -26,6 +26,7 @@ class UserInstallTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    require_once \DRUPAL_ROOT . '/core/includes/install.inc';
     $this->container->get('module_handler')->loadInclude('user', 'install');
     $this->installEntitySchema('user');
     $name = 'user';

@@ -6,6 +6,8 @@ namespace Drupal\TestTools\Extension;
 
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\Install\SchemaInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
@@ -31,23 +33,35 @@ class SchemaInspector {
    * @see \hook_schema()
    */
   public static function getTablesSpecification(ModuleHandlerInterface $handler, string $module): Schema|array {
-    if ($handler->loadInclude($module, 'install')) {
+    $schema = [];
+    $module_path = \Drupal::service('extension.list.module')
+      ->getPath($module);
+    $pathname = "$module_path/$module.info.yml";
+    $extension = new Extension(\DRUPAL_ROOT, 'module', $pathname, NULL);
+    $class_name = install_get_fixed_class_name($extension, 'Install/Schema');
+    if (class_exists($class_name)) {
+      if (is_subclass_of($class_name, SchemaInterface::class)) {
+        $install_class = \Drupal::classResolver($class_name);
+        /** @var \Drupal\Core\Extension\Install\SchemaInterface $install_class */
+        $schema = $install_class->getSchema();
+      }
+    }
+    elseif ($handler->loadInclude($module, 'install')) {
       $schema = $handler->invoke($module, 'schema') ?? [];
-      // @todo Remove Schema check in drupal:13.0.0.
-      if ($schema instanceof Schema) {
-        assert($schema->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
-        assert($schema->name === $module, 'Invalid schema definition name, must be equal to the module name');
-        return $schema;
-      }
-      // If the module does not implement hook_schema(), the value of
-      // $schema will be an empty array, and we do not need to trigger a
-      // deprecation.
-      if ($schema !== []) {
-        @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
-      }
+    }
+    // @todo Remove Schema check in drupal:13.0.0.
+    if ($schema instanceof Schema) {
+      assert($schema->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
+      assert($schema->name === $module, 'Invalid schema definition name, must be equal to the module name');
       return $schema;
     }
-    return [];
+    // If the module does not implement hook_schema(), the value of
+    // $schema will be an empty array, and we do not need to trigger a
+    // deprecation.
+    if ($schema !== []) {
+      @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
+    }
+    return $schema;
   }
 
   /**
