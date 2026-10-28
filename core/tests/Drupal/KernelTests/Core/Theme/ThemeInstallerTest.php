@@ -268,7 +268,7 @@ class ThemeInstallerTest extends KernelTestBase {
    */
   public function testUninstallDefault(): void {
     $name = 'stark';
-    $other_name = 'olivero';
+    $other_name = 'test_theme';
     $this->themeInstaller()->install([$name, $other_name]);
     $this->config('system.theme')->set('default', $name)->save();
 
@@ -295,7 +295,7 @@ class ThemeInstallerTest extends KernelTestBase {
    */
   public function testUninstallAdmin(): void {
     $name = 'stark';
-    $other_name = 'olivero';
+    $other_name = 'test_theme';
     $this->themeInstaller()->install([$name, $other_name]);
     $this->config('system.theme')->set('admin', $name)->save();
 
@@ -413,11 +413,11 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests that theme info can be altered by a module.
    *
-   * @see module_test_system_info_alter()
+   * @see \Drupal\module_test\Hook\ModuleTestThemeHooks::extensionInfoAlter()
    */
   public function testThemeInfoAlter(): void {
     $name = 'stark';
-    $this->container->get('state')->set('module_test.hook_system_info_alter', TRUE);
+    $this->container->get('state')->set('module_test.hook_extension_info_alter', TRUE);
 
     $this->themeInstaller()->install([$name]);
 

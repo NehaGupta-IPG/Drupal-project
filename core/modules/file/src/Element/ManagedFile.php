@@ -11,9 +11,14 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\FormElementBase;
+use Drupal\Core\Security\Attribute\TrustedCallback;
+use Drupal\Core\Security\StaticTrustedCallbackHelper;
+use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Security\UntrustedCallbackException;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
+use Drupal\file\Upload\ManagedFileElementHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 // cspell:ignore filefield
@@ -72,7 +77,7 @@ class ManagedFile extends FormElementBase {
       $return = $input;
 
       // Uploads take priority over all other values.
-      if ($files = file_managed_file_save_upload($element, $form_state)) {
+      if ($files = \Drupal::service(ManagedFileElementHelper::class)->managedFileSaveUpload($element, $form_state)) {
         if ($element['#multiple']) {
           $fids = array_merge($fids, array_keys($files));
           $denied_fids = [];
@@ -95,7 +100,18 @@ class ManagedFile extends FormElementBase {
         // functionality to allow File fields to be extended through FAPI.
         if (isset($element['#file_value_callbacks'])) {
           foreach ($element['#file_value_callbacks'] as $callback) {
-            $callback($element, $input, $form_state);
+            $message = sprintf(
+              'Using ManagedFile element #file_value_callbacks callbacks that are not tagged with the %s attribute, not methods of a class that implements %s, and not anonymous functions is deprecated in drupal:12.1.0 and will throw an exception in drupal:13.0.0. The callback was %%s. See https://www.drupal.org/node/3620771',
+              TrustedCallback::class,
+              TrustedCallbackInterface::class,
+            );
+            try {
+              StaticTrustedCallbackHelper::callback($callback, [&$element, $input, $form_state], $message);
+            }
+            catch (UntrustedCallbackException $e) {
+              @trigger_error($e->getMessage(), E_USER_DEPRECATED);
+              $callback($element, $input, $form_state);
+            }
           }
         }
 
