@@ -19,7 +19,7 @@ use Drupal\Core\Extension\Install\SchemaInterface;
 /**
  * Database Schema for User module.
  */
-class UserRemovedUpdate implements SchemaInterface {
+class UserSchema implements SchemaInterface {
 
   /**
    * Implements hook_schema().

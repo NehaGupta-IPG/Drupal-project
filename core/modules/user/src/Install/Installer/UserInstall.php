@@ -9,7 +9,7 @@ use Drupal\Core\Extension\Install\InstallInterface;
 /**
  * Install tasks for User module.
  */
-class UserFieldHooks implements InstallInterface {
+class UserInstall implements InstallInterface {
 
   /**
    * Implements hook_install().

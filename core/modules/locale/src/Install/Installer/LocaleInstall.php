@@ -11,7 +11,7 @@ use Drupal\locale\StreamWrapper\TranslationsStream;
 /**
  * Install tasks for Locale module.
  */
-class LocaleFieldHooks implements InstallInterface {
+class LocaleInstall implements InstallInterface {
 
   /**
    * Implements hook_install().

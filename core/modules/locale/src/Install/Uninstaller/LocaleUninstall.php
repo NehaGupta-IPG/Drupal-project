@@ -10,7 +10,7 @@ use Drupal\Core\File\Exception\FileException;
 /**
  * Uninstall tasks for Locale module.
  */
-class LocaleFieldHooks implements UninstallInterface {
+class LocaleUninstall implements UninstallInterface {
 
   /**
    * Implements hook_uninstall().

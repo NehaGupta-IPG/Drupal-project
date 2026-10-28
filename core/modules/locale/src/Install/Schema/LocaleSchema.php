@@ -21,7 +21,7 @@ use Drupal\locale\LocaleDefaultOptions;
 /**
  * Database Schema for Locale module.
  */
-class LocaleRemovedUpdate implements SchemaInterface {
+class LocaleSchema implements SchemaInterface {
 
   /**
    * Implements hook_schema().
