@@ -100,8 +100,10 @@ class DecimalItem extends NumericItemBase {
     $element = parent::fieldSettingsForm($form, $form_state);
     $settings = $this->getSettings();
 
-    $element['min']['#step'] = pow(0.1, $settings['scale']);
-    $element['max']['#step'] = pow(0.1, $settings['scale']);
+    // Guard against problems with small numbers beyond 15 positions.
+    $step = '0.' . str_repeat('0', $settings['scale'] - 1) . '1';
+    $element['min']['#step'] = $step;
+    $element['max']['#step'] = $step;
 
     return $element;
   }
