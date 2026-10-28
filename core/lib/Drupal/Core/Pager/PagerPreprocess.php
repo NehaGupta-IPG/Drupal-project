@@ -41,6 +41,8 @@ class PagerPreprocess {
    *       append to the pager links.
    *     - #route_parameters: An associative array of the route parameters.
    *     - #quantity: The number of pages in the list.
+   *     - #skip_modal_ajax: (optional) TRUE to skip the generic modal AJAX
+   *       link attributes, for pagers that handle their own AJAX.
    */
   public function preprocessPager(array &$variables): void {
     $element = $variables['pager']['#element'];
@@ -51,7 +53,10 @@ class PagerPreprocess {
 
     $link_attributes = [];
 
-    if ($this->requestStack->getCurrentRequest()?->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_modal') {
+    // Allow pagers to opt out of generic modal AJAX handling (e.g., Views with
+    // AJAX enabled has its own pager AJAX handling that conflicts with this).
+    if (empty($variables['pager']['#skip_modal_ajax']) &&
+      $this->requestStack->getCurrentRequest()?->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_modal') {
       $link_attributes = [
         'class' => ['use-ajax'],
         'data-dialog-type' => 'modal',
