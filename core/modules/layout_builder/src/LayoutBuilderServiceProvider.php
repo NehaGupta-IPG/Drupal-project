@@ -6,6 +6,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\layout_builder\EventSubscriber\SetInlineBlockDependency;
 use Drupal\layout_builder\Normalizer\LayoutEntityDisplayNormalizer;
+use Drupal\layout_builder\Normalizer\SectionDataNormalizer;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -47,6 +48,12 @@ class LayoutBuilderServiceProvider implements ServiceProviderInterface {
         // over the generic serializer.normalizer.config_entity.
         ->addTag('normalizer', ['priority' => 5]);
       $container->setDefinition('layout_builder.normalizer.layout_entity_display', $definition);
+      $section_definition = (new ChildDefinition('serializer.normalizer.typed_data'))
+        ->setClass(SectionDataNormalizer::class)
+      // Ensure that this normalizer takes precedence for Layout Builder data
+      // over the generic serializer.normalizer.typed_data.
+        ->addTag('normalizer', ['priority' => 5]);
+      $container->setDefinition('layout_builder.normalizer.section_data', $section_definition);
     }
   }
 

@@ -211,6 +211,9 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
    *
    * @return \Drupal\block_content\BlockContentInterface
    *   The block content entity.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   protected function getEntity() {
     if (!isset($this->blockContent)) {
@@ -226,6 +229,10 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
           'type' => $this->getDerivativeId(),
           'reusable' => FALSE,
         ]);
+      }
+      if (!isset($this->blockContent) && isset($this->configuration['type']) && isset($this->configuration['uuid'])) {
+        $entity = $this->entityTypeManager->getStorage('block_content')->loadByProperties(['uuid' => $this->configuration['uuid']]);
+        $this->blockContent = is_array($entity) ? array_pop($entity) : $entity;
       }
       if ($this->blockContent instanceof RefinableDependentAccessInterface && $dependee = $this->getAccessDependency()) {
         $this->blockContent->setAccessDependency($dependee);
@@ -280,6 +287,8 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
       $this->configuration['block_id'] = $block->id();
       $this->configuration['block_revision_id'] = $block->getRevisionId();
       $this->configuration['block_serialized'] = NULL;
+      $this->configuration['type'] = $block->bundle();
+      $this->configuration['uuid'] = $block->uuid();
     }
   }
 

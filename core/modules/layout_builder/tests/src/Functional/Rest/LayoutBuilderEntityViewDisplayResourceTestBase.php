@@ -39,9 +39,39 @@ abstract class LayoutBuilderEntityViewDisplayResourceTestBase extends EntityView
     array_unshift($expected['dependencies']['module'], 'layout_builder');
     $expected['hidden'][OverridesSectionStorage::FIELD_NAME] = TRUE;
     $expected['hidden']['links'] = TRUE;
+
+    /** @var \Drupal\layout_builder\Section[] $sections */
+    $sections = $this->entity->getThirdPartySetting('layout_builder', 'sections');
+    $components = $sections[0]->getComponents();
+    $component = array_pop($components);
+
     $expected['third_party_settings']['layout_builder'] = [
       'enabled' => TRUE,
       'allow_custom' => TRUE,
+      'sections' => [
+        [
+          'layout_id' => 'layout_onecol',
+          'layout_settings' => [
+            'label' => '',
+          ],
+          'components' => [
+            $component->getUuid() => [
+              'uuid' => $component->getUuid(),
+              'region' => 'content',
+              'configuration' => [
+                'label_display' => '0',
+                'context_mapping' => [
+                  'entity' => 'layout_builder.entity',
+                ],
+                'id' => 'extra_field_block:node:camelids:links',
+              ],
+              'weight' => 0,
+              'additional' => [],
+            ],
+          ],
+          'third_party_settings' => [],
+        ],
+      ],
     ];
     $expected['content'] = [];
     return $expected;
