@@ -210,6 +210,18 @@ config_test.system:
     '404':
       type: string
       label: '404'
+    colors:
+      type: sequence
+      label: 'Colors'
+      sequence:
+        - type: string
+          label: 'Color'
+    planets:
+      type: sequence
+      label: 'Planets'
+      sequence:
+        - type: string
+          label: 'Planet'
 
 config_test.new:
   type: config_object

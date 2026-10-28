@@ -334,6 +334,10 @@ class NestedArray {
         if (is_int($key) && !$preserve_integer_keys) {
           $result[] = $value;
         }
+        // Allow empty arrays to be set. Indicate this with a value of \EmptyIterator().
+        elseif (isset($result[$key]) && is_array($result[$key]) && $value instanceof \EmptyIterator) {
+          $result[$key] = [];
+        }
         // Recurse when both values are arrays.
         elseif (isset($result[$key]) && is_array($result[$key]) && is_array($value)) {
           $result[$key] = self::mergeDeepArray([$result[$key], $value], $preserve_integer_keys);

@@ -1,2 +1,8 @@
 foo: bar
 404: herp
+colors:
+  - red
+  - orange
+planets:
+  - mercury
+  - venus

@@ -37,6 +37,8 @@ class ConfigOverrideTest extends KernelTestBase {
       'foo' => 'bar',
       'baz' => NULL,
       '404' => 'herp',
+      'colors' => ['red', 'orange'],
+      'planets' => ['mercury', 'venus'],
     ];
 
     // Set globals before installing to prove that the installed file does not
@@ -44,6 +46,10 @@ class ConfigOverrideTest extends KernelTestBase {
     $overrides['config_test.system']['foo'] = 'overridden';
     $overrides['config_test.system']['baz'] = 'injected';
     $overrides['config_test.system']['404'] = 'something';
+    // Add a new value to the array.
+    $overrides['config_test.system']['colors'] = ['red', 'orange', 'yellow'];
+    // Empty the existing array values.
+    $overrides['config_test.system']['planets'] = new \EmptyIterator();
     $GLOBALS['config'] = $overrides;
 
     $this->installConfig(['config_test']);
@@ -55,6 +61,8 @@ class ConfigOverrideTest extends KernelTestBase {
     $this->assertSame($expected_original_data['foo'], $data['foo']);
     $this->assertFalse(isset($data['baz']));
     $this->assertSame($expected_original_data['404'], $data['404']);
+    $this->assertSame($expected_original_data['colors'], $data['colors']);
+    $this->assertSame($expected_original_data['planets'], $data['planets']);
 
     // Get the configuration object with overrides.
     $config = \Drupal::configFactory()->get('config_test.system');
@@ -63,6 +71,8 @@ class ConfigOverrideTest extends KernelTestBase {
     $this->assertSame($overrides['config_test.system']['foo'], $config->get('foo'));
     $this->assertSame($overrides['config_test.system']['baz'], $config->get('baz'));
     $this->assertSame($overrides['config_test.system']['404'], $config->get('404'));
+    $this->assertSame($overrides['config_test.system']['colors'], $config->get('colors'));
+    $this->assertSame([], $config->get('planets'));
 
     // Get the configuration object which does not have overrides.
     $config = \Drupal::configFactory()->getEditable('config_test.system');
