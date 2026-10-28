@@ -1,12 +1,4 @@
-Cache contexts
-==============
-
-> Cache contexts = (request) context dependencies
-
-> Cache contexts are analogous to HTTP's [`Vary`](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44) header.
-
-[](#why "Permalink to this headline")Why?
------------------------------------------
+## Cache contexts
 
 Cache contexts provide a declarative way to create context-dependent variations of something that needs to be cached. By making it declarative, code that creates caches becomes easier to read, and the same logic doesn't need to be repeated in every place where the same context variations are necessary.
 
@@ -16,12 +8,12 @@ Examples:
 - When creating a render array that shows a personalized message, the render array varies per user. Then you'd vary (the render array) by the `user` cache context.
 - Generally: when some expensive-to-calculate information varies by some environment context: vary by a cache context.
 
-Please note that cache contexts are not applied when serving cached pages to anonymous users with the [Internal Page Cache (page\_cache) ](https://www.drupal.org/docs/8/administering-drupal-8-site/internal-page-cache)module enabled.
 
-[](#what "Permalink to this headline")What?
--------------------------------------------
+Cache contexts are services tagged with 'cache.context', whose classes implement [\\Drupal\\Core\\Cache\\Context\\CacheContextInterface](https://www.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Cache%21Context%21CacheContextInterface.php/interface/CacheContextInterface/main "Provides an interface for defining a cache context service.").
 
-A cache context is a string that refers to one of the available cache context services (see below).
+### Definition
+
+A cache context is a string that refers to one of the available cache context services.
 
 Cache contexts are passed around in sets (order doesn't matter) of strings, so they are typehinted to `string[]`. They're sets because a single cache item can depend on (vary by) many cache contexts.
 
@@ -31,12 +23,14 @@ But, this doesn't mean cache contexts *have* to originate from the request — t
 Second, cache contexts are *hierarchical* in nature. The clearest example: when varying something per user, it's pointless to also vary that per permissions (i.e., the set of permissions that a user has), because per-user is already more granular. A user has a set of permissions, so per-user caching *implies* per-permissions caching.  
 Now for the most interesting aspect: if one part of the page is varied per user and another per permissions, then Drupal needs to be smart enough to make the combination of the two: only vary per user. That is where Drupal can exploit the hierarchy information to not create unnecessary variations.
 
-### [](#syntax "Permalink to this headline")Syntax
+For a render array, the cache context is specified as part of the #cache property of a render array. See the Caching section of the [Render API overview topic](https://www.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Render%21theme.api.php/group/theme_render/main "Overview of the Theme system and Render API.") for details.
+
+#### Syntax
 
 - periods separate parents from children
 - a plurally named cache context indicates a parameter may be specified; to use: append a colon, then specify the desired parameter (when no parameter is specified, *all* possible parameters are captured, e.g., *all* query arguments)
 
-### [](#core-contexts "Permalink to this headline")Drupal core's cache contexts
+### Drupal core cache contexts
 
 Drupal core ships with the following hierarchy of cache contexts:
 
@@ -100,7 +94,7 @@ So, examples of declarative cache contexts from that hierarchy:
 - `url.query_args:foo` (vary by the `?foo` query argument)
 - `protocol_version` (vary by HTTP 1 vs 2)
 
-### [](#optimizing "Permalink to this headline")Optimizing/folding/combining/simplifying of cache contexts
+### Optimizing cache contexts
 
 Drupal automatically uses the hierarchy information to simplify cache contexts as much as possible. For example, when one part of the page is varied per user (`user` cache context) and another part of the page is varied per permissions (`user.permissions` cache context), then it doesn't make sense to vary the final result (e.g.,: the page) per permissions, since varying per user is already more granular.  
 In other words: `optimize([user, user.permissions]) = [user]`.
@@ -114,20 +108,18 @@ That is why cache contexts that depend on configuration that may change over tim
 A similar, but more advanced example are node grants. Node grants apply to a specific user, so the node grants cache context is `user.node_grants` Except that node grants *can* be extremely dynamic (they could, e.g., be time-dependent, and change every few minutes). It depends on the node grant hook implementations present on the particular site. Therefore, to be safe, the node grants cache context specifies `max-age = 0`, meaning that it can *not* be cached (i.e., optimized away). Hence `optimize([user, user.node_grants]) = [user, user.node_grants]`.  
 Specific sites can override the default node grants cache context implementation and specify `max-age = 3600` instead, indicating that all their node grant hooks allow access results to be cached for *at most* an hour. On such sites, `optimize([user, user.node_grants]) = [user]`.
 
-### [](#s-uncacheable-contexts "Permalink to this headline")Uncacheable contexts
+### Uncacheable contexts
 
 Drupal core treats cache contexts with poor cacheability as uncacheable. The definition of what constitutes "poor cacheability" depends on the `renderer.config.auto_placeholder_conditions` service container parameter (defined in `core.services.yml`, by default `session` &amp; `user` contexts are not cached), which can be overridden by sites.  
 For more information, see [Render API &gt; Auto-placeholdering](https://www.drupal.org/docs/drupal-apis/render-api/auto-placeholdering).
 
-[](#recognize-discover-create "Permalink to this headline")How to recognize, discover and create?
--------------------------------------------------------------------------------------------------
+#### Discover
 
 Cache contexts are `cache.context`-tagged services. Any module can thus add more cache contexts. They implement `\Drupal\Core\Cache\Context\CacheContextInterface` or `\Drupal\Core\Cache\Context\CalculatedCacheContextInterface` (for cache contexts that accept parameters — i.e., cache contexts that accept a `:parameter` suffix).
 
 Hence, all you have to do to find all cache contexts you have available for use, is to go to the `CacheContextInterface` and `CalculatedCacheContextInterface` and use your IDE to find all of its implementations. (In PHPStorm: Type Hierarchy → Subtypes Hierarchy, in NetBeans: right-click on Interface name → Find Usages → Find All Subtypes.)
 
 Alternatively you can use Drush `php` command to run PHP code inside the context of Drupal to display all current cache contexts for your site or application. For this, run `drush php` and paste the following code in the PHP console:
-
 
 ```php
 $cache_contexts_manager_service =  \Drupal::service('cache_contexts_manager');
@@ -176,80 +168,66 @@ cache_context.route.book_navigation:
 
 This defines the `route.book_navigation` cache context.
 
-[](#debugging "Permalink to this headline")Debugging
-----------------------------------------------------
+## CacheableDependencyInterface friends
 
-All of the above is helpful information when debugging something that is being cached. But, there's one more thing: let's say something is being cached with the cache keys `['foo', 'bar']` and the cache contexts `['languages:language_interface', 'user.permissions', 'route']`. Then the corresponding cache item will be cached in a particular cache bin with a CID (*cache ID*) of:
+To make dealing with cacheability metadata ([cache tags](https://www.drupal.org/docs/drupal-apis/cache-api/cache-tags), [cache contexts](https://www.drupal.org/docs/drupal-apis/cache-api/cache-contexts) and [max-age](https://www.drupal.org/docs/drupal-apis/cache-api/cache-max-age)) easier, Drupal 8 has `CacheableDependencyInterface`.
+
+### Entities and configuration objects
+
+*All* entities in Drupal 8 (core, contrib &amp; custom) implement the [`EntityInterface` interface](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Entity%21EntityInterface.php/interface/EntityInterface/8) which extends both [`CacheableDependencyInterface`](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Cache%21CacheableDependencyInterface.php/interface/CacheableDependencyInterface/8.2.x) and [`RefinableCacheableDependencyInterface`](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Cache%21RefinableCacheableDependencyInterface.php/interface/RefinableCacheableDependencyInterface/8.2.x). Besides that, all entities in Drupal 8 core extend the [`Entity` abstract base class](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Entity%21Entity.php/class/Entity/8), and contrib/custom are encouraged to do the same. This means that every single entity you interact with in Drupal 8 automatically has consistent cache tags (of the form `<entity type>:<entity ID>`, e.g. `node:5` and `user:3`) and cache contexts to reflect the translation.
+
+*All* configuration objects in Drupal 8 core extend the [`ConfigBase` abstract base class](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Config%21ConfigBase.php/class/ConfigBase/8), which implements both `CacheableDependencyInterface` and `RefinableCacheableDependencyInterface`. This means that every single configuration object you interact with in Drupal 8 automatically has consistent cache tags (of the form `config:<configuration name>`, e.g. `config:system.performance`) and cache contexts to reflect the config overrides (of which translation is the only example in core).
+
+Finally, all entities and configuration objects in Drupal 8 automatically have the content/interface language cache contexts (respectively) thanks to [`Entitymanager::getTranslationFromContext()`](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Entity%21EntityManager.php/function/EntityManager%3A%3AgetTranslationFromContext/8) and [`LangaugeConfigFactoryOverride::getCacheableMetadata($name)`](https://api.drupal.org/api/drupal/core%21modules%21language%21src%21Config%21LanguageConfigFactoryOverride.php/function/LanguageConfigFactoryOverride%3A%3AgetCacheableMetadata/8).
+
+### Using objects that are cacheable dependencies
+
+
+Rendering is the most common example of depending on an object that is a cacheable dependency. To simplify that, we have [`RendererInterface::addCacheableDependency($build, $dependency)`](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Render%21RendererInterface.php/function/RendererInterface%3A%3AaddCacheableDependency/8) — where `$build` is the render array that depends on the object `$dependency`; the cacheability metadata of the object will automatically be "absorbed" by the render array. Which means the render array will be invalidated whenever the object's cache tag is invalidated, will cause a different version to be cached if a different translation is used (i.e. the content language cache context maps to a different language) and will expire automatically if the dependency has a max-age that isn't permanent (infinite).
+
+See [Cacheability of render arrays — Concrete example](https://www.drupal.org/developing/api/8/render/arrays/cacheability#concrete-example) for a full example.
+
+Another good example is access checks, which return [`AccessResult`](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Access%21AccessResult.php/class/AccessResult/8) objects, which also has an [`AccessResult::addCacheableDependency($dependency)`](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Access%21AccessResult.php/function/AccessResult%3A%3AaddCacheableDependency/8) method. Note that here, we *only* have the `$dependency` parameter, because we can store the cacheability metadata of the passed in dependency on the access result object itself. (The renderer, with its render arrays, is the exception.)
+
+## Cache max-age
+
+Cache max-age provides a declarative way to create time-dependent caches.
+
+Some data is only valid for a limited period of time, in that case, you want to specify a corresponding maximum age. However, in Drupal core's case, we don't have any data that is valid for only a limited period of time; we typically cache permanently (see below) and rely entirely on [cache tags](https://www.drupal.org/developing/api/8/cache/tags) for invalidation.
+
+## Definition
+
+A cache `max-age` is a positive integer, expressing a number of seconds.
+
+Cache max-ages are passed around as individual integers, because a given cache item can only logically have a single max-age.
+
+Examples:
+
+- `60` means cacheable for 60 seconds
+- `100` means cacheable for 100 seconds
+- `0` means cacheable for zero seconds, i.e. *not cacheable*
+- [`\Drupal\Core\Cache\Cache::PERMANENT`](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Cache%21Cache.php/constant/Cache%3A%3APERMANENT) (value `-1`) means `cacheable forever`, i.e. *this will only ever be invalidated due to [cache tags](https://www.drupal.org/developing/api/8/cache/tags)*. (In other words: ∞, or *infinite* seconds.)
+
+So if you for example want to prevent a rendered block from being cached, you should specify `max-age=0` on it.
+
+Example for most render arrays:
+
+`$build['#cache']['max-age'] = 0;`
+
+Example in a function:
 
 
 ```php
-foo:bar:[languages:language_interface]=en:[route]=myroute.ROUTE_PARAMS_HASH:[user.permissions]=A_QUITE_LONG_HASH
-
+\Drupal::cache()->set('my_cache_item', $school_list, \Drupal::time()->getRequestTime() + (86400));
 ```
 
-In other words:
+If you want to change block max-age to 0 then you must implement getCacheMaxAge method.
 
-- cache keys are listed first, in the order provided
-- cache contexts are listed second, alphabetically, and result in CID parts of the form `[<cache context name>]=<cache context value>`
-- all these CID parts are concatenated together using colons
+#### Limitations of max-age
 
-That should make it much easier to analyze &amp; debug caches!
+Unfortunately, `max-age`does not work for anonymous users and the Drupal core Page Cache module (or other external cache services such as Varnish or CDNs). For example, see these issues:
 
-### [](#s-html-comments-debugging "Permalink to this headline")HTML comments (debugging)
+- <span class="project-issue-issue-link project-issue-status-info project-issue-status-13">[\#2352009: Bubbling of elements' max-age to the page's headers and the page cache](https://www.drupal.org/project/drupal/issues/2352009 "Status: Needs work")</span>
+- <span class="project-issue-issue-link project-issue-status-info project-issue-status-1">[\#2449749: Add #cache\['downstream-ttl'\] to force expiration after a certain time and fix #cache\['max-age'\] logic by adding #cache\['age'\]](https://www.drupal.org/project/drupal/issues/2449749 "Status: Active")</span>
 
-By [enabling render cache debugging](https://www.drupal.org/docs/develop/development-tools/disabling-and-debugging-caching#s-enable-render-cache-debugging) each render elements will display its cache information (including context) in HTML comments:
-
-
-```html
-<!-- CACHE CONTEXTS:
-   * languages:language_interface
-   * theme
-   * timezone
-   * url.site
-   * user.permissions
-   * user.roles
-   * user.roles:anonymous
-   * user.roles:authenticated
--->
-...
-<!-- PRE-BUBBLING CACHE CONTEXTS:
-   * url.site
-   * languages:language_interface
-   * theme
-   * user.permissions
--->
-```
-
-### [](#headers "Permalink to this headline")Headers (debugging)
-
-Finally: it is easy to see which cache contexts a certain response depends on (and thus is varied by): one must only look at the `X-Drupal-Cache-Contexts` header!
-
-*Note: If you're not seeing those headers, you will want to [set up your Drupal instance for development.](https://www.drupal.org/developing/api/8/render/arrays/cacheability#headers)*
-
-[](#dynamic "Permalink to this headline")Dynamic Page Cache
------------------------------------------------------------
-
-Comprehensive use of cache contexts across Drupal allows Drupal to ship with its [Dynamic Page Cache](https://www.drupal.org/documentation/modules/smart_cache) enabled by default. (Previously known as 'Smart Cache')
-
-[](#internal "Permalink to this headline")Internal Page Cache
--------------------------------------------------------------
-
-Note the [Internal Page Cache](https://www.drupal.org/docs/8/administering-drupal-8-site/internal-page-cache) assumes that all pages served to anonymous users will be identical, regardless of the implementation of cache contexts. If you want to use cache contexts to vary the content served to anonymous users, this module must be disabled, and the performance impact that entails incurred.
-
-
- Related Content 
------------------
-
-[Cacheability of render arrays](https://www.drupal.org/docs/drupal-apis/render-api/cacheability-of-render-arrays)
------------------------------------------------------------------------------------------------------------------
-
- Short version in the API documentation: Render API overview: Caching [Cache tags](https://www.drupal.org/docs/develop/drupal-apis/cache-api/cache-tags)
-----------------------------------------------------------------------------------
-
- Cache tags = data dependencies [Cache max-age](https://www.drupal.org/docs/develop/drupal-apis/cache-api/cache-max-age)
-----------------------------------------------------------------------------------------
-
- Cache max-age = time dependencies [Auto-placeholdering](https://www.drupal.org/docs/drupal-apis/render-api/auto-placeholdering)
----------------------------------------------------------------------------------------------
-
- Drupal 8's Render API automatically creates placeholders of highly dynamic parts of a page, to have the best possible cacheability. 
+Until these (and perhaps other) issues are resolved, beware that setting `max-age` on a render array included in a page is insufficient to ensure that anonymous users will see a new version after the `max-age` as elapsed. In the meanwhile, the [Cache Control Override](https://www.drupal.org/project/cache_control_override) contributed module tries to mitigate the problems. You might also have more luck setting a custom [cache tag](https://www.drupal.org/docs/8/api/cache-api/cache-tags) on pages with time-dependent content and invalidating those cache tags manually via `hook_cron()`. Good luck!
