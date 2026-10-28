@@ -303,11 +303,11 @@ default:
 
 '🖱️️️ PHPUnit Functional Javascript':
   <<: [ *with-composer, *test-setup ]
-  parallel: 2
+  parallel: 3
   variables:
     TESTSUITE: functional-javascript
-    CONCURRENCY: "12"
-    KUBERNETES_CPU_REQUEST: "14"
+    CONCURRENCY: "9"
+    KUBERNETES_CPU_REQUEST: "12"
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
@@ -317,7 +317,7 @@ default:
 
 '🌐️️ PHPUnit Functional':
   <<: [ *with-composer, *test-setup ]
-  parallel: 6
+  parallel: 7
   variables:
     TESTSUITE: functional
     CONCURRENCY: "15"
