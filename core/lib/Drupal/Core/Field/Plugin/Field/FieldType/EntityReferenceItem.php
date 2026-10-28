@@ -477,6 +477,9 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       }
     }
 
+    // Sort the handlers options.
+    natcasesort($handlers_options);
+
     $form = [
       '#type' => 'container',
       '#process' => [[static::class, 'fieldSettingsAjaxProcess']],
