@@ -64,6 +64,13 @@ class WorkspaceViewTest extends BrowserTestBase {
     // But editor 2 should be able to activate the Packers workspace.
     $this->drupalGet("admin/config/workflow/workspaces/manage/{$packers->id()}/activate");
     $this->assertSession()->statusCodeEquals(200);
+
+    // The workspace listing should only show workspaces the user can view.
+    // Editor 2 should see their own workspace but not editor 1's workspace.
+    $this->drupalGet('admin/config/workflow/workspaces');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Packers');
+    $this->assertSession()->pageTextNotContains('Bears');
   }
 
   /**

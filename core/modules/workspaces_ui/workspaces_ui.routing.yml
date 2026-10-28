@@ -4,7 +4,7 @@ entity.workspace.collection:
     _title: 'Workspaces'
     _entity_list: 'workspace'
   requirements:
-    _permission: 'view any workspace+administer workspaces+edit any workspace'
+    _permission: 'view own workspace+view any workspace+administer workspaces+edit any workspace'
 
 entity.workspace.activate_form:
   path: '/admin/config/workflow/workspaces/manage/{workspace}/activate'
