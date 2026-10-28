@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * @file
+ * Hooks for path_entity_test_external module.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function path_entity_test_external_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() === 'entity_test_external') {
+    $fields['path'] = BaseFieldDefinition::create('path')
+      ->setLabel(t('URL alias'))
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'path',
+        'weight' => 30,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setComputed(TRUE);
+
+    return $fields;
+  }
+}

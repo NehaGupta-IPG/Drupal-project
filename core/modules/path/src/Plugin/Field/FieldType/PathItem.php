@@ -81,8 +81,9 @@ class PathItem extends FieldItemBase {
     // Otherwise, fall back to the field/entity langcode.
     $alias_langcode = $langcode ?: $this->getLangcode();
 
-    // If we have an alias, we need to create or update a path alias entity.
-    if ($alias) {
+    // If we have an alias, and the entity has an internal path,
+    // we need to create or update a path alias entity.
+    if ($alias && $entity->toUrl()->isRouted()) {
       $properties = [
         'path' => '/' . $entity->toUrl()->getInternalPath(),
         'alias' => $alias,
@@ -103,7 +104,7 @@ class PathItem extends FieldItemBase {
         $pid = $ids ? reset($ids) : $pid;
       }
 
-      if (!$pid) {
+      if (!$update || !$pid) {
         $path_alias = $path_alias_storage->create($properties);
         $path_alias->save();
         $this->set('pid', $path_alias->id());
@@ -126,8 +127,9 @@ class PathItem extends FieldItemBase {
         }
       }
     }
-    elseif ($pid) {
-      // Otherwise, delete the old alias if the user erased it.
+    elseif ($pid && (!$alias || !$entity->toUrl()->isRouted())) {
+      // Otherwise, delete the old alias if the user erased it or the entity's
+      // url has become unrouted.
       $path_alias = $path_alias_storage->load($pid);
       if ($entity->isDefaultRevision()) {
         $path_alias_storage->delete([$path_alias]);
