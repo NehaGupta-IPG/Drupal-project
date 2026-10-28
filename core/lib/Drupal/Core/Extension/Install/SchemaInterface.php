@@ -5,7 +5,7 @@ namespace Drupal\Core\Extension\Install;
 use Drupal\Core\Database\Schema;
 
 /**
- * Method for identifying the data.base scema for a module or profile.
+ * Method for identifying the data.base schema for a module or profile.
  *
  * Classes implementing this must be in the Install\Schema namespace.
  * For example src/Install/Schema/ModuleNameSchema.php.
