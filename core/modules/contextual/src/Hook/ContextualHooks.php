@@ -2,7 +2,6 @@
 
 namespace Drupal\contextual\Hook;
 
-use Drupal\Component\Serialization\Json;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -94,19 +93,6 @@ class ContextualHooks {
         return $output;
     }
     return NULL;
-  }
-
-  /**
-   * Implements hook_contextual_links_view_alter().
-   *
-   * @see \Drupal\contextual\Plugin\views\field\ContextualLinks::render()
-   */
-  #[Hook('contextual_links_view_alter')]
-  public function contextualLinksViewAlter(&$element, $items): void {
-    if (isset($element['#contextual_links']['contextual'])) {
-      $encoded_links = $element['#contextual_links']['contextual']['metadata']['contextual-views-field-links'];
-      $element['#links'] = Json::decode(rawurldecode($encoded_links));
-    }
   }
 
 }
