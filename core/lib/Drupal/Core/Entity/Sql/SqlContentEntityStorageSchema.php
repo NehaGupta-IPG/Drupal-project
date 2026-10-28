@@ -664,6 +664,43 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   }
 
   /**
+   * Drops the indexes and unique keys of a table schema.
+   *
+   * @param string $table_name
+   *   The table name.
+   * @param array $schema
+   *   The table schema.
+   */
+  private function dropTableKeys(string $table_name, array $schema): void {
+    $schema_handler = $this->database->schema();
+    foreach (array_keys($schema['indexes'] ?? []) as $name) {
+      $schema_handler->dropIndex($table_name, $name);
+    }
+    foreach (array_keys($schema['unique keys'] ?? []) as $name) {
+      $schema_handler->dropUniqueKey($table_name, $name);
+    }
+  }
+
+  /**
+   * Adds the indexes and unique keys of a table schema.
+   *
+   * @param string $table_name
+   *   The table name.
+   * @param array $schema
+   *   The table schema.
+   */
+  private function addTableKeys(string $table_name, array $schema): void {
+    foreach ($schema['indexes'] ?? [] as $name => $specifier) {
+      // Check if the index exists because it might already have been
+      // created as part of the earlier entity type update event.
+      $this->addIndex($table_name, $name, $specifier, $schema);
+    }
+    foreach ($schema['unique keys'] ?? [] as $name => $specifier) {
+      $this->database->schema()->addUniqueKey($table_name, $name, $specifier);
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function handleEntityTypeSchemaUpdateExceptionOnDataCopy(EntityTypeInterface $entity_type, EntityTypeInterface $original, array &$sandbox) {
@@ -1628,18 +1665,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
             $schema_handler->addField($table_name, $name, $specifier, $new_keys);
           }
         }
-        if (!empty($schema[$table_name]['indexes'])) {
-          foreach ($schema[$table_name]['indexes'] as $name => $specifier) {
-            // Check if the index exists because it might already have been
-            // created as part of the earlier entity type update event.
-            $this->addIndex($table_name, $name, $specifier, $schema[$table_name]);
-          }
-        }
-        if (!empty($schema[$table_name]['unique keys'])) {
-          foreach ($schema[$table_name]['unique keys'] as $name => $specifier) {
-            $schema_handler->addUniqueKey($table_name, $name, $specifier);
-          }
-        }
+        $this->addTableKeys($table_name, $schema[$table_name]);
       }
     }
 
@@ -1696,16 +1722,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       $schema = $this->getSharedTableFieldSchema($storage_definition, $table_name, $column_names);
 
       // Drop indexes and unique keys first.
-      if (!empty($schema['indexes'])) {
-        foreach ($schema['indexes'] as $name => $specifier) {
-          $schema_handler->dropIndex($table_name, $name);
-        }
-      }
-      if (!empty($schema['unique keys'])) {
-        foreach ($schema['unique keys'] as $name => $specifier) {
-          $schema_handler->dropUniqueKey($table_name, $name);
-        }
-      }
+      $this->dropTableKeys($table_name, $schema);
       // Drop columns.
       foreach ($column_names as $column_name) {
         $schema_handler->dropField($table_name, $column_name);
@@ -1887,30 +1904,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
           }
         }
 
-        // Drop original indexes and unique keys.
-        if (!empty($original_schema[$table_name]['indexes'])) {
-          foreach ($original_schema[$table_name]['indexes'] as $name => $specifier) {
-            $schema_handler->dropIndex($table_name, $name);
-          }
-        }
-        if (!empty($original_schema[$table_name]['unique keys'])) {
-          foreach ($original_schema[$table_name]['unique keys'] as $name => $specifier) {
-            $schema_handler->dropUniqueKey($table_name, $name);
-          }
-        }
-        // Create new indexes and unique keys.
-        if (!empty($schema[$table_name]['indexes'])) {
-          foreach ($schema[$table_name]['indexes'] as $name => $specifier) {
-            // Check if the index exists because it might already have been
-            // created as part of the earlier entity type update event.
-            $this->addIndex($table_name, $name, $specifier, $schema[$table_name]);
-          }
-        }
-        if (!empty($schema[$table_name]['unique keys'])) {
-          foreach ($schema[$table_name]['unique keys'] as $name => $specifier) {
-            $schema_handler->addUniqueKey($table_name, $name, $specifier);
-          }
-        }
+        // Drop original indexes and unique keys, then create the new ones.
+        $this->dropTableKeys($table_name, $original_schema[$table_name] ?? []);
+        $this->addTableKeys($table_name, $schema[$table_name]);
       }
       $this->saveFieldSchemaData($storage_definition, $schema);
     }
