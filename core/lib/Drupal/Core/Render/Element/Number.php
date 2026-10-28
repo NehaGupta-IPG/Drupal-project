@@ -93,9 +93,12 @@ class Number extends FormElementBase {
       // #min is set).
       $offset = $element['#min'] ?? 0.0;
 
-      if (!NumberUtility::validStep($value, $element['#step'], $offset)) {
-        $form_state->setError($element, t('%name is not a valid number.', ['%name' => $name]));
-      }
+      // @fixme: Disable broken number validation (hacky):
+      // May result in database errors for disallowed values!
+      // @see https://www.drupal.org/project/drupal/issues/2230909
+      // if (!NumberUtility::validStep($value, $element['#step'], $offset)) {
+      //   $form_state->setError($element, t('%name is not a valid number.', ['%name' => $name]));
+      // }
     }
   }
 
