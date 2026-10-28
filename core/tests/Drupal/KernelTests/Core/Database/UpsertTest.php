@@ -48,7 +48,7 @@ class UpsertTest extends DatabaseTestBase {
 
     $result = $upsert->execute();
     // @todo Remove the assertion in drupal:13.0.0.
-    // @see https://www.drupal.org/project/drupal/issues/3615136
+    //   https://www.drupal.org/project/drupal/issues/3615136
     $this->assertNull($result);
 
     $num_records_after = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();

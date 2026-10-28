@@ -489,7 +489,7 @@ class StringDatabaseStorage implements StringStorageInterface {
    *   The string object.
    *
    * @return true
-   *   If the record upsert succeeded.
+   *   If the record UPSERT succeeded.
    *
    * @throws \Drupal\locale\StringStorageException
    *   If the string is not suitable for this storage, an exception is thrown.

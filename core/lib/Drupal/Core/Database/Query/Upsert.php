@@ -12,8 +12,7 @@ use Drupal\Core\Database\Connection;
  * composite (multi-field) unique or primary key constraints.
  *
  * @todo Remove commented out QueryExecutionVoidInterface in drupal:13.0.0.
- *
- * @see https://www.drupal.org/project/drupal/issues/3615136
+ *   in https://www.drupal.org/project/drupal/issues/3615136
  */
 abstract class Upsert extends Query implements \Countable /* , QueryExecutionVoidInterface */ {
 
