@@ -909,12 +909,14 @@ class ModuleInstaller implements ModuleInstallerInterface {
               return NULL;
             }
             break;
+
           case 'schema':
             if (is_subclass_of($class_name, SchemaInterface::class)) {
               /** @var \Drupal\Core\Extension\Install\SchemaInterface $class_name */
               return $class_name->getSchema();
             }
             break;
+
           case 'uninstall':
             /** @var \Drupal\Core\Extension\Install\UninstallInterface $class_name */
             if (is_subclass_of($class_name, UninstallInterface::class)) {
@@ -922,19 +924,20 @@ class ModuleInstaller implements ModuleInstallerInterface {
               return NULL;
             }
             break;
+
           case 'update_last_removed':
             if (is_subclass_of($class_name, LastRemovedInterface::class)) {
               /** @var \Drupal\Core\Extension\Install\LastRemovedInterface $class_name */
               return $class_name->getLastRemoved();
             }
             break;
+
         }
       }
     }
 
     $function = $extension->getName() . '_' . $hook;
     if (function_exists($function)) {
-      @trigger_error("Procedural hook_{$hook}() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use the class replacements instead. See https://www.drupal.org/node/3633696', E_USER_DEPRECATED);
       return $function(...$args);
     }
     return NULL;
