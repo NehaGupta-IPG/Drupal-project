@@ -16,6 +16,7 @@ use Drupal\Core\Extension\Exception\ObsoleteExtensionException;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\Install\InstallInterface;
 use Drupal\Core\Extension\Install\LastRemovedInterface;
+use Drupal\Core\Extension\Install\SchemaInterface;
 use Drupal\Core\Extension\Install\UninstallInterface;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Serialization\Yaml;
@@ -825,7 +826,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected function installSchema(Extension $extension): void {
     $extensionName = $extension->getName();
-    $schemaDefinition = $this->invoke($extension, 'schema') ?? [];
+    $schemaDefinition = $this->invoke($extension, 'schema', 'Install/Schema') ?? [];
     $schema = $this->connection->schema();
     if ($schemaDefinition instanceof Schema) {
       assert($schemaDefinition->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
@@ -852,7 +853,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected function uninstallSchema(Extension $extension): void {
     $extensionName = $extension->getName();
-    $schemaDefinition = $this->invoke($extension, 'schema') ?? [];
+    $schemaDefinition = $this->invoke($extension, 'schema', 'Install/Schema') ?? [];
     if ($schemaDefinition instanceof Schema) {
       $table_names = $schemaDefinition->tableNames();
     }
@@ -906,6 +907,12 @@ class ModuleInstaller implements ModuleInstallerInterface {
               /** @var \Drupal\Core\Extension\Install\InstallInterface $class_name */
               $class_name->doInstall(...$args);
               return NULL;
+            }
+            break;
+          case 'schema':
+            if (is_subclass_of($class_name, SchemaInterface::class)) {
+              /** @var \Drupal\Core\Extension\Install\SchemaInterface $class_name */
+              return $class_name->getSchema();
             }
             break;
           case 'uninstall':
