@@ -30,6 +30,11 @@ final class UpdateMetadataConfirmForm extends ConfirmFormBase {
    */
   protected MediaSourceStatus $status;
 
+  /**
+   * Whether the thumbnail of a media item with a missing source is removed.
+   */
+  protected bool $thumbnailRemoved = FALSE;
+
   public function __construct(
     protected readonly MediaMetadataRefresher $refresher,
   ) {}
@@ -47,8 +52,13 @@ final class UpdateMetadataConfirmForm extends ConfirmFormBase {
   public function buildForm(array $form, FormStateInterface $form_state, ?MediaInterface $media = NULL): array {
     $this->media = $media;
     $this->status = $this->refresher->check($media);
+    $this->thumbnailRemoved = $this->status === MediaSourceStatus::Missing && $this->refresher->hasIconThumbnail($media);
 
     $form = parent::buildForm($form, $form_state);
+    // With the thumbnail already removed there is nothing left to do.
+    if ($this->thumbnailRemoved) {
+      unset($form['actions']['submit']);
+    }
     // Cancelling must leave a status message, so it is a button, not a link.
     $form['actions']['cancel'] = [
       '#type' => 'submit',
@@ -71,7 +81,9 @@ final class UpdateMetadataConfirmForm extends ConfirmFormBase {
    */
   public function getDescription(): TranslatableMarkup {
     return match ($this->status) {
-      MediaSourceStatus::Missing => $this->t('The source file for media item %label is missing, unable to refresh.', ['%label' => $this->media->label()]),
+      MediaSourceStatus::Missing => $this->thumbnailRemoved
+        ? $this->t('The source file for media item %label is missing, unable to refresh. It already shows a placeholder icon.', ['%label' => $this->media->label()])
+        : $this->t('The source file for media item %label is missing, unable to refresh.', ['%label' => $this->media->label()]),
       MediaSourceStatus::Unavailable => $this->t('The remote source for media item %label is unavailable.', ['%label' => $this->media->label()]),
       MediaSourceStatus::Available => $this->t('The source for media item %label is available again.', ['%label' => $this->media->label()]),
     };

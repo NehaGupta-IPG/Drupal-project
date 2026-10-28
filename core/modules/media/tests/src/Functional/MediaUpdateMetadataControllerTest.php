@@ -12,6 +12,7 @@ use Drupal\media\Entity\MediaType;
 use Drupal\media\MediaInterface;
 use Drupal\media_test_oembed\Controller\ResourceController;
 use Drupal\Tests\media\Traits\OEmbedTestTrait;
+use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -25,6 +26,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class MediaUpdateMetadataControllerTest extends MediaFunctionalTestBase {
 
   use OEmbedTestTrait;
+  use TestFileCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -160,26 +162,48 @@ class MediaUpdateMetadataControllerTest extends MediaFunctionalTestBase {
    * Tests refreshing a media item whose source file is missing.
    */
   public function testRefreshMissingSourceFile(): void {
-    $media = $this->createFileMedia();
-    $thumbnail_id = $media->thumbnail->target_id;
-    unlink('public://foo.txt');
+    $media_type = $this->createMediaType('image');
+    $source_field = $media_type->getSource()->getSourceFieldDefinition($media_type)->getName();
+    $uri = $this->container->get('file_system')->copy($this->getTestFiles('image')[0]->uri, 'public://statue.png');
+    $file = FileEntity::create(['uri' => $uri]);
+    $file->save();
+    $media = Media::create([
+      'bundle' => $media_type->id(),
+      'name' => 'Statue',
+      $source_field => ['target_id' => $file->id(), 'alt' => 'Statue'],
+    ]);
+    $media->save();
+    $this->assertSame($uri, $media->thumbnail->entity->getFileUri());
+    unlink($uri);
 
     $this->clickRefresh($media);
     $assert_session = $this->assertSession();
     $assert_session->addressEquals('/media/' . $media->id() . '/update-metadata/confirm');
-    $assert_session->pageTextContains('The source file for media item File media is missing, unable to refresh.');
+    $assert_session->pageTextContains('The source file for media item Statue is missing, unable to refresh.');
+    $assert_session->pageTextNotContains('It already shows a placeholder icon.');
     $assert_session->buttonExists('Remove thumbnail');
 
     $this->submitForm([], 'Cancel');
     $assert_session->addressEquals('/admin/content/media');
-    $assert_session->statusMessageContains('Canceled. Media item File media remains unchanged.', 'status');
-    $this->assertSame($thumbnail_id, $this->reloadMedia($media)->thumbnail->target_id);
+    $assert_session->statusMessageContains('Canceled. Media item Statue remains unchanged.', 'status');
+    $this->assertSame($uri, $this->reloadMedia($media)->thumbnail->entity->getFileUri());
 
     $this->clickRefresh($media);
     $this->submitForm([], 'Remove thumbnail');
-    $assert_session->statusMessageContains('Thumbnail removed for media item File media.', 'status');
+    $assert_session->statusMessageContains('Thumbnail removed for media item Statue.', 'status');
+    $media = $this->reloadMedia($media);
+    $this->assertStringStartsWith($this->config('media.settings')->get('icon_base_uri') . '/', $media->thumbnail->entity->getFileUri());
     // The stored name survives, although the source no longer provides it.
-    $this->assertSame('File media', $this->reloadMedia($media)->label());
+    $this->assertSame('Statue', $media->label());
+
+    // Refreshing again explains there is nothing left to remove, instead of
+    // offering to remove the thumbnail a second time.
+    $this->clickRefresh($media);
+    $assert_session->pageTextContains('The source file for media item Statue is missing, unable to refresh. It already shows a placeholder icon.');
+    $assert_session->buttonNotExists('Remove thumbnail');
+    $this->submitForm([], 'Cancel');
+    $assert_session->statusMessageContains('Canceled. Media item Statue remains unchanged.', 'status');
+    $assert_session->pageTextNotContains('Thumbnail removed');
   }
 
   /**
@@ -193,11 +217,14 @@ class MediaUpdateMetadataControllerTest extends MediaFunctionalTestBase {
     $this->clickRefresh($media);
     $assert_session = $this->assertSession();
     $assert_session->pageTextContains('The remote source for media item Remote video is unavailable.');
+    // Only the form's own explanation is shown, not the source plugin's error.
+    $assert_session->pageTextNotContains('Could not retrieve the oEmbed resource.');
 
     // Retrying while the source is still unavailable shows the form again.
     $this->submitForm([], 'Retry');
     $assert_session->addressEquals('/media/' . $media->id() . '/update-metadata/confirm');
     $assert_session->pageTextContains('The remote source for media item Remote video is unavailable.');
+    $assert_session->pageTextNotContains('Could not retrieve the oEmbed resource.');
     $this->assertSame('Drupal Rap Video - Schipulcon09', $this->reloadMedia($media)->get('field_title')->value);
 
     $this->submitForm([], 'Cancel');
@@ -239,6 +266,11 @@ class MediaUpdateMetadataControllerTest extends MediaFunctionalTestBase {
     /** @var \Drupal\system\ActionConfigEntityInterface $action */
     $action = $this->container->get('entity_type.manager')->getStorage('action')->load('media_update_metadata');
     $this->assertSame('Refresh from source', $action->label());
+    // The action is offered in the media overview's bulk operations.
+    $this->drupalGet('/admin/content/media');
+    $this->assertSession()->optionExists('action', 'media_update_metadata');
+    $this->assertSession()->pageTextContains('Refresh from source');
+
     $action->execute([$this->reloadMedia($available), $this->reloadMedia($missing)]);
     $this->assertSame('bar.txt', $this->reloadMedia($available)->getSource()->getMetadata($available, 'name'));
 
