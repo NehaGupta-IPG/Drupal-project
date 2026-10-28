@@ -152,7 +152,7 @@ class HandlerTest extends UITestBase {
       // Remove the item and check that it's removed.
       $this->drupalGet($edit_handler_url);
       $this->submitForm([], 'Remove');
-      $this->assertSession()->linkByHrefNotExists($edit_handler_url, 0, 'The handler edit link does not appears in the UI after removing.');
+      $this->assertSession()->linkByHrefNotExists($edit_handler_url, 'The handler edit link does not appears in the UI after removing.');
 
       $this->submitForm([], 'Save');
       $view = $this->container->get('entity_type.manager')->getStorage('view')->load('test_view_empty');
