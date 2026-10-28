@@ -893,6 +893,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       $dedicated_table_field_columns = $table_mapping->getColumnNames($deleted_storage_definition->getName());
 
       $dedicated_table_name = $table_mapping->getDedicatedDataTableName($deleted_storage_definition, TRUE);
+      $dedicated_revision_table_name = NULL;
       $dedicated_table_name_mapping[$table_mapping->getDedicatedDataTableName($deleted_storage_definition)] = $dedicated_table_name;
       if ($this->entityType->isRevisionable()) {
         $dedicated_revision_table_name = $table_mapping->getDedicatedRevisionTableName($deleted_storage_definition, TRUE);
@@ -909,50 +910,33 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         }
       }
 
-      try {
-        if ($this->database->supportsTransactionalDDL()) {
-          // If the database supports transactional DDL, we can go ahead and
-          // rely on it. If not, we will have to rollback manually if something
-          // fails.
-          $transaction = $this->database->startTransaction();
-        }
-
-        // Copy the data from the base table.
-        $this->database->insert($dedicated_table_name)
-          ->from($this->getSelectQueryForFieldStorageDeletion($field_table_name, $shared_table_field_columns, $dedicated_table_field_columns))
-          ->execute();
-
-        // Copy the data from the revision table.
-        if (isset($dedicated_revision_table_name)) {
-          if ($this->entityType->isTranslatable()) {
-            $revision_table = $storage_definition->isRevisionable() ? $this->storage->getRevisionDataTable() : $this->storage->getDataTable();
-          }
-          else {
-            $revision_table = $storage_definition->isRevisionable() ? $this->storage->getRevisionTable() : $this->storage->getBaseTable();
-          }
-          $this->database->insert($dedicated_revision_table_name)
-            ->from($this->getSelectQueryForFieldStorageDeletion($revision_table, $shared_table_field_columns, $dedicated_table_field_columns, $field_table_name))
+      $this->runWithDdlRollback(
+        function () use ($storage_definition, $dedicated_table_field_columns, $field_table_name, $shared_table_field_columns, $dedicated_table_name, $dedicated_revision_table_name) {
+          // Copy the data from the base table.
+          $this->database->insert($dedicated_table_name)
+            ->from($this->getSelectQueryForFieldStorageDeletion($field_table_name, $shared_table_field_columns, $dedicated_table_field_columns))
             ->execute();
-        }
 
-        if (isset($transaction)) {
-          $transaction->commitOrRelease();
-        }
-      }
-      catch (\Exception $e) {
-        if ($this->database->supportsTransactionalDDL()) {
-          if (isset($transaction)) {
-            $transaction->rollBack();
+          // Copy the data from the revision table.
+          if (isset($dedicated_revision_table_name)) {
+            if ($this->entityType->isTranslatable()) {
+              $revision_table = $storage_definition->isRevisionable() ? $this->storage->getRevisionDataTable() : $this->storage->getDataTable();
+            }
+            else {
+              $revision_table = $storage_definition->isRevisionable() ? $this->storage->getRevisionTable() : $this->storage->getBaseTable();
+            }
+            $this->database->insert($dedicated_revision_table_name)
+              ->from($this->getSelectQueryForFieldStorageDeletion($revision_table, $shared_table_field_columns, $dedicated_table_field_columns, $field_table_name))
+              ->execute();
           }
-        }
-        else {
-          // Delete the dedicated tables.
-          foreach ($dedicated_table_field_schema as $name => $table) {
-            $this->database->schema()->dropTable($dedicated_table_name_mapping[$name]);
+        },
+        function () use ($dedicated_table_name_mapping) {
+          // Delete the dedicated tables if the copy fails.
+          foreach ($dedicated_table_name_mapping as $table_name) {
+            $this->database->schema()->dropTable($table_name);
           }
-        }
-        throw $e;
-      }
+        },
+      );
 
       // Delete the field from the shared tables.
       $this->deleteSharedTableSchema($storage_definition);
