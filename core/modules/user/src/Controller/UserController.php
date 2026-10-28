@@ -73,9 +73,18 @@ class UserController extends ControllerBase {
     FloodInterface $flood,
     protected TimeInterface $time,
     protected OneTimeAuthentication $oneTimeAuthentication,
-    protected LoginFinalizer $loginFinalizer,
-    protected LogoutFinalizer $logoutFinalizer,
-    protected AccountCancellation $accountCancellation,
+    /**
+     * @var \Closure(): \Drupal\user\LoginFinalizer
+     */
+    protected \Closure $loginFinalizer,
+    /**
+     * @var \Closure(): \Drupal\user\LogoutFinalizer
+     */
+    protected \Closure $logoutFinalizer,
+    /**
+     * @var \Closure(): \Drupal\user\AccountCancellation
+     */
+    protected \Closure $accountCancellation,
   ) {
     $this->dateFormatter = $date_formatter;
     $this->userStorage = $user_storage;
@@ -96,9 +105,9 @@ class UserController extends ControllerBase {
       $container->get('flood'),
       $container->get('datetime.time'),
       $container->get(OneTimeAuthentication::class),
-      $container->get(LoginFinalizer::class),
-      $container->get(LogoutFinalizer::class),
-      $container->get(AccountCancellation::class),
+      fn () => $container->get(LoginFinalizer::class),
+      fn () => $container->get(LogoutFinalizer::class),
+      fn () => $container->get(AccountCancellation::class),
     );
   }
 
@@ -137,7 +146,7 @@ class UserController extends ControllerBase {
     if ($account->isAuthenticated()) {
       // The current user is already logged in.
       if ($account->id() == $uid) {
-        $this->logoutFinalizer->finalizeLogout();
+        ($this->logoutFinalizer)()->finalizeLogout();
         // We need to begin the redirect process again because logging out will
         // destroy the session.
         return $this->redirect(
@@ -286,7 +295,7 @@ class UserController extends ControllerBase {
     $this->flood->clear('user.failed_login_user', $identifier);
     $this->flood->clear('user.http_login', $identifier);
 
-    $this->loginFinalizer->finalizeLogin($user);
+    ($this->loginFinalizer)()->finalizeLogin($user);
     $this->logger->info('User %name used one-time login link at time %timestamp.', [
       '%name' => $user->getDisplayName(),
       '%timestamp' => $timestamp,
@@ -431,7 +440,7 @@ class UserController extends ControllerBase {
   )]
   public function logout() {
     if ($this->currentUser()->isAuthenticated()) {
-      $this->logoutFinalizer->finalizeLogout();
+      ($this->logoutFinalizer)()->finalizeLogout();
     }
     return $this->redirect('<front>');
   }
@@ -474,7 +483,7 @@ class UserController extends ControllerBase {
         $edit = [
           'user_cancel_notify' => $account_data['cancel_notify'] ?? $this->config('user.settings')->get('notify.status_canceled'),
         ];
-        $this->accountCancellation->cancel($edit, $user->id(), $account_data['cancel_method']);
+        ($this->accountCancellation)()->cancel($edit, $user->id(), $account_data['cancel_method']);
         // Since user_cancel() is not invoked via Form API, batch processing
         // needs to be invoked manually and should redirect to the front page
         // after completion.
