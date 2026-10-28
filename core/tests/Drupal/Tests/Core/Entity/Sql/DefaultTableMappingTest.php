@@ -339,6 +339,7 @@ class DefaultTableMappingTest extends UnitTestCase {
     $data[] = [FALSE, ['foo', 'bar'], 'deleted', 'deleted'];
     // Bundle field referencing a dedicated table column.
     $data[] = [FALSE, ['foo'], 'entity_id', 'entity_id'];
+    $data[] = [FALSE, ['foo'], 'delta', 'delta'];
     // Bundle field that owns a property named like a dedicated table column.
     $data[] = [FALSE, ['langcode'], 'langcode', 'test_langcode'];
 

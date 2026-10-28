@@ -12,30 +12,9 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 class DefaultTableMapping implements TableMappingInterface {
 
   /**
-   * Columns that every dedicated field table has regardless of field type.
-   *
-   * Unlike TableMappingInterface::getReservedColumns(), which is also used
-   * to validate a field type's own column names, this list is specific to
-   * resolving column names for a dedicated-table field (e.g. when building
-   * an index) and must not be used for that broader validation.
-   *
-   * A field type's own column takes precedence when its name collides with
-   * one of these (see getFieldColumnName()). This means a field type that
-   * owns e.g. its own "langcode" property (such as the contrib "address"
-   * field type) has no way to build an index against the table's built-in
-   * "langcode" column instead: any index naming "langcode" always resolves
-   * to the field's own column. This is a deliberate, permanent limitation,
-   * not a gap to be closed later - disambiguating the two would require
-   * disallowing field types from using these names for their own columns,
-   * which is a backward-incompatible change existing field types already
-   * violate, and is out of scope here. It does not regress anything: prior
-   * to this class distinguishing dedicated-table reserved columns from a
-   * field's own columns at all, there was no way to reference the table's
-   * built-in columns for indexing purposes either, colliding or not.
-   *
-   * @see \Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema::getDedicatedTableSchema()
+   * Columns that every dedicated field table has.
    */
-  const DEDICATED_TABLE_COLUMNS = ['bundle', 'deleted', 'entity_id', 'revision_id', 'langcode'];
+  protected const DEDICATED_TABLE_COLUMNS = ['bundle', 'deleted', 'entity_id', 'revision_id', 'langcode', 'delta'];
 
   /**
    * The entity type definition.
@@ -268,14 +247,6 @@ class DefaultTableMapping implements TableMappingInterface {
     $dedicated_table_definitions = array_filter($table_mapping->fieldStorageDefinitions, function (FieldStorageDefinitionInterface $definition) use ($table_mapping) {
       return $table_mapping->requiresDedicatedTableStorage($definition);
     });
-    $extra_columns = [
-      'bundle',
-      'deleted',
-      'entity_id',
-      'revision_id',
-      'langcode',
-      'delta',
-    ];
     foreach ($dedicated_table_definitions as $field_name => $definition) {
       $tables = [$table_mapping->getDedicatedDataTableName($definition)];
       if ($revisionable && $definition->isRevisionable()) {
@@ -283,7 +254,7 @@ class DefaultTableMapping implements TableMappingInterface {
       }
       foreach ($tables as $table_name) {
         $table_mapping->setFieldNames($table_name, [$field_name]);
-        $table_mapping->setExtraColumns($table_name, $extra_columns);
+        $table_mapping->setExtraColumns($table_name, static::DEDICATED_TABLE_COLUMNS);
       }
     }
 
