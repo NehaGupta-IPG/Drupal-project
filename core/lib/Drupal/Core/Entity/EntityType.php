@@ -84,6 +84,15 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * The name of the default administrative permission.
    *
+   * This permission must be declared by the module providing the entity type.
+   * Users with the administrative permission can perform create, view, update
+   * or delete operations on any entity of that type. They also are granted
+   * access to the overview (or collection) of the entities of that type, if one
+   * exists.
+   *
+   * If a custom access control handler is declared, access can be restricted
+   * even for users with this permission.
+   *
    * @var string
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
@@ -91,6 +100,19 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
 
   /**
    * The name of the collection permission.
+   *
+   * This permission must be declared by the module providing the entity type.
+   * Users with the collection permission are allowed to access the overview (or
+   * collection) of the entities of that type, if one exists. It does not grant
+   * access to any particular entities, but is used in combination with other
+   * permissions. For example. this makes it possible to grant users access to
+   * view entities of a particular type in the overview, but not edit or delete
+   * them. Another example is to grant users access to manage certain entities
+   * from the overview, but not all entities.
+   *
+   * If a custom access control handler is declared, access can be restricted
+   * even further for users with this permission or, alternatively, further
+   * access can be granted.
    *
    * @var string
    */
