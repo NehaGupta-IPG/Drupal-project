@@ -760,7 +760,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $url->setAbsolute()->setOptions(['base_url' => '', 'query' => []])->toString(),
     );
     $message = 'The "' . static::$entityTypeId . '" parameter was not converted for the path "' . $path . '" (route name: "rest.entity.' . static::$entityTypeId . '.GET")';
-    $this->assertResourceErrorResponse(404, $message, $response);
+    $this->assertResourceErrorResponse(404, $message, $response, ['4xx-response', 'http_response'], []);
 
     $this->resourceConfigStorage->load(static::$resourceConfigId)->delete();
     $this->refreshTestStateAfterRestConfigChange();

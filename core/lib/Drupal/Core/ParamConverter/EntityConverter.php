@@ -149,7 +149,7 @@ class EntityConverter implements ParamConverterInterface, ParamConverterRouteReq
         !in_array($entity->bundle(), $definition['bundle'], TRUE)
       ) {
         throw new ParamNotConvertedException(
-          sprintf('Entity latest revision of type "%s" with ID "%s" and bundle "%s" did not match the required bundle "%s"', $entity_type_id, $entity->id(), $entity->bundle(), $definition['bundle']),
+          sprintf('Entity latest revision of type "%s" with ID "%s" and bundle "%s" did not match the required bundle(s) "%s"', $entity_type_id, $entity->id(), $entity->bundle(), implode(', ', $definition['bundle'])),
           // Entities cannot change bundle, so this does not expire.
           cacheability: new CacheableMetadata(),
         );
@@ -166,7 +166,7 @@ class EntityConverter implements ParamConverterInterface, ParamConverterRouteReq
       !in_array($entity->bundle(), $definition['bundle'], TRUE)
     ) {
       throw new ParamNotConvertedException(
-        sprintf('Entity of type "%s" with ID "%s" and bundle "%s" did not match the required bundle "%s"', $entity_type_id, $entity->id(), $entity->bundle(), $definition['bundle']),
+        sprintf('Entity of type "%s" with ID "%s" and bundle "%s" did not match the required bundle(s) "%s"', $entity_type_id, $entity->id(), $entity->bundle(), implode(', ', $definition['bundle'])),
         // Entities cannot change bundle, so this does not expire.
         cacheability: new CacheableMetadata(),
       );
