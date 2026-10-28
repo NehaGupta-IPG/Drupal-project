@@ -781,16 +781,17 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *   The storage definition of the field being updated.
    * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
    *   The original storage definition.
-   * @param callable $undo
-   *   Restores the original schema, if the database cannot roll back DDL.
    */
-  private function recreateFieldSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original, callable $undo): void {
+  private function recreateFieldSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original): void {
     // The field may move between shared and dedicated tables, so use
     // performFieldSchemaOperation() to pick the right method.
-    $this->runWithDdlRollback(function () use ($storage_definition, $original) {
-      $this->performFieldSchemaOperation('delete', $original);
-      $this->performFieldSchemaOperation('create', $storage_definition);
-    }, $undo);
+    $this->runWithDdlRollback(
+      function () use ($storage_definition, $original) {
+        $this->performFieldSchemaOperation('delete', $original);
+        $this->performFieldSchemaOperation('create', $storage_definition);
+      },
+      fn () => $this->performFieldSchemaOperation('create', $original),
+    );
   }
 
   /**
@@ -1840,7 +1841,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    */
   protected function updateDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
     if (!$this->storage->countFieldData($original, TRUE)) {
-      $this->recreateFieldSchema($storage_definition, $original, fn () => $this->performFieldSchemaOperation('create', $original));
+      $this->recreateFieldSchema($storage_definition, $original);
     }
     else {
       if (empty($storage_definition->getSetting('column_changes_handled')) && $this->hasColumnChanges($storage_definition, $original)) {
@@ -1898,7 +1899,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    */
   protected function updateSharedTableSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
     if (!$this->storage->countFieldData($original, TRUE)) {
-      $this->recreateFieldSchema($storage_definition, $original, fn () => $this->createSharedTableSchema($original));
+      $this->recreateFieldSchema($storage_definition, $original);
     }
     else {
       if (empty($storage_definition->getSetting('column_changes_handled')) && $this->hasColumnChanges($storage_definition, $original)) {
