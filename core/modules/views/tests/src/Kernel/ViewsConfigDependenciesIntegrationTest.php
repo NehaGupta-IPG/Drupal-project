@@ -34,7 +34,7 @@ class ViewsConfigDependenciesIntegrationTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $testViews = ['entity_test_fields'];
+  public static $testViews = ['entity_test_fields', 'test_view'];
 
   /**
    * {@inheritdoc}
@@ -168,6 +168,22 @@ class ViewsConfigDependenciesIntegrationTest extends ViewsKernelTestBase {
     $this->container->get('module_installer')->uninstall(['entity_test']);
     // Check that the View has been deleted.
     $this->assertNull(View::load('entity_test_fields'));
+  }
+
+  /**
+   * Tests dependencies from display extenders bubble up to the main view.
+   */
+  public function testDisplayExtenderDependenciesBubbleUp(): void {
+    $this->enableModules(['views_test_display_extender']);
+    $this->config('views.settings')->set('display_extenders', ['views_test_display_extender_display_extender_test'])->save();
+    $view = View::load('test_view');
+    $display =& $view->getDisplay('default');
+    $display['display_options']['display_extenders']['views_test_display_extender_display_extender_test'] = [
+      'test_extender_test_option' => 'override',
+    ];
+    $view->save();
+
+    self::assertContains('views_test_display_extender', $view->getDependencies()['module'] ?? []);
   }
 
 }

@@ -74,6 +74,29 @@ abstract class DisplayExtenderPluginBase extends PluginBase {
    */
   public function defaultableSections(&$sections, $section = NULL) {}
 
+  /**
+   * Determines if the plugin is enabled.
+   *
+   * Display extenders are instantiated on every display, and may affect other
+   * plugins. We naively consider a plugin as active if it does not provide
+   * default options (i.e. is always on), or the configuration is non-default.
+   *
+   * Complex display extenders should override this method for best results.
+   *
+   * @return bool
+   *   TRUE if it is enabled, FALSE otherwise.
+   */
+  public function isEnabled(): bool {
+    $defaults = [];
+    $this->setOptionDefaults($defaults, $this->defineOptions());
+    if (empty($defaults)) {
+      // No default options specified, assume "always on".
+      return TRUE;
+    }
+    // Use loose type comparison for calls from ::submitOptionsForm.
+    return $defaults != $this->options;
+  }
+
 }
 
 /**

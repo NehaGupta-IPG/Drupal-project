@@ -1,0 +1,7 @@
+name: 'Views Test Display Extender'
+type: module
+description: 'Provides a display extender that does not live in views_test_data.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:views
