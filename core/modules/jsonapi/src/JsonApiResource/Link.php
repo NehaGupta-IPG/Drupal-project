@@ -78,7 +78,11 @@ final class Link implements CacheableDependencyInterface {
       return is_string($target_attribute_value) || is_array($target_attribute_value);
     }, array_values($target_attributes)));
     $generated_url = $url->setAbsolute()->toString(TRUE);
-    $this->href = $generated_url->getGeneratedUrl();
+    $absolute_url = $generated_url->getGeneratedUrl();
+
+    \Drupal::moduleHandler()->alter('jsonapi_generated_link', $absolute_url);
+
+    $this->href = $absolute_url;
     $this->uri = $url;
     $this->rel = $link_relation_type;
     $this->attributes = $target_attributes;
