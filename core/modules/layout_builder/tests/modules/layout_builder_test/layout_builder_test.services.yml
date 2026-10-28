@@ -1,5 +1,9 @@
 services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
   layout_builder_test.i_have_runtime_contexts:
     class: Drupal\layout_builder_test\ContextProvider\IHaveRuntimeContexts
     tags:
       - { name: 'context_provider' }
+  Drupal\layout_builder_test\EventSubscriber\LayoutBuilderTestSubscriber: ~

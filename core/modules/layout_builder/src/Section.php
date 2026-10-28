@@ -4,7 +4,11 @@ namespace Drupal\layout_builder;
 
 use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
 use Drupal\Core\Plugin\PreviewAwarePluginInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Render\Element;
+use Drupal\layout_builder\Event\SectionBuildRegionsRenderArrayEvent;
+use Drupal\layout_builder\Event\SectionBuildRenderArrayEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides a domain object for layout sections.
@@ -83,12 +87,11 @@ class Section implements ThirdPartySettingsInterface {
    *   A renderable array representing the content of the section.
    */
   public function toRenderArray(array $contexts = [], $in_preview = FALSE) {
-    $regions = [];
-    foreach ($this->getComponents() as $component) {
-      if ($output = $component->toRenderArray($contexts, $in_preview)) {
-        $regions[$component->getRegion()][$component->getUuid()] = $output;
-      }
-    }
+    $event = new SectionBuildRegionsRenderArrayEvent($this, $contexts, $in_preview);
+    $this->eventDispatcher()->dispatch($event);
+    $regions = $event->getRegions();
+    $metadata = CacheableMetadata::createFromRenderArray($regions);
+    $metadata->merge($event->getCacheableMetadata())->applyTo($regions);
 
     $layout = $this->getLayout($contexts);
     if ($layout instanceof PreviewAwarePluginInterface) {
@@ -100,7 +103,11 @@ class Section implements ThirdPartySettingsInterface {
     if (!Element::isEmpty($build) && isset($contexts['layout_builder.entity'])) {
       $build['#entity'] = $contexts['layout_builder.entity']->getContextValue();
     }
-    return $build;
+
+    $section_build_event = new SectionBuildRenderArrayEvent($this, $build, $contexts, $in_preview);
+    $this->eventDispatcher()->dispatch($section_build_event);
+
+    return $section_build_event->getBuild();
   }
 
   /**
@@ -332,6 +339,16 @@ class Section implements ThirdPartySettingsInterface {
       $component->setWeight($weight++);
     }
     return $this;
+  }
+
+  /**
+   * Wraps the event dispatcher.
+   *
+   * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   *   The event dispatcher.
+   */
+  protected function eventDispatcher(): EventDispatcherInterface {
+    return \Drupal::service('event_dispatcher');
   }
 
   /**
