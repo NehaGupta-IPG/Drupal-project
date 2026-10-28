@@ -45,19 +45,19 @@ final readonly class Unpacker {
    * Stores the package's unpacked version in its `composer.json` file.
    */
   public function writeUnpackedVersion(): void {
-    $file = $this->composer->getConfig()->get('vendor-dir') . '/composer';
+    $path = $this->composer->getConfig()->get('vendor-dir') . '/composer';
 
-    assert(isset($file) && is_dir($file) && is_writable($file));
-    $file .= '/recipe-unpack.json';
+    assert(is_dir($path) && is_writable($path));
+    $path .= '/recipe-unpack.json';
 
     $manipulator = new JsonManipulator(
-      file_exists($file) ? file_get_contents($file) : '{}',
+      file_exists($path) ? file_get_contents($path) : '{}',
     );
     $manipulator->addMainKey(
       $this->package->getName(),
       $this->package->getPrettyVersion(),
     );
-    file_put_contents($file, $manipulator->getContents());
+    file_put_contents($path, $manipulator->getContents());
   }
 
   /**
