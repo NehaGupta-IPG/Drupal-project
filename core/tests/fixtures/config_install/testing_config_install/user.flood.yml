@@ -1,8 +1,9 @@
 _core:
-  default_config_hash: UYfMzeP1S8jKm9PSvxf7nQNe8DsNS-3bc2WSNNXBQWs
+  default_config_hash: ya3jJKHyb7Nyw11JB-6iQIyO8tZ72fQGLvNDVCrx404
 langcode: fr
 uid_only: false
 ip_limit: 50
 ip_window: 3600
 user_limit: 5
 user_window: 21600
+use_username: false

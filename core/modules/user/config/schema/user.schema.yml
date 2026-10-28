@@ -131,6 +131,10 @@ user.flood:
       label: 'User window'
       constraints:
         PositiveOrZero: ~
+    use_username:
+      type: boolean
+      label: 'Use username as identifier'
+
 user.role.*:
   type: config_entity
   label: 'User role settings'

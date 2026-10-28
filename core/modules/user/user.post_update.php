@@ -35,3 +35,12 @@ function user_post_update_add_created_to_display(array &$sandbox): void {
     return ($display->getTargetEntityTypeId() === 'user') && is_null($display->getComponent('created'));
   }, TRUE);
 }
+
+/**
+ * Update user.flood with a default value for the new `use_username` setting.
+ */
+function user_post_update_user_flood_default_use_username(): void {
+  $config = \Drupal::configFactory()->getEditable('user.flood');
+  $config->set('use_username', FALSE);
+  $config->save();
+}

@@ -147,6 +147,48 @@ class UserLoginTest extends BrowserTestBase {
   }
 
   /**
+   * Tests the per-unknown-user login flood control with use_username.
+   */
+  public function testPerUnknownUserLoginFloodControlWithUseUsername(): void {
+    $this->config('user.flood')
+      // Set a high global limit out so that it is not relevant in the test.
+      ->set('ip_limit', 4000)
+      ->set('user_limit', 3)
+      ->set('use_username', TRUE)
+      ->save();
+
+    // Create an existing user and an unsaved user with an unknown username.
+    $user1 = $this->drupalCreateUser([]);
+    $unknown_user = User::create(['name' => $this->randomMachineName()]);
+    $unknown_user->passRaw = $this->randomString();
+
+    // Try 3 failed logins for the unknown user, they will not trigger flood
+    // control.
+    for ($i = 0; $i < 3; $i++) {
+      $this->assertFailedLogin($unknown_user);
+    }
+
+    // A successful login for user 1 should not trigger any flood control.
+    $this->drupalLogin($user1);
+    $this->drupalLogout();
+
+    // One more attempt for the unknown user should be blocked.
+    $this->assertFailedLogin($unknown_user, 'user');
+
+    // Create a user with the previously unknown username.
+    $user2 = $this->drupalCreateUser([], $unknown_user->getAccountName());
+
+    // Add Created field to the user profile display so that there is something
+    // to check page contents against.
+    EntityViewDisplay::collectRenderDisplay($user2, 'default')
+      ->setComponent('created', ['type' => 'timestamp'])
+      ->save();
+    // Try to log in as user 2, as it now exists, it should be successful.
+    $this->drupalLogin($user2);
+    $this->assertSession()->responseContains('Created');
+  }
+
+  /**
    * Tests user password is re-hashed upon login after changing $count_log2.
    */
   public function testPasswordRehashOnLogin(): void {
