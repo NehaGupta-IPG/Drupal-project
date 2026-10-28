@@ -15,6 +15,9 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
 /**
  * Provides UI helper methods using the HTTP kernel to make requests.
  *
+ * Assertions and helpers from Drupal\KernelTests\AssertContentTrait can be
+ * used.
+ *
  * This is for use by Kernel tests, with the following limitations:
  * - There is no logged in user. Use \Drupal\Tests\user\Traits\UserCreationTrait
  *   to set a current user.
@@ -22,8 +25,9 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
  *   theme and then set it as active.
  * - Session semantics differ from normal page requests. Do not rely on session
  *   state beyond its existence (no persistence or regeneration).
- * - Page caching modules will not work. See \Drupal\Tests\Traits\Core\Cache\PageCachePolicyTrait
- *   for how to set them up.
+ * - Page caching modules will not work. See
+ *   \Drupal\Tests\Traits\Core\Cache\PageCachePolicyTrait for how to set them
+ *   up.
  */
 trait HttpKernelUiHelperTrait {
 
@@ -35,6 +39,13 @@ trait HttpKernelUiHelperTrait {
    * This is lazily initialized by the first call to self::drupalGet().
    */
   protected ?Mink $mink;
+
+  /**
+   * The current raw content.
+   *
+   * @var string
+   */
+  protected string $content;
 
   /**
    * Retrieves a Drupal path.
@@ -95,11 +106,8 @@ trait HttpKernelUiHelperTrait {
       $this->htmlOutput($html_output);
     }
 
-    // If $this->content exists, set it for the benefit of all the methods in
-    // \Drupal\KernelTests\AssertContentTrait.
-    if (property_exists($this, 'content')) {
-      $this->content = $out;
-    }
+    // Set the content for use with \Drupal\KernelTests\AssertContentTrait.
+    $this->content = $out;
 
     return $out;
   }
