@@ -30,3 +30,8 @@
   margin-right: auto;
   margin-left: auto;
 }
+
+.ck-widget {
+  margin-block: 16px;
+  margin-inline: 40px;
+}
