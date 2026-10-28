@@ -199,7 +199,20 @@ function hook_node_access_records(NodeInterface $node): array {
  * user must have one or more matching permissions in order to complete the
  * requested operation.
  *
- * A module may deny all access to a node by setting $grants to an empty array.
+ * If $grants is empty and the node is published, the default grant (view access
+ * for everyone) is used. To deny all access to a node, a module must set
+ * $grants to a record that grants nothing, for example:
+ * @code
+ * $grants = [
+ *   [
+ *     'realm' => 'all',
+ *     'gid' => 0,
+ *     'grant_view' => 0,
+ *     'grant_update' => 0,
+ *     'grant_delete' => 0,
+ *   ],
+ * ];
+ * @endcode
  *
  * The preferred use of this hook is in a module that bridges multiple node
  * access modules with a configurable behavior, as shown in the example with the
