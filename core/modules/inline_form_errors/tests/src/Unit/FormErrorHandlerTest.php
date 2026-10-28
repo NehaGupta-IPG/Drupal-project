@@ -162,6 +162,77 @@ class FormErrorHandlerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that an inherited field-level error is shown inline only once.
+   *
+   * A single error set on a parent element (for example via
+   * $form_state->setErrorByName() on an entity reference field rendered with an
+   * inline entity form) is inherited, through parent traversal, by every
+   * renderable child. Without deduplication the same message is rendered inline
+   * once per child. The error itself must remain on every element (so the
+   * error indicator, e.g. aria-invalid, is preserved), but the message must be
+   * suppressed on all but the first displaying element.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3450375
+   * @legacy-covers ::handleFormErrors
+   */
+  public function testInheritedErrorMessageShownOnce(): void {
+    $form = [
+      '#parents' => [],
+      '#form_id' => 'test_form',
+      '#array_parents' => [],
+    ];
+    // A group whose children all inherit an error set on the group itself,
+    // mirroring an inline entity form. The group and both children render an
+    // inline message.
+    $form['group'] = [
+      '#type' => 'fieldset',
+      '#title' => 'Group',
+      '#parents' => ['group'],
+      '#array_parents' => ['group'],
+      '#id' => 'edit-group',
+    ];
+    $form['group']['one'] = [
+      '#type' => 'textfield',
+      '#title' => 'One',
+      '#parents' => ['group', 'one'],
+      '#array_parents' => ['group', 'one'],
+      '#id' => 'edit-group-one',
+      '#theme_wrappers' => ['form_element'],
+    ];
+    $form['group']['two'] = [
+      '#type' => 'textfield',
+      '#title' => 'Two',
+      '#parents' => ['group', 'two'],
+      '#array_parents' => ['group', 'two'],
+      '#id' => 'edit-group-two',
+      '#theme_wrappers' => ['form_element'],
+    ];
+
+    // This test only asserts the deduplication flags; message display is
+    // covered by ::testErrorMessagesInline. The single retained error produces
+    // one summary message.
+    $this->renderer->expects($this->once())->method('renderInIsolation')->willReturn('summary');
+    $this->messenger->expects($this->once())->method('addError');
+
+    $form_state = new FormState();
+    // Set the error on the parent element only.
+    $form_state->setErrorByName('group', 'The group has an error.');
+    $this->formErrorHandler->handleFormErrors($form, $form_state);
+
+    // The error is inherited by the group and both children, so #errors - and
+    // therefore the error indicator - is preserved on all three.
+    $this->assertSame('The group has an error.', $form['group']['#errors']);
+    $this->assertSame('The group has an error.', $form['group']['one']['#errors']);
+    $this->assertSame('The group has an error.', $form['group']['two']['#errors']);
+
+    // The message is kept on the first (outermost) displaying element and
+    // suppressed on the children, so it is rendered inline exactly once.
+    $this->assertArrayNotHasKey('#error_no_message', $form['group']);
+    $this->assertTrue($form['group']['one']['#error_no_message']);
+    $this->assertTrue($form['group']['two']['#error_no_message']);
+  }
+
+  /**
    * Tests that opting out of Inline Form Errors works.
    */
   public function testErrorMessagesNotInline(): void {
