@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\Exception\ObsoleteExtensionException;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
+use Drupal\Core\Extension\Install\InstallInterface;
 use Drupal\Core\Extension\Install\LastRemovedInterface;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Serialization\Yaml;
@@ -472,7 +473,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::InstallEntities);
 
       // Allow the module to perform install tasks.
-      $this->invoke($module_filenames[$module], 'install', '', [$sync_status]);
+      $this->invoke($module_filenames[$module], 'install', 'Install/Installer', [$sync_status]);
 
       // Record the fact that it was installed.
       \Drupal::logger('system')->info('%module module installed.', ['%module' => $module]);
@@ -897,10 +898,18 @@ class ModuleInstaller implements ModuleInstallerInterface {
   protected function invoke(Extension $extension, string $hook, string $directory_search = '', array $args = []): mixed {
     if ($directory_search != '') {
       $class_name = install_get_fixed_class_name($extension, $directory_search);
-      if (class_exists($class_name) && is_subclass_of($class_name, LastRemovedInterface::class)) {
+      if (class_exists($class_name)) {
         switch ($hook) {
+          case 'install':
+            if (is_subclass_of($class_name, InstallInterface::class)) {
+              return $class_name::doInstall();
+            }
+            break;
           case 'update_last_removed':
-            return $class_name::getLastRemoved();
+            if (is_subclass_of($class_name, LastRemovedInterface::class)) {
+              return $class_name::getLastRemoved();
+            }
+            break;
         }
       }
     }
