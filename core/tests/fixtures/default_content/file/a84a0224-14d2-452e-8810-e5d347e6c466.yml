@@ -1,0 +1,24 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: a84a0224-14d2-452e-8810-e5d347e6c466
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: test.yml
+  uri:
+    -
+      value: 'public://test.yml'
+  filemime:
+    -
+      value: application/x-yaml
+  filesize:
+    -
+      value: 45
+  status:
+    -
+      value: true
