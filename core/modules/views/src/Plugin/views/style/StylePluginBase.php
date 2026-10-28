@@ -659,7 +659,7 @@ abstract class StylePluginBase extends PluginBase {
    * @param array $result
    *   The result array from $view->result.
    */
-  protected function renderFields(array $result) {
+  public function renderFields(array $result) {
     if (!$this->usesFields()) {
       return;
     }
@@ -788,6 +788,23 @@ abstract class StylePluginBase extends PluginBase {
     if (isset($this->rendered_fields[$index][$field])) {
       return $this->rendered_fields[$index][$field];
     }
+  }
+
+  /**
+   * Gets all rendered fields.
+   *
+   * @return array|null
+   *   The output of all rendered fields, or NULL if it was empty.
+   */
+  public function getRenderedFields() {
+    return $this->rendered_fields ?? NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRenderedField($field_value, $row_index, $field_name) {
+    $this->rendered_fields[$row_index][$field_name] = $field_value;
   }
 
   /**
