@@ -762,6 +762,209 @@
   };
 
   /**
+   * Submits a form via Ajax.
+   *
+   * This function implements a similar, but reduced, API as the jQuery Form
+   * plugin's ajaxSubmit() function.
+   *
+   * @param form
+   * @param options
+   */
+  function submitForm(form, options) {
+    const $form = $(form);
+
+    // @todo Keep for BC with the jQuery Form plugin, or remove it.
+    const veto = {};
+    $form.trigger('form-pre-serialize', [$form, options, veto]);
+    if (veto.veto) {
+      return;
+    }
+
+    // Invoke beforeSerialize(), which can:
+    // - Return false to abort the submission.
+    // - Set options.data with data to submit in addition to the form elements.
+    if (options.beforeSerialize) {
+      const proceed = options.beforeSerialize($form, options);
+      if (proceed === false) {
+        return;
+      }
+    }
+    if (options.data) {
+      options.extraData = options.data;
+      delete options.data;
+    }
+
+    // Invoke beforeSubmit(), which can:
+    // - Return false to abort the submission.
+    // - Modify the form values to submit.
+    //
+    // For BC with the jQuery Form plugin, the form data is converted to an
+    // array of objects with 'name' and 'value' properties.
+    //
+    // @todo If/when we're willing to break the BC of beforeSubmit(), we can
+    //   simplify this to pass the FormData object instead of converting to an
+    //   array and then having to convert it back to a FormData object later in
+    //   this function.
+    const originalFormData = new FormData(form, form.clk);
+    const map = ([name, value]) => ({ name, value });
+    const formValues = Array.from(originalFormData.entries(), map);
+    if (options.beforeSubmit) {
+      const proceed = options.beforeSubmit(formValues, $form, options);
+      if (proceed === false) {
+        return;
+      }
+    }
+
+    // @todo Keep for BC with the jQuery Form plugin, or remove it?
+    $form.trigger('form-submit-validate', [formValues, $form, options, veto]);
+    if (veto.veto) {
+      return;
+    }
+
+    let dataString = '';
+    // Convert the possibly modified formValues to a data string for $.ajax().
+    const formData = new FormData();
+    formValues.forEach(({ name, value }) => {
+      dataString += `${dataString.length ? '&' : ''}${name}=${value}`;
+    });
+    if (options.extraData) {
+      const entries = Object.entries(options.extraData);
+      entries.forEach(([name, value]) => {
+        dataString += `${dataString.length ? '&' : ''}${name}=${value}`;
+      });
+    }
+    // Send the request.
+    options.processData = false;
+    options.data = encodeURIComponent(dataString);
+    $.ajax(options);
+
+    // @todo Keep for BC with the jQuery Form plugin, or remove it?
+    $form.trigger('form-submit-notify', [$form, options]);
+  }
+
+  /**
+   * Returns the value(s) of the element in the matched set. For example, consider the following form:
+   *
+   *	<form><fieldset>
+   *		<input name="A" type="text">
+   *		<input name="A" type="text">
+   *		<input name="B" type="checkbox" value="B1">
+   *		<input name="B" type="checkbox" value="B2">
+   *		<input name="C" type="radio" value="C1">
+   *		<input name="C" type="radio" value="C2">
+   *	</fieldset></form>
+   *
+   *	var v = $('input[type=text]').fieldValue();
+   *	// if no values are entered into the text inputs
+   *	v === ['','']
+   *	// if values entered into the text inputs are 'foo' and 'bar'
+   *	v === ['foo','bar']
+   *
+   *	var v = $('input[type=checkbox]').fieldValue();
+   *	// if neither checkbox is checked
+   *	v === undefined
+   *	// if both checkboxes are checked
+   *	v === ['B1', 'B2']
+   *
+   *	var v = $('input[type=radio]').fieldValue();
+   *	// if neither radio is checked
+   *	v === undefined
+   *	// if first radio is checked
+   *	v === ['C1']
+   *
+   * The successful argument controls whether or not the field element must be 'successful'
+   * (per http://www.w3.org/TR/html4/interact/forms.html#successful-controls).
+   * The default value of the successful argument is true. If this value is false the value(s)
+   * for each element is returned.
+   *
+   * Note: This method *always* returns an array. If no valid value can be determined the
+   *	array will be empty, otherwise it will contain one or more values.
+   */
+  $.fn.fieldValue = function (successful) {
+    const val = [];
+    const max = this.length;
+    for (let i = 0; i < max; i++) {
+      const el = this[i];
+      const v = $.fieldValue(el, successful);
+
+      if (
+        v === null ||
+        typeof v === 'undefined' ||
+        (v.constructor === Array && !v.length)
+      ) {
+        continue;
+      }
+
+      if (v.constructor === Array) {
+        Array.concat(val, v);
+      } else {
+        val.push(v);
+      }
+    }
+
+    return val;
+  };
+
+  /**
+   * Returns the value of the field element.
+   */
+  $.fieldValue = function (el, successful) {
+    const n = el.name;
+    const t = el.type;
+    const tag = el.tagName.toLowerCase();
+
+    if (typeof successful === 'undefined') {
+      successful = true;
+    }
+
+    if (
+      successful &&
+      /* eslint-disable */
+      (!n ||
+        el.disabled ||
+        t === 'reset' ||
+        t === 'button' ||
+        ((t === 'checkbox' || t === 'radio') && !el.checked) ||
+        ((t === 'submit' || t === 'image') && el.form && el.form.clk !== el) ||
+        (tag === 'select' && el.selectedIndex === -1))
+    ) {
+      /* eslint-enable */
+      return null;
+    }
+
+    if (tag === 'select') {
+      const index = el.selectedIndex;
+
+      if (index < 0) {
+        return null;
+      }
+
+      const a = [];
+      const ops = el.options;
+      const one = t === 'select-one';
+      const max = one ? index + 1 : ops.length;
+
+      for (let i = one ? index : 0; i < max; i++) {
+        const op = ops[i];
+
+        if (op.selected && !op.disabled) {
+          const v = op.value;
+
+          if (one) {
+            return v;
+          }
+
+          a.push(v);
+        }
+      }
+
+      return a;
+    }
+
+    return el.value.replace('/\r?\n/g;', '\r\n');
+  };
+
+  /**
    * Handle an event that triggers an Ajax response.
    *
    * When an event that triggers an Ajax response happens, this method will
@@ -798,7 +1001,19 @@
           element.form.clk = element;
         }
 
-        ajax.$form.ajaxSubmit(ajax.options);
+        // The jQuery Form plugin (which adds the ajaxSubmit() function) is no
+        // longer maintained and has a lot of code for handling old browsers and
+        // uncommon options. The submitForm() function provides a more
+        // streamlined implementation. In case there are Drupal modules/sites
+        // that require jQuery Form's full implementation, use it if it's there
+        // (i.e., if that library has been added to the page).
+        if (ajax.$form.ajaxSubmit) {
+          ajax.$form.ajaxSubmit(ajax.options);
+        } else if (element.form) {
+          submitForm(element.form, ajax.options);
+        } else if (element.tagName === 'FORM') {
+          submitForm(element, ajax.options);
+        }
       } else {
         ajax.beforeSerialize(ajax.element, ajax.options);
         $.ajax(ajax.options);
