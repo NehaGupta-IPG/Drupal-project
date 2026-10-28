@@ -526,6 +526,38 @@ function install_begin_request($class_loader, &$install_state): void {
     $task = install_verify_completed_task();
   }
 
+  // This check only matters for the interactive install to prevent
+  // earlier steps when the site is already installed.
+  if (
+    !empty($task)
+    && empty($install_state['config_install_path'])
+    && $install_state['interactive']
+  ) {
+
+    // If the current step happens before the configure step, ensure
+    // that configuration has not already been set up. Otherwise a completed
+    // step that subsequently has new tasks can allow the installation to
+    // happen again, such as new translations being available.
+    $tasks_to_perform = array_keys(install_tasks($install_state));
+    $install_configure_form_key = array_search('install_configure_form', $tasks_to_perform);
+    $current_key = array_search($task, $tasks_to_perform);
+    if (
+      $current_key !== FALSE
+      && $install_configure_form_key !== FALSE
+      && $current_key < $install_configure_form_key
+      && class_exists('\Drupal\user\Entity\User')
+      && $user1 = User::load(1)
+    ) {
+
+      // If the user does not complete the configuration page and refreshes,
+      // the password will not yet be set. The user should still be able to
+      // complete the install.
+      if (!empty($user1->getPassword())) {
+        throw new AlreadyInstalledException(\Drupal::service('string_translation'));
+      }
+    }
+  }
+
   // Ensure that the active configuration is empty before installation starts.
   if ($install_state['config_verified'] && empty($task)) {
     if (count($kernel->getConfigStorage()->listAll())) {
