@@ -411,22 +411,47 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
         'role' => 'group',
         'aria-label' => $section_label,
       ],
-      'remove' => [
-        '#type' => 'link',
-        '#title' => $this->t('Remove @section', ['@section' => $section_label]),
-        '#url' => Url::fromRoute('layout_builder.remove_section', [
-          'section_storage_type' => $storage_type,
-          'section_storage' => $storage_id,
-          'delta' => $delta,
-        ]),
+      'action_links' => [
+        '#type' => 'container',
         '#attributes' => [
-          'class' => [
-            'use-ajax',
-            'layout-builder__link',
-            'layout-builder__link--remove',
+          'class' => ['layout-builder__section__links'],
+        ],
+        'remove' => [
+          '#type' => 'link',
+          '#title' => $this->t('Remove @section', ['@section' => $section_label]),
+          '#url' => Url::fromRoute('layout_builder.remove_section', [
+            'section_storage_type' => $storage_type,
+            'section_storage' => $storage_id,
+            'delta' => $delta,
+          ]),
+          '#attributes' => [
+            'class' => [
+              'use-ajax',
+              'layout-builder__link',
+              'layout-builder__link--remove',
+            ],
+            'data-dialog-type' => 'dialog',
+            'data-dialog-renderer' => 'off_canvas',
           ],
-          'data-dialog-type' => 'dialog',
-          'data-dialog-renderer' => 'off_canvas',
+        ],
+        'configure' => [
+          '#type' => 'link',
+          '#title' => $this->t('Configure @section', ['@section' => $section_label]),
+          '#access' => $layout instanceof PluginFormInterface,
+          '#url' => Url::fromRoute('layout_builder.configure_section', [
+            'section_storage_type' => $storage_type,
+            'section_storage' => $storage_id,
+            'delta' => $delta,
+          ]),
+          '#attributes' => [
+            'class' => [
+              'use-ajax',
+              'layout-builder__link',
+              'layout-builder__link--configure',
+            ],
+            'data-dialog-type' => 'dialog',
+            'data-dialog-renderer' => 'off_canvas',
+          ],
         ],
       ],
       // The section label is added to sections without a "Configure section"
@@ -434,25 +459,6 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
       'section_label' => [
         '#markup' => $this->t('<span class="layout-builder__section-label" aria-hidden="true">@section</span>', ['@section' => $section_label]),
         '#access' => !$layout instanceof PluginFormInterface,
-      ],
-      'configure' => [
-        '#type' => 'link',
-        '#title' => $this->t('Configure @section', ['@section' => $section_label]),
-        '#access' => $layout instanceof PluginFormInterface,
-        '#url' => Url::fromRoute('layout_builder.configure_section', [
-          'section_storage_type' => $storage_type,
-          'section_storage' => $storage_id,
-          'delta' => $delta,
-        ]),
-        '#attributes' => [
-          'class' => [
-            'use-ajax',
-            'layout-builder__link',
-            'layout-builder__link--configure',
-          ],
-          'data-dialog-type' => 'dialog',
-          'data-dialog-renderer' => 'off_canvas',
-        ],
       ],
       'layout-builder__section' => $build,
     ];
