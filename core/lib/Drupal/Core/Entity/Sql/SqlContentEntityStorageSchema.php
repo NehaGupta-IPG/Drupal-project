@@ -307,11 +307,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
     }
     elseif ($table_mapping->allowsSharedTableStorage($storage_definition)) {
       $field_name = $storage_definition->getName();
-      foreach (array_diff($table_mapping->getTableNames(), $table_mapping->getDedicatedTableNames()) as $table_name) {
-        if (in_array($field_name, $table_mapping->getFieldNames($table_name))) {
-          $column_names = $table_mapping->getColumnNames($storage_definition->getName());
-          $schema[$table_name] = $this->getSharedTableFieldSchema($storage_definition, $table_name, $column_names);
-        }
+      $column_names = $table_mapping->getColumnNames($field_name);
+      foreach ($this->getSharedTablesForField($table_mapping, $field_name) as $table_name) {
+        $schema[$table_name] = $this->getSharedTableFieldSchema($storage_definition, $table_name, $column_names);
       }
     }
     return $schema;
@@ -647,6 +645,22 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       }
     }
     return $table_names;
+  }
+
+  /**
+   * Gets the shared tables that store a field.
+   *
+   * @param \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping
+   *   A table mapping.
+   * @param string $field_name
+   *   The field name.
+   *
+   * @return string[]
+   *   The names of the shared tables that store the field.
+   */
+  private function getSharedTablesForField(DefaultTableMapping $table_mapping, string $field_name): array {
+    $shared_table_names = array_diff($table_mapping->getTableNames(), $table_mapping->getDedicatedTableNames());
+    return array_filter($shared_table_names, fn (string $table_name) => in_array($field_name, $table_mapping->getFieldNames($table_name)));
   }
 
   /**
@@ -1589,51 +1603,42 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
     $table_mapping = $this->getTableMapping($this->entityType, [$storage_definition]);
     $column_names = $table_mapping->getColumnNames($created_field_name);
     $schema_handler = $this->database->schema();
-    $shared_table_names = array_diff($table_mapping->getTableNames(), $table_mapping->getDedicatedTableNames());
 
-    // Iterate over the mapped table to find the ones that will host the created
-    // field schema.
     $schema = [];
-    foreach ($shared_table_names as $table_name) {
-      foreach ($table_mapping->getFieldNames($table_name) as $field_name) {
-        if ($field_name == $created_field_name) {
-          // Create field columns.
-          $schema[$table_name] = $this->getSharedTableFieldSchema($storage_definition, $table_name, $column_names);
-          if (!$only_save) {
-            // The entity schema needs to be checked because the field schema is
-            // potentially incomplete.
-            // @todo Fix this in https://www.drupal.org/node/2929120.
-            $entity_schema = $this->getEntitySchema($this->entityType);
-            foreach ($schema[$table_name]['fields'] as $name => $specifier) {
-              // Check if the field is part of the primary keys and pass along
-              // this information when adding the field.
-              // @see \Drupal\Core\Database\Schema::addField()
-              $new_keys = [];
-              if (isset($entity_schema[$table_name]['primary key']) && array_intersect($column_names, $entity_schema[$table_name]['primary key'])) {
-                $new_keys = ['primary key' => $entity_schema[$table_name]['primary key']];
-              }
-
-              // Check if the field exists because it might already have been
-              // created as part of the earlier entity type update event.
-              if (!$schema_handler->fieldExists($table_name, $name)) {
-                $schema_handler->addField($table_name, $name, $specifier, $new_keys);
-              }
-            }
-            if (!empty($schema[$table_name]['indexes'])) {
-              foreach ($schema[$table_name]['indexes'] as $name => $specifier) {
-                // Check if the index exists because it might already have been
-                // created as part of the earlier entity type update event.
-                $this->addIndex($table_name, $name, $specifier, $schema[$table_name]);
-              }
-            }
-            if (!empty($schema[$table_name]['unique keys'])) {
-              foreach ($schema[$table_name]['unique keys'] as $name => $specifier) {
-                $schema_handler->addUniqueKey($table_name, $name, $specifier);
-              }
-            }
+    foreach ($this->getSharedTablesForField($table_mapping, $created_field_name) as $table_name) {
+      // Create field columns.
+      $schema[$table_name] = $this->getSharedTableFieldSchema($storage_definition, $table_name, $column_names);
+      if (!$only_save) {
+        // The entity schema needs to be checked because the field schema is
+        // potentially incomplete.
+        // @todo Fix this in https://www.drupal.org/node/2929120.
+        $entity_schema = $this->getEntitySchema($this->entityType);
+        foreach ($schema[$table_name]['fields'] as $name => $specifier) {
+          // Check if the field is part of the primary keys and pass along
+          // this information when adding the field.
+          // @see \Drupal\Core\Database\Schema::addField()
+          $new_keys = [];
+          if (isset($entity_schema[$table_name]['primary key']) && array_intersect($column_names, $entity_schema[$table_name]['primary key'])) {
+            $new_keys = ['primary key' => $entity_schema[$table_name]['primary key']];
           }
-          // After creating the field schema skip to the next table.
-          break;
+
+          // Check if the field exists because it might already have been
+          // created as part of the earlier entity type update event.
+          if (!$schema_handler->fieldExists($table_name, $name)) {
+            $schema_handler->addField($table_name, $name, $specifier, $new_keys);
+          }
+        }
+        if (!empty($schema[$table_name]['indexes'])) {
+          foreach ($schema[$table_name]['indexes'] as $name => $specifier) {
+            // Check if the index exists because it might already have been
+            // created as part of the earlier entity type update event.
+            $this->addIndex($table_name, $name, $specifier, $schema[$table_name]);
+          }
+        }
+        if (!empty($schema[$table_name]['unique keys'])) {
+          foreach ($schema[$table_name]['unique keys'] as $name => $specifier) {
+            $schema_handler->addUniqueKey($table_name, $name, $specifier);
+          }
         }
       }
     }
@@ -1686,33 +1691,24 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
     $table_mapping = $this->getTableMapping($this->entityType, [$storage_definition]);
     $column_names = $table_mapping->getColumnNames($deleted_field_name);
     $schema_handler = $this->database->schema();
-    $shared_table_names = array_diff($table_mapping->getTableNames(), $table_mapping->getDedicatedTableNames());
 
-    // Iterate over the mapped table to find the ones that host the deleted
-    // field schema.
-    foreach ($shared_table_names as $table_name) {
-      foreach ($table_mapping->getFieldNames($table_name) as $field_name) {
-        if ($field_name == $deleted_field_name) {
-          $schema = $this->getSharedTableFieldSchema($storage_definition, $table_name, $column_names);
+    foreach ($this->getSharedTablesForField($table_mapping, $deleted_field_name) as $table_name) {
+      $schema = $this->getSharedTableFieldSchema($storage_definition, $table_name, $column_names);
 
-          // Drop indexes and unique keys first.
-          if (!empty($schema['indexes'])) {
-            foreach ($schema['indexes'] as $name => $specifier) {
-              $schema_handler->dropIndex($table_name, $name);
-            }
-          }
-          if (!empty($schema['unique keys'])) {
-            foreach ($schema['unique keys'] as $name => $specifier) {
-              $schema_handler->dropUniqueKey($table_name, $name);
-            }
-          }
-          // Drop columns.
-          foreach ($column_names as $column_name) {
-            $schema_handler->dropField($table_name, $column_name);
-          }
-          // After deleting the field schema skip to the next table.
-          break;
+      // Drop indexes and unique keys first.
+      if (!empty($schema['indexes'])) {
+        foreach ($schema['indexes'] as $name => $specifier) {
+          $schema_handler->dropIndex($table_name, $name);
         }
+      }
+      if (!empty($schema['unique keys'])) {
+        foreach ($schema['unique keys'] as $name => $specifier) {
+          $schema_handler->dropUniqueKey($table_name, $name);
+        }
+      }
+      // Drop columns.
+      foreach ($column_names as $column_name) {
+        $schema_handler->dropField($table_name, $column_name);
       }
     }
 
@@ -1872,56 +1868,47 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       $column_names = $table_mapping->getColumnNames($updated_field_name);
       $schema_handler = $this->database->schema();
 
-      // Iterate over the mapped table to find the ones that host the deleted
-      // field schema.
       $original_schema = $this->loadFieldSchemaData($original);
       $schema = [];
-      foreach ($table_mapping->getTableNames() as $table_name) {
-        foreach ($table_mapping->getFieldNames($table_name) as $field_name) {
-          if ($field_name == $updated_field_name) {
-            $schema[$table_name] = $this->getSharedTableFieldSchema($storage_definition, $table_name, $column_names);
+      foreach ($this->getSharedTablesForField($table_mapping, $updated_field_name) as $table_name) {
+        $schema[$table_name] = $this->getSharedTableFieldSchema($storage_definition, $table_name, $column_names);
 
-            // Handle NOT NULL constraints.
-            foreach ($schema[$table_name]['fields'] as $column_name => $specifier) {
-              $not_null = !empty($specifier['not null']);
-              $original_not_null = !empty($original_schema[$table_name]['fields'][$column_name]['not null']);
-              if ($not_null !== $original_not_null) {
-                if ($not_null && $this->hasNullFieldPropertyData($table_name, $column_name)) {
-                  throw new EntityStorageException("The $column_name column cannot have NOT NULL constraints as it holds NULL values.");
-                }
-                $column_schema = $original_schema[$table_name]['fields'][$column_name];
-                $column_schema['not null'] = $not_null;
-                $schema_handler->changeField($table_name, $column_name, $column_name, $column_schema);
-              }
+        // Handle NOT NULL constraints.
+        foreach ($schema[$table_name]['fields'] as $column_name => $specifier) {
+          $not_null = !empty($specifier['not null']);
+          $original_not_null = !empty($original_schema[$table_name]['fields'][$column_name]['not null']);
+          if ($not_null !== $original_not_null) {
+            if ($not_null && $this->hasNullFieldPropertyData($table_name, $column_name)) {
+              throw new EntityStorageException("The $column_name column cannot have NOT NULL constraints as it holds NULL values.");
             }
+            $column_schema = $original_schema[$table_name]['fields'][$column_name];
+            $column_schema['not null'] = $not_null;
+            $schema_handler->changeField($table_name, $column_name, $column_name, $column_schema);
+          }
+        }
 
-            // Drop original indexes and unique keys.
-            if (!empty($original_schema[$table_name]['indexes'])) {
-              foreach ($original_schema[$table_name]['indexes'] as $name => $specifier) {
-                $schema_handler->dropIndex($table_name, $name);
-              }
-            }
-            if (!empty($original_schema[$table_name]['unique keys'])) {
-              foreach ($original_schema[$table_name]['unique keys'] as $name => $specifier) {
-                $schema_handler->dropUniqueKey($table_name, $name);
-              }
-            }
-            // Create new indexes and unique keys.
-            if (!empty($schema[$table_name]['indexes'])) {
-              foreach ($schema[$table_name]['indexes'] as $name => $specifier) {
-                // Check if the index exists because it might already have been
-                // created as part of the earlier entity type update event.
-                $this->addIndex($table_name, $name, $specifier, $schema[$table_name]);
-
-              }
-            }
-            if (!empty($schema[$table_name]['unique keys'])) {
-              foreach ($schema[$table_name]['unique keys'] as $name => $specifier) {
-                $schema_handler->addUniqueKey($table_name, $name, $specifier);
-              }
-            }
-            // After deleting the field schema skip to the next table.
-            break;
+        // Drop original indexes and unique keys.
+        if (!empty($original_schema[$table_name]['indexes'])) {
+          foreach ($original_schema[$table_name]['indexes'] as $name => $specifier) {
+            $schema_handler->dropIndex($table_name, $name);
+          }
+        }
+        if (!empty($original_schema[$table_name]['unique keys'])) {
+          foreach ($original_schema[$table_name]['unique keys'] as $name => $specifier) {
+            $schema_handler->dropUniqueKey($table_name, $name);
+          }
+        }
+        // Create new indexes and unique keys.
+        if (!empty($schema[$table_name]['indexes'])) {
+          foreach ($schema[$table_name]['indexes'] as $name => $specifier) {
+            // Check if the index exists because it might already have been
+            // created as part of the earlier entity type update event.
+            $this->addIndex($table_name, $name, $specifier, $schema[$table_name]);
+          }
+        }
+        if (!empty($schema[$table_name]['unique keys'])) {
+          foreach ($schema[$table_name]['unique keys'] as $name => $specifier) {
+            $schema_handler->addUniqueKey($table_name, $name, $specifier);
           }
         }
       }
