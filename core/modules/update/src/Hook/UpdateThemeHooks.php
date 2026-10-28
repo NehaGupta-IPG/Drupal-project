@@ -183,7 +183,17 @@ class UpdateThemeHooks {
     $variables['project_types'] = [];
     foreach ($project_types as $type_name => $type_label) {
       if (!empty($rows[$type_name])) {
-        ksort($rows[$type_name]);
+
+        // Sort by the status of each project, if possible.
+        uksort($rows[$type_name], function ($a, $b) use ($rows, $type_name) {
+          if (isset($rows[$type_name][$a]['status']['#project']['status']) && isset($rows[$type_name][$b]['status']['#project']['status']) && $rows[$type_name][$a]['status']['#project']['status'] !== $rows[$type_name][$b]['status']['#project']['status']) {
+            return $rows[$type_name][$a]['status']['#project']['status'] <=> $rows[$type_name][$b]['status']['#project']['status'];
+          }
+          else {
+            return $a <=> $b;
+          }
+        });
+
         $variables['project_types'][] = [
           'label' => $type_label,
           'table' => $rows[$type_name],
