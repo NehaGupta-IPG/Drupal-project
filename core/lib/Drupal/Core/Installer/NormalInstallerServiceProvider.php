@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Installer;
 
-use Drupal\Component\Datetime\Time;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\NullBackendFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -40,22 +39,24 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     // During the installer user 1 is a superuser.
     $container->setDefinition(InstallerAccessPolicy::class, (new Definition())->addTag('access_policy')->setPublic(FALSE));
 
-    // Explicitly configure all cache bins to use the memory backend. This
-    // results in less queries to set caches which will only be cleared on the
-    // next module install.
-    foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
-      $definition = $container->getDefinition($id);
-      $tags = $definition->getTags();
-      $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
-      $definition->setTags($tags);
+    if ($install_state['completed_task'] !== 'install_base_system') {
+      foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
+        $definition = $container->getDefinition($id);
+        $tags = $definition->getTags();
+        $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
+        $definition->setTags($tags);
+      }
+      $definition = $container->getDefinition('cache.file_parsing');
+      $definition->setClass(MemoryBackend::class);
+      // Use a service reference rather than an object instance, so that the
+      // container can still be dumped.
+      $definition->setArguments([new Reference('datetime.time')]);
+      $definition->setFactory(NULL);
+      // Remove the cache tags invalidator tag from the cache tags storage, so
+      // that we don't call it when cache tags are invalidated in the installer.
+      $container->getDefinition('cache_tags.invalidator.checksum')
+        ->clearTag('cache_tags_invalidator');
     }
-
-    // Separately override the file_parsing bin as that doesn't use a
-    // tag/parameter.
-    $definition = $container->getDefinition('cache.file_parsing');
-    $definition->setClass(MemoryBackend::class);
-    $definition->setArguments([new Time()]);
-    $definition->setFactory(NULL);
 
     // When installing from existing config, disabling the config cache entirely
     // yields much faster install times.
@@ -78,10 +79,6 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     $container
       ->register('lock', NullLockBackend::class);
 
-    // Remove the cache tags invalidator tag from the cache tags storage, so
-    // that we don't call it when cache tags are invalidated in the installer.
-    $container->getDefinition('cache_tags.invalidator.checksum')
-      ->clearTag('cache_tags_invalidator');
 
     // Don't register the lazy route provider in the super early installer.
     if (static::class === NormalInstallerServiceProvider::class) {
@@ -95,16 +92,23 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     }
 
     $pass_config = $container->getCompilerPassConfig();
-    $pass_config->setRemovingPasses(array_filter($pass_config->getRemovingPasses(), function ($pass) {
-      // Remove InlineServiceDefinitionsPass, RemoveUnusedDefinitionsPass,
-      // AnalyzeServiceReferencesPass and ReplaceAliasByActualDefinitionPass as
-      // these are not necessary during installation.
-      // @see \Symfony\Component\DependencyInjection\Compiler\PassConfig
-      return !($pass instanceof InlineServiceDefinitionsPass ||
-               $pass instanceof RemoveUnusedDefinitionsPass ||
-               $pass instanceof AnalyzeServiceReferencesPass ||
-               $pass instanceof ReplaceAliasByActualDefinitionPass);
-    }));
+    // Skipping these passes is only safe while the container is never dumped:
+    // a dumped container needs aliases and private services fully resolved.
+    // Once the base system is installed, the installer dumps its container so
+    // it can be reused across requests, so the passes must run then.
+    // @see install_begin_request()
+    if (empty($install_state['base_system_verified'])) {
+      $pass_config->setRemovingPasses(array_filter($pass_config->getRemovingPasses(), function ($pass) {
+        // Remove InlineServiceDefinitionsPass, RemoveUnusedDefinitionsPass,
+        // AnalyzeServiceReferencesPass and ReplaceAliasByActualDefinitionPass
+        // as these are not necessary during the early installer.
+        // @see \Symfony\Component\DependencyInjection\Compiler\PassConfig
+        return !($pass instanceof InlineServiceDefinitionsPass ||
+                 $pass instanceof RemoveUnusedDefinitionsPass ||
+                 $pass instanceof AnalyzeServiceReferencesPass ||
+                 $pass instanceof ReplaceAliasByActualDefinitionPass);
+      }));
+    }
     $pass_config->setAfterRemovingPasses(array_filter($pass_config->getAfterRemovingPasses(), function ($pass) {
       // Remove ResolveHotPathPass as Drupal's container dumper does not support
       // it.
