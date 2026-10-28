@@ -150,14 +150,14 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
       if ($entity_type->hasKey('bundle')) {
         $message = [
           '#theme' => 'status_message_item',
-          '#message' =>$this->t('You are editing the layout for this @bundle @singular_label.', $variables)
+          '#message' => $this->t('You are editing the layout for this @bundle @singular_label.', $variables),
         ];
       }
       else {
         $message = [
           '#theme' => 'status_message_item',
           '#message' => $this->t('You are editing the layout for this @singular_label.', $variables),
-       ];
+        ];
       }
     }
     return $this->buildMessageContainer($message, 'overrides');

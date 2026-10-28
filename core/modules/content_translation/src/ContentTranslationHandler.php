@@ -600,9 +600,9 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
         '#message_list' => $message,
         '#weight' => -100,
         '#status_headings' => [
-          'status' => t('Status message'),
-          'error' => t('Error message'),
-          'warning' => t('Warning message'),
+          'status' => $this->t('Status message'),
+          'error' => $this->t('Error message'),
+          'warning' => $this->t('Warning message'),
         ],
       ];
     }
