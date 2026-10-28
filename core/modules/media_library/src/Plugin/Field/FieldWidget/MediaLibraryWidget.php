@@ -715,6 +715,14 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $announcement = \Drupal::translation()->formatPlural($new_items, 'Added one media item.', 'Added @count media items.');
     }
 
+    // If the element is part of a group (#group is set on it) it won't be
+    // rendered unless we remove #group from it. This is caused by
+    // \Drupal\Core\Render\Element\RenderElementBase::preRenderGroup(), which
+    // prevents all members of groups from being rendered directly.
+    if (!empty($element['#group'])) {
+      unset($element['#group']);
+    }
+
     $response = new AjaxResponse();
     $response->addCommand(new ReplaceCommand("#$wrapper_id", $element));
     $response->addCommand(new AnnounceCommand($announcement));
