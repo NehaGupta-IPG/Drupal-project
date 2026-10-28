@@ -426,30 +426,29 @@ class DefaultTableMapping implements TableMappingInterface {
     $field_name = $storage_definition->getName();
 
     if ($this->allowsSharedTableStorage($storage_definition)) {
-      $column_name = count($storage_definition->getColumns()) == 1 ? $field_name : $field_name . '__' . $property_name;
+      return count($storage_definition->getColumns()) == 1 ? $field_name : $field_name . '__' . $property_name;
     }
     elseif ($this->requiresDedicatedTableStorage($storage_definition)) {
       if ($property_name == TableMappingInterface::DELTA) {
-        $column_name = 'delta';
+        return 'delta';
       }
-      else {
-        $column_name = $field_name . '_' . $property_name;
-        if (in_array($property_name, $this->getReservedColumns())) {
-          $column_name = $property_name;
-        }
-        elseif (in_array($property_name, static::DEDICATED_TABLE_COLUMNS, TRUE)) {
-          // A field's own property wins over a table column of the same name.
-          if (!isset($storage_definition->getColumns()[$property_name])) {
-            $column_name = $property_name;
-          }
+
+      if (in_array($property_name, $this->getReservedColumns())) {
+        return $property_name;
+      }
+
+      // A field's own property wins over a table column of the same name.
+      if (in_array($property_name, static::DEDICATED_TABLE_COLUMNS, TRUE)) {
+        if (!isset($storage_definition->getColumns()[$property_name])) {
+          return $property_name;
         }
       }
+
+      return $field_name . '_' . $property_name;
     }
     else {
       throw new SqlContentEntityStorageException("Column information not available for the '$field_name' field.");
     }
-
-    return $column_name;
   }
 
   /**
