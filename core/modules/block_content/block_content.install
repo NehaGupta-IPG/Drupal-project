@@ -5,9 +5,25 @@
  * Install, update and uninstall functions for the block_content module.
  */
 
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
 /**
  * Implements hook_update_last_removed().
  */
 function block_content_update_last_removed(): int {
   return 10300;
+}
+
+/**
+ * Install the owner field for Block Content entities.
+ */
+function block_content_update_11000(): void {
+  $entityDefinitionUpdateManager = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(new TranslatableMarkup('User ID'))
+    ->setSetting('target_type', 'user')
+    ->setTranslatable(TRUE);
+  $entityDefinitionUpdateManager->installFieldStorageDefinition('uid', 'block_content', 'block_content', $storage_definition);
 }
