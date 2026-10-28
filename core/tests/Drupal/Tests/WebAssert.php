@@ -923,7 +923,7 @@ class WebAssert extends MinkWebAssert {
     $selector = $this->buildXPathQuery('//ul[@data-drupal-message-list-type]');
 
     if ($message && $type) {
-      $selector =$this->buildXPathQuery('//ul[@data-drupal-message-list-type=:type]/li[contains(., :message)]', [
+      $selector = $this->buildXPathQuery('//ul[@data-drupal-message-list-type=:type]/li[contains(., :message)]', [
         ':type' => $type,
         ':message' => $message,
       ]);
