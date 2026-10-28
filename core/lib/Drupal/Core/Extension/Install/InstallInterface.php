@@ -55,9 +55,9 @@ interface InstallInterface {
    *   need to do them again.
    *
    * @see \Drupal\Core\Config\ConfigInstallerInterface::isSyncing
-   * @see hook_schema()
+   * @see \Drupal\Core\Extension\Install\SchemaInterface::getSchema()
    * @see \Drupal\Core\Extension\ModuleInstaller::install()
-   * @see hook_uninstall()
+   * @see \Drupal\Core\Extension\Install\UninstallInterface::doUninstall()
    * @see hook_modules_installed()
    */
   public function doInstall(bool $isSyncing): void;

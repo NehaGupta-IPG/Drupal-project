@@ -41,8 +41,8 @@ interface UninstallInterface {
    *   entities. Those changes should be made earlier and exported so during
    *   import there's no need to do them again.
    *
-   * @see hook_install()
-   * @see hook_schema()
+   * @see \Drupal\Core\Extension\Install\InstallInterface::doInstall()
+   * @see \Drupal\Core\Extension\Install\SchemaInterface::getSchema()
    * @see hook_modules_uninstalled()
    * @see \Drupal\Core\Extension\ModuleUninstallValidatorInterface
    */
