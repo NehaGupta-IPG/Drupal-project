@@ -3,6 +3,7 @@
 namespace Drupal\Core\StackMiddleware;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -26,6 +27,11 @@ class ContentLength implements HttpKernelInterface {
    */
   public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = TRUE): Response {
     $response = $this->httpKernel->handle($request, $type, $catch);
+    // Don't set a content-length header for files because they may be gzipped
+    // by the server.
+    if ($response instanceof BinaryFileResponse) {
+      return $response;
+    }
     if ($response->isInformational() || $response->isEmpty()) {
       return $response;
     }
