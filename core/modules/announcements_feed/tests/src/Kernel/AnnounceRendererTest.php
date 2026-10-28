@@ -27,7 +27,7 @@ class AnnounceRendererTest extends AnnounceTestBase {
     ]);
     $render = $this->container->get('announcements_feed.renderer')->render();
     $this->assertEquals('status_messages', $render['#theme']);
-    $this->assertEquals('An error occurred while parsing the announcements feed, check the logs for more information.', $render['#message_list']['error'][0]);
+    $this->assertEquals('An error occurred while parsing the announcements feed, check the logs for more information.', $render['#message_list']['error']['#message']);
   }
 
   /**

@@ -44,11 +44,14 @@ final class AnnounceRenderer {
         '#theme' => 'status_messages',
         '#message_list' => [
           'error' => [
-            $this->t('An error occurred while parsing the announcements feed, check the logs for more information.'),
+            '#theme' => 'status_message_item',
+            '#message' => $this->t('An error occurred while parsing the announcements feed, check the logs for more information.'),
           ],
         ],
         '#status_headings' => [
-          'error' => $this->t('Error Message'),
+          'status' => t('Status message'),
+          'error' => t('Error message'),
+          'warning' => t('Warning message'),
         ],
       ];
     }

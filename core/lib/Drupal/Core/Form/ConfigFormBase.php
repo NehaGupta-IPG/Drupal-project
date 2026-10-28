@@ -384,9 +384,18 @@ abstract class ConfigFormBase extends FormBase {
       $form['config_override_status_messages'] = [
         'message' => [
           '#theme' => 'status_messages',
-          '#message_list' => ['status' => [$override_output]],
+          '#message_list' => [
+            'status' => [
+              [
+                '#theme' => 'status_message_item',
+                '#message' => $override_output,
+              ],
+            ],
+          ],
           '#status_headings' => [
-            'status' => $this->t('Status message'),
+            'status' => t('Status message'),
+            'error' => t('Error message'),
+            'warning' => t('Warning message'),
           ],
         ],
         // Ensure that the status message is at the top of the form.

@@ -44,7 +44,9 @@ trait LayoutBuilderEntityFormTrait {
         '#theme' => 'status_messages',
         '#message_list' => ['status' => [$message]],
         '#status_headings' => [
-          'status' => $this->t('Status message'),
+          'status' => t('Status message'),
+          'error' => t('Error message'),
+          'warning' => t('Warning message'),
         ],
       ],
       '#weight' => -900,
