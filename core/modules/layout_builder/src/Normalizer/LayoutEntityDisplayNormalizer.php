@@ -17,7 +17,7 @@ class LayoutEntityDisplayNormalizer extends ConfigEntityNormalizer {
   /**
    * {@inheritdoc}
    */
-  public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
+  public function normalize($object, $format = NULL, array $context = []): array {
     $data = parent::normalize($object, $format, $context);
     if (!empty($data['third_party_settings']['layout_builder']['sections'])) {
       $sections = &$data['third_party_settings']['layout_builder']['sections'];
