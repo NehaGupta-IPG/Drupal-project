@@ -711,7 +711,7 @@ class ViewsThemeHooks {
 
       // Add a CSS align class to each field if one was set.
       if (!empty($options['info'][$field]['align'])) {
-        $variables['fields'][$field] .= ' ' . Html::cleanCssIdentifier($options['info'][$field]['align']);
+        $variables['fields'][$field] .= ' ' . Html::cleanCssIdentifier(str_replace('views-', 'text-', $options['info'][$field]['align']));
       }
 
       // Render each field into its appropriate column.
