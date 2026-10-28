@@ -22,7 +22,6 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
     'test_field',
     'hidden_test_field',
     'test_field_with_preconfigured_options',
-    'test_field_reserved_column',
   ],
   weight: -10,
 )]
