@@ -269,6 +269,11 @@ class AjaxTestController {
             'data-dialog-type' => 'modal',
             'data-dialog-options' => json_encode([
               'width' => 400,
+              'minWidth' => '300px',
+              'maxWidth' => '600px',
+              'minHeight' => '180px',
+              'maxHeight' => '400px',
+              'autoResize' => FALSE,
             ]),
           ],
         ],
@@ -280,7 +285,10 @@ class AjaxTestController {
             'data-dialog-type' => 'dialog',
             'data-dialog-options' => json_encode([
               'target' => 'ajax-test-dialog-wrapper-1',
-              'width' => 800,
+              'width' => '800px',
+              'maxWidth' => '600px',
+              'maxHeight' => '400px',
+              'autoResize' => TRUE,
             ]),
           ],
         ],
@@ -338,6 +346,52 @@ class AjaxTestController {
     ];
 
     return $build;
+  }
+
+  /**
+   * Builds AJAX dialog links with configurable sizes and successive steps.
+   */
+  public function dialogSizes(Request $request): array {
+    $query = $request->query;
+    $is_content = $query->getBoolean('content');
+    $modal = $query->getBoolean('modal', TRUE);
+    $height = $query->getInt('height', 1000);
+    $step = $query->getInt('step');
+    $options = $is_content
+      ? ($step === 0 ? ['maxHeight' => '300px'] : [])
+      : Json::decode($query->get('options', '{}'));
+    $link = [
+      '#type' => 'link',
+      '#title' => $is_content ? 'Next step' : 'Open dialog',
+      '#url' => Url::fromRoute('ajax_test.dialog_sizes', [], [
+        'query' => [
+          'content' => 1,
+          'modal' => (int) $modal,
+          'height' => $height,
+          'step' => $is_content ? $step + 1 : 0,
+        ],
+      ]),
+      '#attributes' => [
+        'class' => ['use-ajax'],
+        'data-dialog-type' => $modal ? 'modal' : 'dialog',
+        'data-dialog-options' => Json::encode($options),
+      ],
+    ];
+    $build = ['#attached' => ['library' => ['core/drupal.dialog.ajax']]];
+    if (!$is_content) {
+      return $build + ['open' => $link];
+    }
+    return $build + [
+      '#type' => 'container',
+      '#title' => 'Dialog sizes',
+      '#attributes' => ['id' => 'dialog-test-content'],
+      'body' => [
+        '#type' => 'container',
+        '#attributes' => ['style' => "height: {$height}px"],
+        '#markup' => 'Dialog content',
+      ],
+      'next' => $link,
+    ];
   }
 
   /**
