@@ -8,12 +8,12 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\Core\Field\FieldException;
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field_test\FieldTestHelper;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests field storage create, read, update, and delete.
@@ -491,133 +491,44 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
   }
 
   /**
-   * Tests adding an index to a dedicated-table field storage that has data.
-   *
-   * The entity_test entity type is not revisionable, so its dedicated field
-   * tables have no revision counterpart. Updating the indexes of a field
-   * storage that already has data goes through
-   * SqlContentEntityStorageSchema::updateDedicatedTableSchema(), which must
-   * not assume a revision table exists for every entity type.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/3305627
+   * Tests changing the indexes of a dedicated table field that has data.
    */
-  public function testUpdateIndexesWithDataNonRevisionable(): void {
-    $field_storage = FieldStorageConfig::create([
-      'field_name' => 'field_update_indexes',
-      'entity_type' => 'entity_test',
-      'type' => 'test_field',
-      // Force dedicated-table storage.
-      'cardinality' => 2,
-    ]);
-    $field_storage->save();
-    FieldConfig::create([
-      'field_storage' => $field_storage,
-      'entity_type' => 'entity_test',
-      'bundle' => 'entity_test',
-    ])->save();
-
-    // Save an entity so the field's dedicated table has data. This is what
-    // sends FieldStorageConfig::preSave() down the "has data" branch of
-    // updateDedicatedTableSchema() when the storage is updated below.
-    $entity = EntityTest::create();
-    $entity->field_update_indexes = 1;
-    $entity->save();
-
-    // Add a second index. Prior to the fix for #3305627, this throws
-    // a fatal TypeError because updateDedicatedTableSchema() unconditionally
-    // reads $actual_schema[$revision_table], which does not exist for a
-    // non-revisionable entity type.
-    $field_storage->setIndexes([
-      'value' => ['value'],
-      'value_2' => ['value'],
-    ]);
-    $field_storage->save();
-
-    $table_mapping = \Drupal::entityTypeManager()->getStorage('entity_test')->getTableMapping();
-    $table = $table_mapping->getDedicatedDataTableName($field_storage);
-    $this->assertTrue(
-      \Drupal::database()->schema()->indexExists($table, 'field_update_indexes_value_2'),
-      'The new index was created on the dedicated field table.'
-    );
-
-    // Removing the index again must likewise not throw.
-    $field_storage->setIndexes([
-      'value' => ['value'],
-    ]);
-    $field_storage->save();
-    $this->assertFalse(
-      \Drupal::database()->schema()->indexExists($table, 'field_update_indexes_value_2'),
-      'The removed index no longer exists on the dedicated field table.'
-    );
-  }
-
-  /**
-   * Tests adding/removing an index on a revisionable entity's dedicated table.
-   *
-   * This is the counterpart to testUpdateIndexesWithDataNonRevisionable():
-   * that test alone would pass even if the revision-table index operations
-   * were skipped unconditionally, since it never has a revision table to
-   * update. This test is what actually exercises and pins down the "index
-   * still gets created on/removed from the revision table when one exists"
-   * behavior, so a future change cannot silently drop that maintenance
-   * without a test catching it.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/3305627
-   */
-  public function testUpdateIndexesWithDataRevisionable(): void {
+  #[TestWith(['entity_test'])]
+  #[TestWith(['entity_test_rev'])]
+  public function testUpdateIndexesWithData(string $entity_type_id): void {
     $this->installEntitySchema('entity_test_rev');
-
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_update_indexes',
-      'entity_type' => 'entity_test_rev',
+      'entity_type' => $entity_type_id,
       'type' => 'test_field',
+      // Force dedicated table storage.
       'cardinality' => 2,
     ]);
     $field_storage->save();
     FieldConfig::create([
       'field_storage' => $field_storage,
-      'entity_type' => 'entity_test_rev',
-      'bundle' => 'entity_test_rev',
+      'entity_type' => $entity_type_id,
+      'bundle' => $entity_type_id,
     ])->save();
+    $storage = \Drupal::entityTypeManager()->getStorage($entity_type_id);
+    $storage->create(['field_update_indexes' => 1])->save();
 
-    $entity = EntityTestRev::create();
-    $entity->field_update_indexes = 1;
-    $entity->save();
-
-    $table_mapping = \Drupal::entityTypeManager()->getStorage('entity_test_rev')->getTableMapping();
-    $table = $table_mapping->getDedicatedDataTableName($field_storage);
-    $revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage);
+    $table_mapping = $storage->getTableMapping();
+    $tables = [$table_mapping->getDedicatedDataTableName($field_storage)];
+    if ($storage->getEntityType()->isRevisionable()) {
+      $tables[] = $table_mapping->getDedicatedRevisionTableName($field_storage);
+    }
     $schema = \Drupal::database()->schema();
 
-    // Add a second index. This must be created on both the data table and
-    // the revision table.
-    $field_storage->setIndexes([
-      'value' => ['value'],
-      'value_2' => ['value'],
-    ]);
-    $field_storage->save();
-    $this->assertTrue(
-      $schema->indexExists($table, 'field_update_indexes_value_2'),
-      'The new index was created on the dedicated field data table.'
-    );
-    $this->assertTrue(
-      $schema->indexExists($revision_table, 'field_update_indexes_value_2'),
-      'The new index was created on the dedicated field revision table.'
-    );
+    $field_storage->setIndexes(['value' => ['value'], 'value_2' => ['value']])->save();
+    foreach ($tables as $table) {
+      $this->assertTrue($schema->indexExists($table, 'field_update_indexes_value_2'));
+    }
 
-    // Removing the index must remove it from both tables too.
-    $field_storage->setIndexes([
-      'value' => ['value'],
-    ]);
-    $field_storage->save();
-    $this->assertFalse(
-      $schema->indexExists($table, 'field_update_indexes_value_2'),
-      'The removed index no longer exists on the dedicated field data table.'
-    );
-    $this->assertFalse(
-      $schema->indexExists($revision_table, 'field_update_indexes_value_2'),
-      'The removed index no longer exists on the dedicated field revision table.'
-    );
+    $field_storage->setIndexes(['value' => ['value']])->save();
+    foreach ($tables as $table) {
+      $this->assertFalse($schema->indexExists($table, 'field_update_indexes_value_2'));
+    }
   }
 
   /**
