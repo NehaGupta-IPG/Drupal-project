@@ -10,6 +10,8 @@ use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\FormLocation;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +22,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('comment')]
 #[RunTestsInSeparateProcesses]
 class CommentLinksTest extends CommentTestBase {
+
+  use PromotedContentViewTestTrait;
 
   /**
    * Comment being tested.
@@ -53,6 +57,8 @@ class CommentLinksTest extends CommentTestBase {
    * Tests that comment links are output and can be hidden.
    */
   public function testCommentLinks(): void {
+    $this->enablePromotedContentView();
+
     // Remove additional user permissions from $this->webUser added by setUp(),
     // since this test is limited to anonymous and authenticated roles only.
     $roles = $this->webUser->getRoles();
@@ -98,7 +104,7 @@ class CommentLinksTest extends CommentTestBase {
       'skip comment approval' => 1,
       'edit own comments' => 1,
     ];
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, $perms);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions($perms)->save();
 
     $nid = $this->node->id();
 

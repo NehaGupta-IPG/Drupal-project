@@ -125,7 +125,7 @@ class SystemRequirementsHooks {
               ':url' => 'https://www.drupal.org/core/experimental',
             ]
           ),
-          'severity' => RequirementSeverity::Warning,
+          'severity' => RequirementSeverity::Info,
         ];
       }
       // Warn if any deprecated modules are installed.
@@ -166,7 +166,7 @@ class SystemRequirementsHooks {
         $requirements['experimental_themes'] = [
           'title' => $this->t('Experimental themes installed'),
           'value' => $this->t('Experimental themes found: %theme_list. Experimental themes are provided for testing purposes only. Use at your own risk.', ['%theme_list' => implode(', ', $experimental_themes)]),
-          'severity' => RequirementSeverity::Warning,
+          'severity' => RequirementSeverity::Info,
         ];
       }
 
@@ -473,6 +473,29 @@ class SystemRequirementsHooks {
     }
 
     // Database information.
+    $allConnections = Database::getAllConnectionInfo();
+    $connection_info = [];
+    foreach ($allConnections as $target) {
+      foreach ($target as $connection_options) {
+        if (!empty($connection_options['host'])) {
+          $connection_info[] = $this->t('Host: %host', ['%host' => $connection_options['host']]);
+        }
+        $connection_info[] = $this->t('Database: %database', ['%database' => $connection_options['database']]);
+        $prefix = !empty($connection_options['prefix']) ? $connection_options['prefix'] : NULL;
+        $connection_info[] = !empty($prefix) ? $this->t('Prefix: %prefix', ['%prefix' => $prefix]) : $this->t('No prefix');
+        $connection_info[] = " ";
+      }
+    }
+    $requirements['database_connection'] = [
+      'title' => new PluralTranslatableMarkup(
+        count($allConnections),
+        'Database connection',
+        'Database connections',
+        ['@version' => \Drupal::VERSION]
+      ),
+      'value' => ['#markup' => implode('<br/>', $connection_info)],
+    ];
+
     $class = Database::getConnection()->getConnectionOptions()['namespace'] . '\\Install\\Tasks';
     /** @var \Drupal\Core\Database\Install\Tasks $tasks */
     $tasks = new $class();
@@ -1471,7 +1494,7 @@ class SystemRequirementsHooks {
             // and both the previous update and the equivalent update are not
             // found in the current code base, prevent updating. This indicates
             // a site attempting to go 'backwards' in terms of database schema.
-            // @see \Drupal\Core\Update\UpdateHookRegistry::markFutureUpdateEquivalent()
+            // @see \Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent
             if (!function_exists($ran_update_function_name) && !function_exists($future_update_function_name)) {
               // If the module is provided by core prepend helpful text as the
               // module does not exist in composer or Drupal.org.
@@ -1493,6 +1516,21 @@ class SystemRequirementsHooks {
               ];
               break;
             }
+          }
+        }
+      }
+
+      if (!\Drupal::moduleHandler()->moduleExists('text_with_summary')) {
+        $config_storage = \Drupal::service('config.storage');
+        foreach ($config_storage->listAll('field.storage.') as $config_name) {
+          $config = $config_storage->read($config_name);
+          if (($config['type'] ?? NULL) === 'text_with_summary') {
+            $requirements['text_with_summary'] = [
+              'title' => $this->t('Missing text_with_summary field type'),
+              'description' => $this->t("The text_with_summary field type has been moved to a contributed module. Install it before updating by running 'composer require drupal/text_with_summary' and then enable the text_with_summary module."),
+              'severity' => RequirementSeverity::Error,
+            ];
+            break;
           }
         }
       }

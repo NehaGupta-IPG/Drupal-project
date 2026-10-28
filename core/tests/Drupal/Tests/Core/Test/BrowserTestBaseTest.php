@@ -68,7 +68,7 @@ class BrowserTestBaseTest extends UnitTestCase {
     $reflected_get_http_client = new \ReflectionMethod($btb, 'getHttpClient');
 
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('The Mink client type stdClass does not support getHttpClient().');
+    $this->expectExceptionMessageIs('The Mink client type stdClass does not support getHttpClient().');
     $reflected_get_http_client->invoke($btb);
   }
 
@@ -92,7 +92,7 @@ class BrowserTestBaseTest extends UnitTestCase {
 /**
  * A class extending BrowserTestBase for testing purposes.
  *
- * @phpstan-ignore testClass.missingAttribute.Group, testClass.missingAttribute.RunInSeparateProcesses
+ * @phpstan-ignore testClass.missingAttribute.Group, testClass.missingAttribute.RunTestsInSeparateProcesses
  */
 class BrowserTestBaseMockableClassTest extends BrowserTestBase {
 

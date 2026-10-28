@@ -42,15 +42,11 @@ class IconPackManagerKernelTest extends KernelTestBase {
 
   /**
    * The IconPackManager instance.
-   *
-   * @var \Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface
    */
   private IconPackManagerInterface $pluginManagerIconPack;
 
   /**
    * The App root instance.
-   *
-   * @var string
    */
   private string $appRoot;
 
@@ -364,7 +360,7 @@ class IconPackManagerKernelTest extends KernelTestBase {
   public function testProcessDefinitionExceptionName(): void {
     $definition = ['provider' => 'foo'];
     $this->expectException(IconPackConfigErrorException::class);
-    $this->expectExceptionMessage('Invalid icon pack id in: foo, name: $ Not valid !* must contain only lowercase letters, numbers, and underscores.');
+    $this->expectExceptionMessageIs('Invalid icon pack id in: foo, name: $ Not valid !* must contain only lowercase letters, numbers, and underscores.');
     $this->pluginManagerIconPack->processDefinition($definition, '$ Not valid !*');
   }
 
@@ -378,7 +374,7 @@ class IconPackManagerKernelTest extends KernelTestBase {
     ];
     $this->pluginManagerIconPack->setValidator();
     $this->expectException(IconPackConfigErrorException::class);
-    $this->expectExceptionMessage('icon_test:foo Error in definition `foo`:[extractor] The property extractor is required, [template] The property template is required');
+    $this->expectExceptionMessageIs('icon_test:foo Error in definition `foo`:[extractor] The property extractor is required, [template] The property template is required');
     $this->pluginManagerIconPack->processDefinition($definition, 'foo');
   }
 

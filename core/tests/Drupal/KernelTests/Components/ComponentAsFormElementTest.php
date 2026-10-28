@@ -155,7 +155,7 @@ class ComponentAsFormElementTest extends ComponentKernelTestBase implements Form
    * @param array $complete_form
    *   The complete form structure.
    */
-  public static function customValidator(&$element, FormStateInterface $form_state, &$complete_form): void {
+  public static function customValidator(array &$element, FormStateInterface $form_state, &$complete_form): void {
     $input_exists = FALSE;
     $input = NestedArray::getValue($form_state->getValues(), $element['#parents'], $input_exists);
 
@@ -234,7 +234,7 @@ class ComponentAsFormElementTest extends ComponentKernelTestBase implements Form
     ];
 
     foreach ($paths as $path) {
-      $this->assertNotEmpty($this->xpath($path), 'There should be a result with the path: ' . $path . '.');
+      $this->assertNotEmpty($this->getSimpleXmlElementsByXpath($path), 'There should be a result with the path: ' . $path . '.');
     }
 
     // Test form submission. Assertions are in submitForm().

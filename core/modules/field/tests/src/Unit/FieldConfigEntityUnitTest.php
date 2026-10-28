@@ -14,9 +14,11 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\field\Entity\FieldConfig.
@@ -34,10 +36,8 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
 
   /**
    * The entity field manager used for testing.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityFieldManager;
+  protected EntityFieldManagerInterface&MockObject $entityFieldManager;
 
   /**
    * The ID of the type of the entity under test.
@@ -55,10 +55,8 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
 
   /**
    * The mock field storage.
-   *
-   * @var \Drupal\field\FieldStorageConfigInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $fieldStorage;
+  protected FieldStorageConfigInterface&MockObject $fieldStorage;
 
   /**
    * The mock field type plugin manager.
@@ -199,7 +197,7 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
       'field_type' => 'test_field',
     ], $this->entityTypeId);
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Missing bundle entity, entity type bundle_entity_type, entity id test_bundle_not_exists.');
+    $this->expectExceptionMessageIs('Missing bundle entity, entity type bundle_entity_type, entity id test_bundle_not_exists.');
     $field->calculateDependencies();
   }
 

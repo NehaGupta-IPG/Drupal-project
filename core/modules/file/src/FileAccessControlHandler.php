@@ -59,7 +59,8 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
         // the file can access it even if it's not yet used.
         if ($account->isAnonymous()) {
           // For anonymous users, only the browser session that uploaded the
-          // file is positively allowed access to it. See file_save_upload().
+          // file is positively allowed access to it. See
+          // FormFileUploader::saveFormUploadedFiles().
           // @todo Implement \Drupal\Core\Entity\EntityHandlerInterface so that
           //   services can be more properly injected.
           $allowed_fids = \Drupal::service('session')->get('anonymous_allowed_file_ids', []);
@@ -109,7 +110,7 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
    * @see https://www.drupal.org/node/3573884
    */
   protected function getFileReferences(FileInterface $file) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service(\Drupal\file\FileReferenceResolver::class) instead. See https://www.drupal.org/node/3573884', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service(\Drupal\file\FileReferenceResolver::class) instead. See https://www.drupal.org/node/3573884', E_USER_DEPRECATED);
     return file_get_file_references($file, NULL, EntityStorageInterface::FIELD_LOAD_REVISION, NULL);
   }
 

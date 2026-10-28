@@ -26,12 +26,10 @@ class EntityComputedFieldTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'olivero';
+  protected $defaultTheme = 'starterkit_theme';
 
   /**
    * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
    */
   protected StateInterface $state;
 

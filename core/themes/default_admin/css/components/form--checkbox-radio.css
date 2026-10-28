@@ -13,10 +13,9 @@
 /**
  * Form item modifiers.
  */
-
 .form-type--boolean {
   margin-inline-start: var(--input--label-spacing);
-  line-height: var(--space-l);
+  line-height: var(--admin-space-l);
 }
 
 .form-boolean {
@@ -25,14 +24,14 @@
   width: 1.3125rem;
   height: 1.3125rem;
   vertical-align: text-bottom;
-  border: 1px solid var(--gin-border-color-form-element);
-  border-radius: var(--gin-border-xs);
+  border: 1px solid var(--admin-color-border-input);
+  border-radius: var(--admin-radius-xs);
   background: var(--input-bg-color) no-repeat 50% 50%;
   background-size: 100% 100%;
   appearance: none;
 
   &:focus {
-    outline-offset: -1px;
+    outline-offset: var(--outline-offset);
   }
 
   &:hover,
@@ -40,8 +39,8 @@
     border-color: var(--input-fg-color);
     box-shadow: inset 0 0 0 1px var(--input-fg-color);
 
-    .gin--dark-mode & {
-      border-color: var(--gin-color-text);
+    .dark-mode & {
+      border-color: var(--admin-color-text);
       box-shadow: none;
     }
   }
@@ -51,7 +50,7 @@
    */
   .form-type--boolean & {
     position: relative;
-    inset-block-start: calc(var(--space-l) / 2);
+    inset-block-start: calc(var(--admin-space-l) / 2);
     float: inline-start;
     margin-inline-start: calc(var(--input--label-spacing) * -1);
     transform: translateY(-50%);
@@ -76,7 +75,7 @@
 .form-radios,
 .form-checkboxes {
   .form-type--boolean {
-    margin-block: var(--gin-spacing-xs);
+    margin-block: var(--admin-space-xs);
   }
 }
 
@@ -90,35 +89,31 @@
   &:active,
   &:focus,
   &:hover:focus {
-    border-color: var(--gin-border-color-form-element);
+    border-color: var(--admin-color-border-input);
     border-radius: 50%;
-    background-color: var(--gin-bg-input);
+    background-color: var(--admin-color-bg-input);
   }
 
   &:hover {
-    box-shadow: inset 0 0 0 1px var(--gin-border-color-layer2);
+    box-shadow: inset 0 0 0 1px var(--admin-color-border);
 
     &,
-    .gin--dark-mode & {
-      border-color: var(--gin-color-text);
+    .dark-mode & {
+      border-color: var(--admin-color-text);
     }
   }
 
   &:checked:not(:disabled) {
     &,
     &:hover {
-      background-color: var(--gin-bg-layer);
-      box-shadow: inset 0 0 0 5px var(--gin-color-primary);
+      background-color: var(--admin-color-bg-surface);
+      box-shadow: inset 0 0 0 5px var(--admin-color-primary);
     }
 
     &:active,
     &:focus,
     &:hover:focus {
-      border-color: var(--gin-color-focus-border);
-      box-shadow:
-        inset 0 0 0 5px var(--gin-color-primary),
-        0 0 0 1px var(--gin-color-focus-border),
-        0 0 0 4px var(--gin-color-focus);
+      border-color: var(--admin-color-focus-border);
     }
   }
 
@@ -126,16 +121,16 @@
     &,
     &:hover {
       cursor: not-allowed;
-      border-color: var(--gin-color-disabled-border);
-      background: var(--gin-color-disabled-bg);
+      border-color: var(--admin-color-border-disabled);
+      background: var(--admin-color-bg-disabled);
     }
   }
 
   &:checked:disabled {
     &,
     &:hover {
-      background: var(--gin-color-disabled);
-      box-shadow: inset 0 0 0 5px var(--gin-color-disabled-bg);
+      background: var(--admin-color-text-disabled);
+      box-shadow: inset 0 0 0 5px var(--admin-color-bg-disabled);
     }
   }
 }
@@ -143,33 +138,32 @@
 /*
  * Checkboxes.
  */
-
 .form-boolean--type-checkbox {
   &:not(:checked) {
-    .gin--dark-mode & {
-      background: var(--gin-bg-input);
+    .dark-mode & {
+      background: var(--admin-color-bg-input);
     }
   }
 
   &:checked {
-    border-color: var(--gin-color-primary);
-    background-color: var(--gin-color-primary);
+    border-color: var(--admin-color-primary);
+    background-color: var(--admin-color-primary);
     background-image: url("data:image/svg+xml,%3csvg width='16' height='16' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M3.795 7.096l2.387 2.506 6.023-6.327 1.484 1.56-7.507 7.89L2.31 8.656z' fill='%23fff'/%3e%3c/svg%3e");
 
     &:not(:disabled) {
-      .gin--dark-mode & {
+      .dark-mode & {
         background-image: var(--admin-icon-checked);
       }
     }
 
     &:hover {
-      border-color: var(--gin-color-primary-hover);
-      background-color: var(--gin-color-primary-hover);
+      border-color: var(--admin-color-primary-hover);
+      background-color: var(--admin-color-primary-hover);
     }
 
     &:active {
-      border-color: var(--gin-color-primary-active);
-      background-color: var(--gin-color-primary-active);
+      border-color: var(--admin-color-primary-active);
+      background-color: var(--admin-color-primary-active);
     }
   }
 
@@ -177,12 +171,12 @@
     &,
     &:hover {
       cursor: not-allowed;
-      border-color: var(--gin-color-disabled-border);
-      background-color: var(--gin-color-disabled-bg);
+      border-color: var(--admin-color-border-disabled);
+      background-color: var(--admin-color-bg-disabled);
 
       &:checked {
-        border-color: var(--gin-color-disabled-border);
-        background-color: var(--gin-color-disabled-bg);
+        border-color: var(--admin-color-border-disabled);
+        background-color: var(--admin-color-bg-disabled);
         box-shadow: none;
       }
     }
@@ -192,7 +186,6 @@
 /**
  * Error states.
  */
-
 .form-boolean.error {
   border-color: var(--input--error-border-color);
   background-color: var(--input-bg-color);
@@ -201,44 +194,26 @@
   &:hover {
     box-shadow: inset 0 0 0 1px var(--input--error-border-color);
   }
-  &:focus,
-  &:focus:active,
-  &:focus:hover {
-    box-shadow:
-      0 0 0 2px var(--color-white),
-      0 0 0 5px var(--color-focus),
-      inset 0 0 0 1px var(--input--error-border-color);
-  }
   &:checked:active,
   &:checked:hover {
     border-color: var(--input--error-border-color);
     background-color: var(--input-bg-color);
   }
 }
-
 .form-boolean--type-checkbox.error:checked,
 .form-boolean--type-checkbox.error:checked:active,
 .form-boolean--type-checkbox.error:checked:hover {
   background-color: var(--input--error-border-color);
 }
-
 .form-boolean--type-radio.error:checked,
 .form-boolean--type-radio.error:checked:active,
 .form-boolean--type-radio.error:checked:hover {
   background-image: url("data:image/svg+xml,%3csvg width='17' height='17' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle r='4.5' cx='8.5' cy='8.5' fill='%23d72222'/%3e%3c/svg%3e");
 }
 
-.form-boolean--type-radio.error:checked:focus {
-  box-shadow:
-    0 0 0 2px var(--color-white),
-    0 0 0 5px var(--color-focus),
-    inset 0 0 0 1px var(--input--error-border-color);
-}
-
 /**
  * Disabled states.
  */
-
 .form-boolean[disabled],
 .form-boolean[disabled]:hover,
 .form-boolean[disabled].error,
@@ -251,11 +226,9 @@
   background-image: none;
   box-shadow: none;
 }
-
 .form-boolean--type-checkbox[disabled]:checked {
   background-image: url("data:image/svg+xml,%3csvg width='16' height='16' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M3.795 7.096l2.387 2.506 6.023-6.327 1.484 1.56-7.507 7.89L2.31 8.656z' fill='%2382828c'/%3e%3c/svg%3e");
 }
-
 .form-boolean--type-radio[disabled]:checked,
 .form-boolean--type-radio[disabled].error:checked {
   background-image: url("data:image/svg+xml,%3csvg width='17' height='17' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle r='4.5' cx='8.5' cy='8.5' fill='%2382828c'/%3e%3c/svg%3e");
