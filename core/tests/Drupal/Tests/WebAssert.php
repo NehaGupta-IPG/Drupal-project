@@ -920,38 +920,22 @@ class WebAssert extends MinkWebAssert {
     if (!in_array($type, $allowed_types, TRUE)) {
       throw new \InvalidArgumentException(sprintf("If a status message type is specified, the allowed values are 'status', 'error', 'warning'. The value provided was '%s'.", $type));
     }
-    $selector = '//div[@data-drupal-messages]';
-    $aria_label = NULL;
-    switch ($type) {
-      case 'status':
-        $aria_label = 'Status message';
-        break;
+    $selector = $this->buildXPathQuery('//ul[@data-drupal-message-list-type]');
 
-      case 'error':
-        $aria_label = 'Error message';
-        break;
-
-      case 'warning':
-        $aria_label = 'Warning message';
-    }
-
-    if ($message && $aria_label && $type) {
-      $selector = $this->buildXPathQuery($selector . '//div[(contains(@aria-label, :aria_label) or contains(@aria-labelledby, :type)) and contains(., :message)]', [
-        // Value of the 'aria-label' attribute, used in Stark.
-        ':aria_label' => $aria_label,
-        // Value of the 'aria-labelledby' attribute, used in core themes.
+    if ($message && $type) {
+      $selector =$this->buildXPathQuery('//ul[@data-drupal-message-list-type=:type]/li[contains(., :message)]', [
         ':type' => $type,
         ':message' => $message,
       ]);
     }
     elseif ($message) {
-      $selector = $this->buildXPathQuery($selector . '//div[contains(., :message)]', [
+      $selector = $this->buildXPathQuery('//ul[@data-drupal-message-list-type]/li[contains(., :message)]', [
         ':message' => $message,
       ]);
     }
-    elseif ($aria_label) {
-      $selector = $this->buildXPathQuery($selector . '//div[@aria-label=:aria_label]', [
-        ':aria_label' => $aria_label,
+    elseif ($type) {
+      $selector = $this->buildXPathQuery('//ul[@data-drupal-message-list-type=:type]/li', [
+        ':type' => $type,
       ]);
     }
 
