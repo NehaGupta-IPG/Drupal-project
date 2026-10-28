@@ -7,7 +7,7 @@ namespace Drupal\user\Install\LastRemoved;
 use Drupal\Core\Extension\Install\LastRemovedInterface;
 
 /**
- * Field and Field UI hook implementations for User module.
+ * Last removed update for User module.
  */
 class UserRemovedUpdate implements LastRemovedInterface {
 

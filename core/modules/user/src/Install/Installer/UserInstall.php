@@ -7,7 +7,7 @@ namespace Drupal\user\Install\Installer;
 use Drupal\Core\Extension\Install\InstallInterface;
 
 /**
- * Field and Field UI hook implementations for User module.
+ * Install tasks for User module.
  */
 class UserFieldHooks implements InstallInterface {
 

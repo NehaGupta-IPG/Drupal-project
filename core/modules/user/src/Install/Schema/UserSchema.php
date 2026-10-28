@@ -17,7 +17,7 @@ use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Extension\Install\SchemaInterface;
 
 /**
- * Field and Field UI hook implementations for User module.
+ * Database Schema for User module.
  */
 class UserRemovedUpdate implements SchemaInterface {
 
