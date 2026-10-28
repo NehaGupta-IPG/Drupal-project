@@ -7,6 +7,7 @@ namespace Drupal\default_admin\Hook;
 use Drupal\default_admin\Helper;
 use Drupal\default_admin\Settings;
 use Drupal\Core\Ajax\AjaxHelperTrait;
+use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -30,12 +31,20 @@ class FormHooks {
   use StringTranslationTrait;
 
   /**
+   * The admin theme settings.
+   */
+  protected readonly Settings $settings;
+
+  /**
    * Constructs the form related hooks.
    */
   public function __construct(
     protected RouteMatchInterface $routeMatch,
     protected AccountInterface $currentUser,
-  ) {}
+    ClassResolverInterface $classResolver,
+  ) {
+    $this->settings = $classResolver->getInstanceFromDefinition(Settings::class);
+  }
 
   /**
    * Implements hook_form_alter().
@@ -363,7 +372,6 @@ class FormHooks {
     if (!isset($form['config_key']['#value']) || $form['config_key']['#value'] !== 'default_admin.settings') {
       return;
     }
-    $settings = Settings::getInstance();
 
     // Move default theme settings to bottom.
     $form['logo']['#open'] = FALSE;
@@ -378,14 +386,14 @@ class FormHooks {
       '#type' => 'details',
       '#open' => TRUE,
       '#title' => $this->t('Settings'),
-    ] + $settings->getSettingsForm();
+    ] + $this->settings->getSettingsForm();
 
     // Allow user settings.
     $form['custom_settings']['show_user_theme_settings'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Users can override Default Admin settings'),
       '#description' => $this->t('Expose the Default Admin theme settings to users.'),
-      '#default_value' => $settings->getDefault('show_user_theme_settings'),
+      '#default_value' => $this->settings->getDefault('show_user_theme_settings'),
     ];
 
     // Add handler.
@@ -431,7 +439,7 @@ class FormHooks {
       return;
     }
 
-    if (Settings::getInstance()->allowUserOverrides()) {
+    if ($this->settings->allowUserOverrides()) {
       // Inject the settings for the dark mode feature.
       $form['admin_theme_settings'] = [
         '#type' => 'details',
@@ -446,7 +454,7 @@ class FormHooks {
         '#type' => 'checkbox',
         '#title' => $this->t('Enable overrides'),
         '#description' => $this->t("Enables default admin theme overrides."),
-        '#default_value' => Settings::getInstance()->userOverrideEnabled($account),
+        '#default_value' => $this->settings->userOverrideEnabled($account),
         '#weight' => 0,
       ];
 
@@ -458,7 +466,7 @@ class FormHooks {
             ':input[name="enable_user_settings"]' => ['checked' => TRUE],
           ],
         ],
-      ] + Settings::getInstance()->getSettingsForm($account);
+      ] + $this->settings->getSettingsForm($account);
 
       // Attach custom library.
       $form['#attached']['library'][] = 'default_admin/settings';
