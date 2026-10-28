@@ -34,11 +34,19 @@ interface PageVariantInterface extends VariantInterface {
   /**
    * Sets the title for the page being rendered.
    *
-   * @param string|array $title
-   *   The page title: either a string for plain titles or a render array for
-   *   formatted titles.
+   * @param string|\Stringable $title
+   *   The page title to set. This can be either:
+   *   - A plain string.
+   *   - An object implementing \Stringable, such as
+   *     \Drupal\Core\StringTranslation\TranslatableMarkup or
+   *     \Drupal\Component\Render\MarkupInterface.
+   *   These objects will be automatically cast to a string during rendering.
    *
    * @return $this
+   *   The called object for method chaining.
+   *
+   * @see \Drupal\Core\Controller\TitleResolverInterface::getTitle()
+   * @see \Drupal\Core\Render\MainContent\HtmlRenderer::prepare()
    */
   public function setTitle($title);
 
