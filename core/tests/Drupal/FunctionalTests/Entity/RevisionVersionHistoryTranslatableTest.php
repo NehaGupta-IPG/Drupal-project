@@ -85,4 +85,41 @@ final class RevisionVersionHistoryTranslatableTest extends BrowserTestBase {
     $this->assertSession()->linkByHrefExists($firstRevision->getTranslation('es')->toUrl('revision-delete-form')->toString());
   }
 
+  /**
+   * Tests that the current revision is indicated correctly for translations.
+   */
+  public function testVersionHistoryCurrentRevisionTranslations(): void {
+    $label = 'view all revisions,revert,delete revision';
+    $entity = EntityTestMulWithRevisionLog::create([
+      'name' => $label,
+      'type' => 'entity_test_mul_revlog',
+    ]);
+    $entity->save();
+    $first_revision_id = $entity->getRevisionId();
+
+    $entity->setNewRevision();
+    $entity->setName($label . ',2')
+      ->save();
+
+    $entity->setNewRevision();
+    $entity->addTranslation('es', ['label' => 'version history test translations es']);
+    $entity->save();
+
+    $this->drupalGet($entity->toUrl('version-history'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->elementsCount('css', 'table tbody tr', 2);
+
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = $this->container->get('entity_type.manager')->getStorage($entity->getEntityTypeId());
+    $first_revision = $storage->loadRevision($first_revision_id);
+    $this->assertSession()->linkByHrefExists($first_revision->toUrl('revision-revert-form')->toString());
+    $this->assertSession()->linkByHrefExists($first_revision->toUrl('revision-delete-form')->toString());
+    $this->assertSession()->pageTextContains('Current revision');
+
+    $this->drupalGet($entity->getTranslation('es')->toUrl('version-history'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->elementsCount('css', 'table tbody tr', 1);
+    $this->assertSession()->pageTextContains('Current revision');
+  }
+
 }
