@@ -16,6 +16,103 @@
     drupalSettings.dialog,
   );
 
+  $.widget('ui.dialog', $.ui.dialog, {
+    _create() {
+      const sizes = getSizeOptions(this.options);
+      // Preserve percentage heights for natural content sizing in _size().
+      delete sizes.height;
+      Object.assign(this.options, sizes);
+      this._super();
+    },
+    _setOptions(options) {
+      this._super({ ...options, ...getSizeOptions(options, this.uiDialog) });
+    },
+    _size() {
+      let sizes = getSizeOptions(this.options);
+      if (
+        typeof this.options.height === 'string' &&
+        this.options.height.trim().endsWith('%') &&
+        Number.isFinite(sizes.height)
+      ) {
+        const settings = { ...this.options };
+        // Measure natural height before applying the percentage height.
+        Object.assign(this.options, sizes, { height: 'auto' });
+        this._super();
+        sizes = getSizeOptions(settings, this.uiDialog);
+      }
+      Object.assign(this.options, sizes);
+      this._super();
+    },
+  });
+
+  /**
+   * Converts dialog size options to pixel values or automatic height.
+   *
+   * Processes width, height, minWidth, minHeight, maxWidth, and maxHeight.
+   * Pixel sizes accept numbers, or strings with an optional "px" suffix.
+   * The height, minHeight, and maxHeight options also accept percentages of
+   * the viewport height minus Drupal displacement offsets. Negative sizes are
+   * clamped to zero; percentage heights are truncated to whole pixels.
+   *
+   * @param {object} settings
+   *   The dialog options to convert. This object is not modified.
+   * @param {jQuery} [$widget]
+   *   The measured dialog wrapper. If a percentage height exceeds its measured
+   *   height, returns "auto" for that option to avoid enlarging short content.
+   *
+   * @return {object}
+   *   Converted size options; unconverted values such as "auto" are omitted.
+   */
+  function getSizeOptions(settings, $widget) {
+    const sizes = {};
+    for (const option of [
+      'width',
+      'height',
+      'minWidth',
+      'minHeight',
+      'maxWidth',
+      'maxHeight',
+    ]) {
+      const value = settings[option];
+      let size = value;
+      let percentage;
+
+      if (typeof value === 'string') {
+        [, size, percentage] = value.trim().match(/^(.*?)(?:px|(%))?$/i) ?? [];
+        if (size === '') {
+          continue;
+        }
+      } else if (typeof size !== 'number') {
+        continue;
+      }
+
+      size = Math.max(0, Number(size));
+      if (!Number.isFinite(size)) {
+        continue;
+      }
+
+      if (percentage) {
+        if (!/height/i.test(option)) {
+          continue;
+        }
+        const availableHeight =
+          $(window).height() - displace.offsets.top - displace.offsets.bottom;
+        size = Math.max(0, Math.trunc((size / 100) * availableHeight));
+
+        if (
+          option === 'height' &&
+          $widget &&
+          Math.round($widget.outerHeight()) < size
+        ) {
+          size = 'auto';
+        }
+      }
+
+      sizes[option] = size;
+    }
+    return sizes;
+  }
+
   /**
    * Position the dialog's center at the center of displace.offsets boundaries.
    *
@@ -55,6 +152,8 @@
    * be disabled by setting autoResize: false in the options array when creating
    * a new {@link Drupal.dialog}.
    *
+   * Only percentage heights are recalculated; pixel sizes are not reapplied.
+   *
    * @function Drupal.dialog~resetSize
    *
    * @param {jQuery.Event} event
@@ -68,48 +167,16 @@
       return;
     }
 
-    const positionOptions = [
-      'width',
-      'height',
-      'minWidth',
-      'minHeight',
-      'maxHeight',
-      'maxWidth',
-      'position',
-    ];
-    let adjustedOptions = {};
-    let windowHeight = $(window).height();
-    let option;
-    let optionValue;
-    let adjustedValue;
-    for (let n = 0; n < positionOptions.length; n++) {
-      option = positionOptions[n];
-      optionValue = event.data.settings[option];
-      if (optionValue) {
-        // jQuery UI does not support percentages on heights, convert to pixels.
-        if (
-          typeof optionValue === 'string' &&
-          optionValue.endsWith('%') &&
-          /height/i.test(option)
-        ) {
-          // Take offsets in account.
-          windowHeight -= displace.offsets.top + displace.offsets.bottom;
-          adjustedValue = parseInt(
-            0.01 * parseInt(optionValue, 10) * windowHeight,
-            10,
-          );
-          // Don't force the dialog to be bigger vertically than needed.
-          if (
-            option === 'height' &&
-            Math.round(event.data.$element.parent().outerHeight()) <
-              adjustedValue
-          ) {
-            adjustedValue = 'auto';
-          }
-          adjustedOptions[option] = adjustedValue;
-        }
-      }
-    }
+    const percentageSettings = Object.fromEntries(
+      Object.entries(event.data.settings).filter(
+        ([, value]) =>
+          typeof value === 'string' && value.trim().endsWith('%'),
+      ),
+    );
+    let adjustedOptions = getSizeOptions(
+      percentageSettings,
+      event.data.$element.parent(),
+    );
     // Offset the dialog center to be at the center of Drupal.displace.offsets.
     if (!event.data.settings.modal) {
       adjustedOptions = resetPosition(adjustedOptions);
