@@ -1,11 +1,11 @@
 <?php
 
-namespace Drupal\Core\Template;
+namespace Drupal\Component\Utility\HtmlAttribute;
 
 use Drupal\Component\Utility\Html;
 
 /**
- * A class that defines a type of Attribute that can be added to as an array.
+ * A class that defines a type of attribute that can be added to as an array.
  *
  * To use with Attribute, the array must be specified.
  * Correct:
@@ -23,15 +23,15 @@ use Drupal\Component\Utility\Html;
  * @implements \ArrayAccess<int|string, mixed>
  * @implements \IteratorAggregate<int|string, mixed>
  *
- * @see \Drupal\Core\Template\Attribute
+ * @see \Drupal\Component\Utility\HtmlAttribute\Attribute
  */
 class AttributeArray extends AttributeValueBase implements \ArrayAccess, \IteratorAggregate {
 
   /**
    * Ensures empty array as a result of array_filter will not print '$name=""'.
    *
-   * @see \Drupal\Core\Template\AttributeArray::__toString()
-   * @see \Drupal\Core\Template\AttributeValueBase::render()
+   * @see \Drupal\Component\Utility\HtmlAttribute\AttributeArray::__toString()
+   * @see \Drupal\Component\Utility\HtmlAttribute\AttributeValueBase::render()
    */
   const RENDER_EMPTY_ATTRIBUTE = FALSE;
 

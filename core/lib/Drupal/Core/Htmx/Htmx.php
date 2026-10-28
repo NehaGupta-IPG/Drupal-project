@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Htmx;
 
+use Drupal\Component\Utility\HtmlAttribute\AttributeBoolean;
+use Drupal\Component\Utility\HtmlAttribute\AttributeString;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Template\Attribute;
-use Drupal\Core\Template\AttributeBoolean;
 use Drupal\Core\Template\AttributeHelper;
-use Drupal\Core\Template\AttributeString;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
