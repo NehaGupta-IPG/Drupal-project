@@ -142,3 +142,33 @@
  *
  * @}
  */
+
+/**
+ * @addtogroup hooks
+ * @{
+ */
+
+/**
+ * Declares a list of trusted local domains.
+ *
+ * Domains returned here are exempt from requiring a TrustedRedirectResponse in
+ * order to be redirected to.
+ *
+ * @return string[]
+ *   A list of trusted local domains.
+ *
+ * @see \Drupal\Core\Routing\TrustedRedirectResponse
+ * @see \Drupal\Component\Utility\UrlHelper::externalIsTrustedLocal()
+ * @see \Drupal\language\Hook\LanguageHooks::trustedLocalDomains()
+ */
+function hook_trusted_local_domains(): array {
+  // A list of local trusted domains.
+  return [
+    'en.example.com',
+    'de.example.com',
+  ];
+}
+
+/**
+ * @} End of "addtogroup hooks".
+ */

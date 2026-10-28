@@ -27,7 +27,8 @@ trait LocalAwareRedirectResponseTrait {
    *   TRUE or FALSE, where TRUE indicates a local path.
    */
   protected function isLocal($url) {
-    return !UrlHelper::isExternal($url) || UrlHelper::externalIsLocal($url, $this->getRequestContext()->getCompleteBaseUrl());
+    return !UrlHelper::isExternal($url)
+      || UrlHelper::externalIsTrustedLocal($url, $this->getRequestContext()->getCompleteBaseUrl());
   }
 
   /**

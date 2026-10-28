@@ -335,6 +335,39 @@ class UrlHelper {
   }
 
   /**
+   * Determines if an external URL points to a trusted domain in this site.
+   *
+   * @param string $url
+   *   A string containing an external URL, such as "http://example.com/foo".
+   * @param string $base_url
+   *   The base URL string to check against, such as "http://example.com/".
+   *
+   * @return bool
+   *   TRUE if the URL has the same domain and base path as the base URL, or
+   *   the URL has a domain name that is within the list of trusted domain
+   *   names.
+   *
+   * @throws \InvalidArgumentException
+   *   Exception thrown when either $url or $base_url are not fully qualified.
+   */
+  public static function externalIsTrustedLocal(string $url, string $base_url): bool {
+    return static::externalIsLocal($url, $base_url) ||
+      in_array(parse_url($url, PHP_URL_HOST), static::getLocalTrustedDomains(), TRUE);
+  }
+
+  /**
+   * Returns the list of local trusted domains.
+   *
+   * @return array
+   *   The list of local trusted domains.
+   *
+   * @see \hook_trusted_local_domains()
+   */
+  protected static function getLocalTrustedDomains(): array {
+    return \Drupal::moduleHandler()->invokeAll('trusted_local_domains');
+  }
+
+  /**
    * Processes an HTML attribute value and strips dangerous protocols from URLs.
    *
    * @param string $string

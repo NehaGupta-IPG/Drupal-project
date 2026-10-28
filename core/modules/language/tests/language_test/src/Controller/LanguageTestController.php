@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\language_test\Controller;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -21,37 +23,30 @@ class LanguageTestController implements ContainerInjectionInterface {
   use StringTranslationTrait;
 
   /**
-   * The HTTP kernel service.
-   *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
-   */
-  protected $httpKernel;
-
-  /**
-   * The language manager service.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
    * Constructs a new LanguageTestController object.
    *
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   An HTTP kernel.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The config factory.
    */
-  public function __construct(HttpKernelInterface $httpKernel, LanguageManagerInterface $language_manager) {
-    $this->httpKernel = $httpKernel;
-    $this->languageManager = $language_manager;
-  }
+  public function __construct(
+    protected HttpKernelInterface $httpKernel,
+    protected LanguageManagerInterface $languageManager,
+    protected ConfigFactoryInterface $configFactory,
+  ) {}
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('http_kernel'), $container->get('language_manager'));
+    return new static(
+      $container->get('http_kernel'),
+      $container->get('language_manager'),
+      $container->get('config.factory'),
+    );
   }
 
   /**
@@ -136,6 +131,21 @@ class LanguageTestController implements ContainerInjectionInterface {
     }
     $sub_request = Request::create($base_path . '/user', 'GET', $request->query->all(), $request->cookies->all(), [], $server);
     return $this->httpKernel->handle($sub_request, HttpKernelInterface::SUB_REQUEST);
+  }
+
+  /**
+   * Attempts to redirect to the domain for the specified language.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   The domain redirect response object.
+   */
+  public function redirectToDomain(Request $request, string $langcode): RedirectResponse {
+    $domain = $this->configFactory->get('language.negotiation')->get('url.domains.' . $langcode);
+    if (!$domain) {
+      // The domain doesn't exist, so fallback to generic prefix.
+      $domain = $langcode . '.' . $request->getHost();
+    }
+    return new RedirectResponse($request->getScheme() . '://' . $domain . base_path());
   }
 
 }

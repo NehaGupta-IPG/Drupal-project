@@ -31,3 +31,10 @@ language_test.entity_using_current_language:
         type: entity:configurable_language
         # Force load in the interface text language selected for page.
         with_config_overrides: TRUE
+
+language_test.redirect_to_domain:
+  path: '/language_test/redirect/{langcode}'
+  defaults:
+    _controller: '\Drupal\language_test\Controller\LanguageTestController::redirectToDomain'
+  requirements:
+    _access: 'TRUE'

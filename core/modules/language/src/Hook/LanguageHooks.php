@@ -142,6 +142,26 @@ class LanguageHooks {
   }
 
   /**
+   * Implements hook_trusted_local_domains().
+   */
+  #[Hook('trusted_local_domains')]
+  public function trustedLocalDomains(): array {
+    $language_negation_config = \Drupal::config('language.negotiation');
+    // Check if the URL language negotiation uses domains.
+    if ($language_negation_config->get('url.source') === LanguageNegotiationUrl::CONFIG_DOMAIN) {
+      /** @var \Drupal\language\LanguageNegotiatorInterface $negotiator */
+      $negotiator = \Drupal::service('language_negotiator');
+      // Check if the URL negotiation is enabled for at least one language type.
+      foreach (\Drupal::languageManager()->getLanguageTypes() as $language_type) {
+        if (isset($negotiator->getNegotiationMethods($language_type)[LanguageNegotiationUrl::METHOD_ID])) {
+          return $language_negation_config->get('url.domains');
+        }
+      }
+    }
+    return [];
+  }
+
+  /**
    * Implements hook_element_info_alter().
    *
    * @see \Drupal\Core\Render\Element\LanguageSelect
