@@ -63,7 +63,7 @@ class OptionsButtonsWidget extends OptionsWidgetBase {
    * {@inheritdoc}
    */
   protected function getEmptyLabel() {
-    if (!$this->required && !$this->multiple) {
+    if (!$this->required && !$this->multiple && ($this->field_type != 'boolean')) {
       return $this->t('N/A');
     }
   }

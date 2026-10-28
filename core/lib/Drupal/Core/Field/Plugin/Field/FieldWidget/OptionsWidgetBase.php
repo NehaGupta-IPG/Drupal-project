@@ -50,6 +50,12 @@ abstract class OptionsWidgetBase extends WidgetBase {
   protected bool $has_value;
 
   /**
+   * Tracks the field type.
+   */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  protected string $field_type;
+
+  /**
    * The array of options for the widget.
    */
   protected array $options;
@@ -67,11 +73,13 @@ abstract class OptionsWidgetBase extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+
     // Prepare some properties for the child methods to build the actual form
     // element.
     $this->required = $element['#required'];
     $this->multiple = $this->fieldDefinition->getFieldStorageDefinition()->isMultiple();
     $this->has_value = isset($items[0]->{$this->column});
+    $this->field_type = $this->fieldDefinition->getFieldStorageDefinition()->getType();
 
     // Add our custom validator.
     $element['#element_validate'][] = [static::class, 'validateElement'];
