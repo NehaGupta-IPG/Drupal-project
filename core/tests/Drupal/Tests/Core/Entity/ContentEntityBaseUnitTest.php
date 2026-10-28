@@ -261,6 +261,12 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
         'en' => $english,
         LanguageInterface::LANGCODE_NOT_SPECIFIED => $not_specified,
       ]);
+    $this->languageManager->expects($this->never())
+      ->method('getLanguage')
+      ->with('en');
+    $this->languageManager->expects($this->never())
+      ->method('getLanguage')
+      ->with(LanguageInterface::LANGCODE_NOT_SPECIFIED);
     \Drupal::getContainer()->set('language_manager', $this->languageManager);
   }
 
