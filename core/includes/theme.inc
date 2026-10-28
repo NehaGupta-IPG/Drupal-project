@@ -313,3 +313,301 @@ function theme_get_suggestions($args, $base, $delimiter = '__'): array {
 
   return $suggestions;
 }
+
+/**
+ * Prepares variables for tablesort indicators.
+ *
+ * Default template: tablesort-indicator.html.twig.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *    template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function template_preprocess_tablesort_indicator(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(ThemePreprocess::class)->preprocessTablesortIndicator($variables);
+}
+
+/**
+ * Prepares variables for maintenance page templates.
+ *
+ * Default template: maintenance-page.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - content - An array of page content.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *  template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function template_preprocess_maintenance_page(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(ThemePreprocess::class)->preprocessMaintenancePage($variables);
+}
+
+/**
+ * Prepares variables for install page templates.
+ *
+ * Default template: install-page.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - content - An array of page content.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *   template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function template_preprocess_install_page(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(ThemePreprocess::class)->preprocessInstallPage($variables);
+}
+
+/**
+ * Prepares variables for region templates.
+ *
+ * Default template: region.html.twig.
+ *
+ * Prepares the values passed to the theme_region function to be passed into a
+ * pluggable template engine. Uses the region name to generate a template file
+ * suggestions.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing properties of the region.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *   template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function template_preprocess_region(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(ThemePreprocess::class)->preprocessRegion($variables);
+}
+
+/**
+ * Prepares variables for field templates.
+ *
+ * Default template: field.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: A render element representing the field.
+ *   - attributes: A string containing the attributes for the wrapping div.
+ *   - title_attributes: A string containing the attributes for the title.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *    template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function template_preprocess_field(&$variables, $hook): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(FieldPreprocess::class)->preprocessField($variables);
+}
+
+/**
+ * Prepares variables for individual form element templates.
+ *
+ * Default template: field-multiple-value-form.html.twig.
+ *
+ * Combines multiple values into a table with drag-n-drop reordering.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: A render element representing the form element.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *    template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function template_preprocess_field_multiple_value_form(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(FieldPreprocess::class)->preprocessFieldMultipleValueForm($variables);
+}
+
+/**
+ * Prepares variables for breadcrumb templates.
+ *
+ * Default template: breadcrumb.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - links: A list of \Drupal\Core\Link objects which should be rendered.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *   template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function template_preprocess_breadcrumb(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(BreadcrumbPreprocess::class)->preprocessBreadcrumb($variables);
+}
+
+/**
+ * Prepares variables for pager templates.
+ *
+ * Default template: pager.html.twig.
+ *
+ * Menu callbacks that display paged query results should use #type => pager
+ * to retrieve a pager control so that users can view other results. Format a
+ * list of nearby pages with additional query results.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - pager: A render element containing:
+ *     - #tags: An array of labels for the controls in the pager.
+ *     - #element: An optional integer to distinguish between multiple pagers on
+ *       one page.
+ *     - #pagination_heading_level: An optional heading level for the pager.
+ *     - #parameters: An associative array of query string parameters to append
+ *       to the pager links.
+ *     - #route_parameters: An associative array of the route parameters.
+ *     - #quantity: The number of pages in the list.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *   template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function template_preprocess_pager(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(PagerPreprocess::class)->preprocessPager($variables);
+}
+
+/**
+ * Prepares variables for single local task link templates.
+ *
+ * Default template: menu-local-task.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: A render element containing:
+ *     - #link: A menu link array with 'title', 'url', and (optionally)
+ *       'localized_options' keys.
+ *     - #active: A boolean indicating whether the local task is active.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *   template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function template_preprocess_menu_local_task(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(MenuPreprocess::class)->preprocessMenuLocalTask($variables);
+}
+
+/**
+ * Prepares variables for local tasks templates.
+ *
+ * Default template: menu-local-tasks.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - primary: HTML list items representing primary tasks.
+ *   - secondary: HTML list items representing secondary tasks.
+ */
+function template_preprocess_menu_local_tasks(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(MenuPreprocess::class)->preprocessMenuLocalTasks($variables);
+}
+
+/**
+ * Prepares variables for single local action link templates.
+ *
+ * Default template: menu-local-action.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: A render element containing:
+ *     - #link: A menu link array with 'title', 'url', and (optionally)
+ *       'localized_options' keys.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *   template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function template_preprocess_menu_local_action(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(MenuPreprocess::class)->preprocessMenuLocalAction($variables);
+}
+
+/**
+ * Callback for usort() of field item form elements.
+ *
+ * Sorts using ['_weight']['#value']
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no
+ *   replacement.
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function _field_multiple_value_form_sort_helper($a, $b) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  $a_weight = (is_array($a) && isset($a['_weight']['#value']) ? $a['_weight']['#value'] : 0);
+  $b_weight = (is_array($b) && isset($b['_weight']['#value']) ? $b['_weight']['#value'] : 0);
+  return $a_weight - $b_weight;
+}
+
+/**
+ * Provides theme registration for themes across .inc files.
+ *
+ * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\Core\Theme\ThemeCommonElements::commonElements() instead,
+ *
+ * @see https://www.drupal.org/node/3488470
+ */
+function drupal_common_theme(): array {
+  @trigger_error('drupal_common_theme() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Theme\ThemeCommonElements::commonElements() instead. See https://www.drupal.org/node/3488470', E_USER_DEPRECATED);
+  return ThemeCommonElements::commonElements();
+}
+
+/**
+ * Prepares variables for authorize.php operation report templates.
+ *
+ * This report displays the results of an operation run via authorize.php.
+ *
+ * Default template: authorize-report.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - messages: An array of result messages.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
+ *   replacement. Use composer to manage the code for your site.
+ *
+ * @see https://www.drupal.org/node/3522119
+ */
+function template_preprocess_authorize_report(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3522119', E_USER_DEPRECATED);
+  $messages = [];
+  if (!empty($variables['messages'])) {
+    foreach ($variables['messages'] as $heading => $logs) {
+      $items = [];
+      foreach ($logs as $number => $log_message) {
+        if ($number === '#abort') {
+          continue;
+        }
+        $class = 'authorize-results__' . ($log_message['success'] ? 'success' : 'failure');
+        $items[] = [
+          '#wrapper_attributes' => ['class' => [$class]],
+          '#markup' => $log_message['message'],
+        ];
+      }
+      $messages[] = [
+        '#theme' => 'item_list',
+        '#items' => $items,
+        '#title' => $heading,
+      ];
+    }
+  }
+  $variables['messages'] = $messages;
+}

@@ -10,6 +10,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
@@ -17,6 +18,8 @@ use Drupal\Core\Plugin\Discovery\YamlCacheCollectorDiscovery;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
@@ -25,6 +28,8 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
  * Provides the default local task manager using YML as primary definition.
  */
 class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerInterface {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -69,6 +74,40 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
    */
   protected bool $loadingLocalTasks = FALSE;
 
+  /**
+   * Indicates wether the user-admin-language negotiation method is enabled.
+   *
+   * @var bool
+   */
+  protected $adminLanguageLanguageNegotiationEnabled;
+
+  /**
+   * Constructs a \Drupal\Core\Menu\LocalTaskManager object.
+   *
+   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
+   *   An object to use in resolving route arguments.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   *   The request object to use for building titles and paths for plugin
+   *   instances.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The current route match.
+   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   *   The route provider to load routes by name.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   *   The cache backend.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
+   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   *   The access manager.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The current user.
+   * @param \Drupal\Core\Utility\CacheCollectorInterface|null $yamlCacheCollector
+   *   The YAML cache collector.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   *   The string translation service.
+   */
   public function __construct(
     protected ArgumentResolverInterface $argumentResolver,
     protected RequestStack $requestStack,
@@ -80,8 +119,21 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
     protected AccessManagerInterface $accessManager,
     protected AccountInterface $account,
     protected CacheCollectorInterface $yamlCacheCollector,
+    ?TranslationInterface $string_translation = NULL,
   ) {
     $this->moduleHandler = $module_handler;
+    $this->stringTranslation = $string_translation;
+
+    if ($string_translation === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $string_translation argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/0000', E_USER_DEPRECATED);
+      $string_translation = \Drupal::service('string_translation');
+    }
+
+    if ($module_handler->moduleExists('language')) {
+      $this->adminLanguageLanguageNegotiationEnabled = \Drupal::service('language_negotiator')->isNegotiationMethodEnabled('language-user-admin');
+    }
+
+    $this->stringTranslation = $string_translation;
     $this->alterInfo('local_tasks');
     $this->setCacheBackend($cache, 'local_task_plugins:' . $language_manager->getCurrentLanguage()->getId(), ['local_task']);
   }
@@ -116,7 +168,18 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
     $controller = [$local_task, 'getTitle'];
     $request = $this->requestStack->getCurrentRequest();
     $arguments = $this->argumentResolver->getArguments($request, $controller);
-    return call_user_func_array($controller, $arguments);
+
+    $userAdminLangcode = $this->account->getPreferredAdminLangcode(FALSE);
+    if ($this->adminLanguageLanguageNegotiationEnabled && !empty($userAdminLangcode)) {
+      $originalLangcode = $this->stringTranslation->setDefaultLangcode($userAdminLangcode);
+      $title = call_user_func_array($controller, $arguments);
+      $this->stringTranslation->setDefaultLangcode($originalLangcode);
+    }
+    else {
+      $title = call_user_func_array($controller, $arguments);
+    }
+
+    return $title;
   }
 
   /**
@@ -263,7 +326,6 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
         // one of its child tabs is the active tab.
         $active = $active || $child->getActive();
         // @todo It might make sense to use link render elements instead.
-
         $link = [
           'title' => $this->getTitle($child),
           'url' => Url::fromRoute($route_name, $route_parameters),
@@ -277,7 +339,9 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
           '#weight' => $child->getWeight(),
           '#access' => $access,
         ];
-        $cacheability->addCacheableDependency($access)->addCacheableDependency($child);
+        $cacheability->addCacheableDependency($access)
+          ->addCacheableDependency($child)
+          ->addCacheContexts(['languages:' . LanguageInterface::TYPE_INTERFACE]);
       }
     }
 

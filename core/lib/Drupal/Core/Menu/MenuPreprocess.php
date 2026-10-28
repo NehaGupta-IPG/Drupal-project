@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Menu;
 
+use Drupal\Core\Template\Attribute;
+
 /**
  * Menu theme preprocess.
  *
@@ -40,6 +42,25 @@ class MenuPreprocess {
       '#url' => $link['url'],
       '#options' => $link['localized_options'],
     ];
+  }
+
+  /**
+   * Prepares variables for local tasks templates.
+   *
+   * Default template: menu-local-tasks.html.twig.
+   *
+   * @param array $variables
+   *   An associative array containing:
+   *   - primary: HTML list items representing primary tasks.
+   *   - secondary: HTML list items representing secondary tasks.
+   */
+  public function preprocessMenuLocalTasks(array &$variables): void {
+    if (is_array($variables['primary_attributes'])) {
+      $variables['primary_attributes'] = new Attribute($variables['primary_attributes']);
+    }
+    if (is_array($variables['secondary_attributes'])) {
+      $variables['secondary_attributes'] = new Attribute($variables['secondary_attributes']);
+    }
   }
 
   /**

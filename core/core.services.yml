@@ -914,7 +914,7 @@ services:
     arguments: ['menu.local_task.yaml', '@cache.file_parsing', '@lock', '@datetime.time']
   plugin.manager.menu.local_task:
     class: Drupal\Core\Menu\LocalTaskManager
-    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user', '@local_task.yaml_cache_collector']
+    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user', '@local_task.yaml_cache_collector', '@string_translation']
   Drupal\Core\Menu\LocalTaskManagerInterface: '@plugin.manager.menu.local_task'
   plugin.manager.menu.contextual_link:
     class: Drupal\Core\Menu\ContextualLinkManager
