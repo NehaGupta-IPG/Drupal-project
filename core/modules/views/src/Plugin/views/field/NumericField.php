@@ -95,7 +95,11 @@ class NumericField extends FieldPluginBase {
     ];
 
     $plural_array = explode(PoItem::DELIMITER, $this->options['format_plural_string']);
-    $plurals = $this->getNumberOfPlurals($this->view->storage->get('langcode'));
+    // Assume 2 plural forms if the Locale module is not installed.
+    $plurals = 2;
+    if (\Drupal::hasService('locale.plural.formula')) {
+      $plurals = \Drupal::service('locale.plural.formula')->getNumberOfPlurals($this->view->storage->get('langcode'));
+    }
     for ($i = 0; $i < $plurals; $i++) {
       $form['format_plural_values'][$i] = [
         '#type' => 'textfield',
