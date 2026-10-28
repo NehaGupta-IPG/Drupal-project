@@ -38,6 +38,23 @@ function hook_options_list_alter(array &$options, array $context) {
 }
 
 /**
+ * Allow modules to alter predefined options plugins metadata.
+ *
+ * This hook is called after the plugins have been discovered, but before they
+ * are cached. Hence any alterations will be cached.
+ *
+ * @param array &$definitions
+ *   An array of metadata on existing plugins, as collected by the discovery
+ *   mechanism.
+ *
+ * @see \Drupal\options\Annotation\PredefinedOptions
+ * @see \Drupal\options\Plugin\PredefinedOptionsPluginManager
+ */
+function hook_options_predefined_options_info_alter(&$definitions) {
+  $definitions['timezones']['class'] = 'Drupal\options\Plugin\Options\Timezones';
+}
+
+/**
  * Provide the allowed values for a 'list_*' field.
  *
  * Callback for options_allowed_values().
@@ -79,6 +96,11 @@ function hook_options_list_alter(array &$options, array $context) {
  * @see options_allowed_values()
  * @see \Drupal\options_test\OptionsAllowedValues::simpleValues()
  * @see \Drupal\options_test\OptionsAllowedValues::dynamicValues()
+ *
+ * @deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Once the
+ *   predefined options plugin feature is completed.
+ *
+ * @see https://www.drupal.org/project/drupal/issues/1909744
  */
 function callback_allowed_values_function(FieldStorageDefinitionInterface $definition, ?FieldableEntityInterface $entity = NULL, &$cacheable = TRUE) {
   if (isset($entity) && ($entity->bundle() == 'not_a_programmer')) {

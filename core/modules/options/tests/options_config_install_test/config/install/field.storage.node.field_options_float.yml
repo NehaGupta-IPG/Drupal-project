@@ -16,6 +16,7 @@ settings:
     -
       value: 0.5
       label: 'Point five'
+  predefined_options_plugin: ''
   allowed_values_function: ''
 module: options
 locked: false
