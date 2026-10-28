@@ -33,7 +33,7 @@ class SchemaInspector {
    * @see \hook_schema()
    */
   public static function getTablesSpecification(ModuleHandlerInterface $handler, string $module): Schema|array {
-    $schema = [];
+    require_once \DRUPAL_ROOT . '/core/includes/install.inc';
     $module_path = \Drupal::service('extension.list.module')
       ->getPath($module);
     $pathname = "$module_path/$module.info.yml";
@@ -61,7 +61,7 @@ class SchemaInspector {
     if ($schema !== []) {
       @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
     }
-    return $schema;
+    return $schema ?? [];
   }
 
   /**
