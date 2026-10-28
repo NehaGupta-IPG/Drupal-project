@@ -195,8 +195,7 @@
 
     const percentageSettings = Object.fromEntries(
       Object.entries(event.data.settings).filter(
-        ([, value]) =>
-          typeof value === 'string' && value.trim().endsWith('%'),
+        ([, value]) => typeof value === 'string' && value.trim().endsWith('%'),
       ),
     );
     let adjustedOptions = getSizeOptions(
