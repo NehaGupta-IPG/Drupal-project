@@ -714,6 +714,35 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   }
 
   /**
+   * Maps the columns of a field index or key to table columns.
+   *
+   * @param \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping
+   *   A table mapping.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The field storage definition.
+   * @param array $columns
+   *   Property names, or arrays of property name and length.
+   *
+   * @return array
+   *   The columns, with property names replaced by table column names.
+   */
+  private function mapKeyColumns(DefaultTableMapping $table_mapping, FieldStorageDefinitionInterface $storage_definition, array $columns): array {
+    $real_columns = [];
+    foreach ($columns as $column_name) {
+      if (is_array($column_name)) {
+        $real_columns[] = [
+          $table_mapping->getFieldColumnName($storage_definition, $column_name[0]),
+          $column_name[1],
+        ];
+      }
+      else {
+        $real_columns[] = $table_mapping->getFieldColumnName($storage_definition, $column_name);
+      }
+    }
+    return $real_columns;
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function handleEntityTypeSchemaUpdateExceptionOnDataCopy(EntityTypeInterface $entity_type, EntityTypeInterface $original, array &$sandbox) {
@@ -1820,20 +1849,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       foreach ($schema['indexes'] as $name => $columns) {
         if (!isset($original_schema['indexes'][$name]) || $columns != $original_schema['indexes'][$name]) {
           $real_name = $this->getFieldIndexName($storage_definition, $name);
-          $real_columns = [];
-          foreach ($columns as $column_name) {
-            // Indexes can be specified as either a column name or an array with
-            // column name and length. Allow for either case.
-            if (is_array($column_name)) {
-              $real_columns[] = [
-                $table_mapping->getFieldColumnName($storage_definition, $column_name[0]),
-                $column_name[1],
-              ];
-            }
-            else {
-              $real_columns[] = $table_mapping->getFieldColumnName($storage_definition, $column_name);
-            }
-          }
+          $real_columns = $this->mapKeyColumns($table_mapping, $storage_definition, $columns);
           // Check if the index exists because it might already have been
           // created as part of the earlier entity type update event.
           $this->addIndex($table, $real_name, $real_columns, $actual_schema[$table]);
@@ -2355,39 +2371,15 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
     }
 
     // Add indexes.
-    foreach ($schema['indexes'] as $index_name => $columns) {
+    foreach (array_filter($schema['indexes']) as $index_name => $columns) {
       $real_name = $this->getFieldIndexName($storage_definition, $index_name);
-      foreach ($columns as $column_name) {
-        // Indexes can be specified as either a column name or an array with
-        // column name and length. Allow for either case.
-        if (is_array($column_name)) {
-          $data_schema['indexes'][$real_name][] = [
-            $table_mapping->getFieldColumnName($storage_definition, $column_name[0]),
-            $column_name[1],
-          ];
-        }
-        else {
-          $data_schema['indexes'][$real_name][] = $table_mapping->getFieldColumnName($storage_definition, $column_name);
-        }
-      }
+      $data_schema['indexes'][$real_name] = $this->mapKeyColumns($table_mapping, $storage_definition, $columns);
     }
 
     // Add unique keys.
-    foreach ($schema['unique keys'] as $index_name => $columns) {
+    foreach (array_filter($schema['unique keys']) as $index_name => $columns) {
       $real_name = $this->getFieldIndexName($storage_definition, $index_name);
-      foreach ($columns as $column_name) {
-        // Unique keys can be specified as either a column name or an array with
-        // column name and length. Allow for either case.
-        if (is_array($column_name)) {
-          $data_schema['unique keys'][$real_name][] = [
-            $table_mapping->getFieldColumnName($storage_definition, $column_name[0]),
-            $column_name[1],
-          ];
-        }
-        else {
-          $data_schema['unique keys'][$real_name][] = $table_mapping->getFieldColumnName($storage_definition, $column_name);
-        }
-      }
+      $data_schema['unique keys'][$real_name] = $this->mapKeyColumns($table_mapping, $storage_definition, $columns);
     }
 
     // Add foreign keys.
