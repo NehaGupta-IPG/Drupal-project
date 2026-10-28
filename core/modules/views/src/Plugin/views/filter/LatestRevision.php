@@ -86,6 +86,13 @@ class LatestRevision extends FilterPluginBase implements ContainerFactoryPluginI
     $query = $this->query;
     $query_base_table = $this->relationship ?: $this->view->storage->get('base_table');
 
+    // If the relationship is a table alias, use the underlying table instead since we can't join aliases
+    foreach ($this->view->relationship as $relationship) {
+      if ($query_base_table === $relationship->alias) {
+        $query_base_table = $relationship->table;
+      }
+    }
+
     $entity_type = $this->entityTypeManager->getDefinition($this->getEntityType());
     $keys = $entity_type->getKeys();
 
