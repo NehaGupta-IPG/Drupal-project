@@ -27,6 +27,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\editor\EditorInterface;
 
@@ -200,7 +201,7 @@ class Ckeditor5Hooks {
      * @param array $plugins_config_form
      *   The plugins config subform render array.
      */
-    $add_listener = function (array &$plugins_config_form) use (&$add_listener) : void {
+    $add_listener = function (array &$plugins_config_form) : void {
       $field_types = ['checkbox', 'select', 'radios', 'textarea'];
       if (isset($plugins_config_form['#type']) && in_array($plugins_config_form['#type'], $field_types) && !isset($plugins_config_form['#ajax'])) {
         $plugins_config_form['#ajax'] = [
@@ -214,7 +215,7 @@ class Ckeditor5Hooks {
       }
       foreach ($plugins_config_form as $key => &$value) {
         if (is_array($value) && !str_contains((string) $key, '#')) {
-          $add_listener($value);
+          \Closure::getCurrent()($value);
         }
       }
     };
@@ -379,6 +380,16 @@ class Ckeditor5Hooks {
     $definitions['ckeditor5_valid_pair__format_and_editor']['mapping']['filters'] = $definitions['filter.format.*']['mapping']['filters'];
     // @see @see editor.editor.*.image_upload
     $definitions['ckeditor5_valid_pair__format_and_editor']['mapping']['image_upload'] = $definitions['editor.editor.*']['mapping']['image_upload'];
+  }
+
+  /**
+   * Implements hook_config_action_alter().
+   */
+  #[Hook('config_action_alter')]
+  public function configActionAlter(array &$definitions): void {
+    // Create a pluralized alias for the `addItemToToolbar` action.
+    $definitions['editor:addItemsToToolbar'] = $definitions['editor:addItemToToolbar'];
+    $definitions['editor:addItemsToToolbar']['admin_label'] = new TranslatableMarkup('Add multiple items to a CKEditor 5 toolbar');
   }
 
   /**
@@ -590,13 +601,13 @@ class Ckeditor5Hooks {
      * @param \Drupal\Core\Ajax\AjaxResponse $response
      *   The AJAX response attachments will be added to.
      */
-    $attach = function (array $form, AjaxResponse &$response) use (&$attach): void {
+    $attach = function (array $form, AjaxResponse &$response): void {
       foreach ($form as $key => $value) {
         if ($key === "#attached") {
           $response->addAttachments(array_diff_key($value, ['placeholders' => '']));
         }
         elseif (is_array($value) && !str_contains((string) $key, '#')) {
-          $attach($value, $response);
+          \Closure::getCurrent()($value, $response);
         }
       }
     };
