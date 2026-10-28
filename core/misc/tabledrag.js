@@ -1200,6 +1200,7 @@
           break;
         }
       }
+      targetElement.dispatchEvent(new Event('change', { bubbles: true }));
     }
   };
 
