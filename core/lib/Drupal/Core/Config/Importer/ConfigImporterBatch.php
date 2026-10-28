@@ -25,16 +25,23 @@ class ConfigImporterBatch {
   public static function process(ConfigImporter $config_importer, $sync_step, &$context) {
     if (!isset($context['sandbox']['config_importer'])) {
       $context['sandbox']['config_importer'] = $config_importer;
+      // If the same importer is used for all the steps, the errors of the
+      // earlier steps have already been added to the results.
+      $context['sandbox']['error_count'] = count($config_importer->getErrors());
     }
 
     $config_importer = $context['sandbox']['config_importer'];
     $config_importer->doSyncStep($sync_step, $context);
-    if ($errors = $config_importer->getErrors()) {
+    // The importer keeps the errors of the earlier calls, so only add the
+    // errors logged since the previous call.
+    $errors = $config_importer->getErrors();
+    if ($new_errors = array_slice($errors, $context['sandbox']['error_count'])) {
       if (!isset($context['results']['errors'])) {
         $context['results']['errors'] = [];
       }
-      $context['results']['errors'] = array_merge($errors, $context['results']['errors']);
+      $context['results']['errors'] = array_merge($new_errors, $context['results']['errors']);
     }
+    $context['sandbox']['error_count'] = count($errors);
   }
 
   /**
