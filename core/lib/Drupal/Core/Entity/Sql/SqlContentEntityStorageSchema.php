@@ -701,6 +701,19 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   }
 
   /**
+   * Gets the column names from an index or key specifier.
+   *
+   * @param array $specifier
+   *   Column names, or arrays of column name and length.
+   *
+   * @return string[]
+   *   The column names.
+   */
+  private function getSpecifierColumns(array $specifier): array {
+    return array_map(static fn ($item) => is_string($item) ? $item : reset($item), $specifier);
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function handleEntityTypeSchemaUpdateExceptionOnDataCopy(EntityTypeInterface $entity_type, EntityTypeInterface $original, array &$sandbox) {
@@ -1942,9 +1955,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
             // involving them. Only indexes for which all columns exist are
             // actually created.
             $create = FALSE;
-            $specifier_columns = array_map(function ($item) {
-              return is_string($item) ? $item : reset($item);
-            }, $specifier);
+            $specifier_columns = $this->getSpecifierColumns($specifier);
             if (!isset($column_names) || array_intersect($specifier_columns, $column_names)) {
               $create = TRUE;
               foreach ($specifier_columns as $specifier_column_name) {
@@ -1996,10 +2007,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       foreach ($index_keys as $key => $drop_method) {
         if (!empty($schema[$key])) {
           foreach ($schema[$key] as $name => $specifier) {
-            $specifier_columns = array_map(function ($item) {
-              return is_string($item) ? $item : reset($item);
-            }, $specifier);
-            if (!isset($column_names) || array_intersect($specifier_columns, $column_names)) {
+            if (!isset($column_names) || array_intersect($this->getSpecifierColumns($specifier), $column_names)) {
               $schema_handler->{$drop_method}($table_name, $name);
             }
           }
