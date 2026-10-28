@@ -39,7 +39,13 @@ class UpdateKernel extends DrupalKernel {
     // Always force a container rebuild, in order to be able to override some
     // services, see \Drupal\Core\Update\UpdateServiceProvider.
     $this->containerNeedsRebuild = TRUE;
-    $container = parent::initializeContainer();
+    if ($this->container === NULL) {
+      $container = parent::initializeContainer();
+    }
+    else {
+      // Reset to persist services, such as the current request.
+      $container = $this->resetContainer();
+    }
     return $container;
   }
 
