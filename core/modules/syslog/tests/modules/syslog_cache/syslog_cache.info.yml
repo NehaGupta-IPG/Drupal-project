@@ -1,0 +1,7 @@
+name: 'Syslog cache'
+type: module
+description: 'Provides a test cache backend for syslog module.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:syslog

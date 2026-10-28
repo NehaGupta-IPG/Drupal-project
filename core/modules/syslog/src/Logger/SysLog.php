@@ -2,10 +2,10 @@
 
 namespace Drupal\syslog\Logger;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Logger\LogMessageParserInterface;
 use Drupal\Core\Logger\RfcLoggerTrait;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 // cspell:ignore ndelay
 
@@ -16,37 +16,27 @@ class SysLog implements LoggerInterface {
   use RfcLoggerTrait;
 
   /**
-   * A configuration object containing syslog settings.
-   *
-   * @var \Drupal\Core\Config\Config
-   */
-  protected $config;
-
-  /**
-   * The message's placeholders parser.
-   *
-   * @var \Drupal\Core\Logger\LogMessageParserInterface
-   */
-  protected $parser;
-
-  /**
    * Stores whether there is a system logger connection opened or not.
    *
    * @var bool
    */
   protected $connectionOpened = FALSE;
 
+  public function __construct(
+    #[AutowireServiceClosure('config.factory')]
+    protected \Closure $configFactory,
+    protected LogMessageParserInterface $parser,
+  ) {
+  }
+
   /**
-   * Constructs a SysLog object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory object.
-   * @param \Drupal\Core\Logger\LogMessageParserInterface $parser
-   *   The parser to use when extracting message variables.
+   * Gets syslog configuration object for backwards-compatibility purposes.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, LogMessageParserInterface $parser) {
-    $this->config = $config_factory->get('syslog.settings');
-    $this->parser = $parser;
+  public function __get(string $name): mixed {
+    trigger_error('The config property is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the configFactory property instead. See https://www.drupal.org/node/3343843', E_USER_DEPRECATED);
+    return match ($name) {
+      'config' => ($this->configFactory)()->get('syslog.settings'),
+    };
   }
 
   /**
@@ -55,8 +45,9 @@ class SysLog implements LoggerInterface {
   protected function openConnection() {
     if (!$this->connectionOpened) {
       // Do not connect if identity or facility are not configured.
-      $identity = $this->config->get('identity');
-      $facility = $this->config->get('facility');
+      $config = ($this->configFactory)()->get('syslog.settings');
+      $identity = $config->get('identity');
+      $facility = $config->get('facility');
       if ($identity === NULL || $facility === NULL) {
         return;
       }
@@ -70,7 +61,7 @@ class SysLog implements LoggerInterface {
   public function log($level, string|\Stringable $message, array $context = []): void {
     global $base_url;
 
-    $format = $this->config->get('format');
+    $format = ($this->configFactory)()->get('syslog.settings')->get('format');
     // If no format is configured then a message will not be written to syslog
     // so return early. This occurs during installation of the syslog module
     // before configuration has been written.
