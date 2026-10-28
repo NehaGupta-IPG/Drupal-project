@@ -96,15 +96,17 @@ class DynamicPageCacheIntegrationTest extends BrowserTestBase {
     $this->drupalGet('dynamic-page-cache-test/html', ['query' => [MainContentViewSubscriber::WRAPPER_FORMAT => 'drupal_modal']]);
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (no cacheability)');
 
-    // Admin routes are ignored by Dynamic Page Cache.
+    // Admin routes are allowed by Dynamic Page Cache.
     $this->drupalGet('dynamic-page-cache-test/html/admin');
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (response policy)');
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'MISS');
     $this->drupalGet('dynamic-page-cache-test/response/admin');
-    // Even this is an admin route, the lack of cacheability prevails in the
-    // header explanation.
+    // The lack of cacheability prevails in the header explanation.
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (no cacheability)');
     $this->drupalGet('dynamic-page-cache-test/cacheable-response/admin');
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE (response policy)');
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'MISS');
+    // The second request to the admin page should result in a cache hit.
+    $this->drupalGet('dynamic-page-cache-test/cacheable-response/admin');
+    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
 
     // Max-age = 0 responses are ignored by Dynamic Page Cache.
     $this->drupalGet('dynamic-page-cache-test/html/uncacheable/max-age');
