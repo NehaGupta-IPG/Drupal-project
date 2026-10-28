@@ -462,17 +462,16 @@ class DefaultTableMapping implements TableMappingInterface {
         $column_name = 'delta';
       }
       else {
-        // A field's own columns always take precedence over the dedicated
-        // table's built-in reserved columns: some field types define their
-        // own property using one of those same names (e.g. the "address"
-        // field type has its own "langcode" property), and that must keep
-        // resolving to its normal, prefixed column rather than colliding
-        // with the table's own column of the same name.
-        $reserved_columns = array_diff(
-          array_merge($this->getReservedColumns(), static::DEDICATED_TABLE_COLUMNS),
-          array_keys($storage_definition->getColumns())
-        );
-        $column_name = !in_array($property_name, $reserved_columns) ? $field_name . '_' . $property_name : $property_name;
+        $column_name = $field_name . '_' . $property_name;
+        if (in_array($property_name, $this->getReservedColumns())) {
+          $column_name = $property_name;
+        }
+        elseif (in_array($property_name, static::DEDICATED_TABLE_COLUMNS, TRUE)) {
+          // A field's own property wins over a table column of the same name.
+          if (!isset($storage_definition->getColumns()[$property_name])) {
+            $column_name = $property_name;
+          }
+        }
       }
     }
     else {
