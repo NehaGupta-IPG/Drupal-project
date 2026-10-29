@@ -106,7 +106,16 @@ class EntityRow extends RowPluginBase {
   public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
-    $this->entityTypeId = $this->definition['entity_type'];
+    // Derive entity_type from definition or plugin_id
+    // (e.g. entity:user -> user).
+    // UserRow and other attribute-based plugins may override
+    // the ViewsEntityRow derivative without including
+    // entity_type in their definition.
+    $this->entityTypeId = $this->definition['entity_type']
+      ?? (str_contains($this->pluginId ?? '', ':') ? explode(':', $this->pluginId, 2)[1] : NULL);
+    if (empty($this->entityTypeId)) {
+      throw new \InvalidArgumentException(sprintf('The row plugin %s requires an entity type. Set entity_type in the plugin definition or use a derivative plugin ID (e.g. entity:user).', $this->pluginId ?? 'unknown'));
+    }
     $this->entityType = $this->entityTypeManager->getDefinition($this->entityTypeId);
     $this->base_table = $this->entityType->getDataTable() ?: $this->entityType->getBaseTable();
     $this->base_field = $this->entityType->getKey('id');
