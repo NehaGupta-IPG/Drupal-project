@@ -64,7 +64,6 @@ const SIMPLETEST_SCRIPT_EXIT_EXCEPTION = 3;
 
 // Setup class autoloading.
 $autoloader = require_once __DIR__ . '/../../autoload.php';
-$autoloader->addPsr4('Drupal\\TestTools\\', __DIR__ . '/../tests/Drupal/TestTools');
 
 // Setup console output.
 $console_output = new ConsoleOutput();

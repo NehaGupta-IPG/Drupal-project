@@ -51,7 +51,6 @@ class TestDiscovery {
     $this->testNamespaces['Drupal\\BuildTests\\'] = [$this->root . '/core/tests/Drupal/BuildTests'];
     $this->testNamespaces['Drupal\\Tests\\'] = [$this->root . '/core/tests/Drupal/Tests'];
     $this->testNamespaces['Drupal\\KernelTests\\'] = [$this->root . '/core/tests/Drupal/KernelTests'];
-    $this->testNamespaces['Drupal\\TestTools\\'] = [$this->root . '/core/tests/Drupal/TestTools'];
 
     foreach ($this->getExtensions() as $name => $extension) {
       $base_path = $this->root . '/' . $extension->getPath();
