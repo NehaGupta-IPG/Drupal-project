@@ -324,7 +324,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
     foreach ($properties as $property) {
       $property_name = $property->getName();
       // @see \Drupal\KernelTests\Core\Entity\ContentEntityCloneTest::testEntityOriginal()
-      if ($property_name === 'originalEntity') {
+      if (in_array($property->getName(), ['originalEntity', 'fieldWeakReferences'])) {
         continue;
       }
 

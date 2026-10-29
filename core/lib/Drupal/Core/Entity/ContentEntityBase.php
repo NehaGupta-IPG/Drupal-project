@@ -49,6 +49,18 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   protected $fields = [];
 
   /**
+   * An array of weak references to FieldItemListInterface.
+   *
+   * @var array
+   */
+  protected array $fieldWeakReferences = [];
+
+  /**
+   * Whether to create weak references or not.
+   */
+  protected bool $createWeakReferences = TRUE;
+
+  /**
    * Local cache for field definitions.
    *
    * @var array
@@ -303,6 +315,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function setNewRevision($value = TRUE) {
+    $this->createWeakReferences = FALSE;
     if (!$this->getEntityType()->hasKey('revision')) {
       throw new \LogicException("Entity type {$this->getEntityTypeId()} does not support revisions.");
     }
@@ -341,6 +354,30 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   public function isNewRevision() {
     return $this->newRevision || ($this->getEntityType()->hasKey('revision') && !$this->getRevisionId());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function enforceIsNew($value = TRUE) {
+    // When entities are newly created such as via Entity::create(), ensure that
+    // all field references are hard references so that default values and etc.
+    // are persisted.
+    $this->createWeakReferences = FALSE;
+    return parent::enforceIsNew($value);
+  }
+
+  /**
+   * Stops field item lists from being held as weak references.
+   *
+   * Field values applied without notifying the entity, such as item-level
+   * default values, would otherwise be held only by a weak reference and lost
+   * before the entity is saved.
+   *
+   * @internal
+   */
+  public function disableWeakFieldReferences(): void {
+    $this->createWeakReferences = FALSE;
   }
 
   /**
@@ -490,6 +527,19 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * {@inheritdoc}
    */
+  public function save() {
+    // SqlContentEntityStorage::mapToStorageRecord() creates field item lists
+    // for entity keys such as the ID and bundle which are otherwise rarely or
+    // never accessed in this way. These have to persist after the save call so
+    // that calling code is able to retrieve the ID, since they are not also
+    // written to $entity->values.
+    $this->createWeakReferences = FALSE;
+    return $this->entityTypeManager()->getStorage($this->entityTypeId)->save($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
@@ -556,6 +606,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       }
     }
     $this->fields = [];
+    $this->fieldWeakReferences = [];
     $this->fieldDefinitions = NULL;
     $this->languages = NULL;
     $this->clearTranslationCache();
@@ -622,53 +673,78 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if ($this->translations[$this->activeLangcode]['status'] == static::TRANSLATION_REMOVED) {
       throw new \InvalidArgumentException("The entity object refers to a removed translation ({$this->activeLangcode}) and cannot be manipulated.");
     }
-    // Populate $this->fields to speed-up further look-ups and to keep track of
-    // fields objects, possibly holding changes to field values.
-    if (!isset($this->fields[$name][$langcode])) {
-      $definition = $this->getFieldDefinition($name);
-      if (!$definition) {
-        throw new \InvalidArgumentException("Field $name is unknown.");
-      }
-      // Non-translatable fields are always stored with
-      // LanguageInterface::LANGCODE_DEFAULT as key.
 
-      $default = $langcode == LanguageInterface::LANGCODE_DEFAULT;
-      if (!$default && !$definition->isTranslatable()) {
-        if (!isset($this->fields[$name][LanguageInterface::LANGCODE_DEFAULT])) {
-          $this->fields[$name][LanguageInterface::LANGCODE_DEFAULT] = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
+    if (isset($this->fields[$name][$langcode])) {
+      return $this->fields[$name][$langcode];
+    }
+    if (isset($this->fieldWeakReferences[$name][$langcode])) {
+      $item = $this->fieldWeakReferences[$name][$langcode]->get();
+      if ($item !== NULL) {
+        if (!$this->createWeakReferences) {
+          $this->fields[$name][$langcode] = $item;
         }
-        $this->fields[$name][$langcode] = &$this->fields[$name][LanguageInterface::LANGCODE_DEFAULT];
-      }
-      else {
-        $value = NULL;
-        if (isset($this->values[$name][$langcode])) {
-          $value = $this->values[$name][$langcode];
-        }
-        $field = \Drupal::service('plugin.manager.field.field_type')->createFieldItemList($this->getTranslation($langcode), $name, $value);
-        if ($default) {
-          // $this->defaultLangcode might not be set if we are initializing the
-          // default language code cache, in which case there is no valid
-          // langcode to assign.
-          $field_langcode = $this->defaultLangcode ?? LanguageInterface::LANGCODE_NOT_SPECIFIED;
-        }
-        else {
-          $field_langcode = $langcode;
-        }
-        $field->setLangcode($field_langcode);
-        $this->fields[$name][$langcode] = $field;
+        return $item;
       }
     }
-    return $this->fields[$name][$langcode];
+    // Populate $this->fields to speed-up further look-ups and to keep track of
+    // fields objects, possibly holding changes to field values.
+    $definition = $this->getFieldDefinition($name);
+    if (!$definition) {
+      throw new \InvalidArgumentException("Field $name is unknown.");
+    }
+    // Non-translatable fields are always stored with
+    // LanguageInterface::LANGCODE_DEFAULT as key.
+
+    $default = $langcode == LanguageInterface::LANGCODE_DEFAULT;
+    if (!$default && !$definition->isTranslatable()) {
+      $field = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
+      if ($this->createWeakReferences) {
+        $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT] = \WeakReference::create($field);
+      }
+      else {
+        $this->fields[$name][LanguageInterface::LANGCODE_DEFAULT] = $field;
+      }
+    }
+    else {
+      $value = NULL;
+      if (isset($this->values[$name][$langcode])) {
+        $value = $this->values[$name][$langcode];
+      }
+      $field = \Drupal::service('plugin.manager.field.field_type')->createFieldItemList($this->getTranslation($langcode), $name, $value);
+      if ($default) {
+        // $this->defaultLangcode might not be set if we are initializing the
+        // default language code cache, in which case there is no valid
+        // langcode to assign.
+        $field_langcode = $this->defaultLangcode ?? LanguageInterface::LANGCODE_NOT_SPECIFIED;
+      }
+      else {
+        $field_langcode = $langcode;
+      }
+      $field->setLangcode($field_langcode);
+      if (!$this->createWeakReferences) {
+        $this->fields[$name][$langcode] = $field;
+      }
+      else {
+        $this->fieldWeakReferences[$name][$langcode] = \WeakReference::create($field);
+      }
+    }
+    return $field;
   }
 
   /**
    * {@inheritdoc}
    */
   public function set($name, $value, $notify = TRUE) {
+    // Ensure any value set explicitly on the entity is written to the fields
+    // array, however allow later ::get() calls to use weak references.
+    $original = $this->createWeakReferences;
+    $this->createWeakReferences = FALSE;
+
     // Assign the value on the child and overrule notify such that we get
     // notified to handle changes afterwards. We can ignore notify as there is
     // no parent to notify anyway.
     $this->get($name)->setValue($value, TRUE);
+    $this->createWeakReferences = $original;
     return $this;
   }
 
@@ -825,6 +901,20 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function onChange($name) {
+    // A field value has changed. If the field item list is currently held only
+    // via a weak reference, promote it to a strong reference so the change
+    // persists even when the calling code does not retain the field object.
+    if (isset($this->fieldWeakReferences[$name])) {
+      foreach ($this->fieldWeakReferences[$name] as $langcode => $weak_reference) {
+        if (!isset($this->fields[$name][$langcode])) {
+          $field = $weak_reference->get();
+          if ($field !== NULL) {
+            $this->fields[$name][$langcode] = $field;
+          }
+        }
+      }
+    }
+
     // Check if the changed name is the value of any entity keys and if any of
     // those values are currently cached, if so, reset it. Exclude the bundle
     // from that check, as it ready only and must not change, unsetting it could
@@ -1279,6 +1369,22 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $original_revision_id = $this->loadedRevisionId;
     $this->loadedRevisionId = &$original_revision_id;
 
+    foreach ($this->fieldWeakReferences as $name => $fields_by_langcode) {
+      if (!$definitions[$name]->isTranslatable() && count($fields_by_langcode) > 1) {
+        $fields_by_langcode = array_intersect_key($fields_by_langcode, [LanguageInterface::LANGCODE_DEFAULT => TRUE]);
+      }
+      foreach ($fields_by_langcode as $langcode => $items) {
+        if (!isset($this->fields[$name][$langcode])) {
+          $field = $items->get();
+          if ($field !== NULL) {
+            // Promote the live field to a strong reference; the loop below
+            // clones it onto the cloned entity along with the other fields.
+            $this->fields[$name][$langcode] = $field;
+          }
+        }
+      }
+    }
+
     $fields = $this->fields;
     $this->fields = &$fields;
 
@@ -1314,6 +1420,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         $this->fields[$name][$langcode]->setContext($name, $this->getTranslation($langcode)->getTypedData());
       }
     }
+    $this->fieldWeakReferences = [];
+    $this->createWeakReferences = FALSE;
   }
 
   /**

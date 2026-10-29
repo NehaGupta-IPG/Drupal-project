@@ -268,6 +268,13 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   is provided all fields will be initialized.
    */
   protected function initFieldValues(ContentEntityInterface $entity, array $values = [], array $field_names = []) {
+    // Values applied here are the entity's initial state and must persist
+    // until the entity is saved, so they are held as strong references rather
+    // than weak ones. This matters for values set without notifying the entity,
+    // such as item-level default values.
+    if ($entity instanceof ContentEntityBase) {
+      $entity->disableWeakFieldReferences();
+    }
     // Populate field values.
     foreach ($entity as $name => $field) {
       if (!$field_names || isset($field_names[$name])) {
