@@ -166,7 +166,7 @@ class TokenReplaceTest extends KernelTestBase {
     $tests['[term:parent:url]'] = $term1->toUrl('canonical', ['absolute' => TRUE])->toString();
     $tests['[term:parent:parent:name]'] = '[term:parent:parent:name]';
     $tests['[term:changed:since]'] = $date_formatter->formatTimeDiffSince($term2->getChangedTime(), ['langcode' => $language_interface->getId()]);
-    $tests['[term:vocabulary:name]'] = $this->vocabulary->label();
+    $tests['[term:vocabulary:name]'] = $this->vocabulary->getName();
 
     // Test to make sure that we generated something for each token.
     $this->assertNotContains(0, array_map('strlen', $tests), 'No empty tokens generated.');
@@ -179,7 +179,7 @@ class TokenReplaceTest extends KernelTestBase {
     // Generate and test sanitized tokens.
     $tests = [];
     $tests['[vocabulary:vid]'] = $this->vocabulary->id();
-    $tests['[vocabulary:name]'] = $this->vocabulary->label();
+    $tests['[vocabulary:name]'] = $this->vocabulary->getName();
     $tests['[vocabulary:description]'] = $this->vocabulary->getDescription();
     $tests['[vocabulary:node-count]'] = 1;
     $tests['[vocabulary:term-count]'] = 2;
