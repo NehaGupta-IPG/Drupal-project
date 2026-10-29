@@ -62,6 +62,10 @@ class ViewsThemeHooks {
       ],
       'initial preprocess' => static::class . ':preprocessViewsMiniPager',
     ];
+    $hooks['views_element_container'] = [
+      'render element' => 'element',
+      'initial preprocess' => static::class . ':preprocessViewsElementContainer',
+    ];
     $variables = [
       // For displays, we pass in a dummy array as the first parameter, since
       // $view is an object but the core contextual_preprocess() function only
@@ -1279,6 +1283,24 @@ class ViewsThemeHooks {
     $variables['#cache']['contexts'][] = 'url.query_args';
 
     $variables['heading_id'] = Html::getUniqueId('pagination-heading');
+  }
+
+  /**
+   * Prepares variables for views element container.
+   *
+   * Default template: views-element-container.html.twig.
+   *
+   * @param array $variables
+   *   An associative array containing:
+   *   - element: An associative array containing the properties of the element.
+   *     Properties used: #id, #attributes, #children.
+   */
+  public function preprocessViewsElementContainer(array &$variables): void {
+    $element = $variables['element'];
+    // Ensure #attributes is set.
+    $element += ['#attributes' => []];
+    $variables['children'] = $element['#children'];
+    $variables['attributes'] = $element['#attributes'];
   }
 
 }
