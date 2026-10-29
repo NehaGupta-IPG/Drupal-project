@@ -207,10 +207,17 @@ class ContentTranslationHandlerTest extends KernelTestBase {
       'hidden_fields_warning_message' => [
         '#theme' => 'status_messages',
         '#message_list' => [
-          'warning' => [t('Fields that apply to all languages are hidden to avoid conflicting changes. <a href=":url">Edit them on the original language form</a>.')],
+          'warning' => [
+            [
+              '#theme' => 'status_message_item',
+              '#message' => t('Fields that apply to all languages are hidden to avoid conflicting changes. <a href=":url">Edit them on the original language form</a>.'),
+            ],
+          ],
         ],
         '#weight' => -100,
         '#status_headings' => [
+          'status' => t('Status message'),
+          'error' => t('Error message'),
           'warning' => t('Warning message'),
         ],
       ],
