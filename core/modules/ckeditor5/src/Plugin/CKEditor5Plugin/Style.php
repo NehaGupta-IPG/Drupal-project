@@ -115,7 +115,7 @@ class Style extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
       // Validate the selector.
       $selector_matches = [];
       // @see https://www.w3.org/TR/CSS2/syndata.html#:~:text=In%20CSS%2C%20identifiers%20(including%20element,hyphen%20followed%20by%20a%20digit
-      if (!preg_match('/^([a-z][0-9a-zA-Z\-]*)((\.[a-zA-Z0-9\x{00A0}-\x{FFFF}\-_]+)+)$/u', $selector, $selector_matches)) {
+      if (!preg_match('/^([a-z][0-9a-zA-Z\-]*)((\.[a-zA-Z0-9\x{00A0}-\x{FFFF}\-_:]+)+)$/u', $selector, $selector_matches)) {
         $invalid_lines[$index + 1] = $line;
         continue;
       }
