@@ -25,6 +25,9 @@
         const $row = $context
           .find(`#${$checkbox.attr('id').replace(/-status$/, '-weight')}`)
           .closest('tr');
+
+        const $table = $row.parents('table');
+        const $tableLabels = $table.siblings();
         // Retrieve the vertical tab belonging to this filter.
         const $filterSettings = $context.find(
           `[data-drupal-selector='${$checkbox
@@ -44,6 +47,8 @@
               // On very narrow viewports, Vertical Tabs are disabled.
               $filterSettings.show();
             }
+            // Show the table labels
+            $tableLabels.show();
           } else {
             $row.hide();
             if (filterSettingsTab) {
@@ -51,6 +56,20 @@
             } else {
               // On very narrow viewports, Vertical Tabs are disabled.
               $filterSettings.hide();
+            }
+
+            // Hide the table labels if there are no visible rows.
+            let visibleRows = false;
+            $table.find('tr').each(function () {
+              const style = window.getComputedStyle(this);
+              const isVisible =
+                style.display !== 'none' && style.visibility !== 'hidden';
+              if (isVisible) {
+                visibleRows = true;
+              }
+            });
+            if (!visibleRows) {
+              $tableLabels.hide();
             }
           }
           // Restripe table after toggling visibility of table row.
