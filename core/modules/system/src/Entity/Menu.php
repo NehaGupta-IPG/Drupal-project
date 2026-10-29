@@ -122,4 +122,12 @@ class Menu extends ConfigEntityBase implements MenuInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function toString(): string {
+    // Return a simple string, so Twig filter works.
+    return (!empty($this->label) ? $this->label : $this->id);
+  }
+
 }
