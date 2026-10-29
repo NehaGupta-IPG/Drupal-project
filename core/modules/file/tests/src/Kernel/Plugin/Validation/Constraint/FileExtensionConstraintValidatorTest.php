@@ -108,6 +108,11 @@ class FileExtensionConstraintValidatorTest extends FileValidatorTestBase {
           'Only files with the following extensions are allowed: exe txt.',
         ],
       ],
+      'Allow all extensions' => [
+        'File properties' => $permanent_png_file_properties,
+        'Allowed_extensions' => [],
+        'Expected errors' => [],
+      ],
     ];
   }
 
