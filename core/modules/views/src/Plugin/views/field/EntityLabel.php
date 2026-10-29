@@ -118,11 +118,15 @@ class EntityLabel extends FieldPluginBase {
     $entity_ids_per_type = [];
     foreach ($values as $value) {
       if ($type = $this->getValue($value, 'type')) {
-        $entity_ids_per_type[$type][] = $this->getValue($value);
+        if ($this->entityTypeManager->hasDefinition($type)) {
+          $entity_ids_per_type[$type][] = $this->getValue($value);
+        }
       }
     }
 
     foreach ($entity_ids_per_type as $type => $ids) {
+      // Check that given entity type has valid plugin definition before
+      // calling the getStorage() method.
       $this->loadedReferencers[$type] = $this->entityTypeManager->getStorage($type)->loadMultiple($ids);
     }
   }
