@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-// cspell:ignore linksuggestionediting focusables
+// cspell:ignore linksuggestionediting
 
 import { Plugin } from 'ckeditor5/src/core';
 import { SwitchButtonView, View, ViewCollection } from 'ckeditor5/src/ui';

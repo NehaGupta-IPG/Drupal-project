@@ -12,7 +12,7 @@ use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration as PhpUnitConfiguration;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 
-// cspell:ignore depsta bootstrapper bootstrappers
+// cspell:ignore bootstrapper bootstrappers
 
 /**
  * Drupal's PHPUnit extension to manage code deprecation.
