@@ -234,6 +234,9 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
         'settings' => [],
         'third_party_settings' => [],
       ],
+      'display_items' => 'display_all',
+      'items_to_display' => '0',
+      'offset' => '0',
     ];
   }
 
@@ -272,6 +275,42 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
     $form['formatter']['settings_wrapper'] = [
       '#prefix' => '<div id="formatter-settings-wrapper">',
       '#suffix' => '</div>',
+    ];
+
+    $form['multivalue_wrapper'] = [
+      '#type' => 'container',
+      '#access' => FALSE,
+      'display_items' => [
+        '#title' => $this->t('When there are multiple values:'),
+        '#type' => 'radios',
+        '#options' => [
+          'display_all' => $this->t('Display all items'),
+          'display_some' => $this->t('Display a specified number of items'),
+        ],
+        '#default_value' => $config['display_items'],
+      ],
+      'items_to_display' => [
+        '#title' => $this->t('Number of items to display'),
+        '#type' => 'number',
+        '#default_value' => $config['items_to_display'],
+        '#description' => $this->t('Enter 0 for no limit.'),
+        '#states' => [
+          'invisible' => [
+            ':input[name="settings[multivalue_wrapper][display_items]"]' => ['value' => 'display_all'],
+          ],
+        ],
+      ],
+      'offset' => [
+        '#title' => $this->t('Offset (number of items to skip)'),
+        '#type' => 'number',
+        '#default_value' => $config['offset'],
+        '#description' => $this->t('For example, set this to 3 and the first 3 items will not be displayed.'),
+        '#states' => [
+          'invisible' => [
+            ':input[name="settings[multivalue_wrapper][display_items]"]' => ['value' => 'display_all'],
+          ],
+        ],
+      ],
     ];
 
     return $form;
@@ -342,6 +381,15 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
     $this->configuration['formatter'] = $form_state->getValue('formatter');
+
+    if (!empty($form['settings']['multivalue_wrapper']['#access'])) {
+      $multivalue_fields = ['display_items', 'items_to_display', 'offset'];
+      foreach ($multivalue_fields as $field_name) {
+        if ($form_state->hasValue(['multivalue_wrapper', $field_name])) {
+          $this->configuration[$field_name] = $form_state->getValue(['multivalue_wrapper', $field_name]);
+        }
+      }
+    }
   }
 
   /**
@@ -356,6 +404,27 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
       $this->fieldDefinition = $field_definitions[$this->fieldName];
     }
     return $this->fieldDefinition;
+  }
+
+  /**
+   * Returns the field name the block is based on.
+   *
+   * @return string
+   *   The field name.
+   */
+  public function getFieldName(): string {
+    return $this->fieldDefinition->getName();
+  }
+
+  /**
+   * Returns the cardinality of the field the block is based on.
+   *
+   * @return int
+   *   The field cardinality or
+   *   FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED.
+   */
+  public function getFieldCardinality(): int {
+    return $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
   }
 
   /**

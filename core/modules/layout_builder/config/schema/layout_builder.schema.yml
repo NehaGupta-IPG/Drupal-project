@@ -121,6 +121,27 @@ inline_block:
                     - NotBlank: {}
                     - NotNull: {}
 
+block.settings.field_block:*:*:*:
+  type: block_settings
+  label: 'Field block'
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    label_display:
+      type: string
+      label: 'Label display'
+    formatter:
+      type: field_formatter
+    display_items:
+      type: string
+      label: 'Display items mode'
+    items_to_display:
+      type: integer
+      label: 'Number of items to display'
+    offset:
+      type: integer
+      label: 'Offset'
+
 block.settings.inline_block:*:
   type: inline_block
 

@@ -7,6 +7,7 @@ use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Ajax\AjaxFormHelperTrait;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\BaseFormIdInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -20,6 +21,7 @@ use Drupal\Core\Plugin\PluginWithFormsInterface;
 use Drupal\layout_builder\Context\LayoutBuilderContextTrait;
 use Drupal\layout_builder\Controller\LayoutRebuildTrait;
 use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
+use Drupal\layout_builder\Plugin\Block\FieldBlock;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\layout_builder\SectionStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -172,6 +174,12 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
     $form['settings'] = [];
     $subform_state = SubformState::createForSubform($form['settings'], $form, $form_state);
     $form['settings'] = $this->getPluginForm($this->block)->buildConfigurationForm($form['settings'], $subform_state);
+
+    // If this block represents a multivalue field display the related
+    // configuration options.
+    if ($this->block instanceof FieldBlock && ($this->block->getFieldCardinality() > 1 || $this->block->getFieldCardinality() === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)) {
+      $form['settings']['multivalue_wrapper']['#access'] = TRUE;
+    }
 
     $form['actions']['submit'] = [
       '#type' => 'submit',

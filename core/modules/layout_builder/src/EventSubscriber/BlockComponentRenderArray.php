@@ -121,6 +121,30 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
         return;
       }
 
+      // If this is a multi-value block configured to not display all values,
+      // remove those field items from the render array.
+      $block_configuration = $block->getConfiguration();
+      if (!$is_content_empty && isset($content[0]['#items']) && isset($block_configuration['display_items']) && $block_configuration['display_items'] == 'display_some') {
+        $total_items = $content[0]['#items']->count();
+        $offset = (int) $block_configuration['offset'];
+        $items_to_display = (int) $block_configuration['items_to_display'] ?? $total_items - $offset;
+        if ($offset || $items_to_display) {
+          if (!$items_to_display) {
+            $items_to_display = $total_items;
+          }
+          $range = range(0, $total_items);
+          foreach ($range as $key) {
+            $top_range = $offset + $items_to_display - 1;
+            if ($key < $offset || $key > $top_range) {
+              $content[0][$key]['#access'] = FALSE;
+            }
+            if ($event->inPreview() && $key < $total_items) {
+              $content[0][$key]['#prefix'] = '(Index: ' . $key . ') ';
+            }
+          }
+        }
+      }
+
       $build = [
         // @todo Move this to BlockBase in https://www.drupal.org/node/2931040.
         '#theme' => 'block',
