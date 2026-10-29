@@ -78,7 +78,13 @@ class PermissionsHashGenerator implements PermissionsHashGeneratorInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata(AccountInterface $account): CacheableMetadata {
-    return CacheableMetadata::createFromObject($this->processor->processAccessPolicies($account));
+    $cid = 'permissions_cacheable_metadata_' . $account->id();
+    if ($static_cache = $this->static->get($cid)) {
+      return $static_cache->data;
+    }
+    $metadata = CacheableMetadata::createFromObject($this->processor->processAccessPolicies($account));
+    $this->static->set($cid, $metadata, Cache::PERMANENT, $metadata->getCacheTags());
+    return $metadata;
   }
 
   /**
