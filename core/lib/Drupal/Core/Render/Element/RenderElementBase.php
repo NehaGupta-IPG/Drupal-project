@@ -36,6 +36,10 @@ use Drupal\Core\Url;
  * of type string, they would generally end up being
  * \Drupal\Core\StringTranslation\TranslatableMarkup objects instead.
  *
+ * For properties containing callables it is not recommended to use a closure
+ * or anonymous function because it will trigger an error if the element is
+ * serialized. Examples in which serializing occurs include form caching.
+ *
  * Here is the list of the properties used during the rendering of all render
  * elements:
  * - #access: (bool or AccessResultInterface)
@@ -124,6 +128,7 @@ use Drupal\Core\Url;
  * @see \Drupal\Core\Render\ElementInterface
  * @see \Drupal\Core\Render\ElementInfoManager
  * @see plugin_api
+ * @see \Drupal\Core\Form\FormState::setCached()
  *
  * @ingroup theme_render
  */
@@ -315,6 +320,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
         case 'number':
         case 'tel':
         case 'textarea':
+        case 'email':
           $element['#ajax']['event'] = 'blur';
           break;
 
@@ -383,6 +389,9 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
           ->merge($url)
           ->applyTo($element);
         $settings['url'] = $url->getGeneratedUrl();
+
+        // Mark the URL as trusted, see ajax.js.
+        $element['#attached']['drupalSettings']['ajaxTrustedUrl'][$settings['url']] = TRUE;
       }
       else {
         $settings['url'] = NULL;
@@ -429,7 +438,6 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
       }
 
       $element['#attached']['drupalSettings']['ajax'][$element['#id']] = $settings;
-      $element['#attached']['drupalSettings']['ajaxTrustedUrl'][$settings['url']] = TRUE;
 
       // Indicate that Ajax processing was successful.
       $element['#ajax_processed'] = TRUE;

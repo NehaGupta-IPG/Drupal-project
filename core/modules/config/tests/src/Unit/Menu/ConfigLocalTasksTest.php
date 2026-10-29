@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Tests\config\Unit\Menu;
 
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests existence of config local tasks.
- *
- * @group config
  */
+#[Group('config')]
 class ConfigLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
@@ -23,17 +24,16 @@ class ConfigLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
    * Tests config local tasks existence.
-   *
-   * @dataProvider getConfigAdminRoutes
    */
-  public function testConfigAdminLocalTasks($route, $expected): void {
+  #[DataProvider('getConfigAdminRoutes')]
+  public function testConfigAdminLocalTasks(string $route, array $expected): void {
     $this->assertLocalTasks($route, $expected);
   }
 
   /**
    * Provides a list of routes to test.
    */
-  public static function getConfigAdminRoutes() {
+  public static function getConfigAdminRoutes(): array {
     return [
       ['config.sync', [['config.sync', 'config.import', 'config.export']]],
       ['config.import_full',

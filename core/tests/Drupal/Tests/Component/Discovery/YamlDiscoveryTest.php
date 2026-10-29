@@ -7,17 +7,20 @@ namespace Drupal\Tests\Component\Discovery;
 use Drupal\Component\Discovery\YamlDiscovery;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamWrapper;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * YamlDiscovery component unit tests.
- *
- * @group Discovery
  */
+#[Group('Discovery')]
 class YamlDiscoveryTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * {@inheritdoc}
@@ -83,7 +86,7 @@ class YamlDiscoveryTest extends TestCase {
     file_put_contents($url . '/test_broken/test_broken.test.yml', "broken:\n:");
 
     $this->expectException(InvalidDataTypeException::class);
-    $this->expectExceptionMessage('vfs://modules/test_broken/test_broken.test.yml');
+    $this->expectExceptionMessageIs('vfs://modules/test_broken/test_broken.test.yml: Unable to parse at line 2 (near ":").');
 
     $directories = ['test_broken' => $url . '/test_broken'];
     $discovery = new YamlDiscovery('test', $directories);

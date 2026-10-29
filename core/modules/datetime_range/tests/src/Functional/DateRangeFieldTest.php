@@ -14,12 +14,14 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\datetime\Functional\DateTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Daterange field functionality.
- *
- * @group datetime
  */
+#[Group('datetime')]
+#[RunTestsInSeparateProcesses]
 class DateRangeFieldTest extends DateTestBase {
 
   /**
@@ -547,7 +549,7 @@ class DateRangeFieldTest extends DateTestBase {
     $end_date = new DrupalDateTime($end_value, timezone_open(date_default_timezone_get()));
 
     $date_format = DateFormat::load('html_date')->getPattern();
-    $time_format = DateFormat::load('html_time')->getPattern();
+    DateFormat::load('html_time')->getPattern();
 
     $edit = [
       "{$field_name}[0][value][date]" => $start_date->format($date_format),
@@ -893,7 +895,7 @@ class DateRangeFieldTest extends DateTestBase {
    * @return array
    *   An array of datelist input permutations to test.
    */
-  protected static function datelistDataProvider() {
+  protected static function datelistDataProvider(): array {
     return [
       // Year only selected, validation error on Month, Day, Hour, Minute.
       [

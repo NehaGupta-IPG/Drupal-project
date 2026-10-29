@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block_content\Functional\Views;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests the block_content integration into views.
- *
- * @group block_content
  */
+#[Group('block_content')]
+#[RunTestsInSeparateProcesses]
 class BlockContentIntegrationTest extends BlockContentTestBase {
 
   /**
@@ -65,7 +68,7 @@ class BlockContentIntegrationTest extends BlockContentTestBase {
    * @internal
    */
   protected function assertIds(array $expected_ids = []): void {
-    $result = $this->xpath('//span[@class="field-content"]');
+    $result = $this->getNodeElementsByXpath('//span[@class="field-content"]');
     $ids = [];
     foreach ($result as $element) {
       $ids[] = $element->getText();

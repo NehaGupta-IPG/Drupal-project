@@ -5,13 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Component\Utility\NestedArray
- * @group Utility
+ * Tests Drupal\Component\Utility\NestedArray.
  */
+#[CoversClass(NestedArray::class)]
+#[Group('Utility')]
 class NestedArrayTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * Form array to check.
@@ -44,8 +51,6 @@ class NestedArrayTest extends TestCase {
 
   /**
    * Tests getting nested array values.
-   *
-   * @covers ::getValue
    */
   public function testGetValue(): void {
     // Verify getting a value of a nested element.
@@ -74,8 +79,6 @@ class NestedArrayTest extends TestCase {
 
   /**
    * Tests setting nested array values.
-   *
-   * @covers ::setValue
    */
   public function testSetValue(): void {
     $new_value = [
@@ -89,14 +92,12 @@ class NestedArrayTest extends TestCase {
     $this->assertTrue($this->form['details']['element']['#required'], 'New nested element value found.');
 
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Cannot create key "child" on non-array value.');
+    $this->expectExceptionMessageIs('Cannot create key "child" on non-array value.');
     NestedArray::setValue($this->form, ['details', 'element', '#value', 'child'], $new_value);
   }
 
   /**
    * Tests force-setting values.
-   *
-   * @covers ::setValue
    */
   public function testSetValueForce(): void {
     $new_value = [
@@ -110,8 +111,6 @@ class NestedArrayTest extends TestCase {
 
   /**
    * Tests unsetting nested array values.
-   *
-   * @covers ::unsetValue
    */
   public function testUnsetValue(): void {
     // Verify unsetting a non-existing nested element throws no errors and the
@@ -146,8 +145,8 @@ class NestedArrayTest extends TestCase {
   /**
    * Tests NestedArray::mergeDeepArray().
    *
-   * @covers ::mergeDeep
-   * @covers ::mergeDeepArray
+   * @legacy-covers ::mergeDeep
+   * @legacy-covers ::mergeDeepArray
    */
   public function testMergeDeepArray(): void {
     $link_options_1 = [
@@ -174,7 +173,7 @@ class NestedArrayTest extends TestCase {
   /**
    * Tests that arrays with implicit keys are appended, not merged.
    *
-   * @covers ::mergeDeepArray
+   * @legacy-covers ::mergeDeepArray
    */
   public function testMergeImplicitKeys(): void {
     $a = [
@@ -195,7 +194,7 @@ class NestedArrayTest extends TestCase {
   /**
    * Tests that even with explicit keys, values are appended, not merged.
    *
-   * @covers ::mergeDeepArray
+   * @legacy-covers ::mergeDeepArray
    */
   public function testMergeExplicitKeys(): void {
     $a = [
@@ -231,7 +230,7 @@ class NestedArrayTest extends TestCase {
    * before those in the first one, they are still appended, and the keys on
    * the first array are deleted and regenerated.
    *
-   * @covers ::mergeDeepArray
+   * @legacy-covers ::mergeDeepArray
    */
   public function testMergeOutOfSequenceKeys(): void {
     $a = [
@@ -261,21 +260,21 @@ class NestedArrayTest extends TestCase {
   }
 
   /**
-   * @covers ::filter
-   * @dataProvider providerTestFilter
+   * Tests filter.
    */
-  public function testFilter($array, $callable, $expected): void {
+  #[DataProvider('providerTestFilter')]
+  public function testFilter(array $array, ?callable $callable, $expected): void {
     $this->assertEquals($expected, NestedArray::filter($array, $callable));
   }
 
-  public static function providerTestFilter() {
+  public static function providerTestFilter(): array {
     $data = [];
     $data['1d-array'] = [
       [0, 1, '', TRUE], NULL, [1 => 1, 3 => TRUE],
     ];
     $data['1d-array-callable'] = [
       [0, 1, '', TRUE],
-      function ($element) {
+      function ($element): bool {
         return $element === '';
       },
       [2 => ''],
@@ -285,7 +284,7 @@ class NestedArrayTest extends TestCase {
     ];
     $data['2d-array-callable'] = [
       [[0, 1, '', TRUE], [0, 1, 2, 3]],
-      function ($element) {
+      function ($element): bool {
         return is_array($element) || $element === 3;
       },
       [0 => [], 1 => [3 => 3]],

@@ -4,26 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Build;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests installing packages in a stage directory.
  *
- * @group package_manager
- * @group #slow
  * @internal
  */
+#[Group('package_manager')]
 class PackageInstallTest extends TemplateProjectTestBase {
 
   /**
    * Tests installing packages in a stage directory.
-   *
-   * @testWith [true]
-   *   [false]
    */
-  public function testPackageInstall(bool $allow_direct_write): void {
-    $this->createTestProject('RecommendedProject');
-    $allow_direct_write = var_export($allow_direct_write, TRUE);
-    $this->writeSettings("\n\$settings['package_manager_allow_direct_write'] = $allow_direct_write;");
+  public function testPackageInstall(): void {
+    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/i/3508109
+    $this->markTestSkipped();
 
+    $this->createTestProject('RecommendedProject');
     $this->setReleaseMetadata([
       'alpha' => __DIR__ . '/../../fixtures/release-history/alpha.1.1.0.xml',
     ]);

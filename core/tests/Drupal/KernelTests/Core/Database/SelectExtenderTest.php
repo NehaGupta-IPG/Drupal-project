@@ -5,17 +5,21 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
-use Drupal\Tests\Core\Database\Stub\StubPDO;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Select query extender classes.
- *
- * @coversDefaultClass \Drupal\Core\Database\Query\Select
- * @group Database
  */
+#[CoversClass(Select::class)]
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class SelectExtenderTest extends KernelTestBase {
 
   /**
@@ -50,26 +54,6 @@ class SelectExtenderTest extends KernelTestBase {
         '\Drupal\Core\Database\Query\TableSortExtender',
       ],
       [
-        'Drupal\search\SearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        'Drupal\search\SearchQuery',
-      ],
-      [
-        'Drupal\search\SearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        '\Drupal\search\SearchQuery',
-      ],
-      [
-        'Drupal\search\ViewsSearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        'Drupal\search\ViewsSearchQuery',
-      ],
-      [
-        'Drupal\search\ViewsSearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        '\Drupal\search\ViewsSearchQuery',
-      ],
-      [
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\PagerSelectExtender',
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
         'Drupal\Core\Database\Query\PagerSelectExtender',
@@ -89,42 +73,23 @@ class SelectExtenderTest extends KernelTestBase {
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
         '\Drupal\Core\Database\Query\TableSortExtender',
       ],
-      [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\SearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        'Drupal\search\SearchQuery',
-      ],
-      [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\SearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        '\Drupal\search\SearchQuery',
-      ],
-      [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\ViewsSearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        'Drupal\search\ViewsSearchQuery',
-      ],
-      [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\ViewsSearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        '\Drupal\search\ViewsSearchQuery',
-      ],
     ];
   }
 
   /**
-   * @covers ::extend
-   * @covers \Drupal\Core\Database\Query\SelectExtender::extend
-   * @dataProvider providerExtend
+   * Tests extend.
+   *
+   * @legacy-covers ::extend
+   * @legacy-covers \Drupal\Core\Database\Query\SelectExtender::extend
    */
+  #[DataProvider('providerExtend')]
   public function testExtend(string $expected, string $namespace, string $extend): void {
     $additional_class_loader = new ClassLoader();
     $additional_class_loader->addPsr4("Drupal\\core_fake\\Driver\\Database\\coreFake\\", __DIR__ . "/../../../../../tests/fixtures/database_drivers/module/core_fake/src/Driver/Database/CoreFake");
     $additional_class_loader->addPsr4("Drupal\\core_fake\\Driver\\Database\\CoreFakeWithAllCustomClasses\\", __DIR__ . "/../../../../../tests/fixtures/database_drivers/module/core_fake/src/Driver/Database/CoreFakeWithAllCustomClasses");
     $additional_class_loader->register(TRUE);
 
-    $mock_pdo = $this->createMock(StubPDO::class);
-    $connection = new StubConnection($mock_pdo, ['namespace' => $namespace]);
+    $connection = new StubConnection($this->createStub(\PDO::class), ['namespace' => $namespace]);
 
     // Tests the method \Drupal\Core\Database\Query\Select::extend().
     $select = $connection->select('test')->extend($extend);

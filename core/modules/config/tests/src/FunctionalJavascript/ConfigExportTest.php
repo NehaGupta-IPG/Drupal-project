@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\FunctionalJavascript;
 
-use Drupal\block_content\Entity\BlockContent;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the config export form.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigExportTest extends WebDriverTestBase {
+
+  use BlockContentCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -25,8 +29,7 @@ class ConfigExportTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * @var string
-   *  A prefix string used in naming the test blocks.
+   * A prefix string used in naming the test blocks.
    */
   protected string $blockNamePrefix = 'aaaaaa_config_export_test_block';
 
@@ -58,26 +61,6 @@ class ConfigExportTest extends WebDriverTestBase {
   }
 
   /**
-   * Creates test blocks.
-   *
-   * @param string $title
-   *   Title of the block.
-   *
-   * @return \Drupal\block_content\Entity\BlockContent
-   *   The created block content entity.
-   *
-   * @throws \Drupal\Core\Entity\EntityStorageException
-   */
-  protected function createBlockContent($title) {
-    $block_content = BlockContent::create([
-      'info' => $title,
-      'type' => 'basic',
-    ]);
-    $block_content->save();
-    return $block_content;
-  }
-
-  /**
    * Tests Ajax form functionality on the config export page.
    */
   public function testAjaxOnExportPage(): void {
@@ -105,6 +88,11 @@ class ConfigExportTest extends WebDriverTestBase {
     $this->assertSession()->fieldValueEquals('export', '');
 
     // Check that the export is emptied again when selecting a config type.
+    // First select a config name to populate the export.
+    $page->selectFieldOption('config_name', 'system.site');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSession()->fieldValueNotEquals('export', '');
+    // Then select a config type to empty the export.
     $page->selectFieldOption('config_type', 'Action');
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->fieldValueEquals('export', '');

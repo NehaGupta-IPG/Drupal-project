@@ -11,11 +11,11 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\jsonapi\JsonApiResource\ErrorCollection;
+use Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel;
 use Drupal\jsonapi\JsonApiResource\LabelOnlyResourceObject;
 use Drupal\jsonapi\JsonApiResource\LinkCollection;
 use Drupal\jsonapi\JsonApiResource\NullIncludedData;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
-use Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel;
 use Drupal\jsonapi\JsonApiResource\ResourceObjectData;
 use Drupal\jsonapi\JsonApiSpec;
 use Drupal\jsonapi\Normalizer\JsonApiDocumentTopLevelNormalizer;
@@ -30,15 +30,21 @@ use Drupal\Tests\jsonapi\Traits\JsonApiJsonSchemaTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @coversDefaultClass \Drupal\jsonapi\Normalizer\JsonApiDocumentTopLevelNormalizer
- * @group jsonapi
+ * Tests Drupal\jsonapi\Normalizer\JsonApiDocumentTopLevelNormalizer.
  *
  * @internal
  */
+#[CoversClass(JsonApiDocumentTopLevelNormalizer::class)]
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   use ImageFieldCreationTrait;
@@ -48,7 +54,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'jsonapi',
     'field',
     'node',
     'serialization',
@@ -57,7 +62,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     'text',
     'filter',
     'user',
-    'file',
     'image',
     'jsonapi_test_normalizers_kernel',
     'jsonapi_test_resource_type_building',
@@ -72,8 +76,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * The node type.
-   *
-   * @var \Drupal\node\Entity\NodeType
    */
   protected NodeType $nodeType;
 
@@ -86,29 +88,21 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * A user.
-   *
-   * @var \Drupal\user\Entity\User
    */
   protected User $user2;
 
   /**
    * A vocabulary.
-   *
-   * @var \Drupal\taxonomy\Entity\Vocabulary
    */
   protected Vocabulary $vocabulary;
 
   /**
    * A term.
-   *
-   * @var \Drupal\taxonomy\Entity\Term
    */
   protected Term $term1;
 
   /**
    * A term.
-   *
-   * @var \Drupal\taxonomy\Entity\Term
    */
   protected Term $term2;
 
@@ -127,9 +121,9 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   protected $resourceTypeRepository;
 
   /**
-   * @var \Drupal\file\Entity\File
+   * The example image file.
    */
-  private $file;
+  private File $file;
 
   /**
    * {@inheritdoc}
@@ -309,7 +303,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * @covers ::normalize
+   * Tests normalize.
    */
   public function testNormalize(): void {
     [$resource_type, $resource_object, $includes] = $this->getTestContentEntityResource();
@@ -342,7 +336,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
       );
     $normalized = $jsonapi_doc_object->getNormalization();
 
-    // @see http://jsonapi.org/format/#document-jsonapi-object
+    // @see https://jsonapi.org/format/#document-jsonapi-object
     $this->assertEquals(JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION, $normalized['jsonapi']['version']);
     $this->assertEquals(JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK, $normalized['jsonapi']['meta']['links']['self']['href']);
 
@@ -406,7 +400,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * @covers ::normalize
+   * Tests normalize uuid.
    */
   public function testNormalizeUuid(): void {
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node', 'article');
@@ -447,7 +441,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * @covers ::normalize
+   * Tests normalize exception.
    */
   public function testNormalizeException(): void {
     $normalized = $this
@@ -535,7 +529,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * @covers ::normalize
+   * Tests normalize config.
    */
   public function testNormalizeConfig(): void {
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node_type', 'node_type');
@@ -565,8 +559,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * Try to POST a node and check if it exists afterwards.
-   *
-   * @covers ::denormalize
    */
   public function testDenormalize(): void {
     $payload = '{"data":{"type":"article","attributes":{"title":"Testing article"}}}';
@@ -583,8 +575,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * Try to POST a node and check if it exists afterwards.
-   *
-   * @covers ::denormalize
    */
   public function testDenormalizeUuid(): void {
     $configurations = [
@@ -750,7 +740,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
    * @return array
    *   The test data.
    */
-  protected function denormalizeUuidProviderBuilder(array $options) {
+  protected function denormalizeUuidProviderBuilder(array $options): array {
     [$input, $expected] = $options;
     [$input_tag_uuids, $input_user_uuid] = $input;
     [$expected_tag_ids, $expected_user_id] = $expected;
@@ -801,9 +791,8 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
    *
    * @param \Drupal\Core\Cache\CacheableMetadata $expected_metadata
    *   The expected cacheable metadata.
-   *
-   * @dataProvider testCacheableMetadataProvider
    */
+  #[DataProvider('cacheableMetadataProvider')]
   public function testCacheableMetadata(CacheableMetadata $expected_metadata): void {
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node', 'article');
     $resource_object = ResourceObject::createFromEntity($resource_type, $this->node);
@@ -824,7 +813,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   /**
    * Provides test cases for asserting cacheable metadata behavior.
    */
-  public static function testCacheableMetadataProvider(): array {
+  public static function cacheableMetadataProvider(): array {
     $cacheable_metadata = function ($metadata) {
       return CacheableMetadata::createFromRenderArray(['#cache' => $metadata]);
     };
@@ -832,7 +821,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     return [
       [
         $cacheable_metadata(['contexts' => ['languages:language_interface']]),
-        ['node--article' => 'body'],
       ],
     ];
   }
@@ -866,8 +854,8 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   /**
    * Test the generated resource object normalization against the schema.
    *
-   * @covers \Drupal\jsonapi\Normalizer\ResourceObjectNormalizer::normalize
-   * @covers \Drupal\jsonapi\Normalizer\ResourceObjectNormalizer::getNormalizationSchema
+   * @legacy-covers \Drupal\jsonapi\Normalizer\ResourceObjectNormalizer::normalize
+   * @legacy-covers \Drupal\jsonapi\Normalizer\ResourceObjectNormalizer::getNormalizationSchema
    */
   public function testResourceObjectSchema(): void {
     [, $resource_object] = $this->getTestContentEntityResource();
@@ -889,8 +877,8 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   /**
    * Test the generated config resource object normalization against the schema.
    *
-   * @covers \Drupal\jsonapi\Normalizer\ResourceObjectNormalizer::normalize
-   * @covers \Drupal\jsonapi\Normalizer\ResourceObjectNormalizer::getNormalizationSchema
+   * @legacy-covers \Drupal\jsonapi\Normalizer\ResourceObjectNormalizer::normalize
+   * @legacy-covers \Drupal\jsonapi\Normalizer\ResourceObjectNormalizer::getNormalizationSchema
    */
   public function testConfigEntityResourceObjectSchema(): void {
     [, $resource_object] = $this->getTestConfigEntityResource();

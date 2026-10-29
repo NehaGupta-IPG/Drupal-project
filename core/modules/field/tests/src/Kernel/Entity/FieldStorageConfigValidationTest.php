@@ -6,12 +6,18 @@ namespace Drupal\Tests\field\Kernel\Entity;
 
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of field_storage_config entities.
- *
- * @group field
  */
+#[Group('field')]
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class FieldStorageConfigValidationTest extends ConfigEntityValidationTestBase {
 
   /**
@@ -22,8 +28,8 @@ class FieldStorageConfigValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
     $this->installEntitySchema('user');
 
     $this->entity = FieldStorageConfig::create([

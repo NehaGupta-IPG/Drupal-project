@@ -10,12 +10,14 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the timestamp formatters.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class TimestampFormatterTest extends KernelTestBase {
 
   /**
@@ -24,7 +26,6 @@ class TimestampFormatterTest extends KernelTestBase {
   protected static $modules = [
     'system',
     'field',
-    'text',
     'entity_test',
     'user',
   ];
@@ -97,10 +98,9 @@ class TimestampFormatterTest extends KernelTestBase {
    * @return string
    *   The rendered entity fields.
    */
-  protected function renderEntityFields(FieldableEntityInterface $entity, EntityViewDisplayInterface $display) {
+  protected function renderEntityFields(FieldableEntityInterface $entity, EntityViewDisplayInterface $display): string {
     $content = $display->build($entity);
-    $content = $this->render($content);
-    return $content;
+    return $this->render($content);
   }
 
   /**
@@ -148,7 +148,7 @@ class TimestampFormatterTest extends KernelTestBase {
     foreach (range(1, 7) as $granularity) {
       $request_time = \Drupal::requestStack()->getCurrentRequest()->server->get('REQUEST_TIME');
 
-      // Test a timestamp in the past
+      // Test a timestamp in the past.
       $value = $request_time - 87654321;
       $interval = \Drupal::service('date.formatter')->formatTimeDiffSince($value, ['granularity' => $granularity]);
       $expected = $interval . ' ago';
@@ -164,7 +164,7 @@ class TimestampFormatterTest extends KernelTestBase {
       $this->renderEntityFields($entity, $this->display);
       $this->assertRaw($expected);
 
-      // Test a timestamp in the future
+      // Test a timestamp in the future.
       $value = $request_time + 87654321;
       $interval = \Drupal::service('date.formatter')->formatTimeDiffUntil($value, ['granularity' => $granularity]);
       $expected = $interval . ' hence';

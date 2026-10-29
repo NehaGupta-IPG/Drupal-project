@@ -8,14 +8,15 @@ use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore blocknodebundle fieldbody fieldlinks
-
 /**
  * Tests moving blocks via the form.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class MoveBlockFormTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;
@@ -214,7 +215,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
    * @param array $updated_blocks
    *   The updated blocks order.
    */
-  protected function moveBlockWithKeyboard($direction, $block_label, array $updated_blocks): void {
+  protected function moveBlockWithKeyboard(string $direction, $block_label, array $updated_blocks): void {
     $keys = [
       'up' => 38,
       'down' => 40,

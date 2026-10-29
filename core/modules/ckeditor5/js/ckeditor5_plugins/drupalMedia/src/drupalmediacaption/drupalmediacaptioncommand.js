@@ -1,15 +1,15 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* cspell:ignore imagecaption */
-import { Command } from 'ckeditor5/src/core';
+import { Command } from 'ckeditor5';
 import { getClosestSelectedDrupalMediaElement, isDrupalMedia } from '../utils';
 import { getMediaCaptionFromModelSelection } from './utils';
 
 /**
  * Gets the caption model element from the media model selection.
  *
- * @param {module:engine/model/element~Element} drupalMediaModelElement
+ * @param {module:engine/model/element~ModelElement} drupalMediaModelElement
  *   The model element from which caption should be retrieved.
- * @returns {module:engine/model/element~Element|null}
+ * @returns {module:engine/model/element~ModelElement|null}
  *   The caption element or `null` if the selection has no child caption
  *   element.
  */

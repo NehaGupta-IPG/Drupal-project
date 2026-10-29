@@ -34,4 +34,10 @@ phpstan-tmp
 .eslintcache
 
 # Ignore stylelint cache
-.stylelint-cache
+.stylelintcache
+
+# Ignore phpcs cache
+.phpcscache
+
+# Ignore twig-cs-fixer cache
+.twigcsfixercache

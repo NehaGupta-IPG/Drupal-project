@@ -5,20 +5,24 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\MigrateSkipRowException;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\process\MigrationLookup;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\process\MigrationLookup
- * @group migrate
+ * Tests Drupal\migrate\Plugin\migrate\process\MigrationLookup.
  */
+#[CoversClass(MigrationLookup::class)]
+#[Group('migrate')]
 class MigrationLookupTest extends MigrationLookupTestCase {
 
   /**
-   * @covers ::transform
+   * Tests transform with stub skipping.
    */
   public function testTransformWithStubSkipping(): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
@@ -47,11 +51,10 @@ class MigrationLookupTest extends MigrationLookupTestCase {
   }
 
   /**
-   * @covers ::transform
-   *
-   * @dataProvider providerTestTransformWithStubbing
+   * Tests transform with stubbing.
    */
-  public function testTransformWithStubbing($exception_class, $exception_message, $expected_message): void {
+  #[DataProvider('providerTestTransformWithStubbing')]
+  public function testTransformWithStubbing(string $exception_class, string $exception_message, string $expected_message): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
     $this->migrateLookup->lookup('destination_migration', [1])->willReturn(NULL);
     $this->migrateStub->createStub('destination_migration', [1], [], FALSE)->willReturn([2]);
@@ -68,7 +71,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
     $this->migrateStub->createStub('destination_migration', [1], [], FALSE)->willThrow(new $exception_class($exception_message));
     $migration = MigrationLookup::create($this->prepareContainer(), $configuration, '', [], $migration_plugin->reveal());
     $this->expectException($exception_class);
-    $this->expectExceptionMessage($expected_message);
+    $this->expectExceptionMessageIs($expected_message);
     $migration->transform(1, $this->migrateExecutable, $this->row, '');
 
   }
@@ -86,12 +89,12 @@ class MigrationLookupTest extends MigrationLookupTestCase {
       [
         MigrateSkipRowException::class,
         'Oh noes!',
-        "Migration lookup for destination '' attempted to create a stub using migration destination_migration, which resulted in a row skip, with message 'Oh noes!'",
+        "Migration lookup for value '1' and destination '' attempted to create a stub using migration destination_migration, which resulted in a row skip, with message 'Oh noes!'",
       ],
       [
         MigrateSkipRowException::class,
         '',
-        "Migration lookup for destination '' attempted to create a stub using migration destination_migration, which resulted in a row skip",
+        "Migration lookup for value '1' and destination '' attempted to create a stub using migration destination_migration, which resulted in a row skip",
       ],
     ];
   }
@@ -101,10 +104,9 @@ class MigrationLookupTest extends MigrationLookupTestCase {
    *
    * @param mixed $value
    *   An invalid value.
-   *
-   * @dataProvider skipInvalidDataProvider
    */
-  public function testSkipInvalid($value): void {
+  #[DataProvider('skipInvalidDataProvider')]
+  public function testSkipInvalid(string|bool|array|null $value): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
     $migration_plugin_manager = $this->prophesize(MigrationPluginManagerInterface::class);
 
@@ -126,7 +128,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
    * @return array
    *   Empty values.
    */
-  public static function skipInvalidDataProvider() {
+  public static function skipInvalidDataProvider(): array {
     return [
       'Empty String' => [''],
       'Boolean False' => [FALSE],
@@ -140,10 +142,9 @@ class MigrationLookupTest extends MigrationLookupTestCase {
    *
    * @param mixed $value
    *   A valid value.
-   *
-   * @dataProvider noSkipValidDataProvider
    */
-  public function testNoSkipValid($value): void {
+  #[DataProvider('noSkipValidDataProvider')]
+  public function testNoSkipValid(int|string|float $value): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
     $migration_plugin_manager = $this->prophesize(MigrationPluginManagerInterface::class);
     $id_map = $this->prophesize(MigrateIdMapInterface::class);
@@ -170,7 +171,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
    * @return array
    *   Empty values.
    */
-  public static function noSkipValidDataProvider() {
+  public static function noSkipValidDataProvider(): array {
     return [
       'Integer Zero' => [0],
       'String Zero' => ['0'],
@@ -192,10 +193,9 @@ class MigrationLookupTest extends MigrationLookupTestCase {
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Drupal\migrate\MigrateException
-   *
-   * @dataProvider successfulLookupDataProvider
    */
-  public function testSuccessfulLookup(array $source_id_values, array $destination_id_values, $source_value, $expected_value): void {
+  #[DataProvider('successfulLookupDataProvider')]
+  public function testSuccessfulLookup(array $source_id_values, array $destination_id_values, int|array $source_value, int|string|array $expected_value): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
     $this->migrateLookup->lookup('foo', $source_id_values)->willReturn([$destination_id_values]);
 
@@ -213,7 +213,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
    * @return array
    *   The data.
    */
-  public static function successfulLookupDataProvider() {
+  public static function successfulLookupDataProvider(): array {
     return [
       // Test data for scalar to scalar.
       [
@@ -307,13 +307,13 @@ class MigrationLookupTest extends MigrationLookupTestCase {
     $row1 = $this->row;
     $row2 = clone $this->row;
 
-    $row1->expects($this->any())
+    $row1
       ->method('getMultiple')
       ->willReturn([1, 2]);
     $result = $migration->transform([1], $this->migrateExecutable, $row1, '');
     $this->assertEquals(2, $result);
 
-    $row2->expects($this->any())
+    $row2
       ->method('getMultiple')
       ->willReturn([3, 4]);
     $result = $migration->transform([2], $this->migrateExecutable, $row2, '');

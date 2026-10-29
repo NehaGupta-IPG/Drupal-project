@@ -35,7 +35,7 @@ class Combine extends StringFilter {
     parent::buildOptionsForm($form, $form_state);
     $this->view->initStyle();
 
-    // Allow to choose all fields as possible
+    // Allow to choose all fields as possible.
     if ($this->view->style_plugin->usesFields()) {
       $options = [];
       foreach ($this->view->display_handler->getHandlers('field') as $name => $field) {
@@ -119,7 +119,11 @@ class Combine extends StringFilter {
         if (!isset($fields[$id])) {
           // Combined field filter only works with fields that are in the field
           // settings.
-          $errors[] = $this->t('Field %field set in %filter is not set in display %display.', ['%field' => $id, '%filter' => $this->adminLabel(), '%display' => $this->displayHandler->display['display_title']]);
+          $errors[] = $this->t('Field %field set in %filter is not set in display %display.', [
+            '%field' => $id,
+            '%filter' => $this->adminLabel(),
+            '%display' => $this->displayHandler->display['display_title'],
+          ]);
           break;
         }
         elseif (!$fields[$id]->clickSortable()) {
@@ -127,12 +131,18 @@ class Combine extends StringFilter {
           // is not click sortable we can assume it is not a simple field.
           // @todo change this check to isComputed. See
           // https://www.drupal.org/node/2349465
-          $errors[] = $this->t('Field %field set in %filter is not usable for this filter type. Combined field filter only works for simple fields.', ['%field' => $fields[$id]->adminLabel(), '%filter' => $this->adminLabel()]);
+          $errors[] = $this->t('Field %field set in %filter is not usable for this filter type. Combined field filter only works for simple fields.', [
+            '%field' => $fields[$id]->adminLabel(),
+            '%filter' => $this->adminLabel(),
+          ]);
         }
       }
     }
     else {
-      $errors[] = $this->t('%display: %filter can only be used on displays that use fields. Set the style or row format for that display to one using fields to use the combine field filter.', ['%display' => $this->displayHandler->display['display_title'], '%filter' => $this->adminLabel()]);
+      $errors[] = $this->t('%display: %filter can only be used on displays that use fields. Set the style or row format for that display to one using fields to use the combine field filter.', [
+        '%display' => $this->displayHandler->display['display_title'],
+        '%filter' => $this->adminLabel(),
+      ]);
     }
     return $errors;
   }
@@ -145,6 +155,7 @@ class Combine extends StringFilter {
     // complex expressions, so override opEqual (and all operators below).
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator($this->operator());
+    $expression .= $this->connection->getConditionFieldSuffix($this->operator());
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => $this->value]);
   }
 
@@ -154,6 +165,7 @@ class Combine extends StringFilter {
   protected function opContains($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('LIKE');
+    $expression .= $this->connection->getConditionFieldSuffix('LIKE');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => '%' . $this->connection->escapeLike($this->value) . '%']);
   }
 
@@ -182,6 +194,7 @@ class Combine extends StringFilter {
     $type = $this->operator == 'word' ? 'OR' : 'AND';
     $group = $this->query->setWhereGroup($type);
     $operator = $this->getConditionOperator('LIKE');
+    $expression .= $this->connection->getConditionFieldSuffix('LIKE');
 
     foreach ($matches as $match_key => $match) {
       $temp_placeholder = $placeholder . '_' . $match_key;
@@ -197,6 +210,7 @@ class Combine extends StringFilter {
   protected function opStartsWith($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('LIKE');
+    $expression .= $this->connection->getConditionFieldSuffix('LIKE');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => $this->connection->escapeLike($this->value) . '%']);
   }
 
@@ -206,6 +220,7 @@ class Combine extends StringFilter {
   protected function opNotStartsWith($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('NOT LIKE');
+    $expression .= $this->connection->getConditionFieldSuffix('NOT LIKE');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => $this->connection->escapeLike($this->value) . '%']);
   }
 
@@ -215,6 +230,7 @@ class Combine extends StringFilter {
   protected function opEndsWith($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('LIKE');
+    $expression .= $this->connection->getConditionFieldSuffix('LIKE');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => '%' . $this->connection->escapeLike($this->value)]);
   }
 
@@ -224,6 +240,7 @@ class Combine extends StringFilter {
   protected function opNotEndsWith($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('NOT LIKE');
+    $expression .= $this->connection->getConditionFieldSuffix('NOT LIKE');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => '%' . $this->connection->escapeLike($this->value)]);
   }
 
@@ -233,6 +250,7 @@ class Combine extends StringFilter {
   protected function opNotLike($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('NOT LIKE');
+    $expression .= $this->connection->getConditionFieldSuffix('NOT LIKE');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => '%' . $this->connection->escapeLike($this->value) . '%']);
   }
 
@@ -242,6 +260,7 @@ class Combine extends StringFilter {
   protected function opRegex($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('REGEXP');
+    $expression .= $this->connection->getConditionFieldSuffix('REGEXP');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => $this->value]);
   }
 

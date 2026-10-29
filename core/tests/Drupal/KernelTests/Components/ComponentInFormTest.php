@@ -7,19 +7,20 @@ namespace Drupal\KernelTests\Components;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the correct rendering of components in form.
- *
- * @group sdc
  */
+#[Group('sdc')]
+#[RunTestsInSeparateProcesses]
 class ComponentInFormTest extends ComponentKernelTestBase implements FormInterface {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'sdc_test',
   ];
 
@@ -144,7 +145,7 @@ class ComponentInFormTest extends ComponentKernelTestBase implements FormInterfa
       '//form/div[2][@data-component-id="sdc_test:my-banner"]/div[2][@class="component--my-banner--body"]/div[1][@data-component-id="sdc_theme_test:my-card"]/div[1][@class="component--my-card__body"]/div[2]/select[@name="bar"]',
     ];
     foreach ($paths as $path) {
-      $this->assertNotEmpty($this->xpath($path), 'There should be a result with the path: ' . $path . '.');
+      $this->assertNotEmpty($this->getSimpleXmlElementsByXpath($path), 'There should be a result with the path: ' . $path . '.');
     }
 
     // Test form submission. Assertions are in submitForm().

@@ -3,7 +3,6 @@
 namespace Drupal\views_ui\Form\Ajax;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\views\Views;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewExecutable;
 
@@ -74,13 +73,21 @@ class ConfigHandlerGroup extends ViewsFormBase {
     if ($item) {
       $handler = $executable->display_handler->getHandler($type, $id);
       if (empty($handler)) {
-        $form['markup'] = ['#markup' => $this->t("Error: handler for @table > @field doesn't exist!", ['@table' => $item['table'], '@field' => $item['field']])];
+        $form['markup'] = [
+          '#markup' => $this->t("Error: handler for @table > @field doesn't exist!", [
+            '@table' => $item['table'],
+            '@field' => $item['field'],
+          ]),
+        ];
       }
       else {
         $handler->init($executable, $executable->display_handler, $item);
         $types = ViewExecutable::getHandlerTypes();
 
-        $form['#title'] = $this->t('Configure aggregation settings for @type %item', ['@type' => $types[$type]['lstitle'], '%item' => $handler->adminLabel()]);
+        $form['#title'] = $this->t('Configure aggregation settings for @type %item', [
+          '@type' => $types[$type]['lstitle'],
+          '%item' => $handler->adminLabel(),
+        ]);
 
         $handler->buildGroupByForm($form['options'], $form_state);
         $form_state->set('handler', $handler);
@@ -96,19 +103,19 @@ class ConfigHandlerGroup extends ViewsFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $view = $form_state->get('view');
-    $item = &$form_state->get('handler')->options;
-    $type = $form_state->get('type');
-
-    $handler = Views::handlerManager($type)->getHandler($item);
-    $executable = $view->getExecutable();
-    $handler->init($executable, $executable->display_handler, $item);
+    // Use the same handler that built the form. When aggregation is enabled,
+    // the display swaps in the aggregation handler, so recreating the handler
+    // from the item would submit with a different handler than the one whose
+    // form elements were displayed.
+    $handler = $form_state->get('handler');
+    $item = &$handler->options;
 
     $handler->submitGroupByForm($form, $form_state);
 
-    // Store the item back on the view
-    $executable->setHandler($form_state->get('display_id'), $form_state->get('type'), $form_state->get('id'), $item);
+    // Store the item back on the view.
+    $view->getExecutable()->setHandler($form_state->get('display_id'), $form_state->get('type'), $form_state->get('id'), $item);
 
-    // Write to cache
+    // Write to cache.
     $view->cacheSet();
   }
 
