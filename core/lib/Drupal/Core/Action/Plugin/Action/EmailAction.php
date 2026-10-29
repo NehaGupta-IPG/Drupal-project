@@ -153,6 +153,7 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
   public function defaultConfiguration() {
     return [
       'recipient' => '',
+      'cc' => '',
       'subject' => '',
       'message' => '',
     ];
@@ -168,6 +169,13 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
       '#default_value' => $this->configuration['recipient'],
       '#maxlength' => '254',
       '#description' => $this->t('You may also use tokens: [node:author:mail], [comment:author:mail], etc. Separate recipients with a comma.'),
+    ];
+    $form['cc'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('CC email address'),
+      '#default_value' => $this->configuration['cc'],
+      '#maxlength' => '254',
+      '#description' => $this->t('The cc email address.'),
     ];
     $form['subject'] = [
       '#type' => 'textfield',
@@ -203,6 +211,7 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configuration['recipient'] = $form_state->getValue('recipient');
+    $this->configuration['cc'] = $form_state->getValue('cc');
     $this->configuration['subject'] = $form_state->getValue('subject');
     $this->configuration['message'] = $form_state->getValue('message');
   }
