@@ -42,7 +42,7 @@ class ResourceFetcher implements ResourceFetcherInterface {
       ]);
     }
     catch (ClientExceptionInterface $e) {
-      throw new ResourceException('Could not retrieve the oEmbed resource.', $url, [], $e);
+      throw new ResourceException('Check the url. It does not correspond to any remote oEmbed resource.', $url, [], $e);
     }
 
     [$format] = $response->getHeader('Content-Type');
