@@ -133,7 +133,7 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
       'cookies:big_pipe_nojs',
       'session.exists',
       'user.permissions',
-      'user.roles',
+      'user.roles:authenticated',
     ];
 
     // Full node page 1.
