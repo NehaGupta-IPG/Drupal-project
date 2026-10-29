@@ -1053,7 +1053,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       return $tree;
     }
     $parameters = new MenuTreeParameters();
-    $parameters->setRoot($id)->onlyEnabledLinks();
+    $parameters->setRoot($id)->onlyEnabledLinks()->setMaxDepth($max_relative_depth);
     return $this->loadTreeData($root['menu_name'], $parameters);
   }
 
