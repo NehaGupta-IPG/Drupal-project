@@ -18,16 +18,6 @@ class EntityTestViewsData extends EntityViewsData {
   public function getViewsData() {
     $views_data = parent::getViewsData();
 
-    if ($this->entityType->id() === 'entity_test_computed_field') {
-      $views_data['entity_test_computed_field']['computed_string_field'] = [
-        'title' => $this->t('Computed String Field'),
-        'field' => [
-          'id' => 'field',
-          'default_formatter' => 'string',
-          'field_name' => 'computed_string_field',
-        ],
-      ];
-    }
     if ($this->entityType->id() === 'entity_test_comp_bund_fld') {
       $views_data['entity_test_comp_bund_fld']['computed_bundle_field'] = [
         'title' => $this->t('Computed Bundle Field'),

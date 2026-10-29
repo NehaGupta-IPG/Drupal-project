@@ -189,6 +189,37 @@ class EntityViewsDataTest extends KernelTestBase {
   }
 
   /**
+   * Tests computed fields.
+   */
+  public function testComputedFields(): void {
+    // Only base computed fields are registered automatically.
+    // @see https://www.drupal.org/project/drupal/issues/3404369 for bundle
+    // fields.
+    $base_field_definitions = $this->commonBaseFields;
+
+    $base_field_definitions['computed_string'] = BaseFieldDefinition::create('string')
+      ->setLabel('computed string')
+      ->setComputed(TRUE);
+    $base_field_definitions['computed_uri'] = BaseFieldDefinition::create('uri')
+      ->setLabel('computed uri')
+      ->setComputed(TRUE);
+
+    $this->setUpEntityType($this->baseEntityType, $base_field_definitions);
+
+    $data = $this->entityTypeManager->getHandler('entity_test', 'views_data')->getViewsData();
+
+    // Check the computed fields.
+    $this->assertArrayHasKey('computed_string', $data['entity_test']);
+    $this->assertViewsDataField($data['entity_test']['computed_string'], 'computed_string');
+    $this->assertArrayNotHasKey('filter', $data['entity_test']['computed_string']);
+    $this->assertArrayNotHasKey('sort', $data['entity_test']['computed_string']);
+    $this->assertArrayNotHasKey('argument', $data['entity_test']['computed_string']);
+
+    // Check special handling for URI fields.
+    $this->assertEquals('string', $data['entity_test']['computed_uri']['field']['default_formatter']);
+  }
+
+  /**
    * Tests data_table support.
    */
   public function testDataTable(): void {
