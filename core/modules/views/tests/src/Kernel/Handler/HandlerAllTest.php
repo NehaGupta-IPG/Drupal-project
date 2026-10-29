@@ -54,6 +54,7 @@ class HandlerAllTest extends ViewsKernelTestBase {
     $this->installEntitySchema('user');
     $this->installSchema('file', ['file_usage']);
     $this->installSchema('dblog', ['watchdog']);
+    $this->installSchema('locale', ['locales_source']);
     // Create the comment body field storage.
     FieldStorageConfig::create([
       'type' => 'text_long',
