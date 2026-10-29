@@ -175,6 +175,15 @@ class FileUploadForm extends AddFormBase {
       '#remaining_slots' => $slots,
     ];
 
+    // Add upload resolution validation if file is an image.
+    $field_settings = $item->getFieldDefinition()->getSettings();
+    if (isset($field_settings['max_resolution']) || isset($field_settings['min_resolution'])) {
+      $form['container']['upload']['#upload_validators']['file_validate_image_resolution'] = [
+        $field_settings['max_resolution'] ?? 0,
+        $field_settings['min_resolution'] ?? 0,
+      ];
+    }
+
     $file_upload_help = [
       '#theme' => 'file_upload_help',
       '#upload_validators' => $form['container']['upload']['#upload_validators'],
