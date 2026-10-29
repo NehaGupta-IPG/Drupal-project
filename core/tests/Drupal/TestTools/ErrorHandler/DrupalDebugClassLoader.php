@@ -58,7 +58,11 @@ class DrupalDebugClassLoader extends DebugClassLoader {
       : $class;
 
     foreach ($returnTypes as $method => $returnTypeData) {
-      // Symfony uses NULL to mark template return types.
+      // PHPDoc template return types have no equivalent native PHP type. Symfony
+      // stores NULL to stop child classes from inheriting return type data from
+      // their interfaces. Skip this entry. It has no return type or declaring
+      // class for the cross-extension deprecation check.
+      // @see \Symfony\Component\ErrorHandler\DebugClassLoader::setReturnType()
       if ($returnTypeData === NULL) {
         continue;
       }
