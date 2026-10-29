@@ -38,7 +38,7 @@ class Connection extends SqliteConnection {
   public bool $destroyOnFailure = FALSE;
 
   /**
-   * The number of upserts requested on this connection.
+   * The number of upsert operations requested on this connection.
    */
   public int $upsertCalls = 0;
 
