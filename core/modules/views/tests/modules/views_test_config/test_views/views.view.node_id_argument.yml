@@ -191,6 +191,7 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - route
         - url
         - 'user.node_grants:view'
         - user.permissions
@@ -207,6 +208,7 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - route
         - url
         - 'user.node_grants:view'
         - user.permissions
