@@ -100,9 +100,12 @@
       Drupal.url(drupalSettings.path.currentPath + window.location.search),
     )}`;
     $contextual.find('.contextual-links a').each(function () {
-      const url = this.getAttribute('href');
+      let url = this.getAttribute('href');
       const glue = url.includes('?') ? '&' : '?';
-      this.setAttribute('href', url + glue + destination);
+      const hash =
+        url.indexOf('#') !== -1 ? url.substring(url.indexOf('#')) : '';
+      url = url.split('#')[0];
+      this.setAttribute('href', url + glue + destination + hash);
     });
     let title = '';
     const $regionHeading = $region.find('h2');
